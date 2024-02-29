@@ -2,24 +2,24 @@ import axios from "axios";
 import { Pool } from "pg";
 import { FormEstablishmentDto, random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
-import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
-import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { getTestPgPool } from "../config/pg/pgUtils";
+import { HttpAddressGateway } from "../domains/core/address/adapters/HttpAddressGateway";
+import { addressesExternalRoutes } from "../domains/core/address/adapters/HttpAddressGateway.routes";
+import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import {
   ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
-} from "../../../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
-import { InseeSiretGateway } from "../../../domains/core/sirene/adapters/InseeSiretGateway";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { PgUowPerformer } from "../../../domains/core/unit-of-work/adapters/PgUowPerformer";
-import { createPgUow } from "../../../domains/core/unit-of-work/adapters/createPgUow";
-import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InsertEstablishmentAggregateFromForm } from "../../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
-import { createLogger } from "../../../utils/logger";
-import { notifyDiscord } from "../../../utils/notifyDiscord";
-import { AppConfig } from "../config/appConfig";
+} from "../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
+import { InseeSiretGateway } from "../domains/core/sirene/adapters/InseeSiretGateway";
+import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
+import { PgUowPerformer } from "../domains/core/unit-of-work/adapters/PgUowPerformer";
+import { createPgUow } from "../domains/core/unit-of-work/adapters/createPgUow";
+import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { InsertEstablishmentAggregateFromForm } from "../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
+import { createLogger } from "../utils/logger";
+import { notifyDiscord } from "../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 

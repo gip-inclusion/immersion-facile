@@ -1,8 +1,8 @@
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { PgNotificationRepository } from "../../../domains/core/notifications/adapters/PgNotificationRepository";
-import { createLogger } from "../../../utils/logger";
-import { AppConfig } from "../config/appConfig";
-import { createGetPgPoolFn } from "../config/createGateways";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { createGetPgPoolFn } from "../adapters/primary/config/createGateways";
+import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { PgNotificationRepository } from "../domains/core/notifications/adapters/PgNotificationRepository";
+import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

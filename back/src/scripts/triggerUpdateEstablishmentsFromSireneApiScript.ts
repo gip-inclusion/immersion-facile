@@ -1,16 +1,16 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
+import { AppConfig } from "../adapters/primary/config/appConfig";
 import {
   ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
-} from "../../../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
-import { InseeSiretGateway } from "../../../domains/core/sirene/adapters/InseeSiretGateway";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
-import { UpdateEstablishmentsFromSirenApiScript } from "../../../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
-import { createLogger } from "../../../utils/logger";
-import { AppConfig } from "../config/appConfig";
+} from "../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
+import { InseeSiretGateway } from "../domains/core/sirene/adapters/InseeSiretGateway";
+import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { UpdateEstablishmentsFromSirenApiScript } from "../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
+import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

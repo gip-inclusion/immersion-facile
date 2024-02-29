@@ -11,16 +11,16 @@ import {
   peParisAgencyId,
   reasonableSchedule,
 } from "shared";
-import { SavedError } from "../../../domains/core/saved-errors/ports/SavedErrorRepository";
-import { UnitOfWork } from "../../../domains/core/unit-of-work/ports/UnitOfWork";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { createAppDependencies } from "../adapters/primary/config/createAppDependencies";
+import { SavedError } from "../domains/core/saved-errors/ports/SavedErrorRepository";
+import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../../domains/establishment/helpers/EstablishmentBuilders";
-import { AppConfig } from "../config/appConfig";
-import { createAppDependencies } from "../config/createAppDependencies";
+} from "../domains/establishment/helpers/EstablishmentBuilders";
 
 /* eslint-disable no-console */
 const seed = async () => {

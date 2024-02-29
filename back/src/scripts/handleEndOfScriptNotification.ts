@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Logger } from "pino";
-import { createLogger } from "../../../utils/logger";
-import { AppConfig } from "../config/appConfig";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { createLogger } from "../utils/logger";
 
 export const handleEndOfScriptNotification = async <T>(
   name: string,

@@ -2,20 +2,20 @@ import { subDays } from "date-fns";
 import { Pool } from "pg";
 import { keys } from "ramda";
 import { SiretDto } from "shared";
-import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
-import { makeGenerateJwtES256 } from "../../../domains/core/jwt";
-import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
-import { NanoIdShortLinkIdGeneratorGateway } from "../../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
-import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { makeGenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
+import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
+import { makeGenerateJwtES256 } from "../domains/core/jwt";
+import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
+import { NanoIdShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
+import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   SendEstablishmentLeadReminderOutput,
   SendEstablishmentLeadReminderScript,
-} from "../../../domains/establishment/use-cases/SendEstablishmentLeadReminderScript";
-import { createLogger } from "../../../utils/logger";
-import { AppConfig } from "../config/appConfig";
-import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
+} from "../domains/establishment/use-cases/SendEstablishmentLeadReminderScript";
+import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

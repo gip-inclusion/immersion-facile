@@ -1,14 +1,14 @@
 import { Pool } from "pg";
-import { HttpPoleEmploiGateway } from "../../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
-import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEmploiGateway";
-import { ResyncOldConventionsToPe } from "../../../domains/convention/use-cases/ResyncOldConventionsToPe";
-import { InMemoryCachingGateway } from "../../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
-import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
-import { createLogger } from "../../../utils/logger";
-import { AppConfig } from "../config/appConfig";
-import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { createPeAxiosSharedClient } from "../adapters/primary/helpers/createAxiosSharedClients";
+import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
+import { GetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
+import { ResyncOldConventionsToPe } from "../domains/convention/use-cases/ResyncOldConventionsToPe";
+import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
+import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
+import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

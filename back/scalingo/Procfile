@@ -1,3 +1,3 @@
-web: cd back && NODE_ENV=production exec node src/adapters/primary/scripts/startServer.js
-crawler: cd back && NODE_ENV=production exec node src/adapters/primary/scripts/startCrawlerScript.js
+web: cd back && NODE_ENV=production exec node src/scripts/startServer.js
+crawler: cd back && NODE_ENV=production exec node src/scripts/startCrawlerScript.js
 postdeploy: cd back && pnpm db:up

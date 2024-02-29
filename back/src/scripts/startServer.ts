@@ -1,11 +1,11 @@
 import * as Sentry from "@sentry/node";
-import { createLogger } from "../../../utils/logger";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { createApp } from "../adapters/primary/server";
+import { createLogger } from "../utils/logger";
 import {
   startPeriodicNodeProcessReport,
   startSamplingEventLoopLag,
-} from "../../../utils/nodeProcessReport";
-import { AppConfig } from "../config/appConfig";
-import { createApp } from "../server";
+} from "../utils/nodeProcessReport";
 import { version } from "./version";
 
 const logger = createLogger(__filename);

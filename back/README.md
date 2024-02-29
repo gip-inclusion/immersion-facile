@@ -233,7 +233,7 @@ private get myNewMultipleChoiceParameter() {
 
 An [AppConfig](src/adapters/primary/config/appConfig.ts) instance must be provided to `createApp()` (in [server.ts](./src/adapters/primary/server.ts)) in order to create a new instance of the back-end server. This is typically done as follows:
 
-1. **Server startup**: [startServer.ts](src/adapters/primary/scripts/startServer.ts) creates an instance that populated from the environment variables after taking into account the `back/.env` file.
+1. **Server startup**: [startServer.ts](src/scripts/startServer.ts) creates an instance that populated from the environment variables after taking into account the `back/.env` file.
 
    Example usage:
 
