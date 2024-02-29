@@ -11,7 +11,6 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
@@ -21,6 +20,7 @@ import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGa
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
 import { UpdateConvention } from "./UpdateConvention";
 
 describe("Update Convention", () => {

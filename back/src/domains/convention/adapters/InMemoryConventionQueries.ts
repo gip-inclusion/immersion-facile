@@ -11,16 +11,16 @@ import {
   WithConventionIdLegacy,
   validatedConventionStatuses,
 } from "shared";
-import { InMemoryAgencyRepository } from "../../domains/agency/adapters/InMemoryAgencyRepository";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { createLogger } from "../../../utils/logger";
+import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
+import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { AssessmentEmailDomainTopic } from "../../core/events/events";
 import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
-} from "../../domains/convention/ports/ConventionQueries";
-import { missingAgencyMessage } from "../../domains/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
-import { InMemoryOutboxRepository } from "../../domains/core/events/adapters/InMemoryOutboxRepository";
-import { AssessmentEmailDomainTopic } from "../../domains/core/events/events";
-import { createLogger } from "../../utils/logger";
-import { NotFoundError } from "../primary/helpers/httpErrors";
+} from "../ports/ConventionQueries";
+import { missingAgencyMessage } from "../use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 const logger = createLogger(__filename);

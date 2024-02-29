@@ -1,12 +1,12 @@
 import { Pool } from "pg";
+import { HttpPoleEmploiGateway } from "../../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEmploiGateway";
-import { ResyncOldConventionsToPe } from "../../../domains/convention/useCases/ResyncOldConventionsToPe";
+import { ResyncOldConventionsToPe } from "../../../domains/convention/use-cases/ResyncOldConventionsToPe";
 import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { createLogger } from "../../../utils/logger";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
-import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { AppConfig } from "../config/appConfig";
 import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";

@@ -1,11 +1,6 @@
 import { KyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { PgAssessmentRepository } from "../../../../adapters/secondary/pg/repositories/PgAssessmentRepository";
 import { PgAuthenticatedUserRepository } from "../../../../adapters/secondary/pg/repositories/PgAuthenticatedUserRepository";
-import { PgConventionExternalIdRepository } from "../../../../adapters/secondary/pg/repositories/PgConventionExternalIdRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../../../adapters/secondary/pg/repositories/PgConventionPoleEmploiAdvisorRepository";
-import { PgConventionQueries } from "../../../../adapters/secondary/pg/repositories/PgConventionQueries";
-import { PgConventionRepository } from "../../../../adapters/secondary/pg/repositories/PgConventionRepository";
-import { PgConventionsToSyncRepository } from "../../../../adapters/secondary/pg/repositories/PgConventionsToSyncRepository";
 import { PgDeletedEstablishmentRepository } from "../../../../adapters/secondary/pg/repositories/PgDeletedEstablishmentRepository";
 import { PgDiscussionAggregateRepository } from "../../../../adapters/secondary/pg/repositories/PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../adapters/secondary/pg/repositories/PgEstablishmentAggregateRepository";
@@ -20,6 +15,11 @@ import { PgRomeRepository } from "../../../../adapters/secondary/pg/repositories
 import { PgSearchMadeRepository } from "../../../../adapters/secondary/pg/repositories/PgSearchMadeRepository";
 import { PgAgencyGroupRepository } from "../../../agency/adapters/PgAgencyGroupRepository";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
+import { PgAssessmentRepository } from "../../../convention/adapters/PgAssessmentRepository";
+import { PgConventionExternalIdRepository } from "../../../convention/adapters/PgConventionExternalIdRepository";
+import { PgConventionQueries } from "../../../convention/adapters/PgConventionQueries";
+import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
+import { PgConventionsToSyncRepository } from "../../../convention/adapters/PgConventionsToSyncRepository";
 import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";

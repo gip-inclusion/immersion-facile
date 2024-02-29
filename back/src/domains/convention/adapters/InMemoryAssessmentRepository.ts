@@ -1,6 +1,6 @@
 import { ConventionId } from "shared";
-import { AssessmentEntity } from "../../domains/convention/entities/AssessmentEntity";
-import { AssessmentRepository } from "../../domains/convention/ports/AssessmentRepository";
+import { AssessmentEntity } from "../entities/AssessmentEntity";
+import { AssessmentRepository } from "../ports/AssessmentRepository";
 
 export class InMemoryAssessmentRepository implements AssessmentRepository {
   #assessments: AssessmentEntity[] = [];

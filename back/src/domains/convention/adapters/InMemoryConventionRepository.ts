@@ -1,8 +1,8 @@
 import { values } from "ramda";
 import { ConventionDto, ConventionId, Email } from "shared";
-import { ConventionRepository } from "../../domains/convention/ports/ConventionRepository";
-import { createLogger } from "../../utils/logger";
-import { ConflictError } from "../primary/helpers/httpErrors";
+import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
+import { createLogger } from "../../../utils/logger";
+import { ConventionRepository } from "../ports/ConventionRepository";
 
 const logger = createLogger(__filename);
 
