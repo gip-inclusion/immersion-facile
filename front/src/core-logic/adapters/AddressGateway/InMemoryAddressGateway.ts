@@ -17,7 +17,7 @@ export class InMemoryAddressGateway implements AddressGateway {
   }
 
   public async lookupStreetAddress(lookup: string): Promise<Location[]> {
-    //eslint-disable-next-line no-console
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
     console.log("InMemoryApiAddresseGateway.lookupStreetAddress", lookup);
     if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
 

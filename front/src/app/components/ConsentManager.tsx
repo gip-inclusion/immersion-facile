@@ -22,7 +22,7 @@ export const {
     href: "/pages/politique-de-confidentialite",
   },
   consentCallback: (arg) => {
-    // eslint-disable-next-line no-console
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
     console.log(arg);
   },
 });

@@ -47,7 +47,7 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
     file: File,
     renameFileToId: boolean,
   ): Promise<AbsoluteUrl> {
-    // eslint-disable-next-line no-console
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
     console.log("logo uploaded : ", file);
     return `http://${file.name}-${renameFileToId}-url`;
   }

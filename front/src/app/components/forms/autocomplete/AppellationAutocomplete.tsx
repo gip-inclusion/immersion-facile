@@ -77,7 +77,6 @@ export const AppellationAutocomplete = ({
     }
   }, [initialOption, selectedOption]);
   useEffect(() => {
-    console.log(debounceSearchTerm, searchTerm, isSearching, options);
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
       const sanitizedTerm = debounceSearchTerm.trim();
@@ -105,7 +104,7 @@ export const AppellationAutocomplete = ({
             .map(romeSearchMatchToProposal),
         );
       } catch (e: any) {
-        //eslint-disable-next-line no-console
+        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
         console.log("AppellationAutocomplete", e);
       } finally {
         setIsSearching(false);

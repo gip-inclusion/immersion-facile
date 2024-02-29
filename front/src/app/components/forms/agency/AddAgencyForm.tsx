@@ -62,7 +62,7 @@ export const AddAgencyForm = () => {
         setSubmitFeedback({ kind: "agencyAdded" });
       })
       .catch((e) => {
-        //eslint-disable-next-line  no-console
+        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
         console.log("AddAgencyPage", e);
         setSubmitFeedback({ kind: "errored", errorMessage: e.message });
       });

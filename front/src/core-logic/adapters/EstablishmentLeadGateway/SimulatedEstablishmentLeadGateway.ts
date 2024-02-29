@@ -12,7 +12,6 @@ export class SimulatedEstablishmentLeadGateway
   public rejectEstablishmentLeadRegistration$(
     jwt: ConventionJwt,
   ): Observable<void> {
-    console.log("rejectEstablishmentLeadRegistration", jwt);
     return jwt === failedJwt
       ? throwError(new Error("Failed Jwt"))
       : of(undefined).pipe(delay(this.delay));
