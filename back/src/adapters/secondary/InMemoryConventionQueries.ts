@@ -11,6 +11,7 @@ import {
   WithConventionIdLegacy,
   validatedConventionStatuses,
 } from "shared";
+import { InMemoryAgencyRepository } from "../../domains/agency/adapters/InMemoryAgencyRepository";
 import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
@@ -20,7 +21,6 @@ import { InMemoryOutboxRepository } from "../../domains/core/events/adapters/InM
 import { AssessmentEmailDomainTopic } from "../../domains/core/events/events";
 import { createLogger } from "../../utils/logger";
 import { NotFoundError } from "../primary/helpers/httpErrors";
-import { InMemoryAgencyRepository } from "./InMemoryAgencyRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 const logger = createLogger(__filename);

@@ -8,15 +8,15 @@ import {
   ConflictError,
   NotFoundError,
   UnauthorizedError,
-} from "../../../../adapters/primary/helpers/httpErrors";
-import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+} from "../../../adapters/primary/helpers/httpErrors";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
 
 const nextDate = new Date("2022-01-01T10:00:00.000");

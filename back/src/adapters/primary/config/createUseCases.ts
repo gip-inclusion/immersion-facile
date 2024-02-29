@@ -7,6 +7,13 @@ import {
   SiretDto,
   sleep,
 } from "shared";
+import { AddAgency } from "../../../domains/agency/use-cases/AddAgency";
+import { ListAgenciesByFilter } from "../../../domains/agency/use-cases/ListAgenciesByFilter";
+import { PrivateListAgencies } from "../../../domains/agency/use-cases/PrivateListAgencies";
+import { RegisterAgencyToInclusionConnectUser } from "../../../domains/agency/use-cases/RegisterAgencyToInclusionConnectUser";
+import { UpdateAgency } from "../../../domains/agency/use-cases/UpdateAgency";
+import { UpdateAgencyReferingToUpdatedAgency } from "../../../domains/agency/use-cases/UpdateAgencyReferingToUpdatedAgency";
+import { UpdateAgencyStatus } from "../../../domains/agency/use-cases/UpdateAgencyStatus";
 import { AddConvention } from "../../../domains/convention/useCases/AddConvention";
 import { CreateAssessment } from "../../../domains/convention/useCases/CreateAssessment";
 import { GetAgencyPublicInfoById } from "../../../domains/convention/useCases/GetAgencyPublicInfoById";
@@ -21,13 +28,6 @@ import { ShareConventionLinkByEmail } from "../../../domains/convention/useCases
 import { SignConvention } from "../../../domains/convention/useCases/SignConvention";
 import { UpdateConvention } from "../../../domains/convention/useCases/UpdateConvention";
 import { UpdateConventionStatus } from "../../../domains/convention/useCases/UpdateConventionStatus";
-import { AddAgency } from "../../../domains/convention/useCases/agencies/AddAgency";
-import { ListAgenciesByFilter } from "../../../domains/convention/useCases/agencies/ListAgenciesByFilter";
-import { PrivateListAgencies } from "../../../domains/convention/useCases/agencies/PrivateListAgencies";
-import { RegisterAgencyToInclusionConnectUser } from "../../../domains/convention/useCases/agencies/RegisterAgencyToInclusionConnectUser";
-import { UpdateAgency } from "../../../domains/convention/useCases/agencies/UpdateAgency";
-import { UpdateAgencyReferingToUpdatedAgency } from "../../../domains/convention/useCases/agencies/UpdateAgencyReferingToUpdatedAgency";
-import { UpdateAgencyStatus } from "../../../domains/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domains/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { DeliverRenewedMagicLink } from "../../../domains/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../../domains/convention/useCases/notifications/NotifyActorThatConventionNeedsModifications";

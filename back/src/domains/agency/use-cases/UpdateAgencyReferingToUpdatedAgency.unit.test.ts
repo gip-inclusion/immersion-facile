@@ -2,14 +2,14 @@ import { AgencyDtoBuilder, expectToEqual } from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../../core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+} from "../../core/events/ports/EventBus";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateAgencyReferingToUpdatedAgency } from "./UpdateAgencyReferingToUpdatedAgency";
 
 describe("UpdateAgencyReferingToUpdatedAgency", () => {

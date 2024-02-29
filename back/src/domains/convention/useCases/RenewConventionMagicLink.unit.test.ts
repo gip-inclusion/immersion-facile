@@ -18,6 +18,7 @@ import {
 } from "../../../adapters/primary/helpers/httpErrors";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
+import { someAgenciesMissingMessage } from "../../agency/ports/AgencyRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../../core/jwt";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -28,7 +29,6 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 

@@ -1,12 +1,12 @@
 import { AddressDto, AgencyDto, expectToEqual } from "shared";
-import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryPeAgenciesReferential } from "../../../../adapters/secondary/offer/peAgenciesReferential/InMemoryPeAgenciesReferential";
-import { InMemoryAddressGateway } from "../../../core/address/adapters/InMemoryAddressGateway";
-import { ConsoleAppLogger } from "../../../core/app-logger/adapters/ConsoleAppLogger";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { PeAgencyFromReferenciel } from "../../../establishment/ports/PeAgenciesReferential";
+import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/offer/peAgenciesReferential/InMemoryPeAgenciesReferential";
+import { InMemoryAddressGateway } from "../../core/address/adapters/InMemoryAddressGateway";
+import { ConsoleAppLogger } from "../../core/app-logger/adapters/ConsoleAppLogger";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { PeAgencyFromReferenciel } from "../../establishment/ports/PeAgenciesReferential";
+import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
 import { UpdateAllPeAgencies } from "./UpdateAllPeAgencies";
 
 const address: AddressDto = {

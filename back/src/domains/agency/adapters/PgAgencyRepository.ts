@@ -19,22 +19,22 @@ import {
   filterNotFalsy,
 } from "shared";
 import {
-  AgencyRepository,
-  someAgenciesMissingMessage,
-} from "../../../../domains/convention/ports/AgencyRepository";
-import { createLogger } from "../../../../utils/logger";
-import {
   ConflictError,
   NotFoundError,
   validateAndParseZodSchema,
-} from "../../../primary/helpers/httpErrors";
+} from "../../../adapters/primary/helpers/httpErrors";
 import {
   KyselyDb,
   cast,
   executeKyselyRawSqlQuery,
   jsonBuildObject,
-} from "../kysely/kyselyUtils";
-import { Database } from "../kysely/model/database";
+} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { Database } from "../../../adapters/secondary/pg/kysely/model/database";
+import { createLogger } from "../../../utils/logger";
+import {
+  AgencyRepository,
+  someAgenciesMissingMessage,
+} from "../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
 
