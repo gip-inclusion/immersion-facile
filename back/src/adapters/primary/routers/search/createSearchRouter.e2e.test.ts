@@ -9,9 +9,10 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../../../../domains/establishment/adapters/InMemoryEstablishmentAggregateRepository";
+import { stubSearchResult } from "../../../../domains/establishment/adapters/InMemoryGroupRepository";
 import { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
 import { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
-import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -19,9 +20,8 @@ import {
   OfferEntityBuilder,
   defaultLocation,
   defaultNafCode,
-} from "../../../secondary/offer/EstablishmentBuilders";
-import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
-import { stubSearchResult } from "../../../secondary/offer/InMemoryGroupRepository";
+} from "../../../../domains/establishment/helpers/EstablishmentBuilders";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 
 const immersionOffer = new OfferEntityBuilder().build();
 const establishmentAggregate1 = new EstablishmentAggregateBuilder()

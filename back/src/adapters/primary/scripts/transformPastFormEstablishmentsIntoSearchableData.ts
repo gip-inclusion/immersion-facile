@@ -14,7 +14,7 @@ import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/Rea
 import { PgUowPerformer } from "../../../domains/core/unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../domains/core/unit-of-work/adapters/createPgUow";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InsertEstablishmentAggregateFromForm } from "../../../domains/establishment/useCases/InsertEstablishmentAggregateFromFormEstablishement";
+import { InsertEstablishmentAggregateFromForm } from "../../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { getTestPgPool } from "../../secondary/pg/pgUtils";

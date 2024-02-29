@@ -8,15 +8,15 @@ import {
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
   TEST_LOCATION,
-} from "../../../secondary/offer/EstablishmentBuilders";
+} from "../../../../domains/establishment/helpers/EstablishmentBuilders";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
   PublicApiV2SearchEstablishmentRoutes,

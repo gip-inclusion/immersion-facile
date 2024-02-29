@@ -13,13 +13,13 @@ import {
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
   defaultNafCode,
-} from "../../../secondary/offer/EstablishmentBuilders";
+} from "../../../../domains/establishment/helpers/EstablishmentBuilders";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
   PublicApiV2SearchEstablishmentRoutes,

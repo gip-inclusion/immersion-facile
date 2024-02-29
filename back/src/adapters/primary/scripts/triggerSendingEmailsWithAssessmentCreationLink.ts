@@ -6,7 +6,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notif
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendEmailsWithAssessmentCreationLink } from "../../../domains/establishment/useCases/SendEmailsWithAssessmentCreationLink";
+import { SendEmailsWithAssessmentCreationLink } from "../../../domains/establishment/use-cases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";

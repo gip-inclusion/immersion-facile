@@ -17,11 +17,11 @@ import {
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
-} from "../../../secondary/offer/EstablishmentBuilders";
+} from "../../../../domains/establishment/helpers/EstablishmentBuilders";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../secondary/siret/InMemorySiretGateway";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {

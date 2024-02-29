@@ -1,5 +1,4 @@
 import { AddressDto, AgencyDto, expectToEqual } from "shared";
-import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/offer/peAgenciesReferential/InMemoryPeAgenciesReferential";
 import { InMemoryAddressGateway } from "../../core/address/adapters/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../core/app-logger/adapters/ConsoleAppLogger";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -7,6 +6,7 @@ import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemo
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { PeAgencyFromReferenciel } from "../../establishment/ports/PeAgenciesReferential";
 import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
+import { InMemoryPeAgenciesReferential } from "../adapters/pe-agencies-referential/InMemoryPeAgenciesReferential";
 import { UpdateAllPeAgencies } from "./UpdateAllPeAgencies";
 
 const address: AddressDto = {

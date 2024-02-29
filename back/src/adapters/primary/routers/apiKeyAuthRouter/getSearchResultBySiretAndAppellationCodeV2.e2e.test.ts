@@ -12,8 +12,7 @@ import {
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { buildTestApp } from "../../../../utils/buildTestApp";
+import { TEST_ROME_LABEL } from "../../../../domains/establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -21,8 +20,9 @@ import {
   OfferEntityBuilder,
   TEST_LOCATION,
   defaultNafCode,
-} from "../../../secondary/offer/EstablishmentBuilders";
-import { TEST_ROME_LABEL } from "../../../secondary/offer/InMemoryEstablishmentAggregateRepository";
+} from "../../../../domains/establishment/helpers/EstablishmentBuilders";
+import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
   PublicApiV2SearchEstablishmentRoutes,

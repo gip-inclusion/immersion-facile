@@ -1,6 +1,5 @@
 import { Pool, PoolClient } from "pg";
 import { AbsoluteUrl, expectObjectsToMatch, expectToEqual } from "shared";
-import { InMemoryInclusionConnectGateway } from "../../../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import {
   KyselyDb,
   makeKyselyDb,
@@ -12,6 +11,7 @@ import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../unit-of-work/adapters/createPgUow";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryInclusionConnectGateway } from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";

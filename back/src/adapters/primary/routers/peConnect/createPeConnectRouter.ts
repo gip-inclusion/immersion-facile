@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { ManagedRedirectError, loginPeConnect, peConnect } from "shared";
-import { makePeConnectLoginPageUrl } from "../../../secondary/PeConnectGateway/peConnectApi.routes";
+import { makePeConnectLoginPageUrl } from "../../../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { sendRedirectResponseWithManagedErrors } from "../../helpers/sendRedirectResponseWithManagedErrors";
 

@@ -9,7 +9,6 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { DiscussionAggregateBuilder } from "../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
 import { StubDashboardGateway } from "../../core/dashboard/adapters/StubDashboardGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -17,6 +16,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { DiscussionAggregateBuilder } from "../../establishment/adapters/InMemoryDiscussionAggregateRepository";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 
 describe("GetUserAgencyDashboardUrl", () => {
