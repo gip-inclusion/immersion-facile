@@ -29,8 +29,6 @@ export const EstablishmentLeadRegistrationRejectedPage = ({
     establishmentLeadStatus,
   );
 
-  console.log("fetchedConvention", fetchedConvention);
-
   const { applicationId } =
     decodeJwtWithoutSignatureCheck<ConventionJwtPayload>(params.jwt);
 

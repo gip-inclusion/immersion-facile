@@ -168,7 +168,7 @@ export const AgencySelector = ({
           setLoadingError(false);
         })
         .catch((e: any) => {
-          //eslint-disable-next-line no-console
+          // biome-ignore lint/suspicious/noConsoleLog: <explanation>
           console.log("AgencySelector", e);
           setAgencies([]);
           setLoadingError(true);

@@ -23,7 +23,8 @@
       },
       "suspicious": {
         "noConfusingVoidType": "off",
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noConsoleLog": "error"
       },
       "complexity": {
         "noForEach": "off"
