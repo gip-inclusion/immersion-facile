@@ -1,6 +1,6 @@
 import { NafDto, NumberEmployeesRange, SiretDto } from "shared";
-import { SiretGateway } from "../domains/sirene/ports/SirenGateway";
-import { getSiretEstablishmentFromApi } from "../domains/sirene/service/getSirenEstablishmentFromApi";
+import { getSiretEstablishmentFromApi } from "../domains/core/sirene/helpers/getSirenEstablishmentFromApi";
+import { SiretGateway } from "../domains/core/sirene/ports/SirenGateway";
 
 export type NafAndNumberOfEmpolyee = {
   nafDto: NafDto;

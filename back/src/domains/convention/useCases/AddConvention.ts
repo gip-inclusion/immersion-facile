@@ -7,10 +7,10 @@ import {
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";
+import { SiretGateway } from "../../core/sirene/ports/SirenGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { SiretGateway } from "../../sirene/ports/SirenGateway";
-import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 
 export class AddConvention extends TransactionalUseCase<
   ConventionDto,

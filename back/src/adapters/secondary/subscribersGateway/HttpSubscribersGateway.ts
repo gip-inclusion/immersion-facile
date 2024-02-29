@@ -3,7 +3,7 @@ import { SubscriptionParams, castError } from "shared";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
   SubscribersGateway,
-} from "../../../domains/broadcast/ports/SubscribersGateway";
+} from "../../../domains/core/api-consumer/ports/SubscribersGateway";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 

@@ -7,10 +7,6 @@ import {
   SiretDto,
   sleep,
 } from "shared";
-import { BroadcastToPartnersOnConventionUpdates } from "../../../domains/broadcast/useCases/BroadcastToPartnersOnConventionUpdates";
-import { DeleteSubscription } from "../../../domains/broadcast/useCases/DeleteSubscription";
-import { ListActiveSubscriptions } from "../../../domains/broadcast/useCases/ListActiveSubscriptions";
-import { SubscribeToWebhook } from "../../../domains/broadcast/useCases/SubscribeToWebhook";
 import { AddConvention } from "../../../domains/convention/useCases/AddConvention";
 import { CreateAssessment } from "../../../domains/convention/useCases/CreateAssessment";
 import { GetAgencyPublicInfoById } from "../../../domains/convention/useCases/GetAgencyPublicInfoById";
@@ -52,7 +48,11 @@ import { MarkPartnersErroredConventionAsHandled } from "../../../domains/convent
 import { TransactionalUseCase, UseCase } from "../../../domains/core/UseCase";
 import { LookupLocation } from "../../../domains/core/address/use-cases/LookupLocation";
 import { LookupStreetAddress } from "../../../domains/core/address/use-cases/LookupStreetAddress";
+import { BroadcastToPartnersOnConventionUpdates } from "../../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
+import { DeleteSubscription } from "../../../domains/core/api-consumer/use-cases/DeleteSubscription";
+import { ListActiveSubscriptions } from "../../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../../domains/core/api-consumer/use-cases/SaveApiConsumer";
+import { SubscribeToWebhook } from "../../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
 import { AdminLogin } from "../../../domains/core/authentication/admin-backoffice/use-cases/AdminLogin";
 import { AuthenticateWithInclusionCode } from "../../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { GetInclusionConnectLogoutUrl } from "../../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
@@ -76,15 +76,19 @@ import {
 import { makeSaveNotificationAndRelatedEvent } from "../../../domains/core/notifications/helpers/Notification";
 import { SendNotification } from "../../../domains/core/notifications/useCases/SendNotification";
 import { HtmlToPdf } from "../../../domains/core/pdf-generation/use-cases/HtmlToPdf";
+import { AppellationSearch } from "../../../domains/core/rome/use-cases/AppellationSearch";
+import { RomeSearch } from "../../../domains/core/rome/use-cases/RomeSearch";
 import { ShortLinkId } from "../../../domains/core/short-link/ports/ShortLinkQuery";
+import { GetSiret } from "../../../domains/core/sirene/use-cases/GetSiret";
+import { GetSiretIfNotAlreadySaved } from "../../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
 import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../../domains/core/uuid-generator/ports/UuidGenerator";
-import { GetInclusionConnectedUser } from "../../../domains/inclusionConnectedUsers/useCases/GetInclusionConnectedUser";
-import { GetInclusionConnectedUsers } from "../../../domains/inclusionConnectedUsers/useCases/GetInclusionConnectedUsers";
-import { LinkFranceTravailUsersToTheirAgencies } from "../../../domains/inclusionConnectedUsers/useCases/LinkFranceTravailUsersToTheirAgencies";
-import { RejectIcUserForAgency } from "../../../domains/inclusionConnectedUsers/useCases/RejectIcUserForAgency";
-import { UpdateIcUserRoleForAgency } from "../../../domains/inclusionConnectedUsers/useCases/UpdateIcUserRoleForAgency";
+import { GetInclusionConnectedUser } from "../../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUser";
+import { GetInclusionConnectedUsers } from "../../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUsers";
+import { LinkFranceTravailUsersToTheirAgencies } from "../../../domains/inclusion-connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
+import { RejectIcUserForAgency } from "../../../domains/inclusion-connected-users/use-cases/RejectIcUserForAgency";
+import { UpdateIcUserRoleForAgency } from "../../../domains/inclusion-connected-users/use-cases/UpdateIcUserRoleForAgency";
 import { AddEstablishmentLead } from "../../../domains/offer/useCases/AddEstablishmentLead";
 import { AddFormEstablishment } from "../../../domains/offer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domains/offer/useCases/AddFormEstablismentsBatch";
@@ -104,11 +108,6 @@ import { AddExchangeToDiscussionAndTransferEmail } from "../../../domains/offer/
 import { NotifyConfirmationEstablishmentCreated } from "../../../domains/offer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domains/offer/useCases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../../domains/offer/useCases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
-import { ConvertRomeToAppellationForEstablishment } from "../../../domains/publicApi/useCases/ConvertRomeToAppellationForEstablishment";
-import { AppellationSearch } from "../../../domains/rome/useCases/AppellationSearch";
-import { RomeSearch } from "../../../domains/rome/useCases/RomeSearch";
-import { GetSiret } from "../../../domains/sirene/useCases/GetSiret";
-import { GetSiretIfNotAlreadySaved } from "../../../domains/sirene/useCases/GetSiretIfNotAlreadySaved";
 import { NotFoundError } from "../helpers/httpErrors";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
@@ -168,8 +167,6 @@ export const createUseCases = (
         uowPerformer,
         gateways.notification,
       ),
-      convertRomeToAppellationForEstablishment:
-        new ConvertRomeToAppellationForEstablishment(uowPerformer),
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
       updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(

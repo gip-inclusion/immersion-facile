@@ -6,8 +6,8 @@ import {
 import {
   NotFoundError,
   TooManyRequestApiError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+} from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemorySiretGateway } from "../../../../adapters/secondary/siret/InMemorySiretGateway";
 import { GetSiret } from "./GetSiret";
 
 const validEstablishment: SiretEstablishmentDto = {

@@ -9,9 +9,9 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+} from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../UseCase";
+import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export class DeleteSubscription extends TransactionalUseCase<
   string,

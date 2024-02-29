@@ -1,7 +1,7 @@
 import Bottleneck from "bottleneck";
 import { SiretDto, SiretEstablishmentDto } from "shared";
 import { HttpClient } from "shared-routes";
-import { SiretGateway } from "../../../domains/sirene/ports/SirenGateway";
+import { SiretGateway } from "../../../domains/core/sirene/ports/SirenGateway";
 import {
   AnnuaireDesEntreprisesSiretEstablishment,
   type AnnuaireDesEntreprisesSiretRoutes,

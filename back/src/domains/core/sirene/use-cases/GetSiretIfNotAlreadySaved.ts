@@ -3,12 +3,12 @@ import {
   SiretEstablishmentDto,
   getSiretRequestSchema,
 } from "shared";
-import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { ConflictError } from "../../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../UseCase";
+import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import { getSiretEstablishmentFromApi } from "../helpers/getSirenEstablishmentFromApi";
 import { SiretGateway } from "../ports/SirenGateway";
-import { getSiretEstablishmentFromApi } from "../service/getSirenEstablishmentFromApi";
 
 export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   GetSiretRequestDto,

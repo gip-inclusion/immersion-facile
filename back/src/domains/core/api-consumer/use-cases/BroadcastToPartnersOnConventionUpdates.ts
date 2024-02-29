@@ -7,12 +7,12 @@ import {
   pipeWithValue,
   withConventionSchema,
 } from "shared";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { isConventionInScope } from "../../convention/entities/Convention";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { getReferedAgency } from "../entities/agency";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { isConventionInScope } from "../../../convention/entities/Convention";
+import { TransactionalUseCase } from "../../UseCase";
+import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import { getReferedAgency } from "../helpers/agency";
 import { SubscribersGateway } from "../ports/SubscribersGateway";
 
 const isConsumerSubscribedToConventionUpdated = (apiConsumer: ApiConsumer) => {

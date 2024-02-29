@@ -2,14 +2,14 @@ import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import {
   ForbiddenError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
-import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+} from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
 import { DeleteSubscription } from "./DeleteSubscription";
 
 describe("DeleteSubscription", () => {

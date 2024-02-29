@@ -3,10 +3,10 @@ import {
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
   zTrimmedString,
 } from "shared";
-import { createLogger } from "../../../utils/logger";
-import { findMatchRanges } from "../../../utils/textSearch";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { createLogger } from "../../../../utils/logger";
+import { findMatchRanges } from "../../../../utils/textSearch";
+import { TransactionalUseCase } from "../../UseCase";
+import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 const logger = createLogger(__filename);
 

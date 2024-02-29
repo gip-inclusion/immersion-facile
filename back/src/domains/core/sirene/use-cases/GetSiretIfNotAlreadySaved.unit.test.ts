@@ -1,13 +1,13 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
-import { EstablishmentAggregateBuilder } from "../../../adapters/secondary/offer/EstablishmentBuilders";
-import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
+import { ConflictError } from "../../../../adapters/primary/helpers/httpErrors";
+import { EstablishmentAggregateBuilder } from "../../../../adapters/secondary/offer/EstablishmentBuilders";
+import { InMemoryEstablishmentAggregateRepository } from "../../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
 import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,
-} from "../../../adapters/secondary/siret/InMemorySiretGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+} from "../../../../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
 import { GetSiretIfNotAlreadySaved } from "./GetSiretIfNotAlreadySaved";
 
 describe("GetSiretIfNotAlreadySaved", () => {
