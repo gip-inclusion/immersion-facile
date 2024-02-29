@@ -1,8 +1,8 @@
 import { ConventionReadDto } from "shared";
 import { ConventionQueries } from "../../domains/convention/ports/ConventionQueries";
-import { isSiretsListFilled } from "../../domains/offer/entities/EstablishmentLeadEntity";
-import { EstablishmentLeadQueries } from "../../domains/offer/ports/EstablishmentLeadQueries";
-import { EstablishmentLeadReminderParams } from "../../domains/offer/useCases/SendEstablishmentLeadReminderScript";
+import { isSiretsListFilled } from "../../domains/establishment/entities/EstablishmentLeadEntity";
+import { EstablishmentLeadQueries } from "../../domains/establishment/ports/EstablishmentLeadQueries";
+import { EstablishmentLeadReminderParams } from "../../domains/establishment/useCases/SendEstablishmentLeadReminderScript";
 import { InMemoryEstablishmentLeadRepository } from "./offer/InMemoryEstablishmentLeadRepository";
 
 export class InMemoryEstablishmentLeadQueries

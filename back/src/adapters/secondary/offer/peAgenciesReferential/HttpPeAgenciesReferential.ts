@@ -4,7 +4,7 @@ import { PoleEmploiGateway } from "../../../../domains/convention/ports/PoleEmpl
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
-} from "../../../../domains/offer/ports/PeAgenciesReferential";
+} from "../../../../domains/establishment/ports/PeAgenciesReferential";
 import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 

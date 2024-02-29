@@ -16,7 +16,7 @@ import {
   rueGuillaumeTellDto,
   rueJacquardDto,
 } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
-import { SearchMade } from "../../../../domains/offer/entities/SearchMadeEntity";
+import { SearchMade } from "../../../../domains/establishment/entities/SearchMadeEntity";
 import { NotFoundError } from "../../../primary/helpers/httpErrors";
 import {
   ContactEntityBuilder,

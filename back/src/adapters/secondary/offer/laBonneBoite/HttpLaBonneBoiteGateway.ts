@@ -5,7 +5,7 @@ import { PoleEmploiGateway } from "../../../../domains/convention/ports/PoleEmpl
 import {
   LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
-} from "../../../../domains/offer/ports/LaBonneBoiteGateway";
+} from "../../../../domains/establishment/ports/LaBonneBoiteGateway";
 import { createLogger } from "../../../../utils/logger";
 import { LaBonneBoiteRoutes } from "./LaBonneBoite.routes";
 import {

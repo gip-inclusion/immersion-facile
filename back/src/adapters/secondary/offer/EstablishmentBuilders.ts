@@ -11,12 +11,12 @@ import {
 } from "shared";
 import { avenueChampsElyseesDto } from "../../../domains/core/address/adapters/InMemoryAddressGateway";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ContactEntity } from "../../../domains/offer/entities/ContactEntity";
+import { ContactEntity } from "../../../domains/establishment/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
-} from "../../../domains/offer/entities/EstablishmentEntity";
-import { OfferEntity } from "../../../domains/offer/entities/OfferEntity";
+} from "../../../domains/establishment/entities/EstablishmentEntity";
+import { OfferEntity } from "../../../domains/establishment/entities/OfferEntity";
 
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
 export const TEST_APPELLATION_CODE = "12345";

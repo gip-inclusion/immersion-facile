@@ -1,8 +1,8 @@
 import { andThen } from "ramda";
 import { ConventionReadDto, filter, pipeWithValue } from "shared";
-import { isSiretsListFilled } from "../../../../domains/offer/entities/EstablishmentLeadEntity";
-import { EstablishmentLeadQueries } from "../../../../domains/offer/ports/EstablishmentLeadQueries";
-import { EstablishmentLeadReminderParams } from "../../../../domains/offer/useCases/SendEstablishmentLeadReminderScript";
+import { isSiretsListFilled } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
+import { EstablishmentLeadQueries } from "../../../../domains/establishment/ports/EstablishmentLeadQueries";
+import { EstablishmentLeadReminderParams } from "../../../../domains/establishment/useCases/SendEstablishmentLeadReminderScript";
 import { KyselyDb } from "../kysely/kyselyUtils";
 import { validateConventionReadResults } from "./PgConventionQueries";
 import { getEstablishmentLeadSiretsByUniqLastEventKindBuilder } from "./PgEstablishmentLeadRepository";

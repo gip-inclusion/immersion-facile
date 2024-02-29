@@ -1,7 +1,7 @@
 import {
   PassEmploiGateway,
   PassEmploiNotificationParams,
-} from "../../../../domains/offer/ports/PassEmploiGateway";
+} from "../../../../domains/establishment/ports/PassEmploiGateway";
 
 export class InMemoryPassEmploiGateway implements PassEmploiGateway {
   constructor(public notifications: PassEmploiNotificationParams[] = []) {}

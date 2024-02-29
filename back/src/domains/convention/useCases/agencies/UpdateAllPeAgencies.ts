@@ -14,7 +14,7 @@ import { UuidGenerator } from "../../../core/uuid-generator/ports/UuidGenerator"
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
-} from "../../../offer/ports/PeAgenciesReferential";
+} from "../../../establishment/ports/PeAgenciesReferential";
 
 const counts = {
   added: 0,

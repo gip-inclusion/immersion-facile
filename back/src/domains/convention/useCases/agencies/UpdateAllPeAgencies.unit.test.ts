@@ -6,7 +6,7 @@ import { ConsoleAppLogger } from "../../../core/app-logger/adapters/ConsoleAppLo
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { PeAgencyFromReferenciel } from "../../../offer/ports/PeAgenciesReferential";
+import { PeAgencyFromReferenciel } from "../../../establishment/ports/PeAgenciesReferential";
 import { UpdateAllPeAgencies } from "./UpdateAllPeAgencies";
 
 const address: AddressDto = {

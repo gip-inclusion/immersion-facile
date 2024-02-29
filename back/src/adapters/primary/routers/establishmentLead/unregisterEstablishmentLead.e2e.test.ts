@@ -19,7 +19,7 @@ import {
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateConventionJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentLead } from "../../../../domains/offer/entities/EstablishmentLeadEntity";
+import { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 const convention = new ConventionDtoBuilder().build();

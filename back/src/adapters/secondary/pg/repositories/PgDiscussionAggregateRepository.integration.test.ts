@@ -1,8 +1,8 @@
 import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
-import { DiscussionAggregate } from "../../../../domains/offer/entities/DiscussionAggregate";
-import { HasDiscussionMatchingParams } from "../../../../domains/offer/ports/DiscussionAggregateRepository";
+import { DiscussionAggregate } from "../../../../domains/establishment/entities/DiscussionAggregate";
+import { HasDiscussionMatchingParams } from "../../../../domains/establishment/ports/DiscussionAggregateRepository";
 import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,

@@ -2,7 +2,7 @@ import { SearchResultDto } from "shared";
 import {
   LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
-} from "../../../../domains/offer/ports/LaBonneBoiteGateway";
+} from "../../../../domains/establishment/ports/LaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDto } from "./LaBonneBoiteCompanyDto";
 
 export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {

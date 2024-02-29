@@ -16,8 +16,8 @@ import {
   GenerateEditFormEstablishmentJwt,
 } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { establishmentNotFoundErrorMessage } from "../../../../domains/offer/ports/EstablishmentAggregateRepository";
-import { formEstablishmentNotFoundErrorMessage } from "../../../../domains/offer/ports/FormEstablishmentRepository";
+import { establishmentNotFoundErrorMessage } from "../../../../domains/establishment/ports/EstablishmentAggregateRepository";
+import { formEstablishmentNotFoundErrorMessage } from "../../../../domains/establishment/ports/FormEstablishmentRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../secondary/offer/EstablishmentBuilders";
 
