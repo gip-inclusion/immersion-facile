@@ -6,7 +6,7 @@ import {
   ConventionDtoBuilder,
 } from "shared";
 import { EmailNotification } from "shared";
-import { expectNotifyConventionCancelled } from "../../../../adapters/secondary/InMemoryNotificationRepository";
+import { expectNotifyConventionCancelled } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";

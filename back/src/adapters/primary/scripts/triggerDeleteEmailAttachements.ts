@@ -1,6 +1,6 @@
+import { PgNotificationRepository } from "../../../domains/core/notifications/adapters/PgNotificationRepository";
 import { createLogger } from "../../../utils/logger";
 import { makeKyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
-import { PgNotificationRepository } from "../../secondary/pg/repositories/PgNotificationRepository";
 import { AppConfig } from "../config/appConfig";
 import { createGetPgPoolFn } from "../config/createGateways";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";

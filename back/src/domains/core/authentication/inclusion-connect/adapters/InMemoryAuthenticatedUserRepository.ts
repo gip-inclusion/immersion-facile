@@ -1,6 +1,6 @@
 import { values } from "ramda";
 import { AuthenticatedUser } from "shared";
-import { AuthenticatedUserRepository } from "../../domains/core/authentication/inclusion-connect/port/AuthenticatedUserRepositiory";
+import { AuthenticatedUserRepository } from "../port/AuthenticatedUserRepositiory";
 
 export class InMemoryAuthenticatedUserRepository
   implements AuthenticatedUserRepository

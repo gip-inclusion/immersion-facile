@@ -10,10 +10,10 @@ import {
   frontRoutes,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
-import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
+import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
   WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,

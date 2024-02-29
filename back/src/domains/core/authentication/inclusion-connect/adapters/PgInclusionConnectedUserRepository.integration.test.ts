@@ -9,9 +9,9 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
 } from "shared";
-import { PgAgencyRepository } from "../../../../domains/agency/adapters/PgAgencyRepository";
-import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+import { makeKyselyDb } from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 
 const authenticatedUser1: AuthenticatedUser = {

@@ -9,7 +9,6 @@ import {
   ConflictError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
-import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,
@@ -17,6 +16,7 @@ import {
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import { InMemoryRomeRepository } from "../../core/rome/adapters/InMemoryRomeRepository";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";

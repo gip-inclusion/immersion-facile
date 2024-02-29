@@ -1,10 +1,10 @@
 import {
-  IdentityProvider,
-  OngoingOAuth,
-} from "../../../../domains/core/authentication/inclusion-connect/entities/OngoingOAuth";
-import { OngoingOAuthRepository } from "../../../../domains/core/authentication/inclusion-connect/port/OngoingOAuthRepositiory";
-import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
-import { optional } from "../pgUtils";
+  KyselyDb,
+  executeKyselyRawSqlQuery,
+} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { optional } from "../../../../../adapters/secondary/pg/pgUtils";
+import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
+import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
 type PersistenceOngoingOAuth = {
   provider: string;

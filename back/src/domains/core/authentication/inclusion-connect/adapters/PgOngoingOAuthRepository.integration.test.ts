@@ -1,8 +1,11 @@
 import { Pool, PoolClient } from "pg";
 import { AuthenticatedUser, expectToEqual } from "shared";
-import { OngoingOAuth } from "../../../../domains/core/authentication/inclusion-connect/entities/OngoingOAuth";
-import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 

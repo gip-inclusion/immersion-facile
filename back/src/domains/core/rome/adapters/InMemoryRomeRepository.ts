@@ -4,9 +4,9 @@ import {
   RomeCode,
   RomeDto,
 } from "shared";
-import { RomeRepository } from "../../domains/core/rome/ports/RomeRepository";
-import { createLogger } from "../../utils/logger";
-import { normalize } from "../../utils/textSearch";
+import { createLogger } from "../../../../utils/logger";
+import { normalize } from "../../../../utils/textSearch";
+import { RomeRepository } from "../ports/RomeRepository";
 
 const logger = createLogger(__filename);
 

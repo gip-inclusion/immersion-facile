@@ -12,9 +12,9 @@ import {
   SmsNotification,
   notificationKinds,
 } from "shared";
-import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryOutboxRepository } from "../domains/core/events/adapters/InMemoryOutboxRepository";
 import { NotificationAddedEvent } from "../domains/core/events/events";
+import { InMemoryNotificationRepository } from "../domains/core/notifications/adapters/InMemoryNotificationRepository";
 import { WithNotificationIdAndKind } from "../domains/core/notifications/helpers/Notification";
 
 export type ExpectSavedNotificationsAndEvents = ReturnType<

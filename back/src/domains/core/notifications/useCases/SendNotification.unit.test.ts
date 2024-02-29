@@ -4,13 +4,13 @@ import {
   expectPromiseToFailWith,
   expectPromiseToFailWithError,
 } from "shared";
-import { InMemoryNotificationRepository } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
 import {
   InMemoryNotificationGateway,
   sendSmsErrorPhoneNumber,
 } from "../adapters/InMemoryNotificationGateway";
+import { InMemoryNotificationRepository } from "../adapters/InMemoryNotificationRepository";
 import { SendNotification } from "./SendNotification";
 
 const someDate = new Date("2023-01-01").toISOString();
