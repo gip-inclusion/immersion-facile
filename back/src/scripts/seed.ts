@@ -42,6 +42,7 @@ const seed = async () => {
 };
 
 const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding feature flags...");
   await client.query("DELETE FROM feature_flags");
 
@@ -60,10 +61,12 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
   };
 
   await uow.featureFlagRepository.insertAll(featureFlags);
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
 };
 
 const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding agencies...");
   await client.query("DELETE FROM conventions");
   await client.query("DELETE FROM agencies");
@@ -101,6 +104,7 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
     uow.agencyRepository.insert(peParisAgency),
     uow.agencyRepository.insert(cciAgency),
   ]);
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
 };
 
@@ -108,6 +112,7 @@ const establishmentAggregateSeed = async (
   uow: UnitOfWork,
   client: PoolClient,
 ) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding establishment aggregates...");
   await client.query("DELETE FROM discussions");
   await client.query("DELETE FROM immersion_contacts");
@@ -197,10 +202,12 @@ const establishmentAggregateSeed = async (
     },
     name: "Decathlon",
   });
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
 };
 
 const conventionSeed = async (uow: UnitOfWork) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding conventions...");
 
   const peConvention = new ConventionDtoBuilder()
@@ -241,11 +248,13 @@ const conventionSeed = async (uow: UnitOfWork) => {
   };
   await uow.errorRepository.save(savedError);
 
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
 };
 
 seed()
   .then(() => {
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
     console.log("Seeding script ended !");
   })
   .catch((err) => {

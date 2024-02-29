@@ -63,6 +63,7 @@ const updateAllPeAgenciesScript = async () => {
 /* eslint-disable no-console */
 updateAllPeAgenciesScript()
   .then(() => {
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
     console.log("Finished successfully");
     process.exit(0);
   })

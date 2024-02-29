@@ -154,8 +154,6 @@ describe("PgScriptsQueries", () => {
         ),
       );
 
-      console.log("PRepared data");
-
       // Act
       const sirets =
         await pgEstablishmentAggregateRepository.getSiretOfEstablishmentsToSuggestUpdate(

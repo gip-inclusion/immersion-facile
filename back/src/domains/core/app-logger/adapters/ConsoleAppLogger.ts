@@ -11,6 +11,7 @@ export class ConsoleAppLogger implements AppLogger {
   }
 
   public info(...messages: unknown[]): void {
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
     console.log(...messages);
   }
 
