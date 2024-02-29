@@ -3,14 +3,12 @@ import supertest from "supertest";
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { Gateways } from "../adapters/primary/config/createGateways";
 import { createApp } from "../adapters/primary/server";
-import { InMemoryInclusionConnectGateway } from "../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
-import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
-import { InMemoryPassEmploiGateway } from "../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import { InMemorySubscribersGateway } from "../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
 import { InMemoryPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
+import { InMemoryInclusionConnectGateway } from "../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
+import { InMemoryPeConnectGateway } from "../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/InMemoryPeConnectGateway";
 import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
 import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
@@ -28,6 +26,8 @@ import { DeterministShortLinkIdGeneratorGateway } from "../domains/core/short-li
 import { CustomTimeGateway } from "../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUnitOfWork } from "../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../domains/core/uuid-generator/ports/UuidGenerator";
+import { InMemoryLaBonneBoiteGateway } from "../domains/establishment/adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
+import { InMemoryPassEmploiGateway } from "../domains/establishment/adapters/pass-emploi/InMemoryPassEmploiGateway";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {

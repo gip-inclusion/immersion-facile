@@ -7,11 +7,11 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
-} from "../../../secondary/offer/EstablishmentBuilders";
+} from "../../../../domains/establishment/helpers/EstablishmentBuilders";
+import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("route to check if a form's siret already exists", () => {
   let httpClient: HttpClient<FormCompletionRoutes>;

@@ -18,7 +18,7 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../secondary/offer/EstablishmentBuilders";
+} from "../../../domains/establishment/helpers/EstablishmentBuilders";
 import { AppConfig } from "../config/appConfig";
 import { createAppDependencies } from "../config/createAppDependencies";
 

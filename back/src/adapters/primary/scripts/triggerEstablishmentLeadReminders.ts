@@ -12,7 +12,7 @@ import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/U
 import {
   SendEstablishmentLeadReminderOutput,
   SendEstablishmentLeadReminderScript,
-} from "../../../domains/establishment/useCases/SendEstablishmentLeadReminderScript";
+} from "../../../domains/establishment/use-cases/SendEstablishmentLeadReminderScript";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";

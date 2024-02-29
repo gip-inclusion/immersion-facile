@@ -8,7 +8,6 @@ import {
   frontRoutes,
 } from "shared";
 import { ForbiddenError } from "../../../../../adapters/primary/helpers/httpErrors";
-import { InMemoryInclusionConnectGateway } from "../../../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -17,6 +16,7 @@ import {
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryInclusionConnectGateway } from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";

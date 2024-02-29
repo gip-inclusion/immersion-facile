@@ -5,8 +5,8 @@ import {
   getInclusionConnectLogoutUrlQueryParamsSchema,
   queryParamsAsString,
 } from "shared";
-import { InclusionConnectLogoutQueryParams } from "../../../../../adapters/secondary/InclusionConnectGateway/inclusionConnectExternalRoutes";
 import { UseCase } from "../../../UseCase";
+import { InclusionConnectLogoutQueryParams } from "../adapters/Inclusion-connect-gateway/inclusionConnectExternalRoutes";
 import { InclusionConnectConfig } from "./InitiateInclusionConnect";
 
 export class GetInclusionConnectLogoutUrl extends UseCase<

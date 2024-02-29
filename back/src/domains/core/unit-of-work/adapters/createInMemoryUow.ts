@@ -1,11 +1,3 @@
-import { InMemoryDeletedEstablishmentRepository } from "../../../../adapters/secondary/InMemoryDeletedEstablishmentRepository";
-import { InMemoryEstablishmentLeadQueries } from "../../../../adapters/secondary/InMemoryEstablishmentLeadQueries";
-import { InMemoryFormEstablishmentRepository } from "../../../../adapters/secondary/InMemoryFormEstablishmentRepository";
-import { InMemoryDiscussionAggregateRepository } from "../../../../adapters/secondary/offer/InMemoryDiscussionAggregateRepository";
-import { InMemoryEstablishmentAggregateRepository } from "../../../../adapters/secondary/offer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryEstablishmentLeadRepository } from "../../../../adapters/secondary/offer/InMemoryEstablishmentLeadRepository";
-import { InMemoryGroupRepository } from "../../../../adapters/secondary/offer/InMemoryGroupRepository";
-import { InMemorySearchMadeRepository } from "../../../../adapters/secondary/offer/InMemorySearchMadeRepository";
 import { InMemoryAgencyGroupRepository } from "../../../agency/adapters/InMemoryAgencyGroupRepository";
 import { InMemoryAgencyRepository } from "../../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryAssessmentRepository } from "../../../convention/adapters/InMemoryAssessmentRepository";
@@ -13,6 +5,14 @@ import { InMemoryConventionExternalIdRepository } from "../../../convention/adap
 import { InMemoryConventionQueries } from "../../../convention/adapters/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../../convention/adapters/InMemoryConventionRepository";
 import { InMemoryConventionsToSyncRepository } from "../../../convention/adapters/InMemoryConventionsToSyncRepository";
+import { InMemoryDeletedEstablishmentRepository } from "../../../establishment/adapters/InMemoryDeletedEstablishmentRepository";
+import { InMemoryDiscussionAggregateRepository } from "../../../establishment/adapters/InMemoryDiscussionAggregateRepository";
+import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
+import { InMemoryEstablishmentLeadQueries } from "../../../establishment/adapters/InMemoryEstablishmentLeadQueries";
+import { InMemoryEstablishmentLeadRepository } from "../../../establishment/adapters/InMemoryEstablishmentLeadRepository";
+import { InMemoryFormEstablishmentRepository } from "../../../establishment/adapters/InMemoryFormEstablishmentRepository";
+import { InMemoryGroupRepository } from "../../../establishment/adapters/InMemoryGroupRepository";
+import { InMemorySearchMadeRepository } from "../../../establishment/adapters/InMemorySearchMadeRepository";
 import { InMemoryApiConsumerRepository } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryAuthenticatedUserRepository } from "../../authentication/inclusion-connect/adapters/InMemoryAuthenticatedUserRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";

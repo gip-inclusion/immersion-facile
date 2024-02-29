@@ -1,11 +1,11 @@
 import { authFailed, expectToEqual, notJobSeeker } from "shared";
-import { InMemoryPeConnectGateway } from "../../../../../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { CONVENTION_ID_DEFAULT_UUID } from "../adapters/InMemoryConventionPoleEmploiAdvisorRepository";
+import { InMemoryPeConnectGateway } from "../adapters/pe-connect-gateway/InMemoryPeConnectGateway";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   PeConnectAdvisorDto,

@@ -10,14 +10,14 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
-import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-} from "../../../secondary/offer/EstablishmentBuilders";
+} from "../../../../domains/establishment/helpers/EstablishmentBuilders";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 const siret = "11112222333344";
 const contactId = "theContactId";

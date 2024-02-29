@@ -19,9 +19,9 @@ import {
 import { shortLinkNotFoundMessage } from "../../../../domains/core/short-link/ShortLink";
 import { ShortLinkId } from "../../../../domains/core/short-link/ports/ShortLinkQuery";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { DiscussionAggregateBuilder } from "../../../../domains/establishment/adapters/InMemoryDiscussionAggregateRepository";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
-import { DiscussionAggregateBuilder } from "../../../secondary/offer/InMemoryDiscussionAggregateRepository";
 import { AppConfig } from "../../config/appConfig";
 
 const discussionId = "my-discussion-id";

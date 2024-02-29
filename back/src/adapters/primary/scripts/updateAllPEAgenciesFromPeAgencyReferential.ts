@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Pool } from "pg";
 import { createAxiosSharedClient } from "shared-routes/axios";
+import { HttpPeAgenciesReferential } from "../../../domains/agency/adapters/pe-agencies-referential/HttpPeAgenciesReferential";
 import { UpdateAllPeAgencies } from "../../../domains/agency/use-cases/UpdateAllPeAgencies";
 import { HttpPoleEmploiGateway } from "../../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEmploiGateway";
@@ -12,7 +13,6 @@ import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/Rea
 import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
-import { HttpPeAgenciesReferential } from "../../secondary/offer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { AppConfig } from "../config/appConfig";
 import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 

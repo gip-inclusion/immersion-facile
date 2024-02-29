@@ -6,8 +6,8 @@ import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/Rea
 import { PgUowPerformer } from "../../../domains/core/unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../domains/core/unit-of-work/adapters/createPgUow";
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SuggestEditEstablishment } from "../../../domains/establishment/useCases/SuggestEditEstablishment";
-import { SuggestEditEstablishmentsScript } from "../../../domains/establishment/useCases/SuggestEditEstablishmentsScript";
+import { SuggestEditEstablishment } from "../../../domains/establishment/use-cases/SuggestEditEstablishment";
+import { SuggestEditEstablishmentsScript } from "../../../domains/establishment/use-cases/SuggestEditEstablishmentsScript";
 import { AppConfig } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
