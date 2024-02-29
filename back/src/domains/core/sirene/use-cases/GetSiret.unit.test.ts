@@ -6,7 +6,7 @@ import {
 import {
   NotFoundError,
   TooManyRequestApiError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+} from "../../../../config/helpers/httpErrors";
 import { InMemorySiretGateway } from "../adapters/InMemorySiretGateway";
 import { GetSiret } from "./GetSiret";
 

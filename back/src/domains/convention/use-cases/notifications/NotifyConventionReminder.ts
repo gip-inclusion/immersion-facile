@@ -18,12 +18,12 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
 } from "shared";
-import { AppConfig } from "../../../../adapters/primary/config/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import {
   ForbiddenError,
   NotFoundError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+} from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   ConventionReminderPayload,

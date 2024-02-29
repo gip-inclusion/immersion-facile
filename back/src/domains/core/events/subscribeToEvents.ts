@@ -1,8 +1,11 @@
 import { keys } from "shared";
-import { DomainTopic } from "../../domains/core/events/events";
-import { NarrowEvent } from "../../domains/core/events/ports/EventBus";
-import type { AppDependencies } from "./config/createAppDependencies";
-import { InstantiatedUseCase, UseCases } from "./config/createUseCases";
+import type { AppDependencies } from "../../../config/bootstrap/createAppDependencies";
+import {
+  InstantiatedUseCase,
+  UseCases,
+} from "../../../config/bootstrap/createUseCases";
+import { DomainTopic } from "./events";
+import { NarrowEvent } from "./ports/EventBus";
 
 type DomainUseCase = UseCases[keyof UseCases];
 

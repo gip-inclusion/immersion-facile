@@ -11,14 +11,14 @@ import {
   renewMagicLinkRequestSchema,
   stringToMd5,
 } from "shared";
-import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
-import { AppConfig } from "../../../adapters/primary/config/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
+import { AppConfig } from "../../../config/bootstrap/appConfig";
+import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
+import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";

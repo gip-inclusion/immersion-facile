@@ -11,7 +11,7 @@ import {
 import {
   BadRequestError,
   NotFoundError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+} from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";

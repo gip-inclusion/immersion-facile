@@ -4,7 +4,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../config/helpers/httpErrors";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {

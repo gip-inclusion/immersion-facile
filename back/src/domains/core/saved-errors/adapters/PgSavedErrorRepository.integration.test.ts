@@ -6,7 +6,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { Database } from "../../../../config/pg/kysely/model/database";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";

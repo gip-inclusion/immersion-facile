@@ -4,7 +4,7 @@ import {
   expectToEqual,
 } from "shared";
 import { ZodError } from "zod";
-import { UnauthorizedError } from "../../../../adapters/primary/helpers/httpErrors";
+import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
 import { InMemoryPdfGeneratorGateway } from "../adapters/InMemoryPdfGeneratorGateway";
 import { HtmlToPdf } from "./HtmlToPdf";
 

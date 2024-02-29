@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { HTTP_STATUS, ManagedRedirectError, RawRedirectError } from "shared";
-import { UnhandledError } from "../../../../../../adapters/primary/helpers/unhandledError";
+import { UnhandledError } from "../../../../../../config/helpers/unhandledError";
 import { PeConnectExternalRoutes } from "./peConnectApi.routes";
 
 type PeConnectTargetsKind = keyof PeConnectExternalRoutes;

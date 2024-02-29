@@ -3,7 +3,7 @@ import {
   WithConventionDto,
   withConventionSchema,
 } from "shared";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/SavedErrorRepository";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

@@ -9,7 +9,7 @@ import {
 import {
   ConflictError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import {
   KyselyDb,
   jsonBuildObject,

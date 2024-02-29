@@ -11,11 +11,11 @@ import {
   propEq,
   queryParamsAsString,
 } from "shared";
-import { AxiosConfig } from "../../../../adapters/primary/config/appConfig";
+import { AxiosConfig } from "../../../../config/bootstrap/appConfig";
 import {
   TooManyRequestApiError,
   UnavailableApiError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+} from "../../../../config/helpers/httpErrors";
 import {
   createAxiosInstance,
   isRetryableError,

@@ -3,7 +3,7 @@ import {
   ShareLinkByEmailDto,
   shareLinkByEmailSchema,
 } from "shared";
-import { AppConfig } from "../../../adapters/primary/config/appConfig";
+import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { makeShortLink } from "../../core/short-link/ShortLink";

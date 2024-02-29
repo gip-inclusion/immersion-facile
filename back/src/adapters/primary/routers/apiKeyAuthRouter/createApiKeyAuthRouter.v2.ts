@@ -2,14 +2,14 @@ import { Router } from "express";
 import { andThen, keys, map } from "ramda";
 import { eventToRightName, isApiConsumerAllowed, pipeWithValue } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
-import { createLogger } from "../../../../utils/logger";
-import type { AppDependencies } from "../../config/createAppDependencies";
+import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import {
   ForbiddenError,
   NotFoundError,
   validateAndParseZodSchemaV2,
-} from "../../helpers/httpErrors";
-import { sendHttpResponseForApiV2 } from "../../helpers/sendHttpResponse";
+} from "../../../../config/helpers/httpErrors";
+import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";
+import { createLogger } from "../../../../utils/logger";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { conventionReadToConventionReadPublicV2 } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.dto";

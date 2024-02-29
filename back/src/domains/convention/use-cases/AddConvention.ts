@@ -4,7 +4,7 @@ import {
   WithConventionIdLegacy,
   conventionSchema,
 } from "shared";
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";

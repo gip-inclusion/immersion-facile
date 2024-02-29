@@ -9,11 +9,11 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeVerifyJwtES256 } from "../../../../domains/core/jwt";
 import { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { AppConfig } from "../../config/appConfig";
 
 describe(`${displayRouteName(adminRoutes.login)} Admin login`, () => {
   let sharedRequest: HttpClient<AdminRoutes>;

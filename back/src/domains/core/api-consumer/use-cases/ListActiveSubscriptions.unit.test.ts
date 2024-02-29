@@ -1,5 +1,5 @@
 import { WebhookSubscription, expectPromiseToFailWithError } from "shared";
-import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../../config/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,

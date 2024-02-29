@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { createApp } from "../adapters/primary/server";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { createApp } from "../config/bootstrap/server";
 import { createLogger } from "../utils/logger";
 import {
   startPeriodicNodeProcessReport,

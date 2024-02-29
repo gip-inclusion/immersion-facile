@@ -15,7 +15,7 @@ import {
   smsTemplatesByName,
 } from "shared";
 import { HttpClient } from "shared-routes";
-import { BadRequestError } from "../../../../adapters/primary/helpers/httpErrors";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import {
   counterSendTransactEmailError,
   counterSendTransactEmailSuccess,

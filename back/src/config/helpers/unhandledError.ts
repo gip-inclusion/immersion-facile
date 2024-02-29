@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Request, Response } from "express";
 import { ZodError } from "zod";
-import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { createLogger } from "../../utils/logger";
+import { notifyObjectDiscord } from "../../utils/notifyDiscord";
 import { HttpError } from "./httpErrors";
 
 const logger = createLogger(__filename);

@@ -22,7 +22,7 @@ import {
   ConflictError,
   NotFoundError,
   validateAndParseZodSchema,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import {
   KyselyDb,
   cast,

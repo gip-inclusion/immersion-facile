@@ -1,5 +1,5 @@
-import { AppConfig } from "../../../../adapters/primary/config/appConfig";
-import { createPeAxiosSharedClient } from "../../../../adapters/primary/helpers/createAxiosSharedClients";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
 import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { GetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";

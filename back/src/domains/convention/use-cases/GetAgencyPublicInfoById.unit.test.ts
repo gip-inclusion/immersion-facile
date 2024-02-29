@@ -4,7 +4,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,

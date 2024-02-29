@@ -1,5 +1,5 @@
 import { GetSiretRequestDto, SiretEstablishmentDto } from "shared";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { SiretGateway } from "../ports/SirenGateway";
 
 export const getSiretEstablishmentFromApi = async (

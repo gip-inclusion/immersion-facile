@@ -11,7 +11,7 @@ import {
   WithConventionIdLegacy,
   validatedConventionStatuses,
 } from "shared";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";

@@ -3,7 +3,7 @@ import {
   SiretEstablishmentDto,
   getSiretRequestSchema,
 } from "shared";
-import { ConflictError } from "../../../../adapters/primary/helpers/httpErrors";
+import { ConflictError } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";

@@ -4,7 +4,7 @@ import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
 import { AbsoluteUrl, castError } from "shared";
 import { HttpClient } from "shared-routes";
-import { AccessTokenConfig } from "../../../../adapters/primary/config/appConfig";
+import { AccessTokenConfig } from "../../../../config/bootstrap/appConfig";
 import {
   createAxiosInstance,
   isRetryableError,

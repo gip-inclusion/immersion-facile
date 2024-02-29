@@ -3,11 +3,11 @@ import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import { technicalRoutes, uploadFileRoute } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
+import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
+import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
 import { UploadFileInput } from "../../../../domains/core/file-storage/useCases/UploadFile";
-import type { AppDependencies } from "../../config/createAppDependencies";
-import { BadRequestError } from "../../helpers/httpErrors";
-import { sendHttpResponse } from "../../helpers/sendHttpResponse";
-import { sendRedirectResponse } from "../../helpers/sendRedirectResponse";
 import { createOpenApiSpecV2 } from "../apiKeyAuthRouter/createOpenApiV2";
 
 export const createTechnicalRouter = (

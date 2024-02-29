@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { inclusionConnectImmersionRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
-import { AppDependencies } from "../../config/createAppDependencies";
-import { sendRedirectResponse } from "../../helpers/sendRedirectResponse";
+import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
 
 export const createInclusionConnectRouter = (deps: AppDependencies) => {
   const router = Router({ mergeParams: true });

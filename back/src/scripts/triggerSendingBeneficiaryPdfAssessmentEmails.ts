@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { keys } from "ramda";
-import { AppConfig } from "../adapters/primary/config/appConfig";
+import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";

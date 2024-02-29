@@ -1,4 +1,4 @@
-import { BadRequestError } from "../../../../adapters/primary/helpers/httpErrors";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import { SiretGateway } from "../ports/SirenGateway";
 import { getSiretEstablishmentFromApi } from "./getSirenEstablishmentFromApi";
 

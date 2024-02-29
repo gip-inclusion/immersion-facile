@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { keys } from "ramda";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { makeGenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";

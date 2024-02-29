@@ -2,7 +2,7 @@ import {
   CreateConventionMagicLinkPayloadProperties,
   filterNotFalsy,
 } from "shared";
-import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
+import { GenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { GenerateApiConsumerJwt } from "../domains/core/jwt";
 
 export const generateApiConsumerJwtTestFn: GenerateApiConsumerJwt = ({ id }) =>

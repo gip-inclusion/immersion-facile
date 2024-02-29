@@ -1,5 +1,5 @@
 import { expectObjectsToMatch, expectToEqual } from "shared";
-import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import { InseeSiretGateway } from "./InseeSiretGateway";

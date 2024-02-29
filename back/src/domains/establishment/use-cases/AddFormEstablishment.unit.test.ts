@@ -7,7 +7,7 @@ import {
 import {
   BadRequestError,
   ConflictError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemoryRomeRepository } from "../../core/rome/adapters/InMemoryRomeRepository";

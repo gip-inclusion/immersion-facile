@@ -7,7 +7,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
-import { UnhandledError } from "../../../../../../adapters/primary/helpers/unhandledError";
+import { UnhandledError } from "../../../../../../config/helpers/unhandledError";
 import {
   CounterType,
   exchangeCodeForAccessTokenCounter,

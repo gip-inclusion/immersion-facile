@@ -1,5 +1,5 @@
 import { AbsoluteUrl, frontRoutes } from "shared";
-import { InMemoryEventBus } from "../../../domains/core/events/adapters/InMemoryEventBus";
+import { InMemoryEventBus } from "../../domains/core/events/adapters/InMemoryEventBus";
 import {
   GenerateApiConsumerJwt,
   GenerateBackOfficeJwt,
@@ -7,19 +7,19 @@ import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
-} from "../../../domains/core/jwt";
-import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
-import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
-import {
-  makeConsumerMiddleware,
-  makeMagicLinkAuthMiddleware,
-} from "../authMiddleware";
+} from "../../domains/core/jwt";
+import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
+import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   makeHandleManagedRedirectResponseError,
   makeHandleRawRedirectResponseError,
 } from "../helpers/handleRedirectResponseError";
+import { makeAdminAuthMiddleware } from "./adminAuthMiddleware";
 import { AppConfig } from "./appConfig";
+import {
+  makeConsumerMiddleware,
+  makeMagicLinkAuthMiddleware,
+} from "./authMiddleware";
 import { createEventCrawler } from "./createEventCrawler";
 import { createGateways, createGetPgPoolFn } from "./createGateways";
 import { createUseCases } from "./createUseCases";

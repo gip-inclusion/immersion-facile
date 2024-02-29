@@ -13,7 +13,7 @@ import {
 import {
   BadRequestError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,

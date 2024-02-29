@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { ManagedRedirectError, loginPeConnect, peConnect } from "shared";
+import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import { sendRedirectResponseWithManagedErrors } from "../../../../config/helpers/sendRedirectResponseWithManagedErrors";
 import { makePeConnectLoginPageUrl } from "../../../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
-import { AppDependencies } from "../../config/createAppDependencies";
-import { sendRedirectResponseWithManagedErrors } from "../../helpers/sendRedirectResponseWithManagedErrors";
 
 export const createPeConnectRouter = (deps: AppDependencies) => {
   const peConnectRouter = Router({ mergeParams: true });

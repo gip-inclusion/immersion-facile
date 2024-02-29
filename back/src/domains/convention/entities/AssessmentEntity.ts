@@ -1,5 +1,5 @@
 import { AssessmentDto, ConventionDto, ConventionStatus } from "shared";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import { BadRequestError } from "../../../config/helpers/httpErrors";
 import { EntityFromDto } from "../../../utils/EntityFromDto";
 
 export type AssessmentEntity = EntityFromDto<AssessmentDto, "Assessment">;

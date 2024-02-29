@@ -1,7 +1,7 @@
 import { keys } from "ramda";
 import { ApiConsumer, WebhookSubscription } from "shared";
 import { z } from "zod";
-import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 

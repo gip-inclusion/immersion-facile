@@ -1,4 +1,4 @@
-import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { HttpPassEmploiGateway } from "./HttpPassEmploiGateway";
 
 describe("HttpPassEmploiGateway", () => {

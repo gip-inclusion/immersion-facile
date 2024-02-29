@@ -9,7 +9,7 @@ import {
 import {
   TooManyRequestApiError,
   UnavailableApiError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+} from "../../../../config/helpers/httpErrors";
 import { createLogger } from "../../../../utils/logger";
 import { SiretGateway } from "../ports/SirenGateway";
 

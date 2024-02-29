@@ -11,7 +11,7 @@ import {
 import {
   ForbiddenError,
   UnauthorizedError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+} from "../../../../config/helpers/httpErrors";
 import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";

@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { inclusionConnectedAllowedRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
-import { AppDependencies } from "../../config/createAppDependencies";
-import { UnauthorizedError } from "../../helpers/httpErrors";
-import { sendHttpResponse } from "../../helpers/sendHttpResponse";
+import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
+import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { createInclusionConnectedMiddleware } from "./createInclusionConnectedMiddleware";
 
 export const createInclusionConnectedAllowedRouter = (
