@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [opened, ready_for_review, review_requested, synchronize]
 
+concurrency:
+  group: review-app
+
 jobs:
   validation:
     uses: ./.github/workflows/fullcheck.yml

@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [closed]
 
+concurrency:
+  group: review-app
+  cancel-in-progress: true
+
 jobs:
   destroy-review-apps:
     runs-on: ubuntu-latest

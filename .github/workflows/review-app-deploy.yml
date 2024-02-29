@@ -50,6 +50,7 @@ jobs:
           else
             echo "Review app for PR_ID ${{ inputs.pull_request_id }} does not exist. Creating now."
             scalingo --app if-dev-back integration-link-manual-review-app ${{ inputs.pull_request_id }}
+            scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} integration-link-update --no-auto-deploy
           fi
       - name: Create front review app
         run: |
@@ -58,13 +59,8 @@ jobs:
           else
             echo "Review app for PR_ID ${{ inputs.pull_request_id }} does not exist. Creating now."
             scalingo --app if-dev-front integration-link-manual-review-app ${{ inputs.pull_request_id }}
+            scalingo --app if-dev-front-pr${{ inputs.pull_request_id }} integration-link-update --no-auto-deploy
           fi
-      - name: Deactivate back review app autodeploy
-        run: |
-          scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} integration-link-update --no-auto-deploy
-      - name: Deactivate front review app autodeploy
-        run: |
-          scalingo --app if-dev-front-pr${{ inputs.pull_request_id }} integration-link-update --no-auto-deploy
       - name: Wait for the postgresql to be ready
         run: sleep 60
       - name: Remove sslmode from $SCALINGO_POSTGRESQL_URL
