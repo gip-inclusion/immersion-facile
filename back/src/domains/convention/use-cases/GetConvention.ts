@@ -10,7 +10,7 @@ import {
 import {
   ForbiddenError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 

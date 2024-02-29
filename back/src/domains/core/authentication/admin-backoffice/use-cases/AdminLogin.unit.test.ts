@@ -1,5 +1,5 @@
 import { expectPromiseToFailWithError } from "shared";
-import { ForbiddenError } from "../../../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../../../config/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { AdminLogin } from "./AdminLogin";
 

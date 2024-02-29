@@ -11,7 +11,7 @@ import {
   BadRequestError,
   ConflictError,
   UnauthorizedError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";

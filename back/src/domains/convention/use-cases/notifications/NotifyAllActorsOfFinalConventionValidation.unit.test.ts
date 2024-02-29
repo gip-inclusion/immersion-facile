@@ -9,7 +9,7 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";

@@ -1,6 +1,6 @@
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { createAppDependencies } from "../adapters/primary/config/createAppDependencies";
-import { startCrawler } from "../adapters/primary/startCrawler";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { createAppDependencies } from "../config/bootstrap/createAppDependencies";
+import { startCrawler } from "../config/bootstrap/startCrawler";
 import { createLogger } from "../utils/logger";
 
 const logger = createLogger(__filename);

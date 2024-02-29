@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { AppConfig } from "../adapters/primary/config/appConfig";
+import { AppConfig } from "../config/bootstrap/appConfig";
 import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 

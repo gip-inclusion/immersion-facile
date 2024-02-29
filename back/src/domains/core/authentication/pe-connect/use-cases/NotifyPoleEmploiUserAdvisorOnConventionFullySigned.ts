@@ -1,5 +1,5 @@
 import { WithConventionDto, frontRoutes, withConventionSchema } from "shared";
-import { GenerateConventionMagicLinkUrl } from "../../../../../adapters/primary/config/magicLinkUrl";
+import { GenerateConventionMagicLinkUrl } from "../../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";

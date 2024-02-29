@@ -4,7 +4,7 @@ import {
   TemplatedEmail,
   expectPromiseToFailWithError,
 } from "shared";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import { BadRequestError } from "../../../config/helpers/httpErrors";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,

@@ -1,8 +1,8 @@
 import { ignoreTabs } from "html-templates";
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
-import { makeEmailAllowListPredicate } from "../../../../adapters/primary/config/appConfig";
-import { BadRequestError } from "../../../../adapters/primary/helpers/httpErrors";
+import { makeEmailAllowListPredicate } from "../../../../config/bootstrap/appConfig";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
 import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import {

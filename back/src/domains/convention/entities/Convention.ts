@@ -13,7 +13,7 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 

@@ -8,7 +8,7 @@ import {
   expectToEqual,
   validSignatoryRoles,
 } from "shared";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { someAgenciesMissingMessage } from "../../agency/ports/AgencyRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";

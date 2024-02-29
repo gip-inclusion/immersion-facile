@@ -7,7 +7,7 @@ import {
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { z } from "zod";
-import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
+import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";

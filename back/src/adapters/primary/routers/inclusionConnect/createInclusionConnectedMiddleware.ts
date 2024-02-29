@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
+import {
+  forbidden,
+  unauthorized,
+} from "../../../../config/bootstrap/middlewareHelpers";
 import { makeVerifyJwtES256 } from "../../../../domains/core/jwt";
-import { forbidden, unauthorized } from "../../middlewareHelpers";
 
 export const createInclusionConnectedMiddleware = (jwtSecret: string) => {
   const verifyJwt = makeVerifyJwtES256<"inclusionConnect">(jwtSecret);

@@ -1,5 +1,5 @@
 import { AgencyId, AgencyRefersToInConvention } from "shared";
-import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export const getReferedAgency = async (

@@ -1,5 +1,5 @@
 import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
-import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
+import { ConflictError } from "../../../config/helpers/httpErrors";
 import { rawAddressToLocation } from "../../../utils/address";
 import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";

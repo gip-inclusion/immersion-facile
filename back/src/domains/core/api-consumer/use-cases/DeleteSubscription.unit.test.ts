@@ -2,7 +2,7 @@ import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import {
   ForbiddenError,
   NotFoundError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+} from "../../../../config/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,

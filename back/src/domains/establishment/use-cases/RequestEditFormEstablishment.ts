@@ -6,7 +6,7 @@ import {
   createEstablishmentJwtPayload,
   siretSchema,
 } from "shared";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import { BadRequestError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";

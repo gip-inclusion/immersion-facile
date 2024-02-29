@@ -22,7 +22,7 @@ import {
   BadRequestError,
   ForbiddenError,
   UnauthorizedError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";

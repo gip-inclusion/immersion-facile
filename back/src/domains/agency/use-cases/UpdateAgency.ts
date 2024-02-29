@@ -2,7 +2,7 @@ import { AgencyDto, BackOfficeJwtPayload, agencySchema } from "shared";
 import {
   NotFoundError,
   UnauthorizedError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

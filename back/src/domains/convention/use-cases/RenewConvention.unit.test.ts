@@ -18,7 +18,7 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";

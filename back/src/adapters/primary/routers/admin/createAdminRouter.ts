@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { GetDashboardParams, adminRoutes, agencyRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
-import type { AppDependencies } from "../../config/createAppDependencies";
-import { BadRequestError } from "../../helpers/httpErrors";
-import { sendHttpResponse } from "../../helpers/sendHttpResponse";
+import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 
 export const createAdminRouter = (deps: AppDependencies): Router => {
   const expressRouter = Router({ mergeParams: true });

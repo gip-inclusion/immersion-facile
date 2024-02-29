@@ -1,5 +1,5 @@
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { createGetPgPoolFn } from "../adapters/primary/config/createGateways";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { PgNotificationRepository } from "../domains/core/notifications/adapters/PgNotificationRepository";
 import { createLogger } from "../utils/logger";

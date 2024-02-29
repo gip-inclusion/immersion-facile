@@ -1,8 +1,8 @@
 import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import supertest from "supertest";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { Gateways } from "../adapters/primary/config/createGateways";
-import { createApp } from "../adapters/primary/server";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { Gateways } from "../config/bootstrap/createGateways";
+import { createApp } from "../config/bootstrap/server";
 import { InMemoryPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
 import { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";

@@ -21,6 +21,7 @@ import { HttpClient } from "shared-routes";
 import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { ZodError } from "zod";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
@@ -31,7 +32,6 @@ import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapte
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
-import { AppConfig } from "../../config/appConfig";
 
 describe("Admin router", () => {
   const now = new Date();

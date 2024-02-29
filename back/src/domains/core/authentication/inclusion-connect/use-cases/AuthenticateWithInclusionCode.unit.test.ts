@@ -7,7 +7,7 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { ForbiddenError } from "../../../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../../../config/helpers/httpErrors";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";

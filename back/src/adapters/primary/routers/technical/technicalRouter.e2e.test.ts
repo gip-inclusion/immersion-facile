@@ -12,6 +12,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
   GenerateBackOfficeJwt,
   GenerateConventionJwt,
@@ -22,7 +23,6 @@ import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapte
 import { DiscussionAggregateBuilder } from "../../../../domains/establishment/adapters/InMemoryDiscussionAggregateRepository";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
-import { AppConfig } from "../../config/appConfig";
 
 const discussionId = "my-discussion-id";
 const domain = "immersion-facile.beta.gouv.fr";

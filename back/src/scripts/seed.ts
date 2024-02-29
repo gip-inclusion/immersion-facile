@@ -11,8 +11,8 @@ import {
   peParisAgencyId,
   reasonableSchedule,
 } from "shared";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { createAppDependencies } from "../adapters/primary/config/createAppDependencies";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { createAppDependencies } from "../config/bootstrap/createAppDependencies";
 import { SavedError } from "../domains/core/saved-errors/ports/SavedErrorRepository";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import {

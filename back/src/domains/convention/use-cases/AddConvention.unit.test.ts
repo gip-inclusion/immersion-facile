@@ -7,7 +7,7 @@ import {
   BadRequestError,
   ConflictError,
   ForbiddenError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { DomainEvent } from "../../core/events/events";
 import {

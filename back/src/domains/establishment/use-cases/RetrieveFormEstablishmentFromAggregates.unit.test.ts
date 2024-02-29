@@ -8,7 +8,7 @@ import {
 import {
   BadRequestError,
   ForbiddenError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,

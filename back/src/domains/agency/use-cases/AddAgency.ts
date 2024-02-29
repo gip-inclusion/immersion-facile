@@ -6,7 +6,7 @@ import {
   createAgencySchema,
   invalidAgencySiretMessage,
 } from "shared";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SiretGateway } from "../../core/sirene/ports/SirenGateway";

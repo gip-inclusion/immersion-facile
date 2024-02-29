@@ -1,6 +1,6 @@
 import { Pool } from "pg";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { createPeAxiosSharedClient } from "../adapters/primary/helpers/createAxiosSharedClients";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { GetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
 import { ResyncOldConventionsToPe } from "../domains/convention/use-cases/ResyncOldConventionsToPe";

@@ -1,6 +1,6 @@
 import { addDays } from "date-fns";
 import { BackOfficeJwt, UserAndPassword, userAndPasswordSchema } from "shared";
-import { ForbiddenError } from "../../../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../../../config/helpers/httpErrors";
 import { UseCase } from "../../../UseCase";
 import { GenerateBackOfficeJwt } from "../../../jwt";
 import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";

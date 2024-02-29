@@ -4,7 +4,7 @@ import {
   GetDashboardParams,
   getDashboardParams,
 } from "shared";
-import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../../config/helpers/httpErrors";
 import { UseCase } from "../../UseCase";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { DashboardGateway } from "../port/DashboardGateway";

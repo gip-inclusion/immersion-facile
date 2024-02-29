@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { unauthenticatedConventionRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
-import type { AppDependencies } from "../../config/createAppDependencies";
-import { sendHttpResponse } from "../../helpers/sendHttpResponse";
+import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 
 export const createConventionRouter = (deps: AppDependencies) => {
   const expressRouter = Router();

@@ -5,7 +5,7 @@ import {
   createWebhookSubscriptionSchema,
   eventToRightName,
 } from "shared";
-import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
+import { ForbiddenError } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../UseCase";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";

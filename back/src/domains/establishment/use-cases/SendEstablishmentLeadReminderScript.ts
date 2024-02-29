@@ -8,8 +8,8 @@ import {
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { z } from "zod";
-import { AppConfig } from "../../../adapters/primary/config/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
+import { AppConfig } from "../../../config/bootstrap/appConfig";
+import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";

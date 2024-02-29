@@ -12,7 +12,7 @@ import {
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
-import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
+import { ConflictError } from "../../../config/helpers/httpErrors";
 import { KyselyDb, falsyToNull } from "../../../config/pg/kysely/kyselyUtils";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";

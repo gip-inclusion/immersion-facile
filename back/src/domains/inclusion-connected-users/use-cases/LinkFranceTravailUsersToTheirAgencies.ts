@@ -6,7 +6,7 @@ import {
   InclusionConnectedUser,
 } from "shared";
 import { z } from "zod";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UserAuthenticatedPayload } from "../../core/events/events";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

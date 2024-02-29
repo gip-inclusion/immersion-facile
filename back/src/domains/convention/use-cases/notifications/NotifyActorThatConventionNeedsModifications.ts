@@ -7,8 +7,8 @@ import {
   frontRoutes,
 } from "shared";
 import { P, match } from "ts-pattern";
-import { AppConfig } from "../../../../adapters/primary/config/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../../core/events/eventPayload.dto";
 import { conventionRequiresModificationPayloadSchema } from "../../../core/events/eventPayload.schema";

@@ -16,7 +16,7 @@ import { JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { apiKeyAuthMiddlewareRequestsTotal } from "../../utils/counters";
 import { createLogger } from "../../utils/logger";
-import { AppConfig } from "./config/appConfig";
+import { AppConfig } from "./appConfig";
 
 const logger = createLogger(__filename);
 

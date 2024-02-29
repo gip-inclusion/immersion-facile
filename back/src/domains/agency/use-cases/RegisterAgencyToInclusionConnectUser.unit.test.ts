@@ -9,7 +9,7 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { InMemoryAuthenticatedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryAuthenticatedUserRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";

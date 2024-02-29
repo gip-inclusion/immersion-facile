@@ -25,6 +25,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { conventionMissingMessage } from "../../../../domains/convention/entities/Convention";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
@@ -39,7 +40,6 @@ import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
-import { AppConfig } from "../../config/appConfig";
 
 const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
 

@@ -8,7 +8,7 @@ import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";

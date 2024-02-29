@@ -13,7 +13,7 @@ import {
   displayEmergencyContactInfos,
   expectToEqual,
 } from "shared";
-import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
 import { ShortLinkId } from "../../short-link/ports/ShortLinkQuery";
 import {

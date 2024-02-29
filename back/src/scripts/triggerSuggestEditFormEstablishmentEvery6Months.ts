@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { SiretDto } from "shared";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { makeGenerateEditFormEstablishmentUrl } from "../adapters/primary/config/magicLinkUrl";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { makeGenerateEditFormEstablishmentUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";

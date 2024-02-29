@@ -1,7 +1,7 @@
 import { AbsoluteUrl, queryParamsAsString } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { AppConfig } from "../../../../../../adapters/primary/config/appConfig";
+import { AppConfig } from "../../../../../../config/bootstrap/appConfig";
 import { AccessTokenDto } from "../../dto/AccessToken.dto";
 import { PeConnectAdvisorDto } from "../../dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../dto/PeConnectUser.dto";

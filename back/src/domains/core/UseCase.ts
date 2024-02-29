@@ -8,7 +8,7 @@ import { z } from "zod";
 import {
   BadRequestError,
   validateAndParseZodSchema,
-} from "../../adapters/primary/helpers/httpErrors";
+} from "../../config/helpers/httpErrors";
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";

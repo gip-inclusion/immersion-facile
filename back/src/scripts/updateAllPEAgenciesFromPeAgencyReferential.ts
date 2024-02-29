@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Pool } from "pg";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { createPeAxiosSharedClient } from "../adapters/primary/helpers/createAxiosSharedClients";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { HttpPeAgenciesReferential } from "../domains/agency/adapters/pe-agencies-referential/HttpPeAgenciesReferential";
 import { UpdateAllPeAgencies } from "../domains/agency/use-cases/UpdateAllPeAgencies";
 import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";

@@ -14,7 +14,7 @@ import {
 import {
   ConflictError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import {

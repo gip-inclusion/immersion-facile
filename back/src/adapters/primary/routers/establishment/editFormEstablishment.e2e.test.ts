@@ -12,6 +12,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
   GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
@@ -24,7 +25,6 @@ import {
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
-import { AppConfig } from "../../config/appConfig";
 
 describe("Edit form establishments", () => {
   let httpClient: HttpClient<EstablishmentRoutes>;

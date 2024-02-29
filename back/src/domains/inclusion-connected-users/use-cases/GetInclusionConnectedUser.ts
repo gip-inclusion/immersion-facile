@@ -10,7 +10,7 @@ import { z } from "zod";
 import {
   ForbiddenError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";

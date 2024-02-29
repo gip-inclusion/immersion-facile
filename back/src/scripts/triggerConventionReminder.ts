@@ -1,6 +1,6 @@
 import { filterNotFalsy } from "shared";
-import { AppConfig } from "../adapters/primary/config/appConfig";
-import { createGetPgPoolFn } from "../adapters/primary/config/createGateways";
+import { AppConfig } from "../config/bootstrap/appConfig";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { ConventionsReminder } from "../domains/convention/use-cases/ConventionsReminder";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";

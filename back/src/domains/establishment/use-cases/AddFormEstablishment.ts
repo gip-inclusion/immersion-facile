@@ -1,5 +1,5 @@
 import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
-import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
+import { ConflictError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";

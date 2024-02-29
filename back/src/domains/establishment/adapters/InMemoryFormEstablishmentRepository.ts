@@ -2,7 +2,7 @@ import { FormEstablishmentDto, SiretDto, propEq } from "shared";
 import {
   ConflictError,
   NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+} from "../../../config/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import {
   FormEstablishmentRepository,

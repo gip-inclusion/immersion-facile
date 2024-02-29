@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { AppConfig } from "../adapters/primary/config/appConfig";
+import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../domains/establishment/adapters/PgEstablishmentAggregateRepository";

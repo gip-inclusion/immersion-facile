@@ -1,5 +1,5 @@
 import { WithConventionDto, withConventionSchema } from "shared";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
+import { BadRequestError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

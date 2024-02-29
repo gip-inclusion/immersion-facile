@@ -1,6 +1,6 @@
 import { subMonths } from "date-fns";
 import { Pool } from "pg";
-import { AppConfig } from "../adapters/primary/config/appConfig";
+import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { PgConventionRepository } from "../domains/convention/adapters/PgConventionRepository";
 import { createLogger } from "../utils/logger";

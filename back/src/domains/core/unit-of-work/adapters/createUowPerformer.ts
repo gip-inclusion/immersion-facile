@@ -1,5 +1,5 @@
-import { AppConfig } from "../../../../adapters/primary/config/appConfig";
-import { GetPgPoolFn } from "../../../../adapters/primary/config/createGateways";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { GetPgPoolFn } from "../../../../config/bootstrap/createGateways";
 import { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
 import { InMemoryUowPerformer } from "./InMemoryUowPerformer";
 import { PgUowPerformer } from "./PgUowPerformer";
