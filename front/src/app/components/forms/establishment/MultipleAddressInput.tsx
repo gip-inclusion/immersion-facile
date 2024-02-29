@@ -26,7 +26,6 @@ export const MultipleAddressInput = ({
   disabled = false,
 }: MultipleAddressInputProps) => {
   const { cx } = useStyles();
-  console.log(currentAddresses);
   return (
     <div
       className={cx(fr.cx("fr-input-group"), "im-multiple-address-input")}

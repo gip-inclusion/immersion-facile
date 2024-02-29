@@ -27,7 +27,7 @@ const establishmentToSearchResultPreview = ({
     lon: 0,
   },
   address: {
-    streetNumberAndAddress: businessAddresses[0].rawAddress ?? "",
+    streetNumberAndAddress: businessAddresses[0]?.rawAddress ?? "",
     city: "",
     departmentCode: "",
     postcode: "",
