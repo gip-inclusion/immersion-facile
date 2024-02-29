@@ -19,8 +19,8 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {

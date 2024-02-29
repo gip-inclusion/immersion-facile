@@ -7,8 +7,8 @@ import {
 import {
   KyselyDb,
   makeKyselyDb,
-} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+} from "../../../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "../../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";

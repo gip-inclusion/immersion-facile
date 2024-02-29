@@ -15,11 +15,8 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
-import {
-  KyselyDb,
-  makeKyselyDb,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgOutboxRepository } from "../../core/events/adapters/PgOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";

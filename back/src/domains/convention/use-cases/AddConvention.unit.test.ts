@@ -8,16 +8,16 @@ import {
   ConflictError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import {
-  InMemorySiretGateway,
-  SiretEstablishmentDtoBuilder,
-} from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { DomainEvent } from "../../core/events/events";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
+import {
+  InMemorySiretGateway,
+  SiretEstablishmentDtoBuilder,
+} from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";

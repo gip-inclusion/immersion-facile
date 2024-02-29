@@ -6,8 +6,8 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { makeKyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { PgAssessmentRepository } from "./PgAssessmentRepository";

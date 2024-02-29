@@ -14,7 +14,7 @@ import {
   KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import {

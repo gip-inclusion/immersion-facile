@@ -3,7 +3,7 @@ import { pipeWithValue } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { DomainEvent } from "../events";
 import { OutboxQueries } from "../ports/OutboxQueries";
 import {

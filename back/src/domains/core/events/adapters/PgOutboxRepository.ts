@@ -4,7 +4,7 @@ import { DateString, castError, propEq, replaceArrayElement } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
 import type {

@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { AppConfig } from "../../primary/config/appConfig";
+import { AppConfig } from "../../adapters/primary/config/appConfig";
 
 export const optional = <T>(v: T | null) => v ?? undefined;
 

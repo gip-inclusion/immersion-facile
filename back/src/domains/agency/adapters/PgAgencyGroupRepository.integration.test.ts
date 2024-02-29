@@ -1,10 +1,7 @@
 import { Pool } from "pg";
 import { AgencyDtoBuilder, AgencyGroup, expectToEqual } from "shared";
-import {
-  KyselyDb,
-  makeKyselyDb,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyGroupRepository } from "./PgAgencyGroupRepository";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 

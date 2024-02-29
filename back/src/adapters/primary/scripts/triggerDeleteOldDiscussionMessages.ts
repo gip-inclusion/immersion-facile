@@ -1,8 +1,8 @@
 import { subMonths } from "date-fns";
 import { Pool } from "pg";
+import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { PgDiscussionAggregateRepository } from "../../../domains/establishment/adapters/PgDiscussionAggregateRepository";
 import { createLogger } from "../../../utils/logger";
-import { makeKyselyDb } from "../../secondary/pg/kysely/kyselyUtils";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 

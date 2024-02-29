@@ -10,7 +10,7 @@ import {
   executeKyselyRawSqlQuery,
   jsonBuildObject,
   jsonStripNulls,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../config/pg/kysely/kyselyUtils";
 import { GroupEntity } from "../entities/GroupEntity";
 import { GroupRepository } from "../ports/GroupRepository";
 

@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { ApiConsumer, WebhookSubscription, expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
+import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 

@@ -10,8 +10,8 @@ import {
   ConflictError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { makeKyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
   formEstablishementUpdateFailedErrorMessage,
   formEstablishmentNotFoundErrorMessage,

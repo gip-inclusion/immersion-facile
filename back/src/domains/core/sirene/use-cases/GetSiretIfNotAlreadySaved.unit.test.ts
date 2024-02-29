@@ -1,13 +1,13 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { ConflictError } from "../../../../adapters/primary/helpers/httpErrors";
-import {
-  InMemorySiretGateway,
-  SiretEstablishmentDtoBuilder,
-} from "../../../../adapters/secondary/siret/InMemorySiretGateway";
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemorySiretGateway,
+  SiretEstablishmentDtoBuilder,
+} from "../adapters/InMemorySiretGateway";
 import { GetSiretIfNotAlreadySaved } from "./GetSiretIfNotAlreadySaved";
 
 describe("GetSiretIfNotAlreadySaved", () => {

@@ -3,7 +3,7 @@ import {
   KyselyDb,
   cast,
   jsonBuildObject,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+} from "../../../config/pg/kysely/kyselyUtils";
 import { AgencyGroupRepository } from "../ports/AgencyGroupRepository";
 
 export class PgAgencyGroupRepository implements AgencyGroupRepository {

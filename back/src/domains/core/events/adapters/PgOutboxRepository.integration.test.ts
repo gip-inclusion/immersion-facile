@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
-import { makeKyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
+import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { DomainEvent, DomainTopic } from "../events";

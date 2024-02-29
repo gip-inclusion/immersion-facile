@@ -1,8 +1,8 @@
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
-} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { optional } from "../../../../../adapters/secondary/pg/pgUtils";
+} from "../../../../../config/pg/kysely/kyselyUtils";
+import { optional } from "../../../../../config/pg/pgUtils";
 import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 

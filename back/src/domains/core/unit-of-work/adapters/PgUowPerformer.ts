@@ -3,8 +3,8 @@ import { Pool } from "pg";
 import {
   KyselyDb,
   makeKyselyDb,
-} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { Database } from "../../../../adapters/secondary/pg/kysely/model/database";
+} from "../../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../../utils/logger";
 import { UnitOfWork } from "../ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";

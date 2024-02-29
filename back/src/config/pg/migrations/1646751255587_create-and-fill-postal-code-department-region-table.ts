@@ -5,7 +5,7 @@ export const up = async (pgm: MigrationBuilder) => {
   pgm.sql(
     fs
       .readFileSync(
-        `${__dirname}/../staticData/postal_code_department_region.sql`,
+        `${__dirname}/../static-data/postal_code_department_region.sql`,
       )
       .toString("utf8"),
   );

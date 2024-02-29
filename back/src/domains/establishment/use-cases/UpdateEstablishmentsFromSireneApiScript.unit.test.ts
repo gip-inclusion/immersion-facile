@@ -1,6 +1,6 @@
 import subDays from "date-fns/subDays";
 import { SiretEstablishmentDto, expectToEqual } from "shared";
-import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {

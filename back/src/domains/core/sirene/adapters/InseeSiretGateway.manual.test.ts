@@ -1,7 +1,7 @@
 import { expectObjectsToMatch, expectToEqual } from "shared";
-import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { AppConfig } from "../../primary/config/appConfig";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
+import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import { InseeSiretGateway } from "./InseeSiretGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the

@@ -7,9 +7,9 @@ import {
   expectToEqual,
 } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
-import { makeKyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { Database } from "../../../../adapters/secondary/pg/kysely/model/database";
-import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
+import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../../config/pg/kysely/model/database";
+import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import {
   SavedError,
   broadcastToPeServiceName,

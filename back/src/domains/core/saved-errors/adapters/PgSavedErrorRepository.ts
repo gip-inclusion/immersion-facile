@@ -1,7 +1,7 @@
 import { sql } from "kysely";
 import { ConventionId } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
-import { KyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import {
   SavedError,
   SavedErrorRepository,

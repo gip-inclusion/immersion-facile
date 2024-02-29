@@ -1,8 +1,8 @@
 import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import { AppellationAndRomeDto, expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 import {
   EstablishmentAggregateBuilder,

@@ -1,6 +1,6 @@
 import { andThen } from "ramda";
 import { ConventionReadDto, filter, pipeWithValue } from "shared";
-import { KyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { validateConventionReadResults } from "../../convention/adapters/PgConventionQueries";
 import {
   createConventionReadQueryBuilder,

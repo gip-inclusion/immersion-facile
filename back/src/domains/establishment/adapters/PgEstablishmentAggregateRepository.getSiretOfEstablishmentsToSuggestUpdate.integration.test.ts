@@ -2,11 +2,8 @@ import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
-import {
-  KyselyDb,
-  makeKyselyDb,
-} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgOutboxRepository } from "../../core/events/adapters/PgOutboxRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";

@@ -6,12 +6,12 @@ import {
   SiretEstablishmentDto,
   tooManySirenRequestsSiret,
 } from "shared";
-import { SiretGateway } from "../../../domains/core/sirene/ports/SirenGateway";
-import { createLogger } from "../../../utils/logger";
 import {
   TooManyRequestApiError,
   UnavailableApiError,
-} from "../../primary/helpers/httpErrors";
+} from "../../../../adapters/primary/helpers/httpErrors";
+import { createLogger } from "../../../../utils/logger";
+import { SiretGateway } from "../ports/SirenGateway";
 
 const logger = createLogger(__filename);
 

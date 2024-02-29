@@ -3,7 +3,7 @@
   "organizeImports": {
     "enabled": true,
     "ignore": [
-      "back/src/adapters/secondary/pg/staticData",
+      "back/src/config/pg/static-data",
       "node_modules",
       "front/public",
       "front/dev-dist",
