@@ -7,11 +7,11 @@ import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { SiretGateway } from "../../core/sirene/ports/SirenGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { makeEstablishmentAggregate } from "../service/makeEstablishmentAggregate";
 
 const logger = createLogger(__filename);

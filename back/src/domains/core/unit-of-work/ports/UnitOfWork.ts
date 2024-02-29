@@ -13,7 +13,6 @@ import { EstablishmentLeadRepository } from "../../../offer/ports/EstablishmentL
 import { FormEstablishmentRepository } from "../../../offer/ports/FormEstablishmentRepository";
 import { GroupRepository } from "../../../offer/ports/GroupRepository";
 import { SearchMadeRepository } from "../../../offer/ports/SearchMadeRepository";
-import { RomeRepository } from "../../../rome/ports/RomeRepository";
 import { ApiConsumerRepository } from "../../api-consumer/ports/ApiConsumerRepository";
 import { AuthenticatedUserRepository } from "../../authentication/inclusion-connect/port/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../authentication/inclusion-connect/port/OngoingOAuthRepositiory";
@@ -23,6 +22,7 @@ import { OutboxQueries } from "../../events/ports/OutboxQueries";
 import { OutboxRepository } from "../../events/ports/OutboxRepository";
 import { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";
 import { NotificationRepository } from "../../notifications/ports/NotificationRepository";
+import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { SavedErrorRepository } from "../../saved-errors/ports/SavedErrorRepository";
 import { ShortLinkQuery } from "../../short-link/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../../short-link/ports/ShortLinkRepository";

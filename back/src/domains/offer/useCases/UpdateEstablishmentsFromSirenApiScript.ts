@@ -3,10 +3,10 @@ import { keys } from "ramda";
 import { SiretDto, SiretEstablishmentDto } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
+import { SiretGateway } from "../../core/sirene/ports/SirenGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import {
   UpdateEstablishmentsWithInseeDataParams,
   ValuesToUpdateFromInseeApi,

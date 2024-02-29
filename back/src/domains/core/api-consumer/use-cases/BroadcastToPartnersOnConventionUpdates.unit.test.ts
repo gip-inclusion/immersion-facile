@@ -7,10 +7,10 @@ import {
 import {
   CallbackParams,
   InMemorySubscribersGateway,
-} from "../../../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
-import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+} from "../../../../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
+import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
 import { BroadcastToPartnersOnConventionUpdates } from "./BroadcastToPartnersOnConventionUpdates";
 
 describe("Broadcast to partners on updated convention", () => {

@@ -8,7 +8,7 @@ import {
 import { createOpenApiGenerator } from "shared-routes/openapi";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/broadcast/ports/SubscribersGateway";
+import { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,

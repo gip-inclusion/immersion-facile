@@ -1,6 +1,6 @@
-import { BadRequestError } from "../../adapters/primary/helpers/httpErrors";
-import { SiretGateway } from "./ports/SirenGateway";
-import { getSiretEstablishmentFromApi } from "./service/getSirenEstablishmentFromApi";
+import { BadRequestError } from "../../../../adapters/primary/helpers/httpErrors";
+import { SiretGateway } from "../ports/SirenGateway";
+import { getSiretEstablishmentFromApi } from "./getSirenEstablishmentFromApi";
 
 export const rejectsSiretIfNotAnOpenCompany = async (
   siretGateway: SiretGateway,

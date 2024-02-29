@@ -1,6 +1,6 @@
 import { AgencyId, AgencyRefersToInConvention } from "shared";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export const getReferedAgency = async (
   uow: UnitOfWork,

@@ -1,11 +1,11 @@
 import { WebhookSubscription, expectPromiseToFailWithError } from "shared";
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../core/unit-of-work/adapters/createInMemoryUow";
+} from "../../unit-of-work/adapters/createInMemoryUow";
+import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
 import { ListActiveSubscriptions } from "./ListActiveSubscriptions";
 
 describe("ListActiveSubscriptions", () => {

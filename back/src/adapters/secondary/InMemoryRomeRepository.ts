@@ -4,7 +4,7 @@ import {
   RomeCode,
   RomeDto,
 } from "shared";
-import { RomeRepository } from "../../domains/rome/ports/RomeRepository";
+import { RomeRepository } from "../../domains/core/rome/ports/RomeRepository";
 import { createLogger } from "../../utils/logger";
 import { normalize } from "../../utils/textSearch";
 

@@ -2,7 +2,7 @@ import { SubscriptionParams } from "shared";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
   SubscribersGateway,
-} from "../../../domains/broadcast/ports/SubscribersGateway";
+} from "../../../domains/core/api-consumer/ports/SubscribersGateway";
 
 export type CallbackParams = {
   body: ConventionUpdatedSubscriptionCallbackBody;

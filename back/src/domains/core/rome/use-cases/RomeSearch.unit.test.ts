@@ -1,7 +1,7 @@
 import { RomeDto } from "shared";
-import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryRomeRepository } from "../../../../adapters/secondary/InMemoryRomeRepository";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
 import { RomeSearch } from "./RomeSearch";
 
 const prepareUseCase = () => {
