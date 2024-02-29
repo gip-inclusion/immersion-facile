@@ -13,13 +13,13 @@ import {
   conventionReadSchema,
   parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
-import { createLogger } from "../../../../utils/logger";
 import {
   KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
-} from "../kysely/kyselyUtils";
+} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { createLogger } from "../../../utils/logger";
 
 export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
   // biome-ignore format: reads better without formatting

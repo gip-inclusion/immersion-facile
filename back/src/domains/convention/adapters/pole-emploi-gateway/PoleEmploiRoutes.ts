@@ -1,7 +1,7 @@
 import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { PoleEmploiConvention } from "../../../domains/convention/ports/PoleEmploiGateway";
+import { PoleEmploiConvention } from "../../ports/PoleEmploiGateway";
 
 export const getPeTestPrefix = (peApiUrl: AbsoluteUrl) =>
   ["https://api.peio.pe-qvr.fr", "https://api-r.es-qvr.fr"].includes(peApiUrl)

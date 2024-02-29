@@ -5,6 +5,8 @@ import {
   expectObjectsToMatch,
 } from "shared";
 import { PgAgencyRepository } from "../../../../domains/agency/adapters/PgAgencyRepository";
+import { PgConventionExternalIdRepository } from "../../../../domains/convention/adapters/PgConventionExternalIdRepository";
+import { PgConventionRepository } from "../../../../domains/convention/adapters/PgConventionRepository";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
@@ -13,12 +15,10 @@ import { PeConnectImmersionAdvisorDto } from "../../../../domains/core/authentic
 import { PeConnectUserDto } from "../../../../domains/core/authentication/pe-connect/dto/PeConnectUser.dto";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
-import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
 import {
   PgConventionPoleEmploiAdvisorRepository,
   PgConventionPoleEmploiUserAdvisorDto,
 } from "./PgConventionPoleEmploiAdvisorRepository";
-import { PgConventionRepository } from "./PgConventionRepository";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
 const userPeExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";

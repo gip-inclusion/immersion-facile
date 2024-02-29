@@ -1,14 +1,14 @@
 import { expectToEqual } from "shared";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { createPeAxiosSharedClient } from "../../../../adapters/primary/helpers/createAxiosSharedClients";
+import { InMemoryCachingGateway } from "../../../../adapters/secondary/core/InMemoryCachingGateway";
+import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
+import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import {
   GetAccessTokenResponse,
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
-} from "../../../domains/convention/ports/PoleEmploiGateway";
-import { noRetries } from "../../../domains/core/retry-strategy/ports/RetryStrategy";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { AppConfig } from "../../primary/config/appConfig";
-import { createPeAxiosSharedClient } from "../../primary/helpers/createAxiosSharedClients";
-import { InMemoryCachingGateway } from "../core/InMemoryCachingGateway";
+} from "../../ports/PoleEmploiGateway";
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
 
 const config = AppConfig.createFromEnv();

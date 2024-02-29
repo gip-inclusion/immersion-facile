@@ -8,7 +8,6 @@ import {
   ConflictError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import {
   InMemorySiretGateway,
   SiretEstablishmentDtoBuilder,
@@ -23,6 +22,7 @@ import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGa
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
 import { AddConvention } from "./AddConvention";
 
 describe("Add Convention", () => {

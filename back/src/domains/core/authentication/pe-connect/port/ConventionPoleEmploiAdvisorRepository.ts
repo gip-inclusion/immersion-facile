@@ -17,7 +17,6 @@ export interface ConventionPoleEmploiAdvisorRepository {
     conventionId: ConventionId,
     userPeExternalId: PeExternalId,
   ) => Promise<ConventionAndPeExternalIds>;
-
   getByConventionId: (
     conventionId: ConventionId,
   ) => Promise<ConventionPoleEmploiUserAdvisorEntity | undefined>;

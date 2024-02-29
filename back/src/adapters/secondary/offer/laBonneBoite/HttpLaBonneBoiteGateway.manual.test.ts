@@ -1,6 +1,7 @@
 import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
+import { HttpPoleEmploiGateway } from "../../../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { GetAccessTokenResponse } from "../../../../domains/convention/ports/PoleEmploiGateway";
 import { noRetries } from "../../../../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -8,7 +9,6 @@ import { LaBonneBoiteRequestParams } from "../../../../domains/establishment/por
 import { AppConfig } from "../../../primary/config/appConfig";
 import { createPeAxiosSharedClient } from "../../../primary/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../../core/InMemoryCachingGateway";
-import { HttpPoleEmploiGateway } from "../../poleEmploi/HttpPoleEmploiGateway";
 import { HttpLaBonneBoiteGateway } from "./HttpLaBonneBoiteGateway";
 import { createLbbRoutes } from "./LaBonneBoite.routes";
 import { LaBonneBoiteCompanyDtoBuilder } from "./LaBonneBoiteCompanyDtoBuilder";

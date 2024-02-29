@@ -4,25 +4,25 @@ import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
 import { AbsoluteUrl, castError } from "shared";
 import { HttpClient } from "shared-routes";
+import { AccessTokenConfig } from "../../../../adapters/primary/config/appConfig";
+import { InMemoryCachingGateway } from "../../../../adapters/secondary/core/InMemoryCachingGateway";
+import {
+  createAxiosInstance,
+  isRetryableError,
+  logAxiosError,
+} from "../../../../utils/axiosUtils";
+import { createLogger } from "../../../../utils/logger";
+import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
+import {
+  RetryStrategy,
+  RetryableError,
+} from "../../../core/retry-strategy/ports/RetryStrategy";
 import {
   GetAccessTokenResponse,
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
-} from "../../../domains/convention/ports/PoleEmploiGateway";
-import {
-  RetryStrategy,
-  RetryableError,
-} from "../../../domains/core/retry-strategy/ports/RetryStrategy";
-import {
-  createAxiosInstance,
-  isRetryableError,
-  logAxiosError,
-} from "../../../utils/axiosUtils";
-import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { AccessTokenConfig } from "../../primary/config/appConfig";
-import { InMemoryCachingGateway } from "../core/InMemoryCachingGateway";
+} from "../../ports/PoleEmploiGateway";
 import { PoleEmploiRoutes, getPeTestPrefix } from "./PoleEmploiRoutes";
 
 const logger = createLogger(__filename);

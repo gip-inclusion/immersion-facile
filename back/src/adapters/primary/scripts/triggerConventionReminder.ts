@@ -1,5 +1,5 @@
 import { filterNotFalsy } from "shared";
-import { ConventionsReminder } from "../../../domains/convention/useCases/ConventionsReminder";
+import { ConventionsReminder } from "../../../domains/convention/use-cases/ConventionsReminder";
 import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";

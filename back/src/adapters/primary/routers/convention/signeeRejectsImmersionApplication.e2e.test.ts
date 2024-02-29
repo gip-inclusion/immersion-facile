@@ -12,10 +12,10 @@ import {
   unauthenticatedConventionRoutes,
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { InMemoryConventionRepository } from "../../../../domains/convention/adapters/InMemoryConventionRepository";
 import { TestAppAndDeps, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
-import { InMemoryConventionRepository } from "../../../secondary/InMemoryConventionRepository";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid conventions in the repository, and ask for establishment edition", async () => {

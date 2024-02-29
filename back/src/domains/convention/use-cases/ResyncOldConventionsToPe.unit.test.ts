@@ -6,13 +6,13 @@ import {
   expectToEqual,
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryPoleEmploiGateway } from "../../../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryPoleEmploiGateway } from "../adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import {
   PoleEmploiConvention,
   conventionStatusToPoleEmploiStatus,

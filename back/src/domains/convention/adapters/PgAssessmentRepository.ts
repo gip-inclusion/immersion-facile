@@ -1,7 +1,10 @@
 import { AssessmentStatus, ConventionId, assessmentSchema } from "shared";
-import { AssessmentEntity } from "../../../../domains/convention/entities/AssessmentEntity";
-import { AssessmentRepository } from "../../../../domains/convention/ports/AssessmentRepository";
-import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
+import {
+  KyselyDb,
+  executeKyselyRawSqlQuery,
+} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { AssessmentEntity } from "../entities/AssessmentEntity";
+import { AssessmentRepository } from "../ports/AssessmentRepository";
 
 interface PgAssessment {
   convention_id: string;

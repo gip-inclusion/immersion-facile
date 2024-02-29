@@ -1,15 +1,15 @@
 import { andThen } from "ramda";
 import { ConventionReadDto, filter, pipeWithValue } from "shared";
+import { validateConventionReadResults } from "../../../../domains/convention/adapters/PgConventionQueries";
+import {
+  createConventionReadQueryBuilder,
+  makeGetLastConventionWithSiretInList,
+} from "../../../../domains/convention/adapters/pgConventionSql";
 import { isSiretsListFilled } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
 import { EstablishmentLeadQueries } from "../../../../domains/establishment/ports/EstablishmentLeadQueries";
 import { EstablishmentLeadReminderParams } from "../../../../domains/establishment/useCases/SendEstablishmentLeadReminderScript";
 import { KyselyDb } from "../kysely/kyselyUtils";
-import { validateConventionReadResults } from "./PgConventionQueries";
 import { getEstablishmentLeadSiretsByUniqLastEventKindBuilder } from "./PgEstablishmentLeadRepository";
-import {
-  createConventionReadQueryBuilder,
-  makeGetLastConventionWithSiretInList,
-} from "./pgConventionSql";
 
 export class PgEstablishmentLeadQueries implements EstablishmentLeadQueries {
   constructor(private transaction: KyselyDb) {}

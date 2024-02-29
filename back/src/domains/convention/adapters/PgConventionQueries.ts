@@ -12,12 +12,12 @@ import {
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
+import { KyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { AssessmentEmailDomainTopic } from "../../core/events/events";
 import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
-} from "../../../../domains/convention/ports/ConventionQueries";
-import { AssessmentEmailDomainTopic } from "../../../../domains/core/events/events";
-import { KyselyDb } from "../kysely/kyselyUtils";
+} from "../ports/ConventionQueries";
 import {
   createConventionReadQueryBuilder,
   getReadConventionById,

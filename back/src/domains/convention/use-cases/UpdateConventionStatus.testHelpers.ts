@@ -23,7 +23,6 @@ import {
   ForbiddenError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
@@ -36,6 +35,7 @@ import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGa
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 
 const allInclusionConnectedTestUsers = [

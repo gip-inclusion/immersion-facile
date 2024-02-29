@@ -2,6 +2,7 @@ import axios from "axios";
 import { Pool } from "pg";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { UpdateAllPeAgencies } from "../../../domains/agency/use-cases/UpdateAllPeAgencies";
+import { HttpPoleEmploiGateway } from "../../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEmploiGateway";
 import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
@@ -12,7 +13,6 @@ import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/
 import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { InMemoryCachingGateway } from "../../secondary/core/InMemoryCachingGateway";
 import { HttpPeAgenciesReferential } from "../../secondary/offer/peAgenciesReferential/HttpPeAgenciesReferential";
-import { HttpPoleEmploiGateway } from "../../secondary/poleEmploi/HttpPoleEmploiGateway";
 import { AppConfig } from "../config/appConfig";
 import { createPeAxiosSharedClient } from "../helpers/createAxiosSharedClients";
 

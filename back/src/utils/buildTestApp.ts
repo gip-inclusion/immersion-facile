@@ -7,9 +7,9 @@ import { InMemoryInclusionConnectGateway } from "../adapters/secondary/Inclusion
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryLaBonneBoiteGateway } from "../adapters/secondary/offer/laBonneBoite/InMemoryLaBonneBoiteGateway";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/offer/passEmploi/InMemoryPassEmploiGateway";
-import { InMemoryPoleEmploiGateway } from "../adapters/secondary/poleEmploi/InMemoryPoleEmploiGateway";
 import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import { InMemorySubscribersGateway } from "../adapters/secondary/subscribersGateway/InMemorySubscribersGateway";
+import { InMemoryPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
 import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";

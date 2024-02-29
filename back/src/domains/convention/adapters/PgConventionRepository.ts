@@ -12,9 +12,12 @@ import {
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
-import { ConventionRepository } from "../../../../domains/convention/ports/ConventionRepository";
-import { ConflictError } from "../../../primary/helpers/httpErrors";
-import { KyselyDb, falsyToNull } from "../kysely/kyselyUtils";
+import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  KyselyDb,
+  falsyToNull,
+} from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {
