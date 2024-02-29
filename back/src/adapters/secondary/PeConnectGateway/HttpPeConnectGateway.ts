@@ -7,11 +7,11 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
-import { AccessTokenDto } from "../../../domains/peConnect/dto/AccessToken.dto";
-import { PeConnectAdvisorDto } from "../../../domains/peConnect/dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../../../domains/peConnect/dto/PeConnectUser.dto";
-import { externalAccessTokenSchema } from "../../../domains/peConnect/port/AccessToken.schema";
-import { PeConnectGateway } from "../../../domains/peConnect/port/PeConnectGateway";
+import { AccessTokenDto } from "../../../domains/core/authentication/pe-connect/dto/AccessToken.dto";
+import { PeConnectAdvisorDto } from "../../../domains/core/authentication/pe-connect/dto/PeConnectAdvisor.dto";
+import { PeConnectUserDto } from "../../../domains/core/authentication/pe-connect/dto/PeConnectUser.dto";
+import { externalAccessTokenSchema } from "../../../domains/core/authentication/pe-connect/port/AccessToken.schema";
+import { PeConnectGateway } from "../../../domains/core/authentication/pe-connect/port/PeConnectGateway";
 import {
   CounterType,
   exchangeCodeForAccessTokenCounter,

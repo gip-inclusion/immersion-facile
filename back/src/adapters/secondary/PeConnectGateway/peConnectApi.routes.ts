@@ -1,9 +1,9 @@
 import { AbsoluteUrl, queryParamsAsString } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { AccessTokenDto } from "../../../domains/peConnect/dto/AccessToken.dto";
-import { PeConnectAdvisorDto } from "../../../domains/peConnect/dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../../../domains/peConnect/dto/PeConnectUser.dto";
+import { AccessTokenDto } from "../../../domains/core/authentication/pe-connect/dto/AccessToken.dto";
+import { PeConnectAdvisorDto } from "../../../domains/core/authentication/pe-connect/dto/PeConnectAdvisor.dto";
+import { PeConnectUserDto } from "../../../domains/core/authentication/pe-connect/dto/PeConnectUser.dto";
 import { AppConfig } from "../../primary/config/appConfig";
 import {
   ExternalAccessToken,

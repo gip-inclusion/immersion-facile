@@ -5,19 +5,19 @@ import {
   frontRoutes,
   reasonableSchedule,
 } from "shared";
-import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
-} from "../../../utils/makeExpectSavedNotificationsAndEvents";
-import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+} from "../../../../../utils/makeExpectSavedNotificationsAndEvents";
+import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
+import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../../unit-of-work/adapters/createInMemoryUow";
+import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";

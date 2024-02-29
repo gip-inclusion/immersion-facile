@@ -18,13 +18,13 @@ import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 
 export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;

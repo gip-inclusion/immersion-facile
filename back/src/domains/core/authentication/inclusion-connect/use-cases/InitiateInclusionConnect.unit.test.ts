@@ -5,9 +5,9 @@ import {
   expectToEqual,
   queryParamsAsString,
 } from "shared";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { InitiateInclusionConnect } from "./InitiateInclusionConnect";
 
 const clientId = "my-client-id";
