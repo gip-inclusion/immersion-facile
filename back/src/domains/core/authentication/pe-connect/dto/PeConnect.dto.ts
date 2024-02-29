@@ -6,7 +6,7 @@ import {
   PeExternalId,
   notJobSeeker,
 } from "shared";
-import { EntityFromDto } from "../../../utils/EntityFromDto";
+import { EntityFromDto } from "../../../../../utils/EntityFromDto";
 import { PeConnectImmersionAdvisorDto } from "./PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "./PeConnectUser.dto";
 

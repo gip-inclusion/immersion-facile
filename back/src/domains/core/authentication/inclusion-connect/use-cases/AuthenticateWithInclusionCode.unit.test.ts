@@ -7,18 +7,18 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryInclusionConnectGateway } from "../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
-import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { ForbiddenError } from "../../../../../adapters/primary/helpers/httpErrors";
+import { InMemoryInclusionConnectGateway } from "../../../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import { makeCreateNewEvent } from "../../../events/ports/EventBus";
+import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
+} from "../../../unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
+import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";

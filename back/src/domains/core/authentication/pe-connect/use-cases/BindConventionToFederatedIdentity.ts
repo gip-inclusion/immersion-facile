@@ -6,10 +6,10 @@ import {
   isPeConnectIdentity,
   withConventionSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { TransactionalUseCase } from "../../../UseCase";
+import { CreateNewEvent } from "../../../events/ports/EventBus";
+import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 
 export class BindConventionToFederatedIdentity extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;

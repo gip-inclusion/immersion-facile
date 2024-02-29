@@ -1,9 +1,9 @@
 import { addDays } from "date-fns";
 import { BackOfficeJwt, UserAndPassword, userAndPasswordSchema } from "shared";
-import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
-import { UseCase } from "../../../core/UseCase";
-import { GenerateBackOfficeJwt } from "../../../core/jwt";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { ForbiddenError } from "../../../../../adapters/primary/helpers/httpErrors";
+import { UseCase } from "../../../UseCase";
+import { GenerateBackOfficeJwt } from "../../../jwt";
+import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 
 export class AdminLogin extends UseCase<UserAndPassword, BackOfficeJwt> {
   protected inputSchema = userAndPasswordSchema;

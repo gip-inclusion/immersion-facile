@@ -11,10 +11,10 @@ import {
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
 } from "shared";
+import { InclusionConnectConfig } from "../../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
 import { EmailableApiKey } from "../../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import { DomainTopic } from "../../../domains/core/events/events";
 import { S3Params } from "../../../domains/core/file-storage/adapters/S3DocumentGateway";
-import { InclusionConnectConfig } from "../../../domains/inclusionConnect/useCases/InitiateInclusionConnect";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;

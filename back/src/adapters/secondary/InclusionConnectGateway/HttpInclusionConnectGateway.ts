@@ -1,12 +1,12 @@
 import { decodeJwtWithoutSignatureCheck, queryParamsAsString } from "shared";
 import { HttpClient } from "shared-routes";
-import { InclusionConnectIdTokenPayload } from "../../../domains/inclusionConnect/entities/InclusionConnectIdTokenPayload";
+import { InclusionConnectIdTokenPayload } from "../../../domains/core/authentication/inclusion-connect/entities/InclusionConnectIdTokenPayload";
 import {
   GetAccessTokenParams,
   GetAccessTokenResult,
   InclusionConnectGateway,
-} from "../../../domains/inclusionConnect/port/InclusionConnectGateway";
-import { InclusionConnectConfig } from "../../../domains/inclusionConnect/useCases/InitiateInclusionConnect";
+} from "../../../domains/core/authentication/inclusion-connect/port/InclusionConnectGateway";
+import { InclusionConnectConfig } from "../../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
 import { createLogger } from "../../../utils/logger";
 import { InclusionConnectExternalRoutes } from "./inclusionConnectExternalRoutes";
 

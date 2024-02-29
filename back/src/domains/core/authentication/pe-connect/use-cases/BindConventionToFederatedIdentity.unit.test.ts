@@ -7,16 +7,16 @@ import {
 import {
   CONVENTION_ID_DEFAULT_UUID,
   InMemoryConventionPoleEmploiAdvisorRepository,
-} from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+} from "../../../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
+import { InMemoryOutboxRepository } from "../../../events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../../events/ports/EventBus";
+import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
 import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedIdentity";

@@ -5,8 +5,6 @@ import { ConventionExternalIdRepository } from "../../../convention/ports/Conven
 import { ConventionQueries } from "../../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../../convention/ports/ConventionRepository";
 import { ConventionsToSyncRepository } from "../../../convention/ports/ConventionsToSyncRepository";
-import { AuthenticatedUserRepository } from "../../../generic/OAuth/ports/AuthenticatedUserRepositiory";
-import { OngoingOAuthRepository } from "../../../generic/OAuth/ports/OngoingOAuthRepositiory";
 import { DeletedEstablishmentRepository } from "../../../offer/ports/DeletedEstablishmentRepository";
 import { DiscussionAggregateRepository } from "../../../offer/ports/DiscussionAggregateRepository";
 import { EstablishmentAggregateRepository } from "../../../offer/ports/EstablishmentAggregateRepository";
@@ -15,9 +13,11 @@ import { EstablishmentLeadRepository } from "../../../offer/ports/EstablishmentL
 import { FormEstablishmentRepository } from "../../../offer/ports/FormEstablishmentRepository";
 import { GroupRepository } from "../../../offer/ports/GroupRepository";
 import { SearchMadeRepository } from "../../../offer/ports/SearchMadeRepository";
-import { ConventionPoleEmploiAdvisorRepository } from "../../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { RomeRepository } from "../../../rome/ports/RomeRepository";
 import { ApiConsumerRepository } from "../../api-consumer/ports/ApiConsumerRepository";
+import { AuthenticatedUserRepository } from "../../authentication/inclusion-connect/port/AuthenticatedUserRepositiory";
+import { OngoingOAuthRepository } from "../../authentication/inclusion-connect/port/OngoingOAuthRepositiory";
+import { ConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/port/ConventionPoleEmploiAdvisorRepository";
 import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { OutboxQueries } from "../../events/ports/OutboxQueries";
 import { OutboxRepository } from "../../events/ports/OutboxRepository";

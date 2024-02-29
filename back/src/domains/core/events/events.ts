@@ -16,8 +16,8 @@ import {
   WithFormEstablishmentDto,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
-import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { WithEstablishmentAggregate } from "../../offer/entities/EstablishmentEntity";
+import { IdentityProvider } from "../authentication/inclusion-connect/entities/OngoingOAuth";
 import { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import {
   ConventionReminderPayload,

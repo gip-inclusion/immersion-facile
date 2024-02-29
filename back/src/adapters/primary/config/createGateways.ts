@@ -7,6 +7,8 @@ import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEm
 import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../../domains/core/address/adapters/InMemoryAddressGateway";
+import { InclusionConnectGateway } from "../../../domains/core/authentication/inclusion-connect/port/InclusionConnectGateway";
+import { PeConnectGateway } from "../../../domains/core/authentication/pe-connect/port/PeConnectGateway";
 import { MetabaseDashboardGateway } from "../../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../../domains/core/dashboard/adapters/StubDashboardGateway";
 import { DashboardGateway } from "../../../domains/core/dashboard/port/DashboardGateway";
@@ -33,8 +35,6 @@ import { CustomTimeGateway } from "../../../domains/core/time-gateway/adapters/C
 import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { TimeGateway } from "../../../domains/core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../../domains/core/uuid-generator/ports/UuidGenerator";
-import { InclusionConnectGateway } from "../../../domains/inclusionConnect/port/InclusionConnectGateway";
-import { PeConnectGateway } from "../../../domains/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../../utils/logger";
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";

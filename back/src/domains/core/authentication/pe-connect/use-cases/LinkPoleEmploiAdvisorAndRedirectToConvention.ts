@@ -5,9 +5,9 @@ import {
   queryParamsAsString,
 } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { TransactionalUseCase } from "../../../UseCase";
+import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   ConventionPeConnectFields,

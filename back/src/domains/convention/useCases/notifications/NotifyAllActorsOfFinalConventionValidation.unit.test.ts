@@ -13,6 +13,7 @@ import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
+import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import {
   WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,
@@ -27,7 +28,6 @@ import {
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 
 const establishmentTutorEmail = "establishment-tutor@mail.com";
