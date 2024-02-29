@@ -1,12 +1,12 @@
 import { filterNotFalsy } from "shared";
-import { ConventionsReminder } from "../../../domains/convention/use-cases/ConventionsReminder";
-import { makeCreateNewEvent } from "../../../domains/core/events/ports/EventBus";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createUowPerformer } from "../../../domains/core/unit-of-work/adapters/createUowPerformer";
-import { UuidV4Generator } from "../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { createLogger } from "../../../utils/logger";
-import { AppConfig } from "../config/appConfig";
-import { createGetPgPoolFn } from "../config/createGateways";
+import { AppConfig } from "../adapters/primary/config/appConfig";
+import { createGetPgPoolFn } from "../adapters/primary/config/createGateways";
+import { ConventionsReminder } from "../domains/convention/use-cases/ConventionsReminder";
+import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
+import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

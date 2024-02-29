@@ -1,14 +1,14 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
+import { AppConfig } from "../adapters/primary/config/appConfig";
 import {
   ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
-} from "../../../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
-import { InseeSiretGateway } from "../../../domains/core/sirene/adapters/InseeSiretGateway";
-import { RealTimeGateway } from "../../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { createLogger } from "../../../utils/logger";
-import { AppConfig } from "../config/appConfig";
+} from "../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
+import { InseeSiretGateway } from "../domains/core/sirene/adapters/InseeSiretGateway";
+import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createLogger } from "../utils/logger";
 
 const logger = createLogger(__filename);
 

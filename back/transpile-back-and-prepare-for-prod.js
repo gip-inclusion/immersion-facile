@@ -14,7 +14,7 @@ if (fs.existsSync("./back-build.tar.gz")) fs.unlinkSync("./back-build.tar.gz");
 const version = process.argv[2];
 console.log(`Transpile back and setting version ${version}`);
 execSync("tsc -b tsconfig.prod.json");
-const path = "build/back/src/adapters/primary/scripts/version.js";
+const path = "build/back/src/scripts/version.js";
 replaceInFileSync(path, /"__VERSION__"/, `"${version}"`);
 
 console.log("Copying package.json of root, shared and libs for prod");
