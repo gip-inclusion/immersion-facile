@@ -7,13 +7,13 @@ import {
 } from "shared";
 import { EmailNotification } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
-import {
-  InMemoryNotificationRepository,
-  expectEmailSignatoryConfirmationSignatureRequestMatchingConvention,
-} from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
+import {
+  InMemoryNotificationRepository,
+  expectEmailSignatoryConfirmationSignatureRequestMatchingConvention,
+} from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
   WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,

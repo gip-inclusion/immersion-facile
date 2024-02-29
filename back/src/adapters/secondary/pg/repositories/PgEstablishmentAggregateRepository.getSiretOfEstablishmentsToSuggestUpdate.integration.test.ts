@@ -3,11 +3,11 @@ import subDays from "date-fns/subDays";
 import { Pool, PoolClient } from "pg";
 import { expectToEqual } from "shared";
 import { PgOutboxRepository } from "../../../../domains/core/events/adapters/PgOutboxRepository";
+import { PgNotificationRepository } from "../../../../domains/core/notifications/adapters/PgNotificationRepository";
 import { EstablishmentAggregateBuilder } from "../../offer/EstablishmentBuilders";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
-import { PgNotificationRepository } from "./PgNotificationRepository";
 
 describe("PgScriptsQueries", () => {
   let pool: Pool;

@@ -10,8 +10,8 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryAuthenticatedUserRepository } from "../../../adapters/secondary/InMemoryAuthenticatedUserRepository";
-import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
+import { InMemoryAuthenticatedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryAuthenticatedUserRepository";
+import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";

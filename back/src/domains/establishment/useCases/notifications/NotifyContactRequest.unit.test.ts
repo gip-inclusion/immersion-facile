@@ -9,7 +9,6 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
-import { InMemoryRomeRepository } from "../../../../adapters/secondary/InMemoryRomeRepository";
 import {
   TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,
@@ -23,6 +22,7 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import { InMemoryRomeRepository } from "../../../core/rome/adapters/InMemoryRomeRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";

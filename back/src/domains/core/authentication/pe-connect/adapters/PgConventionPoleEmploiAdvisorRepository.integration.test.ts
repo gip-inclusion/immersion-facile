@@ -4,17 +4,20 @@ import {
   ConventionDtoBuilder,
   expectObjectsToMatch,
 } from "shared";
-import { PgAgencyRepository } from "../../../../domains/agency/adapters/PgAgencyRepository";
-import { PgConventionExternalIdRepository } from "../../../../domains/convention/adapters/PgConventionExternalIdRepository";
-import { PgConventionRepository } from "../../../../domains/convention/adapters/PgConventionRepository";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../../adapters/secondary/pg/pgUtils";
+import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
+import { PgConventionExternalIdRepository } from "../../../../convention/adapters/PgConventionExternalIdRepository";
+import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
-} from "../../../../domains/core/authentication/pe-connect/dto/PeConnect.dto";
-import { PeConnectImmersionAdvisorDto } from "../../../../domains/core/authentication/pe-connect/dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../../../../domains/core/authentication/pe-connect/dto/PeConnectUser.dto";
-import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+} from "../dto/PeConnect.dto";
+import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
+import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
 import {
   PgConventionPoleEmploiAdvisorRepository,
   PgConventionPoleEmploiUserAdvisorDto,

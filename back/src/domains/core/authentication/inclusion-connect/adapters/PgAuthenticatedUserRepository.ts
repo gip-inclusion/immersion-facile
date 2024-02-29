@@ -1,6 +1,9 @@
 import { AuthenticatedUser } from "shared";
-import { AuthenticatedUserRepository } from "../../../../domains/core/authentication/inclusion-connect/port/AuthenticatedUserRepositiory";
-import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
+import {
+  KyselyDb,
+  executeKyselyRawSqlQuery,
+} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { AuthenticatedUserRepository } from "../port/AuthenticatedUserRepositiory";
 
 type PersistenceAuthenticatedUser = {
   id: string;

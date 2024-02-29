@@ -12,11 +12,14 @@ import {
   exhaustiveCheck,
 } from "shared";
 import {
+  KyselyDb,
+  executeKyselyRawSqlQuery,
+} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { createLogger } from "../../../../utils/logger";
+import {
   EmailNotificationFilters,
   NotificationRepository,
-} from "../../../../domains/core/notifications/ports/NotificationRepository";
-import { createLogger } from "../../../../utils/logger";
-import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
+} from "../ports/NotificationRepository";
 
 const logger = createLogger(__filename);
 export class PgNotificationRepository implements NotificationRepository {

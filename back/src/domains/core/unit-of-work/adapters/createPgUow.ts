@@ -1,6 +1,4 @@
 import { KyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { PgAuthenticatedUserRepository } from "../../../../adapters/secondary/pg/repositories/PgAuthenticatedUserRepository";
-import { PgConventionPoleEmploiAdvisorRepository } from "../../../../adapters/secondary/pg/repositories/PgConventionPoleEmploiAdvisorRepository";
 import { PgDeletedEstablishmentRepository } from "../../../../adapters/secondary/pg/repositories/PgDeletedEstablishmentRepository";
 import { PgDiscussionAggregateRepository } from "../../../../adapters/secondary/pg/repositories/PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "../../../../adapters/secondary/pg/repositories/PgEstablishmentAggregateRepository";
@@ -8,10 +6,6 @@ import { PgEstablishmentLeadQueries } from "../../../../adapters/secondary/pg/re
 import { PgEstablishmentLeadRepository } from "../../../../adapters/secondary/pg/repositories/PgEstablishmentLeadRepository";
 import { PgFormEstablishmentRepository } from "../../../../adapters/secondary/pg/repositories/PgFormEstablishmentRepository";
 import { PgGroupRepository } from "../../../../adapters/secondary/pg/repositories/PgGroupRepository";
-import { PgInclusionConnectedUserRepository } from "../../../../adapters/secondary/pg/repositories/PgInclusionConnectedUserRepository";
-import { PgNotificationRepository } from "../../../../adapters/secondary/pg/repositories/PgNotificationRepository";
-import { PgOngoingOAuthRepository } from "../../../../adapters/secondary/pg/repositories/PgOngoingOAuthRepository";
-import { PgRomeRepository } from "../../../../adapters/secondary/pg/repositories/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../../../adapters/secondary/pg/repositories/PgSearchMadeRepository";
 import { PgAgencyGroupRepository } from "../../../agency/adapters/PgAgencyGroupRepository";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
@@ -21,9 +15,15 @@ import { PgConventionQueries } from "../../../convention/adapters/PgConventionQu
 import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
 import { PgConventionsToSyncRepository } from "../../../convention/adapters/PgConventionsToSyncRepository";
 import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
+import { PgAuthenticatedUserRepository } from "../../authentication/inclusion-connect/adapters/PgAuthenticatedUserRepository";
+import { PgInclusionConnectedUserRepository } from "../../authentication/inclusion-connect/adapters/PgInclusionConnectedUserRepository";
+import { PgOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/PgOngoingOAuthRepository";
+import { PgConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/adapters/PgConventionPoleEmploiAdvisorRepository";
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";
+import { PgNotificationRepository } from "../../notifications/adapters/PgNotificationRepository";
+import { PgRomeRepository } from "../../rome/adapters/PgRomeRepository";
 import { PgSavedErrorRepository } from "../../saved-errors/adapters/PgSavedErrorRepository";
 import { PgShortLinkRepository } from "../../short-link/adapters/short-link-repository/PgShortLinkRepository";
 import { UnitOfWork } from "../ports/UnitOfWork";

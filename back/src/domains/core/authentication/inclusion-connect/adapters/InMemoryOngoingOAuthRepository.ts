@@ -1,8 +1,5 @@
-import {
-  IdentityProvider,
-  OngoingOAuth,
-} from "../../domains/core/authentication/inclusion-connect/entities/OngoingOAuth";
-import { OngoingOAuthRepository } from "../../domains/core/authentication/inclusion-connect/port/OngoingOAuthRepositiory";
+import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
+import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
 export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   // for test purpose

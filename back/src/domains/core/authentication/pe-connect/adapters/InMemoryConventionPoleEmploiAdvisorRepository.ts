@@ -1,13 +1,13 @@
 import { ConventionId, PeExternalId } from "shared";
+import { NotFoundError } from "../../../../../adapters/primary/helpers/httpErrors";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
-} from "../../domains/core/authentication/pe-connect/dto/PeConnect.dto";
+} from "../dto/PeConnect.dto";
 import {
   ConventionAndPeExternalIds,
   ConventionPoleEmploiAdvisorRepository,
-} from "../../domains/core/authentication/pe-connect/port/ConventionPoleEmploiAdvisorRepository";
-import { NotFoundError } from "../primary/helpers/httpErrors";
+} from "../port/ConventionPoleEmploiAdvisorRepository";
 
 export class InMemoryConventionPoleEmploiAdvisorRepository
   implements ConventionPoleEmploiAdvisorRepository

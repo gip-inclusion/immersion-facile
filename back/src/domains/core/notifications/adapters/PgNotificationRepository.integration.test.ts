@@ -8,8 +8,8 @@ import {
   TemplatedSms,
   expectToEqual,
 } from "shared";
-import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+import { makeKyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
 const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";

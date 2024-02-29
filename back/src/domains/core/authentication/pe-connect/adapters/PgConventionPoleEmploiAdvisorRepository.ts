@@ -4,18 +4,21 @@ import {
   parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
 import {
+  KyselyDb,
+  executeKyselyRawSqlQuery,
+} from "../../../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { createLogger } from "../../../../../utils/logger";
+import {
   ConventionPoleEmploiUserAdvisorDto,
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
-} from "../../../../domains/core/authentication/pe-connect/dto/PeConnect.dto";
-import { isPeAdvisorImmersionKind } from "../../../../domains/core/authentication/pe-connect/dto/PeConnectAdvisor.dto";
+} from "../dto/PeConnect.dto";
+import { isPeAdvisorImmersionKind } from "../dto/PeConnectAdvisor.dto";
 import {
   ConventionAndPeExternalIds,
   ConventionPoleEmploiAdvisorRepository,
-} from "../../../../domains/core/authentication/pe-connect/port/ConventionPoleEmploiAdvisorRepository";
-import { conventionPoleEmploiUserAdvisorDtoSchema } from "../../../../domains/core/authentication/pe-connect/port/PeConnect.schema";
-import { createLogger } from "../../../../utils/logger";
-import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
+} from "../port/ConventionPoleEmploiAdvisorRepository";
+import { conventionPoleEmploiUserAdvisorDtoSchema } from "../port/PeConnect.schema";
 
 const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
 

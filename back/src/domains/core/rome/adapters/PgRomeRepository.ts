@@ -6,9 +6,12 @@ import {
   RomeLabel,
   castError,
 } from "shared";
-import { RomeRepository } from "../../../../domains/core/rome/ports/RomeRepository";
+import {
+  KyselyDb,
+  executeKyselyRawSqlQuery,
+} from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../utils/logger";
-import { KyselyDb, executeKyselyRawSqlQuery } from "../kysely/kyselyUtils";
+import { RomeRepository } from "../ports/RomeRepository";
 
 const logger = createLogger(__filename);
 
