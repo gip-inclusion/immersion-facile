@@ -7,11 +7,11 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-} from "../../../../adapters/primary/helpers/httpErrors";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import { CreateNewEvent } from "../../../core/events/ports/EventBus";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+} from "../../../adapters/primary/helpers/httpErrors";
+import { TransactionalUseCase } from "../../core/UseCase";
+import { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
   AgencyId[],

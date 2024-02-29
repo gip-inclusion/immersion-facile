@@ -1,10 +1,10 @@
 import { subDays } from "date-fns";
 import { Pool } from "pg";
 import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
+import { PgAgencyRepository } from "../../../../domains/agency/adapters/PgAgencyRepository";
 import { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
-import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgEstablishmentLeadQueries } from "./PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";

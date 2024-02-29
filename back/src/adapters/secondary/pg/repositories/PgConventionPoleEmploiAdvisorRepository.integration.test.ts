@@ -4,6 +4,7 @@ import {
   ConventionDtoBuilder,
   expectObjectsToMatch,
 } from "shared";
+import { PgAgencyRepository } from "../../../../domains/agency/adapters/PgAgencyRepository";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
@@ -12,7 +13,6 @@ import { PeConnectImmersionAdvisorDto } from "../../../../domains/core/authentic
 import { PeConnectUserDto } from "../../../../domains/core/authentication/pe-connect/dto/PeConnectUser.dto";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
-import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
 import {
   PgConventionPoleEmploiAdvisorRepository,

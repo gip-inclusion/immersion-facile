@@ -1,6 +1,4 @@
 import { KyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
-import { PgAgencyGroupRepository } from "../../../../adapters/secondary/pg/repositories/PgAgencyGroupRepository";
-import { PgAgencyRepository } from "../../../../adapters/secondary/pg/repositories/PgAgencyRepository";
 import { PgAssessmentRepository } from "../../../../adapters/secondary/pg/repositories/PgAssessmentRepository";
 import { PgAuthenticatedUserRepository } from "../../../../adapters/secondary/pg/repositories/PgAuthenticatedUserRepository";
 import { PgConventionExternalIdRepository } from "../../../../adapters/secondary/pg/repositories/PgConventionExternalIdRepository";
@@ -20,6 +18,8 @@ import { PgNotificationRepository } from "../../../../adapters/secondary/pg/repo
 import { PgOngoingOAuthRepository } from "../../../../adapters/secondary/pg/repositories/PgOngoingOAuthRepository";
 import { PgRomeRepository } from "../../../../adapters/secondary/pg/repositories/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../../../adapters/secondary/pg/repositories/PgSearchMadeRepository";
+import { PgAgencyGroupRepository } from "../../../agency/adapters/PgAgencyGroupRepository";
+import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";

@@ -15,13 +15,13 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
+import { PgAgencyRepository } from "../../../../domains/agency/adapters/PgAgencyRepository";
 import { PgOutboxRepository } from "../../../../domains/core/events/adapters/PgOutboxRepository";
 import { makeCreateNewEvent } from "../../../../domains/core/events/ports/EventBus";
 import { RealTimeGateway } from "../../../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { UuidV4Generator } from "../../../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
-import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 

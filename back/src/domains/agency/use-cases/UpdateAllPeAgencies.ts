@@ -5,16 +5,16 @@ import {
   activeAgencyStatuses,
 } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import { AddressGateway } from "../../../core/address/ports/AddressGateway";
-import { AppLogger } from "../../../core/app-logger/ports/AppLogger";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { UuidGenerator } from "../../../core/uuid-generator/ports/UuidGenerator";
+import { TransactionalUseCase } from "../../core/UseCase";
+import { AddressGateway } from "../../core/address/ports/AddressGateway";
+import { AppLogger } from "../../core/app-logger/ports/AppLogger";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
-} from "../../../establishment/ports/PeAgenciesReferential";
+} from "../../establishment/ports/PeAgenciesReferential";
 
 const counts = {
   added: 0,

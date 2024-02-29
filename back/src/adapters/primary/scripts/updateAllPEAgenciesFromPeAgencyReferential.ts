@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Pool } from "pg";
 import { createAxiosSharedClient } from "shared-routes/axios";
+import { UpdateAllPeAgencies } from "../../../domains/agency/use-cases/UpdateAllPeAgencies";
 import { GetAccessTokenResponse } from "../../../domains/convention/ports/PoleEmploiGateway";
-import { UpdateAllPeAgencies } from "../../../domains/convention/useCases/agencies/UpdateAllPeAgencies";
 import { HttpAddressGateway } from "../../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { ConsoleAppLogger } from "../../../domains/core/app-logger/adapters/ConsoleAppLogger";

@@ -10,23 +10,23 @@ import {
 import {
   ConflictError,
   NotFoundError,
-} from "../../../../adapters/primary/helpers/httpErrors";
+} from "../../../adapters/primary/helpers/httpErrors";
 import {
   InMemorySiretGateway,
   TEST_OPEN_ESTABLISHMENT_1,
-} from "../../../../adapters/secondary/siret/InMemorySiretGateway";
+} from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../../core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+} from "../../core/events/ports/EventBus";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { referedAgencyMissingMessage } from "../../ports/AgencyRepository";
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { referedAgencyMissingMessage } from "../ports/AgencyRepository";
 import { AddAgency } from "./AddAgency";
 
 describe("AddAgency use case", () => {

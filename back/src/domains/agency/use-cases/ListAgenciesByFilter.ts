@@ -5,8 +5,8 @@ import {
   activeAgencyStatuses,
   listAgenciesRequestSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../../core/UseCase";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../core/UseCase";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export class ListAgenciesByFilter extends TransactionalUseCase<
   ListAgenciesRequestDto,

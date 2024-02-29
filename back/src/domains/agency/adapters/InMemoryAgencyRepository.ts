@@ -15,12 +15,12 @@ import {
   WithGeoPosition,
   isTruthy,
 } from "shared";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import {
   AgencyRepository,
   someAgenciesMissingMessage,
-} from "../../domains/convention/ports/AgencyRepository";
-import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
-import { NotFoundError } from "../primary/helpers/httpErrors";
+} from "../ports/AgencyRepository";
 
 const testAgencies: AgencyDto[] = [
   {

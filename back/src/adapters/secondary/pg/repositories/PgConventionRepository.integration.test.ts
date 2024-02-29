@@ -13,10 +13,10 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
+import { PgAgencyRepository } from "../../../../domains/agency/adapters/PgAgencyRepository";
 import { ConflictError } from "../../../primary/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../kysely/kyselyUtils";
 import { getTestPgPool } from "../pgUtils";
-import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {

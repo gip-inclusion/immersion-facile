@@ -11,14 +11,14 @@ import {
   BadRequestError,
   ConflictError,
   UnauthorizedError,
-} from "../../../../adapters/primary/helpers/httpErrors";
-import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
-import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
-import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+} from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
 import { UpdateAgency } from "./UpdateAgency";
 
 const backofficeJwtPayload: BackOfficeJwtPayload = {

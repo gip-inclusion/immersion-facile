@@ -8,9 +8,9 @@ import {
 } from "shared";
 import { makeKyselyDb } from "../../../../adapters/secondary/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../adapters/secondary/pg/pgUtils";
-import { PgAgencyRepository } from "../../../../adapters/secondary/pg/repositories/PgAgencyRepository";
 import { PgAssessmentRepository } from "../../../../adapters/secondary/pg/repositories/PgAssessmentRepository";
 import { PgConventionRepository } from "../../../../adapters/secondary/pg/repositories/PgConventionRepository";
+import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { AssessmentEntity } from "../../../convention/entities/AssessmentEntity";
 
 const conventionId = "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa";

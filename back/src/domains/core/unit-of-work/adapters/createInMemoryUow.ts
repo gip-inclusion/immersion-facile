@@ -1,5 +1,3 @@
-import { InMemoryAgencyGroupRepository } from "../../../../adapters/secondary/InMemoryAgencyGroupRepository";
-import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryAssessmentRepository } from "../../../../adapters/secondary/InMemoryAssessmentRepository";
 import { InMemoryAuthenticatedUserRepository } from "../../../../adapters/secondary/InMemoryAuthenticatedUserRepository";
 import { InMemoryConventionExternalIdRepository } from "../../../../adapters/secondary/InMemoryConventionExternalIdRepository";
@@ -19,6 +17,8 @@ import { InMemoryEstablishmentAggregateRepository } from "../../../../adapters/s
 import { InMemoryEstablishmentLeadRepository } from "../../../../adapters/secondary/offer/InMemoryEstablishmentLeadRepository";
 import { InMemoryGroupRepository } from "../../../../adapters/secondary/offer/InMemoryGroupRepository";
 import { InMemorySearchMadeRepository } from "../../../../adapters/secondary/offer/InMemorySearchMadeRepository";
+import { InMemoryAgencyGroupRepository } from "../../../agency/adapters/InMemoryAgencyGroupRepository";
+import { InMemoryAgencyRepository } from "../../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryApiConsumerRepository } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryOutboxQueries } from "../../events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../events/adapters/InMemoryOutboxRepository";

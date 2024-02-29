@@ -14,8 +14,8 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { agencyMissingMessage } from "../ports/AgencyRepository";
 
 const throwIfStatusTransitionNotPossible = ({
   initialStatus,

@@ -1,5 +1,5 @@
-import { AgencyGroupRepository } from "../../../convention/ports/AgencyGroupRepository";
-import { AgencyRepository } from "../../../convention/ports/AgencyRepository";
+import { AgencyGroupRepository } from "../../../agency/ports/AgencyGroupRepository";
+import { AgencyRepository } from "../../../agency/ports/AgencyRepository";
 import { AssessmentRepository } from "../../../convention/ports/AssessmentRepository";
 import { ConventionExternalIdRepository } from "../../../convention/ports/ConventionExternalIdRepository";
 import { ConventionQueries } from "../../../convention/ports/ConventionQueries";

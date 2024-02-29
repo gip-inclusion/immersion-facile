@@ -7,13 +7,13 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { someAgenciesMissingMessage } from "../../../../domains/convention/ports/AgencyRepository";
 import {
   ConflictError,
   NotFoundError,
-} from "../../../primary/helpers/httpErrors";
-import { makeKyselyDb } from "../kysely/kyselyUtils";
-import { getTestPgPool } from "../pgUtils";
+} from "../../../adapters/primary/helpers/httpErrors";
+import { makeKyselyDb } from "../../../adapters/secondary/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../adapters/secondary/pg/pgUtils";
+import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
 import {
   PgAgencyRepository,
   safirConflictErrorMessage,
