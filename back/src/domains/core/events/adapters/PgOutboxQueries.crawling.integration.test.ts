@@ -18,6 +18,7 @@ let alreadyProcessedEvent: DomainEvent;
 let quarantinedEvent: DomainEvent;
 let convention: ConventionDto;
 let failedButQuarantinedEvent: DomainEvent;
+let inProcessEvent: DomainEvent;
 
 const createEvents = async (
   uuidGenerator: TestUuidGenerator,
@@ -121,6 +122,14 @@ const createEvents = async (
       },
     ],
   });
+
+  timeGateway.setNextDate(new Date("2021-11-15T10:04:00.000Z"));
+  uuidGenerator.setNextUuid("dbdbdc99-9d0d-dddd-dd6d-6dd9dd38dbdb");
+  inProcessEvent = createNewEvent({
+    topic: "ConventionSubmittedByBeneficiary",
+    payload: { convention },
+    status: "in-process",
+  });
 };
 
 describe("PgOutboxQueries for crawling purposes", () => {
@@ -164,6 +173,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       event3,
       alreadyProcessedEvent,
       quarantinedEvent,
+      inProcessEvent,
     ]);
 
     // act
@@ -184,6 +194,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       event1,
       withFailureButEventuallySuccessfulEvent,
       failedButQuarantinedEvent,
+      inProcessEvent,
     ]);
 
     // act
@@ -219,6 +230,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       withFailureButEventuallySuccessfulEvent,
       failedButQuarantinedEvent,
       anotherEventFailedToRerun,
+      inProcessEvent,
     ]);
 
     // act
