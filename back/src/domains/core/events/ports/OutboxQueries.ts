@@ -1,6 +1,8 @@
 import { DomainEvent } from "../events";
 
 export interface OutboxQueries {
-  getAllUnpublishedEvents: () => Promise<DomainEvent[]>;
-  getAllFailedEvents: () => Promise<DomainEvent[]>;
+  getAllUnpublishedEvents: (params: { limit: number }) => Promise<
+    DomainEvent[]
+  >;
+  getAllFailedEvents: (params: { limit: number }) => Promise<DomainEvent[]>;
 }
