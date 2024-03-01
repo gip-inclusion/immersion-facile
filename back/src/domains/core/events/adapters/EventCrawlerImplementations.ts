@@ -83,8 +83,8 @@ export class BasicEventCrawler implements EventCrawler {
     try {
       const events = await this.uowPerformer.perform((uow) =>
         type === "unpublished"
-          ? uow.outboxQueries.getAllUnpublishedEvents({ limit: 600 })
-          : uow.outboxQueries.getAllFailedEvents({ limit: 600 }),
+          ? uow.outboxQueries.getAllUnpublishedEvents({ limit: 300 })
+          : uow.outboxQueries.getAllFailedEvents({ limit: 300 }),
       );
       return events;
     } catch (error: any) {
