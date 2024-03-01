@@ -22,6 +22,7 @@ export const createPoleEmploiRoutes = (peApiUrl: AbsoluteUrl) => {
       ...withAuthorizationHeaders,
       responses: {
         200: z.literal(""),
+        201: z.literal(""),
       },
     }),
   });
