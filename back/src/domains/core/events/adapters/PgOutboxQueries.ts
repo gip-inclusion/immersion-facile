@@ -14,7 +14,9 @@ import {
 export class PgOutboxQueries implements OutboxQueries {
   constructor(private transaction: KyselyDb) {}
 
-  public async getAllFailedEvents(): Promise<DomainEvent[]> {
+  public async getAllFailedEvents(params: { limit: number }): Promise<
+    DomainEvent[]
+  > {
     const selectEventIdsWithFailure = `(
       SELECT outbox.id
       FROM outbox_failures
@@ -54,13 +56,16 @@ export class PgOutboxQueries implements OutboxQueries {
      LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
      WHERE outbox.id IN ${selectEventIdsStillFailing}
      ORDER BY outbox_failures.subscription_id ASC
+     LIMIT ${params.limit}
     `,
     );
 
     return convertRowsToDomainEvents(rows);
   }
 
-  public async getAllUnpublishedEvents(): Promise<DomainEvent[]> {
+  public async getAllUnpublishedEvents(params: { limit: number }): Promise<
+    DomainEvent[]
+  > {
     const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
       this.transaction,
       `
@@ -72,6 +77,7 @@ export class PgOutboxQueries implements OutboxQueries {
     LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
     WHERE was_quarantined = false AND status IN ('never-published', 'to-republish')
     ORDER BY published_at ASC
+    LIMIT ${params.limit}
     `,
     );
 
