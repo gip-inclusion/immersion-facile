@@ -65,6 +65,7 @@ export class PgInclusionConnectedUserRepository
             'departmentCode', agencies.department_code,
             'city', agencies.city
           ),
+          'coveredDepartments', agencies.covered_departments,
           'adminEmails', agencies.admin_emails,
           'agencySiret', agencies.agency_siret,
           'codeSafir', agencies.code_safir,
