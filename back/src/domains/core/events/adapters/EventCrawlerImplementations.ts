@@ -26,12 +26,12 @@ export class BasicEventCrawler implements EventCrawler {
     status,
     limit,
   }: { status: EventStatus; limit: number }) {
-    const neverPublishedCount = await this.uowPerformer.perform((uow) =>
+    const count = await this.uowPerformer.perform((uow) =>
       uow.outboxRepository.countAllEvents({ status }),
     );
-    if (neverPublishedCount < limit) return;
-    logger.error(`${status} outbox ${neverPublishedCount} exceeds ${limit}`);
-    notifyDiscord(`${status} outbox ${neverPublishedCount} exceeds ${limit}`);
+    if (count <= limit) return;
+    logger.error(`${status} outbox ${count} exceeds ${limit}`);
+    notifyDiscord(`${status} outbox ${count} exceeds ${limit}`);
   }
 
   public async processNewEvents(): Promise<void> {
@@ -184,21 +184,22 @@ export class RealEventCrawler
 
     retryFailedEvents();
 
-    this.#checkForOutboxCount({
-      status: "never-published",
-      limit: neverPublishedOutboxLimit,
-    });
+    this.#checkForOutboxCount();
   }
 
-  #checkForOutboxCount({
-    status,
-    limit,
-  }: { status: EventStatus; limit: number }) {
+  #checkForOutboxCount() {
     setTimeout(
       () =>
-        this.notifyDiscordOnTooManyOutboxWithStatus({ status, limit }).finally(
-          () => this.#checkForOutboxCount({ status, limit }),
-        ),
+        Promise.all([
+          this.notifyDiscordOnTooManyOutboxWithStatus({
+            status: "never-published",
+            limit: neverPublishedOutboxLimit,
+          }),
+          this.notifyDiscordOnTooManyOutboxWithStatus({
+            status: "in-process",
+            limit: crawlerMaxBatchSize,
+          }),
+        ]).finally(() => this.#checkForOutboxCount()),
       5 * 60 * 1000, //5 min
     );
   }
