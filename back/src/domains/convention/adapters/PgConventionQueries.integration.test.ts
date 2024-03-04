@@ -48,6 +48,8 @@ describe("Pg implementation of ConventionQueries", () => {
     await client.query(
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
     );
+    await client.query("DELETE FROM agency_groups__agencies");
+    await client.query("DELETE FROM agency_groups");
     await client.query("DELETE FROM agencies");
     transaction = makeKyselyDb(pool);
 

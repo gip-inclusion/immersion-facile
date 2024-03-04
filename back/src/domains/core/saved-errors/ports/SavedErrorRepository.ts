@@ -1,7 +1,9 @@
-import { ConventionId } from "shared";
+import { ApiConsumerId, ApiConsumerName, ConventionId } from "shared";
 
 export type SavedError = {
   serviceName: string;
+  consumerId: ApiConsumerId | null;
+  consumerName: ApiConsumerName;
   message: string;
   params?: Record<string, unknown>;
   occurredAt: Date;

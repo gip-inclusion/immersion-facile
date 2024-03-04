@@ -128,6 +128,8 @@ interface Agencies {
 
 interface SavedErrors {
   id: Generated<number>;
+  consumer_id: string | null;
+  consumer_name: string;
   service_name: string;
   message: string;
   params: Record<string, unknown> | null;
@@ -260,7 +262,7 @@ interface EstablishmentLeadEvents {
 
 interface ApiConsumers {
   id: string;
-  consumer: string;
+  name: string;
   description: string | null;
   created_at: Timestamp;
   expiration_date: Timestamp;

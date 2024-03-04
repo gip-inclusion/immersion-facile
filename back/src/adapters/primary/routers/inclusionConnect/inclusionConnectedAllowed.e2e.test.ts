@@ -269,6 +269,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inMemoryUow.conventionRepository.setConventions([convention]);
       await inMemoryUow.errorRepository.save({
         serviceName: broadcastToPeServiceName,
+        consumerName: "France Travail",
+        consumerId: null,
         message: "Some message",
         params: { conventionId, httpStatus: 500 },
         occurredAt: new Date("2023-10-26T12:00:00.000"),
@@ -287,6 +289,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectToEqual(inMemoryUow.errorRepository.savedErrors, [
         {
           serviceName: broadcastToPeServiceName,
+          consumerName: "France Travail",
+          consumerId: null,
           message: "Some message",
           params: { conventionId, httpStatus: 500 },
           occurredAt: new Date("2023-10-26T12:00:00.000"),

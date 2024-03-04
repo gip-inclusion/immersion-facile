@@ -114,16 +114,18 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
         logger.error(response);
 
         await uow.errorRepository.save({
-          serviceName: "BroadcastToPartnersOnConventionUpdates",
+          consumerId: apiConsumer.id,
+          consumerName: apiConsumer.name,
+          handledByAgency: false,
           message: response.message,
           occurredAt: this.#timeGateway.now(),
           params: {
-            httpStatus: response.status,
+            callbackUrl: response.callbackUrl,
             conventionId: response.conventionId,
             conventionStatus: response.conventionStatus,
-            callbackUrl: response.callbackUrl,
+            httpStatus: response.status,
           },
-          handledByAgency: false,
+          serviceName: "BroadcastToPartnersOnConventionUpdates",
         });
 
         return;

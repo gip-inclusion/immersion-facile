@@ -7,7 +7,7 @@ import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
 const apiConsumer: ApiConsumer = {
   id: new UuidV4Generator().new(),
-  consumer: "passeEmploi",
+  name: "passeEmploi",
   description: "my description",
   contact: {
     firstName: "john",
@@ -68,7 +68,7 @@ describe("PgApiConsumerRepository", () => {
 
     const updatedApiConsumer: ApiConsumer = {
       id: apiConsumer.id,
-      consumer: "passeEmploiupdated",
+      name: "passeEmploiupdated",
       contact: {
         firstName: "john 5",
         lastName: "manson",

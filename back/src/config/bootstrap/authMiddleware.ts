@@ -196,14 +196,14 @@ export const makeConsumerMiddleware = (
       if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
         incTotalCountForRequest({
           authorisationStatus: "expiredToken",
-          consumerName: apiConsumer.consumer,
+          consumerName: apiConsumer.name,
         });
         return responseErrorForV2(res, "expired token", 401);
       }
 
       // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
       incTotalCountForRequest({
-        consumerName: apiConsumer.consumer,
+        consumerName: apiConsumer.name,
         authorisationStatus: "authorised",
       });
 

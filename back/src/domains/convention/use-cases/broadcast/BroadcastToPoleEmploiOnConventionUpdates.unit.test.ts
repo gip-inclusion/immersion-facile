@@ -114,6 +114,8 @@ describe("Broadcasts events to pole-emploi", () => {
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
     expectToEqual(uow.errorRepository.savedErrors, [
       {
+        consumerId: null,
+        consumerName: "France Travail",
         serviceName: broadcastToPeServiceName,
         params: {
           conventionId: convention.id,

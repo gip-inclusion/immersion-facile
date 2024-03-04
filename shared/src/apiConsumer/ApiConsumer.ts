@@ -60,7 +60,7 @@ export type ConventionScope = Either<
 
 export type WriteApiConsumerParams = {
   id: ApiConsumerId;
-  consumer: ApiConsumerName;
+  name: ApiConsumerName;
   contact: ApiConsumerContact;
   description?: string;
   rights: WriteApiConsumerRights;
@@ -147,7 +147,7 @@ export const createApiConsumerParamsFromApiConsumer = (
       subscriptions: [],
     },
   },
-  consumer: apiConsumer.consumer,
+  name: apiConsumer.name,
   contact: apiConsumer.contact,
   description: apiConsumer.description,
   expirationDate: apiConsumer.expirationDate,

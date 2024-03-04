@@ -11,7 +11,10 @@ import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/events/ports/EventBus";
-import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/SavedErrorRepository";
+import {
+  SavedError,
+  broadcastToPeServiceName,
+} from "../../../core/saved-errors/ports/SavedErrorRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -83,8 +86,10 @@ describe("mark partners errored convention as handled", () => {
     const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
     const savedErrorsRepository = uow.errorRepository;
 
-    const savedErrorConvention = {
+    const savedErrorConvention: SavedError = {
       serviceName: broadcastToPeServiceName,
+      consumerName: "Yolo",
+      consumerId: "yolo-id",
       params: {
         conventionId,
         httpStatus: 404,
@@ -131,8 +136,10 @@ describe("mark partners errored convention as handled", () => {
     const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
     const savedErrorsRepository = uow.errorRepository;
 
-    const savedErrorConvention1 = {
+    const savedErrorConvention1: SavedError = {
       serviceName: broadcastToPeServiceName,
+      consumerId: "my-consumer-id",
+      consumerName: "My consumer name",
       params: {
         conventionId,
         httpStatus: 404,
@@ -142,8 +149,10 @@ describe("mark partners errored convention as handled", () => {
       handledByAgency: false,
     };
 
-    const savedErrorConvention2 = {
+    const savedErrorConvention2: SavedError = {
       serviceName: broadcastToPeServiceName,
+      consumerId: "my-consumer-id",
+      consumerName: "My consumer name",
       params: {
         conventionId,
         httpStatus: 404,
@@ -153,8 +162,10 @@ describe("mark partners errored convention as handled", () => {
       handledByAgency: false,
     };
 
-    const savedErrorConvention3 = {
+    const savedErrorConvention3: SavedError = {
       serviceName: "Yolo.serviceName",
+      consumerId: "my-consumer-id",
+      consumerName: "My consumer name",
       params: {
         conventionId,
         httpStatus: 404,
@@ -228,8 +239,10 @@ describe("mark partners errored convention as handled", () => {
     const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
     const savedErrorsRepository = uow.errorRepository;
 
-    const savedHandledErrorConvention = {
+    const savedHandledErrorConvention: SavedError = {
       serviceName: broadcastToPeServiceName,
+      consumerId: "my-consumer-id",
+      consumerName: "My consumer name",
       params: {
         conventionId,
         httpStatus: 404,

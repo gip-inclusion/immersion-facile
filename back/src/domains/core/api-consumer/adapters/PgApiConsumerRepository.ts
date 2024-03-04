@@ -59,7 +59,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
 
     const values = {
       id: rest.id,
-      consumer: rest.consumer,
+      name: rest.name,
       description: rest.description ?? null,
       rights: JSON.parse(JSON.stringify(rightsWithoutSubscriptions)),
       created_at: rest.createdAt,
@@ -162,7 +162,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
         jsonStripNulls(
           jsonBuildObject({
             id: eb.ref("c.id"),
-            consumer: eb.ref("c.consumer"),
+            name: eb.ref("c.name"),
             description: eb.ref("c.description"),
             rights: cast<ApiConsumerRights>(eb.ref("c.rights")),
             createdAt: sql<DateString>`date_to_iso(c.created_at)`,
@@ -193,7 +193,7 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
 
 type PgRawConsumerData = {
   id: string;
-  consumer: string;
+  name: string;
   description?: string;
   rights: ApiConsumerRights;
   createdAt: DateString;

@@ -172,7 +172,7 @@ export class SimulatedAdminGateway implements AdminGateway {
 const apiConsumers: ApiConsumer[] = [
   {
     id: "fake-api-consumer-id-1",
-    consumer: "FakeApiConsumer1",
+    name: "FakeApiConsumer1",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce fermentum odio nibh, quis porta mi tempus quis.",
     contact: {
@@ -201,7 +201,7 @@ const apiConsumers: ApiConsumer[] = [
   },
   {
     id: "fake-api-consumer-id-2",
-    consumer: "FakeApiConsumer2",
+    name: "FakeApiConsumer2",
     description: "Temp",
     contact: {
       lastName: "FakeLastname2",

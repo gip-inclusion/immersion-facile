@@ -113,6 +113,8 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
 
     if (!isBroadcastResponseOk(response)) {
       await uow.errorRepository.save({
+        consumerId: null,
+        consumerName: "France Travail",
         serviceName: broadcastToPeServiceName,
         message: response.message,
         params: { conventionId: convention.id, httpStatus: response.status },
