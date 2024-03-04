@@ -344,16 +344,32 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns agencies filtered by departmentCode", async () => {
+      const agencyWithParisInCoveredDepartments = new AgencyDtoBuilder()
+        .withId("66666666-6666-6666-6666-666666666666")
+        .withKind("cci")
+        .withAddress({
+          departmentCode: "64",
+          city: "Bayonne",
+          postcode: "64100",
+          streetNumberAndAddress: "OSEF",
+        })
+        .withCoveredDepartments(["64", "75"])
+        .build();
+
       await Promise.all([
         agencyRepository.insert(agenciesByName[0]),
         agencyRepository.insert(agenciesByName[1]),
         agencyRepository.insert(agenciesByName[2]),
         agencyRepository.insert(agencyCciInParis),
+        agencyRepository.insert(agencyWithParisInCoveredDepartments),
       ]);
       const agencies = await agencyRepository.getAgencies({
         filters: { departmentCode: "75" },
       });
-      expect(sortById(agencies)).toEqual([agencyCciInParis]);
+      expect(sortById(agencies)).toEqual([
+        agencyCciInParis,
+        agencyWithParisInCoveredDepartments,
+      ]);
     });
   });
 

@@ -86,7 +86,7 @@ const makeDepartmentCodeFilterSQL = (
   departmentCode?: DepartmentCode,
 ): string | undefined => {
   if (!departmentCode) return;
-  return format("department_code =%1$L", departmentCode);
+  return format("covered_departments @> %L", `["${departmentCode}"]`);
 };
 
 const makePositionFilterSQL = (
