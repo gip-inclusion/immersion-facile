@@ -1,7 +1,10 @@
 import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
 import { createLogger } from "../../../../utils/logger";
-import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
+import {
+  notifyDiscord,
+  notifyObjectDiscord,
+} from "../../../../utils/notifyDiscord";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { DomainEvent, eventsToDebugInfo } from "../events";
 import { EventBus } from "../ports/EventBus";
@@ -10,12 +13,27 @@ import { EventCrawler } from "../ports/EventCrawler";
 const logger = createLogger(__filename);
 
 const maxEventsProcessedInParallel = 5;
+const neverPublishedOutboxLimit = 1500;
+const crawlerMaxBatchSize = 300;
 
 export class BasicEventCrawler implements EventCrawler {
   constructor(
     private uowPerformer: UnitOfWorkPerformer,
     private readonly eventBus: EventBus,
   ) {}
+
+  protected async notifyDiscordOnTooManyNeverPublishedOutbox() {
+    const neverPublishedCount = await this.uowPerformer.perform((uow) =>
+      uow.outboxRepository.countAllNeverPublishedEvents(),
+    );
+    if (neverPublishedCount < neverPublishedOutboxLimit) return;
+    logger.error(
+      `"never-published" outbox ${neverPublishedCount} exceeds ${neverPublishedOutboxLimit}`,
+    );
+    notifyDiscord(
+      `"never-published" outbox ${neverPublishedCount} exceeds ${neverPublishedOutboxLimit}`,
+    );
+  }
 
   public async processNewEvents(): Promise<void> {
     const getEventsStartDate = new Date();
@@ -83,8 +101,10 @@ export class BasicEventCrawler implements EventCrawler {
     try {
       const events = await this.uowPerformer.perform((uow) =>
         type === "unpublished"
-          ? uow.outboxQueries.getAllUnpublishedEvents({ limit: 300 })
-          : uow.outboxQueries.getAllFailedEvents({ limit: 300 }),
+          ? uow.outboxQueries.getAllUnpublishedEvents({
+              limit: crawlerMaxBatchSize,
+            })
+          : uow.outboxQueries.getAllFailedEvents({ limit: crawlerMaxBatchSize }),
       );
       return events;
     } catch (error: any) {
@@ -164,5 +184,16 @@ export class RealEventCrawler
       }, retryErrorsPeriodMs);
 
     retryFailedEvents();
+
+    const checkForNeverPublishedOutboxCount = () => {
+      setTimeout(
+        () =>
+          this.notifyDiscordOnTooManyNeverPublishedOutbox().finally(() =>
+            checkForNeverPublishedOutboxCount(),
+          ),
+        5 * 60 * 1000, //5 min
+      );
+    };
+    checkForNeverPublishedOutboxCount();
   }
 }

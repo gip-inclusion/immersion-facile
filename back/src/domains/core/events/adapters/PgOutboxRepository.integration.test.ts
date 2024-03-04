@@ -40,6 +40,22 @@ describe("PgOutboxRepository", () => {
     outboxRepository = new PgOutboxRepository(makeKyselyDb(pool));
   });
 
+  it("countAllNeverPublishedEvents", async () => {
+    await client.query(
+      `INSERT INTO outbox(id, status, occurred_at, topic, payload) VALUES ('aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa', 'never-published','2021-11-15T08:30:00.000Z', 'PeConnectFederatedIdentityAssociated', '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}')`,
+    );
+    await client.query(
+      `INSERT INTO outbox(id, status, occurred_at, topic, payload) VALUES ('aaaaac99-9c0b-1aaa-aa6d-6bb9bd38cccc', 'never-published','2021-11-15T08:30:00.000Z', 'PeConnectFederatedIdentityAssociated', '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}')`,
+    );
+    await client.query(
+      `INSERT INTO outbox(id, status, occurred_at, topic, payload) VALUES ('aaaaac99-9c0b-1aaa-aa6d-6bb9bd38bbbb', 'in-process','2021-11-15T08:30:00.000Z', 'PeConnectFederatedIdentityAssociated', '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}')`,
+    );
+
+    const total = await outboxRepository.countAllNeverPublishedEvents();
+
+    expect(total).toBe(2);
+  });
+
   describe("save", () => {
     it("saves an event with published data", async () => {
       const convention = new ConventionDtoBuilder().build();

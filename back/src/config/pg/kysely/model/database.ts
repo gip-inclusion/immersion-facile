@@ -6,26 +6,27 @@ export interface Database {
   agencies: Agencies;
   agency_groups: AgencyGroups;
   agency_groups__agencies: AgencyGroupsAgencies;
-  convention_external_ids: ConventionExternalIds;
-  conventions: Conventions;
-  discussions: Discussions;
-  exchanges: Exchanges;
-  form_establishments: PgFormEstablishments;
-  groups__sirets: GroupsSirets;
-  groups: Groups;
-  partners_pe_connect: PartnersPeConnect;
-  saved_errors: SavedErrors;
-  view_appellations_dto: ViewAppellationsDto;
-  establishment_lead_events: EstablishmentLeadEvents;
   api_consumers: ApiConsumers;
   api_consumers_subscriptions: ApiConsumersSubscriptions;
   authenticated_users: AuthenticatedUsers;
-  ongoing_oauths: OngoingOauths;
+  convention_external_ids: ConventionExternalIds;
+  conventions: Conventions;
+  discussions: Discussions;
+  establishment_lead_events: EstablishmentLeadEvents;
   establishments: Establishments;
-  establishments_locations: EstablishmentsLocations;
   establishments__immersion_contacts: EstablishmentsImmersionContacts;
+  establishments_locations: EstablishmentsLocations;
+  exchanges: Exchanges;
+  form_establishments: PgFormEstablishments;
+  groups: Groups;
+  groups__sirets: GroupsSirets;
   immersion_contacts: ImmersionContacts;
   immersion_offers: ImmersionOffers;
+  ongoing_oauths: OngoingOauths;
+  outbox: Outbox;
+  partners_pe_connect: PartnersPeConnect;
+  saved_errors: SavedErrors;
+  view_appellations_dto: ViewAppellationsDto;
 }
 
 type JsonArray = JsonValue[];
@@ -382,4 +383,20 @@ export interface AgencyGroups {
 export interface AgencyGroupsAgencies {
   agency_group_id: number;
   agency_id: string;
+}
+
+export type EventStatus =
+  | "failed-but-will-retry"
+  | "failed-to-many-times"
+  | "never-published"
+  | "published"
+  | "to-republish";
+
+export interface Outbox {
+  id: string;
+  occurred_at: Timestamp;
+  was_quarantined: Generated<boolean | null>;
+  topic: string;
+  payload: Json;
+  status: EventStatus;
 }
