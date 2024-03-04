@@ -508,6 +508,7 @@ export const createUseCases = (
         new BroadcastToPartnersOnConventionUpdates(
           uowPerformer,
           gateways.subscribersGateway,
+          gateways.timeGateway,
         ),
       listActiveSubscriptions: new ListActiveSubscriptions(uowPerformer),
       subscribeToWebhook: new SubscribeToWebhook(

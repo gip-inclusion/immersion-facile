@@ -1,6 +1,7 @@
 import { SubscriptionParams } from "shared";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
+  SubscriberResponse,
   SubscribersGateway,
 } from "../ports/SubscribersGateway";
 
@@ -12,6 +13,14 @@ export type CallbackParams = {
 export class InMemorySubscribersGateway implements SubscribersGateway {
   #calls: CallbackParams[] = [];
 
+  #simulatedResponse: SubscriberResponse = {
+    title: "Partner subscription notified successfully",
+    callbackUrl: "http://fake.com",
+    conventionStatus: "ACCEPTED_BY_VALIDATOR",
+    conventionId: "lala",
+    status: 200,
+  };
+
   public get calls(): CallbackParams[] {
     return this.#calls;
   }
@@ -19,7 +28,12 @@ export class InMemorySubscribersGateway implements SubscribersGateway {
   public async notify(
     body: ConventionUpdatedSubscriptionCallbackBody,
     subscriptionParams: SubscriptionParams,
-  ): Promise<void> {
+  ): Promise<SubscriberResponse> {
     this.#calls.push({ body, subscriptionParams });
+    return this.#simulatedResponse;
+  }
+
+  public set simulatedResponse(simulatedResponse: SubscriberResponse) {
+    this.#simulatedResponse = simulatedResponse;
   }
 }
