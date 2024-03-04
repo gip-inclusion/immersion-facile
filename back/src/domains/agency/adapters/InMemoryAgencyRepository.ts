@@ -33,6 +33,7 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["contact@immersion-facile.fr"],
     signature: "Signature of Immersion Facile",
     agencySiret: "00000000000000",
+    coveredDepartments: ["75"],
     address: {
       streetNumberAndAddress: "No address",
       departmentCode: "75",
@@ -60,6 +61,7 @@ const testAgencies: AgencyDto[] = [
     questionnaireUrl: "http://questionnaire.agency1.fr",
     signature: "Signature of Test Agency 1",
     agencySiret: "00000000000000",
+    coveredDepartments: ["75"],
     address: {
       streetNumberAndAddress: "Agency 1 address",
       departmentCode: "75",
@@ -86,6 +88,7 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["admin1@agency2.fr", "admin2@agency2.fr"],
     questionnaireUrl: "http://questionnaire.agency2.fr",
     signature: "Signature of Test Agency 2",
+    coveredDepartments: ["68"],
     address: {
       city: "Mulhouse",
       departmentCode: "68",
@@ -112,6 +115,7 @@ const testAgencies: AgencyDto[] = [
     adminEmails: ["admin@agency3.fr"],
     questionnaireUrl: "http://questionnaire.agency3.fr",
     signature: "Signature of Test Agency 3",
+    coveredDepartments: ["64"],
     address: {
       streetNumberAndAddress: "3 Agency street",
       departmentCode: "64",
@@ -138,6 +142,7 @@ const testAgencies: AgencyDto[] = [
     adminEmails: [],
     questionnaireUrl: "http://questionnaire.agency4.fr",
     signature: "Signature of Test Agency 4 accompagnante",
+    coveredDepartments: ["64"],
     address: {
       streetNumberAndAddress: "4 Agency street",
       departmentCode: "64",
@@ -164,6 +169,7 @@ const testAgencies: AgencyDto[] = [
     adminEmails: [],
     questionnaireUrl: "http://questionnaire.agency5.fr",
     signature: "Signature of Test Agency 5 accompagnante",
+    coveredDepartments: ["64"],
     address: {
       streetNumberAndAddress: "5 Agency street",
       departmentCode: "64",

@@ -162,6 +162,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       adminEmails: [],
       ...normalizePosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
+      coveredDepartments: [geocodedAddress.departmentCode],
       address: geocodedAddress,
       codeSafir: peReferentialAgency.codeSafir,
       agencySiret: peReferentialAgency.siret,

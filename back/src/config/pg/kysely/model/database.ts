@@ -121,6 +121,7 @@ interface Agencies {
   post_code: string;
   city: string;
   department_code: string;
+  covered_departments: Json;
   refers_to_agency_id: string | null;
   rejection_justification: string | null;
 }

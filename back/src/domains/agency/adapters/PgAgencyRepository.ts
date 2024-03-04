@@ -60,7 +60,8 @@ type AgencyColumns =
   | "street_number_and_address"
   | "validator_emails"
   | "refers_to_agency_id"
-  | "rejection_justification";
+  | "rejection_justification"
+  | "covered_departments";
 
 type PersistenceAgency = Record<AgencyColumns, any>;
 
@@ -190,7 +191,7 @@ export class PgAgencyRepository implements AgencyRepository {
     const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
       this.transaction,
       `SELECT id, name, status, kind, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
-        street_number_and_address, post_code, city, department_code, refers_to_agency_id, rejection_justification
+        street_number_and_address, post_code, city, department_code, refers_to_agency_id, rejection_justification, covered_departments
        FROM public.agencies
        WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
       [email],
@@ -270,6 +271,7 @@ export class PgAgencyRepository implements AgencyRepository {
       post_code: agency.address?.postcode,
       city: agency.address?.city,
       department_code: agency.address?.departmentCode,
+      covered_departments: JSON.stringify(agency.coveredDepartments),
       refers_to_agency_id: agency.refersToAgencyId,
     };
 
@@ -312,6 +314,9 @@ export class PgAgencyRepository implements AgencyRepository {
         post_code: agency.address?.postcode,
         city: agency.address?.city,
         department_code: agency.address?.departmentCode,
+        covered_departments:
+          agency.coveredDepartments &&
+          JSON.stringify(agency.coveredDepartments),
         refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
         rejection_justification: agency.rejectionJustification,
@@ -345,6 +350,9 @@ export class PgAgencyRepository implements AgencyRepository {
           city: ref("a.city"),
           departmentCode: ref("a.department_code"),
         }),
+        coveredDepartments: cast<DepartmentCode[]>(
+          ref("a.covered_departments"),
+        ),
         agencySiret: ref("a.agency_siret"),
         codeSafir: ref("a.code_safir"),
         adminEmails: sql<Email[]>`${ref("a.admin_emails")}`,
@@ -358,34 +366,34 @@ export class PgAgencyRepository implements AgencyRepository {
 const STPointStringFromPosition = (position: GeoPositionDto) =>
   `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
 
-const persistenceAgencyToAgencyDto = (params: PersistenceAgency): AgencyDto =>
-  validateAndParseZodSchema(
-    agencySchema,
-    {
-      address: {
-        streetNumberAndAddress: params.street_number_and_address,
-        postcode: params.post_code,
-        departmentCode: params.department_code,
-        city: params.city,
-      },
-      adminEmails: params.admin_emails,
-      agencySiret: params.agency_siret,
-      codeSafir: params.code_safir,
-      counsellorEmails: params.counsellor_emails,
-      id: params.id,
-      kind: params.kind,
-      logoUrl: params.logo_url,
-      name: params.name,
-      position: parseGeoJson(params.position),
-      questionnaireUrl: params.questionnaire_url,
-      signature: params.email_signature,
-      status: params.status,
-      validatorEmails: params.validator_emails,
-      rejectionJustification: params.rejection_justification,
-      refersToAgencyId: params.refers_to_agency_id,
+const persistenceAgencyToAgencyDto = (params: PersistenceAgency): AgencyDto => {
+  const agencyToValidate: AgencyDto = {
+    coveredDepartments: params.covered_departments,
+    address: {
+      streetNumberAndAddress: params.street_number_and_address,
+      postcode: params.post_code,
+      departmentCode: params.department_code,
+      city: params.city,
     },
-    logger,
-  );
+    adminEmails: params.admin_emails,
+    agencySiret: params.agency_siret,
+    codeSafir: params.code_safir,
+    counsellorEmails: params.counsellor_emails,
+    id: params.id,
+    kind: params.kind,
+    logoUrl: params.logo_url,
+    name: params.name,
+    position: parseGeoJson(params.position),
+    questionnaireUrl: params.questionnaire_url,
+    signature: params.email_signature,
+    status: params.status,
+    validatorEmails: params.validator_emails,
+    rejectionJustification: params.rejection_justification,
+    refersToAgencyId: params.refers_to_agency_id,
+  };
+
+  return validateAndParseZodSchema(agencySchema, agencyToValidate, logger);
+};
 
 const parseGeoJson = (raw: string): GeoPositionDto => {
   const json = JSON.parse(raw);

@@ -51,6 +51,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [],
         validatorEmails: ["molsheim@pole-emploi.fr"],
         adminEmails: [],
+        coveredDepartments: [address.departmentCode],
         address,
         position: {
           lon: 7.511,
@@ -84,6 +85,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [],
         validatorEmails: [commonEmail],
         adminEmails: ["someAdmin@mail.com"],
+        coveredDepartments: [address.departmentCode],
         address,
         position: {
           lon: 7,
@@ -133,6 +135,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [commonEmail],
         validatorEmails: [],
         adminEmails: ["someAdmin@mail.com"],
+        coveredDepartments: [address.departmentCode],
         address,
         position: {
           lon: 3,
@@ -177,6 +180,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [],
         validatorEmails: ["existing@mail.com"],
         adminEmails: ["someAdmin@mail.com"],
+        coveredDepartments: [address.departmentCode],
         address,
         position: {
           lon: 7.51213,
@@ -224,6 +228,7 @@ describe("UpdateAllPeAgencies use case", () => {
       counsellorEmails: [],
       validatorEmails: ["existing@mail.com"],
       adminEmails: ["someAdmin@mail.com"],
+      coveredDepartments: [address.departmentCode],
       address,
       position: {
         lon: 7,
@@ -253,6 +258,7 @@ describe("UpdateAllPeAgencies use case", () => {
         counsellorEmails: [],
         validatorEmails: ["molsheim@pole-emploi.fr"],
         adminEmails: [],
+        coveredDepartments: [address.departmentCode],
         address,
         position: {
           lon: 7.511,
