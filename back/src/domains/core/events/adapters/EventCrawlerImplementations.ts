@@ -104,7 +104,7 @@ export class BasicEventCrawler implements EventCrawler {
           ? uow.outboxQueries.getAllUnpublishedEvents({
               limit: crawlerMaxBatchSize,
             })
-          : uow.outboxQueries.getAllFailedEvents({ limit: crawlerMaxBatchSize }),
+          : uow.outboxQueries.getFailedEvents({ limit: crawlerMaxBatchSize }),
       );
       return events;
     } catch (error: any) {

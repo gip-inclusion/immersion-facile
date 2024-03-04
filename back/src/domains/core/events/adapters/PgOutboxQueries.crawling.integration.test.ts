@@ -198,7 +198,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     ]);
 
     // act
-    const eventsToRerun = await outboxQueries.getAllFailedEvents({ limit: 10 });
+    const eventsToRerun = await outboxQueries.getFailedEvents({ limit: 10 });
 
     // assert
     expectToEqual(eventsToRerun, [eventFailedToRerun]);
@@ -234,7 +234,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     ]);
 
     // act
-    const eventsToRerun = await outboxQueries.getAllFailedEvents({ limit: 1 });
+    const eventsToRerun = await outboxQueries.getFailedEvents({ limit: 1 });
 
     // assert
     expectToEqual(eventsToRerun, [
