@@ -76,7 +76,7 @@ export const isBroadcastResponseOk = (
   [200, 201].includes(response.status);
 
 // https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
-export type GetAccessTokenResponse = {
+export type PoleEmploiGetAccessTokenResponse = {
   access_token: string;
   expires_in: number;
 };
@@ -86,5 +86,5 @@ export interface PoleEmploiGateway {
     poleEmploiConvention: PoleEmploiConvention,
   ) => Promise<PoleEmploiBroadcastResponse>;
 
-  getAccessToken: (scope: string) => Promise<GetAccessTokenResponse>;
+  getAccessToken: (scope: string) => Promise<PoleEmploiGetAccessTokenResponse>;
 }

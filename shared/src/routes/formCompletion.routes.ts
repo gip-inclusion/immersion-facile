@@ -44,6 +44,7 @@ export const formCompletionRoutes = defineRoutes({
     url: "/appellation",
     queryParamsSchema: z.object({
       searchText: zStringMinLength1,
+      naturalLanguage: z.literal("true").optional(),
     }),
     responses: {
       200: appellationSearchResponseSchema,

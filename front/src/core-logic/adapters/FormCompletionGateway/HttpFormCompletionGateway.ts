@@ -23,7 +23,7 @@ export class HttpFormCompletionGateway implements FormCompletionGateway {
   ): Promise<AppellationMatchDto[]> {
     return this.httpClient
       .appellation({
-        queryParams: { searchText },
+        queryParams: { searchText, naturalLanguage: "true" },
       })
       .then((response) =>
         match(response)

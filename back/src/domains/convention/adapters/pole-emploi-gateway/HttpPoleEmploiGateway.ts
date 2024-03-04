@@ -18,10 +18,10 @@ import {
   RetryableError,
 } from "../../../core/retry-strategy/ports/RetryStrategy";
 import {
-  GetAccessTokenResponse,
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
+  PoleEmploiGetAccessTokenResponse,
 } from "../../ports/PoleEmploiGateway";
 import { PoleEmploiRoutes, getPeTestPrefix } from "./PoleEmploiRoutes";
 
@@ -41,7 +41,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
   readonly #httpClient: HttpClient<PoleEmploiRoutes>;
 
-  readonly #caching: InMemoryCachingGateway<GetAccessTokenResponse>;
+  readonly #caching: InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>;
 
   readonly #accessTokenConfig: AccessTokenConfig;
 
@@ -49,7 +49,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
   constructor(
     httpClient: HttpClient<PoleEmploiRoutes>,
-    caching: InMemoryCachingGateway<GetAccessTokenResponse>,
+    caching: InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>,
     peApiUrl: AbsoluteUrl,
     accessTokenConfig: AccessTokenConfig,
     retryStrategy: RetryStrategy,
@@ -63,7 +63,9 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     this.#isDev = isDev;
   }
 
-  public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
+  public async getAccessToken(
+    scope: string,
+  ): Promise<PoleEmploiGetAccessTokenResponse> {
     return this.#caching.caching(scope, () =>
       this.#retryStrategy.apply(() =>
         this.#limiter.schedule(() =>

@@ -2,7 +2,7 @@ import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
-import { GetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
+import { PoleEmploiGetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
 import { ResyncOldConventionsToPe } from "../domains/convention/use-cases/ResyncOldConventionsToPe";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
@@ -21,7 +21,7 @@ const executeUsecase = async () => {
 
   const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
     peAxiosHttpClient,
-    new InMemoryCachingGateway<GetAccessTokenResponse>(
+    new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
       timeGateway,
       "expires_in",
     ),

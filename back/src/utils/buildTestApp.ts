@@ -1,6 +1,5 @@
 import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import supertest from "supertest";
-import { InMemoryAppellationsGateway } from "../adapters/secondary/appellationsGateway/InMemoryAppellationsGateway";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { Gateways } from "../config/bootstrap/createGateways";
 import { createApp } from "../config/bootstrap/server";
@@ -22,6 +21,7 @@ import {
 } from "../domains/core/jwt";
 import type { InMemoryNotificationGateway } from "../domains/core/notifications/adapters/InMemoryNotificationGateway";
 import { InMemoryPdfGeneratorGateway } from "../domains/core/pdf-generation/adapters/InMemoryPdfGeneratorGateway";
+import { InMemoryAppellationsGateway } from "../domains/core/rome/adapters/InMemoryAppellationsGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { InMemorySiretGateway } from "../domains/core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../domains/core/time-gateway/adapters/CustomTimeGateway";

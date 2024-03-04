@@ -3,12 +3,10 @@ import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { DiagorienteAppellationsGateway } from "../../adapters/secondary/appellationsGateway/DiagorienteAppellationsGateway";
-import { InMemoryAppellationsGateway } from "../../adapters/secondary/appellationsGateway/InMemoryAppellationsGateway";
 import { HttpPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/PoleEmploiRoutes";
-import { GetAccessTokenResponse } from "../../domains/convention/ports/PoleEmploiGateway";
+import { PoleEmploiGetAccessTokenResponse } from "../../domains/convention/ports/PoleEmploiGateway";
 import { HttpAddressGateway } from "../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
@@ -43,6 +41,13 @@ import {
 } from "../../domains/core/pdf-generation/adapters/ScalingoPdfGeneratorGateway";
 import { PdfGeneratorGateway } from "../../domains/core/pdf-generation/ports/PdfGeneratorGateway";
 import { noRetries } from "../../domains/core/retry-strategy/ports/RetryStrategy";
+import {
+  DiagorienteAccessTokenResponse,
+  DiagorienteAppellationsGateway,
+  diagorienteTokenScope,
+} from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway";
+import { diagorienteAppellationsRoutes } from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway.routes";
+import { InMemoryAppellationsGateway } from "../../domains/core/rome/adapters/InMemoryAppellationsGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { AnnuaireDesEntreprisesSiretGateway } from "../../domains/core/sirene/adapters/AnnuaireDesEntreprisesSiretGateway";
@@ -133,7 +138,7 @@ export const createGateways = async (
           createAxiosHttpClientForExternalAPIs(
             createPoleEmploiRoutes(config.peApiUrl),
           ),
-          new InMemoryCachingGateway<GetAccessTokenResponse>(
+          new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
             timeGateway,
             "expires_in",
           ),
@@ -183,10 +188,22 @@ export const createGateways = async (
         ),
     })[config.emailValidationGateway]();
 
-  const appellationsGateway = {
-    IN_MEMORY: () => new InMemoryAppellationsGateway(),
-    DIAGORIENTE: () => new DiagorienteAppellationsGateway(),
-  }[config.appellationsGateway]();
+  const appellationsGateway = (config: AppConfig) =>
+    ({
+      IN_MEMORY: () => new InMemoryAppellationsGateway(),
+      DIAGORIENTE: () =>
+        new DiagorienteAppellationsGateway(
+          createAxiosHttpClientForExternalAPIs(diagorienteAppellationsRoutes),
+          new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
+            timeGateway,
+            diagorienteTokenScope,
+          ),
+          {
+            clientId: config.diagorienteApiClientId,
+            clientSecret: config.diagorienteApiClientSecret,
+          },
+        ),
+    })[config.appellationsGateway]();
 
   const addressGateway = {
     IN_MEMORY: () => new InMemoryAddressGateway(),
@@ -273,7 +290,7 @@ export const createGateways = async (
 
   return {
     addressApi: addressGateway,
-    appellationsGateway,
+    appellationsGateway: appellationsGateway(config),
     dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
     notification: createNotificationGateway(config, timeGateway),

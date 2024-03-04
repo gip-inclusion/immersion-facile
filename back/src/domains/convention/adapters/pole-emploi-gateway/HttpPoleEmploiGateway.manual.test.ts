@@ -5,17 +5,18 @@ import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/I
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import {
-  GetAccessTokenResponse,
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
+  PoleEmploiGetAccessTokenResponse,
 } from "../../ports/PoleEmploiGateway";
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
 
 const config = AppConfig.createFromEnv();
-const cachingGateway = new InMemoryCachingGateway<GetAccessTokenResponse>(
-  new RealTimeGateway(),
-  "expires_in",
-);
+const cachingGateway =
+  new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
+    new RealTimeGateway(),
+    "expires_in",
+  );
 
 const getAPI = () => {
   const peAxiosHttpClient = createPeAxiosSharedClient(config);

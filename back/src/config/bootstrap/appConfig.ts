@@ -159,6 +159,14 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("EMAILABLE_API_KEY");
   }
 
+  public get diagorienteApiClientId(): EmailableApiKey {
+    return this.#throwIfNotDefinedOrDefault("DIAGORIENTE_API_CLIENT_ID");
+  }
+
+  public get diagorienteApiClientSecret(): EmailableApiKey {
+    return this.#throwIfNotDefinedOrDefault("DIAGORIENTE_API_CLIENT_SECRET");
+  }
+
   // == Email notifications ==
   public get emailAllowList() {
     return parseStringList(this.env.EMAIL_ALLOW_LIST);
