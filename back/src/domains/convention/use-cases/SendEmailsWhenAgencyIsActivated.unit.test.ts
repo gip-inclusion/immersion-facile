@@ -26,12 +26,12 @@ const agency = new AgencyDtoBuilder()
   .build();
 
 const agencyWithRefersTo = new AgencyDtoBuilder()
-  .withId("accompanying-agency-id")
+  .withId("id-of-agency-refering-to-other")
   .withRefersToAgencyId(agency.id)
-  .withCounsellorEmails(["accompanying-councellor@email.com"])
+  .withCounsellorEmails(["councellor@email.com"])
   .withValidatorEmails(agency.validatorEmails)
-  .withName("just-activated-accompanying-agency")
-  .withLogoUrl("https://accompanying-logo.com")
+  .withName("just-activated-agency-refering-to-other-one")
+  .withLogoUrl("https://agency-refering-logo.com")
   .build();
 
 describe("SendEmailWhenAgencyIsActivated", () => {
@@ -83,14 +83,14 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     });
   });
 
-  it("throw not found error if no agency were found with agency refers to id when accompanying agency activated", async () => {
+  it("throw not found error if no agency were found with agency refers to id when agency refering to other activated", async () => {
     await expectPromiseToFailWith(
       sendEmailsWhenAencyActivated.execute({ agency: agencyWithRefersTo }),
       `No agency were found with id : ${agency.id}`,
     );
   });
 
-  it("send a notification email to validating agency when accompagnying agency was activated and one activation email to the counsellors of the acompanying agency", async () => {
+  it("send a notification email to validating agency when agency refering to other was activated and one activation email to the counsellors of the agency refering to other", async () => {
     uow.agencyRepository.agencies = [agency];
 
     await sendEmailsWhenAencyActivated.execute({ agency: agencyWithRefersTo });
@@ -102,17 +102,17 @@ describe("SendEmailWhenAgencyIsActivated", () => {
           recipients: [...agencyWithRefersTo.counsellorEmails],
           params: {
             agencyName: agencyWithRefersTo.name,
-            agencyLogoUrl: "https://accompanying-logo.com",
+            agencyLogoUrl: "https://agency-refering-logo.com",
             refersToOtherAgency: true,
             validatorEmails: agencyWithRefersTo.validatorEmails,
           },
         },
         {
-          kind: "ACCOMPANYING_AGENCY_WITH_AGENCY_REFERS_TO_NOTIFICATION",
+          kind: "AGENCY_WITH_REFERS_TO_ACTIVATED",
           recipients: [...agency.validatorEmails],
           params: {
             agencyLogoUrl: "https://agency-logo.com",
-            accompanyingAgencyName: agencyWithRefersTo.name,
+            nameOfAgencyRefering: agencyWithRefersTo.name,
             refersToAgencyName: agency.name,
             validatorEmails: agencyWithRefersTo.validatorEmails,
           },
