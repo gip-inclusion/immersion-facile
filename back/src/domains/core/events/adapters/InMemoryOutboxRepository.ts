@@ -1,4 +1,5 @@
 import { values } from "ramda";
+import { EventStatus } from "../../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../../utils/logger";
 import { DomainEvent } from "../events";
 import { OutboxRepository } from "../ports/OutboxRepository";
@@ -8,9 +9,10 @@ const logger = createLogger(__filename);
 export class InMemoryOutboxRepository implements OutboxRepository {
   constructor(private readonly _events: Record<string, DomainEvent> = {}) {}
 
-  public async countAllNeverPublishedEvents(): Promise<number> {
-    return this.events.filter((event) => event.status === "never-published")
-      .length;
+  public async countAllEvents({
+    status,
+  }: { status: EventStatus }): Promise<number> {
+    return this.events.filter((event) => event.status === status).length;
   }
 
   //test purposes

@@ -388,6 +388,7 @@ export interface AgencyGroupsAgencies {
 export type EventStatus =
   | "failed-but-will-retry"
   | "failed-to-many-times"
+  | "in-process"
   | "never-published"
   | "published"
   | "to-republish";
