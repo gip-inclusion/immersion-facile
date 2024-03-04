@@ -47,9 +47,8 @@ export class AppellationSearch extends TransactionalUseCase<
   ): Promise<AppellationMatchDto[]> {
     if (searchText.length < ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH)
       return [];
-
     const appellations = fetchAppellationsFromNaturalLanguage
-      ? await this.#appellationsGateway.findAppellations(searchText)
+      ? await this.#appellationsGateway.searchAppellations(searchText)
       : await uow.romeRepository.searchAppellation(searchText);
 
     const appellationsWithMatch: AppellationMatchDto[] = appellations.map(

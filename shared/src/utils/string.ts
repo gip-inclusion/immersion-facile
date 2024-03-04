@@ -22,3 +22,9 @@ export const cleanStringToHTMLAttribute = (
   }
   return result.replaceAll(":", "");
 };
+
+export const toLowerCaseWithoutDiacritics = (str: string): string =>
+  str
+    .normalize("NFD")
+    .toLowerCase()
+    .replace(/[\u0300-\u036f]/g, "");

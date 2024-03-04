@@ -5,7 +5,7 @@ export type AppellationCode = Flavor<string, "AppellationCode">;
 export type RomeLabel = Flavor<string, "RomeLabel">;
 export type AppellationLabel = Flavor<string, "AppellationLabel">;
 
-export const ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH = 3;
+export const ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH = 2;
 
 export type RomeSearchInput = {
   searchText: string;

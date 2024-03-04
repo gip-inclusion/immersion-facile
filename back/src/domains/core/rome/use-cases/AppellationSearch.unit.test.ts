@@ -1,7 +1,7 @@
 import { AppellationMatchDto } from "shared";
-import { InMemoryAppellationsGateway } from "../../../../adapters/secondary/appellationsGateway/InMemoryAppellationsGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryAppellationsGateway } from "../adapters/InMemoryAppellationsGateway";
 import { InMemoryRomeRepository } from "../adapters/InMemoryRomeRepository";
 import { AppellationsGateway } from "../ports/AppellationsGateway";
 import { RomeRepository } from "../ports/RomeRepository";
@@ -91,5 +91,42 @@ describe("AppellationSearch", () => {
         fetchAppellationsFromNaturalLanguage: false,
       }),
     ).toEqual([]);
+  });
+  describe("with natural language search", () => {
+    it("returns the list of found matches with ranges", async () => {
+      const response = await createUseCase().execute({
+        searchText: "secret",
+        fetchAppellationsFromNaturalLanguage: true,
+      });
+      const expected: AppellationMatchDto[] = [
+        {
+          appellation: {
+            romeCode: "M1607",
+            appellationCode: "19364",
+            appellationLabel: "Secrétaire",
+            romeLabel: "Secrétariat",
+          },
+          matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 6 }],
+        },
+        {
+          appellation: {
+            romeCode: "M1607",
+            appellationCode: "19367",
+            appellationLabel: "Secrétaire bureautique spécialisé / spécialisée",
+            romeLabel: "Secrétariat",
+          },
+          matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 6 }],
+        },
+      ];
+      expect(response).toEqual(expected);
+    });
+    it("returns empty array if no match", async () => {
+      const response = await createUseCase().execute({
+        searchText: "unknown_search_term",
+        fetchAppellationsFromNaturalLanguage: true,
+      });
+      const expected: AppellationMatchDto[] = [];
+      expect(response).toEqual(expected);
+    });
   });
 });

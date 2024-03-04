@@ -6,7 +6,7 @@ import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedCl
 import { HttpPeAgenciesReferential } from "../domains/agency/adapters/pe-agencies-referential/HttpPeAgenciesReferential";
 import { UpdateAllPeAgencies } from "../domains/agency/use-cases/UpdateAllPeAgencies";
 import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
-import { GetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
+import { PoleEmploiGetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
 import { HttpAddressGateway } from "../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../domains/core/address/adapters/HttpAddressGateway.routes";
 import { ConsoleAppLogger } from "../domains/core/app-logger/adapters/ConsoleAppLogger";
@@ -25,7 +25,7 @@ const updateAllPeAgenciesScript = async () => {
     config.peApiUrl,
     new HttpPoleEmploiGateway(
       peAxiosHttpClient,
-      new InMemoryCachingGateway<GetAccessTokenResponse>(
+      new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
         new RealTimeGateway(),
         "expires_in",
       ),

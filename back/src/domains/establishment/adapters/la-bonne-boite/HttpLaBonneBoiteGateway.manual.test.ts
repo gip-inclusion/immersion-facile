@@ -4,7 +4,7 @@ import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
 import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
-import { GetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
+import { PoleEmploiGetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
@@ -27,7 +27,7 @@ describe("HttpLaBonneBoiteGateway", () => {
       createAxiosSharedClient(createLbbRoutes(config.peApiUrl), axios),
       new HttpPoleEmploiGateway(
         axiosHttpClient,
-        new InMemoryCachingGateway<GetAccessTokenResponse>(
+        new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
           new RealTimeGateway(),
           "expires_in",
         ),
