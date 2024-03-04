@@ -63,9 +63,9 @@ export const ApiConsumerForm = ({
       <Input
         label="Nom du consommateur"
         nativeInputProps={{
-          ...register("consumer"),
+          ...register("name"),
         }}
-        {...getFieldError("consumer")}
+        {...getFieldError("name")}
       />
       <Input
         label="Nom du contact"

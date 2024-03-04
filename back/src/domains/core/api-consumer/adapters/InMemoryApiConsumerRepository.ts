@@ -10,7 +10,7 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
   id: uuidGenerator.new(),
   createdAt: "2023-09-22T10:00:00.000Z",
   expirationDate: "2025-09-22T10:00:00.000Z",
-  consumer: "unJeuneUneSolution",
+  name: "unJeuneUneSolution",
   contact: {
     firstName: "john",
     lastName: "doe",
@@ -39,7 +39,7 @@ export const unauthorizedApiConsumer: ApiConsumer = {
   id: uuidGenerator.new(),
   createdAt: "2023-09-22T10:00:00.000Z",
   expirationDate: "2025-09-22T10:00:00.000Z",
-  consumer: "unauthorised consumer",
+  name: "unauthorised consumer",
   contact: {
     firstName: "john",
     lastName: "doe",
@@ -67,7 +67,7 @@ export const unauthorizedApiConsumer: ApiConsumer = {
 
 export const outdatedApiConsumer: ApiConsumer = {
   id: uuidGenerator.new(),
-  consumer: "outdated consumer",
+  name: "outdated consumer",
   contact: {
     firstName: "john",
     lastName: "doe",
@@ -141,7 +141,7 @@ export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
 
 const defaultApiConsumer: ApiConsumer = {
   id: "aaaaaaaa-4444-4444-4444-aaaaaaaaaaaa",
-  consumer: "unJeuneUneSolution",
+  name: "unJeuneUneSolution",
   contact: {
     firstName: "john",
     lastName: "doe",

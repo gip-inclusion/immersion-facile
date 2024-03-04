@@ -9,7 +9,7 @@ import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const apiConsumer1: ApiConsumer = {
   id: "1",
-  consumer: "consumer1",
+  name: "consumer1",
   contact: {
     lastName: "Jean",
     firstName: "Bonneau",

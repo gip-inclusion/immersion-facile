@@ -78,6 +78,8 @@ describe("PgEstablishmentLeadQueries", () => {
 
   beforeEach(async () => {
     await kyselyDb.deleteFrom("conventions").execute();
+    await kyselyDb.deleteFrom("agency_groups__agencies").execute();
+    await kyselyDb.deleteFrom("agency_groups").execute();
     await kyselyDb.deleteFrom("agencies").execute();
     await kyselyDb.deleteFrom("establishment_lead_events").execute();
 

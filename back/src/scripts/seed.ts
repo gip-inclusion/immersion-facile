@@ -242,6 +242,8 @@ const conventionSeed = async (uow: UnitOfWork) => {
   const savedError: SavedError = {
     handledByAgency: false,
     message: "message de la seed",
+    consumerId: null,
+    consumerName: "Fake consumer",
     occurredAt: addDays(new Date(peConvention.dateSubmission), 2),
     serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
     params: { httpStatus: 404, conventionId: peConvention.id },

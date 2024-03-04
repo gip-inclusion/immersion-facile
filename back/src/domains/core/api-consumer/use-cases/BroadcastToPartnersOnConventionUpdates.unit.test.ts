@@ -206,16 +206,18 @@ describe("Broadcast to partners on updated convention", () => {
     await broadcastUpdatedConvention.execute({ convention: convention1 });
 
     const expectedSavedError: SavedError = {
-      serviceName: "BroadcastToPartnersOnConventionUpdates",
-      occurredAt: now,
+      consumerId: apiConsumer1.id,
+      consumerName: apiConsumer1.name,
+      handledByAgency: false,
       message: errorResponse.message,
+      occurredAt: now,
       params: {
-        httpStatus: errorResponse.status,
+        callbackUrl: errorResponse.callbackUrl,
         conventionId: errorResponse.conventionId,
         conventionStatus: errorResponse.conventionStatus,
-        callbackUrl: errorResponse.callbackUrl,
+        httpStatus: errorResponse.status,
       },
-      handledByAgency: false,
+      serviceName: "BroadcastToPartnersOnConventionUpdates",
     };
 
     expectToEqual(uow.errorRepository.savedErrors, [expectedSavedError]);

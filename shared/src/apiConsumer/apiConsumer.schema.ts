@@ -106,7 +106,7 @@ const apiConsumerRightsSchema: z.Schema<ApiConsumer["rights"]> = z.object({
 
 const commonApiConsumerShape = {
   id: z.string().uuid(localization.invalidUuid),
-  consumer: zStringMinLength1,
+  name: zStringMinLength1.max(255),
   contact: apiConsumerContactSchema,
   rights: writeApiConsumerRightsSchema,
   description: z.string().optional(),

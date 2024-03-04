@@ -29,13 +29,22 @@ export class PgSavedErrorRepository implements SavedErrorRepository {
   }
 
   public async save(savedError: SavedError): Promise<void> {
-    const { serviceName, message, params, occurredAt, handledByAgency } =
-      savedError;
+    const {
+      serviceName,
+      message,
+      params,
+      occurredAt,
+      handledByAgency,
+      consumerName,
+      consumerId,
+    } = savedError;
 
     await this.transaction
       .insertInto("saved_errors")
       .values({
         service_name: serviceName,
+        consumer_name: consumerName,
+        consumer_id: consumerId,
         message,
         params: params ?? null,
         occurred_at: occurredAt,

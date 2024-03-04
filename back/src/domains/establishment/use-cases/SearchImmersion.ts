@@ -82,7 +82,7 @@ export class SearchImmersion extends TransactionalUseCase<
       ...searchMade,
       id: this.uuidGenerator.new(),
       needsToBeSearched: true,
-      apiConsumerName: apiConsumer?.consumer,
+      apiConsumerName: apiConsumer?.name,
       numberOfResults:
         voluntaryToImmersion !== false
           ? repositorySearchResults.length

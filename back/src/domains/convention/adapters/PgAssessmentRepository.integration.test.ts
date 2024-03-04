@@ -33,6 +33,8 @@ describe("PgAssessmentRepository", () => {
     pool = getTestPgPool();
     client = await pool.connect();
     await client.query("DELETE FROM conventions");
+    await client.query("DELETE FROM agency_groups__agencies");
+    await client.query("DELETE FROM agency_groups");
     await client.query("DELETE FROM agencies");
     const transaction = makeKyselyDb(pool);
     const agencyRepository = new PgAgencyRepository(transaction);

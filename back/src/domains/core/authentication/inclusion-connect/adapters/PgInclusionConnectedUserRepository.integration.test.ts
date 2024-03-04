@@ -61,6 +61,8 @@ describe("PgInclusionConnectedUserRepository", () => {
     await client.query("DELETE FROM authenticated_users");
     await client.query("DELETE FROM users__agencies");
     await client.query("DELETE FROM conventions");
+    await client.query("DELETE FROM agency_groups__agencies");
+    await client.query("DELETE FROM agency_groups");
     await client.query("DELETE FROM agencies");
     const transaction = makeKyselyDb(pool);
     icUserRepository = new PgInclusionConnectedUserRepository(transaction);

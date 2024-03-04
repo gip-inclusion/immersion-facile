@@ -94,7 +94,7 @@ export const ApiConsumersSection = () => {
   );
 
   const tableDataFromApiConsumers = sortedApiConsumers.map((apiConsumer) => [
-    formatApiConsumerName(apiConsumer.id, apiConsumer.consumer),
+    formatApiConsumerName(apiConsumer.id, apiConsumer.name),
     formatApiConsumerDescription(apiConsumer.description),
     toDisplayedDate({
       date: new Date(apiConsumer.expirationDate),
@@ -219,7 +219,7 @@ const ShowApiKeyToCopy = ({
 
 const defaultApiConsumerValues: ApiConsumer = {
   id: uuidV4(),
-  consumer: "",
+  name: "",
   contact: {
     lastName: "",
     firstName: "",

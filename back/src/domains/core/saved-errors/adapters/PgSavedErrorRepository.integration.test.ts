@@ -21,6 +21,8 @@ const makeSavedError = (
   conventionId: ConventionId,
   handledByAgency?: boolean,
 ): SavedError => ({
+  consumerId: null,
+  consumerName: "my-consumer",
   serviceName,
   message: "Some message",
   params: { conventionId, httpStatus: 500 },
@@ -28,7 +30,7 @@ const makeSavedError = (
   handledByAgency: handledByAgency ? handledByAgency : false,
 });
 
-describe("PgErrorRepository", () => {
+describe("PgSavedErrorRepository", () => {
   let pool: Pool;
   let pgErrorRepository: PgSavedErrorRepository;
   let kyselyDb: Kysely<Database>;
@@ -104,14 +106,15 @@ describe("PgErrorRepository", () => {
 
       expectToEqual(
         pgSavedErrors.map(
-          (pgSavedError) =>
-            ({
-              serviceName: pgSavedError.service_name,
-              message: pgSavedError.message,
-              params: pgSavedError.params ?? undefined,
-              occurredAt: pgSavedError.occurred_at,
-              handledByAgency: pgSavedError.handled_by_agency,
-            }) satisfies SavedError,
+          (pgSavedError): SavedError => ({
+            serviceName: pgSavedError.service_name,
+            message: pgSavedError.message,
+            params: pgSavedError.params ?? undefined,
+            occurredAt: pgSavedError.occurred_at,
+            handledByAgency: pgSavedError.handled_by_agency,
+            consumerName: pgSavedError.consumer_name,
+            consumerId: pgSavedError.consumer_id,
+          }),
         ),
         [
           { ...savedError1, handledByAgency: true },
