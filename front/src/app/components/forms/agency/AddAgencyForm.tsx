@@ -239,6 +239,7 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   id,
   kind: "",
   name: "",
+  coveredDepartments: [],
   address: {
     streetNumberAndAddress: "",
     postcode: "",

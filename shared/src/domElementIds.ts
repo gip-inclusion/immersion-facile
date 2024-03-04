@@ -134,6 +134,7 @@ export const domElementIds = {
   addAgency: {
     uploadLogoInput: "file-upload-logo",
     id: "agency-id",
+    coveredDepartmentsInput: "agency-covered-departments",
     nameInput: "agency-name",
     addressInput: {
       address: "agency-address",

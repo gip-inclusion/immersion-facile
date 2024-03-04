@@ -25,6 +25,10 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: domElementIds.addAgency.nameInput,
     autoComplete: "organization",
   },
+  coveredDepartments: {
+    id: domElementIds.addAgency.coveredDepartmentsInput,
+    label: "Départements couverts",
+  },
   address: {
     label: "Adresse de la structure",
     required: true,
