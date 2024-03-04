@@ -8,7 +8,7 @@ const logger = createLogger(__filename);
 export class InMemoryOutboxQueries implements OutboxQueries {
   constructor(private readonly outboxRepository: InMemoryOutboxRepository) {}
 
-  public async getAllFailedEvents(): Promise<DomainEvent[]> {
+  public async getFailedEvents(): Promise<DomainEvent[]> {
     const allEvents = this.outboxRepository.events;
     logger.debug(
       { allEvents: eventsToDebugInfo(allEvents) },

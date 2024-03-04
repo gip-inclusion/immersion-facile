@@ -14,7 +14,7 @@ import {
 export class PgOutboxQueries implements OutboxQueries {
   constructor(private transaction: KyselyDb) {}
 
-  public async getAllFailedEvents(params: { limit: number }): Promise<
+  public async getFailedEvents(params: { limit: number }): Promise<
     DomainEvent[]
   > {
     const selectEventIdsWithFailure = `(
