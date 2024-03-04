@@ -32,6 +32,7 @@ import { AddAgency } from "./AddAgency";
 describe("AddAgency use case", () => {
   const createParisMissionLocaleParams: CreateAgencyDto = {
     id: "some-id",
+    coveredDepartments: ["75"],
     address: {
       streetNumberAndAddress: "10 avenue des Champs Elysées",
       city: "Paris",
@@ -52,6 +53,7 @@ describe("AddAgency use case", () => {
 
   const createAgencyWithRefersToParams: CreateAgencyDto = {
     id: "another-id",
+    coveredDepartments: ["75"],
     address: {
       streetNumberAndAddress: "10bis avenue des Champs Elysées",
       city: "Paris",

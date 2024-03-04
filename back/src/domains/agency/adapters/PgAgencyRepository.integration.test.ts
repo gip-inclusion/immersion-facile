@@ -30,6 +30,7 @@ const agency1builder = AgencyDtoBuilder.create(
     postcode: "75001",
     departmentCode: "75",
   })
+  .withCoveredDepartments(["75"])
   .withCounsellorEmails(["counsellor1@agency1.fr", "counsellor2@agency1.fr"])
   .withValidatorEmails(["validator1@agency1.fr", "validator2@agency1.fr"])
   .withAdminEmails(["adminA@agency1.fr", "adminB@agency1.fr"])
@@ -91,6 +92,8 @@ describe("PgAgencyRepository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM conventions");
+    await client.query("DELETE FROM agency_groups__agencies");
+    await client.query("DELETE FROM agency_groups");
     await client.query("DELETE FROM agencies");
     agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
   });

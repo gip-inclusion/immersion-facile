@@ -74,6 +74,7 @@ const commonAgencyShape = {
   id: agencyIdSchema,
   name: stringWithMaxLength255,
   kind: agencyKindSchema,
+  coveredDepartments: z.array(zStringMinLength1),
   address: addressSchema,
   position: geoPositionSchema,
   counsellorEmails: z.array(emailSchema),

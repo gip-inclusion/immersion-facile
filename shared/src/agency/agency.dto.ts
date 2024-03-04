@@ -21,6 +21,7 @@ export type CreateAgencyDto = {
   id: AgencyId;
   kind: AgencyKind;
   name: string;
+  coveredDepartments: DepartmentCode[];
   address: AddressDto;
   position: GeoPositionDto;
   counsellorEmails: Email[];

@@ -1,10 +1,10 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { Builder } from "../Builder";
-import { AddressDto } from "../address/address.dto";
+import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { Email } from "../email/email.dto";
 import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
 
-const emptyAddress: AddressDto = {
+const defaultAddress: AddressDto = {
   streetNumberAndAddress: "26 rue de l'adresse par défaut",
   city: "Ville par défaut",
   departmentCode: "86",
@@ -24,7 +24,8 @@ const emptyAgency: AgencyDto = {
   adminEmails: [],
   questionnaireUrl: "https://empty-questionnaire-url",
   signature: "empty-signature",
-  address: emptyAddress,
+  coveredDepartments: [defaultAddress.departmentCode],
+  address: defaultAddress,
   position: {
     lat: 48.866667, // Paris lat/lon
     lon: 2.333333,
@@ -61,6 +62,19 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({
       ...this.#agency,
       address,
+      coveredDepartments: [
+        ...new Set([
+          address.departmentCode,
+          ...this.#agency.coveredDepartments,
+        ]),
+      ],
+    });
+  }
+
+  public withCoveredDepartments(departments: DepartmentCode[]) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      coveredDepartments: departments,
     });
   }
 
