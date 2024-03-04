@@ -22,8 +22,8 @@ import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { RenewConventionMagicLink } from "../../domains/convention/use-cases/RenewConventionMagicLink";
-import { SendEmailWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsActivated";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
+import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionLinkByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
@@ -383,7 +383,7 @@ export const createUseCases = (
       listAgenciesByFilter: new ListAgenciesByFilter(uowPerformer),
       privateListAgencies: new PrivateListAgencies(uowPerformer),
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
-      sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
+      sendEmailsWhenAgencyIsActivated: new SendEmailsWhenAgencyIsActivated(
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),

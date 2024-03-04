@@ -111,7 +111,7 @@ const getUseCasesByTopics = (
 
   // Agency related :
   NewAgencyAdded: [],
-  AgencyActivated: [useCases.sendEmailWhenAgencyIsActivated],
+  AgencyActivated: [useCases.sendEmailsWhenAgencyIsActivated],
   AgencyUpdated: [useCases.updateAgencyReferingToUpdatedAgency],
   AgencyRejected: [useCases.sendEmailWhenAgencyIsRejected],
   AgencyRegisteredToInclusionConnectedUser: [],

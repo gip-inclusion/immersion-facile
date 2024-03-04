@@ -4,6 +4,7 @@ import {
   getCounsellorsAndValidatorsEmailsDeduplicated,
 } from "shared";
 import { z } from "zod";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -11,7 +12,7 @@ import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPer
 
 type WithAgency = { agency: AgencyDto };
 
-export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAgency> {
+export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAgency> {
   protected inputSchema = z.object({ agency: agencySchema });
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
@@ -39,7 +40,9 @@ export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAge
       kind: "email",
       templatedContent: {
         kind: "AGENCY_WAS_ACTIVATED",
-        recipients: getCounsellorsAndValidatorsEmailsDeduplicated(agency),
+        recipients: agency.refersToAgencyId
+          ? [...agency.counsellorEmails]
+          : getCounsellorsAndValidatorsEmailsDeduplicated(agency),
         params: {
           agencyName: agency.name,
           agencyLogoUrl: agency.logoUrl ?? undefined,
@@ -50,5 +53,31 @@ export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAge
         agencyId: agency.id,
       },
     });
+
+    if (agency.refersToAgencyId) {
+      const agencyReferredTo = await uow.agencyRepository.getById(
+        agency.refersToAgencyId,
+      );
+      if (!agencyReferredTo)
+        throw new NotFoundError(
+          `No agency were found with id : ${agency.refersToAgencyId}`,
+        );
+      this.#saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "ACCOMPANYING_AGENCY_WITH_AGENCY_REFERS_TO_NOTIFICATION",
+          recipients: [...agencyReferredTo.validatorEmails],
+          params: {
+            accompanyingAgencyName: agency.name,
+            agencyLogoUrl: agencyReferredTo.logoUrl ?? undefined,
+            refersToAgencyName: agencyReferredTo.name,
+            validatorEmails: agencyReferredTo.validatorEmails,
+          },
+        },
+        followedIds: {
+          agencyId: agency.id,
+        },
+      });
+    }
   }
 }
