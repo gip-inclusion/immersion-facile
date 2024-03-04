@@ -37,6 +37,12 @@ export type EmailParamsByEmailType = {
         validatorEmails: string[];
       }
   );
+  ACCOMPANYING_AGENCY_WITH_AGENCY_REFERS_TO_NOTIFICATION: {
+    accompanyingAgencyName: string;
+    refersToAgencyName: string;
+    agencyLogoUrl: AbsoluteUrl | undefined;
+    validatorEmails: string[];
+  };
   AGENCY_WAS_REJECTED: {
     agencyName: string;
     rejectionJustification: string;

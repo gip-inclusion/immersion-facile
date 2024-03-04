@@ -226,6 +226,12 @@ export const defaultEmailValueByEmailKind: {
     refersToOtherAgency: true,
     validatorEmails: ["VALIDATOR_EMAIL1", "VALIDATOR_EMAIL2"],
   },
+  ACCOMPANYING_AGENCY_WITH_AGENCY_REFERS_TO_NOTIFICATION: {
+    accompanyingAgencyName: "ACCOMPANYING_AGENCY_NAME",
+    refersToAgencyName: "REFERS_TO_AGENCY_NAME",
+    agencyLogoUrl: defaultEmailPreviewUrl,
+    validatorEmails: ["VALIDATOR_EMAIL1", "VALIDATOR_EMAIL2"],
+  },
   BENEFICIARY_ASSESSMENT_NOTIFICATION: {
     conventionId: "CONVENTION_ID",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
