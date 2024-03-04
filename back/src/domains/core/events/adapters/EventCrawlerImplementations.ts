@@ -24,7 +24,7 @@ export class BasicEventCrawler implements EventCrawler {
 
   protected async notifyDiscordOnTooManyNeverPublishedOutbox() {
     const neverPublishedCount = await this.uowPerformer.perform((uow) =>
-      uow.outboxRepository.countAllNeverPublishedEvents(),
+      uow.outboxRepository.countAllEvents({ status: "never-published" }),
     );
     if (neverPublishedCount < neverPublishedOutboxLimit) return;
     logger.error(
