@@ -278,6 +278,13 @@ export const appellationAndRomeDtoSerializer: ValueSerializer<AppellationAndRome
     stringify: (appellationDto) => JSON.stringify(appellationDto),
   };
 
+export const appellationAndRomeDtoArraySerializer: ValueSerializer<
+  AppellationAndRomeDto[]
+> = {
+  parse: (raw) => JSON.parse(raw),
+  stringify: (appellationDto) => JSON.stringify(appellationDto),
+};
+
 export const appellationDtoSerializer: ValueSerializer<AppellationDto> = {
   parse: (raw) => JSON.parse(raw),
   stringify: (appellationDto) => JSON.stringify(appellationDto),
