@@ -1129,6 +1129,36 @@ export const emailTemplatesByName =
         subContent: defaultSignature("immersion"),
       }),
     },
+    ACCOMPANYING_AGENCY_WITH_AGENCY_REFERS_TO_NOTIFICATION: {
+      niceName:
+        "Agence - notification de l'agence prescriptrice lors de l'activation d'une agence accompagnatrice",
+      tags: [
+        "notification agence prescriptrice activation agence accompagnatrice",
+      ],
+      createEmailVariables: ({
+        accompanyingAgencyName,
+        refersToAgencyName,
+        agencyLogoUrl,
+        ...rest
+      }) => ({
+        subject:
+          "Une structure d'accompagnement qui vous à référencé comme structure prescriptrice à été activé",
+        greetings: "Bonjour,",
+        content: `La structure d'accompagnement ${accompanyingAgencyName} est activée sur Immersion facilité.
+        Elle a désigné comme prescripteur votre propre structure « ${refersToAgencyName} ».
+        
+        Cela signifie que vous allez recevoir des demandes de conventions initiées par des candidats ou entreprises accompagnés par la structure d'accompagnement ${accompanyingAgencyName}.
+        Ces demandes seront toutes examinées en premier lieu par la structure d'accompagnement. Si celle-ci confirme leur pertinence, vous les recevrez pour validation définitive (validées par ${rest.validatorEmails.join(
+          ", ",
+        )}).
+        
+        L'accompagnement lors du déroulement de l'immersion et du bilan relève de la responsabilité de la structure d'accompagnement.
+        
+        Merci à vous !`,
+        agencyLogoUrl,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     AGENCY_WAS_REJECTED: {
       niceName: "Agence - Refusée",
       tags: ["rejet prescripteur"],
