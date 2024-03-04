@@ -1019,7 +1019,7 @@ export const emailTemplatesByName =
         subject:
           internshipKind === "immersion"
             ? "Comment s'est déroulée l'immersion ?"
-            : "Mini Stage - Comment s'est déroulée le mini stage ?",
+            : "Mini Stage - Comment s'est déroulé le mini stage ?",
         greetings: greetingsWithConventionId(
           conventionId,
           establishmentTutorName,

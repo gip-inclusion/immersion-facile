@@ -67,7 +67,7 @@ export const AssessmentForm = ({
         label={
           convention.internshipKind === "immersion"
             ? "Comment s'est passée l'immersion ?"
-            : "Comment s'est passée le mini-stage ?"
+            : "Comment s'est passé le mini-stage ?"
         }
         textArea
         nativeTextAreaProps={{
