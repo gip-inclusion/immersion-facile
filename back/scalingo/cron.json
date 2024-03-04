@@ -13,10 +13,6 @@
       "size": "M"
     },
     {
-      "command": "02 3 * * * pnpm back run trigger-resync-old-conventions-to-pe",
-      "size": "M"
-    },
-    {
       "command": "00 6 * * * pnpm back run trigger-establishment-leads-reminders",
       "size": "M"
     },
