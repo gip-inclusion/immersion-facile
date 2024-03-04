@@ -41,7 +41,7 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
       templatedContent: {
         kind: "AGENCY_WAS_ACTIVATED",
         recipients: agency.refersToAgencyId
-          ? [...agency.counsellorEmails]
+          ? agency.counsellorEmails
           : getCounsellorsAndValidatorsEmailsDeduplicated(agency),
         params: {
           agencyName: agency.name,
@@ -65,10 +65,10 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
       this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
-          kind: "ACCOMPANYING_AGENCY_WITH_AGENCY_REFERS_TO_NOTIFICATION",
-          recipients: [...agencyReferredTo.validatorEmails],
+          kind: "AGENCY_WITH_REFERS_TO_ACTIVATED",
+          recipients: agencyReferredTo.validatorEmails,
           params: {
-            accompanyingAgencyName: agency.name,
+            nameOfAgencyRefering: agency.name,
             agencyLogoUrl: agencyReferredTo.logoUrl ?? undefined,
             refersToAgencyName: agencyReferredTo.name,
             validatorEmails: agencyReferredTo.validatorEmails,

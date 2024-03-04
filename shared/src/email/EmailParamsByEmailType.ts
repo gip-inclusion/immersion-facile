@@ -37,8 +37,8 @@ export type EmailParamsByEmailType = {
         validatorEmails: string[];
       }
   );
-  ACCOMPANYING_AGENCY_WITH_AGENCY_REFERS_TO_NOTIFICATION: {
-    accompanyingAgencyName: string;
+  AGENCY_WITH_REFERS_TO_ACTIVATED: {
+    nameOfAgencyRefering: string;
     refersToAgencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
     validatorEmails: string[];
