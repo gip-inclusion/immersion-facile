@@ -129,6 +129,7 @@ export const AgencyFormCommonFields = ({
         setFormValue={({ position, address }) => {
           setValue("position", position);
           setValue("address", address);
+          setValue("coveredDepartments", [address.departmentCode]);
         }}
         id={domElementIds.addAgency.addressAutocomplete}
         disabled={isFetchingSiret}
