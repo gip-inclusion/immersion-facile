@@ -6,7 +6,7 @@ import {
   notifyObjectDiscord,
 } from "../../../../utils/notifyDiscord";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
-import { DomainEvent, eventsToDebugInfo } from "../events";
+import { DomainEvent, EventStatus, eventsToDebugInfo } from "../events";
 import { EventBus } from "../ports/EventBus";
 import { EventCrawler } from "../ports/EventCrawler";
 
@@ -22,17 +22,16 @@ export class BasicEventCrawler implements EventCrawler {
     private readonly eventBus: EventBus,
   ) {}
 
-  protected async notifyDiscordOnTooManyNeverPublishedOutbox() {
+  protected async notifyDiscordOnTooManyOutboxWithStatus({
+    status,
+    limit,
+  }: { status: EventStatus; limit: number }) {
     const neverPublishedCount = await this.uowPerformer.perform((uow) =>
-      uow.outboxRepository.countAllEvents({ status: "never-published" }),
+      uow.outboxRepository.countAllEvents({ status }),
     );
-    if (neverPublishedCount < neverPublishedOutboxLimit) return;
-    logger.error(
-      `"never-published" outbox ${neverPublishedCount} exceeds ${neverPublishedOutboxLimit}`,
-    );
-    notifyDiscord(
-      `"never-published" outbox ${neverPublishedCount} exceeds ${neverPublishedOutboxLimit}`,
-    );
+    if (neverPublishedCount < limit) return;
+    logger.error(`${status} outbox ${neverPublishedCount} exceeds ${limit}`);
+    notifyDiscord(`${status} outbox ${neverPublishedCount} exceeds ${limit}`);
   }
 
   public async processNewEvents(): Promise<void> {
@@ -185,15 +184,22 @@ export class RealEventCrawler
 
     retryFailedEvents();
 
-    const checkForNeverPublishedOutboxCount = () => {
-      setTimeout(
-        () =>
-          this.notifyDiscordOnTooManyNeverPublishedOutbox().finally(() =>
-            checkForNeverPublishedOutboxCount(),
-          ),
-        5 * 60 * 1000, //5 min
-      );
-    };
-    checkForNeverPublishedOutboxCount();
+    this.#checkForOutboxCount({
+      status: "never-published",
+      limit: neverPublishedOutboxLimit,
+    });
+  }
+
+  #checkForOutboxCount({
+    status,
+    limit,
+  }: { status: EventStatus; limit: number }) {
+    setTimeout(
+      () =>
+        this.notifyDiscordOnTooManyOutboxWithStatus({ status, limit }).finally(
+          () => this.#checkForOutboxCount({ status, limit }),
+        ),
+      5 * 60 * 1000, //5 min
+    );
   }
 }
