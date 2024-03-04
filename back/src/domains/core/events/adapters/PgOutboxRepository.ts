@@ -33,6 +33,16 @@ const logger = createLogger(__filename);
 export class PgOutboxRepository implements OutboxRepository {
   constructor(private transaction: KyselyDb) {}
 
+  public async countAllNeverPublishedEvents(): Promise<number> {
+    const result = (await this.transaction
+      .selectFrom("outbox")
+      .select((eb) => eb.fn.countAll().as("total"))
+      .where("status", "=", "never-published")
+      .executeTakeFirst()) as { total: string };
+
+    return parseInt(result.total);
+  }
+
   public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {
     if (!events.length) return;
     const query = format(

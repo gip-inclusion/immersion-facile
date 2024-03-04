@@ -8,6 +8,11 @@ const logger = createLogger(__filename);
 export class InMemoryOutboxRepository implements OutboxRepository {
   constructor(private readonly _events: Record<string, DomainEvent> = {}) {}
 
+  public async countAllNeverPublishedEvents(): Promise<number> {
+    return this.events.filter((event) => event.status === "never-published")
+      .length;
+  }
+
   //test purposes
   public get events(): DomainEvent[] {
     return values(this._events);
