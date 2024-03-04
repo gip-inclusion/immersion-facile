@@ -71,7 +71,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
             if (existingAgencyRight && existingAgencyRight.role !== "toReview")
               return existingAgencyRight;
 
-            return { agency, role: "validator" };
+            return { agency, role: "counsellor" };
           }),
         ],
       });
