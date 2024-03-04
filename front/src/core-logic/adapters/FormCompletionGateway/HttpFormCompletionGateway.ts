@@ -20,10 +20,14 @@ export class HttpFormCompletionGateway implements FormCompletionGateway {
 
   public getAppellationDtoMatching(
     searchText: string,
+    useNaturalLanguage: boolean,
   ): Promise<AppellationMatchDto[]> {
     return this.httpClient
       .appellation({
-        queryParams: { searchText, naturalLanguage: "true" },
+        queryParams: {
+          searchText,
+          naturalLanguage: useNaturalLanguage ? "true" : undefined,
+        },
       })
       .then((response) =>
         match(response)

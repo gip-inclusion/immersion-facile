@@ -183,6 +183,20 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.search}`,
   ),
+  searchDiagoriente: defineRoute(
+    {
+      distanceKm: param.query.optional.number,
+      latitude: param.query.optional.number,
+      longitude: param.query.optional.number,
+      appellations: param.query.optional.ofType(
+        appellationAndRomeDtoArraySerializer,
+      ),
+      sortedBy: param.query.optional.string,
+      place: param.query.optional.string,
+      ...matomoParams,
+    },
+    () => `/${frontRoutes.searchDiagoriente}`,
+  ),
   standard: defineRoute(
     { pagePath: param.path.ofType(standardPagesSerializer) },
     (params) => `/${frontRoutes.standard}/${params.pagePath}`,

@@ -416,4 +416,5 @@ export const domElementIds = {
   offerExternal: {},
   manageEstablishmentAdmin: {},
   establishmentDashboard: {},
+  searchDiagoriente: {},
 } satisfies DomElementIds;

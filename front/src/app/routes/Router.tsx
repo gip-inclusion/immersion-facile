@@ -118,6 +118,9 @@ const getPageByRouteName: {
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => <SearchPage route={route} />,
+  searchDiagoriente: (route) => (
+    <SearchPage route={route} useNaturalLanguageForAppellations />
+  ),
   standard: (route) =>
     standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
       <StandardLayout route={route} />

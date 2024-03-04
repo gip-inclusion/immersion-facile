@@ -44,8 +44,10 @@ const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
 
 export const SearchPage = ({
   route,
+  useNaturalLanguageForAppellations,
 }: {
-  route: Route<typeof routes.search>;
+  route: Route<typeof routes.search | typeof routes.searchDiagoriente>;
+  useNaturalLanguageForAppellations?: boolean;
 }) => {
   const { cx } = useStyles();
   const initialSearchSliceState = initialState;
@@ -160,6 +162,7 @@ export const SearchPage = ({
                 }}
                 id={domElementIds.search.appellationAutocomplete}
                 placeholder="Ex: boulanger, styliste, etc"
+                useNaturalLanguage={useNaturalLanguageForAppellations}
               />
             </div>
             <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
