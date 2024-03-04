@@ -165,9 +165,9 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
         [icUser.id]: [
-          { agency: agency1InGroup, role: "validator" },
-          { agency: agency2InGroup, role: "validator" },
-          { agency: agency3InGroup, role: "validator" },
+          { agency: agency1InGroup, role: "counsellor" },
+          { agency: agency2InGroup, role: "counsellor" },
+          { agency: agency3InGroup, role: "counsellor" },
         ],
       });
     });
@@ -177,7 +177,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [
-          { agency: agency1InGroup, role: "counsellor" },
+          { agency: agency1InGroup, role: "validator" },
           { agency: agency2InGroup, role: "toReview" },
         ],
         establishmentDashboards: {},
@@ -193,9 +193,9 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
         [icUser.id]: [
-          { agency: agency1InGroup, role: "counsellor" },
-          { agency: agency2InGroup, role: "validator" },
-          { agency: agency3InGroup, role: "validator" },
+          { agency: agency1InGroup, role: "validator" },
+          { agency: agency2InGroup, role: "counsellor" },
+          { agency: agency3InGroup, role: "counsellor" },
         ],
       });
     });
