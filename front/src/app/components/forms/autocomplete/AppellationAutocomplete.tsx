@@ -32,6 +32,7 @@ type AppellationAutocompleteProps = {
   placeholder?: string;
   id?: string;
   disabled?: boolean;
+  useNaturalLanguage?: boolean;
 };
 
 type Option = Proposal<AppellationAndRomeDto>;
@@ -47,6 +48,7 @@ export const AppellationAutocomplete = ({
   placeholder,
   id = "im-appellation-autocomplete",
   disabled = false,
+  useNaturalLanguage = false,
 }: AppellationAutocompleteProps) => {
   const initialOption: Option | null = useMemo(
     () =>
@@ -92,6 +94,7 @@ export const AppellationAutocomplete = ({
         const appellationOptions =
           await outOfReduxDependencies.formCompletionGateway.getAppellationDtoMatching(
             sanitizedTerm,
+            useNaturalLanguage,
           );
         setOptions(
           appellationOptions

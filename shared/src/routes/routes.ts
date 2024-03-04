@@ -30,6 +30,7 @@ export const frontRoutes = {
   manageConventionInclusionConnected: "pilotage-convention-inclusion-connect",
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
   search: "recherche",
+  searchDiagoriente: "recherche-diagoriente",
   standard: "pages",
   unsubscribeEstablishmentLead: "desinscription-prospect",
 };
