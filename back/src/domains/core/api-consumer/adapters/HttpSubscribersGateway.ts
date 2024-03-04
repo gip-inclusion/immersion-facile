@@ -1,13 +1,10 @@
 import axios, { AxiosInstance } from "axios";
 import { SubscriptionParams, castError } from "shared";
-import { createLogger } from "../../../../utils/logger";
-import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
+  SubscriberResponse,
   SubscribersGateway,
 } from "../ports/SubscribersGateway";
-
-const logger = createLogger(__filename);
 
 export class HttpSubscribersGateway implements SubscribersGateway {
   #axios: AxiosInstance;
@@ -19,7 +16,7 @@ export class HttpSubscribersGateway implements SubscribersGateway {
   public async notify(
     { payload, subscribedEvent }: ConventionUpdatedSubscriptionCallbackBody,
     { callbackUrl, callbackHeaders }: SubscriptionParams,
-  ): Promise<void> {
+  ): Promise<SubscriberResponse> {
     return this.#axios
       .post(
         callbackUrl,
@@ -31,18 +28,18 @@ export class HttpSubscribersGateway implements SubscribersGateway {
           headers: callbackHeaders,
         },
       )
-      .then((response) => {
-        logger.info({
+      .then(
+        (response): SubscriberResponse => ({
           title: "Partner subscription notified successfully",
           callbackUrl,
           status: response.status,
           conventionId: payload.convention.id,
           conventionStatus: payload.convention.status,
-        });
-      })
-      .catch((err) => {
+        }),
+      )
+      .catch((err): SubscriberResponse => {
         const error = castError(err);
-        const errorContext = {
+        return {
           title: "Partner subscription errored",
           callbackUrl,
           conventionId: payload.convention.id,
@@ -50,16 +47,13 @@ export class HttpSubscribersGateway implements SubscribersGateway {
           ...(axios.isAxiosError(error)
             ? {
                 status: error.response?.status,
-                message: error.response?.data as unknown,
+                message: error.response?.data,
               }
             : {
-                status: "not an axios error",
-                message: error.message,
+                status: 500,
+                message: `not an axios error ${error.message}`,
               }),
         };
-
-        logger.error({ ...errorContext, error });
-        notifyObjectDiscord(errorContext);
       });
   }
 }

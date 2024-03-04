@@ -8,12 +8,16 @@ import {
   withConventionSchema,
 } from "shared";
 import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { createLogger } from "../../../../utils/logger";
 import { isConventionInScope } from "../../../convention/entities/Convention";
 import { TransactionalUseCase } from "../../UseCase";
+import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { getReferedAgency } from "../helpers/agency";
 import { SubscribersGateway } from "../ports/SubscribersGateway";
+
+const logger = createLogger(__filename);
 
 const isConsumerSubscribedToConventionUpdated = (apiConsumer: ApiConsumer) => {
   const conventionUpdatedCallbackParams =
@@ -28,12 +32,16 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
 
   readonly #subscribersGateway: SubscribersGateway;
 
+  readonly #timeGateway: TimeGateway;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     subscribersGateway: SubscribersGateway,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
     this.#subscribersGateway = subscribersGateway;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute({ convention }: WithConventionDto, uow: UnitOfWork) {
@@ -72,30 +80,57 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
     );
 
     await Promise.all(
-      apiConsumers.map((apiConsumers) => {
-        const conventionUpdatedCallbackParams =
-          apiConsumers.rights.convention.subscriptions.find(
-            (sub) => sub.subscribedEvent === "convention.updated",
-          );
-        if (!conventionUpdatedCallbackParams) {
-          throw new Error(
-            `No callback params found for convention.updated : apiConsumer : ${apiConsumers.id} | convention : ${conventionRead.id}`,
-          );
-        }
-
-        return this.#subscribersGateway.notify(
-          {
-            payload: {
-              convention: conventionRead,
-            },
-            subscribedEvent: "convention.updated",
-          },
-          {
-            callbackUrl: conventionUpdatedCallbackParams.callbackUrl,
-            callbackHeaders: conventionUpdatedCallbackParams.callbackHeaders,
-          },
-        );
-      }),
+      apiConsumers.map(this.#notifySubscriber(uow, conventionRead)),
     );
+  }
+
+  #notifySubscriber(uow: UnitOfWork, conventionRead: ConventionReadDto) {
+    return async (apiConsumer: ApiConsumer) => {
+      const conventionUpdatedCallbackParams =
+        apiConsumer.rights.convention.subscriptions.find(
+          (sub) => sub.subscribedEvent === "convention.updated",
+        );
+
+      if (!conventionUpdatedCallbackParams) {
+        throw new Error(
+          `No callback params found for convention.updated : apiConsumer : ${apiConsumer.id} | convention : ${conventionRead.id}`,
+        );
+      }
+
+      const response = await this.#subscribersGateway.notify(
+        {
+          payload: {
+            convention: conventionRead,
+          },
+          subscribedEvent: "convention.updated",
+        },
+        {
+          callbackUrl: conventionUpdatedCallbackParams.callbackUrl,
+          callbackHeaders: conventionUpdatedCallbackParams.callbackHeaders,
+        },
+      );
+
+      if (response.title === "Partner subscription errored") {
+        logger.error(response);
+
+        await uow.errorRepository.save({
+          serviceName: "BroadcastToPartnersOnConventionUpdates",
+          message: response.message,
+          occurredAt: this.#timeGateway.now(),
+          params: {
+            httpStatus: response.status,
+            conventionId: response.conventionId,
+            conventionStatus: response.conventionStatus,
+            callbackUrl: response.callbackUrl,
+          },
+          handledByAgency: false,
+        });
+
+        return;
+      }
+
+      logger.info(response);
+      return;
+    };
   }
 }
