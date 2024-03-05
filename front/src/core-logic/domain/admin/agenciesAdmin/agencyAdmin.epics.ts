@@ -19,11 +19,14 @@ const agencyAdminGetByNameEpic: AgencyEpic = (
   { agencyGateway, scheduler },
 ) =>
   action$.pipe(
-    filter(agencyAdminSlice.actions.setAgencySearchText.match),
+    filter(agencyAdminSlice.actions.setAgencySearchQuery.match),
     debounceTime(400, scheduler),
     distinctUntilChanged(),
     switchMap((action: PayloadAction<string>) =>
-      agencyGateway.listAgenciesByFilter$({ nameIncludes: action.payload }),
+      agencyGateway.listAgenciesByFilter$({
+        [/^\d+$/.test(action.payload) ? "siret" : "nameIncludes"]:
+          action.payload,
+      }),
     ),
     map(agencyAdminSlice.actions.setAgencyOptions),
   );

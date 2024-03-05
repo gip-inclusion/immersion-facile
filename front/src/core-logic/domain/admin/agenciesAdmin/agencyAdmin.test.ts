@@ -183,11 +183,11 @@ describe("agencyAdmin", () => {
       it("shows when search is onGoing", () => {
         const searchedText = "agen";
         store.dispatch(
-          agencyAdminSlice.actions.setAgencySearchText(searchedText),
+          agencyAdminSlice.actions.setAgencySearchQuery(searchedText),
         );
         expectAgencyAdminStateToMatch({
           isSearching: true,
-          agencySearchText: searchedText,
+          agencySearchQuery: searchedText,
         });
       });
 
@@ -202,7 +202,7 @@ describe("agencyAdmin", () => {
         ];
         feedWithAgencyOptions(agencies);
         expectAgencyAdminStateToMatch({
-          agencySearchText: searchedText,
+          agencySearchQuery: searchedText,
           isSearching: false,
           agencyOptions: agencies,
         });
@@ -221,7 +221,7 @@ describe("agencyAdmin", () => {
             agencyAdmin: {
               ...agencyAdminInitialState,
               agencyOptions,
-              agencySearchText,
+              agencySearchQuery: agencySearchText,
             },
           }),
         }));
@@ -236,7 +236,7 @@ describe("agencyAdmin", () => {
           isSearching: false,
           agency: agencyDto,
           agencyOptions,
-          agencySearchText,
+          agencySearchQuery: agencySearchText,
         });
       });
     });
@@ -344,6 +344,6 @@ describe("agencyAdmin", () => {
   };
 
   const whenSearchTextIsProvided = (searchedText: string) => {
-    store.dispatch(agencyAdminSlice.actions.setAgencySearchText(searchedText));
+    store.dispatch(agencyAdminSlice.actions.setAgencySearchQuery(searchedText));
   };
 });

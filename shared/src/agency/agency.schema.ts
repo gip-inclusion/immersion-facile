@@ -68,6 +68,7 @@ export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
     departmentCode: z.string().optional(),
     nameIncludes: z.string().optional(),
     kind: z.enum(agencyKindFilters).optional(),
+    siret: z.string().optional(),
   });
 
 const commonAgencyShape = {

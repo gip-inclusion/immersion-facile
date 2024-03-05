@@ -12,7 +12,7 @@ export type AgencySuccessFeedbackKind = "agencyAdded" | "agencyUpdated";
 export type AgencySubmitFeedback = SubmitFeedBack<AgencySuccessFeedbackKind>;
 
 export interface AgencyAdminState {
-  agencySearchText: string;
+  agencySearchQuery: string;
   agencyOptions: AgencyOption[];
   agencyNeedingReviewOptions: AgencyOption[];
   agency: AgencyDto | null;
@@ -31,7 +31,7 @@ export interface AgencyAdminState {
 
 export const agencyAdminInitialState: AgencyAdminState = {
   agencyNeedingReviewOptions: [],
-  agencySearchText: "",
+  agencySearchQuery: "",
   agencyOptions: [],
   agency: null,
   agencyNeedingReview: null,
@@ -52,8 +52,8 @@ export const agencyAdminSlice = createSlice({
       state.isFetchingAgenciesNeedingReview = true;
       state.agencyNeedingReviewOptions = [];
     },
-    setAgencySearchText: (state, action: PayloadAction<string>) => {
-      state.agencySearchText = action.payload;
+    setAgencySearchQuery: (state, action: PayloadAction<string>) => {
+      state.agencySearchQuery = action.payload;
       state.isSearching = true;
     },
     setAgencyOptions: (state, action: PayloadAction<AgencyOption[]>) => {

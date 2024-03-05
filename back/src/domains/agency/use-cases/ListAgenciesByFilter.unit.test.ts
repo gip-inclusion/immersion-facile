@@ -15,6 +15,12 @@ const cergyAddress: AddressDto = {
   postcode: "95000",
   streetNumberAndAddress: "OSEF",
 };
+const uzercheAddress: AddressDto = {
+  city: "Uzerche",
+  departmentCode: "19",
+  postcode: "19140",
+  streetNumberAndAddress: "OSEF",
+};
 
 const otherAgencyInParis = new AgencyDtoBuilder()
   .withId("0")
@@ -52,6 +58,13 @@ const otherAgencyWithRefersToInCergy = new AgencyDtoBuilder()
   .withName("Agence avec refersTo")
   .withAddress(cergyAddress)
   .build();
+const agencyWithSiret = new AgencyDtoBuilder()
+  .withId("6")
+  .withName("Agence avec Siret")
+  .withKind("autre")
+  .withAddress(uzercheAddress)
+  .withAgencySiret("11122233344455")
+  .build();
 
 describe("Query: List agencies by filter", () => {
   const uow = createInMemoryUow();
@@ -64,6 +77,7 @@ describe("Query: List agencies by filter", () => {
     peAgency1InParis,
     peAgency2InParis,
     otherAgencyWithRefersToInCergy,
+    agencyWithSiret,
   ];
   agencyRepository.setAgencies(allAgencies);
 
@@ -85,9 +99,11 @@ describe("Query: List agencies by filter", () => {
     it("List immersionWithoutPe agencies", async () => {
       expectToEqual(
         await useCase.execute({ kind: "immersionWithoutPe" }, undefined),
-        [otherAgencyInParis, otherAgencyWithRefersToInCergy].map(
-          toAgencyOption,
-        ),
+        [
+          otherAgencyInParis,
+          otherAgencyWithRefersToInCergy,
+          agencyWithSiret,
+        ].map(toAgencyOption),
       );
     });
 
@@ -106,6 +122,7 @@ describe("Query: List agencies by filter", () => {
           peAgency1InParis,
           peAgency2InParis,
           otherAgencyWithRefersToInCergy,
+          agencyWithSiret,
         ].map(toAgencyOption),
       );
     });
@@ -116,6 +133,13 @@ describe("Query: List agencies by filter", () => {
         allAgencies
           .filter((agency) => agency.refersToAgencyId === null)
           .map(toAgencyOption),
+      );
+    });
+
+    it("List agencies for given siret", async () => {
+      expectToEqual(
+        await useCase.execute({ siret: "11122233344455" }, undefined),
+        [toAgencyOption(agencyWithSiret)],
       );
     });
   });

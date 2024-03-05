@@ -117,6 +117,7 @@ export type GetAgenciesFilter = {
   departmentCode?: DepartmentCode;
   kind?: AgencyKindFilter;
   status?: AgencyStatus[];
+  siret?: SiretDto;
 };
 
 export type ListAgenciesRequestDto = Omit<GetAgenciesFilter, "position">;

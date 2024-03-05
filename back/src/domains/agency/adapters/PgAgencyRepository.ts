@@ -82,6 +82,11 @@ const makeNameFilterSQL = (name?: string): string | undefined => {
   return format("name ILIKE '%' || %1$L || '%'", name);
 };
 
+const makeSiretFilterSQL = (siret?: string): string | undefined => {
+  if (!siret) return;
+  return format("agency_siret = %1$L", siret);
+};
+
 const makeDepartmentCodeFilterSQL = (
   departmentCode?: DepartmentCode,
 ): string | undefined => {
@@ -145,6 +150,7 @@ export class PgAgencyRepository implements AgencyRepository {
       makeAgencyKindFilterSQL(filters.kind),
       makePositionFilterSQL(filters.position),
       makeStatusFilterSQL(filters.status),
+      makeSiretFilterSQL(filters.siret),
     ].filter(filterNotFalsy);
 
     const whereClause =
@@ -408,4 +414,5 @@ export const safirConflictErrorMessage = (
 ): any =>
   `Multiple agencies were found with safir code "${safirCode}": ${agencies
     .map(({ id }) => id)
+    .sort()
     .join(",")}`;

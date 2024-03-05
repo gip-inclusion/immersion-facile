@@ -16,7 +16,7 @@ export const useAgencyAdminAutocomplete = () => {
 
   return {
     updateSearchTerm: (searchTerm: string) =>
-      dispatch(agencyAdminSlice.actions.setAgencySearchText(searchTerm)),
+      dispatch(agencyAdminSlice.actions.setAgencySearchQuery(searchTerm)),
     selectOption: (agencyId: AgencyId) =>
       dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId)),
   };
@@ -40,8 +40,12 @@ export const AgencyAdminAutocomplete = ({
   tooltip,
 }: AgencyAdminAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
-  const { agencySearchText, isSearching, agencyOptions, agency } =
-    useAppSelector(agencyAdminSelectors.agencyState);
+  const {
+    agencySearchQuery: agencySearchText,
+    isSearching,
+    agencyOptions,
+    agency,
+  } = useAppSelector(agencyAdminSelectors.agencyState);
   const { updateSearchTerm, selectOption } = useAgencyAdminAutocomplete();
 
   const { cx } = useStyles();
