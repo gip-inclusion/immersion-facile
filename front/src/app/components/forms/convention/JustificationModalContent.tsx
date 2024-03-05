@@ -141,11 +141,6 @@ export const JustificationModalContent = ({
 
     return (
       <div>
-        <p>
-          Dans ce cas, il ne faut pas réclamer de modification car cela entraîne
-          la perte de toutes les signatures déjà enregistrées.
-        </p>
-
         {signatoryEmailsWithMissingSignature.length === 0 ? (
           <p>
             <strong>
