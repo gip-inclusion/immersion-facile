@@ -201,6 +201,12 @@ const bottomsLinks: NavLink[] = [
       }
     },
   },
+  {
+    label: "Kit de communication",
+    href: "https://inclusion.beta.gouv.fr/kits-de-communication/immersion-facilitée/",
+    id: bottomsLinksIds.communicationKit,
+    target: "_blank",
+  },
 ];
 
 const navTopGroupLinks: NavTopGroupLinks[] = [

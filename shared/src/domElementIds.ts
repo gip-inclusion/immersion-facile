@@ -78,6 +78,7 @@ export const domElementIds = {
       sitemap: buildFooterNavLinkId("sitemap"),
       budget: buildFooterNavLinkId("budget"),
       apiDocumentation: buildFooterNavLinkId("api-documentation"),
+      communicationKit: buildFooterNavLinkId("communication-kit"),
     },
   },
 
