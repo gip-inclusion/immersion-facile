@@ -1,3 +1,4 @@
+import { subHours } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import {
   EmailAttachment,
@@ -13,11 +14,12 @@ import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
 const agencyId = "aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa";
+const now = new Date();
 const emailNotifications: EmailNotification[] = [
   {
     kind: "email",
     id: "11111111-1111-4000-1111-111111111111",
-    createdAt: new Date("2023-06-09T19:00").toISOString(),
+    createdAt: subHours(now, 2).toISOString(),
     followedIds: { agencyId },
     templatedContent: {
       replyTo: { email: "yolo@mail.com", name: "Yolo" },
@@ -40,7 +42,7 @@ const emailNotifications: EmailNotification[] = [
   {
     kind: "email",
     id: "22222222-2222-4000-2222-222222222222",
-    createdAt: new Date("2023-06-09T15:00").toISOString(),
+    createdAt: subHours(now, 3).toISOString(),
     followedIds: { agencyId },
     templatedContent: {
       kind: "EDIT_FORM_ESTABLISHMENT_LINK",
@@ -61,7 +63,7 @@ const emailNotifications: EmailNotification[] = [
   {
     kind: "email",
     id: "33333333-3333-4000-3333-333333333333",
-    createdAt: new Date("2023-06-09T21:00").toISOString(),
+    createdAt: now.toISOString(),
     followedIds: { agencyId },
     templatedContent: {
       kind: "AGENCY_LAST_REMINDER",
@@ -251,7 +253,7 @@ describe("PgNotificationRepository", () => {
         {
           kind: "sms",
           id: "77777777-7777-4000-7777-777777777777",
-          createdAt: new Date("2023-06-10T20:00").toISOString(),
+          createdAt: subHours(new Date(), 4).toISOString(),
           templatedContent: {
             kind: "FirstReminderForSignatories",
             recipientPhone: "33610101010",
@@ -317,6 +319,7 @@ describe("PgNotificationRepository", () => {
       expectToEqual(await pgNotificationRepository.getLastNotifications(), {
         sms: [],
         emails: [
+          emailNotificationWithUrlAttachment,
           {
             ...emailNotification,
             templatedContent: {
@@ -330,7 +333,6 @@ describe("PgNotificationRepository", () => {
               ],
             },
           },
-          emailNotificationWithUrlAttachment,
         ],
       });
     });
@@ -369,7 +371,7 @@ const createTemplatedEmailAndNotification = ({
   const emailNotification: Notification = {
     id: id ?? "22222222-2222-4444-2222-222222222222",
     kind: "email",
-    createdAt: new Date("2023-01-01").toISOString(),
+    createdAt: subHours(new Date(), 1).toISOString(),
     followedIds: { agencyId: "cccccccc-1111-4111-1111-cccccccccccc" },
     templatedContent: email,
   };
