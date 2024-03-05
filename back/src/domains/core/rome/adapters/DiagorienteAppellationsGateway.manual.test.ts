@@ -41,6 +41,15 @@ describe("DiagorienteAppellationsGateway", () => {
       token_type: "Bearer",
     });
   });
+
+  it("should retrieve stored token, not requesting another", async () => {
+    const { access_token: originalToken } =
+      await appellationsGateway.getAccessToken();
+    const { access_token: newToken } =
+      await appellationsGateway.getAccessToken();
+    expect(originalToken).toEqual(newToken);
+  });
+
   it("returns matching results for query", async () => {
     const response = await appellationsGateway.searchAppellations("Dév");
     expectObjectsToMatch(response, [
