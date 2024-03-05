@@ -53,7 +53,7 @@ export const SearchPage = ({
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
-  const searchUseCase = useSearchUseCase();
+  const triggerSearch = useSearchUseCase(route);
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const initialValues: SearchPageParams = {
     latitude: 0,
@@ -115,11 +115,11 @@ export const SearchPage = ({
 
   useEffect(() => {
     if (availableForInitialSearchRequest) {
-      searchUseCase(filterFormValues(formValues));
+      triggerSearch(filterFormValues(formValues));
     }
   }, [
     availableForInitialSearchRequest,
-    searchUseCase,
+    triggerSearch,
     filterFormValues,
     formValues,
   ]);
@@ -133,7 +133,7 @@ export const SearchPage = ({
         >
           <form
             onSubmit={handleSubmit((value) =>
-              searchUseCase(filterFormValues(value)),
+              triggerSearch(filterFormValues(value)),
             )}
             className={cx(
               fr.cx("fr-grid-row", "fr-grid-row--gutters"),
@@ -251,7 +251,7 @@ export const SearchPage = ({
                               value={option.value}
                               checked={routeParams.sortedBy === option.value}
                               onChange={() => {
-                                searchUseCase({
+                                triggerSearch({
                                   ...formValues,
                                   sortedBy: option.value,
                                 });

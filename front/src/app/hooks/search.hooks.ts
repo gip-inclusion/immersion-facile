@@ -5,8 +5,11 @@ import {
   SearchPageParams,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
+import { Route } from "type-route";
 
-export const useSearchUseCase = () => {
+export const useSearchUseCase = ({
+  name,
+}: Route<typeof routes.search | typeof routes.searchDiagoriente>) => {
   const dispatch = useDispatch();
   const urlParams = getUrlParameters(window.location);
   return (values: SearchPageParams) => {
@@ -16,11 +19,9 @@ export const useSearchUseCase = () => {
     dispatch(
       searchSlice.actions.searchRequested({ ...values, appellationCodes }),
     );
-    routes
-      .search({
-        ...urlParams,
-        ...values,
-      })
-      .replace();
+    routes[name]({
+      ...urlParams,
+      ...values,
+    }).replace();
   };
 };
