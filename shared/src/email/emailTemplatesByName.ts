@@ -1142,12 +1142,12 @@ export const emailTemplatesByName =
         ...rest
       }) => ({
         subject:
-          "Une structure d'accompagnement qui vous à référencé comme structure prescriptrice à été activé",
+          "Une structure d'accompagnement qui vous a désigné comme structure prescriptrice a été activée",
         greetings: "Bonjour,",
-        content: `La structure d'accompagnement ${nameOfAgencyRefering} est activée sur Immersion facilité.
+        content: `La structure d'accompagnement ${nameOfAgencyRefering} est activée sur Immersion facilitée.
         Elle a désigné comme prescripteur votre propre structure « ${refersToAgencyName} ».
         
-        Cela signifie que vous allez recevoir des demandes de conventions initiées par des candidats ou entreprises accompagnés par la structure d'accompagnement ${nameOfAgencyRefering}.
+        Cela signifie que vous allez recevoir des demandes de conventions initiées par des candidats ou entreprises qui sont accompagnés par la structure d'accompagnement ${nameOfAgencyRefering}.
         Ces demandes seront toutes examinées en premier lieu par la structure d'accompagnement. Si celle-ci confirme leur pertinence, vous les recevrez pour validation définitive (validées par ${rest.validatorEmails.join(
           ", ",
         )}).
