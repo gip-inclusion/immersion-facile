@@ -33,7 +33,7 @@ jobs:
 
   deploy-dev:
     name: Deploy dev
-    needs: [validation, tag, build-front-artefact, build-back-artefact]
+    needs: [ validation, tag, build-front-artefact, build-back-artefact ]
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
       environment: dev
@@ -74,3 +74,13 @@ jobs:
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  create-release-notes:
+    name: Create release notes
+    needs: deploy-prod
+    uses: ./.github/workflows/create-release-notes.yml
+    with:
+      tag: "v${{ github.run_number }}"
+      repository: ${{ github.repository }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

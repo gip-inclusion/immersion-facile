@@ -1,0 +1,50 @@
+name: Create release notes
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+      repository:
+        type: string
+        required: true
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  create-release-notes:
+    name: Create release notes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Get tag of latest release
+        id: get-latest-release-tag
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const latestRelease = await github.request(`GET /repos/${{ inputs.repository }}/releases/latest`)
+            return latestRelease.data.tag_name
+          result-encoding: string
+      - name: Generate release notes from latest release
+        id: generate-release-notes
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const releaseNotes = await github.request(`POST /repos/${{ inputs.repository }}/releases/generate-notes`, {
+              tag_name: `${{ inputs.tag }}`,
+              previous_tag_name: `${{steps.get-latest-release-tag.outputs.result}}` })
+            return releaseNotes.data
+      - name: Create release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.request(`POST /repos/${{ inputs.repository }}/releases`, {
+              tag_name: `${{ inputs.tag }}`,
+              name: `${{fromJson(steps.generate-release-notes.outputs.result).name}}`,
+              body: `${{fromJson(steps.generate-release-notes.outputs.result).body}}`})
