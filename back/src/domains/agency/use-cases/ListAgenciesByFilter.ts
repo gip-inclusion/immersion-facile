@@ -15,7 +15,7 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
   protected inputSchema = listAgenciesRequestSchema;
 
   public async _execute(
-    { departmentCode, nameIncludes, kind }: ListAgenciesRequestDto,
+    { departmentCode, nameIncludes, kind, siret }: ListAgenciesRequestDto,
     uow: UnitOfWork,
   ): Promise<AgencyOption[]> {
     const agencies = await uow.agencyRepository.getAgencies({
@@ -24,6 +24,7 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
         departmentCode,
         kind,
         status: activeAgencyStatuses,
+        siret,
       },
     });
 

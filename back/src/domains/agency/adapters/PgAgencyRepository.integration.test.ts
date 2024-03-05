@@ -343,6 +343,17 @@ describe("PgAgencyRepository", () => {
       ]);
     });
 
+    it("returns all agencies filtered by siret", async () => {
+      await Promise.all([
+        agencyRepository.insert(agency1),
+        agencyRepository.insert(agency2),
+      ]);
+      const agencies = await agencyRepository.getAgencies({
+        filters: { siret: "01234567890123" },
+      });
+      expect(sortById(agencies)).toEqual([agency1]);
+    });
+
     it("returns agencies filtered by departmentCode", async () => {
       const agencyWithParisInCoveredDepartments = new AgencyDtoBuilder()
         .withId("66666666-6666-6666-6666-666666666666")

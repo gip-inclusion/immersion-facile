@@ -12,6 +12,7 @@ import {
   GeoPositionDto,
   GetAgenciesFilter as GetAgenciesFilters,
   PartialAgencyDto,
+  SiretDto,
   WithGeoPosition,
   isTruthy,
 } from "shared";
@@ -252,6 +253,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
             agencyIsOfKind(agency, filters?.kind),
             agencyIsOfPosition(agency, filters?.position),
             agencyIsOfStatus(agency, filters?.status),
+            agencyHasSiret(agency, filters?.siret),
           ].includes(false),
       )
       .slice(0, limit);
@@ -389,6 +391,11 @@ const agencyHasDepartmentCode = (
 const agencyHasName = (agency: AgencyDto, name?: string): boolean => {
   if (!name) return true;
   return agency.name.toLowerCase().includes(name.toLowerCase());
+};
+
+const agencyHasSiret = (agency: AgencyDto, siret?: SiretDto): boolean => {
+  if (!siret) return true;
+  return agency.agencySiret === siret;
 };
 
 const agencyIsOfPosition = (
