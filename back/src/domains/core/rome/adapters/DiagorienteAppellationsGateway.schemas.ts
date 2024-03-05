@@ -14,17 +14,6 @@ export const diagorienteRawResponseSchema: z.Schema<DiagorienteRawResponse> =
     search_id: z.string(),
     original_query: z.array(z.string()),
     rewritten_query: z.array(z.string()),
-    // edits: z.array(
-    //   z.object({
-    //     type: z.string(),
-    //     message: z.string(),
-    //     matching_terms: z.array(z.string()),
-    //     replacement: z.array(z.string()).optional(),
-    //     added_terms: z.array(z.string()).optional(),
-    //     similar_to: z.array(z.string()).optional(),
-    //     similarity: z.number().optional(),
-    //   }),
-    // ),
     search_results: z.array(
       z.object({
         position: z.number(),

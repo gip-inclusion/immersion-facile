@@ -15,19 +15,8 @@ export const diagorienteTokenScope: keyof DiagorienteAccessTokenResponse =
 export type DiagorienteRawResponse = {
   search_id: string;
   original_query: string[];
-  //edits: DiagorienteEdit[];
   rewritten_query: string[];
   search_results: DiagorienteSearchResult[];
-};
-
-export type DiagorienteEdit = {
-  type: string;
-  message: string;
-  matching_terms?: string[];
-  replacement?: string[];
-  added_terms?: string[];
-  similar_to?: string[];
-  similarity?: number;
 };
 
 export type DiagorienteSearchResult = {
@@ -84,10 +73,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
         })
         .then((response) =>
           diagorienteRawResponseToAppellationAndRomeDto(response.body),
-        )
-        .catch((error) => {
-          throw error;
-        }),
+        ),
     );
   }
 
@@ -105,10 +91,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
               grant_type: "client_credentials",
             },
           })
-          .then((response) => response.body)
-          .catch((error) => {
-            throw error;
-          }),
+          .then((response) => response.body),
       ),
     );
   }
