@@ -23,8 +23,14 @@ export const cleanStringToHTMLAttribute = (
   return result.replaceAll(":", "");
 };
 
+export const removeDiacritics = (str: string) =>
+  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
 export const toLowerCaseWithoutDiacritics = (str: string): string =>
-  str
-    .normalize("NFD")
-    .toLowerCase()
-    .replace(/[\u0300-\u036f]/g, "");
+  removeDiacritics(str).toLowerCase();
+
+export const slugify = (str: string) =>
+  toLowerCaseWithoutDiacritics(str)
+    .trim()
+    .replace(/[()]/g, "")
+    .replace(/\W/g, "-");

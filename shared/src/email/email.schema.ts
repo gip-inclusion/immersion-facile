@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { toLowerCaseWithoutDiacritics } from "../utils/string";
 import { requiredText } from "../zodUtils";
 import type { EmailType, TemplatedEmail } from "./email";
 import type { Email, EmailAttachment } from "./email.dto";
@@ -33,13 +34,7 @@ const temporaryEmailRegex =
 
 export const emailSchema: z.Schema<Email> = z
   .string(requiredText)
-  .transform((arg) =>
-    arg
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, ""),
-  )
+  .transform((arg) => toLowerCaseWithoutDiacritics(arg))
   .pipe(
     //Temporary regex instead of email - waiting zod release
     z
