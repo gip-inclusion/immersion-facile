@@ -33,11 +33,11 @@ jobs:
           wget -qO- https://cli-dl.scalingo.com/install.sh | bash
           echo "$HOME/bin" >> $GITHUB_PATH
       - name: Download back artefact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: back-build-${{ inputs.tag }}
       - name: Download front artefact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: front-build-${{ inputs.tag }}
       - name: Login to scalingo

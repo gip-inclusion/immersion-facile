@@ -25,7 +25,7 @@ jobs:
       - name: Build backend
         run: pnpm back build ${{ inputs.tag }}
       - name: Archive build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: back-build-${{ inputs.tag }}
           path: back/back-build.tar.gz

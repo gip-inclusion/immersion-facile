@@ -28,7 +28,7 @@ jobs:
       - name: Build front
         run: NODE_OPTIONS=--max-old-space-size=4096 VITE_RELEASE_TAG=${{ inputs.tag }} SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} pnpm front build-scalingo
       - name: Archive build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: front-build-${{ inputs.tag }}
           path: front/front-build.tar.gz
