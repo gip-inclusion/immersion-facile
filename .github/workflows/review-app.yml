@@ -2,10 +2,11 @@ name: "Review app"
 
 on:
   pull_request:
-    types: [opened, ready_for_review, review_requested, synchronize]
+    types: [ opened, ready_for_review, review_requested, synchronize ]
 
 concurrency:
   group: review-app
+  cancel-in-progress: true
 
 jobs:
   validation:
