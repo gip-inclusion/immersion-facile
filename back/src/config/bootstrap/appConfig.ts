@@ -116,7 +116,7 @@ export class AppConfig {
     readDotEnv = true,
     configParams = process.env,
   ): AppConfig {
-    if (readDotEnv) dotenv.config({ path: `${__dirname}/../../../../.env` });
+    if (readDotEnv) dotenv.config({ path: `${__dirname}/../../../.env` });
     return new AppConfig(configParams);
   }
 
