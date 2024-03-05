@@ -83,26 +83,28 @@ export class PgNotificationRepository implements NotificationRepository {
 
     const subQueryToGetEmailsNotificationsIds = `SELECT e.id FROM notifications_email e
       LEFT JOIN notifications_email_recipients r ON id = r.notifications_email_id
+      WHERE e.created_at > NOW() - INTERVAL '2 day'
       ${
         filterConditions.length > 0
-          ? `WHERE ${filterConditions.join(" AND ")}`
+          ? `AND ${filterConditions.join(" AND ")}`
           : ""
-      }
+      } 
       GROUP BY e.id
       ORDER BY created_at DESC
       LIMIT $${filterValues.length + 1}`;
 
-    const response = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `SELECT ${buildEmailNotificationObject} as notif
+    const query = `SELECT ${buildEmailNotificationObject} as notif
         FROM notifications_email e
         LEFT JOIN notifications_email_recipients r ON e.id = r.notifications_email_id
         LEFT JOIN notifications_email_attachments a ON e.id = a.notifications_email_id
         WHERE e.id IN (${subQueryToGetEmailsNotificationsIds})
         GROUP BY e.id
-        ORDER BY created_at DESC`,
-      [...filterValues, this.maxRetrievedNotifications],
-    );
+        ORDER BY created_at DESC`;
+
+    const response = await executeKyselyRawSqlQuery(this.transaction, query, [
+      ...filterValues,
+      this.maxRetrievedNotifications,
+    ]);
 
     return response.rows.map((row) => row.notif);
   }
@@ -115,6 +117,7 @@ export class PgNotificationRepository implements NotificationRepository {
       `
         SELECT ${buildSmsNotificationObject} as notif
         FROM notifications_sms
+        WHERE notifications_sms.created_at > NOW() - INTERVAL '2 day'
         ORDER BY created_at DESC
         LIMIT $1
           `,
