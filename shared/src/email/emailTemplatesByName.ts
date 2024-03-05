@@ -1280,8 +1280,9 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         ],
         highlight: {
           content: `Nouveautés ! Il est maintenant possible de :
-        • limiter le nombre de mises en relations reçues par semaine,
-        • informer que votre entreprise peut accueillir en immersion des personnes en situation de handicap *.`,
+        • Préciser votre disponibilité
+        • Limiter le nombre de mises en relations reçues par semaine
+        • Informer que votre entreprise peut accueillir en immersion des personnes en situation de handicap ou des publics scolaires et étudiants`,
         },
       }),
     },
