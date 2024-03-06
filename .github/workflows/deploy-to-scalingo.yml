@@ -9,6 +9,9 @@ on:
       tag:
         type: string
         required: true
+      version-new-features:
+        required: true
+        type: string
       region:
         required: false
         type: string
@@ -49,7 +52,7 @@ jobs:
       - name: Send Discord notification
         run: |
           curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}",
+            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.\n\n ${{ inputs.version-new-features }}",
             "embeds": [
               {
                 "title": "Liens utiles :",
