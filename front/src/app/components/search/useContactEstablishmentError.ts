@@ -8,9 +8,9 @@ type ErrorTitleAndDescription = {
 
 const errorKindToTitleAndDescription = {
   alreadyContactedRecently: {
-    title: "Mise en contact effectuée",
+    title: "Mise en contact déjà effectuée",
     description:
-      "Vous avez déjà contacté cette entreprise. Elle a bien reçu votre demande. Il n'est pas nécessaire de la contacter de nouveau.",
+      "Vous avez déjà contacté cette entreprise il y a moins de 7 jours. Elle a bien reçu votre demande. Il n'est pas nécessaire de la contacter de nouveau.",
   },
 } satisfies Record<ContactErrorKind, ErrorTitleAndDescription>;
 

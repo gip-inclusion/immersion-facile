@@ -37,7 +37,7 @@ export const searchImmersionRoutes = defineRoutes({
       201: expressEmptyResponseBody,
       400: httpErrorSchema,
       404: httpErrorSchema,
-      409: httpErrorSchema,
+      409: legacyHttpErrorSchema,
     },
   }),
   getSearchResult: defineRoute({
