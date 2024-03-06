@@ -1,5 +1,6 @@
 import {
   cleanStringToHTMLAttribute,
+  looksLikeSiret,
   removeDiacritics,
   slugify,
   toLowerCaseWithoutDiacritics,
@@ -93,5 +94,21 @@ describe("string utils", () => {
     ])("should remove diacritics", (input, expected) => {
       expect(removeDiacritics(input)).toBe(expected);
     });
+  });
+  describe("looksLikeSiret", () => {
+    it.each([
+      "123 456 789 00010",
+      "1234567890001 0",
+      "1234567890 0010",
+      "123 456 789 000 10",
+    ])(`should return true for "%s"`, (input) => {
+      expect(looksLikeSiret(input)).toBe(true);
+    });
+    it.each(["123 456 789 AAA10 1", "not-a-siret", ""])(
+      `should return false for "%s"`,
+      (input) => {
+        expect(looksLikeSiret(input)).toBe(false);
+      },
+    );
   });
 });

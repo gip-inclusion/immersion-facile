@@ -34,3 +34,11 @@ export const slugify = (str: string) =>
     .trim()
     .replace(/[()]/g, "")
     .replace(/\W/g, "-");
+
+export const looksLikeSiret = (input: string) => {
+  const cleanedInput = removeSpaces(input);
+  const siretRegex = /^\d{14}$/;
+  return siretRegex.test(cleanedInput);
+};
+
+export const removeSpaces = (str: string) => str.replace(/\s/g, "");
