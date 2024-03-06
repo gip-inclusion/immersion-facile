@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { nafSchema } from "../naf";
+import { removeSpaces } from "../utils/string";
 import { zStringMinLength1 } from "../zodUtils";
 import {
   GetSiretInfo,
@@ -11,11 +12,9 @@ import {
   siretRegex,
 } from "./siret";
 
-const normalizeSiret = (siret: string): string => siret.replace(/\s/g, "");
-
 export const siretSchema: z.Schema<SiretDto> = zStringMinLength1
   .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
-  .transform(normalizeSiret);
+  .transform(removeSpaces);
 
 const getSiretResponseSchema: z.Schema<SiretEstablishmentDto> = z.object({
   siret: siretSchema,

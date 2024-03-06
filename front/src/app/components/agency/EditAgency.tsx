@@ -16,7 +16,7 @@ export const EditAgency = () => {
       </h5>
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <AgencyAdminAutocomplete
-          title="Je sélectionne une agence"
+          title="Je sélectionne une agence (nom ou SIRET)"
           placeholder={"Ex : Agence de Berry"}
         />
       </div>

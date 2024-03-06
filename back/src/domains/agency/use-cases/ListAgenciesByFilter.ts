@@ -4,6 +4,7 @@ import {
   ListAgenciesRequestDto,
   activeAgencyStatuses,
   listAgenciesRequestSchema,
+  removeSpaces,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -24,7 +25,7 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
         departmentCode,
         kind,
         status: activeAgencyStatuses,
-        siret,
+        siret: siret ? removeSpaces(siret) : undefined,
       },
     });
 
@@ -34,6 +35,9 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
 
 export const toAgencyOption = (agency: AgencyDto): AgencyOption => ({
   id: agency.id,
-  name: agency.name,
+  name: toAgencyOptionName(agency),
   kind: agency.kind,
 });
+
+export const toAgencyOptionName = (agency: AgencyDto): string =>
+  `${agency.name} (${agency.address.city})`;
