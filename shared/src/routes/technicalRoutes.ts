@@ -71,4 +71,14 @@ export const technicalRoutes = defineRoutes({
       400: httpErrorSchema,
     },
   }),
+
+  npsValidatedConvention: defineRoute({
+    method: "post",
+    url: "/nps-validated-convention",
+    requestBodySchema: z.object({data:z.string()}),
+    responses: {
+      200: expressEmptyResponseBody,
+    }
+  }),
+
 });

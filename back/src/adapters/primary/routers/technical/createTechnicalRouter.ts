@@ -88,5 +88,12 @@ export const createTechnicalRouter = (
     ),
   );
 
+  technicalSharedRouter.npsValidatedConvention(async (req, res) =>
+    sendHttpResponse(req, res, () => {
+      console.log(req.body);
+      return "test";
+    }),
+  );
+
   return technicalRouter;
 };
