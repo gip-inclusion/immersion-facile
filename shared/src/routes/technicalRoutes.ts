@@ -75,10 +75,11 @@ export const technicalRoutes = defineRoutes({
   npsValidatedConvention: defineRoute({
     method: "post",
     url: "/nps-validated-convention",
-    requestBodySchema: z.object({data:z.string()}),
+    requestBodySchema: z.object({ data: z.any() }).passthrough(),
+    headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
     responses: {
       200: expressEmptyResponseBody,
-    }
+      403: httpErrorSchema,
+    },
   }),
-
 });

@@ -1,10 +1,14 @@
+import { createHmac } from "crypto";
 import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import { technicalRoutes, uploadFileRoute } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import {
+  BadRequestError,
+  ForbiddenError,
+} from "../../../../config/helpers/httpErrors";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
 import { UploadFileInput } from "../../../../domains/core/file-storage/useCases/UploadFile";
@@ -90,8 +94,35 @@ export const createTechnicalRouter = (
 
   technicalSharedRouter.npsValidatedConvention(async (req, res) =>
     sendHttpResponse(req, res, () => {
-      console.log(req.body);
-      return "test";
+      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+      console.log("body => ", req.body);
+      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+      console.log("headers => ", req.headers);
+      const receivedSignature = req.headers["tally-signature"];
+
+      const calculatedSignature = createHmac(
+        "sha256",
+        deps.config.tallySignatureSecret,
+      )
+        .update(JSON.stringify(req.body))
+        .digest("base64");
+
+      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+      console.log({
+        receivedSignature,
+        calculatedSignature,
+      });
+
+      if (receivedSignature !== calculatedSignature) {
+        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+        console.log("missamtch ");
+        throw new ForbiddenError("Missmatch Tally signature");
+      }
+
+      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+      console.log("success ");
+
+      return Promise.resolve();
     }),
   );
 
