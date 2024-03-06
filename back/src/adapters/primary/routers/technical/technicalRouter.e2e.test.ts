@@ -235,6 +235,19 @@ describe("technical router", () => {
       });
     });
   });
+
+  describe("/nps", () => {
+    it("mon test", async () => {
+      const response = await httpClient.npsValidatedConvention({
+        body: { data: "string" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: "",
+        status: 200,
+      });
+    });
+  });
 });
 
 const correctBrevoResponse: BrevoInboundBody = {
