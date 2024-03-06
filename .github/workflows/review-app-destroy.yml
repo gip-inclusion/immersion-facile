@@ -2,10 +2,10 @@ name: "Destroy review apps"
 
 on:
   pull_request:
-    types: [closed]
+    types: [ closed ]
 
 concurrency:
-  group: review-app
+  group: review-app-${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
