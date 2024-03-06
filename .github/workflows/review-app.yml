@@ -5,7 +5,7 @@ on:
     types: [ opened, ready_for_review, review_requested, synchronize ]
 
 concurrency:
-  group: review-app
+  group: review-app-${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
