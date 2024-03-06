@@ -486,6 +486,10 @@ export class AppConfig {
     });
   }
 
+  public get tallySignatureSecret() {
+    return this.#throwIfNotDefinedOrDefault("TALLY_SIGNATURE_SECRET");
+  }
+
   public get timeGateway() {
     return this.#throwIfNotInArray({
       variableName: "TIME_GATEWAY",

@@ -1,3 +1,4 @@
+import { createHmac } from "crypto";
 import {
   AbsoluteUrl,
   BrevoInboundBody,
@@ -26,6 +27,7 @@ import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
 const discussionId = "my-discussion-id";
 const domain = "immersion-facile.beta.gouv.fr";
+const tallySecret = "my-tally-secret";
 
 describe("technical router", () => {
   let generateConventionJwt: GenerateConventionJwt;
@@ -48,6 +50,7 @@ describe("technical router", () => {
       new AppConfigBuilder({
         INBOUND_EMAIL_ALLOWED_IPS: "130.10.10.10,::ffff:127.0.0.1",
         DOMAIN: domain,
+        TALLY_SIGNATURE_SECRET: tallySecret,
       }).build(),
     ));
     httpClient = createSupertestSharedClient(technicalRoutes, request);
@@ -238,8 +241,14 @@ describe("technical router", () => {
 
   describe("/nps", () => {
     it("mon test", async () => {
+      const body = { data: "my body from NPS" };
+      const bodySignature = createHmac("sha256", tallySecret)
+        .update(JSON.stringify(body))
+        .digest("base64");
+
       const response = await httpClient.npsValidatedConvention({
-        body: { data: "string" },
+        headers: { "tally-signature": bodySignature },
+        body,
       });
 
       expectHttpResponseToEqual(response, {
