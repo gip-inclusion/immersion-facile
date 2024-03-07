@@ -52,7 +52,7 @@ jobs:
       - name: Send Discord notification
         run: |
           curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.\n\n ${{ inputs.version-new-features }}",
+            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.",
             "embeds": [
               {
                 "title": "Liens utiles :",
