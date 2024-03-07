@@ -380,6 +380,7 @@ export const emailTemplatesByName =
         magicLink,
         possibleRoleAction,
         validatorName,
+        peAdvisor,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -390,7 +391,14 @@ export const emailTemplatesByName =
       <strong>Une nouvelle demande ${
         internshipKind === "immersion" ? "d'immersion" : "de mini stage"
       } vous est envoyée${validatorName ? ` par ${validatorName} ` : " "}pour que vous l'examiniez.</strong>
-
+      
+      ${
+        peAdvisor && !peAdvisor.recipientIsPeAdvisor
+          ? `Vous recevez cet email en copie de ${peAdvisor.firstName} ${peAdvisor.lastName} (${peAdvisor.email}).
+      C'est à ce conseiller d'examiner cette demande d'immersion en priorité. En cas d'absence de sa part, un autre conseiller peut l'examiner afin de ne pas retarder le candidat.`
+          : ""
+      }
+      
       Elle concerne le bénéficiaire ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} 
 
       Nous vous remercions d'en prendre connaissance pour ${possibleRoleAction}.
