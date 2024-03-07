@@ -3,7 +3,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import {
   AppellationDto,
@@ -11,6 +11,7 @@ import {
   contactEstablishmentInPersonSchema,
   domElementIds,
 } from "shared";
+import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -29,16 +30,21 @@ export const ContactInPerson = ({
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<typeof routes.searchResult>;
 
-  const initialValues: ContactEstablishmentInPersonDto = {
-    siret: route.params.siret,
-    appellationCode:
-      appellations.length > 1 ? "" : appellations[0].appellationCode,
-    contactMode: "IN_PERSON",
-    potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
-    potentialBeneficiaryLastName: route.params.contactLastName ?? "",
-    potentialBeneficiaryEmail: route.params.contactEmail ?? "",
-    locationId: route.params.location ?? "",
-  };
+  const initialValues: ContactEstablishmentInPersonDto = useMemo(
+    () => ({
+      siret: route.params.siret,
+      appellationCode: getDefaultAppellationCode(
+        appellations,
+        route.params.appellationCode,
+      ),
+      contactMode: "IN_PERSON",
+      potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
+      potentialBeneficiaryLastName: route.params.contactLastName ?? "",
+      potentialBeneficiaryEmail: route.params.contactEmail ?? "",
+      locationId: route.params.location ?? "",
+    }),
+    [route.params, appellations],
+  );
 
   const appellationListOfOptions = appellations.map((appellation) => ({
     value: appellation.appellationCode,
