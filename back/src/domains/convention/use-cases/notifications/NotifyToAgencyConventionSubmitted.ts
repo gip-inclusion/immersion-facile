@@ -61,6 +61,21 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
       );
     }
 
+    const conventionAdsivorEntity =
+      await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
+        convention.id,
+      );
+
+    if (conventionAdsivorEntity?.advisor)
+      return this.#sendEmailToRecipients({
+        agency,
+        convention,
+        recipients: [conventionAdsivorEntity.advisor.email],
+        role: "validator",
+        warning: undefined,
+        uow,
+      });
+
     const hasCounsellors = agency.counsellorEmails.length > 0;
 
     const recipients: {
@@ -80,25 +95,12 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
       agency,
       convention,
       ...recipients,
-      warning: await this.#makeWarning(agency, convention, uow),
+      warning:
+        agency.kind === "pole-emploi"
+          ? "Merci de vérifier le conseiller référent associé à ce bénéficiaire."
+          : undefined,
       uow,
     });
-  }
-
-  async #makeWarning(
-    agency: AgencyDto,
-    convention: ConventionDto,
-    uow: UnitOfWork,
-  ): Promise<string | undefined> {
-    if (agency.kind !== "pole-emploi") return;
-    const conventionAdsivorEntity =
-      await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
-        convention.id,
-      );
-    const advisor = conventionAdsivorEntity?.advisor;
-    return !advisor
-      ? "Merci de vérifier le conseiller référent associé à ce bénéficiaire."
-      : `Un mail a également été envoyé au conseiller référent (${advisor.firstName} ${advisor.lastName} - ${advisor.email})`;
   }
 
   async #sendEmailToRecipients({

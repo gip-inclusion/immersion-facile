@@ -7,6 +7,7 @@ import {
   UpdateConventionStatusRequestDto,
   VALID_EMAILS,
   conventionMagicLinkRoutes,
+  expectArraysToEqualIgnoringOrder,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectToEqual,
@@ -211,14 +212,13 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   expect(peNotification.email).toBe(convention.signatories.beneficiary.email);
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
-  expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [VALID_EMAILS[0]],
-    [VALID_EMAILS[2]],
-    [VALID_EMAILS[1]],
-  ]);
+  expectArraysToEqualIgnoringOrder(
+    sentEmails.map((e) => e.recipients),
+    [[VALID_EMAILS[2]], [VALID_EMAILS[0]], [VALID_EMAILS[1]]],
+  );
 
   const beneficiaryShortLinkSignEmail = expectEmailOfType(
-    sentEmails[0],
+    sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentShortLinkSignEmail = expectEmailOfType(
@@ -320,8 +320,8 @@ const establishmentSignsApplication = async (
 
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails.map((email) => email.kind)).toStrictEqual([
-    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     "NEW_CONVENTION_AGENCY_NOTIFICATION",
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     "SIGNEE_HAS_SIGNED_CONVENTION",
     "SIGNEE_HAS_SIGNED_CONVENTION",
@@ -391,8 +391,8 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails.map((email) => email.kind)).toStrictEqual([
-    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     "NEW_CONVENTION_AGENCY_NOTIFICATION",
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     "SIGNEE_HAS_SIGNED_CONVENTION",
     "SIGNEE_HAS_SIGNED_CONVENTION",

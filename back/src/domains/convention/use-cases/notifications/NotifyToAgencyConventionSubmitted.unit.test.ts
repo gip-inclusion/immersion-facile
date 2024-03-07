@@ -14,6 +14,7 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationsAndEvents";
+import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -30,13 +31,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
   const councellorEmail = "councellor@email.fr";
   const councellorEmail2 = "councellor2@email.fr";
   const validatorEmail = "validator@mail.com";
-
-  const agencyWithCounsellors = AgencyDtoBuilder.create(
-    "agency-with-councellors",
-  )
-    .withCounsellorEmails([councellorEmail, councellorEmail2])
-    .withName("test-agency-name")
-    .build();
 
   const agencyWithOnlyValidator = AgencyDtoBuilder.create(
     "agency-with-only-validator",
@@ -82,7 +76,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([
-      agencyWithCounsellors,
       agencyWithOnlyValidator,
       agencyWithConsellorsAndValidator,
       agencyPeWithCouncellors,
@@ -110,84 +103,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       shortLinkIdGeneratorGateway,
       config,
     );
-  });
-
-  it("Sends notification email to agency counsellor when it is initially submitted", async () => {
-    const shortLinkIds = [
-      "shortLink1",
-      "shortLink2",
-      "shortLink3",
-      "shortLink4",
-    ];
-    shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
-    const validConvention = new ConventionDtoBuilder()
-      .withAgencyId(agencyWithCounsellors.id)
-      .build();
-
-    await notifyToAgencyConventionSubmitted.execute({
-      convention: validConvention,
-    });
-
-    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-      [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "counsellor",
-        email: councellorEmail,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.manageConvention,
-      }),
-      [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "counsellor",
-        email: councellorEmail2,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.manageConvention,
-      }),
-      [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "counsellor",
-        email: councellorEmail,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionStatusDashboard,
-      }),
-
-      [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "counsellor",
-        email: councellorEmail2,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionStatusDashboard,
-      }),
-    });
-
-    expectSavedNotificationsAndEvents({
-      emails: [
-        {
-          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [councellorEmail],
-          params: {
-            internshipKind: validConvention.internshipKind,
-            ...expectedParams(agencyWithCounsellors, validConvention),
-            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
-            agencyLogoUrl: agencyWithCounsellors.logoUrl ?? undefined,
-            warning: undefined,
-          },
-        },
-        {
-          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [councellorEmail2],
-          params: {
-            internshipKind: validConvention.internshipKind,
-            ...expectedParams(agencyWithCounsellors, validConvention),
-            magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
-            agencyLogoUrl: agencyWithCounsellors.logoUrl ?? undefined,
-            warning: undefined,
-          },
-        },
-      ],
-    });
   });
 
   it("Sends notification email to agency validator when it is initially submitted, and agency has no counsellor", async () => {
@@ -225,10 +140,10 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           recipients: [validatorEmail],
           params: {
             internshipKind: validConvention.internshipKind,
-            ...expectedParams(agencyWithCounsellors, validConvention),
+            ...expectedParams(agencyWithOnlyValidator, validConvention),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
             conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
-            agencyLogoUrl: agencyWithCounsellors.logoUrl ?? undefined,
+            agencyLogoUrl: agencyWithOnlyValidator.logoUrl ?? undefined,
           },
         },
       ],
@@ -416,6 +331,80 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
             warning:
               "Merci de vérifier le conseiller référent associé à ce bénéficiaire.",
+          },
+        },
+      ],
+    });
+  });
+
+  it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
+    const shortLinkIds = ["shortlink1", "shortlink2"];
+    shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
+    const peAdvisorEmail = "pe-advisor@gmail.com";
+    const peIdentity: PeConnectIdentity = {
+      provider: "peConnect",
+      token: "123",
+    };
+
+    const validConvention = new ConventionDtoBuilder()
+      .withAgencyId(agencyPeWithCouncellors.id)
+      .withFederatedIdentity(peIdentity)
+      .build();
+
+    const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
+      _entityName: "ConventionPoleEmploiAdvisor",
+      advisor: {
+        email: peAdvisorEmail,
+        firstName: "Elsa",
+        lastName: "Oldenburg",
+        type: "CAPEMPLOI",
+      },
+      peExternalId: peIdentity.token,
+      conventionId: validConvention.id,
+    };
+
+    uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      [userConventionAdvisor],
+    );
+
+    await notifyToAgencyConventionSubmitted.execute({
+      convention: validConvention,
+    });
+
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+      [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: "validator",
+        targetRoute: frontRoutes.manageConvention,
+        email: peAdvisorEmail,
+        now: timeGateway.now(),
+      }),
+      [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: "validator",
+        targetRoute: frontRoutes.conventionStatusDashboard,
+        email: peAdvisorEmail,
+        now: timeGateway.now(),
+      }),
+    });
+
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [peAdvisorEmail],
+          params: {
+            internshipKind: validConvention.internshipKind,
+            warning: undefined,
+            ...expectedParams(
+              agencyWithConsellorsAndValidator,
+              validConvention,
+            ),
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            agencyLogoUrl:
+              agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
         },
       ],
