@@ -446,6 +446,12 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
     possibleRoleAction: "POSSIBLE_ROLE_ACTION",
     validatorName: "VALIDATOR_NAME",
+    peAdvisor: {
+      email: "PE_ADVISOR_EMAIL",
+      firstName: "PE_ADVISOR_FIRSTAME",
+      lastName: "PE_ADVISOR_LASTNAME",
+      recipientIsPeAdvisor: false,
+    },
   },
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
     contactFirstName: "CONTACT_FIRST_NAME",

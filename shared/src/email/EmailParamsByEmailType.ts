@@ -250,6 +250,14 @@ export type EmailParamsByEmailType = {
     magicLink: string;
     possibleRoleAction: string;
     validatorName: string;
+    peAdvisor:
+      | {
+          recipientIsPeAdvisor: boolean;
+          firstName: string;
+          lastName: string;
+          email: string;
+        }
+      | undefined;
   };
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
     contactFirstName: string;
