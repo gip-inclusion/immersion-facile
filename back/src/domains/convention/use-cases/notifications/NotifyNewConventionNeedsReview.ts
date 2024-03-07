@@ -12,6 +12,7 @@ import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { createLogger } from "../../../../utils/logger";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { PeConnectImmersionAdvisorDto } from "../../../core/authentication/pe-connect/dto/PeConnectAdvisor.dto";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
@@ -64,8 +65,17 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
       );
       return;
     }
+    const conventionAdsivorEntity =
+      await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
+        convention.id,
+      );
+    const peAdvisor = conventionAdsivorEntity?.advisor;
 
-    const recipients = determineRecipients(convention.status, agency);
+    const recipients = determineRecipients(
+      convention.status,
+      agency,
+      peAdvisor,
+    );
     logger.debug(`conventionDto.status : ${convention.status}`);
 
     if (!recipients) {
@@ -89,13 +99,13 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
     );
 
     const emails: TemplatedEmail[] = await Promise.all(
-      recipients.emails.map(async (recipientEmail) => {
+      recipients.map(async (recipient) => {
         const makeShortMagicLink = prepareMagicShortLinkMaker({
           config: this.#config,
           conventionMagicLinkPayload: {
             id: convention.id,
-            role: recipients.role,
-            email: recipientEmail,
+            role: recipient.role,
+            email: recipient.email,
             now: this.#timeGateway.now(),
           },
           generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
@@ -105,7 +115,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
 
         return {
           kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-          recipients: [recipientEmail],
+          recipients: [recipient.email],
           params: {
             agencyLogoUrl: agency.logoUrl ?? undefined,
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
@@ -118,12 +128,13 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
             internshipKind: convention.internshipKind,
             magicLink: await makeShortMagicLink(frontRoutes.manageConvention),
             possibleRoleAction:
-              recipients.role === "counsellor"
+              recipient.role === "counsellor"
                 ? "en vérifier l'éligibilité"
                 : "en considérer la validation",
             validatorName: convention.validators?.agencyCounsellor
               ? concatValidatorNames(convention.validators?.agencyCounsellor)
               : "",
+            peAdvisor: recipient.peAdvisor,
           },
         };
       }),
@@ -153,38 +164,111 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
   }
 }
 
-type Recipients = {
+type Recipient = {
   role: Role;
-  emails: string[];
+  email: string;
+  peAdvisor:
+    | {
+        recipientIsPeAdvisor: boolean;
+        firstName: string;
+        lastName: string;
+        email: string;
+      }
+    | undefined;
 };
 
 const determineRecipients = (
   status: ConventionStatus,
   agency: AgencyDto,
-): Recipients | undefined => {
+  peAdvisor: PeConnectImmersionAdvisorDto | undefined,
+): Recipient[] => {
   const hasCounsellorEmails = agency.counsellorEmails.length > 0;
   const hasValidatorEmails = agency.validatorEmails.length > 0;
-  const hasAdminEmails = agency.adminEmails.length > 0;
 
   switch (status) {
     case "IN_REVIEW": {
+      if (peAdvisor) {
+        const validatorRecipients = agency.validatorEmails.map(
+          (email): Recipient => ({
+            role: "validator",
+            email,
+            peAdvisor: {
+              recipientIsPeAdvisor: false,
+              ...peAdvisor,
+            },
+          }),
+        );
+
+        return [
+          {
+            role: "validator",
+            email: peAdvisor.email,
+            peAdvisor: {
+              recipientIsPeAdvisor: true,
+              ...peAdvisor,
+            },
+          },
+          ...validatorRecipients,
+        ];
+      }
+
       if (hasCounsellorEmails)
-        return { role: "counsellor", emails: agency.counsellorEmails };
+        return agency.counsellorEmails.map(
+          (email): Recipient => ({
+            role: "counsellor",
+            email,
+            peAdvisor: undefined,
+          }),
+        );
+
       if (hasValidatorEmails)
-        return { role: "validator", emails: agency.validatorEmails };
-      return;
+        return agency.validatorEmails.map(
+          (email): Recipient => ({
+            role: "validator",
+            email,
+            peAdvisor: undefined,
+          }),
+        );
+
+      return [];
     }
     case "ACCEPTED_BY_COUNSELLOR":
-      return hasValidatorEmails
-        ? { role: "validator", emails: agency.validatorEmails }
-        : undefined;
-    case "ACCEPTED_BY_VALIDATOR":
-      return hasAdminEmails
-        ? { role: "backOffice", emails: agency.adminEmails }
-        : undefined;
+      if (peAdvisor) {
+        const validatorRecipients = agency.validatorEmails.map(
+          (email): Recipient => ({
+            role: "validator",
+            email,
+            peAdvisor: {
+              recipientIsPeAdvisor: false,
+              ...peAdvisor,
+            },
+          }),
+        );
+
+        return [
+          {
+            role: "validator",
+            email: peAdvisor.email,
+            peAdvisor: {
+              recipientIsPeAdvisor: true,
+              ...peAdvisor,
+            },
+          },
+          ...validatorRecipients,
+        ];
+      }
+
+      return agency.validatorEmails.map(
+        (email): Recipient => ({
+          role: "validator",
+          email,
+          peAdvisor: undefined,
+        }),
+      );
+
     default:
       // This notification may fire when using the /debug/populate route, with
       // statuses not included in the above list. Ignore this case.
-      return;
+      return [];
   }
 };
