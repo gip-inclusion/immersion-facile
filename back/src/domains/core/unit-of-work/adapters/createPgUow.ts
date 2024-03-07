@@ -6,6 +6,7 @@ import { PgConventionExternalIdRepository } from "../../../convention/adapters/P
 import { PgConventionQueries } from "../../../convention/adapters/PgConventionQueries";
 import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
 import { PgConventionsToSyncRepository } from "../../../convention/adapters/PgConventionsToSyncRepository";
+import { PgNpsRepository } from "../../../convention/adapters/PgNpsRepository";
 import { PgDeletedEstablishmentRepository } from "../../../establishment/adapters/PgDeletedEstablishmentRepository";
 import { PgDiscussionAggregateRepository } from "../../../establishment/adapters/PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
@@ -62,6 +63,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
       transaction,
     ),
+    npsRepository: new PgNpsRepository(transaction),
     notificationRepository: new PgNotificationRepository(transaction),
     ongoingOAuthRepository: new PgOngoingOAuthRepository(transaction),
     outboxQueries: new PgOutboxQueries(transaction),

@@ -15,6 +15,7 @@ import { UpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
 import { UpdateAgencyReferingToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferingToUpdatedAgency";
 import { UpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
 import { AddConvention } from "../../domains/convention/use-cases/AddConvention";
+import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { CreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
@@ -217,6 +218,8 @@ export const createUseCases = (
       ),
       uploadFile: new UploadFile(gateways.documentGateway, uuidGenerator),
       htmlToPdf: new HtmlToPdf(gateways.pdfGeneratorGateway),
+
+      addValidatedConventionNPS: new AddValidatedConventionNps(uowPerformer),
 
       // Address
       lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),
@@ -570,6 +573,7 @@ export const createUseCases = (
         uowPerformer.perform((uow) =>
           uow.notificationRepository.getLastNotifications(),
         ),
+
       findSimilarConventions: (
         params: FindSimilarConventionsParams,
       ): Promise<FindSimilarConventionsResponseDto> =>

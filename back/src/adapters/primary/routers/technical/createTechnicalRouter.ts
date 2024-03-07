@@ -93,11 +93,7 @@ export const createTechnicalRouter = (
   );
 
   technicalSharedRouter.npsValidatedConvention(async (req, res) =>
-    sendHttpResponse(req, res, () => {
-      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-      console.log("body => ", req.body);
-      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-      console.log("headers => ", req.headers);
+    sendHttpResponse(req, res.status(201), () => {
       const receivedSignature = req.headers["tally-signature"];
 
       const calculatedSignature = createHmac(
@@ -107,22 +103,11 @@ export const createTechnicalRouter = (
         .update(JSON.stringify(req.body))
         .digest("base64");
 
-      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-      console.log({
-        receivedSignature,
-        calculatedSignature,
-      });
-
       if (receivedSignature !== calculatedSignature) {
-        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-        console.log("missamtch ");
         throw new ForbiddenError("Missmatch Tally signature");
       }
 
-      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-      console.log("success ");
-
-      return Promise.resolve();
+      return deps.useCases.addValidatedConventionNPS.execute(req.body);
     }),
   );
 

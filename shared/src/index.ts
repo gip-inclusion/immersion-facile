@@ -102,6 +102,7 @@ export * from "./siretAndRome/SiretAndRome.dto";
 export * from "./siretAndRome/SiretAndRome.schema";
 export * from "./sms/sms.schema";
 export * from "./sms/smsTemplateByName";
+export * from "./tallyForm";
 export * from "./test.helpers";
 export * from "./tokens/jwt.dto";
 export * from "./tokens/jwt.schema";
