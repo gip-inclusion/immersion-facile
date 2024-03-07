@@ -22,6 +22,7 @@ export interface Database {
   groups__sirets: GroupsSirets;
   immersion_contacts: ImmersionContacts;
   immersion_offers: ImmersionOffers;
+  nps: Nps;
   ongoing_oauths: OngoingOauths;
   outbox: Outbox;
   partners_pe_connect: PartnersPeConnect;
@@ -403,4 +404,17 @@ export interface Outbox {
   topic: string;
   payload: Json;
   status: EventStatus;
+}
+
+export interface Nps {
+  id: Generated<number>;
+  convention_id: string | null;
+  role: string | null;
+  score: number | null;
+  would_have_done_without_if: boolean | null;
+  comments: string | null;
+  raw_result: Json;
+  respondent_id: string;
+  response_id: string;
+  created_at: Generated<Timestamp>;
 }

@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect } from "react";
 import { useStyles } from "tss-react/dsfr";
+import { keys } from "../../utils";
 
 export type NPSFormProps = {
   title?: string;
@@ -61,9 +62,10 @@ export const NPSForm = ({
   mode,
 }: NPSFormProps) => {
   const { cx } = useStyles();
-  const paramsAsString = (
-    Object.keys(conventionInfos) as (keyof typeof conventionInfos)[]
-  ).reduce((acc, key) => `${acc}&${key}=${conventionInfos[key]}`, "");
+  const paramsAsString = keys(conventionInfos)
+    .map((key) => `${key}=${conventionInfos[key]}`)
+    .join("&");
+
   useEffect(() => {
     if (mode === "popup") {
       const script = document.createElement("script");
@@ -88,6 +90,7 @@ export const NPSForm = ({
       };
     }
   }, []);
+
   return mode === "embed" ? (
     <section className={cx(componentName)}>
       <hr className={fr.cx("fr-hr", "fr-my-4w")} />

@@ -5,6 +5,7 @@ import { InMemoryConventionExternalIdRepository } from "../../../convention/adap
 import { InMemoryConventionQueries } from "../../../convention/adapters/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../../convention/adapters/InMemoryConventionRepository";
 import { InMemoryConventionsToSyncRepository } from "../../../convention/adapters/InMemoryConventionsToSyncRepository";
+import { InMemoryNpsRepository } from "../../../convention/adapters/InMemoryNpsRepository";
 import { InMemoryDeletedEstablishmentRepository } from "../../../establishment/adapters/InMemoryDeletedEstablishmentRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../../establishment/adapters/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
@@ -78,6 +79,7 @@ export const createInMemoryUow = () => {
       new InMemoryDeletedEstablishmentRepository(),
     conventionExternalIdRepository:
       new InMemoryConventionExternalIdRepository(),
+    npsRepository: new InMemoryNpsRepository(),
   } satisfies UnitOfWork;
 };
 

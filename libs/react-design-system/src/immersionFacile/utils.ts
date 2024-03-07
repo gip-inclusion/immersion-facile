@@ -7,3 +7,7 @@ export const useStyleUtils = makeStyles()((_theme) => ({
     textAlign: "center",
   },
 }));
+
+export const keys = <T extends string | number | symbol>(
+  obj: Partial<Record<T, unknown>>,
+): T[] => Object.keys(obj) as T[];

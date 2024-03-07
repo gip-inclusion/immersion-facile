@@ -36,9 +36,9 @@ describe("technical router", () => {
   let appConfig: AppConfig;
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: InMemoryGateways;
+  let request: SuperTest<Test>;
 
   beforeEach(async () => {
-    let request: SuperTest<Test>;
     ({
       request,
       generateConventionJwt,
@@ -239,9 +239,25 @@ describe("technical router", () => {
     });
   });
 
-  describe("/nps", () => {
-    it("mon test", async () => {
-      const body = { data: "my body from NPS" };
+  describe("NPS route for tally webhook", () => {
+    const body = {
+      eventType: "FORM_SUBMISSION",
+      createdAt: "2023-06-28T08:06:52.000Z",
+      eventId: "tally-event-id",
+      data: {
+        createdAt: "2023-06-28T08:06:52.000Z",
+        formId: "tally-form-id",
+        formName: "tally-form-name",
+        responseId: "tally-response-id",
+        fields: [],
+        respondentId: "tally-respondent-id",
+        submissionId: "tally-submission-id",
+      },
+    };
+
+    it(`${displayRouteName(
+      technicalRoutes.npsValidatedConvention,
+    )} 201 when all goes well`, async () => {
       const bodySignature = createHmac("sha256", tallySecret)
         .update(JSON.stringify(body))
         .digest("base64");
@@ -250,10 +266,25 @@ describe("technical router", () => {
         headers: { "tally-signature": bodySignature },
         body,
       });
-
       expectHttpResponseToEqual(response, {
         body: "",
-        status: 200,
+        status: 201,
+      });
+    });
+
+    it(`${displayRouteName(
+      technicalRoutes.npsValidatedConvention,
+    )}  403 when signature does not match`, async () => {
+      const response = await httpClient.npsValidatedConvention({
+        headers: { "tally-signature": "wrong-signature" },
+        body,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors: "Missmatch Tally signature",
+        },
+        status: 403,
       });
     });
   });

@@ -75,11 +75,13 @@ export const technicalRoutes = defineRoutes({
   npsValidatedConvention: defineRoute({
     method: "post",
     url: "/nps-validated-convention",
-    requestBodySchema: z.object({ data: z.any() }).passthrough(),
+    requestBodySchema: z.any(), // could not find better to not mutate the original object.
+    // we need the original object to check the signature
+    // validation is still checked in the usecase
     headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
     responses: {
-      200: expressEmptyResponseBody,
-      403: httpErrorSchema,
+      201: expressEmptyResponseBody,
+      403: legacyHttpErrorSchema,
     },
   }),
 });

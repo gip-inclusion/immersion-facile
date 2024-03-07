@@ -5,6 +5,7 @@ import { ConventionExternalIdRepository } from "../../../convention/ports/Conven
 import { ConventionQueries } from "../../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../../convention/ports/ConventionRepository";
 import { ConventionsToSyncRepository } from "../../../convention/ports/ConventionsToSyncRepository";
+import { NpsRepository } from "../../../convention/ports/NpsRepository";
 import { DeletedEstablishmentRepository } from "../../../establishment/ports/DeletedEstablishmentRepository";
 import { DiscussionAggregateRepository } from "../../../establishment/ports/DiscussionAggregateRepository";
 import { EstablishmentAggregateRepository } from "../../../establishment/ports/EstablishmentAggregateRepository";
@@ -56,4 +57,5 @@ export type UnitOfWork = {
   shortLinkQuery: ShortLinkQuery;
   shortLinkRepository: ShortLinkRepository;
   establishmentLeadQueries: EstablishmentLeadQueries;
+  npsRepository: NpsRepository;
 };
