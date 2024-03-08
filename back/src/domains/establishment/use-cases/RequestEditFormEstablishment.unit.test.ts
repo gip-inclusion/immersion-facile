@@ -4,7 +4,6 @@ import {
   TemplatedEmail,
   expectPromiseToFailWithError,
 } from "shared";
-import { BadRequestError } from "../../../config/helpers/httpErrors";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -139,44 +138,39 @@ describe("RequestUpdateFormEstablishment", () => {
     });
   });
 
-  describe("If an email has already been sent for this establishment.", () => {
-    it("Throws an error if an email has already been sent to this contact less than 24h ago", async () => {
-      // Prepare
-      const initialMailDate = new Date("2021-01-01T13:00:00.000");
+  it("should resend a request establishment link successfully", async () => {
+    // Prepare
+    const initialMailDate = new Date("2021-01-01T13:00:00.000");
 
-      uow.notificationRepository.notifications = [
-        {
-          kind: "email",
-          id: "111111111111-1111-4000-1111-111111111111",
-          createdAt: initialMailDate.toISOString(),
-          followedIds: {},
-          templatedContent: {
-            kind: "EDIT_FORM_ESTABLISHMENT_LINK",
-            recipients: [contactEmail],
-            params: {
-              editFrontUrl: "my-edit-link.com",
-              businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
-              businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
-            },
+    uow.notificationRepository.notifications = [
+      {
+        kind: "email",
+        id: "111111111111-1111-4000-1111-111111111111",
+        createdAt: initialMailDate.toISOString(),
+        followedIds: {},
+        templatedContent: {
+          kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+          recipients: [contactEmail],
+          params: {
+            editFrontUrl: "my-edit-link.com",
+            businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
+            businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
         },
-      ];
+      },
+    ];
 
-      const newModificationAskedDateLessThan24hAfterInitial = addHours(
-        initialMailDate,
-        23,
-      );
+    const newModificationAskedDateLessThan24hAfterInitial = addHours(
+      initialMailDate,
+      23,
+    );
 
-      timeGateway.setNextDate(newModificationAskedDateLessThan24hAfterInitial);
+    timeGateway.setNextDate(newModificationAskedDateLessThan24hAfterInitial);
 
-      // Act and assert
-      await expectPromiseToFailWithError(
-        requestEditFormEstablishment.execute(siret),
-        new BadRequestError(
-          "Un email a déjà été envoyé au contact référent de l'établissement le 01/01/2021",
-        ),
-      );
-    });
+    const response = await requestEditFormEstablishment.execute(siret);
+
+    // Act and assert
+    expect(() => response).not.toThrow();
   });
 
   it("Sends a new email if the edit link in last email has expired", async () => {

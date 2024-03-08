@@ -1,16 +1,12 @@
-import subDays from "date-fns/subDays";
 import {
-  Email,
   SiretDto,
   addressDtoToString,
   createEstablishmentJwtPayload,
   siretSchema,
 } from "shared";
-import { BadRequestError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -51,12 +47,6 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     const now = this.#timeGateway.now();
 
-    await this.#throwIfMailToEditEstablishmentWasSentRecently(
-      uow.notificationRepository,
-      contact.email,
-      now,
-    );
-
     const payload = createEstablishmentJwtPayload({
       siret,
       now,
@@ -83,30 +73,5 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
         establishmentSiret: siret,
       },
     });
-  }
-
-  async #throwIfMailToEditEstablishmentWasSentRecently(
-    notificationRepository: NotificationRepository,
-    email: Email,
-    now: Date,
-  ): Promise<void> {
-    const recentNotifications = await notificationRepository.getEmailsByFilters(
-      {
-        email,
-        emailKind: "EDIT_FORM_ESTABLISHMENT_LINK",
-        since: subDays(now, 1),
-      },
-    );
-
-    const lastNotification = recentNotifications.at(-1);
-
-    if (lastNotification) {
-      const sentAt = new Date(lastNotification.createdAt);
-      throw new BadRequestError(
-        `Un email a déjà été envoyé au contact référent de l'établissement le ${sentAt.toLocaleDateString(
-          "fr-FR",
-        )}`,
-      );
-    }
   }
 }
