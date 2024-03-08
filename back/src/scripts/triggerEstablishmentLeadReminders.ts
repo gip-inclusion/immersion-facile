@@ -76,10 +76,10 @@ handleEndOfScriptNotification(
   ({ firstReminderResult, secondReminderResult }) =>
     [
       "First reminder:",
-      ...reminderReport(firstReminderResult),
+      reminderReport(firstReminderResult),
       "---",
       "Second reminder:",
-      ...reminderReport(secondReminderResult),
+      reminderReport(secondReminderResult),
     ].join("\n"),
   logger,
 );
