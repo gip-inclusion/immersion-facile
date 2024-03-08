@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
+import "leaflet/dist/leaflet.css";
 import { keys } from "ramda";
 import React, { useEffect, useRef } from "react";
 import {
@@ -11,7 +12,9 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
-import { GeoPositionDto, SearchSortedBy, domElementIds } from "shared";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { useDispatch } from "react-redux";
+import { GeoPositionDto, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -27,6 +30,7 @@ import {
   SearchStatus,
   initialState,
 } from "src/core-logic/domain/search/search.slice";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
 import "./SearchPage.scss";
@@ -39,11 +43,6 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
   }),
 );
 
-const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
-  { value: "distance", label: "Par proximité" },
-  { value: "date", label: "Par date de publication" },
-];
-
 export const SearchPage = ({
   route,
   useNaturalLanguageForAppellations,
@@ -54,7 +53,6 @@ export const SearchPage = ({
   const { cx } = useStyles();
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
-  const searchResults = useAppSelector(searchSelectors.searchResults);
   const triggerSearch = useSearchUseCase(route);
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const acquisitionParams = useGetAcquisitionParams();
@@ -108,14 +106,6 @@ export const SearchPage = ({
     lat !== 0 &&
     lon !== 0;
 
-  const getSearchResultsSummary = (resultsNumber: number) => {
-    const plural = resultsNumber > 1 ? "s" : "";
-    return (
-      <>
-        <strong>{resultsNumber}</strong> résultat{plural} trouvé{plural}
-      </>
-    );
-  };
   useEffect(() => {
     if (availableForInitialSearchRequest) {
       triggerSearch(filterFormValues(formValues));
@@ -214,105 +204,22 @@ export const SearchPage = ({
             </div>
           </form>
         </PageHeader>
-        <div className={fr.cx("fr-pt-6w")} ref={searchResultsWrapper}>
+        <div ref={searchResultsWrapper}>
           {searchStatus === "ok" && (
-            <>
-              <div className={fr.cx("fr-container")}>
-                <div
-                  className={fr.cx(
-                    "fr-grid-row",
-                    "fr-grid-row--gutters",
-                    "fr-mb-4w",
-                  )}
-                >
-                  <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
-                    <fieldset
-                      className={fr.cx(
-                        "fr-fieldset",
-                        "fr-fieldset--inline",
-                        "fr-mb-0",
-                      )}
-                    >
-                      <legend
-                        className={fr.cx(
-                          "fr-fieldset__legend",
-                          "fr-text--regular",
-                        )}
-                        id={domElementIds.search.sortFilter}
-                      >
-                        Trier les résultats :
-                      </legend>
-                      <div className={fr.cx("fr-fieldset__content")}>
-                        {sortedByOptions.map((option, index) => (
-                          <div
-                            className={fr.cx("fr-radio-group")}
-                            key={option.value}
-                          >
-                            <input
-                              type="radio"
-                              id={`${domElementIds.search.searchSortOptionBase}${index}`}
-                              name="search-sort-option"
-                              value={option.value}
-                              checked={routeParams.sortedBy === option.value}
-                              onChange={() => {
-                                triggerSearch({
-                                  ...formValues,
-                                  sortedBy: option.value,
-                                });
-                              }}
-                            />
-                            <label
-                              className={cx(fr.cx("fr-label"))}
-                              htmlFor={`${domElementIds.search.searchSortOptionBase}${index}`}
-                            >
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </fieldset>
-                  </div>
-                  <div
-                    className={cx(
-                      fr.cx(
-                        "fr-col-12",
-                        "fr-col-md-4",
-                        "fr-grid-row",
-                        "fr-grid-row--right",
-                      ),
-                      Styles.resultsSummary,
-                    )}
-                  >
-                    {searchStatus === "ok" && (
-                      <>
-                        <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
-                          {getSearchResultsSummary(searchResults.length)}
-                        </h2>
-                        {routeParams.appellations &&
-                          routeParams.appellations.length > 0 && (
-                            <span className={cx(fr.cx("fr-text--xs"))}>
-                              pour la recherche{" "}
-                              <strong className={fr.cx("fr-text--bold")}>
-                                {routeParams.appellations[0].appellationLabel}
-                              </strong>
-                              , étendue au secteur{" "}
-                              <a
-                                href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${routeParams.appellations[0].romeCode}`}
-                                target="_blank"
-                                className={fr.cx("fr-text--bold")}
-                                rel="noreferrer"
-                              >
-                                {routeParams.appellations[0].romeLabel}
-                              </a>
-                            </span>
-                          )}
-                      </>
-                    )}
-                  </div>
-                </div>
+            <div className={fr.cx("fr-grid-row")}>
+              <div
+                className={fr.cx("fr-col-4")}
+                style={{
+                  overflowY: "auto",
+                  height: "100vh",
+                }}
+              >
+                <SearchListResults />
               </div>
-              <SearchListResults />
-            </>
+              <div className={fr.cx("fr-col-8")}>
+                <SearchMapResults />
+              </div>
+            </div>
           )}
           {searchStatus === "extraFetch" ||
             (searchStatus === "initialFetch" && <Loader />)}
@@ -328,5 +235,84 @@ export const SearchPage = ({
         </div>
       </MainWrapper>
     </HeaderFooterLayout>
+  );
+};
+
+const radiusOptionsToZoomLevelStrategy: Record<
+  (typeof radiusOptions)[0]["value"],
+  number
+> = {
+  "1": 14,
+  "2": 13,
+  "5": 12,
+  "10": 11,
+  "20": 10,
+  "50": 9,
+  "100": 8,
+};
+
+const SearchMapResults = () => {
+  const searchResultsWrapper = useRef<HTMLDivElement>(null);
+  const searchResults = useAppSelector(searchSelectors.searchResults);
+  const searchParams = useAppSelector(searchSelectors.searchParams);
+  const dispatch = useDispatch();
+  return (
+    <div ref={searchResultsWrapper}>
+      <div className="search-map-results">
+        <MapContainer
+          scrollWheelZoom={false}
+          style={{ height: "100vh", width: "100%" }}
+          center={[searchParams.latitude, searchParams.longitude]}
+          zoom={radiusOptionsToZoomLevelStrategy[`${searchParams.distanceKm}`]}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {searchResults.map((searchResult) => (
+            <Marker
+              key={searchResult.locationId}
+              position={[searchResult.position.lat, searchResult.position.lon]}
+            >
+              <Popup>
+                <h1>{searchResult.name}</h1>
+                <p>{searchResult.address.streetNumberAndAddress}</p>
+                <p>{searchResult.address.city}</p>
+                <Button
+                  onClick={() => {
+                    const appellations = searchResult.appellations;
+                    const appellationCode = appellations?.length
+                      ? appellations[0].appellationCode
+                      : null;
+                    if (appellationCode && searchResult.locationId) {
+                      routes
+                        .searchResult({
+                          siret: searchResult.siret,
+                          appellationCode,
+                          location: searchResult.locationId,
+                        })
+                        .push();
+                      return;
+                    }
+                    dispatch(
+                      searchSlice.actions.fetchSearchResultRequested(
+                        searchResult,
+                      ),
+                    );
+                    routes
+                      .searchResultExternal({
+                        siret: searchResult.siret,
+                      })
+                      .push();
+                  }}
+                >
+                  Voir la fiche
+                </Button>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
+    </div>
   );
 };
