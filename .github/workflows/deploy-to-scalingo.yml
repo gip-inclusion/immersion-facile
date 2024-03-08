@@ -53,9 +53,8 @@ jobs:
         run: |
           newChanges=${{ inputs.version-new-features }}
           formattedNewChanges="${newChanges//$'\n'/\\n}"
-          curl -X POST -H "Content-Type: application/json" -d @- ${{ secrets.DISCORD_WEBHOOK_URL }} <<EOF
-          {
-            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.\n\n$formattedNewChanges",
+          curl -X POST -H "Content-Type: application/json" -d '{
+            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.",
             "embeds": [
               {
                 "title": "Liens utiles :",
@@ -75,5 +74,4 @@ jobs:
                 ]
               }
             ]
-          }
-          EOF
+          }' ${{ secrets.DISCORD_WEBHOOK_URL }}
