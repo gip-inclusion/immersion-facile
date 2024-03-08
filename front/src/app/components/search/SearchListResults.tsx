@@ -76,6 +76,7 @@ export const SearchListResults = () => {
               <SearchResult
                 key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
                 establishment={searchResult}
+                layout="fr-col-12"
                 onButtonClick={() => {
                   const appellations = searchResult.appellations;
                   const appellationCode = appellations?.length
