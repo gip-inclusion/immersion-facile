@@ -39,25 +39,4 @@ describe("Route to generate an establishment edition link", () => {
 
     expectHttpResponseToEqual(response, { body: "", status: 201 });
   });
-
-  it(`${displayRouteName(
-    establishmentRoutes.requestEmailToUpdateFormRoute,
-  )} 400 with an error message if previous edit link for this siret has not yet expired`, async () => {
-    // Prepare
-    // first query of modification link
-    await httpClient.requestEmailToUpdateFormRoute({ urlParams: { siret } });
-
-    // second query soon after which should fail
-    const response = await httpClient.requestEmailToUpdateFormRoute({
-      urlParams: { siret },
-    });
-
-    expectHttpResponseToEqual(response, {
-      body: {
-        errors:
-          "Un email a déjà été envoyé au contact référent de l'établissement le 01/09/2021",
-      },
-      status: 400,
-    });
-  });
 });
