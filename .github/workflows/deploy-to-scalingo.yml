@@ -51,10 +51,8 @@ jobs:
         run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz ${{ inputs.tag }}
       - name: Send Discord notification
         run: |
-          newChanges=${{ inputs.version-new-features }}
-          formattedNewChanges="${newChanges//$'\n'/\\n}"
           curl -X POST -H "Content-Type: application/json" -d '{
-            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.",
+            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}",
             "embeds": [
               {
                 "title": "Liens utiles :",
