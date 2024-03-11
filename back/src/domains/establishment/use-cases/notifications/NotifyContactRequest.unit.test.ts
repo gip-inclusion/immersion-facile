@@ -20,9 +20,9 @@ import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemo
 import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  DiscussionAggregateBuilder,
-  InMemoryDiscussionAggregateRepository,
-} from "../../adapters/InMemoryDiscussionAggregateRepository";
+  DiscussionBuilder,
+  InMemoryDiscussionRepository,
+} from "../../adapters/InMemoryDiscussionRepository";
 import {
   TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,
@@ -35,14 +35,14 @@ const allowedContactEmail = "toto@gmail.com";
 const allowedCopyEmail = "copy@gmail.com";
 
 describe("NotifyContactRequest", () => {
-  let discussionAggregateRepository: InMemoryDiscussionAggregateRepository;
+  let discussionRepository: InMemoryDiscussionRepository;
   let romeRepository: InMemoryRomeRepository;
   let notifyContactRequest: NotifyContactRequest;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    discussionAggregateRepository = uow.discussionAggregateRepository;
+    discussionRepository = uow.discussionRepository;
     romeRepository = uow.romeRepository;
 
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
@@ -74,7 +74,7 @@ describe("NotifyContactRequest", () => {
       },
     ];
 
-    const discussion = new DiscussionAggregateBuilder()
+    const discussion = new DiscussionBuilder()
       .withId(discussionId)
       .withSiret(siret)
       .withEstablishmentContact({
@@ -85,7 +85,7 @@ describe("NotifyContactRequest", () => {
       .withAppellationCode(TEST_APPELLATION_CODE)
       .build();
 
-    discussionAggregateRepository.discussionAggregates = [discussion];
+    discussionRepository.discussions = [discussion];
     return discussion;
   };
 

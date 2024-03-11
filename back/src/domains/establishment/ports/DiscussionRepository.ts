@@ -1,11 +1,11 @@
 import {
   AppellationCode,
+  DiscussionDto,
   DiscussionId,
   Email,
   LocationId,
   SiretDto,
 } from "shared";
-import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 
 export type HasDiscussionMatchingParams = {
   siret: SiretDto;
@@ -16,12 +16,10 @@ export type HasDiscussionMatchingParams = {
   addressId: LocationId;
 };
 
-export interface DiscussionAggregateRepository {
-  insert: (discussionAggregate: DiscussionAggregate) => Promise<void>;
-  update: (discussionAggregate: DiscussionAggregate) => Promise<void>;
-  getById: (
-    discussionId: DiscussionId,
-  ) => Promise<DiscussionAggregate | undefined>;
+export interface DiscussionRepository {
+  insert: (discussion: DiscussionDto) => Promise<void>;
+  update: (discussion: DiscussionDto) => Promise<void>;
+  getById: (discussionId: DiscussionId) => Promise<DiscussionDto | undefined>;
   countDiscussionsForSiretSince: (
     siret: SiretDto,
     since: Date,

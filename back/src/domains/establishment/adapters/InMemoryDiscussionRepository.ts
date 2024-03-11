@@ -3,37 +3,33 @@ import {
   AddressDto,
   AppellationCode,
   Builder,
+  DiscussionDto,
+  DiscussionEstablishmentContact,
   DiscussionId,
+  DiscussionPotentialBeneficiary,
+  Exchange,
   ImmersionObjective,
   SiretDto,
 } from "shared";
 import {
-  DiscussionAggregate,
-  DiscussionEstablishmentContact,
-  DiscussionPotentialBeneficiary,
-  ExchangeEntity,
-} from "../entities/DiscussionAggregate";
-import {
-  DiscussionAggregateRepository,
+  DiscussionRepository,
   HasDiscussionMatchingParams,
-} from "../ports/DiscussionAggregateRepository";
+} from "../ports/DiscussionRepository";
 
-type DiscussionsById = Record<DiscussionId, DiscussionAggregate>;
+type DiscussionsById = Record<DiscussionId, DiscussionDto>;
 
-export class InMemoryDiscussionAggregateRepository
-  implements DiscussionAggregateRepository
-{
-  constructor(private _discussionAggregates: DiscussionsById = {}) {}
+export class InMemoryDiscussionRepository implements DiscussionRepository {
+  constructor(private _discussions: DiscussionsById = {}) {}
 
   public async countDiscussionsForSiretSince(siret: SiretDto, since: Date) {
-    return this.discussionAggregates.filter(
+    return this.discussions.filter(
       (discussion) =>
         discussion.siret === siret && isAfter(discussion.createdAt, since),
     ).length;
   }
 
   public async getById(discussionId: DiscussionId) {
-    return this._discussionAggregates[discussionId];
+    return this._discussions[discussionId];
   }
 
   public async hasDiscussionMatching({
@@ -44,44 +40,44 @@ export class InMemoryDiscussionAggregateRepository
     establishmentRepresentativeEmail,
   }: Partial<HasDiscussionMatchingParams>): Promise<boolean> {
     const filters = [
-      (discussion: DiscussionAggregate) =>
+      (discussion: DiscussionDto) =>
         siret ? discussion.siret === siret : true,
-      (discussion: DiscussionAggregate) =>
+      (discussion: DiscussionDto) =>
         appellationCode ? discussion.appellationCode === appellationCode : true,
-      (discussion: DiscussionAggregate) =>
+      (discussion: DiscussionDto) =>
         potentialBeneficiaryEmail
           ? discussion.potentialBeneficiary.email === potentialBeneficiaryEmail
           : true,
-      (discussion: DiscussionAggregate) =>
+      (discussion: DiscussionDto) =>
         since ? discussion.createdAt >= since : true,
-      (discussion: DiscussionAggregate) =>
+      (discussion: DiscussionDto) =>
         establishmentRepresentativeEmail
           ? discussion.establishmentContact.email ===
             establishmentRepresentativeEmail
           : true,
     ];
-    return this.discussionAggregates.some((discussion) =>
+    return this.discussions.some((discussion) =>
       filters.every((filter) => filter(discussion)),
     );
   }
 
-  public async insert(discussionAggregate: DiscussionAggregate) {
-    this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
+  public async insert(discussion: DiscussionDto) {
+    this._discussions[discussion.id] = discussion;
   }
 
-  public async update(discussionAggregate: DiscussionAggregate) {
-    if (!this._discussionAggregates[discussionAggregate.id])
-      throw new Error("DiscussionAggregate not found");
-    this._discussionAggregates[discussionAggregate.id] = discussionAggregate;
+  public async update(discussion: DiscussionDto) {
+    if (!this._discussions[discussion.id])
+      throw new Error("Discussion not found");
+    this._discussions[discussion.id] = discussion;
   }
 
   // For test purposes
-  public get discussionAggregates(): DiscussionAggregate[] {
-    return Object.values(this._discussionAggregates);
+  public get discussions(): DiscussionDto[] {
+    return Object.values(this._discussions);
   }
 
-  public set discussionAggregates(discussions: DiscussionAggregate[]) {
-    this._discussionAggregates = discussions.reduce(
+  public set discussions(discussions: DiscussionDto[]) {
+    this._discussions = discussions.reduce(
       (acc, discussion) => ({ ...acc, [discussion.id]: discussion }),
       {} as DiscussionsById,
     );
@@ -90,7 +86,7 @@ export class InMemoryDiscussionAggregateRepository
 
 const createdAt = new Date("2023-06-23T12:00:00.000");
 
-const defaultDiscussionAggregateV2: DiscussionAggregate = {
+const defaultDiscussion: DiscussionDto = {
   id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
   appellationCode: "11704",
   siret: "12345671234567",
@@ -130,34 +126,30 @@ const defaultDiscussionAggregateV2: DiscussionAggregate = {
   ],
 };
 
-export class DiscussionAggregateBuilder
-  implements Builder<DiscussionAggregate>
-{
-  constructor(
-    private readonly discussionAggregate: DiscussionAggregate = defaultDiscussionAggregateV2,
-  ) {}
+export class DiscussionBuilder implements Builder<DiscussionDto> {
+  constructor(private readonly discussion: DiscussionDto = defaultDiscussion) {}
 
   public build() {
-    return this.discussionAggregate;
+    return this.discussion;
   }
 
   public withAddress(address: AddressDto) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
+    return new DiscussionBuilder({
+      ...this.discussion,
       address,
     });
   }
 
   public withAppellationCode(appellationCode: AppellationCode) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
+    return new DiscussionBuilder({
+      ...this.discussion,
       appellationCode,
     });
   }
 
   public withCreatedAt(createdAt: Date) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
+    return new DiscussionBuilder({
+      ...this.discussion,
       createdAt,
     });
   }
@@ -165,29 +157,29 @@ export class DiscussionAggregateBuilder
   public withEstablishmentContact(
     establishmentContact: Partial<DiscussionEstablishmentContact>,
   ) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
+    return new DiscussionBuilder({
+      ...this.discussion,
       establishmentContact: {
-        ...this.discussionAggregate.establishmentContact,
+        ...this.discussion.establishmentContact,
         ...establishmentContact,
       },
     });
   }
 
-  public withExchanges(exchanges: ExchangeEntity[]) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
+  public withExchanges(exchanges: Exchange[]) {
+    return new DiscussionBuilder({
+      ...this.discussion,
       exchanges,
     });
   }
 
   public withId(id: DiscussionId) {
-    return new DiscussionAggregateBuilder({ ...this.discussionAggregate, id });
+    return new DiscussionBuilder({ ...this.discussion, id });
   }
 
   public withImmersionObjective(immersionObjective: ImmersionObjective | null) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
+    return new DiscussionBuilder({
+      ...this.discussion,
       immersionObjective,
     });
   }
@@ -195,18 +187,18 @@ export class DiscussionAggregateBuilder
   public withPotentialBeneficiary(
     potentialBeneficiary: Partial<DiscussionPotentialBeneficiary>,
   ) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
+    return new DiscussionBuilder({
+      ...this.discussion,
       potentialBeneficiary: {
-        ...this.discussionAggregate.potentialBeneficiary,
+        ...this.discussion.potentialBeneficiary,
         ...potentialBeneficiary,
       },
     });
   }
 
   public withSiret(siret: SiretDto) {
-    return new DiscussionAggregateBuilder({
-      ...this.discussionAggregate,
+    return new DiscussionBuilder({
+      ...this.discussion,
       siret,
     });
   }

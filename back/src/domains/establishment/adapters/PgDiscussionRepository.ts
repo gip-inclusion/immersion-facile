@@ -1,6 +1,13 @@
 import type { InsertObject } from "kysely";
 import { sql } from "kysely";
-import { ContactMethod, DiscussionId, SiretDto, pipeWithValue } from "shared";
+import {
+  ContactMethod,
+  DiscussionDto,
+  DiscussionId,
+  Exchange,
+  SiretDto,
+  pipeWithValue,
+} from "shared";
 import {
   KyselyDb,
   jsonBuildObject,
@@ -8,17 +15,11 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { Database } from "../../../config/pg/kysely/model/database";
 import {
-  DiscussionAggregate,
-  ExchangeEntity,
-} from "../entities/DiscussionAggregate";
-import {
-  DiscussionAggregateRepository,
+  DiscussionRepository,
   HasDiscussionMatchingParams,
-} from "../ports/DiscussionAggregateRepository";
+} from "../ports/DiscussionRepository";
 
-export class PgDiscussionAggregateRepository
-  implements DiscussionAggregateRepository
-{
+export class PgDiscussionRepository implements DiscussionRepository {
   constructor(private transaction: KyselyDb) {}
 
   public async countDiscussionsForSiretSince(
@@ -50,7 +51,7 @@ export class PgDiscussionAggregateRepository
 
   public async getById(
     discussionId: DiscussionId,
-  ): Promise<DiscussionAggregate | undefined> {
+  ): Promise<DiscussionDto | undefined> {
     const pgResult = await this.transaction
       .with("exchanges_by_id", (db) =>
         db
@@ -60,7 +61,7 @@ export class PgDiscussionAggregateRepository
           .select(({ ref, fn }) => [
             "discussion_id",
             fn
-              .agg<ExchangeEntity[]>("array_agg", [
+              .agg<Exchange[]>("array_agg", [
                 jsonBuildObject({
                   subject: ref("subject"),
                   message: ref("message"),
@@ -125,7 +126,7 @@ export class PgDiscussionAggregateRepository
         createdAt: new Date(discussion.createdAt),
         immersionObjective: discussion.immersionObjective ?? null,
         exchanges: discussion.exchanges
-          ? discussion.exchanges.map(({ sentAt, ...rest }: ExchangeEntity) => ({
+          ? discussion.exchanges.map(({ sentAt, ...rest }: Exchange) => ({
               sentAt: new Date(sentAt),
               ...rest,
             }))
@@ -179,29 +180,26 @@ export class PgDiscussionAggregateRepository
     return !!result.at(0)?.exists;
   }
 
-  public async insert(discussion: DiscussionAggregate) {
+  public async insert(discussion: DiscussionDto) {
     await this.transaction
       .insertInto("discussions")
-      .values(discussionAggregateToPg(discussion))
+      .values(discussionToPg(discussion))
       .execute();
 
     await this.#insertAllExchanges(discussion.id, discussion.exchanges);
   }
 
-  public async update(discussion: DiscussionAggregate) {
+  public async update(discussion: DiscussionDto) {
     await this.transaction
       .updateTable("discussions")
-      .set(discussionAggregateToPg(discussion))
+      .set(discussionToPg(discussion))
       .where("id", "=", discussion.id)
       .execute();
     await this.#clearAllExistingExchanges(discussion);
     await this.#insertAllExchanges(discussion.id, discussion.exchanges);
   }
 
-  async #insertAllExchanges(
-    discussionId: DiscussionId,
-    exchanges: ExchangeEntity[],
-  ) {
+  async #insertAllExchanges(discussionId: DiscussionId, exchanges: Exchange[]) {
     if (exchanges.length === 0) return;
 
     await this.transaction
@@ -219,7 +217,7 @@ export class PgDiscussionAggregateRepository
       .execute();
   }
 
-  async #clearAllExistingExchanges(discussion: DiscussionAggregate) {
+  async #clearAllExistingExchanges(discussion: DiscussionDto) {
     await this.transaction
       .deleteFrom("exchanges")
       .where("discussion_id", "=", discussion.id)
@@ -227,8 +225,8 @@ export class PgDiscussionAggregateRepository
   }
 }
 
-const discussionAggregateToPg = (
-  discussion: DiscussionAggregate,
+const discussionToPg = (
+  discussion: DiscussionDto,
 ): InsertObject<Database, "discussions"> => ({
   id: discussion.id,
   appellation_code: +discussion.appellationCode,

@@ -29,6 +29,7 @@ export * from "./convention/conventionStatusTransitions";
 export * from "./dashboard/dashboard.dto";
 export * from "./dashboard/dashboard.schema";
 export * from "./discussion/discussion.dto";
+export * from "./discussion/discussion.schema";
 export * from "./domElementIds";
 export * from "./email/email";
 export * from "./email/email.dto";

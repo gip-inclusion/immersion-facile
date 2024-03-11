@@ -7,7 +7,7 @@ import { InMemoryConventionRepository } from "../../../convention/adapters/InMem
 import { InMemoryConventionsToSyncRepository } from "../../../convention/adapters/InMemoryConventionsToSyncRepository";
 import { InMemoryNpsRepository } from "../../../convention/adapters/InMemoryNpsRepository";
 import { InMemoryDeletedEstablishmentRepository } from "../../../establishment/adapters/InMemoryDeletedEstablishmentRepository";
-import { InMemoryDiscussionAggregateRepository } from "../../../establishment/adapters/InMemoryDiscussionAggregateRepository";
+import { InMemoryDiscussionRepository } from "../../../establishment/adapters/InMemoryDiscussionRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentLeadQueries } from "../../../establishment/adapters/InMemoryEstablishmentLeadQueries";
 import { InMemoryEstablishmentLeadRepository } from "../../../establishment/adapters/InMemoryEstablishmentLeadRepository";
@@ -52,7 +52,7 @@ export const createInMemoryUow = () => {
     conventionPoleEmploiAdvisorRepository:
       new InMemoryConventionPoleEmploiAdvisorRepository(),
     conventionsToSyncRepository: new InMemoryConventionsToSyncRepository(),
-    discussionAggregateRepository: new InMemoryDiscussionAggregateRepository(),
+    discussionRepository: new InMemoryDiscussionRepository(),
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
     groupRepository: new InMemoryGroupRepository(),

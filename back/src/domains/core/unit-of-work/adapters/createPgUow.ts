@@ -8,7 +8,7 @@ import { PgConventionRepository } from "../../../convention/adapters/PgConventio
 import { PgConventionsToSyncRepository } from "../../../convention/adapters/PgConventionsToSyncRepository";
 import { PgNpsRepository } from "../../../convention/adapters/PgNpsRepository";
 import { PgDeletedEstablishmentRepository } from "../../../establishment/adapters/PgDeletedEstablishmentRepository";
-import { PgDiscussionAggregateRepository } from "../../../establishment/adapters/PgDiscussionAggregateRepository";
+import { PgDiscussionRepository } from "../../../establishment/adapters/PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { PgEstablishmentLeadQueries } from "../../../establishment/adapters/PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "../../../establishment/adapters/PgEstablishmentLeadRepository";
@@ -47,9 +47,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     deletedEstablishmentRepository: new PgDeletedEstablishmentRepository(
       transaction,
     ),
-    discussionAggregateRepository: new PgDiscussionAggregateRepository(
-      transaction,
-    ),
+    discussionRepository: new PgDiscussionRepository(transaction),
     errorRepository: new PgSavedErrorRepository(transaction),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       transaction,

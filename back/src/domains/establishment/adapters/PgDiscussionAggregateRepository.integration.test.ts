@@ -1,16 +1,15 @@
 import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
-import { AppellationAndRomeDto, expectToEqual } from "shared";
+import { AppellationAndRomeDto, DiscussionDto, expectToEqual } from "shared";
 import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { HasDiscussionMatchingParams } from "../ports/DiscussionAggregateRepository";
-import { DiscussionAggregateBuilder } from "./InMemoryDiscussionAggregateRepository";
-import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
+import { HasDiscussionMatchingParams } from "../ports/DiscussionRepository";
+import { DiscussionBuilder } from "./InMemoryDiscussionRepository";
+import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
 const styliste: AppellationAndRomeDto = {
@@ -29,10 +28,10 @@ const offer = new OfferEntityBuilder()
 
 const siret = "01234567891011";
 
-describe("PgDiscussionAggregateRepository", () => {
+describe("PgDiscussionRepository", () => {
   let pool: Pool;
   let client: PoolClient;
-  let pgDiscussionAggregateRepository: PgDiscussionAggregateRepository;
+  let pgDiscussionRepository: PgDiscussionRepository;
   let establishmentAggregateRepo: PgEstablishmentAggregateRepository;
 
   beforeAll(async () => {
@@ -46,9 +45,7 @@ describe("PgDiscussionAggregateRepository", () => {
     await client.query("DELETE FROM discussions");
     await client.query("DELETE FROM exchanges");
     const transaction = makeKyselyDb(pool);
-    pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(
-      transaction,
-    );
+    pgDiscussionRepository = new PgDiscussionRepository(transaction);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(
       transaction,
     );
@@ -61,14 +58,14 @@ describe("PgDiscussionAggregateRepository", () => {
 
   const discussionCreatedAt = new Date("2023-07-07");
 
-  const discussionWithExchanges = new DiscussionAggregateBuilder()
+  const discussionWithExchanges = new DiscussionBuilder()
     .withSiret(siret)
     .withEstablishmentContact({
       email: "TEST@email.com",
     })
     .withCreatedAt(discussionCreatedAt)
     .build();
-  const discussionWithoutExchanges = new DiscussionAggregateBuilder()
+  const discussionWithoutExchanges = new DiscussionBuilder()
     .withSiret(siret)
     .withExchanges([])
     .withCreatedAt(discussionCreatedAt)
@@ -76,7 +73,7 @@ describe("PgDiscussionAggregateRepository", () => {
 
   it.each([
     {
-      discussionAggregate: discussionWithExchanges,
+      discussion: discussionWithExchanges,
       testFilters: {
         siret: discussionWithExchanges.siret,
         appellationCode: discussionWithExchanges.appellationCode,
@@ -88,7 +85,7 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "discussion with exchange",
     },
     {
-      discussionAggregate: discussionWithExchanges,
+      discussion: discussionWithExchanges,
       testFilters: {
         siret: discussionWithExchanges.siret,
         appellationCode: discussionWithExchanges.appellationCode,
@@ -100,7 +97,7 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "discussion with exchange with match since creation date +1",
     },
     {
-      discussionAggregate: discussionWithoutExchanges,
+      discussion: discussionWithoutExchanges,
       testFilters: {
         siret: discussionWithExchanges.siret,
         appellationCode: discussionWithExchanges.appellationCode,
@@ -112,7 +109,7 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "discussion without exchange initialy",
     },
     {
-      discussionAggregate: discussionWithoutExchanges,
+      discussion: discussionWithoutExchanges,
       testFilters: {
         siret: discussionWithExchanges.siret,
         appellationCode: discussionWithExchanges.appellationCode,
@@ -125,7 +122,7 @@ describe("PgDiscussionAggregateRepository", () => {
         "discussion without exchange initialy with match since creation date +1",
     },
     {
-      discussionAggregate: discussionWithExchanges,
+      discussion: discussionWithExchanges,
       testFilters: {
         siret: discussionWithExchanges.siret,
       },
@@ -133,7 +130,7 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "match with Siret",
     },
     {
-      discussionAggregate: discussionWithExchanges,
+      discussion: discussionWithExchanges,
       testFilters: {
         siret: "00000000000000",
       },
@@ -141,7 +138,7 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "don't match with Siret",
     },
     {
-      discussionAggregate: discussionWithExchanges,
+      discussion: discussionWithExchanges,
       testFilters: {
         appellationCode: discussionWithExchanges.appellationCode,
       },
@@ -149,7 +146,7 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "match with appellationCode",
     },
     {
-      discussionAggregate: discussionWithExchanges,
+      discussion: discussionWithExchanges,
       testFilters: {
         potentialBeneficiaryEmail:
           discussionWithExchanges.potentialBeneficiary.email,
@@ -158,7 +155,7 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "match with potentialBeneficiaryEmail",
     },
     {
-      discussionAggregate: discussionWithExchanges,
+      discussion: discussionWithExchanges,
       testFilters: {
         since: discussionCreatedAt,
       },
@@ -166,7 +163,7 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "match with since",
     },
     {
-      discussionAggregate: discussionWithExchanges,
+      discussion: discussionWithExchanges,
       testFilters: {
         establishmentRepresentativeEmail:
           discussionWithExchanges.establishmentContact.email.toUpperCase(),
@@ -175,40 +172,39 @@ describe("PgDiscussionAggregateRepository", () => {
       testName: "match with establishmentRepresentativeEmail",
     },
   ] satisfies {
-    discussionAggregate: DiscussionAggregate;
+    discussion: DiscussionDto;
     testFilters: Partial<HasDiscussionMatchingParams>;
     expectedResult: boolean;
     testName: string;
   }[])(
     "Methode insert, update, getById and hasDiscussionMatching $testName",
-    async ({ discussionAggregate, testFilters, expectedResult }) => {
+    async ({ discussion, testFilters, expectedResult }) => {
       expectToEqual(
-        await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
+        await pgDiscussionRepository.getById(discussion.id),
         undefined,
       );
 
-      await pgDiscussionAggregateRepository.insert(discussionAggregate);
+      await pgDiscussionRepository.insert(discussion);
       expectToEqual(
-        await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
-        discussionAggregate,
+        await pgDiscussionRepository.getById(discussion.id),
+        discussion,
       );
 
-      const updatedDiscussionAggregate1: DiscussionAggregate =
-        new DiscussionAggregateBuilder(discussionAggregate)
-          .withImmersionObjective("Initier une démarche de recrutement")
-          .build();
-
-      await pgDiscussionAggregateRepository.update(updatedDiscussionAggregate1);
-      expectToEqual(
-        await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
-        updatedDiscussionAggregate1,
-      );
-
-      const updatedDiscussionAggregate2 = new DiscussionAggregateBuilder(
-        updatedDiscussionAggregate1,
+      const updatedDiscussion1: DiscussionDto = new DiscussionBuilder(
+        discussion,
       )
+        .withImmersionObjective("Initier une démarche de recrutement")
+        .build();
+
+      await pgDiscussionRepository.update(updatedDiscussion1);
+      expectToEqual(
+        await pgDiscussionRepository.getById(discussion.id),
+        updatedDiscussion1,
+      );
+
+      const updatedDiscussion2 = new DiscussionBuilder(updatedDiscussion1)
         .withExchanges([
-          ...updatedDiscussionAggregate1.exchanges,
+          ...updatedDiscussion1.exchanges,
           {
             subject: "mon nouveau sujet",
             message: "mon nouveau message",
@@ -219,16 +215,14 @@ describe("PgDiscussionAggregateRepository", () => {
         ])
         .build();
 
-      await pgDiscussionAggregateRepository.update(updatedDiscussionAggregate2);
+      await pgDiscussionRepository.update(updatedDiscussion2);
       expectToEqual(
-        await pgDiscussionAggregateRepository.getById(discussionAggregate.id),
-        updatedDiscussionAggregate2,
+        await pgDiscussionRepository.getById(discussion.id),
+        updatedDiscussion2,
       );
 
       expect(
-        await pgDiscussionAggregateRepository.hasDiscussionMatching(
-          testFilters,
-        ),
+        await pgDiscussionRepository.hasDiscussionMatching(testFilters),
       ).toBe(expectedResult);
     },
   );
@@ -245,39 +239,36 @@ describe("PgDiscussionAggregateRepository", () => {
         .build(),
     );
 
-    const discussionAggregate1 = new DiscussionAggregateBuilder()
+    const discussion1 = new DiscussionBuilder()
       .withSiret(siret)
       .withId("bbbbbd2c-6f02-11ec-90d6-0242ac120003")
       .withCreatedAt(new Date("2023-03-05"))
       .build();
 
-    const discussionAggregate2 = new DiscussionAggregateBuilder()
+    const discussion2 = new DiscussionBuilder()
       .withSiret(siret)
       .withId("cccccd2c-6f02-11ec-90d6-0242ac120003")
       .withCreatedAt(new Date("2023-03-07"))
       .build();
 
-    const discussionAggregateToOld = new DiscussionAggregateBuilder()
+    const discussionToOld = new DiscussionBuilder()
       .withSiret(siret)
       .withId("aaaaad2c-6f02-11ec-90d6-0242ac120003")
       .withCreatedAt(new Date("2023-03-04"))
       .build();
 
     await Promise.all([
-      pgDiscussionAggregateRepository.insert(discussionAggregate1),
-      pgDiscussionAggregateRepository.insert(discussionAggregate2),
-      pgDiscussionAggregateRepository.insert(discussionAggregateToOld),
+      pgDiscussionRepository.insert(discussion1),
+      pgDiscussionRepository.insert(discussion2),
+      pgDiscussionRepository.insert(discussionToOld),
     ]);
 
     const numberOfDiscussions =
-      await pgDiscussionAggregateRepository.countDiscussionsForSiretSince(
-        siret,
-        since,
-      );
+      await pgDiscussionRepository.countDiscussionsForSiretSince(siret, since);
     expect(numberOfDiscussions).toBe(2);
   });
 
-  it("Delete messages from old discussions", async () => {
+  it("Deletes messages from old discussions", async () => {
     const siret = "12212222333344";
     const since = new Date("2023-03-05");
 
@@ -289,7 +280,7 @@ describe("PgDiscussionAggregateRepository", () => {
         .build(),
     );
 
-    const discussionAggregate1 = new DiscussionAggregateBuilder()
+    const discussion1 = new DiscussionBuilder()
       .withSiret(siret)
       .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120104")
       .withCreatedAt(new Date("2023-11-11"))
@@ -303,7 +294,7 @@ describe("PgDiscussionAggregateRepository", () => {
         },
       ])
       .build();
-    const discussionAggregateOld = new DiscussionAggregateBuilder()
+    const discussionOld = new DiscussionBuilder()
       .withSiret(siret)
       .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120103")
       .withCreatedAt(new Date("2022-11-11"))
@@ -319,28 +310,25 @@ describe("PgDiscussionAggregateRepository", () => {
       .build();
 
     await Promise.all([
-      pgDiscussionAggregateRepository.insert(discussionAggregate1),
-      pgDiscussionAggregateRepository.insert(discussionAggregateOld),
+      pgDiscussionRepository.insert(discussion1),
+      pgDiscussionRepository.insert(discussionOld),
     ]);
 
     const numberOfUpdatedMessages =
-      await pgDiscussionAggregateRepository.deleteOldMessages(since);
+      await pgDiscussionRepository.deleteOldMessages(since);
 
     expectToEqual(numberOfUpdatedMessages, 1);
-    await expectMessageToBeDeleted(discussionAggregate1, "mon nouveau message");
-    await expectMessageToBeDeleted(
-      discussionAggregateOld,
-      "Supprimé car trop ancien",
-    );
+    await expectMessageToBeDeleted(discussion1, "mon nouveau message");
+    await expectMessageToBeDeleted(discussionOld, "Supprimé car trop ancien");
   });
 
   const expectMessageToBeDeleted = async (
-    discussion: DiscussionAggregate,
+    discussion: DiscussionDto,
     expectedMessage: string,
   ) => {
     expectToEqual(
-      await pgDiscussionAggregateRepository.getById(discussion.id),
-      new DiscussionAggregateBuilder(discussion)
+      await pgDiscussionRepository.getById(discussion.id),
+      new DiscussionBuilder(discussion)
         .withExchanges([
           {
             subject: "mon nouveau sujet",

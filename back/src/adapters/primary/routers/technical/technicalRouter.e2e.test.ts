@@ -21,7 +21,7 @@ import {
 import { shortLinkNotFoundMessage } from "../../../../domains/core/short-link/ShortLink";
 import { ShortLinkId } from "../../../../domains/core/short-link/ports/ShortLinkQuery";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { DiscussionAggregateBuilder } from "../../../../domains/establishment/adapters/InMemoryDiscussionAggregateRepository";
+import { DiscussionBuilder } from "../../../../domains/establishment/adapters/InMemoryDiscussionRepository";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
@@ -109,8 +109,8 @@ describe("technical router", () => {
     it(`${displayRouteName(
       technicalRoutes.inboundEmailParsing,
     )} 200 - when IP is allowed and body is correct`, async () => {
-      inMemoryUow.discussionAggregateRepository.discussionAggregates = [
-        new DiscussionAggregateBuilder().withId(discussionId).build(),
+      inMemoryUow.discussionRepository.discussions = [
+        new DiscussionBuilder().withId(discussionId).build(),
       ];
 
       const response = await httpClient.inboundEmailParsing({
