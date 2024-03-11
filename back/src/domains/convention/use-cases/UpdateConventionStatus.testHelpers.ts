@@ -49,7 +49,14 @@ const allInclusionConnectedTestUsers = [
 type InclusionConnectedTestUser =
   (typeof allInclusionConnectedTestUsers)[number];
 
-const fakeAgency = new AgencyDtoBuilder().build();
+const agencyWithoutCounsellorEmail = new AgencyDtoBuilder()
+  .withId("agency-without-counsellors")
+  .build();
+
+const agencyWithCounsellorEmails = new AgencyDtoBuilder()
+  .withCounsellorEmails(["counsellor1@mail.com", "counsellor2@mail.com"])
+  .withId("agency-with-two-step-validation")
+  .build();
 
 const establishmentRepEmail: Email = "establishmentrep@email.com";
 
@@ -60,7 +67,11 @@ const makeUserIdMapInclusionConnectedUser: Record<
   icUserWithRoleToReview: {
     agencyRights: [
       {
-        agency: fakeAgency,
+        agency: agencyWithoutCounsellorEmail,
+        role: "toReview",
+      },
+      {
+        agency: agencyWithCounsellorEmails,
         role: "toReview",
       },
     ],
@@ -74,7 +85,11 @@ const makeUserIdMapInclusionConnectedUser: Record<
   icUserWithRoleCounsellor: {
     agencyRights: [
       {
-        agency: fakeAgency,
+        agency: agencyWithoutCounsellorEmail,
+        role: "counsellor",
+      },
+      {
+        agency: agencyWithCounsellorEmails,
         role: "counsellor",
       },
     ],
@@ -88,7 +103,11 @@ const makeUserIdMapInclusionConnectedUser: Record<
   icUserWithRoleValidator: {
     agencyRights: [
       {
-        agency: fakeAgency,
+        agency: agencyWithoutCounsellorEmail,
+        role: "validator",
+      },
+      {
+        agency: agencyWithCounsellorEmails,
         role: "validator",
       },
     ],
@@ -103,7 +122,11 @@ const makeUserIdMapInclusionConnectedUser: Record<
   icUserWithRoleAgencyOwner: {
     agencyRights: [
       {
-        agency: fakeAgency,
+        agency: agencyWithoutCounsellorEmail,
+        role: "agencyOwner",
+      },
+      {
+        agency: agencyWithCounsellorEmails,
         role: "agencyOwner",
       },
     ],
@@ -142,26 +165,53 @@ type ConventionDomainTopic = ExtractFromDomainTopics<
 type SetupInitialStateParams = {
   initialStatus: ConventionStatus;
   withIcUser: boolean;
+  conventionId: ConventionId;
   alreadySigned?: boolean;
 };
 export const originalConventionId: ConventionId =
   "add5c20e-6dd2-45af-affe-927358005251";
+export const conventionWithAgencyTwoStepsValidationId: ConventionId =
+  "add5c20e-6dd2-45af-affe-927358005252";
 
 export const setupInitialState = ({
   initialStatus,
   alreadySigned = true,
+  conventionId,
   withIcUser,
 }: SetupInitialStateParams) => {
   const conventionBuilder = new ConventionDtoBuilder()
     .withId(originalConventionId)
     .withStatus(initialStatus)
-    .withEstablishmentRepresentativeEmail(establishmentRepEmail);
+    .withEstablishmentRepresentativeEmail(establishmentRepEmail)
+    .withAgencyId(agencyWithoutCounsellorEmail.id);
+
   const originalConvention = alreadySigned
     ? conventionBuilder.build()
     : conventionBuilder.notSigned().build();
 
+  const conventionWithAgencyTwoStepsValidationBuilder =
+    new ConventionDtoBuilder()
+      .withId(conventionWithAgencyTwoStepsValidationId)
+      .withStatus(initialStatus)
+      .withEstablishmentRepresentativeEmail(establishmentRepEmail)
+      .withAgencyId(agencyWithCounsellorEmails.id);
+
+  const conventionWithAgencyTwoStepsValidation: ConventionDto = {
+    ...(alreadySigned
+      ? conventionWithAgencyTwoStepsValidationBuilder.build()
+      : conventionWithAgencyTwoStepsValidationBuilder.notSigned().build()),
+    dateApproval: undefined,
+  };
+
+  const conventionsToTest = {
+    [originalConvention.id]: originalConvention,
+    [conventionWithAgencyTwoStepsValidation.id]:
+      conventionWithAgencyTwoStepsValidation,
+  };
+
   const uow = createInMemoryUow();
   const conventionRepository = uow.conventionRepository;
+  const agencyRepository = uow.agencyRepository;
   const outboxRepository = uow.outboxRepository;
   const timeGateway = new CustomTimeGateway();
   const createNewEvent = makeCreateNewEvent({
@@ -175,13 +225,18 @@ export const setupInitialState = ({
     timeGateway,
   );
 
-  conventionRepository.setConventions([originalConvention]);
+  agencyRepository.setAgencies([
+    agencyWithCounsellorEmails,
+    agencyWithoutCounsellorEmail,
+  ]);
+  conventionRepository.setConventions(values(conventionsToTest));
   withIcUser &&
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
       values(makeUserIdMapInclusionConnectedUser),
     );
+
   return {
-    originalConvention,
+    originalConvention: conventionsToTest[conventionId],
     updateConventionStatusUseCase,
     conventionRepository,
     outboxRepository,
@@ -259,6 +314,7 @@ const makeTestAcceptsStatusUpdate =
       timeGateway,
     } = await setupInitialState({
       initialStatus: testAcceptNewStatusParams.initialStatus,
+      conventionId: updateStatusParams.conventionId,
       withIcUser: "userId" in testAcceptNewStatusParams,
     });
 
@@ -399,6 +455,7 @@ const makeTestRejectsStatusUpdate =
     } = await setupInitialState({
       initialStatus: testRejectsNewStatusParams.initialStatus,
       withIcUser: "userId" in testRejectsNewStatusParams,
+      conventionId: updateStatusParams.conventionId,
     });
     const jwtPayload: ConventionRelatedJwtPayload =
       "role" in testRejectsNewStatusParams
@@ -443,7 +500,6 @@ export const testForAllRolesAndInitialStatusCases = ({
 }: TestAllCaseProps) => {
   const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
     splitCasesBetweenPassingAndFailing(allRoles, allowedMagicLinkRoles);
-
   const [
     allowedInclusionConnectedUsersToUpdate,
     notAllowedInclusionConnectedUsersToUpdate,
@@ -533,7 +589,8 @@ export const testForAllRolesAndInitialStatusCases = ({
               establishmentRepEmail
                 ? "establishment-representative"
                 : makeUserIdMapInclusionConnectedUser[userId].agencyRights.find(
-                    (agencyRight) => agencyRight.agency.id === fakeAgency.id,
+                    (agencyRight) =>
+                      agencyRight.agency.id === agencyWithoutCounsellorEmail.id,
                   )?.role
             }' is not allowed to go to status '${
               updateStatusParams.status
@@ -545,14 +602,24 @@ export const testForAllRolesAndInitialStatusCases = ({
 
     it.each(forbiddenInitalStatuses.map((status) => ({ status })))(
       "Rejected from status $status",
-      ({ status }) =>
-        testRejectsStatusUpdate({
+      ({ status }) => {
+        const agencyHasTwoStepsAndValidatorTriesToValidate =
+          updateStatusParams.status === "ACCEPTED_BY_VALIDATOR" &&
+          status === "IN_REVIEW";
+
+        const error = agencyHasTwoStepsAndValidatorTriesToValidate
+          ? new ForbiddenError(
+              `Cannot go to status '${updateStatusParams.status}' for convention '${updateStatusParams.conventionId}. Convention should be reviewed by counsellor`,
+            )
+          : new BadRequestError(
+              `Cannot go from status '${status}' to '${updateStatusParams.status}'`,
+            );
+        return testRejectsStatusUpdate({
           role: someValidRole,
           initialStatus: status,
-          expectedError: new BadRequestError(
-            `Cannot go from status '${status}' to '${updateStatusParams.status}'`,
-          ),
-        }),
+          expectedError: error,
+        });
+      },
     );
   });
 };

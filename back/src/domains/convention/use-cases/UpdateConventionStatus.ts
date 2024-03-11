@@ -20,6 +20,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
+import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import { DomainTopic } from "../../core/events/events";
@@ -75,6 +76,15 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     if (!originalConvention)
       throw new NotFoundError(conventionMissingMessage(params.conventionId));
 
+    const agency = await uow.agencyRepository.getById(
+      originalConvention.agencyId,
+    );
+
+    if (!agency)
+      throw new NotFoundError(
+        agencyMissingMessage(originalConvention.agencyId),
+      );
+
     const role =
       "role" in payload
         ? payload.role
@@ -94,6 +104,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       role,
       targetStatus: params.status,
       conventionId: originalConvention.id,
+      agencyHasTwoStepsValidation: agency.counsellorEmails.length > 0,
     });
 
     const conventionUpdatedAt = this.timeGateway.now().toISOString();
