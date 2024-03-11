@@ -96,7 +96,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
     const exchange: Exchange = {
       subject: item.Subject || defaultSubject,
       message: processEmailMessage(item),
-      sentAt: new Date(item.SentAtDate),
+      sentAt: new Date(item.SentAtDate).toISOString(),
       recipient: recipientKind,
       sender,
     };

@@ -209,7 +209,7 @@ describe("PgDiscussionRepository", () => {
             subject: "mon nouveau sujet",
             message: "mon nouveau message",
             recipient: "potentialBeneficiary",
-            sentAt: new Date(),
+            sentAt: new Date().toISOString(),
             sender: "establishment",
           },
         ])
@@ -289,7 +289,7 @@ describe("PgDiscussionRepository", () => {
           subject: "mon nouveau sujet",
           message: "mon nouveau message",
           recipient: "potentialBeneficiary",
-          sentAt: new Date("2023-11-11"),
+          sentAt: new Date("2023-11-11").toISOString(),
           sender: "establishment",
         },
       ])
@@ -303,7 +303,7 @@ describe("PgDiscussionRepository", () => {
           subject: "mon nouveau sujet",
           message: "mon nouveau message",
           recipient: "potentialBeneficiary",
-          sentAt: new Date("2022-11-11"),
+          sentAt: new Date("2022-11-11").toISOString(),
           sender: "establishment",
         },
       ])
@@ -334,7 +334,7 @@ describe("PgDiscussionRepository", () => {
             subject: "mon nouveau sujet",
             message: expectedMessage,
             recipient: "potentialBeneficiary",
-            sentAt: new Date(discussion.exchanges[0].sentAt),
+            sentAt: discussion.exchanges[0].sentAt,
             sender: "establishment",
           },
         ])

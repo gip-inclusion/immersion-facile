@@ -24,7 +24,8 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
   public async countDiscussionsForSiretSince(siret: SiretDto, since: Date) {
     return this.discussions.filter(
       (discussion) =>
-        discussion.siret === siret && isAfter(discussion.createdAt, since),
+        discussion.siret === siret &&
+        isAfter(new Date(discussion.createdAt), since),
     ).length;
   }
 
@@ -49,7 +50,7 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
           ? discussion.potentialBeneficiary.email === potentialBeneficiaryEmail
           : true,
       (discussion: DiscussionDto) =>
-        since ? discussion.createdAt >= since : true,
+        since ? new Date(discussion.createdAt) >= since : true,
       (discussion: DiscussionDto) =>
         establishmentRepresentativeEmail
           ? discussion.establishmentContact.email ===
@@ -84,7 +85,7 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
   }
 }
 
-const createdAt = new Date("2023-06-23T12:00:00.000");
+const createdAt = new Date("2023-06-23T12:00:00.000").toISOString();
 
 const defaultDiscussion: DiscussionDto = {
   id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
@@ -150,7 +151,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   public withCreatedAt(createdAt: Date) {
     return new DiscussionBuilder({
       ...this.discussion,
-      createdAt,
+      createdAt: createdAt.toISOString(),
     });
   }
 

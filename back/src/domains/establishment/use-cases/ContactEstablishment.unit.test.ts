@@ -254,6 +254,7 @@ describe("ContactEstablishment", () => {
     const establishmentContact = establishmentAggregate.contact!;
 
     const connectionDate = new Date("2022-01-01T12:00:00.000");
+    const connectionDateStr = connectionDate.toISOString();
     timeGateway.setNextDate(connectionDate);
 
     const discussionId = "someDiscussionUuid";
@@ -285,12 +286,12 @@ describe("ContactEstablishment", () => {
           job: establishmentContact.job,
           copyEmails: establishmentContact.copyEmails,
         },
-        createdAt: connectionDate,
+        createdAt: connectionDateStr,
         immersionObjective: "Confirmer un projet professionnel",
         exchanges: [
           {
             subject: "Demande de contact initiée par le bénéficiaire",
-            sentAt: connectionDate,
+            sentAt: connectionDateStr,
             message: validEmailRequest.message,
             recipient: "establishment",
             sender: "potentialBeneficiary",
@@ -317,8 +318,10 @@ describe("ContactEstablishment", () => {
     const connectionDate = new Date("2022-01-10T12:00:00.000");
     timeGateway.setNextDate(connectionDate);
 
-    const discussion1Date = new Date("2022-01-09T12:00:00.000");
-    const discussionToOldDate = new Date("2022-01-02T12:00:00.000");
+    const discussion1Date = new Date("2022-01-09T12:00:00.000").toISOString();
+    const discussionToOldDate = new Date(
+      "2022-01-02T12:00:00.000",
+    ).toISOString();
     uow.discussionRepository.discussions = [
       {
         id: "discussionToOld",

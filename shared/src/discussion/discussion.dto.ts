@@ -2,10 +2,12 @@ import { AddressDto } from "../address/address.dto";
 import { ImmersionObjective } from "../convention/convention.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
+import { DateString } from "../utils/date";
 
-const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
+export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 export type ExchangeRole = (typeof exchangeRoles)[number];
 export const isExchangeRole = includesTypeGuard(exchangeRoles);
 
@@ -31,8 +33,8 @@ export type DiscussionEstablishmentContact = {
 
 export type DiscussionDto = {
   id: DiscussionId;
-  createdAt: Date;
-  siret: string;
+  createdAt: DateString;
+  siret: SiretDto;
   businessName: string;
   appellationCode: AppellationCode;
   immersionObjective: ImmersionObjective | null;
@@ -47,5 +49,5 @@ export type Exchange = {
   message: string;
   sender: ExchangeRole;
   recipient: ExchangeRole;
-  sentAt: Date;
+  sentAt: DateString;
 };
