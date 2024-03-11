@@ -85,8 +85,7 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
       body: "",
     });
 
-    const discussions =
-      inMemoryUow.discussionAggregateRepository.discussionAggregates;
+    const discussions = inMemoryUow.discussionRepository.discussions;
 
     expect(discussions).toHaveLength(1);
     const discussionId = discussions[0].id;
@@ -104,9 +103,7 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
       "CONTACT_BY_EMAIL_REQUEST",
     );
 
-    expect(
-      inMemoryUow.discussionAggregateRepository.discussionAggregates,
-    ).toHaveLength(1);
+    expect(inMemoryUow.discussionRepository.discussions).toHaveLength(1);
   });
 
   it("fails with 404 for unknown siret", async () => {

@@ -16,7 +16,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { DiscussionAggregateBuilder } from "../../establishment/adapters/InMemoryDiscussionAggregateRepository";
+import { DiscussionBuilder } from "../../establishment/adapters/InMemoryDiscussionRepository";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 
 describe("GetUserAgencyDashboardUrl", () => {
@@ -302,8 +302,8 @@ describe("GetUserAgencyDashboardUrl", () => {
             agencyRights: [],
           },
         ]);
-        uow.discussionAggregateRepository.discussionAggregates = [
-          new DiscussionAggregateBuilder()
+        uow.discussionRepository.discussions = [
+          new DiscussionBuilder()
             .withEstablishmentContact({
               email: john.email,
             })

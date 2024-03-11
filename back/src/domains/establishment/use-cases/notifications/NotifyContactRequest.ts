@@ -13,7 +13,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { createOpaqueEmail } from "../../entities/DiscussionAggregate";
+import { createOpaqueEmail } from "../../helpers/discussion.helpers";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
   protected inputSchema = contactEstablishmentEventPayloadSchema;
@@ -37,7 +37,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     payload: ContactEstablishmentEventPayload,
     uow: UnitOfWork,
   ): Promise<void> {
-    const discussion = await uow.discussionAggregateRepository.getById(
+    const discussion = await uow.discussionRepository.getById(
       payload.discussionId,
     );
     if (!discussion)

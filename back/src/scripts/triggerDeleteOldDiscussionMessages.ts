@@ -2,7 +2,7 @@ import { subMonths } from "date-fns";
 import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
-import { PgDiscussionAggregateRepository } from "../domains/establishment/adapters/PgDiscussionAggregateRepository";
+import { PgDiscussionRepository } from "../domains/establishment/adapters/PgDiscussionRepository";
 import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
@@ -18,15 +18,13 @@ const triggerDeleteOldDiscussionMessages = async () => {
   });
 
   const transaction = makeKyselyDb(pool);
-  const pgDiscussionAggregateRepository = new PgDiscussionAggregateRepository(
-    transaction,
-  );
+  const pgDiscussionRepository = new PgDiscussionRepository(transaction);
   const deleteAllDiscussionMessagesBefore = subMonths(
     new Date(),
     numberOfMonthBeforeDeletion,
   );
   const numberOfMessagesDeleted =
-    await pgDiscussionAggregateRepository.deleteOldMessages(
+    await pgDiscussionRepository.deleteOldMessages(
       deleteAllDiscussionMessagesBefore,
     );
   return { numberOfMessagesDeleted };

@@ -1,6 +1,7 @@
 import subDays from "date-fns/subDays";
 import {
   ContactEstablishmentRequestDto,
+  DiscussionDto,
   contactEstablishmentRequestSchema,
 } from "shared";
 import {
@@ -17,7 +18,6 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { ContactEntity } from "../entities/ContactEntity";
-import { DiscussionAggregate } from "../entities/DiscussionAggregate";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
@@ -85,7 +85,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       );
 
     const similarDiscussionAlreadyExits =
-      await uow.discussionAggregateRepository.hasDiscussionMatching({
+      await uow.discussionRepository.hasDiscussionMatching({
         siret: contactRequest.siret,
         appellationCode: contactRequest.appellationCode,
         potentialBeneficiaryEmail: contactRequest.potentialBeneficiaryEmail,
@@ -129,7 +129,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       now,
     });
 
-    await uow.discussionAggregateRepository.insert(discussion);
+    await uow.discussionRepository.insert(discussion);
 
     await this.#markEstablishmentAsNotSearchableIfLimitReached({
       uow,
@@ -156,7 +156,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     contact: ContactEntity;
     establishment: EstablishmentEntity;
     now: Date;
-  }): DiscussionAggregate {
+  }): DiscussionDto {
     const matchingAddress = establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
     );
@@ -228,7 +228,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       establishmentAggregate.establishment.maxContactsPerWeek;
 
     const numberOfDiscussionsOfPast7Days =
-      await uow.discussionAggregateRepository.countDiscussionsForSiretSince(
+      await uow.discussionRepository.countDiscussionsForSiretSince(
         contactRequest.siret,
         subDays(now, 7),
       );

@@ -3,6 +3,7 @@ import {
   BrevoEmailItem,
   BrevoInboundBody,
   DiscussionId,
+  Exchange,
   ExchangeRole,
   brevoInboundBodySchema,
   immersionFacileContactEmail,
@@ -18,10 +19,9 @@ import { NotificationGateway } from "../../../core/notifications/ports/Notificat
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
-  ExchangeEntity,
   addExchangeToDiscussion,
   createOpaqueEmail,
-} from "../../entities/DiscussionAggregate";
+} from "../../helpers/discussion.helpers";
 
 const defaultSubject = "Sans objet";
 
@@ -84,8 +84,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
   ): Promise<void> {
     const [discussionId, recipientKind] =
       this.#getDiscussionParamsFromEmail(item);
-    const discussion =
-      await uow.discussionAggregateRepository.getById(discussionId);
+    const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion)
       throw new NotFoundError(`Discussion ${discussionId} not found`);
 
@@ -94,7 +93,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
         ? "potentialBeneficiary"
         : "establishment";
 
-    const exchange: ExchangeEntity = {
+    const exchange: Exchange = {
       subject: item.Subject || defaultSubject,
       message: processEmailMessage(item),
       sentAt: new Date(item.SentAtDate),
@@ -102,7 +101,7 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       sender,
     };
 
-    await uow.discussionAggregateRepository.update(
+    await uow.discussionRepository.update(
       addExchangeToDiscussion(discussion, exchange),
     );
 

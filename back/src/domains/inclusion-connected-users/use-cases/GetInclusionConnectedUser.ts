@@ -91,7 +91,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     uow: UnitOfWork,
     user: InclusionConnectedUser,
   ): Promise<AbsoluteUrl | undefined> {
-    return (await uow.discussionAggregateRepository.hasDiscussionMatching({
+    return (await uow.discussionRepository.hasDiscussionMatching({
       establishmentRepresentativeEmail: user.email,
     }))
       ? this.#dashboardGateway.getEstablishmentDiscussionsDashboardUrl(

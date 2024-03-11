@@ -23,7 +23,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { DiscussionAggregateBuilder } from "../adapters/InMemoryDiscussionAggregateRepository";
+import { DiscussionBuilder } from "../adapters/InMemoryDiscussionRepository";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -262,7 +262,7 @@ describe("ContactEstablishment", () => {
     await contactEstablishment.execute(validEmailRequest);
 
     // Assert
-    expectToEqual(uow.discussionAggregateRepository.discussionAggregates, [
+    expectToEqual(uow.discussionRepository.discussions, [
       {
         id: discussionId,
         appellationCode: "12898",
@@ -319,7 +319,7 @@ describe("ContactEstablishment", () => {
 
     const discussion1Date = new Date("2022-01-09T12:00:00.000");
     const discussionToOldDate = new Date("2022-01-02T12:00:00.000");
-    uow.discussionAggregateRepository.discussionAggregates = [
+    uow.discussionRepository.discussions = [
       {
         id: "discussionToOld",
         appellationCode: appellationAndRome.appellationCode,
@@ -409,9 +409,7 @@ describe("ContactEstablishment", () => {
     const establishmentAggregateAfterSecondContact =
       uow.establishmentAggregateRepository.establishmentAggregates[0];
 
-    expect(uow.discussionAggregateRepository.discussionAggregates).toHaveLength(
-      3,
-    );
+    expect(uow.discussionRepository.discussions).toHaveLength(3);
     expect(
       establishmentAggregateAfterSecondContact.establishment.isSearchable,
     ).toBe(false);
@@ -429,8 +427,8 @@ describe("ContactEstablishment", () => {
       const contactDate = new Date("2022-01-01T12:00:00.000Z");
       timeGateway.setNextDate(contactDate);
 
-      uow.discussionAggregateRepository.discussionAggregates = [
-        new DiscussionAggregateBuilder()
+      uow.discussionRepository.discussions = [
+        new DiscussionBuilder()
           .withAppellationCode(validEmailRequest.appellationCode)
           .withSiret(validEmailRequest.siret)
           .withPotentialBeneficiary({

@@ -12,7 +12,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { DiscussionAggregateBuilder } from "../../adapters/InMemoryDiscussionAggregateRepository";
+import { DiscussionBuilder } from "../../adapters/InMemoryDiscussionRepository";
 import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstablishment";
 
 const user: AuthenticatedUser = {
@@ -22,8 +22,8 @@ const user: AuthenticatedUser = {
   lastName: "Doe",
   externalId: "sub-123",
 };
-const discussion = new DiscussionAggregateBuilder().build();
-const userDiscussion = new DiscussionAggregateBuilder()
+const discussion = new DiscussionBuilder().build();
+const userDiscussion = new DiscussionBuilder()
   .withEstablishmentContact({ email: user.email })
   .withId("user-discussion-id")
   .build();
@@ -72,7 +72,7 @@ describe("GetDiscussionById use case", () => {
 
     it("cannot access someone else's discussions", async () => {
       uow.authenticatedUserRepository.users = [user];
-      uow.discussionAggregateRepository.discussionAggregates = [discussion];
+      uow.discussionRepository.discussions = [discussion];
       await expectPromiseToFailWithError(
         getDiscussionById.execute(discussion.id, {
           userId: user.id,
@@ -87,7 +87,7 @@ describe("GetDiscussionById use case", () => {
   describe("Happy path", () => {
     it("Gets the matching discussion", async () => {
       uow.authenticatedUserRepository.users = [user];
-      uow.discussionAggregateRepository.discussionAggregates = [userDiscussion];
+      uow.discussionRepository.discussions = [userDiscussion];
       const response = await getDiscussionById.execute(userDiscussion.id, {
         userId: user.id,
       });

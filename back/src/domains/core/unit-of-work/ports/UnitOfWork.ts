@@ -7,7 +7,7 @@ import { ConventionRepository } from "../../../convention/ports/ConventionReposi
 import { ConventionsToSyncRepository } from "../../../convention/ports/ConventionsToSyncRepository";
 import { NpsRepository } from "../../../convention/ports/NpsRepository";
 import { DeletedEstablishmentRepository } from "../../../establishment/ports/DeletedEstablishmentRepository";
-import { DiscussionAggregateRepository } from "../../../establishment/ports/DiscussionAggregateRepository";
+import { DiscussionRepository } from "../../../establishment/ports/DiscussionRepository";
 import { EstablishmentAggregateRepository } from "../../../establishment/ports/EstablishmentAggregateRepository";
 import { EstablishmentLeadQueries } from "../../../establishment/ports/EstablishmentLeadQueries";
 import { EstablishmentLeadRepository } from "../../../establishment/ports/EstablishmentLeadRepository";
@@ -39,7 +39,7 @@ export type UnitOfWork = {
   conventionRepository: ConventionRepository;
   conventionsToSyncRepository: ConventionsToSyncRepository;
   deletedEstablishmentRepository: DeletedEstablishmentRepository;
-  discussionAggregateRepository: DiscussionAggregateRepository;
+  discussionRepository: DiscussionRepository;
   errorRepository: SavedErrorRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
   establishmentLeadRepository: EstablishmentLeadRepository;

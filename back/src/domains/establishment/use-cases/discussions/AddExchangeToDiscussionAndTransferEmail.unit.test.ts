@@ -19,16 +19,16 @@ import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemo
 import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  DiscussionAggregateBuilder,
-  InMemoryDiscussionAggregateRepository,
-} from "../../adapters/InMemoryDiscussionAggregateRepository";
+  DiscussionBuilder,
+  InMemoryDiscussionRepository,
+} from "../../adapters/InMemoryDiscussionRepository";
 import { AddExchangeToDiscussionAndTransferEmail } from "./AddExchangeToDiscussionAndTransferEmail";
 
 const domain = "my-domain.com";
 const replyDomain = `reply.${domain}`;
 
 describe("AddExchangeToDiscussionAndTransferEmail", () => {
-  let discussionAggregateRepository: InMemoryDiscussionAggregateRepository;
+  let discussionRepository: InMemoryDiscussionRepository;
   let addExchangeToDiscussionAndTransferEmail: AddExchangeToDiscussionAndTransferEmail;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
@@ -36,7 +36,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    discussionAggregateRepository = uow.discussionAggregateRepository;
+    discussionRepository = uow.discussionRepository;
     const uowPerformer = new InMemoryUowPerformer(uow);
 
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
@@ -71,7 +71,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
       const bufferRawContent = Buffer.from("my-attachment-content");
       notificationGateway.attachment = bufferRawContent;
 
-      const discussion1 = new DiscussionAggregateBuilder()
+      const discussion1 = new DiscussionBuilder()
         .withAppellationCode("20567")
         .withId(discussionId1)
         .withExchanges([
@@ -85,7 +85,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         ])
         .build();
 
-      const discussion2 = new DiscussionAggregateBuilder()
+      const discussion2 = new DiscussionBuilder()
         .withAppellationCode("13252")
         .withId(discussionId2)
         .withExchanges([
@@ -99,17 +99,13 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         ])
         .build();
 
-      discussionAggregateRepository.discussionAggregates = [
-        discussion1,
-        discussion2,
-      ];
+      discussionRepository.discussions = [discussion1, discussion2];
       await addExchangeToDiscussionAndTransferEmail.execute(brevoResponse);
-      const discussionsInRepository =
-        discussionAggregateRepository.discussionAggregates;
+      const discussionsInRepository = discussionRepository.discussions;
 
       expect(discussionsInRepository).toHaveLength(2);
 
-      expectToEqual(discussionAggregateRepository.discussionAggregates, [
+      expectToEqual(discussionRepository.discussions, [
         {
           ...discussion1,
           exchanges: [
@@ -210,7 +206,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
       const bufferRawContent = Buffer.from("my-attachment-content");
       notificationGateway.attachment = bufferRawContent;
 
-      const discussion1 = new DiscussionAggregateBuilder()
+      const discussion1 = new DiscussionBuilder()
         .withAppellationCode("20567")
         .withId(discussionId1)
         .withExchanges([
@@ -224,7 +220,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         ])
         .build();
 
-      const discussion2 = new DiscussionAggregateBuilder()
+      const discussion2 = new DiscussionBuilder()
         .withAppellationCode("13252")
         .withId(discussionId2)
         .withExchanges([
@@ -238,17 +234,13 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
         ])
         .build();
 
-      discussionAggregateRepository.discussionAggregates = [
-        discussion1,
-        discussion2,
-      ];
+      discussionRepository.discussions = [discussion1, discussion2];
       await addExchangeToDiscussionAndTransferEmail.execute(brevoResponse);
-      const discussionsInRepository =
-        discussionAggregateRepository.discussionAggregates;
+      const discussionsInRepository = discussionRepository.discussions;
 
       expect(discussionsInRepository).toHaveLength(2);
 
-      expectToEqual(discussionAggregateRepository.discussionAggregates, [
+      expectToEqual(discussionRepository.discussions, [
         {
           ...discussion1,
           exchanges: [
