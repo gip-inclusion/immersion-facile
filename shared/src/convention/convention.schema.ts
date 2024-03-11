@@ -181,7 +181,7 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
     }),
   );
 
-const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
+export const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
   zEnumValidation<ImmersionObjective>(
     conventionObjectiveOptions,
     localization.invalidImmersionObjective,

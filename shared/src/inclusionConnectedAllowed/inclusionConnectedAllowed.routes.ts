@@ -2,6 +2,7 @@ import { defineRoute, defineRoutes } from "shared-routes";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencyIdsSchema } from "../agency/agency.schema";
 import { markPartnersErroredConventionAsHandledRequestSchema } from "../convention/convention.schema";
+import { discussionSchema } from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
@@ -56,6 +57,17 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     queryParamsSchema: getInclusionConnectLogoutUrlQueryParamsSchema,
     responses: {
       200: absoluteUrlSchema,
+    },
+  }),
+  getDiscussionByIdForEstablishment: defineRoute({
+    method: "get",
+    url: "/discussion-for-establishment/:discussionId",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: discussionSchema,
+      401: legacyHttpErrorSchema,
+      403: legacyHttpErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
 });

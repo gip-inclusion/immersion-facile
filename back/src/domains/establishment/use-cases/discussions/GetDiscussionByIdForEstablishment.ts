@@ -7,13 +7,14 @@ import {
 import {
   ForbiddenError,
   NotFoundError,
+  UnauthorizedError,
 } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
 export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
   DiscussionId,
-  DiscussionDto | undefined,
+  DiscussionDto,
   InclusionConnectDomainJwtPayload
 > {
   inputSchema = discussionIdSchema;
@@ -21,9 +22,8 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     discussionId: DiscussionId,
     uow: UnitOfWork,
     jwtPayload?: InclusionConnectDomainJwtPayload,
-  ): Promise<DiscussionDto | undefined> {
-    if (!jwtPayload)
-      throw new ForbiddenError("Inclusion connect payload is needed");
+  ): Promise<DiscussionDto> {
+    if (!jwtPayload) throw new UnauthorizedError();
 
     const user = await uow.inclusionConnectedUserRepository.getById(
       jwtPayload.userId,

@@ -61,5 +61,16 @@ export const createInclusionConnectedAllowedRouter = (
       }),
   );
 
+  inclusionConnectedSharedRoutes.getDiscussionByIdForEstablishment(
+    inclusionConnectedMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getDiscussionByIdForEstablishment.execute(
+          req.params.discussionId,
+          req.payloads?.inclusion,
+        ),
+      ),
+  );
+
   return inclusionConnectedRouter;
 };

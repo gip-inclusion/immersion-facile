@@ -79,7 +79,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             subject: "My subject - discussion 1",
             message: "Hello",
             sender: "potentialBeneficiary",
-            sentAt: new Date(),
+            sentAt: new Date().toISOString(),
             recipient: "establishment",
           },
         ])
@@ -93,7 +93,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             subject: "My subject - discussion 2",
             message: "Hello",
             sender: "potentialBeneficiary",
-            sentAt: new Date(),
+            sentAt: new Date().toISOString(),
             recipient: "establishment",
           },
         ])
@@ -113,7 +113,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             {
               message: brevoResponse.items[0].RawHtmlBody,
               sender: "establishment",
-              sentAt: new Date("2023-06-28T08:06:52.000Z"),
+              sentAt: "2023-06-28T08:06:52.000Z",
               recipient: "potentialBeneficiary",
               subject: brevoResponse.items[0].Subject,
             },
@@ -126,7 +126,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             {
               message: brevoResponse.items[1].RawHtmlBody,
               sender: "potentialBeneficiary",
-              sentAt: new Date("2023-06-28T08:06:52.000Z"),
+              sentAt: "2023-06-28T08:06:52.000Z",
               recipient: "establishment",
               subject: brevoResponse.items[1].Subject,
             },
@@ -214,7 +214,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             subject: "Ma discussion 1",
             message: "Hello",
             sender: "potentialBeneficiary",
-            sentAt: new Date(),
+            sentAt: new Date().toISOString(),
             recipient: "establishment",
           },
         ])
@@ -228,7 +228,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             subject: "",
             message: "Hello",
             sender: "potentialBeneficiary",
-            sentAt: new Date(),
+            sentAt: new Date().toISOString(),
             recipient: "establishment",
           },
         ])
@@ -248,7 +248,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             {
               message: brevoResponse.items[0].RawHtmlBody,
               sender: "establishment",
-              sentAt: new Date("2023-06-28T08:06:52.000Z"),
+              sentAt: "2023-06-28T08:06:52.000Z",
               recipient: "potentialBeneficiary",
               subject: "Sans objet",
             },
@@ -261,7 +261,7 @@ describe("AddExchangeToDiscussionAndTransferEmail", () => {
             {
               message: brevoResponse.items[1].RawHtmlBody,
               sender: "potentialBeneficiary",
-              sentAt: new Date("2023-06-28T08:06:52.000Z"),
+              sentAt: "2023-06-28T08:06:52.000Z",
               recipient: "establishment",
               subject: "Sans objet",
             },

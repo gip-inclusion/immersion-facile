@@ -170,7 +170,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       appellationCode: contactRequest.appellationCode,
       siret: contactRequest.siret,
       businessName: establishment.customizedName ?? establishment.name,
-      createdAt: now,
+      createdAt: now.toISOString(),
       immersionObjective:
         contactRequest.contactMode === "EMAIL"
           ? contactRequest.immersionObjective
@@ -203,7 +203,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
           ? [
               {
                 subject: "Demande de contact initiée par le bénéficiaire",
-                sentAt: now,
+                sentAt: now.toISOString(),
                 message: contactRequest.message,
                 recipient: "establishment",
                 sender: "potentialBeneficiary",

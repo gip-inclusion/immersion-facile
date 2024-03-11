@@ -1,7 +1,9 @@
 import {
   AgencyDtoBuilder,
+  AuthenticatedUser,
   ConventionDtoBuilder,
   InclusionConnectedAllowedRoutes,
+  InclusionConnectedUser,
   allowedStartInclusionConnectLoginPages,
   currentJwtVersions,
   displayRouteName,
@@ -10,7 +12,6 @@ import {
   frontRoutes,
   inclusionConnectedAllowedRoutes,
 } from "shared";
-import { InclusionConnectedUser } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
@@ -18,6 +19,7 @@ import { Gateways } from "../../../../config/bootstrap/createGateways";
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToPeServiceName } from "../../../../domains/core/saved-errors/ports/SavedErrorRepository";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { DiscussionBuilder } from "../../../../domains/establishment/adapters/InMemoryDiscussionRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {
@@ -314,6 +316,41 @@ describe("InclusionConnectedAllowedRoutes", () => {
           });
         },
       );
+    });
+
+    describe(`${displayRouteName(
+      inclusionConnectedAllowedRoutes.getDiscussionByIdForEstablishment,
+    )} returns the discussion`, () => {
+      it("gets the discussion for the establishment", async () => {
+        const user: AuthenticatedUser = {
+          id: "11111111-1111-4111-1111-111111111111",
+          email: "user@mail.com",
+          firstName: "User",
+          lastName: "Name",
+          externalId: "user-external-id",
+        };
+        const discussion = new DiscussionBuilder()
+          .withEstablishmentContact(user)
+          .build();
+
+        inMemoryUow.discussionRepository.discussions = [discussion];
+        inMemoryUow.authenticatedUserRepository.users = [user];
+
+        const token = generateInclusionConnectJwt({
+          userId: user.id,
+          version: currentJwtVersions.inclusion,
+        });
+
+        const response = await httpClient.getDiscussionByIdForEstablishment({
+          headers: { authorization: token },
+          urlParams: { discussionId: discussion.id },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 200,
+          body: discussion,
+        });
+      });
     });
   });
 });

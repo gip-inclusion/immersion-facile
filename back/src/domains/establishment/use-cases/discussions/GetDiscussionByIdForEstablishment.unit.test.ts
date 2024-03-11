@@ -6,6 +6,7 @@ import {
 import {
   ForbiddenError,
   NotFoundError,
+  UnauthorizedError,
 } from "../../../../config/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -44,7 +45,7 @@ describe("GetDiscussionById use case", () => {
       const someId = "whatever-id";
       await expectPromiseToFailWithError(
         getDiscussionById.execute(someId),
-        new ForbiddenError("Inclusion connect payload is needed"),
+        new UnauthorizedError(),
       );
     });
 

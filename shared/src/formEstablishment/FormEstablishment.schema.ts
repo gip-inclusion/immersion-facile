@@ -42,7 +42,7 @@ const validContactMethods: NotEmptyArray<ContactMethod> = [
   "PHONE",
   "IN_PERSON",
 ];
-const preferredContactMethodSchema = zEnumValidation(
+export const contactMethodSchema = zEnumValidation(
   validContactMethods,
   "Choisissez parmis les options proposées",
 );
@@ -53,7 +53,7 @@ export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   job: zTrimmedString,
   phone: zStringMinLength1.regex(phoneRegExp, localization.invalidPhone),
   email: emailSchema,
-  contactMethod: preferredContactMethodSchema,
+  contactMethod: contactMethodSchema,
   copyEmails: z.array(emailSchema),
 });
 
@@ -155,7 +155,7 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     businessContact_phone: zStringMinLength1,
     businessContact_lastName: zStringMinLength1,
     businessContact_firstName: zStringMinLength1,
-    businessContact_contactMethod: preferredContactMethodSchema,
+    businessContact_contactMethod: contactMethodSchema,
     businessContact_copyEmails: zStringPossiblyEmpty,
     isSearchable: csvBooleanSchema,
     website: zStringPossiblyEmpty,
