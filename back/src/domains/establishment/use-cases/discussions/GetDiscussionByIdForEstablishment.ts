@@ -1,6 +1,6 @@
 import {
-  DiscussionDto,
   DiscussionId,
+  DiscussionReadDto,
   InclusionConnectDomainJwtPayload,
   discussionIdSchema,
 } from "shared";
@@ -11,10 +11,11 @@ import {
 } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import { discussionToRead } from "../../helpers/discussion.helpers";
 
 export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
   DiscussionId,
-  DiscussionDto,
+  DiscussionReadDto,
   InclusionConnectDomainJwtPayload
 > {
   inputSchema = discussionIdSchema;
@@ -22,7 +23,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     discussionId: DiscussionId,
     uow: UnitOfWork,
     jwtPayload?: InclusionConnectDomainJwtPayload,
-  ): Promise<DiscussionDto> {
+  ): Promise<DiscussionReadDto> {
     if (!jwtPayload) throw new UnauthorizedError();
 
     const user = await uow.inclusionConnectedUserRepository.getById(
@@ -46,6 +47,6 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
         `You are not allowed to access discussion with id ${discussionId}`,
       );
 
-    return discussion;
+    return discussionToRead(discussion);
   }
 }
