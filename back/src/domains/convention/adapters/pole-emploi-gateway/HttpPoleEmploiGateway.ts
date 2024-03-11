@@ -142,7 +142,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
               originalId: poleEmploiConvention.originalId,
             },
           });
-          throw error;
+          return {
+            status: 500,
+            message: JSON.stringify(error),
+          };
         }
 
         const message = !error.response.data?.message
