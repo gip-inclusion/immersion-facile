@@ -20,6 +20,7 @@ import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToPeServiceName } from "../../../../domains/core/saved-errors/ports/SavedErrorRepository";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { DiscussionBuilder } from "../../../../domains/establishment/adapters/InMemoryDiscussionRepository";
+import { discussionToRead } from "../../../../domains/establishment/helpers/discussion.helpers";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {
@@ -348,7 +349,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
         expectHttpResponseToEqual(response, {
           status: 200,
-          body: discussion,
+          body: discussionToRead(discussion),
         });
       });
     });

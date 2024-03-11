@@ -123,9 +123,14 @@ export class PgDiscussionRepository implements DiscussionRepository {
     return (
       discussion && {
         ...discussion,
-        createdAt: discussion.createdAt.toISOString(),
+        createdAt: new Date(discussion.createdAt).toISOString(),
         immersionObjective: discussion.immersionObjective ?? null,
-        exchanges: discussion.exchanges ?? [],
+        exchanges: discussion.exchanges
+          ? discussion.exchanges.map((exchange) => ({
+              ...exchange,
+              sentAt: new Date(exchange.sentAt).toISOString(),
+            }))
+          : [],
       }
     );
   }
