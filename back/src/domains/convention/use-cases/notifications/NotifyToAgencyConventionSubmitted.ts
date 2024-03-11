@@ -61,16 +61,16 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
       );
     }
 
-    const conventionAdsivorEntity =
+    const conventionAdvisorEntity =
       await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
         convention.id,
       );
 
-    if (conventionAdsivorEntity?.advisor)
+    if (conventionAdvisorEntity?.advisor)
       return this.#sendEmailToRecipients({
         agency,
         convention,
-        recipients: [conventionAdsivorEntity.advisor.email],
+        recipients: [conventionAdvisorEntity.advisor.email],
         role: "validator",
         warning: undefined,
         uow,
