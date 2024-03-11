@@ -9,7 +9,10 @@ import {
   validSignatoryRoles,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
-import { someAgenciesMissingMessage } from "../../agency/ports/AgencyRepository";
+import {
+  agencyMissingMessage,
+  // someAgenciesMissingMessage,
+} from "../../agency/ports/AgencyRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -18,6 +21,7 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { conventionMissingMessage } from "../entities/Convention";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 import {
+  conventionWithAgencyTwoStepsValidationId,
   executeUpdateConventionStatusUseCase,
   originalConventionId,
   setupInitialState,
@@ -74,6 +78,7 @@ describe("UpdateConventionStatus", () => {
       });
 
       const conventionRepository = uow.conventionRepository;
+      const agencyRepository = uow.agencyRepository;
       const uowPerformer = new InMemoryUowPerformer(uow);
       const updateConventionStatus = new UpdateConventionStatus(
         uowPerformer,
@@ -88,8 +93,10 @@ describe("UpdateConventionStatus", () => {
         .withStatus("READY_TO_SIGN")
         .withId(conventionId)
         .build();
+      const agency = new AgencyDtoBuilder().build();
 
       await conventionRepository.save(conventionBuilder);
+      agencyRepository.agencies = [agency];
 
       await updateConventionStatus.execute(
         {
@@ -164,7 +171,7 @@ describe("UpdateConventionStatus", () => {
             emailHash: "osef",
           },
         ),
-        someAgenciesMissingMessage([agency.id]),
+        agencyMissingMessage(agency.id),
       );
     });
 
@@ -294,6 +301,21 @@ describe("UpdateConventionStatus", () => {
       updatedFields: { dateValidation: validationDate.toISOString() },
       nextDate: validationDate,
     });
+
+    describe("When agency have two steps validation", () => {
+      testForAllRolesAndInitialStatusCases({
+        updateStatusParams: {
+          status: "ACCEPTED_BY_VALIDATOR",
+          conventionId: conventionWithAgencyTwoStepsValidationId,
+        },
+        expectedDomainTopic: "ConventionAcceptedByValidator",
+        allowedMagicLinkRoles: ["validator"],
+        allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
+        allowedInitialStatuses: ["ACCEPTED_BY_COUNSELLOR"],
+        updatedFields: { dateValidation: validationDate.toISOString() },
+        nextDate: validationDate,
+      });
+    });
   });
 
   describe("* -> REJECTED transition", () => {
@@ -359,13 +381,16 @@ describe("UpdateConventionStatus", () => {
   });
 
   it("fails for unknown convention ids", async () => {
+    const missingConventionId: ConventionId =
+      "add5c20e-6dd2-45af-affe-000000000000";
+
     const { updateConventionStatusUseCase, conventionRepository, timeGateway } =
       await setupInitialState({
         initialStatus: "IN_REVIEW",
         withIcUser: false,
+        conventionId: missingConventionId,
       });
-    const missingConventionId: ConventionId =
-      "add5c20e-6dd2-45af-affe-000000000000";
+
     await expectPromiseToFailWithError(
       executeUpdateConventionStatusUseCase({
         jwtPayload: createConventionMagicLinkPayload({

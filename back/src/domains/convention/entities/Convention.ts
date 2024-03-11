@@ -34,16 +34,28 @@ const throwIfStatusTransitionNotPossible = ({
 const throwIfRoleNotAllowedToChangeStatus = ({
   role,
   targetStatus,
+  initialStatus,
   conventionId,
+  agencyHasTwoStepsValidation,
 }: {
   role: Role;
   targetStatus: ConventionStatus;
+  initialStatus: ConventionStatus;
   conventionId: ConventionId;
+  agencyHasTwoStepsValidation?: boolean;
 }) => {
   const config = statusTransitionConfigs[targetStatus];
   if (!config.validRoles.includes(role))
     throw new ForbiddenError(
       `Role '${role}' is not allowed to go to status '${targetStatus}' for convention '${conventionId}'.`,
+    );
+  if (
+    initialStatus === "IN_REVIEW" &&
+    targetStatus === "ACCEPTED_BY_VALIDATOR" &&
+    agencyHasTwoStepsValidation
+  )
+    throw new ForbiddenError(
+      `Cannot go to status '${targetStatus}' for convention '${conventionId}. Convention should be reviewed by counsellor`,
     );
 };
 
@@ -52,13 +64,21 @@ export const throwIfTransitionNotAllowed = ({
   initialStatus,
   role,
   conventionId,
+  agencyHasTwoStepsValidation,
 }: {
   targetStatus: ConventionStatus;
   initialStatus: ConventionStatus;
   role: Role;
   conventionId: ConventionId;
+  agencyHasTwoStepsValidation?: boolean;
 }) => {
-  throwIfRoleNotAllowedToChangeStatus({ role, targetStatus, conventionId });
+  throwIfRoleNotAllowedToChangeStatus({
+    role,
+    targetStatus,
+    initialStatus,
+    conventionId,
+    agencyHasTwoStepsValidation,
+  });
   throwIfStatusTransitionNotPossible({ initialStatus, targetStatus });
 };
 
