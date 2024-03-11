@@ -65,11 +65,11 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
       );
       return;
     }
-    const conventionAdsivorEntity =
+    const conventionAdvisorEntity =
       await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
         convention.id,
       );
-    const peAdvisor = conventionAdsivorEntity?.advisor;
+    const peAdvisor = conventionAdvisorEntity?.advisor;
 
     const recipients = determineRecipients(
       convention.status,
