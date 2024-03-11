@@ -101,6 +101,7 @@ import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establish
 import { SearchImmersion } from "../../domains/establishment/use-cases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { AddExchangeToDiscussionAndTransferEmail } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussionAndTransferEmail";
+import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -164,6 +165,9 @@ export const createUseCases = (
           config.immersionFacileDomain,
           gateways.notification,
         ),
+      getDiscussionByIdForEstablishment: new GetDiscussionByIdForEstablishment(
+        uowPerformer,
+      ),
       sendNotification: new SendNotification(
         uowPerformer,
         gateways.notification,
