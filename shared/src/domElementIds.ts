@@ -411,7 +411,10 @@ export const domElementIds = {
   conventionMiniStageRoute: {},
   agencyDashboard: {},
   manageConventionAdmin: {},
-  manageConventionInclusionConnected: {},
+  manageConventionInclusionConnected: {
+    erroredConventionHandledModal:
+      "im-errored-convention-handled-confirmation-modal",
+  },
   offer: {},
   offerExternal: {},
   manageEstablishmentAdmin: {},
