@@ -184,6 +184,7 @@ const AgencyForm = ({
                   label: "Type de structure",
                   required: true,
                   id: "refersToAgencyKind",
+                  placeholder: "Veuillez choisir un type de structure",
                 },
               }}
               shouldLockToPeAgencies={false}

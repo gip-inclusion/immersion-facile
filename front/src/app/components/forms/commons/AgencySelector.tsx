@@ -230,15 +230,11 @@ export const AgencySelector = ({
           placeholder={
             agencyKindOptions.length === 0
               ? agencyPlaceholder
-              : agencyDepartmentField.placeholder
+              : agencyKindField.placeholder
           }
           disabled={agencyKindOptions.length === 0 || shouldLockToPeAgencies}
           nativeSelectProps={{
             ...agencyKindField,
-            value:
-              agencyKinds.length === initialAgencyKinds.length
-                ? "all"
-                : agencyKinds[0],
             onChange: (event) => {
               if (event.currentTarget.value === "all")
                 return setAgencyKinds(allAgencyKindsAllowedToAdd);
