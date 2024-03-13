@@ -115,7 +115,7 @@ const establishmentAggregateSeed = async (
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding establishment aggregates...");
   await client.query("DELETE FROM discussions");
-  await client.query("DELETE FROM immersion_contacts");
+  await client.query("DELETE FROM establishments_contact");
   await client.query("DELETE FROM form_establishments");
   await client.query("DELETE FROM establishments CASCADE");
   await client.query("DELETE FROM groups CASCADE");

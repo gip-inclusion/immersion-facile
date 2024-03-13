@@ -82,15 +82,7 @@ export const getEstablishmentsRowsBySiret = async (
     .executeTakeFirst();
 
 export const getAllImmersionContactsRows = async (kyselyDb: KyselyDb) =>
-  kyselyDb.selectFrom("immersion_contacts").selectAll().execute();
-
-export const getAllEstablishmentImmersionContactsRows = async (
-  kyselyDb: KyselyDb,
-) =>
-  kyselyDb
-    .selectFrom("establishments__immersion_contacts")
-    .selectAll()
-    .execute();
+  kyselyDb.selectFrom("establishments_contacts").selectAll().execute();
 
 export type InsertEstablishmentAggregateProps = {
   siret: string;

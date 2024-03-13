@@ -70,7 +70,7 @@ describe("PgEstablishmentGroupRepository", () => {
     );
     await db.deleteFrom("groups__sirets").execute();
     await db.deleteFrom("groups").execute();
-    await client.query("DELETE FROM immersion_contacts");
+    await db.deleteFrom("establishments_contacts").execute();
     await db.deleteFrom("discussions").execute();
     await client.query("DELETE FROM establishments_locations");
     await client.query("DELETE FROM establishments");
