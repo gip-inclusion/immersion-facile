@@ -12,7 +12,7 @@ import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRe
 describe("PgScriptsQueries", () => {
   let pool: Pool;
   let client: PoolClient;
-  let transaction: KyselyDb;
+  let db: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
   let pgOutboxRepository: PgOutboxRepository;
   let pgNotificationRepository: PgNotificationRepository;
@@ -20,22 +20,22 @@ describe("PgScriptsQueries", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    transaction = makeKyselyDb(pool);
+    db = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_contacts");
-    await client.query("DELETE FROM establishments_locations");
-    await client.query("DELETE FROM establishments");
+    await db.deleteFrom("establishments_contacts").execute();
+    await db.deleteFrom("establishments_locations").execute();
+    await db.deleteFrom("establishments").execute();
     await client.query("DELETE FROM outbox_failures");
     await client.query("DELETE FROM outbox_publications");
     await client.query("DELETE FROM outbox");
     await client.query("DELETE FROM notifications_email_recipients");
     await client.query("DELETE FROM notifications_email");
-    pgOutboxRepository = new PgOutboxRepository(transaction);
-    pgNotificationRepository = new PgNotificationRepository(transaction);
+    pgOutboxRepository = new PgOutboxRepository(db);
+    pgNotificationRepository = new PgNotificationRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
-      transaction,
+      db,
     );
   });
 

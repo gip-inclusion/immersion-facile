@@ -14,13 +14,12 @@ export interface Database {
   discussions: Discussions;
   establishment_lead_events: EstablishmentLeadEvents;
   establishments: Establishments;
-  establishments__immersion_contacts: EstablishmentsImmersionContacts;
   establishments_locations: EstablishmentsLocations;
   exchanges: Exchanges;
   form_establishments: PgFormEstablishments;
   groups: Groups;
   groups__sirets: GroupsSirets;
-  immersion_contacts: ImmersionContacts;
+  establishments_contacts: EstablishmentsContacts;
   immersion_offers: ImmersionOffers;
   nps: Nps;
   ongoing_oauths: OngoingOauths;
@@ -329,11 +328,6 @@ export interface Establishments {
   searchable_by_job_seekers: boolean;
 }
 
-export interface EstablishmentsImmersionContacts {
-  establishment_siret: string;
-  contact_uuid: string;
-}
-
 export interface EstablishmentsLocations {
   id: string;
   establishment_siret: string;
@@ -357,7 +351,7 @@ export interface ImmersionOffers {
 
 export type ContactMode = "EMAIL" | "IN_PERSON" | "PHONE";
 
-export interface ImmersionContacts {
+export interface EstablishmentsContacts {
   uuid: string;
   lastname: string;
   firstname: string;
@@ -366,6 +360,7 @@ export interface ImmersionContacts {
   phone: string | null;
   contact_mode: ContactMode;
   copy_emails: Generated<Json>;
+  siret: string | null;
 }
 
 export type AgencyGroupKind = "france-travail";

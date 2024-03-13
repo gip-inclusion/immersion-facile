@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { AppellationAndRomeDto, DiscussionDto, expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
   EstablishmentAggregateBuilder,
@@ -30,29 +30,25 @@ const siret = "01234567891011";
 
 describe("PgDiscussionRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
   let pgDiscussionRepository: PgDiscussionRepository;
   let establishmentAggregateRepo: PgEstablishmentAggregateRepository;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_contacts");
-    await client.query("DELETE FROM establishments");
-    await client.query("DELETE FROM discussions");
-    await client.query("DELETE FROM exchanges");
-    const transaction = makeKyselyDb(pool);
-    pgDiscussionRepository = new PgDiscussionRepository(transaction);
-    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(
-      transaction,
-    );
+    db = makeKyselyDb(pool);
+    await db.deleteFrom("establishments_contacts").execute();
+    await db.deleteFrom("establishments").execute();
+    await db.deleteFrom("discussions").execute();
+    await db.deleteFrom("exchanges").execute();
+    pgDiscussionRepository = new PgDiscussionRepository(db);
+    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 

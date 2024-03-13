@@ -30,7 +30,7 @@ import {
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
   InsertEstablishmentAggregateProps,
-  getAllEstablishmentImmersionContactsRows,
+  // getAllEstablishmentImmersionContactsRows,
   getAllEstablishmentsRows,
   getAllImmersionContactsRows,
   getAllImmersionOfferRows,
@@ -135,7 +135,7 @@ describe("PgEstablishmentAggregateRepository", () => {
   });
 
   beforeEach(async () => {
-    await kyselyDb.deleteFrom("immersion_contacts").execute();
+    await kyselyDb.deleteFrom("establishments_contacts").execute();
     await kyselyDb.deleteFrom("immersion_offers").execute();
     await kyselyDb.deleteFrom("discussions").execute();
     await kyselyDb.deleteFrom("establishments_locations").execute();
@@ -1052,17 +1052,9 @@ describe("PgEstablishmentAggregateRepository", () => {
             job: contact.job,
             contact_mode: "EMAIL",
             copy_emails: contact.copyEmails as any,
+            siret: siret1,
           },
         ]);
-        expectToEqual(
-          await getAllEstablishmentImmersionContactsRows(kyselyDb),
-          [
-            {
-              contact_uuid: contact.id,
-              establishment_siret: siret1,
-            },
-          ],
-        );
       });
 
       it("adds as many row as immersion offers in table `immersion_offers`, each referencing the establishment siret and the contact uuid", async () => {
@@ -1260,10 +1252,6 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       expectToEqual(await getAllImmersionOfferRows(kyselyDb), []);
       expectToEqual(await getAllImmersionContactsRows(kyselyDb), []);
-      expectToEqual(
-        await getAllEstablishmentImmersionContactsRows(kyselyDb),
-        [],
-      );
       expectToEqual(await getAllEstablishmentsRows(kyselyDb), []);
       expectToEqual(
         await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(

@@ -99,12 +99,12 @@ export class PgEstablishmentAggregateRepository
     const aggregateWithStringDates = (
       await executeKyselyRawSqlQuery(
         this.transaction,
-        `WITH unique_establishments__immersion_contacts AS (
+        `WITH unique_establishments_contacts AS (
           SELECT 
-            DISTINCT ON (establishment_siret) establishment_siret, 
-            contact_uuid 
+            DISTINCT ON (siret) siret, 
+            uuid 
           FROM 
-            establishments__immersion_contacts
+            establishments_contacts
         ), 
         filtered_immersion_offers AS (
           SELECT 
@@ -171,19 +171,19 @@ export class PgEstablishmentAggregateRepository
               ), 
               'immersionOffers', io.immersionOffers, 
               'contact', JSON_BUILD_OBJECT(
-                'id', ic.uuid, 'firstName', ic.firstname, 
-                'lastName', ic.lastname, 'job', ic.job, 
-                'contactMethod', ic.contact_mode, 
-                'phone', ic.phone, 'email', ic.email, 
-                'copyEmails', ic.copy_emails
+                'id', ec.uuid, 'firstName', ec.firstname, 
+                'lastName', ec.lastname, 'job', ec.job, 
+                'contactMethod', ec.contact_mode, 
+                'phone', ec.phone, 'email', ec.email, 
+                'copyEmails', ec.copy_emails
               )
             )
           ) AS aggregate 
         FROM 
           filtered_immersion_offers AS io 
           LEFT JOIN establishments AS e ON e.siret = io.siret 
-          LEFT JOIN unique_establishments__immersion_contacts AS eic ON e.siret = eic.establishment_siret 
-          LEFT JOIN immersion_contacts AS ic ON eic.contact_uuid = ic.uuid
+          LEFT JOIN unique_establishments_contacts AS uec ON e.siret = uec.siret 
+          LEFT JOIN establishments_contacts AS ec ON uec.uuid = ec.uuid
           LEFT JOIN establishment_locations_agg AS ela ON e.siret = ela.establishment_siret
         `,
         [siret],
@@ -571,14 +571,10 @@ export class PgEstablishmentAggregateRepository
     await executeKyselyRawSqlQuery(
       this.transaction,
       `
-      DELETE
-      FROM immersion_contacts
-      WHERE uuid IN (
-        SELECT contact_uuid
-        FROM establishments__immersion_contacts
-        WHERE establishment_siret = $1
-      )
-    `,
+        DELETE
+        FROM establishments_contacts
+        WHERE siret = $1
+      `,
       [siret],
     );
   }
@@ -660,32 +656,18 @@ export class PgEstablishmentAggregateRepository
       contact.phone,
       contact.contactMethod,
       JSON.stringify(contact.copyEmails),
-    ];
-
-    const establishmentContactFields = [
       aggregate.establishment.siret,
-      contact.id,
     ];
 
     try {
       const insertContactsQuery = format(
-        `INSERT INTO immersion_contacts (
-        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
+        `INSERT INTO establishments_contacts (
+        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails, siret
       ) VALUES ( %L )`,
         contactFields,
       );
 
-      const insertEstablishmentsContactsQuery = format(
-        `INSERT INTO establishments__immersion_contacts (
-        establishment_siret, contact_uuid) VALUES ( %L )`,
-        establishmentContactFields,
-      );
-
       await executeKyselyRawSqlQuery(this.transaction, insertContactsQuery);
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        insertEstablishmentsContactsQuery,
-      );
     } catch (e: any) {
       logger.error(e, "Error inserting contacts");
       throw e;
@@ -802,15 +784,16 @@ export class PgEstablishmentAggregateRepository
     ) {
       await executeKyselyRawSqlQuery(
         this.transaction,
-        `UPDATE immersion_contacts 
-       SET lastname = $1, 
+        ` UPDATE establishments_contact
+          SET lastname = $1, 
             firstname = $2, 
             email = $3, 
             job = $4, 
             phone = $5, 
             contact_mode = $6, 
             copy_emails = $7
-       WHERE uuid = $8`,
+            siret = $8
+          WHERE uuid = $9`,
         [
           updatedAggregate.contact.lastName,
           updatedAggregate.contact.firstName,
@@ -819,6 +802,7 @@ export class PgEstablishmentAggregateRepository
           updatedAggregate.contact.phone,
           updatedAggregate.contact.contactMethod,
           JSON.stringify(updatedAggregate.contact.copyEmails),
+          updatedAggregate.establishment.siret,
           existingAggregate.contact.id,
         ],
       );
@@ -869,7 +853,7 @@ const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m
 ) => `
-      WITH unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ), 
+      WITH unique_establishments_contacts AS ( SELECT DISTINCT ON (siret) siret, uuid FROM establishments_contacts ), 
            match_immersion_offer AS (${selectedOffersSubQuery}),
           ${withEstablishmentAggregateSubQuery}
       SELECT 
@@ -898,15 +882,15 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
             ),
           'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat), 
           'locationId', io.location_id,
-          'contactMode', ic.contact_mode,
+          'contactMode', ec.contact_mode,
           'numberOfEmployeeRange', e.number_employees
         ) 
       ) AS search_immersion_result
       FROM match_immersion_offer AS io 
       LEFT JOIN establishments AS e ON e.siret = io.siret  
       LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      LEFT JOIN unique_establishments__immersion_contacts AS eic ON eic.establishment_siret = e.siret
-      LEFT JOIN immersion_contacts AS ic ON ic.uuid = eic.contact_uuid
+      LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = e.siret
+      LEFT JOIN establishments_contacts AS ec ON ec.uuid = uec.uuid
       ORDER BY row_number ASC, io.location_id ASC; `;
 
 const offersEqual = (a: OfferEntity, b: OfferEntity) =>
