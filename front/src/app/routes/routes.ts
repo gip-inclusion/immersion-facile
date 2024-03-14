@@ -23,7 +23,7 @@ const inclusionConnectedParams = createInclusionConnectedParams({
   email: param.query.optional.string,
 });
 
-const matomoParams = {
+const trackingParams = {
   mtm_campaign: param.query.optional.string,
   mtm_kwd: param.query.optional.string,
 };
@@ -40,7 +40,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
   ]),
   conventionCustomAgency: defineRoute(
-    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
+    {
+      jwt: param.query.optional.string,
+      ...conventionValuesFromUrl,
+      ...trackingParams,
+    },
     () => `/${frontRoutes.conventionImmersionRoute}-agence-immersion-facilitee`,
   ),
   conventionDocument: defineRoute(
@@ -54,6 +58,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     {
       jwt: param.query.optional.string,
       ...conventionValuesFromUrl,
+      ...trackingParams,
     },
     () => `/${frontRoutes.conventionImmersionRoute}`,
   ),
@@ -62,6 +67,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       consumer: param.path.string,
       jwt: param.query.optional.string,
       ...conventionValuesFromUrl,
+      ...trackingParams,
     },
     (params) => `/${frontRoutes.conventionImmersionRoute}/${params.consumer}`,
   ),
@@ -98,7 +104,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.error}`,
   ),
   formEstablishment: defineRoute(
-    formEstablishmentParamsInUrl,
+    {
+      ...formEstablishmentParamsInUrl,
+      ...trackingParams,
+    },
     () => `/${frontRoutes.establishment}`,
   ),
   formEstablishmentForExternals: defineRoute(
@@ -179,7 +188,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ),
       sortedBy: param.query.optional.string,
       place: param.query.optional.string,
-      ...matomoParams,
+      ...trackingParams,
     },
     () => `/${frontRoutes.search}`,
   ),
@@ -193,7 +202,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       ),
       sortedBy: param.query.optional.string,
       place: param.query.optional.string,
-      ...matomoParams,
+      ...trackingParams,
     },
     () => `/${frontRoutes.searchDiagoriente}`,
   ),

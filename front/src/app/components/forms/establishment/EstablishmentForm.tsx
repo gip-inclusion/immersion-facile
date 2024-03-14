@@ -31,6 +31,7 @@ import {
   formEstablishmentQueryParamsToFormEstablishmentDto,
 } from "src/app/routes/routeParams/formEstablishment";
 import { routes, useRoute } from "src/app/routes/routes";
+import { getUrlParameters } from "src/app/utils/url.utils";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import {
   EstablishmentFeedback,
@@ -86,6 +87,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const dispatch = useDispatch();
   const adminJwt = useAdminToken();
   const route = useRoute() as RouteByMode[Mode];
+  const initialUrlParams = useRef(getUrlParameters(window.location));
 
   const isEstablishmentCreation =
     route.name === "formEstablishment" ||
@@ -216,9 +218,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     if (isEstablishmentCreation) {
       routes
         .formEstablishment(
-          formEstablishmentDtoToFormEstablishmentQueryParams(
-            debouncedFormValues,
-          ),
+          formEstablishmentDtoToFormEstablishmentQueryParams({
+            ...initialUrlParams.current,
+            ...debouncedFormValues,
+          }),
         )
         .replace();
     }
