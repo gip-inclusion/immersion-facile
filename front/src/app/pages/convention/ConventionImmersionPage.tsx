@@ -56,7 +56,12 @@ const storeConventionRouteParamsOnDevice = (
 export const ConventionImmersionPage = ({
   route,
 }: ConventionImmersionPageProps) => {
-  const { jwt, ...routeParamsWithoutJwt } = route.params;
+  const {
+    jwt,
+    mtm_campaign: _,
+    mtm_kwd: __,
+    ...routeParamsWithoutJwtAndTrackers
+  } = route.params;
 
   const t = useConventionTexts("immersion");
   const showSummary = useAppSelector(conventionSelectors.showSummary);
@@ -65,8 +70,8 @@ export const ConventionImmersionPage = ({
   useFederatedIdentityFromUrl(route);
 
   const isSharedConvention = useMemo(
-    () => keys(routeParamsWithoutJwt).length > 0 && !isPeConnected,
-    [routeParamsWithoutJwt, isPeConnected],
+    () => keys(routeParamsWithoutJwtAndTrackers).length > 0 && !isPeConnected,
+    [routeParamsWithoutJwtAndTrackers, isPeConnected],
   );
 
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =
@@ -115,10 +120,15 @@ export const ConventionImmersionPage = ({
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { isLoading } = useFeatureFlags();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const { jwt: _, ...routeParamsWithoutJwt } = route.params;
+  const {
+    jwt: _,
+    mtm_campaign: __,
+    mtm_kwd: ____,
+    ...routeParamsWithoutJwtAndTrackers
+  } = route.params;
   const isSharedConvention = useMemo(
-    () => keys(routeParamsWithoutJwt).length > 0,
-    [routeParamsWithoutJwt],
+    () => keys(routeParamsWithoutJwtAndTrackers).length > 0,
+    [routeParamsWithoutJwtAndTrackers],
   );
   const [shouldShowForm, setShouldShowForm] = useState(
     isSharedConvention ||
