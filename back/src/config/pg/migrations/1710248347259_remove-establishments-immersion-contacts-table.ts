@@ -27,6 +27,14 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   });
   pgm.createIndex(newContactsTableName, "siret");
 
+  pgm.sql(`
+  DELETE FROM ${newContactsTableName}
+  WHERE uuid NOT IN (
+  SELECT contact_uuid
+  FROM "establishments__immersion_contacts"
+  );
+  `);
+
   // insert data from joint table to establishment contacts
   pgm.sql(`
   UPDATE ${newContactsTableName}
@@ -34,6 +42,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   FROM "establishments__immersion_contacts" eic
   WHERE ${newContactsTableName}.uuid = eic.contact_uuid;
 `);
+
+  pgm.alterColumn(newContactsTableName, "siret", {
+    type: "char(14)",
+    notNull: true,
+  });
 
   // create view
   createEstablishmentsView(pgm, "up");

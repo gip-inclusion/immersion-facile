@@ -360,7 +360,7 @@ export interface EstablishmentsContacts {
   phone: string | null;
   contact_mode: ContactMode;
   copy_emails: Generated<Json>;
-  siret: string | null;
+  siret: string;
 }
 
 export type AgencyGroupKind = "france-travail";

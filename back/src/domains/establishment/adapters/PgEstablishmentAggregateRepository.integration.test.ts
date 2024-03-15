@@ -30,7 +30,6 @@ import {
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
   InsertEstablishmentAggregateProps,
-  // getAllEstablishmentImmersionContactsRows,
   getAllEstablishmentsRows,
   getAllImmersionContactsRows,
   getAllImmersionOfferRows,
