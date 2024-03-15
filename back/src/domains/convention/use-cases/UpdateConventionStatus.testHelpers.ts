@@ -603,6 +603,8 @@ export const testForAllRolesAndInitialStatusCases = ({
     it.each(forbiddenInitalStatuses.map((status) => ({ status })))(
       "Rejected from status $status",
       ({ status }) => {
+        // this case is handle separately cause we don't have yet another way to test refined transition config
+        // TODO refactor this to handle all refine
         const agencyHasTwoStepsAndValidatorTriesToValidate =
           updateStatusParams.status === "ACCEPTED_BY_VALIDATOR" &&
           status === "IN_REVIEW";

@@ -8,7 +8,10 @@ import {
 
 export type SubmitFeedbackProps<T extends string> = {
   submitFeedback: SubmitFeedBack<T>;
-  messageByKind: Record<T, { title: string; message: NonNullable<ReactNode> }>;
+  messageByKind: Record<
+    T,
+    { title: string; message: NonNullable<ReactNode>; isError?: boolean }
+  >;
 };
 
 export const SubmitFeedbackNotification = <T extends string>({
@@ -27,7 +30,9 @@ export const SubmitFeedbackNotification = <T extends string>({
         />
       ) : (
         <Alert
-          severity="success"
+          severity={
+            messageByKind[submitFeedback.kind].isError ? "error" : "success"
+          }
           title={messageByKind[submitFeedback.kind].title}
           description={messageByKind[submitFeedback.kind].message}
         />

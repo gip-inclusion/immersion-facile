@@ -39,7 +39,7 @@ export const createConventionFeedbackMessageByKind = (
   signatories: Signatories,
 ): Record<
   ConventionFeedbackKind,
-  { title: string; message: NonNullable<ReactNode> }
+  { title: string; message: NonNullable<ReactNode>; isError?: boolean }
 > => ({
   modificationsAskedFromSignatory: {
     title: "Succès",
@@ -98,6 +98,12 @@ export const createConventionFeedbackMessageByKind = (
     title: "Succès",
     message:
       "La convention a bien été supprimée. La confirmation de cette suppression va être communiquée par mail à chacun des signataires.",
+  },
+  missingCounsellorValidationError: {
+    title: "Impossible de valider cette convention",
+    message:
+      "Vous ne pouvez pas valider cette convention, elle doit d'abord être revue et marquée comme éligible par un conseiller.",
+    isError: true,
   },
 });
 
