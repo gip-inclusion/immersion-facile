@@ -30,7 +30,8 @@ type ConventionSignatoryFeedbackKind =
 
 export type ConventionFeedbackKind =
   | ConventionSignatoryFeedbackKind
-  | ConventionValidationFeedbackKind;
+  | ConventionValidationFeedbackKind
+  | "missingCounsellorValidationError";
 
 export type ConventionSubmitFeedback = SubmitFeedBack<ConventionFeedbackKind>;
 

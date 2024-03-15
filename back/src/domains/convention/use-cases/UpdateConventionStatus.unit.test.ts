@@ -9,10 +9,7 @@ import {
   validSignatoryRoles,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
-import {
-  agencyMissingMessage,
-  // someAgenciesMissingMessage,
-} from "../../agency/ports/AgencyRepository";
+import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";

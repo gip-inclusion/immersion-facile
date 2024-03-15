@@ -844,6 +844,35 @@ describe("Convention slice", () => {
         feedback: { kind: "errored", errorMessage },
       });
     });
+
+    it("gets missing validation step feedback", () => {
+      const jwt = "some-correct-jwt";
+      store.dispatch(
+        conventionSlice.actions.statusChangeRequested({
+          updateStatusParams: {
+            status: "IN_REVIEW",
+            conventionId: "some-id",
+          },
+          feedbackKind: "markedAsValidated",
+          jwt,
+        }),
+      );
+
+      expectConventionState({
+        isLoading: true,
+      });
+
+      feedGatewayWithModificationFailure(
+        new Error(
+          `{\n "errors": "Cannot go to status 'ACCEPTED_BY_VALIDATOR' for convention 'convId'. Convention should be reviewed by counsellor"\n}`,
+        ),
+      );
+
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "missingCounsellorValidationError" },
+      });
+    });
   });
 
   it("gets the dashboard Url for convention status check", () => {

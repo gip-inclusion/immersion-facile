@@ -115,9 +115,14 @@ const conventionStatusChangeEpic: ConventionEpic = (
           ),
         ),
     ),
-    catchEpicError((error: Error) =>
-      conventionSlice.actions.statusChangeFailed(error.message),
-    ),
+    catchEpicError((error: Error) => {
+      if (error.message.includes("Convention should be reviewed by counsellor"))
+        return conventionSlice.actions.statusChangeSucceeded(
+          "missingCounsellorValidationError",
+        );
+
+      return conventionSlice.actions.statusChangeFailed(error.message);
+    }),
   );
 
 const getConventionStatusDashboardUrl: ConventionEpic = (
