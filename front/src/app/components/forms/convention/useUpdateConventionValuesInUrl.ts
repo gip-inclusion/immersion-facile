@@ -2,14 +2,23 @@ import { useEffect } from "react";
 import { objectToDependencyList } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
-import { routes, useRoute } from "src/app/routes/routes";
-import { getUrlParameters } from "src/app/utils/url.utils";
+import {
+  conventionForExternalParams,
+  conventionParams,
+  routes,
+  useRoute,
+} from "src/app/routes/routes";
+import {
+  filteredUrlParamsForRoute,
+  getUrlParameters,
+} from "src/app/utils/url.utils";
 
 export const useUpdateConventionValuesInUrl = (
   watchedValues: ConventionParamsInUrl,
 ) => {
   const route = useRoute();
   const urlParams = getUrlParameters(window.location);
+
   useEffect(
     () => {
       if (
@@ -26,13 +35,21 @@ export const useUpdateConventionValuesInUrl = (
         route.name === "conventionCustomAgency" ||
         route.name === "conventionMiniStage"
       ) {
-        routes[route.name]({ ...urlParams, ...watchedValues }).replace();
+        const filteredParams = filteredUrlParamsForRoute(
+          urlParams,
+          conventionParams,
+        );
+        routes[route.name]({ ...filteredParams, ...watchedValues }).replace();
       }
 
       if (route.name === "conventionImmersionForExternals") {
+        const filteredParams = filteredUrlParamsForRoute(
+          urlParams,
+          conventionForExternalParams,
+        );
         routes
           .conventionImmersionForExternals({
-            ...urlParams,
+            ...filteredParams,
             ...watchedValues,
             consumer: route.params.consumer,
           })

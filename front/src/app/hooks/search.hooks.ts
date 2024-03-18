@@ -1,6 +1,9 @@
 import { useDispatch } from "react-redux";
-import { routes } from "src/app/routes/routes";
-import { getUrlParameters } from "src/app/utils/url.utils";
+import { routes, searchParams } from "src/app/routes/routes";
+import {
+  filteredUrlParamsForRoute,
+  getUrlParameters,
+} from "src/app/utils/url.utils";
 import {
   SearchPageParams,
   searchSlice,
@@ -12,6 +15,7 @@ export const useSearchUseCase = ({
 }: Route<typeof routes.search | typeof routes.searchDiagoriente>) => {
   const dispatch = useDispatch();
   const urlParams = getUrlParameters(window.location);
+  const filteredParams = filteredUrlParamsForRoute(urlParams, searchParams);
   return (values: SearchPageParams) => {
     const appellationCodes = values.appellations?.map(
       (appellation) => appellation.appellationCode,
@@ -20,7 +24,7 @@ export const useSearchUseCase = ({
       searchSlice.actions.searchRequested({ ...values, appellationCodes }),
     );
     routes[name]({
-      ...urlParams,
+      ...filteredParams,
       ...values,
     }).replace();
   };
