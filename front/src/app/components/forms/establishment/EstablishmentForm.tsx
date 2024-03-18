@@ -30,8 +30,11 @@ import {
   formEstablishmentDtoToFormEstablishmentQueryParams,
   formEstablishmentQueryParamsToFormEstablishmentDto,
 } from "src/app/routes/routeParams/formEstablishment";
-import { routes, useRoute } from "src/app/routes/routes";
-import { getUrlParameters } from "src/app/utils/url.utils";
+import { establishmentParams, routes, useRoute } from "src/app/routes/routes";
+import {
+  filteredUrlParamsForRoute,
+  getUrlParameters,
+} from "src/app/utils/url.utils";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import {
   EstablishmentFeedback,
@@ -216,10 +219,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   useEffect(() => {
     if (isEstablishmentCreation) {
+      const filteredParams = filteredUrlParamsForRoute(
+        initialUrlParams.current,
+        establishmentParams,
+      );
       routes
         .formEstablishment(
           formEstablishmentDtoToFormEstablishmentQueryParams({
-            ...initialUrlParams.current,
+            ...filteredParams,
             ...debouncedFormValues,
           }),
         )

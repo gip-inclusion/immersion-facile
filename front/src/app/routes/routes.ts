@@ -28,6 +28,34 @@ const trackingParams = {
   mtm_kwd: param.query.optional.string,
 };
 
+export const conventionParams = {
+  ...conventionValuesFromUrl,
+  ...trackingParams,
+};
+
+export const conventionForExternalParams = {
+  ...conventionParams,
+  consumer: param.path.string,
+  jwt: param.query.optional.string,
+};
+
+export const establishmentParams = {
+  ...formEstablishmentParamsInUrl,
+  ...trackingParams,
+};
+
+export const searchParams = {
+  distanceKm: param.query.optional.number,
+  latitude: param.query.optional.number,
+  longitude: param.query.optional.number,
+  appellations: param.query.optional.ofType(
+    appellationAndRomeDtoArraySerializer,
+  ),
+  sortedBy: param.query.optional.string,
+  place: param.query.optional.string,
+  ...trackingParams,
+};
+
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
   adminRoot: defineRoute(`/${frontRoutes.admin}`),
@@ -42,8 +70,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   conventionCustomAgency: defineRoute(
     {
       jwt: param.query.optional.string,
-      ...conventionValuesFromUrl,
-      ...trackingParams,
+      ...conventionParams,
     },
     () => `/${frontRoutes.conventionImmersionRoute}-agence-immersion-facilitee`,
   ),
@@ -57,18 +84,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   conventionImmersion: defineRoute(
     {
       jwt: param.query.optional.string,
-      ...conventionValuesFromUrl,
-      ...trackingParams,
+      ...conventionParams,
     },
     () => `/${frontRoutes.conventionImmersionRoute}`,
   ),
   conventionImmersionForExternals: defineRoute(
-    {
-      consumer: param.path.string,
-      jwt: param.query.optional.string,
-      ...conventionValuesFromUrl,
-      ...trackingParams,
-    },
+    conventionForExternalParams,
     (params) => `/${frontRoutes.conventionImmersionRoute}/${params.consumer}`,
   ),
   conventionMiniStage: defineRoute(
@@ -104,15 +125,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.error}`,
   ),
   formEstablishment: defineRoute(
-    {
-      ...formEstablishmentParamsInUrl,
-      ...trackingParams,
-    },
+    establishmentParams,
     () => `/${frontRoutes.establishment}`,
   ),
   formEstablishmentForExternals: defineRoute(
     {
-      ...formEstablishmentParamsInUrl,
+      ...establishmentParams,
       consumer: param.path.string,
     },
     (params) => `/etablissement/${params.consumer}`,
@@ -178,32 +196,9 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { expiredJwt: param.query.string, originalURL: param.query.string },
     () => `/${frontRoutes.magicLinkRenewal}`,
   ),
-  search: defineRoute(
-    {
-      distanceKm: param.query.optional.number,
-      latitude: param.query.optional.number,
-      longitude: param.query.optional.number,
-      appellations: param.query.optional.ofType(
-        appellationAndRomeDtoArraySerializer,
-      ),
-      sortedBy: param.query.optional.string,
-      place: param.query.optional.string,
-      ...trackingParams,
-    },
-    () => `/${frontRoutes.search}`,
-  ),
+  search: defineRoute(searchParams, () => `/${frontRoutes.search}`),
   searchDiagoriente: defineRoute(
-    {
-      distanceKm: param.query.optional.number,
-      latitude: param.query.optional.number,
-      longitude: param.query.optional.number,
-      appellations: param.query.optional.ofType(
-        appellationAndRomeDtoArraySerializer,
-      ),
-      sortedBy: param.query.optional.string,
-      place: param.query.optional.string,
-      ...trackingParams,
-    },
+    searchParams,
     () => `/${frontRoutes.searchDiagoriente}`,
   ),
   standard: defineRoute(
