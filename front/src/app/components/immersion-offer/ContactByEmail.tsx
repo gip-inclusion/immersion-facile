@@ -5,11 +5,13 @@ import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AppellationDto,
   ContactEstablishmentByMailDto,
+  OmitFromExistingKeys,
+  ValueOf,
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
@@ -38,13 +40,71 @@ Je pourrais alors vous expliquer directement mon projet. \n\
   \n\
 En vous remerciant,`;
 
+type ContactTranscientData = OmitFromExistingKeys<
+  ContactEstablishmentByMailDto,
+  "locationId" | "message" | "appellationCode" | "contactMode" | "siret"
+>;
+
+type TranscientData = {
+  "contact-establishment": ContactTranscientData;
+};
+
+type PreferTranscientData = Record<keyof TranscientData, boolean>;
+
+const useTranscientDataFromStorage = (key: keyof TranscientData) => {
+  const dataInStorage = localStorage.getItem(key);
+  const preferUseTranscientDataInStorage = localStorage.getItem(
+    "preferUseTranscientData",
+  );
+  const [transcientData, setTranscientData] = useState<TranscientData | null>(
+    null,
+  );
+  const [preferUseTranscientData, setPreferUseTranscientData] =
+    useState<PreferTranscientData>({
+      "contact-establishment": false,
+    });
+  if (dataInStorage && !transcientData) {
+    setTranscientData(JSON.parse(dataInStorage));
+  }
+  if (preferUseTranscientDataInStorage && !preferUseTranscientData) {
+    setPreferUseTranscientData(JSON.parse(preferUseTranscientDataInStorage));
+  }
+
+  const setTranscientDataAtKey = (data: ValueOf<TranscientData>) => {
+    setTranscientData({ ...transcientData, [key]: data });
+  };
+
+  useEffect(() => {
+    if (transcientData) {
+      localStorage.setItem(key, JSON.stringify(transcientData));
+    }
+    if (preferUseTranscientDataInStorage) {
+      localStorage.setItem(
+        "preferUseTranscientData",
+        JSON.stringify(preferUseTranscientDataInStorage),
+      );
+    }
+  }, [transcientData, preferUseTranscientDataInStorage, key]);
+  return {
+    preferUseTranscientData: preferUseTranscientDataInStorage,
+    setPreferUseTranscientData,
+    transcientData,
+    setTranscientData,
+    setTranscientDataAtKey,
+  };
+};
+
 export const ContactByEmail = ({
   appellations,
   onSubmitSuccess,
 }: ContactByEmailProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<typeof routes.searchResult>;
-
+  const { transcientData, setTranscientDataAtKey } =
+    useTranscientDataFromStorage("contact-establishment");
+  console.log({
+    transcientData,
+  });
   const initialValues = useMemo<ContactEstablishmentByMailDto>(
     () => ({
       siret: route.params.siret,
@@ -86,6 +146,7 @@ export const ContactByEmail = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByMailDto) => {
+    setTranscientDataAtKey(values);
     const errorKind =
       await outOfReduxDependencies.searchGateway.contactEstablishment({
         ...values,
