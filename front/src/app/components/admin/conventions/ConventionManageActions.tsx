@@ -155,6 +155,7 @@ export const ConventionManageActions = ({
             convention={convention}
             onSubmit={createOnSubmitWithFeedbackKind("rejected")}
             currentSignatoryRole={role}
+            modalTitle={t.verification.rejectConvention}
           >
             {t.verification.rejectConvention}
           </VerificationActionButton>
@@ -168,6 +169,7 @@ export const ConventionManageActions = ({
             onSubmit={createOnSubmitWithFeedbackKind("deprecated")}
             convention={convention}
             currentSignatoryRole={role}
+            modalTitle={t.verification.markAsDeprecated}
           >
             {t.verification.markAsDeprecated}
           </VerificationActionButton>
@@ -183,6 +185,7 @@ export const ConventionManageActions = ({
             )}
             convention={convention}
             currentSignatoryRole={role}
+            modalTitle={t.verification.modifyConventionTitle}
           >
             {t.verification.modifyConvention}
           </VerificationActionButton>
@@ -198,6 +201,11 @@ export const ConventionManageActions = ({
             currentSignatoryRole={role}
             onCloseValidatorModalWithoutValidatorInfo={
               setValidatorWarningMessage
+            }
+            modalTitle={
+              convention.status === "ACCEPTED_BY_COUNSELLOR"
+                ? t.verification.conventionAlreadyMarkedAsEligible
+                : t.verification.markAsEligible
             }
           >
             {convention.status === "ACCEPTED_BY_COUNSELLOR"
@@ -221,6 +229,11 @@ export const ConventionManageActions = ({
             onCloseValidatorModalWithoutValidatorInfo={
               setValidatorWarningMessage
             }
+            modalTitle={
+              convention.status === "ACCEPTED_BY_VALIDATOR"
+                ? t.verification.conventionAlreadyValidated
+                : t.verification.markAsValidated
+            }
           >
             {convention.status === "ACCEPTED_BY_VALIDATOR"
               ? t.verification.conventionAlreadyValidated
@@ -239,6 +252,11 @@ export const ConventionManageActions = ({
                 disabled || convention.status !== "ACCEPTED_BY_VALIDATOR"
               }
               currentSignatoryRole={role}
+              modalTitle={
+                convention.status === "CANCELLED"
+                  ? t.verification.conventionAlreadyCancelled
+                  : t.verification.markAsCancelled
+              }
             >
               {convention.status === "CANCELLED"
                 ? t.verification.conventionAlreadyCancelled

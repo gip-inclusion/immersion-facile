@@ -216,6 +216,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
   verification: {
     rejectConvention: "Refuser l'immersion",
     modifyConvention: "Demander une modification",
+    modifyConventionTitle: "Demander une modification",
     conventionAlreadyMarkedAsEligible: "Demande déjà validée.",
     markAsEligible: "Marquer la demande comme éligible",
     conventionAlreadyValidated: "Demande déjà validée",

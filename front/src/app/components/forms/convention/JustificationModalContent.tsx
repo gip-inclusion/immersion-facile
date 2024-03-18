@@ -5,7 +5,7 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   ConventionDto,
@@ -18,6 +18,8 @@ import {
   signatoryTitleByRole,
   updateConventionStatusRequestSchema,
 } from "shared";
+import { ModalWrapperProps } from "src/app/components/forms/convention/VerificationActionButton";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 export const JustificationModalContent = ({
@@ -26,16 +28,29 @@ export const JustificationModalContent = ({
   newStatus,
   convention,
   currentSignatoryRole,
+  onModalPropsChange,
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: ConventionStatusWithJustification;
   convention: ConventionDto;
   currentSignatoryRole: Role;
+  onModalPropsChange: (props: Partial<ModalWrapperProps>) => void;
 }) => {
+  const t = useConventionTexts(convention?.internshipKind ?? "immersion");
   const [areSignaturesMissing, setAreSignaturesMissing] = useState<
     boolean | null
   >(null);
+
+  useEffect(() => {
+    if (newStatus === "DRAFT") {
+      onModalPropsChange({
+        title: areSignaturesMissing
+          ? "Relancer les signataires"
+          : t.verification.modifyConventionTitle,
+      });
+    }
+  }, [areSignaturesMissing]);
 
   const { register, handleSubmit, formState } = useForm<
     Partial<UpdateConventionStatusRequestDto>

@@ -137,7 +137,6 @@ export const ConventionSignForm = ({
             internshipKind={convention.internshipKind}
             signatory={currentSignatory}
             onSubmitClick={methods.handleSubmit(onSignFormSubmit, (errors) => {
-              // eslint-disable-next-line no-console
               console.error(methods.getValues(), errors);
             })}
             convention={convention}

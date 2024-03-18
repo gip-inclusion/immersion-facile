@@ -5,7 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { Dispatch, Fragment, SetStateAction } from "react";
+import React, { Dispatch, Fragment, SetStateAction, useState } from "react";
 import { createPortal } from "react-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -39,6 +39,7 @@ export type VerificationActionButtonProps = {
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
+  modalTitle: string;
 };
 
 export type VerificationActions = Exclude<
@@ -147,6 +148,7 @@ export const VerificationActionButton = ({
   currentSignatoryRole,
   initialStatus,
   onCloseValidatorModalWithoutValidatorInfo,
+  modalTitle,
 }: VerificationActionButtonProps) => {
   const iconByStatus: Partial<Record<ConventionStatus, FrIconClassName>> = {
     REJECTED: "fr-icon-close-circle-line",
@@ -194,7 +196,7 @@ export const VerificationActionButton = ({
       {(doesStatusNeedsJustification(newStatus) ||
         doesStatusNeedsValidators(initialStatus, newStatus)) && (
         <ModalWrapper
-          title={children}
+          title={modalTitle}
           initialStatus={initialStatus}
           newStatus={newStatus}
           onSubmit={onSubmit}
@@ -209,15 +211,7 @@ export const VerificationActionButton = ({
   );
 };
 
-const ModalWrapper = ({
-  title,
-  initialStatus,
-  newStatus,
-  onSubmit,
-  convention,
-  currentSignatoryRole,
-  onCloseValidatorModalWithoutValidatorInfo,
-}: {
+export type ModalWrapperProps = {
   title: string;
   initialStatus: ConventionStatus;
   newStatus: VerificationActions;
@@ -227,9 +221,22 @@ const ModalWrapper = ({
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
-}) => {
+};
+
+const ModalWrapper = (props: ModalWrapperProps) => {
+  const {
+    newStatus,
+    convention,
+    initialStatus,
+    currentSignatoryRole,
+    onSubmit,
+    onCloseValidatorModalWithoutValidatorInfo,
+  } = props;
   const modalObject = modalByStatus(newStatus);
-  const isModalOpen = useIsModalOpen(modalObject.createModalParams);
+  const { createModalParams } = modalObject;
+  const isModalOpen = useIsModalOpen(createModalParams);
+  const Modal = modalObject.modal;
+  const [modalProps, setModalProps] = useState<ModalWrapperProps>(props);
 
   if (
     !doesStatusNeedsJustification(newStatus) &&
@@ -237,11 +244,16 @@ const ModalWrapper = ({
   )
     return null;
 
-  const Modal = modalObject.modal;
-  const closeModal = modalObject.closeModal;
+  const { closeModal } = modalObject;
+  const onModalPropsChange = (newProps: Partial<ModalWrapperProps>) => {
+    setModalProps({
+      ...modalProps,
+      ...newProps,
+    });
+  };
 
   return createPortal(
-    <Modal title={title}>
+    <Modal title={modalProps.title}>
       <Fragment
         key={`${modalObject.createModalParams.id}-${isModalOpen.toString()}`}
       >
@@ -252,6 +264,7 @@ const ModalWrapper = ({
             newStatus={newStatus}
             convention={convention}
             currentSignatoryRole={currentSignatoryRole}
+            onModalPropsChange={onModalPropsChange}
           />
         )}
         {!doesStatusNeedsJustification(newStatus) && (
