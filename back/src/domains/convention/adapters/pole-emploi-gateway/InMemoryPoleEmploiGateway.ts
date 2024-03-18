@@ -22,6 +22,9 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
   public async notifyOnConventionUpdated(
     convention: PoleEmploiConvention,
   ): Promise<PoleEmploiBroadcastResponse> {
+    if (convention.statut === "DEMANDE_OBSOLETE") {
+      throw new Error("fake axios error");
+    }
     this.notifications.push(convention);
     return this.#nextResponse;
   }

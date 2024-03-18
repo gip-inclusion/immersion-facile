@@ -3,6 +3,7 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   expectObjectsToMatch,
+  expectPromiseToFailWithError,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
@@ -174,5 +175,20 @@ describe("Broadcasts events to pole-emploi", () => {
       statut: "DEMANDE_VALIDÉE",
       codeAppellation: "011111",
     });
+  });
+
+  it("if an axios error happens", async () => {
+    const { broadcastToPe, peAgency } = await prepareUseCase();
+
+    const convention = new ConventionDtoBuilder()
+      .withStatus("DEPRECATED")
+      .withAgencyId(peAgency.id)
+      .withoutFederatedIdentity()
+      .build();
+
+    await expectPromiseToFailWithError(
+      broadcastToPe.execute({ convention }),
+      new Error("fake axios error"),
+    );
   });
 });
