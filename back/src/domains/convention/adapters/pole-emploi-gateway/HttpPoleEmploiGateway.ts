@@ -11,7 +11,10 @@ import {
   logAxiosError,
 } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
-import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
+import {
+  notifyDiscord,
+  notifyObjectDiscord,
+} from "../../../../utils/notifyDiscord";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
   RetryStrategy,
@@ -132,20 +135,47 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       })
       .catch((err) => {
         const error = castError(err);
-        if (!axios.isAxiosError(error) || !error.response) {
+        if (!axios.isAxiosError(error)) {
           logger.error({
             _title: "PeBroadcast",
-            status: "notAxiosErrorOrNoResponse",
+            status: "notAxiosError",
             error,
             peConvention: {
               peId: poleEmploiConvention.id,
               originalId: poleEmploiConvention.originalId,
             },
           });
+
+          notifyDiscord(
+            `HttpPoleEmploiGateway notAxiosError ${
+              poleEmploiConvention.originalId
+            }: ${JSON.stringify(error)}`,
+          );
+
           return {
             status: 500,
             message: JSON.stringify(error),
           };
+        }
+
+        if (!error.response) {
+          logger.error({
+            _title: "PeBroadcast",
+            status: "noResponseInAxiosError",
+            error,
+            peConvention: {
+              peId: poleEmploiConvention.id,
+              originalId: poleEmploiConvention.originalId,
+            },
+          });
+
+          notifyDiscord(
+            `HttpPoleEmploiGateway noResponseInAxiosError ${
+              poleEmploiConvention.originalId
+            }: ${JSON.stringify(error)}`,
+          );
+
+          throw error;
         }
 
         const message = !error.response.data?.message
