@@ -1,5 +1,11 @@
-import { expectToEqual } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import axios from "axios";
+import MockAdapter from "axios-mock-adapter";
+import { expectPromiseToFail, expectToEqual } from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
+import {
+  AccessTokenConfig,
+  AppConfig,
+} from "../../../../config/bootstrap/appConfig";
 import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
@@ -10,6 +16,7 @@ import {
   PoleEmploiGetAccessTokenResponse,
 } from "../../ports/PoleEmploiGateway";
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
+import { createPoleEmploiRoutes } from "./PoleEmploiRoutes";
 
 const config = AppConfig.createFromEnv();
 const cachingGateway =
@@ -138,4 +145,51 @@ describe("HttpPoleEmploiGateway", () => {
       expectToEqual(response.status, expected.status);
     },
   );
+
+  it("throw error axios timeout", async () => {
+    const peApiUrl = "https://fake-pe.fr";
+    const peEnterpriseUrl = "https://fake-pe-enterprise.fr";
+    const routes = createPoleEmploiRoutes(peApiUrl);
+
+    const httpClient = createAxiosSharedClient(routes, axios, {
+      skipResponseValidation: true,
+    });
+
+    const cachingGateway =
+      new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
+        new RealTimeGateway(),
+        "expires_in",
+      );
+
+    const accessTokenConfig: AccessTokenConfig = {
+      immersionFacileBaseUrl: "https://",
+      peApiUrl,
+      peAuthCandidatUrl: "https://",
+      peEnterpriseUrl,
+      clientId: "",
+      clientSecret: "",
+    };
+
+    const poleEmploiGateway = new HttpPoleEmploiGateway(
+      httpClient,
+      cachingGateway,
+      peApiUrl,
+      accessTokenConfig,
+      noRetries,
+    );
+
+    const mock = new MockAdapter(axios);
+
+    mock
+      .onPost(
+        `${peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+      )
+      .reply(200, { access_token: "yolo" })
+      .onPost(routes.broadcastConvention.url)
+      .timeout();
+
+    await expectPromiseToFail(
+      poleEmploiGateway.notifyOnConventionUpdated(peConvention),
+    );
+  });
 });
