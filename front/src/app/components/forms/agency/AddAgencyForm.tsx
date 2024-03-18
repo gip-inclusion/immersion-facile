@@ -103,6 +103,7 @@ export const AddAgencyForm = () => {
         .with(P.boolean, (refersToOtherAgency) => (
           <AgencyForm
             refersToOtherAgency={refersToOtherAgency}
+            key={`add-agency-form-${refersToOtherAgency}`}
             submitFeedback={submitFeedback}
             onFormValid={onFormValid}
           />
