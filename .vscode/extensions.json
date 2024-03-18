@@ -1,10 +1,7 @@
 {
   "recommendations": [
     "ms-azuretools.vscode-docker",
-    "dbaeumer.vscode-eslint",
     "ms-vsliveshare.vsliveshare",
-    "esbenp.prettier-vscode",
-    "rvest.vs-code-prettier-eslint",
     "ms-playwright.playwright"
   ]
 }
