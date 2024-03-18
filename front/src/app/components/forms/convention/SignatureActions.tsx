@@ -1,9 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import React, { Dispatch, SetStateAction } from "react";
+import { ModalProps, createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
+import React, { Dispatch, Fragment, SetStateAction, useState } from "react";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
+
 import {
   ConventionDto,
   ConventionStatusWithJustification,
@@ -16,6 +18,7 @@ import {
   isConventionRenewed,
 } from "shared";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { JustificationModalContent } from "./JustificationModalContent";
@@ -31,29 +34,38 @@ type SignatureActionsProperties = {
   onCloseSignModalWithoutSignature: Dispatch<SetStateAction<boolean>>;
 };
 
+const requestModificationModalParams = {
+  isOpenedByDefault: false,
+  id: "requestModification",
+};
+
 const {
   Component: RequestModificationModal,
   open: openRequestModificationModal,
   close: closeRequestModificationModal,
-} = createModal({
-  isOpenedByDefault: false,
-  id: "requestModification",
-});
+} = createModal(requestModificationModalParams);
 
-export const SignatureActions = ({
-  onModificationRequired,
-  onSubmitClick,
-  signatory,
-  internshipKind,
-  convention,
-  newStatus,
-  currentSignatoryRole,
-  onCloseSignModalWithoutSignature,
-}: SignatureActionsProperties) => {
+export const SignatureActions = (props: SignatureActionsProperties) => {
+  const {
+    onModificationRequired,
+    onSubmitClick,
+    signatory,
+    internshipKind,
+    convention,
+    newStatus,
+    currentSignatoryRole,
+    onCloseSignModalWithoutSignature,
+  } = props;
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const { fieldName } = getSignatoryProcessedData(signatory);
   const { setValue } = useFormContext();
+  const t = useConventionTexts(internshipKind);
+  const [modalProps, setModalProps] = useState<ModalProps>({
+    title: t.verification.modifyConventionTitle,
+    children: null,
+  });
+  const isModalOpen = useIsModalOpen(requestModificationModalParams);
 
   return (
     <>
@@ -103,14 +115,22 @@ export const SignatureActions = ({
       </ul>
 
       {createPortal(
-        <RequestModificationModal title="Demande de modification">
-          <JustificationModalContent
-            onSubmit={onModificationRequired}
-            closeModal={closeRequestModificationModal}
-            newStatus={newStatus}
-            convention={convention}
-            currentSignatoryRole={currentSignatoryRole}
-          />
+        <RequestModificationModal title={modalProps.title}>
+          <Fragment key={`${requestModificationModalParams.id}-${isModalOpen}`}>
+            <JustificationModalContent
+              onSubmit={onModificationRequired}
+              closeModal={closeRequestModificationModal}
+              newStatus={newStatus}
+              convention={convention}
+              currentSignatoryRole={currentSignatoryRole}
+              onModalPropsChange={(newProps) => {
+                setModalProps({
+                  ...modalProps,
+                  ...newProps,
+                });
+              }}
+            />
+          </Fragment>
         </RequestModificationModal>,
         document.body,
       )}
