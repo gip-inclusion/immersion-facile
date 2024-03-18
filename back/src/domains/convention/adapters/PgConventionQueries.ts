@@ -12,7 +12,9 @@ import {
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
+import { validateAndParseZodSchema } from "../../../config/helpers/httpErrors";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { createLogger } from "../../../utils/logger";
 import { AssessmentEmailDomainTopic } from "../../core/events/events";
 import {
   ConventionQueries,
@@ -23,6 +25,8 @@ import {
   getReadConventionById,
   makeGetLastConventionWithSiretInList,
 } from "./pgConventionSql";
+
+const logger = createLogger(__filename);
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
@@ -195,7 +199,9 @@ const addFiltersToBuilder =
 export const validateConventionReadResults = (
   pgResults: { dto: unknown }[],
 ): ConventionReadDto[] =>
-  pgResults.map((pgResult) => conventionReadSchema.parse(pgResult.dto));
+  pgResults.map((pgResult) =>
+    validateAndParseZodSchema(conventionReadSchema, pgResult.dto, logger),
+  );
 
 type AddToBuilder = (
   b: ConventionReadQueryBuilder,
