@@ -187,6 +187,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { conventionId: param.query.string },
     () => `/${frontRoutes.manageConventionInclusionConnected}`,
   ),
+  manageDiscussion: defineRoute(
+    { discussionId: param.query.string },
+    () => `/${frontRoutes.manageDiscussion}`,
+  ),
   manageEstablishmentAdmin: defineRoute(
     { siret: param.query.string },
     () => `/${frontRoutes.manageEstablishmentAdmin}`,

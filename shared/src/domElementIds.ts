@@ -432,6 +432,7 @@ export const domElementIds = {
     erroredConventionHandledModal:
       "im-errored-convention-handled-confirmation-modal",
   },
+  manageDiscussion: {},
   offer: {},
   offerExternal: {},
   manageEstablishmentAdmin: {},
