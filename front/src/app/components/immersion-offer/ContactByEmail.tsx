@@ -10,6 +10,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import {
   AppellationDto,
   ContactEstablishmentByMailDto,
+  OmitFromExistingKeys,
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
@@ -39,6 +40,26 @@ Je pourrais alors vous expliquer directement mon projet. \n\
   \n\
 En vous remerciant,`;
 
+export const inputsLabelsByKey: Record<
+  keyof OmitFromExistingKeys<
+    ContactEstablishmentByMailDto,
+    "siret" | "contactMode" | "locationId"
+  >,
+  string
+> = {
+  immersionObjective:
+    "Objet de la période de mise en situation en milieu professionnel *",
+  appellationCode: "Métier sur lequel porte la demande d'immersion *",
+  message: "Votre message à l’entreprise *",
+  potentialBeneficiaryFirstName: "Prénom *",
+  potentialBeneficiaryLastName: "Nom *",
+  potentialBeneficiaryEmail: "Email *",
+  potentialBeneficiaryPhone: "Téléphone *",
+  potentialBeneficiaryResumeLink: "Page LinkedIn ou CV en ligne (optionnel)",
+};
+
+export const expirationTimeInMinutes = 10;
+
 export const ContactByEmail = ({
   appellations,
   onSubmitSuccess,
@@ -46,10 +67,13 @@ export const ContactByEmail = ({
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<typeof routes.searchResult>;
   const {
-    transcientDataForScope,
+    getTranscientDataForScope,
     setTranscientDataForScope,
-    preferUseTranscientData,
+    getPreferUseTranscientDataForScope,
+    transcientModalPreferences,
   } = useTranscientDataFromStorage("contact-establishment");
+  const transcientDataForScope = getTranscientDataForScope();
+  const preferUseTranscientData = getPreferUseTranscientDataForScope();
   const initialValues = useMemo<ContactEstablishmentByMailDto>(
     () => ({
       siret: route.params.siret,
@@ -66,9 +90,8 @@ export const ContactByEmail = ({
       potentialBeneficiaryResumeLink: "",
       potentialBeneficiaryPhone: route.params.contactPhone ?? "",
       locationId: route.params.location ?? "",
-      ...(preferUseTranscientData?.["contact-establishment"] &&
-      transcientDataForScope
-        ? transcientDataForScope
+      ...(preferUseTranscientData && transcientDataForScope?.value
+        ? { ...transcientDataForScope.value }
         : {}),
     }),
     [
@@ -95,12 +118,13 @@ export const ContactByEmail = ({
     handleSubmit,
     formState,
     formState: { isSubmitting },
+    reset,
   } = methods;
 
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByMailDto) => {
-    setTranscientDataForScope(values);
+    setTranscientDataForScope(values, expirationTimeInMinutes);
     const errorKind =
       await outOfReduxDependencies.searchGateway.contactEstablishment({
         ...values,
@@ -109,9 +133,17 @@ export const ContactByEmail = ({
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };
-
   return (
     <FormProvider {...methods}>
+      <transcientModalPreferences.Component
+        scope="contact-establishment"
+        onPreferencesChange={() => {
+          reset({
+            ...initialValues,
+            ...transcientDataForScope?.value,
+          });
+        }}
+      />
       <form onSubmit={handleSubmit(onFormValid)} id={"im-contact-form--email"}>
         <>
           <p>
@@ -132,9 +164,7 @@ export const ContactByEmail = ({
             Votre email de motivation
           </h2>
           <Select
-            label={
-              "Objet de la période de mise en situation en milieu professionnel *"
-            }
+            label={inputsLabelsByKey.immersionObjective}
             options={immersionObjectiveListOfOptions}
             placeholder={"Sélectionnez un objet"}
             nativeSelectProps={{
@@ -144,7 +174,7 @@ export const ContactByEmail = ({
           />
           <Select
             disabled={appellations.length === 1}
-            label={"Métier sur lequel porte la demande d'immersion *"}
+            label={inputsLabelsByKey.appellationCode}
             options={appellationListOfOptions}
             placeholder={"Sélectionnez un métier"}
             nativeSelectProps={{
@@ -153,7 +183,7 @@ export const ContactByEmail = ({
             {...getFieldError("appellationCode")}
           />
           <Input
-            label="Votre message à l’entreprise *"
+            label={inputsLabelsByKey.message}
             textArea
             nativeTextAreaProps={{
               ...register("message"),
@@ -163,24 +193,24 @@ export const ContactByEmail = ({
           />
           <h2 className={fr.cx("fr-h6")}>Vos informations</h2>
           <Input
-            label="Prénom *"
+            label={inputsLabelsByKey.potentialBeneficiaryFirstName}
             nativeInputProps={register("potentialBeneficiaryFirstName")}
             {...getFieldError("potentialBeneficiaryFirstName")}
           />
           <Input
-            label="Nom *"
+            label={inputsLabelsByKey.potentialBeneficiaryLastName}
             nativeInputProps={register("potentialBeneficiaryLastName")}
             {...getFieldError("potentialBeneficiaryLastName")}
           />
           <EmailValidationInput
-            label="Email *"
+            label={inputsLabelsByKey.potentialBeneficiaryEmail}
             nativeInputProps={{
               ...register("potentialBeneficiaryEmail"),
             }}
             {...getFieldError("potentialBeneficiaryEmail")}
           />
           <Input
-            label="Téléphone *"
+            label={inputsLabelsByKey.potentialBeneficiaryPhone}
             nativeInputProps={{
               ...register("potentialBeneficiaryPhone"),
               type: "phone",
@@ -188,7 +218,7 @@ export const ContactByEmail = ({
             {...getFieldError("potentialBeneficiaryPhone")}
           />
           <Input
-            label="Page LinkedIn ou CV en ligne (facultatif)"
+            label={inputsLabelsByKey.potentialBeneficiaryResumeLink}
             nativeInputProps={{
               ...register("potentialBeneficiaryResumeLink"),
             }}
