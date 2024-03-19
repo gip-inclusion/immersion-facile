@@ -1,5 +1,6 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AgencyDto, AgencyId } from "../agency/agency.dto";
+import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
 import { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
 import { EstablishmentRole } from "../role/role.dto";
@@ -35,6 +36,9 @@ type WithAgencyRights = {
 export type ConventionsEstablishmentDashboard = {
   url: AbsoluteUrl;
   role: EstablishmentRole;
+};
+export type WithDiscussionId = {
+  discussionId: DiscussionId;
 };
 
 export type EstablishmentDashboards = {

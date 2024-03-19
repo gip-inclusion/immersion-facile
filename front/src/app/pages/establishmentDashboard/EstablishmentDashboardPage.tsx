@@ -14,6 +14,7 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
 import { Route } from "type-route";
+import { ManageDiscussionFormSection } from "./ManageDiscussionFormSection";
 
 type EstablishmentDashboardTab = {
   label: string;
@@ -69,6 +70,7 @@ export const EstablishmentDashboardPage = ({
       label: "Mises en relation",
       content: (
         <>
+          <ManageDiscussionFormSection />
           {currentUser.establishmentDashboards.discussions ? (
             <MetabaseView
               title={`Suivi des mises en relations pour ${currentUser.firstName} ${currentUser.lastName}`}

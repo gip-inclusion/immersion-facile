@@ -28,6 +28,7 @@ import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPa
 import { ConventionManageAdminPage } from "../pages/convention/ConventionManageAdminPage";
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
+import { DiscussionManagePage } from "../pages/discussion/DiscussionManagePage";
 import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentCreationFormPage } from "../pages/establishment/EstablishmentCreationFormPage";
 import { GroupPage } from "../pages/group/GroupPage";
@@ -114,6 +115,7 @@ const getPageByRouteName: {
   manageConventionInclusionConnected: (route) => (
     <ConventionManageInclusionConnectedPage route={route} />
   ),
+  manageDiscussion: (route) => <DiscussionManagePage route={route} />,
   openApiDoc: () => <OpenApiDocPage />,
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
