@@ -12,7 +12,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   BackOfficeJwt,
-  ConventionDto,
   ConventionJwt,
   ConventionReadDto,
   ConventionStatus,
@@ -406,14 +405,15 @@ export const RenewConventionForm = ({
 };
 
 const isAllowedTransition = (
-  convention: ConventionDto,
+  convention: ConventionReadDto,
   targetStatus: ConventionStatus,
   actingRole: Role,
 ): boolean => {
   const transitionConfig = statusTransitionConfigs[targetStatus];
-  if (isConventionRenewed(convention) && targetStatus === "DRAFT") return false;
+
   return (
     transitionConfig.validInitialStatuses.includes(convention.status) &&
-    transitionConfig.validRoles.includes(actingRole)
+    transitionConfig.validRoles.includes(actingRole) &&
+    (!transitionConfig.refine?.(convention).isError ?? true)
   );
 };

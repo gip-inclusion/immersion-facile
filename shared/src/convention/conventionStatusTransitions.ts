@@ -1,9 +1,13 @@
-import { Role } from "..";
-import { ConventionStatus } from "./convention.dto";
+import { Role } from "../role/role.dto";
+import type { ConventionReadDto, ConventionStatus } from "./convention.dto";
 
 export type StatusTransitionConfig = {
   validInitialStatuses: ConventionStatus[];
   validRoles: Role[];
+  refine?: (conventionRead: ConventionReadDto) => {
+    isError: boolean;
+    errorMessage: string;
+  };
 };
 
 export const validSignatoryRoles: Role[] = [
@@ -39,6 +43,12 @@ export const statusTransitionConfigs: Record<
   ACCEPTED_BY_VALIDATOR: {
     validInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
     validRoles: ["validator"],
+    refine: (conventionRead) => ({
+      isError:
+        conventionRead.status === "IN_REVIEW" &&
+        conventionRead.agencyCounsellorEmails.length > 0,
+      errorMessage: `Cannot go to status 'ACCEPTED_BY_VALIDATOR' for convention '${conventionRead.id}'. Convention should be reviewed by counsellor`,
+    }),
   },
 
   // This config allows a counsellor to reject or cancel a Convention after it been
@@ -73,6 +83,13 @@ export const statusTransitionConfigs: Record<
       "backOffice",
       ...validSignatoryRoles,
     ],
+    refine: (conventionRead) => {
+      const renewedKey: keyof ConventionReadDto = "renewed";
+      return {
+        isError: renewedKey in conventionRead,
+        errorMessage: "Cannot edit a renewed convention",
+      };
+    },
   },
   DEPRECATED: {
     validInitialStatuses: [

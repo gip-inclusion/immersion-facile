@@ -1,4 +1,5 @@
 import {
+  AgencyDtoBuilder,
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
@@ -97,8 +98,11 @@ describe("Sign convention", () => {
       it.each(forbiddenToSignRoles.map((role) => ({ role })))(
         "$role is not allowed to sign",
         async ({ role }) => {
-          const convention = prepareConventionWithStatus("READY_TO_SIGN");
+          const { convention, agency } =
+            prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
           uow.conventionRepository.setConventions([convention]);
+          uow.agencyRepository.setAgencies([agency]);
+
           await expectPromiseToFailWithError(
             signConvention.execute(
               { conventionId },
@@ -118,8 +122,10 @@ describe("Sign convention", () => {
 
     describe("with convention inclusion connect jwt", () => {
       it("wh IC user is not establishment rep", async () => {
-        const conventionInDb = prepareConventionWithStatus("READY_TO_SIGN");
-        uow.conventionRepository.setConventions([conventionInDb]);
+        const { convention, agency } =
+          prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
+        uow.conventionRepository.setConventions([convention]);
+        uow.agencyRepository.setAgencies([agency]);
         const icUser: InclusionConnectedUser = {
           agencyRights: [],
           establishmentDashboards: {},
@@ -155,8 +161,10 @@ describe("Sign convention", () => {
       )(
         "$initialStatus initial status is not allowed",
         async ({ initialStatus }) => {
-          const conventionInDb = prepareConventionWithStatus(initialStatus);
-          uow.conventionRepository.setConventions([conventionInDb]);
+          const { convention, agency } =
+            prepareAgencyAndConventionWithStatus(initialStatus);
+          uow.conventionRepository.setConventions([convention]);
+          uow.agencyRepository.setAgencies([agency]);
 
           await expectPromiseToFailWithError(
             signConvention.execute(
@@ -181,8 +189,10 @@ describe("Sign convention", () => {
       it.each(allowedToSignRoles.map((role) => ({ role })))(
         "updates the convention with new signature for $role",
         async ({ role }) => {
-          const conventionInDb = prepareConventionWithStatus("READY_TO_SIGN");
-          uow.conventionRepository.setConventions([conventionInDb]);
+          const { convention, agency } =
+            prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
+          uow.conventionRepository.setConventions([convention]);
+          uow.agencyRepository.setAgencies([agency]);
           const signedAt = new Date("2022-01-01");
           timeGateway.setNextDate(signedAt);
 
@@ -197,9 +207,9 @@ describe("Sign convention", () => {
 
           expectToEqual(uow.conventionRepository.conventions, [
             {
-              ...conventionInDb,
+              ...convention,
               status: "PARTIALLY_SIGNED",
-              signatories: makeSignatories(conventionInDb, {
+              signatories: makeSignatories(convention, {
                 establishmentRepresentativeSignedAt:
                   role === "establishment-representative"
                     ? signedAt.toISOString()
@@ -223,12 +233,14 @@ describe("Sign convention", () => {
 
     describe("with inclusion connect jwt", () => {
       it("updates the convention with new signature for IC user when user is establisment representative", async () => {
-        const conventionInDb = prepareConventionWithStatus("READY_TO_SIGN");
-        uow.conventionRepository.setConventions([conventionInDb]);
+        const { convention, agency } =
+          prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
+        uow.conventionRepository.setConventions([convention]);
+        uow.agencyRepository.setAgencies([agency]);
         const icUser: InclusionConnectedUser = {
           agencyRights: [],
           establishmentDashboards: {},
-          email: conventionInDb.signatories.establishmentRepresentative.email,
+          email: convention.signatories.establishmentRepresentative.email,
           firstName: "Billy",
           lastName: "Idol",
           id: "id",
@@ -249,9 +261,9 @@ describe("Sign convention", () => {
 
         expectToEqual(uow.conventionRepository.conventions, [
           {
-            ...conventionInDb,
+            ...convention,
             status: "PARTIALLY_SIGNED",
-            signatories: makeSignatories(conventionInDb, {
+            signatories: makeSignatories(convention, {
               establishmentRepresentativeSignedAt: signedAt.toISOString(),
             }),
           },
@@ -262,8 +274,10 @@ describe("Sign convention", () => {
     describe("convention status transitions", () => {
       it("goes from status READY_TO_SIGN to PARTIALLY_SIGNED, and saves corresponding event", async () => {
         expectAllowedInitialStatus("READY_TO_SIGN");
-        const initialConvention = prepareConventionWithStatus("READY_TO_SIGN");
+        const { convention: initialConvention, agency } =
+          prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
         uow.conventionRepository.setConventions([initialConvention]);
+        uow.agencyRepository.setAgencies([agency]);
         const signedAt = new Date("2022-01-01");
         timeGateway.setNextDate(signedAt);
 
@@ -297,8 +311,10 @@ describe("Sign convention", () => {
       it("goes from status PARTIALLY_SIGNED to PARTIALLY_SIGNED, and saves corresponding event", async () => {
         expectAllowedInitialStatus("PARTIALLY_SIGNED");
         const beneficiarySignedAt = new Date("2022-01-02");
+        const agency = new AgencyDtoBuilder().build();
         const initialConvention = new ConventionDtoBuilder()
           .withId(conventionId)
+          .withAgencyId(agency.id)
           .withStatus("PARTIALLY_SIGNED")
           .withBeneficiaryRepresentative(beneficiaryRepresentative)
           .notSigned()
@@ -306,6 +322,7 @@ describe("Sign convention", () => {
           .build();
 
         uow.conventionRepository.setConventions([initialConvention]);
+        uow.agencyRepository.setAgencies([agency]);
 
         const establishmentRepresentativeSignedAt = new Date("2022-01-01");
         timeGateway.setNextDate(establishmentRepresentativeSignedAt);
@@ -344,17 +361,21 @@ describe("Sign convention", () => {
         ]);
       });
 
-      it("With 2 signatories, goes from status PARTIALLY_SIGNED to IN_REVIEW, and saves corresponding event", async () => {
+      it("with 2 signatories, goes from status PARTIALLY_SIGNED to IN_REVIEW, and saves corresponding event", async () => {
         expectAllowedInitialStatus("PARTIALLY_SIGNED");
         const beneficiarySignedAt = new Date("2022-01-02");
+
+        const agency = new AgencyDtoBuilder().build();
         const initialConvention = new ConventionDtoBuilder()
           .withId(conventionId)
+          .withAgencyId(agency.id)
           .withStatus("PARTIALLY_SIGNED")
           .notSigned()
           .signedByBeneficiary(beneficiarySignedAt.toISOString())
           .build();
 
         uow.conventionRepository.setConventions([initialConvention]);
+        uow.agencyRepository.setAgencies([agency]);
 
         const establishmentRepresentativeSignedAt = new Date("2022-01-01");
         timeGateway.setNextDate(establishmentRepresentativeSignedAt);
@@ -391,14 +412,21 @@ describe("Sign convention", () => {
   });
 
   const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
-  const prepareConventionWithStatus = (status: ConventionStatus) =>
-    new ConventionDtoBuilder()
-      .withId(conventionId)
-      .withStatus(status)
-      .withBeneficiaryRepresentative(beneficiaryRepresentative)
-      .withEstablishmentRepresentative(establishmentRepresentative)
-      .notSigned()
-      .build();
+  const prepareAgencyAndConventionWithStatus = (status: ConventionStatus) => {
+    const agency = new AgencyDtoBuilder().build();
+
+    return {
+      agency,
+      convention: new ConventionDtoBuilder()
+        .withId(conventionId)
+        .withAgencyId(agency.id)
+        .withStatus(status)
+        .withBeneficiaryRepresentative(beneficiaryRepresentative)
+        .withEstablishmentRepresentative(establishmentRepresentative)
+        .notSigned()
+        .build(),
+    };
+  };
 
   const expectAllowedInitialStatus = (status: ConventionStatus) =>
     expect(allowedInitialStatuses.includes(status)).toBeTruthy();

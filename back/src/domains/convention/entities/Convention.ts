@@ -17,69 +17,31 @@ import {
 import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
-const throwIfStatusTransitionNotPossible = ({
-  initialStatus,
-  targetStatus,
-}: {
-  initialStatus: ConventionStatus;
-  targetStatus: ConventionStatus;
-}) => {
-  const config = statusTransitionConfigs[targetStatus];
-  if (!config.validInitialStatuses.includes(initialStatus))
-    throw new BadRequestError(
-      `Cannot go from status '${initialStatus}' to '${targetStatus}'`,
-    );
-};
-
-const throwIfRoleNotAllowedToChangeStatus = ({
-  role,
-  targetStatus,
-  initialStatus,
-  conventionId,
-  agencyHasTwoStepsValidation,
-}: {
-  role: Role;
-  targetStatus: ConventionStatus;
-  initialStatus: ConventionStatus;
-  conventionId: ConventionId;
-  agencyHasTwoStepsValidation?: boolean;
-}) => {
-  const config = statusTransitionConfigs[targetStatus];
-  if (!config.validRoles.includes(role))
-    throw new ForbiddenError(
-      `Role '${role}' is not allowed to go to status '${targetStatus}' for convention '${conventionId}'.`,
-    );
-  if (
-    initialStatus === "IN_REVIEW" &&
-    targetStatus === "ACCEPTED_BY_VALIDATOR" &&
-    agencyHasTwoStepsValidation
-  )
-    throw new ForbiddenError(
-      `Cannot go to status '${targetStatus}' for convention '${conventionId}. Convention should be reviewed by counsellor`,
-    );
-};
-
 export const throwIfTransitionNotAllowed = ({
   targetStatus,
-  initialStatus,
   role,
-  conventionId,
-  agencyHasTwoStepsValidation,
+  conventionRead,
 }: {
   targetStatus: ConventionStatus;
-  initialStatus: ConventionStatus;
   role: Role;
-  conventionId: ConventionId;
-  agencyHasTwoStepsValidation?: boolean;
+  conventionRead: ConventionReadDto;
 }) => {
-  throwIfRoleNotAllowedToChangeStatus({
-    role,
-    targetStatus,
-    initialStatus,
-    conventionId,
-    agencyHasTwoStepsValidation,
-  });
-  throwIfStatusTransitionNotPossible({ initialStatus, targetStatus });
+  const config = statusTransitionConfigs[targetStatus];
+
+  if (!config.validRoles.includes(role))
+    throw new ForbiddenError(
+      `Role '${role}' is not allowed to go to status '${targetStatus}' for convention '${conventionRead.id}'.`,
+    );
+
+  if (!config.validInitialStatuses.includes(conventionRead.status))
+    throw new BadRequestError(
+      `Cannot go from status '${conventionRead.status}' to '${targetStatus}'`,
+    );
+
+  if (config.refine) {
+    const { isError, errorMessage } = config.refine(conventionRead);
+    if (isError) throw new ForbiddenError(errorMessage);
+  }
 };
 
 export async function retrieveConventionWithAgency(

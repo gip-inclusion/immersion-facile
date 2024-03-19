@@ -3,9 +3,9 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   createConventionMagicLinkPayload,
+  expectObjectsToMatch,
   expectPromiseToFailWith,
   expectPromiseToFailWithError,
-  expectToEqual,
   validSignatoryRoles,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
@@ -109,7 +109,7 @@ describe("UpdateConventionStatus", () => {
 
       expect(outboxRepo.events).toHaveLength(1);
 
-      expectToEqual(
+      expectObjectsToMatch(
         outboxRepo.events[0],
         createNewEvent({
           topic: "ConventionRequiresModification",
