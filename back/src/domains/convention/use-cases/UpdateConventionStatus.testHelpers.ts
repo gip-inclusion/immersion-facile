@@ -611,7 +611,7 @@ export const testForAllRolesAndInitialStatusCases = ({
 
         const error = agencyHasTwoStepsAndValidatorTriesToValidate
           ? new ForbiddenError(
-              `Cannot go to status '${updateStatusParams.status}' for convention '${updateStatusParams.conventionId}. Convention should be reviewed by counsellor`,
+              `Cannot go to status '${updateStatusParams.status}' for convention '${updateStatusParams.conventionId}'. Convention should be reviewed by counsellor`,
             )
           : new BadRequestError(
               `Cannot go from status '${status}' to '${updateStatusParams.status}'`,

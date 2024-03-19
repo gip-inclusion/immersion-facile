@@ -1,10 +1,7 @@
 import { values } from "ramda";
-import { ConventionDto, ConventionId, Email } from "shared";
+import { ConventionDto, ConventionId, ConventionReadDto, Email } from "shared";
 import { ConflictError } from "../../../config/helpers/httpErrors";
-import { createLogger } from "../../../utils/logger";
 import { ConventionRepository } from "../ports/ConventionRepository";
-
-const logger = createLogger(__filename);
 
 export class InMemoryConventionRepository implements ConventionRepository {
   #conventions: Record<string, ConventionDto> = {};
@@ -18,7 +15,6 @@ export class InMemoryConventionRepository implements ConventionRepository {
   }
 
   public async getById(id: ConventionId) {
-    logger.info({ id }, "getById");
     return this.#conventions[id];
   }
 
@@ -42,29 +38,46 @@ export class InMemoryConventionRepository implements ConventionRepository {
   }
 
   public async save(convention: ConventionDto): Promise<void> {
-    logger.info({ conventionWithoutExternalId: convention }, "save");
     if (this.#conventions[convention.id]) {
       throw new ConflictError(
         `Convention with id ${convention.id} already exists`,
       );
     }
-    this.#conventions[convention.id] = convention;
+    this.#conventions[convention.id] = dropConventionReadFields(convention);
   }
 
   // for test purpose
   public setConventions(conventions: ConventionDto[]) {
     this.#conventions = conventions.reduce<Record<ConventionId, ConventionDto>>(
-      (acc, convention) => ({ ...acc, [convention.id]: convention }),
+      (acc, convention) => ({
+        ...acc,
+        [convention.id]: dropConventionReadFields(convention),
+      }),
       {},
     );
   }
 
   public async update(convention: ConventionDto) {
-    logger.info({ convention }, "updateConvention");
     const id = convention.id;
     if (!this.#conventions[id]) return;
 
-    this.#conventions[id] = convention;
+    this.#conventions[id] = dropConventionReadFields(convention);
     return id;
   }
 }
+
+const dropConventionReadFields = (
+  convention: ConventionReadDto | ConventionDto,
+): ConventionDto => {
+  const {
+    agencyCounsellorEmails: _1,
+    agencyValidatorEmails: _2,
+    agencyDepartment: _3,
+    agencyKind: _4,
+    agencyName: _5,
+    agencySiret: _6,
+    agencyRefersTo: _7,
+    ...conventionWithoutReadFields
+  } = convention as ConventionReadDto;
+  return conventionWithoutReadFields;
+};

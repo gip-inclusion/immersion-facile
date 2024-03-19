@@ -20,7 +20,6 @@ import {
   ConventionQueries,
   GetConventionsByFiltersQueries,
 } from "../ports/ConventionQueries";
-import { missingAgencyMessage } from "../use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 const logger = createLogger(__filename);
@@ -159,7 +158,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
       (agency) => agency.id === convention.agencyId,
     );
 
-    if (!agency) throw new NotFoundError(missingAgencyMessage(convention));
+    if (!agency)
+      throw new NotFoundError(
+        `Agency with id '${convention.agencyId}' not found.`,
+      );
 
     const referedAgency =
       agency?.refersToAgencyId &&

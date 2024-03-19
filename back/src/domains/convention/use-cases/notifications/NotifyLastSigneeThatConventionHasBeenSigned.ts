@@ -20,7 +20,7 @@ export const missingConventionMessage = (conventionId: ConventionId) =>
   `Missing convention ${conventionId} on convention repository.`;
 
 export const missingAgencyMessage = (convention: ConventionDto) =>
-  `Missing agency '${convention.agencyId}' on agency repository.`;
+  `Agency with id '${convention.agencyId}' not found.`;
 
 export const noSignatoryMessage = (convention: ConventionDto): string =>
   `No signatories has signed the convention id ${convention.id}.`;

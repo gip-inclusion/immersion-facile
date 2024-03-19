@@ -32,4 +32,4 @@ export const someAgenciesMissingMessage = (agencyIds: AgencyId[]) =>
 export const referedAgencyMissingMessage = (refersToAgencyId: AgencyId) =>
   `Refered agency with id '${refersToAgencyId}' missing on agency repository.`;
 export const agencyMissingMessage = (agencyId: AgencyId): string =>
-  `Agency with id '${agencyId}' missing.`;
+  `Agency with id '${agencyId}' not found.`;

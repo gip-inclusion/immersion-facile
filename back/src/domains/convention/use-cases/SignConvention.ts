@@ -62,11 +62,11 @@ export class SignConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
-    const initialConvention =
-      await uow.conventionRepository.getById(conventionId);
-    if (!initialConvention) throw new NotFoundError(conventionId);
+    const initialConventionRead =
+      await uow.conventionQueries.getConventionById(conventionId);
+    if (!initialConventionRead) throw new NotFoundError(conventionId);
 
-    const role = await this.#getRole(jwtPayload, uow, initialConvention);
+    const role = await this.#getRole(jwtPayload, uow, initialConventionRead);
 
     logger.debug({ conventionId, role });
 
@@ -76,15 +76,14 @@ export class SignConvention extends TransactionalUseCase<
       );
 
     const signedConvention = signConventionDtoWithRole(
-      initialConvention,
+      initialConventionRead,
       role,
       this.#timeGateway.now().toISOString(),
     );
     throwIfTransitionNotAllowed({
       role,
       targetStatus: signedConvention.status,
-      initialStatus: initialConvention.status,
-      conventionId: initialConvention.id,
+      conventionRead: initialConventionRead,
     });
 
     const signedId = await uow.conventionRepository.update(signedConvention);

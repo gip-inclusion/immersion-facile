@@ -70,20 +70,16 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     uow: UnitOfWork,
     payload: UpdateConventionStatusSupportedJwtPayload,
   ): Promise<WithConventionIdLegacy> {
-    const originalConvention = await uow.conventionRepository.getById(
+    const conventionRead = await uow.conventionQueries.getConventionById(
       params.conventionId,
     );
-    if (!originalConvention)
+    if (!conventionRead)
       throw new NotFoundError(conventionMissingMessage(params.conventionId));
 
-    const agency = await uow.agencyRepository.getById(
-      originalConvention.agencyId,
-    );
+    const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
 
     if (!agency)
-      throw new NotFoundError(
-        agencyMissingMessage(originalConvention.agencyId),
-      );
+      throw new NotFoundError(agencyMissingMessage(conventionRead.agencyId));
 
     const role =
       "role" in payload
@@ -91,20 +87,18 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         : await this.#agencyRoleFromUserIdAndAgencyId(
             uow,
             payload.userId,
-            originalConvention,
+            conventionRead,
           );
 
     if (role === "toReview" || role === "agencyOwner")
       throw new ForbiddenError(
-        `Role '${role}' is not allowed to go to status '${params.status}' for convention '${originalConvention.id}'.`,
+        `Role '${role}' is not allowed to go to status '${params.status}' for convention '${conventionRead.id}'.`,
       );
 
     throwIfTransitionNotAllowed({
-      initialStatus: originalConvention.status,
       role,
       targetStatus: params.status,
-      conventionId: originalConvention.id,
-      agencyHasTwoStepsValidation: agency.counsellorEmails.length > 0,
+      conventionRead,
     });
 
     const conventionUpdatedAt = this.timeGateway.now().toISOString();
@@ -117,7 +111,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         ? params.statusJustification
         : undefined;
 
-    const conventionBuilder = new ConventionDtoBuilder(originalConvention)
+    const conventionBuilder = new ConventionDtoBuilder(conventionRead)
       .withStatus(params.status)
       .withDateValidation(
         validatedConventionStatuses.includes(params.status)
@@ -163,7 +157,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
                     agencyActorEmail: await this.#getAgencyActorEmail(
                       uow,
                       payload,
-                      originalConvention,
+                      conventionRead,
                     ),
                   }
                 : {
