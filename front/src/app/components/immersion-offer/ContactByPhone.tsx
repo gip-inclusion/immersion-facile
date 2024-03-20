@@ -11,7 +11,12 @@ import {
   contactEstablishmentByPhoneSchema,
   domElementIds,
 } from "shared";
+import { TranscientPreferencesModal } from "src/app/components/immersion-offer/TranscientPreferencesModal";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
+import {
+  transcientExpirationTimeInMinutes,
+  useTranscientDataFromStorage,
+} from "src/app/components/immersion-offer/useTranscientDataFromStorage";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -29,6 +34,13 @@ export const ContactByPhone = ({
 }: ContactByPhoneProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<typeof routes.searchResult>;
+  const {
+    getTranscientDataForScope,
+    setTranscientDataForScope,
+    getPreferUseTranscientDataForScope,
+  } = useTranscientDataFromStorage("contact-establishment", false);
+  const transcientDataForScope = getTranscientDataForScope();
+  const preferUseTranscientData = getPreferUseTranscientDataForScope();
   const initialValues: ContactEstablishmentByPhoneDto = useMemo(
     () => ({
       siret: route.params.siret,
@@ -41,10 +53,12 @@ export const ContactByPhone = ({
       potentialBeneficiaryLastName: route.params.contactLastName ?? "",
       potentialBeneficiaryEmail: route.params.contactEmail ?? "",
       locationId: route.params.location ?? "",
+      ...(preferUseTranscientData && transcientDataForScope?.value
+        ? { ...transcientDataForScope.value }
+        : {}),
     }),
     [route.params, appellations],
   );
-
   const appellationListOfOptions = appellations.map((appellation) => ({
     value: appellation.appellationCode,
     label: appellation.appellationLabel,
@@ -61,6 +75,7 @@ export const ContactByPhone = ({
     handleSubmit,
     formState,
     formState: { isSubmitting },
+    reset,
   } = methods;
 
   const getFieldError = makeFieldError(formState);
@@ -70,10 +85,23 @@ export const ContactByPhone = ({
       await outOfReduxDependencies.searchGateway.contactEstablishment(values);
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
+    setTranscientDataForScope(values, transcientExpirationTimeInMinutes);
   };
 
   return (
     <form onSubmit={handleSubmit(onFormValid)} id={"im-contact-form--phone"}>
+      <TranscientPreferencesModal
+        scope="contact-establishment"
+        onPreferencesChange={(accept) => {
+          const newInitialValues = accept
+            ? {
+                ...initialValues,
+                ...transcientDataForScope?.value,
+              }
+            : initialValues;
+          reset(newInitialValues);
+        }}
+      />
       <>
         <p className={"fr-my-2w"}>
           Cette entreprise souhaite être contactée par téléphone. Merci de nous

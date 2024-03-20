@@ -15,8 +15,12 @@ import {
   conventionObjectiveOptions,
   domElementIds,
 } from "shared";
+import { TranscientPreferencesModal } from "src/app/components/immersion-offer/TranscientPreferencesModal";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
-import { useTranscientDataFromStorage } from "src/app/components/immersion-offer/transcientData";
+import {
+  transcientExpirationTimeInMinutes,
+  useTranscientDataFromStorage,
+} from "src/app/components/immersion-offer/useTranscientDataFromStorage";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -58,8 +62,6 @@ export const inputsLabelsByKey: Record<
   potentialBeneficiaryResumeLink: "Page LinkedIn ou CV en ligne (optionnel)",
 };
 
-export const expirationTimeInMinutes = 10;
-
 export const ContactByEmail = ({
   appellations,
   onSubmitSuccess,
@@ -70,8 +72,7 @@ export const ContactByEmail = ({
     getTranscientDataForScope,
     setTranscientDataForScope,
     getPreferUseTranscientDataForScope,
-    transcientModalPreferences,
-  } = useTranscientDataFromStorage("contact-establishment");
+  } = useTranscientDataFromStorage("contact-establishment", false);
   const transcientDataForScope = getTranscientDataForScope();
   const preferUseTranscientData = getPreferUseTranscientDataForScope();
   const initialValues = useMemo<ContactEstablishmentByMailDto>(
@@ -124,7 +125,7 @@ export const ContactByEmail = ({
   const getFieldError = makeFieldError(formState);
 
   const onFormValid = async (values: ContactEstablishmentByMailDto) => {
-    setTranscientDataForScope(values, expirationTimeInMinutes);
+    setTranscientDataForScope(values, transcientExpirationTimeInMinutes);
     const errorKind =
       await outOfReduxDependencies.searchGateway.contactEstablishment({
         ...values,
@@ -135,13 +136,16 @@ export const ContactByEmail = ({
   };
   return (
     <FormProvider {...methods}>
-      <transcientModalPreferences.Component
+      <TranscientPreferencesModal
         scope="contact-establishment"
-        onPreferencesChange={() => {
-          reset({
-            ...initialValues,
-            ...transcientDataForScope?.value,
-          });
+        onPreferencesChange={(accept) => {
+          const newInitialValues = accept
+            ? {
+                ...initialValues,
+                ...transcientDataForScope?.value,
+              }
+            : initialValues;
+          reset(newInitialValues);
         }}
       />
       <form onSubmit={handleSubmit(onFormValid)} id={"im-contact-form--email"}>

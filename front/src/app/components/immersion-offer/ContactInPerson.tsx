@@ -11,7 +11,12 @@ import {
   contactEstablishmentInPersonSchema,
   domElementIds,
 } from "shared";
+import { TranscientPreferencesModal } from "src/app/components/immersion-offer/TranscientPreferencesModal";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
+import {
+  transcientExpirationTimeInMinutes,
+  useTranscientDataFromStorage,
+} from "src/app/components/immersion-offer/useTranscientDataFromStorage";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -29,7 +34,13 @@ export const ContactInPerson = ({
 }: ContactInPersonProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<typeof routes.searchResult>;
-
+  const {
+    getTranscientDataForScope,
+    setTranscientDataForScope,
+    getPreferUseTranscientDataForScope,
+  } = useTranscientDataFromStorage("contact-establishment", false);
+  const transcientDataForScope = getTranscientDataForScope();
+  const preferUseTranscientData = getPreferUseTranscientDataForScope();
   const initialValues: ContactEstablishmentInPersonDto = useMemo(
     () => ({
       siret: route.params.siret,
@@ -42,6 +53,9 @@ export const ContactInPerson = ({
       potentialBeneficiaryLastName: route.params.contactLastName ?? "",
       potentialBeneficiaryEmail: route.params.contactEmail ?? "",
       locationId: route.params.location ?? "",
+      ...(preferUseTranscientData && transcientDataForScope?.value
+        ? { ...transcientDataForScope.value }
+        : {}),
     }),
     [route.params, appellations],
   );
@@ -61,6 +75,7 @@ export const ContactInPerson = ({
     handleSubmit,
     formState,
     formState: { isSubmitting },
+    reset,
   } = methods;
 
   const getFieldError = makeFieldError(formState);
@@ -70,6 +85,7 @@ export const ContactInPerson = ({
       await outOfReduxDependencies.searchGateway.contactEstablishment(values);
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
+    setTranscientDataForScope(values, transcientExpirationTimeInMinutes);
   };
 
   return (
@@ -77,6 +93,18 @@ export const ContactInPerson = ({
       onSubmit={handleSubmit(onFormValid)}
       id={"im-contact-form--in-person"}
     >
+      <TranscientPreferencesModal
+        scope="contact-establishment"
+        onPreferencesChange={(accept) => {
+          const newInitialValues = accept
+            ? {
+                ...initialValues,
+                ...transcientDataForScope?.value,
+              }
+            : initialValues;
+          reset(newInitialValues);
+        }}
+      />
       <>
         <p className={"fr-my-2w"}>
           Cette entreprise souhaite que vous vous présentiez directement pour
