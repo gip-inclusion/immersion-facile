@@ -349,7 +349,7 @@ export const forbiddenUnsupportedStatusMessage = (
   convention: ConventionDto,
   kind: ReminderKind,
 ): string =>
-  `Convention status ${convention.status} is not supported for reminder ${kind}.`;
+  `Convention with id: '${convention.id}' and status: '${convention.status}' is not supported for reminder ${kind}.`;
 
 export const toSignatoriesSummary = ({
   signatories,
