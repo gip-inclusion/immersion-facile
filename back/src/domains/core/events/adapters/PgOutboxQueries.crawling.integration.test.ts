@@ -183,10 +183,11 @@ describe("PgOutboxQueries for crawling purposes", () => {
       alreadyProcessedEvent,
       quarantinedEvent,
       inProcessEvent,
+      eventToRepublish,
     ]);
 
     // act
-    const events = await outboxQueries.getAllUnpublishedEvents({ limit: 2 });
+    const events = await outboxQueries.getEventsToPublish({ limit: 2 });
 
     // assert
     expect(events.length).toBe(2);
@@ -240,7 +241,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
 
     await storeInOutbox([
       eventFailedToRerun,
-      event1,
+      neverPublished1,
       withFailureButEventuallySuccessfulEvent,
       failedButQuarantinedEvent,
       anotherEventFailedToRerun,

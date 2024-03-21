@@ -63,7 +63,7 @@ export class PgOutboxQueries implements OutboxQueries {
     return convertRowsToDomainEvents(rows);
   }
 
-  public async getAllUnpublishedEvents(params: { limit: number }): Promise<
+  public async getEventsToPublish(params: { limit: number }): Promise<
     DomainEvent[]
   > {
     const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
