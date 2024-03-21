@@ -1,0 +1,11 @@
+.im-exchange-message {
+  background: var(--background-default-grey-hover);
+
+  &--potentialBeneficiary {
+    border-right: 6px solid var(--green-archipel-main-557);
+  }
+
+  &--establishment {
+    border-left: 6px solid var(--blue-cumulus-main-526)
+  }
+}
