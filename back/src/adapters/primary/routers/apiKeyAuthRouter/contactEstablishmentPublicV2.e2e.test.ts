@@ -234,4 +234,42 @@ describe("POST contact-establishment public V2 route", () => {
     expectToEqual(body, "");
     expectToEqual(status, 201);
   });
+
+  it("contacts the establishment when everything goes right even without location id", async () => {
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(contactEstablishment.siret)
+            .withLocations([TEST_LOCATION])
+            .withNumberOfEmployeeRange("10-19")
+            .build(),
+        )
+        .withContact(
+          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
+        )
+        .withOffers([
+          new OfferEntityBuilder()
+            .withAppellationCode(contactEstablishment.appellationCode)
+            .build(),
+        ])
+        .build(),
+    ];
+
+    const { locationId: _, ...contactEstablishmentWithoutLocationId } =
+      contactEstablishment;
+
+    const { body, status } = await request
+      .post("/v2/contact-establishment")
+      .set(
+        "Authorization",
+        generateApiConsumerJwt({
+          id: authorizedUnJeuneUneSolutionApiConsumer.id,
+        }),
+      )
+      .send(contactEstablishmentWithoutLocationId);
+
+    expectToEqual(body, "");
+    expectToEqual(status, 201);
+  });
 });

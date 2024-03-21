@@ -14,7 +14,7 @@ type ContactInformationPublicV2<T extends ContactMethod> = {
   potentialBeneficiaryLastName: string;
   potentialBeneficiaryEmail: string;
   contactMode: T;
-  locationId: LocationId;
+  locationId?: LocationId;
 };
 
 type ContactEstablishmentByMailPublicV2Dto =
@@ -36,6 +36,11 @@ export type ContactEstablishmentPublicV2Dto =
   | ContactEstablishmentInPersonPublicV2Dto
   | ContactEstablishmentByMailPublicV2Dto;
 
-export const contactEstablishmentPublicV2ToDomain = (
-  contactRequest: ContactEstablishmentPublicV2Dto,
-): ContactEstablishmentRequestDto => contactRequest;
+export const contactEstablishmentPublicV2ToDomain =
+  (getLocationId: () => Promise<LocationId>) =>
+  async (
+    contactRequest: ContactEstablishmentPublicV2Dto,
+  ): Promise<ContactEstablishmentRequestDto> => ({
+    ...contactRequest,
+    locationId: await getLocationId(),
+  });
