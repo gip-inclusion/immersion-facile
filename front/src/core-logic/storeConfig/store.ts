@@ -38,6 +38,8 @@ import { agencyInfoSlice } from "../domain/agencyInfo/agencyInfo.slice";
 import { authEpics } from "../domain/auth/auth.epics";
 import { conventionEpics } from "../domain/convention/convention.epics";
 import { conventionSlice } from "../domain/convention/convention.slice";
+import { discussionEpics } from "../domain/discussion/discussion.epics";
+import { discussionSlice } from "../domain/discussion/discussion.slice";
 import { establishmentBatchEpics } from "../domain/establishmentBatch/establishmentBatch.epics";
 import { establishmentBatchSlice } from "../domain/establishmentBatch/establishmentBatch.slice";
 import { establishmentSlice } from "../domain/establishmentPath/establishment.slice";
@@ -45,8 +47,10 @@ import { geosearchEpics } from "../domain/geosearch/geosearch.epics";
 import { geosearchSlice } from "../domain/geosearch/geosearch.slice";
 import { partnersErroredConventionEpics } from "../domain/partnersErroredConvention/partnersErroredConvention.epics";
 import { partnersErroredConventionSlice } from "../domain/partnersErroredConvention/partnersErroredConvention.slice";
+import { AppEpic } from "./redux.helpers";
 
-const allEpics: any[] = [
+const allEpics: AppEpic<any>[] = [
+  //TODO order alpha
   ...rootAppEpics,
   ...dashboardUrlsEpics,
   ...notificationsEpics,
@@ -68,9 +72,11 @@ const allEpics: any[] = [
   ...apiConsumerEpics,
   ...partnersErroredConventionEpics,
   ...establishmentLeadEpics,
+  ...discussionEpics,
 ];
 
 const appReducer = combineReducers({
+  // TODO : order alpha
   [agencyInfoSlice.name]: agencyInfoSlice.reducer,
   [agenciesSlice.name]: agenciesSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
@@ -85,6 +91,7 @@ const appReducer = combineReducers({
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,
   [establishmentLeadSlice.name]: establishmentLeadSlice.reducer,
+  [discussionSlice.name]: discussionSlice.reducer,
   admin: combineReducers({
     [agencyAdminSlice.name]: agencyAdminSlice.reducer,
     [icUsersAdminSlice.name]: icUsersAdminSlice.reducer,

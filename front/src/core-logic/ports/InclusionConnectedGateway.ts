@@ -3,10 +3,12 @@ import {
   AbsoluteUrl,
   AgencyId,
   ConventionSupportedJwt,
+  DiscussionReadDto,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
   WithSourcePage,
 } from "shared";
+import { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
 
 export interface InclusionConnectedGateway {
   getCurrentUser$(token: string): Observable<InclusionConnectedUser>;
@@ -18,5 +20,8 @@ export interface InclusionConnectedGateway {
     params: MarkPartnersErroredConventionAsHandledRequest,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
+  getDiscussionById$(
+    payload: FetchDiscussionRequestedPayload,
+  ): Observable<DiscussionReadDto | undefined>;
   getLogoutUrl$(params: WithSourcePage): Observable<AbsoluteUrl>;
 }
