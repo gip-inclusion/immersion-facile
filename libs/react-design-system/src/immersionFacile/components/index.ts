@@ -31,3 +31,4 @@ export * from "./skip-links";
 export * from "./submit-confirmation-section";
 export * from "./toastr";
 export * from "./tooltip";
+export * from "./exchange-message";
