@@ -2,9 +2,13 @@ import { Observable, Subject, delay, of, throwError } from "rxjs";
 import {
   AbsoluteUrl,
   AgencyId,
+  DiscussionBuilder,
+  DiscussionReadDto,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  discussionToRead,
 } from "shared";
+import { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 const simulatedUserConnected: InclusionConnectedUser = {
@@ -25,6 +29,13 @@ export class SimulatedInclusionConnectedGateway
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
   constructor(private simulatedLatency = 0) {}
+  getDiscussionById$(
+    _payload: FetchDiscussionRequestedPayload,
+  ): Observable<DiscussionReadDto | undefined> {
+    return of(discussionToRead(new DiscussionBuilder().build())).pipe(
+      delay(this.simulatedLatency),
+    );
+  }
 
   public getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
     return of(simulatedUserConnected);
