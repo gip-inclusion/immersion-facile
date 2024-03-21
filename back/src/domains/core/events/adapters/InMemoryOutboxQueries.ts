@@ -22,7 +22,7 @@ export class InMemoryOutboxQueries implements OutboxQueries {
     });
   }
 
-  public async getAllUnpublishedEvents() {
+  public async getEventsToPublish() {
     const allEvents = this.outboxRepository.events;
     logger.debug(
       { allEvents: eventsToDebugInfo(allEvents) },
