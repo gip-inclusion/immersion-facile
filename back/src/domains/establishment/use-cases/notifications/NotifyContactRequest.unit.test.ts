@@ -1,6 +1,7 @@
 import {
   ContactEstablishmentEventPayload,
   ContactMethod,
+  DiscussionBuilder,
   addressDtoToString,
   expectPromiseToFailWithError,
   immersionFacileNoReplyEmailSender,
@@ -19,10 +20,7 @@ import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTim
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import {
-  DiscussionBuilder,
-  InMemoryDiscussionRepository,
-} from "../../adapters/InMemoryDiscussionRepository";
+import { InMemoryDiscussionRepository } from "../../adapters/InMemoryDiscussionRepository";
 import {
   TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,

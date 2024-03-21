@@ -1,6 +1,11 @@
 import { addDays } from "date-fns";
 import { Pool } from "pg";
-import { AppellationAndRomeDto, DiscussionDto, expectToEqual } from "shared";
+import {
+  AppellationAndRomeDto,
+  DiscussionBuilder,
+  DiscussionDto,
+  expectToEqual,
+} from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
@@ -8,7 +13,6 @@ import {
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
 import { HasDiscussionMatchingParams } from "../ports/DiscussionRepository";
-import { DiscussionBuilder } from "./InMemoryDiscussionRepository";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 

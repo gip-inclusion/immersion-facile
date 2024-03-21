@@ -2,10 +2,12 @@ import {
   AgencyDtoBuilder,
   AuthenticatedUser,
   ConventionDtoBuilder,
+  DiscussionBuilder,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   allowedStartInclusionConnectLoginPages,
   currentJwtVersions,
+  discussionToRead,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -19,8 +21,6 @@ import { Gateways } from "../../../../config/bootstrap/createGateways";
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToPeServiceName } from "../../../../domains/core/saved-errors/ports/SavedErrorRepository";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { DiscussionBuilder } from "../../../../domains/establishment/adapters/InMemoryDiscussionRepository";
-import { discussionToRead } from "../../../../domains/establishment/helpers/discussion.helpers";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {

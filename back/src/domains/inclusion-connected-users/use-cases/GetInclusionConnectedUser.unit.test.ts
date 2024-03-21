@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   AuthenticatedUser,
   ConventionDtoBuilder,
+  DiscussionBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   allAgencyRoles,
@@ -16,7 +17,6 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { DiscussionBuilder } from "../../establishment/adapters/InMemoryDiscussionRepository";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 
 describe("GetUserAgencyDashboardUrl", () => {

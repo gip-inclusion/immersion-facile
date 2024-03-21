@@ -1,5 +1,6 @@
 import {
   AuthenticatedUser,
+  DiscussionBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -13,7 +14,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { DiscussionBuilder } from "../../adapters/InMemoryDiscussionRepository";
+
 import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstablishment";
 
 const user: AuthenticatedUser = {

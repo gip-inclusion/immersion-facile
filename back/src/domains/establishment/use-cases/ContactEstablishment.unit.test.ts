@@ -3,6 +3,7 @@ import subDays from "date-fns/subDays";
 import {
   AppellationAndRomeDto,
   ContactEstablishmentRequestDto,
+  DiscussionBuilder,
   Location,
   expectArraysToEqual,
   expectPromiseToFailWithError,
@@ -23,7 +24,6 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { DiscussionBuilder } from "../adapters/InMemoryDiscussionRepository";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
