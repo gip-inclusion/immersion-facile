@@ -153,7 +153,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       });
 
     expectToEqual(body, {
-      message: `No offer found for siret ${siretNotInDB} and appellation code ${styliste.appellationCode}`,
+      message: `No establishment found with siret: ${siretNotInDB}`,
       status: 404,
     });
     expectToEqual(status, 404);

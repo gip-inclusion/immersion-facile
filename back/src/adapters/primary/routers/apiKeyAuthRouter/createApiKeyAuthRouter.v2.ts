@@ -1,6 +1,12 @@
 import { Router } from "express";
 import { andThen, keys, map } from "ramda";
-import { eventToRightName, isApiConsumerAllowed, pipeWithValue } from "shared";
+import {
+  LocationId,
+  SiretDto,
+  eventToRightName,
+  isApiConsumerAllowed,
+  pipeWithValue,
+} from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import {
@@ -9,6 +15,7 @@ import {
   validateAndParseZodSchemaV2,
 } from "../../../../config/helpers/httpErrors";
 import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";
+import { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { createLogger } from "../../../../utils/logger";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
@@ -77,20 +84,12 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
           })
         )
           throw new ForbiddenError();
-        const locationId = await deps.uowPerformer.perform(async (uow) => {
-          const aggregate =
-            await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-              req.params.siret,
-            );
-          if (aggregate) {
-            return aggregate.establishment.locations[0].id;
-          }
-        });
-        if (!locationId) {
-          throw new NotFoundError(
-            `No offer found for siret ${req.params.siret} and appellation code ${req.params.appellationCode}`,
-          );
-        }
+
+        const locationId = await getFirstLocationIdOrThrow(
+          deps.uowPerformer,
+          req.params.siret,
+        );
+
         return domainToSearchImmersionResultPublicV2(
           await deps.useCases.getSearchResultBySearchQuery.execute(
             {
@@ -121,9 +120,12 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
             req.body,
             logger,
           ),
-          contactEstablishmentPublicV2ToDomain,
-          (contactRequest) =>
+          contactEstablishmentPublicV2ToDomain(() =>
+            getFirstLocationIdOrThrow(deps.uowPerformer, req.body.siret),
+          ),
+          andThen((contactRequest) =>
             deps.useCases.contactEstablishment.execute(contactRequest),
+          ),
         );
       }),
   );
@@ -223,4 +225,27 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   return v2ExpressRouter;
+};
+
+const getFirstLocationIdOrThrow = async (
+  uowPerformer: UnitOfWorkPerformer,
+  siret: SiretDto,
+): Promise<LocationId> => {
+  return uowPerformer.perform(async (uow) => {
+    const aggregate =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        siret,
+      );
+
+    if (!aggregate)
+      throw new NotFoundError(`No establishment found with siret: ${siret}`);
+
+    if (aggregate.establishment.locations[0]?.id) {
+      return aggregate.establishment.locations[0].id;
+    }
+
+    throw new NotFoundError(
+      `No location found for establishment with siret: ${siret}`,
+    );
+  });
 };
