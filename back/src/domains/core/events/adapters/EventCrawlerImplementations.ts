@@ -100,7 +100,7 @@ export class BasicEventCrawler implements EventCrawler {
     try {
       const events = await this.uowPerformer.perform((uow) =>
         type === "unpublished"
-          ? uow.outboxQueries.getAllUnpublishedEvents({
+          ? uow.outboxQueries.getEventsToPublish({
               limit: crawlerMaxBatchSize,
             })
           : uow.outboxQueries.getFailedEvents({ limit: crawlerMaxBatchSize }),

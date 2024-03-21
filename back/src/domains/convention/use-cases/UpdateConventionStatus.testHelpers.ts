@@ -275,7 +275,7 @@ const expectNewEvent = async <T extends DomainTopic>(
 ) => {
   const allEvents = await new InMemoryOutboxQueries(
     outboxRepository,
-  ).getAllUnpublishedEvents();
+  ).getEventsToPublish();
   expect(allEvents).toHaveLength(1);
   expect(allEvents[0]).toMatchObject(expectedEvent);
 };

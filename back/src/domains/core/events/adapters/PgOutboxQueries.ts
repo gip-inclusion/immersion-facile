@@ -63,7 +63,7 @@ export class PgOutboxQueries implements OutboxQueries {
     return convertRowsToDomainEvents(rows);
   }
 
-  public async getAllUnpublishedEvents(params: { limit: number }): Promise<
+  public async getEventsToPublish(params: { limit: number }): Promise<
     DomainEvent[]
   > {
     const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
@@ -76,7 +76,7 @@ export class PgOutboxQueries implements OutboxQueries {
     LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
     LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
     WHERE was_quarantined = false AND status IN ('never-published', 'to-republish')
-    ORDER BY published_at ASC
+    ORDER BY occurred_at ASC
     LIMIT ${params.limit}
     `,
     );
