@@ -1,10 +1,4 @@
-import {
-  DiscussionDto,
-  DiscussionId,
-  DiscussionReadDto,
-  Exchange,
-  ExchangeRole,
-} from "shared";
+import { DiscussionDto, DiscussionId, Exchange, ExchangeRole } from "shared";
 
 export const addExchangeToDiscussion = (
   discussion: DiscussionDto,
@@ -23,20 +17,3 @@ export const createOpaqueEmail = (
 
   return `${discussionId}_${recipientLetter}@${replyDomain}`;
 };
-
-export const discussionToRead = (
-  discussion: DiscussionDto,
-): DiscussionReadDto => ({
-  ...discussion,
-  potentialBeneficiary: {
-    firstName: discussion.potentialBeneficiary.firstName,
-    lastName: discussion.potentialBeneficiary.lastName,
-    resumeLink: discussion.potentialBeneficiary.resumeLink,
-  },
-  establishmentContact: {
-    firstName: discussion.establishmentContact.firstName,
-    lastName: discussion.establishmentContact.lastName,
-    job: discussion.establishmentContact.job,
-    contactMethod: discussion.establishmentContact.contactMethod,
-  },
-});

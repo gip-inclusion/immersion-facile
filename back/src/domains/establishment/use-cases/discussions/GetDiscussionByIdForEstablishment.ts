@@ -3,6 +3,7 @@ import {
   DiscussionReadDto,
   InclusionConnectDomainJwtPayload,
   discussionIdSchema,
+  discussionToRead,
 } from "shared";
 import {
   ForbiddenError,
@@ -11,7 +12,6 @@ import {
 } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { discussionToRead } from "../../helpers/discussion.helpers";
 
 export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
   DiscussionId,

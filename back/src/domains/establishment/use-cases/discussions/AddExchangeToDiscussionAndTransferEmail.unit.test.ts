@@ -1,5 +1,6 @@
 import {
   BrevoInboundBody,
+  DiscussionBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
   immersionFacileNoReplyEmailSender,
@@ -18,10 +19,7 @@ import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTim
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import {
-  DiscussionBuilder,
-  InMemoryDiscussionRepository,
-} from "../../adapters/InMemoryDiscussionRepository";
+import { InMemoryDiscussionRepository } from "../../adapters/InMemoryDiscussionRepository";
 import { AddExchangeToDiscussionAndTransferEmail } from "./AddExchangeToDiscussionAndTransferEmail";
 
 const domain = "my-domain.com";

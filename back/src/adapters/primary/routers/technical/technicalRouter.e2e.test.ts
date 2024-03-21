@@ -2,6 +2,7 @@ import { createHmac } from "crypto";
 import {
   AbsoluteUrl,
   BrevoInboundBody,
+  DiscussionBuilder,
   TechnicalRoutes,
   ValidateEmailStatus,
   displayRouteName,
@@ -21,7 +22,6 @@ import {
 import { shortLinkNotFoundMessage } from "../../../../domains/core/short-link/ShortLink";
 import { ShortLinkId } from "../../../../domains/core/short-link/ports/ShortLinkQuery";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { DiscussionBuilder } from "../../../../domains/establishment/adapters/InMemoryDiscussionRepository";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
