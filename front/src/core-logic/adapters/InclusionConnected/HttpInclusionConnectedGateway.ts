@@ -2,6 +2,7 @@ import { Observable, from } from "rxjs";
 import {
   AbsoluteUrl,
   AgencyId,
+  DiscussionReadDto,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
@@ -12,6 +13,7 @@ import {
   logBodyAndThrow,
   otherwiseThrow,
 } from "src/core-logic/adapters/otherwiseThrow";
+import { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import { match } from "ts-pattern";
 
@@ -21,6 +23,30 @@ export class HttpInclusionConnectedGateway
   constructor(
     private readonly httpClient: HttpClient<InclusionConnectedAllowedRoutes>,
   ) {}
+  getDiscussionById$({
+    discussionId,
+    jwt,
+  }: FetchDiscussionRequestedPayload): Observable<
+    DiscussionReadDto | undefined
+  > {
+    return from(
+      this.httpClient
+        .getDiscussionByIdForEstablishment({
+          headers: { authorization: jwt },
+          urlParams: {
+            discussionId,
+          },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 403 }, logBodyAndThrow)
+            .with({ status: 404 }, () => undefined)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
 
   public getCurrentUser$(token: string): Observable<InclusionConnectedUser> {
     return from(
