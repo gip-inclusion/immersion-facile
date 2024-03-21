@@ -9,9 +9,9 @@ import { CreateNewEvent, makeCreateNewEvent } from "../ports/EventBus";
 import { PgOutboxQueries } from "./PgOutboxQueries";
 import { PgOutboxRepository } from "./PgOutboxRepository";
 
-let event1: DomainEvent;
-let event2: DomainEvent;
-let event3: DomainEvent;
+let neverPublished1: DomainEvent;
+let neverPublished2: DomainEvent;
+let neverPublished3: DomainEvent;
 let eventFailedToRerun: DomainEvent;
 let withFailureButEventuallySuccessfulEvent: DomainEvent;
 let alreadyProcessedEvent: DomainEvent;
@@ -30,21 +30,21 @@ const createEvents = async (
   uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
   timeGateway.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
   convention = new ConventionDtoBuilder().build();
-  event1 = createNewEvent({
+  neverPublished1 = createNewEvent({
     topic: "ConventionSubmittedByBeneficiary",
     payload: { convention },
   });
 
   uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
   timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
-  event2 = createNewEvent({
+  neverPublished2 = createNewEvent({
     topic: "ConventionSubmittedByBeneficiary",
     payload: { convention },
   });
 
   uuidGenerator.setNextUuid("cbcbcc99-9c0b-bbbb-bb6d-6bb9bd38cccc");
   timeGateway.setNextDate(new Date("2021-11-15T10:02:00.000Z"));
-  event3 = createNewEvent({
+  neverPublished3 = createNewEvent({
     topic: "ConventionSubmittedByBeneficiary",
     payload: { convention },
   });
@@ -167,10 +167,19 @@ describe("PgOutboxQueries for crawling purposes", () => {
   });
 
   it("finds all events to be processed", async () => {
+    timeGateway.setNextDate(new Date("2020-11-15T09:00:00.000Z"));
+    uuidGenerator.setNextUuid("cccccc77-9c0c-cccc-cc6d-6cc9cd38cccc");
+    const eventToRepublish = createNewEvent({
+      topic: "ConventionSubmittedByBeneficiary",
+      payload: { convention },
+      publications: [{ publishedAt: "2020-11-05T08:30:00.000Z", failures: [] }],
+      status: "to-republish",
+    });
+
     await storeInOutbox([
-      event2,
-      event1,
-      event3,
+      neverPublished2,
+      neverPublished1,
+      neverPublished3,
       alreadyProcessedEvent,
       quarantinedEvent,
       inProcessEvent,
@@ -181,7 +190,12 @@ describe("PgOutboxQueries for crawling purposes", () => {
 
     // assert
     expect(events.length).toBe(2);
-    const expectedEventIds = [event1.id, event2.id, event3.id];
+    const expectedEventIds = [
+      eventToRepublish.id,
+      neverPublished1.id,
+      neverPublished2.id,
+      neverPublished3.id,
+    ];
     const unexpectedEventIds = events.filter(
       (event) => !expectedEventIds.includes(event.id),
     );
@@ -191,7 +205,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
   it("finds all events that have failed and should be reprocessed", async () => {
     await storeInOutbox([
       eventFailedToRerun,
-      event1,
+      neverPublished1,
       withFailureButEventuallySuccessfulEvent,
       failedButQuarantinedEvent,
       inProcessEvent,
