@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
 import { immersionObjectiveSchema } from "../convention/convention.schema";
 import { contactMethodSchema } from "../formEstablishment/FormEstablishment.schema";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { dateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zStringMinLength1 } from "../zodUtils";
+import { zStringMinLength1, zStringPossiblyEmpty } from "../zodUtils";
 import {
   DiscussionId,
   DiscussionReadDto,
@@ -38,7 +37,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> = z.object({
   potentialBeneficiary: z.object({
     firstName: zStringMinLength1,
     lastName: zStringMinLength1,
-    resumeLink: absoluteUrlSchema.optional(),
+    resumeLink: zStringPossiblyEmpty,
   }),
   establishmentContact: z.object({
     firstName: zStringMinLength1,
