@@ -9,12 +9,10 @@ type DiscussionManagePageProps = {
   route: Route<typeof routes.manageDiscussion>;
 };
 
-export const DiscussionManagePage = ({ route }: DiscussionManagePageProps) => {
-  return (
-    <HeaderFooterLayout>
-      <MainWrapper layout="default" vSpacing={8}>
-        <DiscussionManageContent discussionId={route.params.discussionId} />
-      </MainWrapper>
-    </HeaderFooterLayout>
-  );
-};
+export const DiscussionManagePage = ({ route }: DiscussionManagePageProps) => (
+  <HeaderFooterLayout>
+    <MainWrapper layout="default" vSpacing={8}>
+      <DiscussionManageContent discussionId={route.params.discussionId} />
+    </MainWrapper>
+  </HeaderFooterLayout>
+);
