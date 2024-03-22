@@ -62,6 +62,8 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
     jobSeekers: true,
     students: true,
   },
+  mtmKwd: undefined,
+  mtmCampaign: undefined,
 };
 
 const emptyFormEstablishment: FormEstablishmentDto = {
@@ -92,6 +94,8 @@ const emptyFormEstablishment: FormEstablishmentDto = {
     jobSeekers: true,
     students: false,
   },
+  mtmKwd: undefined,
+  mtmCampaign: undefined,
 };
 
 export class FormEstablishmentDtoBuilder

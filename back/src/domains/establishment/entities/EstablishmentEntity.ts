@@ -6,6 +6,7 @@ import {
   NafDto,
   NumberEmployeesRange,
   SiretDto,
+  WithMatomo,
 } from "shared";
 import { ContactEntity } from "./ContactEntity";
 import { OfferEntity } from "./OfferEntity";
@@ -34,7 +35,7 @@ export type EstablishmentEntity = {
   additionalInformation?: string;
   maxContactsPerWeek: number;
   searchableBy: EstablishmentSearchableBy;
-};
+} & WithMatomo;
 
 export type EstablishmentAggregate = {
   establishment: EstablishmentEntity;

@@ -7,6 +7,7 @@ import {
 } from "../admin/admin.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
+import { withMatomoSchema } from "../matomo.dto";
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
@@ -95,6 +96,7 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
     }),
   )
+  .and(withMatomoSchema)
   .superRefine((createAgency, context) => {
     if (
       createAgency.refersToAgencyId &&
@@ -122,7 +124,8 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       rejectionJustification: zStringMinLength1.or(z.null()),
     }),
-  );
+  )
+  .and(withMatomoSchema);
 
 export const agencySchema: z.ZodSchema<AgencyDto> = z
   .object(commonAgencyShape)
@@ -136,7 +139,8 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       rejectionJustification: z.string().or(z.null()),
     }),
-  );
+  )
+  .and(withMatomoSchema);
 
 export const withAgencySchema: z.ZodSchema<WithAgencyDto> = z.object({
   agency: agencySchema,

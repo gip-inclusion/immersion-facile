@@ -7,6 +7,7 @@ import {
 } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
+import { withMatomoSchema } from "../matomo.dto";
 import { allModifierRoles, allRoles } from "../role/role.dto";
 import {
   appellationCodeSchema,
@@ -204,37 +205,45 @@ const renewedSchema = z.object({
   justification: zStringMinLength1,
 });
 
-const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
-  id: conventionIdSchema,
-  status: z.enum(conventionStatuses),
-  statusJustification: z.string().optional(),
-  agencyId: agencyIdSchema,
-  dateSubmission: zStringMinLength1.regex(dateRegExp, localization.invalidDate),
-  dateStart: zStringMinLength1.regex(dateRegExp, localization.invalidDateStart),
-  dateEnd: zStringMinLength1.regex(dateRegExp, localization.invalidDateEnd),
-  dateValidation: zStringMinLength1
-    .regex(dateRegExp, localization.invalidValidationFormatDate)
-    .optional(),
-  dateApproval: zStringMinLength1
-    .regex(dateRegExp, localization.invalidApprovalFormatDate)
-    .optional(),
-  siret: siretSchema,
-  businessName: zTrimmedString,
-  schedule: scheduleSchema,
-  workConditions: z.string().optional(),
-  businessAdvantages: z.string().optional(),
-  individualProtection: zBoolean,
-  sanitaryPrevention: zBoolean,
-  sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
-  immersionAddress: addressWithPostalCodeSchema,
-  immersionObjective: immersionObjectiveSchema,
-  immersionAppellation: appellationDtoSchema,
-  immersionActivities: zTrimmedStringWithMax(2000),
-  immersionSkills: zStringPossiblyEmptyWithMax(2000),
-  establishmentTutor: establishmentTutorSchema,
-  validators: conventionValidatorsSchema.optional(),
-  renewed: renewedSchema.optional(),
-});
+const conventionCommonSchema: z.Schema<ConventionCommon> = z
+  .object({
+    id: conventionIdSchema,
+    status: z.enum(conventionStatuses),
+    statusJustification: z.string().optional(),
+    agencyId: agencyIdSchema,
+    dateSubmission: zStringMinLength1.regex(
+      dateRegExp,
+      localization.invalidDate,
+    ),
+    dateStart: zStringMinLength1.regex(
+      dateRegExp,
+      localization.invalidDateStart,
+    ),
+    dateEnd: zStringMinLength1.regex(dateRegExp, localization.invalidDateEnd),
+    dateValidation: zStringMinLength1
+      .regex(dateRegExp, localization.invalidValidationFormatDate)
+      .optional(),
+    dateApproval: zStringMinLength1
+      .regex(dateRegExp, localization.invalidApprovalFormatDate)
+      .optional(),
+    siret: siretSchema,
+    businessName: zTrimmedString,
+    schedule: scheduleSchema,
+    workConditions: z.string().optional(),
+    businessAdvantages: z.string().optional(),
+    individualProtection: zBoolean,
+    sanitaryPrevention: zBoolean,
+    sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
+    immersionAddress: addressWithPostalCodeSchema,
+    immersionObjective: immersionObjectiveSchema,
+    immersionAppellation: appellationDtoSchema,
+    immersionActivities: zTrimmedStringWithMax(2000),
+    immersionSkills: zStringPossiblyEmptyWithMax(2000),
+    establishmentTutor: establishmentTutorSchema,
+    validators: conventionValidatorsSchema.optional(),
+    renewed: renewedSchema.optional(),
+  })
+  .and(withMatomoSchema);
 
 export const internshipKindSchema: z.Schema<InternshipKind> =
   z.enum(internshipKinds);
