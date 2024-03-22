@@ -78,7 +78,8 @@ export const ConventionManageContent = ({
       .replace();
   }
   if (isLoading) return <Loader />;
-  if (!role) return <p>Pas de rôle correspondant</p>;
+  if (!role)
+    return <p>Vous n'êtes pas autorisé à accéder à cette convention</p>;
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
 
   return (
