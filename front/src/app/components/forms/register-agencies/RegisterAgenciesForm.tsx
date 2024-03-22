@@ -44,6 +44,7 @@ export const RegisterAgenciesForm = () => {
             }),
           ),
         )}
+        id={"im-form-register-agencies"}
       >
         <MultipleAgencyInput
           initialAgencies={watch("agencies")}

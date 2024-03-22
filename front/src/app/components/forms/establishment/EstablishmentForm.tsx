@@ -12,6 +12,7 @@ import {
   EstablishmentJwtPayload,
   FormEstablishmentDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  domElementIds,
   expiredMagicLinkErrorMessage,
   formEstablishmentSchema,
   noContactPerWeek,
@@ -327,7 +328,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     ))
     .otherwise(() => (
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          id={domElementIds.establishment.form[mode]}
+        >
           {match(currentStep)
             .with(null, () => (
               <>

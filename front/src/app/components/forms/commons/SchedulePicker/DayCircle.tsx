@@ -25,6 +25,7 @@ export const DayCircle = ({
           style={{ backgroundColor: "#B8FEC9" }}
           onClick={onClick}
           disabled={disabled}
+          id={`im-schedule-regular__day--${name}`}
         >
           <div>{name}</div>
         </button>

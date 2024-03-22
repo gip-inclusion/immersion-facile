@@ -390,7 +390,10 @@ export const RenewConventionForm = ({
   };
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={methods.handleSubmit(onSubmit)}
+        id="im-convention-renew-form"
+      >
         <Input
           label="Id de la convention renouvelée"
           hintText={

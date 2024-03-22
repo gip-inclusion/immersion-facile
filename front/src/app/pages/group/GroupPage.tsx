@@ -157,6 +157,7 @@ const GroupPageContent = ({ group, results }: GroupWithResults) => {
           <form
             className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
             onSubmit={onFilterSubmit}
+            id="im-group-page-filter-form"
           >
             <div className={fr.cx("fr-col-12", "fr-col-sm-8")}>
               <Input

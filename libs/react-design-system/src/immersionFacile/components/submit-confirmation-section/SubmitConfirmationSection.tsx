@@ -51,6 +51,7 @@ export const SubmitConfirmationSection = ({
               "fr-mt-2w",
               "fr-mt-md-0",
             )}
+            id={"im-submit-confirmation-section__copy-button"}
           >
             {copyButtonLabel}
           </Button>

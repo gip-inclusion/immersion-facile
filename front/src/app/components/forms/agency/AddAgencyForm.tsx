@@ -159,7 +159,10 @@ const AgencyForm = ({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onFormValid)}>
+      <form
+        onSubmit={handleSubmit(onFormValid)}
+        id={domElementIds.addAgency.formAdd}
+      >
         <p className={fr.cx("fr-text--xs")}>
           Tous les champs marqués d'une astérisque (*) sont obligatoires.
         </p>

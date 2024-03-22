@@ -140,6 +140,7 @@ export const SearchPage = ({
               Styles.form,
               Styles.formV2,
             )}
+            id={domElementIds.search.searchForm}
           >
             <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
               <AppellationAutocomplete

@@ -73,7 +73,10 @@ export const ContactInPerson = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormValid)}>
+    <form
+      onSubmit={handleSubmit(onFormValid)}
+      id={"im-contact-form--in-person"}
+    >
       <>
         <p className={"fr-my-2w"}>
           Cette entreprise souhaite que vous vous présentiez directement pour

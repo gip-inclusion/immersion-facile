@@ -52,7 +52,7 @@ export const AssessmentForm = ({
   const getFieldError = makeFieldError(formState);
 
   return (
-    <form onSubmit={handleSubmit(createAssessment)}>
+    <form onSubmit={handleSubmit(createAssessment)} id="im-form-assessment">
       <RadioButtons
         options={assessmentStatuses.map((value) => ({
           label: getLabels(convention.internshipKind)[value],

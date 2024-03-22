@@ -9,6 +9,7 @@ import {
   ConventionDto,
   ConventionReadDto,
   UpdateConventionStatusRequestDto,
+  domElementIds,
   isConventionRenewed,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
@@ -116,7 +117,7 @@ export const ConventionSignForm = ({
         <ConventionRenewedInformations renewed={convention.renewed} />
       )}
       <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
-      <form>
+      <form id={domElementIds.conventionToSign.form}>
         {currentSignatory && <ConventionSummary />}
 
         <ConventionFeedbackNotification

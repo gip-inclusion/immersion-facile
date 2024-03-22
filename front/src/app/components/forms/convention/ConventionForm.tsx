@@ -317,7 +317,11 @@ export const ConventionForm = ({
                       obligatoires.
                     </p>
 
-                    <form>
+                    <form
+                      id={domElementIds.conventionImmersionRoute.form({
+                        mode,
+                      })}
+                    >
                       <ConventionFormFields onSubmit={onSubmit} mode={mode} />
                       <ConventionFeedbackNotification
                         submitFeedback={submitFeedback}
@@ -344,8 +348,12 @@ export const ConventionForm = ({
                         <Button
                           type="submit"
                           onClick={methods.handleSubmit(onSubmit)}
+                          id={
+                            domElementIds.conventionImmersionRoute
+                              .submitFormButtonMobile
+                          }
                         >
-                          Envoyer la convention
+                          Vérifier la demande
                         </Button>
                       </div>
                     }
@@ -436,6 +444,7 @@ const ConventionSummarySection = (props: {
                 }),
               );
             },
+            id: domElementIds.conventionImmersionRoute.summaryEditButton,
             priority: "secondary",
           },
           {
