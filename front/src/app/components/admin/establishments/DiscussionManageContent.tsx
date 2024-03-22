@@ -46,8 +46,6 @@ const DiscussionDetails = ({
         iconId="fr-icon-arrow-left-line"
         iconPosition="left"
         className={fr.cx("fr-mb-2w")}
-        // TODO : lors du click retour on arrive bien sur la page de pilotage mais pas sur l'onglet des mises en relation,
-        // faudra prévoir un param pour rappel onglet de pilotage entreprise qui ne doit pas être en place
       >
         Retour
       </Button>
@@ -55,10 +53,7 @@ const DiscussionDetails = ({
         Discussion avec {potentialBeneficiary.firstName}{" "}
         {potentialBeneficiary.lastName}
       </h1>
-      <p>
-        {immersionObjective} . !!! APPELATION LABEL !!!! . !!! EMAIL !!! . !!!
-        TEL !!!
-      </p>
+      <p>{immersionObjective}</p>
     </header>
     {exchanges.map(({ sender, sentAt, subject, message }) => (
       <ExchangeMessage sender={sender}>
@@ -71,11 +66,6 @@ const DiscussionDetails = ({
                 ? `${businessName}`
                 : `${potentialBeneficiary.firstName} ${potentialBeneficiary.lastName}`}
             </h2>
-            <span className={fr.cx("fr-hint-text")}>
-              {sender === "establishment"
-                ? "!!! establishmentContact.email !!!"
-                : "!!!  potentialBeneficiary.email !!! "}
-            </span>
           </div>
           <div className={fr.cx("fr-ml-auto")}>
             <div className={fr.cx("fr-mb-2w")}>
