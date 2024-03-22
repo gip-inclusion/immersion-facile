@@ -61,7 +61,7 @@ export const MultipleAppellationInput = ({
                 iconId="fr-icon-delete-bin-line"
                 title="Suppression"
                 disabled={disabled}
-                id="im-mulitple-appellation-input__delete-option-button"
+                id="im-multiple-appellation-input__delete-option-button"
                 onClick={() => {
                   onAppellationDelete(index);
                 }}
