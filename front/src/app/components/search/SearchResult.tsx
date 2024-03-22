@@ -20,7 +20,7 @@ export type EnterpriseSearchResultProps = {
   disableButton?: boolean;
   preview?: boolean;
   showDistance?: boolean;
-  layout?: "fr-col-lg-4" | "fr-col-md-6";
+  layout?: "fr-col-lg-4" | "fr-col-md-6" | "fr-col-12";
 };
 
 const componentName = "im-search-result";
@@ -70,7 +70,7 @@ const SearchResultComponent = ({
   ].join("");
 
   return (
-    <div className={fr.cx("fr-col-12", "fr-col-md-6", layout)}>
+    <div className={fr.cx("fr-col-12", layout)}>
       <div
         className={cx(fr.cx("fr-card"), componentName)}
         data-establishment-siret={siret}
