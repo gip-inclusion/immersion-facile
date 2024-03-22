@@ -1,7 +1,8 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
+  WithMatomo,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -10,7 +11,7 @@ import {
   ConflictError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
   formEstablishementUpdateFailedErrorMessage,
@@ -40,23 +41,22 @@ describe("PgFormEstablishmentRepository", () => {
     .build();
 
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let formEstablishmentRepository: PgFormEstablishmentRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM form_establishments");
+    await db.deleteFrom("form_establishments").execute();
     formEstablishmentRepository = new PgFormEstablishmentRepository(
       makeKyselyDb(pool),
     );
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
@@ -168,5 +168,30 @@ describe("PgFormEstablishmentRepository", () => {
         ),
       );
     });
+  });
+
+  it("stores matomo campaign params when provided", async () => {
+    const mtm = {
+      mtmKwd: "yolo",
+      mtmCampaign: "my campaign",
+    } satisfies WithMatomo;
+
+    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withMtm(mtm)
+      .build();
+
+    await formEstablishmentRepository.create(formEstablishment);
+
+    const result = await db
+      .selectFrom("form_establishments")
+      .select(["mtm_keyword", "mtm_campaign"])
+      .execute();
+
+    expectToEqual(result, [
+      {
+        mtm_campaign: mtm.mtmCampaign,
+        mtm_keyword: mtm.mtmKwd,
+      },
+    ]);
   });
 });

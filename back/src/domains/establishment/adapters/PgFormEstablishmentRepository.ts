@@ -54,6 +54,8 @@ export class PgFormEstablishmentRepository
         next_availability_date: formEstablishment.nextAvailabilityDate,
         searchable_by_job_seekers: formEstablishment.searchableBy.jobSeekers,
         searchable_by_students: formEstablishment.searchableBy.students,
+        mtm_campaign: formEstablishment.mtmCampaign,
+        mtm_keyword: formEstablishment.mtmKwd,
       })
       .execute()
       .then((_) => Promise.resolve())
