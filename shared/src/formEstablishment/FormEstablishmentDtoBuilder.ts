@@ -1,4 +1,5 @@
 import { Builder } from "../Builder";
+import { WithMatomo } from "../matomo.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import {
@@ -176,6 +177,10 @@ export class FormEstablishmentDtoBuilder
 
   public withSource(source: FormEstablishmentSource) {
     return new FormEstablishmentDtoBuilder({ ...this.#dto, source });
+  }
+
+  public withMtm(params: WithMatomo) {
+    return new FormEstablishmentDtoBuilder({ ...this.#dto, ...params });
   }
 }
 
