@@ -470,8 +470,10 @@ export class PgEstablishmentAggregateRepository
       );
     }
 
-    // Create contact if it does'not exist
-    if (!existingAggregate.contact) {
+    if (
+      !existingAggregate.contact ||
+      keys(existingAggregate.contact).length === 0
+    ) {
       await this.#insertContactFromAggregate(updatedAggregate);
     } else {
       // Update contact if it has changed
@@ -784,14 +786,14 @@ export class PgEstablishmentAggregateRepository
     ) {
       await executeKyselyRawSqlQuery(
         this.transaction,
-        ` UPDATE establishments_contact
+        ` UPDATE establishments_contacts
           SET lastname = $1, 
             firstname = $2, 
             email = $3, 
             job = $4, 
             phone = $5, 
             contact_mode = $6, 
-            copy_emails = $7
+            copy_emails = $7,
             siret = $8
           WHERE uuid = $9`,
         [
