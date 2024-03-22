@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { emailSchema } from "../email/email.schema";
+import { withMatomoSchema } from "../matomo.dto";
 import { nafSchema } from "../naf";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
@@ -66,8 +67,8 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "passeEmploi",
 ];
 export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources);
-export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
-  {
+export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
+  .object({
     source: formEstablishmentSourceSchema,
     siret: siretSchema,
     businessName: zTrimmedString,
@@ -112,8 +113,8 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       students: zBoolean,
       jobSeekers: zBoolean,
     }),
-  },
-);
+  })
+  .and(withMatomoSchema);
 
 export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =
   z.object({

@@ -11,11 +11,11 @@ const mtmColumns = {
   },
 };
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.addColumn("conventions", mtmColumns);
-  pgm.addColumn("form_establishments", mtmColumns);
-  pgm.addColumn("establishments", mtmColumns);
-  pgm.addColumn("agencies", mtmColumns);
-  pgm.addColumn("searches_made", mtmColumns);
+  pgm.addColumns("conventions", mtmColumns);
+  pgm.addColumns("form_establishments", mtmColumns);
+  pgm.addColumns("establishments", mtmColumns);
+  pgm.addColumns("agencies", mtmColumns);
+  pgm.addColumns("searches_made", mtmColumns);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {

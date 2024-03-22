@@ -107,6 +107,8 @@ const validConvention: ConventionDto = {
   internshipKind: "immersion",
   signatories: { beneficiary, establishmentRepresentative },
   establishmentTutor,
+  mtmKwd: undefined,
+  mtmCampaign: undefined,
 };
 
 export class ConventionDtoBuilder implements Builder<ConventionDto> {
