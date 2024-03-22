@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import {
   InternshipKind,
   ShareLinkByEmailDto,
+  domElementIds,
   shareLinkByEmailSchema,
 } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -80,7 +81,10 @@ export const ShareForm = ({
     );
   }, [conventionFormData, reset]);
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      id={domElementIds.conventionImmersionRoute.shareForm}
+    >
       <input type="hidden" {...register("conventionLink")} />
       <Input
         label="Adresse mail à qui partager la demande"
@@ -99,7 +103,12 @@ export const ShareForm = ({
         state={formState.errors.details ? "error" : "default"}
         stateRelatedMessage={formState.errors.details?.message}
       />
-      <Button type="submit" title="Envoyer" disabled={!formState.isValid}>
+      <Button
+        type="submit"
+        title="Envoyer"
+        disabled={!formState.isValid}
+        id={domElementIds.conventionImmersionRoute.shareFormSubmitButton}
+      >
         Envoyer
       </Button>
     </form>

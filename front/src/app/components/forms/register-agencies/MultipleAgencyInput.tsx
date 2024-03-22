@@ -65,6 +65,7 @@ export const MultipleAgencyInput = ({
               type="button"
               iconId="fr-icon-delete-bin-line"
               title="Suppression"
+              id="im-mulitple-agency-input__delete-option-button"
               onClick={() => {
                 const updatedAgencies = [...currentAgencies];
                 updatedAgencies.splice(index, 1);

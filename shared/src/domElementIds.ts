@@ -116,6 +116,7 @@ export const domElementIds = {
   },
 
   search: {
+    searchForm: "im-search-page__search-form",
     placeAutocompleteInput: "im-search-page__address-autocomplete",
     resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
     appellationAutocomplete: "im-search-page__appellation-autocomplete",
@@ -133,6 +134,8 @@ export const domElementIds = {
   },
 
   addAgency: {
+    formAdd: "im-form-add-agency",
+    formEdit: "im-form-edit-agency",
     uploadLogoInput: "file-upload-logo",
     id: "agency-id",
     coveredDepartmentsInput: "agency-covered-departments",
@@ -163,10 +166,17 @@ export const domElementIds = {
   },
 
   conventionImmersionRoute: {
+    form: (params) => `im-convention-immersion-form--${params.mode}`,
+    shareForm: "im-convention-immersion__share-form",
+    shareFormSubmitButton: "im-convention-immersion__share-form-submit-button",
+    copyLinkButton: "im-convention-immersion__copy-link-button",
     showFormButton: "im-convention-immersion__show-form-button",
     submitFormButton: "im-convention-immersion__submit-form-button",
+    submitFormButtonMobile:
+      "im-convention-immersion__submit-form-button--mobile",
     confirmSubmitFormButton:
       "im-convention-immersion__confirm-submit-form-button",
+    summaryEditButton: "im-convention-immersion__summary-edit-button",
     conventionSection: {
       agencyDepartment: "im-convention-form__agencyDepartement",
       agencyId: "im-convention-form__agencyId",
@@ -293,6 +303,12 @@ export const domElementIds = {
   unsubscribeEstablishmentLead: {},
 
   establishment: {
+    form: {
+      create: "im-form-add-establishment",
+      edit: "im-form-edit-establishment",
+      admin: "im-form-manage-establishment-admin",
+    },
+    formEdit: "im-form-edit-establishment",
     establishmentFormAddressAutocomplete:
       "autocomplete-address-creation-establishment-form",
     siret: "establishment-siret",
@@ -399,6 +415,7 @@ export const domElementIds = {
   },
   landingEstablishment: {},
   conventionToSign: {
+    form: "im-convention-to-sign-form",
     submitButton: "im-convention-to-sign__submit-button",
     openSignModalButton: "im-convention-to-sign__open-sign-modal-button",
     openRequestModificationModalButton:

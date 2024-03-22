@@ -73,6 +73,7 @@ export const ShareConventionLink = () => {
               onClick={() => {
                 onCopyButtonClick(window.location.href);
               }}
+              id={domElementIds.conventionImmersionRoute.copyLinkButton}
             >
               {isCopied ? t.linkCopied : t.copyLinkTooltip}
             </Button>
