@@ -15,8 +15,8 @@ import { FormEstablishmentRepository } from "../../../establishment/ports/FormEs
 import { GroupRepository } from "../../../establishment/ports/GroupRepository";
 import { SearchMadeRepository } from "../../../establishment/ports/SearchMadeRepository";
 import { ApiConsumerRepository } from "../../api-consumer/ports/ApiConsumerRepository";
-import { AuthenticatedUserRepository } from "../../authentication/inclusion-connect/port/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../authentication/inclusion-connect/port/OngoingOAuthRepositiory";
+import { UserRepository } from "../../authentication/inclusion-connect/port/UserRepositiory";
 import { ConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/port/ConventionPoleEmploiAdvisorRepository";
 import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { OutboxQueries } from "../../events/ports/OutboxQueries";
@@ -32,7 +32,7 @@ export type UnitOfWork = {
   agencyRepository: AgencyRepository;
   agencyGroupRepository: AgencyGroupRepository;
   apiConsumerRepository: ApiConsumerRepository;
-  authenticatedUserRepository: AuthenticatedUserRepository;
+  userRepository: UserRepository;
   conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
   conventionExternalIdRepository: ConventionExternalIdRepository;
   conventionQueries: ConventionQueries;

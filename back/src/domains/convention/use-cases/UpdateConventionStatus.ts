@@ -1,7 +1,6 @@
 import {
   AgencyId,
   AgencyRole,
-  AuthenticatedUserId,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionRelatedJwtPayload,
@@ -9,6 +8,7 @@ import {
   Email,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
+  UserId,
   WithConventionIdLegacy,
   backOfficeEmail,
   reviewedConventionStatuses,
@@ -176,7 +176,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
 
   async #agencyRoleFromUserIdAndAgencyId(
     uow: UnitOfWork,
-    userId: AuthenticatedUserId,
+    userId: UserId,
     convention: ConventionDto,
   ): Promise<
     AgencyRole | Extract<SignatoryRole, "establishment-representative">
@@ -202,7 +202,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
 
   async #agencyEmailFromUserIdAndAgencyId(
     uow: UnitOfWork,
-    userId: AuthenticatedUserId,
+    userId: UserId,
     agencyId: AgencyId,
   ): Promise<string> {
     const user = await uow.inclusionConnectedUserRepository.getById(userId);

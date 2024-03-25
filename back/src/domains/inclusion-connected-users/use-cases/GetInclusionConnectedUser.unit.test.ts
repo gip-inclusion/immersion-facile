@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
-  AuthenticatedUser,
   ConventionDtoBuilder,
   DiscussionBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
+  User,
   allAgencyRoles,
   expectPromiseToFailWith,
   expectToEqual,
@@ -27,7 +27,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     version: 1,
     userId,
   };
-  const john: AuthenticatedUser = {
+  const john: User = {
     id: userId,
     email: "john@mail.com",
     firstName: "John",

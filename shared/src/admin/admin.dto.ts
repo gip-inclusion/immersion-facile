@@ -2,7 +2,7 @@ import { ActiveOrRejectedStatus, AgencyId } from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
 import {
   AgencyRole,
-  AuthenticatedUserId,
+  UserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { SiretDto } from "../siret/siret";
 import { OmitFromExistingKeys } from "../utils";
@@ -15,7 +15,7 @@ export type UserAndPassword = {
 export type IcUserRoleForAgencyParams = {
   agencyId: AgencyId;
   role: AgencyRole;
-  userId: AuthenticatedUserId;
+  userId: UserId;
 };
 
 export type RejectIcUserRoleForAgencyParams = OmitFromExistingKeys<

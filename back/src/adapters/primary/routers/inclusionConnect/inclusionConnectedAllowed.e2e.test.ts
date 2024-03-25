@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
-  AuthenticatedUser,
   ConventionDtoBuilder,
   DiscussionBuilder,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
+  User,
   allowedStartInclusionConnectLoginPages,
   currentJwtVersions,
   displayRouteName,
@@ -322,7 +322,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inclusionConnectedAllowedRoutes.getDiscussionByIdForEstablishment,
     )} returns the discussion`, () => {
       it("gets the discussion for the establishment", async () => {
-        const user: AuthenticatedUser = {
+        const user: User = {
           id: "11111111-1111-4111-1111-111111111111",
           email: "user@mail.com",
           firstName: "User",
@@ -334,7 +334,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           .build();
 
         inMemoryUow.discussionRepository.discussions = [discussion];
-        inMemoryUow.authenticatedUserRepository.users = [user];
+        inMemoryUow.userRepository.users = [user];
 
         const token = generateInclusionConnectJwt({
           userId: user.id,

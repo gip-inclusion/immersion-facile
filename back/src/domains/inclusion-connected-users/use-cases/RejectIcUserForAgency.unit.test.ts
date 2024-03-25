@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
-  AuthenticatedUser,
   BackOfficeDomainPayload,
   BackOfficeJwtPayload,
   InclusionConnectedUser,
+  User,
   expectPromiseToFailWith,
   expectToEqual,
 } from "shared";
@@ -17,7 +17,7 @@ import {
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { RejectIcUserForAgency } from "./RejectIcUserForAgency";
 
-const user: AuthenticatedUser = {
+const user: User = {
   id: "john-123",
   email: "john@mail.com",
   firstName: "John",

@@ -1,7 +1,7 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AgencyId } from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
-import { AuthenticatedUserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 
 export type DashboardName =
   | AdminDashboardName
@@ -56,7 +56,7 @@ export type DashboardUrlAndName = {
 
 export type GetEstablishmentDashboardParams =
   GenericGetDashboardParams<"establishmentRepresentativeConventions"> & {
-    ic_user_id: AuthenticatedUserId;
+    ic_user_id: UserId;
   };
 
 export type GetAdminDashboardParams =

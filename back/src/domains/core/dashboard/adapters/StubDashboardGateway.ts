@@ -2,8 +2,8 @@ import {
   AbsoluteUrl,
   AdminDashboardName,
   AgencyId,
-  AuthenticatedUserId,
   ConventionId,
+  UserId,
 } from "shared";
 import { DashboardGateway } from "../port/DashboardGateway";
 
@@ -25,16 +25,16 @@ export class StubDashboardGateway implements DashboardGateway {
   }
 
   public getEstablishmentConventionsDashboardUrl(
-    authenticatedUserId: AuthenticatedUserId,
+    userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    return `http://stubEstablishmentConventionsDashboardUrl/${authenticatedUserId}/${now}`;
+    return `http://stubEstablishmentConventionsDashboardUrl/${userId}/${now}`;
   }
 
   public getEstablishmentDiscussionsDashboardUrl(
-    authenticatedUserId: AuthenticatedUserId,
+    userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    return `http://stubEstablishmentDiscussionsDashboardUrl/${authenticatedUserId}/${now}`;
+    return `http://stubEstablishmentDiscussionsDashboardUrl/${userId}/${now}`;
   }
 }

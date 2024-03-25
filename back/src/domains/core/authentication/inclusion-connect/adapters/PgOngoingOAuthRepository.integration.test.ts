@@ -1,25 +1,25 @@
 import { Pool } from "pg";
-import { AuthenticatedUser, expectToEqual } from "shared";
+import { User, expectToEqual } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
+import { PgUserRepository } from "./PgUserRepository";
 
 describe("PgOngoingOAuthRepository", () => {
   let pool: Pool;
   let pgOngoingOAuthRepository: PgOngoingOAuthRepository;
-  let pgAuthenticatedUserRepository: PgAuthenticatedUserRepository;
+  let pgUserRepository: PgUserRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
     pgOngoingOAuthRepository = new PgOngoingOAuthRepository(db);
-    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(db);
+    pgUserRepository = new PgUserRepository(db);
     await db.deleteFrom("users_ongoing_oauths").execute();
     await db.deleteFrom("users").execute();
   });
@@ -36,14 +36,14 @@ describe("PgOngoingOAuthRepository", () => {
       nonce: "123",
       provider,
     };
-    const authenticatedUser: AuthenticatedUser = {
+    const user: User = {
       id: "22222222-2222-2222-2222-222222222222",
       firstName: "John",
       lastName: "Doe",
       email: "john.doe@mail.com",
       externalId: "john-external-id",
     };
-    await pgAuthenticatedUserRepository.save(authenticatedUser);
+    await pgUserRepository.save(user);
     await pgOngoingOAuthRepository.save(ongoingOAuth);
 
     const fetched = await pgOngoingOAuthRepository.findByState(state, provider);
@@ -55,11 +55,11 @@ describe("PgOngoingOAuthRepository", () => {
       .execute();
     expect(results).toHaveLength(1);
 
-    await pgAuthenticatedUserRepository.save(authenticatedUser);
+    await pgUserRepository.save(user);
     const updatedOngoingOAuth: OngoingOAuth = {
       ...ongoingOAuth,
-      userId: authenticatedUser.id,
-      externalId: authenticatedUser.externalId,
+      userId: user.id,
+      externalId: user.externalId,
       accessToken: "some-token",
     };
     await pgOngoingOAuthRepository.save(updatedOngoingOAuth);

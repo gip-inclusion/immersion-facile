@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
   AgencyRole,
-  AuthenticatedUser,
   BackOfficeJwtPayload,
   InclusionConnectedUser,
+  User,
   expectPromiseToFailWith,
   expectToEqual,
 } from "shared";
@@ -19,7 +19,7 @@ import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemo
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateIcUserRoleForAgency } from "./UpdateIcUserRoleForAgency";
 
-const user: AuthenticatedUser = {
+const user: User = {
   id: "john-123",
   email: "john@mail.com",
   firstName: "John",

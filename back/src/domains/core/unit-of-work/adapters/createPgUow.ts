@@ -16,9 +16,9 @@ import { PgFormEstablishmentRepository } from "../../../establishment/adapters/P
 import { PgGroupRepository } from "../../../establishment/adapters/PgGroupRepository";
 import { PgSearchMadeRepository } from "../../../establishment/adapters/PgSearchMadeRepository";
 import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
-import { PgAuthenticatedUserRepository } from "../../authentication/inclusion-connect/adapters/PgAuthenticatedUserRepository";
 import { PgInclusionConnectedUserRepository } from "../../authentication/inclusion-connect/adapters/PgInclusionConnectedUserRepository";
 import { PgOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/PgOngoingOAuthRepository";
+import { PgUserRepository } from "../../authentication/inclusion-connect/adapters/PgUserRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/adapters/PgConventionPoleEmploiAdvisorRepository";
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
@@ -35,7 +35,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     agencyRepository: new PgAgencyRepository(transaction),
     agencyGroupRepository: new PgAgencyGroupRepository(transaction),
     apiConsumerRepository: new PgApiConsumerRepository(transaction),
-    authenticatedUserRepository: new PgAuthenticatedUserRepository(transaction),
+    userRepository: new PgUserRepository(transaction),
     conventionPoleEmploiAdvisorRepository:
       new PgConventionPoleEmploiAdvisorRepository(transaction),
     conventionExternalIdRepository: new PgConventionExternalIdRepository(

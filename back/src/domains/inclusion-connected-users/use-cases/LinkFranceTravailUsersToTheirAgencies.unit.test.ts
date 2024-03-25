@@ -1,8 +1,8 @@
 import {
   AgencyDtoBuilder,
   AgencyGroup,
-  AuthenticatedUser,
   InclusionConnectedUser,
+  User,
   expectToEqual,
 } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -32,7 +32,7 @@ const agency3InGroup = new AgencyDtoBuilder()
 
 const agenciesInRepo = [agency, agency1InGroup, agency2InGroup, agency3InGroup];
 
-const defaultUser: AuthenticatedUser = {
+const defaultUser: User = {
   id: "my-user-id",
   firstName: "John",
   lastName: "Doe",
@@ -48,7 +48,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
     uow = createInMemoryUow();
     linkFranceTravailUsersToTheirAgencies =
       new LinkFranceTravailUsersToTheirAgencies(new InMemoryUowPerformer(uow));
-    uow.authenticatedUserRepository.users = [defaultUser];
+    uow.userRepository.users = [defaultUser];
     uow.agencyRepository.setAgencies(agenciesInRepo);
   });
 
@@ -60,7 +60,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: null,
       });
 
-      expectToEqual(uow.authenticatedUserRepository.users, [defaultUser]);
+      expectToEqual(uow.userRepository.users, [defaultUser]);
       expectToEqual(
         uow.inclusionConnectedUserRepository.agencyRightsByUserId,
         {},

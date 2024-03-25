@@ -1,7 +1,7 @@
 import {
   AgencyDtoBuilder,
-  AuthenticatedUser,
   InclusionConnectedUser,
+  User,
   expectPromiseToFailWith,
 } from "shared";
 import {
@@ -20,7 +20,7 @@ import { NotifyIcUserAgencyRightRejected } from "./NotifyIcUserAgencyRightReject
 
 const agency = new AgencyDtoBuilder().withId("agency-1").build();
 
-const user: AuthenticatedUser = {
+const user: User = {
   id: "john-123",
   email: "john@mail.com",
   firstName: "John",

@@ -1,7 +1,7 @@
 import { AgencyId } from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
 import { TemplatedEmail } from "../email/email";
-import { AuthenticatedUserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { SiretDto } from "../siret/siret";
 import { TemplatedSms } from "../sms/smsTemplateByName";
 import { Flavor } from "../typeFlavors";
@@ -28,7 +28,7 @@ export type FollowedIds = {
   conventionId?: ConventionId;
   establishmentSiret?: SiretDto;
   agencyId?: AgencyId;
-  userId?: AuthenticatedUserId;
+  userId?: UserId;
 };
 
 export type NotificationCommonFields = {

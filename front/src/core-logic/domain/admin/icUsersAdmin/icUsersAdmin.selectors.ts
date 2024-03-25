@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { values } from "ramda";
-import { AuthenticatedUser } from "shared";
+import { User } from "shared";
 import { RootState } from "src/core-logic/storeConfig/store";
 
 const icUsersAdminState = ({ admin }: RootState) =>
@@ -31,7 +31,7 @@ const agenciesNeedingReviewForSelectedUser = createSelector(
 
 const icUsersNeedingReview = createSelector(
   icUsersNeedingReviewSelector,
-  (normalizedUsers): AuthenticatedUser[] =>
+  (normalizedUsers): User[] =>
     values(normalizedUsers)
       .filter((user) =>
         values(user.agencyRights).some((right) => right.role === "toReview"),
