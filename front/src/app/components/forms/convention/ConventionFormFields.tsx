@@ -96,7 +96,9 @@ export const ConventionFormFields = ({
   } = getFormFields();
 
   useEffect(() => {
-    outOfReduxDependencies.deviceRepository.delete("partialConventionInUrl");
+    outOfReduxDependencies.localDeviceRepository.delete(
+      "partialConventionInUrl",
+    );
     dispatch(conventionSlice.actions.setCurrentStep(1));
   }, []);
 

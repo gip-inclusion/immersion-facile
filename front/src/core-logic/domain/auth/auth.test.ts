@@ -56,11 +56,11 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
       },
     }));
-    dependencies.deviceRepository.set(
+    dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
       inclusionConnectedFederatedIdentity,
     );
-    dependencies.deviceRepository.set("partialConventionInUrl", {
+    dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
     store.dispatch(
@@ -83,11 +83,11 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
       },
     }));
-    dependencies.deviceRepository.set(
+    dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
       inclusionConnectedFederatedIdentity,
     );
-    dependencies.deviceRepository.set("partialConventionInUrl", {
+    dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
     store.dispatch(
@@ -101,7 +101,7 @@ describe("Auth slice", () => {
 
   it("retrieves federatedIdentity if stored in device", () => {
     expectFederatedIdentityToEqual(null);
-    dependencies.deviceRepository.set(
+    dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
       inclusionConnectedFederatedIdentity,
     );
@@ -126,7 +126,7 @@ describe("Auth slice", () => {
 
   it("shouldn't be logged in if no federatedIdentity stored in device", () => {
     expectFederatedIdentityToEqual(null);
-    dependencies.deviceRepository.delete("federatedIdentityWithUser");
+    dependencies.localDeviceRepository.delete("federatedIdentityWithUser");
     store.dispatch(rootAppSlice.actions.appIsReady());
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
@@ -142,15 +142,15 @@ describe("Auth slice", () => {
     federatedIdentity: FederatedIdentity | undefined,
   ) => {
     expect(
-      dependencies.deviceRepository.get("federatedIdentityWithUser"),
+      dependencies.localDeviceRepository.get("federatedIdentityWithUser"),
     ).toEqual(federatedIdentity);
   };
 
   const expectPartialConventionInUrlInDevice = (
     conventionParams: Partial<ConventionParamsInUrl> | undefined,
   ) => {
-    expect(dependencies.deviceRepository.get("partialConventionInUrl")).toEqual(
-      conventionParams,
-    );
+    expect(
+      dependencies.localDeviceRepository.get("partialConventionInUrl"),
+    ).toEqual(conventionParams);
   };
 });

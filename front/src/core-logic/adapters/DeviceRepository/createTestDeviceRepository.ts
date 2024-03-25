@@ -1,6 +1,11 @@
-import type { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
+import type {
+  DeviceRepository,
+  GenericStorage,
+} from "src/core-logic/ports/DeviceRepository";
 
-export const createTestDeviceRepository = (): DeviceRepository => {
+export const createTestDeviceRepository = <
+  S extends GenericStorage,
+>(): DeviceRepository<S> => {
   const fakeStorage: Partial<Record<string, any>> = {};
 
   return {

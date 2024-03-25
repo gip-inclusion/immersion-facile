@@ -20,14 +20,22 @@ const callLoginEpic: AdminEpic = (action$, _, { adminGateway }) =>
     ),
   );
 
-const storeTokenInDevice: AdminEpic = (action$, _, { deviceRepository }) =>
+const storeTokenInDevice: AdminEpic = (
+  action$,
+  _,
+  { localDeviceRepository: deviceRepository },
+) =>
   action$.pipe(
     filter(adminAuthSlice.actions.loginSucceeded.match),
     tap(({ payload }) => deviceRepository.set("adminToken", payload)),
     map(adminAuthSlice.actions.adminTokenStoredInDevice),
   );
 
-const checkIfAdminLoggedIn: AdminEpic = (action$, _, { deviceRepository }) =>
+const checkIfAdminLoggedIn: AdminEpic = (
+  action$,
+  _,
+  { localDeviceRepository: deviceRepository },
+) =>
   action$.pipe(
     filter(rootAppSlice.actions.appIsReady.match),
     map(() => {
@@ -37,7 +45,11 @@ const checkIfAdminLoggedIn: AdminEpic = (action$, _, { deviceRepository }) =>
     }),
   );
 
-const logout: AdminEpic = (action$, _, { deviceRepository }) =>
+const logout: AdminEpic = (
+  action$,
+  _,
+  { localDeviceRepository: deviceRepository },
+) =>
   action$.pipe(
     filter(adminAuthSlice.actions.logoutRequested.match),
     tap(() => deviceRepository.delete("adminToken")),

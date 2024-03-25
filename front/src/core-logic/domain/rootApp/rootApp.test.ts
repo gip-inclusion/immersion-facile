@@ -35,7 +35,7 @@ describe("rootApp epic", () => {
   });
 
   it("should dispatch appIsReady action", () => {
-    dependencies.deviceRepository.set("adminToken", "my-super-token");
+    dependencies.localDeviceRepository.set("adminToken", "my-super-token");
 
     expect(store.getState().admin.adminAuth.adminToken).toBeNull();
 

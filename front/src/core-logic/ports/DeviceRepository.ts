@@ -1,25 +1,38 @@
+import { WithAcquisition } from "shared";
 import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 
-type GenericPair<K extends string, Payload> = {
+export type GenericPair<K extends string, Payload> = {
   key: K;
   payload: Payload;
 };
 
-type StoredPair =
+export type GenericStorage = GenericPair<string, unknown>;
+
+export type LocalStoragePair =
   | GenericPair<"partialConventionInUrl", Partial<ConventionParamsInUrl>>
   | GenericPair<"adminToken", string>
   | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>;
 
-export type KeyInDevice = StoredPair["key"];
+export type SessionStoragePair = GenericPair<
+  "acquisitionParams",
+  WithAcquisition
+>;
 
-type NarrowPair<
-  K extends KeyInDevice,
-  P extends StoredPair = StoredPair,
-> = Extract<P, { key: K }>;
+export type KeyInDevice<S extends GenericStorage> = S["key"];
 
-export interface DeviceRepository {
-  set<K extends KeyInDevice>(key: K, value: NarrowPair<K>["payload"]): void;
-  get<K extends KeyInDevice>(key: K): NarrowPair<K>["payload"] | undefined;
-  delete(key: KeyInDevice): void;
-}
+type NarrowPair<K extends KeyInDevice<S>, S extends GenericStorage> = Extract<
+  S,
+  { key: K }
+>;
+
+export type DeviceRepository<S extends GenericStorage> = {
+  set<K extends KeyInDevice<S>>(
+    key: K,
+    value: NarrowPair<K, S>["payload"],
+  ): void;
+  get<K extends KeyInDevice<S>>(
+    key: K,
+  ): NarrowPair<K, S>["payload"] | undefined;
+  delete(key: KeyInDevice<S>): void;
+};

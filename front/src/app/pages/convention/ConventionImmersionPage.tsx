@@ -46,7 +46,7 @@ const storeConventionRouteParamsOnDevice = (
     ...partialConvention
   } = routeParams;
   if (keys(partialConvention).length) {
-    outOfReduxDependencies.deviceRepository.set(
+    outOfReduxDependencies.localDeviceRepository.set(
       "partialConventionInUrl",
       partialConvention,
     );

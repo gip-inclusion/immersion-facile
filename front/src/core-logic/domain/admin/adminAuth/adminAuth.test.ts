@@ -56,14 +56,17 @@ describe("adminAuth slice", () => {
 
   describe("check if already logged in", () => {
     it("appears as logged in if a token is already in device", () => {
-      dependencies.deviceRepository.set("adminToken", "already-there-token");
+      dependencies.localDeviceRepository.set(
+        "adminToken",
+        "already-there-token",
+      );
       store.dispatch(rootAppSlice.actions.appIsReady());
       expectIsAuthenticatedToBe(true);
       expectTokenToBe("already-there-token");
     });
 
     it("appears as NOT logged in if a NO token in device", () => {
-      dependencies.deviceRepository.delete("adminToken");
+      dependencies.localDeviceRepository.delete("adminToken");
       store.dispatch(rootAppSlice.actions.appIsReady());
       expectIsAuthenticatedToBe(false);
       expectTokenToBe(null);
@@ -80,7 +83,7 @@ describe("adminAuth slice", () => {
         }),
       }));
 
-      dependencies.deviceRepository.set("adminToken", adminToken);
+      dependencies.localDeviceRepository.set("adminToken", adminToken);
       store.dispatch(adminAuthSlice.actions.logoutRequested());
       expectIsAuthenticatedToBe(false);
       expectTokenToBe(null);
@@ -109,7 +112,9 @@ describe("adminAuth slice", () => {
   const expectAdminTokenInDevice = (
     expectedToken: BackOfficeJwt | undefined,
   ) => {
-    expect(dependencies.deviceRepository.get("adminToken")).toBe(expectedToken);
+    expect(dependencies.localDeviceRepository.get("adminToken")).toBe(
+      expectedToken,
+    );
   };
 
   const feedAdminGatewayWithToken = (token: BackOfficeJwt) => {
