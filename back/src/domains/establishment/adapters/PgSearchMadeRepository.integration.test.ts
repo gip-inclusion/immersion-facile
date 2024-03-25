@@ -1,14 +1,17 @@
-import { Pool, PoolClient } from "pg";
-import { uniq } from "ramda";
-import { AppellationCode, WithAcquisition, expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { Pool } from "pg";
+import {
+  AppellationCode,
+  WithAcquisition,
+  expectObjectsToMatch,
+  expectToEqual,
+} from "shared";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool, optional } from "../../../config/pg/pgUtils";
 import { SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
 
-const searchMade: SearchMadeEntity = {
+const defaultSearchMade: SearchMadeEntity = {
   id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
-  appellationCodes: ["19365"],
   distanceKm: 30,
   lat: 48.119146,
   lon: 4.17602,
@@ -21,29 +24,28 @@ const searchMade: SearchMadeEntity = {
 
 describe("PgSearchesMadeRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let pgSearchesMadeRepository: PgSearchMadeRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM searches_made__appellation_code");
-    await client.query("DELETE FROM searches_made");
+    await db.deleteFrom("searches_made__appellation_code").execute();
+    await db.deleteFrom("searches_made").execute();
     pgSearchesMadeRepository = new PgSearchMadeRepository(makeKyselyDb(pool));
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   it("insert a search made", async () => {
-    await pgSearchesMadeRepository.insertSearchMade(searchMade);
-    const retrievedSearchMade = await getSearchMadeById(searchMade.id);
-    expectToEqual(retrievedSearchMade, searchMade);
+    await pgSearchesMadeRepository.insertSearchMade(defaultSearchMade);
+    const retrievedSearchMade = await getSearchMadeById(defaultSearchMade.id);
+    expectToEqual(retrievedSearchMade, defaultSearchMade);
   });
 
   it("insert a search made and keeps acquisition params", async () => {
@@ -52,22 +54,25 @@ describe("PgSearchesMadeRepository", () => {
       acquisitionCampaign: "acquisition-campaign",
     } satisfies WithAcquisition;
     await pgSearchesMadeRepository.insertSearchMade({
-      ...searchMade,
+      ...defaultSearchMade,
       ...withAcquisition,
     });
-    const result = await client.query("SELECT * FROM searches_made");
-    expect(result.rows).toHaveLength(1);
-    expect(result.rows[0]).toMatchObject({
-      id: searchMade.id,
+
+    const results = await db.selectFrom("searches_made").selectAll().execute();
+
+    expect(results).toHaveLength(1);
+    expectObjectsToMatch(results[0], {
+      id: defaultSearchMade.id,
       acquisition_keyword: withAcquisition.acquisitionKeyword,
       acquisition_campaign: withAcquisition.acquisitionCampaign,
     });
   });
 
   it("Remove duplicated appellationCodes then insert search", async () => {
+    const appellationCodes: AppellationCode[] = ["19365", "19365"];
     const searchMade: SearchMadeEntity = {
       id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
-      appellationCodes: ["19365", "19365"],
+      appellationCodes,
       distanceKm: 30,
       lat: 48.119146,
       lon: 4.17602,
@@ -82,34 +87,32 @@ describe("PgSearchesMadeRepository", () => {
 
     expect(retrievedSearchMade).toEqual({
       ...searchMade,
-      appellationCodes: uniq(searchMade.appellationCodes ?? []),
+      appellationCodes: [appellationCodes[0]],
     });
   });
 
   const getSearchMadeById = async (
     id: string,
   ): Promise<SearchMadeEntity | undefined> => {
-    const searchMadeResult = (
-      await client.query<{
-        id: string;
-        distance: number;
-        lat: number;
-        lon: number;
-        sorted_by?: "distance";
-        voluntary_to_immersion?: boolean;
-        address?: string;
-        needstobesearched: boolean;
-        api_consumer_name?: string;
-        number_of_results?: number;
-      }>("SELECT * FROM searches_made WHERE id=$1", [id])
-    ).rows.at(0);
+    const searchMadeResult = await db
+      .selectFrom("searches_made")
+      .selectAll()
+      .where("id", "=", id)
+      .executeTakeFirst();
 
-    const appellationCodes: AppellationCode[] = await client
-      .query(
-        "SELECT * FROM searches_made__appellation_code WHERE search_made_id=$1",
-        [id],
-      )
-      .then(({ rows }) => rows.map(({ appellation_code }) => appellation_code));
+    const appellationCodes: AppellationCode[] = await db
+      .selectFrom("searches_made__appellation_code")
+      .selectAll()
+      .where("search_made_id", "=", id)
+      .execute()
+      .then((rows) =>
+        rows
+          .map(({ appellation_code }) => appellation_code)
+          .filter(
+            (appellationCode): appellationCode is AppellationCode =>
+              appellationCode !== null,
+          ),
+      );
 
     return (
       searchMadeResult && {
@@ -117,11 +120,13 @@ describe("PgSearchesMadeRepository", () => {
         distanceKm: searchMadeResult.distance,
         lat: searchMadeResult.lat,
         lon: searchMadeResult.lon,
-        sortedBy: searchMadeResult.sorted_by,
-        voluntaryToImmersion: searchMadeResult.voluntary_to_immersion,
-        place: searchMadeResult.address,
-        needsToBeSearched: searchMadeResult.needstobesearched,
-        appellationCodes: optional(appellationCodes),
+        sortedBy: optional(searchMadeResult.sorted_by),
+        voluntaryToImmersion: optional(searchMadeResult.voluntary_to_immersion),
+        place: optional(searchMadeResult.address),
+        needsToBeSearched: searchMadeResult.needstobesearched ?? false,
+        appellationCodes: appellationCodes.length
+          ? appellationCodes
+          : undefined,
         apiConsumerName: optional(searchMadeResult.api_consumer_name),
         numberOfResults: optional(searchMadeResult.number_of_results) ?? 0,
       }

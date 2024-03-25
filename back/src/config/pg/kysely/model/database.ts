@@ -25,6 +25,8 @@ export interface Database {
   ongoing_oauths: OngoingOauths;
   outbox: Outbox;
   partners_pe_connect: PartnersPeConnect;
+  searches_made: SearchesMade;
+  searches_made__appellation_code: SearchesMadeAppellationCode;
   saved_errors: SavedErrors;
   view_appellations_dto: ViewAppellationsDto;
 }
@@ -417,4 +419,26 @@ export interface Nps {
   respondent_id: string;
   response_id: string;
   created_at: Generated<Timestamp>;
+}
+
+export interface SearchesMadeAppellationCode {
+  search_made_id: string;
+  appellation_code: Generated<string | null>;
+}
+
+export type SortedBy = "date" | "distance";
+export interface SearchesMade extends WithAcquisition {
+  id: string;
+  rome: string | null;
+  lat: number;
+  lon: number;
+  distance: number;
+  needstobesearched: boolean | null;
+  update_date: Generated<Timestamp | null>;
+  gps: string | null;
+  voluntary_to_immersion: boolean | null;
+  api_consumer_name: string | null;
+  sorted_by: Generated<SortedBy | null>;
+  address: string | null;
+  number_of_results: number | null;
 }
