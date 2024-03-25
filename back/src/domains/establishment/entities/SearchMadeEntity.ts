@@ -3,6 +3,7 @@ import {
   EstablishmentSearchableByValue,
   Flavor,
   SearchSortedBy,
+  WithAcquisition,
 } from "shared";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
@@ -24,4 +25,5 @@ export type SearchMadeEntity = {
   needsToBeSearched: boolean;
   apiConsumerName?: ApiConsumerName;
   numberOfResults: number;
-} & SearchMade;
+} & SearchMade &
+  WithAcquisition;

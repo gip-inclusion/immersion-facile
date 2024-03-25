@@ -1,10 +1,23 @@
 import { Pool, PoolClient } from "pg";
 import { uniq } from "ramda";
-import { AppellationCode } from "shared";
+import { AppellationCode, WithAcquisition, expectToEqual } from "shared";
 import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool, optional } from "../../../config/pg/pgUtils";
 import { SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
+
+const searchMade: SearchMadeEntity = {
+  id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
+  appellationCodes: ["19365"],
+  distanceKm: 30,
+  lat: 48.119146,
+  lon: 4.17602,
+  needsToBeSearched: true,
+  sortedBy: "distance",
+  place: "Nantes",
+  voluntaryToImmersion: true,
+  numberOfResults: 1,
+};
 
 describe("PgSearchesMadeRepository", () => {
   let pool: Pool;
@@ -25,6 +38,30 @@ describe("PgSearchesMadeRepository", () => {
   afterAll(async () => {
     client.release();
     await pool.end();
+  });
+
+  it("insert a search made", async () => {
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+    const retrievedSearchMade = await getSearchMadeById(searchMade.id);
+    expectToEqual(retrievedSearchMade, searchMade);
+  });
+
+  it("insert a search made and keeps acquisition params", async () => {
+    const withAcquisition = {
+      acquisitionKeyword: "acquisition-keyword",
+      acquisitionCampaign: "acquisition-campaign",
+    } satisfies WithAcquisition;
+    await pgSearchesMadeRepository.insertSearchMade({
+      ...searchMade,
+      ...withAcquisition,
+    });
+    const result = await client.query("SELECT * FROM searches_made");
+    expect(result.rows).toHaveLength(1);
+    expect(result.rows[0]).toMatchObject({
+      id: searchMade.id,
+      acquisition_keyword: withAcquisition.acquisitionKeyword,
+      acquisition_campaign: withAcquisition.acquisitionCampaign,
+    });
   });
 
   it("Remove duplicated appellationCodes then insert search", async () => {
