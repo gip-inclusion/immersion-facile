@@ -1,4 +1,4 @@
-import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
+import { AuthenticatedUserQueryParams, ValueOf, frontRoutes } from "shared";
 import { createRouter, defineRoute, param } from "type-route";
 import { adminTabSerializer } from "./routeParams/adminTabs";
 import {
@@ -23,14 +23,14 @@ const inclusionConnectedParams = createInclusionConnectedParams({
   email: param.query.optional.string,
 });
 
-const trackingParams = {
+export const acquisitionParams = {
   mtm_campaign: param.query.optional.string,
   mtm_kwd: param.query.optional.string,
 };
 
 export const conventionParams = {
   ...conventionValuesFromUrl,
-  ...trackingParams,
+  ...acquisitionParams,
 };
 
 export const conventionForExternalParams = {
@@ -41,7 +41,7 @@ export const conventionForExternalParams = {
 
 export const establishmentParams = {
   ...formEstablishmentParamsInUrl,
-  ...trackingParams,
+  ...acquisitionParams,
 };
 
 export const searchParams = {
@@ -53,11 +53,13 @@ export const searchParams = {
   ),
   sortedBy: param.query.optional.string,
   place: param.query.optional.string,
-  ...trackingParams,
+  ...acquisitionParams,
 };
 
+export type FrontRouteUnion = ValueOf<typeof routes>;
+
 export const { RouteProvider, useRoute, routes } = createRouter({
-  addAgency: defineRoute(`/${frontRoutes.addAgency}`),
+  addAgency: defineRoute(acquisitionParams, () => `/${frontRoutes.addAgency}`),
   adminRoot: defineRoute(`/${frontRoutes.admin}`),
   adminTab: defineRoute(
     { tab: param.path.ofType(adminTabSerializer) },

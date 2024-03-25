@@ -41,10 +41,11 @@ export const conventionInitialValuesFromUrl = ({
   internshipKind: InternshipKind;
 }): ConventionPresentation => {
   const params = mergeObjectsExceptFalsyValues(
-    outOfReduxDependencies.deviceRepository.get("partialConventionInUrl") ?? {},
+    outOfReduxDependencies.localDeviceRepository.get(
+      "partialConventionInUrl",
+    ) ?? {},
     route.params satisfies ConventionParamsInUrl,
   );
-
   const initialFormWithStoredAndUrlParams: ConventionPresentation = {
     ...conventionPresentationFromParams(params),
     id: uuidV4(),

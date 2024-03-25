@@ -14,7 +14,7 @@ type AuthEpic = AppEpic<AuthAction>;
 const storeFederatedIdentityInDevice: AuthEpic = (
   action$,
   state$,
-  { deviceRepository },
+  { localDeviceRepository: deviceRepository },
 ) =>
   action$.pipe(
     filter(authSlice.actions.federatedIdentityProvided.match),
@@ -36,7 +36,7 @@ const storeFederatedIdentityInDevice: AuthEpic = (
 const deleteFederatedIdentityFromDevice: AuthEpic = (
   action$,
   _,
-  { deviceRepository },
+  { localDeviceRepository: deviceRepository },
 ) =>
   action$.pipe(
     filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
@@ -74,7 +74,7 @@ const logoutFromInclusionConnect: AuthEpic = (
 const checkConnectedWithFederatedIdentity: AuthEpic = (
   action$,
   _,
-  { deviceRepository },
+  { localDeviceRepository: deviceRepository },
 ) =>
   action$.pipe(
     filter(rootAppSlice.actions.appIsReady.match),

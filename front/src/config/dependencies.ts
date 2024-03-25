@@ -7,7 +7,11 @@ import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
-import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
+import {
+  DeviceRepository,
+  LocalStoragePair,
+  SessionStoragePair,
+} from "src/core-logic/ports/DeviceRepository";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
 import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
@@ -30,7 +34,8 @@ export type Dependencies = {
   searchGateway: SearchGateway;
   inclusionConnectedGateway: InclusionConnectedGateway;
   navigationGateway: NavigationGateway;
-  deviceRepository: DeviceRepository;
+  localDeviceRepository: DeviceRepository<LocalStoragePair>;
+  sessionDeviceRepository: DeviceRepository<SessionStoragePair>;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
 };
@@ -46,7 +51,8 @@ const {
   conventionGateway,
   searchGateway,
   agencyGateway,
-  deviceRepository,
+  localDeviceRepository,
+  sessionDeviceRepository,
   technicalGateway,
   formCompletionGateway,
 } = dependencies;
@@ -56,7 +62,8 @@ export const outOfReduxDependencies = {
   conventionGateway,
   searchGateway,
   agencyGateway,
-  deviceRepository,
+  localDeviceRepository,
+  sessionDeviceRepository,
   technicalGateway,
   formCompletionGateway,
 };
