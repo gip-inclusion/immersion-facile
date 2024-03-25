@@ -5,6 +5,7 @@ import {
   Location,
   RomeCode,
   SearchResultDto,
+  WithAcquisition,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
   expectObjectsToMatch,
@@ -987,6 +988,39 @@ describe("PgEstablishmentAggregateRepository", () => {
           max_contacts_per_week: establishmentToInsert.maxContactsPerWeek,
           last_insee_check_date: establishmentToInsert.lastInseeCheckDate,
         });
+      });
+
+      it("adds the establishment values in `establishments` table and keeps acquisition params", async () => {
+        // Prepare
+        const establishmentToInsert = new EstablishmentEntityBuilder()
+          .withMaxContactsPerWeek(7)
+          .withLastInseeCheck(new Date("2020-04-14T12:00:00.000"))
+          .build();
+
+        const withAcquisition = {
+          acquisitionKeyword: "acquisition-keyword",
+          acquisitionCampaign: "acquisition-campaign",
+        } satisfies WithAcquisition;
+
+        // Act;
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(establishmentToInsert)
+            .withAcquisition(withAcquisition)
+            .build(),
+        );
+        // Assert
+        const result = await kyselyDb
+          .selectFrom("establishments")
+          .select(["acquisition_keyword", "acquisition_campaign"])
+          .execute();
+
+        expectObjectsToMatch(result, [
+          {
+            acquisition_campaign: withAcquisition.acquisitionCampaign,
+            acquisition_keyword: withAcquisition.acquisitionKeyword,
+          },
+        ]);
       });
 
       it("adds one new row per establishment in `establishments` table when multiple establishments are given", async () => {

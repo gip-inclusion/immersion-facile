@@ -7,6 +7,7 @@ import {
   NafDto,
   NumberEmployeesRange,
   RomeCode,
+  WithAcquisition,
   defaultMaxContactsPerWeek,
 } from "shared";
 import { avenueChampsElyseesDto } from "../../core/address/adapters/InMemoryAddressGateway";
@@ -225,6 +226,13 @@ export class EstablishmentEntityBuilder
   public withWebsite(website?: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, website });
   }
+
+  withAcquisition(withAcquisition: WithAcquisition) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      ...withAcquisition,
+    });
+  }
 }
 
 export class EstablishmentAggregateBuilder
@@ -396,6 +404,17 @@ export class EstablishmentAggregateBuilder
         this.aggregate.establishment,
       )
         .withSearchableBy(searchableBy)
+        .build(),
+    });
+  }
+
+  withAcquisition(withAcquisition: WithAcquisition) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withAcquisition(withAcquisition)
         .build(),
     });
   }
