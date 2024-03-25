@@ -1,8 +1,9 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import {
   AgencyDto,
   AgencyDtoBuilder,
   GeoPositionDto,
+  WithAcquisition,
   activeAgencyStatuses,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -11,7 +12,7 @@ import {
   ConflictError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
 import {
@@ -77,24 +78,24 @@ const agencyWithRefersTo = agency2builder
 
 describe("PgAgencyRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
   let agencyRepository: PgAgencyRepository;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM conventions");
-    await client.query("DELETE FROM agency_groups__agencies");
-    await client.query("DELETE FROM agency_groups");
-    await client.query("DELETE FROM agencies");
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("agencies").execute();
+
     agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
   });
 
@@ -628,7 +629,7 @@ describe("PgAgencyRepository", () => {
       agency2 = agency2builder.build();
     });
 
-    it("inserts unknown entities", async () => {
+    it("inserts unknown agencies", async () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(0);
 
       await agencyRepository.insert(agency1);
@@ -638,6 +639,26 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.insert(agency2);
       expect(await agencyRepository.getAgencies({})).toHaveLength(2);
+    });
+
+    it("keeps the acquisitions fields when provided", async () => {
+      const withAcquisition = {
+        acquisitionKeyword: "keyword",
+        acquisitionCampaign: "campaign",
+      } satisfies WithAcquisition;
+      const agency = agency1builder.withAcquisition(withAcquisition).build();
+      await agencyRepository.insert(agency);
+      const result = await db
+        .selectFrom("agencies")
+        .select(["acquisition_campaign", "acquisition_keyword"])
+        .execute();
+
+      expectToEqual(result, [
+        {
+          acquisition_campaign: withAcquisition.acquisitionCampaign,
+          acquisition_keyword: withAcquisition.acquisitionKeyword,
+        },
+      ]);
     });
   });
 

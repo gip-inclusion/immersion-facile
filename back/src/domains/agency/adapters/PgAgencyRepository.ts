@@ -279,6 +279,8 @@ export class PgAgencyRepository implements AgencyRepository {
       department_code: agency.address?.departmentCode,
       covered_departments: JSON.stringify(agency.coveredDepartments),
       refers_to_agency_id: agency.refersToAgencyId,
+      acquisition_campaign: agency.acquisitionCampaign,
+      acquisition_keyword: agency.acquisitionKeyword,
     };
 
     try {
