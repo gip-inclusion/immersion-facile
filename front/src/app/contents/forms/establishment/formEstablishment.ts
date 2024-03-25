@@ -133,6 +133,14 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     label: "Qui souhaitez-vous accueillir en immersion ?",
     id: domElementIds.establishment.searchableBy,
   },
+  acquisitionKeyword: {
+    label: "",
+    id: "",
+  },
+  acquisitionCampaign: {
+    label: "",
+    id: "",
+  },
 };
 
 export const mailtoHref = (siret: SiretDto) => {

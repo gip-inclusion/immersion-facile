@@ -1,5 +1,5 @@
 import { Builder } from "../Builder";
-import { WithMatomo } from "../matomo.dto";
+import { WithAcquisition } from "../acquisition.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import {
@@ -63,8 +63,8 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
     jobSeekers: true,
     students: true,
   },
-  mtmKwd: undefined,
-  mtmCampaign: undefined,
+  acquisitionKeyword: undefined,
+  acquisitionCampaign: undefined,
 };
 
 const emptyFormEstablishment: FormEstablishmentDto = {
@@ -95,8 +95,8 @@ const emptyFormEstablishment: FormEstablishmentDto = {
     jobSeekers: true,
     students: false,
   },
-  mtmKwd: undefined,
-  mtmCampaign: undefined,
+  acquisitionKeyword: undefined,
+  acquisitionCampaign: undefined,
 };
 
 export class FormEstablishmentDtoBuilder
@@ -179,7 +179,7 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({ ...this.#dto, source });
   }
 
-  public withMtm(params: WithMatomo) {
+  public withAcquisition(params: WithAcquisition) {
     return new FormEstablishmentDtoBuilder({ ...this.#dto, ...params });
   }
 }

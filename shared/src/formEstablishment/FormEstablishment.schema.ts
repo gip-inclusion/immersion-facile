@@ -1,6 +1,6 @@
 import { z } from "zod";
+import { withAcquisitionSchema } from "../acquisition.dto";
 import { emailSchema } from "../email/email.schema";
-import { withMatomoSchema } from "../matomo.dto";
 import { nafSchema } from "../naf";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
@@ -114,7 +114,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
       jobSeekers: zBoolean,
     }),
   })
-  .and(withMatomoSchema);
+  .and(withAcquisitionSchema);
 
 export const withFormEstablishmentSchema: z.Schema<WithFormEstablishmentDto> =
   z.object({

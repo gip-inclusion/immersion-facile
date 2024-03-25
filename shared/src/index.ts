@@ -62,7 +62,7 @@ export * from "./inclusionConnect/inclusionConnect.schema";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.routes";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
-export * from "./matomo.dto";
+export * from "./acquisition.dto";
 export * from "./naf";
 export * from "./notifications/notifications.dto";
 export * from "./npsForms";
