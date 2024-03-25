@@ -2,7 +2,7 @@ import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { templatedEmailSchema } from "../email/email.schema";
-import { authenticatedUserIdSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
+import { userIdSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
 import { dateRegExp } from "../utils/date";
@@ -24,7 +24,7 @@ const followedIdsSchema: z.Schema<FollowedIds> = z.object({
   conventionId: conventionIdSchema.optional(),
   establishmentSiret: siretSchema.optional(),
   agencyId: agencyIdSchema.optional(),
-  userId: authenticatedUserIdSchema.optional(),
+  userId: userIdSchema.optional(),
 });
 
 const notificationCommonSchema: z.Schema<NotificationCommonFields> = z.object({

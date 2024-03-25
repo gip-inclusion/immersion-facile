@@ -1,7 +1,7 @@
 import { sql } from "kysely";
-import { AuthenticatedUser } from "shared";
+import { User } from "shared";
 import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
-import { AuthenticatedUserRepository } from "../port/AuthenticatedUserRepositiory";
+import { UserRepository } from "../port/UserRepositiory";
 
 type PersistenceAuthenticatedUser = {
   id: string;
@@ -11,14 +11,10 @@ type PersistenceAuthenticatedUser = {
   external_id: string;
 };
 
-export class PgAuthenticatedUserRepository
-  implements AuthenticatedUserRepository
-{
+export class PgUserRepository implements UserRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async findByExternalId(
-    externalId: string,
-  ): Promise<AuthenticatedUser | undefined> {
+  public async findByExternalId(externalId: string): Promise<User | undefined> {
     const response = await this.transaction
       .selectFrom("users")
       .selectAll()
@@ -27,7 +23,7 @@ export class PgAuthenticatedUserRepository
     return toAuthenticatedUser(response);
   }
 
-  public async save(user: AuthenticatedUser): Promise<void> {
+  public async save(user: User): Promise<void> {
     const { id, email, firstName, lastName, externalId } = user;
     const existingUser = await this.findByExternalId(externalId);
 
@@ -68,7 +64,7 @@ export class PgAuthenticatedUserRepository
 
 const toAuthenticatedUser = (
   raw?: PersistenceAuthenticatedUser,
-): AuthenticatedUser | undefined =>
+): User | undefined =>
   raw && {
     id: raw.id,
     email: raw.email,

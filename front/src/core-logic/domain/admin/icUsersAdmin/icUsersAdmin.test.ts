@@ -3,9 +3,9 @@ import {
   AgencyDtoBuilder,
   AgencyId,
   AgencyRight,
-  AuthenticatedUser,
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
+  User,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -43,7 +43,7 @@ const user2AgencyRights: Record<AgencyId, AgencyRight> = {
 };
 
 const user1Id = "user-id-1";
-const authUser1: AuthenticatedUser = {
+const authUser1: User = {
   id: user1Id,
   email: "user-email",
   firstName: "user-first-name",
@@ -52,7 +52,7 @@ const authUser1: AuthenticatedUser = {
 };
 
 const user2Id = "user-id-2";
-const authUser2: AuthenticatedUser = {
+const authUser2: User = {
   id: user2Id,
   email: "user-email-2",
   firstName: "user-first-name-2",

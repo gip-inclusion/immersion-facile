@@ -2,11 +2,11 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   AgencyId,
   AgencyRight,
-  AuthenticatedUserId,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   OmitFromExistingKeys,
   RejectIcUserRoleForAgencyParams,
+  UserId,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
@@ -18,7 +18,7 @@ type NormalizedInclusionConnectedUser = OmitFromExistingKeys<
 };
 
 export type NormalizedIcUserById = Record<
-  AuthenticatedUserId,
+  UserId,
   NormalizedInclusionConnectedUser
 >;
 
@@ -31,7 +31,7 @@ export type IcUsersAdminFeedback = SubmitFeedBack<IcUsersAdminFeedbackKind>;
 
 export type IcUsersAdminState = {
   icUsersNeedingReview: NormalizedIcUserById;
-  selectedUserId: AuthenticatedUserId | null;
+  selectedUserId: UserId | null;
   isUpdatingIcUserAgency: boolean;
   isFetchingAgenciesNeedingReviewForIcUser: boolean;
   feedback: IcUsersAdminFeedback;
@@ -51,7 +51,7 @@ export const icUsersAdminSlice = createSlice({
   reducers: {
     inclusionConnectedUserSelected: (
       state,
-      action: PayloadAction<AuthenticatedUserId | null>,
+      action: PayloadAction<UserId | null>,
     ) => {
       state.selectedUserId = action.payload;
       if (state.feedback.kind === "errored")

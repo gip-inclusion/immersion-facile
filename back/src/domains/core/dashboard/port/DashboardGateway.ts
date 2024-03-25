@@ -2,8 +2,8 @@ import {
   AbsoluteUrl,
   AdminDashboardName,
   AgencyId,
-  AuthenticatedUserId,
   ConventionId,
+  UserId,
 } from "shared";
 
 export interface DashboardGateway {
@@ -18,11 +18,11 @@ export interface DashboardGateway {
   ) => AbsoluteUrl;
   getConventionStatusUrl: (id: ConventionId, now: Date) => AbsoluteUrl;
   getEstablishmentConventionsDashboardUrl(
-    authenticatedUserId: AuthenticatedUserId,
+    userId: UserId,
     now: Date,
   ): AbsoluteUrl;
   getEstablishmentDiscussionsDashboardUrl(
-    authenticatedUserId: AuthenticatedUserId,
+    userId: UserId,
     now: Date,
   ): AbsoluteUrl;
 }

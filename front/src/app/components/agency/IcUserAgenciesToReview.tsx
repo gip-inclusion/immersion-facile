@@ -13,8 +13,8 @@ import {
   AgencyId,
   AgencyRight,
   AgencyRole,
-  AuthenticatedUserId,
   RejectIcUserRoleForAgencyParams,
+  UserId,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -28,7 +28,7 @@ const selectableAgencyRoles = [
 
 type IcUserAgenciesToReviewProps = {
   agenciesNeedingReviewForUser: AgencyRight[];
-  selectedUserId: AuthenticatedUserId;
+  selectedUserId: UserId;
 };
 
 function AgencyReviewForm({
@@ -37,7 +37,7 @@ function AgencyReviewForm({
   selectedUserId,
 }: {
   agency: AgencyDto;
-  selectedUserId: AuthenticatedUserId;
+  selectedUserId: UserId;
   setSelectedAgency: (agency: AgencyDto) => void;
 }) {
   const dispatch = useDispatch();
@@ -212,7 +212,7 @@ type RejectIcUserRegistrationToAgencyFormProps = {
     id: AgencyId;
     name: string;
   };
-  userId: AuthenticatedUserId;
+  userId: UserId;
 };
 
 const RejectIcUserRegistrationToAgencyForm = ({

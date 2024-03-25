@@ -1,6 +1,6 @@
 import {
   AgencyDtoBuilder,
-  AuthenticatedUser,
+  User,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -10,8 +10,8 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { InMemoryAuthenticatedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryAuthenticatedUserRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
+import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -26,7 +26,7 @@ const userId = "456";
 const agencyId1 = "agency-111";
 const agencyId2 = "agency-222";
 
-const user: AuthenticatedUser = {
+const user: User = {
   id: userId,
   email: "john.doe@mail.com",
   firstName: "Joe",
@@ -40,14 +40,14 @@ const agency2 = new AgencyDtoBuilder().withId(agencyId2).build();
 describe("RegisterAgencyToInclusionConnectUser use case", () => {
   let registerAgencyToInclusionConnectUser: RegisterAgencyToInclusionConnectUser;
   let uowPerformer: InMemoryUowPerformer;
-  let userRepository: InMemoryAuthenticatedUserRepository;
+  let userRepository: InMemoryUserRepository;
   let agencyRepository: InMemoryAgencyRepository;
   let outboxRepository: InMemoryOutboxRepository;
   let inclusionConnectedUserRepository: InMemoryInclusionConnectedUserRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    userRepository = uow.authenticatedUserRepository;
+    userRepository = uow.userRepository;
     agencyRepository = uow.agencyRepository;
     inclusionConnectedUserRepository = uow.inclusionConnectedUserRepository;
     outboxRepository = uow.outboxRepository;

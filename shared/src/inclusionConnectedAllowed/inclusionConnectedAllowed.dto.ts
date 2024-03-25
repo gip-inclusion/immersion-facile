@@ -19,10 +19,10 @@ export type AgencyRight = {
   role: AgencyRole;
 };
 
-export type AuthenticatedUserId = Flavor<string, "AuthenticatedUserId">;
+export type UserId = Flavor<string, "UserId">;
 
-export type AuthenticatedUser = {
-  id: AuthenticatedUserId;
+export type User = {
+  id: UserId;
   email: Email;
   firstName: string;
   lastName: string;
@@ -55,7 +55,7 @@ export type WithDashboardUrls = {
   erroredConventionsDashboardUrl?: AbsoluteUrl;
 } & WithEstablishmentDashboards;
 
-export type InclusionConnectedUser = AuthenticatedUser &
+export type InclusionConnectedUser = User &
   WithAgencyRights &
   WithDashboardUrls;
 

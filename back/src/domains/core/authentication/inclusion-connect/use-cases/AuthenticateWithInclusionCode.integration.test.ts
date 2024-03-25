@@ -105,7 +105,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       });
 
       expectToEqual(
-        await uow.authenticatedUserRepository.findByExternalId(
+        await uow.userRepository.findByExternalId(
           defaultExpectedIcIdTokenPayload.sub,
         ),
         {

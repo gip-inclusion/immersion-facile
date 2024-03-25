@@ -1,6 +1,6 @@
 import {
-  AuthenticatedUser,
   DiscussionBuilder,
+  User,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -19,7 +19,7 @@ import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstabli
 
 import { v4 as uuid } from "uuid";
 
-const user: AuthenticatedUser = {
+const user: User = {
   id: "user-111",
   email: "user@mail.com",
   firstName: "John",
@@ -63,7 +63,7 @@ describe("GetDiscussionById use case", () => {
 
     it("throws NotFound when discussion cannot be found", async () => {
       const someId = uuid();
-      uow.authenticatedUserRepository.users = [user];
+      uow.userRepository.users = [user];
       await expectPromiseToFailWithError(
         getDiscussionById.execute(someId, {
           userId: user.id,
@@ -73,7 +73,7 @@ describe("GetDiscussionById use case", () => {
     });
 
     it("cannot access someone else's discussions", async () => {
-      uow.authenticatedUserRepository.users = [user];
+      uow.userRepository.users = [user];
       uow.discussionRepository.discussions = [discussion];
       await expectPromiseToFailWithError(
         getDiscussionById.execute(discussion.id, {
@@ -88,7 +88,7 @@ describe("GetDiscussionById use case", () => {
 
   describe("Happy path", () => {
     it("Gets the matching discussion", async () => {
-      uow.authenticatedUserRepository.users = [user];
+      uow.userRepository.users = [user];
       uow.discussionRepository.discussions = [userDiscussion];
       const response = await getDiscussionById.execute(userDiscussion.id, {
         userId: user.id,

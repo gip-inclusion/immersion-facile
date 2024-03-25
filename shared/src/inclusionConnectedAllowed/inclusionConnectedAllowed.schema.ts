@@ -8,9 +8,9 @@ import { establishmentsRoles } from "../role/role.dto";
 import { zStringMinLength1, zTrimmedString } from "../zodUtils";
 import {
   AgencyRight,
-  AuthenticatedUserId,
   GetInclusionConnectLogoutUrlQueryParams,
   InclusionConnectedUser,
+  UserId,
   WithDiscussionId,
   allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
@@ -26,12 +26,11 @@ export const withDiscussionSchemaId: z.Schema<WithDiscussionId> = z.object({
   discussionId: discussionIdSchema,
 });
 
-export const authenticatedUserIdSchema: z.Schema<AuthenticatedUserId> =
-  zTrimmedString;
+export const userIdSchema: z.Schema<UserId> = zTrimmedString;
 
 export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
   z.object({
-    id: authenticatedUserIdSchema,
+    id: userIdSchema,
     email: emailSchema,
     firstName: zStringMinLength1,
     lastName: zStringMinLength1,

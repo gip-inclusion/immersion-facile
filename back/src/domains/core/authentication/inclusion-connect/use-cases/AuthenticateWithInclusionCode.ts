@@ -1,8 +1,8 @@
 import {
   AbsoluteUrl,
   AuthenticateWithInclusionCodeConnectParams,
-  AuthenticatedUser,
   AuthenticatedUserQueryParams,
+  User,
   authenticateWithInclusionCodeSchema,
   currentJwtVersions,
   frontRoutes,
@@ -93,12 +93,11 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     if (icIdTokenPayload.nonce !== existingOngoingOAuth.nonce)
       throw new ForbiddenError("Nonce mismatch");
 
-    const existingAuthenticatedUser =
-      await uow.authenticatedUserRepository.findByExternalId(
-        icIdTokenPayload.sub,
-      );
+    const existingAuthenticatedUser = await uow.userRepository.findByExternalId(
+      icIdTokenPayload.sub,
+    );
 
-    const newOrUpdatedAuthenticatedUser: AuthenticatedUser = {
+    const newOrUpdatedAuthenticatedUser: User = {
       ...this.#makeAuthenticatedUser(
         this.#uuidGenerator.new(),
         icIdTokenPayload,
@@ -122,7 +121,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       );
     }
 
-    await uow.authenticatedUserRepository.save(newOrUpdatedAuthenticatedUser);
+    await uow.userRepository.save(newOrUpdatedAuthenticatedUser);
     await uow.ongoingOAuthRepository.save(ongoingOAuth);
 
     await uow.outboxRepository.save(
@@ -157,7 +156,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   #makeAuthenticatedUser(
     userId: string,
     jwtPayload: InclusionConnectIdTokenPayload,
-  ): AuthenticatedUser {
+  ): User {
     return {
       id: userId,
       firstName: jwtPayload.given_name,

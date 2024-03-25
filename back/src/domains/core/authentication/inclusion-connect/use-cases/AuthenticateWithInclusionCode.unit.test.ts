@@ -1,6 +1,6 @@
 import {
   AbsoluteUrl,
-  AuthenticatedUser,
+  User,
   allowedStartInclusionConnectLoginPages,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
@@ -82,7 +82,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           page: "agencyDashboard",
         });
 
-        expectToEqual(uow.authenticatedUserRepository.users, [
+        expectToEqual(uow.userRepository.users, [
           {
             id: userId,
             firstName: defaultExpectedIcIdTokenPayload.given_name,
@@ -143,7 +143,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const { alreadyExistingUser } =
           addAlreadyExistingAuthenticatedUserInRepo();
 
-        expectToEqual(uow.authenticatedUserRepository.users, [
+        expectToEqual(uow.userRepository.users, [
           {
             id: alreadyExistingUser.id,
             email: alreadyExistingUser.email,
@@ -159,7 +159,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           page: "agencyDashboard",
         });
 
-        expectToEqual(uow.authenticatedUserRepository.users, [
+        expectToEqual(uow.userRepository.users, [
           {
             id: alreadyExistingUser.id,
             email: defaultExpectedIcIdTokenPayload.email,
@@ -260,14 +260,14 @@ describe("AuthenticateWithInclusionCode use case", () => {
   };
 
   const addAlreadyExistingAuthenticatedUserInRepo = () => {
-    const alreadyExistingUser: AuthenticatedUser = {
+    const alreadyExistingUser: User = {
       id: "already-existing-id",
       email: "johnny-d@gmail.com",
       firstName: "Johnny",
       lastName: "Doe Existing",
       externalId: defaultExpectedIcIdTokenPayload.sub,
     };
-    uow.authenticatedUserRepository.users = [alreadyExistingUser];
+    uow.userRepository.users = [alreadyExistingUser];
     return { alreadyExistingUser };
   };
 });

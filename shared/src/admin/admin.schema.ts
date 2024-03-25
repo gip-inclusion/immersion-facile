@@ -3,7 +3,7 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import {
   agencyRoleSchema,
-  authenticatedUserIdSchema,
+  userIdSchema,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zTrimmedString } from "../zodUtils";
@@ -24,14 +24,14 @@ export const userAndPasswordSchema: z.Schema<UserAndPassword> = z.object({
 export const icUserRoleForAgencyParamsSchema: z.Schema<IcUserRoleForAgencyParams> =
   z.object({
     agencyId: agencyIdSchema,
-    userId: authenticatedUserIdSchema,
+    userId: userIdSchema,
     role: agencyRoleSchema,
   });
 
 export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleForAgencyParams> =
   z.object({
     agencyId: agencyIdSchema,
-    userId: authenticatedUserIdSchema,
+    userId: userIdSchema,
     justification: zTrimmedString,
   });
 

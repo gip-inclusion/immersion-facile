@@ -1,6 +1,5 @@
 import {
   AgencyId,
-  AuthenticatedUserId,
   ContactEstablishmentEventPayload,
   ConventionId,
   DateString,
@@ -9,6 +8,7 @@ import {
   Flavor,
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
+  UserId,
   WithAgencyDto,
   WithAssessmentDto,
   WithConventionDto,
@@ -125,7 +125,7 @@ export type DomainEvent =
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload>
   | GenericEvent<
       "AgencyRegisteredToInclusionConnectedUser",
-      { userId: AuthenticatedUserId; agencyIds: AgencyId[] }
+      { userId: UserId; agencyIds: AgencyId[] }
     >
   | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams>
   | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams>
@@ -134,7 +134,7 @@ export type DomainEvent =
   // ERRORED CONVENTION RELATED
   | GenericEvent<
       "PartnerErroredConventionMarkedAsHandled",
-      { conventionId: ConventionId; userId: AuthenticatedUserId }
+      { conventionId: ConventionId; userId: UserId }
     >;
 
 export type DomainTopic = DomainEvent["topic"];

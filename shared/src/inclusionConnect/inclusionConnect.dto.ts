@@ -1,8 +1,8 @@
 import { ConventionDto } from "../convention/convention.dto";
 import {
   AgencyRole,
-  AuthenticatedUser,
   InclusionConnectedUser,
+  User,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { SignatoryRole } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
@@ -22,7 +22,7 @@ export type WithSourcePage = {
 
 export type AuthenticatedUserQueryParams = {
   token: string;
-} & Pick<AuthenticatedUser, "email" | "firstName" | "lastName">;
+} & Pick<User, "email" | "firstName" | "lastName">;
 
 export type InclusionConnectConventionManageAllowedRoles =
   | ExcludeFromExisting<AgencyRole, "toReview">

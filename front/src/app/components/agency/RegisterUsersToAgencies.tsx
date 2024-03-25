@@ -3,7 +3,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { AuthenticatedUserId } from "shared";
+import { UserId } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -55,7 +55,7 @@ export const RegisterUsersToAgencies = () => {
               onChange: (event) => {
                 dispatch(
                   icUsersAdminSlice.actions.inclusionConnectedUserSelected(
-                    event.currentTarget.value as AuthenticatedUserId,
+                    event.currentTarget.value as UserId,
                   ),
                 );
               },

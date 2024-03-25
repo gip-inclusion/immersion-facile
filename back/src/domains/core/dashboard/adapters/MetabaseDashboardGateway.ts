@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 import {
   AbsoluteUrl,
   AgencyId,
-  AuthenticatedUserId,
   ConventionId,
   DashboardName,
+  UserId,
 } from "shared";
 import { DashboardGateway } from "../port/DashboardGateway";
 
@@ -88,14 +88,14 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   }
 
   public getEstablishmentConventionsDashboardUrl(
-    authenticatedUserId: AuthenticatedUserId,
+    userId: UserId,
     now: Date,
   ): AbsoluteUrl {
     const dashboard = dashboardByName.establishmentRepresentativeConventions;
     const token = this.#createToken({
       dashboard,
       params: {
-        ic_user_id: [authenticatedUserId],
+        ic_user_id: [userId],
       },
       now,
     });
@@ -103,14 +103,14 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   }
 
   public getEstablishmentDiscussionsDashboardUrl(
-    authenticatedUserId: AuthenticatedUserId,
+    userId: UserId,
     now: Date,
   ): AbsoluteUrl {
     const dashboard = dashboardByName.establishmentRepresentativeDiscussions;
     const token = this.#createToken({
       dashboard,
       params: {
-        ic_user_id: [authenticatedUserId],
+        ic_user_id: [userId],
       },
       now,
     });

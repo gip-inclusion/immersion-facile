@@ -1,7 +1,7 @@
 import {
   AgencyRole,
-  AuthenticatedUserId,
   InclusionConnectedUser,
+  UserId,
   WithAgencyRole,
 } from "shared";
 import {
@@ -50,7 +50,7 @@ export class PgInclusionConnectedUserRepository
   }
 
   async #getInclusionConnectedUsers(filters: {
-    userId?: AuthenticatedUserId;
+    userId?: UserId;
     agencyRole?: AgencyRole;
   }): Promise<InclusionConnectedUser[]> {
     const buildAgencyRight = `JSON_BUILD_OBJECT(
@@ -125,7 +125,7 @@ export class PgInclusionConnectedUserRepository
   }
 }
 
-type Filters = { userId?: AuthenticatedUserId; agencyRole?: AgencyRole };
+type Filters = { userId?: UserId; agencyRole?: AgencyRole };
 
 type WhereClause = {
   statement: string;

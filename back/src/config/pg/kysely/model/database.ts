@@ -1,5 +1,4 @@
 import { ColumnType, Generated } from "kysely";
-import { AgencyRole } from "kysely-codegen/dist/db";
 import { AbsoluteUrl, ConventionId } from "shared";
 
 export interface Database {
@@ -444,6 +443,8 @@ export interface SearchesMade extends WithAcquisition {
   address: string | null;
   number_of_results: number | null;
 }
+
+type AgencyRole = "agencyOwner" | "counsellor" | "toReview" | "validator";
 
 export interface UsersAgencies {
   user_id: string;

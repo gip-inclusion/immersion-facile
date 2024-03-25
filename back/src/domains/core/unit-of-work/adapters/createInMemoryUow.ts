@@ -15,9 +15,9 @@ import { InMemoryFormEstablishmentRepository } from "../../../establishment/adap
 import { InMemoryGroupRepository } from "../../../establishment/adapters/InMemoryGroupRepository";
 import { InMemorySearchMadeRepository } from "../../../establishment/adapters/InMemorySearchMadeRepository";
 import { InMemoryApiConsumerRepository } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
-import { InMemoryAuthenticatedUserRepository } from "../../authentication/inclusion-connect/adapters/InMemoryAuthenticatedUserRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/InMemoryOngoingOAuthRepository";
+import { InMemoryUserRepository } from "../../authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/adapters/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryOutboxQueries } from "../../events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../events/adapters/InMemoryOutboxRepository";
@@ -38,7 +38,7 @@ export const createInMemoryUow = () => {
     agencyRepository,
     outboxRepository,
   );
-  const authenticatedUserRepository = new InMemoryAuthenticatedUserRepository();
+  const userRepository = new InMemoryUserRepository();
   const shortLinkRepository = new InMemoryShortLinkRepository();
   const establishmentLeadRepository = new InMemoryEstablishmentLeadRepository();
 
@@ -46,7 +46,7 @@ export const createInMemoryUow = () => {
     agencyRepository,
     agencyGroupRepository: new InMemoryAgencyGroupRepository(),
     apiConsumerRepository: new InMemoryApiConsumerRepository(),
-    authenticatedUserRepository,
+    userRepository,
     conventionQueries,
     conventionRepository,
     conventionPoleEmploiAdvisorRepository:
@@ -61,7 +61,7 @@ export const createInMemoryUow = () => {
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
     assessmentRepository: new InMemoryAssessmentRepository(),
     inclusionConnectedUserRepository:
-      new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository),
+      new InMemoryInclusionConnectedUserRepository(userRepository),
     establishmentLeadRepository,
     establishmentLeadQueries: new InMemoryEstablishmentLeadQueries(
       establishmentLeadRepository,
