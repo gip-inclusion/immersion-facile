@@ -78,8 +78,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
   });
 
   beforeEach(async () => {
-    await transaction.deleteFrom("ongoing_oauths").execute();
-    await transaction.deleteFrom("authenticated_users").execute();
+    await transaction.deleteFrom("users_ongoing_oauths").execute();
+    await transaction.deleteFrom("users").execute();
   });
 
   describe("when user had never connected before", () => {

@@ -1,4 +1,5 @@
 import { ColumnType, Generated } from "kysely";
+import { AgencyRole } from "kysely-codegen/dist/db";
 import { AbsoluteUrl, ConventionId } from "shared";
 
 export interface Database {
@@ -8,7 +9,6 @@ export interface Database {
   agency_groups__agencies: AgencyGroupsAgencies;
   api_consumers: ApiConsumers;
   api_consumers_subscriptions: ApiConsumersSubscriptions;
-  authenticated_users: AuthenticatedUsers;
   convention_external_ids: ConventionExternalIds;
   conventions: Conventions;
   discussions: Discussions;
@@ -22,12 +22,14 @@ export interface Database {
   establishments_contacts: EstablishmentsContacts;
   immersion_offers: ImmersionOffers;
   nps: Nps;
-  ongoing_oauths: OngoingOauths;
   outbox: Outbox;
   partners_pe_connect: PartnersPeConnect;
   searches_made: SearchesMade;
   searches_made__appellation_code: SearchesMadeAppellationCode;
   saved_errors: SavedErrors;
+  users: AuthenticatedUsers;
+  users_ongoing_oauths: OngoingOauths;
+  users__agencies: UsersAgencies;
   view_appellations_dto: ViewAppellationsDto;
 }
 
@@ -441,4 +443,10 @@ export interface SearchesMade extends WithAcquisition {
   sorted_by: Generated<SortedBy | null>;
   address: string | null;
   number_of_results: number | null;
+}
+
+export interface UsersAgencies {
+  user_id: string;
+  agency_id: string;
+  role: Generated<AgencyRole>;
 }

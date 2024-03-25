@@ -1,26 +1,27 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { AuthenticatedUser, expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";
 
 describe("PgAuthenticatedUserRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let pgAuthenticatedUserRepository: PgAuthenticatedUserRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
-    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(
-      makeKyselyDb(pool),
-    );
-    await client.query("DELETE FROM ongoing_oauths");
-    await client.query("DELETE FROM authenticated_users");
+    db = makeKyselyDb(pool);
+    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(db);
+
+    await db.deleteFrom("users_ongoing_oauths").execute();
+    await db.deleteFrom("users").execute();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 

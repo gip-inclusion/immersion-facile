@@ -1,4 +1,3 @@
-import format from "pg-format";
 import {
   AgencyRole,
   AuthenticatedUserId,
@@ -38,17 +37,16 @@ export class PgInclusionConnectedUserRepository
       [user.id],
     );
     if (user.agencyRights.length > 0)
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        format(
-          "INSERT INTO users__agencies (user_id, agency_id, role) VALUES %L",
-          user.agencyRights.map(({ agency, role }) => [
-            user.id,
-            agency.id,
+      await this.transaction
+        .insertInto("users__agencies")
+        .values(
+          user.agencyRights.map(({ agency, role }) => ({
+            user_id: user.id,
+            agency_id: agency.id,
             role,
-          ]),
-        ),
-      );
+          })),
+        )
+        .execute();
   }
 
   async #getInclusionConnectedUsers(filters: {
@@ -99,22 +97,22 @@ export class PgInclusionConnectedUserRepository
       this.transaction,
       `
       SELECT JSON_BUILD_OBJECT(
-        'id', authenticated_users.id,
-        'email', authenticated_users.email,
-        'firstName', authenticated_users.first_name,
-        'lastName', authenticated_users.last_name,
+        'id', users.id,
+        'email', users.email,
+        'firstName', users.first_name,
+        'lastName', users.last_name,
         'agencyRights', 
             CASE 
               WHEN ${agencyRightsJsonAgg} = '[null]' THEN '[]' 
               ELSE ${agencyRightsJsonAgg} 
             END ,
-         'externalId', authenticated_users.external_id
+         'externalId', users.external_id
         ) as inclusion_user
-      FROM authenticated_users
-      LEFT JOIN users__agencies ON authenticated_users.id = users__agencies.user_id
+      FROM users
+      LEFT JOIN users__agencies ON users.id = users__agencies.user_id
       LEFT JOIN agencies ON users__agencies.agency_id = agencies.id
       ${whereClause.statement}
-      GROUP BY authenticated_users.id;
+      GROUP BY users.id;
     `,
       whereClause.values,
     );
@@ -137,17 +135,17 @@ type WhereClause = {
 const getWhereClause = (filters: Filters): WhereClause => {
   if (filters.userId)
     return {
-      statement: "WHERE authenticated_users.id = $1",
+      statement: "WHERE users.id = $1",
       values: [filters.userId],
     };
 
   if (filters.agencyRole)
     return {
-      statement: `WHERE authenticated_users.id IN (
+      statement: `WHERE users.id IN (
         SELECT user_id FROM users__agencies WHERE users__agencies.role = $1
         )`,
       values: [filters.agencyRole],
     };
 
-  return { statement: "WHERE authenticated_users.id IS NULL", values: [] };
+  return { statement: "WHERE users.id IS NULL", values: [] };
 };

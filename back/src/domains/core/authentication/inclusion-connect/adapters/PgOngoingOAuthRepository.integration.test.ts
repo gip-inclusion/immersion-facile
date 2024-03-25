@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { AuthenticatedUser, expectToEqual } from "shared";
 import {
   KyselyDb,
@@ -11,25 +11,20 @@ import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 
 describe("PgOngoingOAuthRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
   let pgOngoingOAuthRepository: PgOngoingOAuthRepository;
   let pgAuthenticatedUserRepository: PgAuthenticatedUserRepository;
-  let transaction: KyselyDb;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
-    transaction = makeKyselyDb(pool);
-    pgOngoingOAuthRepository = new PgOngoingOAuthRepository(transaction);
-    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(
-      transaction,
-    );
-    await client.query("DELETE FROM ongoing_oauths");
-    await client.query("DELETE FROM authenticated_users");
+    db = makeKyselyDb(pool);
+    pgOngoingOAuthRepository = new PgOngoingOAuthRepository(db);
+    pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(db);
+    await db.deleteFrom("users_ongoing_oauths").execute();
+    await db.deleteFrom("users").execute();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
@@ -54,8 +49,11 @@ describe("PgOngoingOAuthRepository", () => {
     const fetched = await pgOngoingOAuthRepository.findByState(state, provider);
     expectToEqual(fetched, ongoingOAuth);
 
-    const response = await client.query("SELECT * FROM ongoing_oauths");
-    expect(response.rows).toHaveLength(1);
+    const results = await db
+      .selectFrom("users_ongoing_oauths")
+      .selectAll()
+      .execute();
+    expect(results).toHaveLength(1);
 
     await pgAuthenticatedUserRepository.save(authenticatedUser);
     const updatedOngoingOAuth: OngoingOAuth = {
