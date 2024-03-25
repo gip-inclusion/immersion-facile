@@ -7,7 +7,6 @@ import {
   InclusionConnectedUser,
   allowedStartInclusionConnectLoginPages,
   currentJwtVersions,
-  discussionToRead,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -349,7 +348,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
         expectHttpResponseToEqual(response, {
           status: 200,
-          body: discussionToRead(discussion),
+          body: new DiscussionBuilder(discussion).buildRead(),
         });
       });
     });
