@@ -1,9 +1,5 @@
-import {
-  DiscussionBuilder,
-  DiscussionReadDto,
-  discussionToRead,
-  expectObjectsToMatch,
-} from "shared";
+import { DiscussionBuilder, DiscussionReadDto, expectToEqual } from "shared";
+import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import {
   TestDependencies,
   createTestStore,
@@ -21,16 +17,14 @@ describe("Discussion slice", () => {
     fetchError: null,
   };
   const jwt = "my-jwt";
-  const discussion: DiscussionReadDto = discussionToRead(
-    new DiscussionBuilder().build(),
-  );
+  const discussion: DiscussionReadDto = new DiscussionBuilder().buildRead();
 
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
 
   it("on discussion fetched missing", () => {
-    expectDiscussionState(defaultStartingDiscussionState);
+    expectDiscussionSelector(defaultStartingDiscussionState);
 
     store.dispatch(
       discussionSlice.actions.fetchDiscussionRequested({
@@ -39,11 +33,14 @@ describe("Discussion slice", () => {
       }),
     );
 
-    expectDiscussionState({ isLoading: true });
+    expectDiscussionSelector({
+      ...defaultStartingDiscussionState,
+      isLoading: true,
+    });
 
     feedGatewayWithDiscussionOrError(undefined);
 
-    expectDiscussionState({
+    expectDiscussionSelector({
       isLoading: false,
       discussion: null,
       fetchError: null,
@@ -51,7 +48,7 @@ describe("Discussion slice", () => {
   });
 
   it("on discussion fetched successfully", () => {
-    expectDiscussionState(defaultStartingDiscussionState);
+    expectDiscussionSelector(defaultStartingDiscussionState);
 
     store.dispatch(
       discussionSlice.actions.fetchDiscussionRequested({
@@ -60,21 +57,21 @@ describe("Discussion slice", () => {
       }),
     );
 
-    expectDiscussionState({
+    expectDiscussionSelector({
       ...defaultStartingDiscussionState,
       isLoading: true,
     });
 
     feedGatewayWithDiscussionOrError(discussion);
 
-    expectDiscussionState({
+    expectDiscussionSelector({
       ...defaultStartingDiscussionState,
       discussion,
     });
   });
 
   it("on discussion fetched failed", () => {
-    expectDiscussionState(defaultStartingDiscussionState);
+    expectDiscussionSelector(defaultStartingDiscussionState);
 
     store.dispatch(
       discussionSlice.actions.fetchDiscussionRequested({
@@ -83,21 +80,21 @@ describe("Discussion slice", () => {
       }),
     );
 
-    expectDiscussionState({
+    expectDiscussionSelector({
       ...defaultStartingDiscussionState,
       isLoading: true,
     });
 
     feedGatewayWithDiscussionOrError(discussionFetchError);
 
-    expectDiscussionState({
+    expectDiscussionSelector({
       ...defaultStartingDiscussionState,
       fetchError: discussionFetchError.message,
     });
   });
 
   it("previous discussion in state removed on discussion fetch requested", () => {
-    expectDiscussionState(defaultStartingDiscussionState);
+    expectDiscussionSelector(defaultStartingDiscussionState);
 
     store.dispatch(
       discussionSlice.actions.fetchDiscussionRequested({
@@ -108,7 +105,7 @@ describe("Discussion slice", () => {
 
     feedGatewayWithDiscussionOrError(discussion);
 
-    expectDiscussionState({
+    expectDiscussionSelector({
       ...defaultStartingDiscussionState,
       discussion,
     });
@@ -120,7 +117,7 @@ describe("Discussion slice", () => {
       }),
     );
 
-    expectDiscussionState({
+    expectDiscussionSelector({
       ...defaultStartingDiscussionState,
       isLoading: true,
       discussion: null,
@@ -139,7 +136,13 @@ describe("Discussion slice", () => {
         );
   };
 
-  const expectDiscussionState = (discussionState: Partial<DiscussionState>) => {
-    expectObjectsToMatch(store.getState().discussion, discussionState);
+  const expectDiscussionSelector = ({
+    isLoading,
+    discussion,
+    fetchError,
+  }: DiscussionState) => {
+    expectToEqual(discussionSelectors.isLoading(store.getState()), isLoading);
+    expectToEqual(discussionSelectors.discussion(store.getState()), discussion);
+    expectToEqual(discussionSelectors.fetchError(store.getState()), fetchError);
   };
 });

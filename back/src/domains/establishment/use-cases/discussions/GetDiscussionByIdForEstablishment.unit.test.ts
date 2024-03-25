@@ -17,6 +17,8 @@ import {
 
 import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstablishment";
 
+import { v4 as uuid } from "uuid";
+
 const user: AuthenticatedUser = {
   id: "user-111",
   email: "user@mail.com",
@@ -27,7 +29,7 @@ const user: AuthenticatedUser = {
 const discussion = new DiscussionBuilder().build();
 const userDiscussion = new DiscussionBuilder()
   .withEstablishmentContact({ email: user.email })
-  .withId("user-discussion-id")
+  .withId(uuid())
   .build();
 
 describe("GetDiscussionById use case", () => {
@@ -43,18 +45,16 @@ describe("GetDiscussionById use case", () => {
 
   describe("Failure cases", () => {
     it("cannot process if no jwt provided", async () => {
-      const someId = "whatever-id";
       await expectPromiseToFailWithError(
-        getDiscussionById.execute(someId),
+        getDiscussionById.execute(uuid()),
         new UnauthorizedError(),
       );
     });
 
     it("throws NotFound when user cannot be found", async () => {
-      const someId = "whatever-id";
       const userId = "user-404";
       await expectPromiseToFailWithError(
-        getDiscussionById.execute(someId, { userId }),
+        getDiscussionById.execute(uuid(), { userId }),
         new NotFoundError(
           `Inclusion Connected user with id ${userId} not found`,
         ),
@@ -62,7 +62,7 @@ describe("GetDiscussionById use case", () => {
     });
 
     it("throws NotFound when discussion cannot be found", async () => {
-      const someId = "whatever-id";
+      const someId = uuid();
       uow.authenticatedUserRepository.users = [user];
       await expectPromiseToFailWithError(
         getDiscussionById.execute(someId, {

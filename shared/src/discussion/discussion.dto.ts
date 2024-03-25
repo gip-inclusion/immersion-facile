@@ -113,6 +113,23 @@ const defaultDiscussion: DiscussionDto = {
 export class DiscussionBuilder implements Builder<DiscussionDto> {
   constructor(private readonly discussion: DiscussionDto = defaultDiscussion) {}
 
+  public buildRead(): DiscussionReadDto {
+    return {
+      ...this.discussion,
+      potentialBeneficiary: {
+        firstName: this.discussion.potentialBeneficiary.firstName,
+        lastName: this.discussion.potentialBeneficiary.lastName,
+        resumeLink: this.discussion.potentialBeneficiary.resumeLink,
+      },
+      establishmentContact: {
+        firstName: this.discussion.establishmentContact.firstName,
+        lastName: this.discussion.establishmentContact.lastName,
+        job: this.discussion.establishmentContact.job,
+        contactMethod: this.discussion.establishmentContact.contactMethod,
+      },
+    };
+  }
+
   public build() {
     return this.discussion;
   }
@@ -187,20 +204,3 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     });
   }
 }
-
-export const discussionToRead = (
-  discussion: DiscussionDto,
-): DiscussionReadDto => ({
-  ...discussion,
-  potentialBeneficiary: {
-    firstName: discussion.potentialBeneficiary.firstName,
-    lastName: discussion.potentialBeneficiary.lastName,
-    resumeLink: discussion.potentialBeneficiary.resumeLink,
-  },
-  establishmentContact: {
-    firstName: discussion.establishmentContact.firstName,
-    lastName: discussion.establishmentContact.lastName,
-    job: discussion.establishmentContact.job,
-    contactMethod: discussion.establishmentContact.contactMethod,
-  },
-});

@@ -3,7 +3,6 @@ import {
   DiscussionReadDto,
   InclusionConnectDomainJwtPayload,
   discussionIdSchema,
-  discussionToRead,
 } from "shared";
 import {
   ForbiddenError,
@@ -47,6 +46,19 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
         `You are not allowed to access discussion with id ${discussionId}`,
       );
 
-    return discussionToRead(discussion);
+    return {
+      ...discussion,
+      potentialBeneficiary: {
+        firstName: discussion.potentialBeneficiary.firstName,
+        lastName: discussion.potentialBeneficiary.lastName,
+        resumeLink: discussion.potentialBeneficiary.resumeLink,
+      },
+      establishmentContact: {
+        firstName: discussion.establishmentContact.firstName,
+        lastName: discussion.establishmentContact.lastName,
+        job: discussion.establishmentContact.job,
+        contactMethod: discussion.establishmentContact.contactMethod,
+      },
+    };
   }
 }

@@ -14,7 +14,7 @@ import {
   exchangeRoles,
 } from "./discussion.dto";
 
-export const discussionIdSchema: z.Schema<DiscussionId> = z.string(); // TODO : why not uuid schema?
+export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
 
 const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
