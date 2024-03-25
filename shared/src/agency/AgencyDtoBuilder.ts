@@ -1,5 +1,6 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { Builder } from "../Builder";
+import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { Email } from "../email/email.dto";
 import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
@@ -183,6 +184,13 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({
       ...this.#agency,
       validatorEmails,
+    });
+  }
+
+  withAcquisition(withAcquisition: WithAcquisition) {
+    return new AgencyDtoBuilder({
+      ...this.#agency,
+      ...withAcquisition,
     });
   }
 }
