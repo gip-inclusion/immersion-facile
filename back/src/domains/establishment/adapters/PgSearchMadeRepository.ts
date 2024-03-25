@@ -32,8 +32,8 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
     return executeKyselyRawSqlQuery(
       this.transaction,
       `INSERT INTO searches_made (
-         id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion, api_consumer_name, sorted_by, address, number_of_results
-       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9, $10, $11, $12)`,
+         id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion, api_consumer_name, sorted_by, address, number_of_results, acquisition_keyword, acquisition_campaign
+       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9, $10, $11, $12, $13, $14)`,
       [
         searchMade.id,
         searchMade.romeCode, // soon : no need to store ROME as we now store appellation_code
@@ -47,6 +47,8 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         searchMade.sortedBy,
         searchMade.place,
         searchMade.numberOfResults,
+        searchMade.acquisitionKeyword,
+        searchMade.acquisitionCampaign,
       ],
     );
   }
