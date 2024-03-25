@@ -1,5 +1,6 @@
 import { differenceInYears } from "date-fns";
 import { z } from "zod";
+import { withAcquisitionSchema } from "../acquisition.dto";
 import {
   agencyIdSchema,
   agencyKindSchema,
@@ -7,7 +8,6 @@ import {
 } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
-import { withMatomoSchema } from "../matomo.dto";
 import { allModifierRoles, allRoles } from "../role/role.dto";
 import {
   appellationCodeSchema,
@@ -243,7 +243,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     validators: conventionValidatorsSchema.optional(),
     renewed: renewedSchema.optional(),
   })
-  .and(withMatomoSchema);
+  .and(withAcquisitionSchema);
 
 export const internshipKindSchema: z.Schema<InternshipKind> =
   z.enum(internshipKinds);

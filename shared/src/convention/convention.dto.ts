@@ -1,8 +1,8 @@
+import { WithAcquisition } from "../acquisition.dto";
 import { Postcode } from "../address/address.dto";
 import { AgencyId, AgencyKind } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
-import { WithMatomo } from "../matomo.dto";
 import {
   ModifierRole,
   Role,
@@ -151,7 +151,7 @@ export type ConventionCommon = {
   establishmentTutor: EstablishmentTutor;
   validators?: ConventionValidatorInputNames;
 } & Partial<WithRenewed> &
-  WithMatomo;
+  WithAcquisition;
 
 export type ConventionRenewed = ConventionDto & WithRenewed;
 

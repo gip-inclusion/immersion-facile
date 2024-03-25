@@ -2,7 +2,7 @@ import { Pool } from "pg";
 import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  WithMatomo,
+  WithAcquisition,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -171,26 +171,26 @@ describe("PgFormEstablishmentRepository", () => {
   });
 
   it("stores matomo campaign params when provided", async () => {
-    const mtm = {
-      mtmKwd: "yolo",
-      mtmCampaign: "my campaign",
-    } satisfies WithMatomo;
+    const withAcquisition = {
+      acquisitionKeyword: "yolo",
+      acquisitionCampaign: "my campaign",
+    } satisfies WithAcquisition;
 
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withMtm(mtm)
+      .withAcquisition(withAcquisition)
       .build();
 
     await formEstablishmentRepository.create(formEstablishment);
 
     const result = await db
       .selectFrom("form_establishments")
-      .select(["mtm_keyword", "mtm_campaign"])
+      .select(["acquisition_keyword", "acquisition_campaign"])
       .execute();
 
     expectToEqual(result, [
       {
-        mtm_campaign: mtm.mtmCampaign,
-        mtm_keyword: mtm.mtmKwd,
+        acquisition_campaign: withAcquisition.acquisitionCampaign,
+        acquisition_keyword: withAcquisition.acquisitionKeyword,
       },
     ]);
   });

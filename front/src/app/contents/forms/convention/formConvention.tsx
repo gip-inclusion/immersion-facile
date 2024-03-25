@@ -643,6 +643,14 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  acquisitionKeyword: {
+    label: "",
+    id: "",
+  },
+  acquisitionCampaign: {
+    label: "",
+    id: "",
+  },
 };
 
 type SidebarStepContent = {

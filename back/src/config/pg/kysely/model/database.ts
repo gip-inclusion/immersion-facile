@@ -40,9 +40,9 @@ type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 type Json = ColumnType<JsonValue, string, string>;
 type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-type WithMtm = {
-  mtm_campaign: string | null;
-  mtm_keyword: string | null;
+type WithAcquisition = {
+  acquisition_campaign: string | null;
+  acquisition_keyword: string | null;
 };
 
 type ImmersionObjectives =
@@ -105,7 +105,7 @@ interface GroupsSirets {
   siret: string;
 }
 
-interface Agencies extends WithMtm {
+interface Agencies extends WithAcquisition {
   id: string;
   name: string;
   counsellor_emails: Json;
@@ -165,7 +165,7 @@ interface ConventionExternalIds {
   external_id: Generated<number>;
 }
 
-interface Conventions extends WithMtm {
+interface Conventions extends WithAcquisition {
   id: ConventionId;
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
@@ -227,7 +227,7 @@ interface ViewAppellationsDto {
   rome_label: string | null;
 }
 
-interface PgFormEstablishments extends WithMtm {
+interface PgFormEstablishments extends WithAcquisition {
   additional_information: Generated<string | null>;
   business_addresses: Json;
   business_contact: Generated<Json>;
@@ -309,7 +309,7 @@ interface OngoingOauths {
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
 }
-export interface Establishments extends WithMtm {
+export interface Establishments extends WithAcquisition {
   siret: string;
   name: string | null;
   legacy_address: string | null;

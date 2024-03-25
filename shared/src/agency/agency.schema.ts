@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressSchema } from "../address/address.schema";
 import {
   UpdateAgencyStatusParams,
@@ -7,7 +8,6 @@ import {
 } from "../admin/admin.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { withMatomoSchema } from "../matomo.dto";
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
@@ -96,7 +96,7 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
     }),
   )
-  .and(withMatomoSchema)
+  .and(withAcquisitionSchema)
   .superRefine((createAgency, context) => {
     if (
       createAgency.refersToAgencyId &&
@@ -125,7 +125,7 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
       rejectionJustification: zStringMinLength1.or(z.null()),
     }),
   )
-  .and(withMatomoSchema);
+  .and(withAcquisitionSchema);
 
 export const agencySchema: z.ZodSchema<AgencyDto> = z
   .object(commonAgencyShape)
@@ -140,7 +140,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       rejectionJustification: z.string().or(z.null()),
     }),
   )
-  .and(withMatomoSchema);
+  .and(withAcquisitionSchema);
 
 export const withAgencySchema: z.ZodSchema<WithAgencyDto> = z.object({
   agency: agencySchema,

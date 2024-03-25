@@ -1,8 +1,8 @@
+import { WithAcquisition } from "../acquisition.dto";
 import { LocationId } from "../address/address.dto";
 import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import { Email } from "../email/email.dto";
 import type { GroupName } from "../group/group.dto";
-import { WithMatomo } from "../matomo.dto";
 import { NafDto } from "../naf";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
@@ -69,7 +69,7 @@ export type FormEstablishmentDto = {
   source: FormEstablishmentSource;
   website?: string;
   searchableBy: EstablishmentSearchableBy;
-} & WithMatomo;
+} & WithAcquisition;
 
 export type WithFormEstablishmentDto = {
   formEstablishment: FormEstablishmentDto;

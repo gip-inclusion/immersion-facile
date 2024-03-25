@@ -1,9 +1,9 @@
 import { keys } from "ramda";
 import { AbsoluteUrl } from "../AbsoluteUrl";
+import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { Email } from "../email/email.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
-import { WithMatomo } from "../matomo.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 import { ExtractFromExisting } from "../utils";
@@ -32,7 +32,7 @@ export type CreateAgencyDto = {
   logoUrl: AbsoluteUrl | null;
   signature: string;
   refersToAgencyId: AgencyId | null;
-} & WithMatomo;
+} & WithAcquisition;
 
 export type AgencyDtoSensitiveFields = {
   adminEmails: Email[];
