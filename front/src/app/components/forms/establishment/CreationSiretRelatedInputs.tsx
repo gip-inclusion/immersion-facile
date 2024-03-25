@@ -9,7 +9,9 @@ import { v4 as uuidV4 } from "uuid";
 
 import {
   FormEstablishmentDto,
+  NumberEmployeesRange,
   addressDtoToString,
+  defaultMaxContactsPerWeek,
   domElementIds,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
@@ -22,6 +24,26 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+
+const maxContactPerWeekByNumberEmployees: Record<NumberEmployeesRange, number> =
+  {
+    "": defaultMaxContactsPerWeek,
+    "0": 1,
+    "1-2": 1,
+    "3-5": 1,
+    "6-9": 1,
+    "10-19": 2,
+    "20-49": 2,
+    "50-99": 5,
+    "100-199": 10,
+    "200-249": 20,
+    "250-499": 20,
+    "500-999": 20,
+    "1000-1999": 20,
+    "2000-4999": 20,
+    "5000-9999": 20,
+    "+10000": 20,
+  };
 
 export const CreationSiretRelatedInputs = () => {
   const {
@@ -64,6 +86,14 @@ export const CreationSiretRelatedInputs = () => {
           },
     );
     setValue("naf", establishmentInfos ? establishmentInfos.nafDto : undefined);
+    setValue(
+      "maxContactsPerWeek",
+      establishmentInfos
+        ? maxContactPerWeekByNumberEmployees[
+            establishmentInfos.numberEmployeesRange
+          ]
+        : defaultMaxContactsPerWeek,
+    );
   }, [establishmentInfos]);
 
   const dispatch = useDispatch();
