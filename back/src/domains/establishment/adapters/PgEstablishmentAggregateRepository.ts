@@ -642,6 +642,8 @@ export class PgEstablishmentAggregateRepository
         searchable_by_students: aggregate.establishment.searchableBy.students,
         searchable_by_job_seekers:
           aggregate.establishment.searchableBy.jobSeekers,
+        acquisition_keyword: aggregate.establishment.acquisitionKeyword,
+        acquisition_campaign: aggregate.establishment.acquisitionCampaign,
       })
       .execute();
   }
