@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   AgencyId,
@@ -9,7 +9,10 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
 } from "shared";
-import { makeKyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
@@ -42,31 +45,31 @@ const agency2 = new AgencyDtoBuilder()
 
 describe("PgInclusionConnectedUserRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let icUserRepository: PgInclusionConnectedUserRepository;
   let agencyRepository: PgAgencyRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM ongoing_oauths");
-    await client.query("DELETE FROM authenticated_users");
-    await client.query("DELETE FROM users__agencies");
-    await client.query("DELETE FROM conventions");
-    await client.query("DELETE FROM agency_groups__agencies");
-    await client.query("DELETE FROM agency_groups");
-    await client.query("DELETE FROM agencies");
-    const transaction = makeKyselyDb(pool);
-    icUserRepository = new PgInclusionConnectedUserRepository(transaction);
-    agencyRepository = new PgAgencyRepository(transaction);
+    db = makeKyselyDb(pool);
+
+    await db.deleteFrom("users_ongoing_oauths").execute();
+    await db.deleteFrom("users").execute();
+    await db.deleteFrom("users__agencies").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("agencies").execute();
+
+    icUserRepository = new PgInclusionConnectedUserRepository(db);
+    agencyRepository = new PgAgencyRepository(db);
   });
 
   describe("getById", () => {
@@ -262,13 +265,18 @@ describe("PgInclusionConnectedUserRepository", () => {
     firstName,
     lastName,
     externalId,
-  }: AuthenticatedUser) =>
-    client.query(
-      `
-      INSERT INTO authenticated_users(id, email, first_name, last_name, external_id) VALUES ($1, $2, $3, $4, $5 )
-      `,
-      [id, email, firstName, lastName, externalId],
-    );
+  }: AuthenticatedUser) => {
+    await db
+      .insertInto("users")
+      .values({
+        id,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        external_id: externalId,
+      })
+      .execute();
+  };
 
   const insertAgencyRegistrationToUser = async ({
     userId,
@@ -278,11 +286,14 @@ describe("PgInclusionConnectedUserRepository", () => {
     userId: AuthenticatedUserId;
     agencyId: AgencyId;
     role: AgencyRole;
-  }) =>
-    client.query(
-      `
-      INSERT INTO users__agencies(user_id, agency_id, role) VALUES ($1, $2, $3)
-      `,
-      [userId, agencyId, role],
-    );
+  }) => {
+    await db
+      .insertInto("users__agencies")
+      .values({
+        user_id: userId,
+        agency_id: agencyId,
+        role,
+      })
+      .execute();
+  };
 });

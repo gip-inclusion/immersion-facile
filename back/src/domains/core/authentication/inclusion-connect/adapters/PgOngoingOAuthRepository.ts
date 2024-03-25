@@ -1,7 +1,5 @@
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../../../config/pg/kysely/kyselyUtils";
+import { sql } from "kysely";
+import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { optional } from "../../../../../config/pg/pgUtils";
 import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
@@ -10,11 +8,9 @@ type PersistenceOngoingOAuth = {
   provider: string;
   state: string;
   nonce: string;
-  user_id?: string;
-  external_id?: string;
-  access_token?: string;
-  createAt: string;
-  updateAt: string;
+  user_id: string | null;
+  external_id: string | null;
+  access_token: string | null;
 };
 
 export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
@@ -24,37 +20,46 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
     state: string,
     provider: "inclusionConnect",
   ): Promise<OngoingOAuth | undefined> {
-    const response = await executeKyselyRawSqlQuery<PersistenceOngoingOAuth>(
-      this.transaction,
-      `
-        SELECT * FROM ongoing_oauths WHERE state=$1 AND provider = $2
-        `,
-      [state, provider],
-    );
-    return this.#toOngoingOAuth(response.rows[0]);
+    const pgOngoingOAuth: PersistenceOngoingOAuth | undefined =
+      await this.transaction
+        .selectFrom("users_ongoing_oauths")
+        .selectAll()
+        .where("state", "=", state)
+        .where("provider", "=", provider)
+        .executeTakeFirst();
+
+    return this.#toOngoingOAuth(pgOngoingOAuth);
   }
 
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
     const { state, nonce, provider, userId, externalId, accessToken } =
       ongoingOAuth;
     if (await this.findByState(state, provider)) {
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        `
-        UPDATE ongoing_oauths
-        SET state=$1, nonce=$2, provider=$3, user_id=$4, external_id=$5, access_token=$6, updated_at=now() 
-        WHERE state=$1 
-      `,
-        [state, nonce, provider, userId, externalId, accessToken],
-      );
+      await this.transaction
+        .updateTable("users_ongoing_oauths")
+        .set({
+          state,
+          nonce,
+          provider,
+          user_id: userId,
+          external_id: externalId,
+          access_token: accessToken,
+          updated_at: sql`now()`,
+        })
+        .where("state", "=", state)
+        .execute();
     } else {
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        `
-      INSERT INTO ongoing_oauths(state, nonce, provider, user_id, external_id, access_token) VALUES ($1, $2, $3, $4, $5, $6 )
-      `,
-        [state, nonce, provider, userId, externalId, accessToken],
-      );
+      await this.transaction
+        .insertInto("users_ongoing_oauths")
+        .values({
+          state,
+          nonce,
+          provider,
+          user_id: userId,
+          external_id: externalId,
+          access_token: accessToken,
+        })
+        .execute();
     }
   }
 

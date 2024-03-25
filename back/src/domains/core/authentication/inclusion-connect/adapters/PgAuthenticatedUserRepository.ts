@@ -1,8 +1,6 @@
+import { sql } from "kysely";
 import { AuthenticatedUser } from "shared";
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { AuthenticatedUserRepository } from "../port/AuthenticatedUserRepositiory";
 
 type PersistenceAuthenticatedUser = {
@@ -22,42 +20,49 @@ export class PgAuthenticatedUserRepository
     externalId: string,
   ): Promise<AuthenticatedUser | undefined> {
     const response = await this.transaction
-      .selectFrom("authenticated_users")
+      .selectFrom("users")
       .selectAll()
       .where("external_id", "=", externalId)
-      .execute();
-    return toAuthenticatedUser(response[0]);
+      .executeTakeFirst();
+    return toAuthenticatedUser(response);
   }
 
   public async save(user: AuthenticatedUser): Promise<void> {
     const { id, email, firstName, lastName, externalId } = user;
     const existingUser = await this.findByExternalId(externalId);
-    if (existingUser) {
-      if (
-        existingUser.firstName === firstName &&
-        existingUser.lastName === lastName &&
-        existingUser.email === email
-      )
-        return;
 
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        `
-        UPDATE authenticated_users
-        SET first_name=$2, last_name=$3, updated_at=now(), email=$1
-        WHERE external_id=$4
-        `,
-        [email, firstName, lastName, externalId],
-      );
-    } else {
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        `
-      INSERT INTO authenticated_users(id, email, first_name, last_name, external_id) VALUES ($1, $2, $3, $4, $5)
-      `,
-        [id, email, firstName, lastName, externalId],
-      );
+    if (!existingUser) {
+      await this.transaction
+        .insertInto("users")
+        .values({
+          id,
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          external_id: externalId,
+        })
+        .execute();
+      return;
     }
+
+    if (
+      existingUser.firstName === firstName &&
+      existingUser.lastName === lastName &&
+      existingUser.email === email
+    )
+      return;
+
+    await this.transaction
+      .updateTable("users")
+      .set({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        updated_at: sql`now()`,
+      })
+      .where("external_id", "=", externalId)
+      .execute();
+    return;
   }
 }
 
