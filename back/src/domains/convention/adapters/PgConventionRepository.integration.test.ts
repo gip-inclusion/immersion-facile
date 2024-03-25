@@ -9,6 +9,7 @@ import {
   ConventionId,
   EstablishmentRepresentative,
   EstablishmentTutor,
+  WithAcquisition,
   expectPromiseToFailWithError,
   expectToEqual,
   reasonableSchedule,
@@ -33,13 +34,13 @@ describe("PgConventionRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let conventionRepository: PgConventionRepository;
-  let transaction: KyselyDb;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
-    transaction = makeKyselyDb(pool);
-    const agencyRepository = new PgAgencyRepository(transaction);
+    db = makeKyselyDb(pool);
+    const agencyRepository = new PgAgencyRepository(db);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
   });
 
@@ -55,7 +56,7 @@ describe("PgConventionRepository", () => {
     await client.query(
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
     );
-    conventionRepository = new PgConventionRepository(transaction);
+    conventionRepository = new PgConventionRepository(db);
   });
 
   it("Adds a new convention", async () => {
@@ -125,6 +126,33 @@ describe("PgConventionRepository", () => {
 
     const fetchedConvention = await conventionRepository.getById(convention.id);
     expect(fetchedConvention).toEqual(convention);
+  });
+
+  it("Keeps acquisition params when provided", async () => {
+    const withAcquisition: WithAcquisition = {
+      acquisitionKeyword: "acquisition-keyword",
+      acquisitionCampaign: "acquisition-campaign",
+    };
+
+    const convention = new ConventionDtoBuilder()
+      .withoutWorkCondition()
+      .withAcquisition(withAcquisition)
+      .notSigned()
+      .build();
+
+    await conventionRepository.save(convention);
+
+    const result = await db
+      .selectFrom("conventions")
+      .select(["acquisition_campaign", "acquisition_keyword"])
+      .execute();
+
+    expectToEqual(result, [
+      {
+        acquisition_campaign: "acquisition-campaign",
+        acquisition_keyword: "acquisition-keyword",
+      },
+    ]);
   });
 
   it("Adds a convention renewed from another one", async () => {

@@ -1,4 +1,5 @@
 import { Builder } from "../Builder";
+import { WithAcquisition } from "../acquisition.dto";
 import { AgencyId } from "../agency/agency.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -278,6 +279,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     throw new Error(
       `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
     );
+  }
+
+  public withAcquisition(withAcquisition: WithAcquisition) {
+    return new ConventionDtoBuilder({ ...this.dto, ...withAcquisition });
   }
 
   public withBeneficiaryEmail(email: string): ConventionDtoBuilder {
