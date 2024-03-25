@@ -182,6 +182,8 @@ export class PgConventionRepository implements ConventionRepository {
         renewed_from: renewed?.from,
         renewed_justification: renewed?.justification,
         validators: sql`${convention.validators}`,
+        acquisition_campaign: convention.acquisitionCampaign,
+        acquisition_keyword: convention.acquisitionKeyword,
       })
       .execute();
   }
