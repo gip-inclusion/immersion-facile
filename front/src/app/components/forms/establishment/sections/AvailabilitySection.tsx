@@ -107,7 +107,7 @@ export const AvailabilitySection = ({
           {...getFieldError("nextAvailabilityDate")}
         />
       )}
-      {availableForImmersion !== undefined && (
+      {availableForImmersion !== undefined && mode === "edit" && (
         <Input
           label={
             availableForImmersion
@@ -120,10 +120,10 @@ export const AvailabilitySection = ({
               valueAsNumber: true,
             }),
             type: "number",
-            min: mode === "create" || (mode === "edit" && isSearchable) ? 1 : 0,
+            min: isSearchable ? 1 : 0,
             pattern: "\\d*",
           }}
-          disabled={mode === "edit" && !isSearchable}
+          disabled={!isSearchable}
           {...getFieldError("maxContactsPerWeek")}
         />
       )}
@@ -160,7 +160,12 @@ export const AvailabilitySection = ({
               children: "Étape suivante",
               disabled: availableForImmersion === undefined,
               onClick: () =>
-                onStepChange(2, ["maxContactsPerWeek", "nextAvailabilityDate"]),
+                onStepChange(
+                  2,
+                  mode === "edit"
+                    ? ["maxContactsPerWeek", "nextAvailabilityDate"]
+                    : ["nextAvailabilityDate"],
+                ),
               type: "button",
               iconId: "fr-icon-arrow-right-line",
               iconPosition: "right",
