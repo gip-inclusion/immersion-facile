@@ -52,7 +52,8 @@ jobs:
       - name: Send Discord notification
         run: |
           newChanges="${{ inputs.version-new-features }}"
-          formattedNewChanges="${newChanges//$'\n'/\\n}"
+          formattedNewChanges1="${newChanges//$'\n'/\\n/}"
+          formattedNewChanges="${formattedNewChanges1//(\`|\")/'}"
           curl -X POST -H "Content-Type: application/json" -d @- ${{ secrets.DISCORD_WEBHOOK_URL }} <<EOF 
           {
             "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.\n\n $formattedNewChanges",
