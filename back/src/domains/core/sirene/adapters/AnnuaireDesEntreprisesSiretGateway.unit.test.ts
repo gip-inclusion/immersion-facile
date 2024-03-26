@@ -14,6 +14,9 @@ const validEstablishment: AnnuaireDesEntreprisesSiretEstablishment = {
     },
   ],
   tranche_effectif_salarie: "1",
+  siege: {
+    activite_principale: "78.3Z",
+  },
 };
 
 describe("convertAdeEstablishmentToSirenEstablishmentDto", () => {

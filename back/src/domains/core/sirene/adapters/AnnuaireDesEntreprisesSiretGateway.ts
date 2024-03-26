@@ -43,6 +43,7 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
 
     const result = response.body.results[0];
     if (!result) return;
+
     const formattedResult =
       convertAdeEstablishmentToSirenEstablishmentDto(result);
 
@@ -74,7 +75,10 @@ export const convertAdeEstablishmentToSirenEstablishmentDto = (
     adeEstablishment.nom_complet,
   businessAddress: adeEstablishment.matching_etablissements[0].adresse,
   nafDto: {
-    code: adeEstablishment.activite_principale.replace(".", ""),
+    code: (
+      adeEstablishment.activite_principale ??
+      adeEstablishment.siege.activite_principale
+    ).replace(".", ""),
     nomenclature: "NAFRev2",
   },
   numberEmployeesRange: getNumberEmployeesRange(

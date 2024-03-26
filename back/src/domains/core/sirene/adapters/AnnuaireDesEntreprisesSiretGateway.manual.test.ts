@@ -132,4 +132,23 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
       await siretGateway.getEstablishmentBySiret("83748116700026");
     expect(establishment?.businessName).toBe("P E CONSEIL");
   });
+
+  it("Should work also with an establishment with no root 'activite_principale'", async () => {
+    const establishment =
+      await siretGateway.getEstablishmentBySiret("77570970201646");
+    expect(establishment?.businessName).toBe(
+      "MUTUELLE ASSURANCE INSTITUTEUR FRANCE",
+    );
+    expect(establishment).toEqual({
+      businessAddress: "200 AV SALVADOR ALLENDE BP 303 79038 NIORT CEDEX",
+      businessName: "MUTUELLE ASSURANCE INSTITUTEUR FRANCE",
+      isOpen: true,
+      nafDto: {
+        code: "6512Z",
+        nomenclature: "NAFRev2",
+      },
+      numberEmployeesRange: "",
+      siret: "77570970201646",
+    });
+  });
 });
