@@ -72,7 +72,7 @@ export const EditAgencyForm = ({
         onSubmit={handleSubmit((values) =>
           dispatch(agencyAdminSlice.actions.updateAgencyRequested(values)),
         )}
-        id={domElementIds.addAgency.formEdit}
+        id={domElementIds.admin.agencyTab.editAgencyForm}
       >
         <div className={fr.cx("fr-mb-4w")}>
           <AgencyFormCommonFields
