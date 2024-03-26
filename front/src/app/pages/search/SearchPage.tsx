@@ -15,6 +15,7 @@ import { GeoPositionDto, SearchSortedBy, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { SearchInfoSection } from "src/app/components/search/SearchInfoSection";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
@@ -314,6 +315,7 @@ export const SearchPage = ({
           {searchStatus === "extraFetch" ||
             (searchStatus === "initialFetch" && <Loader />)}
 
+          <SearchInfoSection />
           <SectionAccordion />
           <SectionTextEmbed
             videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
