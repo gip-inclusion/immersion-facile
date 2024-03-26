@@ -26,9 +26,6 @@ test.describe("Establishment creation and modification workflow", () => {
     await addEstablishmentButton.click();
 
     await page.locator(".fr-radio-rich").getByText("Oui").click();
-    await page
-      .locator(`#${domElementIds.establishment.maxContactsPerWeek}`)
-      .fill("2");
 
     await goToNextStep(page, 1, "create");
     await page
