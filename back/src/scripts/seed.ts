@@ -1,5 +1,4 @@
 import { addDays } from "date-fns";
-import { PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -30,10 +29,19 @@ const seed = async () => {
   const pool = deps.getPgPoolFn();
   const client = await pool.connect();
 
+  await client.query("DELETE FROM feature_flags");
+  await client.query("DELETE FROM conventions");
+  await client.query("DELETE FROM agencies");
+  await client.query("DELETE FROM discussions");
+  await client.query("DELETE FROM establishments_contacts");
+  await client.query("DELETE FROM form_establishments");
+  await client.query("DELETE FROM establishments CASCADE");
+  await client.query("DELETE FROM groups CASCADE");
+
   await deps.uowPerformer.perform(async (uow) => {
-    await featureFlagsSeed(uow, client);
-    await agencySeed(uow, client);
-    await establishmentAggregateSeed(uow, client);
+    await featureFlagsSeed(uow);
+    await agencySeed(uow);
+    await establishmentAggregateSeed(uow);
     await conventionSeed(uow);
   });
 
@@ -41,10 +49,9 @@ const seed = async () => {
   await pool.end();
 };
 
-const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
+const featureFlagsSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding feature flags...");
-  await client.query("DELETE FROM feature_flags");
 
   const featureFlags: FeatureFlags = {
     enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
@@ -65,11 +72,9 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
   console.log("done");
 };
 
-const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
+const agencySeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding agencies...");
-  await client.query("DELETE FROM conventions");
-  await client.query("DELETE FROM agencies");
   const peParisAgency = new AgencyDtoBuilder()
     .withId(peParisAgencyId)
     .withName("Agence Pôle Emploi Paris")
@@ -108,17 +113,9 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
   console.log("done");
 };
 
-const establishmentAggregateSeed = async (
-  uow: UnitOfWork,
-  client: PoolClient,
-) => {
+const establishmentAggregateSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding establishment aggregates...");
-  await client.query("DELETE FROM discussions");
-  await client.query("DELETE FROM establishments_contacts");
-  await client.query("DELETE FROM form_establishments");
-  await client.query("DELETE FROM establishments CASCADE");
-  await client.query("DELETE FROM groups CASCADE");
   const franceMerguez = new EstablishmentAggregateBuilder()
     .withEstablishment(
       new EstablishmentEntityBuilder()
