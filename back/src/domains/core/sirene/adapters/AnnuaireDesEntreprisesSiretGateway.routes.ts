@@ -13,8 +13,11 @@ const adeEstablishmentSchema = z.object({
     )
     .min(1),
   nom_complet: z.string(),
-  activite_principale: z.string(),
+  activite_principale: z.string().or(z.null()),
   tranche_effectif_salarie: z.string().nullable(),
+  siege: z.object({
+    activite_principale: z.string(),
+  }),
 });
 
 const annuaireDesEntreprisesSiretGatewayResponseSchema: z.Schema<AnnuaireDesEntreprisesSiretGatewayResponse> =
@@ -35,8 +38,11 @@ export type AnnuaireDesEntreprisesSiretEstablishment = {
     nom_commercial: string | null;
   }[];
   nom_complet: string;
-  activite_principale: string;
+  activite_principale: string | null;
   tranche_effectif_salarie: string | null;
+  siege: {
+    activite_principale: string;
+  };
 };
 
 type AnnuaireDesEntreprisesSiretGatewayResponse = {
@@ -54,7 +60,6 @@ export const annuaireDesEntreprisesSiretRoutes = defineRoutes({
   search: defineRoute({
     method: "get",
     url: "https://recherche-entreprises.api.gouv.fr/search",
-
     queryParamsSchema: annuaireDesEntreprisesQueryParamsSchema,
     responses: {
       200: annuaireDesEntreprisesSiretGatewayResponseSchema,
