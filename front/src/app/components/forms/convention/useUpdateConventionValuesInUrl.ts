@@ -9,7 +9,7 @@ import {
   useRoute,
 } from "src/app/routes/routes";
 import {
-  filteredUrlParamsForRoute,
+  filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
 
@@ -35,7 +35,7 @@ export const useUpdateConventionValuesInUrl = (
         route.name === "conventionCustomAgency" ||
         route.name === "conventionMiniStage"
       ) {
-        const filteredParams = filteredUrlParamsForRoute(
+        const filteredParams = filterParamsForRoute(
           urlParams,
           conventionParams,
         );
@@ -43,7 +43,7 @@ export const useUpdateConventionValuesInUrl = (
       }
 
       if (route.name === "conventionImmersionForExternals") {
-        const filteredParams = filteredUrlParamsForRoute(
+        const filteredParams = filterParamsForRoute(
           urlParams,
           conventionForExternalParams,
         );

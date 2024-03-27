@@ -1,12 +1,13 @@
 import { z } from "zod";
+import { withAcquisitionSchema } from "../acquisition.dto";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zToBoolean, zToNumber } from "../zodUtils";
 import { SearchQueryParamsDto } from "./SearchQueryParams.dto";
 
-export const searchQueryParamsSchema: z.Schema<SearchQueryParamsDto> = z.object(
-  {
+export const searchQueryParamsSchema: z.Schema<SearchQueryParamsDto> = z
+  .object({
     appellationCodes: z.array(appellationCodeSchema).optional(),
     siret: siretSchema.optional(),
     latitude: zToNumber,
@@ -16,8 +17,8 @@ export const searchQueryParamsSchema: z.Schema<SearchQueryParamsDto> = z.object(
     place: z.string().optional(),
     sortedBy: z.enum(["distance", "date"]).optional(),
     establishmentSearchableBy: z.enum(["students", "jobSeekers"]).optional(),
-  },
-);
+  })
+  .and(withAcquisitionSchema);
 
 export const searchParamsSchema: z.Schema<SearchQueryParamsDto> =
   searchQueryParamsSchema.and(

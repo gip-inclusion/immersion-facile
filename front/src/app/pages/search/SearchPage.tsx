@@ -116,7 +116,6 @@ export const SearchPage = ({
       </>
     );
   };
-
   useEffect(() => {
     if (availableForInitialSearchRequest) {
       triggerSearch(filterFormValues(formValues));
