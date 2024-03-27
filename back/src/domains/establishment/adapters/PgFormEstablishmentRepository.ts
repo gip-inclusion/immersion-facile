@@ -91,6 +91,20 @@ export class PgFormEstablishmentRepository
     );
   }
 
+  public async getFormEstablishmentsByContactEmail(
+    email: string,
+  ): Promise<FormEstablishmentDto[]> {
+    const pgResults = await this.#selectEstablishmentJsonBuildQueryBuilder()
+      .where(sql<string>`"business_contact" ->> 'email'`, "=", email)
+      .execute();
+
+    const results = pgResults.map((res) =>
+      formEstablishmentSchema.parse(res.formEstablishment),
+    );
+
+    return results;
+  }
+
   public async getBySiret(
     siret: SiretDto,
   ): Promise<FormEstablishmentDto | undefined> {
