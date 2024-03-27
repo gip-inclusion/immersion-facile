@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
+  FormEstablishmentDtoBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   User,
@@ -17,6 +18,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { ContactEntityBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 
 describe("GetUserAgencyDashboardUrl", () => {
@@ -337,6 +339,72 @@ describe("GetUserAgencyDashboardUrl", () => {
         );
 
         expectToEqual(result.establishmentDashboards, {});
+      });
+    });
+
+    describe("establishments", () => {
+      it("retrieve establishments  when IC user is establishement rep in at least one establishment", async () => {
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            establishmentDashboards: {},
+            agencyRights: [],
+          },
+        ]);
+
+        const fakeBusinessContact = new ContactEntityBuilder()
+          .withEmail(john.email)
+          .build();
+
+        const formEstablishment1 = FormEstablishmentDtoBuilder.valid()
+          .withFitForDisabledWorkers(true)
+          .withSiret("12345678901234")
+          .withBusinessContact(fakeBusinessContact)
+          .withBusinessName("fake business name 1")
+          .build();
+
+        const formEstablishment2 = FormEstablishmentDtoBuilder.valid()
+          .withFitForDisabledWorkers(true)
+          .withSiret("22222222222222")
+          .withBusinessContact(fakeBusinessContact)
+          .withBusinessName("fake business name 2")
+          .build();
+
+        uow.formEstablishmentRepository.setFormEstablishments([
+          formEstablishment1,
+          formEstablishment2,
+        ]);
+
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
+
+        expectToEqual(result.establishments, [
+          formEstablishment1,
+          formEstablishment2,
+        ]);
+      });
+
+      it("do not retrieve  establishment  when IC user is not establishment representative in at least one establishment", async () => {
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            agencyRights: [],
+            establishmentDashboards: {},
+          },
+        ]);
+        const convention = new ConventionDtoBuilder()
+          .withEstablishmentTutorEmail(john.email)
+          .build();
+        uow.conventionRepository.setConventions([convention]);
+
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
+
+        expectToEqual(result.establishments, undefined);
       });
     });
   });

@@ -2,6 +2,7 @@ import {
   AbsoluteUrl,
   ConventionsEstablishmentDashboard,
   EstablishmentDashboards,
+  FormEstablishmentDto,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   WithDashboardUrls,
@@ -49,9 +50,11 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)
       throw new NotFoundError(`No user found with provided ID : ${userId}`);
+    const establishments = await this.#withEstablishments(uow, user);
     return {
       ...user,
       ...(await this.#withEstablishmentDashboards(user, uow)),
+      ...(establishments.length > 0 ? { establishments: establishments } : {}),
     };
   }
 
@@ -99,6 +102,18 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
           this.#timeGateway.now(),
         )
       : undefined;
+  }
+
+  async #withEstablishments(
+    uow: UnitOfWork,
+    user: InclusionConnectedUser,
+  ): Promise<FormEstablishmentDto[]> {
+    const establishementForms =
+      await uow.formEstablishmentRepository.getFormEstablishmentsByContactEmail(
+        user.email,
+      );
+
+    return establishementForms;
   }
 
   async #makeEstablishmentDashboard(
