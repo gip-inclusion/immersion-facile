@@ -4,6 +4,7 @@ import {
   AppellationAndRomeDto,
   DiscussionBuilder,
   DiscussionDto,
+  WithAcquisition,
   expectToEqual,
 } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
@@ -226,6 +227,32 @@ describe("PgDiscussionRepository", () => {
       ).toBe(expectedResult);
     },
   );
+
+  it("Method insert with acquisitionCampaign and acquisitionKeyword", async () => {
+    const acquisitionParams = {
+      acquisitionCampaign: "campagne",
+      acquisitionKeyword: "mot-clé",
+    } satisfies WithAcquisition;
+    const siret = "01234567891011";
+    const discussion = new DiscussionBuilder()
+      .withSiret(siret)
+      .withCreatedAt(new Date("2023-07-07"))
+      .withAcquisition(acquisitionParams)
+      .build();
+
+    await pgDiscussionRepository.insert(discussion);
+
+    expectToEqual(
+      await db
+        .selectFrom("discussions")
+        .select(["acquisition_campaign", "acquisition_keyword"])
+        .executeTakeFirst(),
+      {
+        acquisition_campaign: acquisitionParams.acquisitionCampaign,
+        acquisition_keyword: acquisitionParams.acquisitionKeyword,
+      },
+    );
+  });
 
   it("Method countDiscussionsForSiretSince", async () => {
     const siret = "11112222333344";

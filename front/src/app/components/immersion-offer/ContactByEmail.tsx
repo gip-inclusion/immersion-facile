@@ -48,7 +48,11 @@ En vous remerciant,`;
 export const inputsLabelsByKey: Record<
   keyof OmitFromExistingKeys<
     ContactEstablishmentByMailDto,
-    "siret" | "contactMode" | "locationId"
+    | "siret"
+    | "contactMode"
+    | "locationId"
+    | "acquisitionCampaign"
+    | "acquisitionKeyword"
   >,
   string
 > = {
@@ -103,6 +107,7 @@ export const ContactByEmail = ({
       route.params,
       preferUseTranscientData,
       transcientDataForScope,
+      acquisitionParams,
     ],
   );
 

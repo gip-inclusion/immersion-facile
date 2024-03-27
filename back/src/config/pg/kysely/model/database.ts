@@ -57,7 +57,7 @@ type ImmersionObjectives =
 
 type InternshipKind = "immersion" | "mini-stage-cci";
 
-interface Discussions {
+interface Discussions extends WithAcquisition {
   id: string;
   siret: string;
   contact_method: string;

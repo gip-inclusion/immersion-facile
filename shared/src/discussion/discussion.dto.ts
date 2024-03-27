@@ -1,4 +1,5 @@
 import { Builder } from "../Builder";
+import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto } from "../address/address.dto";
 import { ImmersionObjective } from "../convention/convention.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
@@ -50,7 +51,7 @@ type DiscussionDtoBase = {
 
 export type DiscussionDto = DiscussionDtoBase & {
   establishmentContact: DiscussionEstablishmentContact;
-};
+} & WithAcquisition;
 
 export type DiscussionReadDto = OmitFromExistingKeys<
   DiscussionDtoBase,
@@ -164,6 +165,13 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     return new DiscussionBuilder({
       ...this.discussion,
       appellationCode,
+    });
+  }
+
+  public withAcquisition(acquisition: WithAcquisition) {
+    return new DiscussionBuilder({
+      ...this.discussion,
+      ...acquisition,
     });
   }
 

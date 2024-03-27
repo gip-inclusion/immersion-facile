@@ -60,7 +60,13 @@ export const ContactInPerson = ({
         ? { ...transcientDataForScope.value }
         : {}),
     }),
-    [route.params, appellations, acquisitionParams],
+    [
+      route.params,
+      appellations,
+      acquisitionParams,
+      preferUseTranscientData,
+      transcientDataForScope,
+    ],
   );
 
   const appellationListOfOptions = appellations.map((appellation) => ({

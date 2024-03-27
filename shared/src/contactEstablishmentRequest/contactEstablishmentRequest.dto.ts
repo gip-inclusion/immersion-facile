@@ -1,3 +1,4 @@
+import { WithAcquisition } from "../acquisition.dto";
 import { LocationId } from "../address/address.dto";
 import { ImmersionObjective } from "../convention/convention.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
@@ -13,7 +14,7 @@ export type ContactInformations<T extends ContactMethod> = {
   potentialBeneficiaryEmail: string;
   contactMode: T;
   locationId: LocationId;
-};
+} & WithAcquisition;
 
 export type ContactEstablishmentByMailDto = ContactInformations<"EMAIL"> & {
   message: string;

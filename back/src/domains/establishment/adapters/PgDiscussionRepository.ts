@@ -252,4 +252,6 @@ const discussionToPg = (
   siret: discussion.siret,
   contact_method: discussion.establishmentContact.contactMethod,
   potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
+  acquisition_campaign: discussion.acquisitionCampaign,
+  acquisition_keyword: discussion.acquisitionKeyword,
 });
