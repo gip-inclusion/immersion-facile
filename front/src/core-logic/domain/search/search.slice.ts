@@ -5,6 +5,7 @@ import {
   SearchQueryParamsDto,
   SearchResultDto,
   SearchResultQuery,
+  WithAcquisition,
 } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
@@ -23,7 +24,7 @@ export type SearchPageParams = OmitFromExistingKeys<
   "appellationCodes" | "rome"
 > & {
   appellations?: AppellationAndRomeDto[];
-};
+} & WithAcquisition;
 
 export type SearchStatus =
   | "noSearchMade"

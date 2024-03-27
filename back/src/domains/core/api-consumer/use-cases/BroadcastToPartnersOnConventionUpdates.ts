@@ -51,9 +51,14 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
         `Agency with Id ${convention.agencyId} not found`,
       );
     }
+    const {
+      acquisitionCampaign: _,
+      acquisitionKeyword: __,
+      ...conventionWithoutAcquisitionParams
+    } = convention;
 
     const conventionRead: ConventionReadDto = {
-      ...convention,
+      ...conventionWithoutAcquisitionParams,
       agencyName: agency.name,
       agencyDepartment: agency.address.departmentCode,
       agencyKind: agency.kind,

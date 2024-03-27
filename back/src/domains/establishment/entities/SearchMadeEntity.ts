@@ -18,12 +18,11 @@ export type SearchMade = {
   voluntaryToImmersion?: boolean;
   place?: string;
   establishmentSearchableBy?: EstablishmentSearchableByValue;
-};
+} & WithAcquisition;
 
 export type SearchMadeEntity = {
   id: SearchMadeId;
   needsToBeSearched: boolean;
   apiConsumerName?: ApiConsumerName;
   numberOfResults: number;
-} & SearchMade &
-  WithAcquisition;
+} & SearchMade;

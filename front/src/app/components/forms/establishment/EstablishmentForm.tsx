@@ -22,6 +22,7 @@ import { BusinessContactSection } from "src/app/components/forms/establishment/s
 import { DetailsSection } from "src/app/components/forms/establishment/sections/DetailsSection";
 import { IntroSection } from "src/app/components/forms/establishment/sections/IntroSection";
 import { SearchableBySection } from "src/app/components/forms/establishment/sections/SearchableBySection";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
@@ -33,7 +34,7 @@ import {
 } from "src/app/routes/routeParams/formEstablishment";
 import { establishmentParams, routes, useRoute } from "src/app/routes/routes";
 import {
-  filteredUrlParamsForRoute,
+  filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
@@ -111,10 +112,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const [currentStep, setCurrentStep] = useState<Step>(
     isEstablishmentAdmin ? null : 0,
   );
-
+  const acquisitionParams = useGetAcquisitionParams();
   const methods = useForm<FormEstablishmentDto>({
     defaultValues: {
       ...initialFormEstablishment,
+      ...acquisitionParams,
       maxContactsPerWeek: undefined,
     },
     resolver: zodResolver(formEstablishmentSchema),
@@ -123,7 +125,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const { handleSubmit, getValues, reset, trigger } = methods;
 
   const formValues = getValues();
-
   const currentRoute = useRef(route);
 
   const debouncedFormValues = useDebounce(formValues);
@@ -211,16 +212,17 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   useEffect(() => {
     reset({
       ...initialFormEstablishment,
+      ...acquisitionParams,
       maxContactsPerWeek:
         mode === "create"
           ? undefined
           : initialFormEstablishment.maxContactsPerWeek,
     });
-  }, [initialFormEstablishment, reset, mode]);
+  }, [initialFormEstablishment, acquisitionParams, reset, mode]);
 
   useEffect(() => {
     if (isEstablishmentCreation) {
-      const filteredParams = filteredUrlParamsForRoute(
+      const filteredParams = filterParamsForRoute(
         initialUrlParams.current,
         establishmentParams,
       );

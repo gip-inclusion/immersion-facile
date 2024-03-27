@@ -1,5 +1,5 @@
 import {
-  filteredUrlParamsForRoute,
+  filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
 
@@ -26,7 +26,7 @@ describe("url.utils", () => {
         param1: "value1",
       };
 
-      const result = filteredUrlParamsForRoute(urlParams, matchingParams);
+      const result = filterParamsForRoute(urlParams, matchingParams);
       expect(result).toEqual({
         param1: "value1",
       });
