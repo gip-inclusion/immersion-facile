@@ -1,16 +1,14 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { DiscussionId } from "shared";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { DiscussionId, InclusionConnectJwt } from "shared";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { useAppSelector } from "./reduxHooks";
 
-export const useDiscussion = (discussionId: DiscussionId) => {
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
-
+export const useDiscussion = (
+  discussionId: DiscussionId,
+  inclusionConnectedJwt?: InclusionConnectJwt,
+) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (inclusionConnectedJwt)
