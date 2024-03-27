@@ -61,6 +61,22 @@ describe("PgFormEstablishmentRepository", () => {
   });
 
   describe("save & get", () => {
+    const siretA = "11111111111111";
+    const businessContactEmail = "business-contact@mail.com";
+
+    const formEstablishmentA = FormEstablishmentDtoBuilder.valid()
+      .withSource("lesentreprises-sengagent")
+      .withSiret(siretA)
+      .withBusinessContactEmail(businessContactEmail)
+      .withNextAvailabilityDate(new Date())
+      .build();
+
+    const siretB = "22222222222222";
+    const formEstablishmentB = FormEstablishmentDtoBuilder.valid()
+      .withFitForDisabledWorkers(true)
+      .withBusinessContactEmail(businessContactEmail)
+      .withSiret(siretB)
+      .build();
     it("Adds a new FormEstablishment", async () => {
       await formEstablishmentRepository.create(formEstablishment);
 
@@ -71,19 +87,6 @@ describe("PgFormEstablishmentRepository", () => {
     });
 
     it("Gets saved Form Establishment", async () => {
-      const siretA = "11111111111111";
-      const formEstablishmentA = FormEstablishmentDtoBuilder.valid()
-        .withSource("lesentreprises-sengagent")
-        .withSiret(siretA)
-        .withNextAvailabilityDate(new Date())
-        .build();
-
-      const siretB = "22222222222222";
-      const formEstablishmentB = FormEstablishmentDtoBuilder.valid()
-        .withFitForDisabledWorkers(true)
-        .withSiret(siretB)
-        .build();
-
       await formEstablishmentRepository.create(formEstablishmentA);
       await formEstablishmentRepository.create(formEstablishmentB);
 
@@ -95,6 +98,17 @@ describe("PgFormEstablishmentRepository", () => {
         formEstablishmentA,
         formEstablishmentB,
       ]);
+    });
+
+    it("Gets Form establishments by contact email", async () => {
+      await formEstablishmentRepository.create(formEstablishmentA);
+      await formEstablishmentRepository.create(formEstablishmentB);
+      expectArraysToEqualIgnoringOrder(
+        await formEstablishmentRepository.getFormEstablishmentsByContactEmail(
+          businessContactEmail,
+        ),
+        [formEstablishmentA, formEstablishmentB],
+      );
     });
   });
 
