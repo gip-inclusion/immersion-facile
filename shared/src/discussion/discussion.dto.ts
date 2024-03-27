@@ -45,10 +45,10 @@ type DiscussionDtoBase = {
   immersionObjective: ImmersionObjective | null;
   address: AddressDto;
   exchanges: Exchange[];
+  potentialBeneficiary: DiscussionPotentialBeneficiary;
 };
 
 export type DiscussionDto = DiscussionDtoBase & {
-  potentialBeneficiary: DiscussionPotentialBeneficiary;
   establishmentContact: DiscussionEstablishmentContact;
 };
 
@@ -58,7 +58,6 @@ export type DiscussionReadDto = OmitFromExistingKeys<
 > & {
   appellation: AppellationAndRomeDto;
 } & {
-  potentialBeneficiary: DiscussionPotentialBeneficiary;
   establishmentContact: OmitFromExistingKeys<
     DiscussionEstablishmentContact,
     "email" | "copyEmails" | "phone"
