@@ -2,6 +2,7 @@ import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AgencyDto, AgencyId } from "../agency/agency.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
+import { FormEstablishmentDto } from "../formEstablishment/FormEstablishment.dto";
 import { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
 import { EstablishmentRole } from "../role/role.dto";
 import { Flavor } from "../typeFlavors";
@@ -33,6 +34,10 @@ type WithAgencyRights = {
   agencyRights: AgencyRight[];
 };
 
+type WithEstablisments = {
+  establishments?: FormEstablishmentDto[];
+};
+
 export type ConventionsEstablishmentDashboard = {
   url: AbsoluteUrl;
   role: EstablishmentRole;
@@ -57,7 +62,8 @@ export type WithDashboardUrls = {
 
 export type InclusionConnectedUser = User &
   WithAgencyRights &
-  WithDashboardUrls;
+  WithDashboardUrls &
+  WithEstablisments;
 
 export type WithAgencyIds = {
   agencies: AgencyId[];
