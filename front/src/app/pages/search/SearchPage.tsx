@@ -17,6 +17,7 @@ import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAu
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { SearchInfoSection } from "src/app/components/search/SearchInfoSection";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
 import { routes } from "src/app/routes/routes";
@@ -56,6 +57,7 @@ export const SearchPage = ({
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const triggerSearch = useSearchUseCase(route);
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
+  const acquisitionParams = useGetAcquisitionParams();
   const initialValues: SearchPageParams = {
     latitude: 0,
     longitude: 0,
@@ -63,6 +65,7 @@ export const SearchPage = ({
     place: "",
     sortedBy: "distance",
     appellations: undefined,
+    ...acquisitionParams,
   };
   const availableForSearchRequest = (
     searchStatus: SearchStatus,

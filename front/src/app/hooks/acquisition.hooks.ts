@@ -1,23 +1,45 @@
+import { equals, values } from "ramda";
 import { useEffect, useState } from "react";
 import { WithAcquisition } from "shared";
-import {
-  FrontRouteUnion,
-  acquisitionParams,
-  useRoute,
-} from "src/app/routes/routes";
+import { acquisitionParams } from "src/app/routes/routes";
+import { getUrlParameters } from "src/app/utils/url.utils";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { Route } from "type-route";
 
 type AcquisitionParams = Record<keyof typeof acquisitionParams, string>;
+type UrlParamsWithAcquisition = Record<string, string> & AcquisitionParams;
 
-const routeParamsContainsAcquisitionParams = <R extends Route<FrontRouteUnion>>(
-  routeParams: R["params"],
-): routeParams is R["params"] & AcquisitionParams =>
+const routeParamsContainsAcquisitionParams = (
+  routeParams: Record<string, string>,
+): routeParams is UrlParamsWithAcquisition =>
   ("mtm_campaign" in routeParams && routeParams.mtm_campaign !== undefined) ||
   ("mtm_kwd" in routeParams && routeParams.mtm_kwd !== undefined);
 
-export const useAcquisitionParams = (): WithAcquisition => {
-  const { params } = useRoute() as Route<FrontRouteUnion>;
+const areRouteParamsDifferentFromAcquisitionParams = (
+  acquisitionParams: WithAcquisition,
+  routeParams: UrlParamsWithAcquisition,
+) =>
+  !equals(
+    values(acquisitionParams).filter((param) => param !== undefined),
+    values({
+      mtm_campaign: routeParams.mtm_campaign,
+      mtm_kwd: routeParams.mtm_kwd,
+    }).filter((param) => param !== undefined),
+  );
+
+export const useSetAcquisitionParams = (): WithAcquisition => {
+  const acquisitionParams = useGetAcquisitionParams();
+  useEffect(() => {
+    outOfReduxDependencies.sessionDeviceRepository.set(
+      "acquisitionParams",
+      acquisitionParams,
+    );
+  }, [acquisitionParams]);
+
+  return acquisitionParams;
+};
+
+export const useGetAcquisitionParams = () => {
+  const urlParams = getUrlParameters(window.location);
   const initialParams =
     outOfReduxDependencies.sessionDeviceRepository.get("acquisitionParams");
   const initialAcquisitionParams = initialParams ?? {
@@ -27,20 +49,14 @@ export const useAcquisitionParams = (): WithAcquisition => {
   const [acquisitionParams, setAcquisitionParams] = useState<WithAcquisition>(
     initialAcquisitionParams,
   );
-
-  if (routeParamsContainsAcquisitionParams(params)) {
+  if (
+    routeParamsContainsAcquisitionParams(urlParams) &&
+    areRouteParamsDifferentFromAcquisitionParams(acquisitionParams, urlParams)
+  ) {
     setAcquisitionParams({
-      acquisitionCampaign: params.mtm_campaign,
-      acquisitionKeyword: params.mtm_kwd,
+      acquisitionCampaign: urlParams.mtm_campaign,
+      acquisitionKeyword: urlParams.mtm_kwd,
     });
   }
-
-  useEffect(() => {
-    outOfReduxDependencies.sessionDeviceRepository.set(
-      "acquisitionParams",
-      acquisitionParams,
-    );
-  }, [acquisitionParams]);
-
   return acquisitionParams;
 };

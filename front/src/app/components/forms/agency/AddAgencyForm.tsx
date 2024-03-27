@@ -27,6 +27,7 @@ import {
   departmentOptions,
 } from "src/app/components/forms/commons/AgencySelector";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import {
   formErrorsToFlatErrors,
   getFormContents,
@@ -129,12 +130,15 @@ const AgencyForm = ({
     formAgencyFieldsLabels,
   );
   const { refersToAgencyId: refersToAgencyIdField } = getFormFields();
+  const acquisitionParams = useGetAcquisitionParams();
+
   const formInitialValues = useMemo(
     () => ({
       ...initialValues(uuidV4()),
+      ...acquisitionParams,
       validatorEmails: refersToOtherAgency ? ["temp@temp.com"] : [],
     }),
-    [refersToOtherAgency],
+    [refersToOtherAgency, acquisitionParams],
   );
   const methods = useForm<CreateAgencyInitialValues>({
     resolver: zodResolver(createAgencySchema),

@@ -18,6 +18,7 @@ import {
   useTranscientDataFromStorage,
 } from "src/app/components/immersion-offer/useTranscientDataFromStorage";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -41,6 +42,7 @@ export const ContactInPerson = ({
   } = useTranscientDataFromStorage("contact-establishment", false);
   const transcientDataForScope = getTranscientDataForScope();
   const preferUseTranscientData = getPreferUseTranscientDataForScope();
+  const acquisitionParams = useGetAcquisitionParams();
   const initialValues: ContactEstablishmentInPersonDto = useMemo(
     () => ({
       siret: route.params.siret,
@@ -53,11 +55,12 @@ export const ContactInPerson = ({
       potentialBeneficiaryLastName: route.params.contactLastName ?? "",
       potentialBeneficiaryEmail: route.params.contactEmail ?? "",
       locationId: route.params.location ?? "",
+      ...acquisitionParams,
       ...(preferUseTranscientData && transcientDataForScope?.value
         ? { ...transcientDataForScope.value }
         : {}),
     }),
-    [route.params, appellations],
+    [route.params, appellations, acquisitionParams],
   );
 
   const appellationListOfOptions = appellations.map((appellation) => ({

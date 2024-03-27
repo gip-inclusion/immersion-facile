@@ -7,6 +7,7 @@ import {
   ConsentBannerAndConsentManagement,
   useConsent,
 } from "src/app/components/ConsentManager";
+import { useSetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useFetchFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ErrorPage } from "src/app/pages/error/ErrorPage";
 import { useRoute } from "src/app/routes/routes";
@@ -36,6 +37,7 @@ export const App = () => {
     production:
       "https://matomo.inclusion.beta.gouv.fr/js/container_gXlljpZ7.js",
   };
+  useSetAcquisitionParams();
   return (
     <ErrorBoundary
       fallbackRender={({ error }) => <ErrorPage message={error.message} />}
