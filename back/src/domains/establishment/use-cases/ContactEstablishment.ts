@@ -210,6 +210,8 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
               },
             ]
           : [],
+      acquisitionCampaign: contactRequest.acquisitionCampaign,
+      acquisitionKeyword: contactRequest.acquisitionKeyword,
     };
   }
 
