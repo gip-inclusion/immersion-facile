@@ -2,7 +2,10 @@ import { Builder } from "../Builder";
 import { AddressDto } from "../address/address.dto";
 import { ImmersionObjective } from "../convention/convention.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import {
+  AppellationAndRomeDto,
+  AppellationCode,
+} from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
@@ -49,11 +52,13 @@ export type DiscussionDto = DiscussionDtoBase & {
   establishmentContact: DiscussionEstablishmentContact;
 };
 
-export type DiscussionReadDto = DiscussionDtoBase & {
-  potentialBeneficiary: OmitFromExistingKeys<
-    DiscussionPotentialBeneficiary,
-    "email" | "phone"
-  >;
+export type DiscussionReadDto = OmitFromExistingKeys<
+  DiscussionDtoBase,
+  "appellationCode"
+> & {
+  appellation: AppellationAndRomeDto;
+} & {
+  potentialBeneficiary: DiscussionPotentialBeneficiary;
   establishmentContact: OmitFromExistingKeys<
     DiscussionEstablishmentContact,
     "email" | "copyEmails" | "phone"
@@ -110,16 +115,31 @@ const defaultDiscussion: DiscussionDto = {
   ],
 };
 
+export const cartographeAppellationAndRome: AppellationAndRomeDto = {
+  romeCode: "M1808",
+  appellationCode: "11704",
+  romeLabel: "Information géographique",
+  appellationLabel: "Cartographe",
+};
+
 export class DiscussionBuilder implements Builder<DiscussionDto> {
   constructor(private readonly discussion: DiscussionDto = defaultDiscussion) {}
 
-  public buildRead(): DiscussionReadDto {
+  public buildRead(
+    appelation: AppellationAndRomeDto = cartographeAppellationAndRome,
+  ): DiscussionReadDto {
+    const { appellationCode, ...rest } = this.discussion;
+    if (appelation.appellationCode !== appellationCode)
+      throw new Error("Appelation code mismatch");
     return {
-      ...this.discussion,
+      ...rest,
+      appellation: appelation,
       potentialBeneficiary: {
         firstName: this.discussion.potentialBeneficiary.firstName,
         lastName: this.discussion.potentialBeneficiary.lastName,
         resumeLink: this.discussion.potentialBeneficiary.resumeLink,
+        email: this.discussion.potentialBeneficiary.email,
+        phone: this.discussion.potentialBeneficiary.phone,
       },
       establishmentContact: {
         firstName: this.discussion.establishmentContact.firstName,

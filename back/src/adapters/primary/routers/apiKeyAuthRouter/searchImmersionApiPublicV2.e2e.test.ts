@@ -1,6 +1,6 @@
 import {
-  AppellationAndRomeDto,
   SiretDto,
+  cartographeAppellationAndRome,
   expectHttpResponseToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -25,13 +25,6 @@ import {
   PublicApiV2SearchEstablishmentRoutes,
   publicApiV2SearchEstablishmentRoutes,
 } from "./publicApiV2.routes";
-
-const cartographeAppellationAndRome: AppellationAndRomeDto = {
-  romeCode: "M1808",
-  appellationCode: "11704",
-  romeLabel: "Information géographique",
-  appellationLabel: "Cartographe",
-};
 
 describe("search route", () => {
   let request: SuperTest<Test>;

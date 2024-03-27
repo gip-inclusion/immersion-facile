@@ -93,20 +93,10 @@ describe("GetDiscussionById use case", () => {
       const response = await getDiscussionById.execute(userDiscussion.id, {
         userId: user.id,
       });
-      expectToEqual(response, {
-        ...userDiscussion,
-        potentialBeneficiary: {
-          firstName: discussion.potentialBeneficiary.firstName,
-          lastName: discussion.potentialBeneficiary.lastName,
-          resumeLink: discussion.potentialBeneficiary.resumeLink,
-        },
-        establishmentContact: {
-          firstName: discussion.establishmentContact.firstName,
-          lastName: discussion.establishmentContact.lastName,
-          job: discussion.establishmentContact.job,
-          contactMethod: discussion.establishmentContact.contactMethod,
-        },
-      });
+      expectToEqual(
+        response,
+        new DiscussionBuilder(userDiscussion).buildRead(),
+      );
     });
   });
 });
