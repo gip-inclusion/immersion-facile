@@ -36,7 +36,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     requestBodySchema: agencyIdsSchema,
     responses: {
       200: expressEmptyResponseBody,
-      400: httpErrorSchema,
+      400: httpErrorSchema.or(legacyHttpErrorSchema),
     },
   }),
   markPartnersErroredConventionAsHandled: defineRoute({
