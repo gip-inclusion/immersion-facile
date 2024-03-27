@@ -29,12 +29,12 @@ import { ShortLinkQuery } from "../../short-link/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../../short-link/ports/ShortLinkRepository";
 
 export type UnitOfWork = {
-  agencyRepository: AgencyRepository;
   agencyGroupRepository: AgencyGroupRepository;
+  agencyRepository: AgencyRepository;
   apiConsumerRepository: ApiConsumerRepository;
-  userRepository: UserRepository;
-  conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
+  assessmentRepository: AssessmentRepository;
   conventionExternalIdRepository: ConventionExternalIdRepository;
+  conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
   conventionQueries: ConventionQueries;
   conventionRepository: ConventionRepository;
   conventionsToSyncRepository: ConventionsToSyncRepository;
@@ -42,13 +42,14 @@ export type UnitOfWork = {
   discussionRepository: DiscussionRepository;
   errorRepository: SavedErrorRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
+  establishmentLeadQueries: EstablishmentLeadQueries;
   establishmentLeadRepository: EstablishmentLeadRepository;
-  groupRepository: GroupRepository;
   featureFlagRepository: FeatureFlagRepository;
   formEstablishmentRepository: FormEstablishmentRepository;
-  assessmentRepository: AssessmentRepository;
+  groupRepository: GroupRepository;
   inclusionConnectedUserRepository: InclusionConnectedUserRepository;
   notificationRepository: NotificationRepository;
+  npsRepository: NpsRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;
   outboxQueries: OutboxQueries;
   outboxRepository: OutboxRepository;
@@ -56,6 +57,5 @@ export type UnitOfWork = {
   searchMadeRepository: SearchMadeRepository;
   shortLinkQuery: ShortLinkQuery;
   shortLinkRepository: ShortLinkRepository;
-  establishmentLeadQueries: EstablishmentLeadQueries;
-  npsRepository: NpsRepository;
+  userRepository: UserRepository;
 };
