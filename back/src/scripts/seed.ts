@@ -2,6 +2,7 @@ import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
+  DiscussionBuilder,
   FeatureFlags,
   cciAgencyId,
   conventionSchema,
@@ -29,19 +30,25 @@ const seed = async () => {
   const pool = deps.getPgPoolFn();
   const client = await pool.connect();
 
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("Reset Db start");
   await client.query("DELETE FROM feature_flags");
   await client.query("DELETE FROM conventions");
+  await client.query("DELETE FROM agency_groups__agencies");
+  await client.query("DELETE FROM agency_groups");
   await client.query("DELETE FROM agencies");
   await client.query("DELETE FROM discussions");
   await client.query("DELETE FROM establishments_contacts");
   await client.query("DELETE FROM form_establishments");
   await client.query("DELETE FROM establishments CASCADE");
   await client.query("DELETE FROM groups CASCADE");
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("Reset Db end");
 
   await deps.uowPerformer.perform(async (uow) => {
     await featureFlagsSeed(uow);
     await agencySeed(uow);
-    await establishmentAggregateSeed(uow);
+    await establishmentAggregateWithDiscusionSeed(uow);
     await conventionSeed(uow);
   });
 
@@ -113,7 +120,7 @@ const agencySeed = async (uow: UnitOfWork) => {
   console.log("done");
 };
 
-const establishmentAggregateSeed = async (uow: UnitOfWork) => {
+const establishmentAggregateWithDiscusionSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding establishment aggregates...");
   const franceMerguez = new EstablishmentAggregateBuilder()
@@ -199,6 +206,33 @@ const establishmentAggregateSeed = async (uow: UnitOfWork) => {
     },
     name: "Decathlon",
   });
+
+  const discussionId = "aaaaaaaa-9c0a-1aaa-aa6d-aaaaaaaaaaaa";
+  await uow.discussionRepository.insert(
+    new DiscussionBuilder()
+      .withId(discussionId)
+      .withSiret(franceMerguez.establishment.siret)
+      .withPotentialBeneficiary({
+        resumeLink: "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
+      })
+      .withExchanges([
+        {
+          sender: "potentialBeneficiary",
+          recipient: "establishment",
+          sentAt: new Date("2024-02-02").toISOString(),
+          subject: "Présentation",
+          message: "Bonjour, je me présente!",
+        },
+        {
+          sender: "establishment",
+          recipient: "potentialBeneficiary",
+          sentAt: new Date("2024-02-03").toISOString(),
+          subject: "Réponse entreprise",
+          message: "Allez viens on est bien.",
+        },
+      ])
+      .build(),
+  );
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
 };
