@@ -35,6 +35,7 @@ const DiscussionDetails = ({
     immersionObjective,
     exchanges,
     businessName,
+    appellation,
   },
 }: { discussion: DiscussionReadDto }): JSX.Element => (
   <>
@@ -53,7 +54,22 @@ const DiscussionDetails = ({
         Discussion avec {potentialBeneficiary.firstName}{" "}
         {potentialBeneficiary.lastName}
       </h1>
-      <p>{immersionObjective}</p>
+      <p>
+        {immersionObjective} · {appellation.appellationLabel}
+        {potentialBeneficiary.resumeLink ? (
+          <>
+            {" · "}
+            <a
+              href={potentialBeneficiary.resumeLink}
+              title={"CV du candidat"}
+              target="_blank"
+              rel="noreferrer"
+            >
+              CV
+            </a>
+          </>
+        ) : null}
+      </p>
     </header>
     {exchanges.map(({ sender, sentAt, subject, message }) => (
       <ExchangeMessage sender={sender}>
