@@ -4,31 +4,33 @@ import { AbsoluteUrl, ConventionId } from "shared";
 export interface Database {
   actors: Actors;
   agencies: Agencies;
-  agency_groups: AgencyGroups;
   agency_groups__agencies: AgencyGroupsAgencies;
-  api_consumers: ApiConsumers;
+  agency_groups: AgencyGroups;
   api_consumers_subscriptions: ApiConsumersSubscriptions;
+  api_consumers: ApiConsumers;
   convention_external_ids: ConventionExternalIds;
   conventions: Conventions;
   discussions: Discussions;
   establishment_lead_events: EstablishmentLeadEvents;
-  establishments: Establishments;
+  establishments_contacts: EstablishmentsContacts;
   establishments_locations: EstablishmentsLocations;
+  establishments: Establishments;
   exchanges: Exchanges;
   form_establishments: PgFormEstablishments;
-  groups: Groups;
   groups__sirets: GroupsSirets;
-  establishments_contacts: EstablishmentsContacts;
+  groups: Groups;
   immersion_offers: ImmersionOffers;
   nps: Nps;
   outbox: Outbox;
   partners_pe_connect: PartnersPeConnect;
-  searches_made: SearchesMade;
-  searches_made__appellation_code: SearchesMadeAppellationCode;
+  public_appellations_data: PublicAppellationsData;
+  public_romes_data: PublicRomesData;
   saved_errors: SavedErrors;
-  users: AuthenticatedUsers;
-  users_ongoing_oauths: OngoingOauths;
+  searches_made__appellation_code: SearchesMadeAppellationCode;
+  searches_made: SearchesMade;
   users__agencies: UsersAgencies;
+  users_ongoing_oauths: OngoingOauths;
+  users: AuthenticatedUsers;
   view_appellations_dto: ViewAppellationsDto;
 }
 
@@ -334,6 +336,20 @@ export interface Establishments extends WithAcquisition {
   next_availability_date: Timestamp | null;
   searchable_by_students: boolean;
   searchable_by_job_seekers: boolean;
+}
+
+export interface PublicAppellationsData {
+  ogr_appellation: Generated<number>;
+  code_rome: string;
+  libelle_appellation_long: string;
+  libelle_appellation_court: string;
+  libelle_appellation_long_tsvector: string | null;
+  libelle_appellation_long_without_special_char: string;
+}
+export interface PublicRomesData {
+  code_rome: string;
+  libelle_rome: string;
+  libelle_rome_tsvector: string | null;
 }
 
 export interface EstablishmentsLocations {
