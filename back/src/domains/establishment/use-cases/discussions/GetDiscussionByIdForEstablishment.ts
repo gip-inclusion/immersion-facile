@@ -46,12 +46,26 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
         `You are not allowed to access discussion with id ${discussionId}`,
       );
 
+    const { appellationCode, ...rest } = discussion;
+
+    const appellation = (
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
+        appellationCode,
+      ])
+    ).at(0);
+
+    if (!appellation)
+      throw new NotFoundError(`Missing appelation code '${appellationCode}'`);
+
     return {
-      ...discussion,
+      ...rest,
+      appellation,
       potentialBeneficiary: {
         firstName: discussion.potentialBeneficiary.firstName,
         lastName: discussion.potentialBeneficiary.lastName,
         resumeLink: discussion.potentialBeneficiary.resumeLink,
+        email: discussion.potentialBeneficiary.email,
+        phone: discussion.potentialBeneficiary.phone,
       },
       establishmentContact: {
         firstName: discussion.establishmentContact.firstName,
