@@ -42,6 +42,7 @@ import {
 } from "src/app/components/forms/convention/conventionHelpers";
 import { sidebarStepContent } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
@@ -136,8 +137,10 @@ export const ConventionForm = ({
   const sidebarContent = sidebarStepContent(
     conventionProperties?.internshipKind ?? "immersion",
   );
+  const acquisitionParams = useGetAcquisitionParams();
   const [initialValues] = useState<ConventionPresentation>({
     ...conventionProperties,
+    ...acquisitionParams,
     signatories: {
       ...conventionProperties.signatories,
       beneficiary: makeInitialBenefiaryForm(
@@ -164,7 +167,6 @@ export const ConventionForm = ({
     mode: "onTouched",
   });
   const { getValues, reset } = methods;
-
   const formSuccessfullySubmitted = submitFeedback.kind === "justSubmitted";
 
   useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(getValues()));
