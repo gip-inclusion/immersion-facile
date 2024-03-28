@@ -2,6 +2,7 @@ import { Request, Router } from "express";
 import {
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
+  InclusionConnectJwtPayload,
   establishmentRoutes,
   formCompletionRoutes,
 } from "shared";
@@ -49,7 +50,9 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
           req.params.siret,
-          getEstablishmentPayload(req) ?? getBackOfficePayload(req),
+          getEstablishmentPayload(req) ??
+            getBackOfficePayload(req) ??
+            getIcPayload(req),
         ),
       ),
   );
@@ -84,3 +87,6 @@ const getEstablishmentPayload = (
 
 const getBackOfficePayload = (req: Request): BackOfficeJwtPayload | undefined =>
   req.payloads?.backOffice;
+
+const getIcPayload = (req: Request): InclusionConnectJwtPayload | undefined =>
+  req.payloads?.inclusion;

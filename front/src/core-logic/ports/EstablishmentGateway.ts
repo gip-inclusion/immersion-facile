@@ -3,6 +3,7 @@ import {
   BackOfficeJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
+  InclusionConnectJwt,
   SiretDto,
 } from "shared";
 
@@ -12,10 +13,10 @@ export interface EstablishmentGateway {
   requestEstablishmentModification$(siret: SiretDto): Observable<void>;
   getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    jwt: EstablishmentJwt | BackOfficeJwt,
+    jwt: EstablishmentJwt | BackOfficeJwt | InclusionConnectJwt,
   ): Observable<FormEstablishmentDto>;
   updateFormEstablishment$(
     establishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt | BackOfficeJwt,
+    jwt: EstablishmentJwt | BackOfficeJwt | InclusionConnectJwt,
   ): Observable<void>;
 }

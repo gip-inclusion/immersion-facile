@@ -3,6 +3,7 @@ import {
   BackOfficeJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
+  InclusionConnectJwt,
   SiretDto,
   defaultMaxContactsPerWeek,
 } from "shared";
@@ -22,7 +23,7 @@ export type EstablishmentFeedback = SubmitFeedBack<
 
 export type EstablishmentUpdatePayload = {
   formEstablishment: FormEstablishmentDto;
-  jwt: EstablishmentJwt | BackOfficeJwt;
+  jwt: EstablishmentJwt | BackOfficeJwt | InclusionConnectJwt;
 };
 
 export type EstablishmentDeletePayload = {
@@ -34,7 +35,7 @@ export type EstablishmentRequestedPayload =
   | Partial<FormEstablishmentDto>
   | {
       siret: SiretDto;
-      jwt: EstablishmentJwt | BackOfficeJwt;
+      jwt: EstablishmentJwt | BackOfficeJwt | InclusionConnectJwt;
     };
 
 export const defaultFormEstablishmentValue = (
