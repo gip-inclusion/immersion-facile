@@ -29,7 +29,9 @@ export const BusinessContactSection = ({
               onClick: () => onStepChange(2, []),
               iconId: "fr-icon-arrow-left-line",
               priority: "secondary",
-              id: domElementIds.establishment.previousButtonFromStepAndMode({
+              id: domElementIds.establishment[
+                mode
+              ].previousButtonFromStepAndMode({
                 currentStep,
                 mode,
               }),
@@ -48,7 +50,7 @@ export const BusinessContactSection = ({
                 ]),
               iconId: "fr-icon-arrow-right-line",
               iconPosition: "right",
-              id: domElementIds.establishment.nextButtonFromStepAndMode({
+              id: domElementIds.establishment[mode].nextButtonFromStepAndMode({
                 currentStep,
                 mode,
               }),

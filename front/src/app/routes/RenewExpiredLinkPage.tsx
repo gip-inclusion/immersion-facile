@@ -91,7 +91,7 @@ export const RenewExpiredLinkContent = ({
           disabled={requested}
           onClick={onClick}
           nativeButtonProps={{
-            id: domElementIds.magicLinkRenewal.magicLinkRenewalButton,
+            id: domElementIds.magicLinkRenewal.renewalButton,
           }}
         >
           Demander un nouveau lien

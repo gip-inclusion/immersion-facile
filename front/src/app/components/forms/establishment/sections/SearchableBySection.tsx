@@ -78,7 +78,7 @@ export const SearchableBySection = ({
           "Quelle catégorie de public souhaitez-vous recevoir en immersion ?"
         }
         name="searchableBy"
-        id={domElementIds.establishment.searchableBy}
+        id={domElementIds.establishment[mode].searchableBy}
         options={searchableByOptions.map((option) => ({
           ...option,
           nativeInputProps: {
@@ -110,7 +110,9 @@ export const SearchableBySection = ({
               onClick: () => onStepChange(1, []),
               iconId: "fr-icon-arrow-left-line",
               priority: "secondary",
-              id: domElementIds.establishment.previousButtonFromStepAndMode({
+              id: domElementIds.establishment[
+                mode
+              ].previousButtonFromStepAndMode({
                 currentStep,
                 mode,
               }),
@@ -120,7 +122,7 @@ export const SearchableBySection = ({
               onClick: () => onStepChange(3, ["searchableBy"]),
               iconId: "fr-icon-arrow-right-line",
               iconPosition: "right",
-              id: domElementIds.establishment.nextButtonFromStepAndMode({
+              id: domElementIds.establishment[mode].nextButtonFromStepAndMode({
                 currentStep,
                 mode,
               }),
