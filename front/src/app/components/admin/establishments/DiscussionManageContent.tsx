@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
+import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import React from "react";
 import { ExchangeMessage, Loader } from "react-design-system";
 import {
@@ -9,6 +10,7 @@ import {
   Email,
   WithDiscussionId,
   addressDtoToString,
+  createOpaqueEmail,
   domElementIds,
   toDisplayedDate,
 } from "shared";
@@ -60,6 +62,7 @@ export const DiscussionManageContent = ({
 
 const DiscussionDetails = ({
   discussion,
+
   userEmail,
 }: { discussion: DiscussionReadDto; userEmail: Email }): JSX.Element => {
   const draftConvention = makeConventionFromDiscussion({
@@ -105,20 +108,38 @@ const DiscussionDetails = ({
             </>
           ) : null}
         </p>
-        <Button
-          priority="tertiary"
-          id={
-            domElementIds.establishmentDashboard.discussion
-              .activateDraftConvention
-          }
-          linkProps={{
-            href: makeDraftConventionLink(draftConvention).href,
-            target: "_blank",
-          }}
-          className={fr.cx("fr-mb-2w")}
-        >
-          Pré-remplir la convention pour cette mise en relation
-        </Button>
+        <ButtonsGroup
+          buttonsEquisized
+          alignment="center"
+          buttons={[
+            {
+              id: domElementIds.establishmentDashboard.discussion
+                .activateDraftConvention,
+              priority: "tertiary",
+              linkProps: {
+                href: makeDraftConventionLink(draftConvention).href,
+                target: "_blank",
+              },
+              children: "Pré-remplir la convention pour cette mise en relation",
+            },
+            {
+              id: domElementIds.establishmentDashboard.discussion
+                .replyToCandidateByEmail,
+              priority: "tertiary",
+              linkProps: {
+                href: `mailto:${createOpaqueEmail(
+                  discussion.id,
+                  "potentialBeneficiary",
+                  window.location.hostname,
+                )}?subject=${encodeURI(
+                  `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.firstName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
+                )}`,
+                target: "_blank",
+              },
+              children: "Envoyer un message au candidat par email",
+            },
+          ]}
+        />
       </header>
       {discussion.exchanges.map(({ sender, sentAt, subject, message }) => (
         <ExchangeMessage sender={sender}>

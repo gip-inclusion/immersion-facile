@@ -56,6 +56,7 @@ export * from "./http/httpStatus";
 export { httpErrorSchema } from "./httpClient/httpErrors.schema";
 export * from "./inboundEmailParsing/brevoInbound.dto";
 export * from "./inboundEmailParsing/brevoInbound.schema";
+export * from "./inboundEmailParsing/inboundEmailParsing.utils";
 export * from "./inclusionConnect/inclusionConnect.dto";
 export * from "./inclusionConnect/inclusionConnect.routes";
 export * from "./inclusionConnect/inclusionConnect.schema";
