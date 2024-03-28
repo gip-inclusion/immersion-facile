@@ -5,6 +5,7 @@ import {
   NafDto,
   NumberEmployeesRange,
   SiretEstablishmentDto,
+  WithAcquisition,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -99,6 +100,10 @@ describe("Insert Establishment aggregate from form data", () => {
 
   it("Converts Form Establishment in search format", async () => {
     // Prepare
+    const withAcquisition = {
+      acquisitionKeyword: "yolo",
+      acquisitionCampaign: "my campaign",
+    } satisfies WithAcquisition;
     const professions: AppellationAndRomeDto[] = [
       {
         romeCode: "A1101",
@@ -120,6 +125,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .withAppellations(professions)
       .withBusinessContact(fakeBusinessContact)
       .withNextAvailabilityDate(nextAvailabilityDate)
+      .withAcquisition(withAcquisition)
       .withBusinessAddresses([
         {
           id: fakeLocation.id,
@@ -151,6 +157,7 @@ describe("Insert Establishment aggregate from form data", () => {
               .withLocations([fakeLocation])
               .withWebsite(formEstablishment.website)
               .withNextAvailabilityDate(nextAvailabilityDate)
+              .withAcquisition(withAcquisition)
               .build(),
           )
           .withFitForDisabledWorkers(true)

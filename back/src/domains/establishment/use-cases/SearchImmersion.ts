@@ -47,6 +47,8 @@ export class SearchImmersion extends TransactionalUseCase<
       voluntaryToImmersion,
       rome,
       establishmentSearchableBy,
+      acquisitionCampaign,
+      acquisitionKeyword,
     }: SearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
@@ -61,6 +63,8 @@ export class SearchImmersion extends TransactionalUseCase<
       appellationCodes,
       romeCode: rome,
       establishmentSearchableBy,
+      acquisitionCampaign,
+      acquisitionKeyword,
     };
 
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([

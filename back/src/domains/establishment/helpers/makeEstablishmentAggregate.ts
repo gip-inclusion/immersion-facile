@@ -20,6 +20,8 @@ export const makeEstablishmentAggregate = ({
   nafAndNumberOfEmployee: NafAndNumberOfEmpolyee;
 }): EstablishmentAggregate => ({
   establishment: {
+    acquisitionCampaign: formEstablishment.acquisitionCampaign,
+    acquisitionKeyword: formEstablishment.acquisitionKeyword,
     locations: addressesAndPosition,
     additionalInformation: formEstablishment.additionalInformation,
     createdAt: timeGateway.now(),

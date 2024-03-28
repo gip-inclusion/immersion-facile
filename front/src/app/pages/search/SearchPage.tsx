@@ -15,7 +15,9 @@ import { GeoPositionDto, SearchSortedBy, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { SearchInfoSection } from "src/app/components/search/SearchInfoSection";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
 import { routes } from "src/app/routes/routes";
@@ -55,6 +57,7 @@ export const SearchPage = ({
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const triggerSearch = useSearchUseCase(route);
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
+  const acquisitionParams = useGetAcquisitionParams();
   const initialValues: SearchPageParams = {
     latitude: 0,
     longitude: 0,
@@ -62,6 +65,7 @@ export const SearchPage = ({
     place: "",
     sortedBy: "distance",
     appellations: undefined,
+    ...acquisitionParams,
   };
   const availableForSearchRequest = (
     searchStatus: SearchStatus,
@@ -112,7 +116,6 @@ export const SearchPage = ({
       </>
     );
   };
-
   useEffect(() => {
     if (availableForInitialSearchRequest) {
       triggerSearch(filterFormValues(formValues));
@@ -314,6 +317,7 @@ export const SearchPage = ({
           {searchStatus === "extraFetch" ||
             (searchStatus === "initialFetch" && <Loader />)}
 
+          <SearchInfoSection />
           <SectionAccordion />
           <SectionTextEmbed
             videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"

@@ -3,6 +3,7 @@ import {
   AppellationCode,
   RomeCode,
   RomeDto,
+  cartographeAppellationAndRome,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { normalize } from "../../../../utils/textSearch";
@@ -59,6 +60,7 @@ const defaultAppellations: AppellationAndRomeDto[] = [
     appellationCode: "19540",
     romeLabel: "Stylisme",
   },
+  cartographeAppellationAndRome,
 ];
 
 const appellationDtoToRomeDto = ({

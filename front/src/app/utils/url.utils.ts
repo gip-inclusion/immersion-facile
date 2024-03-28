@@ -3,8 +3,8 @@ export const getUrlParameters: (location: Location) => {
 } = (location) =>
   Object.fromEntries(new URLSearchParams(location.search).entries());
 
-export const filteredUrlParamsForRoute = (
-  urlParams: Record<string, string>,
+export const filterParamsForRoute = (
+  urlParams: Record<string, unknown>,
   matchingParams: Record<string, unknown>,
 ) =>
   Object.fromEntries(

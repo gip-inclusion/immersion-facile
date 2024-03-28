@@ -1,3 +1,4 @@
+import { WithAcquisition } from "../acquisition.dto";
 import { EstablishmentSearchableByValue } from "../formEstablishment/FormEstablishment.dto";
 import {
   AppellationCode,
@@ -16,4 +17,4 @@ export type SearchQueryParamsDto = {
   voluntaryToImmersion?: boolean;
   place?: string;
   establishmentSearchableBy?: EstablishmentSearchableByValue;
-};
+} & WithAcquisition;

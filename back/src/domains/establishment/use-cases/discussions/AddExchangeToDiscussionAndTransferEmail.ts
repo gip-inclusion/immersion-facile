@@ -6,6 +6,7 @@ import {
   Exchange,
   ExchangeRole,
   brevoInboundBodySchema,
+  createOpaqueEmail,
   immersionFacileContactEmail,
   immersionFacileNoReplyEmailSender,
 } from "shared";
@@ -18,10 +19,7 @@ import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/hel
 import { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import {
-  addExchangeToDiscussion,
-  createOpaqueEmail,
-} from "../../helpers/discussion.helpers";
+import { addExchangeToDiscussion } from "../../helpers/discussion.helpers";
 
 const defaultSubject = "Sans objet";
 

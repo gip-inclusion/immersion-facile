@@ -22,6 +22,7 @@ import {
   useTranscientDataFromStorage,
 } from "src/app/components/immersion-offer/useTranscientDataFromStorage";
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -47,7 +48,11 @@ En vous remerciant,`;
 export const inputsLabelsByKey: Record<
   keyof OmitFromExistingKeys<
     ContactEstablishmentByMailDto,
-    "siret" | "contactMode" | "locationId"
+    | "siret"
+    | "contactMode"
+    | "locationId"
+    | "acquisitionCampaign"
+    | "acquisitionKeyword"
   >,
   string
 > = {
@@ -75,6 +80,7 @@ export const ContactByEmail = ({
   } = useTranscientDataFromStorage("contact-establishment", false);
   const transcientDataForScope = getTranscientDataForScope();
   const preferUseTranscientData = getPreferUseTranscientDataForScope();
+  const acquisitionParams = useGetAcquisitionParams();
   const initialValues = useMemo<ContactEstablishmentByMailDto>(
     () => ({
       siret: route.params.siret,
@@ -91,6 +97,7 @@ export const ContactByEmail = ({
       potentialBeneficiaryResumeLink: "",
       potentialBeneficiaryPhone: route.params.contactPhone ?? "",
       locationId: route.params.location ?? "",
+      ...acquisitionParams,
       ...(preferUseTranscientData && transcientDataForScope?.value
         ? { ...transcientDataForScope.value }
         : {}),
@@ -100,6 +107,7 @@ export const ContactByEmail = ({
       route.params,
       preferUseTranscientData,
       transcientDataForScope,
+      acquisitionParams,
     ],
   );
 
