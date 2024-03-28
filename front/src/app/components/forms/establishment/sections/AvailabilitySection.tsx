@@ -39,7 +39,7 @@ export const AvailabilitySection = ({
   const { register, setValue, getValues, formState, clearErrors } =
     useFormContext<FormEstablishmentDto>();
   const formContents = getFormContents(
-    formEstablishmentFieldsLabels,
+    formEstablishmentFieldsLabels(mode),
   ).getFormFields();
   const getFieldError = makeFieldError(formState);
 

@@ -61,7 +61,9 @@ export const CreationSiretRelatedInputs = () => {
     register,
     formState: { touchedFields },
   } = useFormContext<FormEstablishmentDto>();
-  const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
+  const { getFormFields } = getFormContents(
+    formEstablishmentFieldsLabels("create"),
+  );
   const formContents = getFormFields();
   const getFieldError = makeFieldError(
     useFormContext<FormEstablishmentDto>().formState,

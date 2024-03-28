@@ -13,6 +13,8 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
+import { Mode } from "./EstablishmentForm";
+
 import { EmailValidationInput } from "../commons/EmailValidationInput";
 
 const preferredContactMethodOptions = (
@@ -43,8 +45,13 @@ const preferredContactMethodOptions = (
   },
 ];
 
-export const BusinessContact = ({ readOnly }: { readOnly?: boolean }) => {
-  const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
+export const BusinessContact = ({
+  readOnly,
+  mode,
+}: { readOnly?: boolean; mode: Mode }) => {
+  const { getFormFields } = getFormContents(
+    formEstablishmentFieldsLabels(mode),
+  );
   const formContents = getFormFields();
   const { setValue, register, watch, getValues, formState } =
     useFormContext<FormEstablishmentDto>();

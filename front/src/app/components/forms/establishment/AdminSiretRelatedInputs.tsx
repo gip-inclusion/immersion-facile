@@ -6,7 +6,9 @@ import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishm
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 
 export const AdminSiretRelatedInputs = () => {
-  const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
+  const { getFormFields } = getFormContents(
+    formEstablishmentFieldsLabels("admin"),
+  );
   const formContents = getFormFields();
   const { register } = useFormContext();
   return (

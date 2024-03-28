@@ -338,9 +338,8 @@ export const domElementIds = {
       additionalInformation:
         "im-form-create-establishment__additional-information",
       maxContactsPerWeek: "im-form-create-establishment__max-contact-per-week",
-      addAppellationButton:
-        "im-form-create-establishment__add-appellation-button",
-      addAddressButton: "im-form-create-establishment__add-address-button",
+      maxContactsPerWeekWhenAvailable:
+        "im-form-create-establishment__max-contact-per-week-when-available",
       errorSiretAlreadyExistButton:
         "im-form-create-establishment__edit-establishment-button",
       startFormButton: "im-form-create-establishment__start-button",
@@ -380,6 +379,8 @@ export const domElementIds = {
       additionalInformation:
         "im-form-edit-establishment__additional-information",
       maxContactsPerWeek: "im-form-edit-establishment__max-contact-per-week",
+      maxContactsPerWeekWhenAvailable:
+        "im-form-edit-establishment__max-contact-per-week-when-available",
       addAppellationButton:
         "im-form-edit-establishment__add-appellation-button",
       addAddressButton: "im-form-edit-establishment__add-address-button",
@@ -409,6 +410,43 @@ export const domElementIds = {
         `im-form-manage-establishment-admin__previous-button--step-${currentStep}`,
       nextButtonFromStepAndMode: ({ currentStep }) =>
         `im-form-manage-establishment-admin__next-button--step-${currentStep}`,
+      addressAutocomplete:
+        "im-form-manage-establishment-admin__autocomplete-address-creation-establishment-form",
+      siret: "im-form-manage-establishment-admin__siret",
+      businessName: "im-form-manage-establishment-admin__business-name",
+      businessNameCustomized:
+        "im-form-manage-establishment-admin__business-name-customized",
+      businessContact: {
+        lastName:
+          "im-form-manage-establishment-admin__business-contact-last-name",
+        firstName:
+          "im-form-manage-establishment-admin__business-contact-first-name",
+        job: "im-form-manage-establishment-admin__businessContact-job",
+        phone: "im-form-manage-establishment-admin__businessContact-phone",
+        email: "im-form-manage-establishment-admin__businessContact-email",
+        copyEmails:
+          "im-form-manage-establishment-admin__businessContact-copy-emails",
+        contactMethod:
+          "im-form-manage-establishment-admin__businessContact-contact-method",
+      },
+      isEngagedEnterprise:
+        "im-form-manage-establishment-admin__is-engaged-enterprise",
+      fitForDisabledWorkers:
+        "im-form-manage-establishment-admin__fit-for-disabled-workers",
+      appellations: "im-form-manage-establishment-admin__appellations",
+      website: "im-form-manage-establishment-admin__website",
+      additionalInformation:
+        "im-form-manage-establishment-admin__additional-information",
+      maxContactsPerWeek:
+        "im-form-manage-establishment-admin__max-contact-per-week",
+      maxContactsPerWeekWhenAvailable:
+        "im-form-manage-establishment-admin__max-contact-per-week-when-available",
+      addAddressButton:
+        "im-form-manage-establishment-admin__add-address-button",
+      errorSiretAlreadyExistButton:
+        "im-form-manage-establishment-admin__edit-establishment-button",
+      nextAvailabilityDateInput:
+        "im-form-manage-establishment-admin__next-availability-date",
     },
   },
 

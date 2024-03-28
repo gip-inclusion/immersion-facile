@@ -62,10 +62,10 @@ export const DetailsSection = ({
   const getFieldError = makeFieldError(methods.formState);
   const feedback = useAppSelector(establishmentSelectors.feedback);
   const formErrors = getFormContents(
-    formEstablishmentFieldsLabels,
+    formEstablishmentFieldsLabels(mode),
   ).getFormErrors();
   const formContents = getFormContents(
-    formEstablishmentFieldsLabels,
+    formEstablishmentFieldsLabels(mode),
   ).getFormFields();
 
   const onClickEstablishmentDeleteButton = () => {
@@ -130,7 +130,9 @@ export const DetailsSection = ({
       </h2>
       {match(mode)
         .with("create", () => <CreationSiretRelatedInputs />)
-        .with(P.union("admin", "edit"), () => <EditionSiretRelatedInputs />)
+        .with(P.union("admin", "edit"), () => (
+          <EditionSiretRelatedInputs mode={mode} />
+        ))
         .exhaustive()}
 
       <RadioButtons
