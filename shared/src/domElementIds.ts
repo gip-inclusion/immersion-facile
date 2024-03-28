@@ -436,6 +436,11 @@ export const domElementIds = {
   offer: {},
   offerExternal: {},
   manageEstablishmentAdmin: {},
-  establishmentDashboard: {},
+  establishmentDashboard: {
+    discussion: {
+      activateDraftConvention:
+        "im-manage-establishment__convert-discussion-to-draft-convention",
+    },
+  },
   searchDiagoriente: {},
 } satisfies DomElementIds;
