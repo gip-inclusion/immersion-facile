@@ -1,20 +1,32 @@
 import { frontRoutes } from "./routes/routes";
 
 type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
+
+type FrontRouteParametrizedKeys = "mode" | "currentStep";
+
 type FrontRouteParametrizedValue = (
-  params: Record<string, string | number>,
+  params: Partial<Record<FrontRouteParametrizedKeys, string | number>>,
 ) => string;
-type FrontRouteValue =
-  | string
-  | Record<string, string | Record<string, string>>
-  | FrontRouteParametrizedValue
+
+type FrontRoutePossibleValues =
   | Record<
       string,
-      | string
-      | FrontRouteParametrizedValue
-      | Record<string, string | FrontRouteParametrizedValue>
-    >;
-type FrontRoutesValues = Record<string, string | FrontRouteValue>;
+      string | FrontRouteParametrizedValue | Record<string, string>
+    >
+  | string
+  | FrontRouteParametrizedValue;
+
+type FrontRouteValue<V extends FrontRoutePossibleValues> = V extends Record<
+  string,
+  string
+>
+  ? FrontRouteValue<V>
+  : V;
+
+type FrontRoutesValues = Record<
+  string,
+  string | FrontRouteValue<FrontRoutePossibleValues>
+>;
 
 type DomElementIds = Record<FrontRoutesKeys, FrontRoutesValues>;
 
