@@ -9,6 +9,7 @@ import {
   Email,
   WithDiscussionId,
   addressDtoToString,
+  domElementIds,
   toDisplayedDate,
 } from "shared";
 import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
@@ -106,6 +107,10 @@ const DiscussionDetails = ({
         </p>
         <Button
           priority="tertiary"
+          id={
+            domElementIds.establishmentDashboard.discussion
+              .activateDraftConvention
+          }
           linkProps={{
             href: makeDraftConventionLink(draftConvention).href,
             target: "_blank",
