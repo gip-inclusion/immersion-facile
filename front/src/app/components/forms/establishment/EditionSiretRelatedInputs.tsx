@@ -1,11 +1,18 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
+import { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 
-export const EditionSiretRelatedInputs = () => {
-  const { getFormFields } = getFormContents(formEstablishmentFieldsLabels);
+export const EditionSiretRelatedInputs = ({
+  mode,
+}: {
+  mode: Mode;
+}) => {
+  const { getFormFields } = getFormContents(
+    formEstablishmentFieldsLabels(mode),
+  );
   const formContents = getFormFields();
   const { register } = useFormContext();
 

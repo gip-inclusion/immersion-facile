@@ -54,7 +54,9 @@ test.describe("Establishment creation and modification workflow", () => {
       faker.internet.email(),
     );
     await page
-      .locator("[for='establishment-businessContact-contactMethod-0']")
+      .locator(
+        `[for='${domElementIds.establishment.create.businessContact.contactMethod}-0']`,
+      )
       .click();
 
     await goToNextStep(page, 3, "create");
@@ -71,7 +73,7 @@ test.describe("Establishment creation and modification workflow", () => {
       ),
     ).not.toHaveValue("");
     await page.click(
-      `#${domElementIds.establishment.create.addAppellationButton}`,
+      `#${domElementIds.establishment.create.appellations}-add-option-button`,
     );
     await page.fill(
       `#${domElementIds.establishment.create.appellations} .fr-input`,
@@ -90,7 +92,9 @@ test.describe("Establishment creation and modification workflow", () => {
       ),
     ).toHaveValue("Avenue des Grands Crus 26600 Tain-l'Hermitage");
 
-    await page.click(`#${domElementIds.establishment.create.addAddressButton}`);
+    await page.click(
+      `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
+    );
 
     await fillAutocomplete({
       page,
@@ -139,9 +143,6 @@ test.describe("Establishment creation and modification workflow", () => {
       .locator(`#${domElementIds.establishment.edit.startFormButton}`)
       .click();
     await page.locator(".fr-radio-rich").getByText("Oui").click();
-    await page
-      .locator(`#${domElementIds.establishment.edit.maxContactsPerWeek}`)
-      .fill("5");
 
     await goToNextStep(page, 1, "edit");
     await page

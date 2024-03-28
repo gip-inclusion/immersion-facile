@@ -17,7 +17,7 @@ export const BusinessContactSection = ({
   const isStepMode = currentStep !== null;
   return (
     <section className={fr.cx("fr-mb-4w")}>
-      <BusinessContact />
+      <BusinessContact mode={mode} />
       {isStepMode && (
         <ButtonsGroup
           inlineLayoutWhen="always"
