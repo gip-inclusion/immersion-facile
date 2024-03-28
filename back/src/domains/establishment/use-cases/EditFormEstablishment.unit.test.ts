@@ -3,6 +3,7 @@ import {
   EstablishmentDomainPayload,
   EstablishmentJwtPayload,
   FormEstablishmentDtoBuilder,
+  InclusionConnectJwtPayload,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -28,6 +29,14 @@ describe("Edit Form Establishment", () => {
   let useCase: EditFormEstablishment;
   let timeGateway: TimeGateway;
   let uuidGenerator: UuidGenerator;
+
+  const userId = "123";
+  const inclusionConnectJwtPayload: InclusionConnectJwtPayload = {
+    exp: 0,
+    iat: 0,
+    version: 1,
+    userId,
+  };
 
   const formSiret = "12345678901234";
   const establishmentPayload: EstablishmentDomainPayload = { siret: formSiret };
@@ -63,6 +72,23 @@ describe("Edit Form Establishment", () => {
         useCase.execute(updatedFormEstablishment, {
           siret: "bad-siret",
         } as EstablishmentJwtPayload),
+        new ForbiddenError(),
+      );
+    });
+
+    it("Forbidden error on InclusionConnectJwtPayload with ic user that doesn't have rights on establishment", async () => {
+      await expectPromiseToFailWithError(
+        useCase.execute(updatedFormEstablishment, inclusionConnectJwtPayload),
+        new ForbiddenError(),
+      );
+    });
+
+    it("Forbidden error on fake jwt payload", async () => {
+      await expectPromiseToFailWithError(
+        useCase.execute(
+          updatedFormEstablishment,
+          {} as EstablishmentJwtPayload,
+        ),
         new ForbiddenError(),
       );
     });
