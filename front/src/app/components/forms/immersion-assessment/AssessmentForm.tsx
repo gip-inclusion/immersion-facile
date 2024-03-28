@@ -82,7 +82,7 @@ export const AssessmentForm = ({
             type="submit"
             disabled={isDisabled}
             nativeButtonProps={{
-              id: domElementIds.assessment.assessmentFormSubmitButton,
+              id: domElementIds.assessment.formSubmitButton,
             }}
           >
             Envoyer
@@ -111,7 +111,7 @@ export const AssessmentForm = ({
               type="button"
               onClick={downloadFullAssessmentPdf}
               nativeButtonProps={{
-                id: domElementIds.assessment.assessmentFormDownloadButton,
+                id: domElementIds.assessment.formDownloadButton,
               }}
             >
               Télécharger le bilan détaillé en PDF

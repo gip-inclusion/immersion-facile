@@ -39,11 +39,7 @@ export const IntroSection = ({
         iconId="fr-icon-arrow-right-line"
         iconPosition="right"
         onClick={() => onStepChange(1, [])}
-        id={
-          mode === "create"
-            ? domElementIds.establishment.startAddEstablishmentButton
-            : domElementIds.establishment.startEditEstablishmentButton
-        }
+        id={domElementIds.establishment[mode].startFormButton}
       >
         {mode === "create"
           ? "Commencer le référencement"

@@ -130,7 +130,8 @@ export const CreationSiretRelatedInputs = () => {
                 );
               }}
               nativeButtonProps={{
-                id: domElementIds.establishment.errorSiretAlreadyExistButton,
+                id: domElementIds.establishment.create
+                  .errorSiretAlreadyExistButton,
                 disabled: isLoading,
               }}
               type="button"
@@ -191,7 +192,7 @@ export const CreationSiretRelatedInputs = () => {
             rawAddress: addressDtoToString(address),
           })
         }
-        id={domElementIds.establishment.establishmentFormAddressAutocomplete}
+        id={domElementIds.establishment.create.addressAutocomplete}
         disabled={isFetchingSiret}
       />
     </>

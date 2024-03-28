@@ -94,7 +94,7 @@ export const DetailsSection = ({
       iconPosition: "right",
       type: "submit",
       disabled: isSubmitting,
-      id: getSubmitButtonId(isEstablishmentAdmin, mode),
+      id: domElementIds.establishment[mode].submitFormButton,
     },
   ];
   if (isStepMode) {
@@ -103,7 +103,7 @@ export const DetailsSection = ({
       iconId: "fr-icon-arrow-left-line",
       priority: "secondary",
       type: "button",
-      id: domElementIds.establishment.previousButtonFromStepAndMode({
+      id: domElementIds.establishment[mode].previousButtonFromStepAndMode({
         currentStep,
         mode,
       }),
@@ -246,7 +246,7 @@ export const DetailsSection = ({
               : removeAtIndex(addresses, index);
           setValue("businessAddresses", newAddresses);
         }}
-        id={domElementIds.establishment.businessAddresses}
+        id={domElementIds.establishment[mode].businessAddresses}
       />
 
       {keys(errors).length === 0 && keys(touchedFields).length > 0 && (
@@ -283,13 +283,3 @@ export const DetailsSection = ({
     </section>
   );
 };
-function getSubmitButtonId(
-  isEstablishmentAdmin: boolean,
-  mode: Mode,
-): string | undefined {
-  if (isEstablishmentAdmin)
-    return domElementIds.admin.manageEstablishment.submitEditButton;
-  if (mode === "edit")
-    return domElementIds.establishment.submitEditEstablishmentButton;
-  return domElementIds.establishment.submitCreateEstablishmentButton;
-}

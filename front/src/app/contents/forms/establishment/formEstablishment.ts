@@ -24,19 +24,19 @@ export type FormEstablishmentFieldsLabels = FormFieldsObjectForContent<
 export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   siret: {
     label: "Indiquez le SIRET de la structure d'accueil",
-    id: domElementIds.establishment.siret,
+    id: domElementIds.establishment.create.siret,
     required: true,
   },
 
   businessName: {
     label: "Vérifiez le nom (raison sociale) de votre établissement",
-    id: domElementIds.establishment.businessName,
+    id: domElementIds.establishment.create.businessName,
     required: true,
   },
   businessNameCustomized: {
     label:
       "Indiquez le nom de l'enseigne de l'établissement d'accueil, si elle diffère de la raison sociale",
-    id: domElementIds.establishment.businessNameCustomized,
+    id: domElementIds.establishment.create.businessNameCustomized,
     autoComplete: "organization",
     hintText:
       "Nom sous lequel vous souhaitez apparaitre dans les résultats de recherche",
@@ -45,67 +45,67 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   businessAddresses: {
     label: "Vérifiez l'adresse de votre établissement",
     required: true,
-    id: domElementIds.establishment.businessAddresses,
+    id: domElementIds.establishment.create.businessAddresses,
     placeholder: "Ex : 26 rue du labrador, 37000 Tours",
   },
   "businessContact.lastName": {
     label: "Nom du référent",
     required: true,
-    id: domElementIds.establishment.businessContact.lastName,
+    id: domElementIds.establishment.create.businessContact.lastName,
   },
   "businessContact.firstName": {
     label: "Prénom du référent",
     required: true,
-    id: domElementIds.establishment.businessContact.firstName,
+    id: domElementIds.establishment.create.businessContact.firstName,
   },
   "businessContact.job": {
     label: "Fonction du référent",
     required: true,
-    id: domElementIds.establishment.businessContact.job,
+    id: domElementIds.establishment.create.businessContact.job,
   },
   "businessContact.phone": {
     label: "Numéro de téléphone (ne sera pas communiqué directement)",
     required: true,
-    id: domElementIds.establishment.businessContact.phone,
+    id: domElementIds.establishment.create.businessContact.phone,
   },
   "businessContact.email": {
     label: "E-mail",
     required: true,
-    id: domElementIds.establishment.businessContact.email,
+    id: domElementIds.establishment.create.businessContact.email,
   },
   "businessContact.copyEmails": {
     label: "Autres destinataires",
     hintText: "Adresses mail à mettre en copie",
     placeholder: "Ex : cc1@mail.com, cc2@mail.com (optionnel)",
-    id: domElementIds.establishment.businessContact.copyEmails,
+    id: domElementIds.establishment.create.businessContact.copyEmails,
   },
   "businessContact.contactMethod": {
     label: "Comment souhaitez-vous que les candidats vous contactent ?",
     required: true,
-    id: domElementIds.establishment.businessContact.contactMethod,
+    id: domElementIds.establishment.create.businessContact.contactMethod,
   },
   isEngagedEnterprise: {
     label:
       "Mon entreprise est membre de la communauté « Les entreprises s'engagent »",
-    id: domElementIds.establishment.isEngagedEnterprise,
+    id: domElementIds.establishment.create.isEngagedEnterprise,
   },
   fitForDisabledWorkers: {
     label:
       "Mon entreprise est prête à accueillir des personnes en situation de handicap",
-    id: domElementIds.establishment.fitForDisabledWorkers,
+    id: domElementIds.establishment.create.fitForDisabledWorkers,
   },
   appellations: {
     label: "",
-    id: domElementIds.establishment.appellations,
+    id: domElementIds.establishment.create.appellations,
   },
   website: {
     label: "URL vers votre site internet",
-    id: domElementIds.establishment.website,
+    id: domElementIds.establishment.create.website,
     placeholder: "Ex : https://mon-site-internet.fr (optionnel)",
   },
   additionalInformation: {
     label: "Informations complémentaires",
-    id: domElementIds.establishment.additionalInformation,
+    id: domElementIds.establishment.create.additionalInformation,
     hintText:
       "En information complémentaire, nous vous conseillons de valoriser votre histoire afin de donner envie à un candidat de découvrir un métier au sein de votre établissement.",
     placeholder:
@@ -116,22 +116,22 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
     hintText:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
-    id: domElementIds.establishment.maxContactsPerWeek,
+    id: domElementIds.establishment.create.maxContactsPerWeek,
   },
   maxContactPerWeekWhenAvailable: {
     label:
       "Quand vous serez à nouveau disponible, combien de mises en relation par semaine souhaiteriez-vous recevoir ?",
     hintText:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
-    id: domElementIds.establishment.maxContactsPerWeek,
+    id: domElementIds.establishment.create.maxContactsPerWeek,
   },
   nextAvailabilityDate: {
     label: "Quand serez-vous à nouveau disponible ?",
-    id: domElementIds.establishment.nextAvailabilityDateInput,
+    id: domElementIds.establishment.create.nextAvailabilityDateInput,
   },
   searchableBy: {
     label: "Qui souhaitez-vous accueillir en immersion ?",
-    id: domElementIds.establishment.searchableBy,
+    id: domElementIds.establishment.create.searchableBy,
   },
   acquisitionKeyword: {
     label: "",

@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { AddressDto, FormEstablishmentAddress, domElementIds } from "shared";
+import { AddressDto, FormEstablishmentAddress } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { useStyles } from "tss-react/dsfr";
 
@@ -70,7 +70,7 @@ export const MultipleAddressInput = ({
         type="button"
         iconId="fr-icon-add-line"
         title="Ajouter un lieu d'immersion"
-        id={domElementIds.establishment.addAddressButton}
+        id={`${id}-add-option-button`}
         priority="secondary"
         onClick={() => {
           onAddressAdded(

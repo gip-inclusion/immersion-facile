@@ -1,11 +1,20 @@
 import { frontRoutes } from "./routes/routes";
 
 type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
+type FrontRouteParametrizedValue = (
+  params: Record<string, string | number>,
+) => string;
 type FrontRouteValue =
   | string
   | Record<string, string | Record<string, string>>
-  | ((params: Record<string, string | number>) => string);
-type FrontRoutesValues = Record<string, FrontRouteValue>;
+  | FrontRouteParametrizedValue
+  | Record<
+      string,
+      | string
+      | FrontRouteParametrizedValue
+      | Record<string, string | FrontRouteParametrizedValue>
+    >;
+type FrontRoutesValues = Record<string, string | FrontRouteValue>;
 
 type DomElementIds = Record<FrontRoutesKeys, FrontRoutesValues>;
 
@@ -123,14 +132,14 @@ export const domElementIds = {
     distanceSelect: "im-search-page__distance-dropdown",
     sortFilter: "radio-inline-legend",
     searchSubmitButton: "im-search__submit-search",
-    searchSortOptionBase: "search-sort-option-",
+    searchSortOptionBase: "im-search__search-sort-option-",
+    lbbSearchResultButton: "im-search-result__lbb-contact-button",
+    searchResultButton: "im-search-result__contact-button",
     contactByMailButton: "im-contact-establishment__contact-email-button",
     contactByMailCancelButton:
       "im-contact-establishment__contact-email-cancel-button",
     contactByPhoneButton: "im-contact-establishment__contact-phone-button",
     contactInPersonButton: "im-contact-establishment__contact-in-person-button",
-    lbbSearchResultButton: "im-search-result__lbb-contact-button",
-    searchResultButton: "im-search-result__contact-button",
   },
   addAgency: {
     form: "im-form-add-agency",
@@ -167,16 +176,14 @@ export const domElementIds = {
 
   conventionImmersionRoute: {
     form: (params) => `im-convention-immersion-form--${params.mode}`,
-    shareForm: "im-convention-immersion__share-form",
-    shareFormSubmitButton: "im-convention-immersion__share-form-submit-button",
-    copyLinkButton: "im-convention-immersion__copy-link-button",
-    showFormButton: "im-convention-immersion__show-form-button",
-    submitFormButton: "im-convention-immersion__submit-form-button",
-    submitFormButtonMobile:
-      "im-convention-immersion__submit-form-button--mobile",
-    confirmSubmitFormButton:
-      "im-convention-immersion__confirm-submit-form-button",
-    summaryEditButton: "im-convention-immersion__summary-edit-button",
+    shareForm: "im-convention-form__share-form",
+    shareFormSubmitButton: "im-convention-form__share-form-submit-button",
+    copyLinkButton: "im-convention-form__copy-link-button",
+    showFormButton: "im-convention-form__show-form-button",
+    submitFormButton: "im-convention-form__submit-form-button",
+    submitFormButtonMobile: "im-convention-form__submit-form-button--mobile",
+    confirmSubmitFormButton: "im-convention-form__confirm-submit-form-button",
+    summaryEditButton: "im-convention-form__summary-edit-button",
     conventionSection: {
       agencyDepartment: "im-convention-form__agencyDepartement",
       agencyId: "im-convention-form__agencyId",
@@ -303,60 +310,115 @@ export const domElementIds = {
   unsubscribeEstablishmentLead: {},
 
   establishment: {
-    form: {
-      create: "im-form-add-establishment",
-      edit: "im-form-edit-establishment",
-      admin: "im-form-manage-establishment-admin",
+    create: {
+      form: "im-form-create-establishment",
+      addressAutocomplete:
+        "im-form-create-establishment__autocomplete-address-creation-establishment-form",
+      siret: "im-form-create-establishment__siret",
+      businessName: "im-form-create-establishment__business-name",
+      businessNameCustomized:
+        "im-form-create-establishment__business-name-customized",
+      businessAddresses: "im-form-create-establishment__business-addresses",
+      businessContact: {
+        lastName: "im-form-create-establishment__business-contact-last-name",
+        firstName: "im-form-create-establishment__business-contact-first-name",
+        job: "im-form-create-establishment__businessContact-job",
+        phone: "im-form-create-establishment__businessContact-phone",
+        email: "im-form-create-establishment__businessContact-email",
+        copyEmails: "im-form-create-establishment__businessContact-copy-emails",
+        contactMethod:
+          "im-form-create-establishment__businessContact-contact-method",
+      },
+      isEngagedEnterprise:
+        "im-form-create-establishment__is-engaged-enterprise",
+      fitForDisabledWorkers:
+        "im-form-create-establishment__fit-for-disabled-workers",
+      appellations: "im-form-create-establishment__appellations",
+      website: "im-form-create-establishment__website",
+      additionalInformation:
+        "im-form-create-establishment__additional-information",
+      maxContactsPerWeek: "im-form-create-establishment__max-contact-per-week",
+      addAppellationButton:
+        "im-form-create-establishment__add-appellation-button",
+      addAddressButton: "im-form-create-establishment__add-address-button",
+      errorSiretAlreadyExistButton:
+        "im-form-create-establishment__edit-establishment-button",
+      startFormButton: "im-form-create-establishment__start-button",
+      submitFormButton: "im-form-create-establishment__submit-button",
+      nextAvailabilityDateInput:
+        "im-form-create-establishment__next-availability-date",
+      previousButtonFromStepAndMode: ({ currentStep }) =>
+        `im-form-create-establishment__previous-button--step-${currentStep}`,
+      nextButtonFromStepAndMode: ({ currentStep }) =>
+        `im-form-create-establishment__next-button--step-${currentStep}`,
+      searchableBy: "im-form-create-establishment__searchable-by",
     },
-    formEdit: "im-form-edit-establishment",
-    establishmentFormAddressAutocomplete:
-      "autocomplete-address-creation-establishment-form",
-    siret: "establishment-siret",
-    businessName: "establishment-businessName",
-    businessNameCustomized: "establishment-businessNameCustomized",
-    businessAddresses: "establishment-businessAddress",
-    businessContact: {
-      lastName: "establishment-businessContact-lastName",
-      firstName: "establishment-businessContact-firstName",
-      job: "establishment-businessContact-job",
-      phone: "establishment-businessContact-phone",
-      email: "establishment-businessContact-email",
-      copyEmails: "establishment-businessContact-copyEmails",
-      contactMethod: "establishment-businessContact-contactMethod",
+    edit: {
+      form: "im-form-edit-establishment",
+      addressAutocomplete:
+        "im-form-edit-establishment__autocomplete-address-creation-establishment-form",
+      siret: "im-form-edit-establishment__siret",
+      businessName: "im-form-edit-establishment__business-name",
+      businessNameCustomized:
+        "im-form-edit-establishment__business-name-customized",
+      businessAddresses: "im-form-edit-establishment__business-addresses",
+      businessContact: {
+        lastName: "im-form-edit-establishment__business-contact-last-name",
+        firstName: "im-form-edit-establishment__business-contact-first-name",
+        job: "im-form-edit-establishment__businessContact-job",
+        phone: "im-form-edit-establishment__businessContact-phone",
+        email: "im-form-edit-establishment__businessContact-email",
+        copyEmails: "im-form-edit-establishment__businessContact-copy-emails",
+        contactMethod:
+          "im-form-edit-establishment__businessContact-contact-method",
+      },
+      isEngagedEnterprise: "im-form-edit-establishment__is-engaged-enterprise",
+      fitForDisabledWorkers:
+        "im-form-edit-establishment__fit-for-disabled-workers",
+      appellations: "im-form-edit-establishment__appellations",
+      website: "im-form-edit-establishment__website",
+      additionalInformation:
+        "im-form-edit-establishment__additional-information",
+      maxContactsPerWeek: "im-form-edit-establishment__max-contact-per-week",
+      addAppellationButton:
+        "im-form-edit-establishment__add-appellation-button",
+      addAddressButton: "im-form-edit-establishment__add-address-button",
+      errorSiretAlreadyExistButton:
+        "im-form-edit-establishment__edit-establishment-button",
+      startFormButton: "im-form-edit-establishment__start-button",
+      submitFormButton: "im-form-edit-establishment__submit-button",
+      nextAvailabilityDateInput:
+        "im-form-edit-establishment__next-availability-date",
+      previousButtonFromStepAndMode: ({ currentStep }) =>
+        `im-form-edit-establishment__previous-button--step-${currentStep}`,
+      nextButtonFromStepAndMode: ({ currentStep }) =>
+        `im-form-edit-establishment__next-button--step-${currentStep}`,
+      searchableBy: "im-form-edit-establishment__searchable-by",
     },
-    isEngagedEnterprise: "establishment-isEngagedEnterprise",
-    fitForDisabledWorkers: "establishment-fitForDisabledWorkers",
-    appellations: "establishment-appellations",
-    website: "establishment-website",
-    additionalInformation: "establishment-additionalInformation",
-    maxContactsPerWeek: "establishment-maxContactPerWeek",
-    addAppellationButton:
-      "im-form-create-establishment__add-appellation-button",
-    addAddressButton: "im-form-create-establishment__add-address-button",
-    errorSiretAlreadyExistButton:
-      "im-form-create-establishment__edit-establishment-button",
-    startAddEstablishmentButton: "im-form-create-establishment__start-button",
-    startEditEstablishmentButton: "im-form-edit-establishment__start-button",
-    submitCreateEstablishmentButton:
-      "im-form-create-establishment__submit-button",
-    submitEditEstablishmentButton: "im-form-edit-establishment__submit-button",
-    manageButton: "im-form-manage-establishment__manage-button",
-    nextAvailabilityDateInput:
-      "im-form-create-establishment__next-availability-date",
-    previousButtonFromStepAndMode: ({ currentStep, mode }) =>
-      `im-form-${mode}-establishment__previous-button--step-${currentStep}`,
-    nextButtonFromStepAndMode: ({ currentStep, mode }) =>
-      `im-form-${mode}-establishment__next-button--step-${currentStep}`,
-    searchableBy: "im-form-create-establishment__searchable-by",
+    admin: {
+      form: "im-form-manage-establishment-admin",
+      manageButton: "im-form-manage-establishment-admin__manage-button",
+      searchableBy: "im-form-manage-establishment-admin__searchable-by",
+      startFormButton: "im-form-manage-establishment-admin__start-button",
+      submitFormButton: "im-form-manage-establishment-admin__submit-button",
+      addAppellationButton:
+        "im-form-manage-establishment-admin__add-appellation-button",
+      businessAddresses:
+        "im-form-manage-establishment-admin__business-addresses",
+      previousButtonFromStepAndMode: ({ currentStep }) =>
+        `im-form-manage-establishment-admin__previous-button--step-${currentStep}`,
+      nextButtonFromStepAndMode: ({ currentStep }) =>
+        `im-form-manage-establishment-admin__next-button--step-${currentStep}`,
+    },
   },
 
   assessment: {
-    assessmentFormSubmitButton: "im-assessment-form__submit-button",
-    assessmentFormDownloadButton: "im-assessment-form__download-button",
+    formSubmitButton: "im-assessment-form__submit-button",
+    formDownloadButton: "im-assessment-form__download-button",
   },
 
   magicLinkRenewal: {
-    magicLinkRenewalButton: "im-renew-page__renew-link-button",
+    renewalButton: "im-renew-page__renew-link-button",
   },
 
   standard: {

@@ -151,7 +151,9 @@ export const AvailabilitySection = ({
               iconId: "fr-icon-arrow-left-line",
               priority: "secondary",
               disabled: true,
-              id: domElementIds.establishment.previousButtonFromStepAndMode({
+              id: domElementIds.establishment[
+                mode
+              ].previousButtonFromStepAndMode({
                 currentStep,
                 mode,
               }),
@@ -169,7 +171,7 @@ export const AvailabilitySection = ({
               type: "button",
               iconId: "fr-icon-arrow-right-line",
               iconPosition: "right",
-              id: domElementIds.establishment.nextButtonFromStepAndMode({
+              id: domElementIds.establishment[mode].nextButtonFromStepAndMode({
                 currentStep,
                 mode,
               }),
