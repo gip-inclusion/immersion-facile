@@ -440,6 +440,8 @@ export const domElementIds = {
     discussion: {
       activateDraftConvention:
         "im-manage-establishment__convert-discussion-to-draft-convention",
+      replyToCandidateByEmail:
+        "im-manage-establishment__reply-to-candidate-by-email",
     },
   },
   searchDiagoriente: {},

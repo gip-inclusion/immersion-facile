@@ -3,6 +3,7 @@ import {
   ContactEstablishmentEventPayload,
   addressDtoToString,
   contactEstablishmentEventPayloadSchema,
+  createOpaqueEmail,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
@@ -13,7 +14,6 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { createOpaqueEmail } from "../../helpers/discussion.helpers";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
   protected inputSchema = contactEstablishmentEventPayloadSchema;
