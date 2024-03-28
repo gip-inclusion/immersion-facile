@@ -37,6 +37,7 @@ import {
   filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import {
   EstablishmentFeedback,
@@ -49,7 +50,9 @@ type RouteByMode = {
   create:
     | Route<typeof routes.formEstablishment>
     | Route<typeof routes.formEstablishmentForExternals>;
-  edit: Route<typeof routes.editFormEstablishment>;
+  edit:
+    | Route<typeof routes.editFormEstablishment>
+    | Route<typeof routes.establishmentDashboard>;
   admin: Route<typeof routes.manageEstablishmentAdmin>;
 };
 
@@ -98,6 +101,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     route.name === "formEstablishment" ||
     route.name === "formEstablishmentForExternals";
   const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
+  const isEstablishmentDashboard = route.name === "establishmentDashboard";
+  const inclusionConnectedJwt = useAppSelector(
+    authSelectors.inclusionConnectToken,
+  );
 
   const feedback = useAppSelector(establishmentSelectors.feedback);
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
@@ -110,7 +117,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   >(undefined);
 
   const [currentStep, setCurrentStep] = useState<Step>(
-    isEstablishmentAdmin ? null : 0,
+    isEstablishmentAdmin || isEstablishmentDashboard ? null : 0,
   );
   const acquisitionParams = useGetAcquisitionParams();
   const methods = useForm<FormEstablishmentDto>({
@@ -158,7 +165,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   );
 
   useEffect(() => {
-    match({ route: currentRoute.current, adminJwt })
+    match({ route: currentRoute.current, adminJwt, inclusionConnectedJwt })
       .with(
         {
           route: {
@@ -202,7 +209,22 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             }),
           ),
       )
-
+      .with(
+        {
+          route: { name: "establishmentDashboard" },
+          inclusionConnectedJwt: P.not(P.nullish),
+        },
+        () => {},
+      )
+      .with(
+        {
+          route: { name: "establishmentDashboard" },
+          inclusionConnectedJwt: P.nullish,
+        },
+        () => {
+          throw new Error("Accès interdit sans être inclusion connecté.");
+        },
+      )
       .exhaustive();
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
@@ -244,7 +266,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   }, [feedback, redirectToErrorOnFeedback, route]);
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
-    match({ route, adminJwt })
+    match({ route, adminJwt, inclusionConnectedJwt })
       .with(
         {
           route: {
@@ -286,6 +308,28 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
         () => {
           throw new Error("Accès interdit sans être connecté en admin.");
+        },
+      )
+      .with(
+        {
+          route: { name: "establishmentDashboard" },
+          inclusionConnectedJwt: P.not(P.nullish),
+        },
+        ({ inclusionConnectedJwt }) =>
+          dispatch(
+            establishmentSlice.actions.establishmentEditionRequested({
+              formEstablishment,
+              jwt: inclusionConnectedJwt,
+            }),
+          ),
+      )
+      .with(
+        {
+          route: { name: "establishmentDashboard" },
+          inclusionConnectedJwt: P.nullish,
+        },
+        () => {
+          throw new Error("Accès interdit sans être inclusion connecté.");
         },
       )
       .exhaustive();

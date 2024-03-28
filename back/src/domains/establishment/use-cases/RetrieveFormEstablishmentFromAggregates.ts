@@ -2,6 +2,7 @@ import {
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
+  InclusionConnectJwtPayload,
   SiretDto,
   addressDtoToString,
   siretSchema,
@@ -16,21 +17,29 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
   FormEstablishmentDto,
-  EstablishmentJwtPayload | BackOfficeJwtPayload
+  EstablishmentJwtPayload | BackOfficeJwtPayload | InclusionConnectJwtPayload
 > {
   protected inputSchema = siretSchema;
 
   protected async _execute(
     siret: SiretDto,
     uow: UnitOfWork,
-    jwtPayload?: EstablishmentJwtPayload | BackOfficeJwtPayload,
+    jwtPayload?:
+      | EstablishmentJwtPayload
+      | BackOfficeJwtPayload
+      | InclusionConnectJwtPayload,
   ) {
     if (!jwtPayload) throw new ForbiddenError();
     const isValidEstablishmentJwtPayload =
       "siret" in jwtPayload && siret === jwtPayload.siret;
     const isValidBackOfficeJwtPayload =
       "role" in jwtPayload && jwtPayload.role === "backOffice";
-    if (isValidBackOfficeJwtPayload || isValidEstablishmentJwtPayload)
+    const isValidIcJwtPayload = "userId" in jwtPayload;
+    if (
+      isValidBackOfficeJwtPayload ||
+      isValidEstablishmentJwtPayload ||
+      isValidIcJwtPayload
+    )
       return this.#onValidJwt(uow, siret);
     throw new ForbiddenError();
   }
