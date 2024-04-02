@@ -1,0 +1,35 @@
+name: "Backup DB scalingo & copy to clever"
+#on:
+#  schedule:
+#    - cron: ""
+on:
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      # - uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-2
+      # - name: Install scalingo CLI
+      #   run: |
+      #     wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+      #     echo "$HOME/bin" >> $GITHUB_PATH
+      # - name: Login to scalingo
+      #   run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
+      # - name: Backup DB
+      #   run: scalingo --app ${{ secrets.SCALINGO_APP }} --region ${{ secrets.SCALINGO_REGION }} --addon ${{ secrets.SCALINGO_DB_ADDON_ID }} backups-download
+      # - name: Upload backup to clever
+      #
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.CELLAR_ADDON_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.CELLAR_ADDON_KEY_SECRET }}
+          aws-region: us-west-1
+      - name: Copy files to the production website with the AWS CLI
+        run: |
+          aws s3 list-objects --endpoint-url https://cellar-c2.services.clever-cloud.com --bucket immersion-dev
+      
