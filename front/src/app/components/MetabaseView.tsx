@@ -4,7 +4,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
-import { statsPageUrl } from "src/app/pages/StatsPage";
+import { globalStatsUrl, immersionStatsUrl } from "src/app/pages/StatsPage";
 import { ENV } from "src/config/environmentVariables";
 import { useStyles } from "tss-react/dsfr";
 
@@ -51,7 +51,9 @@ export const MetabaseView = ({
       <h5 className={cx(fr.cx("fr-h5", "fr-mb-2w"), "flex")}>
         {title} <TitleButton url={url} />
       </h5>
-      {ENV.envType === "production" || url === statsPageUrl ? (
+      {ENV.envType === "production" ||
+      url === globalStatsUrl ||
+      url === immersionStatsUrl ? (
         <iframe
           title="Tableau Metabase"
           src={url}
