@@ -50,7 +50,7 @@ export class InMemoryFormEstablishmentRepository
     email: string,
   ): Promise<FormEstablishmentDto[]> {
     return this.#formEstablishments.filter(
-      (fe) => fe.businessContact.email === email,
+      (formEstablishment) => formEstablishment.businessContact.email === email,
     );
   }
 
