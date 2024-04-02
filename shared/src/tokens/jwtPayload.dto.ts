@@ -61,21 +61,3 @@ export type JwtPayloads = {
 };
 export type PayloadKey = keyof JwtPayloads;
 export type PayloadOption = ValueOf<Required<JwtPayloads>>;
-
-export const isEstablishmentJwtPayload = (
-  payload: any,
-): payload is EstablishmentJwtPayload => {
-  return "siret" in payload;
-};
-
-export const isBackOfficeJwtPayload = (
-  payload: any,
-): payload is BackOfficeJwtPayload => {
-  return payload.role === "backOffice";
-};
-
-export const isInclusionConnectJwtPayload = (
-  payload: any,
-): payload is InclusionConnectJwtPayload => {
-  return "userId" in payload;
-};

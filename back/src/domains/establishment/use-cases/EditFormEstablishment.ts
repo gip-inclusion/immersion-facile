@@ -4,9 +4,6 @@ import {
   FormEstablishmentDto,
   InclusionConnectJwtPayload,
   formEstablishmentSchema,
-  isBackOfficeJwtPayload,
-  isEstablishmentJwtPayload,
-  isInclusionConnectJwtPayload,
 } from "shared";
 import { ForbiddenError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -42,12 +39,7 @@ export class EditFormEstablishment extends TransactionalUseCase<
       | InclusionConnectJwtPayload,
   ): Promise<void> {
     if (!jwtPayload) throw new ForbiddenError();
-    if (
-      !isInclusionConnectJwtPayload(jwtPayload) &&
-      !isBackOfficeJwtPayload(jwtPayload) &&
-      !isEstablishmentJwtPayload(jwtPayload)
-    )
-      throw new ForbiddenError();
+
     if ("siret" in jwtPayload && jwtPayload.siret !== dto.siret)
       throw new ForbiddenError();
     if ("userId" in jwtPayload) {

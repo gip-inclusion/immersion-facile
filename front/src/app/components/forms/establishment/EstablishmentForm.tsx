@@ -229,7 +229,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
-  }, [adminJwt, dispatch, currentRoute]);
+  }, [adminJwt, dispatch, inclusionConnectedJwt]);
 
   useEffect(() => {
     reset({

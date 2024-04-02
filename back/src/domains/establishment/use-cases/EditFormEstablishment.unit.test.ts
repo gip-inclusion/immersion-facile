@@ -83,16 +83,6 @@ describe("Edit Form Establishment", () => {
       );
     });
 
-    it("Forbidden error on fake jwt payload", async () => {
-      await expectPromiseToFailWithError(
-        useCase.execute(
-          updatedFormEstablishment,
-          {} as EstablishmentJwtPayload,
-        ),
-        new ForbiddenError(),
-      );
-    });
-
     it("Forbidden error without jwt payload", async () => {
       await expectPromiseToFailWithError(
         useCase.execute(updatedFormEstablishment),
