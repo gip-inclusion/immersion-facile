@@ -55,6 +55,7 @@ export const AvailabilitySection = ({
     toDateString(new Date(currentNextAvailabilityDate));
 
   const isStepMode = currentStep !== null;
+
   return (
     <section className={fr.cx("fr-mb-4w")}>
       <RadioButtons
@@ -107,26 +108,27 @@ export const AvailabilitySection = ({
           {...getFieldError("nextAvailabilityDate")}
         />
       )}
-      {availableForImmersion !== undefined && mode === "edit" && (
-        <Input
-          label={
-            availableForImmersion
-              ? formContents.maxContactsPerWeek.label
-              : formContents.maxContactPerWeekWhenAvailable.label
-          }
-          nativeInputProps={{
-            ...formContents.maxContactsPerWeek,
-            ...register("maxContactsPerWeek", {
-              valueAsNumber: true,
-            }),
-            type: "number",
-            min: isSearchable ? 1 : 0,
-            pattern: "\\d*",
-          }}
-          disabled={!isSearchable}
-          {...getFieldError("maxContactsPerWeek")}
-        />
-      )}
+      {availableForImmersion !== undefined &&
+        (mode === "edit" || mode === "admin") && (
+          <Input
+            label={
+              availableForImmersion
+                ? formContents.maxContactsPerWeek.label
+                : formContents.maxContactPerWeekWhenAvailable.label
+            }
+            nativeInputProps={{
+              ...formContents.maxContactsPerWeek,
+              ...register("maxContactsPerWeek", {
+                valueAsNumber: true,
+              }),
+              type: "number",
+              min: isSearchable ? 1 : 0,
+              pattern: "\\d*",
+            }}
+            disabled={!isSearchable}
+            {...getFieldError("maxContactsPerWeek")}
+          />
+        )}
       {availableForImmersion === false && mode === "edit" && (
         <div className={fr.cx("fr-highlight", "fr-ml-0")}>
           <p>
