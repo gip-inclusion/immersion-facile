@@ -599,6 +599,8 @@ describe("convention e2e", () => {
         body: {
           status: "ACCEPTED_BY_VALIDATOR",
           conventionId: convention.id,
+          firstname: "John",
+          lastname: "Doe",
         },
       });
 
@@ -624,7 +626,12 @@ describe("convention e2e", () => {
 
     it("400 - no JWT", async () => {
       const response = await magicLinkRequest.updateConventionStatus({
-        body: { status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id },
+        body: {
+          status: "ACCEPTED_BY_VALIDATOR",
+          conventionId: convention.id,
+          firstname: "John",
+          lastname: "Doe",
+        },
         headers: undefined as unknown as WithAuthorizationHeader,
       });
 
@@ -641,7 +648,12 @@ describe("convention e2e", () => {
 
     it("403 - unauthorized role for expected status update", async () => {
       const response = await magicLinkRequest.updateConventionStatus({
-        body: { status: "ACCEPTED_BY_VALIDATOR", conventionId: convention.id },
+        body: {
+          status: "ACCEPTED_BY_VALIDATOR",
+          conventionId: convention.id,
+          firstname: "John",
+          lastname: "Doe",
+        },
         headers: {
           authorization: generateConventionJwt(
             createConventionMagicLinkPayload({
@@ -668,6 +680,8 @@ describe("convention e2e", () => {
         body: {
           status: "ACCEPTED_BY_COUNSELLOR",
           conventionId: unknownId,
+          firstname: "John",
+          lastname: "Doe",
         },
         headers: {
           authorization: generateConventionJwt(

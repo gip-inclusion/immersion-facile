@@ -50,7 +50,7 @@ export const doesStatusNeedsJustification = (
 export const doesStatusNeedsValidators = (
   initialStatus: ConventionStatus,
   targetStatus: ConventionStatus,
-): boolean => {
+): targetStatus is ConventionStatusWithValidator => {
   const isValidatorRequired = conventionStatusesWithValidator.includes(
     targetStatus as ConventionStatusWithValidator,
   );
@@ -296,8 +296,8 @@ export type UpdateConventionRequestDto = {
 export type UpdateConventionStatusWithValidator = {
   status: ConventionStatusWithValidator;
   conventionId: ConventionId;
-  lastname?: string;
-  firstname?: string;
+  lastname: string;
+  firstname: string;
 };
 
 export type UpdateConventionStatusWithoutJustification = {

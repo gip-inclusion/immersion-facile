@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import test, { expect } from "@playwright/test";
 import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
@@ -159,6 +160,16 @@ test.describe("Convention creation and modification workflow", () => {
           `#${domElementIds.manageConvention.conventionValidationValidateButton}`,
         )
         .click();
+      await page
+        .locator(
+          `#${domElementIds.manageConvention.validatorModalLastNameInput}`,
+        )
+        .fill(faker.person.lastName());
+      await page
+        .locator(
+          `#${domElementIds.manageConvention.validatorModalFirstNameInput}`,
+        )
+        .fill(faker.person.firstName());
       await page
         .locator(
           `#${domElementIds.manageConvention.validatorModalSubmitButton}`,

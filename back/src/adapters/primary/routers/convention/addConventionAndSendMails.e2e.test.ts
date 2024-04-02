@@ -356,6 +356,8 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   const params: UpdateConventionStatusRequestDto = {
     status: "ACCEPTED_BY_VALIDATOR",
     conventionId: initialConvention.id,
+    firstname: "John",
+    lastname: "Doe",
   };
 
   gateways.timeGateway.setNextDate(validationDate);
@@ -383,6 +385,12 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
         establishmentRepresentativeSignedAt:
           establishmentRepresentativeSignDate.toISOString(),
       }),
+      validators: {
+        agencyValidator: {
+          firstname: params.firstname,
+          lastname: params.lastname,
+        },
+      },
       statusJustification: undefined,
     },
   );

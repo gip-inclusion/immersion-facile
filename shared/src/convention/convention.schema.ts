@@ -22,7 +22,7 @@ import {
 } from "../schedule/ScheduleUtils";
 import { siretSchema } from "../siret/siret.schema";
 import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
-import { phoneRegExp } from "../utils";
+import { OmitFromExistingKeys, phoneRegExp } from "../utils";
 import { dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
@@ -410,13 +410,24 @@ export const updateConventionStatusWithJustificationWithModifierRoleSchema: z.Sc
     conventionId: conventionIdSchema,
     modifierRole: modifierRoleSchema,
   });
+
+export type WithValidatorInfo = OmitFromExistingKeys<
+  UpdateConventionStatusWithValidator,
+  "conventionId" | "status"
+>;
+
+export const withValidatorInfoSchema: z.Schema<WithValidatorInfo> = z.object({
+  firstname: zStringMinLength1,
+  lastname: zStringMinLength1,
+});
+
 const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatusWithValidator> =
-  z.object({
-    status: z.enum(conventionStatusesWithValidator),
-    conventionId: conventionIdSchema,
-    lastname: z.string().trim().optional(),
-    firstname: z.string().trim().optional(),
-  });
+  z
+    .object({
+      status: z.enum(conventionStatusesWithValidator),
+      conventionId: conventionIdSchema,
+    })
+    .and(withValidatorInfoSchema);
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z.union([

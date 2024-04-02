@@ -275,8 +275,18 @@ describe("UpdateConventionStatus", () => {
       updateStatusParams: {
         status: "ACCEPTED_BY_COUNSELLOR",
         conventionId: originalConventionId,
+        firstname: "Counsellor Firstname",
+        lastname: "Counsellor Lastname",
       },
-      updatedFields: { dateApproval: dateApproval.toISOString() },
+      updatedFields: {
+        dateApproval: dateApproval.toISOString(),
+        validators: {
+          agencyCounsellor: {
+            firstname: "Counsellor Firstname",
+            lastname: "Counsellor Lastname",
+          },
+        },
+      },
       expectedDomainTopic: "ConventionAcceptedByCounsellor",
       allowedMagicLinkRoles: ["counsellor"],
       allowedInclusionConnectedUsers: ["icUserWithRoleCounsellor"],
@@ -290,12 +300,22 @@ describe("UpdateConventionStatus", () => {
       updateStatusParams: {
         status: "ACCEPTED_BY_VALIDATOR",
         conventionId: originalConventionId,
+        firstname: "Validator Firstname",
+        lastname: "Validator Lastname",
       },
       expectedDomainTopic: "ConventionAcceptedByValidator",
       allowedMagicLinkRoles: ["validator"],
       allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
-      updatedFields: { dateValidation: validationDate.toISOString() },
+      updatedFields: {
+        dateValidation: validationDate.toISOString(),
+        validators: {
+          agencyValidator: {
+            firstname: "Validator Firstname",
+            lastname: "Validator Lastname",
+          },
+        },
+      },
       nextDate: validationDate,
     });
 
@@ -304,12 +324,22 @@ describe("UpdateConventionStatus", () => {
         updateStatusParams: {
           status: "ACCEPTED_BY_VALIDATOR",
           conventionId: conventionWithAgencyTwoStepsValidationId,
+          firstname: "Validator Firstname",
+          lastname: "Validator Lastname",
         },
         expectedDomainTopic: "ConventionAcceptedByValidator",
         allowedMagicLinkRoles: ["validator"],
         allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
         allowedInitialStatuses: ["ACCEPTED_BY_COUNSELLOR"],
-        updatedFields: { dateValidation: validationDate.toISOString() },
+        updatedFields: {
+          dateValidation: validationDate.toISOString(),
+          validators: {
+            agencyValidator: {
+              firstname: "Validator Firstname",
+              lastname: "Validator Lastname",
+            },
+          },
+        },
         nextDate: validationDate,
       });
     });
@@ -399,6 +429,8 @@ describe("UpdateConventionStatus", () => {
         updateStatusParams: {
           status: "ACCEPTED_BY_VALIDATOR",
           conventionId: missingConventionId,
+          firstname: "Validator Firstname",
+          lastname: "Validator Lastname",
         },
         updateConventionStatusUseCase,
         conventionRepository,

@@ -15,18 +15,13 @@ import {
   ConventionStatusWithValidator,
   Role,
   UpdateConventionStatusRequestDto,
+  WithValidatorInfo,
   doesStatusNeedsJustification,
   doesStatusNeedsValidators,
   domElementIds,
+  withValidatorInfoSchema,
 } from "shared";
-import { z } from "zod";
 import { JustificationModalContent } from "./JustificationModalContent";
-
-type WithValidatorInfo = { firstname?: string; lastname?: string };
-const withValidatorInfoSchema: z.Schema<WithValidatorInfo> = z.object({
-  firstname: z.string().trim().optional(),
-  lastname: z.string().trim().optional(),
-});
 
 export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
@@ -168,12 +163,7 @@ export const VerificationActionButton = ({
       domElementIds.manageConvention.conventionValidationDeprecateButton,
   };
 
-  const conventionId = convention.id;
-  const onActionButtonClick = () =>
-    doesStatusNeedsJustification(newStatus) ||
-    doesStatusNeedsValidators(initialStatus, newStatus)
-      ? modalByStatus(newStatus).openModal()
-      : onSubmit({ status: newStatus, conventionId });
+  const onActionButtonClick = () => modalByStatus(newStatus).openModal();
 
   return (
     <>
@@ -314,15 +304,19 @@ const ValidatorModalContent = ({
     <>
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <Input
-          label={"Nom du conseiller qui marque la demande (facultatif)"}
+          label={"Nom du conseiller qui marque la demande *"}
           nativeInputProps={{
             ...register("lastname"),
+            required: true,
+            id: domElementIds.manageConvention.validatorModalLastNameInput,
           }}
         />
         <Input
-          label={"Prénom du conseiller qui marque la demande (facultatif)"}
+          label={"Prénom du conseiller qui marque la demande *"}
           nativeInputProps={{
             ...register("firstname"),
+            required: true,
+            id: domElementIds.manageConvention.validatorModalFirstNameInput,
           }}
         />
         <ButtonsGroup
