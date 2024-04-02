@@ -317,6 +317,8 @@ export const domElementIds = {
       "im-convention-validation__submit-renew-modal-button",
     openRenewModalButton: "im-convention-validation__open-renew-modal-button",
     openDocumentButton: "im-convention-validation__open-document-button",
+    validatorModalLastNameInput: "im-validator-modal__last-name-input",
+    validatorModalFirstNameInput: "im-validator-modal__first-name-input",
   },
 
   unsubscribeEstablishmentLead: {},
