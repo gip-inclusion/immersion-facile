@@ -126,7 +126,7 @@ export const emailTemplatesByName =
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/les_etapes_de_votre_demande.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -195,7 +195,7 @@ export const emailTemplatesByName =
       `,
         subContent: defaultSignature("immersion"),
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -260,7 +260,7 @@ export const emailTemplatesByName =
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -360,7 +360,7 @@ export const emailTemplatesByName =
       ${defaultSignature("immersion")}
       `,
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -415,7 +415,7 @@ export const emailTemplatesByName =
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -1135,6 +1135,9 @@ export const emailTemplatesByName =
         Merci à vous !`,
         agencyLogoUrl,
         subContent: defaultSignature("immersion"),
+        attachmentUrls: [
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo prescripteur-Role-des-prescripteurs-et-couverture-des risques-immersionfacilitee2024.pdf",
+        ],
       }),
     },
     AGENCY_WITH_REFERS_TO_ACTIVATED: {
@@ -1248,7 +1251,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         buttons: [
           {
             label: "Nos bons conseils",
-            url: "https://immersion.cellar-c2.services.clever-cloud.com/livret_accueil_entreprise.pdf",
+            url: "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-entreprise accueillante-immersion facilitee 2024.pdf",
           },
         ],
       }),

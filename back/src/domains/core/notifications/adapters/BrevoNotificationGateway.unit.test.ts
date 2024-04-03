@@ -240,6 +240,11 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       </html>
       `),
           sender,
+          attachment: [
+            {
+              url: "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo prescripteur-Role-des-prescripteurs-et-couverture-des risques-immersionfacilitee2024.pdf",
+            },
+          ],
         },
       });
     });
