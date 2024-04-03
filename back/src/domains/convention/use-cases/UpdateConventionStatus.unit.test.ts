@@ -18,16 +18,17 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { conventionMissingMessage } from "../entities/Convention";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 import {
+  acceptStatusTransitionTests,
   conventionWithAgencyTwoStepsValidationId,
   executeUpdateConventionStatusUseCase,
   originalConventionId,
+  rejectStatusTransitionTests,
   setupInitialState,
-  testForAllRolesAndInitialStatusCases,
 } from "./UpdateConventionStatus.testHelpers";
 
 describe("UpdateConventionStatus", () => {
   describe("* -> DRAFT transition", () => {
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "DRAFT",
         statusJustification: "test justification",
@@ -39,6 +40,34 @@ describe("UpdateConventionStatus", () => {
         statusJustification: "test justification",
         establishmentRepresentativeSignedAt: undefined,
         beneficiarySignedAt: undefined,
+      },
+      allowedMagicLinkRoles: [
+        "beneficiary",
+        "establishment-representative",
+        "beneficiary-representative",
+        "beneficiary-current-employer",
+        "counsellor",
+        "validator",
+        "backOffice",
+      ],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleCounsellor",
+        "icUserWithRoleValidator",
+        "icUserWithRoleEstablishmentRepresentative",
+      ],
+      allowedInitialStatuses: [
+        "READY_TO_SIGN",
+        "PARTIALLY_SIGNED",
+        "IN_REVIEW",
+        "ACCEPTED_BY_COUNSELLOR",
+      ],
+    });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "DRAFT",
+        statusJustification: "test justification",
+        conventionId: originalConventionId,
+        modifierRole: "beneficiary",
       },
       allowedMagicLinkRoles: [
         "beneficiary",
@@ -225,7 +254,7 @@ describe("UpdateConventionStatus", () => {
   });
 
   describe("* -> READY_TO_SIGN transition", () => {
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "READY_TO_SIGN",
         conventionId: originalConventionId,
@@ -237,10 +266,21 @@ describe("UpdateConventionStatus", () => {
       ],
       allowedInitialStatuses: ["DRAFT"],
     });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "READY_TO_SIGN",
+        conventionId: originalConventionId,
+      },
+      allowedMagicLinkRoles: validSignatoryRoles,
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleEstablishmentRepresentative",
+      ],
+      allowedInitialStatuses: ["DRAFT"],
+    });
   });
 
   describe("* -> PARTIALLY_SIGNED transition", () => {
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "PARTIALLY_SIGNED",
         conventionId: originalConventionId,
@@ -252,10 +292,21 @@ describe("UpdateConventionStatus", () => {
       ],
       allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "PARTIALLY_SIGNED",
+        conventionId: originalConventionId,
+      },
+      allowedMagicLinkRoles: validSignatoryRoles,
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleEstablishmentRepresentative",
+      ],
+      allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
+    });
   });
 
   describe("* -> IN_REVIEW transition", () => {
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "IN_REVIEW",
         conventionId: originalConventionId,
@@ -267,11 +318,22 @@ describe("UpdateConventionStatus", () => {
       ],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
     });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "IN_REVIEW",
+        conventionId: originalConventionId,
+      },
+      allowedMagicLinkRoles: validSignatoryRoles,
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleEstablishmentRepresentative",
+      ],
+      allowedInitialStatuses: ["PARTIALLY_SIGNED"],
+    });
   });
 
   describe("* -> ACCEPTED_BY_COUNSELLOR transition", () => {
     const dateApproval = new Date("2021-09-01T10:10:00.000Z");
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "ACCEPTED_BY_COUNSELLOR",
         conventionId: originalConventionId,
@@ -292,11 +354,22 @@ describe("UpdateConventionStatus", () => {
       allowedInclusionConnectedUsers: ["icUserWithRoleCounsellor"],
       allowedInitialStatuses: ["IN_REVIEW"],
     });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "ACCEPTED_BY_COUNSELLOR",
+        conventionId: originalConventionId,
+        firstname: "Counsellor Firstname",
+        lastname: "Counsellor Lastname",
+      },
+      allowedMagicLinkRoles: ["counsellor"],
+      allowedInclusionConnectedUsers: ["icUserWithRoleCounsellor"],
+      allowedInitialStatuses: ["IN_REVIEW"],
+    });
   });
 
   describe("* -> ACCEPTED_BY_VALIDATOR transition", () => {
     const validationDate = new Date("2022-01-01T12:00:00.000");
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "ACCEPTED_BY_VALIDATOR",
         conventionId: originalConventionId,
@@ -318,9 +391,20 @@ describe("UpdateConventionStatus", () => {
       },
       nextDate: validationDate,
     });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "ACCEPTED_BY_VALIDATOR",
+        conventionId: originalConventionId,
+        firstname: "Validator Firstname",
+        lastname: "Validator Lastname",
+      },
+      allowedMagicLinkRoles: ["validator"],
+      allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
+      allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
+    });
 
     describe("When agency have two steps validation", () => {
-      testForAllRolesAndInitialStatusCases({
+      acceptStatusTransitionTests({
         updateStatusParams: {
           status: "ACCEPTED_BY_VALIDATOR",
           conventionId: conventionWithAgencyTwoStepsValidationId,
@@ -346,7 +430,7 @@ describe("UpdateConventionStatus", () => {
   });
 
   describe("* -> REJECTED transition", () => {
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "REJECTED",
         statusJustification: "my rejection justification",
@@ -366,10 +450,28 @@ describe("UpdateConventionStatus", () => {
         "ACCEPTED_BY_COUNSELLOR",
       ],
     });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "REJECTED",
+        statusJustification: "my rejection justification",
+        conventionId: originalConventionId,
+      },
+      allowedMagicLinkRoles: ["backOffice", "validator", "counsellor"],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleValidator",
+        "icUserWithRoleCounsellor",
+      ],
+      allowedInitialStatuses: [
+        "PARTIALLY_SIGNED",
+        "READY_TO_SIGN",
+        "IN_REVIEW",
+        "ACCEPTED_BY_COUNSELLOR",
+      ],
+    });
   });
 
   describe("* -> CANCELLED transition", () => {
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "CANCELLED",
         statusJustification: "Cancelled justification",
@@ -381,10 +483,20 @@ describe("UpdateConventionStatus", () => {
       allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "CANCELLED",
+        statusJustification: "Cancelled justification",
+        conventionId: originalConventionId,
+      },
+      allowedMagicLinkRoles: ["validator", "backOffice"],
+      allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
+      allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
+    });
   });
 
   describe("* -> DEPRECATED transition", () => {
-    testForAllRolesAndInitialStatusCases({
+    acceptStatusTransitionTests({
       updateStatusParams: {
         status: "DEPRECATED",
         statusJustification: "my deprecation justification",
