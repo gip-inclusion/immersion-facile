@@ -265,6 +265,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withSiret(siret1)
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withAgencyId(agencyId)
+      .withValidator({
+        firstname: "Jean",
+        lastname: "Dupont",
+      })
       .build();
 
     const oldestConventionForSiret1 = new ConventionDtoBuilder()
@@ -273,6 +277,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withSchedule(reasonableSchedule)
       .withSiret(siret1)
       .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withValidator({
+        firstname: "Jean",
+        lastname: "Dupont",
+      })
       .withAgencyId(agencyId)
       .build();
 
@@ -282,6 +290,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withSchedule(reasonableSchedule)
       .withSiret(siret2)
       .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withValidator({
+        firstname: "Jean",
+        lastname: "Dupont",
+      })
       .withAgencyId(agencyId)
       .build();
 
@@ -291,6 +303,10 @@ describe("Pg implementation of ConventionQueries", () => {
       .withSchedule(reasonableSchedule)
       .withSiret(siret2)
       .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withValidator({
+        firstname: "Jean",
+        lastname: "Dupont",
+      })
       .withAgencyId(agencyId)
       .build();
 
@@ -330,6 +346,12 @@ describe("Pg implementation of ConventionQueries", () => {
           agencySiret: agency.agencySiret,
           agencyCounsellorEmails: agency.counsellorEmails,
           agencyValidatorEmails: agency.validatorEmails,
+          validators: {
+            agencyValidator: {
+              firstname: "Jean",
+              lastname: "Dupont",
+            },
+          },
         },
         {
           ...latestConventionForSiret2,
@@ -339,6 +361,12 @@ describe("Pg implementation of ConventionQueries", () => {
           agencySiret: agency.agencySiret,
           agencyCounsellorEmails: agency.counsellorEmails,
           agencyValidatorEmails: agency.validatorEmails,
+          validators: {
+            agencyValidator: {
+              firstname: "Jean",
+              lastname: "Dupont",
+            },
+          },
         },
       ]);
     });
