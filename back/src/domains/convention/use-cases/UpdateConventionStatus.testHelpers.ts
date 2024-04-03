@@ -484,25 +484,17 @@ const makeTestRejectsStatusUpdate =
     );
   };
 
-type TestAllCaseProps = {
-  updateStatusParams: UpdateConventionStatusRequestDto;
-  expectedDomainTopic: ConventionDomainTopic;
-  updatedFields?: UpdatedFields;
-  allowedMagicLinkRoles: Role[];
-  allowedInclusionConnectedUsers: InclusionConnectedTestUser[];
-  allowedInitialStatuses: ConventionStatus[];
-  nextDate?: Date;
-};
-
-export const testForAllRolesAndInitialStatusCases = ({
+export const rejectStatusTransitionTests = ({
   allowedMagicLinkRoles,
-  expectedDomainTopic,
-  updatedFields = {},
   allowedInitialStatuses,
   allowedInclusionConnectedUsers,
-  nextDate,
   updateStatusParams,
-}: TestAllCaseProps) => {
+}: {
+  allowedMagicLinkRoles: Role[];
+  allowedInitialStatuses: ConventionStatus[];
+  allowedInclusionConnectedUsers: InclusionConnectedTestUser[];
+  updateStatusParams: UpdateConventionStatusRequestDto;
+}) => {
   const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
     splitCasesBetweenPassingAndFailing(allRoles, allowedMagicLinkRoles);
   const [
@@ -521,43 +513,6 @@ export const testForAllRolesAndInitialStatusCases = ({
 
   const someValidInitialStatus = authorizedInitialStatuses[0];
   const someValidRole = allowedRolesToUpdate[0];
-
-  describe("Accepted", () => {
-    const testAcceptsStatusUpdate = makeTestAcceptsStatusUpdate({
-      updateStatusParams,
-      expectedDomainTopic,
-      updatedFields,
-      nextDate,
-    });
-
-    it.each(allowedMagicLinkRoles.map((role) => ({ role })))(
-      "Accepted from role '$role'",
-      ({ role }) =>
-        testAcceptsStatusUpdate({
-          role,
-          initialStatus: someValidInitialStatus,
-        }),
-    );
-
-    if (allowedInclusionConnectedUsersToUpdate.length)
-      it.each(
-        allowedInclusionConnectedUsersToUpdate.map((userId) => ({ userId })),
-      )("Accepted from userId '$userId'", ({ userId }) =>
-        testAcceptsStatusUpdate({
-          userId,
-          initialStatus: someValidInitialStatus,
-        }),
-      );
-
-    it.each(authorizedInitialStatuses.map((status) => ({ status })))(
-      "Accepted from status $status",
-      ({ status }) =>
-        testAcceptsStatusUpdate({
-          role: someValidRole,
-          initialStatus: status,
-        }),
-    );
-  });
 
   describe("Rejected", () => {
     const testRejectsStatusUpdate = makeTestRejectsStatusUpdate({
@@ -627,6 +582,80 @@ export const testForAllRolesAndInitialStatusCases = ({
           expectedError: error,
         });
       },
+    );
+  });
+};
+
+export const acceptStatusTransitionTests = ({
+  allowedMagicLinkRoles,
+  expectedDomainTopic,
+  updatedFields = {},
+  allowedInitialStatuses,
+  allowedInclusionConnectedUsers,
+  nextDate,
+  updateStatusParams,
+}: {
+  allowedMagicLinkRoles: Role[];
+  expectedDomainTopic: ConventionDomainTopic;
+  updatedFields?: UpdatedFields;
+  allowedInitialStatuses: ConventionStatus[];
+  allowedInclusionConnectedUsers: InclusionConnectedTestUser[];
+  nextDate?: Date;
+  updateStatusParams: UpdateConventionStatusRequestDto;
+}) => {
+  describe("Accepted", () => {
+    const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
+      splitCasesBetweenPassingAndFailing(allRoles, allowedMagicLinkRoles);
+    const [
+      allowedInclusionConnectedUsersToUpdate,
+      notAllowedInclusionConnectedUsersToUpdate,
+    ] = splitCasesBetweenPassingAndFailing(
+      allInclusionConnectedTestUsers,
+      allowedInclusionConnectedUsers,
+    );
+
+    const [authorizedInitialStatuses, forbiddenInitalStatuses] =
+      splitCasesBetweenPassingAndFailing(
+        conventionStatuses,
+        allowedInitialStatuses,
+      );
+
+    const someValidInitialStatus = authorizedInitialStatuses[0];
+    const someValidRole = allowedRolesToUpdate[0];
+
+    const testAcceptsStatusUpdate = makeTestAcceptsStatusUpdate({
+      updateStatusParams,
+      expectedDomainTopic,
+      updatedFields,
+      nextDate,
+    });
+
+    it.each(allowedMagicLinkRoles.map((role) => ({ role })))(
+      "Accepted from role '$role'",
+      ({ role }) =>
+        testAcceptsStatusUpdate({
+          role,
+          initialStatus: someValidInitialStatus,
+        }),
+    );
+
+    if (allowedInclusionConnectedUsersToUpdate.length)
+      it.each(
+        allowedInclusionConnectedUsersToUpdate.map((userId) => ({ userId })),
+      )("Accepted from userId '$userId'", ({ userId }) =>
+        testAcceptsStatusUpdate({
+          userId,
+          initialStatus: someValidInitialStatus,
+        }),
+      );
+
+    it.each(authorizedInitialStatuses.map((status) => ({ status })))(
+      "Accepted from status $status",
+      ({ status }) =>
+        testAcceptsStatusUpdate({
+          role: someValidRole,
+          initialStatus: status,
+        }),
     );
   });
 };
