@@ -1,6 +1,11 @@
 import React from "react";
 import { PageHeader } from "react-design-system";
-import { AdminTab, adminTabsList } from "shared";
+import {
+  AdminTab,
+  EstablishmentDashboardTab,
+  adminTabsList,
+  establishmentDashboardTabsList,
+} from "shared";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
@@ -83,20 +88,26 @@ const getPageByRouteName: {
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   debugPopulateDB: () => undefined,
   editFormEstablishment: () => <EstablishmentEditionFormPage />,
-  establishmentDashboard: (route) => (
-    <InclusionConnectedPrivateRoute
-      route={route}
-      inclusionConnectConnexionPageHeader={
-        <PageHeader
-          title="Retrouvez vos conventions en tant qu'entreprise"
-          theme="establishment"
-          centered
-        />
-      }
-    >
-      <EstablishmentDashboardPage route={route} />
-    </InclusionConnectedPrivateRoute>
-  ),
+  establishmentDashboard: (route) =>
+    establishmentDashboardTabsList.includes(
+      route.params.tab as EstablishmentDashboardTab,
+    ) ? (
+      <InclusionConnectedPrivateRoute
+        route={route}
+        inclusionConnectConnexionPageHeader={
+          <PageHeader
+            title="Retrouvez vos conventions en tant qu'entreprise"
+            theme="establishment"
+            centered
+          />
+        }
+      >
+        <EstablishmentDashboardPage route={route} />
+      </InclusionConnectedPrivateRoute>
+    ) : (
+      <ErrorPage type="httpClientNotFoundError" />
+    ),
+
   errorRedirect: (route) => <ErrorRedirectPage route={route} />,
   formEstablishment: () => <EstablishmentCreationFormPage />,
   formEstablishmentForExternals: (route) => (

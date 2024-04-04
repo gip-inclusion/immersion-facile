@@ -47,7 +47,7 @@ export const InclusionConnectedPrivateRoute = ({
       );
       if (route.name === "agencyDashboard") routes.agencyDashboard().replace();
       if (route.name === "establishmentDashboard")
-        routes.establishmentDashboard().replace();
+        routes.establishmentDashboard({ tab: "conventions" }).replace();
     }
   }, [route.params, route.name, dispatch]);
 

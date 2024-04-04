@@ -132,7 +132,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const { handleSubmit, getValues, reset, trigger } = methods;
 
   const formValues = getValues();
-  const currentRoute = useRef(route);
 
   const debouncedFormValues = useDebounce(formValues);
 
@@ -141,7 +140,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     formValues.maxContactsPerWeek > noContactPerWeek;
 
   useInitialSiret(
-    (isEstablishmentCreation || isEstablishmentAdmin) && route.params.siret
+    (isEstablishmentCreation ||
+      isEstablishmentAdmin ||
+      isEstablishmentDashboard) &&
+      route.params.siret
       ? route.params.siret
       : "",
   );
@@ -165,7 +167,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   );
 
   useEffect(() => {
-    match({ route: currentRoute.current, adminJwt, inclusionConnectedJwt })
+    match({ route, adminJwt, inclusionConnectedJwt })
       .with(
         {
           route: {
@@ -214,7 +216,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           route: { name: "establishmentDashboard" },
           inclusionConnectedJwt: P.not(P.nullish),
         },
-        () => {},
+        ({ route, inclusionConnectedJwt }) =>
+          dispatch(
+            establishmentSlice.actions.establishmentRequested({
+              siret: route.params.siret,
+              jwt: inclusionConnectedJwt,
+            }),
+          ),
       )
       .with(
         {
@@ -229,7 +237,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
-  }, [adminJwt, dispatch, inclusionConnectedJwt]);
+  }, [adminJwt, dispatch, inclusionConnectedJwt, route]);
 
   useEffect(() => {
     reset({
