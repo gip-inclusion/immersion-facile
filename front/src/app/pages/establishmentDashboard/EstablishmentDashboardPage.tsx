@@ -1,34 +1,30 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
-import Tabs from "@codegouvfr/react-dsfr/Tabs";
-import React, { useState } from "react";
+import Tabs, { TabsProps } from "@codegouvfr/react-dsfr/Tabs";
+import React from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  EstablishmentDashboardTab,
   EstablishmentRole,
   InclusionConnectedUser,
-  WithEstablismentsSiretAndName,
 } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
-import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
+import { isEstablishmentDashboardTab } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { routes } from "src/app/routes/routes";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+
+import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
+
+import { ManageEstablishmentsTab } from "src/app/pages/establishmentDashboard/ManageEstablishmentTab";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
 import { Route } from "type-route";
 import { ManageDiscussionFormSection } from "./ManageDiscussionFormSection";
-
-type EstablishmentDashboardTab = {
-  label: string;
-  content: JSX.Element;
-};
 
 const currentUserRoleToDisplay = (role: EstablishmentRole) =>
   role === "establishment-representative"
@@ -39,31 +35,20 @@ export const EstablishmentDashboardPage = ({
   route,
 }: {
   route: Route<typeof routes.establishmentDashboard>;
-}) => {
+}): ReactJSXElement => {
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
-  const selectedFormEstablishment = useAppSelector(
-    establishmentSelectors.formEstablishment,
-  );
+
   const dispatch = useDispatch();
-  const [showEstablishmentForm, setShowEstablishmentForm] =
-    useState<boolean>(false);
 
-  const establishmentOptions: SelectProps.Option<
-    WithEstablismentsSiretAndName["siret"]
-  >[] = (currentUser?.establishments || []).map((establishment) => ({
-    value: establishment.siret,
-    label: `${establishment.businessName}`,
-  }));
-
-  const establishmentDashboardTabs = (
+  const rawEstablishmentDashboardTabs = (
     currentUser: InclusionConnectedUser,
-  ): EstablishmentDashboardTab[] => [
+  ): Array<
+    TabsProps.Controlled["tabs"][number] & { content: React.ReactNode }
+  > => [
     {
       label: "Conventions en cours",
+      tabId: "conventions",
       content: (
         <>
           {currentUser.establishmentDashboards.conventions?.role ===
@@ -75,9 +60,9 @@ export const EstablishmentDashboardPage = ({
           {currentUser.establishmentDashboards.conventions ? (
             <MetabaseView
               title={`Tableau des conventions en cours
-            pour le ${currentUserRoleToDisplay(
-              currentUser.establishmentDashboards.conventions.role,
-            )} ${currentUser.firstName} ${currentUser.lastName}`}
+                pour le ${currentUserRoleToDisplay(
+                  currentUser.establishmentDashboards.conventions.role,
+                )} ${currentUser.firstName} ${currentUser.lastName}`}
               url={currentUser.establishmentDashboards.conventions.url}
             />
           ) : (
@@ -92,6 +77,7 @@ export const EstablishmentDashboardPage = ({
     },
     {
       label: "Mises en relation",
+      tabId: "discussions",
       content: (
         <>
           <ManageDiscussionFormSection />
@@ -114,45 +100,29 @@ export const EstablishmentDashboardPage = ({
       ? [
           {
             label: "Fiche entreprise",
+            tabId: "fiche-entreprise",
             content: (
-              <>
-                <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
-                  Piloter votre établissement
-                </h5>
-                <div
-                  className={fr.cx(
-                    "fr-card",
-                    "fr-px-4w",
-                    "fr-py-2w",
-                    "fr-mb-4w",
-                  )}
-                >
-                  <Select
-                    label={"Sélectionner un établissement"}
-                    options={establishmentOptions}
-                    placeholder="Sélectionner un établissement"
-                    nativeSelectProps={{
-                      defaultValue: "",
-                      value: selectedFormEstablishment.siret,
-                      onChange: (event) => {
-                        dispatch(
-                          establishmentSlice.actions.establishmentRequested({
-                            siret: event.currentTarget.value,
-                            jwt: inclusionConnectedJwt,
-                          }),
-                        );
-                        setShowEstablishmentForm(true);
-                      },
-                    }}
-                  />
-                  {showEstablishmentForm && <EstablishmentForm mode="edit" />}
-                </div>
-              </>
+              <ManageEstablishmentsTab
+                establishments={currentUser.establishments}
+                route={route}
+              />
             ),
           },
         ]
       : []),
   ];
+
+  const getEstablishmentDashboardTabs = (
+    currentTab: EstablishmentDashboardTab,
+    currentUser: InclusionConnectedUser,
+  ) =>
+    rawEstablishmentDashboardTabs(currentUser).map((tab) => ({
+      ...tab,
+      tabId: tab.tabId,
+      isDefault: currentTab === tab.tabId,
+    }));
+
+  const currentTab = route.params.tab;
 
   return (
     <>
@@ -180,9 +150,25 @@ export const EstablishmentDashboardPage = ({
           {
             currentUser: P.not(P.nullish),
           },
-          ({ currentUser }) => (
-            <Tabs tabs={establishmentDashboardTabs(currentUser)} />
-          ),
+          ({ currentUser }) => {
+            const tabs = getEstablishmentDashboardTabs(currentTab, currentUser);
+            return (
+              <Tabs
+                tabs={tabs}
+                selectedTabId={currentTab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
+                onTabChange={(tab) => {
+                  if (isEstablishmentDashboardTab(tab))
+                    routes
+                      .establishmentDashboard({
+                        tab,
+                      })
+                      .push();
+                }}
+              >
+                {tabs.find((tab) => tab.tabId === currentTab)?.content}
+              </Tabs>
+            );
+          },
         )
         .otherwise(() => (
           <Alert

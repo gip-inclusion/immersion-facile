@@ -144,7 +144,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-line-chart-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.establishmentDashboard,
-        link: routes.establishmentDashboard().link,
+        link: routes.establishmentDashboard({ tab: "conventions" }).link,
       },
     ],
     agency: [

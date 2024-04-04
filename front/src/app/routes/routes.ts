@@ -1,4 +1,5 @@
 import { AuthenticatedUserQueryParams, ValueOf, frontRoutes } from "shared";
+import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { createRouter, defineRoute, param } from "type-route";
 import { adminTabSerializer } from "./routeParams/adminTabs";
 import {
@@ -21,6 +22,12 @@ const inclusionConnectedParams = createInclusionConnectedParams({
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,
   email: param.query.optional.string,
+});
+
+const establishmentDashboardParams = createInclusionConnectedParams({
+  ...inclusionConnectedParams,
+  tab: param.path.ofType(icUserEstablishmentDashboardTabSerializer),
+  siret: param.query.optional.string,
 });
 
 export const acquisitionParams = {
@@ -115,8 +122,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.editFormEstablishmentRoute}`,
   ),
   establishmentDashboard: defineRoute(
-    inclusionConnectedParams,
-    () => `/${frontRoutes.establishmentDashboard}`,
+    establishmentDashboardParams,
+    ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
   ),
   errorRedirect: defineRoute(
     {

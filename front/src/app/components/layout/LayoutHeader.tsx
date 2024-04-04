@@ -153,9 +153,11 @@ export const LayoutHeader = () => {
         },
         {
           text: "Piloter mon entreprise",
-          isActive: currentRoute.name === routes.establishmentDashboard().name,
+          isActive:
+            currentRoute.name ===
+            routes.establishmentDashboard({ tab: "conventions" }).name,
           linkProps: {
-            ...routes.establishmentDashboard().link,
+            ...routes.establishmentDashboard({ tab: "conventions" }).link,
             id: establishmentIds.establishmentDashboard,
           },
         },
