@@ -12,7 +12,7 @@ export const searchQueryParamsSchema: z.Schema<SearchQueryParamsDto> = z
     siret: siretSchema.optional(),
     latitude: zToNumber,
     longitude: zToNumber,
-    distanceKm: zToNumber.positive("'distance_km' doit être > 0").max(100),
+    distanceKm: zToNumber.positive("'distance_km' doit être > 0").max(1000),
     voluntaryToImmersion: z.undefined().or(zToBoolean.optional()),
     place: z.string().optional(),
     sortedBy: z.enum(["distance", "date"]).optional(),

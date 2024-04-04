@@ -1,25 +1,21 @@
-import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
-import { Select } from "@codegouvfr/react-dsfr/SelectNext";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { keys } from "ramda";
 import React, { useEffect, useRef } from "react";
+import { Loader, MainWrapper } from "react-design-system";
 import {
-  Loader,
-  MainWrapper,
-  PageHeader,
-  SectionAccordion,
-  SectionTextEmbed,
-} from "react-design-system";
-import { useForm, useWatch } from "react-hook-form";
+  FormProvider,
+  useForm,
+  useFormContext,
+  useWatch,
+} from "react-hook-form";
+import { useMapEvents } from "react-leaflet";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { useDispatch } from "react-redux";
-import { GeoPositionDto, domElementIds } from "shared";
+import { SearchResultDto, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
-import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { SearchInfoSection } from "src/app/components/search/SearchInfoSection";
-import { SearchListResults } from "src/app/components/search/SearchListResults";
+import { SearchResult } from "src/app/components/search/SearchResult";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
@@ -27,7 +23,6 @@ import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchPageParams,
-  SearchStatus,
   initialState,
 } from "src/core-logic/domain/search/search.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
@@ -36,12 +31,29 @@ import { Route } from "type-route";
 import "./SearchPage.scss";
 import Styles from "./SearchPage.styles";
 
-const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
-  (distance) => ({
-    label: `${distance} km`,
-    value: distance,
-  }),
-);
+const defaultMarkerIcon = L.icon({
+  iconUrl: "/marker-icon-2x.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+const lbbMarkerIcon = L.icon({
+  iconUrl: "/marker-icon-2x--purple.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+const activeMarkerIcon = L.icon({
+  iconUrl: "/marker-icon-2x--green.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 export const SearchPage = ({
   route,
@@ -53,26 +65,18 @@ export const SearchPage = ({
   const { cx } = useStyles();
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
+  const loading = useAppSelector(searchSelectors.isLoading);
   const triggerSearch = useSearchUseCase(route);
-  const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const acquisitionParams = useGetAcquisitionParams();
   const initialValues: SearchPageParams = {
-    latitude: 0,
-    longitude: 0,
-    distanceKm: 10,
+    latitude: 48.8535,
+    longitude: 2.34839,
+    distanceKm: 100,
     place: "",
     sortedBy: "distance",
     appellations: undefined,
     ...acquisitionParams,
   };
-  const availableForSearchRequest = (
-    searchStatus: SearchStatus,
-    { lat, lon }: GeoPositionDto,
-  ): boolean =>
-    searchStatus !== "initialFetch" &&
-    searchStatus !== "extraFetch" &&
-    lon !== 0 &&
-    lat !== 0;
 
   const filterFormValues = (values: SearchPageParams) =>
     keys(values).reduce(
@@ -93,15 +97,21 @@ export const SearchPage = ({
     ),
     mode: "onTouched",
   });
-  const { handleSubmit, setValue, register, control, getValues } = methods;
+  const { handleSubmit, setValue, control, getValues } = methods;
   const formValues = getValues();
   const [lat, lon] = useWatch({
     control,
     name: ["latitude", "longitude"],
   });
+  const [activeMarkerKey, setActiveMarkerKey] = React.useState<string | null>(
+    null,
+  );
+  const distance = useWatch({
+    control,
+    name: "distanceKm",
+  });
 
   const availableForInitialSearchRequest =
-    keys(routeParams).length &&
     searchStatus === initialSearchSliceState.searchStatus &&
     lat !== 0 &&
     lon !== 0;
@@ -117,202 +127,217 @@ export const SearchPage = ({
     formValues,
   ]);
 
+  useEffect(() => {
+    triggerSearch(
+      filterFormValues({
+        ...formValues,
+        latitude: lat,
+        longitude: lon,
+        distanceKm: distance,
+      }),
+    );
+  }, [distance, lat, lon]);
+
   return (
     <HeaderFooterLayout>
+      {loading && <Loader />}
       <MainWrapper vSpacing={0} layout="fullscreen">
-        <PageHeader
-          title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
-          theme="candidate"
-        >
+        <FormProvider {...methods}>
           <form
             onSubmit={handleSubmit((value) =>
               triggerSearch(filterFormValues(value)),
             )}
-            className={cx(
-              fr.cx("fr-grid-row", "fr-grid-row--gutters"),
-              Styles.form,
-              Styles.formV2,
-            )}
+            className={cx(Styles.form, Styles.formV2)}
             id={domElementIds.search.searchForm}
+            style={
+              activeMarkerKey
+                ? {
+                    top: "-8rem",
+                  }
+                : {}
+            }
           >
-            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
-              <AppellationAutocomplete
-                label="Je recherche le métier :"
-                initialValue={
-                  formValues.appellations
-                    ? formValues.appellations[0]
-                    : undefined
-                }
-                onAppellationSelected={(newAppellationAndRome) => {
-                  setValue("appellations", [newAppellationAndRome]);
-                }}
-                selectedAppellations={
-                  formValues.appellations
-                    ? [formValues.appellations[0]]
-                    : undefined
-                }
-                onInputClear={() => {
-                  setValue("appellations", undefined);
-                }}
-                id={domElementIds.search.appellationAutocomplete}
-                placeholder="Ex: boulanger, styliste, etc"
-                useNaturalLanguage={useNaturalLanguageForAppellations}
-              />
-            </div>
-            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
-              <PlaceAutocomplete
-                label="Je me situe dans la ville de :"
-                initialInputValue={formValues.place}
-                onValueChange={(lookupSearchResult) => {
-                  if (!lookupSearchResult) return;
-                  setValue("latitude", lookupSearchResult.position.lat);
-                  setValue("longitude", lookupSearchResult.position.lon);
-                  setValue("place", lookupSearchResult.label);
-                }}
-                id={domElementIds.search.placeAutocompleteInput}
-                onInputClear={() => {
-                  setValue("latitude", initialValues.latitude);
-                  setValue("longitude", initialValues.latitude);
-                  setValue("place", initialValues.place);
-                }}
-              />
-            </div>
-            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
-              <Select
-                label="Distance maximum"
-                placeholder="Distance"
-                options={radiusOptions}
-                nativeSelectProps={{
-                  ...register("distanceKm"),
-                  id: domElementIds.search.distanceSelect,
-                }}
-              />
-            </div>
-
-            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
-              <Button
-                disabled={
-                  !availableForSearchRequest(searchStatus, { lat, lon })
-                }
-                type="submit"
-                nativeButtonProps={{
-                  id: domElementIds.search.searchSubmitButton,
-                }}
-              >
-                Rechercher
-              </Button>
-            </div>
+            <AppellationAutocomplete
+              label="Je recherche le métier :"
+              initialValue={
+                formValues.appellations ? formValues.appellations[0] : undefined
+              }
+              onAppellationSelected={(newAppellationAndRome) => {
+                setValue("appellations", [newAppellationAndRome]);
+                triggerSearch(
+                  filterFormValues({
+                    ...formValues,
+                    appellations: [newAppellationAndRome],
+                  }),
+                );
+              }}
+              selectedAppellations={
+                formValues.appellations
+                  ? [formValues.appellations[0]]
+                  : undefined
+              }
+              onInputClear={() => {
+                setValue("appellations", undefined);
+              }}
+              id={domElementIds.search.appellationAutocomplete}
+              placeholder="Ex: boulanger, styliste, etc"
+              useNaturalLanguage={useNaturalLanguageForAppellations}
+            />
           </form>
-        </PageHeader>
-        <div ref={searchResultsWrapper}>
-          {searchStatus === "ok" && (
-            <div className={fr.cx("fr-grid-row")}>
-              <div
-                className={fr.cx("fr-col-4")}
-                style={{
-                  overflowY: "auto",
-                  height: "100vh",
-                }}
-              >
-                <SearchListResults />
-              </div>
-              <div className={fr.cx("fr-col-8")}>
-                <SearchMapResults />
-              </div>
-            </div>
-          )}
-          {searchStatus === "extraFetch" ||
-            (searchStatus === "initialFetch" && <Loader />)}
-
-          <SearchInfoSection />
-          <SectionAccordion />
-          <SectionTextEmbed
-            videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
-            videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
-            videoDescription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.vtt"
-            videoTranscription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.txt"
+          <SearchMapResults
+            activeMarkerKey={activeMarkerKey}
+            setActiveMarkerKey={setActiveMarkerKey}
           />
-        </div>
+        </FormProvider>
       </MainWrapper>
     </HeaderFooterLayout>
   );
 };
 
-const radiusOptionsToZoomLevelStrategy: Record<
-  (typeof radiusOptions)[0]["value"],
-  number
-> = {
-  "1": 14,
-  "2": 13,
-  "5": 12,
-  "10": 11,
-  "20": 10,
-  "50": 9,
-  "100": 8,
-};
-
-const SearchMapResults = () => {
+const SearchMapResults = ({
+  activeMarkerKey,
+  setActiveMarkerKey,
+}: {
+  activeMarkerKey: string | null;
+  setActiveMarkerKey: (key: string | null) => void;
+}) => {
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const searchParams = useAppSelector(searchSelectors.searchParams);
+
+  const mapRef = useRef<L.Map | null>(null);
   const dispatch = useDispatch();
+  const getIconMarker = (searchResult: SearchResultDto, key: string) => {
+    if (activeMarkerKey === key) {
+      return activeMarkerIcon;
+    }
+    return searchResult.voluntaryToImmersion
+      ? defaultMarkerIcon
+      : lbbMarkerIcon;
+  };
+  if (searchParams.latitude === 0 && searchParams.longitude === 0) {
+    return null;
+  }
   return (
     <div ref={searchResultsWrapper}>
       <div className="search-map-results">
         <MapContainer
           scrollWheelZoom={false}
-          style={{ height: "100vh", width: "100%" }}
+          style={{ height: "75vh", width: "100%" }}
           center={[searchParams.latitude, searchParams.longitude]}
-          zoom={radiusOptionsToZoomLevelStrategy[`${searchParams.distanceKm}`]}
+          zoom={10}
+          touchZoom={true}
+          minZoom={6}
+          ref={mapRef}
         >
+          <ZoomEvent setActiveMarkerKey={setActiveMarkerKey} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {searchResults.map((searchResult) => (
-            <Marker
-              key={searchResult.locationId}
-              position={[searchResult.position.lat, searchResult.position.lon]}
-            >
-              <Popup>
-                <h1>{searchResult.name}</h1>
-                <p>{searchResult.address.streetNumberAndAddress}</p>
-                <p>{searchResult.address.city}</p>
-                <Button
-                  onClick={() => {
-                    const appellations = searchResult.appellations;
-                    const appellationCode = appellations?.length
-                      ? appellations[0].appellationCode
-                      : null;
-                    if (appellationCode && searchResult.locationId) {
+          {searchResults.map((searchResult, index) => {
+            const key = searchResult.locationId
+              ? `${searchResult.locationId}-${index}`
+              : `lbb-${index}`;
+            return (
+              <Marker
+                key={key}
+                position={[
+                  searchResult.position.lat,
+                  searchResult.position.lon,
+                ]}
+                icon={getIconMarker(searchResult, key)}
+                eventHandlers={{
+                  click: () => {
+                    setActiveMarkerKey(key);
+                  },
+                }}
+              >
+                <Popup>
+                  <SearchResult
+                    key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
+                    establishment={searchResult}
+                    layout="fr-col-12"
+                    onButtonClick={() => {
+                      const appellations = searchResult.appellations;
+                      const appellationCode = appellations?.length
+                        ? appellations[0].appellationCode
+                        : null;
+                      if (appellationCode && searchResult.locationId) {
+                        routes
+                          .searchResult({
+                            siret: searchResult.siret,
+                            appellationCode,
+                            location: searchResult.locationId,
+                          })
+                          .push();
+                        return;
+                      }
+                      dispatch(
+                        searchSlice.actions.fetchSearchResultRequested(
+                          searchResult,
+                        ),
+                      );
                       routes
-                        .searchResult({
+                        .searchResultExternal({
                           siret: searchResult.siret,
-                          appellationCode,
-                          location: searchResult.locationId,
                         })
                         .push();
-                      return;
-                    }
-                    dispatch(
-                      searchSlice.actions.fetchSearchResultRequested(
-                        searchResult,
-                      ),
-                    );
-                    routes
-                      .searchResultExternal({
-                        siret: searchResult.siret,
-                      })
-                      .push();
-                  }}
-                >
-                  Voir la fiche
-                </Button>
-              </Popup>
-            </Marker>
-          ))}
+                    }}
+                  />
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
     </div>
   );
+};
+
+const ZoomEvent = ({
+  setActiveMarkerKey,
+}: {
+  setActiveMarkerKey: (key: string | null) => void;
+}) => {
+  const { setValue } = useFormContext<SearchPageParams>();
+  useMapEvents({
+    popupclose: () => {
+      setActiveMarkerKey(null);
+    },
+    zoomend: (event) => {
+      const zoom: number = event.target.getZoom();
+
+      setValue("distanceKm", zoomToRadiusOptions[zoom]);
+    },
+    dragend: (event) => {
+      const center = event.target.getCenter();
+      setValue("latitude", center.lat);
+      setValue("longitude", center.lng);
+      setActiveMarkerKey(null);
+    },
+  });
+  return null;
+};
+
+const zoomToRadiusOptions: Record<number, number> = {
+  18: 1,
+  17: 1,
+  16: 1,
+  15: 2,
+  14: 5,
+  13: 10,
+  12: 20,
+  11: 50,
+  10: 75,
+  9: 100,
+  8: 200,
+  7: 400,
+  6: 1000,
+  5: 100,
+  4: 100,
+  3: 100,
+  2: 100,
+  1: 100,
+  0: 100,
 };

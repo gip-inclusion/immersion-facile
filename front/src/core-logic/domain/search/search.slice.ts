@@ -67,6 +67,7 @@ export const searchSlice = createSlice({
       state.searchStatus = "initialFetch";
       state.searchParams = action.payload;
       state.searchResults = [];
+      state.isLoading = true;
     },
     initialSearchSucceeded: (
       state,
@@ -77,6 +78,7 @@ export const searchSlice = createSlice({
     ) => {
       state.searchResults = action.payload.results;
       state.searchStatus = "ok";
+      state.isLoading = false;
     },
     extraFetchRequested: (state) => {
       state.searchStatus = "extraFetch";
@@ -84,6 +86,7 @@ export const searchSlice = createSlice({
     extraFetchSucceeded: (state, action: PayloadAction<SearchResultDto[]>) => {
       state.searchResults.push(...action.payload);
       state.searchStatus = "ok";
+      state.isLoading = false;
     },
     fetchSearchResultRequested: (
       state,

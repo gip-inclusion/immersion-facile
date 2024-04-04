@@ -3,7 +3,21 @@
     display: flex;
     align-items: flex-end;
     &--v2 {
-      max-width: 100% !important;
+      background: var(--green-archipel-sun-391-moon-716);
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 402;
+      padding: .5rem 2rem 1.5rem;
+      border-radius: 0 0 50px 50px;
+      text-align: center;
+      min-width: 30vw;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+      transition: top 1s ease;
+      .MuiAutocomplete-root {
+        width: 100%;
+      }
     }
 
     .fr-label {
@@ -13,4 +27,34 @@
   &__results-summary {
     text-align: right;
   }
+}
+
+.leaflet-control-zoom [href] {
+  background-image: none;
+}
+.leaflet-popup {
+  z-index: 9999;
+}
+
+.im-search-result {
+  background-image: none !important;
+
+  .fr-card__body {
+    padding: 0;
+  }
+  .fr-card__content {
+    padding: 1rem 2rem;
+  }
+  .fr-card__footer {
+    padding-bottom: 1rem;
+  }
+  .fr-card__desc {
+    margin: .2rem 0;
+  }
+}
+
+.leaflet-popup-content-wrapper {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }

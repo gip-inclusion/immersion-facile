@@ -16,9 +16,9 @@ export const useSearchUseCase = ({
   const dispatch = useDispatch();
   const urlParams = getUrlParameters(window.location);
   return (values: SearchPageParams) => {
-    const appellationCodes = values.appellations?.map(
-      (appellation) => appellation.appellationCode,
-    );
+    const appellationCodes = values.appellations
+      ? values.appellations.map((appellation) => appellation.appellationCode)
+      : [];
     dispatch(
       searchSlice.actions.searchRequested({ ...values, appellationCodes }),
     );

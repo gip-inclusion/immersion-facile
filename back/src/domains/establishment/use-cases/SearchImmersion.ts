@@ -70,7 +70,7 @@ export class SearchImmersion extends TransactionalUseCase<
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([
       uow.establishmentAggregateRepository.searchImmersionResults({
         searchMade,
-        maxResults: 100,
+        maxResults: 300,
       }),
       shouldFetchLBB(appellationCodes, voluntaryToImmersion)
         ? this.#searchOnLbb(uow, {
