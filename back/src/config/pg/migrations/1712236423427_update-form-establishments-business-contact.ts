@@ -8,3 +8,5 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     WHERE business_contact ->> 'copyEmails' is null
   `);
 }
+
+export async function down(): Promise<void> {}
