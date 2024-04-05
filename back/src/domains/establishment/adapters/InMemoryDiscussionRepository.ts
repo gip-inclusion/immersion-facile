@@ -2,6 +2,7 @@ import isAfter from "date-fns/isAfter";
 import { DiscussionDto, DiscussionId, SiretDto } from "shared";
 import {
   DiscussionRepository,
+  GetDiscusionsParams,
   HasDiscussionMatchingParams,
 } from "../ports/DiscussionRepository";
 
@@ -9,6 +10,22 @@ type DiscussionsById = Record<DiscussionId, DiscussionDto>;
 
 export class InMemoryDiscussionRepository implements DiscussionRepository {
   constructor(private _discussions: DiscussionsById = {}) {}
+
+  public async getDiscussions({
+    createdSince,
+    sirets,
+  }: GetDiscusionsParams): Promise<DiscussionDto[]> {
+    const filters: Array<(discussion: DiscussionDto) => boolean> = [
+      ({ siret }) => (sirets ? sirets.includes(siret) : true),
+      ({ createdAt }) =>
+        createdSince ? new Date(createdAt) >= createdSince : true,
+    ];
+    const discussions = this.discussions.filter((discussion) =>
+      filters.every((filter) => filter(discussion)),
+    );
+
+    return discussions;
+  }
 
   public async countDiscussionsForSiretSince(siret: SiretDto, since: Date) {
     return this.discussions.filter(

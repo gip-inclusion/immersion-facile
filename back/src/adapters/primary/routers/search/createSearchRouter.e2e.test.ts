@@ -166,6 +166,7 @@ describe("search-immersion route", () => {
             {
               appellationLabel: offer.appellationLabel,
               appellationCode: offer.appellationCode,
+              score: 4.5,
             },
           ],
           siret,
@@ -384,6 +385,7 @@ describe("search-immersion route", () => {
             {
               appellationCode: "19540",
               appellationLabel: "Styliste",
+              score: 4.5,
             },
           ],
           contactMode: "EMAIL",

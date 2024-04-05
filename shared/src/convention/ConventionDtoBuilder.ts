@@ -10,6 +10,7 @@ import {
 } from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { SiretDto } from "../siret/siret";
+import { DateString } from "../utils/date";
 import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
@@ -388,7 +389,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withDateValidation(
-    dateValidation: string | undefined,
+    dateValidation: DateString | undefined,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, dateValidation });
   }

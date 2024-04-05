@@ -277,10 +277,12 @@ describe("PgEstablishmentAggregateRepository", () => {
               {
                 appellationLabel: "Pilote de machines d'abattage",
                 appellationCode: "17751",
+                score: 0,
               },
               {
                 appellationLabel: "Tractoriste agricole",
                 appellationCode: "20404",
+                score: 0,
               },
             ],
           },
@@ -634,10 +636,12 @@ describe("PgEstablishmentAggregateRepository", () => {
                 analysteEnGeomatiqueImmersionOffer.appellationLabel,
               appellationCode:
                 analysteEnGeomatiqueImmersionOffer.appellationCode,
+              score: analysteEnGeomatiqueImmersionOffer.score,
             },
             {
               appellationLabel: cartographeImmersionOffer.appellationLabel,
               appellationCode: cartographeImmersionOffer.appellationCode,
+              score: cartographeImmersionOffer.score,
             },
           ],
           distance_m: 0,
@@ -1587,6 +1591,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           {
             appellationLabel: "Chef boulanger / boulangère",
             appellationCode: "12006",
+            score: 0,
           },
         ],
         naf: establishment.nafDto.code,

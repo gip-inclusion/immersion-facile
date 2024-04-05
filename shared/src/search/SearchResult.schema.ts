@@ -38,6 +38,7 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
     z.object({
       appellationLabel: z.string(),
       appellationCode: appellationCodeSchema,
+      score: z.number(),
     }),
   ),
   // locationId: zUuidLike,

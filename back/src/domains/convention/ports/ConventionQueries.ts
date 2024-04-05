@@ -12,6 +12,7 @@ export type GetConventionsByFiltersQueries = {
   startDateGreater?: Date;
   startDateLessOrEqual?: Date;
   dateSubmissionEqual?: Date;
+  dateSubmissionSince?: Date;
   withStatuses?: ConventionStatus[];
   withSirets?: SiretDto[];
 };

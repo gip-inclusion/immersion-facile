@@ -26,10 +26,12 @@ export class SimulatedSearchGateway implements SearchGateway {
       {
         appellationCode: "20552",
         appellationLabel: "Aide agricole de production fruitière ou viticole",
+        score: 0,
       },
       {
         appellationCode: "15480",
         appellationLabel: "Ouvrier agricole polyvalent",
+        score: 0,
       },
     ],
     naf: "01.11Z",

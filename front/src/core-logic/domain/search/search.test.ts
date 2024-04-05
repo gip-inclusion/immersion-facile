@@ -39,6 +39,7 @@ const immersionOffer: SearchResultDto = {
     {
       appellationCode: "A1201",
       appellationLabel: "Aide agricole de production fruitière ou viticole",
+      score: 0,
     },
   ],
   naf: "01.11Z",

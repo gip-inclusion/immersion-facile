@@ -125,6 +125,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
         {
           appellationLabel: styliste.appellationLabel,
           appellationCode: styliste.appellationCode,
+          score: 4.5,
         },
       ],
       nafLabel: "NAFRev2",
