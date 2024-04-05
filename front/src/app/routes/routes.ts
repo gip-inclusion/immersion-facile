@@ -24,12 +24,6 @@ const inclusionConnectedParams = createInclusionConnectedParams({
   email: param.query.optional.string,
 });
 
-const establishmentDashboardParams = createInclusionConnectedParams({
-  ...inclusionConnectedParams,
-  tab: param.path.ofType(icUserEstablishmentDashboardTabSerializer),
-  siret: param.query.optional.string,
-});
-
 export const acquisitionParams = {
   mtm_campaign: param.query.optional.string,
   mtm_kwd: param.query.optional.string,
@@ -122,7 +116,13 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.editFormEstablishmentRoute}`,
   ),
   establishmentDashboard: defineRoute(
-    establishmentDashboardParams,
+    {
+      ...inclusionConnectedParams,
+      tab: param.path.optional
+        .ofType(icUserEstablishmentDashboardTabSerializer)
+        .default("conventions"),
+      siret: param.query.optional.string,
+    },
     ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
   ),
   errorRedirect: defineRoute(
