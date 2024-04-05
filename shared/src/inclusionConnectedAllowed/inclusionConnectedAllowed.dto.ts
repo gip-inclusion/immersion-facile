@@ -39,7 +39,7 @@ export type WithEstablismentsSiretAndName = {
   businessName: string;
 };
 
-type WithEstablisments = {
+type WithEstablishments = {
   establishments?: WithEstablismentsSiretAndName[];
 };
 
@@ -68,7 +68,7 @@ export type WithDashboardUrls = {
 export type InclusionConnectedUser = User &
   WithAgencyRights &
   WithDashboardUrls &
-  WithEstablisments;
+  WithEstablishments;
 
 export type WithAgencyIds = {
   agencies: AgencyId[];
