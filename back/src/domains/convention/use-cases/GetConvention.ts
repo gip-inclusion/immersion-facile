@@ -5,12 +5,14 @@ import {
   InclusionConnectJwtPayload,
   WithConventionId,
   getIcUserRoleForAccessingConvention,
+  stringToMd5,
   withConventionIdSchema,
 } from "shared";
 import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
+import { conventionEmailsByRole } from "../../../utils/convention";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -35,6 +37,28 @@ export class GetConvention extends TransactionalUseCase<
       await uow.conventionQueries.getConventionById(conventionId);
     if (!convention)
       throw new NotFoundError(`No convention found with id ${conventionId}`);
+
+    const isConventionDomainPayload = authPayload && "emailHash" in authPayload;
+    if (isConventionDomainPayload) {
+      const agency = await uow.agencyRepository.getById(convention.agencyId);
+      if (!agency) {
+        throw new NotFoundError(`Agency ${convention.agencyId} not found`);
+      }
+      const emailsByRole = conventionEmailsByRole(
+        authPayload.role,
+        convention,
+        agency,
+      )[authPayload.role];
+      if (emailsByRole instanceof Error) throw emailsByRole;
+      const matchingMd5Emails = emailsByRole.find(
+        (email) => authPayload.emailHash === stringToMd5(email),
+      );
+      if (!matchingMd5Emails) {
+        throw new ForbiddenError(
+          `User has no right on convention '${convention.id}'`,
+        );
+      }
+    }
 
     if (isInclusionConnectPayload) {
       const user = await uow.inclusionConnectedUserRepository.getById(
