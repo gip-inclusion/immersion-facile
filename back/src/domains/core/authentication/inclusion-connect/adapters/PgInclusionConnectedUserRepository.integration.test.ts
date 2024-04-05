@@ -197,30 +197,25 @@ describe("PgInclusionConnectedUserRepository", () => {
     });
 
     it("fetches Inclusion Connected Users with status 'toReview'", async () => {
-      await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agency2),
-        insertUser(user1),
-        insertUser(user2),
-      ]);
-
-      await Promise.all([
-        insertAgencyRegistrationToUser({
-          agencyId: agency1.id,
-          userId: user1.id,
-          role: "toReview",
-        }),
-        insertAgencyRegistrationToUser({
-          agencyId: agency2.id,
-          userId: user1.id,
-          role: "validator",
-        }),
-        insertAgencyRegistrationToUser({
-          agencyId: agency2.id,
-          userId: user2.id,
-          role: "toReview",
-        }),
-      ]);
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
+      await insertUser(user1);
+      await insertUser(user2);
+      await insertAgencyRegistrationToUser({
+        agencyId: agency1.id,
+        userId: user1.id,
+        role: "toReview",
+      });
+      await insertAgencyRegistrationToUser({
+        agencyId: agency2.id,
+        userId: user1.id,
+        role: "validator",
+      });
+      await insertAgencyRegistrationToUser({
+        agencyId: agency2.id,
+        userId: user2.id,
+        role: "toReview",
+      });
 
       const icUsers = await icUserRepository.getWithFilter({
         agencyRole: "toReview",
