@@ -73,6 +73,7 @@ export const EditAgencyForm = ({
           dispatch(agencyAdminSlice.actions.updateAgencyRequested(values)),
         )}
         id={domElementIds.admin.agencyTab.editAgencyForm}
+        data-matomo-name={domElementIds.admin.agencyTab.editAgencyForm}
       >
         <div className={fr.cx("fr-mb-4w")}>
           <AgencyFormCommonFields

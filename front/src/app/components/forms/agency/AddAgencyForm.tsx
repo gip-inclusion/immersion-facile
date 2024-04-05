@@ -166,6 +166,7 @@ const AgencyForm = ({
       <form
         onSubmit={handleSubmit(onFormValid)}
         id={domElementIds.addAgency.form}
+        data-matomo-name={domElementIds.addAgency.form}
       >
         <p className={fr.cx("fr-text--xs")}>
           Tous les champs marqués d'une astérisque (*) sont obligatoires.

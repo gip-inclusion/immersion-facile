@@ -323,6 +323,11 @@ export const ConventionForm = ({
                       id={domElementIds.conventionImmersionRoute.form({
                         mode,
                       })}
+                      data-matomo-name={domElementIds.conventionImmersionRoute.form(
+                        {
+                          mode,
+                        },
+                      )}
                     >
                       <ConventionFormFields onSubmit={onSubmit} mode={mode} />
                       <ConventionFeedbackNotification
