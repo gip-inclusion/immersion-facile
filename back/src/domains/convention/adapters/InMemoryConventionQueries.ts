@@ -193,30 +193,36 @@ const makeApplyFiltersToConventions =
     startDateGreater,
     withStatuses,
     dateSubmissionEqual,
+    dateSubmissionSince,
+    withSirets,
   }: GetConventionsByFiltersQueries) =>
-  (convention: ConventionDto) => {
-    if (
-      dateSubmissionEqual &&
-      new Date(convention.dateSubmission).getTime() !==
-        dateSubmissionEqual.getTime()
-    )
-      return false;
+  (convention: ConventionDto) =>
+    (
+      [
+        ({ dateStart }) =>
+          startDateLessOrEqual
+            ? new Date(dateStart) <= startDateLessOrEqual
+            : true,
+        ({ dateStart }) =>
+          startDateGreater ? new Date(dateStart) > startDateGreater : true,
+        ({ dateSubmission }) =>
+          dateSubmissionEqual
+            ? new Date(dateSubmission).getTime() ===
+              dateSubmissionEqual.getTime()
+            : true,
+        ({ dateSubmission }) =>
+          dateSubmissionSince
+            ? new Date(dateSubmission).getTime() >=
+              dateSubmissionSince.getTime()
+            : true,
+        ({ status }) =>
+          withStatuses && withStatuses.length > 0
+            ? withStatuses.includes(status)
+            : true,
 
-    if (
-      startDateLessOrEqual &&
-      new Date(convention.dateStart) > startDateLessOrEqual
-    )
-      return false;
-
-    if (startDateGreater && new Date(convention.dateStart) <= startDateGreater)
-      return false;
-
-    if (
-      withStatuses &&
-      withStatuses.length > 0 &&
-      !withStatuses.includes(convention.status)
-    )
-      return false;
-
-    return true;
-  };
+        ({ siret }) =>
+          withSirets && withSirets.length > 0
+            ? withSirets.includes(siret)
+            : true,
+      ] satisfies Array<(convention: ConventionDto) => boolean>
+    ).every((filter) => filter(convention));

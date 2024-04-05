@@ -14,7 +14,11 @@ export const stubSearchResult: SearchResultDto = {
   position: { lon: 50, lat: 35 },
   romeLabel: "Boucherie",
   appellations: [
-    { appellationLabel: "Boucher / Bouchère", appellationCode: "11564" },
+    {
+      appellationLabel: "Boucher / Bouchère",
+      appellationCode: "11564",
+      score: 0,
+    },
   ],
   naf: "7820Z",
   nafLabel: "Activités des agences de travail temporaire",

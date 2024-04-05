@@ -143,10 +143,12 @@ describe("search route", () => {
               {
                 appellationLabel: offer1.appellationLabel,
                 appellationCode: offer1.appellationCode,
+                score: 4.5,
               },
               {
                 appellationLabel: offer2.appellationLabel,
                 appellationCode: offer2.appellationCode,
+                score: 4.5,
               },
             ],
             siret: "78000403200019",
@@ -255,10 +257,12 @@ describe("search route", () => {
               {
                 appellationLabel: offer1.appellationLabel,
                 appellationCode: offer1.appellationCode,
+                score: 4.5,
               },
               {
                 appellationLabel: offer2.appellationLabel,
                 appellationCode: offer2.appellationCode,
+                score: 4.5,
               },
             ],
             siret,

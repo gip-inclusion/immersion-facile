@@ -1,7 +1,9 @@
+import { subYears } from "date-fns";
 import { prop, propEq } from "ramda";
 import {
   ApiConsumer,
   AppellationCode,
+  DiscussionDto,
   SearchQueryParamsDto,
   SearchResultDto,
   SiretDto,
@@ -100,7 +102,10 @@ export class SearchImmersion extends TransactionalUseCase<
 
     const searchResultsInRepo =
       voluntaryToImmersion !== false
-        ? this.#prepareVoluntaryToImmersionResults(repositorySearchResults)
+        ? await this.#prepareVoluntaryToImmersionResults(
+            repositorySearchResults,
+            uow,
+          )
         : [];
 
     const lbbAllowedResults = lbbSearchResults
@@ -117,11 +122,49 @@ export class SearchImmersion extends TransactionalUseCase<
       );
   }
 
-  #prepareVoluntaryToImmersionResults(
+  async #prepareVoluntaryToImmersionResults(
     results: SearchImmersionResult[],
-  ): SearchResultDto[] {
+    uow: UnitOfWork,
+  ): Promise<SearchResultDto[]> {
+    const oneYearAgo = subYears(this.timeGateway.now(), 1);
+    const sirets = results.map(({ siret }) => siret);
+
+    const discussions = await uow.discussionRepository.getDiscussions({
+      sirets: sirets,
+      createdSince: oneYearAgo,
+    });
+    const conventions = await uow.conventionQueries.getConventionsByFilters({
+      withSirets: sirets,
+      withStatuses: ["ACCEPTED_BY_VALIDATOR"],
+      dateSubmissionSince: oneYearAgo,
+    });
+
     histogramSearchImmersionStoredCount.observe(results.length);
-    return results.map(({ isSearchable: _, ...rest }) => rest);
+    return results
+      .map(({ isSearchable: _, ...rest }) => rest)
+      .map((result) => ({
+        ...result,
+        appellations: result.appellations.map((appellation) => ({
+          ...appellation,
+          score:
+            appellation.score +
+            this.#makeEstablishmentResponseRate(
+              discussions.filter(({ siret }) => siret === result.siret),
+            ) +
+            conventions.filter(({ siret }) => siret === result.siret).length *
+              10,
+        })),
+      }));
+  }
+
+  #makeEstablishmentResponseRate(discussionsForSiret: DiscussionDto[]): number {
+    return discussionsForSiret.length === 0
+      ? 0
+      : (discussionsForSiret.filter((discussion) =>
+          discussion.exchanges.some(({ sender }) => sender === "establishment"),
+        ).length /
+          discussionsForSiret.length) *
+          100;
   }
 
   async #searchOnLbb(

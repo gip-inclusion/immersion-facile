@@ -1,6 +1,6 @@
 import { Pool, PoolClient } from "pg";
 import {
-  AppellationDto,
+  AppellationWithScoreDto,
   Group,
   GroupOptions,
   Location,
@@ -189,7 +189,7 @@ describe("PgEstablishmentGroupRepository", () => {
       location,
     }: {
       establishment: EstablishmentEntity;
-      appellations: AppellationDto[];
+      appellations: AppellationWithScoreDto[];
       rome: string;
       romeLabel: string;
       location: Location;
@@ -225,6 +225,7 @@ describe("PgEstablishmentGroupRepository", () => {
             {
               appellationLabel: "Boucher / Bouchère",
               appellationCode: "11564",
+              score: 0,
             },
           ],
           location: establishment1.locations[0],
@@ -237,10 +238,12 @@ describe("PgEstablishmentGroupRepository", () => {
             {
               appellationLabel: "Aide-boulanger / Aide-boulangère",
               appellationCode: "10868",
+              score: 0,
             },
             {
               appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
               appellationCode: "11574",
+              score: 0,
             },
           ],
           location: establishment1.locations[0],
@@ -253,6 +256,7 @@ describe("PgEstablishmentGroupRepository", () => {
             {
               appellationLabel: "Vendeur / Vendeuse en alimentation générale",
               appellationCode: "20540",
+              score: 0,
             },
           ],
           location: establishment2.locations[0],
@@ -265,6 +269,7 @@ describe("PgEstablishmentGroupRepository", () => {
             {
               appellationLabel: "Vendeur / Vendeuse en alimentation générale",
               appellationCode: "20540",
+              score: 0,
             },
           ],
           location: establishment2.locations[1],

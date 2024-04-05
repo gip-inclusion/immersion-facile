@@ -26,6 +26,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Designer industriel / Designeuse industrielle",
         appellationCode: "14000",
+        score: 0,
       },
     ],
     naf: "6820B",
@@ -57,6 +58,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Conseiller sportif / Conseillère sportive",
         appellationCode: "13480",
+        score: 0,
       },
     ],
     naf: "4764Z",
@@ -87,6 +89,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
+        score: 0,
       },
     ],
     naf: "4764Z",
@@ -117,6 +120,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
+        score: 0,
       },
     ],
     naf: "4764Z",
@@ -147,6 +151,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
+        score: 0,
       },
     ],
     naf: "4764Z",
@@ -177,6 +182,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Hôte / Hôtesse de caisse services clients",
         appellationCode: "38655",
+        score: 0,
       },
     ],
     naf: "4764Z",
@@ -207,6 +213,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
+        score: 0,
       },
     ],
     naf: "4764Z",
@@ -238,6 +245,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
+        score: 0,
       },
     ],
     naf: "4764Z",
@@ -269,18 +277,22 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Aide-magasinier / Aide-magasinière",
         appellationCode: "10880",
+        score: 0,
       },
       {
         appellationLabel: "Magasinier / Magasinière",
         appellationCode: "16276",
+        score: 0,
       },
       {
         appellationLabel: "Magasinier / Magasinière cariste",
         appellationCode: "16277",
+        score: 0,
       },
       {
         appellationLabel: "Préparateur / Préparatrice de commandes",
         appellationCode: "17993",
+        score: 0,
       },
     ],
     naf: "5210B",
@@ -330,10 +342,12 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Facteur / Factrice",
         appellationCode: "15044",
+        score: 0,
       },
       {
         appellationLabel: "Développeur / Développeuse web",
         appellationCode: "14156",
+        score: 0,
       },
     ],
     nafLabel: "Métallurgie",
@@ -406,10 +420,12 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Facteur / Factrice",
         appellationCode: "15044",
+        score: 0,
       },
       {
         appellationLabel: "Développeur / Développeuse web",
         appellationCode: "14156",
+        score: 0,
       },
     ],
     nafLabel: "",
@@ -449,7 +465,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 7086.36203317,
     customizedName: "SASU",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -478,6 +498,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -504,7 +525,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 2891.57824012,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -533,6 +558,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -561,6 +587,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -587,7 +614,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SARL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -612,7 +643,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 4738.4779907,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -641,6 +676,7 @@ export const seedSearchResults: SearchResultDto[] = [
         appellationLabel:
           "Boulanger-pâtissier-traiteur / Boulangère-pâtissière-traiteuse",
         appellationCode: "11575",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -670,6 +706,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -695,7 +732,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 4839.42843775,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -723,6 +764,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -752,6 +794,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -781,6 +824,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -810,6 +854,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -835,7 +880,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 3109.76403522,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -863,6 +912,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -889,7 +939,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 2261.23388227,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -915,7 +969,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SAS",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -941,7 +999,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "EI",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -969,6 +1031,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -997,6 +1060,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1023,7 +1087,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SASU",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1049,7 +1117,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SARL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1075,7 +1147,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SAS",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1100,7 +1176,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 5843.64091263,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1125,7 +1205,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 3660.04835307,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1151,7 +1235,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "EI",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1180,6 +1268,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1209,6 +1298,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1234,7 +1324,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 6902.11262242,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1262,6 +1356,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1291,6 +1386,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1316,7 +1412,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 5035.87465645,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1342,10 +1442,15 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SARL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1374,6 +1479,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1403,6 +1509,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1428,7 +1535,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 1070.19516661,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1454,7 +1565,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SAS",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1480,7 +1595,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SAS",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1506,7 +1625,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "EURL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1535,6 +1658,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1561,7 +1685,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SARL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1587,7 +1715,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SASU",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1613,7 +1745,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "EURL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1638,7 +1774,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 2867.69681386,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1667,6 +1807,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1696,6 +1837,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1722,7 +1864,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SARL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1750,6 +1896,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1776,7 +1923,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 3278.35339437,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1804,6 +1955,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1833,6 +1985,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1862,6 +2015,7 @@ export const seedSearchResults: SearchResultDto[] = [
         appellationLabel:
           "Boulanger-pâtissier-traiteur / Boulangère-pâtissière-traiteuse",
         appellationCode: "11575",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1888,7 +2042,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 4812.97222357,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1914,7 +2072,11 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "EMAIL",
     customizedName: "SARL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -1942,6 +2104,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1970,6 +2133,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1999,6 +2163,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2027,6 +2192,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2057,6 +2223,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2082,7 +2249,11 @@ export const seedSearchResults: SearchResultDto[] = [
     distance_m: 4164.25129854,
     contactMode: "EMAIL",
     appellations: [
-      { appellationLabel: "Boulanger / Boulangère", appellationCode: "11573" },
+      {
+        appellationLabel: "Boulanger / Boulangère",
+        appellationCode: "11573",
+        score: 0,
+      },
     ],
     voluntaryToImmersion: true,
     additionalInformation: "",
@@ -2111,6 +2282,7 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
+        score: 0,
       },
     ],
     voluntaryToImmersion: true,

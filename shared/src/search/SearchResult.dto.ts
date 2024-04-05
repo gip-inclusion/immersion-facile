@@ -7,10 +7,12 @@ import {
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 
+export type AppellationWithScoreDto = AppellationDto & { score: number };
+
 export type SearchResultDto = {
   rome: RomeCode;
   romeLabel: string;
-  appellations: AppellationDto[];
+  appellations: AppellationWithScoreDto[];
   naf: string;
   nafLabel: string;
   siret: SiretDto;

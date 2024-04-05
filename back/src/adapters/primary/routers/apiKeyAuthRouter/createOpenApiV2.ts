@@ -63,11 +63,13 @@ const searchImmersionResult: SearchResultDto = {
     {
       appellationCode: "19540",
       appellationLabel: "Styliste",
+      score: 0,
     },
     {
       appellationCode: "12831",
       appellationLabel:
         "Concepteur / Conceptrice maquettiste en accessoires de mode",
+      score: 0,
     },
   ],
   contactMode: "EMAIL",
