@@ -277,12 +277,12 @@ describe("PgEstablishmentAggregateRepository", () => {
               {
                 appellationLabel: "Pilote de machines d'abattage",
                 appellationCode: "17751",
-                score: 0,
+                score: 4.5,
               },
               {
                 appellationLabel: "Tractoriste agricole",
                 appellationCode: "20404",
-                score: 0,
+                score: 4.5,
               },
             ],
           },
@@ -1591,7 +1591,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           {
             appellationLabel: "Chef boulanger / boulangère",
             appellationCode: "12006",
-            score: 0,
+            score: 4.5,
           },
         ],
         naf: establishment.nafDto.code,

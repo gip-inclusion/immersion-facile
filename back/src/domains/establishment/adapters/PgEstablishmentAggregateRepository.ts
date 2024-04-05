@@ -1044,7 +1044,8 @@ const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
 const buildAppellationsArray = `JSON_AGG(
   JSON_BUILD_OBJECT(
     'appellationCode', ogr_appellation::text,
-    'appellationLabel', libelle_appellation_long
+    'appellationLabel', libelle_appellation_long,
+    'score', io.score
   )
   ORDER BY ogr_appellation
 )`;

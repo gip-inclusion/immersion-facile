@@ -14,14 +14,6 @@ import {
 import { GroupEntity } from "../entities/GroupEntity";
 import { GroupRepository } from "../ports/GroupRepository";
 
-const buildAppellationsArray = `JSON_AGG(
-    JSON_BUILD_OBJECT(
-      'appellationCode', ogr_appellation::text,
-      'appellationLabel', libelle_appellation_long
-    )
-    ORDER BY ogr_appellation
-  )`;
-
 export class PgGroupRepository implements GroupRepository {
   constructor(private transaction: KyselyDb) {}
 
@@ -65,7 +57,14 @@ export class PgGroupRepository implements GroupRepository {
         'fitForDisabledWorkers', e.fit_for_disabled_workers,
         'position', JSON_BUILD_OBJECT('lon', loc.lon, 'lat', loc.lat), 
         'romeLabel', r.libelle_rome,
-        'appellations',  ${buildAppellationsArray},
+        'appellations',  JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'appellationCode', ogr_appellation::text,
+            'appellationLabel', libelle_appellation_long,
+            'score', io.score
+          )
+          ORDER BY ogr_appellation
+        ),
         'naf', e.naf_code,
         'nafLabel', public_naf_classes_2008.class_label,
         'address', JSON_BUILD_OBJECT(

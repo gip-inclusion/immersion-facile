@@ -1,5 +1,6 @@
 import type { InsertObject } from "kysely";
 import { sql } from "kysely";
+import { keys } from "ramda";
 import {
   ContactMethod,
   DiscussionDto,
@@ -16,6 +17,7 @@ import {
 import { Database } from "../../../config/pg/kysely/model/database";
 import {
   DiscussionRepository,
+  GetDiscusionsParams,
   HasDiscussionMatchingParams,
 } from "../ports/DiscussionRepository";
 
@@ -33,8 +35,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .where("created_at", ">=", since)
       .executeTakeFirst();
 
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    return parseInt(result!.count);
+    return result ? parseInt(result.count) : 0;
   }
 
   public async deleteOldMessages(endedSince: Date) {
@@ -52,11 +53,93 @@ export class PgDiscussionRepository implements DiscussionRepository {
   public async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionDto | undefined> {
-    const pgResult = await this.transaction
+    const pgResult = await this.#makeDiscussionQueryBuilder()
+      .where("id", "=", discussionId)
+      .executeTakeFirst();
+
+    return pgResult
+      ? this.#makeDiscussionDtoFromPgDiscussion(pgResult.discussion)
+      : undefined;
+  }
+
+  public async getDiscussions(
+    params: GetDiscusionsParams,
+  ): Promise<DiscussionDto[]> {
+    if (keys(params).length === 0)
+      throw new Error("At least one filter mandatory");
+
+    const pgResults = await pipeWithValue(
+      this.#makeDiscussionQueryBuilder(),
+      (builder) =>
+        params.createdSince
+          ? builder.where("discussions.created_at", ">=", params.createdSince)
+          : builder,
+      (builder) =>
+        params.sirets
+          ? builder.where("discussions.siret", "in", params.sirets)
+          : builder,
+    ).execute();
+
+    return pgResults.map(({ discussion }) =>
+      this.#makeDiscussionDtoFromPgDiscussion(discussion),
+    );
+  }
+
+  #makeDiscussionDtoFromPgDiscussion(discussion: {
+    id: string;
+    createdAt: Date;
+    siret: string;
+    businessName: string;
+    appellationCode: string;
+    immersionObjective:
+      | "Confirmer un projet professionnel"
+      | "Découvrir un métier ou un secteur d'activité"
+      | "Initier une démarche de recrutement"
+      | undefined;
+    potentialBeneficiary: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone: string | undefined;
+      resumeLink: string | undefined;
+    };
+    establishmentContact: {
+      contactMethod: "EMAIL" | "PHONE" | "IN_PERSON";
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone: string;
+      job: string;
+      copyEmails: string[];
+    };
+    address: {
+      streetNumberAndAddress: string;
+      postcode: string;
+      departmentCode: string;
+      city: string;
+    };
+    exchanges: Exchange[] | undefined;
+  }): DiscussionDto {
+    return (
+      discussion && {
+        ...discussion,
+        createdAt: new Date(discussion.createdAt).toISOString(),
+        immersionObjective: discussion.immersionObjective ?? null,
+        exchanges: discussion.exchanges
+          ? discussion.exchanges.map((exchange) => ({
+              ...exchange,
+              sentAt: new Date(exchange.sentAt).toISOString(),
+            }))
+          : [],
+      }
+    );
+  }
+
+  #makeDiscussionQueryBuilder() {
+    return this.transaction
       .with("exchanges_by_id", (db) =>
         db
           .selectFrom("exchanges")
-          .where("discussion_id", "=", discussionId)
           .groupBy("discussion_id")
           .select(({ ref, fn }) => [
             "discussion_id",
@@ -75,7 +158,6 @@ export class PgDiscussionRepository implements DiscussionRepository {
       )
       .selectFrom("discussions")
       .leftJoin("exchanges_by_id", "discussion_id", "id")
-      .where("id", "=", discussionId)
       .select((qb) => [
         jsonStripNulls(
           jsonBuildObject({
@@ -114,25 +196,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
             exchanges: qb.ref("exchanges"),
           }),
         ).as("discussion"),
-      ])
-      .executeTakeFirst();
-
-    if (!pgResult) return;
-    const { discussion } = pgResult;
-
-    return (
-      discussion && {
-        ...discussion,
-        createdAt: new Date(discussion.createdAt).toISOString(),
-        immersionObjective: discussion.immersionObjective ?? null,
-        exchanges: discussion.exchanges
-          ? discussion.exchanges.map((exchange) => ({
-              ...exchange,
-              sentAt: new Date(exchange.sentAt).toISOString(),
-            }))
-          : [],
-      }
-    );
+      ]);
   }
 
   public async hasDiscussionMatching({
@@ -153,7 +217,6 @@ export class PgDiscussionRepository implements DiscussionRepository {
               appellationCode
                 ? builder.where("appellation_code", "=", +appellationCode)
                 : builder,
-
             (builder) =>
               since ? builder.where("created_at", ">=", since) : builder,
             (builder) =>
