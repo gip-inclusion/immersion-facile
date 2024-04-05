@@ -7,6 +7,7 @@ import {
   InclusionConnectedUser,
   expectPromiseToFailWithError,
   expectToEqual,
+  stringToMd5,
 } from "shared";
 import {
   ForbiddenError,
@@ -76,6 +77,25 @@ describe("Get Convention", () => {
           ),
           new ForbiddenError(
             `User with id 'my-user-id' is not allowed to access convention with id '${convention.id}'`,
+          ),
+        );
+      });
+
+      it("When the user email is not used in the convention anymore", async () => {
+        uow.agencyRepository.setAgencies([agency]);
+        uow.conventionRepository.setConventions([convention]);
+        const payload: ConventionJwtPayload = {
+          role: "validator",
+          emailHash: "oldHash",
+          applicationId: convention.id,
+          iat: 1,
+          version: 1,
+        };
+
+        await expectPromiseToFailWithError(
+          getConvention.execute({ conventionId: convention.id }, payload),
+          new ForbiddenError(
+            `User has no right on convention '${convention.id}'`,
           ),
         );
       });
@@ -182,7 +202,9 @@ describe("Get Convention", () => {
     it("with ConventionJwtPayload", async () => {
       const payload: ConventionJwtPayload = {
         role: "establishment-representative",
-        emailHash: "",
+        emailHash: stringToMd5(
+          convention.signatories.establishmentRepresentative.email,
+        ),
         applicationId: convention.id,
         iat: 1,
         version: 1,
