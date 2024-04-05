@@ -377,6 +377,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         <form
           onSubmit={handleSubmit(onSubmit)}
           id={domElementIds.establishment[mode].form}
+          data-matomo-name={domElementIds.establishment[mode].form}
         >
           {match(currentStep)
             .with(null, () => (
