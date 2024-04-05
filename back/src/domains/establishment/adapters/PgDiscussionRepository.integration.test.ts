@@ -5,6 +5,7 @@ import {
   DiscussionBuilder,
   DiscussionDto,
   WithAcquisition,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
@@ -13,7 +14,10 @@ import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { HasDiscussionMatchingParams } from "../ports/DiscussionRepository";
+import {
+  GetDiscusionsParams,
+  HasDiscussionMatchingParams,
+} from "../ports/DiscussionRepository";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
@@ -75,111 +79,143 @@ describe("PgDiscussionRepository", () => {
   it.each([
     {
       discussion: discussionWithExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         siret: discussionWithExchanges.siret,
         appellationCode: discussionWithExchanges.appellationCode,
         potentialBeneficiaryEmail:
           discussionWithExchanges.potentialBeneficiary.email,
         since: discussionCreatedAt,
       },
-      expectedResult: true,
+      hasDiscussionMatchingResult: true,
       testName: "discussion with exchange",
+      getDiscussionsParams: {
+        sirets: [discussionWithExchanges.siret],
+      },
+      getDiscussionsResults: [discussionWithExchanges],
     },
     {
       discussion: discussionWithExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         siret: discussionWithExchanges.siret,
         appellationCode: discussionWithExchanges.appellationCode,
         potentialBeneficiaryEmail:
           discussionWithExchanges.potentialBeneficiary.email,
         since: addDays(discussionCreatedAt, 1),
       },
-      expectedResult: false,
+      hasDiscussionMatchingResult: false,
       testName: "discussion with exchange with match since creation date +1",
+      getDiscussionsParams: {
+        createdSince: new Date(discussionWithExchanges.createdAt),
+      },
+      getDiscussionsResults: [discussionWithExchanges],
     },
     {
       discussion: discussionWithoutExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         siret: discussionWithExchanges.siret,
         appellationCode: discussionWithExchanges.appellationCode,
         potentialBeneficiaryEmail:
           discussionWithExchanges.potentialBeneficiary.email,
         since: discussionCreatedAt,
       },
-      expectedResult: true,
+      hasDiscussionMatchingResult: true,
       testName: "discussion without exchange initialy",
+      getDiscussionsParams: {},
+      getDiscussionsResults: new Error("At least one filter mandatory"),
     },
     {
       discussion: discussionWithoutExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         siret: discussionWithExchanges.siret,
         appellationCode: discussionWithExchanges.appellationCode,
         potentialBeneficiaryEmail:
           discussionWithExchanges.potentialBeneficiary.email,
         since: addDays(discussionCreatedAt, 1),
       },
-      expectedResult: false,
+      hasDiscussionMatchingResult: false,
       testName:
         "discussion without exchange initialy with match since creation date +1",
+      getDiscussionsParams: {},
+      getDiscussionsResults: new Error("At least one filter mandatory"),
     },
     {
       discussion: discussionWithExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         siret: discussionWithExchanges.siret,
       },
-      expectedResult: true,
+      hasDiscussionMatchingResult: true,
       testName: "match with Siret",
+      getDiscussionsParams: {},
+      getDiscussionsResults: new Error("At least one filter mandatory"),
     },
     {
       discussion: discussionWithExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         siret: "00000000000000",
       },
-      expectedResult: false,
+      hasDiscussionMatchingResult: false,
       testName: "don't match with Siret",
+      getDiscussionsParams: {},
+      getDiscussionsResults: new Error("At least one filter mandatory"),
     },
     {
       discussion: discussionWithExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         appellationCode: discussionWithExchanges.appellationCode,
       },
-      expectedResult: true,
+      hasDiscussionMatchingResult: true,
       testName: "match with appellationCode",
+      getDiscussionsParams: {},
+      getDiscussionsResults: new Error("At least one filter mandatory"),
     },
     {
       discussion: discussionWithExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         potentialBeneficiaryEmail:
           discussionWithExchanges.potentialBeneficiary.email,
       },
-      expectedResult: true,
+      hasDiscussionMatchingResult: true,
       testName: "match with potentialBeneficiaryEmail",
+      getDiscussionsParams: {},
+      getDiscussionsResults: new Error("At least one filter mandatory"),
     },
     {
       discussion: discussionWithExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         since: discussionCreatedAt,
       },
-      expectedResult: true,
+      hasDiscussionMatchingResult: true,
       testName: "match with since",
+      getDiscussionsParams: {},
+      getDiscussionsResults: new Error("At least one filter mandatory"),
     },
     {
       discussion: discussionWithExchanges,
-      testFilters: {
+      hasDiscussionMatchingParams: {
         establishmentRepresentativeEmail:
           discussionWithExchanges.establishmentContact.email.toUpperCase(),
       },
-      expectedResult: true,
+      hasDiscussionMatchingResult: true,
       testName: "match with establishmentRepresentativeEmail",
+      getDiscussionsParams: {},
+      getDiscussionsResults: new Error("At least one filter mandatory"),
     },
   ] satisfies {
     discussion: DiscussionDto;
-    testFilters: Partial<HasDiscussionMatchingParams>;
-    expectedResult: boolean;
+    hasDiscussionMatchingParams: Partial<HasDiscussionMatchingParams>;
+    hasDiscussionMatchingResult: boolean;
+    getDiscussionsParams: GetDiscusionsParams;
+    getDiscussionsResults: DiscussionDto[] | Error;
     testName: string;
   }[])(
     "Methode insert, update, getById and hasDiscussionMatching $testName",
-    async ({ discussion, testFilters, expectedResult }) => {
+    async ({
+      discussion,
+      hasDiscussionMatchingParams,
+      hasDiscussionMatchingResult,
+      getDiscussionsParams,
+      getDiscussionsResults,
+    }) => {
       expectToEqual(
         await pgDiscussionRepository.getById(discussion.id),
         undefined,
@@ -190,6 +226,16 @@ describe("PgDiscussionRepository", () => {
         await pgDiscussionRepository.getById(discussion.id),
         discussion,
       );
+
+      getDiscussionsResults instanceof Error
+        ? expectPromiseToFailWithError(
+            pgDiscussionRepository.getDiscussions(getDiscussionsParams),
+            getDiscussionsResults,
+          )
+        : expectToEqual(
+            await pgDiscussionRepository.getDiscussions(getDiscussionsParams),
+            getDiscussionsResults,
+          );
 
       const updatedDiscussion1: DiscussionDto = new DiscussionBuilder(
         discussion,
@@ -222,9 +268,12 @@ describe("PgDiscussionRepository", () => {
         updatedDiscussion2,
       );
 
-      expect(
-        await pgDiscussionRepository.hasDiscussionMatching(testFilters),
-      ).toBe(expectedResult);
+      expectToEqual(
+        await pgDiscussionRepository.hasDiscussionMatching(
+          hasDiscussionMatchingParams,
+        ),
+        hasDiscussionMatchingResult,
+      );
     },
   );
 
