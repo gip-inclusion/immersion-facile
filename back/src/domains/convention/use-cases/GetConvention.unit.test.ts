@@ -5,8 +5,10 @@ import {
   ConventionJwtPayload,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
+  Role,
   expectPromiseToFailWithError,
   expectToEqual,
+  stringToMd5,
 } from "shared";
 import {
   ForbiddenError,
@@ -79,6 +81,33 @@ describe("Get Convention", () => {
           ),
         );
       });
+
+      it.each([
+        "validator",
+        "beneficiary",
+        "counsellor",
+        "establishment-representative",
+      ] as const)(
+        "When the user email for role %s is not used in the convention anymore",
+        async (role: Role) => {
+          uow.agencyRepository.setAgencies([agency]);
+          uow.conventionRepository.setConventions([convention]);
+          const payload: ConventionJwtPayload = {
+            role,
+            emailHash: "oldHash",
+            applicationId: convention.id,
+            iat: 1,
+            version: 1,
+          };
+
+          await expectPromiseToFailWithError(
+            getConvention.execute({ conventionId: convention.id }, payload),
+            new ForbiddenError(
+              `User has no right on convention '${convention.id}'`,
+            ),
+          );
+        },
+      );
     });
 
     describe("Not found error", () => {
@@ -182,7 +211,9 @@ describe("Get Convention", () => {
     it("with ConventionJwtPayload", async () => {
       const payload: ConventionJwtPayload = {
         role: "establishment-representative",
-        emailHash: "",
+        emailHash: stringToMd5(
+          convention.signatories.establishmentRepresentative.email,
+        ),
         applicationId: convention.id,
         iat: 1,
         version: 1,

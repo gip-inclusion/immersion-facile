@@ -1,6 +1,5 @@
 import { TokenExpiredError, decode } from "jsonwebtoken";
 import {
-  AgencyDto,
   ConventionDto,
   ConventionId,
   ConventionJwtPayload,
@@ -19,6 +18,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
+import { conventionEmailsByRole } from "../../../utils/convention";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -232,31 +232,3 @@ const extractDataFromExpiredJwt: (payload: any) => LinkRenewData = (
         applicationId: payload.applicationId,
         emailHash: payload.emailHash,
       };
-
-const conventionEmailsByRole = (
-  role: Role,
-  convention: ConventionDto,
-  agency: AgencyDto,
-): Record<Role, string[] | Error> => ({
-  backOffice: new BadRequestError("Le backoffice n'a pas de liens magiques."),
-  beneficiary: [convention.signatories.beneficiary.email],
-  "beneficiary-current-employer": convention.signatories
-    .beneficiaryCurrentEmployer
-    ? [convention.signatories.beneficiaryCurrentEmployer.email]
-    : new BadRequestError(
-        "There is no beneficiaryCurrentEmployer on convention.",
-      ),
-  "beneficiary-representative": convention.signatories.beneficiaryRepresentative
-    ? [convention.signatories.beneficiaryRepresentative.email]
-    : new BadRequestError(
-        "There is no beneficiaryRepresentative on convention.",
-      ),
-  counsellor: agency.counsellorEmails,
-  validator: agency.validatorEmails,
-  "establishment-representative": [
-    convention.signatories.establishmentRepresentative.email,
-  ],
-  "establishment-tutor": new BadRequestError(
-    `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
-  ),
-});
