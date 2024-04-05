@@ -132,7 +132,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const { handleSubmit, getValues, reset, trigger } = methods;
 
   const formValues = getValues();
-  const currentRoute = useRef(route);
+  const currentRoute = isEstablishmentDashboard ? route : useRef(route).current;
 
   const debouncedFormValues = useDebounce(formValues);
 
@@ -168,7 +168,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   );
 
   useEffect(() => {
-    match({ route: currentRoute.current, adminJwt, inclusionConnectedJwt })
+    match({ route: currentRoute, adminJwt, inclusionConnectedJwt })
       .with(
         {
           route: {
@@ -238,7 +238,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
-  }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute.current]);
+  }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute]);
 
   useEffect(() => {
     reset({
