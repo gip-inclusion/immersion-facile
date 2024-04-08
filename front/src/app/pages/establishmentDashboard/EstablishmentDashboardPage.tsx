@@ -1,12 +1,16 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Select from "@codegouvfr/react-dsfr/SelectNext";
+import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import React, { useState } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { EstablishmentRole, InclusionConnectedUser } from "shared";
+import {
+  EstablishmentRole,
+  InclusionConnectedUser,
+  WithEstablismentsSiretAndName,
+} from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -47,6 +51,13 @@ export const EstablishmentDashboardPage = ({
   const dispatch = useDispatch();
   const [showEstablishmentForm, setShowEstablishmentForm] =
     useState<boolean>(false);
+
+  const establishmentOptions: SelectProps.Option<
+    WithEstablismentsSiretAndName["siret"]
+  >[] = (currentUser?.establishments || []).map((establishment) => ({
+    value: establishment.siret,
+    label: `${establishment.businessName}`,
+  }));
 
   const establishmentDashboardTabs = (
     currentUser: InclusionConnectedUser,
@@ -118,12 +129,7 @@ export const EstablishmentDashboardPage = ({
                 >
                   <Select
                     label={"Sélectionner un établissement"}
-                    options={[
-                      ...currentUser.establishments.map((establishment) => ({
-                        value: establishment.siret,
-                        label: `${establishment.businessName}`,
-                      })),
-                    ]}
+                    options={establishmentOptions}
                     placeholder="Sélectionner un établissement"
                     nativeSelectProps={{
                       defaultValue: "",

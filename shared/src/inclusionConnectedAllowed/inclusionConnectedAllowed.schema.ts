@@ -3,7 +3,6 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencySchema } from "../agency/agency.schema";
 import { discussionIdSchema } from "../discussion/discussion.schema";
 import { emailSchema } from "../email/email.schema";
-import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
 import { withSourcePageSchema } from "../inclusionConnect/inclusionConnect.schema";
 import { establishmentsRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
@@ -14,6 +13,7 @@ import {
   InclusionConnectedUser,
   UserId,
   WithDiscussionId,
+  WithEstablismentsSiretAndName,
   allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
 
@@ -29,6 +29,12 @@ export const withDiscussionSchemaId: z.Schema<WithDiscussionId> = z.object({
 });
 
 export const userIdSchema: z.Schema<UserId> = zTrimmedString;
+
+const withEstablishmentSiretAndName: z.Schema<WithEstablismentsSiretAndName> =
+  z.object({
+    siret: siretSchema,
+    businessName: zStringMinLength1,
+  });
 
 export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
   z.object({
@@ -50,7 +56,7 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
       discussions: absoluteUrlSchema.optional(),
       editEstablishment: siretSchema.optional(),
     }),
-    establishments: z.array(formEstablishmentSchema).optional(),
+    establishments: z.array(withEstablishmentSiretAndName).optional(),
   });
 
 export const getInclusionConnectLogoutUrlQueryParamsSchema: z.Schema<GetInclusionConnectLogoutUrlQueryParams> =
