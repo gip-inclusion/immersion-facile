@@ -360,17 +360,26 @@ export class PgEstablishmentAggregateRepository
     appellationCode: AppellationCode,
     locationId: LocationId,
   ): Promise<SearchResultDto | undefined> {
+    const subQuery = `
+      SELECT 
+        siret,
+        io.rome_code,
+        prd.libelle_rome as rome_label,
+        ${buildAppellationsArray},
+        null AS distance_m,
+        1 AS row_number,
+        loc.*,
+        loc.id AS location_id
+      FROM immersion_offers AS io
+      LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
+      LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+      LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
+      WHERE io.siret = $1 AND io.appellation_code = $2 AND loc.id = $3
+      GROUP BY (siret, io.rome_code, prd.libelle_rome, location_id)`;
+
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        `
-        SELECT siret, io.rome_code, prd.libelle_rome as rome_label, ${buildAppellationsArray} AS appellations, null AS distance_m, 1 AS row_number, loc.*, loc.id AS location_id
-        FROM immersion_offers AS io
-        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
-        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
-        LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
-        WHERE io.siret = $1 AND io.appellation_code = $2 AND loc.id = $3
-        GROUP BY (siret, io.rome_code, prd.libelle_rome, location_id)
-        `,
+        subQuery,
         [siret, appellationCode, locationId],
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
@@ -509,20 +518,18 @@ export class PgEstablishmentAggregateRepository
       : "";
     const sortExpression = makeOrderByStatement(searchMade.sortedBy);
     const selectedOffersSubQuery = format(
-      `WITH active_establishments_within_area AS (
+      `WITH
+        active_establishments_within_area AS (
           SELECT siret, fit_for_disabled_workers, loc.*
           FROM establishments e
-            LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
+          LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
           WHERE is_open 
           ${andSearchableByFilter}
-            AND ST_DWithin(loc.position, ST_GeographyFromText($1), $2)
+          AND ST_DWithin(loc.position, ST_GeographyFromText($1), $2)
         ),
         matching_offers AS (
           SELECT 
-            aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(aewa.position, ST_GeographyFromText($1)) AS distance_m,
-            ${buildAppellationsArray} AS appellations,
-            MAX(created_at) AS max_created_at, 
-            fit_for_disabled_workers,
+            aewa.siret, 
             aewa.position,
             aewa.lat,
             aewa.lon,
@@ -530,16 +537,28 @@ export class PgEstablishmentAggregateRepository
             aewa.street_number_and_address,
             aewa.department_code,
             aewa.post_code,
-            aewa.id as location_id
+            aewa.id as location_id,
+            rome_code, 
+            prd.libelle_rome AS rome_label, 
+            ST_Distance(aewa.position, ST_GeographyFromText($1)) AS distance_m,
+            fit_for_disabled_workers,
+            ${buildAppellationsArray},
+            MAX(created_at) AS max_created_at,
+            MAX(io.score) AS max_score
           FROM active_establishments_within_area aewa 
-            LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
-            LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
-            LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-            ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
-            GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
+          LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
+          LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
+          LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
+          ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
+          GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
               aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id)
-          )
-        SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
+        )
+        SELECT *, 
+        (
+          ROW_NUMBER () OVER (${sortExpression})
+        )::integer AS row_number 
+        FROM matching_offers
+        ${sortExpression}
         LIMIT $3`,
       romeCodes,
     ); // Formats optional litterals %1$L
@@ -967,6 +986,8 @@ const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
       return "ORDER BY distance_m ASC, RANDOM()";
     case "date":
       return "ORDER BY max_created_at DESC, RANDOM()";
+    case "score":
+      return "ORDER BY max_score DESC, RANDOM()";
     default: // undefined
       return "ORDER BY RANDOM()";
   }
@@ -974,45 +995,51 @@ const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m
 ) => `
-      WITH unique_establishments_contacts AS ( SELECT DISTINCT ON (siret) siret, uuid FROM establishments_contacts ), 
-           match_immersion_offer AS (${selectedOffersSubQuery}),
-          ${withEstablishmentAggregateSubQuery}
-      SELECT 
-      row_number,
-      JSON_STRIP_NULLS(
-        JSON_BUILD_OBJECT(
-          'rome', io.rome_code, 
-          'siret', io.siret, 
-          'distance_m', io.distance_m, 
-          'isSearchable',e.is_searchable,
-          'nextAvailabilityDate', date_to_iso(e.next_availability_date),
-          'name', e.name, 
-          'website', e.website, 
-          'additionalInformation', e.additional_information, 
-          'customizedName', e.customized_name, 
-          'fitForDisabledWorkers', e.fit_for_disabled_workers,
-          'romeLabel', io.rome_label,
-          'appellations',  io.appellations,
-          'naf', e.naf_code,
-          'nafLabel', public_naf_classes_2008.class_label,
-          'address', JSON_BUILD_OBJECT(
-            'streetNumberAndAddress', io.street_number_and_address, 
-            'postcode', io.post_code,
-            'city', io.city,
-            'departmentCode', io.department_code
-            ),
-          'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat), 
-          'locationId', io.location_id,
-          'contactMode', ec.contact_mode,
-          'numberOfEmployeeRange', e.number_employees
-        ) 
-      ) AS search_immersion_result
-      FROM match_immersion_offer AS io 
-      LEFT JOIN establishments AS e ON e.siret = io.siret  
-      LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = e.siret
-      LEFT JOIN establishments_contacts AS ec ON ec.uuid = uec.uuid
-      ORDER BY row_number ASC, io.location_id ASC; `;
+WITH 
+  unique_establishments_contacts AS ( 
+    SELECT DISTINCT ON (siret) siret, uuid 
+    FROM establishments_contacts
+  ), 
+  match_immersion_offer AS (
+    ${selectedOffersSubQuery}
+  ),
+  ${withEstablishmentAggregateSubQuery}
+  SELECT 
+  row_number,
+  JSON_STRIP_NULLS(
+      JSON_BUILD_OBJECT(
+        'rome', io.rome_code,
+        'siret', io.siret,
+        'distance_m', io.distance_m,
+        'isSearchable',e.is_searchable,
+        'nextAvailabilityDate', date_to_iso(e.next_availability_date),
+        'name', e.name,
+        'website', e.website,
+        'additionalInformation', e.additional_information,
+        'customizedName', e.customized_name,
+        'fitForDisabledWorkers', e.fit_for_disabled_workers,
+        'romeLabel', io.rome_label,
+        'appellations',  io.appellations,
+        'naf', e.naf_code,
+        'nafLabel', public_naf_classes_2008.class_label,
+        'address', JSON_BUILD_OBJECT(
+          'streetNumberAndAddress', io.street_number_and_address,
+          'postcode', io.post_code,
+          'city', io.city,
+          'departmentCode', io.department_code
+          ),
+        'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat),
+        'locationId', io.location_id,
+        'contactMode', ec.contact_mode,
+        'numberOfEmployeeRange', e.number_employees
+      )
+    ) AS search_immersion_result
+FROM match_immersion_offer AS io 
+LEFT JOIN establishments AS e ON e.siret = io.siret  
+LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = e.siret
+LEFT JOIN establishments_contacts AS ec ON ec.uuid = uec.uuid
+ORDER BY row_number ASC, io.location_id ASC; `;
 
 const offersEqual = (a: OfferEntity, b: OfferEntity) =>
   // Only compare romeCode and appellationCode
@@ -1041,14 +1068,11 @@ const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
   return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
 };
 
-const buildAppellationsArray = `JSON_AGG(
-  JSON_BUILD_OBJECT(
-    'appellationCode', ogr_appellation::text,
-    'appellationLabel', libelle_appellation_long,
-    'score', io.score
-  )
-  ORDER BY ogr_appellation
-)`;
+const buildAppellationsArray = `(JSON_AGG(JSON_BUILD_OBJECT(
+              'appellationCode', ogr_appellation::text,
+              'appellationLabel', libelle_appellation_long,
+              'score', io.score
+            ) ORDER BY ogr_appellation)) AS appellations`;
 
 const reStGeographyFromText =
   /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
@@ -1058,22 +1082,22 @@ const reStGeographyFromText =
 const fixStGeographyEscapingInQuery = (query: string) =>
   query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
 
-const withEstablishmentAggregateSubQuery = `establishment_locations_agg AS (
-            SELECT
-                establishment_siret,
-                JSON_AGG(
-                        JSON_BUILD_OBJECT(
-                                'id', id,
-                                'position', JSON_BUILD_OBJECT('lon', lon, 'lat', lat),
-                                'address', JSON_BUILD_OBJECT(
-                                    'streetNumberAndAddress', street_number_and_address,
-                                    'postcode', post_code,
-                                    'city', city,
-                                    'departmentCode', department_code
-                               )
-                        )
-                ) AS locations
-            FROM establishments_locations
-            GROUP BY
-                establishment_siret
-                )`;
+const withEstablishmentAggregateSubQuery = `
+establishment_locations_agg AS (
+  SELECT
+    establishment_siret,
+    JSON_AGG(
+      JSON_BUILD_OBJECT(
+        'id', id,
+        'position', JSON_BUILD_OBJECT('lon', lon, 'lat', lat),
+        'address', JSON_BUILD_OBJECT(
+            'streetNumberAndAddress', street_number_and_address,
+            'postcode', post_code,
+            'city', city,
+            'departmentCode', department_code
+        )
+      )
+    ) AS locations
+  FROM establishments_locations
+  GROUP BY establishment_siret 
+)`;

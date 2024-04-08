@@ -443,7 +443,7 @@ export interface SearchesMadeAppellationCode {
   appellation_code: Generated<string | null>;
 }
 
-export type SortedBy = "date" | "distance";
+export type SortedBy = "date" | "distance" | "score";
 export interface SearchesMade extends WithAcquisition {
   id: string;
   rome: string | null;
