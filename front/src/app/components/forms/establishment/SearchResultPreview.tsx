@@ -16,7 +16,10 @@ const establishmentToSearchResultPreview = ({
 }: FormEstablishmentDto): SearchResultDto => ({
   rome: appellations.length > 0 ? appellations[0].romeCode : "",
   romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
-  appellations: appellations.map((appelation) => ({ ...appelation, score: 0 })),
+  appellations: appellations.map((appellation) => ({
+    ...appellation,
+    score: 0,
+  })),
   nafLabel: "",
   naf: naf?.code || "",
   name: businessNameCustomized || businessName || "Mon entreprise",
