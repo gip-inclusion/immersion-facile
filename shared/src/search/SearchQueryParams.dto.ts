@@ -5,7 +5,8 @@ import {
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
-export type SearchSortedBy = "distance" | "date";
+export const searchSortedByOptions = ["distance", "date", "score"] as const;
+export type SearchSortedBy = (typeof searchSortedByOptions)[number];
 
 export type SearchQueryParamsDto = {
   longitude: number;

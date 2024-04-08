@@ -42,6 +42,7 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
   { value: "distance", label: "Par proximité" },
   { value: "date", label: "Par date de publication" },
+  { value: "score", label: "Par pertinence" },
 ];
 
 export const SearchPage = ({
