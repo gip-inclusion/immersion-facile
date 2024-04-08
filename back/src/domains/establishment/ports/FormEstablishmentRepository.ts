@@ -6,9 +6,6 @@ export interface FormEstablishmentRepository {
   delete: (siret: SiretDto) => Promise<void>;
 
   getBySiret: (siret: SiretDto) => Promise<FormEstablishmentDto | undefined>;
-  getFormEstablishmentsByContactEmail: (
-    email: string,
-  ) => Promise<FormEstablishmentDto[]>;
   getAll: () => Promise<FormEstablishmentDto[]>;
 }
 

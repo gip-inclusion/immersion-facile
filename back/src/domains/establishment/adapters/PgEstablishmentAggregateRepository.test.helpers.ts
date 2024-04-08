@@ -6,7 +6,9 @@ import {
   NumberEmployeesRange,
 } from "shared";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { ContactEntity } from "../entities/ContactEntity";
 import {
+  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -88,7 +90,7 @@ export type InsertEstablishmentAggregateProps = {
   siret: string;
   romeAndAppellationCodes?: { romeCode: string; appellationCode: string }[];
   establishmentPosition?: GeoPositionDto;
-  offerContactUid?: string;
+  contact?: ContactEntity;
   sourceProvider?: FormEstablishmentSource;
   createdAt?: Date;
   locationId?: string;
@@ -116,7 +118,7 @@ export const insertEstablishmentAggregate = async (
         appellationCode: "140927", // "Cuviste"
       },
     ],
-    offerContactUid,
+    contact,
     sourceProvider = "immersion-facile",
     isOpen = true,
     isSearchable = true,
@@ -154,8 +156,11 @@ export const insertEstablishmentAggregate = async (
 
   const aggregate = new EstablishmentAggregateBuilder()
     .withEstablishment(establishment)
-    .withContactId(
-      offerContactUid ?? `22222222-2222-4444-2222-22222222000${index}`,
+    .withContact(
+      contact ??
+        new ContactEntityBuilder()
+          .withId(`22222222-2222-4444-2222-22222222000${index}`)
+          .build(),
     )
     .withOffers(
       romeAndAppellationCodes.map(({ romeCode, appellationCode }) =>

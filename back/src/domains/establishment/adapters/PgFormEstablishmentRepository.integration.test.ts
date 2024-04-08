@@ -99,17 +99,6 @@ describe("PgFormEstablishmentRepository", () => {
         formEstablishmentB,
       ]);
     });
-
-    it("Gets Form establishments by contact email", async () => {
-      await formEstablishmentRepository.create(formEstablishmentA);
-      await formEstablishmentRepository.create(formEstablishmentB);
-      expectArraysToEqualIgnoringOrder(
-        await formEstablishmentRepository.getFormEstablishmentsByContactEmail(
-          businessContactEmail,
-        ),
-        [formEstablishmentA, formEstablishmentB],
-      );
-    });
   });
 
   describe("update", () => {

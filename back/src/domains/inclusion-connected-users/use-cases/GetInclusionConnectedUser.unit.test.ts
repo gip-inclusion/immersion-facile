@@ -2,7 +2,6 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
-  FormEstablishmentDtoBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   User,
@@ -18,7 +17,10 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { ContactEntityBuilder } from "../../establishment/helpers/EstablishmentBuilders";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+} from "../../establishment/helpers/EstablishmentBuilders";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 
 describe("GetUserAgencyDashboardUrl", () => {
@@ -343,7 +345,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     });
 
     describe("establishments", () => {
-      it("retrieve establishments  when IC user is establishement rep in at least one establishment", async () => {
+      it("retrieve establishments when IC user is establishement rep in at least one establishment", async () => {
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
           {
             ...john,
@@ -356,24 +358,20 @@ describe("GetUserAgencyDashboardUrl", () => {
           .withEmail(john.email)
           .build();
 
-        const formEstablishment1 = FormEstablishmentDtoBuilder.valid()
-          .withFitForDisabledWorkers(true)
-          .withSiret("12345678901234")
-          .withBusinessContact(fakeBusinessContact)
-          .withBusinessName("fake business name 1")
+        const establishmentAggregate1 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("89114285300012")
+          .withContact(fakeBusinessContact)
           .build();
 
-        const formEstablishment2 = FormEstablishmentDtoBuilder.valid()
-          .withFitForDisabledWorkers(true)
-          .withSiret("22222222222222")
-          .withBusinessContact(fakeBusinessContact)
-          .withBusinessName("fake business name 2")
+        const establishmentAggregate2 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("89114285300013")
+          .withContact(fakeBusinessContact)
           .build();
 
-        uow.formEstablishmentRepository.setFormEstablishments([
-          formEstablishment1,
-          formEstablishment2,
-        ]);
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishmentAggregate1,
+          establishmentAggregate2,
+        ];
 
         const result = await getInclusionConnectedUser.execute(
           undefined,
@@ -381,8 +379,14 @@ describe("GetUserAgencyDashboardUrl", () => {
         );
 
         expectToEqual(result.establishments, [
-          formEstablishment1,
-          formEstablishment2,
+          {
+            siret: establishmentAggregate1.establishment.siret,
+            businessName: establishmentAggregate1.establishment.name,
+          },
+          {
+            siret: establishmentAggregate2.establishment.siret,
+            businessName: establishmentAggregate2.establishment.name,
+          },
         ]);
       });
 

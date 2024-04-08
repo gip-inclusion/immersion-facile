@@ -2,9 +2,9 @@ import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AgencyDto, AgencyId } from "../agency/agency.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
-import { FormEstablishmentDto } from "../formEstablishment/FormEstablishment.dto";
 import { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
 import { EstablishmentRole } from "../role/role.dto";
+import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 
 export type AgencyRole = (typeof allAgencyRoles)[number];
@@ -34,8 +34,13 @@ type WithAgencyRights = {
   agencyRights: AgencyRight[];
 };
 
+export type WithEstablismentsSiretAndName = {
+  siret: SiretDto;
+  businessName: string;
+};
+
 type WithEstablisments = {
-  establishments?: FormEstablishmentDto[];
+  establishments?: WithEstablismentsSiretAndName[];
 };
 
 export type ConventionsEstablishmentDashboard = {

@@ -58,6 +58,15 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
+  public async getEstablishmentAggregates({
+    contactEmail,
+  }: { contactEmail: string }): Promise<EstablishmentAggregate[]> {
+    return this.#establishmentAggregates.filter(
+      (establishmentAggregate) =>
+        establishmentAggregate.contact?.email === contactEmail,
+    );
+  }
+
   public async getOffersAsAppellationDtoEstablishment(
     siret: string,
   ): Promise<AppellationAndRomeDto[]> {

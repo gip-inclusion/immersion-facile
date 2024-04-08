@@ -46,14 +46,6 @@ export class InMemoryFormEstablishmentRepository
     return this.#formEstablishments.find(propEq("siret", siretToGet));
   }
 
-  public async getFormEstablishmentsByContactEmail(
-    email: string,
-  ): Promise<FormEstablishmentDto[]> {
-    return this.#formEstablishments.filter(
-      (formEstablishment) => formEstablishment.businessContact.email === email,
-    );
-  }
-
   // for testing purpose
   public setFormEstablishments(formEstablishments: FormEstablishmentDto[]) {
     this.#formEstablishments = formEstablishments;
