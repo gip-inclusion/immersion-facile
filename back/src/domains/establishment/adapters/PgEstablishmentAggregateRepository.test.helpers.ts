@@ -103,6 +103,7 @@ export type InsertEstablishmentAggregateProps = {
   fitForDisabledWorkers?: boolean;
   searchableByStudents?: boolean;
   searchableByJobSeekers?: boolean;
+  offerScore?: number;
 };
 
 export const insertEstablishmentAggregate = async (
@@ -129,6 +130,7 @@ export const insertEstablishmentAggregate = async (
     createdAt = new Date(),
     offerCreatedAt,
     fitForDisabledWorkers,
+    offerScore,
   }: InsertEstablishmentAggregateProps,
   index = 0,
 ) => {
@@ -168,6 +170,7 @@ export const insertEstablishmentAggregate = async (
           .withRomeCode(romeCode)
           .withAppellationCode(appellationCode)
           .withCreatedAt(offerCreatedAt ?? new Date())
+          .withScore(offerScore)
           .build(),
       ),
     )

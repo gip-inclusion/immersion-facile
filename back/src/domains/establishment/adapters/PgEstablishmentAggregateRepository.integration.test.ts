@@ -12,6 +12,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
@@ -778,98 +779,175 @@ describe("PgEstablishmentAggregateRepository", () => {
       expectArraysToEqualIgnoringOrder(readableResults, []);
     });
 
-    it("if sorted=distance, returns closest establishments in first", async () => {
-      // Prepare : establishment in geographical area but not active
-      const closeSiret = "99000403200029";
-      const farSiret = "11000403200029";
+    describe("sorting", () => {
+      it("if sorted=distance, returns closest establishments in first", async () => {
+        // Prepare : establishment in geographical area but not active
+        const closeSiret = "99000403200029";
+        const farSiret = "11000403200029";
 
-      await insertEstablishmentAggregate(
-        pgEstablishmentAggregateRepository,
-        {
-          siret: closeSiret,
-          establishmentPosition: searchedPosition,
-          createdAt: new Date(),
-          romeAndAppellationCodes: [
-            {
-              romeCode: cartographeImmersionOffer.romeCode,
-              appellationCode: cartographeImmersionOffer.appellationCode,
-            },
-          ],
-        },
-        0,
-      );
-
-      await insertEstablishmentAggregate(
-        pgEstablishmentAggregateRepository,
-        {
-          siret: farSiret,
-          establishmentPosition: {
-            lon: searchedPosition.lon + 0.01,
-            lat: searchedPosition.lat + 0.01,
-          },
-          createdAt: new Date(),
-          romeAndAppellationCodes: [
-            {
-              romeCode: cartographeImmersionOffer.romeCode,
-              appellationCode: cartographeImmersionOffer.appellationCode,
-            },
-          ],
-        },
-        1,
-      );
-
-      // Act
-      const searchResult =
-        await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: { ...cartographeSearchMade, sortedBy: "distance" },
-          maxResults: 2,
-        });
-      // Assert
-      expect(searchResult[0].siret).toEqual(closeSiret);
-      expect(searchResult[1].siret).toEqual(farSiret);
-    });
-
-    it("if sorted=date, returns latest offers in first", async () => {
-      // Prepare : establishment in geographical area but not active
-      const recentOfferSiret = "99000403200029";
-      const oldOfferSiret = "11000403200029";
-
-      await Promise.all(
-        [
-          { siret: recentOfferSiret, offerCreatedAt: new Date("2022-05-05") },
+        await insertEstablishmentAggregate(
+          pgEstablishmentAggregateRepository,
           {
-            siret: oldOfferSiret,
-            offerCreatedAt: new Date("2022-05-02"),
+            siret: closeSiret,
+            establishmentPosition: searchedPosition,
+            createdAt: new Date(),
+            romeAndAppellationCodes: [
+              {
+                romeCode: cartographeImmersionOffer.romeCode,
+                appellationCode: cartographeImmersionOffer.appellationCode,
+              },
+            ],
           },
-        ].map((params, index) =>
-          insertEstablishmentAggregate(
-            pgEstablishmentAggregateRepository,
-            {
-              siret: params.siret,
-              establishmentPosition: searchedPosition,
-              createdAt: new Date(),
-              romeAndAppellationCodes: [
-                {
-                  romeCode: cartographeImmersionOffer.romeCode,
-                  appellationCode: cartographeImmersionOffer.appellationCode,
-                },
-              ],
-              offerCreatedAt: params.offerCreatedAt,
-            },
-            index,
-          ),
-        ),
-      );
+          0,
+        );
 
-      // Act
-      const searchResult =
-        await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: { ...cartographeSearchMade, sortedBy: "date" },
-          maxResults: 2,
-        });
-      // Assert
-      expect(searchResult[0].siret).toEqual(recentOfferSiret);
-      expect(searchResult[1].siret).toEqual(oldOfferSiret);
+        await insertEstablishmentAggregate(
+          pgEstablishmentAggregateRepository,
+          {
+            siret: farSiret,
+            establishmentPosition: {
+              lon: searchedPosition.lon + 0.01,
+              lat: searchedPosition.lat + 0.01,
+            },
+            createdAt: new Date(),
+            romeAndAppellationCodes: [
+              {
+                romeCode: cartographeImmersionOffer.romeCode,
+                appellationCode: cartographeImmersionOffer.appellationCode,
+              },
+            ],
+          },
+          1,
+        );
+
+        // Act
+        const searchResult =
+          await pgEstablishmentAggregateRepository.searchImmersionResults({
+            searchMade: { ...cartographeSearchMade, sortedBy: "distance" },
+            maxResults: 2,
+          });
+        // Assert
+        expect(searchResult[0].siret).toEqual(closeSiret);
+        expect(searchResult[1].siret).toEqual(farSiret);
+      });
+
+      it("if sorted=date, returns latest offers in first", async () => {
+        // Prepare : establishment in geographical area but not active
+        const recentOfferSiret = "99000403200029";
+        const oldOfferSiret = "11000403200029";
+
+        await Promise.all(
+          [
+            { siret: recentOfferSiret, offerCreatedAt: new Date("2022-05-05") },
+            {
+              siret: oldOfferSiret,
+              offerCreatedAt: new Date("2022-05-02"),
+            },
+          ].map((params, index) =>
+            insertEstablishmentAggregate(
+              pgEstablishmentAggregateRepository,
+              {
+                siret: params.siret,
+                establishmentPosition: searchedPosition,
+                createdAt: new Date(),
+                romeAndAppellationCodes: [
+                  {
+                    romeCode: cartographeImmersionOffer.romeCode,
+                    appellationCode: cartographeImmersionOffer.appellationCode,
+                  },
+                ],
+                offerCreatedAt: params.offerCreatedAt,
+              },
+              index,
+            ),
+          ),
+        );
+
+        // Act
+        const searchResult =
+          await pgEstablishmentAggregateRepository.searchImmersionResults({
+            searchMade: { ...cartographeSearchMade, sortedBy: "date" },
+            maxResults: 2,
+          });
+        // Assert
+        expect(searchResult[0].siret).toEqual(recentOfferSiret);
+        expect(searchResult[1].siret).toEqual(oldOfferSiret);
+      });
+
+      it("if sorted=score, returns offers with appellations that have better score first", async () => {
+        const establishmentWithHighAndLowScore =
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("99000403200029")
+            .withContactId(uuid())
+            .withLocations([
+              {
+                id: uuid(),
+                position: searchedPosition,
+                address: {
+                  city: "",
+                  departmentCode: "",
+                  postcode: "",
+                  streetNumberAndAddress: "",
+                },
+              },
+            ])
+            .withOffers([
+              new OfferEntityBuilder(cartographeImmersionOffer)
+                .withScore(1)
+                .build(),
+              new OfferEntityBuilder(analysteEnGeomatiqueImmersionOffer)
+                .withScore(10)
+                .build(),
+            ])
+            .build();
+        const establishmentWithMediumScores =
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("11000403200029")
+            .withContactId(uuid())
+            .withLocations([
+              {
+                id: uuid(),
+                position: searchedPosition,
+                address: {
+                  city: "",
+                  departmentCode: "",
+                  postcode: "",
+                  streetNumberAndAddress: "",
+                },
+              },
+            ])
+            .withOffers([
+              new OfferEntityBuilder(cartographeImmersionOffer)
+                .withScore(6)
+                .build(),
+              new OfferEntityBuilder(analysteEnGeomatiqueImmersionOffer)
+                .withScore(3)
+                .build(),
+            ])
+            .build();
+
+        await Promise.all([
+          pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+            establishmentWithHighAndLowScore,
+          ),
+          pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+            establishmentWithMediumScores,
+          ),
+        ]);
+
+        // Act
+        const searchResult =
+          await pgEstablishmentAggregateRepository.searchImmersionResults({
+            searchMade: { ...cartographeSearchMade, sortedBy: "score" },
+          });
+        // Assert
+        expectToEqual(
+          searchResult.map(({ siret }) => siret),
+          [establishmentWithHighAndLowScore, establishmentWithMediumScores].map(
+            ({ establishment: { siret } }) => siret,
+          ),
+        );
+      });
     });
 
     it("when multiple appellationCodes, returns the two related immersion-offers", async () => {
