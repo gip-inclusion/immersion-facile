@@ -28,6 +28,7 @@ import {
   OfferEntityBuilder,
   defaultLocation,
 } from "../helpers/EstablishmentBuilders";
+import { EstablishmentAggregateFilters } from "../ports/EstablishmentAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
   InsertEstablishmentAggregateProps,
@@ -129,7 +130,7 @@ describe("PgEstablishmentAggregateRepository", () => {
   let kyselyDb: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     pool = getTestPgPool();
     kyselyDb = makeKyselyDb(pool);
   });
@@ -565,7 +566,6 @@ describe("PgEstablishmentAggregateRepository", () => {
             },
           ],
           establishmentPosition: searchedPosition,
-          offerContactUid: undefined,
           sourceProvider: "immersion-facile",
           address: matchingEstablishmentAddress,
           nafCode: matchingNaf,
@@ -1052,10 +1052,10 @@ describe("PgEstablishmentAggregateRepository", () => {
         // Assert
         const establishmentsRows = await getAllEstablishmentsRows(kyselyDb);
         expect(establishmentsRows).toHaveLength(2);
-        expect(establishmentsRows.map((row) => row.siret)).toEqual([
-          siret1,
-          siret2,
-        ]);
+        expectArraysToEqualIgnoringOrder(
+          establishmentsRows.map((row) => row.siret),
+          [siret1, siret2],
+        );
       });
 
       it("adds a new row in contact table with contact referencing the establishment siret", async () => {
@@ -1605,6 +1605,97 @@ describe("PgEstablishmentAggregateRepository", () => {
         distance_m: undefined,
         locationId: extraLocation.id,
       });
+    });
+  });
+
+  describe("getEstablishmentAggregates", () => {
+    beforeEach(async () => {
+      const searchedPosition = { lat: 49, lon: 6 };
+      const establishmentsAndOffers = [
+        {
+          siret: "78000403200029",
+          romeAndAppellationCodes: [
+            { romeCode: "A1101", appellationCode: "11987" },
+          ],
+          establishmentPosition: searchedPosition,
+          createdAt: new Date(),
+          contact: new ContactEntityBuilder()
+            .withId("22222222-2222-4444-2222-222222220001")
+            .withEmail("78000403200029@email-in-repo.fr")
+            .build(),
+        },
+        {
+          siret: "79000403200029",
+          romeAndAppellationCodes: [
+            { romeCode: "A1101", appellationCode: "11987" },
+          ],
+          establishmentPosition: searchedPosition,
+          createdAt: new Date(),
+          contact: new ContactEntityBuilder()
+            .withId("22222222-2222-4444-2222-222222220002")
+            .withEmail("existing@email-in-repo.fr")
+            .build(),
+        },
+        {
+          siret: "71000403200029",
+          romeAndAppellationCodes: [
+            { romeCode: "A1101", appellationCode: "11987" },
+          ],
+          establishmentPosition: searchedPosition,
+          createdAt: new Date(),
+          contact: new ContactEntityBuilder()
+            .withId("22222222-2222-4444-2222-222222220003")
+            .withEmail("existing@email-in-repo.fr")
+            .build(),
+        },
+      ] satisfies InsertEstablishmentAggregateProps[];
+
+      await Promise.all(
+        establishmentsAndOffers.map((establishmentsAndOffer, index) =>
+          insertEstablishmentAggregate(
+            pgEstablishmentAggregateRepository,
+            establishmentsAndOffer,
+            index,
+          ),
+        ),
+      );
+    });
+
+    it("return empty list if no establishment matched", async () => {
+      const filters: EstablishmentAggregateFilters = {
+        contactEmail: "not-existing@email-in-repo.fr",
+      };
+
+      const establishmentAggregates =
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregates(
+          filters,
+        );
+
+      expectToEqual(establishmentAggregates, []);
+    });
+
+    it("return an establishmentAggregate if matched email", async () => {
+      const filters: EstablishmentAggregateFilters = {
+        contactEmail: "existing@email-in-repo.fr",
+      };
+
+      const establishmentAggregates =
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregates(
+          filters,
+        );
+
+      const expectedResult = establishmentAggregates.map(
+        ({ contact, establishment }) => ({
+          siret: establishment.siret,
+          contactEmail: contact?.email,
+        }),
+      );
+
+      expectToEqual(establishmentAggregates.length, 2);
+      expectArraysToEqualIgnoringOrder(expectedResult, [
+        { siret: "79000403200029", contactEmail: "existing@email-in-repo.fr" },
+        { siret: "71000403200029", contactEmail: "existing@email-in-repo.fr" },
+      ]);
     });
   });
 });

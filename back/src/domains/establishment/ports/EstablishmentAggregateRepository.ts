@@ -24,6 +24,8 @@ export type SearchImmersionParams = {
   maxResults?: number;
 };
 
+export type EstablishmentAggregateFilters = { contactEmail: string };
+
 export interface EstablishmentAggregateRepository {
   delete(siret: SiretDto): Promise<void>;
   insertEstablishmentAggregate(
@@ -49,6 +51,10 @@ export interface EstablishmentAggregateRepository {
   getEstablishmentAggregateBySiret(
     siret: string,
   ): Promise<EstablishmentAggregate | undefined>;
+
+  getEstablishmentAggregates({
+    contactEmail,
+  }: EstablishmentAggregateFilters): Promise<EstablishmentAggregate[]>;
 
   getOffersAsAppellationDtoEstablishment(
     siret: string,

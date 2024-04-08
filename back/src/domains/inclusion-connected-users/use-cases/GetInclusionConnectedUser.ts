@@ -2,10 +2,10 @@ import {
   AbsoluteUrl,
   ConventionsEstablishmentDashboard,
   EstablishmentDashboards,
-  FormEstablishmentDto,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   WithDashboardUrls,
+  WithEstablismentsSiretAndName,
 } from "shared";
 import { z } from "zod";
 import {
@@ -54,7 +54,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     return {
       ...user,
       ...(await this.#withEstablishmentDashboards(user, uow)),
-      ...(establishments.length > 0 ? { establishments: establishments } : {}),
+      ...(establishments.length > 0 ? { establishments } : {}),
     };
   }
 
@@ -107,13 +107,16 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   async #withEstablishments(
     uow: UnitOfWork,
     user: InclusionConnectedUser,
-  ): Promise<FormEstablishmentDto[]> {
-    const establishementForms =
-      await uow.formEstablishmentRepository.getFormEstablishmentsByContactEmail(
-        user.email,
-      );
+  ): Promise<WithEstablismentsSiretAndName[]> {
+    const establishementAggregates =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregates({
+        contactEmail: user.email,
+      });
 
-    return establishementForms;
+    return establishementAggregates.map(({ establishment }) => ({
+      siret: establishment.siret,
+      businessName: establishment.customizedName ?? establishment.name,
+    }));
   }
 
   async #makeEstablishmentDashboard(
