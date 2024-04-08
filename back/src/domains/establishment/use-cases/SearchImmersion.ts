@@ -119,6 +119,12 @@ export class SearchImmersion extends TransactionalUseCase<
           repositorySearchResults,
           this.timeGateway.now(),
         ),
+      )
+      .sort(({ appellations: a }, { appellations: b }) =>
+        sortedBy === "score"
+          ? Math.max(...b.map(({ score }) => score)) -
+            Math.max(...a.map(({ score }) => score))
+          : 0,
       );
   }
 

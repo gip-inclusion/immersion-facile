@@ -475,7 +475,7 @@ export class OfferEntityBuilder implements Builder<OfferEntity> {
     });
   }
 
-  public withScore(score: number) {
+  public withScore(score = 4.5) {
     return new OfferEntityBuilder({
       ...this.entity,
       score,

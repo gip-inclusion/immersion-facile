@@ -896,6 +896,13 @@ describe("SearchImmersionUseCase", () => {
   });
 
   describe("scoring capabilities", () => {
+    const discussionWithEstablishmentResponse = new DiscussionBuilder()
+      .withId(uuid())
+      .withCreatedAt(subDays(now, 1))
+      .withSiret(establishment.establishment.siret)
+      .withExchanges([potentialBeneficiaryExchange, establishmentExchange])
+      .build();
+
     beforeEach(() => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
         establishment,
@@ -903,13 +910,6 @@ describe("SearchImmersionUseCase", () => {
     });
 
     describe("discussion response rate impact on scoring", () => {
-      const discussionWithEstablishmentResponse = new DiscussionBuilder()
-        .withId(uuid())
-        .withCreatedAt(subDays(now, 1))
-        .withSiret(establishment.establishment.siret)
-        .withExchanges([potentialBeneficiaryExchange, establishmentExchange])
-        .build();
-
       const discussionWithoutEstablishmentResponse = new DiscussionBuilder()
         .withId(uuid())
         .withCreatedAt(subDays(now, 1))
@@ -1093,6 +1093,78 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatOffer.romeCode,
             606885,
+            4.5,
+          ),
+        ]);
+      });
+    });
+
+    describe("search made sortedBy score", () => {
+      const establishment1 = new EstablishmentAggregateBuilder(establishment)
+        .withEstablishmentSiret("12312312312311")
+        .build();
+
+      const establishment2 = new EstablishmentAggregateBuilder(establishment)
+        .withEstablishmentSiret("12312312312312")
+        .build();
+      beforeEach(() => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishment1,
+          establishment2,
+        ];
+      });
+
+      it("First establishment first because higher score", async () => {
+        uow.discussionRepository.discussions = [
+          new DiscussionBuilder(discussionWithEstablishmentResponse)
+            .withSiret(establishment1.establishment.siret)
+            .build(),
+        ];
+
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
+
+        expectToEqual(response, [
+          establishmentAggregateToSearchResultByRomeForFirstLocation(
+            establishment1,
+            secretariatOffer.romeCode,
+            281737,
+            104.5,
+          ),
+          establishmentAggregateToSearchResultByRomeForFirstLocation(
+            establishment2,
+            secretariatOffer.romeCode,
+            281737,
+            4.5,
+          ),
+        ]);
+      });
+
+      it("Second establishment first because higher score", async () => {
+        uow.discussionRepository.discussions = [
+          new DiscussionBuilder(discussionWithEstablishmentResponse)
+            .withSiret(establishment2.establishment.siret)
+            .build(),
+        ];
+
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
+
+        expectToEqual(response, [
+          establishmentAggregateToSearchResultByRomeForFirstLocation(
+            establishment2,
+            secretariatOffer.romeCode,
+            281737,
+            104.5,
+          ),
+          establishmentAggregateToSearchResultByRomeForFirstLocation(
+            establishment1,
+            secretariatOffer.romeCode,
+            281737,
             4.5,
           ),
         ]);
