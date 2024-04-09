@@ -115,7 +115,10 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
 
     return establishementAggregates.map(({ establishment }) => ({
       siret: establishment.siret,
-      businessName: establishment.customizedName ?? establishment.name,
+      businessName:
+        establishment.customizedName && establishment.customizedName.length > 0
+          ? establishment.customizedName
+          : establishment.name,
     }));
   }
 
