@@ -512,7 +512,8 @@ describe("ScheduleUtils", () => {
           new ZodError([
             {
               code: "custom",
-              message: "Veuillez remplir les horaires.",
+              message:
+                "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez remplir les horaires.",
               path: ["schedule"],
             },
           ]),
@@ -544,7 +545,7 @@ describe("ScheduleUtils", () => {
               {
                 code: "custom",
                 message:
-                  "Le nombre total d'heure ne correspond pas à celui du calendrier. Calcul du calendrier: 22.5, Nombre total heures fourni: 3",
+                  "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Le nombre total d'heure ne correspond pas à celui du calendrier. Calcul du calendrier: 22.5, Nombre total heures fourni: 3",
                 path: ["schedule"],
               },
             ]),
@@ -568,7 +569,7 @@ describe("ScheduleUtils", () => {
               {
                 code: "custom",
                 message:
-                  "Le nombre total de jours travaillés ne correspond pas à celui du calendrier. Calcul du calendrier: 3, Nombre de jours fourni: 1",
+                  "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Le nombre total de jours travaillés ne correspond pas à celui du calendrier. Calcul du calendrier: 3, Nombre de jours fourni: 1",
                 path: ["schedule"],
               },
             ]),

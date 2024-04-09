@@ -340,9 +340,11 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
       );
     }
 
-    const message = validateSchedule(convention.schedule, {
-      start: new Date(convention.dateStart),
-      end: new Date(convention.dateEnd),
+    const message = validateSchedule({
+      dateEnd: convention.dateEnd,
+      dateStart: convention.dateStart,
+      id: convention.id,
+      schedule: convention.schedule,
     });
     if (message) {
       addIssue(message, "schedule");
@@ -454,10 +456,7 @@ export const renewConventionParamsSchema: z.Schema<RenewConventionParams> = z
       });
     };
 
-    const message = validateSchedule(renewConventionParams.schedule, {
-      start: new Date(renewConventionParams.dateStart),
-      end: new Date(renewConventionParams.dateEnd),
-    });
+    const message = validateSchedule(renewConventionParams);
     if (message) {
       addIssue(message, "schedule");
     }

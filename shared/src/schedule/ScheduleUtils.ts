@@ -10,7 +10,10 @@ import {
   subDays,
 } from "date-fns";
 import { clone, prop, uniq } from "ramda";
-import { IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS } from "../convention/convention.dto";
+import {
+  IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS,
+  RenewConventionParams,
+} from "../convention/convention.dto";
 import { arrayFromNumber } from "../utils";
 import { DateString } from "../utils/date";
 import {
@@ -180,14 +183,20 @@ export const calculateNumberOfWorkedDays = (
   complexSchedule: DailyScheduleDto[],
 ): number => complexSchedule.filter((v) => v.timePeriods.length > 0).length;
 
-export const validateSchedule = (
-  schedule: ScheduleDto,
-  interval: DateIntervalDto,
-): string | undefined => {
-  const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule, interval);
+export const validateSchedule = ({
+  schedule,
+  dateEnd,
+  dateStart,
+  id,
+}: Omit<RenewConventionParams, "renewed">): string | undefined => {
+  const conventionIdPrefix = `Convention ${id} - `;
+  const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule, {
+    start: new Date(dateStart),
+    end: new Date(dateEnd),
+  });
   for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
     if (totalHours > IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS)
-      return `Veuillez saisir moins de ${IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS}h pour la semaine ${
+      return `${conventionIdPrefix}Veuillez saisir moins de ${IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS}h pour la semaine ${
         totalHoursIndex + 1
       }.`;
   }
@@ -196,17 +205,17 @@ export const validateSchedule = (
     calculateTotalImmersionHoursFromComplexSchedule(schedule.complexSchedule);
 
   if (totalHoursFromComplexSchedule !== schedule.totalHours)
-    return `Le nombre total d'heure ne correspond pas à celui du calendrier. Calcul du calendrier: ${totalHoursFromComplexSchedule}, Nombre total heures fourni: ${schedule.totalHours}`;
+    return `${conventionIdPrefix}Le nombre total d'heure ne correspond pas à celui du calendrier. Calcul du calendrier: ${totalHoursFromComplexSchedule}, Nombre total heures fourni: ${schedule.totalHours}`;
 
   const workedDays = calculateNumberOfWorkedDays(schedule.complexSchedule);
   if (workedDays !== schedule.workedDays)
-    return `Le nombre total de jours travaillés ne correspond pas à celui du calendrier. Calcul du calendrier: ${workedDays}, Nombre de jours fourni: ${schedule.workedDays}`;
+    return `${conventionIdPrefix}Le nombre total de jours travaillés ne correspond pas à celui du calendrier. Calcul du calendrier: ${workedDays}, Nombre de jours fourni: ${schedule.workedDays}`;
 
   for (const dailySchedule of schedule.complexSchedule) {
     for (const [periodIndex, period] of dailySchedule.timePeriods.entries()) {
       // Check if all periods are positive.
       if (!isTimePeriodPositive(period))
-        return `La plage horaire ${
+        return `${conventionIdPrefix}La plage horaire ${
           periodIndex + 1
         } ${periodToHumanReadableString(period)} du ${toFrenchReadableDate(
           dailySchedule.date,
@@ -221,7 +230,7 @@ export const validateSchedule = (
           periodIndex !== otherPeriodIndex &&
           isPeriodsOverlap(period, otherPeriod)
         )
-          return `Les plages horaires ${
+          return `${conventionIdPrefix}Les plages horaires ${
             periodIndex + 1
           } ${periodToHumanReadableString(period)} et ${
             otherPeriodIndex + 1
@@ -232,7 +241,8 @@ export const validateSchedule = (
     }
   }
   const totalScheduleHours = totalWeeksHours.reduce((a, b) => a + b, 0);
-  if (totalScheduleHours === 0) return "Veuillez remplir les horaires.";
+  if (totalScheduleHours === 0)
+    return `${conventionIdPrefix}Veuillez remplir les horaires.`;
 };
 
 const toFrenchReadableDate = (isoStringDate: string): string =>
