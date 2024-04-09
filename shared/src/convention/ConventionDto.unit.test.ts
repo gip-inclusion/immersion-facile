@@ -353,7 +353,7 @@ describe("conventionDtoSchema", () => {
         "Le format de la date de début est invalide",
         "La date de fin doit être après la date de début.",
         "La durée maximale calendaire d'une immersion est de 30 jours.",
-        "Veuillez remplir les horaires.",
+        "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez remplir les horaires.",
       ]);
     });
 
@@ -366,7 +366,7 @@ describe("conventionDtoSchema", () => {
         "Le format de la date de fin est invalide",
         "La date de fin doit être après la date de début.",
         "La durée maximale calendaire d'une immersion est de 30 jours.",
-        "Veuillez remplir les horaires.",
+        "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez remplir les horaires.",
       ]);
     });
 
@@ -379,7 +379,7 @@ describe("conventionDtoSchema", () => {
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
         "La date de fin doit être après la date de début.",
-        "Veuillez remplir les horaires.",
+        "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez remplir les horaires.",
       ]);
     });
 
@@ -648,7 +648,7 @@ describe("conventionDtoSchema", () => {
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-        "Veuillez saisir moins de 48h pour la semaine 1.",
+        "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez saisir moins de 48h pour la semaine 1.",
       ]);
     });
 
