@@ -22,6 +22,7 @@ import {
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
+import { convertHtmlToText } from "src/app/utils/html.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { P, match } from "ts-pattern";
 
@@ -177,7 +178,7 @@ const DiscussionDetails = ({
           <hr className={fr.cx("fr-hr")} />
           <section>
             <h3>{subject}</h3>
-            <div>{message}</div>
+            <div>{convertHtmlToText(message)}</div>
           </section>
         </ExchangeMessage>
       ))}
