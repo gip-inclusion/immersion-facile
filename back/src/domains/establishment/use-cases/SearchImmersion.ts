@@ -6,6 +6,7 @@ import {
   DiscussionDto,
   SearchQueryParamsDto,
   SearchResultDto,
+  SearchSortedBy,
   SiretDto,
   searchParamsSchema,
 } from "shared";
@@ -103,8 +104,9 @@ export class SearchImmersion extends TransactionalUseCase<
     const searchResultsInRepo =
       voluntaryToImmersion !== false
         ? await this.#prepareVoluntaryToImmersionResults(
-            repositorySearchResults,
             uow,
+            repositorySearchResults,
+            searchMade.sortedBy,
           )
         : [];
 
@@ -129,21 +131,28 @@ export class SearchImmersion extends TransactionalUseCase<
   }
 
   async #prepareVoluntaryToImmersionResults(
-    results: SearchImmersionResult[],
     uow: UnitOfWork,
+    results: SearchImmersionResult[],
+    sortedBy?: SearchSortedBy,
   ): Promise<SearchResultDto[]> {
     const oneYearAgo = subYears(this.timeGateway.now(), 1);
     const sirets = results.map(({ siret }) => siret);
 
-    const discussions = await uow.discussionRepository.getDiscussions({
-      sirets: sirets,
-      createdSince: oneYearAgo,
-    });
-    const conventions = await uow.conventionQueries.getConventionsByFilters({
-      withSirets: sirets,
-      withStatuses: ["ACCEPTED_BY_VALIDATOR"],
-      dateSubmissionSince: oneYearAgo,
-    });
+    const discussions =
+      sortedBy === "score"
+        ? await uow.discussionRepository.getDiscussions({
+            sirets: sirets,
+            createdSince: oneYearAgo,
+          })
+        : [];
+    const conventions =
+      sortedBy === "score"
+        ? await uow.conventionQueries.getConventionsByFilters({
+            withSirets: sirets,
+            withStatuses: ["ACCEPTED_BY_VALIDATOR"],
+            dateSubmissionSince: oneYearAgo,
+          })
+        : [];
 
     histogramSearchImmersionStoredCount.observe(results.length);
     return results
