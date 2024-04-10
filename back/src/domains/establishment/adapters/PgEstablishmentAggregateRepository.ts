@@ -545,8 +545,13 @@ export class PgEstablishmentAggregateRepository
             ST_Distance(aewa.position, ST_GeographyFromText($1)) AS distance_m,
             fit_for_disabled_workers,
             ${buildAppellationsArray},
-            MAX(created_at) AS max_created_at,
-            MAX(io.score) AS max_score
+            ${
+              searchMade.sortedBy === "score"
+                ? "MAX(io.score) AS max_score,"
+                : ""
+            }
+            MAX(created_at) AS max_created_at
+            
           FROM active_establishments_within_area aewa 
           LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
           LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation

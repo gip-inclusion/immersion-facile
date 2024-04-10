@@ -26,7 +26,7 @@ export const searchImmersionRoutes = defineRoutes({
     queryParamsSchema: searchQueryParamsSchema,
     responses: {
       200: searchResultsSchema,
-      400: httpErrorSchema,
+      400: httpErrorSchema.or(legacyHttpErrorSchema),
     },
   }),
   contactEstablishment: defineRoute({

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { searchImmersionRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 
 export const createSearchRouter = (deps: AppDependencies) => {
@@ -13,9 +14,12 @@ export const createSearchRouter = (deps: AppDependencies) => {
   );
 
   expressSharedRouter.search(async (req, res) =>
-    sendHttpResponse(req, res, async () =>
-      deps.useCases.searchImmersion.execute(req.query, req.apiConsumer),
-    ),
+    sendHttpResponse(req, res, async () => {
+      if (req.query.sortedBy === "score") {
+        throw new BadRequestError("sortedBy score is not supported");
+      }
+      return deps.useCases.searchImmersion.execute(req.query, req.apiConsumer);
+    }),
   );
 
   expressSharedRouter.contactEstablishment(async (req, res) =>

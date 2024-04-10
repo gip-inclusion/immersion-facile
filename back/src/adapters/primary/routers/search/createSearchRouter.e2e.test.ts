@@ -144,6 +144,25 @@ describe("search-immersion route", () => {
           body: [],
         });
       });
+
+      it("temporary disable sortedBy score", async () => {
+        const result = await httpClient.search({
+          queryParams: {
+            distanceKm: 30,
+            longitude: 2.34999,
+            latitude: 48.8531,
+            voluntaryToImmersion: true,
+            sortedBy: "score",
+          },
+        });
+
+        expectHttpResponseToEqual(result, {
+          status: 400,
+          body: {
+            errors: "sortedBy score is not supported",
+          },
+        });
+      });
     });
 
     describe("with filter establishmentSearchableBy", () => {
