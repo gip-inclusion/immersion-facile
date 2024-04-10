@@ -11,10 +11,13 @@ type DiscussionsById = Record<DiscussionId, DiscussionDto>;
 export class InMemoryDiscussionRepository implements DiscussionRepository {
   constructor(private _discussions: DiscussionsById = {}) {}
 
+  public discussionCallsCount = 0;
+
   public async getDiscussions({
     createdSince,
     sirets,
   }: GetDiscussionsParams): Promise<DiscussionDto[]> {
+    this.discussionCallsCount++;
     const filters: Array<(discussion: DiscussionDto) => boolean> = [
       ({ siret }) => (sirets ? sirets.includes(siret) : true),
       ({ createdAt }) =>

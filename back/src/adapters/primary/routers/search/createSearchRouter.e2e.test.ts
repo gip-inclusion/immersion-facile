@@ -145,9 +145,22 @@ describe("search-immersion route", () => {
         });
       });
 
-      it("temporary disable sortedBy score", async () => {
+      it("sortedBy score supported", async () => {
+        const immersionOffer = new OfferEntityBuilder()
+          .withRomeCode(establishmentAggregate2.offers[0].romeCode)
+          .withAppellationCode(
+            establishmentAggregate2.offers[0].appellationCode,
+          )
+          .withAppellationLabel("Coiffeur / Coiffeuse mixte")
+          .build();
+
+        await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentAggregate2,
+        );
+
         const result = await httpClient.search({
           queryParams: {
+            appellationCodes: [immersionOffer.appellationCode],
             distanceKm: 30,
             longitude: 2.34999,
             latitude: 48.8531,
@@ -157,10 +170,14 @@ describe("search-immersion route", () => {
         });
 
         expectHttpResponseToEqual(result, {
-          status: 400,
-          body: {
-            errors: "sortedBy score is not supported",
-          },
+          status: 200,
+          body: [
+            establishmentAggregateToSearchResultByRomeForFirstLocation(
+              establishmentAggregate2,
+              immersionOffer.romeCode,
+              0,
+            ),
+          ],
         });
       });
     });
