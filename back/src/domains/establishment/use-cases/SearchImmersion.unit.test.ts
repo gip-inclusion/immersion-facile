@@ -931,9 +931,10 @@ describe("SearchImmersionUseCase", () => {
           discussionWithoutEstablishmentResponseOutOfYear,
         ];
 
-        const response = await searchImmersionUseCase.execute(
-          searchSecretariatInMetzRequestDto,
-        );
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
 
         expectToEqual(response, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -952,9 +953,10 @@ describe("SearchImmersionUseCase", () => {
           discussionWithoutEstablishmentResponseOutOfYear,
         ];
 
-        const response = await searchImmersionUseCase.execute(
-          searchSecretariatInMetzRequestDto,
-        );
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
 
         expectToEqual(response, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -971,9 +973,10 @@ describe("SearchImmersionUseCase", () => {
           discussionWithoutEstablishmentResponseOutOfYear,
         ];
 
-        const response = await searchImmersionUseCase.execute(
-          searchSecretariatInMetzRequestDto,
-        );
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
 
         expectToEqual(response, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -993,9 +996,10 @@ describe("SearchImmersionUseCase", () => {
           discussionWithoutEstablishmentResponseOutOfYear,
         ];
 
-        const response = await searchImmersionUseCase.execute(
-          searchSecretariatInMetzRequestDto,
-        );
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
 
         expectToEqual(response, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -1029,9 +1033,10 @@ describe("SearchImmersionUseCase", () => {
           establishmentValidatedConvention,
         ]);
 
-        const response = await searchImmersionUseCase.execute(
-          searchSecretariatInMetzRequestDto,
-        );
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
 
         expectToEqual(response, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -1054,9 +1059,10 @@ describe("SearchImmersionUseCase", () => {
             .build(),
         ]);
 
-        const response = await searchImmersionUseCase.execute(
-          searchSecretariatInMetzRequestDto,
-        );
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
 
         expectToEqual(response, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
@@ -1084,9 +1090,10 @@ describe("SearchImmersionUseCase", () => {
             .build(),
         ]);
 
-        const response = await searchImmersionUseCase.execute(
-          searchSecretariatInMetzRequestDto,
-        );
+        const response = await searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          sortedBy: "score",
+        });
 
         expectToEqual(response, [
           establishmentAggregateToSearchResultByRomeForFirstLocation(
