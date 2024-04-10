@@ -1,6 +1,5 @@
 import type { InsertObject } from "kysely";
 import { sql } from "kysely";
-import { keys } from "ramda";
 import {
   ContactMethod,
   DiscussionDto,
@@ -17,7 +16,7 @@ import {
 import { Database } from "../../../config/pg/kysely/model/database";
 import {
   DiscussionRepository,
-  GetDiscusionsParams,
+  GetDiscussionsParams,
   HasDiscussionMatchingParams,
 } from "../ports/DiscussionRepository";
 
@@ -63,10 +62,9 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }
 
   public async getDiscussions(
-    params: GetDiscusionsParams,
+    params: GetDiscussionsParams,
   ): Promise<DiscussionDto[]> {
-    if (keys(params).length === 0)
-      throw new Error("At least one filter mandatory");
+    if (params.sirets.length === 0) return [];
 
     const pgResults = await pipeWithValue(
       this.#makeDiscussionQueryBuilder(),
