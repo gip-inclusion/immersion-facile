@@ -1,15 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Tabs, { TabsProps } from "@codegouvfr/react-dsfr/Tabs";
+import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import React from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import {
-  EstablishmentDashboardTab,
-  EstablishmentRole,
-  InclusionConnectedUser,
-} from "shared";
+import { EstablishmentRole, InclusionConnectedUser } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
@@ -20,7 +16,8 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 
-import { ManageEstablishmentsTab } from "src/app/pages/establishmentDashboard/ManageEstablishmentTab";
+import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
+import { DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
 import { Route } from "type-route";
@@ -43,9 +40,7 @@ export const EstablishmentDashboardPage = ({
 
   const rawEstablishmentDashboardTabs = (
     currentUser: InclusionConnectedUser,
-  ): Array<
-    TabsProps.Controlled["tabs"][number] & { content: React.ReactNode }
-  > => [
+  ): DashboardTab[] => [
     {
       label: "Conventions en cours",
       tabId: "conventions",
@@ -112,16 +107,6 @@ export const EstablishmentDashboardPage = ({
       : []),
   ];
 
-  const getEstablishmentDashboardTabs = (
-    currentTab: EstablishmentDashboardTab,
-    currentUser: InclusionConnectedUser,
-  ) =>
-    rawEstablishmentDashboardTabs(currentUser).map((tab) => ({
-      ...tab,
-      tabId: tab.tabId,
-      isDefault: currentTab === tab.tabId,
-    }));
-
   const currentTab = route.params.tab;
 
   return (
@@ -151,7 +136,10 @@ export const EstablishmentDashboardPage = ({
             currentUser: P.not(P.nullish),
           },
           ({ currentUser }) => {
-            const tabs = getEstablishmentDashboardTabs(currentTab, currentUser);
+            const tabs = getDashboardTabs(
+              rawEstablishmentDashboardTabs(currentUser),
+              currentTab,
+            );
             return (
               <Tabs
                 tabs={tabs}
