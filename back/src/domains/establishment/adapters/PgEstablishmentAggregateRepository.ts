@@ -137,6 +137,8 @@ export class PgEstablishmentAggregateRepository
           JSON_STRIP_NULLS(
             JSON_BUILD_OBJECT(
               'establishment', JSON_BUILD_OBJECT(
+                'acquisitionCampaign', e.acquisition_campaign,
+                'acquisitionKeyword' , e.acquisition_keyword,
                 'siret', e.siret, 
                 'name', e.name, 
                 'customizedName', e.customized_name, 
@@ -658,26 +660,26 @@ export class PgEstablishmentAggregateRepository
     await this.transaction
       .updateTable("establishments")
       .set({
-        siret: establishment.siret,
-        name: establishment.name,
-        customized_name: establishment.customizedName,
-        website: establishment.website,
-        additional_information: establishment.additionalInformation,
-        number_employees: establishment.numberEmployeesRange,
-        naf_code: establishment.nafDto.code,
-        naf_nomenclature: establishment.nafDto.nomenclature,
-        source_provider: establishment.sourceProvider,
-        update_date: updatedAt,
+        additional_information: establishment.additionalInformation ?? null,
+        created_at: establishment.createdAt,
+        customized_name: establishment.customizedName ?? null,
+        fit_for_disabled_workers: establishment.fitForDisabledWorkers ?? null,
+        is_commited: establishment.isCommited ?? null,
         is_open: establishment.isOpen,
         is_searchable: establishment.isSearchable,
-        is_commited: establishment.isCommited,
-        fit_for_disabled_workers: establishment.fitForDisabledWorkers,
+        last_insee_check_date: establishment.lastInseeCheckDate ?? null,
         max_contacts_per_week: establishment.maxContactsPerWeek,
-        last_insee_check_date: establishment.lastInseeCheckDate,
-        created_at: establishment.createdAt,
-        next_availability_date: establishment.nextAvailabilityDate,
-        searchable_by_students: establishment.searchableBy.students,
+        naf_code: establishment.nafDto.code,
+        naf_nomenclature: establishment.nafDto.nomenclature,
+        name: establishment.name,
+        next_availability_date: establishment.nextAvailabilityDate ?? null,
+        number_employees: establishment.numberEmployeesRange,
         searchable_by_job_seekers: establishment.searchableBy.jobSeekers,
+        searchable_by_students: establishment.searchableBy.students,
+        siret: establishment.siret,
+        source_provider: establishment.sourceProvider,
+        update_date: updatedAt,
+        website: establishment.website ?? null,
       })
       .where("siret", "=", establishment.siret)
       .execute();

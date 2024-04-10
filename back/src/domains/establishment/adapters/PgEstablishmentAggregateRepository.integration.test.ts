@@ -1310,6 +1310,63 @@ describe("PgEstablishmentAggregateRepository", () => {
         updatedAggregate,
       );
     });
+
+    it("remove optional values", async () => {
+      const aquisition = {
+        acquisitionCampaign: "my-campaign",
+        acquisitionKeyword: "my-keyword",
+      };
+
+      const establishmentEntity = new EstablishmentEntityBuilder()
+        .withAdditionalInformation("my additionnal info")
+        .withCustomizedName("my customize name")
+        .withFitForDisabledWorkers(true)
+        .withIsCommited(true)
+        .withLastInseeCheck(new Date())
+        .withNextAvailabilityDate(new Date())
+        .withUpdatedAt(new Date())
+        .withWebsite("www.truc.com")
+        .withAcquisition(aquisition)
+        .build();
+      const originalEstablishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishment(establishmentEntity)
+        .build();
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        originalEstablishmentAggregate,
+      );
+
+      const updatedAt = new Date("2024-04-10");
+
+      const updatedAggregate = new EstablishmentAggregateBuilder(
+        originalEstablishmentAggregate,
+      )
+        .withEstablishment(
+          new EstablishmentEntityBuilder(establishmentEntity)
+            .withAdditionalInformation("")
+            .withCustomizedName(undefined)
+            .withFitForDisabledWorkers(undefined)
+            .withIsCommited(undefined)
+            .withLastInseeCheck(undefined)
+            .withNextAvailabilityDate(undefined)
+            .withUpdatedAt(updatedAt)
+            .withWebsite(undefined)
+            .withAcquisition(aquisition)
+            .build(),
+        )
+        .build();
+
+      await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
+        updatedAggregate,
+        updatedAt,
+      );
+
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          updatedAggregate.establishment.siret,
+        ),
+        updatedAggregate,
+      );
+    });
   });
 
   describe("hasEstablishmentFromFormWithSiret", () => {
