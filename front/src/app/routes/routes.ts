@@ -1,4 +1,5 @@
 import { AuthenticatedUserQueryParams, ValueOf, frontRoutes } from "shared";
+import { icUserAgencyDashboardTabSerializer } from "src/app/routes/routeParams/agencyDashboardTabs";
 import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { createRouter, defineRoute, param } from "type-route";
 import { adminTabSerializer } from "./routeParams/adminTabs";
@@ -66,10 +67,18 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { tab: param.path.ofType(adminTabSerializer) },
     ({ tab }) => `/${frontRoutes.admin}/${tab}`,
   ),
-  agencyDashboard: defineRoute(inclusionConnectedParams, () => [
-    `/${frontRoutes.agencyDashboard}`,
-    "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
-  ]),
+  agencyDashboard: defineRoute(
+    {
+      ...inclusionConnectedParams,
+      tab: param.path.optional
+        .ofType(icUserAgencyDashboardTabSerializer)
+        .default("dashboard"),
+    },
+    ({ tab }) => [
+      `/${frontRoutes.agencyDashboard}/${tab}`,
+      `/agence-dashboard/${tab}`, //legacy route redirect to frontRoutes.agencyDashboard
+    ],
+  ),
   conventionCustomAgency: defineRoute(
     {
       jwt: param.query.optional.string,

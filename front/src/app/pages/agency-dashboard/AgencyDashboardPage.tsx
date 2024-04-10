@@ -6,12 +6,14 @@ import { all } from "ramda";
 import React from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { AbsoluteUrl, AgencyRight } from "shared";
+import { AgencyRight, InclusionConnectedUser } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
+import { isAgencyDashboardTab } from "src/app/routes/routeParams/agencyDashboardTabs";
 import { routes } from "src/app/routes/routes";
+import { DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -38,32 +40,33 @@ export const AgencyDashboardPage = ({
   );
   const dispatch = useDispatch();
 
-  type AgencyDashboardTab = {
-    label: string;
-    content: JSX.Element;
-  };
-
-  const agencyDashboardTabs = (
-    agencyDashboardUrl: AbsoluteUrl,
-    conventionErrorUrl?: AbsoluteUrl,
-  ): AgencyDashboardTab[] => [
-    {
-      label: "Tableau de bord agence",
-      content: (
-        <>
-          <ManageConventionFormSection
-            routeNameToRedirectTo={"manageConventionInclusionConnected"}
-          />
-          <MetabaseView
-            title="Tableau de bord agence"
-            url={agencyDashboardUrl}
-          />
-        </>
-      ),
-    },
-    ...(conventionErrorUrl
+  const rawAgencyDashboardTabs = ({
+    agencyDashboardUrl,
+    erroredConventionsDashboardUrl,
+  }: InclusionConnectedUser): DashboardTab[] => [
+    ...(agencyDashboardUrl
       ? [
           {
+            tabId: "dashboard",
+            label: "Tableau de bord agence",
+            content: (
+              <>
+                <ManageConventionFormSection
+                  routeNameToRedirectTo={"manageConventionInclusionConnected"}
+                />
+                <MetabaseView
+                  title="Tableau de bord agence"
+                  url={agencyDashboardUrl}
+                />
+              </>
+            ),
+          },
+        ]
+      : []),
+    ...(erroredConventionsDashboardUrl
+      ? [
+          {
+            tabId: "conventions-en-erreur",
             label: "Conventions en erreur",
             content: (
               <>
@@ -103,7 +106,7 @@ export const AgencyDashboardPage = ({
 
                 <MetabaseView
                   title="Tableau de bord agence"
-                  url={conventionErrorUrl}
+                  url={erroredConventionsDashboardUrl}
                 />
               </>
             ),
@@ -111,6 +114,8 @@ export const AgencyDashboardPage = ({
         ]
       : []),
   ];
+
+  const currentTab = route.params.tab;
 
   return (
     <>
@@ -159,45 +164,6 @@ export const AgencyDashboardPage = ({
         .with(
           {
             currentUser: {
-              agencyDashboardUrl: P.select(
-                "agencyDashboardUrl",
-                P.when(
-                  (agencyDashboardUrl) => agencyDashboardUrl !== undefined,
-                ),
-              ),
-              erroredConventionsDashboardUrl: P.select(
-                "erroredConventionsDashboardUrl",
-                P.when(
-                  (erroredConventionsDashboardUrl) =>
-                    erroredConventionsDashboardUrl !== undefined,
-                ),
-              ),
-            },
-          },
-          ({ agencyDashboardUrl, erroredConventionsDashboardUrl }) =>
-            agencyDashboardUrl &&
-            erroredConventionsDashboardUrl && (
-              <Tabs
-                tabs={agencyDashboardTabs(
-                  agencyDashboardUrl,
-                  erroredConventionsDashboardUrl,
-                )}
-              />
-            ),
-        )
-        .with(
-          {
-            currentUser: {
-              agencyDashboardUrl: P.not(undefined),
-            },
-          },
-          ({ currentUser: { agencyDashboardUrl } }) => (
-            <Tabs tabs={agencyDashboardTabs(agencyDashboardUrl)} />
-          ),
-        )
-        .with(
-          {
-            currentUser: {
               agencyRights: [],
             },
           },
@@ -237,6 +203,34 @@ export const AgencyDashboardPage = ({
               title="En attente de validation"
               description="Votre demande d'accès à l'outil est en cours de validation par l'administration. Vous recevrez un email dès que votre accès sera validé."
             />
+          ),
+        )
+        .with(
+          {
+            currentUser: P.not(null),
+          },
+          ({ currentUser }) => (
+            <Tabs
+              tabs={getDashboardTabs(
+                rawAgencyDashboardTabs(currentUser),
+                currentTab,
+              )}
+              selectedTabId={currentTab}
+              onTabChange={(tab) => {
+                if (isAgencyDashboardTab(tab))
+                  routes
+                    .agencyDashboard({
+                      tab,
+                    })
+                    .push();
+              }}
+            >
+              {
+                rawAgencyDashboardTabs(currentUser).find(
+                  (tab) => tab.tabId === currentTab,
+                )?.content
+              }
+            </Tabs>
           ),
         )
         .with(

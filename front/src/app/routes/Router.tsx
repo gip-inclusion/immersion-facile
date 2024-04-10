@@ -2,24 +2,26 @@ import React from "react";
 import { PageHeader } from "react-design-system";
 import {
   AdminTab,
+  AgencyDashboardTab,
   EstablishmentDashboardTab,
   adminTabsList,
+  agencyDashboardTabsList,
   establishmentDashboardTabsList,
 } from "shared";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
+import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
-import { AgencyDashboardPage } from "src/app/pages/agencyDashboard/AgencyDashboardPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionManageInclusionConnectedPage } from "src/app/pages/convention/ConventionManageInclusionConnectedPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
+import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
-import { EstablishmentDashboardPage } from "src/app/pages/establishmentDashboard/EstablishmentDashboardPage";
 import { OpenApiDocPage } from "src/app/pages/open-api-doc/OpenApiDocPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
@@ -61,20 +63,23 @@ const getPageByRouteName: {
     ) : (
       <ErrorPage type="httpClientNotFoundError" />
     ),
-  agencyDashboard: (route) => (
-    <InclusionConnectedPrivateRoute
-      route={route}
-      inclusionConnectConnexionPageHeader={
-        <PageHeader
-          title="Retrouvez vos conventions en tant que prescripteur"
-          theme="agency"
-          centered
-        />
-      }
-    >
-      <AgencyDashboardPage route={route} />
-    </InclusionConnectedPrivateRoute>
-  ),
+  agencyDashboard: (route) =>
+    agencyDashboardTabsList.includes(route.params.tab as AgencyDashboardTab) ? (
+      <InclusionConnectedPrivateRoute
+        route={route}
+        inclusionConnectConnexionPageHeader={
+          <PageHeader
+            title="Retrouvez vos conventions en tant que prescripteur"
+            theme="agency"
+            centered
+          />
+        }
+      >
+        <AgencyDashboardPage route={route} />
+      </InclusionConnectedPrivateRoute>
+    ) : (
+      <ErrorPage type="httpClientNotFoundError" />
+    ),
   conventionCustomAgency: () => <ConventionCustomAgencyPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
   conventionImmersionForExternals: (route) => (
