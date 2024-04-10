@@ -15,7 +15,7 @@ import {
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
 import {
-  GetDiscusionsParams,
+  GetDiscussionsParams,
   HasDiscussionMatchingParams,
 } from "../ports/DiscussionRepository";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
@@ -105,6 +105,7 @@ describe("PgDiscussionRepository", () => {
       hasDiscussionMatchingResult: false,
       testName: "discussion with exchange with match since creation date +1",
       getDiscussionsParams: {
+        sirets: [discussionWithExchanges.siret],
         createdSince: new Date(discussionWithExchanges.createdAt),
       },
       getDiscussionsResults: [discussionWithExchanges],
@@ -120,8 +121,10 @@ describe("PgDiscussionRepository", () => {
       },
       hasDiscussionMatchingResult: true,
       testName: "discussion without exchange initialy",
-      getDiscussionsParams: {},
-      getDiscussionsResults: new Error("At least one filter mandatory"),
+      getDiscussionsParams: {
+        sirets: [],
+      },
+      getDiscussionsResults: [],
     },
     {
       discussion: discussionWithoutExchanges,
@@ -135,8 +138,10 @@ describe("PgDiscussionRepository", () => {
       hasDiscussionMatchingResult: false,
       testName:
         "discussion without exchange initialy with match since creation date +1",
-      getDiscussionsParams: {},
-      getDiscussionsResults: new Error("At least one filter mandatory"),
+      getDiscussionsParams: {
+        sirets: [],
+      },
+      getDiscussionsResults: [],
     },
     {
       discussion: discussionWithExchanges,
@@ -145,8 +150,8 @@ describe("PgDiscussionRepository", () => {
       },
       hasDiscussionMatchingResult: true,
       testName: "match with Siret",
-      getDiscussionsParams: {},
-      getDiscussionsResults: new Error("At least one filter mandatory"),
+      getDiscussionsParams: { sirets: [] },
+      getDiscussionsResults: [],
     },
     {
       discussion: discussionWithExchanges,
@@ -155,8 +160,8 @@ describe("PgDiscussionRepository", () => {
       },
       hasDiscussionMatchingResult: false,
       testName: "don't match with Siret",
-      getDiscussionsParams: {},
-      getDiscussionsResults: new Error("At least one filter mandatory"),
+      getDiscussionsParams: { sirets: [] },
+      getDiscussionsResults: [],
     },
     {
       discussion: discussionWithExchanges,
@@ -165,8 +170,8 @@ describe("PgDiscussionRepository", () => {
       },
       hasDiscussionMatchingResult: true,
       testName: "match with appellationCode",
-      getDiscussionsParams: {},
-      getDiscussionsResults: new Error("At least one filter mandatory"),
+      getDiscussionsParams: { sirets: [] },
+      getDiscussionsResults: [],
     },
     {
       discussion: discussionWithExchanges,
@@ -176,8 +181,8 @@ describe("PgDiscussionRepository", () => {
       },
       hasDiscussionMatchingResult: true,
       testName: "match with potentialBeneficiaryEmail",
-      getDiscussionsParams: {},
-      getDiscussionsResults: new Error("At least one filter mandatory"),
+      getDiscussionsParams: { sirets: [] },
+      getDiscussionsResults: [],
     },
     {
       discussion: discussionWithExchanges,
@@ -186,8 +191,8 @@ describe("PgDiscussionRepository", () => {
       },
       hasDiscussionMatchingResult: true,
       testName: "match with since",
-      getDiscussionsParams: {},
-      getDiscussionsResults: new Error("At least one filter mandatory"),
+      getDiscussionsParams: { sirets: [] },
+      getDiscussionsResults: [],
     },
     {
       discussion: discussionWithExchanges,
@@ -197,14 +202,14 @@ describe("PgDiscussionRepository", () => {
       },
       hasDiscussionMatchingResult: true,
       testName: "match with establishmentRepresentativeEmail",
-      getDiscussionsParams: {},
-      getDiscussionsResults: new Error("At least one filter mandatory"),
+      getDiscussionsParams: { sirets: [] },
+      getDiscussionsResults: [],
     },
   ] satisfies {
     discussion: DiscussionDto;
     hasDiscussionMatchingParams: Partial<HasDiscussionMatchingParams>;
     hasDiscussionMatchingResult: boolean;
-    getDiscussionsParams: GetDiscusionsParams;
+    getDiscussionsParams: GetDiscussionsParams;
     getDiscussionsResults: DiscussionDto[] | Error;
     testName: string;
   }[])(

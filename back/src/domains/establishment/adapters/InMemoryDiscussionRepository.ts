@@ -2,7 +2,7 @@ import isAfter from "date-fns/isAfter";
 import { DiscussionDto, DiscussionId, SiretDto } from "shared";
 import {
   DiscussionRepository,
-  GetDiscusionsParams,
+  GetDiscussionsParams,
   HasDiscussionMatchingParams,
 } from "../ports/DiscussionRepository";
 
@@ -14,7 +14,7 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
   public async getDiscussions({
     createdSince,
     sirets,
-  }: GetDiscusionsParams): Promise<DiscussionDto[]> {
+  }: GetDiscussionsParams): Promise<DiscussionDto[]> {
     const filters: Array<(discussion: DiscussionDto) => boolean> = [
       ({ siret }) => (sirets ? sirets.includes(siret) : true),
       ({ createdAt }) =>
