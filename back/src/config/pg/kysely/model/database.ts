@@ -315,27 +315,27 @@ interface OngoingOauths {
   updated_at: Generated<Timestamp>;
 }
 export interface Establishments extends WithAcquisition {
-  siret: string;
-  name: string | null;
-  legacy_address: string | null;
-  number_employees: string | null;
-  naf_code: string | null;
-  is_open: Generated<boolean>;
+  additional_information: Generated<string | null>;
   created_at: Timestamp;
-  update_date: Timestamp | null;
   customized_name: string | null;
-  is_commited: boolean | null;
-  naf_nomenclature: string | null;
-  source_provider: string;
-  is_searchable: Generated<boolean>;
-  website: Generated<string | null>;
-  additional_information: Generated<string>;
   fit_for_disabled_workers: Generated<boolean | null>;
-  max_contacts_per_week: number;
+  is_commited: boolean | null;
+  is_open: Generated<boolean>;
+  is_searchable: Generated<boolean>;
   last_insee_check_date: Timestamp | null;
+  legacy_address: string | null;
+  max_contacts_per_week: number;
+  naf_code: string | null;
+  naf_nomenclature: string | null;
+  name: string | null;
   next_availability_date: Timestamp | null;
-  searchable_by_students: boolean;
+  number_employees: string | null;
   searchable_by_job_seekers: boolean;
+  searchable_by_students: boolean;
+  siret: string;
+  source_provider: string;
+  update_date: Timestamp | null;
+  website: Generated<string | null>;
 }
 
 export interface PublicAppellationsData {

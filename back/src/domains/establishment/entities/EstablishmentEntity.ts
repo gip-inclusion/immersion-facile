@@ -15,26 +15,26 @@ type ApiSource = "api_labonneboite";
 type SourceProvider = FormEstablishmentSource | ApiSource;
 
 export type EstablishmentEntity = {
-  nextAvailabilityDate?: DateTimeIsoString;
-  siret: SiretDto;
-  name: string;
-  customizedName?: string;
-  locations: Location[];
-  voluntaryToImmersion: boolean;
-  sourceProvider: SourceProvider;
-  nafDto: NafDto;
-  numberEmployeesRange: NumberEmployeesRange;
+  additionalInformation?: string;
   createdAt: Date;
-  updatedAt?: Date;
-  lastInseeCheckDate?: Date;
+  customizedName?: string;
+  fitForDisabledWorkers?: boolean;
+  isCommited?: boolean;
   isOpen: boolean;
   isSearchable: boolean;
-  isCommited?: boolean;
-  fitForDisabledWorkers?: boolean;
-  website?: string;
-  additionalInformation?: string;
+  lastInseeCheckDate?: Date;
+  locations: Location[];
   maxContactsPerWeek: number;
+  nafDto: NafDto;
+  name: string;
+  nextAvailabilityDate?: DateTimeIsoString;
+  numberEmployeesRange: NumberEmployeesRange;
   searchableBy: EstablishmentSearchableBy;
+  siret: SiretDto;
+  sourceProvider: SourceProvider;
+  updatedAt?: Date;
+  voluntaryToImmersion: boolean;
+  website?: string;
 } & WithAcquisition;
 
 export type EstablishmentAggregate = {
