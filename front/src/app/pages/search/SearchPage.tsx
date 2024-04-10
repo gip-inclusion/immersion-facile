@@ -40,9 +40,9 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
 );
 
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
-  { value: "score", label: "Par pertinence" },
   { value: "distance", label: "Par proximité" },
   { value: "date", label: "Par date de publication" },
+  // { value: "score", label: "Par pertinence" },
 ];
 
 export const SearchPage = ({
@@ -64,7 +64,7 @@ export const SearchPage = ({
     longitude: 0,
     distanceKm: 10,
     place: "",
-    sortedBy: "score",
+    sortedBy: "distance",
     appellations: undefined,
     ...acquisitionParams,
   };
