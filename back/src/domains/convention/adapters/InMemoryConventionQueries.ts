@@ -85,9 +85,12 @@ export class InMemoryConventionQueries implements ConventionQueries {
     return this.#addAgencyDataToConvention(convention);
   }
 
+  public getConventionsByFiltersCalled = 0;
+
   public async getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
   ): Promise<ConventionReadDto[]> {
+    this.getConventionsByFiltersCalled++;
     return this.conventionRepository.conventions
       .filter(makeApplyFiltersToConventions(filters))
       .map((convention) => this.#addAgencyDataToConvention(convention));

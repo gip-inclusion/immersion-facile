@@ -102,7 +102,7 @@ export class SearchImmersion extends TransactionalUseCase<
       );
 
     const searchResultsInRepo =
-      voluntaryToImmersion !== false
+      voluntaryToImmersion !== false && repositorySearchResults.length > 0
         ? await this.#prepareVoluntaryToImmersionResults(
             uow,
             repositorySearchResults,

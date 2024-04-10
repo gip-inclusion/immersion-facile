@@ -895,6 +895,43 @@ describe("SearchImmersionUseCase", () => {
     });
   });
 
+  describe("repository call optimization", () => {
+    it("does not call discussion & convention repositories when there is no search results", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [];
+
+      const response = await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+        sortedBy: "score",
+      });
+
+      expectToEqual(response, []);
+      expectToEqual(uow.discussionRepository.discussionCallsCount, 0);
+      expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 0);
+    });
+
+    it("does not call discussion & convention repositories when there is search results but not sorted by score", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishment,
+      ];
+
+      const response = await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+        sortedBy: "distance",
+      });
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          secretariatOffer.romeCode,
+          606885,
+          4.5,
+        ),
+      ]);
+      expectToEqual(uow.discussionRepository.discussionCallsCount, 0);
+      expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 0);
+    });
+  });
+
   describe("scoring capabilities", () => {
     const discussionWithEstablishmentResponse = new DiscussionBuilder()
       .withId(uuid())
@@ -944,6 +981,8 @@ describe("SearchImmersionUseCase", () => {
             104.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
 
       it("Increase score by 50 if discussion yearly response rate is 50%", async () => {
@@ -966,6 +1005,8 @@ describe("SearchImmersionUseCase", () => {
             54.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
       it("Increase score by 0 if discussion yearly response rate is 0%", async () => {
         uow.discussionRepository.discussions = [
@@ -986,6 +1027,8 @@ describe("SearchImmersionUseCase", () => {
             4.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
 
       it("Increase score by 0 if no yearly discussion", async () => {
@@ -1009,6 +1052,8 @@ describe("SearchImmersionUseCase", () => {
             4.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
     });
 
@@ -1046,6 +1091,8 @@ describe("SearchImmersionUseCase", () => {
             14.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
 
       it("Increase score by 30 if 3 establishment validated convention done since last year", async () => {
@@ -1072,6 +1119,8 @@ describe("SearchImmersionUseCase", () => {
             34.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
 
       it("Increase score by 0 if 0 establishment validated convention done since last year", async () => {
@@ -1103,6 +1152,8 @@ describe("SearchImmersionUseCase", () => {
             4.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
     });
 
@@ -1147,6 +1198,8 @@ describe("SearchImmersionUseCase", () => {
             4.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
 
       it("Second establishment first because higher score", async () => {
@@ -1175,6 +1228,8 @@ describe("SearchImmersionUseCase", () => {
             4.5,
           ),
         ]);
+        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
+        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
       });
     });
   });
