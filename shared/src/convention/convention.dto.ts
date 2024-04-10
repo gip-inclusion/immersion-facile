@@ -54,7 +54,11 @@ export const doesStatusNeedsValidators = (
   const isValidatorRequired = conventionStatusesWithValidator.includes(
     targetStatus as ConventionStatusWithValidator,
   );
-  return isValidatorRequired && initialStatus === "IN_REVIEW";
+  return (
+    isValidatorRequired &&
+    (initialStatus === "IN_REVIEW" ||
+      initialStatus === "ACCEPTED_BY_COUNSELLOR")
+  );
 };
 
 export const conventionStatusesWithJustificationWithoutModifierRole = [
