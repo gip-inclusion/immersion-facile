@@ -41,22 +41,6 @@ describe("Get Convention", () => {
         );
       });
 
-      it("When convention id in jwt token does not match provided one", async () => {
-        await expectPromiseToFailWithError(
-          getConvention.execute(
-            { conventionId: convention.id },
-            {
-              role: "establishment-representative",
-              applicationId: "not-matching-convention-id",
-              emailHash: "",
-            },
-          ),
-          new ForbiddenError(
-            `This token is not allowed to access convention with id ${convention.id}. Role was 'establishment-representative'`,
-          ),
-        );
-      });
-
       it("When the user don't have correct role on inclusion connected users", async () => {
         const user: InclusionConnectedUser = {
           id: "my-user-id",
@@ -82,32 +66,50 @@ describe("Get Convention", () => {
         );
       });
 
-      it.each([
-        "validator",
-        "beneficiary",
-        "counsellor",
-        "establishment-representative",
-      ] as const)(
-        "When the user email for role %s is not used in the convention anymore",
-        async (role: Role) => {
-          uow.agencyRepository.setAgencies([agency]);
-          uow.conventionRepository.setConventions([convention]);
-          const payload: ConventionJwtPayload = {
-            role,
-            emailHash: "oldHash",
-            applicationId: convention.id,
-            iat: 1,
-            version: 1,
-          };
-
+      describe("with ConventionJwtPayload", () => {
+        it("When convention id in jwt token does not match provided one", async () => {
           await expectPromiseToFailWithError(
-            getConvention.execute({ conventionId: convention.id }, payload),
+            getConvention.execute(
+              { conventionId: convention.id },
+              {
+                role: "establishment-representative",
+                applicationId: "not-matching-convention-id",
+                emailHash: "",
+              },
+            ),
             new ForbiddenError(
-              `User has no right on convention '${convention.id}'`,
+              `This token is not allowed to access convention with id ${convention.id}. Role was 'establishment-representative'`,
             ),
           );
-        },
-      );
+        });
+
+        it.each([
+          "validator",
+          "beneficiary",
+          "counsellor",
+          "establishment-representative",
+        ] as const)(
+          "When the user email for role %s is not used in the convention anymore",
+          async (role: Role) => {
+            uow.agencyRepository.setAgencies([agency]);
+            uow.conventionRepository.setConventions([convention]);
+            const payload: ConventionJwtPayload = {
+              role,
+              emailHash: "oldHash",
+              applicationId: convention.id,
+              iat: 1,
+              version: 1,
+            };
+
+            await expectPromiseToFailWithError(
+              getConvention.execute({ conventionId: convention.id }, payload),
+              new ForbiddenError(
+                `User has no right on convention '${convention.id}'`,
+              ),
+            );
+          },
+        );
+      });
     });
 
     describe("Not found error", () => {
@@ -208,30 +210,32 @@ describe("Get Convention", () => {
       });
     });
 
-    it("with ConventionJwtPayload", async () => {
-      const payload: ConventionJwtPayload = {
-        role: "establishment-representative",
-        emailHash: stringToMd5(
-          convention.signatories.establishmentRepresentative.email,
-        ),
-        applicationId: convention.id,
-        iat: 1,
-        version: 1,
-      };
+    describe("with ConventionJwtPayload", () => {
+      it("user has no inclusion connect", async () => {
+        const payload: ConventionJwtPayload = {
+          role: "establishment-representative",
+          emailHash: stringToMd5(
+            convention.signatories.establishmentRepresentative.email,
+          ),
+          applicationId: convention.id,
+          iat: 1,
+          version: 1,
+        };
 
-      const conventionResult = await getConvention.execute(
-        { conventionId: convention.id },
-        payload,
-      );
+        const conventionResult = await getConvention.execute(
+          { conventionId: convention.id },
+          payload,
+        );
 
-      expectToEqual(conventionResult, {
-        ...convention,
-        agencyName: agency.name,
-        agencyDepartment: agency.address.departmentCode,
-        agencyKind: agency.kind,
-        agencySiret: agency.agencySiret,
-        agencyCounsellorEmails: agency.counsellorEmails,
-        agencyValidatorEmails: agency.validatorEmails,
+        expectToEqual(conventionResult, {
+          ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+        });
       });
     });
 
