@@ -1,10 +1,8 @@
+import { AgencyRight, InclusionConnectedUser, UserId } from "shared";
 import {
-  AgencyRight,
-  InclusionConnectedUser,
-  UserId,
-  WithAgencyRole,
-} from "shared";
-import { InclusionConnectedUserRepository } from "../../../dashboard/port/InclusionConnectedUserRepository";
+  InclusionConnectedFilters,
+  InclusionConnectedUserRepository,
+} from "../../../dashboard/port/InclusionConnectedUserRepository";
 import { InMemoryUserRepository } from "./InMemoryUserRepository";
 
 type AgencyRightsByUserId = Record<UserId, AgencyRight[]>;
@@ -32,11 +30,15 @@ export class InMemoryInclusionConnectedUserRepository
 
   public async getWithFilter({
     agencyRole,
-  }: Partial<WithAgencyRole>): Promise<InclusionConnectedUser[]> {
+    agencyId,
+  }: InclusionConnectedFilters): Promise<InclusionConnectedUser[]> {
+    // TODO: gestion des filtres optionnels à améliorer
     return this.userRepository.users
       .filter((user) =>
-        this.agencyRightsByUserId[user.id].some(
-          ({ role }) => role === agencyRole,
+        this.agencyRightsByUserId[user.id].some(({ role, agency }) =>
+          agencyId
+            ? role === agencyRole && agency.id === agencyId
+            : role === agencyRole,
         ),
       )
       .map((user) => ({
