@@ -158,7 +158,7 @@ export const LayoutHeader = () => {
             routes.establishmentDashboard({ tab: "conventions" }).name,
           linkProps: {
             ...routes.establishmentDashboard({ tab: "conventions" }).link,
-            id: establishmentIds.establishmentDashboard,
+            id: establishmentIds.dashboard,
           },
         },
       ],
@@ -197,7 +197,7 @@ export const LayoutHeader = () => {
           isActive: false,
           linkProps: {
             ...routes.agencyDashboard().link,
-            id: adminIds.dashboard,
+            id: agencyIds.dashboard,
           },
         },
       ],

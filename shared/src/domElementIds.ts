@@ -48,17 +48,17 @@ export const domElementIds = {
         home: buildHeaderNavLinkId("establishment-home"),
         addEstablishmentForm: buildHeaderNavLinkId("establishment-form"),
         formConvention: buildHeaderNavLinkId("establishment-form-convention"),
-        establishmentDashboard: buildHeaderNavLinkId("establishment-dashboard"),
+        dashboard: buildHeaderNavLinkId("establishment-dashboard"),
       },
       agency: {
         home: buildHeaderNavLinkId("agency-home"),
         addAgencyForm: buildHeaderNavLinkId("agency-form"),
         formConvention: buildHeaderNavLinkId("agency-form-convention"),
+        dashboard: buildHeaderNavLinkId("agency-my-dashboard"),
       },
       admin: {
         backOffice: buildHeaderNavLinkId("admin-home"),
         emails: buildHeaderNavLinkId("admin-emails"),
-        dashboard: buildHeaderNavLinkId("agency-my-dashboard"),
       },
     },
   },
@@ -499,6 +499,15 @@ export const domElementIds = {
       editAgencyFormSafirCodeInput: "im-form-edit-agency__safir-code-input",
       editAgencyFormEditSubmitButton: "im-form-edit-agency__submit-button",
       rejectAgencyModal: "im-reject-agency-modal",
+      agencyToReviewInput: "im-agency-to-review__input",
+      agencyToReviewButton: "im-agency-to-review__review-button",
+      agencyToReviewActivateButton: "im-agency-to-review__activate-button",
+      agencyToReviewRejectButton: "im-agency-to-review__reject-button",
+      selectIcUserToReview: "im-agency-user-review__select-ic-user",
+      registerIcUserToAgencyButton: "im-agency-user-review__register-button",
+      rejectAgencyModalJustificationInput:
+        "im-reject-agency-modal__justification-input",
+      rejectAgencyModalSubmitButton: "im-reject-agency-modal__submit-button",
     },
     emailPreviewTab: {
       emailTemplateNameSelect: "selectTemplateName",
@@ -541,7 +550,19 @@ export const domElementIds = {
   editFormEstablishmentRoute: {},
   error: {},
   conventionMiniStageRoute: {},
-  agencyDashboard: {},
+  agencyDashboard: {
+    login: {
+      inclusionConnectButton: "im-login-form__inclusion-connect-button--agency",
+    },
+    registerAgencies: {
+      form: "im-register-agencies-form",
+      agencyAutocomplete: "im-register-agencies-form__agency-autocomplete",
+      submitButton: "im-register-agencies-form__submit-button",
+    },
+    dashboard: {
+      tabContainer: "im-agency-dashboard__tab-container",
+    },
+  },
   manageConventionAdmin: {},
   manageConventionInclusionConnected: {
     erroredConventionHandledModal:
@@ -552,6 +573,10 @@ export const domElementIds = {
   offerExternal: {},
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
+    login: {
+      inclusionConnectButton:
+        "im-login-form__inclusion-connect-button--establishment",
+    },
     discussion: {
       activateDraftConvention:
         "im-manage-establishment__convert-discussion-to-draft-convention",

@@ -15,6 +15,7 @@ import {
   AgencyRole,
   RejectIcUserRoleForAgencyParams,
   UserId,
+  domElementIds,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -116,6 +117,7 @@ function AgencyReviewForm({
                 {
                   type: "button",
                   priority: "primary",
+                  id: `${domElementIds.admin.agencyTab.registerIcUserToAgencyButton}-${agency.id}-${selectedUserId}`,
                   onClick: () => registerIcUserToAgency(agency),
                   children: "Valider",
                   disabled: !selectedRole,

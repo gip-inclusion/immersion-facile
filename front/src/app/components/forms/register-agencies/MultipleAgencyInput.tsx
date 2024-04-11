@@ -14,6 +14,7 @@ type MultipleAgencyInputProps = {
   onAgencyAdd: (agency: AgencyOption) => void;
   onAgencyDelete: (agency: AgencyOption) => void;
   error?: string;
+  id?: string;
 };
 
 const placeholderOption: AgencyOption = {
@@ -29,6 +30,7 @@ export const MultipleAgencyInput = ({
   onAgencyAdd,
   onAgencyDelete,
   error,
+  id = "multiple-agency-input",
 }: MultipleAgencyInputProps) => {
   const { cx } = useStyles();
   const [currentAgencies, setCurrentAgencies] = useState<AgencyOption[]>(
@@ -52,6 +54,7 @@ export const MultipleAgencyInput = ({
                 label="Commencez à taper le nom de votre structure"
                 placeholder="Ex: Agence de Berry"
                 seletedAgency={currentAgencies[index]}
+                id={`${id}--${index}`}
                 onAgencySelected={(selectedAgency) => {
                   const updatedAgencies = [...currentAgencies];
                   updatedAgencies[index] = selectedAgency;
@@ -110,6 +113,7 @@ type AgencyAutocompleteProps = {
   seletedAgency: AgencyOption;
   onAgencySelected: (agency: AgencyOption) => void;
   excludeAgencies?: AgencyOption[];
+  id: string;
 };
 
 const AgencyAutocomplete = ({
@@ -118,6 +122,7 @@ const AgencyAutocomplete = ({
   seletedAgency,
   onAgencySelected,
   excludeAgencies,
+  id = "agency-autocomplete",
 }: AgencyAutocompleteProps) => {
   const { cx } = useStyles();
   const [agencyOptions, setAgencyOptions] = useState<AgencyOption[]>([]);
@@ -149,6 +154,7 @@ const AgencyAutocomplete = ({
       filterOptions={(x) => x}
       options={agencyOptions}
       value={seletedAgency ?? ""}
+      id={id}
       getOptionLabel={(option: AgencyOption) => option.name}
       renderOption={(props, option) => <li {...props}>{option.name}</li>}
       onChange={(_, selectedAgency) => {

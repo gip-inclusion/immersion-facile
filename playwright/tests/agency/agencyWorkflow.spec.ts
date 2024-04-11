@@ -1,6 +1,6 @@
 import { Page, expect, test } from "@playwright/test";
 import { AgencyId, addressRoutes, domElementIds, frontRoutes } from "shared";
-import { connectToAdmin, goToAdminTab } from "../../utils/admin";
+import { goToAdminTab } from "../../utils/admin";
 import { fillAutocomplete } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
@@ -22,32 +22,11 @@ test.describe("Agency workflow", () => {
 
   test("Rejects an agency in backoffice", async ({ page }) => {
     if (!agencyAddedId) throw new Error("agencyAddedId is null");
-    await connectToAdmin(page);
-    await goToAdminTab(page, "agencies");
-    await page.locator("#admin-agency-to-review-id").click();
-    await page.locator("#admin-agency-to-review-id").fill(agencyAddedId);
-
-    await expect(
-      await page.locator("#admin-agency-to-review-submit"),
-    ).toBeEnabled();
-
-    await page.locator("#admin-agency-to-review-submit").click();
-
-    await page.locator("#admin-agency-to-review-reject-button").click();
-
-    await page
-      .locator("#admin-agency-to-review-rejection-justification")
-      .click();
-    await page
-      .locator("#admin-agency-to-review-rejection-justification")
-      .fill("This is a justification");
-    await page.locator("#admin-agency-to-review-reject-confirm-button").click();
-
-    await expect(page.locator(".fr-alert--success")).toBeVisible();
+    await rejectAgencyInAdmin(page, agencyAddedId);
   });
 });
 
-const fillAndSubmitBasicAgencyForm = async (
+export const fillAndSubmitBasicAgencyForm = async (
   page: Page,
 ): Promise<AgencyId | null> => {
   await page.goto(frontRoutes.addAgency);
@@ -106,4 +85,45 @@ const fillAndSubmitBasicAgencyForm = async (
   await page.locator(`#${domElementIds.addAgency.submitButton}`).click();
 
   return page.locator(`#${domElementIds.addAgency.id}`).getAttribute("value");
+};
+
+export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
+  console.info("goToAdminTab rejectAgencyInAdmin");
+  await goToAdminTab(page, "agencies");
+  await page
+    .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
+    .click();
+  await page
+    .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
+    .fill(agencyId);
+
+  await expect(
+    await page.locator(
+      `#${domElementIds.admin.agencyTab.agencyToReviewButton}`,
+    ),
+  ).toBeEnabled();
+
+  await page
+    .locator(`#${domElementIds.admin.agencyTab.agencyToReviewButton}`)
+    .click();
+
+  await page
+    .locator(`#${domElementIds.admin.agencyTab.agencyToReviewRejectButton}`)
+    .click();
+
+  await page
+    .locator(
+      `#${domElementIds.admin.agencyTab.rejectAgencyModalJustificationInput}`,
+    )
+    .click();
+  await page
+    .locator(
+      `#${domElementIds.admin.agencyTab.rejectAgencyModalJustificationInput}`,
+    )
+    .fill("This is a justification");
+  await page
+    .locator(`#${domElementIds.admin.agencyTab.rejectAgencyModalSubmitButton}`)
+    .click();
+
+  await expect(page.locator(".fr-alert--success")).toBeVisible();
 };
