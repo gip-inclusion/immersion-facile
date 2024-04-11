@@ -109,6 +109,42 @@ describe("Get Convention", () => {
             );
           },
         );
+
+        it("when the user has inclusion connect but not for the agency of this convention", async () => {
+          uow.agencyRepository.setAgencies([agency]);
+          uow.conventionRepository.setConventions([convention]);
+          const inclusionConnectedUser: InclusionConnectedUser = {
+            id: "my-user-id",
+            email: "john@mail.com",
+            firstName: "John",
+            lastName: "Doe",
+            agencyRights: [
+              {
+                agency: new AgencyDtoBuilder().withId("another-agency").build(),
+                role: "validator",
+              },
+            ],
+            establishmentDashboards: {},
+            externalId: "john-external-id",
+          };
+          uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+            inclusionConnectedUser,
+          ]);
+          const payload: ConventionJwtPayload = {
+            role: "validator",
+            emailHash: stringToMd5(inclusionConnectedUser.email),
+            applicationId: convention.id,
+            iat: 1,
+            version: 1,
+          };
+
+          await expectPromiseToFailWithError(
+            getConvention.execute({ conventionId: convention.id }, payload),
+            new ForbiddenError(
+              `User has no right on convention '${convention.id}'`,
+            ),
+          );
+        });
       });
     });
 
@@ -217,6 +253,43 @@ describe("Get Convention", () => {
           emailHash: stringToMd5(
             convention.signatories.establishmentRepresentative.email,
           ),
+          applicationId: convention.id,
+          iat: 1,
+          version: 1,
+        };
+
+        const conventionResult = await getConvention.execute(
+          { conventionId: convention.id },
+          payload,
+        );
+
+        expectToEqual(conventionResult, {
+          ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+        });
+      });
+
+      it("user has inclusion connect", async () => {
+        const inclusionConnectedUser: InclusionConnectedUser = {
+          id: "my-user-id",
+          email: "john@mail.com",
+          firstName: "John",
+          lastName: "Doe",
+          agencyRights: [{ agency, role: "validator" }],
+          establishmentDashboards: {},
+          externalId: "john-external-id",
+        };
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          inclusionConnectedUser,
+        ]);
+        const payload: ConventionJwtPayload = {
+          role: "validator",
+          emailHash: stringToMd5(inclusionConnectedUser.email),
           applicationId: convention.id,
           iat: 1,
           version: 1,
