@@ -188,7 +188,7 @@ export const ActivateAgency = () => {
                     }),
                 },
                 {
-                  id: "admin-agency-to-review-reject-button",
+                  id: domElementIds.admin.agencyTab.agencyToReviewRejectButton,
                   iconId: "fr-icon-alert-fill",
                   children: "Rejeter cette agence",
                   priority: "secondary",

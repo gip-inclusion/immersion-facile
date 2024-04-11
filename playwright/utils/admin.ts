@@ -43,15 +43,15 @@ export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
   await page
     .locator(`#${domElementIds.header.navLinks.admin.backOffice}`)
     .click();
-  const tabLocator = page
+  await adminButton.click(); // close admin submenu
+  await page.waitForTimeout(200); // wait for the submenu to close (its visibility makes hard to click on tabs)
+  const tabLocator = await page
     .locator(".fr-tabs__list li")
     .nth(getTabIndexByTabName(tabName))
     .locator(".fr-tabs__tab");
   await expect(tabLocator).toBeVisible();
-  const tabPanelId = await tabLocator.getAttribute("id");
   await tabLocator.click({ force: true });
-  await page.locator(`[aria-labelledby="${tabPanelId}"]`).waitFor(); // can't select by ID because of the : in the ID, but we can select by aria-labelledby
-  expect(page.url()).toContain(`${frontRoutes.admin}/${tabName}`);
+  expect(await page.url()).toContain(`${frontRoutes.admin}/${tabName}`);
 };
 
 export const openEmailInAdmin = async (

@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker/locale/fr";
 import { Page, expect, test } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../../custom.config";
-import { connectToAdmin, goToAdminTab } from "../../utils/admin";
+import { goToAdminTab } from "../../utils/admin";
 import { fillAutocomplete } from "../../utils/utils";
 
 const providedSiret = "41433740200039";
@@ -131,7 +131,6 @@ test.describe("Establishment creation and modification workflow", () => {
     await page.waitForTimeout(testConfig.timeForEventCrawler);
 
     // Go to admin page / go to notifications tab
-    await connectToAdmin(page);
     await goToAdminTab(page, "notifications");
     const emailWrapper = page
       .locator(".fr-accordion:has-text('EDIT_FORM_ESTABLISHMENT_LINK')")
@@ -193,7 +192,6 @@ test.describe("Establishment creation and modification workflow", () => {
 
   test("deletes an establishment", async ({ page }) => {
     page.on("dialog", (dialog) => dialog.accept());
-    await connectToAdmin(page);
     await goToAdminTab(page, "establishments");
     const siretInputLocator = page.locator(
       `#${domElementIds.admin.manageEstablishment.siretInput}`,

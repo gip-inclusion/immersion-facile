@@ -4,6 +4,10 @@ on:
     secrets:
       SCALINGO_API_TOKEN:
         required: true
+      IC_USERNAME:
+        required: true
+      IC_PASSWORD:
+        required: true
     inputs:
       tag:
         type: string

@@ -91,6 +91,7 @@ export const AdminPage = ({
                     })
                     .push();
               }}
+              id="admin-tabs"
             >
               {tabs.find((tab) => tab.tabId === currentTab)?.content}
             </Tabs>

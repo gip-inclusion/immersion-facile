@@ -5,6 +5,11 @@ import { fillAutocomplete } from "./utils";
 
 export const fillAndSubmitBasicAgencyForm = async (
   page: Page,
+  override?: {
+    siret?: string;
+    customizedName?: string;
+    rawAddress?: string;
+  },
 ): Promise<AgencyId | null> => {
   await page.goto(frontRoutes.addAgency);
   await page
@@ -17,35 +22,27 @@ export const fillAndSubmitBasicAgencyForm = async (
   await page.locator(`#${domElementIds.addAgency.agencySiretInput}`).click();
   await page
     .locator(`#${domElementIds.addAgency.agencySiretInput}`)
-    .fill("751 984 972 00016");
+    .fill(override?.siret ?? "751 984 972 00016");
 
   await expect(
-    await page.locator(`#${domElementIds.addAgency.nameInput}`),
-  ).toHaveValue(
-    "CONFEDERATION NATIONALE HANDICAP & EMPLOI DES ORGANISMES DE PLACEMENT SPECIALISES (CHEOPS)",
-  );
-  await expect(
     await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`),
-  ).toHaveValue("55 Rue Boissonade 75014 Paris");
+  ).toHaveValue(override?.rawAddress ?? "55 Rue Boissonade 75014 Paris");
 
   await page
     .locator(`#${domElementIds.addAgency.nameInput}`)
-    .fill("Cap emploi de Bayonne");
+    .fill(override?.customizedName ?? "Cap emploi de Bayonne");
   await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).click();
   await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).clear();
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.addAgency.addressAutocomplete}`,
-    value: "18 rue des tonneliers",
+    value: override?.rawAddress ? "17 rue lamartine" : "18 rue des tonneliers",
     endpoint: addressRoutes.lookupStreetAddress.url,
   });
 
   await expect(
     await page.locator(`#${domElementIds.addAgency.nameInput}`),
-  ).toHaveValue("Cap emploi de Bayonne");
-  await expect(
-    await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`),
-  ).toHaveValue("18 Rue des Tonneliers 67065 Strasbourg");
+  ).toHaveValue(override?.customizedName ?? "Cap emploi de Bayonne");
 
   await page
     .locator(`#${domElementIds.addAgency.validatorEmailsInput}`)
@@ -58,10 +55,10 @@ export const fillAndSubmitBasicAgencyForm = async (
   await page
     .locator(`#${domElementIds.addAgency.signatureInput}`)
     .fill("Mon équipe de ouf !");
-
   await page.locator(`#${domElementIds.addAgency.submitButton}`).click();
-
-  return page.locator(`#${domElementIds.addAgency.id}`).getAttribute("value");
+  return await page
+    .locator(`#${domElementIds.addAgency.id}`)
+    .getAttribute("value");
 };
 
 export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {

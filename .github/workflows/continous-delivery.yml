@@ -79,6 +79,8 @@ jobs:
       tag: "v${{ github.run_number }}"
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+      IC_USERNAME: ${{ secrets.IC_USERNAME }}
+      IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
 
   deploy-staging:
     name: Deploy staging
