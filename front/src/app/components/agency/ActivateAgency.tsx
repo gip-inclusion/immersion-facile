@@ -59,7 +59,8 @@ const RejectAgencyModalContent = ({
           textArea
           label="Justification"
           nativeTextAreaProps={{
-            id: "admin-agency-to-review-rejection-justification",
+            id: domElementIds.admin.agencyTab
+              .rejectAgencyModalJustificationInput,
             ...register("rejectionJustification"),
           }}
         />
@@ -76,7 +77,7 @@ const RejectAgencyModalContent = ({
               onClick: () => rejectAgencyModal.close(),
             },
             {
-              id: "admin-agency-to-review-reject-confirm-button",
+              id: domElementIds.admin.agencyTab.rejectAgencyModalSubmitButton,
               iconId: "fr-icon-checkbox-fill",
               children: "Rejeter cette agence",
               priority: "primary",
@@ -150,13 +151,13 @@ export const ActivateAgency = () => {
           <Input
             label="Id de l'agence *"
             nativeInputProps={{
-              id: "admin-agency-to-review-id",
+              id: domElementIds.admin.agencyTab.agencyToReviewInput,
               ...register("agencyId"),
             }}
             {...getFieldError("agencyId")}
           />
           <Button
-            id="admin-agency-to-review-submit"
+            id={domElementIds.admin.agencyTab.agencyToReviewButton}
             type="submit"
             title="Examiner cette agence"
             disabled={!formState.isValid}
@@ -175,7 +176,8 @@ export const ActivateAgency = () => {
               inlineLayoutWhen="always"
               buttons={[
                 {
-                  id: "admin-agency-to-review-activate-button",
+                  id: domElementIds.admin.agencyTab
+                    .agencyToReviewActivateButton,
                   iconId: "fr-icon-checkbox-fill",
                   children: "Activer cette agence",
                   priority: "primary",

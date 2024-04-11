@@ -6,12 +6,14 @@ export interface InclusionConnectButtonProps {
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   inclusionConnectEndpoint: string;
   layout?: "default" | "2-lines";
+  id?: string;
 }
 
 export const InclusionConnectButton = ({
   onClick,
   inclusionConnectEndpoint,
   layout = "default",
+  id = "inclusion-connect-button",
 }: InclusionConnectButtonProps) => {
   const { cx } = useStyles();
   return (
@@ -19,6 +21,7 @@ export const InclusionConnectButton = ({
     <a
       onClick={onClick}
       href={`/api${inclusionConnectEndpoint}`}
+      id={id}
       className={cx(
         "inclusion-connect-button",
         `inclusion-connect-button--${layout}`,

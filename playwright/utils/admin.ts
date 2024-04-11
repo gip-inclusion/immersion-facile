@@ -33,11 +33,17 @@ export const connectToAdmin = async (page: Page) => {
 
 export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
   const adminButton = await page.locator("#fr-header-main-navigation-button-4");
-
-  if (!adminButton.isVisible()) {
+  const isUserAdminConnected = await adminButton.isVisible();
+  if (!isUserAdminConnected) {
+    await expect(isUserAdminConnected).toBe(false);
+    console.info("connectToAdmin goToAdminTab");
     await connectToAdmin(page);
   }
-  await expect(adminButton.isVisible()).toBeTruthy();
+  await expect(adminButton).toBeVisible();
+  await adminButton.click();
+  await page
+    .locator(`#${domElementIds.header.navLinks.admin.backOffice}`)
+    .click();
   const tabLocator = page
     .locator(".fr-tabs__list li")
     .nth(getTabIndexByTabName(tabName))

@@ -5,7 +5,11 @@ import {
   MainWrapper,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { inclusionConnectImmersionRoutes, queryParamsAsString } from "shared";
+import {
+  domElementIds,
+  inclusionConnectImmersionRoutes,
+  queryParamsAsString,
+} from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -66,6 +70,7 @@ export const InclusionConnectedPrivateRoute = ({
                   "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
                 authComponent: (
                   <InclusionConnectButton
+                    id={domElementIds[route.name].login.inclusionConnectButton}
                     inclusionConnectEndpoint={`${
                       inclusionConnectImmersionRoutes.startInclusionConnectLogin
                         .url

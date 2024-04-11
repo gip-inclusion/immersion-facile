@@ -6,7 +6,12 @@ import React from "react";
 import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { AgencyOption, agencyIdAndNameSchema, toDotNotation } from "shared";
+import {
+  AgencyOption,
+  agencyIdAndNameSchema,
+  domElementIds,
+  toDotNotation,
+} from "shared";
 import { formErrorsToFlatErrors } from "src/app/hooks/formContents.hooks";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { z } from "zod";
@@ -44,11 +49,12 @@ export const RegisterAgenciesForm = () => {
             }),
           ),
         )}
-        id={"im-form-register-agencies"}
+        id={domElementIds.agencyDashboard.registerAgencies.form}
       >
         <MultipleAgencyInput
           initialAgencies={watch("agencies")}
           label="Organisme(s) au(x)quel(s) vous êtes rattaché(s)"
+          id={domElementIds.agencyDashboard.registerAgencies.agencyAutocomplete}
           onAgencyAdd={(agency) => {
             setValue("agencies", [...getValues("agencies"), agency]);
           }}
@@ -66,7 +72,11 @@ export const RegisterAgenciesForm = () => {
           visible={keys(formState.errors).length > 0}
         />
         <div className={fr.cx("fr-mt-2w")}>
-          <Button>Demander à être relié à ces structures</Button>
+          <Button
+            id={domElementIds.agencyDashboard.registerAgencies.submitButton}
+          >
+            Demander à être relié à ces structures
+          </Button>
         </div>
       </form>
     </>

@@ -6,7 +6,7 @@ import { all } from "ramda";
 import React from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { AgencyRight, InclusionConnectedUser } from "shared";
+import { AgencyRight, InclusionConnectedUser, domElementIds } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -215,6 +215,7 @@ export const AgencyDashboardPage = ({
                 rawAgencyDashboardTabs(currentUser),
                 currentTab,
               )}
+              id={domElementIds.agencyDashboard.dashboard.tabContainer}
               selectedTabId={currentTab}
               onTabChange={(tab) => {
                 if (isAgencyDashboardTab(tab))
