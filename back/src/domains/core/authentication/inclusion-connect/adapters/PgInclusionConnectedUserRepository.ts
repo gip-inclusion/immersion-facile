@@ -1,14 +1,12 @@
-import {
-  AgencyRole,
-  InclusionConnectedUser,
-  UserId,
-  WithAgencyRole,
-} from "shared";
+import { AgencyId, AgencyRole, InclusionConnectedUser, UserId } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
 } from "../../../../../config/pg/kysely/kyselyUtils";
-import { InclusionConnectedUserRepository } from "../../../dashboard/port/InclusionConnectedUserRepository";
+import {
+  InclusionConnectedFilters,
+  InclusionConnectedUserRepository,
+} from "../../../dashboard/port/InclusionConnectedUserRepository";
 
 export class PgInclusionConnectedUserRepository
   implements InclusionConnectedUserRepository
@@ -24,8 +22,9 @@ export class PgInclusionConnectedUserRepository
 
   public async getWithFilter({
     agencyRole,
-  }: Partial<WithAgencyRole>): Promise<InclusionConnectedUser[]> {
-    return this.#getInclusionConnectedUsers({ agencyRole });
+    agencyId,
+  }: InclusionConnectedFilters): Promise<InclusionConnectedUser[]> {
+    return this.#getInclusionConnectedUsers({ agencyRole, agencyId });
   }
 
   public async update(user: InclusionConnectedUser): Promise<void> {
@@ -52,6 +51,7 @@ export class PgInclusionConnectedUserRepository
   async #getInclusionConnectedUsers(filters: {
     userId?: UserId;
     agencyRole?: AgencyRole;
+    agencyId?: AgencyId;
   }): Promise<InclusionConnectedUser[]> {
     const buildAgencyRight = `JSON_BUILD_OBJECT(
        'role', users__agencies.role,
@@ -125,7 +125,11 @@ export class PgInclusionConnectedUserRepository
   }
 }
 
-type Filters = { userId?: UserId; agencyRole?: AgencyRole };
+type Filters = {
+  userId?: UserId;
+  agencyRole?: AgencyRole;
+  agencyId?: AgencyId;
+};
 
 type WhereClause = {
   statement: string;
@@ -133,19 +137,36 @@ type WhereClause = {
 };
 
 const getWhereClause = (filters: Filters): WhereClause => {
-  if (filters.userId)
-    return {
-      statement: "WHERE users.id = $1",
-      values: [filters.userId],
-    };
+  if (!filters.userId && !filters.agencyRole && !filters.agencyId) {
+    return { statement: "WHERE users.id IS NULL", values: [] };
+  }
 
-  if (filters.agencyRole)
-    return {
-      statement: `WHERE users.id IN (
-        SELECT user_id FROM users__agencies WHERE users__agencies.role = $1
-        )`,
-      values: [filters.agencyRole],
-    };
+  let searchClause = "WHERE";
+  let searchParams: string[] = [];
 
-  return { statement: "WHERE users.id IS NULL", values: [] };
+  if (filters.userId) {
+    searchClause = `${searchClause} users.id = $1`;
+    searchParams = [...searchParams, filters.userId];
+  }
+
+  if (filters.agencyRole) {
+    searchClause = `${searchClause} ${searchParams.length > 0 ? "AND" : ""} users.id IN (
+        SELECT user_id FROM users__agencies WHERE users__agencies.role = $${
+          searchParams.length + 1
+        }
+        )`;
+    searchParams = [...searchParams, filters.agencyRole];
+  }
+
+  if (filters.agencyId) {
+    searchClause = `${searchClause} ${
+      searchParams.length > 0 ? "AND" : ""
+    } users__agencies.agency_id = $${searchParams.length + 1}`;
+    searchParams = [...searchParams, filters.agencyId];
+  }
+
+  return {
+    statement: searchClause,
+    values: searchParams,
+  };
 };

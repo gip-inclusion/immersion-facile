@@ -49,7 +49,7 @@ describe("PgInclusionConnectedUserRepository", () => {
   let icUserRepository: PgInclusionConnectedUserRepository;
   let agencyRepository: PgAgencyRepository;
 
-  beforeAll(async () => {
+  beforeAll(() => {
     pool = getTestPgPool();
   });
 
@@ -233,6 +233,41 @@ describe("PgInclusionConnectedUserRepository", () => {
         {
           ...user2,
           agencyRights: [{ agency: agency2, role: "toReview" }],
+          establishmentDashboards: {},
+        },
+      ]);
+    });
+
+    it("fetches inclusion connected users given its status 'validator' and agencyId", async () => {
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
+      await insertUser(user1);
+      await insertUser(user2);
+      await insertAgencyRegistrationToUser({
+        agencyId: agency1.id,
+        userId: user1.id,
+        role: "validator",
+      });
+      await insertAgencyRegistrationToUser({
+        agencyId: agency1.id,
+        userId: user2.id,
+        role: "toReview",
+      });
+      await insertAgencyRegistrationToUser({
+        agencyId: agency2.id,
+        userId: user1.id,
+        role: "validator",
+      });
+
+      const icUsers = await icUserRepository.getWithFilter({
+        agencyRole: "validator",
+        agencyId: agency1.id,
+      });
+
+      expectArraysToEqualIgnoringOrder(icUsers, [
+        {
+          ...user1,
+          agencyRights: [{ agency: agency1, role: "validator" }],
           establishmentDashboards: {},
         },
       ]);
