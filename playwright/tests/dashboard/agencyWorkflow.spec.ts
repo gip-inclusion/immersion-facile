@@ -2,9 +2,9 @@ import test, { expect } from "@playwright/test";
 import { AgencyId, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { connectToAdmin, goToAdminTab } from "../../utils/admin";
+import { fillAndSubmitBasicAgencyForm } from "../../utils/agency";
 import { loginWithInclusionConnect } from "../../utils/inclusionConnect";
 import { fillAutocomplete } from "../../utils/utils";
-import { fillAndSubmitBasicAgencyForm } from "../agency/agencyWorkflow.spec";
 
 test.describe("Agency dashboard workflow", () => {
   let agencyId: AgencyId | null;
@@ -14,9 +14,7 @@ test.describe("Agency dashboard workflow", () => {
     agencyId = await fillAndSubmitBasicAgencyForm(page);
     console.info("Added agency ID: ", agencyId);
     if (!agencyId) throw new Error("Agency ID is null");
-    console.info("connectToAdmin 1");
     await connectToAdmin(page);
-    console.info("goToAdminTab 1");
     await goToAdminTab(page, "agencies");
     await page
       .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
@@ -55,7 +53,6 @@ test.describe("Agency dashboard workflow", () => {
     await expect(
       await page.locator(".fr-alert--success").first(),
     ).toBeVisible();
-    console.info("goToAdminTab 2");
     await goToAdminTab(page, "agencies");
     await page
       .locator(`#${domElementIds.admin.agencyTab.selectIcUserToReview}`)
