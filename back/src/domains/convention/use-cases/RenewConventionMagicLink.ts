@@ -18,7 +18,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { conventionEmailsByRole } from "../../../utils/convention";
+import { conventionEmailsByRoleForMagicLinkRenewal } from "../../../utils/convention";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -72,7 +72,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     );
 
     const convention = await this.#getConvention(uow, applicationId);
-    const emails = conventionEmailsByRole(
+    const emails = conventionEmailsByRoleForMagicLinkRenewal(
       role,
       convention,
       await this.#getAgency(uow, convention),

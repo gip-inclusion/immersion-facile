@@ -105,11 +105,9 @@ export class GetConvention extends TransactionalUseCase<
     agency: AgencyDto;
     inclusionConnectedUserRepository: InclusionConnectedUserRepository;
   }): Promise<boolean> {
-    const emailsByRole = conventionEmailsByRole(
-      authPayload.role,
-      convention,
-      agency,
-    )[authPayload.role];
+    const emailsByRole = conventionEmailsByRole(convention, agency)[
+      authPayload.role
+    ];
     if (emailsByRole instanceof Error) throw emailsByRole;
     const isEmailMatchingConventionEmails = !!emailsByRole.find(
       (email) => authPayload.emailHash === stringToMd5(email),

@@ -22,7 +22,10 @@ import {
 import { GetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
-  const agency = new AgencyDtoBuilder().build();
+  const agency = new AgencyDtoBuilder()
+    .withCounsellorEmails(["counsellor@mail.fr"])
+    .withValidatorEmails(["validator@mail.fr"])
+    .build();
   const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
   let getConvention: GetConvention;
   let uow: InMemoryUnitOfWork;
@@ -247,32 +250,54 @@ describe("Get Convention", () => {
     });
 
     describe("with ConventionJwtPayload", () => {
-      it("user has no inclusion connect", async () => {
-        const payload: ConventionJwtPayload = {
+      it.each([
+        {
           role: "establishment-representative",
-          emailHash: stringToMd5(
-            convention.signatories.establishmentRepresentative.email,
-          ),
-          applicationId: convention.id,
-          iat: 1,
-          version: 1,
-        };
+          email: convention.signatories.establishmentRepresentative.email,
+        },
+        {
+          role: "establishment-tutor",
+          email: convention.establishmentTutor.email,
+        },
+        {
+          role: "beneficiary",
+          email: convention.signatories.beneficiary.email,
+        },
+        {
+          role: "counsellor",
+          email: agency.counsellorEmails[0],
+        },
+        {
+          role: "validator",
+          email: agency.validatorEmails[0],
+        },
+      ] as const)(
+        "user $role  has no inclusion connect",
+        async ({ role, email }: { role: Role; email: string }) => {
+          const payload: ConventionJwtPayload = {
+            role,
+            emailHash: stringToMd5(email),
+            applicationId: convention.id,
+            iat: 1,
+            version: 1,
+          };
 
-        const conventionResult = await getConvention.execute(
-          { conventionId: convention.id },
-          payload,
-        );
+          const conventionResult = await getConvention.execute(
+            { conventionId: convention.id },
+            payload,
+          );
 
-        expectToEqual(conventionResult, {
-          ...convention,
-          agencyName: agency.name,
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-          agencySiret: agency.agencySiret,
-          agencyCounsellorEmails: agency.counsellorEmails,
-          agencyValidatorEmails: agency.validatorEmails,
-        });
-      });
+          expectToEqual(conventionResult, {
+            ...convention,
+            agencyName: agency.name,
+            agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
+            agencySiret: agency.agencySiret,
+            agencyCounsellorEmails: agency.counsellorEmails,
+            agencyValidatorEmails: agency.validatorEmails,
+          });
+        },
+      );
 
       it("user has inclusion connect", async () => {
         const inclusionConnectedUser: InclusionConnectedUser = {

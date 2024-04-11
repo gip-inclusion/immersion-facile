@@ -2,7 +2,6 @@ import { AgencyDto, ConventionDto, Role } from "shared";
 import { BadRequestError } from "../config/helpers/httpErrors";
 
 export const conventionEmailsByRole = (
-  role: Role,
   convention: ConventionDto,
   agency: AgencyDto,
 ): Record<Role, string[] | Error> => ({
@@ -24,7 +23,19 @@ export const conventionEmailsByRole = (
   "establishment-representative": [
     convention.signatories.establishmentRepresentative.email,
   ],
-  "establishment-tutor": new BadRequestError(
-    `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
-  ),
+  "establishment-tutor": [convention.establishmentTutor.email],
 });
+
+export const conventionEmailsByRoleForMagicLinkRenewal = (
+  role: Role,
+  convention: ConventionDto,
+  agency: AgencyDto,
+): Record<Role, string[] | Error> => {
+  return {
+    ...conventionEmailsByRole(convention, agency),
+    backOffice: new BadRequestError("Le backoffice n'a pas de liens magiques."),
+    "establishment-tutor": new BadRequestError(
+      `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
+    ),
+  };
+};
