@@ -71,6 +71,9 @@ describe("Get Convention", () => {
 
       describe("with ConventionJwtPayload", () => {
         it("When convention id in jwt token does not match provided one", async () => {
+          uow.agencyRepository.setAgencies([agency]);
+          uow.conventionRepository.setConventions([convention]);
+
           await expectPromiseToFailWithError(
             getConvention.execute(
               { conventionId: convention.id },

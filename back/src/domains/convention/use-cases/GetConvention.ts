@@ -32,60 +32,93 @@ export class GetConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     authPayload?: ConventionRelatedJwtPayload,
   ): Promise<ConventionReadDto> {
-    const isInclusionConnectPayload = this.#isInclusionConnectPayload(
-      authPayload,
-      conventionId,
-    );
+    if (!authPayload) {
+      throw new ForbiddenError("No auth payload provided");
+    }
 
     const convention =
       await uow.conventionQueries.getConventionById(conventionId);
     if (!convention)
       throw new NotFoundError(`No convention found with id ${conventionId}`);
 
-    const isConventionDomainPayload = authPayload && "emailHash" in authPayload;
+    const isConventionDomainPayload = "emailHash" in authPayload;
+    const isInclusionConnectPayload = this.#isInclusionConnectPayload(
+      authPayload,
+      conventionId,
+    );
+
+    if ("role" in authPayload && authPayload.role === "backOffice") {
+      return convention;
+    }
+
     if (isConventionDomainPayload) {
-      const agency = await uow.agencyRepository.getById(convention.agencyId);
-      if (!agency) {
-        throw new NotFoundError(`Agency ${convention.agencyId} not found`);
-      }
-      const matchingMd5Emails = await this.#isMatchingMd5Emails({
-        authPayload,
-        convention,
-        agency,
-        inclusionConnectedUserRepository: uow.inclusionConnectedUserRepository,
-      });
-      if (!matchingMd5Emails) {
-        throw new ForbiddenError(
-          `User has no right on convention '${convention.id}'`,
-        );
-      }
+      return this.#onConventionDomainPayload({ authPayload, uow, convention });
     }
 
     if (isInclusionConnectPayload) {
-      const user = await uow.inclusionConnectedUserRepository.getById(
-        authPayload.userId,
+      return this.#onInclusionConnectPayload({ authPayload, uow, convention });
+    }
+
+    throw new ForbiddenError("Incorrect jwt");
+  }
+
+  async #onConventionDomainPayload({
+    authPayload,
+    convention,
+    uow,
+  }: {
+    authPayload: ConventionDomainPayload;
+    convention: ConventionReadDto;
+    uow: UnitOfWork;
+  }): Promise<ConventionReadDto> {
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (!agency) {
+      throw new NotFoundError(`Agency ${convention.agencyId} not found`);
+    }
+    const matchingMd5Emails = await this.#isMatchingMd5Emails({
+      authPayload,
+      convention,
+      agency,
+      inclusionConnectedUserRepository: uow.inclusionConnectedUserRepository,
+    });
+    if (!matchingMd5Emails) {
+      throw new ForbiddenError(
+        `User has no right on convention '${convention.id}'`,
       );
-      if (!user)
-        throw new NotFoundError(
-          `No user found with id '${authPayload.userId}'`,
-        );
-
-      const role = getIcUserRoleForAccessingConvention(convention, user);
-
-      if (!role)
-        throw new ForbiddenError(
-          `User with id '${authPayload.userId}' is not allowed to access convention with id '${conventionId}'`,
-        );
     }
 
     return convention;
   }
 
+  async #onInclusionConnectPayload({
+    authPayload,
+    convention,
+    uow,
+  }: {
+    authPayload: InclusionConnectJwtPayload;
+    convention: ConventionReadDto;
+    uow: UnitOfWork;
+  }): Promise<ConventionReadDto> {
+    const user = await uow.inclusionConnectedUserRepository.getById(
+      authPayload.userId,
+    );
+    if (!user)
+      throw new NotFoundError(`No user found with id '${authPayload.userId}'`);
+
+    const role = getIcUserRoleForAccessingConvention(convention, user);
+
+    if (!role)
+      throw new ForbiddenError(
+        `User with id '${authPayload.userId}' is not allowed to access convention with id '${convention.id}'`,
+      );
+
+    return convention;
+  }
+
   #isInclusionConnectPayload(
-    authPayload: ConventionRelatedJwtPayload | undefined,
+    authPayload: ConventionRelatedJwtPayload,
     conventionId: ConventionId,
   ): authPayload is InclusionConnectJwtPayload {
-    if (!authPayload) throw new ForbiddenError("No auth payload provided");
     if (!("role" in authPayload)) return true;
     if (authPayload.role === "backOffice") return false;
     if (authPayload.applicationId === conventionId) return false;
