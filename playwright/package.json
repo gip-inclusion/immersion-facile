@@ -21,6 +21,7 @@
     "@playwright/test": "^1.40.1",
     "@types/jest": "^29.5.2",
     "@types/node": "^18.19.3",
+    "dotenv": "^16.0.0",
     "shared": "workspace:*"
   },
   "dependencies": {

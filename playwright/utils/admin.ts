@@ -36,7 +36,6 @@ export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
   const isUserAdminConnected = await adminButton.isVisible();
   if (!isUserAdminConnected) {
     await expect(isUserAdminConnected).toBe(false);
-    console.info("connectToAdmin goToAdminTab");
     await connectToAdmin(page);
   }
   await expect(adminButton).toBeVisible();
