@@ -364,20 +364,31 @@ export class PgEstablishmentAggregateRepository
   ): Promise<SearchResultDto | undefined> {
     const subQuery = `
       SELECT 
-        siret,
+        io.siret,
         io.rome_code,
         prd.libelle_rome as rome_label,
         ${buildAppellationsArray},
         null AS distance_m,
         1 AS row_number,
         loc.*,
-        loc.id AS location_id
+        loc.id AS location_id,
+        e.naf_code,
+        e.is_searchable,
+        date_to_iso(e.next_availability_date) as next_availability_date,
+        e.name,
+        e.website,
+        e.additional_information,
+        e.customized_name,
+        e.fit_for_disabled_workers,
+        e.number_employees
       FROM immersion_offers AS io
+      LEFT JOIN establishments e ON io.siret = e.siret
       LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
       LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
       LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
       WHERE io.siret = $1 AND io.appellation_code = $2 AND loc.id = $3
-      GROUP BY (siret, io.rome_code, prd.libelle_rome, location_id)`;
+      GROUP BY (io.siret, io.rome_code, prd.libelle_rome, location_id, e.naf_code, e.is_searchable, e.next_availability_date, e.name, e.website,
+               e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees)`;
 
     const immersionSearchResultDtos =
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -522,7 +533,18 @@ export class PgEstablishmentAggregateRepository
     const selectedOffersSubQuery = format(
       `WITH
         active_establishments_within_area AS (
-          SELECT siret, fit_for_disabled_workers, loc.*
+          SELECT
+              e.siret,
+              e.fit_for_disabled_workers,
+              date_to_iso(e.next_availability_date) as next_availability_date,
+              e.additional_information,
+              e.customized_name,
+              e.is_searchable,
+              e.naf_code,
+              e.name,
+              e.number_employees,
+              e.website,
+              loc.*
           FROM establishments e
           LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
           WHERE is_open 
@@ -543,7 +565,15 @@ export class PgEstablishmentAggregateRepository
             rome_code, 
             prd.libelle_rome AS rome_label, 
             ST_Distance(aewa.position, ST_GeographyFromText($1)) AS distance_m,
-            fit_for_disabled_workers,
+            aewa.fit_for_disabled_workers,
+            aewa.next_availability_date,
+            aewa.additional_information,
+            aewa.customized_name,
+            aewa.is_searchable,
+            aewa.naf_code,
+            aewa.name,
+            aewa.number_employees,
+            aewa.website,
             ${buildAppellationsArray},
             ${
               searchMade.sortedBy === "score"
@@ -558,7 +588,8 @@ export class PgEstablishmentAggregateRepository
           LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
           ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
           GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
-              aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id)
+              aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id,
+              aewa.next_availability_date, aewa.additional_information, aewa.customized_name, aewa.is_searchable, aewa.naf_code, aewa.name, aewa.number_employees, aewa.website)
         )
         SELECT *, 
         (
@@ -1018,16 +1049,16 @@ WITH
         'rome', io.rome_code,
         'siret', io.siret,
         'distance_m', io.distance_m,
-        'isSearchable',e.is_searchable,
-        'nextAvailabilityDate', date_to_iso(e.next_availability_date),
-        'name', e.name,
-        'website', e.website,
-        'additionalInformation', e.additional_information,
-        'customizedName', e.customized_name,
-        'fitForDisabledWorkers', e.fit_for_disabled_workers,
+        'isSearchable',io.is_searchable,
+        'nextAvailabilityDate', io.next_availability_date,
+        'name', io.name,
+        'website', io.website,
+        'additionalInformation', io.additional_information,
+        'customizedName', io.customized_name,
+        'fitForDisabledWorkers', io.fit_for_disabled_workers,
         'romeLabel', io.rome_label,
         'appellations',  io.appellations,
-        'naf', e.naf_code,
+        'naf', io.naf_code,
         'nafLabel', public_naf_classes_2008.class_label,
         'address', JSON_BUILD_OBJECT(
           'streetNumberAndAddress', io.street_number_and_address,
@@ -1038,13 +1069,12 @@ WITH
         'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat),
         'locationId', io.location_id,
         'contactMode', ec.contact_mode,
-        'numberOfEmployeeRange', e.number_employees
+        'numberOfEmployeeRange', io.number_employees
       )
     ) AS search_immersion_result
-FROM match_immersion_offer AS io 
-LEFT JOIN establishments AS e ON e.siret = io.siret  
-LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = e.siret
+FROM match_immersion_offer AS io   
+LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(io.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = io.siret
 LEFT JOIN establishments_contacts AS ec ON ec.uuid = uec.uuid
 ORDER BY row_number ASC, io.location_id ASC; `;
 
