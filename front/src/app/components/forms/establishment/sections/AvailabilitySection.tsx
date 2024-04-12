@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
@@ -129,6 +130,17 @@ export const AvailabilitySection = ({
             {...getFieldError("maxContactsPerWeek")}
           />
         )}
+      {mode === "admin" && (
+        <div>
+          <Alert
+            severity="info"
+            description={`Mise en relation maximum par semaine actuel : ${
+              getValues().maxContactsPerWeek
+            }`}
+            small={true}
+          />
+        </div>
+      )}
       {availableForImmersion === false && mode === "edit" && (
         <div className={fr.cx("fr-highlight", "fr-ml-0")}>
           <p>
