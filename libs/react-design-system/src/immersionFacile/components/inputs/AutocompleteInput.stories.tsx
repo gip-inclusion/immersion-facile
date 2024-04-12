@@ -43,7 +43,9 @@ export const Default: Story = {
         ref: React.createRef(),
         startAdornment: undefined,
       },
-      inputProps: {},
+      inputProps: {
+        ref: React.createRef(),
+      },
     },
   },
 };

@@ -1,6 +1,6 @@
 import { type FrCxArg, fr } from "@codegouvfr/react-dsfr";
 import React from "react";
-import { makeStyles } from "tss-react/dsfr";
+import { tss } from "tss-react/dsfr";
 import Styles from "./MainWrapper.styles";
 
 type MainWrapperCommonProps = {
@@ -35,7 +35,7 @@ export const MainWrapper = ({
   useBackground,
   backgroundStyles,
 }: MainWrapperProps) => {
-  const { cx, classes } = makeStyles()(() => ({
+  const { cx, classes } = tss.create(() => ({
     customBackground: {
       ...backgroundStyles,
     },
