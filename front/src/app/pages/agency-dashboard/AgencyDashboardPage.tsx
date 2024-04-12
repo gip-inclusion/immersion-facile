@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
+import { subMinutes } from "date-fns";
 import { all } from "ramda";
 import React from "react";
 import { Loader } from "react-design-system";
@@ -167,7 +168,17 @@ export const AgencyDashboardPage = ({
               agencyRights: [],
             },
           },
-          () => <RegisterAgenciesForm />,
+          ({ currentUser }) => {
+            if (new Date(currentUser.createdAt) > subMinutes(new Date(), 1))
+              return (
+                <Alert
+                  severity="warning"
+                  title="Rattachement à vos agences en cours"
+                  description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des agences rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
+                />
+              );
+            return <RegisterAgenciesForm />;
+          },
         )
         .with(
           {
