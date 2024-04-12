@@ -1,5 +1,5 @@
 import { subYears } from "date-fns";
-import { prop, propEq } from "ramda";
+import { prop, propEq, uniq } from "ramda";
 import {
   ApiConsumer,
   AppellationCode,
@@ -136,23 +136,22 @@ export class SearchImmersion extends TransactionalUseCase<
     sortedBy?: SearchSortedBy,
   ): Promise<SearchResultDto[]> {
     const oneYearAgo = subYears(this.timeGateway.now(), 1);
-    const sirets = results.map(({ siret }) => siret);
+    const sirets = uniq(results.map(({ siret }) => siret));
 
-    const discussions =
+    const [discussions, conventions] =
       sortedBy === "score"
-        ? await uow.discussionRepository.getDiscussions({
-            sirets: sirets,
-            createdSince: oneYearAgo,
-          })
-        : [];
-    const conventions =
-      sortedBy === "score"
-        ? await uow.conventionQueries.getConventionsByFilters({
-            withSirets: sirets,
-            withStatuses: ["ACCEPTED_BY_VALIDATOR"],
-            dateSubmissionSince: oneYearAgo,
-          })
-        : [];
+        ? await Promise.all([
+            uow.discussionRepository.getDiscussions({
+              sirets: sirets,
+              createdSince: oneYearAgo,
+            }),
+            uow.conventionQueries.getConventionsByFilters({
+              withSirets: sirets,
+              withStatuses: ["ACCEPTED_BY_VALIDATOR"],
+              dateSubmissionSince: oneYearAgo,
+            }),
+          ])
+        : [[], []];
 
     histogramSearchImmersionStoredCount.observe(results.length);
     return results
