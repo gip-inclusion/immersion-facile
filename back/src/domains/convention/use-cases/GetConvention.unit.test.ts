@@ -343,6 +343,47 @@ describe("Get Convention", () => {
           agencyValidatorEmails: agency.validatorEmails,
         });
       });
+
+      it("user is a PeAdvisor", async () => {
+        const peAdvisorEmail = "pe-advisor@mail.fr";
+        const peConnectedConvention = new ConventionDtoBuilder(convention)
+          .withFederatedIdentity({
+            provider: "peConnect",
+            token: "some-id",
+            payload: {
+              advisor: {
+                email: peAdvisorEmail,
+                firstName: "john",
+                lastName: "doe",
+                type: "PLACEMENT",
+              },
+            },
+          })
+          .build();
+        uow.conventionRepository.setConventions([peConnectedConvention]);
+        const payload: ConventionJwtPayload = {
+          role: "validator",
+          emailHash: stringToMd5(peAdvisorEmail),
+          applicationId: convention.id,
+          iat: 1,
+          version: 1,
+        };
+
+        const conventionResult = await getConvention.execute(
+          { conventionId: convention.id },
+          payload,
+        );
+
+        expectToEqual(conventionResult, {
+          ...peConnectedConvention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+        });
+      });
     });
 
     it("with BackOfficeJwtPayload", async () => {
