@@ -46,6 +46,7 @@ describe("mark partners errored convention as handled", () => {
     agencyRights: [],
     establishmentDashboards: {},
     externalId: "icUserWithoutRight-external-id",
+    createdAt: new Date().toISOString(),
   };
 
   const icUserWithAgencyRights: InclusionConnectedUser = {
@@ -56,6 +57,7 @@ describe("mark partners errored convention as handled", () => {
     agencyRights: [{ role: "validator", agency }],
     establishmentDashboards: {},
     externalId: "icUserWithAgencyRights-external-id",
+    createdAt: new Date().toISOString(),
   };
 
   const convention = new ConventionDtoBuilder()

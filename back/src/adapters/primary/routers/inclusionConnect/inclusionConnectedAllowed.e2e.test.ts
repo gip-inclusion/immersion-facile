@@ -33,6 +33,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     agencyRights: [],
     establishmentDashboards: {},
     externalId: "joe-external-id",
+    createdAt: new Date().toISOString(),
   };
   const inclusionConnectedUserWithRights: InclusionConnectedUser = {
     ...inclusionConnectedUserWithoutRights,
@@ -259,6 +260,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         agencyRights: [{ agency, role: "validator" }],
         establishmentDashboards: {},
         externalId: "joe-external-id",
+        createdAt: new Date().toISOString(),
       };
       const convention = new ConventionDtoBuilder()
         .withId(conventionId)
@@ -328,6 +330,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           firstName: "User",
           lastName: "Name",
           externalId: "user-external-id",
+          createdAt: new Date().toISOString(),
         };
         const discussion = new DiscussionBuilder()
           .withEstablishmentContact(user)

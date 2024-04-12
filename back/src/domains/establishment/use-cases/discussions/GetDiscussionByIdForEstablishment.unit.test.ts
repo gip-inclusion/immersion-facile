@@ -25,6 +25,7 @@ const user: User = {
   firstName: "John",
   lastName: "Doe",
   externalId: "sub-123",
+  createdAt: new Date().toISOString(),
 };
 const discussion = new DiscussionBuilder().build();
 const userDiscussion = new DiscussionBuilder()

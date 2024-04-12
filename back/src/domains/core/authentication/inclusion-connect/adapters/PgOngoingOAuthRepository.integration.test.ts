@@ -42,6 +42,7 @@ describe("PgOngoingOAuthRepository", () => {
       lastName: "Doe",
       email: "john.doe@mail.com",
       externalId: "john-external-id",
+      createdAt: new Date().toISOString(),
     };
     await pgUserRepository.save(user);
     await pgOngoingOAuthRepository.save(ongoingOAuth);

@@ -391,6 +391,7 @@ describe("Admin router", () => {
         agencyRights: [{ agency, role: "toReview" }],
         establishmentDashboards: {},
         externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -447,6 +448,7 @@ describe("Admin router", () => {
         agencyRights: [{ agency, role: "toReview" }],
         establishmentDashboards: {},
         externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
       };
 
       const updatedRole: AgencyRole = "counsellor";
@@ -481,6 +483,7 @@ describe("Admin router", () => {
         agencyRights: [{ agency, role: "toReview" }],
         establishmentDashboards: {},
         externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([

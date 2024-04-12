@@ -209,6 +209,7 @@ export const createUseCases = (
         generateAuthenticatedUserToken,
         config.immersionFacileBaseUrl,
         config.inclusionConnectConfig,
+        gateways.timeGateway,
       ),
       linkFranceTravailUsersToTheirAgencies:
         new LinkFranceTravailUsersToTheirAgencies(uowPerformer),

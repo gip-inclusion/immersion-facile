@@ -101,6 +101,7 @@ export class PgInclusionConnectedUserRepository
         'email', users.email,
         'firstName', users.first_name,
         'lastName', users.last_name,
+        'createdAt', users.created_at,
         'agencyRights', 
             CASE 
               WHEN ${agencyRightsJsonAgg} = '[null]' THEN '[]' 
@@ -118,10 +119,13 @@ export class PgInclusionConnectedUserRepository
     );
 
     if (response.rows.length === 0) return [];
-    return response.rows.map((row) => ({
-      ...row.inclusion_user,
-      establishmentDashboards: {},
-    }));
+    return response.rows.map(
+      (row): InclusionConnectedUser => ({
+        ...row.inclusion_user,
+        createdAt: new Date(row.inclusion_user.createdAt).toISOString(),
+        establishmentDashboards: {},
+      }),
+    );
   }
 }
 

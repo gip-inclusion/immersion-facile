@@ -85,6 +85,7 @@ describe("RenewConvention", () => {
     agencyRights: [{ role: "validator", agency }],
     establishmentDashboards: {},
     externalId: "my-user-external-id",
+    createdAt: new Date().toISOString(),
   };
   const inclusionConnectPayload: InclusionConnectDomainJwtPayload = {
     userId: inclusionConnectedUser.id,

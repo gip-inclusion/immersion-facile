@@ -116,6 +116,7 @@ describe("Auth slice", () => {
       agencyRights: [],
       establishmentDashboards: {},
       externalId: "fake-user-external-id",
+      createdAt: new Date().toISOString(),
     };
     dependencies.inclusionConnectedGateway.currentUser$.next(icUser);
     expectToEqual(

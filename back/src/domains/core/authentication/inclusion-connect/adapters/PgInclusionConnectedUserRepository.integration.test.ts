@@ -23,6 +23,7 @@ const user1: User = {
   lastName: "Doe",
   email: "john.doe@mail.com",
   externalId: "john-external-id",
+  createdAt: new Date().toISOString(),
 };
 
 const user2: User = {
@@ -31,6 +32,7 @@ const user2: User = {
   lastName: "Doe",
   email: "jane.doe@mail.com",
   externalId: "jane-external-id",
+  createdAt: new Date().toISOString(),
 };
 
 const agency1 = new AgencyDtoBuilder()
@@ -280,6 +282,7 @@ describe("PgInclusionConnectedUserRepository", () => {
     firstName,
     lastName,
     externalId,
+    createdAt,
   }: User) => {
     await db
       .insertInto("users")
@@ -289,6 +292,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         first_name: firstName,
         last_name: lastName,
         external_id: externalId,
+        created_at: createdAt,
       })
       .execute();
   };

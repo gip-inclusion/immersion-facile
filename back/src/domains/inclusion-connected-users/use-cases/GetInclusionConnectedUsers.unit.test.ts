@@ -18,6 +18,7 @@ const johnWithAgenciesToReview: InclusionConnectedUser = {
   email: "john@mail.com",
   firstName: "John",
   lastName: "Lennon",
+  createdAt: new Date().toISOString(),
   agencyRights: [
     { agency: agency1, role: "toReview" },
     { agency: agency2, role: "validator" },
@@ -31,6 +32,7 @@ const paulWithAllAgenciesReviewed: InclusionConnectedUser = {
   email: "paul@mail.com",
   firstName: "Paul",
   lastName: "McCartney",
+  createdAt: new Date().toISOString(),
   agencyRights: [
     { agency: agency1, role: "counsellor" },
     { agency: agency2, role: "validator" },

@@ -299,7 +299,7 @@ interface AuthenticatedUsers {
   email: string;
   first_name: string;
   last_name: string;
-  created_at: Generated<Timestamp>;
+  created_at: Generated<string>;
   updated_at: Generated<Timestamp>;
   external_id: string;
 }

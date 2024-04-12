@@ -6,6 +6,7 @@ import { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
 import { EstablishmentRole } from "../role/role.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
+import { DateTimeIsoString } from "../utils/date";
 
 export type AgencyRole = (typeof allAgencyRoles)[number];
 export const allAgencyRoles = [
@@ -28,6 +29,7 @@ export type User = {
   firstName: string;
   lastName: string;
   externalId: string;
+  createdAt: DateTimeIsoString;
 };
 
 type WithAgencyRights = {

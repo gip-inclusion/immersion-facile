@@ -32,6 +32,7 @@ const user: User = {
   firstName: "Joe",
   lastName: "Doe",
   externalId: "john-external-id",
+  createdAt: new Date().toISOString(),
 };
 
 const agency1 = new AgencyDtoBuilder().withId(agencyId1).build();

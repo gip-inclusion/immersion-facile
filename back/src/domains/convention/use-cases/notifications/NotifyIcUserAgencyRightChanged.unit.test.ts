@@ -99,6 +99,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       ],
       establishmentDashboards: {},
       externalId: "jean-external-id",
+      createdAt: new Date().toISOString(),
     };
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
 
@@ -136,6 +137,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       ],
       establishmentDashboards: {},
       externalId: "jean-external-id",
+      createdAt: new Date().toISOString(),
     };
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
 
