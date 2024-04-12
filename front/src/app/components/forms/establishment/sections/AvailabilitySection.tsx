@@ -10,6 +10,7 @@ import {
   domElementIds,
   immersionFacileContactEmail,
   toDateString,
+  toDisplayedDate,
 } from "shared";
 import { richBooleanSelectOptions } from "src/app/contents/forms/common/values";
 import {
@@ -130,14 +131,24 @@ export const AvailabilitySection = ({
             {...getFieldError("maxContactsPerWeek")}
           />
         )}
-      {mode === "admin" && (
+      {mode === "admin" && availableForImmersion === undefined && (
         <div>
           <Alert
             severity="info"
-            description={`Mise en relation maximum par semaine actuel : ${
-              getValues().maxContactsPerWeek
-            }`}
+            description={
+              <p>
+                Mise en relation max/semaine : {getValues().maxContactsPerWeek}{" "}
+                <br />
+                Prochaine disponibilité :{" "}
+                {currentNextAvailabilityDate
+                  ? `à partir du ${toDisplayedDate({
+                      date: new Date(currentNextAvailabilityDate),
+                    })}`
+                  : "tout le temps"}
+              </p>
+            }
             small={true}
+            title="Actuellement"
           />
         </div>
       )}
