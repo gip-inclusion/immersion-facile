@@ -151,7 +151,17 @@ export class GetConvention extends TransactionalUseCase<
         agencyId: agency.id,
         inclusionConnectedUserRepository,
       });
-    return isEmailMatchingConventionEmails || isEmailMatchingIcUserEmails;
+    const peAdvisorEmail =
+      convention.signatories.beneficiary.federatedIdentity?.payload?.advisor
+        .email;
+    const isEmailMatchingPeAdvisor = peAdvisorEmail
+      ? stringToMd5(peAdvisorEmail) === authPayload.emailHash
+      : false;
+    return (
+      isEmailMatchingConventionEmails ||
+      isEmailMatchingIcUserEmails ||
+      isEmailMatchingPeAdvisor
+    );
   }
 
   async #isInclusionConnectedCounsellorOrValidator({
