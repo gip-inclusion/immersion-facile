@@ -53,6 +53,7 @@ describe("Get Convention", () => {
           agencyRights: [{ role: "toReview", agency }],
           establishmentDashboards: {},
           externalId: "john-external-id",
+          createdAt: new Date().toISOString(),
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
         uow.agencyRepository.setAgencies([agency]);
@@ -132,6 +133,7 @@ describe("Get Convention", () => {
             ],
             establishmentDashboards: {},
             externalId: "john-external-id",
+            createdAt: new Date().toISOString(),
           };
           uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
             inclusionConnectedUser,
@@ -198,6 +200,7 @@ describe("Get Convention", () => {
           agencyRights: [{ role: "validator", agency }],
           establishmentDashboards: {},
           externalId: "john-external-id",
+          createdAt: new Date().toISOString(),
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
         const jwtPayload: InclusionConnectDomainJwtPayload = {
@@ -228,6 +231,7 @@ describe("Get Convention", () => {
           agencyRights: [],
           establishmentDashboards: {},
           externalId: "john-external-id",
+          createdAt: new Date().toISOString(),
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
 
@@ -311,6 +315,7 @@ describe("Get Convention", () => {
           agencyRights: [{ agency, role: "validator" }],
           establishmentDashboards: {},
           externalId: "john-external-id",
+          createdAt: new Date().toISOString(),
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
           inclusionConnectedUser,

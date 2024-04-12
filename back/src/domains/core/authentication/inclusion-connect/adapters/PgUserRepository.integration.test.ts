@@ -10,12 +10,12 @@ import { PgUserRepository } from "./PgUserRepository";
 describe("PgAuthenticatedUserRepository", () => {
   let pool: Pool;
   let db: KyselyDb;
-  let pgAuthenticatedUserRepository: PgUserRepository;
+  let pgUserRepository: PgUserRepository;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
-    pgAuthenticatedUserRepository = new PgUserRepository(db);
+    pgUserRepository = new PgUserRepository(db);
 
     await db.deleteFrom("users_ongoing_oauths").execute();
     await db.deleteFrom("users").execute();
@@ -27,18 +27,19 @@ describe("PgAuthenticatedUserRepository", () => {
 
   it("saves an authenticated user, than finds it from external_id, then updates it", async () => {
     const userExternalId = "my-external-id";
+    const createdAt = new Date().toISOString();
     const user: User = {
       email: "joe@mail.com",
       lastName: "Doe",
       firstName: "John",
       id: "11111111-1111-1111-1111-111111111111",
       externalId: userExternalId,
+      createdAt,
     };
 
-    await pgAuthenticatedUserRepository.save(user);
+    await pgUserRepository.save(user);
 
-    const fetchedUser =
-      await pgAuthenticatedUserRepository.findByExternalId(userExternalId);
+    const fetchedUser = await pgUserRepository.findByExternalId(userExternalId);
     expectToEqual(fetchedUser, user);
 
     const updatedUser: User = {
@@ -47,10 +48,11 @@ describe("PgAuthenticatedUserRepository", () => {
       lastName: "Dodo",
       firstName: "Johnny",
       externalId: userExternalId,
+      createdAt,
     };
-    await pgAuthenticatedUserRepository.save(updatedUser);
+    await pgUserRepository.save(updatedUser);
     const fetchedUpdatedUser =
-      await pgAuthenticatedUserRepository.findByExternalId(userExternalId);
+      await pgUserRepository.findByExternalId(userExternalId);
     expectToEqual(fetchedUpdatedUser, updatedUser);
   });
 
@@ -62,20 +64,18 @@ describe("PgAuthenticatedUserRepository", () => {
         firstName: "John",
         id: "11111111-1111-1111-1111-111111111111",
         externalId: "my-external-id",
+        createdAt: new Date().toISOString(),
       };
+      await pgUserRepository.save(user);
 
-      await pgAuthenticatedUserRepository.save(user);
-
-      const response = await pgAuthenticatedUserRepository.findByExternalId(
-        user.externalId,
-      );
+      const response = await pgUserRepository.findByExternalId(user.externalId);
 
       expectToEqual(response, user);
     });
 
     it("returns undefined when authenticated_user not found", async () => {
       const response =
-        await pgAuthenticatedUserRepository.findByExternalId("an-external-id");
+        await pgUserRepository.findByExternalId("an-external-id");
 
       expect(response).toBeUndefined();
     });

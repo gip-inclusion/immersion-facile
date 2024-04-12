@@ -36,6 +36,7 @@ describe("InclusionConnected", () => {
     ],
     establishmentDashboards: {},
     externalId: "fake-user-external-id",
+    createdAt: new Date().toISOString(),
   };
 
   const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {

@@ -23,6 +23,7 @@ const user: User = {
   firstName: "John",
   lastName: "Lennon",
   externalId: "john-external-id",
+  createdAt: new Date().toISOString(),
 };
 
 describe("reject IcUser for agency", () => {

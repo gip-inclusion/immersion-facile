@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { AbsoluteUrl, expectObjectsToMatch, expectToEqual } from "shared";
+import { AbsoluteUrl, expectObjectsToMatch } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
@@ -49,6 +49,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     transaction = makeKyselyDb(pool);
     uow = createPgUow(transaction);
     uuidGenerator = new UuidV4Generator();
+    const timeGateway = new CustomTimeGateway();
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
     const immersionBaseUri: AbsoluteUrl = "http://immersion-uri.com";
     immersionRedirectUri = `${immersionBaseUri}/my-redirection`;
@@ -69,6 +70,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         clientId,
         clientSecret,
       },
+      timeGateway,
     );
   });
 
@@ -104,7 +106,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         externalId: defaultExpectedIcIdTokenPayload.sub,
       });
 
-      expectToEqual(
+      expectObjectsToMatch(
         await uow.userRepository.findByExternalId(
           defaultExpectedIcIdTokenPayload.sub,
         ),

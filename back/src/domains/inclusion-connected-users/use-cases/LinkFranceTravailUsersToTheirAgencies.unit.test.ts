@@ -38,6 +38,7 @@ const defaultUser: User = {
   lastName: "Doe",
   externalId: "my-external-id",
   email: "john.doe@inclusion.com",
+  createdAt: new Date().toISOString(),
 };
 
 describe("LinkFranceTravailUsersToTheirAgencies", () => {

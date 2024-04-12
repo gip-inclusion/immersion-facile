@@ -5,6 +5,7 @@ import { discussionIdSchema } from "../discussion/discussion.schema";
 import { emailSchema } from "../email/email.schema";
 import { withSourcePageSchema } from "../inclusionConnect/inclusionConnect.schema";
 import { establishmentsRoles } from "../role/role.dto";
+import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1, zTrimmedString } from "../zodUtils";
 import {
@@ -42,6 +43,7 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     email: emailSchema,
     firstName: zStringMinLength1,
     lastName: zStringMinLength1,
+    createdAt: dateTimeIsoStringSchema,
     agencyRights: z.array(agencyRightSchema),
     agencyDashboardUrl: absoluteUrlSchema.optional(),
     erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),

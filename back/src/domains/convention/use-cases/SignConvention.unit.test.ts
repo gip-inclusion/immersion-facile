@@ -134,6 +134,7 @@ describe("Sign convention", () => {
           lastName: "Idol",
           id: "id",
           externalId: "billy-external-id",
+          createdAt: new Date().toISOString(),
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
           icUser,
@@ -245,6 +246,7 @@ describe("Sign convention", () => {
           lastName: "Idol",
           id: "id",
           externalId: "billy-external-id",
+          createdAt: new Date().toISOString(),
         };
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
           icUser,

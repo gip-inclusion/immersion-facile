@@ -42,11 +42,13 @@ describe("AuthenticateWithInclusionCode use case", () => {
   let uow: InMemoryUnitOfWork;
   let inclusionConnectGateway: InMemoryInclusionConnectGateway;
   let uuidGenerator: TestUuidGenerator;
+  let timeGateway: CustomTimeGateway;
   let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
+    timeGateway = new CustomTimeGateway();
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
     const immersionBaseUri: AbsoluteUrl = "http://immersion-uri.com";
     const immersionRedirectUri: AbsoluteUrl = `${immersionBaseUri}/my-redirection`;
@@ -67,6 +69,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         clientId,
         clientSecret,
       },
+      timeGateway,
     );
   });
 
@@ -82,7 +85,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           page: "agencyDashboard",
         });
 
-        expectToEqual(uow.userRepository.users, [
+        expectObjectInArrayToMatch(uow.userRepository.users, [
           {
             id: userId,
             firstName: defaultExpectedIcIdTokenPayload.given_name,
@@ -143,7 +146,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const { alreadyExistingUser } =
           addAlreadyExistingAuthenticatedUserInRepo();
 
-        expectToEqual(uow.userRepository.users, [
+        expectObjectInArrayToMatch(uow.userRepository.users, [
           {
             id: alreadyExistingUser.id,
             email: alreadyExistingUser.email,
@@ -159,7 +162,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           page: "agencyDashboard",
         });
 
-        expectToEqual(uow.userRepository.users, [
+        expectObjectInArrayToMatch(uow.userRepository.users, [
           {
             id: alreadyExistingUser.id,
             email: defaultExpectedIcIdTokenPayload.email,
@@ -266,6 +269,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       firstName: "Johnny",
       lastName: "Doe Existing",
       externalId: defaultExpectedIcIdTokenPayload.sub,
+      createdAt: new Date().toISOString(),
     };
     uow.userRepository.users = [alreadyExistingUser];
     return { alreadyExistingUser };

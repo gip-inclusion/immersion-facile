@@ -37,6 +37,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     firstName: "John",
     lastName: "Doe",
     externalId: "john-external-id",
+    createdAt: new Date().toISOString(),
   };
 
   let getInclusionConnectedUser: GetInclusionConnectedUser;

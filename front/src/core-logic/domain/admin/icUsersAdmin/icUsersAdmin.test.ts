@@ -49,6 +49,7 @@ const authUser1: User = {
   firstName: "user-first-name",
   lastName: "user-last-name",
   externalId: "fake-user-external-id-1",
+  createdAt: new Date().toISOString(),
 };
 
 const user2Id = "user-id-2";
@@ -58,6 +59,7 @@ const authUser2: User = {
   firstName: "user-first-name-2",
   lastName: "user-last-name-2",
   externalId: "fake-user-external-id-2",
+  createdAt: new Date().toISOString(),
 };
 
 const testUserSet: NormalizedIcUserById = {

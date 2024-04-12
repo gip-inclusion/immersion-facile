@@ -13,6 +13,7 @@ import { notifyDiscord } from "../../../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../../UseCase";
 import { CreateNewEvent } from "../../../events/ports/EventBus";
 import { GenerateInclusionConnectJwt } from "../../../jwt";
+import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
@@ -42,6 +43,8 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   readonly #inclusionConnectConfig: InclusionConnectConfig;
 
+  readonly #timeGateway: TimeGateway;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
@@ -50,6 +53,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     generateAuthenticatedUserJwt: GenerateInclusionConnectJwt,
     immersionFacileBaseUrl: AbsoluteUrl,
     inclusionConnectConfig: InclusionConnectConfig,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
 
@@ -59,6 +63,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     this.#generateAuthenticatedUserJwt = generateAuthenticatedUserJwt;
     this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
     this.#inclusionConnectConfig = inclusionConnectConfig;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
@@ -100,6 +105,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     const newOrUpdatedAuthenticatedUser: User = {
       ...this.#makeAuthenticatedUser(
         this.#uuidGenerator.new(),
+        this.#timeGateway.now(),
         icIdTokenPayload,
       ),
       ...(existingAuthenticatedUser && {
@@ -155,6 +161,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   #makeAuthenticatedUser(
     userId: string,
+    createdAt: Date,
     jwtPayload: InclusionConnectIdTokenPayload,
   ): User {
     return {
@@ -163,6 +170,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       lastName: jwtPayload.family_name,
       email: jwtPayload.email,
       externalId: jwtPayload.sub,
+      createdAt: createdAt.toISOString(),
     };
   }
 }

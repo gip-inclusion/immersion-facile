@@ -302,6 +302,7 @@ describe("Magic link router", () => {
         agencyRights: [{ role: "validator", agency }],
         establishmentDashboards: {},
         externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -424,6 +425,7 @@ describe("Magic link router", () => {
         lastName: "",
         id: "1",
         externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -459,6 +461,7 @@ describe("Magic link router", () => {
         lastName: "",
         id: "1",
         externalId: "my-external-id",
+        createdAt: new Date().toISOString(),
       };
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([

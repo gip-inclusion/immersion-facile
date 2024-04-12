@@ -9,6 +9,7 @@ type PersistenceAuthenticatedUser = {
   first_name: string;
   last_name: string;
   external_id: string;
+  created_at: string;
 };
 
 export class PgUserRepository implements UserRepository {
@@ -24,7 +25,7 @@ export class PgUserRepository implements UserRepository {
   }
 
   public async save(user: User): Promise<void> {
-    const { id, email, firstName, lastName, externalId } = user;
+    const { id, email, firstName, lastName, externalId, createdAt } = user;
     const existingUser = await this.findByExternalId(externalId);
 
     if (!existingUser) {
@@ -36,6 +37,7 @@ export class PgUserRepository implements UserRepository {
           first_name: firstName,
           last_name: lastName,
           external_id: externalId,
+          created_at: createdAt,
         })
         .execute();
       return;
@@ -71,4 +73,5 @@ const toAuthenticatedUser = (
     firstName: raw.first_name,
     lastName: raw.last_name,
     externalId: raw.external_id,
+    createdAt: new Date(raw.created_at).toISOString(),
   };

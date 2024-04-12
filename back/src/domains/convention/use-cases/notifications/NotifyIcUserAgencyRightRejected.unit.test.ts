@@ -26,6 +26,7 @@ const user: User = {
   firstName: "John",
   lastName: "Lennon",
   externalId: "john-external-id",
+  createdAt: new Date().toISOString(),
 };
 
 const icUser: InclusionConnectedUser = {

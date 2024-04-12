@@ -81,6 +81,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     lastName: "ToReview",
     establishmentDashboards: {},
     externalId: "icUserWithRoleToReview-external-id",
+    createdAt: new Date().toISOString(),
   },
   icUserWithRoleCounsellor: {
     agencyRights: [
@@ -99,6 +100,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     lastName: "Consellor",
     establishmentDashboards: {},
     externalId: "icUserWithRoleCounsellor-external-id",
+    createdAt: new Date().toISOString(),
   },
   icUserWithRoleValidator: {
     agencyRights: [
@@ -117,6 +119,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     lastName: "Validator",
     establishmentDashboards: {},
     externalId: "icUserWithRoleValidator-external-id",
+    createdAt: new Date().toISOString(),
   },
 
   icUserWithRoleAgencyOwner: {
@@ -136,6 +139,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     lastName: "Owner",
     establishmentDashboards: {},
     externalId: "icUserWithRoleAgencyOwner-external-id",
+    createdAt: new Date().toISOString(),
   },
   icUserWithRoleEstablishmentRepresentative: {
     agencyRights: [],
@@ -145,6 +149,7 @@ const makeUserIdMapInclusionConnectedUser: Record<
     lastName: "Owner",
     establishmentDashboards: {},
     externalId: "icUserWithRoleEstablishmentRepresentative-external-id",
+    createdAt: new Date().toISOString(),
   },
 };
 
