@@ -1,4 +1,5 @@
 import {
+  AppellationAndRomeDto,
   BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
@@ -13,6 +14,7 @@ import {
 } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
@@ -53,42 +55,46 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     if (!establishmentAggregate)
       throw new BadRequestError(`No establishment found with siret ${siret}.`);
 
-    if (!establishmentAggregate.contact)
-      throw new BadRequestError("No contact ");
-
-    const offersAsAppellationDto =
+    return establishmentAggragateToFormEstablishement(
+      establishmentAggregate,
       await uow.establishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
         siret,
-      );
-
-    const retrievedForm: FormEstablishmentDto = {
-      siret,
-      source: "immersion-facile",
-      website: establishmentAggregate.establishment.website,
-      additionalInformation:
-        establishmentAggregate.establishment.additionalInformation,
-      businessName: establishmentAggregate.establishment.name,
-      businessNameCustomized:
-        establishmentAggregate.establishment.customizedName,
-      businessAddresses: establishmentAggregate.establishment.locations.map(
-        (location) => ({
-          id: location.id,
-          rawAddress: addressDtoToString(location.address),
-        }),
       ),
-      isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
-      fitForDisabledWorkers:
-        establishmentAggregate.establishment.fitForDisabledWorkers,
-      naf: establishmentAggregate.establishment?.nafDto,
-      appellations: offersAsAppellationDto,
-      businessContact: establishmentAggregate.contact,
-      maxContactsPerWeek:
-        establishmentAggregate.establishment.maxContactsPerWeek,
-      searchableBy: {
-        jobSeekers: true,
-        students: true,
-      },
-    };
-    return retrievedForm;
+    );
   }
 }
+
+export const establishmentAggragateToFormEstablishement = (
+  establishmentAggregate: EstablishmentAggregate,
+  appellations: AppellationAndRomeDto[],
+): FormEstablishmentDto => {
+  if (!establishmentAggregate.contact) throw new BadRequestError("No contact ");
+  return {
+    siret: establishmentAggregate.establishment.siret,
+    source: "immersion-facile",
+    website: establishmentAggregate.establishment.website,
+    additionalInformation:
+      establishmentAggregate.establishment.additionalInformation,
+    businessName: establishmentAggregate.establishment.name,
+    businessNameCustomized: establishmentAggregate.establishment.customizedName,
+    businessAddresses: establishmentAggregate.establishment.locations.map(
+      (location) => ({
+        id: location.id,
+        rawAddress: addressDtoToString(location.address),
+      }),
+    ),
+    isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
+    fitForDisabledWorkers:
+      establishmentAggregate.establishment.fitForDisabledWorkers,
+    naf: establishmentAggregate.establishment?.nafDto,
+    appellations,
+    businessContact: establishmentAggregate.contact,
+    maxContactsPerWeek: establishmentAggregate.establishment.maxContactsPerWeek,
+    nextAvailabilityDate:
+      establishmentAggregate.establishment.nextAvailabilityDate,
+    searchableBy: {
+      jobSeekers: true,
+      students: true,
+    },
+  } satisfies FormEstablishmentDto;
+};
