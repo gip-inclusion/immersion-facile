@@ -133,7 +133,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     const payload: MetabasePayload = {
       resource: { [dashboard.kind]: dashboard.id },
       params,
-      exp: Math.round(now.getTime() / 1000) + 60 * 30, // 30 minute expiration
+      exp: Math.round(now.getTime() / 1000) + 60 * 60 * 8, // 8 hours expiration
     };
 
     return jwt.sign(payload, this.metabaseApiKey);
