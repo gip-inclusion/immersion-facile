@@ -21,6 +21,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../domains/establishment/helpers/EstablishmentBuilders";
+import { establishmentAggragateToFormEstablishement } from "../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 
 /* eslint-disable no-console */
 const seed = async () => {
@@ -48,7 +49,7 @@ const seed = async () => {
   await deps.uowPerformer.perform(async (uow) => {
     await featureFlagsSeed(uow);
     await agencySeed(uow);
-    await establishmentAggregateWithDiscusionSeed(uow);
+    await establishmentSeed(uow);
     await conventionSeed(uow);
   });
 
@@ -120,9 +121,9 @@ const agencySeed = async (uow: UnitOfWork) => {
   console.log("done");
 };
 
-const establishmentAggregateWithDiscusionSeed = async (uow: UnitOfWork) => {
+const establishmentSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("seeding establishment aggregates...");
+  console.log("seeding establishments ...");
   const franceMerguez = new EstablishmentAggregateBuilder()
     .withEstablishment(
       new EstablishmentEntityBuilder()
@@ -233,6 +234,22 @@ const establishmentAggregateWithDiscusionSeed = async (uow: UnitOfWork) => {
       ])
       .build(),
   );
+
+  Promise.all(
+    [franceMerguez, decathlon].map(async (establishmentAggregate) => {
+      const offersAsAppellationDto =
+        await uow.establishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
+          establishmentAggregate.establishment.siret,
+        );
+      await uow.formEstablishmentRepository.create(
+        establishmentAggragateToFormEstablishement(
+          establishmentAggregate,
+          offersAsAppellationDto,
+        ),
+      );
+    }),
+  );
+
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
 };
