@@ -1219,8 +1219,9 @@ describe("PgEstablishmentAggregateRepository", () => {
   describe("updateEstablishmentAggregate", () => {
     it("updates the establishment values", async () => {
       // Prepare
-      const originalEstablishmentAggregate =
-        new EstablishmentAggregateBuilder().build();
+      const originalEstablishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishmentCreatedAt(new Date("2021-01-15"))
+        .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         originalEstablishmentAggregate,
       );
@@ -1251,7 +1252,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
           updatedAggregate.establishment.siret,
         ),
-        updatedAggregate,
+        {
+          ...updatedAggregate,
+          establishment: {
+            ...updatedAggregate.establishment,
+            createdAt: originalEstablishmentAggregate.establishment.createdAt,
+          },
+        },
       );
     });
 

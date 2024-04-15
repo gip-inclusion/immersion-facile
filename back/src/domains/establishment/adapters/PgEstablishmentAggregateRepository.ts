@@ -697,7 +697,6 @@ export class PgEstablishmentAggregateRepository
       .updateTable("establishments")
       .set({
         additional_information: establishment.additionalInformation ?? null,
-        created_at: establishment.createdAt,
         customized_name: establishment.customizedName ?? null,
         fit_for_disabled_workers: establishment.fitForDisabledWorkers ?? null,
         is_commited: establishment.isCommited ?? null,
