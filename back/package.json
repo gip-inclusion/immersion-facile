@@ -16,7 +16,7 @@
     "free-quarantined-form-establishments-with-correct-siret": "ts-node src/scripts/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
     "fullcheck": "pnpm -w fullcheck --filter=back",
     "generate-api-key": "ts-node src/scripts/generateApiKey.ts",
-    "includecheck": "./check_includes.sh",
+    "includecheck": "src/scripts/check_includes.sh",
     "lint": "pnpm -w lintconfig:glob ./back/src",
     "mark-establishments-as-searchable-when-max-contacts-allows": "ts-node src/scripts/markEstablishmentsAsSearchableWhenMaxContactsAllows.ts",
     "migrate": "pnpm db:migrate",
