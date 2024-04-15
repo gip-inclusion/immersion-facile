@@ -24,7 +24,10 @@ export class InMemoryInclusionConnectedUserRepository
     return {
       ...user,
       agencyRights: this.agencyRightsByUserId[userId] ?? [],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     };
   }
 
@@ -44,7 +47,10 @@ export class InMemoryInclusionConnectedUserRepository
       .map((user) => ({
         ...user,
         agencyRights: this.agencyRightsByUserId[user.id],
-        establishmentDashboards: {},
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       }));
   }
 

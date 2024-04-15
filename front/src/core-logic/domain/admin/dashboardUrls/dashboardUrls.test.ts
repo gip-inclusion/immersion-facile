@@ -56,21 +56,21 @@ describe("dashboardUrls slice", () => {
     });
 
     it("should store AbsoluteUrl in events when requesting events dashboard", () => {
-      expectUrlsToMatch({ agency: null });
+      expectUrlsToMatch({ agencyForAdmin: null });
 
       store.dispatch(
         dashboardUrlsSlice.actions.dashboardUrlRequested({
-          name: "agency",
+          name: "agencyForAdmin",
           agencyId: "my-agency-id",
         }),
       );
       const valueFromApi: DashboardUrlAndName = {
-        name: "agency",
+        name: "agencyForAdmin",
         url: "https://agency.url",
       };
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
 
-      expectUrlsToMatch({ agency: valueFromApi.url });
+      expectUrlsToMatch({ agencyForAdmin: valueFromApi.url });
       expectDashboardError(null);
     });
 
@@ -90,11 +90,11 @@ describe("dashboardUrls slice", () => {
     });
 
     it("should be able to load 2 different dashboards at the same time (agency and agencies for exemple)", () => {
-      expectUrlsToMatch({ agency: null, agencies: null });
+      expectUrlsToMatch({ agencyForAdmin: null, agencies: null });
 
       store.dispatch(
         dashboardUrlsSlice.actions.dashboardUrlRequested({
-          name: "agency",
+          name: "agencyForAdmin",
           agencyId: "my-agency-id",
         }),
       );
@@ -106,7 +106,7 @@ describe("dashboardUrls slice", () => {
       );
 
       const agencyValueFromApi: DashboardUrlAndName = {
-        name: "agency",
+        name: "agencyForAdmin",
         url: "https://my-agency.url",
       };
       dependencies.adminGateway.dashboardUrl$.next(agencyValueFromApi);
@@ -118,7 +118,7 @@ describe("dashboardUrls slice", () => {
       dependencies.adminGateway.dashboardUrl$.next(agenciesValueFromApi);
 
       expectUrlsToMatch({
-        agency: agencyValueFromApi.url,
+        agencyForAdmin: agencyValueFromApi.url,
         agencies: agenciesValueFromApi.url,
       });
     });

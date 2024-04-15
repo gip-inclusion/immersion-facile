@@ -81,7 +81,10 @@ describe("PgInclusionConnectedUserRepository", () => {
       expectToEqual(inclusionConnectedUser, {
         ...user1,
         agencyRights: [],
-        establishmentDashboards: {},
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       });
     });
 
@@ -114,7 +117,10 @@ describe("PgInclusionConnectedUserRepository", () => {
           { agency: agency1, role: "toReview" },
           { agency: agency2, role: "validator" },
         ],
-        establishmentDashboards: {},
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       });
     });
 
@@ -125,7 +131,10 @@ describe("PgInclusionConnectedUserRepository", () => {
         const icUserToSave: InclusionConnectedUser = {
           ...user1,
           agencyRights: [{ role: "counsellor", agency: agency1 }],
-          establishmentDashboards: {},
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
         };
 
         await icUserRepository.update(icUserToSave);
@@ -140,7 +149,10 @@ describe("PgInclusionConnectedUserRepository", () => {
         const icUserToSave: InclusionConnectedUser = {
           ...user1,
           agencyRights: [],
-          establishmentDashboards: {},
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
         };
 
         await icUserRepository.update(icUserToSave);
@@ -161,7 +173,10 @@ describe("PgInclusionConnectedUserRepository", () => {
             { agency: agency1, role: "validator" },
             { agency: agency2, role: "toReview" },
           ],
-          establishmentDashboards: {},
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
         };
 
         await icUserRepository.update(icUserToSave);
@@ -173,7 +188,10 @@ describe("PgInclusionConnectedUserRepository", () => {
         const updatedIcUserToSave: InclusionConnectedUser = {
           ...user1,
           agencyRights: [{ agency: agency1, role: "validator" }],
-          establishmentDashboards: {},
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
         };
 
         await icUserRepository.update(updatedIcUserToSave);
@@ -230,12 +248,18 @@ describe("PgInclusionConnectedUserRepository", () => {
             { agency: agency1, role: "toReview" },
             { agency: agency2, role: "validator" },
           ],
-          establishmentDashboards: {},
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
         },
         {
           ...user2,
           agencyRights: [{ agency: agency2, role: "toReview" }],
-          establishmentDashboards: {},
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
         },
       ]);
     });
@@ -270,7 +294,10 @@ describe("PgInclusionConnectedUserRepository", () => {
         {
           ...user1,
           agencyRights: [{ agency: agency1, role: "validator" }],
-          establishmentDashboards: {},
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
         },
       ]);
     });

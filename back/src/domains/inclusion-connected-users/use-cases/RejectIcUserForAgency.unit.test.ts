@@ -49,7 +49,10 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [{ agency: agency1, role: "toReview" }],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     };
 
     await expectPromiseToFailWith(
@@ -68,7 +71,10 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [{ agency: agency1, role: "toReview" }],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     };
 
     await expectPromiseToFailWith(
@@ -90,7 +96,10 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [{ agency: agency1, role: "toReview" }],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     };
 
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
@@ -114,7 +123,10 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [{ agency: agency1, role: "toReview" }],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     };
 
     await expectPromiseToFailWith(
@@ -144,7 +156,10 @@ describe("reject IcUser for agency", () => {
         { agency: agency1, role: "toReview" },
         { agency: agency2, role: "toReview" },
       ],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     };
 
     uow.agencyRepository.setAgencies([agency1, agency2]);

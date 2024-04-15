@@ -31,7 +31,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     firstName: "Joe",
     lastName: "Doe",
     agencyRights: [],
-    establishmentDashboards: {},
+    dashboards: { agencies: {}, establishments: {} },
     externalId: "joe-external-id",
     createdAt: new Date().toISOString(),
   };
@@ -83,13 +83,19 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectHttpResponseToEqual(response, {
         body: {
           ...inclusionConnectedUserWithRights,
-          agencyDashboardUrl: `http://stubAgencyDashboard/${agency.id}`,
-          establishmentDashboards: {
-            conventions: {
-              url: `http://stubEstablishmentConventionsDashboardUrl/${
+          dashboards: {
+            agencies: {
+              agencyDashboardUrl: `http://stubAgencyUserDashboard/${
                 inclusionConnectedUserWithRights.id
               }/${gateways.timeGateway.now()}`,
-              role: "establishment-representative",
+            },
+            establishments: {
+              conventions: {
+                url: `http://stubEstablishmentConventionsDashboardUrl/${
+                  inclusionConnectedUserWithRights.id
+                }/${gateways.timeGateway.now()}`,
+                role: "establishment-representative",
+              },
             },
           },
         },
@@ -258,7 +264,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         firstName: "Joe",
         lastName: "Doe",
         agencyRights: [{ agency, role: "validator" }],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
         externalId: "joe-external-id",
         createdAt: new Date().toISOString(),
       };

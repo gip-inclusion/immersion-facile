@@ -16,10 +16,11 @@ type MetabaseDashboard = {
 };
 
 const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
-  agency: { kind: "dashboard", id: 4 },
+  agencyForAdmin: { kind: "dashboard", id: 4 },
+  agencyForIcUser: { kind: "dashboard", id: 150 }, // https://metabase.immersion-facile.beta.gouv.fr/dashboard/150
   agencies: { kind: "dashboard", id: 130 },
   conventions: { kind: "dashboard", id: 5 },
-  erroredConventions: { kind: "dashboard", id: 101 },
+  erroredConventions: { kind: "dashboard", id: 151 },
   conventionStatus: { kind: "dashboard", id: 45 },
   events: { kind: "question", id: 330 },
   establishments: { kind: "dashboard", id: 115 },
@@ -35,7 +36,7 @@ const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
 
 type MetabasePayload = {
   resource: Partial<Record<DashboardKind, number>>;
-  params?: Record<string, string[]>;
+  params?: Record<string, string[] | string>;
   exp: number; // number of milliseconds before expiration
 };
 
@@ -44,12 +45,21 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     private metabaseUrl: AbsoluteUrl,
     private metabaseApiKey: string,
   ) {}
-
-  public getAgencyUserUrl(agencyIds: AgencyId[], now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.agency;
+  public getAgencyForAdminUrl(agencyId: AgencyId, now: Date): AbsoluteUrl {
+    const dashboard = dashboardByName.agencyForAdmin;
     const token = this.#createToken({
       dashboard,
-      params: { filtrer_par_structure: agencyIds },
+      params: { filtrer_par_structure: [agencyId] },
+      now,
+    });
+    return this.#makeUrl(token, dashboard);
+  }
+
+  public getAgencyUserUrl(userId: UserId, now: Date): AbsoluteUrl {
+    const dashboard = dashboardByName.agencyForIcUser;
+    const token = this.#createToken({
+      dashboard,
+      params: { ic_user_id: userId },
       now,
     });
     return this.#makeUrl(token, dashboard);
@@ -75,13 +85,13 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   }
 
   public getErroredConventionsDashboardUrl(
-    agencyIds: AgencyId[],
+    userId: UserId,
     now: Date,
   ): AbsoluteUrl {
     const dashboard = dashboardByName.erroredConventions;
     const token = this.#createToken({
       dashboard,
-      params: { idstructure: agencyIds },
+      params: { ic_user_id: userId },
       now,
     });
     return this.#makeUrl(token, dashboard);
@@ -95,7 +105,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     const token = this.#createToken({
       dashboard,
       params: {
-        ic_user_id: [userId],
+        ic_user_id: userId,
       },
       now,
     });
@@ -110,7 +120,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     const token = this.#createToken({
       dashboard,
       params: {
-        ic_user_id: [userId],
+        ic_user_id: userId,
       },
       now,
     });
@@ -127,7 +137,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     now,
   }: {
     dashboard: MetabaseDashboard;
-    params?: Record<string, string[]>;
+    params?: Record<string, string | string[]>;
     now: Date;
   }): string {
     const payload: MetabasePayload = {

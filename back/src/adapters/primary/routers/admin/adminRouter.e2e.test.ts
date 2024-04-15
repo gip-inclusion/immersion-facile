@@ -90,7 +90,10 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 200,
-        body: { name: "events", url: "http://stubDashboard/events" },
+        body: {
+          name: "events",
+          url: `http://stubDashboard/events/${gateways.timeGateway.now()}`,
+        },
       });
     });
 
@@ -104,22 +107,23 @@ describe("Admin router", () => {
         status: 200,
         body: {
           name: "establishments",
-          url: "http://stubDashboard/establishments",
+          url: `http://stubDashboard/establishments/${gateways.timeGateway.now()}`,
         },
       });
     });
 
     it("200 - Gets the absolute Url of the agency dashboard", async () => {
+      const agencyId = "my-agency-id";
       const response = await sharedRequest.getDashboardUrl({
-        urlParams: { dashboardName: "agency" },
+        urlParams: { dashboardName: "agencyForAdmin" },
         headers: { authorization: token },
-        queryParams: { agencyId: "my-agency-id" },
+        queryParams: { agencyId: agencyId },
       });
       expectHttpResponseToEqual(response, {
         status: 200,
         body: {
-          name: "agency",
-          url: "http://stubAgencyDashboard/my-agency-id",
+          name: "agencyForAdmin",
+          url: `http://stubAgencyForAdminDashboard/${agencyId}/${gateways.timeGateway.now()}`,
         },
       });
     });
@@ -161,7 +165,7 @@ describe("Admin router", () => {
                         {
                           received: "unknown-dashboard",
                           code: "invalid_enum_value",
-                          options: ["agency"],
+                          options: ["agencyForAdmin"],
                           path: ["name"],
                           message:
                             "Vous devez sélectionner une option parmi celles proposées",
@@ -389,7 +393,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };
@@ -446,7 +450,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };
@@ -481,7 +485,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [{ agency, role: "toReview" }],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };

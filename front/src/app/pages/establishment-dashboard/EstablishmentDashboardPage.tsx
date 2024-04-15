@@ -38,27 +38,31 @@ export const EstablishmentDashboardPage = ({
 
   const dispatch = useDispatch();
 
-  const rawEstablishmentDashboardTabs = (
-    currentUser: InclusionConnectedUser,
-  ): DashboardTab[] => [
+  const rawEstablishmentDashboardTabs = ({
+    dashboards: {
+      establishments: { conventions, discussions },
+    },
+    firstName,
+    lastName,
+    establishments,
+  }: InclusionConnectedUser): DashboardTab[] => [
     {
       label: "Conventions en cours",
       tabId: "conventions",
       content: (
         <>
-          {currentUser.establishmentDashboards.conventions?.role ===
-            "establishment-representative" && (
+          {conventions?.role === "establishment-representative" && (
             <ManageConventionFormSection
               routeNameToRedirectTo={"manageConventionInclusionConnected"}
             />
           )}
-          {currentUser.establishmentDashboards.conventions ? (
+          {conventions ? (
             <MetabaseView
               title={`Tableau des conventions en cours
                 pour le ${currentUserRoleToDisplay(
-                  currentUser.establishmentDashboards.conventions.role,
-                )} ${currentUser.firstName} ${currentUser.lastName}`}
-              url={currentUser.establishmentDashboards.conventions.url}
+                  conventions.role,
+                )} ${firstName} ${lastName}`}
+              url={conventions.url}
             />
           ) : (
             <p>
@@ -76,10 +80,10 @@ export const EstablishmentDashboardPage = ({
       content: (
         <>
           <ManageDiscussionFormSection />
-          {currentUser.establishmentDashboards.discussions ? (
+          {discussions ? (
             <MetabaseView
-              title={`Suivi des mises en relations pour ${currentUser.firstName} ${currentUser.lastName}`}
-              url={currentUser.establishmentDashboards.discussions}
+              title={`Suivi des mises en relations pour ${firstName} ${lastName}`}
+              url={discussions}
             />
           ) : (
             <p>
@@ -91,14 +95,14 @@ export const EstablishmentDashboardPage = ({
         </>
       ),
     },
-    ...(currentUser.establishments
+    ...(establishments
       ? [
           {
             label: "Fiche entreprise",
             tabId: "fiche-entreprise",
             content: (
               <ManageEstablishmentsTab
-                establishments={currentUser.establishments}
+                establishments={establishments}
                 route={route}
               />
             ),

@@ -300,7 +300,7 @@ describe("Magic link router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [{ role: "validator", agency }],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };
@@ -419,7 +419,7 @@ describe("Magic link router", () => {
         .build();
       const icUser: InclusionConnectedUser = {
         agencyRights: [],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
         email: convention.signatories.establishmentRepresentative.email,
         firstName: "",
         lastName: "",
@@ -455,7 +455,7 @@ describe("Magic link router", () => {
         .build();
       const icUser: InclusionConnectedUser = {
         agencyRights: [],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
         email: "email@mail.com",
         firstName: "",
         lastName: "",

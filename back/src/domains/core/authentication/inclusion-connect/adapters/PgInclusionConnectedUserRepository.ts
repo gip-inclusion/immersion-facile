@@ -123,7 +123,10 @@ export class PgInclusionConnectedUserRepository
       (row): InclusionConnectedUser => ({
         ...row.inclusion_user,
         createdAt: new Date(row.inclusion_user.createdAt).toISOString(),
-        establishmentDashboards: {},
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       }),
     );
   }

@@ -1,10 +1,11 @@
 import {
   AbsoluteUrl,
+  AgencyDashboards,
   ConventionsEstablishmentDashboard,
   EstablishmentDashboards,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
-  WithDashboardUrls,
+  WithDashboards,
   WithEstablismentsSiretAndName,
 } from "shared";
 import { z } from "zod";
@@ -142,7 +143,18 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   async #withEstablishmentDashboards(
     user: InclusionConnectedUser,
     uow: UnitOfWork,
-  ): Promise<WithDashboardUrls> {
+  ): Promise<WithDashboards> {
+    return {
+      dashboards: {
+        agencies: await this.makeAgencyDashboards(user),
+        establishments: await this.#makeEstablishmentDashboard(user, uow),
+      },
+    };
+  }
+
+  private async makeAgencyDashboards(
+    user: InclusionConnectedUser,
+  ): Promise<AgencyDashboards> {
     const agencyIdsWithEnoughPrivileges = user.agencyRights
       .filter(({ role }) => role !== "toReview")
       .map(({ agency }) => agency.id);
@@ -155,7 +167,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
       ...(agencyIdsWithEnoughPrivileges.length > 0
         ? {
             agencyDashboardUrl: await this.#dashboardGateway.getAgencyUserUrl(
-              agencyIdsWithEnoughPrivileges,
+              user.id,
               this.#timeGateway.now(),
             ),
           }
@@ -164,15 +176,11 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
         ? {
             erroredConventionsDashboardUrl:
               await this.#dashboardGateway.getErroredConventionsDashboardUrl(
-                agencyIdsWithEnoughPrivileges,
+                user.id,
                 this.#timeGateway.now(),
               ),
           }
         : {}),
-      establishmentDashboards: await this.#makeEstablishmentDashboard(
-        user,
-        uow,
-      ),
     };
   }
 }

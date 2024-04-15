@@ -42,8 +42,9 @@ export const AgencyDashboardPage = ({
   const dispatch = useDispatch();
 
   const rawAgencyDashboardTabs = ({
-    agencyDashboardUrl,
-    erroredConventionsDashboardUrl,
+    dashboards: {
+      agencies: { agencyDashboardUrl, erroredConventionsDashboardUrl },
+    },
   }: InclusionConnectedUser): DashboardTab[] => [
     ...(agencyDashboardUrl
       ? [

@@ -14,7 +14,7 @@ export type DashboardsState = {
 export const dashboardInitialState: DashboardsState = {
   urls: {
     conventions: null,
-    agency: null,
+    agencyForAdmin: null,
     events: null,
     erroredConventions: null,
     establishments: null,

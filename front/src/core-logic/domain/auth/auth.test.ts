@@ -114,7 +114,7 @@ describe("Auth slice", () => {
       firstName: inclusionConnectedFederatedIdentity.firstName,
       lastName: inclusionConnectedFederatedIdentity.lastName,
       agencyRights: [],
-      establishmentDashboards: {},
+      dashboards: { agencies: {}, establishments: {} },
       externalId: "fake-user-external-id",
       createdAt: new Date().toISOString(),
     };

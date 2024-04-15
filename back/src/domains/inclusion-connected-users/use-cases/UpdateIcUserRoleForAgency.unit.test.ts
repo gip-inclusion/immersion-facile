@@ -97,7 +97,14 @@ describe("GetInclusionConnectedUsers", () => {
 
   it("throws not found if agency does not exist for user", async () => {
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      { ...user, agencyRights: [], establishmentDashboards: {} },
+      {
+        ...user,
+        agencyRights: [],
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
+      },
     ]);
 
     await expectPromiseToFailWith(
@@ -118,7 +125,10 @@ describe("GetInclusionConnectedUsers", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [{ agency, role: "toReview" }],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     };
 
     inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
@@ -136,7 +146,10 @@ describe("GetInclusionConnectedUsers", () => {
     expectToEqual(await inclusionConnectedUserRepository.getById(user.id), {
       ...user,
       agencyRights: [{ agency, role: newRole }],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     });
   });
 
@@ -145,7 +158,10 @@ describe("GetInclusionConnectedUsers", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [{ agency, role: "toReview" }],
-      establishmentDashboards: {},
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
     };
 
     inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);

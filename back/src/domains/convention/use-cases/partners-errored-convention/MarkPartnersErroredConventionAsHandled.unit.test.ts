@@ -44,7 +44,10 @@ describe("mark partners errored convention as handled", () => {
     firstName: "John",
     lastName: "Doe",
     agencyRights: [],
-    establishmentDashboards: {},
+    dashboards: {
+      agencies: {},
+      establishments: {},
+    },
     externalId: "icUserWithoutRight-external-id",
     createdAt: new Date().toISOString(),
   };
@@ -55,7 +58,10 @@ describe("mark partners errored convention as handled", () => {
     firstName: "John",
     lastName: "Doe",
     agencyRights: [{ role: "validator", agency }],
-    establishmentDashboards: {},
+    dashboards: {
+      agencies: {},
+      establishments: {},
+    },
     externalId: "icUserWithAgencyRights-external-id",
     createdAt: new Date().toISOString(),
   };

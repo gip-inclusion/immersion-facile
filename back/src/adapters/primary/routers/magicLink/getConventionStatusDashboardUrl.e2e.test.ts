@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
@@ -18,19 +19,23 @@ describe("getConventionStatusDashboardUrl", () => {
   let httpClient: HttpClient<ConventionMagicLinkRoutes>;
   let jwt: ConventionJwt;
   let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(async () => {
-    const { request, generateConventionJwt, inMemoryUow } =
+    const { request, generateConventionJwt, inMemoryUow, gateways } =
       await buildTestApp();
 
     uow = inMemoryUow;
+
+    timeGateway = gateways.timeGateway;
+    timeGateway.setNextDate(new Date());
 
     jwt = generateConventionJwt(
       createConventionMagicLinkPayload({
         id: conventionId,
         role: "beneficiary",
         email: beneficiaryEmail,
-        now: new Date(),
+        now: gateways.timeGateway.now(),
       }),
     );
 
@@ -69,7 +74,9 @@ describe("getConventionStatusDashboardUrl", () => {
     expectHttpResponseToEqual(response, {
       status: 200,
       body: {
-        url: `http://stubConventionStatusDashboard/${convention.id}`,
+        url: `http://stubConventionStatusDashboard/${
+          convention.id
+        }/${timeGateway.now()}`,
         name: "conventionStatus",
       },
     });

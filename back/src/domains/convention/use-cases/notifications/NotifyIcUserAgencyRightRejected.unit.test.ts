@@ -32,7 +32,10 @@ const user: User = {
 const icUser: InclusionConnectedUser = {
   ...user,
   agencyRights: [],
-  establishmentDashboards: {},
+  dashboards: {
+    agencies: {},
+    establishments: {},
+  },
 };
 
 describe("Notify icUser agency right rejected", () => {

@@ -86,7 +86,10 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [{ agency, role: "agencyOwner" }],
-        establishmentDashboards: {},
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       };
 
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
@@ -106,7 +109,10 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [{ agency, role: "toReview" }],
-        establishmentDashboards: {},
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       };
 
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
@@ -153,7 +159,10 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [],
-        establishmentDashboards: {},
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       };
 
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
@@ -181,7 +190,10 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
           { agency: agency1InGroup, role: "validator" },
           { agency: agency2InGroup, role: "toReview" },
         ],
-        establishmentDashboards: {},
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       };
 
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);

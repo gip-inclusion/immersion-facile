@@ -128,7 +128,7 @@ describe("Sign convention", () => {
         uow.agencyRepository.setAgencies([agency]);
         const icUser: InclusionConnectedUser = {
           agencyRights: [],
-          establishmentDashboards: {},
+          dashboards: { agencies: {}, establishments: {} },
           email: "other@mail.com",
           firstName: "Billy",
           lastName: "Idol",
@@ -240,7 +240,7 @@ describe("Sign convention", () => {
         uow.agencyRepository.setAgencies([agency]);
         const icUser: InclusionConnectedUser = {
           agencyRights: [],
-          establishmentDashboards: {},
+          dashboards: { agencies: {}, establishments: {} },
           email: convention.signatories.establishmentRepresentative.email,
           firstName: "Billy",
           lastName: "Idol",
