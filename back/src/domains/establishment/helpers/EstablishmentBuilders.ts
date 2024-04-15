@@ -313,6 +313,17 @@ export class EstablishmentAggregateBuilder
     });
   }
 
+  public withEstablishmentCreatedAt(createdAt: Date) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withCreatedAt(createdAt)
+        .build(),
+    });
+  }
+
   public withEstablishmentUpdatedAt(updatedAt: Date) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
