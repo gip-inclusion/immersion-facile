@@ -83,7 +83,7 @@ describe("RenewConvention", () => {
     firstName: "John",
     lastName: "Doe",
     agencyRights: [{ role: "validator", agency }],
-    establishmentDashboards: {},
+    dashboards: { agencies: {}, establishments: {} },
     externalId: "my-user-external-id",
     createdAt: new Date().toISOString(),
   };

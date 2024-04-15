@@ -59,18 +59,26 @@ export type EstablishmentDashboards = {
 };
 
 export type WithEstablishmentDashboards = {
-  establishmentDashboards: EstablishmentDashboards;
+  establishments: EstablishmentDashboards;
 };
 
-export type WithDashboardUrls = {
+export type AgencyDashboards = {
   agencyDashboardUrl?: AbsoluteUrl;
   erroredConventionsDashboardUrl?: AbsoluteUrl;
-} & WithEstablishmentDashboards;
+};
+
+export type WithAgencyDashboards = {
+  agencies: AgencyDashboards;
+};
+
+export type WithDashboards = {
+  dashboards: WithAgencyDashboards & WithEstablishmentDashboards;
+};
 
 export type InclusionConnectedUser = User &
   WithAgencyRights &
-  WithDashboardUrls &
-  WithEstablishments;
+  WithEstablishments &
+  WithDashboards;
 
 export type WithAgencyIds = {
   agencies: AgencyId[];

@@ -14,7 +14,7 @@ export const getAdminDashboardParamsSchema: z.Schema<GetAdminDashboardParams> =
       name: z.enum(simpleDashboardNames),
     }),
     z.object({
-      name: z.enum(["agency"]),
+      name: z.enum(["agencyForAdmin"]),
       agencyId: z.string(),
     }),
   ]);

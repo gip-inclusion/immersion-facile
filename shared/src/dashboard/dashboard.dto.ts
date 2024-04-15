@@ -6,7 +6,8 @@ import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.d
 export type DashboardName =
   | AdminDashboardName
   | ConventionMagicLinkDashboardName
-  | EstablishmentDashboardName;
+  | EstablishmentDashboardName
+  | AgencyDashboardName;
 
 export type EstablishmentDashboardName =
   (typeof establishmentDashboardNames)[number];
@@ -15,6 +16,9 @@ export const establishmentDashboardNames = [
   "establishmentRepresentativeConventions",
   "establishmentRepresentativeDiscussions",
 ] as const;
+
+export type AgencyDashboardName = (typeof agencyDashboardNames)[number];
+export const agencyDashboardNames = ["agencyForIcUser"] as const;
 
 export const simpleDashboardNames = [
   "conventions",
@@ -25,7 +29,7 @@ export const simpleDashboardNames = [
 
 export const adminDashboardNames = [
   ...simpleDashboardNames,
-  "agency",
+  "agencyForAdmin",
   "erroredConventions",
 ] as const;
 export type AdminDashboardName = (typeof adminDashboardNames)[number];
@@ -63,7 +67,7 @@ export type GetAdminDashboardParams =
   | GenericGetDashboardParams<
       "events" | "conventions" | "establishments" | "agencies"
     >
-  | (GenericGetDashboardParams<"agency" | "erroredConventions"> & {
+  | (GenericGetDashboardParams<"agencyForAdmin" | "erroredConventions"> & {
       agencyId: AgencyId;
     });
 

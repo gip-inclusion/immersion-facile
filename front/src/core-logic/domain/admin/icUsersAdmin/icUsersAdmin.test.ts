@@ -66,12 +66,12 @@ const testUserSet: NormalizedIcUserById = {
   [user1Id]: {
     ...authUser1,
     agencyRights: user1AgencyRights,
-    establishmentDashboards: {},
+    dashboards: { agencies: {}, establishments: {} },
   },
   [user2Id]: {
     ...authUser2,
     agencyRights: user2AgencyRights,
-    establishmentDashboards: {},
+    dashboards: { agencies: {}, establishments: {} },
   },
 };
 
@@ -142,12 +142,12 @@ describe("Agency registration for authenticated users", () => {
         {
           ...authUser1,
           agencyRights: [agency1Right, agency2Right],
-          establishmentDashboards: {},
+          dashboards: { agencies: {}, establishments: {} },
         },
         {
           ...authUser2,
           agencyRights: [agency3Right, agency4Right],
-          establishmentDashboards: {},
+          dashboards: { agencies: {}, establishments: {} },
         },
       ]);
       expectIsFetchingIcUsersNeedingReviewToBe(false);

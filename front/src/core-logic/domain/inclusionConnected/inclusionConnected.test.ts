@@ -27,14 +27,16 @@ describe("InclusionConnected", () => {
     firstName: "Fake",
     lastName: "User",
     id: "fake-user-id",
-    agencyDashboardUrl: "https://placeholder.com/",
+    dashboards: {
+      agencies: { agencyDashboardUrl: "https://placeholder.com/" },
+      establishments: {},
+    },
     agencyRights: [
       {
         role: "agencyOwner",
         agency: new AgencyDtoBuilder().build(),
       },
     ],
-    establishmentDashboards: {},
     externalId: "fake-user-external-id",
     createdAt: new Date().toISOString(),
   };

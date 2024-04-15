@@ -13,7 +13,9 @@ import {
   GetInclusionConnectLogoutUrlQueryParams,
   InclusionConnectedUser,
   UserId,
+  WithAgencyDashboards,
   WithDiscussionId,
+  WithEstablishmentDashboards,
   WithEstablismentsSiretAndName,
   allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
@@ -37,6 +39,25 @@ const withEstablishmentSiretAndName: z.Schema<WithEstablismentsSiretAndName> =
     businessName: zStringMinLength1,
   });
 
+const dashboardsSchema: z.Schema<
+  WithAgencyDashboards & WithEstablishmentDashboards
+> = z.object({
+  establishments: z.object({
+    conventions: z
+      .object({
+        url: absoluteUrlSchema,
+        role: z.enum(establishmentsRoles),
+      })
+      .optional(),
+    discussions: absoluteUrlSchema.optional(),
+    editEstablishment: siretSchema.optional(),
+  }),
+  agencies: z.object({
+    agencyDashboardUrl: absoluteUrlSchema.optional(),
+    erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
+  }),
+});
+
 export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
   z.object({
     id: userIdSchema,
@@ -45,19 +66,9 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     lastName: zStringMinLength1,
     createdAt: dateTimeIsoStringSchema,
     agencyRights: z.array(agencyRightSchema),
-    agencyDashboardUrl: absoluteUrlSchema.optional(),
-    erroredConventionsDashboardUrl: absoluteUrlSchema.optional(),
+
     externalId: zStringMinLength1,
-    establishmentDashboards: z.object({
-      conventions: z
-        .object({
-          url: absoluteUrlSchema,
-          role: z.enum(establishmentsRoles),
-        })
-        .optional(),
-      discussions: absoluteUrlSchema.optional(),
-      editEstablishment: siretSchema.optional(),
-    }),
+    dashboards: dashboardsSchema,
     establishments: z.array(withEstablishmentSiretAndName).optional(),
   });
 

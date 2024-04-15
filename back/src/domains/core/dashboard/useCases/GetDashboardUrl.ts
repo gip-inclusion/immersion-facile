@@ -37,20 +37,23 @@ export class GetDashboardUrl extends UseCase<
   }
 
   #getDashboardAbsoluteUrl(params: GetDashboardParams): AbsoluteUrl {
-    if (params.name === "agency")
-      return this.#dashboardGateway.getAgencyUserUrl(
-        [params.agencyId],
+    if (params.name === "agencyForAdmin")
+      return this.#dashboardGateway.getAgencyForAdminUrl(
+        params.agencyId,
         this.#timeGateway.now(),
       );
+
     if (params.name === "conventionStatus")
       return this.#dashboardGateway.getConventionStatusUrl(
         params.conventionId,
         this.#timeGateway.now(),
       );
+
     if (params.name === "establishmentRepresentativeConventions")
       throw new ForbiddenError(
         "establishmentRepresentativeConventions is not available for GetDashboardUrl",
       );
+
     return this.#dashboardGateway.getDashboardUrl(
       params.name,
       this.#timeGateway.now(),

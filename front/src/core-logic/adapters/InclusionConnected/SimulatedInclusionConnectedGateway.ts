@@ -16,7 +16,7 @@ const simulatedUserConnected: InclusionConnectedUser = {
   lastName: "User",
   id: "fake-user-id",
   agencyRights: [],
-  establishmentDashboards: {},
+  dashboards: { agencies: {}, establishments: {} },
   externalId: "fake-user-external-id",
   createdAt: new Date().toISOString(),
 };

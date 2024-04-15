@@ -51,7 +51,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [{ role: "toReview", agency }],
-          establishmentDashboards: {},
+          dashboards: { agencies: {}, establishments: {} },
           externalId: "john-external-id",
           createdAt: new Date().toISOString(),
         };
@@ -131,7 +131,7 @@ describe("Get Convention", () => {
                 role: "validator",
               },
             ],
-            establishmentDashboards: {},
+            dashboards: { agencies: {}, establishments: {} },
             externalId: "john-external-id",
             createdAt: new Date().toISOString(),
           };
@@ -198,7 +198,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [{ role: "validator", agency }],
-          establishmentDashboards: {},
+          dashboards: { agencies: {}, establishments: {} },
           externalId: "john-external-id",
           createdAt: new Date().toISOString(),
         };
@@ -229,7 +229,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [],
-          establishmentDashboards: {},
+          dashboards: { agencies: {}, establishments: {} },
           externalId: "john-external-id",
           createdAt: new Date().toISOString(),
         };
@@ -313,7 +313,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [{ agency, role: "validator" }],
-          establishmentDashboards: {},
+          dashboards: { agencies: {}, establishments: {} },
           externalId: "john-external-id",
           createdAt: new Date().toISOString(),
         };

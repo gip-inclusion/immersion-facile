@@ -89,7 +89,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       {
         ...user,
         agencyRights: [{ agency: agency1, role: "counsellor" }],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
       },
     ]);
     await expectPromiseToFailWithError(
@@ -117,7 +117,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       expectToEqual(inclusionConnectedUser, {
         ...user,
         agencyRights: [{ agency: agency1, role: "toReview" }],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
       });
       expect(outboxRepository.events).toHaveLength(1);
       expectObjectsToMatch(outboxRepository.events[0], {
@@ -143,7 +143,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
           { agency: agency1, role: "toReview" },
           { agency: agency2, role: "toReview" },
         ],
-        establishmentDashboards: {},
+        dashboards: { agencies: {}, establishments: {} },
       });
       expect(outboxRepository.events).toHaveLength(1);
       expectObjectsToMatch(outboxRepository.events[0], {

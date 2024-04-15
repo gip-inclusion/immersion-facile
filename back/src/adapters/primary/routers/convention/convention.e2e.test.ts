@@ -49,7 +49,7 @@ const inclusionConnectedUser: InclusionConnectedUser = {
   firstName: "John",
   lastName: "Doe",
   agencyRights: [{ role: "validator", agency: peAgency }],
-  establishmentDashboards: {},
+  dashboards: { agencies: {}, establishments: {} },
   externalId: "john-external-id",
   createdAt: new Date().toISOString(),
 };

@@ -23,7 +23,10 @@ const johnWithAgenciesToReview: InclusionConnectedUser = {
     { agency: agency1, role: "toReview" },
     { agency: agency2, role: "validator" },
   ],
-  establishmentDashboards: {},
+  dashboards: {
+    agencies: {},
+    establishments: {},
+  },
   externalId: "john-external-id",
 };
 
@@ -37,7 +40,10 @@ const paulWithAllAgenciesReviewed: InclusionConnectedUser = {
     { agency: agency1, role: "counsellor" },
     { agency: agency2, role: "validator" },
   ],
-  establishmentDashboards: {},
+  dashboards: {
+    agencies: {},
+    establishments: {},
+  },
   externalId: "paul-external-id",
 };
 

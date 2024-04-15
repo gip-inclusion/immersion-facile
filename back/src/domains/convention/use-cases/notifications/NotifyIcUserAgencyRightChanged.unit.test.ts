@@ -90,14 +90,16 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       firstName: "jean",
       lastName: "babouche",
       id: "jbab-123",
-      agencyDashboardUrl: "https://placeholder.com/",
+      dashboards: {
+        agencies: { agencyDashboardUrl: "https://placeholder.com/" },
+        establishments: {},
+      },
       agencyRights: [
         {
           role: "toReview",
           agency,
         },
       ],
-      establishmentDashboards: {},
       externalId: "jean-external-id",
       createdAt: new Date().toISOString(),
     };
@@ -128,14 +130,16 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       firstName: "jean",
       lastName: "babouche",
       id: "jbab-123",
-      agencyDashboardUrl: "https://placeholder.com/",
+      dashboards: {
+        agencies: { agencyDashboardUrl: "https://placeholder.com/" },
+        establishments: {},
+      },
       agencyRights: [
         {
           role: "validator",
           agency,
         },
       ],
-      establishmentDashboards: {},
       externalId: "jean-external-id",
       createdAt: new Date().toISOString(),
     };
