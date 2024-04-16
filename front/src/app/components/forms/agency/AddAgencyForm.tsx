@@ -40,7 +40,7 @@ import { routes } from "src/app/routes/routes";
 import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { AgencySubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { AgencyAdminSubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { P, match } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 
@@ -52,9 +52,11 @@ export const AddAgencyForm = () => {
   const [refersToOtherAgency, setRefersToOtherAgency] = useState<
     boolean | undefined
   >(undefined);
-  const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
-    kind: "idle",
-  });
+  const [submitFeedback, setSubmitFeedback] =
+    useState<AgencyAdminSubmitFeedback>({
+      kind: "idle",
+    });
+
   useScrollToTop(submitFeedback.kind === "agencyAdded");
   useScrollToTop(submitFeedback.kind === "agencyOfTypeOtherAdded");
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
@@ -132,7 +134,7 @@ export const AddAgencyForm = () => {
 
 type AgencyFormProps = {
   refersToOtherAgency: boolean;
-  submitFeedback: AgencySubmitFeedback;
+  submitFeedback: AgencyAdminSubmitFeedback;
   onFormValid: SubmitHandler<CreateAgencyInitialValues>;
 };
 

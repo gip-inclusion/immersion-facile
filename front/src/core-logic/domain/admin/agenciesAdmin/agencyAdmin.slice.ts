@@ -7,12 +7,13 @@ import type {
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
-export type AgencySuccessFeedbackKind =
+export type AgencyAdminSuccessFeedbackKind =
   | "agencyAdded"
   | "agencyUpdated"
   | "agencyOfTypeOtherAdded";
 
-export type AgencySubmitFeedback = SubmitFeedBack<AgencySuccessFeedbackKind>;
+export type AgencyAdminSubmitFeedback =
+  SubmitFeedBack<AgencyAdminSuccessFeedbackKind>;
 
 export interface AgencyAdminState {
   agencySearchQuery: string;
@@ -29,7 +30,7 @@ export interface AgencyAdminState {
   isUpdating: boolean;
 
   error: string | null;
-  feedback: AgencySubmitFeedback;
+  feedback: AgencyAdminSubmitFeedback;
 }
 
 export const agencyAdminInitialState: AgencyAdminState = {
