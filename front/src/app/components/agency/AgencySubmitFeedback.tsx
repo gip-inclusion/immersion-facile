@@ -1,9 +1,9 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { immersionFacileDelegationEmail } from "shared";
-import { AgencySuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { AgencyAdminSuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 
 export const agencySubmitMessageByKind: Record<
-  AgencySuccessFeedbackKind,
+  AgencyAdminSuccessFeedbackKind,
   { title: string; message: NonNullable<ReactNode> }
 > = {
   agencyAdded: {

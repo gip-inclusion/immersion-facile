@@ -8,7 +8,7 @@ import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedS
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import {
   AgencyAdminState,
-  AgencySubmitFeedback,
+  AgencyAdminSubmitFeedback,
   agencyAdminInitialState,
   agencyAdminSlice,
 } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
@@ -60,7 +60,7 @@ describe("agencyAdmin", () => {
       });
 
       it("display feedback error on fetch failure", () => {
-        const expectedFeedback: AgencySubmitFeedback = {
+        const expectedFeedback: AgencyAdminSubmitFeedback = {
           kind: "errored",
           errorMessage: "Ceci est mon erreur",
         };
