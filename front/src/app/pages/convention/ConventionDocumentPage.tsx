@@ -26,10 +26,9 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
-import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
+import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
+import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { Route } from "type-route";
-
 import logoIf from "/assets/img/logo-if.svg";
 import logoRf from "/assets/img/logo-rf.svg";
 
@@ -95,8 +94,8 @@ export const ConventionDocumentPage = ({
     jwt,
     conventionId: routeConventionId ?? jwtPayload.applicationId,
   });
-  const agencyInfo = useAppSelector(agencyInfoSelectors.details);
-  const agencyFeedback = useAppSelector(agencyInfoSelectors.feedback);
+  const agencyInfo = useAppSelector(agenciesSelectors.details);
+  const agencyFeedback = useAppSelector(agenciesSelectors.feedback);
   const canShowConvention = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const dispatch = useDispatch();
   const [isPdfLoading, setIsPdfLoading] = useState(false);
@@ -104,7 +103,7 @@ export const ConventionDocumentPage = ({
   useEffect(() => {
     if (convention?.agencyId) {
       dispatch(
-        agencyInfoSlice.actions.fetchAgencyInfoRequested(convention.agencyId),
+        agenciesSlice.actions.fetchAgencyInfoRequested(convention.agencyId),
       );
     }
   }, [convention?.agencyId, dispatch]);
