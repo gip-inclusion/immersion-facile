@@ -6,7 +6,6 @@ import {
   ConventionJwtPayload,
   ExtractFromExisting,
   PayloadKey,
-  backOfficeJwtPayloadSchema,
   castError,
   currentJwtVersions,
   expiredMagicLinkErrorMessage,
@@ -68,7 +67,7 @@ export const makeMagicLinkAuthMiddleware = (
   payloadKey: ExtractFromExisting<PayloadKey, "convention" | "establishment">,
 ): RequestHandler => {
   const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig<
-    "convention" | "establishment" | "backOffice" | "inclusionConnect"
+    "convention" | "establishment" | "inclusionConnect"
   >(config);
   return (req, res, next) => {
     const maybeJwt = req.headers.authorization;
@@ -89,12 +88,7 @@ export const makeMagicLinkAuthMiddleware = (
           ),
         );
       }
-      req.payloads =
-        "role" in payload && payload.role === "backOffice"
-          ? {
-              backOffice: backOfficeJwtPayloadSchema.parse(payload),
-            }
-          : { [payloadKey]: payload };
+      req.payloads = { [payloadKey]: payload };
 
       next();
     } catch (err) {

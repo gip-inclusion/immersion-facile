@@ -22,7 +22,6 @@ export type ConventionSupportedJwt =
 export const currentJwtVersions: Record<PayloadKey, number> = {
   convention: 1,
   establishment: 1,
-  backOffice: 1,
   inclusion: 1,
 };
 

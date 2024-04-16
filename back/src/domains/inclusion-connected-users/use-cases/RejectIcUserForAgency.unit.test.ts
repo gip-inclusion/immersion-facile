@@ -1,7 +1,6 @@
 import {
   AgencyDtoBuilder,
-  BackOfficeDomainPayload,
-  BackOfficeJwtPayload,
+  InclusionConnectJwtPayload,
   InclusionConnectedUser,
   User,
   expectPromiseToFailWith,
@@ -26,17 +25,38 @@ const user: User = {
   createdAt: new Date().toISOString(),
 };
 
+const backofficeAdminUser: InclusionConnectedUser = {
+  id: "backoffice-admin",
+  email: "jack.admin@mail.com",
+  firstName: "Jack",
+  lastName: "The Admin",
+  externalId: "jack-admin-external-id",
+  createdAt: new Date().toISOString(),
+  isBackofficeAdmin: true,
+  agencyRights: [],
+  dashboards: { agencies: {}, establishments: {} },
+  establishments: [],
+};
+
+const backofficeAdminJwtPayload = {
+  userId: backofficeAdminUser.id,
+} as InclusionConnectJwtPayload;
+
 describe("reject IcUser for agency", () => {
   let uow: InMemoryUnitOfWork;
   let rejectIcUserForAgencyUsecase: RejectIcUserForAgency;
   let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
+
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ timeGateway, uuidGenerator });
     const uowPerformer = new InMemoryUowPerformer(uow);
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
     rejectIcUserForAgencyUsecase = new RejectIcUserForAgency(
       uowPerformer,
       createNewEvent,
@@ -65,6 +85,30 @@ describe("reject IcUser for agency", () => {
     );
   });
 
+  it("Throws if current user is not a backoffice admin", async () => {
+    const currentUser = {
+      ...backofficeAdminUser,
+      id: "not-an-admin-id",
+      isBackofficeAdmin: false,
+    };
+
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      currentUser,
+    ]);
+
+    await expectPromiseToFailWith(
+      rejectIcUserForAgencyUsecase.execute(
+        {
+          userId: "osef",
+          agencyId: "osef",
+          justification: "osef",
+        },
+        { userId: currentUser.id } as InclusionConnectJwtPayload,
+      ),
+      "User with id 'not-an-admin-id' is not a backOffice user",
+    );
+  });
+
   it("Throw when no icUser were found", async () => {
     const agency1 = new AgencyDtoBuilder().withId("agency1").build();
 
@@ -84,7 +128,7 @@ describe("reject IcUser for agency", () => {
           agencyId: agency1.id,
           justification: "osef",
         },
-        { role: "backOffice" } as BackOfficeJwtPayload,
+        backofficeAdminJwtPayload,
       ),
       `No user found with id: ${icUser.id}`,
     );
@@ -102,7 +146,10 @@ describe("reject IcUser for agency", () => {
       },
     };
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+      icUser,
+    ]);
 
     await expectPromiseToFailWith(
       rejectIcUserForAgencyUsecase.execute(
@@ -111,7 +158,7 @@ describe("reject IcUser for agency", () => {
           agencyId: agency1.id,
           justification: "osef",
         },
-        { role: "backOffice" } as BackOfficeJwtPayload,
+        backofficeAdminJwtPayload,
       ),
       `No agency found with id: ${agency1.id}`,
     );
@@ -129,6 +176,16 @@ describe("reject IcUser for agency", () => {
       },
     };
 
+    const randomUser: InclusionConnectedUser = {
+      ...backofficeAdminUser,
+      isBackofficeAdmin: false,
+      id: "random-user-id",
+    };
+
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      randomUser,
+    ]);
+
     await expectPromiseToFailWith(
       rejectIcUserForAgencyUsecase.execute(
         {
@@ -136,11 +193,9 @@ describe("reject IcUser for agency", () => {
           agencyId: agency1.id,
           justification: "osef",
         },
-        {
-          role: "validator",
-        } as unknown as BackOfficeDomainPayload,
+        { userId: randomUser.id } as InclusionConnectJwtPayload,
       ),
-      "This user is not a backOffice user, role was : 'validator'",
+      `User with id '${randomUser.id}' is not a backOffice user`,
     );
   });
 
@@ -164,7 +219,10 @@ describe("reject IcUser for agency", () => {
 
     uow.agencyRepository.setAgencies([agency1, agency2]);
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+      icUser,
+    ]);
 
     await rejectIcUserForAgencyUsecase.execute(
       {
@@ -172,11 +230,12 @@ describe("reject IcUser for agency", () => {
         agencyId: agency1.id,
         justification: "osef",
       },
-      { role: "backOffice" } as BackOfficeJwtPayload,
+      backofficeAdminJwtPayload,
     );
 
     expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
       [icUser.id]: [{ agency: agency2, role: "toReview" }],
+      [backofficeAdminUser.id]: [],
     });
 
     expectToEqual(uow.outboxRepository.events, [

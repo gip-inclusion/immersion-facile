@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
-  BackOfficeJwtPayload,
   ConventionDtoBuilder,
   ConventionJwtPayload,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   Role,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -254,6 +254,33 @@ describe("Get Convention", () => {
           agencyValidatorEmails: agency.validatorEmails,
         });
       });
+
+      it("the user is backofficeAdmin", async () => {
+        const backofficeAdminUser = new InclusionConnectedUserBuilder()
+          .withIsAdmin(true)
+          .build();
+
+        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          backofficeAdminUser,
+        ]);
+
+        const conventionResult = await getConvention.execute(
+          { conventionId: convention.id },
+          {
+            userId: backofficeAdminUser.id,
+          },
+        );
+
+        expectToEqual(conventionResult, {
+          ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+        });
+      });
     });
 
     describe("with ConventionJwtPayload", () => {
@@ -383,30 +410,6 @@ describe("Get Convention", () => {
           agencyCounsellorEmails: agency.counsellorEmails,
           agencyValidatorEmails: agency.validatorEmails,
         });
-      });
-    });
-
-    it("with BackOfficeJwtPayload", async () => {
-      const payload: BackOfficeJwtPayload = {
-        role: "backOffice",
-        sub: "",
-        iat: 1,
-        version: 1,
-      };
-
-      const conventionResult = await getConvention.execute(
-        { conventionId: convention.id },
-        payload,
-      );
-
-      expectToEqual(conventionResult, {
-        ...convention,
-        agencyName: agency.name,
-        agencyDepartment: agency.address.departmentCode,
-        agencyKind: agency.kind,
-        agencySiret: agency.agencySiret,
-        agencyCounsellorEmails: agency.counsellorEmails,
-        agencyValidatorEmails: agency.validatorEmails,
       });
     });
   });

@@ -1,6 +1,7 @@
 import {
-  BackOfficeJwtPayload,
   EstablishmentJwtPayload,
+  InclusionConnectJwtPayload,
+  InclusionConnectedUser,
   addressDtoToString,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -22,6 +23,23 @@ import {
 } from "../helpers/EstablishmentBuilders";
 import { RetrieveFormEstablishmentFromAggregates } from "./RetrieveFormEstablishmentFromAggregates";
 
+const backofficeAdminUser: InclusionConnectedUser = {
+  id: "backoffice-admin",
+  email: "jack.admin@mail.com",
+  firstName: "Jack",
+  lastName: "The Admin",
+  externalId: "jack-admin-external-id",
+  createdAt: new Date().toISOString(),
+  isBackofficeAdmin: true,
+  agencyRights: [],
+  dashboards: { agencies: {}, establishments: {} },
+  establishments: [],
+};
+
+const backofficeAdminJwtPayload = {
+  userId: backofficeAdminUser.id,
+} as InclusionConnectJwtPayload;
+
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
   const siret = "12345678901234";
   const establishmentJwtPayload: EstablishmentJwtPayload = {
@@ -31,13 +49,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     version: 1,
   };
 
-  const backOfficeJwtPayload: BackOfficeJwtPayload = {
-    exp: 2,
-    iat: 1,
-    version: 1,
-    role: "backOffice",
-    sub: "admin",
-  };
   let useCase: RetrieveFormEstablishmentFromAggregates;
   let uow: InMemoryUnitOfWork;
 
@@ -117,7 +128,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     });
   });
 
-  it("returns a reconstructed form if establishment with siret exists with dataSource=form & backoffice jwt payload", async () => {
+  it("returns a reconstructed form if establishment with siret exists with dataSource=form & IC jwt payload with backoffice rights", async () => {
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
@@ -134,8 +145,86 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         .withOffers([offer])
         .build(),
     );
+
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
     // Act
-    const retrievedForm = await useCase.execute(siret, backOfficeJwtPayload);
+    const retrievedForm = await useCase.execute(
+      siret,
+      backofficeAdminJwtPayload,
+    );
+
+    // Assert
+    expectToEqual(retrievedForm, {
+      siret,
+      source: "immersion-facile",
+      businessName: establishment.name,
+      businessNameCustomized: establishment.customizedName,
+      businessAddresses: establishment.locations.map((location) => ({
+        rawAddress: addressDtoToString(location.address),
+        id: location.id,
+      })),
+      isEngagedEnterprise: establishment.isCommited,
+      naf: establishment.nafDto,
+      appellations: [
+        {
+          romeCode: offer.romeCode,
+          romeLabel: offer.romeLabel,
+          appellationCode: offer.appellationCode,
+          appellationLabel: offer.appellationLabel,
+        },
+      ],
+      businessContact: contact,
+      website: establishment.website,
+      additionalInformation: establishment.additionalInformation,
+      maxContactsPerWeek: establishment.maxContactsPerWeek,
+      searchableBy: {
+        jobSeekers: true,
+        students: true,
+      },
+      fitForDisabledWorkers: false,
+    });
+  });
+
+  it("returns a reconstructed form if establishment with siret exists with dataSource=form & IC jwt payload with user that have same email on establishment contacts", async () => {
+    const establishment = new EstablishmentEntityBuilder()
+      .withSiret(siret)
+      .build();
+    const contact = new ContactEntityBuilder().build();
+    const offer = new OfferEntityBuilder()
+      .withRomeCode("A1101")
+      .withAppellationCode("11987")
+      .build();
+
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(establishment)
+        .withContact(contact)
+        .withOffers([offer])
+        .build(),
+    );
+
+    const userWithEstablishmentRights: InclusionConnectedUser = {
+      ...backofficeAdminUser,
+      isBackofficeAdmin: false,
+      id: "not-backoffice-user-id",
+      establishments: [
+        {
+          siret: establishment.siret,
+          businessName: establishment.name,
+        },
+      ],
+    };
+
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      userWithEstablishmentRights,
+    ]);
+
+    // Act
+    const retrievedForm = await useCase.execute(siret, {
+      userId: userWithEstablishmentRights.id,
+    } as InclusionConnectJwtPayload);
 
     // Assert
     expectToEqual(retrievedForm, {

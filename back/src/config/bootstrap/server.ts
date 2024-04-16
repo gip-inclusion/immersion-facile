@@ -20,7 +20,6 @@ import { createTechnicalRouter } from "../../adapters/primary/routers/technical/
 import { EventCrawler } from "../../domains/core/events/ports/EventCrawler";
 import {
   GenerateApiConsumerJwt,
-  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
@@ -49,7 +48,6 @@ type CreateAppProperties = {
   generateConventionJwt: GenerateConventionJwt;
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateInclusionConnectJwt: GenerateInclusionConnectJwt;
-  generateBackOfficeJwt: GenerateBackOfficeJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
 };
@@ -102,7 +100,6 @@ export const createApp = async (
     generateConventionJwt: deps.generateConventionJwt,
     generateEditEstablishmentJwt: deps.generateEditEstablishmentJwt,
     generateInclusionConnectJwt: deps.generateInclusionConnectJwt,
-    generateBackOfficeJwt: deps.generateBackOfficeJwt,
     uuidGenerator: deps.uuidGenerator,
   };
 };

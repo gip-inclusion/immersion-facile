@@ -1,11 +1,14 @@
 import {
-  BackOfficeDomainPayload,
   EstablishmentDomainPayload,
   FormEstablishmentDto,
-  InclusionConnectJwtPayload,
+  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
   formEstablishmentSchema,
 } from "shared";
-import { ForbiddenError } from "../../../config/helpers/httpErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -14,9 +17,7 @@ import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPer
 export class EditFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
   void,
-  | EstablishmentDomainPayload
-  | BackOfficeDomainPayload
-  | InclusionConnectJwtPayload
+  EstablishmentDomainPayload | InclusionConnectDomainJwtPayload
 > {
   protected inputSchema = formEstablishmentSchema;
 
@@ -31,32 +32,43 @@ export class EditFormEstablishment extends TransactionalUseCase<
   }
 
   public async _execute(
-    dto: FormEstablishmentDto,
+    formEstablishment: FormEstablishmentDto,
     uow: UnitOfWork,
-    jwtPayload?:
-      | EstablishmentDomainPayload
-      | BackOfficeDomainPayload
-      | InclusionConnectJwtPayload,
+    jwtPayload?: EstablishmentDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<void> {
     if (!jwtPayload) throw new ForbiddenError();
 
-    if ("siret" in jwtPayload && jwtPayload.siret !== dto.siret)
+    if ("siret" in jwtPayload && jwtPayload.siret !== formEstablishment.siret)
       throw new ForbiddenError();
     if ("userId" in jwtPayload) {
       const user = await uow.inclusionConnectedUserRepository.getById(
         jwtPayload.userId,
       );
-      if (user?.email !== dto.businessContact.email) throw new ForbiddenError();
+      if (!user)
+        throw new NotFoundError(
+          `User with id '${jwtPayload.userId}' not found`,
+        );
+
+      throwIfIcUserNotAllowed(user, formEstablishment);
     }
 
     await Promise.all([
-      uow.formEstablishmentRepository.update(dto),
+      uow.formEstablishmentRepository.update(formEstablishment),
       uow.outboxRepository.save(
         this.#createNewEvent({
           topic: "FormEstablishmentEdited",
-          payload: { formEstablishment: dto },
+          payload: { formEstablishment },
         }),
       ),
     ]);
   }
 }
+
+const throwIfIcUserNotAllowed = (
+  user: InclusionConnectedUser,
+  formEstablishment: FormEstablishmentDto,
+) => {
+  if (user.isBackofficeAdmin) return;
+  if (user.email === formEstablishment.businessContact.email) return;
+  throw new ForbiddenError();
+};

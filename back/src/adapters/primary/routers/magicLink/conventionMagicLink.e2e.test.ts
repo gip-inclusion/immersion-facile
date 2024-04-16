@@ -3,16 +3,18 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
+  InclusionConnectJwtPayload,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
   conventionMagicLinkRoutes,
+  currentJwtVersions,
   expectToEqual,
 } from "shared";
 import { SuperTest, Test } from "supertest";
 import {
-  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
@@ -27,9 +29,20 @@ const payloadMeta = {
 
 const conventionBuilder = new ConventionDtoBuilder().withStatus("DRAFT");
 
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-user")
+  .withIsAdmin(true)
+  .build();
+
+const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+  version: currentJwtVersions.inclusion,
+  iat: new Date().getTime(),
+  exp: addDays(new Date(), 30).getTime(),
+  userId: backofficeAdminUser.id,
+};
+
 describe("Magic link router", () => {
   let request: SuperTest<Test>;
-  let generateBackOfficeJwt: GenerateBackOfficeJwt;
   let generateConventionJwt: GenerateConventionJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -37,13 +50,15 @@ describe("Magic link router", () => {
   beforeEach(async () => {
     ({
       request,
-      generateBackOfficeJwt,
       generateConventionJwt,
       generateInclusionConnectJwt,
       inMemoryUow,
     } = await buildTestApp());
     const initialConvention = conventionBuilder.build();
     inMemoryUow.conventionRepository.setConventions([initialConvention]);
+    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
   });
 
   describe("POST /auth/demande-immersion/:conventionId", () => {
@@ -91,10 +106,9 @@ describe("Magic link router", () => {
           .withStatusJustification("Justif")
           .build();
 
-        const backOfficeJwt = generateBackOfficeJwt({
+        const backOfficeJwt = generateInclusionConnectJwt({
           ...payloadMeta,
-          role: "backOffice",
-          sub: "admin",
+          userId: "TODO create admin boUser and save it",
         });
         const response = await request
           .post(
@@ -255,13 +269,7 @@ describe("Magic link router", () => {
         .post(conventionMagicLinkRoutes.renewConvention.url)
         .send(renewedConventionParams)
         .set({
-          authorization: generateBackOfficeJwt({
-            sub: "Rodrigo",
-            role: "backOffice",
-            version: 1,
-            iat: new Date().getTime() / 1000,
-            exp: new Date().getTime() / 1000 + 1000,
-          }),
+          authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
         });
 
       expectToEqual(response.body, "");

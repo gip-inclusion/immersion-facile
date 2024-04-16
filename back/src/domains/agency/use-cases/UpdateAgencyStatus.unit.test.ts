@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
-  BackOfficeJwtPayload,
+  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUserBuilder,
   UpdateAgencyStatusParamsWithoutId,
   expectPromiseToFailWithError,
 } from "shared";
@@ -21,12 +22,13 @@ import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
 
 const nextDate = new Date("2022-01-01T10:00:00.000");
 const nextUuid = "event-uuid";
-const backofficeJwtPayload: BackOfficeJwtPayload = {
-  role: "backOffice",
-  iat: 0,
-  exp: 0,
-  sub: "backoffice-id",
-  version: 1,
+
+const backofficeAdmin = new InclusionConnectedUserBuilder()
+  .withIsAdmin(true)
+  .build();
+
+const backofficeJwtPayload: InclusionConnectDomainJwtPayload = {
+  userId: backofficeAdmin.id,
 };
 
 describe("Update agency status", () => {
@@ -39,6 +41,10 @@ describe("Update agency status", () => {
     const timeGateway = new CustomTimeGateway();
     timeGateway.setNextDate(nextDate);
     uuidGenerator.setNextUuid(nextUuid);
+
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdmin,
+    ]);
 
     const createNewEvent = makeCreateNewEvent({
       uuidGenerator,

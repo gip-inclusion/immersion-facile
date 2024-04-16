@@ -1,8 +1,11 @@
+import { addDays } from "date-fns";
 import {
   EstablishmentRoutes,
+  InclusionConnectJwtPayload,
+  InclusionConnectedUserBuilder,
   addressDtoToString,
-  createBackOfficeJwtPayload,
   createEstablishmentJwtPayload,
+  currentJwtVersions,
   displayRouteName,
   establishmentRoutes,
   expectHttpResponseToEqual,
@@ -13,8 +16,8 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
 import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
 import {
-  GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
+  GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
@@ -23,6 +26,18 @@ import {
   EstablishmentEntityBuilder,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-user")
+  .withIsAdmin(true)
+  .build();
+
+const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+  version: currentJwtVersions.inclusion,
+  iat: new Date().getTime(),
+  exp: addDays(new Date(), 30).getTime(),
+  userId: backofficeAdminUser.id,
+};
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
   const establishmentAggregate = new EstablishmentAggregateBuilder()
@@ -44,7 +59,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     .build();
 
   let httpClient: HttpClient<EstablishmentRoutes>;
-  let generateBackOfficeJwt: GenerateBackOfficeJwt;
+  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: InMemoryGateways;
@@ -55,7 +70,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       request,
       inMemoryUow,
       gateways,
-      generateBackOfficeJwt,
+      generateInclusionConnectJwt,
       generateEditEstablishmentJwt,
     } = await buildTestApp());
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
@@ -131,12 +146,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateBackOfficeJwt(
-          createBackOfficeJwtPayload({
-            durationDays: 1,
-            now: new Date(),
-          }),
-        ),
+        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
       },
       urlParams: { siret: TEST_OPEN_ESTABLISHMENT_1.siret },
     });
@@ -177,6 +187,27 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         fitForDisabledWorkers: false,
       },
       status: 200,
+    });
+  });
+
+  it(`${displayRouteName(
+    establishmentRoutes.getFormEstablishment,
+  )} 400 if missing establishment`, async () => {
+    const response = await httpClient.getFormEstablishment({
+      body: {},
+      headers: {
+        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+      },
+      urlParams: {
+        siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+      },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        errors: "No establishment found with siret 12345678901234.",
+      },
+      status: 400,
     });
   });
 

@@ -16,8 +16,8 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
-  GenerateBackOfficeJwt,
   GenerateConventionJwt,
+  GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
 import { shortLinkNotFoundMessage } from "../../../../domains/core/short-link/ShortLink";
 import { ShortLinkId } from "../../../../domains/core/short-link/ports/ShortLinkQuery";
@@ -104,7 +104,7 @@ const delegationContactTallyForm = {
 
 describe("technical router", () => {
   let generateConventionJwt: GenerateConventionJwt;
-  let generateBackOfficeJwt: GenerateBackOfficeJwt;
+  let _generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let httpClient: HttpClient<TechnicalRoutes>;
   let appConfig: AppConfig;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -112,20 +112,14 @@ describe("technical router", () => {
   let request: SuperTest<Test>;
 
   beforeEach(async () => {
-    ({
-      request,
-      generateConventionJwt,
-      generateBackOfficeJwt,
-      appConfig,
-      inMemoryUow,
-      gateways,
-    } = await buildTestApp(
-      new AppConfigBuilder({
-        INBOUND_EMAIL_ALLOWED_IPS: "130.10.10.10,::ffff:127.0.0.1",
-        DOMAIN: domain,
-        TALLY_SIGNATURE_SECRET: tallySecret,
-      }).build(),
-    ));
+    ({ request, generateConventionJwt, appConfig, inMemoryUow, gateways } =
+      await buildTestApp(
+        new AppConfigBuilder({
+          INBOUND_EMAIL_ALLOWED_IPS: "130.10.10.10,::ffff:127.0.0.1",
+          DOMAIN: domain,
+          TALLY_SIGNATURE_SECRET: tallySecret,
+        }).build(),
+      ));
     httpClient = createSupertestSharedClient(technicalRoutes, request);
   });
 
@@ -140,29 +134,6 @@ describe("technical router", () => {
         role: "validator",
         emailHash: "my-hash",
         applicationId: "convention-id",
-      });
-      const response = await httpClient.htmlToPdf({
-        body: {
-          htmlContent: "<p>some html content</p>",
-        },
-        headers: {
-          authorization: validatorJwt,
-        },
-      });
-      expectToEqual(response.body, 'PDF_OF >> "<p>some html content</p>"');
-
-      expectToEqual(response.status, 200);
-    });
-
-    it(`${displayRouteName(
-      technicalRoutes.htmlToPdf,
-    )} 200 - Should get PDF content from html string with admin token`, async () => {
-      const validatorJwt = generateBackOfficeJwt({
-        exp: new Date().getTime() / 1000 + 1000,
-        iat: new Date().getTime() / 1000,
-        sub: "admin",
-        version: 1,
-        role: "backOffice",
       });
       const response = await httpClient.htmlToPdf({
         body: {

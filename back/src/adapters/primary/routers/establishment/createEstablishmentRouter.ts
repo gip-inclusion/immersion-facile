@@ -1,11 +1,5 @@
-import { Request, Router } from "express";
-import {
-  BackOfficeJwtPayload,
-  EstablishmentJwtPayload,
-  InclusionConnectJwtPayload,
-  establishmentRoutes,
-  formCompletionRoutes,
-} from "shared";
+import { Router } from "express";
+import { establishmentRoutes, formCompletionRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
@@ -50,9 +44,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
           req.params.siret,
-          getEstablishmentPayload(req) ??
-            getBackOfficePayload(req) ??
-            getIcPayload(req),
+          req.payloads?.establishment ?? req.payloads?.inclusion,
         ),
       ),
   );
@@ -63,7 +55,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.editFormEstablishment.execute(
           req.body,
-          getEstablishmentPayload(req) ?? getBackOfficePayload(req),
+          req.payloads?.establishment ?? req.payloads?.inclusion,
         ),
       ),
   );
@@ -74,19 +66,9 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res.status(204), () =>
         deps.useCases.deleteEstablishment.execute(
           req.params,
-          getBackOfficePayload(req),
+          req.payloads?.inclusion,
         ),
       ),
   );
   return establishmentRouter;
 };
-
-const getEstablishmentPayload = (
-  req: Request,
-): EstablishmentJwtPayload | undefined => req.payloads?.establishment;
-
-const getBackOfficePayload = (req: Request): BackOfficeJwtPayload | undefined =>
-  req.payloads?.backOffice;
-
-const getIcPayload = (req: Request): InclusionConnectJwtPayload | undefined =>
-  req.payloads?.inclusion;

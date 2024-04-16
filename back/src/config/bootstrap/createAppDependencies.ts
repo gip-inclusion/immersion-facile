@@ -2,7 +2,6 @@ import { AbsoluteUrl, frontRoutes } from "shared";
 import { InMemoryEventBus } from "../../domains/core/events/adapters/InMemoryEventBus";
 import {
   GenerateApiConsumerJwt,
-  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
@@ -46,7 +45,6 @@ export const createAppDependencies = async (config: AppConfig) => {
 
   const oneHourInSeconds = 3600;
   const oneDayInSecond = oneHourInSeconds * 24;
-  const onYearInSeconds = oneDayInSecond * 365;
   const thirtyDaysInSecond = oneDayInSecond * 30;
 
   const generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt =
@@ -56,8 +54,6 @@ export const createAppDependencies = async (config: AppConfig) => {
       config.apiJwtPrivateKey,
       undefined, // no expiration
     );
-  const generateBackOfficeJwt: GenerateBackOfficeJwt =
-    makeGenerateJwtES256<"backOffice">(config.jwtPrivateKey, onYearInSeconds);
   const generateInclusionConnectJwt: GenerateInclusionConnectJwt =
     makeGenerateJwtES256<"inclusionConnect">(
       config.jwtPrivateKey,
@@ -82,7 +78,6 @@ export const createAppDependencies = async (config: AppConfig) => {
     gateways,
     generateConventionJwt,
     generateEditEstablishmentJwt,
-    generateBackOfficeJwt,
     generateInclusionConnectJwt,
     generateApiConsumerJwt,
     uowPerformer,
@@ -115,7 +110,6 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateConventionJwt,
     generateApiConsumerJwt,
     generateInclusionConnectJwt,
-    generateBackOfficeJwt,
     eventBus,
     eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
     uuidGenerator,

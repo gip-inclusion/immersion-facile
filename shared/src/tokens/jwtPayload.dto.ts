@@ -15,9 +15,6 @@ export type StandardJwtPayload<R extends Role> = {
   role: R;
 };
 
-export type BackOfficeDomainPayload = StandardJwtPayload<"backOffice">;
-export type BackOfficeJwtPayload = CommonJwtPayload & BackOfficeDomainPayload;
-
 export type ConventionDomainPayload = {
   applicationId: ConventionId;
   role: Role;
@@ -31,7 +28,6 @@ export type InclusionConnectJwtPayload = CommonJwtPayload &
   InclusionConnectDomainJwtPayload;
 
 export type ConventionRelatedJwtPayload =
-  | BackOfficeDomainPayload
   | ConventionDomainPayload
   | InclusionConnectDomainJwtPayload;
 
@@ -57,7 +53,6 @@ export type JwtPayloads = {
   convention?: ConventionJwtPayload;
   establishment?: EstablishmentJwtPayload;
   inclusion?: InclusionConnectJwtPayload;
-  backOffice?: BackOfficeJwtPayload;
 };
 export type PayloadKey = keyof JwtPayloads;
 export type PayloadOption = ValueOf<Required<JwtPayloads>>;

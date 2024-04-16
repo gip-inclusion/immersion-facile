@@ -1,6 +1,9 @@
+import { addDays } from "date-fns";
 import {
   EstablishmentRoutes,
   FormEstablishmentDtoBuilder,
+  InclusionConnectJwtPayload,
+  InclusionConnectedUserBuilder,
   currentJwtVersions,
   displayRouteName,
   establishmentRoutes,
@@ -12,14 +15,26 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import {
-  GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
+  GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { establishmentNotFoundErrorMessage } from "../../../../domains/establishment/ports/EstablishmentAggregateRepository";
 import { formEstablishmentNotFoundErrorMessage } from "../../../../domains/establishment/ports/FormEstablishmentRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
+
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-user")
+  .withIsAdmin(true)
+  .build();
+
+const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+  version: currentJwtVersions.inclusion,
+  iat: new Date().getTime(),
+  exp: addDays(new Date(), 30).getTime(),
+  userId: backofficeAdminUser.id,
+};
 
 describe("Delete form establishment", () => {
   const establishmentAggregate = new EstablishmentAggregateBuilder().build();
@@ -29,18 +44,21 @@ describe("Delete form establishment", () => {
 
   let httpClient: HttpClient<EstablishmentRoutes>;
   let uow: InMemoryUnitOfWork;
-  let generateBackOfficeJwt: GenerateBackOfficeJwt;
   let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
+  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 
   beforeEach(async () => {
     let request: SuperTest<Test>;
     ({
       request,
       inMemoryUow: uow,
-      generateBackOfficeJwt,
       generateEditEstablishmentJwt,
+      generateInclusionConnectJwt,
     } = await buildTestApp());
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
   });
 
   it(`${displayRouteName(
@@ -56,11 +74,7 @@ describe("Delete form establishment", () => {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateBackOfficeJwt({
-          role: "backOffice",
-          sub: "",
-          version: currentJwtVersions.backOffice,
-        }),
+        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
       },
     });
 
@@ -104,12 +118,7 @@ describe("Delete form establishment", () => {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateBackOfficeJwt({
-          role: "backOffice",
-          sub: "",
-          version: currentJwtVersions.backOffice,
-          exp: Math.round((new Date().getTime() - 48 * 3600 * 1000) / 1000),
-        }),
+        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
       },
     });
 
@@ -153,11 +162,7 @@ describe("Delete form establishment", () => {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateBackOfficeJwt({
-          role: "backOffice",
-          sub: "",
-          version: currentJwtVersions.backOffice,
-        }),
+        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
       },
     });
 
@@ -183,11 +188,7 @@ describe("Delete form establishment", () => {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateBackOfficeJwt({
-          role: "backOffice",
-          sub: "",
-          version: currentJwtVersions.backOffice,
-        }),
+        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
       },
     });
 

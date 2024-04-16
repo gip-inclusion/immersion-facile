@@ -20,26 +20,15 @@ import {
 } from "../httpClient/httpErrors.schema";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
-import { backOfficeJwtSchema } from "../tokens/jwtPayload.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
   icUserRoleForAgencyParamsSchema,
   rejectIcUserRoleForAgencyParamsSchema,
-  userAndPasswordSchema,
   withAgencyRoleSchema,
 } from "./admin.schema";
 
 export type AdminRoutes = typeof adminRoutes;
 export const adminRoutes = defineRoutes({
-  login: defineRoute({
-    method: "post",
-    url: "/admin/login",
-    requestBodySchema: userAndPasswordSchema,
-    responses: {
-      200: backOfficeJwtSchema,
-      403: legacyHttpErrorSchema,
-    },
-  }),
   getDashboardUrl: defineRoute({
     method: "get",
     url: "/admin/dashboard/:dashboardName",

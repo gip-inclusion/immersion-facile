@@ -1,9 +1,13 @@
+import { addDays } from "date-fns";
 import {
   AdminRoutes,
-  BackOfficeJwt,
   EmailNotification,
+  InclusionConnectJwt,
+  InclusionConnectJwtPayload,
+  InclusionConnectedUserBuilder,
   SmsNotification,
   adminRoutes,
+  currentJwtVersions,
   expectHttpResponseToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -12,21 +16,31 @@ import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapte
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe(`${adminRoutes.getLastNotifications.url} route`, () => {
-  let adminToken: BackOfficeJwt;
+  let adminToken: InclusionConnectJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<AdminRoutes>;
 
   beforeEach(async () => {
     const testApp = await buildTestApp();
     ({ inMemoryUow } = testApp);
-    const iat = new Date().getTime() / 1000;
-    adminToken = testApp.generateBackOfficeJwt({
-      role: "backOffice",
-      sub: "admin",
-      iat,
-      exp: iat + 1000,
-      version: 1,
-    });
+
+    const backofficeAdminUser = new InclusionConnectedUserBuilder()
+      .withId("backoffice-admin-user")
+      .withIsAdmin(true)
+      .build();
+
+    const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+      version: currentJwtVersions.inclusion,
+      iat: new Date().getTime(),
+      exp: addDays(new Date(), 30).getTime(),
+      userId: backofficeAdminUser.id,
+    };
+
+    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
+
+    adminToken = testApp.generateInclusionConnectJwt(backofficeAdminJwtPayload);
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
   });
 

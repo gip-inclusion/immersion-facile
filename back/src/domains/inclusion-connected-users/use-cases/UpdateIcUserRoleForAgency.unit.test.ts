@@ -1,7 +1,7 @@
 import {
   AgencyDtoBuilder,
   AgencyRole,
-  BackOfficeJwtPayload,
+  InclusionConnectJwtPayload,
   InclusionConnectedUser,
   User,
   expectPromiseToFailWith,
@@ -28,6 +28,19 @@ const user: User = {
   createdAt: new Date().toISOString(),
 };
 
+const backofficeAdminUser: InclusionConnectedUser = {
+  id: "backoffice-admin",
+  email: "jack.admin@mail.com",
+  firstName: "Jack",
+  lastName: "The Admin",
+  externalId: "jack-admin-external-id",
+  createdAt: new Date().toISOString(),
+  isBackofficeAdmin: true,
+  agencyRights: [],
+  dashboards: { agencies: {}, establishments: {} },
+  establishments: [],
+};
+
 describe("GetInclusionConnectedUsers", () => {
   let updateIcUserRoleForAgency: UpdateIcUserRoleForAgency;
   let uowPerformer: InMemoryUowPerformer;
@@ -50,6 +63,10 @@ describe("GetInclusionConnectedUsers", () => {
 
     inclusionConnectedUserRepository = uow.inclusionConnectedUserRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
+
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
     updateIcUserRoleForAgency = new UpdateIcUserRoleForAgency(
       uowPerformer,
       createNewEvent,
@@ -70,14 +87,14 @@ describe("GetInclusionConnectedUsers", () => {
   it("throws Forbidden if token payload is not backoffice token", async () => {
     const badBackOfficeJwtPayload = {
       role: "validator",
-    } as unknown as BackOfficeJwtPayload;
+    } as unknown as InclusionConnectJwtPayload;
 
     await expectPromiseToFailWith(
       updateIcUserRoleForAgency.execute(
         { role: "counsellor", agencyId: "agency-1", userId: "john-123" },
         badBackOfficeJwtPayload,
       ),
-      "This user is not a backOffice user, role was : 'validator'",
+      "This user is not a backOffice admin",
     );
   });
 
@@ -89,7 +106,7 @@ describe("GetInclusionConnectedUsers", () => {
           agencyId: "agency-1",
           userId: "john-123",
         },
-        { role: "backOffice" } as BackOfficeJwtPayload,
+        { userId: backofficeAdminUser.id } as InclusionConnectJwtPayload,
       ),
       "User with id john-123 not found",
     );
@@ -97,6 +114,7 @@ describe("GetInclusionConnectedUsers", () => {
 
   it("throws not found if agency does not exist for user", async () => {
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
       {
         ...user,
         agencyRights: [],
@@ -114,7 +132,7 @@ describe("GetInclusionConnectedUsers", () => {
           agencyId: "agency-1",
           userId: "john-123",
         },
-        { role: "backOffice" } as BackOfficeJwtPayload,
+        { userId: backofficeAdminUser.id } as InclusionConnectJwtPayload,
       ),
       "Agency with id agency-1 is not registered for user with id john-123",
     );
@@ -131,7 +149,10 @@ describe("GetInclusionConnectedUsers", () => {
       },
     };
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+      icUser,
+    ]);
     const newRole: AgencyRole = "validator";
 
     await updateIcUserRoleForAgency.execute(
@@ -140,7 +161,7 @@ describe("GetInclusionConnectedUsers", () => {
         agencyId: agency.id,
         userId: user.id,
       },
-      { role: "backOffice" } as BackOfficeJwtPayload,
+      { userId: backofficeAdminUser.id } as InclusionConnectJwtPayload,
     );
 
     expectToEqual(await inclusionConnectedUserRepository.getById(user.id), {
@@ -164,7 +185,10 @@ describe("GetInclusionConnectedUsers", () => {
       },
     };
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+      icUser,
+    ]);
     const newRole: AgencyRole = "validator";
     const IcUserRoleForAgency = {
       userId: user.id,
@@ -172,8 +196,8 @@ describe("GetInclusionConnectedUsers", () => {
       role: newRole,
     };
     await updateIcUserRoleForAgency.execute(IcUserRoleForAgency, {
-      role: "backOffice",
-    } as BackOfficeJwtPayload);
+      userId: backofficeAdminUser.id,
+    } as InclusionConnectJwtPayload);
 
     expect(outboxRepo.events).toHaveLength(1);
 

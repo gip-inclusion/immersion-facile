@@ -9,7 +9,7 @@ export const makeAdminAuthMiddleware = (
   jwtPublicKey: string,
   timeGateway: TimeGateway,
 ) => {
-  const verifyJwt = makeVerifyJwtES256<"backOffice">(jwtPublicKey);
+  const verifyJwt = makeVerifyJwtES256<"inclusionConnect">(jwtPublicKey);
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
       return res.status(401).json({ error: "You need to authenticate first" });
@@ -25,7 +25,7 @@ export const makeAdminAuthMiddleware = (
         return res.status(401).json({ error: "Token is expired" });
       }
 
-      req.payloads = { backOffice: payload };
+      req.payloads = { inclusion: payload };
       return next();
     } catch (error) {
       logger.error(

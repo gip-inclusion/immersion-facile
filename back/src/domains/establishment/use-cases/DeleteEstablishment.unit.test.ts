@@ -1,7 +1,8 @@
 import {
-  BackOfficeJwtPayload,
   FormEstablishmentDtoBuilder,
   GroupOptions,
+  InclusionConnectJwtPayload,
+  InclusionConnectedUserBuilder,
   addressDtoToString,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -28,6 +29,14 @@ import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders"
 import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
 import { formEstablishmentNotFoundErrorMessage } from "../ports/FormEstablishmentRepository";
 import { DeleteEstablishment } from "./DeleteEstablishment";
+
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withIsAdmin(true)
+  .build();
+
+const backofficeAdminJwtPayload = {
+  userId: backofficeAdminUser.id,
+} as InclusionConnectJwtPayload;
 
 const groupOptions: GroupOptions = {
   heroHeader: {
@@ -56,13 +65,6 @@ describe("Delete Establishment", () => {
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(establishmentAggregate.establishment.siret)
     .build();
-  const backofficeJwtPayload: BackOfficeJwtPayload = {
-    role: "backOffice",
-    sub: "admin",
-    exp: 2,
-    iat: 1,
-    version: 1,
-  };
 
   let deleteEstablishment: DeleteEstablishment;
   let uow: InMemoryUnitOfWork;
@@ -99,7 +101,7 @@ describe("Delete Establishment", () => {
           {
             siret: establishmentAggregate.establishment.siret,
           },
-          backofficeJwtPayload,
+          backofficeAdminJwtPayload,
         ),
         new NotFoundError(
           establishmentNotFoundErrorMessage(
@@ -118,7 +120,7 @@ describe("Delete Establishment", () => {
           {
             siret: formEstablishment.siret,
           },
-          backofficeJwtPayload,
+          backofficeAdminJwtPayload,
         ),
         new NotFoundError(
           formEstablishmentNotFoundErrorMessage(formEstablishment.siret),
@@ -148,7 +150,7 @@ describe("Delete Establishment", () => {
         {
           siret: establishmentAggregate.establishment.siret,
         },
-        backofficeJwtPayload,
+        backofficeAdminJwtPayload,
       );
 
       expectToEqual(

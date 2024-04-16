@@ -1,15 +1,19 @@
+import { addDays } from "date-fns";
 import {
   AdminRoutes,
   AgencyDtoBuilder,
   AgencyRole,
   ApiConsumer,
   ApiConsumerJwt,
-  BackOfficeJwt,
   FeatureFlags,
+  InclusionConnectJwt,
+  InclusionConnectJwtPayload,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   SetFeatureFlagParam,
   adminRoutes,
   createApiConsumerParamsFromApiConsumer,
+  currentJwtVersions,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -26,6 +30,7 @@ import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../../domains/cor
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
   GenerateApiConsumerJwt,
+  GenerateInclusionConnectJwt,
   makeVerifyJwtES256,
 } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
@@ -33,14 +38,27 @@ import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-user")
+  .withIsAdmin(true)
+  .build();
+
+const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+  version: currentJwtVersions.inclusion,
+  iat: new Date().getTime(),
+  exp: addDays(new Date(), 30).getTime(),
+  userId: backofficeAdminUser.id,
+};
+
 describe("Admin router", () => {
   const now = new Date();
   let sharedRequest: HttpClient<AdminRoutes>;
-  let token: BackOfficeJwt;
+  let token: InclusionConnectJwt;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let appConfig: AppConfig;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
+  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let getFeatureFlags: () => Promise<FeatureFlags>;
   let eventCrawler: BasicEventCrawler;
 
@@ -60,17 +78,17 @@ describe("Admin router", () => {
       appConfig,
       generateApiConsumerJwt,
       eventCrawler,
+      generateInclusionConnectJwt,
     } = testDepsAndApp);
 
     sharedRequest = createSupertestSharedClient(adminRoutes, request);
 
+    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
+
     gateways.timeGateway.defaultDate = now;
-    token = await sharedRequest
-      .login({ body: { user: "user", password: "pwd" } })
-      .then((response) => {
-        if (response.status === 200) return response.body;
-        throw new Error(response.body.errors);
-      });
+    token = generateInclusionConnectJwt(backofficeAdminJwtPayload);
 
     getFeatureFlags = async () => {
       const { body } = await request.get(technicalRoutes.featureFlags.url);

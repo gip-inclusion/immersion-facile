@@ -4,15 +4,13 @@ import {
   ApiConsumerJwt,
   ApiConsumerRight,
   ApiConsumerRights,
-  BackOfficeDomainPayload,
   CreateWebhookSubscription,
+  InclusionConnectDomainJwtPayload,
   WriteApiConsumerParams,
   writeApiConsumerSchema,
 } from "shared";
-import {
-  ForbiddenError,
-  UnauthorizedError,
-} from "../../../../config/helpers/httpErrors";
+import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
+import { throwIfIcUserNotBackofficeAdmin } from "../../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
 import { TransactionalUseCase } from "../../UseCase";
 import { CreateNewEvent } from "../../events/ports/EventBus";
 import { GenerateApiConsumerJwt } from "../../jwt";
@@ -25,7 +23,7 @@ export const EXPIRATION_IN_YEARS = 2;
 export class SaveApiConsumer extends TransactionalUseCase<
   WriteApiConsumerParams,
   ApiConsumerJwt | undefined,
-  BackOfficeDomainPayload
+  InclusionConnectDomainJwtPayload
 > {
   protected inputSchema = writeApiConsumerSchema;
 
@@ -50,13 +48,10 @@ export class SaveApiConsumer extends TransactionalUseCase<
   protected async _execute(
     input: WriteApiConsumerParams,
     uow: UnitOfWork,
-    payload?: BackOfficeDomainPayload,
+    payload?: InclusionConnectDomainJwtPayload,
   ): Promise<ApiConsumerJwt | undefined> {
     if (!payload) throw new UnauthorizedError();
-    if (payload.role !== "backOffice")
-      throw new ForbiddenError(
-        "Provided JWT payload does not have sufficient privileges. Received role: 'beneficiary'",
-      );
+    await throwIfIcUserNotBackofficeAdmin(uow, payload);
 
     const existingApiConsumer = await uow.apiConsumerRepository.getById(
       input.id,
