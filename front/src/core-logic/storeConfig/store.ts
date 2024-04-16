@@ -31,10 +31,8 @@ import { searchEpics } from "src/core-logic/domain/search/search.epics";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
-import { agenciesEpics } from "../domain/agenciesConvention/agencies.epics";
-import { agenciesSlice } from "../domain/agenciesConvention/agencies.slice";
-import { agencyInfoEpics } from "../domain/agencyInfo/agencyInfo.epics";
-import { agencyInfoSlice } from "../domain/agencyInfo/agencyInfo.slice";
+import { agenciesEpics } from "../domain/agencies/agencies.epics";
+import { agenciesSlice } from "../domain/agencies/agencies.slice";
 import { authEpics } from "../domain/auth/auth.epics";
 import { conventionEpics } from "../domain/convention/convention.epics";
 import { conventionSlice } from "../domain/convention/convention.slice";
@@ -53,7 +51,6 @@ const allEpics: AppEpic<any>[] = [
   ...adminAuthEpics,
   ...agenciesAdminEpics,
   ...agenciesEpics,
-  ...agencyInfoEpics,
   ...apiConsumerEpics,
   ...assessmentEpics,
   ...authEpics,
@@ -83,8 +80,8 @@ const appReducer = combineReducers({
     [notificationsSlice.name]: notificationsSlice.reducer,
     [apiConsumerSlice.name]: apiConsumerSlice.reducer,
   }),
+  [agencyAdminSlice.name]: agencyAdminSlice.reducer,
   [agenciesSlice.name]: agenciesSlice.reducer,
-  [agencyInfoSlice.name]: agencyInfoSlice.reducer,
   [assessmentSlice.name]: assessmentSlice.reducer,
   [authSlice.name]: authSlice.reducer,
   [conventionSlice.name]: conventionSlice.reducer,
