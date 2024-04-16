@@ -565,7 +565,7 @@ export const ConventionDocumentPage = ({
                   {internshipKind === "immersion"
                     ? "de l'immersion"
                     : "du mini-stage"}
-                  , <strong>{convention.agencyName}</strong> (validée le{" "}
+                  , <strong>{convention.agencyName}</strong> (validé le{" "}
                   {toDisplayedDate({
                     date: new Date(
                       throwOnMissingSignDate(convention.dateValidation),
@@ -581,7 +581,7 @@ export const ConventionDocumentPage = ({
                     {internshipKind === "immersion"
                       ? "de l'immersion"
                       : "du mini-stage"}
-                    , <strong>{convention.agencyRefersTo.name}</strong> (validée
+                    , <strong>{convention.agencyRefersTo.name}</strong> (validé
                     le{" "}
                     {toDisplayedDate({
                       date: new Date(
@@ -591,8 +591,14 @@ export const ConventionDocumentPage = ({
                     ).
                   </li>
                   <li>
-                    La personne bénéficiaire est accompagnée par :{" "}
-                    <strong>{convention.agencyName}</strong>
+                    √ La structure d'accompagnement du candidat,{" "}
+                    <strong>{convention.agencyName}</strong> (validé le{" "}
+                    {toDisplayedDate({
+                      date: new Date(
+                        throwOnMissingSignDate(convention.dateApproval),
+                      ),
+                    })}
+                    ).
                   </li>
                 </>
               )}
