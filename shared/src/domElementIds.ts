@@ -192,6 +192,13 @@ export const domElementIds = {
     shareFormSubmitButton: "im-convention-form__share-form-submit-button",
     copyLinkButton: "im-convention-form__copy-link-button",
     showFormButton: "im-convention-form__show-form-button",
+    initiateConventionSection: {
+      ftConnectButton: "im-convention-form__initiate__ft-connect-button",
+      showFormButton: "im-convention-form__initiate__show-form-button",
+      iHaveAProblemButton:
+        "im-convention-form__initiate__i-have-a-problem-button",
+      canIFillOnline: "im-convention-form__initiate__can-i-fill-online-link",
+    },
     submitFormButton: "im-convention-form__submit-form-button",
     submitFormButtonMobile: "im-convention-form__submit-form-button--mobile",
     confirmSubmitFormButton: "im-convention-form__confirm-submit-form-button",

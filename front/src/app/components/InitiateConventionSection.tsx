@@ -35,7 +35,8 @@ export const InitiateConventionSection = ({
           imageUrl={illustrationForm}
           linkProps={{
             href: "#",
-            id: domElementIds.conventionImmersionRoute.showFormButton,
+            id: domElementIds.conventionImmersionRoute.initiateConventionSection
+              .showFormButton,
           }}
           size="medium"
           title="Je remplis une convention sans identifiants France Travail (anciennement Pôle emploi)"
@@ -58,6 +59,8 @@ export const InitiateConventionSection = ({
           imageUrl={illustrationPe}
           linkProps={{
             href: `/api/${loginPeConnect}`,
+            id: domElementIds.conventionImmersionRoute.initiateConventionSection
+              .ftConnectButton,
           }}
           size="medium"
           title="Je remplis une convention avec mes identifiants France Travail (anciennement Pôle emploi)"
@@ -82,6 +85,8 @@ export const InitiateConventionSection = ({
           linkProps={{
             href: "https://tally.so/r/mBdQQe",
             target: "_blank",
+            id: domElementIds.conventionImmersionRoute.initiateConventionSection
+              .iHaveAProblemButton,
           }}
           size="medium"
           title="J’ai déjà rempli une demande de convention mais j’ai un problème"
@@ -93,6 +98,10 @@ export const InitiateConventionSection = ({
       className={fr.cx("fr-mt-5w", "fr-btns-group", "fr-btns-group--center")}
     >
       <a
+        id={
+          domElementIds.conventionImmersionRoute.initiateConventionSection
+            .canIFillOnline
+        }
         href="https://tally.so/r/w2X7xV"
         className={fr.cx(
           "fr-link",
