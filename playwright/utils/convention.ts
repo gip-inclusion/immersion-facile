@@ -18,7 +18,7 @@ export const submitBasicConventionForm = async (page: Page) => {
     await page.request.get(technicalRoutes.featureFlags.url),
   ).toBeOK();
   const formButton = await page.locator(
-    `#${domElementIds.conventionImmersionRoute.showFormButton}`,
+    `#${domElementIds.conventionImmersionRoute.initiateConventionSection.showFormButton}`,
   );
   await formButton.waitFor();
   await formButton.click();

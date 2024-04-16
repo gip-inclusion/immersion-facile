@@ -26,7 +26,7 @@ test.describe("Home user flow", () => {
       `#${domElementIds.homeCandidates.heroHeader.formConvention}`,
     );
     const formButton = await page.locator(
-      `#${domElementIds.conventionImmersionRoute.showFormButton}`,
+      `#${domElementIds.conventionImmersionRoute.initiateConventionSection.showFormButton}`,
     );
     await formButton.click();
     await expect(page.url()).toContain(
