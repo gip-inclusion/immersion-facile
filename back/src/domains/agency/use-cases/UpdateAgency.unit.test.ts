@@ -1,6 +1,6 @@
 import {
   AgencyDtoBuilder,
-  BackOfficeJwtPayload,
+  InclusionConnectedUserBuilder,
   expectObjectsToMatch,
   expectPromiseToFail,
   expectPromiseToFailWith,
@@ -21,16 +21,12 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
 import { UpdateAgency } from "./UpdateAgency";
 
-const backofficeJwtPayload: BackOfficeJwtPayload = {
-  role: "backOffice",
-  iat: 0,
-  exp: 0,
-  sub: "backoffice-id",
-  version: 1,
-};
-
+//TODO : gérer sans le backoffice JWT
 describe("Update agency", () => {
   const initialAgencyInRepo = new AgencyDtoBuilder().build();
+  const backofficeAdmin = new InclusionConnectedUserBuilder()
+    .withIsAdmin(true)
+    .build();
 
   let agencyRepository: InMemoryAgencyRepository;
   let outboxRepository: InMemoryOutboxRepository;
@@ -64,7 +60,7 @@ describe("Update agency", () => {
   it("Fails trying to update if no matching agency was found", async () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWith(
-      updateAgency.execute(agency, backofficeJwtPayload),
+      updateAgency.execute(agency, { userId: backofficeAdmin.id }),
       `No agency found with id : ${agency.id}`,
     );
   });
@@ -83,7 +79,7 @@ describe("Update agency", () => {
       })
       .build();
     await expectPromiseToFail(
-      updateAgency.execute(updatedAgency, backofficeJwtPayload),
+      updateAgency.execute(updatedAgency, { userId: backofficeAdmin.id }),
     );
   });
 
@@ -115,7 +111,7 @@ describe("Update agency", () => {
     );
 
     await expectPromiseToFailWithError(
-      updateAgency.execute(updatedAgency, backofficeJwtPayload),
+      updateAgency.execute(updatedAgency, { userId: backofficeAdmin.id }),
       new BadRequestError(expectedErrorMessage),
     );
   });
@@ -140,10 +136,9 @@ describe("Update agency", () => {
     );
 
     // no conflict error if user is admin
-    const result = await updateAgency.execute(
-      updatedAgency,
-      backofficeJwtPayload,
-    );
+    const result = await updateAgency.execute(updatedAgency, {
+      userId: backofficeAdmin.id,
+    });
     expect(result).toBeUndefined();
   });
 
@@ -157,10 +152,9 @@ describe("Update agency", () => {
       .withValidatorEmails(["new-validator@mail.com"])
       .build();
 
-    const response = await updateAgency.execute(
-      updatedAgency,
-      backofficeJwtPayload,
-    );
+    const response = await updateAgency.execute(updatedAgency, {
+      userId: backofficeAdmin.id,
+    });
     expect(response).toBeUndefined();
     expectToEqual(agencyRepository.agencies, [updatedAgency]);
 

@@ -1,9 +1,11 @@
-import { subYears } from "date-fns";
+import { addDays, subYears } from "date-fns";
 import {
   EstablishmentRoutes,
   FormEstablishmentDtoBuilder,
-  createBackOfficeJwtPayload,
+  InclusionConnectJwtPayload,
+  InclusionConnectedUserBuilder,
   createEstablishmentJwtPayload,
+  currentJwtVersions,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -14,8 +16,8 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
-  GenerateBackOfficeJwt,
   GenerateEditFormEstablishmentJwt,
+  GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../../../domains/core/jwt";
 import {
@@ -32,7 +34,7 @@ describe("Edit form establishments", () => {
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
-  let generateBackOfficeJwt: GenerateBackOfficeJwt;
+  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
@@ -46,7 +48,7 @@ describe("Edit form establishments", () => {
       gateways,
       inMemoryUow,
       generateEditEstablishmentJwt,
-      generateBackOfficeJwt,
+      generateInclusionConnectJwt,
     } = await buildTestApp(
       new AppConfigBuilder().withTestPresetPreviousKeys().build(),
     ));
@@ -82,15 +84,26 @@ describe("Edit form establishments", () => {
   });
 
   it("200 - Supports posting already existing form establisment when authenticated with backoffice JWT", async () => {
+    const backofficeAdminUser = new InclusionConnectedUserBuilder()
+      .withId("inclusion-connected-user")
+      .withIsAdmin(false)
+      .build();
+
+    const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+      version: currentJwtVersions.inclusion,
+      iat: new Date().getTime(),
+      exp: addDays(new Date(), 30).getTime(),
+      userId: backofficeAdminUser.id,
+    };
+
+    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
+
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateBackOfficeJwt(
-          createBackOfficeJwtPayload({
-            durationDays: 1,
-            now: new Date(),
-          }),
-        ),
+        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
       },
     });
 

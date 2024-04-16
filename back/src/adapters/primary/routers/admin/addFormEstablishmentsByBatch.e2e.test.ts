@@ -1,10 +1,15 @@
+import { addDays } from "date-fns";
 import {
   AdminRoutes,
   BackOfficeJwt,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
+  InclusionConnectJwt,
+  InclusionConnectJwtPayload,
+  InclusionConnectedUserBuilder,
   adminRoutes,
+  currentJwtVersions,
   expectHttpResponseToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -12,6 +17,18 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-user")
+  .withIsAdmin(true)
+  .build();
+
+const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+  version: currentJwtVersions.inclusion,
+  iat: new Date().getTime(),
+  exp: addDays(new Date(), 30).getTime(),
+  userId: backofficeAdminUser.id,
+};
 
 describe("POST /add-form-establishment-batch", () => {
   const formEstablishment1: FormEstablishmentDto =
@@ -23,7 +40,7 @@ describe("POST /add-form-establishment-batch", () => {
     formEstablishments: [formEstablishment1],
   };
   let httpClient: HttpClient<AdminRoutes>;
-  let token: BackOfficeJwt;
+  let token: InclusionConnectJwt;
   let gateways: InMemoryGateways;
 
   beforeEach(async () => {
@@ -38,17 +55,13 @@ describe("POST /add-form-establishment-batch", () => {
 
     ({ gateways } = testApp);
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
+    testApp.inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
+      [backofficeAdminUser],
+    );
 
     gateways.timeGateway.defaultDate = new Date();
 
-    const response = await httpClient.login({
-      body: {
-        user: "user",
-        password: "pwd",
-      },
-    });
-    if (response.status !== 200) throw new Error("Login failed");
-    token = response.body;
+    token = testApp.generateInclusionConnectJwt(backofficeAdminJwtPayload);
   });
 
   it("throws 401 if invalid token", async () => {

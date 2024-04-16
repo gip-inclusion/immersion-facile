@@ -1,10 +1,13 @@
+import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionMagicLinkRoutes,
+  InclusionConnectJwtPayload,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   TechnicalRoutes,
   UnauthenticatedConventionRoutes,
   WithAuthorizationHeader,
@@ -29,7 +32,6 @@ import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { conventionMissingMessage } from "../../../../domains/convention/entities/Convention";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
-  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
@@ -60,12 +62,23 @@ const convention = new ConventionDtoBuilder()
 
 const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-user")
+  .withIsAdmin(true)
+  .build();
+
+const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+  version: currentJwtVersions.inclusion,
+  iat: new Date().getTime(),
+  exp: addDays(new Date(), 30).getTime(),
+  userId: backofficeAdminUser.id,
+};
+
 describe("convention e2e", () => {
   let unauthenticatedRequest: HttpClient<UnauthenticatedConventionRoutes>;
   let magicLinkRequest: HttpClient<ConventionMagicLinkRoutes>;
   let technicalRoutesClient: HttpClient<TechnicalRoutes>;
   let generateConventionJwt: GenerateConventionJwt;
-  let generateBackOfficeJwt: GenerateBackOfficeJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
@@ -80,7 +93,6 @@ describe("convention e2e", () => {
       eventCrawler,
       gateways,
       generateConventionJwt,
-      generateBackOfficeJwt,
       generateInclusionConnectJwt,
       inMemoryUow,
       appConfig,
@@ -277,7 +289,7 @@ describe("convention e2e", () => {
       "200 - succeeds with JWT %s",
       async (scenario) => {
         inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
-          [inclusionConnectedUser],
+          [inclusionConnectedUser, backofficeAdminUser],
         );
 
         const jwt = match(scenario)
@@ -294,12 +306,7 @@ describe("convention e2e", () => {
             }),
           )
           .with("BackOfficeJwt", () =>
-            generateBackOfficeJwt({
-              role: "backOffice",
-              sub: "",
-              version: 1,
-              iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
-            }),
+            generateInclusionConnectJwt(backofficeAdminJwtPayload),
           )
           .with("InclusionConnectJwt", () =>
             generateInclusionConnectJwt({
@@ -492,6 +499,7 @@ describe("convention e2e", () => {
       };
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
+        backofficeAdminUser,
       ]);
     });
 
@@ -510,12 +518,7 @@ describe("convention e2e", () => {
             ),
           )
           .with("BackOfficeJwt", () =>
-            generateBackOfficeJwt({
-              role: "backOffice",
-              sub: "",
-              version: 1,
-              iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
-            }),
+            generateInclusionConnectJwt(backofficeAdminJwtPayload),
           )
           .with("InclusionConnectJwt", () =>
             generateInclusionConnectJwt({

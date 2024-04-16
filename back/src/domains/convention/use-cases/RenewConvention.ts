@@ -84,7 +84,7 @@ export class RenewConvention extends TransactionalUseCase<
     from: ConventionId,
   ): Promise<Role> {
     if ("role" in jwtPayload) {
-      if (jwtPayload.role !== "backOffice" && from !== jwtPayload.applicationId)
+      if (from !== jwtPayload.applicationId)
         throw new ForbiddenError(
           "This token is not allowed to renew this convention",
         );
@@ -97,6 +97,8 @@ export class RenewConvention extends TransactionalUseCase<
       throw new NotFoundError(
         `Inclusion connected user '${jwtPayload.userId}' not found.`,
       );
+
+    if (inclusionConnectedUser.isBackofficeAdmin) return "backOffice";
 
     const agencyRights = inclusionConnectedUser.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === convention.agencyId,

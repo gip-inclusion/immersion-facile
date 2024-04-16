@@ -1,7 +1,7 @@
 import {
   AgencyRight,
-  BackOfficeJwtPayload,
   IcUserRoleForAgencyParams,
+  InclusionConnectDomainJwtPayload,
   icUserRoleForAgencyParamsSchema,
   replaceElementWhere,
 } from "shared";
@@ -14,11 +14,12 @@ import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { throwIfIcUserNotBackofficeAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
   IcUserRoleForAgencyParams,
   void,
-  BackOfficeJwtPayload
+  InclusionConnectDomainJwtPayload
 > {
   protected inputSchema = icUserRoleForAgencyParamsSchema;
 
@@ -36,21 +37,19 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
   protected async _execute(
     params: IcUserRoleForAgencyParams,
     uow: UnitOfWork,
-    jwtPayload: BackOfficeJwtPayload,
+    jwtPayload: InclusionConnectDomainJwtPayload,
   ): Promise<void> {
     if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
-    if (jwtPayload.role !== "backOffice")
-      throw new ForbiddenError(
-        `This user is not a backOffice user, role was : '${jwtPayload?.role}'`,
-      );
 
-    const user = await uow.inclusionConnectedUserRepository.getById(
+    await throwIfIcUserNotBackofficeAdmin(uow, jwtPayload);
+
+    const userToUpdate = await uow.inclusionConnectedUserRepository.getById(
       params.userId,
     );
-    if (!user)
+    if (!userToUpdate)
       throw new NotFoundError(`User with id ${params.userId} not found`);
 
-    const agencyRightToUpdate = user.agencyRights.find(
+    const agencyRightToUpdate = userToUpdate.agencyRights.find(
       ({ agency }) => agency.id === params.agencyId,
     );
 
@@ -65,9 +64,9 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
     };
 
     const updatedUser = {
-      ...user,
+      ...userToUpdate,
       agencyRights: replaceElementWhere(
-        user.agencyRights,
+        userToUpdate.agencyRights,
         updatedAgencyRight,
         ({ agency }) => agency.id === params.agencyId,
       ),

@@ -14,7 +14,6 @@ import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerI
 import { NotImplementedDocumentGateway } from "../domains/core/file-storage/adapters/NotImplementedDocumentGateway";
 import {
   GenerateApiConsumerJwt,
-  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
@@ -64,7 +63,6 @@ export type TestAppAndDeps = {
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateConventionJwt: GenerateConventionJwt;
   generateInclusionConnectJwt: GenerateInclusionConnectJwt;
-  generateBackOfficeJwt: GenerateBackOfficeJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow: InMemoryUnitOfWork;
 };
@@ -120,7 +118,6 @@ export const buildTestApp = async (
     generateConventionJwt,
     generateEditEstablishmentJwt,
     generateInclusionConnectJwt,
-    generateBackOfficeJwt,
     uuidGenerator,
     inMemoryUow: uow,
   } = await createApp(appConfig);
@@ -142,7 +139,6 @@ export const buildTestApp = async (
     generateConventionJwt,
     generateEditEstablishmentJwt,
     generateInclusionConnectJwt,
-    generateBackOfficeJwt,
     uuidGenerator,
     inMemoryUow,
   };

@@ -47,10 +47,6 @@ export class GetConvention extends TransactionalUseCase<
       conventionId,
     );
 
-    if ("role" in authPayload && authPayload.role === "backOffice") {
-      return convention;
-    }
-
     if (isConventionDomainPayload) {
       return this.#onConventionDomainPayload({ authPayload, uow, convention });
     }

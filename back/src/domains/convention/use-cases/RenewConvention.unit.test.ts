@@ -7,6 +7,7 @@ import {
   ConventionRelatedJwtPayload,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
@@ -91,6 +92,10 @@ describe("RenewConvention", () => {
     userId: inclusionConnectedUser.id,
   };
 
+  const backofficeAdmin = new InclusionConnectedUserBuilder()
+    .withIsAdmin(true)
+    .build();
+
   beforeEach(() => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
@@ -120,11 +125,8 @@ describe("RenewConvention", () => {
         }),
       },
       {
-        payloadKind: "backOffice",
-        payload: {
-          role: "backOffice",
-          sub: "my-sub",
-        },
+        payloadKind: "inclusionConnect admin",
+        payload: { userId: backofficeAdmin.id },
       },
       {
         payloadKind: "inclusionConnect",
@@ -140,6 +142,7 @@ describe("RenewConvention", () => {
 
         uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
           inclusionConnectedUser,
+          backofficeAdmin,
         ]);
 
         const result = await renewConvention.execute(

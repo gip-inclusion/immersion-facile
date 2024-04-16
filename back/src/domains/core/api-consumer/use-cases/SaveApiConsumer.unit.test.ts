@@ -1,10 +1,9 @@
 import { addMilliseconds, addYears } from "date-fns";
 import {
   ApiConsumer,
-  BackOfficeJwtPayload,
+  InclusionConnectedUserBuilder,
   Role,
   createApiConsumerParamsFromApiConsumer,
-  createBackOfficeJwtPayload,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -24,21 +23,30 @@ import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorIm
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../adapters/InMemoryApiConsumerRepository";
 import { SaveApiConsumer } from "./SaveApiConsumer";
 
+const backofficeAdmin = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin")
+  .withIsAdmin(true)
+  .build();
+
+const simpleUser = new InclusionConnectedUserBuilder()
+  .withId("simple-user")
+  .withIsAdmin(false)
+  .build();
+
 describe("SaveApiConsumer", () => {
   let uow: InMemoryUnitOfWork;
   let saveApiConsumer: SaveApiConsumer;
   let timeGateway: CustomTimeGateway;
   let uuidGenerator: TestUuidGenerator;
-  let backOfficeJwtPayload: BackOfficeJwtPayload;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    backOfficeJwtPayload = createBackOfficeJwtPayload({
-      durationDays: 1,
-      now: timeGateway.now(),
-    });
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdmin,
+      simpleUser,
+    ]);
     saveApiConsumer = new SaveApiConsumer(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
@@ -59,7 +67,7 @@ describe("SaveApiConsumer", () => {
         createApiConsumerParamsFromApiConsumer(
           authorizedUnJeuneUneSolutionApiConsumer,
         ),
-        backOfficeJwtPayload,
+        { userId: backofficeAdmin.id },
       );
 
       expectToEqual(
@@ -139,10 +147,9 @@ describe("SaveApiConsumer", () => {
         },
       };
 
-      const result = await saveApiConsumer.execute(
-        updatedConsumer,
-        backOfficeJwtPayload,
-      );
+      const result = await saveApiConsumer.execute(updatedConsumer, {
+        userId: backofficeAdmin.id,
+      });
 
       expectToEqual(result, undefined);
       expectToEqual(uow.apiConsumerRepository.consumers, [
@@ -183,20 +190,17 @@ describe("SaveApiConsumer", () => {
     });
 
     it("ForbiddenError on if provided JWT payload is not a backoffice one", async () => {
-      const wrongRole: Role = "beneficiary";
+      const _wrongRole: Role = "beneficiary";
       await expectPromiseToFailWithError(
         saveApiConsumer.execute(
           createApiConsumerParamsFromApiConsumer(
             authorizedUnJeuneUneSolutionApiConsumer,
           ),
           {
-            role: wrongRole as BackOfficeJwtPayload["role"],
-            sub: "123",
+            userId: simpleUser.id,
           },
         ),
-        new ForbiddenError(
-          `Provided JWT payload does not have sufficient privileges. Received role: '${wrongRole}'`,
-        ),
+        new ForbiddenError(`User '${simpleUser.id}' is not a backOffice user`),
       );
 
       expectToEqual(uow.apiConsumerRepository.consumers, []);

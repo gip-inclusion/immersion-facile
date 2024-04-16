@@ -12,14 +12,8 @@ import {
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
   RejectIcUserRoleForAgencyParams,
-  UserAndPassword,
   WithAgencyRole,
 } from "./admin.dto";
-
-export const userAndPasswordSchema: z.Schema<UserAndPassword> = z.object({
-  user: zTrimmedString,
-  password: zTrimmedString,
-});
 
 export const icUserRoleForAgencyParamsSchema: z.Schema<IcUserRoleForAgencyParams> =
   z.object({

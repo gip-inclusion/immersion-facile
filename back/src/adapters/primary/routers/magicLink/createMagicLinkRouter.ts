@@ -31,9 +31,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, async () =>
         deps.useCases.getConvention.execute(
           { conventionId: req.params.conventionId },
-          req.payloads?.backOffice ??
-            req.payloads?.inclusion ??
-            req.payloads?.convention,
+          req.payloads?.inclusion ?? req.payloads?.convention,
         ),
       ),
   );
@@ -42,7 +40,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!(req.payloads?.backOffice || req.payloads?.convention))
+        if (!(req.payloads?.inclusion || req.payloads?.convention))
           throw new UnauthorizedError();
         return deps.useCases.updateConvention.execute(req.body);
       }),
@@ -53,9 +51,6 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     async (req, res) =>
       sendHttpResponse(req, res, () =>
         match(req.payloads)
-          .with({ backOffice: P.not(P.nullish) }, ({ backOffice }) =>
-            deps.useCases.updateConventionStatus.execute(req.body, backOffice),
-          )
           .with({ convention: P.not(P.nullish) }, ({ convention }) =>
             deps.useCases.updateConventionStatus.execute(req.body, convention),
           )
@@ -96,7 +91,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
-        const jwtPayload = req.payloads?.convention || req.payloads?.backOffice;
+        const jwtPayload = req.payloads?.convention || req.payloads?.inclusion;
         return deps.useCases.renewConvention.execute(req.body, jwtPayload);
       }),
   );

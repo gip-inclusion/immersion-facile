@@ -1,6 +1,5 @@
 import {
   AgencyDtoBuilder,
-  BackOfficeJwtPayload,
   InclusionConnectedUser,
   expectPromiseToFailWith,
   expectToEqual,
@@ -47,6 +46,25 @@ const paulWithAllAgenciesReviewed: InclusionConnectedUser = {
   externalId: "paul-external-id",
 };
 
+const backofficeAdminUser: InclusionConnectedUser = {
+  id: "backoffice-admin",
+  email: "jack.admin@mail.com",
+  firstName: "Jack",
+  lastName: "The Admin",
+  externalId: "jack-admin-external-id",
+  createdAt: new Date().toISOString(),
+  isBackofficeAdmin: true,
+  agencyRights: [],
+  dashboards: { agencies: {}, establishments: {} },
+  establishments: [],
+};
+
+const notBackofficeAdminUser: InclusionConnectedUser = {
+  ...backofficeAdminUser,
+  isBackofficeAdmin: false,
+  id: "not-backoffice-admin",
+};
+
 describe("GetInclusionConnectedUsers", () => {
   let getInclusionConnectedUsers: GetInclusionConnectedUsers;
   let uowPerformer: InMemoryUowPerformer;
@@ -66,17 +84,29 @@ describe("GetInclusionConnectedUsers", () => {
     );
   });
 
-  it("throws Forbidden if token payload is not backoffice token", async () => {
-    const badBackOfficeJwtPayload = {
-      role: "validator",
-    } as unknown as BackOfficeJwtPayload;
+  it("throws Forbidden if IC backoffice user not found", async () => {
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([]);
 
     await expectPromiseToFailWith(
       getInclusionConnectedUsers.execute(
         { agencyRole: "toReview" },
-        badBackOfficeJwtPayload,
+        { userId: notBackofficeAdminUser.id },
       ),
-      "This user is not a backOffice user, role was : 'validator'",
+      "User 'not-backoffice-admin' not found",
+    );
+  });
+
+  it("throws Forbidden if token payload is not backoffice token", async () => {
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      notBackofficeAdminUser,
+    ]);
+
+    await expectPromiseToFailWith(
+      getInclusionConnectedUsers.execute(
+        { agencyRole: "toReview" },
+        { userId: notBackofficeAdminUser.id },
+      ),
+      "User 'not-backoffice-admin' is not a backOffice user",
     );
   });
 
@@ -84,12 +114,11 @@ describe("GetInclusionConnectedUsers", () => {
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       johnWithAgenciesToReview,
       paulWithAllAgenciesReviewed,
+      backofficeAdminUser,
     ]);
     const users = await getInclusionConnectedUsers.execute(
       { agencyRole: "toReview" },
-      {
-        role: "backOffice",
-      } as BackOfficeJwtPayload,
+      { userId: backofficeAdminUser.id },
     );
 
     expectToEqual(users, [johnWithAgenciesToReview]);

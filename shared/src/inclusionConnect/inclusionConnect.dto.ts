@@ -26,12 +26,14 @@ export type AuthenticatedUserQueryParams = {
 
 export type InclusionConnectConventionManageAllowedRoles =
   | ExcludeFromExisting<AgencyRole, "toReview">
-  | ExtractFromExisting<SignatoryRole, "establishment-representative">;
+  | ExtractFromExisting<SignatoryRole, "establishment-representative">
+  | "backOffice";
 
 export const getIcUserRoleForAccessingConvention = (
   convention: ConventionDto,
   user: InclusionConnectedUser,
 ): InclusionConnectConventionManageAllowedRoles | null => {
+  if (user.isBackofficeAdmin) return "backOffice";
   if (convention.signatories.establishmentRepresentative.email === user.email)
     return "establishment-representative";
   const agencyRight = user.agencyRights.find(

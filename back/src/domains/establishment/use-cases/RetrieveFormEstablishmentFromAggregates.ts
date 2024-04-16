@@ -1,6 +1,5 @@
 import {
   AppellationAndRomeDto,
-  BackOfficeJwtPayload,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
   InclusionConnectJwtPayload,
@@ -20,34 +19,19 @@ import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
   FormEstablishmentDto,
-  EstablishmentJwtPayload | BackOfficeJwtPayload | InclusionConnectJwtPayload
+  EstablishmentJwtPayload | InclusionConnectJwtPayload
 > {
   protected inputSchema = siretSchema;
 
   protected async _execute(
     siret: SiretDto,
     uow: UnitOfWork,
-    jwtPayload?:
-      | EstablishmentJwtPayload
-      | BackOfficeJwtPayload
-      | InclusionConnectJwtPayload,
+    jwtPayload?: EstablishmentJwtPayload | InclusionConnectJwtPayload,
   ) {
     if (!jwtPayload) throw new ForbiddenError();
     const isValidEstablishmentJwtPayload =
       "siret" in jwtPayload && siret === jwtPayload.siret;
-    const isValidBackOfficeJwtPayload =
-      "role" in jwtPayload && jwtPayload.role === "backOffice";
-    const isValidIcJwtPayload = "userId" in jwtPayload;
-    if (
-      isValidBackOfficeJwtPayload ||
-      isValidEstablishmentJwtPayload ||
-      isValidIcJwtPayload
-    )
-      return this.#onValidJwt(uow, siret);
-    throw new ForbiddenError();
-  }
 
-  async #onValidJwt(uow: UnitOfWork, siret: SiretDto) {
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
@@ -56,10 +40,35 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     if (!establishmentAggregate)
       throw new NotFoundError(`No establishment found with siret ${siret}.`);
 
+    if (isValidEstablishmentJwtPayload)
+      return this.#onValidJwt(uow, establishmentAggregate);
+
+    const isValidIcJwtPayload = "userId" in jwtPayload;
+    if (isValidIcJwtPayload) {
+      const currentUser = await uow.inclusionConnectedUserRepository.getById(
+        jwtPayload.userId,
+      );
+      if (!currentUser)
+        throw new NotFoundError(`No user found with id ${jwtPayload.userId}`);
+      if (
+        currentUser.establishments?.some(
+          ({ siret }) => siret === establishmentAggregate.establishment.siret,
+        ) ||
+        currentUser.isBackofficeAdmin
+      )
+        return this.#onValidJwt(uow, establishmentAggregate);
+    }
+    throw new ForbiddenError("User not allowed to access this establishment.");
+  }
+
+  async #onValidJwt(
+    uow: UnitOfWork,
+    establishmentAggregate: EstablishmentAggregate,
+  ) {
     return establishmentAggragateToFormEstablishement(
       establishmentAggregate,
       await uow.establishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
-        siret,
+        establishmentAggregate.establishment.siret,
       ),
     );
   }

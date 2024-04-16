@@ -18,12 +18,6 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     expressRouter,
   );
 
-  sharedAdminRouter.login((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.adminLogin.execute(req.body),
-    ),
-  );
-
   sharedAdminRouter.getDashboardUrl(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () => {
       if (req.params.dashboardName === "agency" && !req.query.agencyId)
@@ -61,7 +55,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.adminAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getIcUsers.execute(req.query, req.payloads?.backOffice),
+        deps.useCases.getIcUsers.execute(req.query, req.payloads?.inclusion),
       ),
   );
 
@@ -71,7 +65,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.updateIcUserRoleForAgency.execute(
           req.body,
-          req.payloads?.backOffice,
+          req.payloads?.inclusion,
         ),
       ),
   );
@@ -82,14 +76,14 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.rejectIcUserForAgency.execute(
           req.body,
-          req.payloads?.backOffice,
+          req.payloads?.inclusion,
         ),
       ),
   );
 
   sharedAdminRouter.saveApiConsumer(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.saveApiConsumer.execute(req.body, req.payloads?.backOffice),
+      deps.useCases.saveApiConsumer.execute(req.body, req.payloads?.inclusion),
     ),
   );
 
@@ -112,7 +106,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
           ...req.body,
           id: req.params.agencyId,
         },
-        req.payloads?.backOffice,
+        req.payloads?.inclusion,
       ),
     ),
   );
@@ -121,7 +115,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     sendHttpResponse(req, res, () =>
       deps.useCases.updateAgencyAdmin.execute(
         req.body,
-        req.payloads?.backOffice,
+        req.payloads?.inclusion,
       ),
     ),
   );

@@ -3,8 +3,6 @@ import {
   ApiConsumerJwt,
   ApiConsumerJwtPayload,
   AppSupportedJwt,
-  BackOfficeJwt,
-  BackOfficeJwtPayload,
   CommonJwtPayload,
   ConventionJwt,
   ConventionJwtPayload,
@@ -17,7 +15,6 @@ import {
 export type GenerateConventionJwt = GenerateJwtFn<"convention">;
 export type GenerateInclusionConnectJwt = GenerateJwtFn<"inclusionConnect">;
 export type GenerateEditFormEstablishmentJwt = GenerateJwtFn<"establishment">;
-export type GenerateBackOfficeJwt = GenerateJwtFn<"backOffice">;
 export type GenerateApiConsumerJwt = GenerateJwtFn<"apiConsumer">;
 
 type JwtTokenMapping<
@@ -39,7 +36,6 @@ type JwtMap =
       InclusionConnectJwt,
       InclusionConnectJwtPayload
     >
-  | JwtTokenMapping<"backOffice", BackOfficeJwt, BackOfficeJwtPayload>
   | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>;
 
 export type JwtKind = JwtMap["kind"];

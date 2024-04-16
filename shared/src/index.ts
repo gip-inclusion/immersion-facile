@@ -63,6 +63,7 @@ export * from "./inclusionConnect/inclusionConnect.dto";
 export * from "./inclusionConnect/inclusionConnect.routes";
 export * from "./inclusionConnect/inclusionConnect.schema";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+export * from "./inclusionConnectedAllowed/InclusionConnectedUser.builder";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.routes";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 export * from "./acquisition.dto";

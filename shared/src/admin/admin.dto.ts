@@ -7,11 +7,6 @@ import {
 import { SiretDto } from "../siret/siret";
 import { OmitFromExistingKeys } from "../utils";
 
-export type UserAndPassword = {
-  user: string;
-  password: string;
-};
-
 export type IcUserRoleForAgencyParams = {
   agencyId: AgencyId;
   role: AgencyRole;

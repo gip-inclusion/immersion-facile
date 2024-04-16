@@ -78,7 +78,7 @@ export type WithDashboards = {
 export type InclusionConnectedUser = User &
   WithAgencyRights &
   WithEstablishments &
-  WithDashboards;
+  WithDashboards & { isBackofficeAdmin?: boolean };
 
 export type WithAgencyIds = {
   agencies: AgencyId[];

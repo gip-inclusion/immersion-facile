@@ -5,7 +5,6 @@ import {
   FindSimilarConventionsParams,
   FindSimilarConventionsResponseDto,
   SiretDto,
-  sleep,
 } from "shared";
 import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
@@ -56,7 +55,6 @@ import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/De
 import { ListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
-import { AdminLogin } from "../../domains/core/authentication/admin-backoffice/use-cases/AdminLogin";
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { GetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
@@ -71,7 +69,6 @@ import { SetFeatureFlag } from "../../domains/core/feature-flags/use-cases/SetFe
 import { UploadFile } from "../../domains/core/file-storage/useCases/UploadFile";
 import {
   GenerateApiConsumerJwt,
-  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
@@ -125,7 +122,6 @@ export const createUseCases = (
   gateways: Gateways,
   generateConventionJwt: GenerateConventionJwt,
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
-  generateBackOfficeJwt: GenerateBackOfficeJwt,
   generateAuthenticatedUserToken: GenerateInclusionConnectJwt,
   generateApiConsumerJwt: GenerateApiConsumerJwt,
   uowPerformer: UnitOfWorkPerformer,
@@ -232,14 +228,6 @@ export const createUseCases = (
       lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),
       lookupLocation: new LookupLocation(gateways.addressApi),
 
-      // Admin
-      adminLogin: new AdminLogin(
-        config.backofficeUsername,
-        config.backofficePassword,
-        generateBackOfficeJwt,
-        () => sleep(config.nodeEnv !== "test" ? 500 : 0),
-        gateways.timeGateway,
-      ),
       addFormEstablishmentBatch: new AddFormEstablishmentBatch(
         addFormEstablishment,
         uowPerformer,

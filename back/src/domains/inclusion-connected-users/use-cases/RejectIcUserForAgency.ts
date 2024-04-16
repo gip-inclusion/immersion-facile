@@ -1,5 +1,5 @@
 import {
-  BackOfficeDomainPayload,
+  InclusionConnectJwtPayload,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
@@ -13,11 +13,12 @@ import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { throwIfIcUserNotBackofficeAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class RejectIcUserForAgency extends TransactionalUseCase<
   RejectIcUserRoleForAgencyParams,
   void,
-  BackOfficeDomainPayload
+  InclusionConnectJwtPayload
 > {
   protected inputSchema = rejectIcUserRoleForAgencyParamsSchema;
 
@@ -35,13 +36,11 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
   protected async _execute(
     params: RejectIcUserRoleForAgencyParams,
     uow: UnitOfWork,
-    jwtPayload: BackOfficeDomainPayload,
+    jwtPayload: InclusionConnectJwtPayload,
   ): Promise<void> {
     if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
-    if (jwtPayload.role !== "backOffice")
-      throw new ForbiddenError(
-        `This user is not a backOffice user, role was : '${jwtPayload?.role}'`,
-      );
+
+    await throwIfIcUserNotBackofficeAdmin(uow, jwtPayload);
 
     const icUser = await uow.inclusionConnectedUserRepository.getById(
       params.userId,

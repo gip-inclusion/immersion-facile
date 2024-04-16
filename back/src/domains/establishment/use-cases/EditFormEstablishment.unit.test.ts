@@ -1,15 +1,16 @@
 import {
-  BackOfficeDomainPayload,
   EstablishmentDomainPayload,
   EstablishmentJwtPayload,
   FormEstablishmentDtoBuilder,
-  InclusionConnectJwtPayload,
+  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUserBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
   ConflictError,
   ForbiddenError,
+  NotFoundError,
 } from "../../../config/helpers/httpErrors";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -24,25 +25,28 @@ import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { formEstablishementUpdateFailedErrorMessage } from "../ports/FormEstablishmentRepository";
 import { EditFormEstablishment } from "./EditFormEstablishment";
 
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withIsAdmin(true)
+  .build();
+
+const inclusionConnectedUser = new InclusionConnectedUserBuilder()
+  .withId("inclusion-connected-user")
+  .withIsAdmin(false)
+  .build();
+
 describe("Edit Form Establishment", () => {
   let uow: InMemoryUnitOfWork;
-  let useCase: EditFormEstablishment;
+  let editFormEstablishment: EditFormEstablishment;
   let timeGateway: TimeGateway;
   let uuidGenerator: UuidGenerator;
 
-  const userId = "123";
-  const inclusionConnectJwtPayload: InclusionConnectJwtPayload = {
-    exp: 0,
-    iat: 0,
-    version: 1,
-    userId,
+  const inclusionConnectJwtPayload: InclusionConnectDomainJwtPayload = {
+    userId: inclusionConnectedUser.id,
   };
 
   const formSiret = "12345678901234";
-  const establishmentPayload: EstablishmentDomainPayload = { siret: formSiret };
-  const backofficePayload: BackOfficeDomainPayload = {
-    role: "backOffice",
-    sub: "",
+  const establishmentPayload: EstablishmentDomainPayload = {
+    siret: formSiret,
   };
 
   const existingFormEstablishment = FormEstablishmentDtoBuilder.valid()
@@ -57,7 +61,10 @@ describe("Edit Form Establishment", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    useCase = new EditFormEstablishment(
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
+    editFormEstablishment = new EditFormEstablishment(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
         timeGateway,
@@ -69,30 +76,51 @@ describe("Edit Form Establishment", () => {
   describe("Wrong paths", () => {
     it("Forbidden error on EstablishmentJwtPayload with bad siret", async () => {
       await expectPromiseToFailWithError(
-        useCase.execute(updatedFormEstablishment, {
+        editFormEstablishment.execute(updatedFormEstablishment, {
           siret: "bad-siret",
         } as EstablishmentJwtPayload),
         new ForbiddenError(),
       );
     });
 
-    it("Forbidden error on InclusionConnectJwtPayload with ic user that doesn't have rights on establishment", async () => {
+    it("Not found error if user is not found", async () => {
       await expectPromiseToFailWithError(
-        useCase.execute(updatedFormEstablishment, inclusionConnectJwtPayload),
+        editFormEstablishment.execute(
+          updatedFormEstablishment,
+          inclusionConnectJwtPayload,
+        ),
+        new NotFoundError(
+          `User with id '${inclusionConnectJwtPayload.userId}' not found`,
+        ),
+      );
+    });
+
+    it("Forbidden error on InclusionConnectJwtPayload with ic user that doesn't have rights on establishment", async () => {
+      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        inclusionConnectedUser,
+      ]);
+      await expectPromiseToFailWithError(
+        editFormEstablishment.execute(
+          updatedFormEstablishment,
+          inclusionConnectJwtPayload,
+        ),
         new ForbiddenError(),
       );
     });
 
     it("Forbidden error without jwt payload", async () => {
       await expectPromiseToFailWithError(
-        useCase.execute(updatedFormEstablishment),
+        editFormEstablishment.execute(updatedFormEstablishment),
         new ForbiddenError(),
       );
     });
 
     it("conflict error when form does not exist", async () => {
       await expectPromiseToFailWithError(
-        useCase.execute(updatedFormEstablishment, establishmentPayload),
+        editFormEstablishment.execute(
+          updatedFormEstablishment,
+          establishmentPayload,
+        ),
         new ConflictError(
           formEstablishementUpdateFailedErrorMessage(updatedFormEstablishment),
         ),
@@ -108,7 +136,10 @@ describe("Edit Form Establishment", () => {
       ]);
 
       // Act
-      await useCase.execute(updatedFormEstablishment, establishmentPayload);
+      await editFormEstablishment.execute(
+        updatedFormEstablishment,
+        establishmentPayload,
+      );
 
       // Assert
       expectToEqual(uow.outboxRepository.events, [
@@ -128,14 +159,20 @@ describe("Edit Form Establishment", () => {
       );
     });
 
-    it("publish a FormEstablishmentEdited event & update formEstablishment on repository with a backoffice payload", async () => {
+    it("publish a FormEstablishmentEdited event & update formEstablishment on repository with a IC payload with user with backoffice rights", async () => {
       // Prepare
       uow.formEstablishmentRepository.setFormEstablishments([
         existingFormEstablishment,
       ]);
 
+      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        backofficeAdminUser,
+      ]);
+
       // Act
-      await useCase.execute(updatedFormEstablishment, backofficePayload);
+      await editFormEstablishment.execute(updatedFormEstablishment, {
+        userId: backofficeAdminUser.id,
+      });
 
       // Assert
       expectToEqual(uow.outboxRepository.events, [
