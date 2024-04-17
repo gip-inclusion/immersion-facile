@@ -1,38 +1,59 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Table } from "@codegouvfr/react-dsfr/Table";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
-import { AgencyPublicDisplayDto } from "shared";
+import { useDispatch } from "react-redux";
 import { makeSummarySections } from "src/app/components/forms/convention/ConventionSummarySection";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { outOfReduxDependencies } from "src/config/dependencies";
+import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
+import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { useStyles } from "tss-react/dsfr";
 
 export const ConventionSummary = () => {
   const convention = useAppSelector(conventionSelectors.convention);
-  const [agency, setAgency] = useState<AgencyPublicDisplayDto | null>(null);
+  const agency = useAppSelector(agenciesSelectors.details);
+  const agencyIsLoading = useAppSelector(agenciesSelectors.isLoading);
+  const agencyfeedback = useAppSelector(agenciesSelectors.feedback);
   const { cx } = useStyles();
+  const dispatch = useDispatch();
   useEffect(() => {
     if (convention) {
-      outOfReduxDependencies.agencyGateway
-        .getAgencyPublicInfoById({
-          agencyId: convention.agencyId,
-        })
-        .then(setAgency)
-        .catch((error) => {
-          setAgency(null);
-          // eslint-disable-next-line no-console
-          console.error(error);
-        });
+      dispatch(
+        agenciesSlice.actions.fetchAgencyInfoRequested(convention.agencyId),
+      );
     }
-  }, [convention]);
+  }, [convention, dispatch]);
   useScrollToTop(true);
-  if (!convention) return null;
-  if (!agency) return <Loader />;
+
+  if (agencyIsLoading) return <Loader />;
+  if (agencyfeedback.kind === "errored")
+    return (
+      <Alert
+        severity="error"
+        title="Erreur lors de la récupération des informations du prescripteur"
+        description={agencyfeedback.errorMessage}
+      />
+    );
+  if (!convention)
+    return (
+      <Alert
+        severity="warning"
+        description="Vous n'avez pas de convention disponible pour l'affichage du résumé de la convention"
+        small={true}
+      />
+    );
+  if (!agency)
+    return (
+      <Alert
+        severity="error"
+        title="Erreur lors de la récupération des informations du prescripteur"
+      />
+    );
 
   const fields = getFormContents(
     formConventionFieldsLabels(convention.internshipKind),
