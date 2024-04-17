@@ -3,9 +3,10 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import RadioButtons, {
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
+import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ErrorNotifications } from "react-design-system";
+import { ErrorNotifications, LinkHome } from "react-design-system";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import {
   AgencyDto,
@@ -22,6 +23,7 @@ import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
 } from "src/app/components/forms/agency/AgencyFormCommonFields";
+import { agencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import {
   AgencySelector,
   departmentOptions,
@@ -33,10 +35,14 @@ import {
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
+import { routes } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { AgencySubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { P, match } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
+import errorSvg from "../../../../assets/img/error.svg";
+import successSvg from "../../../../assets/img/success.svg";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";
@@ -129,7 +135,7 @@ const AgencyForm = ({
   const { getFormErrors, getFormFields } = getFormContents(
     formAgencyFieldsLabels,
   );
-  const { refersToAgencyId: refersToAgencyIdField } = getFormFields();
+  const formContents = getFormFields();
   const acquisitionParams = useGetAcquisitionParams();
 
   const formInitialValues = useMemo(
@@ -146,7 +152,7 @@ const AgencyForm = ({
     defaultValues: formInitialValues,
   });
 
-  const { handleSubmit, formState, reset } = methods;
+  const { handleSubmit, formState, reset, register, watch } = methods;
 
   const agenciesRetrieverMemoized = useCallback(
     (departmentCode: DepartmentCode) =>
@@ -160,7 +166,9 @@ const AgencyForm = ({
   useEffect(() => {
     reset(formInitialValues);
   }, [reset, formInitialValues]);
-
+  const [hasDelegation, setHasDelegation] = useState<boolean | null>(null);
+  const selectedKind = watch("kind");
+  // const formContents = getFormContents(formAgencyFieldsLabels).getFormFields();
   return (
     <FormProvider {...methods}>
       <form
@@ -187,7 +195,7 @@ const AgencyForm = ({
                   id: "refersToAgencyDepartment",
                   placeholder: "Sélectionnez un département",
                 },
-                agencyIdField: refersToAgencyIdField,
+                agencyIdField: formContents.refersToAgencyId,
                 agencyKindField: {
                   name: "refersToAgencyKind",
                   label: "Type de structure",
@@ -207,37 +215,126 @@ const AgencyForm = ({
         <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
           {refersToOtherAgency ? "Structure d'accompagnement" : "Prescripteur"}
         </h2>
-        <AgencyFormCommonFields refersToOtherAgency={refersToOtherAgency} />
-        <AgencyLogoUpload />
-
-        <ErrorNotifications
-          labels={getFormErrors()}
-          errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
-          visible={
-            formState.submitCount !== 0 &&
-            Object.values(formState.errors).length > 0
+        <Select
+          label={formContents.kind.label}
+          hint={formContents.kind.hintText}
+          options={agencyListOfOptions.sort((a, b) =>
+            a.label < b.label ? -1 : 0,
+          )}
+          placeholder={formContents.kind.placeholder}
+          nativeSelectProps={{
+            ...formContents.kind,
+            ...register("kind"),
+          }}
+          state={selectedKind === "pole-emploi" ? "error" : "default"}
+          stateRelatedMessage={
+            selectedKind === "pole-emploi" ? agencyErrorMessage : undefined
           }
         />
-        <input
-          id={domElementIds.addAgency.id}
-          {...methods.register("id")}
-          type="hidden"
-        />
-        <SubmitFeedbackNotification
-          submitFeedback={submitFeedback}
-          messageByKind={agencySubmitMessageByKind}
-        />
-        <div className={fr.cx("fr-mt-4w")}>
-          <Button
-            type="submit"
-            disabled={formState.isSubmitting}
-            nativeButtonProps={{
-              id: domElementIds.addAgency.submitButton,
-            }}
-          >
-            Soumettre
-          </Button>
-        </div>
+
+        {selectedKind === "autre" && (
+          <RadioButtons
+            legend="Avez-vous déjà une convention de délégation ? *"
+            name="hasDelegation"
+            options={hasDelegationOptions.map((option) => ({
+              ...option,
+              nativeInputProps: {
+                ...option.nativeInputProps,
+                checked:
+                  Boolean(option.nativeInputProps.value) === hasDelegation,
+                onChange: () => {
+                  setHasDelegation(option.nativeInputProps.value === 1);
+                },
+              },
+            }))}
+            orientation="vertical"
+          />
+        )}
+
+        {match({ selectedKind, hasDelegation })
+          .with(
+            { selectedKind: "autre", hasDelegation: true },
+            { selectedKind: P.not("").and(P.not("autre")) },
+            () => (
+              <>
+                <AgencyFormCommonFields
+                  refersToOtherAgency={refersToOtherAgency}
+                />
+                <AgencyLogoUpload />
+
+                <ErrorNotifications
+                  labels={getFormErrors()}
+                  errors={toDotNotation(
+                    formErrorsToFlatErrors(formState.errors),
+                  )}
+                  visible={
+                    formState.submitCount !== 0 &&
+                    Object.values(formState.errors).length > 0
+                  }
+                />
+                <input
+                  id={domElementIds.addAgency.id}
+                  {...methods.register("id")}
+                  type="hidden"
+                />
+                <SubmitFeedbackNotification
+                  submitFeedback={submitFeedback}
+                  messageByKind={agencySubmitMessageByKind}
+                />
+                <div className={fr.cx("fr-mt-4w")}>
+                  <Button
+                    type="submit"
+                    disabled={formState.isSubmitting}
+                    nativeButtonProps={{
+                      id: domElementIds.addAgency.submitButton,
+                    }}
+                  >
+                    Soumettre
+                  </Button>
+                </div>
+              </>
+            ),
+          )
+          .with({ selectedKind: "autre", hasDelegation: false }, () => (
+            <Alert
+              severity="info"
+              title="Vous ne pouvez pas finaliser votre référencement sans convention de délégation"
+              description={
+                <>
+                  Remplissez ce formulaire afin de recevoir par mail le contact
+                  du prescripteur de droit qui peut vous délivrer votre
+                  convention de délégation:{" "}
+                  <a
+                    href="https://tally.so/r/w7WM49"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    https://tally.so/r/w7WM49
+                  </a>
+                </>
+              }
+            />
+          ))
+          .with(
+            {
+              selectedKind: "",
+              hasDelegation: null,
+            },
+            {
+              selectedKind: "",
+              hasDelegation: false,
+            },
+            {
+              selectedKind: "",
+              hasDelegation: true,
+            },
+            {
+              selectedKind: "autre",
+              hasDelegation: null,
+            },
+            () => undefined,
+          )
+          .exhaustive()}
       </form>
     </FormProvider>
   );
@@ -268,3 +365,33 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   agencySiret: "",
   refersToAgencyId: null,
 });
+
+const agencyErrorMessage = (
+  <span>
+    Attention, toutes les agences France Travail ont déjà été ajoutées par notre
+    équipe sur Immersion Facilitée.{" "}
+    <LinkHome {...routes.agencyDashboard().link}>
+      Accéder à votre espace prescripteur.
+    </LinkHome>
+  </span>
+);
+
+const hasDelegationOptions: RadioButtonsProps["options"] = [
+  {
+    illustration: <img src={successSvg} alt="" />,
+    label: "Oui",
+    nativeInputProps: {
+      value: 1,
+    },
+    hintText:
+      "J'ai une délégation délivrée par France Travail, Mission Locale ou Cap Emploi",
+  },
+  {
+    illustration: <img src={errorSvg} alt="" />,
+    label: "Non",
+    nativeInputProps: {
+      value: 0,
+    },
+    hintText: `Je dois en faire la demande auprès d'un prescipteur de plein droit`,
+  },
+];
