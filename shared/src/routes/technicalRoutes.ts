@@ -84,4 +84,17 @@ export const technicalRoutes = defineRoutes({
       403: legacyHttpErrorSchema,
     },
   }),
+
+  delegationContactRequest: defineRoute({
+    method: "post",
+    url: "/delegation-contact-request",
+    requestBodySchema: z.any(), // could not find better to not mutate the original object.
+    // we need the original object to check the signature
+    // validation is still checked in the usecase
+    headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
+    responses: {
+      201: expressEmptyResponseBody,
+      403: legacyHttpErrorSchema,
+    },
+  }),
 });

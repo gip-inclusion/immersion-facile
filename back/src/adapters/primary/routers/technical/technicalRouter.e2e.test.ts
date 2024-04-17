@@ -27,7 +27,144 @@ import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
 const discussionId = "my-discussion-id";
 const domain = "immersion-facile.beta.gouv.fr";
-const tallySecret = "my-tally-secret";
+const tallySecret = "tally-secret";
+
+const npsTallyBody = {
+  eventType: "FORM_SUBMISSION",
+  createdAt: "2023-06-28T08:06:52.000Z",
+  eventId: "tally-event-id",
+  data: {
+    createdAt: "2023-06-28T08:06:52.000Z",
+    formId: "tally-form-id",
+    formName: "tally-form-name",
+    responseId: "tally-response-id",
+    fields: [],
+    respondentId: "tally-respondent-id",
+    submissionId: "tally-submission-id",
+  },
+};
+
+const delegationContactTallyForm = {
+  eventId: "444e93a8-68db-4cc2-ac17-0bbcbd4460f8",
+  eventType: "FORM_SUBMISSION",
+  createdAt: "2024-04-17T08:56:10.922Z",
+  data: {
+    responseId: "2O0vAe",
+    submissionId: "2O0vAe",
+    respondentId: "v2eE1D",
+    formId: "w7WM49",
+    formName:
+      "Recevoir le contact du prescripteur de droit qui peut me délivrer une convention de délégation",
+    createdAt: "2024-04-17T08:56:10.000Z",
+    fields: [
+      {
+        key: "question_rDVYj2",
+        label: "Nom",
+        type: "INPUT_TEXT",
+        value: "sdfghjk",
+      },
+      {
+        key: "question_4aLO4A",
+        label: "Prénom",
+        type: "INPUT_TEXT",
+        value: "dfghjk",
+      },
+      {
+        key: "question_jeLzaJ",
+        label: "Email",
+        type: "INPUT_EMAIL",
+        value: "recipient@mail.com",
+      },
+      {
+        key: "question_xV2zXv",
+        label: "Nom de la structure qui souhaite une convention de délégation",
+        type: "INPUT_TEXT",
+        value: "kjhg",
+      },
+      {
+        key: "question_VpY1aa",
+        label:
+          "Région de la structure qui souhaite une convention de délégation",
+        type: "MULTIPLE_CHOICE",
+        value: ["98052009-6a3a-44c4-87ee-8bc28b5b7161"],
+        options: [
+          {
+            id: "5263bf8d-0eed-4e3a-9e6b-a41d55f6632e",
+            text: "Auvergne-Rhône-Alpes",
+          },
+          {
+            id: "98052009-6a3a-44c4-87ee-8bc28b5b7161",
+            text: "Bourgogne-Franche-Comté",
+          },
+          {
+            id: "13174829-5679-413b-952c-aa47dd2c7a29",
+            text: "Bretagne",
+          },
+          {
+            id: "bb7b5e75-1930-4cb0-802d-97423f3348e9",
+            text: "Centre-Val de Loire",
+          },
+          {
+            id: "04a47353-6c31-465f-8a32-1d6af9bcf2ae",
+            text: "Corse",
+          },
+          {
+            id: "88910a41-172a-4429-a94b-9912b1903fa7",
+            text: "Grand Est",
+          },
+          {
+            id: "c85462a5-17eb-443f-90c6-47e417f4f12f",
+            text: "Guadeloupe",
+          },
+          {
+            id: "ee2a2ee6-82fe-4243-a74d-e1cbbf6a3bba",
+            text: "Guyane",
+          },
+          {
+            id: "fcb5d857-9261-4ac1-9eab-72c9bf0ce335",
+            text: "Hauts-de-France",
+          },
+          {
+            id: "2bbe93a6-450c-468f-8ba5-f4f670638713",
+            text: "Île-de-France",
+          },
+          {
+            id: "1eaa35d4-0d6f-4073-a736-513189ab2831",
+            text: "Martinique",
+          },
+          {
+            id: "1eaa35d4-0d6f-4073-a736-513189ab2832",
+            text: "Mayotte",
+          },
+          {
+            id: "0db88b69-b04f-4211-aec0-68c9c60412c3",
+            text: "Normandie",
+          },
+          {
+            id: "9673d28a-8974-4e1b-adec-fc5dc4dc84d3",
+            text: "Nouvelle-Aquitaine",
+          },
+          {
+            id: "fe7fc4b1-3f04-4272-b1e2-5786d83d1ee6",
+            text: "Occitanie",
+          },
+          {
+            id: "0eeac1f6-efc5-493c-9354-ce6161c16521",
+            text: "Pays de la Loire",
+          },
+          {
+            id: "69d933fb-2c02-4b09-9402-8d4eae94c41f",
+            text: "Provence-Alpes-Côte d'Azur",
+          },
+          {
+            id: "7135e2be-3e0d-46c9-beca-280d187fcf15",
+            text: "Réunion",
+          },
+        ],
+      },
+    ],
+  },
+};
 
 describe("technical router", () => {
   let generateConventionJwt: GenerateConventionJwt;
@@ -240,31 +377,16 @@ describe("technical router", () => {
   });
 
   describe("NPS route for tally webhook", () => {
-    const body = {
-      eventType: "FORM_SUBMISSION",
-      createdAt: "2023-06-28T08:06:52.000Z",
-      eventId: "tally-event-id",
-      data: {
-        createdAt: "2023-06-28T08:06:52.000Z",
-        formId: "tally-form-id",
-        formName: "tally-form-name",
-        responseId: "tally-response-id",
-        fields: [],
-        respondentId: "tally-respondent-id",
-        submissionId: "tally-submission-id",
-      },
-    };
-
     it(`${displayRouteName(
       technicalRoutes.npsValidatedConvention,
     )} 201 when all goes well`, async () => {
       const bodySignature = createHmac("sha256", tallySecret)
-        .update(JSON.stringify(body))
+        .update(JSON.stringify(npsTallyBody))
         .digest("base64");
 
       const response = await httpClient.npsValidatedConvention({
         headers: { "tally-signature": bodySignature },
-        body,
+        body: npsTallyBody,
       });
       expectHttpResponseToEqual(response, {
         body: "",
@@ -277,7 +399,42 @@ describe("technical router", () => {
     )}  403 when signature does not match`, async () => {
       const response = await httpClient.npsValidatedConvention({
         headers: { "tally-signature": "wrong-signature" },
-        body,
+        body: npsTallyBody,
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors: "Missmatch Tally signature",
+        },
+        status: 403,
+      });
+    });
+  });
+
+  describe("DelegationContactRequest for Tally webhook", () => {
+    it(`${displayRouteName(
+      technicalRoutes.delegationContactRequest,
+    )} 201 when all goes well`, async () => {
+      const bodySignature = createHmac("sha256", tallySecret)
+        .update(JSON.stringify(delegationContactTallyForm))
+        .digest("base64");
+
+      const response = await httpClient.delegationContactRequest({
+        headers: { "tally-signature": bodySignature },
+        body: delegationContactTallyForm,
+      });
+      expectHttpResponseToEqual(response, {
+        body: "",
+        status: 201,
+      });
+    });
+
+    it(`${displayRouteName(
+      technicalRoutes.delegationContactRequest,
+    )}  403 when signature does not match`, async () => {
+      const response = await httpClient.delegationContactRequest({
+        headers: { "tally-signature": "wrong-signature" },
+        body: delegationContactTallyForm,
       });
 
       expectHttpResponseToEqual(response, {

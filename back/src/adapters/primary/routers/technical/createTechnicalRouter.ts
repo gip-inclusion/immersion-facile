@@ -2,7 +2,7 @@ import { createHmac } from "crypto";
 import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
-import { technicalRoutes, uploadFileRoute } from "shared";
+import { TallyForm, technicalRoutes, uploadFileRoute } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import {
@@ -94,22 +94,41 @@ export const createTechnicalRouter = (
 
   technicalSharedRouter.npsValidatedConvention(async (req, res) =>
     sendHttpResponse(req, res.status(201), () => {
-      const receivedSignature = req.headers["tally-signature"];
-
-      const calculatedSignature = createHmac(
-        "sha256",
+      throwErrorIfWrongTallySignature(
+        req.headers["tally-signature"],
+        req.body,
         deps.config.tallySignatureSecret,
-      )
-        .update(JSON.stringify(req.body))
-        .digest("base64");
-
-      if (receivedSignature !== calculatedSignature) {
-        throw new ForbiddenError("Missmatch Tally signature");
-      }
+      );
 
       return deps.useCases.addValidatedConventionNPS.execute(req.body);
     }),
   );
 
+  technicalSharedRouter.delegationContactRequest(async (req, res) =>
+    sendHttpResponse(req, res.status(201), () => {
+      throwErrorIfWrongTallySignature(
+        req.headers["tally-signature"],
+        req.body,
+        deps.config.tallySignatureSecret,
+      );
+
+      return deps.useCases.notifyAgencyDelegationContact.execute(req.body);
+    }),
+  );
+
   return technicalRouter;
+};
+
+const throwErrorIfWrongTallySignature = (
+  receivedTallySignature: string | string[] | undefined,
+  body: TallyForm,
+  tallySignatureSecret: string,
+) => {
+  const calculatedSignature = createHmac("sha256", tallySignatureSecret)
+    .update(JSON.stringify(body))
+    .digest("base64");
+
+  if (receivedTallySignature !== calculatedSignature) {
+    throw new ForbiddenError("Missmatch Tally signature");
+  }
 };
