@@ -104,7 +104,7 @@ const wrongTallyForm: TallyForm = {
 
 const tallyForm: TallyForm = {
   eventId: "444e93a8-68db-4cc2-ac17-0bbcbd4460f8",
-  eventType: "FORM_RESPONSE",
+  eventType: "FORM_SUBMISSION",
   createdAt: "2024-04-17T08:56:10.922Z",
   data: {
     responseId: "2O0vAe",
