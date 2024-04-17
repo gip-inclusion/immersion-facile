@@ -32,6 +32,7 @@ import { UpdateConventionStatus } from "../../domains/convention/use-cases/Updat
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../domains/convention/use-cases/notifications/NotifyActorThatConventionNeedsModifications";
+import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
@@ -508,6 +509,10 @@ export const createUseCases = (
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
+      notifyAgencyDelegationContact: new NotifyAgencyDelegationContact(
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
+      ),
       broadcastToPoleEmploiOnConventionUpdates:
         new BroadcastToPoleEmploiOnConventionUpdates(
           uowPerformer,
