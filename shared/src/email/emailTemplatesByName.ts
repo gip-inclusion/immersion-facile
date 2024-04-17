@@ -1140,6 +1140,28 @@ export const emailTemplatesByName =
         ],
       }),
     },
+    AGENCY_DELEGATION_CONTACT_INFORMATION: {
+      niceName: "Délégation - Information de contact DR",
+      tags: [
+        "Transmision des informations de contact des DR aux agences sans délégation",
+      ],
+      createEmailVariables: ({
+        firstName,
+        lastName,
+        agencyName,
+        agencyProvince,
+        delegationProviderMail,
+      }) => ({
+        subject: "Immersion Facilitée - Demande de référencement",
+        greetings: `Bonjour ${firstName} ${lastName},`,
+        content: `
+        Vous recevez cet email suite à votre demande de référencement sur le site Immersion Facilitée.
+        Afin de référencer votre structure ${agencyName} située dans la région ${agencyProvince}, vous devez demander une convention de délégation par email au prescripteur de droit dont votre structure dépend.
+        Votre structure dépend de la DR ${agencyProvince}, contactez-les par email  : <a href= "mailto:${delegationProviderMail}" target="_blank">${delegationProviderMail}</a>
+      `,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     AGENCY_WITH_REFERS_TO_ACTIVATED: {
       niceName:
         "Agence - notification de l'agence prescriptrice lors de l'activation d'une agence accompagnatrice",

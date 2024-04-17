@@ -37,6 +37,13 @@ export type EmailParamsByEmailType = {
         validatorEmails: string[];
       }
   );
+  AGENCY_DELEGATION_CONTACT_INFORMATION: {
+    firstName: string;
+    lastName: string;
+    agencyName: string;
+    agencyProvince: string;
+    delegationProviderMail: string;
+  };
   AGENCY_WITH_REFERS_TO_ACTIVATED: {
     nameOfAgencyRefering: string;
     refersToAgencyName: string;
