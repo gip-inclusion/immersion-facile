@@ -1152,7 +1152,8 @@ export const emailTemplatesByName =
         agencyProvince,
         delegationProviderMail,
       }) => ({
-        subject: "Immersion Facilitée - Demande de référencement",
+        subject:
+          "Envoyez la demande de délégation à votre Direction régionale France Travail !",
         greetings: `Bonjour ${firstName} ${lastName},`,
         content: `
         Vous recevez cet email suite à votre demande de référencement sur le site Immersion Facilitée.
