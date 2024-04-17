@@ -232,6 +232,13 @@ export const defaultEmailValueByEmailKind: {
     agencyLogoUrl: defaultEmailPreviewUrl,
     validatorEmails: ["VALIDATOR_EMAIL1", "VALIDATOR_EMAIL2"],
   },
+  AGENCY_DELEGATION_CONTACT_INFORMATION: {
+    agencyName: "AGENCY_NAME",
+    agencyProvince: "AGENCY_PROVINCE",
+    delegationProviderMail: "DELEGATION_PROVIDER_EMAIL",
+    firstName: "FIRST_NAME",
+    lastName: "LAST_NAME",
+  },
   BENEFICIARY_ASSESSMENT_NOTIFICATION: {
     conventionId: "CONVENTION_ID",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
