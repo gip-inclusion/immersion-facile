@@ -1,4 +1,5 @@
 import axios from "axios";
+import Bottleneck from "bottleneck";
 import { Logger } from "pino";
 import {
   HTTP_STATUS,
@@ -82,8 +83,17 @@ const exchangeCodeForAccessTokenLogger = makePeConnectLogger(
   "exchangeCodeForAccessToken",
 );
 
+const peConnectMaxRequestsPerInterval = 1;
+
 // TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS PE
 export class HttpPeConnectGateway implements PeConnectGateway {
+  // PE Connect limit rate at 1 call per 1.2s
+  #limiter = new Bottleneck({
+    reservoir: peConnectMaxRequestsPerInterval,
+    reservoirRefreshInterval: 1200, // number of ms
+    reservoirRefreshAmount: peConnectMaxRequestsPerInterval,
+  });
+
   constructor(
     private httpClient: HttpClient<PeConnectExternalRoutes>,
     private configs: PeConnectOauthConfig,
@@ -97,18 +107,20 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     try {
       counter.total.inc();
       log.total({});
-      const response = await this.httpClient.exchangeCodeForAccessToken({
-        body: queryParamsAsString({
-          client_id: this.configs.poleEmploiClientId,
-          client_secret: this.configs.poleEmploiClientSecret,
-          code: authorizationCode,
-          grant_type: "authorization_code",
-          redirect_uri: `${this.configs.immersionFacileBaseUrl}/api/pe-connect`,
+      const response = await this.#limiter.schedule(() =>
+        this.httpClient.exchangeCodeForAccessToken({
+          body: queryParamsAsString({
+            client_id: this.configs.poleEmploiClientId,
+            client_secret: this.configs.poleEmploiClientSecret,
+            code: authorizationCode,
+            grant_type: "authorization_code",
+            redirect_uri: `${this.configs.immersionFacileBaseUrl}/api/pe-connect`,
+          }),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         }),
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+      );
       if (response.status !== 200) {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
@@ -183,9 +195,11 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     try {
       counter.total.inc();
       log.total({ peExternalId });
-      const response = await this.httpClient.getUserStatutInfo({
-        headers,
-      });
+      const response = await this.#limiter.schedule(() =>
+        this.httpClient.getUserStatutInfo({
+          headers,
+        }),
+      );
       if (response.status !== 200) {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
@@ -236,9 +250,11 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     try {
       counter.total.inc();
       log.total({});
-      const response = await this.httpClient.getUserInfo({
-        headers,
-      });
+      const response = await this.#limiter.schedule(() =>
+        this.httpClient.getUserInfo({
+          headers,
+        }),
+      );
       if (response.status !== 200) {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
@@ -281,9 +297,11 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     try {
       counter.total.inc();
       log.total({});
-      const response = await this.httpClient.getAdvisorsInfo({
-        headers,
-      });
+      const response = await this.#limiter.schedule(() =>
+        this.httpClient.getAdvisorsInfo({
+          headers,
+        }),
+      );
       if (response.status !== 200) {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
