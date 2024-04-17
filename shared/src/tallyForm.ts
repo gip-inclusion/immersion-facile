@@ -33,3 +33,14 @@ export const tallyFormSchema = z
     }),
   })
   .passthrough();
+
+export const getTallyFormValueOf = (
+  tallyForm: TallyForm,
+  label: string,
+): string | undefined => {
+  const field = tallyForm.data.fields.find((field) => field.label === label);
+  if (field && field.type === "MULTIPLE_CHOICE") {
+    return field.options?.find((option) => option.id === field.value[0])?.text;
+  }
+  return field?.value;
+};
