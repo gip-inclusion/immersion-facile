@@ -7,7 +7,10 @@ import type {
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
-export type AgencySuccessFeedbackKind = "agencyAdded" | "agencyUpdated";
+export type AgencySuccessFeedbackKind =
+  | "agencyAdded"
+  | "agencyUpdated"
+  | "agencyOfTypeOtherAdded";
 
 export type AgencySubmitFeedback = SubmitFeedBack<AgencySuccessFeedbackKind>;
 

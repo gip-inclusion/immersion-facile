@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import RadioButtons, {
   RadioButtonsProps,
@@ -42,7 +43,6 @@ import { P, match } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 import errorSvg from "../../../../assets/img/error.svg";
 import successSvg from "../../../../assets/img/success.svg";
-import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";
@@ -56,6 +56,7 @@ export const AddAgencyForm = () => {
     kind: "idle",
   });
   useScrollToTop(submitFeedback.kind === "agencyAdded");
+  useScrollToTop(submitFeedback.kind === "agencyOfTypeOtherAdded");
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
     if (values.kind === "") throw new Error("Agency kind is empty");
     return outOfReduxDependencies.agencyGateway
@@ -66,7 +67,10 @@ export const AddAgencyForm = () => {
           values.kind === "pole-emploi" ? null : values.questionnaireUrl,
       })
       .then(() => {
-        setSubmitFeedback({ kind: "agencyAdded" });
+        setSubmitFeedback({
+          kind:
+            values.kind !== "autre" ? "agencyAdded" : "agencyOfTypeOtherAdded",
+        });
       })
       .catch((e) => {
         // biome-ignore lint/suspicious/noConsoleLog: <explanation>
@@ -91,7 +95,10 @@ export const AddAgencyForm = () => {
       },
     },
   ];
-  if (submitFeedback.kind === "agencyAdded") {
+  if (
+    submitFeedback.kind === "agencyAdded" ||
+    submitFeedback.kind === "agencyOfTypeOtherAdded"
+  ) {
     return (
       <SubmitFeedbackNotification
         submitFeedback={submitFeedback}
@@ -168,7 +175,7 @@ const AgencyForm = ({
   }, [reset, formInitialValues]);
   const [hasDelegation, setHasDelegation] = useState<boolean | null>(null);
   const selectedKind = watch("kind");
-  // const formContents = getFormContents(formAgencyFieldsLabels).getFormFields();
+
   return (
     <FormProvider {...methods}>
       <form
@@ -213,7 +220,7 @@ const AgencyForm = ({
           </>
         )}
         <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-          {refersToOtherAgency ? "Structure d'accompagnement" : "Prescripteur"}
+          {refersToOtherAgency ? "Votre structure" : "Prescripteur"}
         </h2>
         <Select
           label={formContents.kind.label}
@@ -232,7 +239,7 @@ const AgencyForm = ({
           }
         />
 
-        {selectedKind === "autre" && (
+        {selectedKind === "autre" && !refersToOtherAgency && (
           <RadioButtons
             legend="Avez-vous déjà une convention de délégation ? *"
             name="hasDelegation"
@@ -251,10 +258,18 @@ const AgencyForm = ({
           />
         )}
 
-        {match({ selectedKind, hasDelegation })
+        {match({ selectedKind, hasDelegation, refersToOtherAgency })
           .with(
-            { selectedKind: "autre", hasDelegation: true },
+            {
+              selectedKind: "autre",
+              hasDelegation: true,
+            },
             { selectedKind: P.not("").and(P.not("autre")) },
+            {
+              selectedKind: "autre",
+              hasDelegation: P.nullish,
+              refersToOtherAgency: true,
+            },
             () => (
               <>
                 <AgencyFormCommonFields
