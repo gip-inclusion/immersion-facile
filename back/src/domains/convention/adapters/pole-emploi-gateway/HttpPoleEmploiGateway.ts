@@ -30,13 +30,22 @@ import { PoleEmploiRoutes, getPeTestPrefix } from "./PoleEmploiRoutes";
 
 const logger = createLogger(__filename);
 
-const poleEmploiMaxRequestsPerSeconds = 3;
+const poleEmploiCommonMaxRequestsPerInterval = 1;
+const poleEmploiBroadcastMaxRequestPerInterval = 3;
 
 export class HttpPoleEmploiGateway implements PoleEmploiGateway {
-  #limiter = new Bottleneck({
-    reservoir: poleEmploiMaxRequestsPerSeconds,
-    reservoirRefreshInterval: 1000, // number of ms
-    reservoirRefreshAmount: poleEmploiMaxRequestsPerSeconds,
+  // Common limiter with 1 call every 1.2s
+  #commonlimiter = new Bottleneck({
+    reservoir: poleEmploiCommonMaxRequestsPerInterval,
+    reservoirRefreshInterval: 1200, // number of ms
+    reservoirRefreshAmount: poleEmploiCommonMaxRequestsPerInterval,
+  });
+
+  // convention broacast limiter with 3 calls every 1.2s
+  #broadcastlimiter = new Bottleneck({
+    reservoir: poleEmploiBroadcastMaxRequestPerInterval,
+    reservoirRefreshInterval: 1200, // number of ms
+    reservoirRefreshAmount: poleEmploiBroadcastMaxRequestPerInterval,
   });
 
   #peTestPrefix: "test" | "";
@@ -71,7 +80,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   ): Promise<PoleEmploiGetAccessTokenResponse> {
     return this.#caching.caching(scope, () =>
       this.#retryStrategy.apply(() =>
-        this.#limiter.schedule(() =>
+        this.#commonlimiter.schedule(() =>
           createAxiosInstance(logger)
             .post(
               `${this.#accessTokenConfig.peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
@@ -225,7 +234,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       `echangespmsmp api_${this.#peTestPrefix}immersion-prov2`,
     );
 
-    return this.#limiter.schedule(() =>
+    return this.#broadcastlimiter.schedule(() =>
       this.#httpClient.broadcastConvention({
         body: poleEmploiConvention,
         headers: {
