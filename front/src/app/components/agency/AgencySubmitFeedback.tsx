@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { AgencySuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 
 export const agencySubmitMessageByKind: Record<
@@ -13,5 +13,17 @@ export const agencySubmitMessageByKind: Record<
   agencyUpdated: {
     title: "Succès",
     message: "Agence éditée avec succès",
+  },
+  agencyOfTypeOtherAdded: {
+    title: "N'oubliez pas de finaliser votre référencement !",
+    message: (
+      <>
+        Envoyez-nous votre convention de délégation au format pdf par email à
+        l'adresse:{" "}
+        <a href="mailto:delegation@immersion-facile.bata.gouv.fr">
+          delegation@immersion-facile.bata.gouv.fr
+        </a>
+      </>
+    ),
   },
 };
