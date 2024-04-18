@@ -10,6 +10,7 @@ export interface Database {
   api_consumers: ApiConsumers;
   convention_external_ids: ConventionExternalIds;
   conventions: Conventions;
+  delegation_contacts: DelegationContacts;
   discussions: Discussions;
   establishment_lead_events: EstablishmentLeadEvents;
   establishments_contacts: EstablishmentsContacts;
@@ -466,4 +467,11 @@ export interface UsersAgencies {
   user_id: string;
   agency_id: string;
   role: Generated<AgencyRole>;
+}
+
+export interface DelegationContacts {
+  province: string;
+  created_at: Generated<Timestamp | null>;
+  updated_at: Generated<Timestamp | null>;
+  email: string;
 }
