@@ -5,6 +5,7 @@ import {
   tallyFormSchema,
 } from "shared";
 import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { DelegationContactRepository } from "../../../agency/ports/DelegationContactRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -17,7 +18,7 @@ export class NotifyAgencyDelegationContact extends TransactionalUseCase<TallyFor
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
 
@@ -28,14 +29,30 @@ export class NotifyAgencyDelegationContact extends TransactionalUseCase<TallyFor
     tallyForm: TallyForm,
     uow: UnitOfWork,
   ): Promise<void> {
-    await this.saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
-      templatedContent: await this.#prepareEmail(tallyForm),
+      templatedContent: await this.#prepareEmail(
+        uow.delegationContactRepository,
+        tallyForm,
+      ),
       followedIds: {},
     });
   }
 
-  async #prepareEmail(tallyForm: TallyForm): Promise<TemplatedEmail> {
+  async #prepareEmail(
+    delegationContactRepository: DelegationContactRepository,
+    tallyForm: TallyForm,
+  ): Promise<TemplatedEmail> {
+    const province = getTallyFormValueOrThrow(
+      tallyForm,
+      "Région de la structure qui souhaite une convention de délégation",
+    );
+    const delegationEmail =
+      await delegationContactRepository.getEmailByProvince(province);
+
+    if (!delegationEmail)
+      throw new BadRequestError(`Province ${province} not found`);
+
     return {
       kind: "AGENCY_DELEGATION_CONTACT_INFORMATION",
       recipients: [getTallyFormValueOrThrow(tallyForm, "Email")],
@@ -50,13 +67,7 @@ export class NotifyAgencyDelegationContact extends TransactionalUseCase<TallyFor
           tallyForm,
           "Région de la structure qui souhaite une convention de délégation",
         ),
-        delegationProviderMail:
-          delegationContactEmailByProvince[
-            getTallyFormValueOrThrow(
-              tallyForm,
-              "Région de la structure qui souhaite une convention de délégation",
-            )
-          ],
+        delegationProviderMail: delegationEmail,
       },
     };
   }
@@ -67,5 +78,3 @@ const getTallyFormValueOrThrow = (tallyForm: TallyForm, label: string) => {
   if (!value) throw new BadRequestError(`No value found for label "${label}"`);
   return value;
 };
-
-export const delegationContactEmailByProvince: Record<string, string> = {};

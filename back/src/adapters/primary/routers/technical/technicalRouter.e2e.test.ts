@@ -418,6 +418,12 @@ describe("technical router", () => {
       const bodySignature = createHmac("sha256", tallySecret)
         .update(JSON.stringify(delegationContactTallyForm))
         .digest("base64");
+      inMemoryUow.delegationContactRepository.delegationContacts = [
+        {
+          province: "Bourgogne-Franche-Comté",
+          email: "delegation-contact@mail.fr",
+        },
+      ];
 
       const response = await httpClient.delegationContactRequest({
         headers: { "tally-signature": bodySignature },

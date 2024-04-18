@@ -1,6 +1,7 @@
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { PgAgencyGroupRepository } from "../../../agency/adapters/PgAgencyGroupRepository";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
+import { PgDelegationContactRepository } from "../../../agency/adapters/PgDelegationContactRepository";
 import { PgAssessmentRepository } from "../../../convention/adapters/PgAssessmentRepository";
 import { PgConventionExternalIdRepository } from "../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionQueries } from "../../../convention/adapters/PgConventionQueries";
@@ -44,6 +45,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     conventionQueries: new PgConventionQueries(transaction),
     conventionRepository: new PgConventionRepository(transaction),
     conventionsToSyncRepository: new PgConventionsToSyncRepository(transaction),
+    delegationContactRepository: new PgDelegationContactRepository(transaction),
     deletedEstablishmentRepository: new PgDeletedEstablishmentRepository(
       transaction,
     ),
