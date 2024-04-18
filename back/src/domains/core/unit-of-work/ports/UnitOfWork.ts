@@ -1,5 +1,6 @@
 import { AgencyGroupRepository } from "../../../agency/ports/AgencyGroupRepository";
 import { AgencyRepository } from "../../../agency/ports/AgencyRepository";
+import { DelegationContactRepository } from "../../../agency/ports/DelegationContactRepository";
 import { AssessmentRepository } from "../../../convention/ports/AssessmentRepository";
 import { ConventionExternalIdRepository } from "../../../convention/ports/ConventionExternalIdRepository";
 import { ConventionQueries } from "../../../convention/ports/ConventionQueries";
@@ -38,6 +39,7 @@ export type UnitOfWork = {
   conventionQueries: ConventionQueries;
   conventionRepository: ConventionRepository;
   conventionsToSyncRepository: ConventionsToSyncRepository;
+  delegationContactRepository: DelegationContactRepository;
   deletedEstablishmentRepository: DeletedEstablishmentRepository;
   discussionRepository: DiscussionRepository;
   errorRepository: SavedErrorRepository;

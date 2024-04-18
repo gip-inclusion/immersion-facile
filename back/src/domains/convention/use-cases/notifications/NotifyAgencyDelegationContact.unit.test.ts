@@ -16,10 +16,7 @@ import {
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import {
-  NotifyAgencyDelegationContact,
-  delegationContactEmailByProvince,
-} from "./NotifyAgencyDelegationContact";
+import { NotifyAgencyDelegationContact } from "./NotifyAgencyDelegationContact";
 
 describe("NotifyAgencyDelegationContact", () => {
   let usecase: NotifyAgencyDelegationContact;
@@ -47,11 +44,17 @@ describe("NotifyAgencyDelegationContact", () => {
   it("fail if tallyForm does not contain requested label", async () => {
     await expectPromiseToFailWithError(
       usecase.execute(wrongTallyForm),
-      new BadRequestError('No value found for label "Email"'),
+      new BadRequestError(
+        'No value found for label "Région de la structure qui souhaite une convention de délégation"',
+      ),
     );
   });
 
   it("send an email to agency", async () => {
+    const delegationContactEmail = "delegation-contact@email.fr";
+    uow.delegationContactRepository.delegationContacts = [
+      { province: tallyFormProvince, email: delegationContactEmail },
+    ];
     await usecase.execute(tallyForm);
 
     expectSavedNotificationsAndEvents({
@@ -67,18 +70,8 @@ describe("NotifyAgencyDelegationContact", () => {
                 tallyForm,
                 "Nom de la structure qui souhaite une convention de délégation",
               ) ?? "",
-            agencyProvince:
-              getTallyFormValueOf(
-                tallyForm,
-                "Région de la structure qui souhaite une convention de délégation",
-              ) ?? "",
-            delegationProviderMail:
-              delegationContactEmailByProvince[
-                getTallyFormValueOf(
-                  tallyForm,
-                  "Région de la structure qui souhaite une convention de délégation",
-                ) ?? ""
-              ],
+            agencyProvince: tallyFormProvince,
+            delegationProviderMail: delegationContactEmail,
           },
         },
       ],
@@ -102,6 +95,7 @@ const wrongTallyForm: TallyForm = {
   },
 };
 
+const tallyFormProvince = "Bourgogne-Franche-Comté";
 const tallyForm: TallyForm = {
   eventId: "444e93a8-68db-4cc2-ac17-0bbcbd4460f8",
   eventType: "FORM_SUBMISSION",
@@ -152,7 +146,7 @@ const tallyForm: TallyForm = {
           },
           {
             id: "98052009-6a3a-44c4-87ee-8bc28b5b7161",
-            text: "Bourgogne-Franche-Comté",
+            text: tallyFormProvince,
           },
           {
             id: "13174829-5679-413b-952c-aa47dd2c7a29",

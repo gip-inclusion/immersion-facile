@@ -1,5 +1,6 @@
 import { InMemoryAgencyGroupRepository } from "../../../agency/adapters/InMemoryAgencyGroupRepository";
 import { InMemoryAgencyRepository } from "../../../agency/adapters/InMemoryAgencyRepository";
+import { InMemoryDelegationContactRepository } from "../../../agency/adapters/InMemoryDelegationContactRepository";
 import { InMemoryAssessmentRepository } from "../../../convention/adapters/InMemoryAssessmentRepository";
 import { InMemoryConventionExternalIdRepository } from "../../../convention/adapters/InMemoryConventionExternalIdRepository";
 import { InMemoryConventionQueries } from "../../../convention/adapters/InMemoryConventionQueries";
@@ -52,6 +53,7 @@ export const createInMemoryUow = () => {
     conventionPoleEmploiAdvisorRepository:
       new InMemoryConventionPoleEmploiAdvisorRepository(),
     conventionsToSyncRepository: new InMemoryConventionsToSyncRepository(),
+    delegationContactRepository: new InMemoryDelegationContactRepository(),
     discussionRepository: new InMemoryDiscussionRepository(),
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
