@@ -57,7 +57,7 @@ jobs:
             "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.",
             "embeds": [
               {
-                "title": "v${{ inputs.tag }}${releaseSuffix}",
+                "title": "${{ inputs.tag }}${releaseSuffix}",
                 "fields": [
                   {
                     "name": "Les changements contenus dans cette version :",
