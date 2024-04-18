@@ -61,7 +61,7 @@ jobs:
                 "fields": [
                   {
                     "name": "Les changements contenus dans cette version :",
-                    "value": "https://github.com/gip-inclusion/immersion-facile/releases/${{ inputs.tag }}${releaseSuffix}"
+                    "value": "https://github.com/gip-inclusion/immersion-facile/releases/tag/${{ inputs.tag }}${releaseSuffix}"
                   },
                   {
                     "name": "Dernières releases :",
