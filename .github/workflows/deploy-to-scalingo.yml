@@ -9,9 +9,9 @@ on:
       tag:
         type: string
         required: true
-      version-new-features:
+      isPreRelease:
         required: true
-        type: string
+        type: boolean
       region:
         required: false
         type: string
@@ -51,21 +51,20 @@ jobs:
         run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz ${{ inputs.tag }}
       - name: Send Discord notification
         run: |
-          newChanges="${{ inputs.version-new-features }}"
-          newChangesWithExplicitNewLines="${newChanges//$'\n'/\\n}"
-          newChangesWithoutBacktickAndDoubleQuote="${newChangesWithExplicitNewLines//\"/‘}"
-          newChangesWithoutBacktickAndDoubleQuote="${newChangesWithoutBacktickAndDoubleQuote//\'/‘}"
-          newChangesWithoutBacktickAndDoubleQuote="${newChangesWithoutBacktickAndDoubleQuote//\`/‘}"
-          echo -E "$newChangesWithBacktickAndDoubleQuote"
+          releaseSuffix=$([[ "${{ inputs.isPreRelease }}" == "true" ]] && echo "-rc" || echo "")
           curl -X POST -H "Content-Type: application/json" -d @- ${{ secrets.DISCORD_WEBHOOK_URL }} <<EOF 
           {
-            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.\n\n $newChangesWithoutBacktickAndDoubleQuote",
+            "content": "La ${{ inputs.tag }} est deployée en ${{ inputs.environment }}.",
             "embeds": [
               {
-                "title": "Liens utiles :",
+                "title": "v${{ inputs.tag }}${releaseSuffix}",
                 "fields": [
                   {
-                    "name": "Dernières mises en prod :",
+                    "name": "Les changements contenus dans cette version :",
+                    "value": "https://github.com/gip-inclusion/immersion-facile/releases/${{ inputs.tag }}${releaseSuffix}"
+                  },
+                  {
+                    "name": "Dernières releases :",
                     "value": "https://github.com/gip-inclusion/immersion-facile/releases"
                   },
                   {
