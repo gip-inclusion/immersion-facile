@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy } from "react";
 import { PageHeader } from "react-design-system";
 import {
   AdminTab,
@@ -22,7 +22,6 @@ import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboar
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
-import { OpenApiDocPage } from "src/app/pages/open-api-doc/OpenApiDocPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
@@ -47,6 +46,10 @@ import {
   standardPageSlugs,
 } from "./routeParams/standardPage";
 import { routes, useRoute } from "./routes";
+
+const OpenApiDocPage = lazy(
+  () => import("src/app/pages/open-api-doc/OpenApiDocPage"),
+);
 
 type Routes = typeof routes;
 

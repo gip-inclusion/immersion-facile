@@ -5,7 +5,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 
-export const OpenApiDocPage = (): React.ReactElement => (
+const OpenApiDocPage = (): React.ReactElement => (
   <HeaderFooterLayout>
     <MainWrapper layout="default" vSpacing={0}>
       <SwaggerUI
@@ -15,3 +15,5 @@ export const OpenApiDocPage = (): React.ReactElement => (
     </MainWrapper>
   </HeaderFooterLayout>
 );
+
+export default OpenApiDocPage;
