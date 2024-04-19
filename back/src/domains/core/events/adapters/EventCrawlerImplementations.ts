@@ -37,7 +37,7 @@ export class BasicEventCrawler implements EventCrawler {
   public async processNewEvents(): Promise<void> {
     const getEventsStartDate = new Date();
     const events = await this.#retrieveEvents("unpublished");
-    const getEventsDurationInSeconds =
+    const retrieveEventsDurationInSeconds =
       calculateDurationInSecondsFrom(getEventsStartDate);
 
     const processStartDate = new Date();
@@ -50,7 +50,7 @@ export class BasicEventCrawler implements EventCrawler {
 
     if (events.length) {
       logger.info({
-        getEventsDurationInSeconds,
+        retrieveEventsDurationInSeconds,
         processEventsDurationInSeconds,
         markEventsAsInProcessDurationInSeconds,
         typeOfEvents: "unpublished",
@@ -88,9 +88,22 @@ export class BasicEventCrawler implements EventCrawler {
   async #publishEvents(events: DomainEvent[]) {
     const eventGroups = splitEvery(maxEventsProcessedInParallel, events);
     for (const eventGroup of eventGroups) {
+      const timer = setTimeout(() => {
+        const warning = {
+          message: "Processing event group is taking long",
+          events: eventGroup.map((event) => {
+            return { eventId: event.id, topic: event.topic };
+          }),
+        };
+        notifyObjectDiscord(warning);
+        logger.warn(warning);
+      }, 30_000);
+
       await Promise.all(
         eventGroup.map((event) => this.eventBus.publish(event)),
       );
+
+      clearTimeout(timer);
     }
   }
 
