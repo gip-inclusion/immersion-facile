@@ -218,6 +218,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             peId: poleEmploiConvention.id,
             originalId: poleEmploiConvention.originalId,
           },
+          detailledError: error.toJSON(),
         };
         logger.error(errorObject);
         notifyObjectDiscord(errorObject);
