@@ -32,20 +32,25 @@ const logger = createLogger(__filename);
 
 const poleEmploiCommonMaxRequestsPerInterval = 1;
 const poleEmploiBroadcastMaxRequestPerInterval = 3;
+const rate_ms = 1250;
 
 export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   // Common limiter with 1 call every 1.2s
   #commonlimiter = new Bottleneck({
     reservoir: poleEmploiCommonMaxRequestsPerInterval,
-    reservoirRefreshInterval: 1200, // number of ms
+    reservoirRefreshInterval: rate_ms,
     reservoirRefreshAmount: poleEmploiCommonMaxRequestsPerInterval,
+    maxConcurrent: 1,
+    minTime: Math.ceil(rate_ms / poleEmploiCommonMaxRequestsPerInterval),
   });
 
   // convention broacast limiter with 3 calls every 1.2s
   #broadcastlimiter = new Bottleneck({
     reservoir: poleEmploiBroadcastMaxRequestPerInterval,
-    reservoirRefreshInterval: 1200, // number of ms
+    reservoirRefreshInterval: rate_ms,
     reservoirRefreshAmount: poleEmploiBroadcastMaxRequestPerInterval,
+    maxConcurrent: 1,
+    minTime: Math.ceil(rate_ms / poleEmploiBroadcastMaxRequestPerInterval),
   });
 
   #peTestPrefix: "test" | "";
