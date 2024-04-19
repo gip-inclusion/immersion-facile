@@ -84,14 +84,17 @@ const exchangeCodeForAccessTokenLogger = makePeConnectLogger(
 );
 
 const peConnectMaxRequestsPerInterval = 1;
+const rate_ms = 1250;
 
 // TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS PE
 export class HttpPeConnectGateway implements PeConnectGateway {
   // PE Connect limit rate at 1 call per 1.2s
   #limiter = new Bottleneck({
     reservoir: peConnectMaxRequestsPerInterval,
-    reservoirRefreshInterval: 1200, // number of ms
+    reservoirRefreshInterval: rate_ms, // number of ms
     reservoirRefreshAmount: peConnectMaxRequestsPerInterval,
+    maxConcurrent: 1,
+    minTime: Math.ceil(rate_ms / peConnectMaxRequestsPerInterval),
   });
 
   constructor(
