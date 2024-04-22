@@ -3,7 +3,7 @@ import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
 import { InMemoryAddressGateway } from "src/core-logic/adapters/AddressGateway/InMemoryAddressGateway";
 import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
-import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
+import { SimulatedAgencyGateway } from "src/core-logic/adapters/AgencyGateway/SimulatedAgencyGateway";
 import { SimulatedAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedAssessmentGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
@@ -20,7 +20,7 @@ const SIMULATED_LATENCY_MS = 400;
 export const createInMemoryDependencies = (): Dependencies => ({
   addressGateway: new InMemoryAddressGateway(SIMULATED_LATENCY_MS),
   adminGateway: new SimulatedAdminGateway(),
-  agencyGateway: new InMemoryAgencyGateway(),
+  agencyGateway: new SimulatedAgencyGateway(),
   conventionGateway: new InMemoryConventionGateway(SIMULATED_LATENCY_MS),
   establishmentGateway: new SimulatedEstablishmentGateway([
     FormEstablishmentDtoBuilder.valid()

@@ -45,7 +45,24 @@ const getAgenciesByDepartmentCodeEpic: AppEpic<AgencyInfoAction> = (
     ),
   );
 
+const addAgencyEpic: AppEpic<AgencyInfoAction> = (
+  action$,
+  _state$,
+  dependencies,
+) =>
+  action$.pipe(
+    filter(agenciesSlice.actions.addAgencyRequested.match),
+    switchMap((action) =>
+      dependencies.agencyGateway.addAgency$(action.payload),
+    ),
+    map(agenciesSlice.actions.addAgencySucceeded),
+    catchEpicError((error) =>
+      agenciesSlice.actions.addAgencyFailed(error.message),
+    ),
+  );
+
 export const agenciesEpics = [
   agencyInfoGetByIdEpic,
   getAgenciesByDepartmentCodeEpic,
+  addAgencyEpic,
 ];

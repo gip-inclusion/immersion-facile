@@ -91,11 +91,54 @@ describe("Agencies in store", () => {
         ),
       );
       expectIsLoadingToBe(true);
-      dependencies.agencyGateway.agencies$.next(agenciesFromApi);
+      dependencies.agencyGateway.agencyOptions$.next(agenciesFromApi);
 
       // Expect
       expectIsLoadingToBe(false);
       expectOptionsToEqual(agenciesFromApi);
+    });
+  });
+
+  describe("add agency", () => {
+    it("add agency successfully & cleared", () => {
+      // Arrange
+      const agency = new AgencyDtoBuilder().build();
+      expectIsLoadingToBe(false);
+
+      // Execute
+      store.dispatch(agenciesSlice.actions.addAgencyRequested(agency));
+
+      expectIsLoadingToBe(true);
+      dependencies.agencyGateway.addAgencyResponse$.next(undefined);
+
+      // Expect
+      expectIsLoadingToBe(false);
+      expectFeedbackToEqual({ kind: "agencyAdded" });
+
+      store.dispatch(agenciesSlice.actions.addAgencyCleared());
+      expectFeedbackToEqual({ kind: "idle" });
+    });
+
+    it("add agency failed & cleared", () => {
+      // Arrange
+      const agency = new AgencyDtoBuilder().build();
+      expectIsLoadingToBe(false);
+
+      // Execute
+      store.dispatch(agenciesSlice.actions.addAgencyRequested(agency));
+
+      expectIsLoadingToBe(true);
+      const errorMessage = "Add agency failed.";
+      dependencies.agencyGateway.addAgencyResponse$.error(
+        new Error(errorMessage),
+      );
+
+      // Expect
+      expectIsLoadingToBe(false);
+      expectFeedbackToEqual({ kind: "errored", errorMessage });
+
+      store.dispatch(agenciesSlice.actions.addAgencyCleared());
+      expectFeedbackToEqual({ kind: "idle" });
     });
   });
 

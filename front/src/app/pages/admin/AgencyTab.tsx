@@ -4,7 +4,7 @@ import { AgencyDto } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { ActivateAgency } from "src/app/components/agency/ActivateAgency";
-import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
+import { agencyAdminSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { EditAgency } from "src/app/components/agency/EditAgency";
 import { RegisterUsersToAgencies } from "src/app/components/agency/RegisterUsersToAgencies";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -19,7 +19,7 @@ export const AgencyTab = () => {
     <>
       <SubmitFeedbackNotification
         submitFeedback={feedback}
-        messageByKind={agencySubmitMessageByKind}
+        messageByKind={agencyAdminSubmitMessageByKind}
       />
       <EditAgency />
 

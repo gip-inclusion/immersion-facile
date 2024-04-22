@@ -22,17 +22,16 @@ import { match } from "ts-pattern";
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyRoutes>) {}
-
-  public async addAgency(createAgencyParams: CreateAgencyDto): Promise<void> {
-    await this.httpClient
-      .addAgency({ body: createAgencyParams })
-      .then((response) =>
+  addAgency$(agency: CreateAgencyDto): Observable<void> {
+    return from(
+      this.httpClient.addAgency({ body: agency }).then((response) =>
         match(response)
-          .with({ status: 200 }, ({ body }) => body)
+          .with({ status: 200 }, () => undefined)
           .with({ status: 404 }, logBodyAndThrow)
           .with({ status: 409 }, logBodyAndThrow)
           .otherwise(otherwiseThrow),
-      );
+      ),
+    );
   }
 
   public getAgencyAdminById$(
