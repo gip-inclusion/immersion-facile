@@ -10,3 +10,6 @@ export const immersionFacileNoReplyEmailSender = {
 };
 
 export const backOfficeEmail = "support@immersion-facile.beta.gouv.fr";
+
+export const immersionFacileDelegationEmail =
+  "delegation@immersion-facile.beta.gouv.fr";

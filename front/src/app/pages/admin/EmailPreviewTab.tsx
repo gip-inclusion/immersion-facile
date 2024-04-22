@@ -226,6 +226,10 @@ export const defaultEmailValueByEmailKind: {
     refersToOtherAgency: true,
     validatorEmails: ["VALIDATOR_EMAIL1", "VALIDATOR_EMAIL2"],
   },
+  AGENCY_OF_TYPE_OTHER_ADDED: {
+    agencyName: "AGENCY_NAME",
+    agencyLogoUrl: defaultEmailPreviewUrl,
+  },
   AGENCY_WITH_REFERS_TO_ACTIVATED: {
     nameOfAgencyRefering: "ACCOMPANYING_AGENCY_NAME",
     refersToAgencyName: "REFERS_TO_AGENCY_NAME",
