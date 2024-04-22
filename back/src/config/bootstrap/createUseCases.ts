@@ -24,6 +24,7 @@ import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { RenewConventionMagicLink } from "../../domains/convention/use-cases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
+import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
 import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionLinkByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
@@ -399,6 +400,11 @@ export const createUseCases = (
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
+      sendEmailWhenNewAgencyOfTypeOtherAdded:
+        new SendEmailWhenNewAgencyOfTypeOtherAdded(
+          uowPerformer,
+          saveNotificationAndRelatedEvent,
+        ),
       sendEmailWhenAgencyIsRejected: new SendEmailWhenAgencyIsRejected(
         uowPerformer,
         saveNotificationAndRelatedEvent,

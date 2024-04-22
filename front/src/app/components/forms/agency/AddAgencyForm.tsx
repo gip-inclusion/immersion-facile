@@ -69,7 +69,9 @@ export const AddAgencyForm = () => {
       .then(() => {
         setSubmitFeedback({
           kind:
-            values.kind !== "autre" ? "agencyAdded" : "agencyOfTypeOtherAdded",
+            values.kind !== "autre" || values.refersToAgencyId
+              ? "agencyAdded"
+              : "agencyOfTypeOtherAdded",
         });
       })
       .catch((e) => {
