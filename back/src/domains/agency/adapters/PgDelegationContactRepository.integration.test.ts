@@ -9,16 +9,13 @@ describe("PgDelegationContact", () => {
   let delegationContactRepository: PgDelegationContactRepository;
   let db: KyselyDb;
 
-  beforeAll(async () => {
-    pool = getTestPgPool();
-    db = makeKyselyDb(pool);
-  });
-
   afterAll(async () => {
     await pool.end();
   });
 
   beforeEach(async () => {
+    pool = getTestPgPool();
+    db = makeKyselyDb(pool);
     await db.deleteFrom("delegation_contacts").execute();
 
     delegationContactRepository = new PgDelegationContactRepository(db);
