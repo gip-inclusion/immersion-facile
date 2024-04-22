@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+import { immersionFacileDelegationEmail } from "shared";
 import { AgencySuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 
 export const agencySubmitMessageByKind: Record<
@@ -20,8 +21,8 @@ export const agencySubmitMessageByKind: Record<
       <>
         Envoyez-nous votre convention de délégation au format pdf par email à
         l'adresse:{" "}
-        <a href="mailto:delegation@immersion-facile.bata.gouv.fr">
-          delegation@immersion-facile.bata.gouv.fr
+        <a href={`mailto:${immersionFacileDelegationEmail}`}>
+          {immersionFacileDelegationEmail}
         </a>
       </>
     ),

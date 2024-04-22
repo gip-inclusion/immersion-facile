@@ -4,7 +4,10 @@ import { isStringDate, toDisplayedDate } from "../utils/date";
 import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
-import { immersionFacileContactEmail } from "./knownEmailsAddresses";
+import {
+  immersionFacileContactEmail,
+  immersionFacileDelegationEmail,
+} from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind: InternshipKind) =>
   internshipKind === "immersion"
@@ -1113,7 +1116,24 @@ export const emailTemplatesByName =
         subContent: defaultSignature("immersion"),
       }),
     },
-
+    AGENCY_OF_TYPE_OTHER_ADDED: {
+      niceName: "Délégation - Agence de type autre ajoutée",
+      tags: ["Agence de type autre ajoutée"],
+      createEmailVariables: ({ agencyLogoUrl, agencyName }) => ({
+        subject: "Immersion Facilitée - Votre structure a été activée",
+        greetings: "Bonjour,",
+        content: `Vous recevez cet email suite à votre demande de référencement sur le site Immersion Facilitée. 
+        Afin de finaliser le référencement de votre structure ${agencyName}, 
+        envoyez-nous votre convention de délégation au format pdf à l'adresse : <a href= "mailto:${immersionFacileDelegationEmail}" target="_blank">${immersionFacileDelegationEmail}</a> 
+        `,
+        agencyLogoUrl,
+        highlight: {
+          content:
+            "Attention : votre structure ne sera activée qu'à la réception de la convention de délégation ! ",
+        },
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     AGENCY_WAS_ACTIVATED: {
       niceName: "Agence - Activée",
       tags: ["activation prescripteur"],

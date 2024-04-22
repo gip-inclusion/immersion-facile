@@ -27,6 +27,10 @@ export type EmailParamsByEmailType = {
     businessName: string;
     conventionId: ConventionId;
   };
+  AGENCY_OF_TYPE_OTHER_ADDED: {
+    agencyName: string;
+    agencyLogoUrl: AbsoluteUrl | undefined;
+  };
   AGENCY_WAS_ACTIVATED: {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
