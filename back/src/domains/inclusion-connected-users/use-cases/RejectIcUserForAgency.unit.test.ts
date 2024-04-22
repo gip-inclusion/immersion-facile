@@ -105,7 +105,7 @@ describe("reject IcUser for agency", () => {
         },
         { userId: currentUser.id } as InclusionConnectJwtPayload,
       ),
-      "User with id 'not-an-admin-id' is not a backOffice user",
+      "User 'not-an-admin-id' is not a backOffice user",
     );
   });
 
@@ -195,7 +195,7 @@ describe("reject IcUser for agency", () => {
         },
         { userId: randomUser.id } as InclusionConnectJwtPayload,
       ),
-      `User with id '${randomUser.id}' is not a backOffice user`,
+      `User '${randomUser.id}' is not a backOffice user`,
     );
   });
 

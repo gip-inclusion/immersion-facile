@@ -1,10 +1,13 @@
+import { addDays } from "date-fns";
 import {
   AddressDto,
   AgencyDtoBuilder,
   AgencyRoutes,
-  BackOfficeJwt,
   CreateAgencyDto,
+  InclusionConnectJwt,
+  InclusionConnectedUserBuilder,
   agencyRoutes,
+  currentJwtVersions,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -13,6 +16,7 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
@@ -25,28 +29,38 @@ const defaultAddress: AddressDto = {
   city: "Paris",
 };
 
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withIsAdmin(true)
+  .build();
+
 describe("Agency routes", () => {
   let httpClient: HttpClient<AgencyRoutes>;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
-  let adminToken: BackOfficeJwt;
+  let backofficeAdminToken: InclusionConnectJwt;
+  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 
   beforeEach(async () => {
     const deps = await buildTestApp();
-    ({ gateways, eventCrawler, inMemoryUow } = deps);
+    ({ gateways, eventCrawler, inMemoryUow, generateInclusionConnectJwt } =
+      deps);
 
     httpClient = createSupertestSharedClient(agencyRoutes, deps.request);
 
     inMemoryUow.agencyRepository.setAgencies([]);
+    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
+
     gateways.timeGateway.defaultDate = new Date();
 
-    adminToken = (
-      await deps.request.post("/admin/login").send({
-        user: deps.appConfig.backofficeUsername,
-        password: deps.appConfig.backofficePassword,
-      })
-    ).body;
+    backofficeAdminToken = generateInclusionConnectJwt({
+      userId: backofficeAdminUser.id,
+      version: currentJwtVersions.inclusion,
+      iat: new Date().getTime(),
+      exp: addDays(new Date(), 5).getTime(),
+    });
   });
 
   const agency1ActiveNearBy = AgencyDtoBuilder.create("test-agency-1")
@@ -281,7 +295,7 @@ describe("Agency routes", () => {
 
         const response = await httpClient.listAgenciesOptionsWithStatus({
           queryParams: { status: "needsReview" },
-          headers: { authorization: adminToken },
+          headers: { authorization: backofficeAdminToken },
         });
 
         expectHttpResponseToEqual(response, {
@@ -305,7 +319,7 @@ describe("Agency routes", () => {
         await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
 
         const response = await httpClient.updateAgencyStatus({
-          headers: { authorization: adminToken },
+          headers: { authorization: backofficeAdminToken },
           body: { status: "active" },
           urlParams: { agencyId: agency4NeedsReview.id },
         });
@@ -359,7 +373,7 @@ describe("Agency routes", () => {
           .build();
 
         const response = await httpClient.updateAgency({
-          headers: { authorization: adminToken },
+          headers: { authorization: backofficeAdminToken },
           urlParams: { agencyId: agency4NeedsReview.id },
           body: updatedAgency,
         });

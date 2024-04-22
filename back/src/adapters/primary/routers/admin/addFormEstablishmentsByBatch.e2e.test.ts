@@ -1,7 +1,6 @@
 import { addDays } from "date-fns";
 import {
   AdminRoutes,
-  BackOfficeJwt,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
@@ -65,7 +64,7 @@ describe("POST /add-form-establishment-batch", () => {
   });
 
   it("throws 401 if invalid token", async () => {
-    const badBackOfficeJwt: BackOfficeJwt = "Invalid";
+    const badBackOfficeJwt: InclusionConnectJwt = "Invalid";
     const response = await httpClient.addFormEstablishmentBatch({
       body: payload,
       headers: { authorization: badBackOfficeJwt },

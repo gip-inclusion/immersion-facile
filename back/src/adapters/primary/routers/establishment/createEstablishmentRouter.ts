@@ -61,7 +61,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   );
 
   establishmentSharedRouter.deleteEstablishment(
-    deps.establishmentMagicLinkAuthMiddleware,
+    deps.adminAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(204), () =>
         deps.useCases.deleteEstablishment.execute(

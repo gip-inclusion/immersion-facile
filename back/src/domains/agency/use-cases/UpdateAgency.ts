@@ -11,7 +11,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfIcUserNotBackofficeAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
+import { getIcUserOrThrow } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
 import { throwConflictErrorOnSimilarAgencyFound } from "../entities/Agency";
 
 export class UpdateAgency extends TransactionalUseCase<
@@ -37,9 +37,15 @@ export class UpdateAgency extends TransactionalUseCase<
     jwtPayload: InclusionConnectDomainJwtPayload,
   ): Promise<void> {
     if (!jwtPayload) throw new UnauthorizedError();
-    await throwIfIcUserNotBackofficeAdmin(uow, jwtPayload);
 
-    await throwConflictErrorOnSimilarAgencyFound({ uow, agency });
+    const user = await getIcUserOrThrow(uow, jwtPayload.userId);
+
+    if (!user.isBackofficeAdmin) {
+      await throwConflictErrorOnSimilarAgencyFound({
+        uow,
+        agency,
+      });
+    }
 
     await uow.agencyRepository.update(agency).catch((error) => {
       if (error.message === `Agency ${agency.id} does not exist`) {

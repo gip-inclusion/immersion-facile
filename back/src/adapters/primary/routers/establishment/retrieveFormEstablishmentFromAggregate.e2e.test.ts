@@ -73,6 +73,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       generateInclusionConnectJwt,
       generateEditEstablishmentJwt,
     } = await buildTestApp());
+    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
   });
 

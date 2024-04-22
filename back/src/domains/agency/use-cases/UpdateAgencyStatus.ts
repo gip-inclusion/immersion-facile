@@ -12,6 +12,8 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getIcUserOrThrow } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwConflictErrorOnSimilarAgencyFound } from "../entities/Agency";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyStatusParams,
@@ -44,12 +46,13 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
         `No agency found with id ${updateAgencyStatusParams.id}`,
       );
 
-    // if (jwtPayload.role !== "backOffice") {
-    //   await throwConflictErrorOnSimilarAgencyFound({
-    //     uow,
-    //     agency: existingAgency,
-    //   });
-    // }
+    const user = await getIcUserOrThrow(uow, jwtPayload.userId);
+    if (!user.isBackofficeAdmin) {
+      await throwConflictErrorOnSimilarAgencyFound({
+        uow,
+        agency: existingAgency,
+      });
+    }
 
     const updatedAgencyParams: PartialAgencyDto = {
       id: updateAgencyStatusParams.id,

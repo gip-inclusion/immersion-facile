@@ -79,7 +79,7 @@ describe("Edit Form Establishment", () => {
         editFormEstablishment.execute(updatedFormEstablishment, {
           siret: "bad-siret",
         } as EstablishmentJwtPayload),
-        new ForbiddenError(),
+        new ForbiddenError("Siret mismatch in JWT payload and form"),
       );
     });
 
@@ -111,7 +111,7 @@ describe("Edit Form Establishment", () => {
     it("Forbidden error without jwt payload", async () => {
       await expectPromiseToFailWithError(
         editFormEstablishment.execute(updatedFormEstablishment),
-        new ForbiddenError(),
+        new ForbiddenError("No JWT payload provided"),
       );
     });
 
