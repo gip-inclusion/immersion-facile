@@ -1,3 +1,4 @@
+import { Email } from "shared";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { DelegationContactRepository } from "../ports/DelegationContactRepository";
 
@@ -8,7 +9,7 @@ export class PgDelegationContactRepository
 
   public async getEmailByProvince(
     province: string,
-  ): Promise<string | undefined> {
+  ): Promise<Email | undefined> {
     const response = await this.transaction
       .selectFrom("delegation_contacts")
       .select("email")

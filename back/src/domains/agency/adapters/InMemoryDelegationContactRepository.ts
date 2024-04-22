@@ -1,5 +1,5 @@
 import { values } from "ramda";
-import { isTruthy } from "shared";
+import { Email, isTruthy } from "shared";
 import { DelegationContactRepository } from "../ports/DelegationContactRepository";
 
 type DelegationContactDto = {
@@ -26,7 +26,7 @@ export class InMemoryDelegationContactRepository
     );
   }
 
-  public getEmailByProvince(province: string): Promise<string | undefined> {
+  public getEmailByProvince(province: string): Promise<Email | undefined> {
     return Promise.resolve(this.#delegationContacts[province]?.email);
   }
 }

@@ -6,8 +6,8 @@ const tableName = "delegation_contacts";
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createTable(tableName, {
     province: { type: "varchar(255)", primaryKey: true },
-    created_at: { type: "timestamp", default: pgm.func("now()") },
-    updated_at: { type: "timestamp", default: pgm.func("now()") },
+    created_at: { type: "timestamptz", default: pgm.func("now()") },
+    updated_at: { type: "timestamptz", default: pgm.func("now()") },
     email: { type: "varchar(255)", notNull: true },
   });
 }
