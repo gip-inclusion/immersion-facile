@@ -110,7 +110,7 @@ const getUseCasesByTopics = (
   MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],
 
   // Agency related :
-  NewAgencyAdded: [],
+  NewAgencyAdded: [useCases.sendEmailWhenNewAgencyOfTypeOtherAdded],
   AgencyActivated: [useCases.sendEmailsWhenAgencyIsActivated],
   AgencyUpdated: [useCases.updateAgencyReferingToUpdatedAgency],
   AgencyRejected: [useCases.sendEmailWhenAgencyIsRejected],
