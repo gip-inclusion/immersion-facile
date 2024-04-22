@@ -4,7 +4,7 @@ import {
   agencyIdResponseSchema,
   agencySchema,
   createAgencySchema,
-  listAgenciesRequestSchema,
+  listAgencyOptionsRequestSchema,
   updateAgencyStatusParamsWithoutIdSchema,
   withAgencyIdSchema,
   withAgencyStatusSchema,
@@ -48,7 +48,7 @@ export const agencyRoutes = defineRoutes({
       409: legacyHttpErrorSchema,
     },
   }),
-  listAgenciesWithStatus: defineRoute({
+  listAgenciesOptionsWithStatus: defineRoute({
     method: "get",
     url: "/admin/agencies",
     queryParamsSchema: withAgencyStatusSchema,
@@ -58,10 +58,10 @@ export const agencyRoutes = defineRoutes({
       401: legacyUnauthenticatedErrorSchema,
     },
   }),
-  getFilteredAgencies: defineRoute({
+  getAgencyOptionsByFilter: defineRoute({
     method: "get",
     url: "/agencies",
-    queryParamsSchema: listAgenciesRequestSchema,
+    queryParamsSchema: listAgencyOptionsRequestSchema,
     responses: { 200: agenciesIdAndNameSchema },
   }),
   addAgency: defineRoute({

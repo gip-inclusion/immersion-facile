@@ -8,7 +8,7 @@ import {
   sleep,
 } from "shared";
 import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
-import { ListAgenciesByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
+import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
 import { RegisterAgencyToInclusionConnectUser } from "../../domains/agency/use-cases/RegisterAgencyToInclusionConnectUser";
 import { UpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
@@ -393,7 +393,7 @@ export const createUseCases = (
       validateEmail: new ValidateEmail(gateways.emailValidationGateway),
 
       // agencies
-      listAgenciesByFilter: new ListAgenciesByFilter(uowPerformer),
+      listAgencyOptionsByFilter: new ListAgencyOptionsByFilter(uowPerformer),
       privateListAgencies: new PrivateListAgencies(uowPerformer),
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailsWhenAgencyIsActivated: new SendEmailsWhenAgencyIsActivated(

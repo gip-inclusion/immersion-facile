@@ -1,22 +1,22 @@
 import {
   AgencyDto,
   AgencyOption,
-  ListAgenciesRequestDto,
+  ListAgencyOptionsRequestDto,
   activeAgencyStatuses,
-  listAgenciesRequestSchema,
+  listAgencyOptionsRequestSchema,
   removeSpaces,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
-export class ListAgenciesByFilter extends TransactionalUseCase<
-  ListAgenciesRequestDto,
+export class ListAgencyOptionsByFilter extends TransactionalUseCase<
+  ListAgencyOptionsRequestDto,
   AgencyOption[]
 > {
-  protected inputSchema = listAgenciesRequestSchema;
+  protected inputSchema = listAgencyOptionsRequestSchema;
 
   public async _execute(
-    { departmentCode, nameIncludes, kind, siret }: ListAgenciesRequestDto,
+    { departmentCode, nameIncludes, kind, siret }: ListAgencyOptionsRequestDto,
     uow: UnitOfWork,
   ): Promise<AgencyOption[]> {
     const agencies = await uow.agencyRepository.getAgencies({

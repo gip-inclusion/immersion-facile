@@ -82,13 +82,11 @@ describe("Agencies in store", () => {
         },
       ];
 
-      const departementCode = "11";
+      const departmentCode = "11";
 
       // Execute
       store.dispatch(
-        agenciesSlice.actions.fetchAgenciesByDepartmentCodeRequested(
-          departementCode,
-        ),
+        agenciesSlice.actions.fetchAgencyOptionsRequested({ departmentCode }),
       );
       expectIsLoadingToBe(true);
       dependencies.agencyGateway.agencyOptions$.next(agenciesFromApi);

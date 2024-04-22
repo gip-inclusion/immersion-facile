@@ -1,7 +1,10 @@
 import { AddressDto, AgencyDtoBuilder, expectToEqual } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { ListAgenciesByFilter, toAgencyOption } from "./ListAgenciesByFilter";
+import {
+  ListAgencyOptionsByFilter,
+  toAgencyOption,
+} from "./ListAgenciesByFilter";
 
 const parisAddress: AddressDto = {
   city: "Paris",
@@ -69,7 +72,7 @@ const agencyWithSiret = new AgencyDtoBuilder()
 describe("Query: List agencies by filter", () => {
   const uow = createInMemoryUow();
   const agencyRepository = uow.agencyRepository;
-  const useCase = new ListAgenciesByFilter(new InMemoryUowPerformer(uow));
+  const useCase = new ListAgencyOptionsByFilter(new InMemoryUowPerformer(uow));
   const allAgencies = [
     otherAgencyInParis,
     cciAgency1InCergy,

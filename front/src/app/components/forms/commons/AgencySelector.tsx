@@ -1,5 +1,5 @@
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
-import { keys, uniqBy } from "ramda";
+import { keys, uniq } from "ramda";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader } from "react-design-system";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -15,7 +15,6 @@ import {
   allAgencyKindsAllowedToAdd,
   departmentNameToDepartmentCode,
   fitForDelegationAgencyKind,
-  sortByPropertyCaseInsensitive,
 } from "shared";
 import { FormFieldAttributes } from "src/app/contents/forms/types";
 import { AgencyErrorText } from "../convention/sections/agency/AgencyErrorText";
@@ -28,10 +27,11 @@ type AgencySelectorProps = {
     agencyIdField: FormFieldAttributes;
   };
   agencyDepartmentOptions: SelectProps.Option<string>[];
-  agenciesRetriever: (
-    departmentCode: DepartmentCode,
-  ) => Promise<AgencyOption[]>;
+  onDepartmentCodeChangedMemoized: (departmentCode: DepartmentCode) => void;
+  agencyOptions: AgencyOption[];
   disabled?: boolean;
+  isLoading: boolean;
+  isFetchAgencyOptionsError: boolean;
 } & (
   | {
       shouldLockToPeAgencies: true;
@@ -70,7 +70,10 @@ export const AgencySelector = ({
   disabled,
   fields: { agencyDepartmentField, agencyKindField, agencyIdField },
   agencyDepartmentOptions,
-  agenciesRetriever,
+  onDepartmentCodeChangedMemoized,
+  agencyOptions,
+  isLoading,
+  isFetchAgencyOptionsError,
 }: AgencySelectorProps) => {
   const {
     register,
@@ -83,11 +86,8 @@ export const AgencySelector = ({
     shouldFilterDelegationPrescriptionAgencyKind,
     shouldLockToPeAgencies,
   });
-  const [agencyKinds, setAgencyKinds] =
+  const [allowedAgencyKinds, setAllowedAgencyKinds] =
     useState<AllowedAgencyKindToAdd[]>(initialAgencyKinds);
-
-  const [agencies, setAgencies] = useState<AgencyOption[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const agencyIdFieldName = useMemo(
     () => agencyIdField.name as keyof SupportedFormsDto,
@@ -105,12 +105,12 @@ export const AgencySelector = ({
 
   const agencyPlaceholder = getAgencyPlaceholder(
     agencyDepartment,
-    agencies.length,
+    agencyOptions.length,
   );
 
-  const agencyOptionsInSelector = agencyOptionsInSelectorFromAgencies(
-    agencies,
-    agencyKinds,
+  const agencyOptionsInSelector = agencyOptionsInSelectorFromAgencyOptions(
+    agencyOptions,
+    allowedAgencyKinds,
   );
   const isAgencySelectionDisabled =
     disabled ||
@@ -118,68 +118,21 @@ export const AgencySelector = ({
     !agencyDepartment ||
     agencyOptionsInSelector.length === 0;
 
-  type AgencyKindOptions = {
-    label: string;
-    value: AgencyKindForSelector;
-  }[];
-
-  const [loadingError, setLoadingError] = useState(false);
-
   const error = errors[agencyIdFieldName];
   const touched = touchedFields[agencyIdFieldName];
   const userError = !!(touched && error);
-  const showError: boolean = userError || loadingError;
+  const showError: boolean = userError || isFetchAgencyOptionsError;
 
-  const agencyKindFilter = (
-    kind: AgencyKind,
-  ): kind is AllowedAgencyKindToAdd => {
-    if (shouldLockToPeAgencies) return kind === "pole-emploi";
-    if (
-      kind !== "immersion-facile" &&
-      shouldFilterDelegationPrescriptionAgencyKind
-    )
-      return fitForDelegationAgencyKind.includes(kind);
-    return kind !== "immersion-facile";
-  };
+  const agencyKindOptions = makeAgencyKindOptions(
+    agencyOptions,
+    shouldLockToPeAgencies,
+    shouldFilterDelegationPrescriptionAgencyKind,
+  );
 
-  const agencyKindOptions: AgencyKindOptions = [
-    ...((shouldLockToPeAgencies || shouldFilterDelegationPrescriptionAgencyKind
-      ? []
-      : [{ label: "Toutes", value: "all" }]) satisfies AgencyKindOptions),
-    ...uniqBy((agencyOption) => agencyOption.kind, agencies)
-      .map((agencyOption) => agencyOption.kind)
-      .filter(agencyKindFilter)
-      .map((agencyKind) => ({
-        label: agencyKindToLabel[agencyKind],
-        value: agencyKind,
-      })),
-  ];
   const agencyIdValue = useWatch({
     name: agencyIdFieldName,
     control,
   }) as AgencyId;
-
-  const onAgencyDepartmentChange = useCallback(
-    (department: string) => {
-      setIsLoading(true);
-      agenciesRetriever(department)
-        .then((retrievedAgencies) => {
-          setAgencies(sortByPropertyCaseInsensitive("name")(retrievedAgencies));
-          setLoadingError(false);
-        })
-        .catch((e: any) => {
-          // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-          console.log("AgencySelector", e);
-          setAgencies([]);
-          setLoadingError(true);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    },
-    [agenciesRetriever],
-  );
-
   const resetSelector = useCallback(() => {
     setValue(agencyDepartmentFieldName, "");
     setValue(agencyIdFieldName, "");
@@ -187,9 +140,9 @@ export const AgencySelector = ({
 
   useEffect(() => {
     if (agencyDepartment) {
-      onAgencyDepartmentChange(agencyDepartment);
+      onDepartmentCodeChangedMemoized(agencyDepartment);
     }
-  }, [agencyDepartment, onAgencyDepartmentChange]);
+  }, [agencyDepartment, onDepartmentCodeChangedMemoized]);
 
   useEffect(
     () => () => {
@@ -211,9 +164,8 @@ export const AgencySelector = ({
           ...agencyDepartmentField,
           ...register(agencyDepartmentFieldName),
           onChange: (event) => {
-            const department = event.currentTarget.value;
+            setValue(agencyDepartmentFieldName, event.currentTarget.value);
             setValue(agencyIdFieldName, "");
-            setValue(agencyDepartmentFieldName, department);
           },
         }}
       />
@@ -235,11 +187,12 @@ export const AgencySelector = ({
           disabled={agencyKindOptions.length === 0 || shouldLockToPeAgencies}
           nativeSelectProps={{
             ...agencyKindField,
-            onChange: (event) => {
-              if (event.currentTarget.value === "all")
-                return setAgencyKinds(allAgencyKindsAllowedToAdd);
-              return setAgencyKinds([event.currentTarget.value]);
-            },
+            onChange: (event) =>
+              setAllowedAgencyKinds(
+                event.currentTarget.value === "all"
+                  ? allAgencyKindsAllowedToAdd
+                  : [event.currentTarget.value],
+              ),
           }}
         />
       )}
@@ -258,7 +211,7 @@ export const AgencySelector = ({
       />
       {showError && (
         <AgencyErrorText
-          loadingError={loadingError}
+          isFetchAgencyOptionsError={isFetchAgencyOptionsError}
           userError={userError ? "Veuillez sélectionner une structure" : ""} // @TODO userError.message
           error={error?.message}
         />
@@ -284,7 +237,7 @@ const getAgencyPlaceholder = (
   return "Veuillez sélectionner une structure";
 };
 
-const agencyOptionsInSelectorFromAgencies = (
+const agencyOptionsInSelectorFromAgencyOptions = (
   agencies: AgencyOption[],
   agencyKinds: AllowedAgencyKindToAdd[],
 ) =>
@@ -296,3 +249,40 @@ const agencyOptionsInSelectorFromAgencies = (
       label: name,
       value: id,
     }));
+
+type AgencyKindOptions = {
+  label: string;
+  value: AgencyKindForSelector;
+}[];
+
+const makeAgencyKindOptions = (
+  agencyOptions: AgencyOption[],
+  shouldLockToPeAgencies: boolean,
+  shouldFilterDelegationPrescriptionAgencyKind: boolean,
+): AgencyKindOptions => {
+  const isAllowedAgencyKindFilter = (
+    kind: AgencyKind,
+  ): kind is AllowedAgencyKindToAdd => {
+    if (shouldLockToPeAgencies) return kind === "pole-emploi";
+    if (
+      kind !== "immersion-facile" &&
+      shouldFilterDelegationPrescriptionAgencyKind
+    )
+      return fitForDelegationAgencyKind.includes(kind);
+    return kind !== "immersion-facile";
+  };
+
+  const availableKinds = uniq(agencyOptions.map(({ kind }) => kind))
+    .filter(isAllowedAgencyKindFilter)
+    .map((agencyKind) => ({
+      label: agencyKindToLabel[agencyKind],
+      value: agencyKind,
+    }));
+
+  const optionalAllKindOption: AgencyKindOptions =
+    shouldLockToPeAgencies || shouldFilterDelegationPrescriptionAgencyKind
+      ? []
+      : [{ label: "Toutes", value: "all" }];
+
+  return [...optionalAllKindOption, ...availableKinds];
+};

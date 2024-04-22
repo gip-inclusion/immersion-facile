@@ -126,7 +126,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     ),
   );
 
-  sharedAgencyRouter.listAgenciesWithStatus(
+  sharedAgencyRouter.listAgenciesOptionsWithStatus(
     deps.adminAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>

@@ -3,8 +3,11 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Autocomplete } from "@mui/material";
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { AgencyOption } from "shared";
-import { outOfReduxDependencies } from "src/config/dependencies";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
+import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { useStyles } from "tss-react/dsfr";
 
 type MultipleAgencyInputProps = {
@@ -125,34 +128,27 @@ const AgencyAutocomplete = ({
   id = "agency-autocomplete",
 }: AgencyAutocompleteProps) => {
   const { cx } = useStyles();
-  const [agencyOptions, setAgencyOptions] = useState<AgencyOption[]>([]);
   const [inputQuery, setInputQuery] = useState<string>("");
+  const dispatch = useDispatch();
+  const agencyOptions = useAppSelector(agenciesSelectors.options);
 
   useEffect(() => {
-    if (inputQuery === "") return;
-    if (inputQuery.length < 3) return;
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    outOfReduxDependencies.agencyGateway
-      .getFilteredAgencies({
-        nameIncludes: inputQuery,
-        status: ["active", "from-api-PE"],
-      })
-      .then((agencies) => {
-        setAgencyOptions(
-          agencies.filter(
-            (agency) =>
-              !excludeAgencies?.find(
-                (excludedAgency) => excludedAgency.id === agency.id,
-              ),
-          ),
-        );
-      });
-  }, [excludeAgencies, inputQuery]);
+    if (inputQuery.length >= 3)
+      dispatch(
+        agenciesSlice.actions.fetchAgencyOptionsRequested({
+          nameIncludes: inputQuery,
+          status: ["active", "from-api-PE"],
+        }),
+      );
+  }, [inputQuery, dispatch]);
   return (
     <Autocomplete
       disablePortal
       filterOptions={(x) => x}
-      options={agencyOptions}
+      options={agencyOptions.filter(
+        ({ id }) =>
+          !excludeAgencies?.find((excludedAgency) => excludedAgency.id === id),
+      )}
       value={seletedAgency ?? ""}
       id={id}
       getOptionLabel={(option: AgencyOption) => option.name}

@@ -9,12 +9,9 @@ import {
   AgencyPublicDisplayDto,
   BackOfficeJwt,
   CreateAgencyDto,
-  DepartmentCode,
-  ListAgenciesRequestDto,
+  ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   WithAgencyId,
-  propEq,
-  propNotEq,
   toAgencyPublicDisplayDto,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
@@ -107,48 +104,33 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     return of(this.#agencies[agencyId]);
   }
 
-  public async getAgencyPublicInfoById(
-    withAgencyId: WithAgencyId,
-  ): Promise<AgencyPublicDisplayDto> {
-    const agency = this.#agencies[withAgencyId.agencyId];
+  public getAgencyPublicInfoById$({
+    agencyId,
+  }: WithAgencyId): Observable<AgencyPublicDisplayDto> {
+    const agency = this.#agencies[agencyId];
 
-    if (agency)
-      return toAgencyPublicDisplayDto(
-        agency,
-        this.#agencies[MISSION_LOCAL_AGENCY_ACTIVE.id],
+    if (agency) {
+      return of(
+        toAgencyPublicDisplayDto(
+          agency,
+          this.#agencies[MISSION_LOCAL_AGENCY_ACTIVE.id],
+        ),
       );
-    throw new Error(`Missing agency with id ${withAgencyId.agencyId}.`);
-  }
-
-  public getAgencyPublicInfoById$(
-    agencyId: WithAgencyId,
-  ): Observable<AgencyPublicDisplayDto> {
-    return from(this.getAgencyPublicInfoById(agencyId));
-  }
-
-  public async getFilteredAgencies(
-    filter: ListAgenciesRequestDto,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies)
-      .filter((agency) => filter.status?.includes(agency.status) ?? true)
-      .map((agency) => ({
-        id: agency.id,
-        name: agency.name,
-        kind: agency.kind,
-      }));
+    }
+    throw new Error(`Missing agency with id ${agencyId}.`);
   }
 
   public getImmersionFacileAgencyId$(): Observable<AgencyId> {
     return of("agency-id-with-immersion-facile-kind");
   }
 
-  public listAgenciesByFilter$(
-    _filter: ListAgenciesRequestDto,
+  public listAgencyOptionsByFilter$(
+    _filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]> {
     return of(values(this.#agencies));
   }
 
-  public listAgenciesNeedingReview$(
+  public listAgencyOptionsNeedingReview$(
     _adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]> {
     return of(
@@ -160,32 +142,6 @@ export class SimulatedAgencyGateway implements AgencyGateway {
           kind: agency.kind,
         })),
     );
-  }
-
-  public async listImmersionAgencies(
-    _departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies).filter(propNotEq("kind", "cci"));
-  }
-
-  public async listImmersionOnlyPeAgencies(
-    _departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies).filter(propEq("kind", "pole-emploi"));
-  }
-
-  public async listImmersionWithoutPeAgencies(
-    _departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies)
-      .filter(propNotEq("kind", "cci"))
-      .filter(propNotEq("kind", "pole-emploi"));
-  }
-
-  public async listMiniStageAgencies(
-    _departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies).filter(propEq("kind", "cci"));
   }
 
   public updateAgency$(): Observable<void> {
