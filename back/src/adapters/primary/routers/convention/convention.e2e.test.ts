@@ -488,6 +488,7 @@ describe("convention e2e", () => {
     conventionMagicLinkRoutes.updateConventionStatus,
   )} updates the status of a convention`, () => {
     const externalId = "00000000001";
+
     beforeEach(() => {
       inMemoryUow.agencyRepository.setAgencies([peAgency]);
       const inReviewConvention = new ConventionDtoBuilder(convention)
@@ -518,7 +519,13 @@ describe("convention e2e", () => {
             ),
           )
           .with("BackOfficeJwt", () =>
-            generateInclusionConnectJwt(backofficeAdminJwtPayload),
+            generateInclusionConnectJwt({
+              userId: inclusionConnectedUser.id,
+              version: currentJwtVersions.inclusion,
+              iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
+              exp:
+                Math.round(gateways.timeGateway.now().getTime() / 1000) + 3600,
+            }),
           )
           .with("InclusionConnectJwt", () =>
             generateInclusionConnectJwt({

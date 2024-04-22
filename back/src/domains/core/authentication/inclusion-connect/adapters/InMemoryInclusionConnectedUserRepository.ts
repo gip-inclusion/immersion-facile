@@ -17,12 +17,12 @@ export class InMemoryInclusionConnectedUserRepository
   public async getById(
     userId: string,
   ): Promise<InclusionConnectedUser | undefined> {
-    const user = await this.userRepository.users.find(
+    const foundUser = await this.userRepository.users.find(
       (user) => user.id === userId,
     );
-    if (!user) return;
+    if (!foundUser) return;
     return {
-      ...user,
+      ...foundUser,
       agencyRights: this.agencyRightsByUserId[userId] ?? [],
       dashboards: {
         agencies: {},

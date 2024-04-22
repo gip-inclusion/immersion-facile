@@ -79,6 +79,9 @@ describe("Delete Establishment", () => {
       timeGateway,
       makeSaveNotificationAndRelatedEvent(new TestUuidGenerator(), timeGateway),
     );
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -91,7 +94,7 @@ describe("Delete Establishment", () => {
         deleteEstablishment.execute({
           siret: establishmentAggregate.establishment.siret,
         }),
-        new ForbiddenError("Accès refusé"),
+        new ForbiddenError("Jwt payload not provided"),
       );
     });
 

@@ -123,6 +123,21 @@ describe("Update agency status", () => {
     });
 
     it("returns HTTP 409 if attempt to update to another existing agency (with same address and kind, and a status 'active' or 'from-api-PE', (except if user is admin))", async () => {
+      const user = new InclusionConnectedUserBuilder()
+        .withId("not-admin-id")
+        .withIsAdmin(false)
+        .build();
+
+      const backofficeAdmin = new InclusionConnectedUserBuilder()
+        .withId("admin-id")
+        .withIsAdmin(true)
+        .build();
+
+      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        user,
+        backofficeAdmin,
+      ]);
+
       const agencyToUpdate = new AgencyDtoBuilder()
         .withId("agency-to-update-id")
         .withStatus("needsReview")
@@ -132,11 +147,10 @@ describe("Update agency status", () => {
 
       uow.agencyRepository.setAgencies([agencyToUpdate, existingAgency]);
 
-      // if user is not admin, conflict error
       await expectPromiseToFailWithError(
         updateAgencyStatus.execute(
           { id: agencyToUpdate.id, status: "active" },
-          { role: "another-role" } as any,
+          { userId: user.id },
         ),
         new ConflictError(
           "Une autre agence du même type existe avec la même adresse",
@@ -146,7 +160,7 @@ describe("Update agency status", () => {
       // if user is admin, no conflict error
       const resultWithoutError = await updateAgencyStatus.execute(
         { id: agencyToUpdate.id, status: "active" },
-        backofficeJwtPayload,
+        { userId: backofficeAdmin.id },
       );
       expect(resultWithoutError).toBeUndefined();
     });

@@ -46,7 +46,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload?: InclusionConnectDomainJwtPayload,
   ): Promise<void> {
-    if (!jwtPayload) throw new ForbiddenError();
+    if (!jwtPayload) throw new ForbiddenError("Jwt payload not provided");
     await throwIfIcUserNotBackofficeAdmin(uow, jwtPayload);
 
     const groupsWithSiret = await uow.groupRepository.groupsWithSiret(siret);

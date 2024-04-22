@@ -36,10 +36,10 @@ export class EditFormEstablishment extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload?: EstablishmentDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<void> {
-    if (!jwtPayload) throw new ForbiddenError();
+    if (!jwtPayload) throw new ForbiddenError("No JWT payload provided");
 
     if ("siret" in jwtPayload && jwtPayload.siret !== formEstablishment.siret)
-      throw new ForbiddenError();
+      throw new ForbiddenError("Siret mismatch in JWT payload and form");
     if ("userId" in jwtPayload) {
       const user = await uow.inclusionConnectedUserRepository.getById(
         jwtPayload.userId,

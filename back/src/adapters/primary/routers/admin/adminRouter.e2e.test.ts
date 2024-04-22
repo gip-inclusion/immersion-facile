@@ -16,6 +16,7 @@ import {
   currentJwtVersions,
   displayRouteName,
   expectHttpResponseToEqual,
+  expectObjectsToMatch,
   expectToEqual,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
@@ -418,6 +419,7 @@ describe("Admin router", () => {
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
+        backofficeAdminUser,
       ]);
 
       const updatedRole: AgencyRole = "counsellor";
@@ -436,7 +438,7 @@ describe("Admin router", () => {
         body: "",
       });
 
-      expectToEqual(
+      expectObjectsToMatch(
         inMemoryUow.inclusionConnectedUserRepository.agencyRightsByUserId,
         {
           [inclusionConnectedUser.id]: [{ agency, role: updatedRole }],
@@ -510,6 +512,7 @@ describe("Admin router", () => {
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
+        backofficeAdminUser,
       ]);
 
       const response = await sharedRequest.rejectIcUserForAgency({
@@ -526,7 +529,7 @@ describe("Admin router", () => {
         body: "",
       });
 
-      expectToEqual(
+      expectObjectsToMatch(
         inMemoryUow.inclusionConnectedUserRepository.agencyRightsByUserId,
         {
           [inclusionConnectedUser.id]: [],

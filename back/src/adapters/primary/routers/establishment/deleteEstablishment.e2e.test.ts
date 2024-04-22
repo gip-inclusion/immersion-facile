@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { addDays, subDays } from "date-fns";
 import {
   EstablishmentRoutes,
   FormEstablishmentDtoBuilder,
@@ -9,15 +9,14 @@ import {
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
-  expiredMagicLinkErrorMessage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
 import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
+import { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { establishmentNotFoundErrorMessage } from "../../../../domains/establishment/ports/EstablishmentAggregateRepository";
@@ -46,15 +45,17 @@ describe("Delete form establishment", () => {
   let uow: InMemoryUnitOfWork;
   let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(async () => {
-    let request: SuperTest<Test>;
+    const testAppAndDeps = await buildTestApp();
     ({
-      request,
       inMemoryUow: uow,
       generateEditEstablishmentJwt,
       generateInclusionConnectJwt,
-    } = await buildTestApp());
+    } = testAppAndDeps);
+    const request = testAppAndDeps.request;
+    timeGateway = testAppAndDeps.gateways.timeGateway;
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
@@ -112,28 +113,31 @@ describe("Delete form establishment", () => {
 
   it(`${displayRouteName(
     establishmentRoutes.deleteEstablishment,
-  )} 403 - Jwt expired`, async () => {
+  )} 401 - Jwt expired`, async () => {
+    const now = new Date("2024-01-30T00:00:00Z");
+    timeGateway.setNextDate(now);
     const response = await httpClient.deleteEstablishment({
       urlParams: {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+        authorization: generateInclusionConnectJwt({
+          ...backofficeAdminJwtPayload,
+          iat: Math.round(now.getTime() / 1000),
+          exp: Math.round(subDays(now, 10).getTime() / 1000),
+        }),
       },
     });
 
     expectHttpResponseToEqual(response, {
-      body: {
-        message: expiredMagicLinkErrorMessage,
-        needsNewMagicLink: true,
-      },
-      status: 403,
+      body: { error: "Token is expired" },
+      status: 401,
     });
   });
 
   it(`${displayRouteName(
     establishmentRoutes.deleteEstablishment,
-  )} 403 - Access refused with edit establishment JWT`, async () => {
+  )} 401 - Access refused with edit establishment JWT`, async () => {
     const response = await httpClient.deleteEstablishment({
       urlParams: {
         siret: establishmentAggregate.establishment.siret,
@@ -150,7 +154,7 @@ describe("Delete form establishment", () => {
       body: {
         errors: "Accès refusé",
       },
-      status: 403,
+      status: 401,
     });
   });
 

@@ -58,6 +58,7 @@ export const establishmentRoutes = defineRoutes({
     responses: {
       204: emptyObjectSchema,
       400: httpErrorSchema,
+      401: legacyUnauthenticatedErrorSchema,
       403: renewMagicLinkResponseSchema,
       404: legacyHttpErrorSchema,
     },

@@ -1,14 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { makeVerifyJwtES256 } from "../../domains/core/jwt";
-import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
-export const makeAdminAuthMiddleware = (
-  jwtPublicKey: string,
-  timeGateway: TimeGateway,
-) => {
+export const makeAdminAuthMiddleware = (jwtPublicKey: string) => {
   const verifyJwt = makeVerifyJwtES256<"inclusionConnect">(jwtPublicKey);
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
@@ -16,18 +12,15 @@ export const makeAdminAuthMiddleware = (
     }
     try {
       const payload = verifyJwt(req.headers.authorization);
-      if (!payload.exp) {
-        return res.status(401).json({ error: "Token is expired" });
-      }
-      const expirationDate = new Date(payload.exp * 1000);
-
-      if (timeGateway.now() > expirationDate) {
-        return res.status(401).json({ error: "Token is expired" });
-      }
+      if (!payload.userId)
+        return res.status(401).json({ errors: "Accès refusé" });
 
       req.payloads = { inclusion: payload };
       return next();
-    } catch (error) {
+    } catch (error: any) {
+      if ("name" in error && error.name === "TokenExpiredError") {
+        return res.status(401).json({ error: "Token is expired" });
+      }
       logger.error(
         { error, jwt: req.headers.authorization },
         "Provided token is invalid",

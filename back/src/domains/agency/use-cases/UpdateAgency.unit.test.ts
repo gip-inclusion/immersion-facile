@@ -21,13 +21,18 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
 import { UpdateAgency } from "./UpdateAgency";
 
-//TODO : gérer sans le backoffice JWT
+const backofficeAdmin = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-id")
+  .withIsAdmin(true)
+  .build();
+
+const icUser = new InclusionConnectedUserBuilder()
+  .withId("not-admin-id")
+  .withIsAdmin(false)
+  .build();
+
 describe("Update agency", () => {
   const initialAgencyInRepo = new AgencyDtoBuilder().build();
-  const backofficeAdmin = new InclusionConnectedUserBuilder()
-    .withIsAdmin(true)
-    .build();
-
   let agencyRepository: InMemoryAgencyRepository;
   let outboxRepository: InMemoryOutboxRepository;
   let updateAgency: UpdateAgency;
@@ -42,6 +47,11 @@ describe("Update agency", () => {
     const uow = createInMemoryUow();
     agencyRepository = uow.agencyRepository;
     outboxRepository = uow.outboxRepository;
+
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdmin,
+      icUser,
+    ]);
 
     updateAgency = new UpdateAgency(
       new InMemoryUowPerformer(uow),
@@ -129,7 +139,7 @@ describe("Update agency", () => {
 
     // conflict error when user is not admin
     await expectPromiseToFailWithError(
-      updateAgency.execute(updatedAgency, { role: "another-role" } as any),
+      updateAgency.execute(updatedAgency, { userId: icUser.id }),
       new ConflictError(
         "Une autre agence du même type existe avec la même adresse",
       ),

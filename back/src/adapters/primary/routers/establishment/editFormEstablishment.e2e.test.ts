@@ -1,4 +1,4 @@
-import { addDays, subYears } from "date-fns";
+import { addDays, millisecondsToSeconds, subYears } from "date-fns";
 import {
   EstablishmentRoutes,
   FormEstablishmentDtoBuilder,
@@ -85,14 +85,14 @@ describe("Edit form establishments", () => {
 
   it("200 - Supports posting already existing form establisment when authenticated with backoffice JWT", async () => {
     const backofficeAdminUser = new InclusionConnectedUserBuilder()
-      .withId("inclusion-connected-user")
-      .withIsAdmin(false)
+      .withId("backoffice-admin-user")
+      .withIsAdmin(true)
       .build();
 
-    const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+    const backofficeAdminICJwtPayload: InclusionConnectJwtPayload = {
       version: currentJwtVersions.inclusion,
-      iat: new Date().getTime(),
-      exp: addDays(new Date(), 30).getTime(),
+      iat: millisecondsToSeconds(new Date().getTime()),
+      exp: millisecondsToSeconds(addDays(new Date(), 30).getTime()),
       userId: backofficeAdminUser.id,
     };
 
@@ -103,7 +103,7 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+        authorization: generateInclusionConnectJwt(backofficeAdminICJwtPayload),
       },
     });
 

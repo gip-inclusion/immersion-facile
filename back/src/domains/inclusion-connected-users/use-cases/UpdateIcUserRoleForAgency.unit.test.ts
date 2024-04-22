@@ -3,7 +3,7 @@ import {
   AgencyRole,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
-  User,
+  InclusionConnectedUserBuilder,
   expectPromiseToFailWith,
   expectToEqual,
 } from "shared";
@@ -19,27 +19,15 @@ import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemo
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateIcUserRoleForAgency } from "./UpdateIcUserRoleForAgency";
 
-const user: User = {
-  id: "john-123",
-  email: "john@mail.com",
-  firstName: "John",
-  lastName: "Lennon",
-  externalId: "john-external-id",
-  createdAt: new Date().toISOString(),
-};
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-id")
+  .withIsAdmin(true)
+  .build();
 
-const backofficeAdminUser: InclusionConnectedUser = {
-  id: "backoffice-admin",
-  email: "jack.admin@mail.com",
-  firstName: "Jack",
-  lastName: "The Admin",
-  externalId: "jack-admin-external-id",
-  createdAt: new Date().toISOString(),
-  isBackofficeAdmin: true,
-  agencyRights: [],
-  dashboards: { agencies: {}, establishments: {} },
-  establishments: [],
-};
+const user = new InclusionConnectedUserBuilder()
+  .withId("not-admin-id")
+  .withIsAdmin(false)
+  .build();
 
 describe("GetInclusionConnectedUsers", () => {
   let updateIcUserRoleForAgency: UpdateIcUserRoleForAgency;
@@ -66,6 +54,7 @@ describe("GetInclusionConnectedUsers", () => {
 
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
+      user,
     ]);
     updateIcUserRoleForAgency = new UpdateIcUserRoleForAgency(
       uowPerformer,
@@ -78,23 +67,19 @@ describe("GetInclusionConnectedUsers", () => {
       updateIcUserRoleForAgency.execute({
         role: "counsellor",
         agencyId: "agency-1",
-        userId: "john-123",
+        userId: user.id,
       }),
       "No JWT token provided",
     );
   });
 
   it("throws Forbidden if token payload is not backoffice token", async () => {
-    const badBackOfficeJwtPayload = {
-      role: "validator",
-    } as unknown as InclusionConnectJwtPayload;
-
     await expectPromiseToFailWith(
       updateIcUserRoleForAgency.execute(
         { role: "counsellor", agencyId: "agency-1", userId: "john-123" },
-        badBackOfficeJwtPayload,
+        { userId: user.id },
       ),
-      "This user is not a backOffice admin",
+      `User '${user.id}' is not a backOffice user`,
     );
   });
 
@@ -130,11 +115,11 @@ describe("GetInclusionConnectedUsers", () => {
         {
           role: "counsellor",
           agencyId: "agency-1",
-          userId: "john-123",
+          userId: user.id,
         },
         { userId: backofficeAdminUser.id } as InclusionConnectJwtPayload,
       ),
-      "Agency with id agency-1 is not registered for user with id john-123",
+      `Agency with id agency-1 is not registered for user with id ${user.id}`,
     );
   });
 

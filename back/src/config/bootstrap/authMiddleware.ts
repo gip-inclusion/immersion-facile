@@ -88,6 +88,7 @@ export const makeMagicLinkAuthMiddleware = (
           ),
         );
       }
+
       req.payloads = { [payloadKey]: payload };
 
       next();
