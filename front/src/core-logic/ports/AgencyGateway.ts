@@ -13,7 +13,8 @@ import {
 } from "shared";
 
 export interface AgencyGateway {
-  addAgency(agency: CreateAgencyDto): Promise<void>;
+  addAgency$(agency: CreateAgencyDto): Observable<void>;
+
   listImmersionAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]>;

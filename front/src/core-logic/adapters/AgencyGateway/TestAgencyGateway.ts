@@ -18,7 +18,11 @@ import {
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
-  public agencies$ = new Subject<AgencyOption[]>();
+  addAgency$(_agency: CreateAgencyDto): Observable<void> {
+    return this.addAgencyResponse$;
+  }
+
+  public agencyOptions$ = new Subject<AgencyOption[]>();
 
   public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
 
@@ -28,18 +32,9 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
-  #agencies: Record<string, AgencyDto> = {};
+  public addAgencyResponse$ = new Subject<undefined>();
 
-  public async addAgency(createAgencyDto: CreateAgencyDto) {
-    this.#agencies[createAgencyDto.id] = {
-      ...createAgencyDto,
-      status: "needsReview",
-      adminEmails: [],
-      questionnaireUrl: createAgencyDto.questionnaireUrl,
-      codeSafir: null,
-      rejectionJustification: null,
-    };
-  }
+  #agencies: Record<string, AgencyDto> = {};
 
   public getAgencyAdminById$(
     _agencyId: AgencyId,
@@ -73,13 +68,13 @@ export class TestAgencyGateway implements AgencyGateway {
   public listAgenciesByFilter$(
     _filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]> {
-    return this.agencies$;
+    return this.agencyOptions$;
   }
 
   public listAgenciesNeedingReview$(
     _adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]> {
-    return this.agencies$;
+    return this.agencyOptions$;
   }
 
   public async listImmersionAgencies(

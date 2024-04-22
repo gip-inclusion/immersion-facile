@@ -1,14 +1,24 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { AgencyId, AgencyOption, AgencyPublicDisplayDto } from "shared";
+import {
+  AgencyId,
+  AgencyOption,
+  AgencyPublicDisplayDto,
+  CreateAgencyDto,
+} from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
-export type AgencySuccessFeedbackKind = "agencyAdded" | "success";
+export type AgenciesFeedbackKind =
+  | "agencyAdded"
+  | "agencyOfTypeOtherAdded"
+  | "success";
+
+export type AgenciesSubmitFeedback = SubmitFeedBack<AgenciesFeedbackKind>;
 
 export type AgenciesState = {
   details: AgencyPublicDisplayDto | null;
   options: AgencyOption[];
   isLoading: boolean;
-  feedback: SubmitFeedBack<AgencySuccessFeedbackKind>;
+  feedback: AgenciesSubmitFeedback;
 };
 
 const initialState: AgenciesState = {
@@ -57,6 +67,21 @@ export const agenciesSlice = createSlice({
       action: PayloadAction<string>,
     ) => {
       state.feedback = { kind: "errored", errorMessage: action.payload };
+      state.isLoading = false;
+    },
+    addAgencyRequested: (state, _action: PayloadAction<CreateAgencyDto>) => {
+      state.isLoading = true;
+    },
+    addAgencySucceeded: (state, _action: PayloadAction<void>) => {
+      state.feedback = { kind: "agencyAdded" };
+      state.isLoading = false;
+    },
+    addAgencyFailed: (state, action: PayloadAction<string>) => {
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+      state.isLoading = false;
+    },
+    addAgencyCleared: (state, _action: PayloadAction<void>) => {
+      state.feedback = { kind: "idle" };
       state.isLoading = false;
     },
   },

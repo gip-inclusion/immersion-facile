@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ErrorNotifications, LinkHome } from "react-design-system";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   AgencyDto,
   AgencyKind,
@@ -19,7 +20,7 @@ import {
   toDotNotation,
 } from "shared";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
-import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
+import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
@@ -35,12 +36,17 @@ import {
   formErrorsToFlatErrors,
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { AgencyAdminSubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
+import {
+  AgenciesSubmitFeedback,
+  agenciesSlice,
+} from "src/core-logic/domain/agencies/agencies.slice";
 import { P, match } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 
@@ -52,36 +58,32 @@ export const AddAgencyForm = () => {
   const [refersToOtherAgency, setRefersToOtherAgency] = useState<
     boolean | undefined
   >(undefined);
-  const [submitFeedback, setSubmitFeedback] =
-    useState<AgencyAdminSubmitFeedback>({
-      kind: "idle",
-    });
 
-  useScrollToTop(submitFeedback.kind === "agencyAdded");
-  useScrollToTop(submitFeedback.kind === "agencyOfTypeOtherAdded");
+  const dispatch = useDispatch();
+  const feedback = useAppSelector(agenciesSelectors.feedback);
+
+  useEffect(() => {
+    dispatch(agenciesSlice.actions.addAgencyCleared);
+  }, [dispatch]);
+
+  useScrollToTop(feedback.kind === "agencyAdded");
+  useScrollToTop(feedback.kind === "agencyOfTypeOtherAdded");
+
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
     if (values.kind === "") throw new Error("Agency kind is empty");
-    return outOfReduxDependencies.agencyGateway
-      .addAgency({
+    dispatch(
+      agenciesSlice.actions.addAgencyRequested({
         ...values,
         kind: values.kind,
         questionnaireUrl:
           values.kind === "pole-emploi" ? null : values.questionnaireUrl,
-      })
-      .then(() => {
-        setSubmitFeedback({
-          kind:
-            values.kind !== "autre" || values.refersToAgencyId
-              ? "agencyAdded"
-              : "agencyOfTypeOtherAdded",
-        });
-      })
-      .catch((e) => {
-        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-        console.log("AddAgencyPage", e);
-        setSubmitFeedback({ kind: "errored", errorMessage: e.message });
-      });
+      }),
+    );
   };
+
+  // values.kind !== "autre" || values.refersToAgencyId
+  // ? "agencyAdded"
+  // : "agencyOfTypeOtherAdded",
 
   const refersToOtherAgencyOptions: RadioButtonsProps["options"] = [
     {
@@ -100,13 +102,13 @@ export const AddAgencyForm = () => {
     },
   ];
   if (
-    submitFeedback.kind === "agencyAdded" ||
-    submitFeedback.kind === "agencyOfTypeOtherAdded"
+    feedback.kind === "agencyAdded" ||
+    feedback.kind === "agencyOfTypeOtherAdded"
   ) {
     return (
       <SubmitFeedbackNotification
-        submitFeedback={submitFeedback}
-        messageByKind={agencySubmitMessageByKind}
+        submitFeedback={feedback}
+        messageByKind={agenciesSubmitMessageByKind}
       />
     );
   }
@@ -122,7 +124,7 @@ export const AddAgencyForm = () => {
           <AgencyForm
             refersToOtherAgency={refersToOtherAgency}
             key={`add-agency-form-${refersToOtherAgency}`}
-            submitFeedback={submitFeedback}
+            submitFeedback={feedback}
             onFormValid={onFormValid}
           />
         ))
@@ -134,7 +136,7 @@ export const AddAgencyForm = () => {
 
 type AgencyFormProps = {
   refersToOtherAgency: boolean;
-  submitFeedback: AgencyAdminSubmitFeedback;
+  submitFeedback: AgenciesSubmitFeedback;
   onFormValid: SubmitHandler<CreateAgencyInitialValues>;
 };
 
@@ -298,7 +300,7 @@ const AgencyForm = ({
                 />
                 <SubmitFeedbackNotification
                   submitFeedback={submitFeedback}
-                  messageByKind={agencySubmitMessageByKind}
+                  messageByKind={agenciesSubmitMessageByKind}
                 />
                 <div className={fr.cx("fr-mt-4w")}>
                   <Button

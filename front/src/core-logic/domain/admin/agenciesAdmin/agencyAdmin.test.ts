@@ -21,7 +21,7 @@ import {
   AGENCY_NEEDING_REVIEW_1,
   AGENCY_NEEDING_REVIEW_2,
   PE_AGENCY_ACTIVE,
-} from "../../../adapters/AgencyGateway/InMemoryAgencyGateway";
+} from "../../../adapters/AgencyGateway/SimulatedAgencyGateway";
 
 describe("agencyAdmin", () => {
   let store: ReduxStore;
@@ -324,11 +324,11 @@ describe("agencyAdmin", () => {
   const fastForwardObservables = () => dependencies.scheduler.flush();
 
   const feedWithAgencyOptions = (agencyOptions: AgencyOption[]) => {
-    dependencies.agencyGateway.agencies$.next(agencyOptions);
+    dependencies.agencyGateway.agencyOptions$.next(agencyOptions);
   };
 
   const feedAgencyOptionsWithError = (error: Error) => {
-    dependencies.agencyGateway.agencies$.error(error);
+    dependencies.agencyGateway.agencyOptions$.error(error);
   };
 
   const feedWithFetchedAgency = (agencyDto: AgencyDto) => {

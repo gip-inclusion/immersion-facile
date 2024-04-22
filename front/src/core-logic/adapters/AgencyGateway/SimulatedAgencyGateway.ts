@@ -74,7 +74,11 @@ export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .withStatus("needsReview")
   .build();
 
-export class InMemoryAgencyGateway implements AgencyGateway {
+export class SimulatedAgencyGateway implements AgencyGateway {
+  addAgency$(_agency: CreateAgencyDto): Observable<void> {
+    return of(undefined);
+  }
+
   public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
 
   #agencies: Record<string, AgencyDto> = {
