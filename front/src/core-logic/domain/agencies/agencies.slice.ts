@@ -4,6 +4,7 @@ import {
   AgencyOption,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
+  ListAgencyOptionsRequestDto,
 } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
@@ -48,13 +49,13 @@ export const agenciesSlice = createSlice({
       state.feedback = { kind: "errored", errorMessage: action.payload };
       state.isLoading = false;
     },
-    fetchAgenciesByDepartmentCodeRequested: (
+    fetchAgencyOptionsRequested: (
       state,
-      _action: PayloadAction<string>,
+      _action: PayloadAction<ListAgencyOptionsRequestDto>,
     ) => {
       state.isLoading = true;
     },
-    fetchAgenciesByDepartmentCodeSucceeded: (
+    fetchAgencyOptionsSucceeded: (
       state,
       action: PayloadAction<AgencyOption[]>,
     ) => {
@@ -62,10 +63,7 @@ export const agenciesSlice = createSlice({
       state.feedback = { kind: "success" };
       state.isLoading = false;
     },
-    fetchAgenciesByDepartmentCodeFailed: (
-      state,
-      action: PayloadAction<string>,
-    ) => {
+    fetchAgencyOptionsFailed: (state, action: PayloadAction<string>) => {
       state.feedback = { kind: "errored", errorMessage: action.payload };
       state.isLoading = false;
     },

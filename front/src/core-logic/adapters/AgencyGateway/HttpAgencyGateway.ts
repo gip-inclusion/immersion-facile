@@ -7,8 +7,7 @@ import {
   AgencyRoutes,
   BackOfficeJwt,
   CreateAgencyDto,
-  DepartmentCode,
-  ListAgenciesRequestDto,
+  ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   WithAgencyId,
 } from "shared";
@@ -22,7 +21,8 @@ import { match } from "ts-pattern";
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyRoutes>) {}
-  addAgency$(agency: CreateAgencyDto): Observable<void> {
+
+  public addAgency$(agency: CreateAgencyDto): Observable<void> {
     return from(
       this.httpClient.addAgency({ body: agency }).then((response) =>
         match(response)
@@ -52,34 +52,18 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
-  public getAgencyPublicInfoById(
-    withAgencyId: WithAgencyId,
-  ): Promise<AgencyPublicDisplayDto> {
-    return this.httpClient
-      .getAgencyPublicInfoById({ queryParams: withAgencyId })
-      .then((response) =>
-        match(response)
-          .with({ status: 200 }, ({ body }) => body)
-          .otherwise(otherwiseThrow),
-      );
-  }
-
-  public getAgencyPublicInfoById$(
-    agencyId: WithAgencyId,
-  ): Observable<AgencyPublicDisplayDto> {
-    return from(this.getAgencyPublicInfoById(agencyId));
-  }
-
-  public getFilteredAgencies(
-    request: ListAgenciesRequestDto,
-  ): Promise<AgencyOption[]> {
-    return this.httpClient
-      .getFilteredAgencies({ queryParams: request })
-      .then((response) =>
-        match(response)
-          .with({ status: 200 }, ({ body }) => body)
-          .otherwise(otherwiseThrow),
-      );
+  public getAgencyPublicInfoById$({
+    agencyId,
+  }: WithAgencyId): Observable<AgencyPublicDisplayDto> {
+    return from(
+      this.httpClient
+        .getAgencyPublicInfoById({ queryParams: { agencyId } })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
+    );
   }
 
   public getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
@@ -92,20 +76,28 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
-  public listAgenciesByFilter$(
-    filter: ListAgenciesRequestDto,
+  public listAgencyOptionsByFilter$(
+    filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]> {
-    return from(this.getFilteredAgencies(filter));
+    return from(
+      this.httpClient
+        .getAgencyOptionsByFilter({ queryParams: filter })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
+    );
   }
 
   // TODO Mieux identifier l'admin
 
-  public listAgenciesNeedingReview$(
+  public listAgencyOptionsNeedingReview$(
     adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]> {
     return from(
       this.httpClient
-        .listAgenciesWithStatus({
+        .listAgenciesOptionsWithStatus({
           queryParams: { status: "needsReview" },
           headers: { authorization: adminToken },
         })
@@ -116,46 +108,6 @@ export class HttpAgencyGateway implements AgencyGateway {
             .otherwise(otherwiseThrow),
         ),
     );
-  }
-
-  public listImmersionAgencies(
-    departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    const request: ListAgenciesRequestDto = {
-      departmentCode,
-      kind: "miniStageExcluded",
-    };
-    return this.getFilteredAgencies(request);
-  }
-
-  public listImmersionOnlyPeAgencies(
-    departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    const request: ListAgenciesRequestDto = {
-      departmentCode,
-      kind: "immersionPeOnly",
-    };
-    return this.getFilteredAgencies(request);
-  }
-
-  public listImmersionWithoutPeAgencies(
-    departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    const request: ListAgenciesRequestDto = {
-      departmentCode,
-      kind: "immersionWithoutPe",
-    };
-    return this.getFilteredAgencies(request);
-  }
-
-  public listMiniStageAgencies(
-    departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    const request: ListAgenciesRequestDto = {
-      departmentCode,
-      kind: "miniStageOnly",
-    };
-    return this.getFilteredAgencies(request);
   }
 
   public updateAgency$(

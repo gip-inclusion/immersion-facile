@@ -121,7 +121,7 @@ export type GetAgenciesFilter = {
   siret?: SiretDto;
 };
 
-export type ListAgenciesRequestDto = Omit<GetAgenciesFilter, "position">;
+export type ListAgencyOptionsRequestDto = Omit<GetAgenciesFilter, "position">;
 
 export type PrivateListAgenciesRequestDto = {
   status?: AgencyStatus;

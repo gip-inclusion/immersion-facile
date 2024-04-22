@@ -12,9 +12,9 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     expressRouter,
   );
 
-  sharedAgencyRouter.getFilteredAgencies((req, res) =>
+  sharedAgencyRouter.getAgencyOptionsByFilter((req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.listAgenciesByFilter.execute(req.query),
+      deps.useCases.listAgencyOptionsByFilter.execute(req.query),
     ),
   );
 

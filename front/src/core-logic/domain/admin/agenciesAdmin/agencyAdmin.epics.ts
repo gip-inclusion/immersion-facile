@@ -23,7 +23,7 @@ const agencyAdminGetByNameEpic: AgencyEpic = (
     debounceTime(400, scheduler),
     distinctUntilChanged(),
     switchMap((action: PayloadAction<string>) =>
-      agencyGateway.listAgenciesByFilter$({
+      agencyGateway.listAgencyOptionsByFilter$({
         [looksLikeSiret(action.payload) ? "siret" : "nameIncludes"]:
           action.payload,
       }),
@@ -39,7 +39,7 @@ const agencyAdminGetNeedingReviewEpic: AgencyEpic = (
   action$.pipe(
     filter(agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested.match),
     switchMap(() =>
-      agencyGateway.listAgenciesNeedingReview$(
+      agencyGateway.listAgencyOptionsNeedingReview$(
         state$.value.admin.adminAuth.adminToken || "",
       ),
     ),

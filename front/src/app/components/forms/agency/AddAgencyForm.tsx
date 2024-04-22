@@ -6,7 +6,7 @@ import RadioButtons, {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ErrorNotifications, LinkHome } from "react-design-system";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -41,7 +41,6 @@ import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";
-import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import {
   AgenciesSubmitFeedback,
@@ -63,7 +62,7 @@ export const AddAgencyForm = () => {
   const feedback = useAppSelector(agenciesSelectors.feedback);
 
   useEffect(() => {
-    dispatch(agenciesSlice.actions.addAgencyCleared);
+    dispatch(agenciesSlice.actions.addAgencyCleared());
   }, [dispatch]);
 
   useScrollToTop(feedback.kind === "agencyAdded");
@@ -167,20 +166,27 @@ const AgencyForm = ({
 
   const { handleSubmit, formState, reset, register, watch } = methods;
 
-  const agenciesRetrieverMemoized = useCallback(
-    (departmentCode: DepartmentCode) =>
-      outOfReduxDependencies.agencyGateway.getFilteredAgencies({
-        departmentCode,
-        kind: "withoutRefersToAgency",
-      }),
-    [],
-  );
+  const dispatch = useDispatch();
+  const agencyOptions = useAppSelector(agenciesSelectors.options);
+  const isLoading = useAppSelector(agenciesSelectors.isLoading);
+  const feedback = useAppSelector(agenciesSelectors.feedback);
 
   useEffect(() => {
     reset(formInitialValues);
   }, [reset, formInitialValues]);
   const [hasDelegation, setHasDelegation] = useState<boolean | null>(null);
   const selectedKind = watch("kind");
+
+  const onDepartmentCodeChangedMemoized = useMemo(
+    () => (departmentCode: DepartmentCode) =>
+      dispatch(
+        agenciesSlice.actions.fetchAgencyOptionsRequested({
+          departmentCode,
+          kind: "withoutRefersToAgency",
+        }),
+      ),
+    [dispatch],
+  );
 
   return (
     <FormProvider {...methods}>
@@ -221,7 +227,10 @@ const AgencyForm = ({
               shouldFilterDelegationPrescriptionAgencyKind={true}
               shouldShowAgencyKindField
               agencyDepartmentOptions={departmentOptions}
-              agenciesRetriever={agenciesRetrieverMemoized}
+              onDepartmentCodeChangedMemoized={onDepartmentCodeChangedMemoized}
+              agencyOptions={agencyOptions}
+              isFetchAgencyOptionsError={feedback.kind === "errored"}
+              isLoading={isLoading}
             />
           </>
         )}

@@ -7,9 +7,9 @@ import { keys } from "ramda";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ErrorNotifications } from "react-design-system";
 import { type SubmitHandler, get, useFormContext } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
-  AgencyOption,
+  AgencyKindFilter,
   ConventionReadDto,
   DepartmentCode,
   FederatedIdentity,
@@ -36,6 +36,8 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
+import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
@@ -226,15 +228,24 @@ export const ConventionFormFields = ({
 
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
-  const agenciesRetrieverMemoized = useMemo(
-    () =>
-      conventionAgenciesRetriever({
-        internshipKind: conventionValues.internshipKind,
-        shouldListAll: false,
-        federatedIdentity,
-      }),
-    [conventionValues.internshipKind, federatedIdentity],
+  const onDepartmentCodeChangedMemoized = useMemo(
+    () => (departmentCode: DepartmentCode) =>
+      dispatch(
+        agenciesSlice.actions.fetchAgencyOptionsRequested({
+          kind: makeListAgencyOptionsKindFilter({
+            internshipKind: conventionValues.internshipKind,
+            shouldListAll: false,
+            federatedIdentity,
+          }),
+          departmentCode,
+        }),
+      ),
+    [dispatch, conventionValues.internshipKind, federatedIdentity],
   );
+
+  const agencyOptions = useSelector(agenciesSelectors.options);
+  const agenciesFeedback = useSelector(agenciesSelectors.feedback);
+  const isAgenciesLoading = useSelector(agenciesSelectors.isLoading);
 
   return (
     <>
@@ -266,7 +277,10 @@ export const ConventionFormFields = ({
                       miniStageRestrictedDepartments.includes(department.value),
                     )
               }
-              agenciesRetriever={agenciesRetrieverMemoized}
+              onDepartmentCodeChangedMemoized={onDepartmentCodeChangedMemoized}
+              agencyOptions={agencyOptions}
+              isLoading={isAgenciesLoading}
+              isFetchAgencyOptionsError={agenciesFeedback.kind === "errored"}
             />
           </Accordion>
         )}
@@ -360,7 +374,7 @@ export const ConventionFormFields = ({
   );
 };
 
-const conventionAgenciesRetriever = ({
+const makeListAgencyOptionsKindFilter = ({
   internshipKind,
   shouldListAll,
   federatedIdentity,
@@ -368,24 +382,10 @@ const conventionAgenciesRetriever = ({
   internshipKind: InternshipKind;
   shouldListAll: boolean;
   federatedIdentity: FederatedIdentity | null;
-}): ((departmentCode: DepartmentCode) => Promise<AgencyOption[]>) => {
-  if (internshipKind === "mini-stage-cci")
-    return (departmentCode) =>
-      outOfReduxDependencies.agencyGateway.listMiniStageAgencies(
-        departmentCode,
-      );
-  if (shouldListAll)
-    return (departmentCode) =>
-      outOfReduxDependencies.agencyGateway.listImmersionAgencies(
-        departmentCode,
-      );
+}): AgencyKindFilter => {
+  if (internshipKind === "mini-stage-cci") return "miniStageOnly";
+  if (shouldListAll) return "miniStageExcluded";
   return federatedIdentity && isPeConnectIdentity(federatedIdentity)
-    ? (departmentCode) =>
-        outOfReduxDependencies.agencyGateway.listImmersionOnlyPeAgencies(
-          departmentCode,
-        )
-    : (departmentCode) =>
-        outOfReduxDependencies.agencyGateway.listImmersionAgencies(
-          departmentCode,
-        );
+    ? "immersionPeOnly"
+    : "miniStageExcluded";
 };

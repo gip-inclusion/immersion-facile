@@ -2,13 +2,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 
 export type AgencyErrorTextProperties = {
-  loadingError: boolean;
+  isFetchAgencyOptionsError: boolean;
   userError: string | boolean | undefined;
   error: string | undefined;
 };
 
 export const AgencyErrorText = ({
-  loadingError,
+  isFetchAgencyOptionsError,
   userError,
   error,
 }: AgencyErrorTextProperties): JSX.Element => (
@@ -16,7 +16,7 @@ export const AgencyErrorText = ({
     id={"agency-code-{name}-error-desc-error"}
     className={fr.cx("fr-error-text")}
   >
-    {loadingError
+    {isFetchAgencyOptionsError
       ? "Erreur de chargement de la liste. Veuillez réessayer plus tard."
       : ""}
     {userError ? error : ""}

@@ -1,6 +1,5 @@
 /* eslint-disable  @typescript-eslint/require-await */
-import { values } from "ramda";
-import { Observable, Subject, firstValueFrom, from } from "rxjs";
+import { Observable, Subject, from } from "rxjs";
 import {
   AgencyDto,
   AgencyId,
@@ -8,12 +7,9 @@ import {
   AgencyPublicDisplayDto,
   BackOfficeJwt,
   CreateAgencyDto,
-  DepartmentCode,
-  ListAgenciesRequestDto,
+  ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   WithAgencyId,
-  propEq,
-  propNotEq,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
@@ -43,62 +39,26 @@ export class TestAgencyGateway implements AgencyGateway {
     return this.fetchedAgency$;
   }
 
-  public async getAgencyPublicInfoById(
-    withAgencyId: WithAgencyId,
-  ): Promise<AgencyPublicDisplayDto> {
-    return firstValueFrom(this.getAgencyPublicInfoById$(withAgencyId));
-  }
-
   public getAgencyPublicInfoById$(
     _agencyId: WithAgencyId,
   ): Observable<AgencyPublicDisplayDto> {
     return this.agencyInfo$;
   }
 
-  public async getFilteredAgencies(
-    _filter: ListAgenciesRequestDto,
-  ): Promise<AgencyOption[]> {
-    throw new Error("Not implemented");
-  }
-
   public getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
     return this.customAgencyId$;
   }
 
-  public listAgenciesByFilter$(
-    _filter: ListAgenciesRequestDto,
+  public listAgencyOptionsByFilter$(
+    _filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]> {
     return this.agencyOptions$;
   }
 
-  public listAgenciesNeedingReview$(
+  public listAgencyOptionsNeedingReview$(
     _adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]> {
     return this.agencyOptions$;
-  }
-
-  public async listImmersionAgencies(
-    _departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies);
-  }
-
-  public async listImmersionOnlyPeAgencies(
-    _departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies).filter(propEq("kind", "pole-emploi"));
-  }
-
-  public async listImmersionWithoutPeAgencies(
-    _departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies).filter(propNotEq("kind", "pole-emploi"));
-  }
-
-  public async listMiniStageAgencies(
-    _departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    return values(this.#agencies).filter(propNotEq("kind", "cci"));
   }
 
   public updateAgency$(

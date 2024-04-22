@@ -79,7 +79,7 @@ describe("Agency routes", () => {
 
   describe("Public Routes", () => {
     describe(`${displayRouteName(
-      agencyRoutes.getFilteredAgencies,
+      agencyRoutes.getAgencyOptionsByFilter,
     )} get agencies with name and position given filters`, () => {
       it("Returns agency list with name and position nearby a given position", async () => {
         // Prepare
@@ -90,7 +90,7 @@ describe("Agency routes", () => {
           agency4NeedsReview,
         ]);
 
-        const response = await httpClient.getFilteredAgencies({
+        const response = await httpClient.getAgencyOptionsByFilter({
           queryParams: { departmentCode: "20" },
         });
 
@@ -256,10 +256,10 @@ describe("Agency routes", () => {
 
   describe("Private routes (for backoffice admin)", () => {
     describe(`${displayRouteName(
-      agencyRoutes.listAgenciesWithStatus,
+      agencyRoutes.listAgenciesOptionsWithStatus,
     )} to get agencies full dto given filters`, () => {
       it("Returns Forbidden if no token provided", async () => {
-        const response = await httpClient.listAgenciesWithStatus({
+        const response = await httpClient.listAgenciesOptionsWithStatus({
           queryParams: { status: "needsReview" },
           headers: { authorization: "" },
         });
@@ -279,7 +279,7 @@ describe("Agency routes", () => {
           ),
         );
 
-        const response = await httpClient.listAgenciesWithStatus({
+        const response = await httpClient.listAgenciesOptionsWithStatus({
           queryParams: { status: "needsReview" },
           headers: { authorization: adminToken },
         });

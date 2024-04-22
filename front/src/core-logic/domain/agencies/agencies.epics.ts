@@ -1,4 +1,3 @@
-import { PayloadAction } from "@reduxjs/toolkit";
 import { filter, map, switchMap } from "rxjs";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -27,21 +26,19 @@ const agencyInfoGetByIdEpic: AppEpic<AgencyInfoAction> = (
     ),
   );
 
-const getAgenciesByDepartmentCodeEpic: AppEpic<AgencyInfoAction> = (
+const getFetchAgencyOptionsEpic: AppEpic<AgencyInfoAction> = (
   action$,
   _state$,
   dependencies,
 ) =>
   action$.pipe(
-    filter(agenciesSlice.actions.fetchAgenciesByDepartmentCodeRequested.match),
-    switchMap((action: PayloadAction<string>) =>
-      dependencies.agencyGateway.listAgenciesByFilter$({
-        departmentCode: action.payload,
-      }),
+    filter(agenciesSlice.actions.fetchAgencyOptionsRequested.match),
+    switchMap((action) =>
+      dependencies.agencyGateway.listAgencyOptionsByFilter$(action.payload),
     ),
-    map(agenciesSlice.actions.fetchAgenciesByDepartmentCodeSucceeded),
+    map(agenciesSlice.actions.fetchAgencyOptionsSucceeded),
     catchEpicError((error) =>
-      agenciesSlice.actions.fetchAgenciesByDepartmentCodeFailed(error.message),
+      agenciesSlice.actions.fetchAgencyOptionsFailed(error.message),
     ),
   );
 
@@ -63,6 +60,6 @@ const addAgencyEpic: AppEpic<AgencyInfoAction> = (
 
 export const agenciesEpics = [
   agencyInfoGetByIdEpic,
-  getAgenciesByDepartmentCodeEpic,
+  getFetchAgencyOptionsEpic,
   addAgencyEpic,
 ];

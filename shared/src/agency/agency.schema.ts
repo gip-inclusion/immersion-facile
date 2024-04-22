@@ -24,7 +24,7 @@ import {
   AgencyKind,
   AgencyOption,
   CreateAgencyDto,
-  ListAgenciesRequestDto,
+  ListAgencyOptionsRequestDto,
   PrivateListAgenciesRequestDto,
   WithAgencyDto,
   WithAgencyId,
@@ -64,7 +64,7 @@ export const agenciesIdAndNameSchema: z.ZodSchema<AgencyOption[]> = z.array(
   agencyIdAndNameSchema,
 );
 
-export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
+export const listAgencyOptionsRequestSchema: z.ZodSchema<ListAgencyOptionsRequestDto> =
   z.object({
     departmentCode: z.string().optional(),
     nameIncludes: z.string().optional(),
