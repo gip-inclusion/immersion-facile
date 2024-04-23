@@ -23,7 +23,6 @@ import { EstablishmentEditionFormPage } from "src/app/pages/establishment/Establ
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
-import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { Route } from "type-route";
@@ -57,12 +56,21 @@ const getPageByRouteName: {
   [K in keyof Routes]: (route: Route<Routes[K]>) => unknown;
 } = {
   addAgency: () => <AddAgencyPage />,
-  adminRoot: () => <LoginForm />,
-  adminTab: (route) =>
+  adminRoot: () => routes.admin({ tab: "conventions" }).push(),
+  admin: (route) =>
     adminTabsList.includes(route.params.tab as AdminTab) ? (
-      <AdminPrivateRoute>
+      <InclusionConnectedPrivateRoute
+        route={route}
+        inclusionConnectConnexionPageHeader={
+          <PageHeader
+            title="Bienvenu cher administrateur de la super team Immersion Facilitée ! 🚀"
+            theme="default"
+            centered
+          />
+        }
+      >
         <AdminPage route={route} />
-      </AdminPrivateRoute>
+      </InclusionConnectedPrivateRoute>
     ) : (
       <ErrorPage type="httpClientNotFoundError" />
     ),

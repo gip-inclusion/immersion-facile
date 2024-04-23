@@ -1,6 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { InclusionConnectJwt, authFailed } from "shared";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
 const currentFederatedIdentity = createRootSelector(
@@ -28,6 +29,11 @@ const inclusionConnectToken = createSelector(
       : undefined,
 );
 
+const isAdminConnected = createSelector(
+  inclusionConnectedSelectors.currentUser,
+  (user) => user?.isBackofficeAdmin ?? false,
+);
+
 const userIsDefined = (
   federatedIdentity: FederatedIdentityWithUser | null,
 ): federatedIdentity is FederatedIdentityWithUser => {
@@ -46,6 +52,7 @@ const connectedUser = createSelector(
 );
 
 export const authSelectors = {
+  isAdminConnected,
   federatedIdentity: currentFederatedIdentity,
   isPeConnected,
   isInclusionConnected,

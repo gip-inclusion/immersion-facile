@@ -1,4 +1,3 @@
-import { adminAuthInitialState } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { agencyAdminInitialState } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { dashboardInitialState } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { icUsersAdminInitialState } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -12,7 +11,6 @@ export const adminPreloadedState = (
   state: Partial<AdminState>,
 ): AdminState => ({
   dashboardUrls: dashboardInitialState,
-  adminAuth: adminAuthInitialState,
   notifications: notificationsInitialState,
   agencyAdmin: agencyAdminInitialState,
   inclusionConnectedUsersAdmin: icUsersAdminInitialState,

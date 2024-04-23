@@ -2,29 +2,18 @@ import { createSelector } from "@reduxjs/toolkit";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
 const adminStateSelector = createRootSelector((state) => state.admin);
-const adminAuthSelector = createSelector(
-  adminStateSelector,
-  ({ adminAuth }) => adminAuth,
-);
+
 const notificationsStateSelector = createSelector(
   adminStateSelector,
   ({ notifications }) => notifications,
 );
+
 const dashboardState = createSelector(
   adminStateSelector,
   ({ dashboardUrls }) => dashboardUrls,
 );
 
 export const adminSelectors = {
-  auth: {
-    token: createSelector(adminAuthSelector, ({ adminToken }) => adminToken),
-    isAuthenticated: createSelector(
-      adminAuthSelector,
-      ({ adminToken }) => adminToken !== null,
-    ),
-    isLoading: createSelector(adminAuthSelector, ({ isLoading }) => isLoading),
-    error: createSelector(adminAuthSelector, ({ error }) => error),
-  },
   notifications: {
     isLoading: createSelector(
       notificationsStateSelector,

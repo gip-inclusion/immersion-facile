@@ -1,4 +1,5 @@
 import { CombinedState } from "@reduxjs/toolkit";
+import { InclusionConnectedUserBuilder } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import {
@@ -35,12 +36,20 @@ describe("rootApp epic", () => {
   });
 
   it("should dispatch appIsReady action", () => {
-    dependencies.localDeviceRepository.set("adminToken", "my-super-token");
+    const user = new InclusionConnectedUserBuilder().build();
+    const token = "my-super-token";
+    dependencies.localDeviceRepository.set("federatedIdentityWithUser", {
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      provider: "inclusionConnect",
+      token,
+    });
 
-    expect(store.getState().admin.adminAuth.adminToken).toBeNull();
+    expect(store.getState().auth.federatedIdentityWithUser).toBeNull();
 
     store.dispatch(rootAppSlice.actions.appResetRequested());
 
-    expect(store.getState().admin.adminAuth.adminToken).toBe("my-super-token");
+    expect(store.getState().auth.federatedIdentityWithUser?.token).toBe(token);
   });
 });

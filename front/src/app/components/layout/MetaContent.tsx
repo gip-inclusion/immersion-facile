@@ -45,7 +45,7 @@ const getMetaContents = (
     if (route.name === "group") {
       return groupMetaContent(route.params.groupSlug);
     }
-    if (route.name === "adminTab") {
+    if (route.name === "admin") {
       return adminMetaContent[route.params.tab];
     }
     return metaContents[route.name];

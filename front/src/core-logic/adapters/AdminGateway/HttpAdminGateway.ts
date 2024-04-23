@@ -3,16 +3,15 @@ import {
   AdminRoutes,
   ApiConsumer,
   ApiConsumerJwt,
-  BackOfficeJwt,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   IcUserRoleForAgencyParams,
+  InclusionConnectJwt,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
-  UserAndPassword,
   createApiConsumerParamsFromApiConsumer,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -28,7 +27,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public addEstablishmentBatch$(
     establishmentBatch: FormEstablishmentBatchDto,
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ): Observable<EstablishmentBatchReport> {
     return from(
       this.httpClient
@@ -49,7 +48,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public getAllApiConsumers$(
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<ApiConsumer[]> {
     return from(
       this.httpClient
@@ -67,7 +66,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public getDashboardUrl$(
     params: GetDashboardParams,
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ): Observable<DashboardUrlAndName> {
     return from(
       this.httpClient
@@ -92,7 +91,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public getInclusionConnectedUsersToReview$(
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ): Observable<InclusionConnectedUser[]> {
     return from(
       this.httpClient
@@ -109,7 +108,7 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
-  public getLastNotifications$(token: BackOfficeJwt) {
+  public getLastNotifications$(token: InclusionConnectJwt) {
     return from(
       this.httpClient
         .getLastNotifications({ headers: { authorization: token } })
@@ -119,17 +118,6 @@ export class HttpAdminGateway implements AdminGateway {
             .with({ status: 400 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
-    );
-  }
-
-  public login$(userAndPassword: UserAndPassword): Observable<BackOfficeJwt> {
-    return from(
-      this.httpClient.login({ body: userAndPassword }).then((response) =>
-        match(response)
-          .with({ status: 200 }, ({ body }) => body)
-          .with({ status: 403 }, logBodyAndThrow)
-          .otherwise(otherwiseThrow),
-      ),
     );
   }
 
@@ -154,7 +142,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public saveApiConsumer$(
     apiConsumer: ApiConsumer,
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<ApiConsumerJwt | undefined> {
     return from(
       this.httpClient
@@ -173,7 +161,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public updateFeatureFlags$(
     params: SetFeatureFlagParam,
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient

@@ -4,8 +4,8 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
-  BackOfficeJwt,
   CreateAgencyDto,
+  InclusionConnectJwt,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   WithAgencyId,
@@ -15,7 +15,7 @@ export interface AgencyGateway {
   addAgency$(agency: CreateAgencyDto): Observable<void>;
   getAgencyAdminById$(
     agencyId: AgencyId,
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<AgencyDto | undefined>;
   getAgencyPublicInfoById$(
     agencyId: WithAgencyId,
@@ -25,14 +25,14 @@ export interface AgencyGateway {
     filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]>;
   listAgencyOptionsNeedingReview$(
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<AgencyOption[]>;
   updateAgency$(
     agencyDto: AgencyDto,
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<void>;
   validateOrRejectAgency$(
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void>;
 }

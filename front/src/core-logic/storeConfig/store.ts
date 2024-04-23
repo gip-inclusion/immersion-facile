@@ -3,8 +3,6 @@ import * as Sentry from "@sentry/browser";
 import { Epic, combineEpics, createEpicMiddleware } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/config/dependencies";
-import { adminAuthEpics } from "src/core-logic/domain/admin/adminAuth/adminAuth.epics";
-import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { agenciesAdminEpics } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.epics";
@@ -48,7 +46,6 @@ import { partnersErroredConventionSlice } from "../domain/partnersErroredConvent
 import { AppEpic } from "./redux.helpers";
 
 const allEpics: AppEpic<any>[] = [
-  ...adminAuthEpics,
   ...agenciesAdminEpics,
   ...agenciesEpics,
   ...apiConsumerEpics,
@@ -75,7 +72,6 @@ const appReducer = combineReducers({
   admin: combineReducers({
     [agencyAdminSlice.name]: agencyAdminSlice.reducer,
     [icUsersAdminSlice.name]: icUsersAdminSlice.reducer,
-    [adminAuthSlice.name]: adminAuthSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,
     [apiConsumerSlice.name]: apiConsumerSlice.reducer,

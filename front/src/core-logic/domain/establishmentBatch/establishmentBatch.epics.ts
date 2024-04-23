@@ -12,6 +12,7 @@ import {
   isCSVCellEmptyString,
   noContactPerWeek,
 } from "shared";
+import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
@@ -49,7 +50,7 @@ const addEstablishmentBatchEpic: AppEpic<EstablishmentBatchAction> = (
     switchMap((action) =>
       adminGateway.addEstablishmentBatch$(
         action.payload,
-        state$.value.admin.adminAuth.adminToken || "",
+        getAdminToken(state$.value),
       ),
     ),
     map((batchResponse) =>

@@ -2,6 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { type AgencyId, looksLikeSiret } from "shared";
+import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
@@ -39,9 +40,7 @@ const agencyAdminGetNeedingReviewEpic: AgencyEpic = (
   action$.pipe(
     filter(agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested.match),
     switchMap(() =>
-      agencyGateway.listAgencyOptionsNeedingReview$(
-        state$.value.admin.adminAuth.adminToken || "",
-      ),
+      agencyGateway.listAgencyOptionsNeedingReview$(getAdminToken(state$.value)),
     ),
     map(agencyAdminSlice.actions.setAgencyNeedingReviewOptions),
     catchEpicError((error: Error) =>
@@ -59,7 +58,7 @@ const agencyAdminGetDetailsForStatusEpic: AgencyEpic = (
     switchMap((action: PayloadAction<AgencyId>) =>
       dependencies.agencyGateway.getAgencyAdminById$(
         action.payload,
-        state$.value.admin.adminAuth.adminToken ?? "",
+        getAdminToken(state$.value),
       ),
     ),
     map((agency) =>
@@ -82,7 +81,7 @@ const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (
     switchMap((action: PayloadAction<AgencyId>) =>
       dependencies.agencyGateway.getAgencyAdminById$(
         action.payload,
-        state$.value.admin.adminAuth.adminToken ?? "",
+        getAdminToken(state$.value),
       ),
     ),
     map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
@@ -93,7 +92,7 @@ const updateAgencyEpic: AgencyEpic = (action$, state$, { agencyGateway }) =>
     filter(agencyAdminSlice.actions.updateAgencyRequested.match),
     switchMap(({ payload }) =>
       agencyGateway
-        .updateAgency$(payload, state$.value.admin.adminAuth.adminToken || "")
+        .updateAgency$(payload, getAdminToken(state$.value))
         .pipe(
           map(() => agencyAdminSlice.actions.updateAgencySucceeded(payload)),
         ),
@@ -114,10 +113,7 @@ const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
     ),
     switchMap(({ payload }) =>
       agencyGateway
-        .validateOrRejectAgency$(
-          state$.value.admin.adminAuth.adminToken || "",
-          payload,
-        )
+        .validateOrRejectAgency$(getAdminToken(state$.value), payload)
         .pipe(
           map(() =>
             agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded(

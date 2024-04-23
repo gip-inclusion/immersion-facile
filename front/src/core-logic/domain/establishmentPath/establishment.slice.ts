@@ -1,6 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
-  BackOfficeJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
   InclusionConnectJwt,
@@ -23,19 +22,19 @@ export type EstablishmentFeedback = SubmitFeedBack<
 
 export type EstablishmentUpdatePayload = {
   formEstablishment: FormEstablishmentDto;
-  jwt: EstablishmentJwt | BackOfficeJwt | InclusionConnectJwt;
+  jwt: EstablishmentJwt | InclusionConnectJwt;
 };
 
 export type EstablishmentDeletePayload = {
   siret: SiretDto;
-  jwt: BackOfficeJwt;
+  jwt: InclusionConnectJwt;
 };
 
 export type EstablishmentRequestedPayload =
   | Partial<FormEstablishmentDto>
   | {
       siret: SiretDto;
-      jwt: EstablishmentJwt | BackOfficeJwt | InclusionConnectJwt;
+      jwt: EstablishmentJwt | InclusionConnectJwt;
     };
 
 export const defaultFormEstablishmentValue = (

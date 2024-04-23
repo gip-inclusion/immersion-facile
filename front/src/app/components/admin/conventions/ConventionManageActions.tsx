@@ -11,7 +11,6 @@ import { createPortal } from "react-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  BackOfficeJwt,
   ConventionJwt,
   ConventionReadDto,
   ConventionStatus,
@@ -55,7 +54,7 @@ import { ScheduleSection } from "../../forms/convention/sections/schedule/Schedu
 
 export type JwtKindProps =
   | {
-      jwt: BackOfficeJwt;
+      jwt: InclusionConnectJwt;
       kind: "backoffice";
     }
   | {

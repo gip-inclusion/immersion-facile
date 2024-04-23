@@ -1,4 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
+import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import {
   ActionOfSlice,
@@ -27,10 +28,7 @@ const setFeatureFlagEpic: FeatureFlagEpic = (
   action$.pipe(
     filter(featureFlagsSlice.actions.setFeatureFlagRequested.match),
     switchMap(({ payload }) =>
-      adminGateway.updateFeatureFlags$(
-        payload,
-        state$.value.admin.adminAuth.adminToken ?? "",
-      ),
+      adminGateway.updateFeatureFlags$(payload, getAdminToken(state$.value)),
     ),
     map(featureFlagsSlice.actions.setFeatureFlagSucceeded),
   );
