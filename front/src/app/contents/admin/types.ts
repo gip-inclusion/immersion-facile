@@ -35,4 +35,5 @@ export type ColField = {
   key: ConventionField | "additionnalInfos";
   colLabel: string;
   getValue?: (convention: ConventionReadDto) => string | ReactNode;
+  copyButton?: (convention: ConventionReadDto) => string | ReactNode;
 } | null;
