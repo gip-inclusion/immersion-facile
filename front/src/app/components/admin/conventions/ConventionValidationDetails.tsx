@@ -20,8 +20,8 @@ const cellStyles = {
 export const ConventionValidationDetails = ({
   convention,
 }: ConventionValidationProps) => {
-  const { onCopyButtonClick, copyButtonLabel, copyButtonIsDisabled } =
-    useCopyButton();
+  const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
+    useCopyButton("Copier");
 
   return (
     <>
@@ -73,16 +73,24 @@ const ConventionValidationSection = ({
 }) => {
   const { cx } = useStyles();
   const [markedAsRead, setMarkedAsRead] = useState<boolean>(false);
+
   const buildContent = (field: ColField): ReactNode => {
     let value: React.ReactNode;
     if (field?.key) {
       value = path(field.key, convention) as string;
       if (field.getValue) {
-        value = field.getValue(convention);
+        value = (
+          <>
+            {field.getValue?.(convention)}
+            {field.copyButton?.(convention)}
+          </>
+        );
       }
     }
+
     return value;
   };
+
   const renderRows = (rowFields: RowFields[]) => {
     const relevantRows = rowFields.filter(
       (row) =>
@@ -121,6 +129,7 @@ const ConventionValidationSection = ({
         ),
     );
   };
+
   return (
     <div
       className={cx(

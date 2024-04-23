@@ -7,6 +7,7 @@ import {
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
+import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { P, match } from "ts-pattern";
 import { ColField, FieldsAndTitle } from "./types";
 
@@ -45,6 +46,31 @@ const renderEmail = (email: string) => (
   </a>
 );
 
+const CopyButton = ({
+  textLabel,
+  value,
+}: { textLabel: string; value: string }) => {
+  const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
+    useCopyButton(textLabel);
+  return (
+    <button
+      onClick={() => onCopyButtonClick(value)}
+      disabled={copyButtonIsDisabled}
+      className={fr.cx(
+        "fr-btn",
+        "fr-btn--sm",
+        "fr-icon-clipboard-fill",
+        "fr-btn--tertiary-no-outline",
+        "fr-btn--icon-left",
+        "fr-ml-1w",
+      )}
+      type="button"
+    >
+      {copyButtonLabel}
+    </button>
+  );
+};
+
 const beneficiaryFields: ColField[] = [
   {
     key: "signatories.beneficiary.signedAt",
@@ -57,6 +83,12 @@ const beneficiaryFields: ColField[] = [
     colLabel: "Mail de demandeur",
     getValue: (convention) =>
       renderEmail(convention.signatories.beneficiary.email),
+    copyButton: (convention) => (
+      <CopyButton
+        textLabel=""
+        value={convention.signatories.beneficiary.email}
+      />
+    ),
   },
   {
     key: "signatories.beneficiary.phone",
@@ -129,6 +161,13 @@ const beneficiaryRepresentativeFields: ColField[] = [
       convention.signatories.beneficiaryRepresentative
         ? renderEmail(convention.signatories.beneficiaryRepresentative.email)
         : "",
+    copyButton: (convention) =>
+      convention.signatories.beneficiaryRepresentative ? (
+        <CopyButton
+          textLabel=""
+          value={convention.signatories.beneficiaryRepresentative.email}
+        />
+      ) : null,
   },
   {
     key: "signatories.beneficiaryRepresentative.phone",
@@ -161,6 +200,15 @@ const beneficiaryCurrentEmployerFields: ColField[] = [
       convention.signatories.beneficiaryCurrentEmployer
         ? renderEmail(convention.signatories.beneficiaryCurrentEmployer.email)
         : "",
+    copyButton: (convention) =>
+      convention.signatories.beneficiaryCurrentEmployer ? (
+        <CopyButton
+          textLabel=""
+          value={convention.signatories.beneficiaryCurrentEmployer.email}
+        />
+      ) : (
+        ""
+      ),
   },
   {
     key: "signatories.beneficiaryCurrentEmployer.phone",
@@ -209,6 +257,12 @@ const establishmentRepresentativeFields: ColField[] = [
       convention.signatories.establishmentRepresentative
         ? renderEmail(convention.signatories.establishmentRepresentative.email)
         : "",
+    copyButton: (convention) => (
+      <CopyButton
+        textLabel=""
+        value={convention.signatories.establishmentRepresentative.email}
+      />
+    ),
   },
   {
     key: "signatories.establishmentRepresentative.phone",
@@ -248,6 +302,9 @@ const establishmentTutorFields: ColField[] = [
       convention.establishmentTutor
         ? renderEmail(convention.establishmentTutor.email)
         : "",
+    copyButton: (convention) => (
+      <CopyButton textLabel="" value={convention.establishmentTutor.email} />
+    ),
   },
   {
     key: "establishmentTutor.phone",
@@ -271,6 +328,10 @@ const agencyFields: ColField[] = [
   {
     key: "agencyName",
     colLabel: "Nom de la structure",
+    copyButton: (convention) => (
+      <CopyButton textLabel="" value={convention.agencyName} />
+    ),
+    getValue: (convention) => convention.agencyName,
   },
   {
     key: "dateValidation",
