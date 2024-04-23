@@ -5,10 +5,10 @@ import {
   AgencyOption,
   AgencyPublicDisplayDto,
   AgencyRoutes,
-  BackOfficeJwt,
+  InclusionConnectJwt,
   CreateAgencyDto,
-  ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
+  ListAgencyOptionsRequestDto,
   WithAgencyId,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -36,7 +36,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public getAgencyAdminById$(
     agencyId: AgencyId,
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<AgencyDto> {
     return from(
       this.httpClient
@@ -93,7 +93,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   // TODO Mieux identifier l'admin
 
   public listAgencyOptionsNeedingReview$(
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<AgencyOption[]> {
     return from(
       this.httpClient
@@ -112,7 +112,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public updateAgency$(
     agencyDto: AgencyDto,
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -132,7 +132,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public async validateOrRejectAgency(
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
     { id, ...rest }: UpdateAgencyStatusParams,
   ): Promise<void> {
     await this.httpClient.updateAgencyStatus({
@@ -143,7 +143,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public validateOrRejectAgency$(
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void> {
     return from(

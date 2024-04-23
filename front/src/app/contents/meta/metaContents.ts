@@ -19,7 +19,7 @@ export const metaContents: Partial<
     title: "Formulaire d'ajout d'un prescripteur",
     description: "Devenir prescripteur de PMSMP et immersions professionnelles",
   },
-  adminTab: {
+  admin: {
     title: "AdminTab",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },

@@ -8,6 +8,7 @@ import {
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
 } from "shared";
+import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import {
   NormalizedIcUserById,
   icUsersAdminSlice,
@@ -29,7 +30,7 @@ const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
     ),
     switchMap((_action) =>
       adminGateway.getInclusionConnectedUsersToReview$(
-        state$.value.admin.adminAuth.adminToken ?? "",
+        getAdminToken(state$.value),
       ),
     ),
     map(normalizeUsers),
@@ -54,10 +55,7 @@ const registerAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
     ),
     switchMap((action: PayloadAction<IcUserRoleForAgencyParams>) =>
       adminGateway
-        .updateUserRoleForAgency$(
-          action.payload,
-          state$.value.admin.adminAuth.adminToken ?? "",
-        )
+        .updateUserRoleForAgency$(action.payload, getAdminToken(state$.value))
         .pipe(
           map(() =>
             icUsersAdminSlice.actions.registerAgencyWithRoleToUserSucceeded(
@@ -82,10 +80,7 @@ const rejectAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
     filter(icUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested.match),
     switchMap((action: PayloadAction<RejectIcUserRoleForAgencyParams>) =>
       adminGateway
-        .rejectUserForAgency$(
-          action.payload,
-          state$.value.admin.adminAuth.adminToken ?? "",
-        )
+        .rejectUserForAgency$(action.payload, getAdminToken(state$.value))
         .pipe(
           map(() =>
             icUsersAdminSlice.actions.rejectAgencyWithRoleToUserSucceeded(

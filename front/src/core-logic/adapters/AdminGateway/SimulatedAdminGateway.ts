@@ -4,16 +4,15 @@ import {
   AgencyRight,
   ApiConsumer,
   ApiConsumerJwt,
-  BackOfficeJwt,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   IcUserRoleForAgencyParams,
+  InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
-  UserAndPassword,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -45,7 +44,7 @@ export class SimulatedAdminGateway implements AdminGateway {
 
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
-    _token: BackOfficeJwt,
+    _token: InclusionConnectJwt,
   ): Observable<EstablishmentBatchReport> {
     return of({
       numberOfEstablishmentsProcessed: 12,
@@ -68,14 +67,14 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 
   public getAllApiConsumers$(
-    _adminToken: BackOfficeJwt,
+    _adminToken: InclusionConnectJwt,
   ): Observable<ApiConsumer[]> {
     return of(apiConsumers);
   }
 
   public getDashboardUrl$(
     { name }: GetDashboardParams,
-    _token: BackOfficeJwt,
+    _token: InclusionConnectJwt,
   ): Observable<DashboardUrlAndName> {
     return of({ name, url: `http://${name}.com` });
   }
@@ -126,22 +125,13 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 
   public getLastNotifications$(
-    _token: BackOfficeJwt,
+    _token: InclusionConnectJwt,
   ): Observable<NotificationsByKind> {
     const notificationsByKind: NotificationsByKind = {
       emails: [],
       sms: [],
     };
     return of(notificationsByKind);
-  }
-
-  public login$({ user }: UserAndPassword): Observable<BackOfficeJwt> {
-    if (user.toLowerCase() === "failed")
-      return throwError(
-        () =>
-          new Error("Impossible de vous authentifier (SimulatedAdminGateway)"),
-      );
-    return of("some-token");
   }
 
   public rejectUserForAgency$(
@@ -155,7 +145,7 @@ export class SimulatedAdminGateway implements AdminGateway {
 
   public saveApiConsumer$(
     _apiConsumer: ApiConsumer,
-    _adminToken: BackOfficeJwt,
+    _adminToken: InclusionConnectJwt,
   ): Observable<ApiConsumerJwt> {
     return of(
       "fakeTokenJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk4ZDE3NTE3LWJlNDItNDY2OS04OTVkLTQ3ODE0MjBhNjhiOCIsImlhdCI6MTY5MTM5MTk4Mn0.WuGBIyvVa7rNaIxjZTgVTSIcU0LkN8GRDmFxXMYTRYFh0vK0c6ImupszTJF4VXHGpkkpE1AXasOwBWhOg",

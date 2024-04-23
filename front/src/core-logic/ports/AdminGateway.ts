@@ -2,53 +2,55 @@ import { Observable } from "rxjs";
 import {
   ApiConsumer,
   ApiConsumerJwt,
-  BackOfficeJwt,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   IcUserRoleForAgencyParams,
+  InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
-  UserAndPassword,
 } from "shared";
 
 export interface AdminGateway {
   addEstablishmentBatch$: (
     establishmentBatch: FormEstablishmentBatchDto,
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ) => Observable<EstablishmentBatchReport>;
 
   getDashboardUrl$: (
     params: GetDashboardParams,
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ) => Observable<DashboardUrlAndName>;
   getInclusionConnectedUsersToReview$: (
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ) => Observable<InclusionConnectedUser[]>;
-  login$: (params: UserAndPassword) => Observable<BackOfficeJwt>;
   updateFeatureFlags$: (
     params: SetFeatureFlagParam,
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ) => Observable<void>;
-  getAllApiConsumers$: (adminToken: BackOfficeJwt) => Observable<ApiConsumer[]>;
+  getAllApiConsumers$: (
+    adminToken: InclusionConnectJwt,
+  ) => Observable<ApiConsumer[]>;
 
-  getLastNotifications$(token: BackOfficeJwt): Observable<NotificationsByKind>;
+  getLastNotifications$(
+    token: InclusionConnectJwt,
+  ): Observable<NotificationsByKind>;
 
   updateUserRoleForAgency$(
     params: IcUserRoleForAgencyParams,
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ): Observable<void>;
 
   rejectUserForAgency$(
     params: RejectIcUserRoleForAgencyParams,
-    token: BackOfficeJwt,
+    token: InclusionConnectJwt,
   ): Observable<void>;
 
   saveApiConsumer$(
     apiConsumer: ApiConsumer,
-    adminToken: BackOfficeJwt,
+    adminToken: InclusionConnectJwt,
   ): Observable<ApiConsumerJwt | undefined>;
 }

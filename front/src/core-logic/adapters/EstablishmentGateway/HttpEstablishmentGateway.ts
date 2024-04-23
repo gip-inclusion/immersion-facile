@@ -1,9 +1,9 @@
 import { Observable, from } from "rxjs";
 import {
-  BackOfficeJwt,
   EstablishmentJwt,
   EstablishmentRoutes,
   FormEstablishmentDto,
+  InclusionConnectJwt,
   SiretDto,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -32,7 +32,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public deleteEstablishment$(
     siret: SiretDto,
-    jwt: BackOfficeJwt,
+    jwt: InclusionConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -45,7 +45,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             .with({ status: 204 }, () => {
               /* void */
             })
-            .with({ status: P.union(404, 400, 403) }, ({ body }) => {
+            .with({ status: P.union(404, 400, 401, 403) }, ({ body }) => {
               throw new Error(JSON.stringify(body));
             })
             .otherwise(otherwiseThrow),
@@ -65,7 +65,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    jwt: EstablishmentJwt | BackOfficeJwt,
+    jwt: EstablishmentJwt | InclusionConnectJwt,
   ): Observable<FormEstablishmentDto> {
     return from(
       this.httpClient
@@ -108,7 +108,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public updateFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt | BackOfficeJwt,
+    jwt: EstablishmentJwt | InclusionConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient

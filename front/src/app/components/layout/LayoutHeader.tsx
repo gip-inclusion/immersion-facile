@@ -14,8 +14,6 @@ import { commonContent } from "src/app/contents/commonContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes, useRoute } from "src/app/routes/routes";
-import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { makeStyles } from "tss-react/dsfr";
@@ -49,18 +47,10 @@ export const LayoutHeader = () => {
     admin: adminIds,
   } = domElementIds.header.navLinks;
 
-  const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
+  const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const tools: HeaderProps["quickAccessItems"] = [headerFooterDisplayItem];
-  if (isAdminConnected) {
-    tools.push({
-      iconId: "fr-icon-lock-line",
-      text: "Se déconnecter",
-      buttonProps: {
-        onClick: () => dispatch(adminAuthSlice.actions.logoutRequested()),
-      },
-    });
-  }
+
   if (isPeConnected) {
     tools.push({
       iconId: "fr-icon-lock-line",
@@ -212,18 +202,18 @@ export const LayoutHeader = () => {
       ],
     },
   ];
+
   if (isAdminConnected) {
     links.push({
       text: "Admin",
-      isActive:
-        currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
+      isActive: currentRoute.name === routes.admin({ tab: "conventions" }).name,
       //id: getHeaderNavLinkId("admin-subnav-toggle"),
       menuLinks: [
         {
           text: "Backoffice",
           isActive: false,
           linkProps: {
-            ...routes.adminTab({ tab: "conventions" }).link,
+            ...routes.admin({ tab: "conventions" }).link,
             id: adminIds.backOffice,
           },
         },
@@ -231,7 +221,7 @@ export const LayoutHeader = () => {
           text: "Notifications",
           isActive: false,
           linkProps: {
-            ...routes.adminTab({ tab: "notifications" }).link,
+            ...routes.admin({ tab: "notifications" }).link,
             id: adminIds.emails,
           },
         },

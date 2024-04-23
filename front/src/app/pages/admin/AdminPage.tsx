@@ -64,7 +64,7 @@ const getAdminTabs = (currentTab: AdminTab) =>
 export const AdminPage = ({
   route,
 }: {
-  route: Route<typeof routes.adminTab>;
+  route: Route<typeof routes.admin>;
 }) => {
   const currentTab = route.params.tab;
   const tabs = getAdminTabs(currentTab);
@@ -86,7 +86,7 @@ export const AdminPage = ({
               onTabChange={(tab) => {
                 if (isAdminTab(tab))
                   routes
-                    .adminTab({
+                    .admin({
                       tab,
                     })
                     .push();

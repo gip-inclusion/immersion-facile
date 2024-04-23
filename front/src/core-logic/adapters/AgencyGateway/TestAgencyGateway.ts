@@ -5,7 +5,7 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
-  BackOfficeJwt,
+  InclusionConnectJwt,
   CreateAgencyDto,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
@@ -34,7 +34,7 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public getAgencyAdminById$(
     _agencyId: AgencyId,
-    _adminToken: BackOfficeJwt,
+    _adminToken: InclusionConnectJwt,
   ): Observable<AgencyDto | undefined> {
     return this.fetchedAgency$;
   }
@@ -56,27 +56,27 @@ export class TestAgencyGateway implements AgencyGateway {
   }
 
   public listAgencyOptionsNeedingReview$(
-    _adminToken: BackOfficeJwt,
+    _adminToken: InclusionConnectJwt,
   ): Observable<AgencyOption[]> {
     return this.agencyOptions$;
   }
 
   public updateAgency$(
     _agencyDto: AgencyDto,
-    _adminToken: BackOfficeJwt,
+    _adminToken: InclusionConnectJwt,
   ): Observable<void> {
     return this.updateAgencyResponse$;
   }
 
   public validateOrRejectAgency$(
-    _: BackOfficeJwt,
+    _: InclusionConnectJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void> {
     return from(this.#validateOrRejectAgency(_, updateAgencyStatusParams.id));
   }
 
   async #validateOrRejectAgency(
-    _: BackOfficeJwt,
+    _: InclusionConnectJwt,
     agencyId: AgencyId,
   ): Promise<void> {
     this.#agencies[agencyId].status = "active";

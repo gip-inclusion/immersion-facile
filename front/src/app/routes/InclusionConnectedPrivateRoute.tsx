@@ -19,7 +19,8 @@ import { Route } from "type-route";
 
 type InclusionConnectPrivateRoute =
   | Route<typeof routes.agencyDashboard>
-  | Route<typeof routes.establishmentDashboard>;
+  | Route<typeof routes.establishmentDashboard>
+  | Route<typeof routes.admin>;
 
 type InclusionConnectedPrivateRouteProps = {
   route: InclusionConnectPrivateRoute;

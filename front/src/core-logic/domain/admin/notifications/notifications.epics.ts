@@ -1,4 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
+import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -13,9 +14,7 @@ const getSentEmail: SentEmailEpic = (action$, state$, { adminGateway }) =>
   action$.pipe(
     filter(notificationsSlice.actions.getLastNotificationsRequested.match),
     switchMap(() =>
-      adminGateway.getLastNotifications$(
-        state$.value.admin.adminAuth.adminToken || "",
-      ),
+      adminGateway.getLastNotifications$(getAdminToken(state$.value)),
     ),
     map(notificationsSlice.actions.getLastNotificationsSucceeded),
     catchEpicError((error) =>

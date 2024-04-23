@@ -63,8 +63,8 @@ export type FrontRouteUnion = ValueOf<typeof routes>;
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
   adminRoot: defineRoute(`/${frontRoutes.admin}`),
-  adminTab: defineRoute(
-    { tab: param.path.ofType(adminTabSerializer) },
+  admin: defineRoute(
+    { ...inclusionConnectedParams, tab: param.path.ofType(adminTabSerializer) },
     ({ tab }) => `/${frontRoutes.admin}/${tab}`,
   ),
   agencyDashboard: defineRoute(

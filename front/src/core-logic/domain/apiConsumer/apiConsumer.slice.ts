@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { ApiConsumer, ApiConsumerJwt, BackOfficeJwt } from "shared";
+import { ApiConsumer, ApiConsumerJwt, InclusionConnectJwt } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 type ApiConsumerState = {
@@ -22,7 +22,7 @@ export const apiConsumerSlice = createSlice({
   reducers: {
     retrieveApiConsumersRequested: (
       state,
-      _action: PayloadAction<BackOfficeJwt>,
+      _action: PayloadAction<InclusionConnectJwt>,
     ) => {
       state.isLoading = true;
     },
@@ -42,7 +42,7 @@ export const apiConsumerSlice = createSlice({
       state,
       _action: PayloadAction<{
         apiConsumer: ApiConsumer;
-        adminToken: BackOfficeJwt;
+        adminToken: InclusionConnectJwt;
       }>,
     ) => {
       state.isLoading = true;
