@@ -30,6 +30,7 @@ export interface Database {
   searches_made__appellation_code: SearchesMadeAppellationCode;
   searches_made: SearchesMade;
   users__agencies: UsersAgencies;
+  users_admins: UsersAdmins;
   users_ongoing_oauths: OngoingOauths;
   users: AuthenticatedUsers;
   view_appellations_dto: ViewAppellationsDto;
@@ -475,4 +476,8 @@ export interface DelegationContacts {
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
   email: string;
+}
+
+export interface UsersAdmins {
+  user_id: string;
 }

@@ -107,11 +107,13 @@ export class PgInclusionConnectedUserRepository
               WHEN ${agencyRightsJsonAgg} = '[null]' THEN '[]' 
               ELSE ${agencyRightsJsonAgg} 
             END ,
-         'externalId', users.external_id
-        ) as inclusion_user
+        'externalId', users.external_id,
+        'isBackofficeAdmin', BOOL_OR(users_admins.user_id IS NOT NULL)
+      ) as inclusion_user
       FROM users
       LEFT JOIN users__agencies ON users.id = users__agencies.user_id
       LEFT JOIN agencies ON users__agencies.agency_id = agencies.id
+      LEFT JOIN users_admins ON users.id = users_admins.user_id
       ${whereClause.statement}
       GROUP BY users.id;
     `,
@@ -120,13 +122,16 @@ export class PgInclusionConnectedUserRepository
 
     if (response.rows.length === 0) return [];
     return response.rows.map(
-      (row): InclusionConnectedUser => ({
-        ...row.inclusion_user,
-        createdAt: new Date(row.inclusion_user.createdAt).toISOString(),
+      ({
+        inclusion_user: { isBackofficeAdmin, createdAt, ...rest },
+      }): InclusionConnectedUser => ({
+        ...rest,
+        createdAt: new Date(createdAt).toISOString(),
         dashboards: {
           agencies: {},
           establishments: {},
         },
+        ...(isBackofficeAdmin ? { isBackofficeAdmin: true } : {}),
       }),
     );
   }

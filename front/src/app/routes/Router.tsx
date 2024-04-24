@@ -58,6 +58,7 @@ const getPageByRouteName: {
   addAgency: () => <AddAgencyPage />,
   adminRoot: () => (
     <InclusionConnectedPrivateRoute
+      allowAdminOnly={true}
       route={routes.admin({ tab: "conventions" })}
       inclusionConnectConnexionPageHeader={
         <PageHeader
@@ -73,6 +74,7 @@ const getPageByRouteName: {
   admin: (route) =>
     adminTabsList.includes(route.params.tab as AdminTab) ? (
       <InclusionConnectedPrivateRoute
+        allowAdminOnly={true}
         route={route}
         inclusionConnectConnexionPageHeader={
           <PageHeader

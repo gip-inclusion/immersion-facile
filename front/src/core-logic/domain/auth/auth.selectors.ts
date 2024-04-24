@@ -31,7 +31,9 @@ const inclusionConnectToken = createSelector(
 
 const isAdminConnected = createSelector(
   inclusionConnectedSelectors.currentUser,
-  (user) => user?.isBackofficeAdmin ?? false,
+  isInclusionConnected,
+  (user, isInclusionConnected) =>
+    (isInclusionConnected && user?.isBackofficeAdmin) ?? false,
 );
 
 const userIsDefined = (
@@ -52,8 +54,8 @@ const connectedUser = createSelector(
 );
 
 export const authSelectors = {
-  isAdminConnected,
   federatedIdentity: currentFederatedIdentity,
+  isAdminConnected,
   isPeConnected,
   isInclusionConnected,
   inclusionConnectToken,
