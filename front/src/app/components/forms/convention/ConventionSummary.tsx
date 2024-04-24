@@ -39,21 +39,7 @@ export const ConventionSummary = () => {
         description={agencyfeedback.errorMessage}
       />
     );
-  if (!convention)
-    return (
-      <Alert
-        severity="warning"
-        description="Vous n'avez pas de convention disponible pour l'affichage du résumé de la convention"
-        small={true}
-      />
-    );
-  if (!agency)
-    return (
-      <Alert
-        severity="error"
-        title="Erreur lors de la récupération des informations du prescripteur"
-      />
-    );
+  if (!convention || !agency) return null;
 
   const fields = getFormContents(
     formConventionFieldsLabels(convention.internshipKind),

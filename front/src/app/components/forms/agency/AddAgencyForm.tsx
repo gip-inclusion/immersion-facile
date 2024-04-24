@@ -6,7 +6,7 @@ import RadioButtons, {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ErrorNotifications, LinkHome } from "react-design-system";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -79,10 +79,6 @@ export const AddAgencyForm = () => {
       }),
     );
   };
-
-  // values.kind !== "autre" || values.refersToAgencyId
-  // ? "agencyAdded"
-  // : "agencyOfTypeOtherAdded",
 
   const refersToOtherAgencyOptions: RadioButtonsProps["options"] = [
     {
@@ -177,8 +173,8 @@ const AgencyForm = ({
   const [hasDelegation, setHasDelegation] = useState<boolean | null>(null);
   const selectedKind = watch("kind");
 
-  const onDepartmentCodeChangedMemoized = useMemo(
-    () => (departmentCode: DepartmentCode) =>
+  const onDepartmentCodeChangedMemoized = useCallback(
+    (departmentCode: DepartmentCode) =>
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
           departmentCode,
