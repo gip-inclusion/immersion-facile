@@ -1,8 +1,6 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import React from "react";
 import { AdminTab } from "shared";
-import { LayoutHeader } from "src/app/components/layout/LayoutHeader";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
@@ -69,35 +67,20 @@ export const AdminPage = ({
   const currentTab = route.params.tab;
   const tabs = getAdminTabs(currentTab);
   return (
-    <>
-      <LayoutHeader />
-      <div className={fr.cx("fr-container")}>
-        <div
-          className={fr.cx(
-            "fr-grid-row",
-            "fr-grid-row--center",
-            "fr-grid-row--gutters",
-          )}
-        >
-          <div className={fr.cx("fr-col-12", "fr-p-2w", "fr-mt-4w")}>
-            <Tabs
-              tabs={tabs}
-              selectedTabId={currentTab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
-              onTabChange={(tab) => {
-                if (isAdminTab(tab))
-                  routes
-                    .admin({
-                      tab,
-                    })
-                    .push();
-              }}
-              id="admin-tabs"
-            >
-              {tabs.find((tab) => tab.tabId === currentTab)?.content}
-            </Tabs>
-          </div>
-        </div>
-      </div>
-    </>
+    <Tabs
+      tabs={tabs}
+      selectedTabId={currentTab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
+      onTabChange={(tab) => {
+        if (isAdminTab(tab))
+          routes
+            .admin({
+              tab,
+            })
+            .push();
+      }}
+      id="admin-tabs"
+    >
+      {tabs.find((tab) => tab.tabId === currentTab)?.content}
+    </Tabs>
   );
 };

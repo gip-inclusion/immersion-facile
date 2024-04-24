@@ -6,7 +6,6 @@ import {
   DiscussionReadDto,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
-  WithSourcePage,
 } from "shared";
 import { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
 
@@ -23,5 +22,5 @@ export interface InclusionConnectedGateway {
   getDiscussionById$(
     payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined>;
-  getLogoutUrl$(params: WithSourcePage): Observable<AbsoluteUrl>;
+  getLogoutUrl$(): Observable<AbsoluteUrl>;
 }

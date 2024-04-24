@@ -64,7 +64,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
   adminRoot: defineRoute(`/${frontRoutes.admin}`),
   admin: defineRoute(
-    { ...inclusionConnectedParams, tab: param.path.ofType(adminTabSerializer) },
+    {
+      ...inclusionConnectedParams,
+      tab: param.path.optional
+        .ofType(adminTabSerializer)
+        .default("conventions"),
+    },
     ({ tab }) => `/${frontRoutes.admin}/${tab}`,
   ),
   agencyDashboard: defineRoute(

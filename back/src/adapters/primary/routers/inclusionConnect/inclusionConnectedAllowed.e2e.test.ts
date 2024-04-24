@@ -5,12 +5,10 @@ import {
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   User,
-  allowedStartInclusionConnectLoginPages,
   currentJwtVersions,
   displayRouteName,
   expectHttpResponseToEqual,
   expectToEqual,
-  frontRoutes,
   inclusionConnectedAllowedRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -312,18 +310,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
     describe(`${displayRouteName(
       inclusionConnectedAllowedRoutes.getInclusionConnectLogoutUrl,
     )} returns the logout url`, () => {
-      it.each(allowedStartInclusionConnectLoginPages)(
-        "returns a correct logout url with status 200 from %s",
-        async (page) => {
-          const response = await httpClient.getInclusionConnectLogoutUrl({
-            queryParams: { page },
-          });
-          expectHttpResponseToEqual(response, {
-            body: `https://fake-inclusion.com/logout/?client_id=inclusion-client-id&post_logout_redirect_uri=https://my-domain/${frontRoutes[page]}`,
-            status: 200,
-          });
-        },
-      );
+      it("returns a correct logout url with status 200", async () => {
+        const response = await httpClient.getInclusionConnectLogoutUrl();
+        expectHttpResponseToEqual(response, {
+          body: "https://fake-inclusion.com/logout/?client_id=inclusion-client-id&post_logout_redirect_uri=https://my-domain",
+          status: 200,
+        });
+      });
     });
 
     describe(`${displayRouteName(

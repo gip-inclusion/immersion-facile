@@ -10,10 +10,7 @@ import {
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
-import {
-  getInclusionConnectLogoutUrlQueryParamsSchema,
-  inclusionConnectedUserSchema,
-} from "./inclusionConnectedAllowed.schema";
+import { inclusionConnectedUserSchema } from "./inclusionConnectedAllowed.schema";
 
 export type InclusionConnectedAllowedRoutes =
   typeof inclusionConnectedAllowedRoutes;
@@ -54,7 +51,6 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
   getInclusionConnectLogoutUrl: defineRoute({
     method: "get",
     url: "/inclusion-connect-logout",
-    queryParamsSchema: getInclusionConnectLogoutUrlQueryParamsSchema,
     responses: {
       200: absoluteUrlSchema,
     },
