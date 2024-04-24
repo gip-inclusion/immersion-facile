@@ -70,6 +70,28 @@ describe("GetUserAgencyDashboardUrl", () => {
     );
   });
 
+  it("returns an admin user without dashboard urls", async () => {
+    const adminUser: InclusionConnectedUser = {
+      ...john,
+      agencyRights: [],
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
+      isBackofficeAdmin: true,
+    };
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      adminUser,
+    ]);
+
+    const result = await getInclusionConnectedUser.execute(undefined, {
+      ...inclusionConnectJwtPayload,
+      userId: adminUser.id,
+    });
+
+    expectToEqual(result, adminUser);
+  });
+
   const [agencyRolesAllowedToGetDashboard, agencyRolesForbiddenToGetDashboard] =
     splitCasesBetweenPassingAndFailing(allAgencyRoles, [
       "agencyOwner",

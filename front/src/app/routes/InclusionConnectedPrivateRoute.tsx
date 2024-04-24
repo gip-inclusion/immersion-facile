@@ -1,6 +1,8 @@
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import React, { useEffect } from "react";
 import {
   InclusionConnectButton,
+  Loader,
   LoginForm,
   MainWrapper,
 } from "react-design-system";
@@ -15,6 +17,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { Route } from "type-route";
 
 type InclusionConnectPrivateRoute =
@@ -26,17 +29,21 @@ type InclusionConnectedPrivateRouteProps = {
   route: InclusionConnectPrivateRoute;
   children: React.ReactElement;
   inclusionConnectConnexionPageHeader: React.ReactElement;
+  allowAdminOnly?: boolean;
 };
 
 export const InclusionConnectedPrivateRoute = ({
   route,
   children,
+  allowAdminOnly,
   inclusionConnectConnexionPageHeader,
 }: InclusionConnectedPrivateRouteProps) => {
   const dispatch = useDispatch();
   const isInclusionConnected = useAppSelector(
     authSelectors.isInclusionConnected,
   );
+  const isLoadingUser = useAppSelector(inclusionConnectedSelectors.isLoading);
+  const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
 
   useEffect(() => {
     const { token, email = "", firstName = "", lastName = "" } = route.params;
@@ -84,6 +91,23 @@ export const InclusionConnectedPrivateRoute = ({
                 ),
               },
             ]}
+          />
+        </MainWrapper>
+      </HeaderFooterLayout>
+    );
+
+  if (isLoadingUser) return <Loader />;
+
+  if (allowAdminOnly && !isAdminConnected)
+    return (
+      <HeaderFooterLayout>
+        <MainWrapper layout="default">
+          <Alert
+            severity="error"
+            title={"Accès refusé"}
+            description={
+              "Vous n'avez pas les droits nécessaires pour accéder à cette page."
+            }
           />
         </MainWrapper>
       </HeaderFooterLayout>

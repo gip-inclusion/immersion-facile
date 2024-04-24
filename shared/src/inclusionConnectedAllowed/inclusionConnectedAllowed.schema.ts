@@ -68,4 +68,6 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     externalId: zStringMinLength1,
     dashboards: dashboardsSchema,
     establishments: z.array(withEstablishmentSiretAndName).optional(),
+
+    isBackofficeAdmin: z.boolean().optional(),
   });

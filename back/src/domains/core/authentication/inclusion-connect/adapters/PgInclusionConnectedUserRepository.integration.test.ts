@@ -63,6 +63,7 @@ describe("PgInclusionConnectedUserRepository", () => {
     db = makeKyselyDb(pool);
 
     await db.deleteFrom("users_ongoing_oauths").execute();
+    await db.deleteFrom("users_admins").execute();
     await db.deleteFrom("users").execute();
     await db.deleteFrom("users__agencies").execute();
     await db.deleteFrom("conventions").execute();
@@ -75,16 +76,36 @@ describe("PgInclusionConnectedUserRepository", () => {
   });
 
   describe("getById", () => {
-    it("gets the Inclusion Connected User from its Id when no agency is connected", async () => {
-      await insertUser(user1);
-      const inclusionConnectedUser = await icUserRepository.getById(user1.id);
-      expectToEqual(inclusionConnectedUser, {
-        ...user1,
-        agencyRights: [],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
+    describe("when no agency is connected", () => {
+      it("gets the Inclusion Connected User from its Id", async () => {
+        await insertUser(user1);
+        await db
+          .insertInto("users_admins")
+          .values({ user_id: user1.id })
+          .execute();
+        const adminUser = await icUserRepository.getById(user1.id);
+        expectToEqual(adminUser, {
+          ...user1,
+          agencyRights: [],
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
+          isBackofficeAdmin: true,
+        });
+      });
+
+      it("gets the inclusion connected User with admin right for admins", async () => {
+        await insertUser(user1);
+        const inclusionConnectedUser = await icUserRepository.getById(user1.id);
+        expectToEqual(inclusionConnectedUser, {
+          ...user1,
+          agencyRights: [],
+          dashboards: {
+            agencies: {},
+            establishments: {},
+          },
+        });
       });
     });
 
