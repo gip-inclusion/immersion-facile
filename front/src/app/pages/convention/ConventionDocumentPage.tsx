@@ -172,7 +172,8 @@ export const ConventionDocumentPage = ({
     ? "Renouvellement de convention"
     : "Convention";
 
-  const agencyIsLoaded = agencyFeedback.kind === "success" && agencyInfo;
+  const agencyIsLoaded =
+    agencyFeedback.kind === "agencyInfoFetched" && agencyInfo;
 
   return (
     <MainWrapper layout="default" vSpacing={8}>

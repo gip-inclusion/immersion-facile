@@ -11,7 +11,8 @@ import { SubmitFeedBack } from "../SubmitFeedback";
 export type AgenciesFeedbackKind =
   | "agencyAdded"
   | "agencyOfTypeOtherAdded"
-  | "success";
+  | "agencyInfoFetched"
+  | "agencyOptionsFetched";
 
 export type AgenciesSubmitFeedback = SubmitFeedBack<AgenciesFeedbackKind>;
 
@@ -43,7 +44,7 @@ export const agenciesSlice = createSlice({
     ) => {
       state.details = action.payload;
       state.isLoading = false;
-      state.feedback = { kind: "success" };
+      state.feedback = { kind: "agencyInfoFetched" };
     },
     fetchAgencyInfoFailed: (state, action: PayloadAction<string>) => {
       state.feedback = { kind: "errored", errorMessage: action.payload };
@@ -60,7 +61,7 @@ export const agenciesSlice = createSlice({
       action: PayloadAction<AgencyOption[]>,
     ) => {
       state.options = action.payload;
-      state.feedback = { kind: "success" };
+      state.feedback = { kind: "agencyOptionsFetched" };
       state.isLoading = false;
     },
     fetchAgencyOptionsFailed: (state, action: PayloadAction<string>) => {
@@ -70,8 +71,13 @@ export const agenciesSlice = createSlice({
     addAgencyRequested: (state, _action: PayloadAction<CreateAgencyDto>) => {
       state.isLoading = true;
     },
-    addAgencySucceeded: (state, _action: PayloadAction<void>) => {
-      state.feedback = { kind: "agencyAdded" };
+    addAgencySucceeded: (state, action: PayloadAction<CreateAgencyDto>) => {
+      state.feedback = {
+        kind:
+          action.payload.kind !== "autre" || action.payload.refersToAgencyId
+            ? "agencyAdded"
+            : "agencyOfTypeOtherAdded",
+      };
       state.isLoading = false;
     },
     addAgencyFailed: (state, action: PayloadAction<string>) => {

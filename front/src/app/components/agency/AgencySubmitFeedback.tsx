@@ -22,9 +22,15 @@ export const agenciesSubmitMessageByKind: Record<
     message:
       "L'agence a été ajoutée avec succès. Vous devez attendre qu'elle soit validée avant qu'elle ne soit effectivement disponible pour conventionner des immersions",
   },
-  success: {
+  agencyInfoFetched: {
     title: "Succès",
-    message: "L'opération d'agence s'est déroulée avec succès",
+    message:
+      "La récupération des informations d'agence s'est déroulée avec succès",
+  },
+  agencyOptionsFetched: {
+    title: "Succès",
+    message:
+      "La récupération de la liste des agences s'est déroulée avec succès",
   },
   agencyOfTypeOtherAdded: {
     title: "N'oubliez pas de finaliser votre référencement !",

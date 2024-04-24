@@ -44,7 +44,7 @@ describe("Agencies in store", () => {
       expectAgencyInfoToEqual(expectedAgencyInfos);
       expectIsLoadingToBe(false);
       expectFeedbackToEqual({
-        kind: "success",
+        kind: "agencyInfoFetched",
       });
     });
 
@@ -93,6 +93,7 @@ describe("Agencies in store", () => {
 
       // Expect
       expectIsLoadingToBe(false);
+      expectFeedbackToEqual({ kind: "agencyOptionsFetched" });
       expectOptionsToEqual(agenciesFromApi);
     });
   });
@@ -100,7 +101,7 @@ describe("Agencies in store", () => {
   describe("add agency", () => {
     it("add agency successfully & cleared", () => {
       // Arrange
-      const agency = new AgencyDtoBuilder().build();
+      const agency = new AgencyDtoBuilder().withKind("cap-emploi").build();
       expectIsLoadingToBe(false);
 
       // Execute
@@ -112,6 +113,25 @@ describe("Agencies in store", () => {
       // Expect
       expectIsLoadingToBe(false);
       expectFeedbackToEqual({ kind: "agencyAdded" });
+
+      store.dispatch(agenciesSlice.actions.addAgencyCleared());
+      expectFeedbackToEqual({ kind: "idle" });
+    });
+
+    it("add 'other' agency successfully & cleared", () => {
+      // Arrange
+      const agency = new AgencyDtoBuilder().withKind("autre").build();
+      expectIsLoadingToBe(false);
+
+      // Execute
+      store.dispatch(agenciesSlice.actions.addAgencyRequested(agency));
+
+      expectIsLoadingToBe(true);
+      dependencies.agencyGateway.addAgencyResponse$.next(undefined);
+
+      // Expect
+      expectIsLoadingToBe(false);
+      expectFeedbackToEqual({ kind: "agencyOfTypeOtherAdded" });
 
       store.dispatch(agenciesSlice.actions.addAgencyCleared());
       expectFeedbackToEqual({ kind: "idle" });

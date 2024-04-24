@@ -50,9 +50,12 @@ const addAgencyEpic: AppEpic<AgencyInfoAction> = (
   action$.pipe(
     filter(agenciesSlice.actions.addAgencyRequested.match),
     switchMap((action) =>
-      dependencies.agencyGateway.addAgency$(action.payload),
+      dependencies.agencyGateway
+        .addAgency$(action.payload)
+        .pipe(
+          map(() => agenciesSlice.actions.addAgencySucceeded(action.payload)),
+        ),
     ),
-    map(agenciesSlice.actions.addAgencySucceeded),
     catchEpicError((error) =>
       agenciesSlice.actions.addAgencyFailed(error.message),
     ),

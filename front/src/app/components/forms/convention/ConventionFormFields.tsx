@@ -4,7 +4,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ErrorNotifications } from "react-design-system";
 import { type SubmitHandler, get, useFormContext } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -228,8 +228,8 @@ export const ConventionFormFields = ({
 
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
-  const onDepartmentCodeChangedMemoized = useMemo(
-    () => (departmentCode: DepartmentCode) =>
+  const onDepartmentCodeChangedMemoized = useCallback(
+    (departmentCode: DepartmentCode) =>
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
           kind: makeListAgencyOptionsKindFilter({
