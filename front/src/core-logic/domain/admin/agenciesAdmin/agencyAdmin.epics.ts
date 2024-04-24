@@ -40,7 +40,9 @@ const agencyAdminGetNeedingReviewEpic: AgencyEpic = (
   action$.pipe(
     filter(agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested.match),
     switchMap(() =>
-      agencyGateway.listAgencyOptionsNeedingReview$(getAdminToken(state$.value)),
+      agencyGateway.listAgencyOptionsNeedingReview$(
+        getAdminToken(state$.value),
+      ),
     ),
     map(agencyAdminSlice.actions.setAgencyNeedingReviewOptions),
     catchEpicError((error: Error) =>

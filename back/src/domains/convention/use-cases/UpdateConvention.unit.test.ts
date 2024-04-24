@@ -1,7 +1,9 @@
 import {
+  ConventionDomainPayload,
   ConventionDtoBuilder,
   ConventionId,
   EstablishmentTutor,
+  InclusionConnectedUserBuilder,
   conventionStatuses,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -10,30 +12,38 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
+  UnauthorizedError,
 } from "../../../config/helpers/httpErrors";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
 import { UpdateConvention } from "./UpdateConvention";
+
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin-user-id")
+  .withIsAdmin(true)
+  .build();
 
 describe("Update Convention", () => {
   let updateConvention: UpdateConvention;
-  let conventionRepository: InMemoryConventionRepository;
-  let outboxRepo: InMemoryOutboxRepository;
   let createNewEvent: CreateNewEvent;
   let uowPerformer: InMemoryUowPerformer;
+  let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    conventionRepository = uow.conventionRepository;
-    outboxRepo = uow.outboxRepository;
+    uow = createInMemoryUow();
+
+    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
 
     createNewEvent = makeCreateNewEvent({
       timeGateway: new CustomTimeGateway(),
@@ -45,10 +55,52 @@ describe("Update Convention", () => {
     updateConvention = new UpdateConvention(uowPerformer, createNewEvent);
   });
 
+  describe("when user is not allowed", () => {
+    it("throws without jwtPayload", async () => {
+      const convention = new ConventionDtoBuilder().build();
+      await expectPromiseToFailWithError(
+        updateConvention.execute({
+          convention,
+        }),
+        new UnauthorizedError(),
+      );
+    });
+
+    it("throws if inclusion connected user is not admin", async () => {
+      const convention = new ConventionDtoBuilder().build();
+      const icUser = new InclusionConnectedUserBuilder()
+        .withIsAdmin(false)
+        .build();
+
+      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+
+      await expectPromiseToFailWithError(
+        updateConvention.execute({ convention }, { userId: icUser.id }),
+        new ForbiddenError(`User '${icUser.id}' is not a backOffice user`),
+      );
+    });
+
+    it("throws if no convention id does not match the one in jwt payload", () => {
+      const convention = new ConventionDtoBuilder().build();
+      const jwtPayload: ConventionDomainPayload = {
+        applicationId: "another-convention-id",
+        role: "beneficiary",
+        emailHash: "yolo",
+      };
+
+      expectPromiseToFailWithError(
+        updateConvention.execute({ convention }, jwtPayload),
+        new ForbiddenError(
+          `User is not allowed to update convention ${convention.id}`,
+        ),
+      );
+    });
+  });
+
   describe("When the Convention is valid", () => {
     it("updates the Convention in the repository", async () => {
       const conventionInRepo = new ConventionDtoBuilder().build();
-      conventionRepository.setConventions([conventionInRepo]);
+      uow.conventionRepository.setConventions([conventionInRepo]);
 
       const updatedConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
@@ -56,11 +108,12 @@ describe("Update Convention", () => {
         .withStatusJustification("justif")
         .build();
 
-      const { id } = await updateConvention.execute({
-        convention: updatedConvention,
-      });
+      const { id } = await updateConvention.execute(
+        { convention: updatedConvention },
+        { userId: backofficeAdminUser.id },
+      );
       expect(id).toEqual(updatedConvention.id);
-      expect(conventionRepository.conventions).toEqual([updatedConvention]);
+      expect(uow.conventionRepository.conventions).toEqual([updatedConvention]);
     });
   });
 
@@ -74,9 +127,10 @@ describe("Update Convention", () => {
         .build();
 
       await expectPromiseToFailWithError(
-        updateConvention.execute({
-          convention: validConvention,
-        }),
+        updateConvention.execute(
+          { convention: validConvention },
+          { userId: backofficeAdminUser.id },
+        ),
         new NotFoundError(`Convention with id ${id} was not found`),
       );
     });
@@ -88,7 +142,7 @@ describe("Update Convention", () => {
         .withStatus("PARTIALLY_SIGNED")
         .build();
 
-      conventionRepository.setConventions([storedConvention]);
+      uow.conventionRepository.setConventions([storedConvention]);
 
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedConvention = new ConventionDtoBuilder()
@@ -98,9 +152,16 @@ describe("Update Convention", () => {
         .build();
 
       await expectPromiseToFailWithError(
-        updateConvention.execute({
-          convention: updatedConvention,
-        }),
+        updateConvention.execute(
+          {
+            convention: updatedConvention,
+          },
+          {
+            applicationId: storedConvention.id,
+            role: "beneficiary",
+            emailHash: "123",
+          },
+        ),
         new BadRequestError(
           `Convention ${storedConvention.id} cannot be modified as it has status PARTIALLY_SIGNED`,
         ),
@@ -127,7 +188,7 @@ describe("Update Convention", () => {
         })
         .build();
 
-      conventionRepository.setConventions([storedConvention]);
+      uow.conventionRepository.setConventions([storedConvention]);
 
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedConvention = new ConventionDtoBuilder(storedConvention)
@@ -141,10 +202,13 @@ describe("Update Convention", () => {
         })
         .build();
 
-      await updateConvention.execute({
-        convention: updatedConvention,
-      });
-      expect(conventionRepository.conventions).toEqual([updatedConvention]);
+      await updateConvention.execute(
+        {
+          convention: updatedConvention,
+        },
+        { userId: backofficeAdminUser.id },
+      );
+      expect(uow.conventionRepository.conventions).toEqual([updatedConvention]);
     });
 
     it("With beneficiary current employer", async () => {
@@ -152,7 +216,7 @@ describe("Update Convention", () => {
         .withStatus("DRAFT")
         .build();
 
-      conventionRepository.setConventions([storedConvention]);
+      uow.conventionRepository.setConventions([storedConvention]);
 
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedConvention = new ConventionDtoBuilder(storedConvention)
@@ -170,10 +234,11 @@ describe("Update Convention", () => {
         })
         .build();
 
-      await updateConvention.execute({
-        convention: updatedConvention,
-      });
-      expect(conventionRepository.conventions).toEqual([updatedConvention]);
+      await updateConvention.execute(
+        { convention: updatedConvention },
+        { userId: backofficeAdminUser.id },
+      );
+      expect(uow.conventionRepository.conventions).toEqual([updatedConvention]);
     });
   });
 
@@ -181,7 +246,7 @@ describe("Update Convention", () => {
     let id: ConventionId;
     beforeEach(() => {
       const convention = new ConventionDtoBuilder().build();
-      conventionRepository.setConventions([convention]);
+      uow.conventionRepository.setConventions([convention]);
       id = convention.id;
     });
 
@@ -192,9 +257,10 @@ describe("Update Convention", () => {
         .build();
 
       expect(
-        await updateConvention.execute({
-          convention: inReviewConvention,
-        }),
+        await updateConvention.execute(
+          { convention: inReviewConvention },
+          { userId: backofficeAdminUser.id },
+        ),
       ).toEqual({
         id: inReviewConvention.id,
       });
@@ -212,9 +278,10 @@ describe("Update Convention", () => {
           .build();
 
         await expectPromiseToFailWithError(
-          updateConvention.execute({
-            convention,
-          }),
+          updateConvention.execute(
+            { convention },
+            { userId: backofficeAdminUser.id },
+          ),
           new ForbiddenError(
             `Convention ${convention.id} with modifications should have status READY_TO_SIGN`,
           ),
@@ -229,13 +296,14 @@ describe("Update Convention", () => {
         .withStatusJustification("updateJustification")
         .build();
 
-      const response = await updateConvention.execute({
-        convention: inReviewConvention,
-      });
+      const response = await updateConvention.execute(
+        { convention: inReviewConvention },
+        { userId: backofficeAdminUser.id },
+      );
 
-      expect(outboxRepo.events).toHaveLength(1);
+      expect(uow.outboxRepository.events).toHaveLength(1);
       expectToEqual(
-        outboxRepo.events[0],
+        uow.outboxRepository.events[0],
         createNewEvent({
           topic: "ConventionSubmittedAfterModification",
           payload: { convention: inReviewConvention },
@@ -254,9 +322,10 @@ describe("Update Convention", () => {
         .build();
 
       await expectPromiseToFailWithError(
-        updateConvention.execute({
-          convention: draftConvention,
-        }),
+        updateConvention.execute(
+          { convention: draftConvention },
+          { userId: backofficeAdminUser.id },
+        ),
         new ForbiddenError(
           `Convention ${id} with modifications should have status READY_TO_SIGN`,
         ),

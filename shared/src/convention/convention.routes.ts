@@ -69,6 +69,8 @@ export const conventionMagicLinkRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: withConventionIdLegacySchema,
+      401: legacyUnauthenticatedErrorSchema,
+      403: legacyHttpErrorSchema,
       404: legacyHttpErrorSchema,
     },
   }),

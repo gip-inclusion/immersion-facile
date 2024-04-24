@@ -42,7 +42,10 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () => {
         if (!(req.payloads?.inclusion || req.payloads?.convention))
           throw new UnauthorizedError();
-        return deps.useCases.updateConvention.execute(req.body);
+        return deps.useCases.updateConvention.execute(
+          req.body,
+          req.payloads?.inclusion || req.payloads?.convention,
+        );
       }),
   );
 
