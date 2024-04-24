@@ -1,22 +1,18 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Button from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
+
+import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 import React from "react";
 import { Loader } from "react-design-system";
-import { useDispatch } from "react-redux";
 import { EstablishmentRole, InclusionConnectedUser } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
-import { isEstablishmentDashboardTab } from "src/app/routes/routeParams/establishmentDashboardTabs";
-import { routes } from "src/app/routes/routes";
-
-import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-
-import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
+import { isEstablishmentDashboardTab } from "src/app/routes/routeParams/establishmentDashboardTabs";
+import { routes } from "src/app/routes/routes";
 import { DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
@@ -35,8 +31,6 @@ export const EstablishmentDashboardPage = ({
 }): ReactJSXElement => {
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
-
-  const dispatch = useDispatch();
 
   const rawEstablishmentDashboardTabs = ({
     dashboards: {
@@ -117,21 +111,6 @@ export const EstablishmentDashboardPage = ({
     <>
       <div className={fr.cx("fr-grid-row")}>
         <h1>Bienvenue</h1>
-        <div className={fr.cx("fr-ml-auto", "fr-mt-1w")}>
-          <Button
-            onClick={() => {
-              dispatch(
-                authSlice.actions.federatedIdentityDeletionTriggered(
-                  route.name,
-                ),
-              );
-            }}
-            type="button"
-            priority="secondary"
-          >
-            Se déconnecter
-          </Button>
-        </div>
       </div>
       {isLoading && <Loader />}
       {match({ currentUser })

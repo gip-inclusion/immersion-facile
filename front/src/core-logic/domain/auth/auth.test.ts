@@ -63,9 +63,7 @@ describe("Auth slice", () => {
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
-    store.dispatch(
-      authSlice.actions.federatedIdentityDeletionTriggered("agencyDashboard"),
-    );
+    store.dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
     dependencies.inclusionConnectedGateway.getLogoutUrlResponse$.next(
       "http://yolo-logout.com",
     );
@@ -90,9 +88,7 @@ describe("Auth slice", () => {
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
-    store.dispatch(
-      authSlice.actions.federatedIdentityDeletionTriggered("other"),
-    );
+    store.dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
     expectPartialConventionInUrlInDevice(undefined);

@@ -56,14 +56,27 @@ const getPageByRouteName: {
   [K in keyof Routes]: (route: Route<Routes[K]>) => unknown;
 } = {
   addAgency: () => <AddAgencyPage />,
-  adminRoot: () => routes.admin({ tab: "conventions" }).push(),
+  adminRoot: () => (
+    <InclusionConnectedPrivateRoute
+      route={routes.admin({ tab: "conventions" })}
+      inclusionConnectConnexionPageHeader={
+        <PageHeader
+          title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀"
+          theme="default"
+          centered
+        />
+      }
+    >
+      <AdminPage route={routes.admin({ tab: "conventions" })} />
+    </InclusionConnectedPrivateRoute>
+  ),
   admin: (route) =>
     adminTabsList.includes(route.params.tab as AdminTab) ? (
       <InclusionConnectedPrivateRoute
         route={route}
         inclusionConnectConnexionPageHeader={
           <PageHeader
-            title="Bienvenu cher administrateur de la super team Immersion Facilitée ! 🚀"
+            title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀"
             theme="default"
             centered
           />

@@ -6,7 +6,6 @@ import { subMinutes } from "date-fns";
 import { all } from "ramda";
 import React from "react";
 import { Loader } from "react-design-system";
-import { useDispatch } from "react-redux";
 import { AgencyRight, InclusionConnectedUser, domElementIds } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
@@ -16,7 +15,6 @@ import { isAgencyDashboardTab } from "src/app/routes/routeParams/agencyDashboard
 import { routes } from "src/app/routes/routes";
 import { DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selector";
 import { P, match } from "ts-pattern";
@@ -39,7 +37,6 @@ export const AgencyDashboardPage = ({
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
-  const dispatch = useDispatch();
 
   const rawAgencyDashboardTabs = ({
     dashboards: {
@@ -123,21 +120,6 @@ export const AgencyDashboardPage = ({
     <>
       <div className={fr.cx("fr-grid-row")}>
         <h1>Bienvenue</h1>
-        <div className={fr.cx("fr-ml-auto", "fr-mt-1w")}>
-          <Button
-            onClick={() => {
-              dispatch(
-                authSlice.actions.federatedIdentityDeletionTriggered(
-                  route.name,
-                ),
-              );
-            }}
-            type="button"
-            priority="secondary"
-          >
-            Se déconnecter
-          </Button>
-        </div>
       </div>
       {isLoading && <Loader />}
       {match({ currentUser, feedback })

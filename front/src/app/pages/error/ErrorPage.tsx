@@ -17,6 +17,7 @@ export const ErrorPage = ({
 }: ErrorPageProperties): React.ReactElement => (
   <HeaderFooterLayout>
     <MainWrapper layout="default" vSpacing={0}>
+      my error
       <ErrorPageContent type={type} message={message} title={title} />
     </MainWrapper>
   </HeaderFooterLayout>

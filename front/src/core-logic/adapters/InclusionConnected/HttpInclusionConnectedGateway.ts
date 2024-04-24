@@ -6,7 +6,6 @@ import {
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
-  WithSourcePage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -64,15 +63,13 @@ export class HttpInclusionConnectedGateway
     );
   }
 
-  public getLogoutUrl$(params: WithSourcePage): Observable<AbsoluteUrl> {
+  public getLogoutUrl$(): Observable<AbsoluteUrl> {
     return from(
-      this.httpClient
-        .getInclusionConnectLogoutUrl({ queryParams: params })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, ({ body }) => body)
-            .otherwise(otherwiseThrow),
-        ),
+      this.httpClient.getInclusionConnectLogoutUrl().then((response) =>
+        match(response)
+          .with({ status: 200 }, ({ body }) => body)
+          .otherwise(otherwiseThrow),
+      ),
     );
   }
 

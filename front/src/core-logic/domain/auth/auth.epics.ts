@@ -57,11 +57,7 @@ const logoutFromInclusionConnect: AuthEpic = (
         state$.value.auth.federatedIdentityWithUser?.provider ===
         "inclusionConnect",
     ),
-    switchMap(({ payload }) => {
-      if (payload === "other")
-        throw new Error("WithSourcePage required in payload");
-      return inclusionConnectedGateway.getLogoutUrl$({ page: payload });
-    }),
+    switchMap(() => inclusionConnectedGateway.getLogoutUrl$()),
     map((logoutUrl) => {
       navigationGateway.goToUrl(logoutUrl);
       return authSlice.actions.loggedOutSuccessfullyFromInclusionConnect();

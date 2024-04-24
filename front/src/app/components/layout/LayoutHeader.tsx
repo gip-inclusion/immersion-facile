@@ -47,9 +47,23 @@ export const LayoutHeader = () => {
     admin: adminIds,
   } = domElementIds.header.navLinks;
 
+  const isInclusionConnected = useAppSelector(
+    authSelectors.isInclusionConnected,
+  );
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const tools: HeaderProps["quickAccessItems"] = [headerFooterDisplayItem];
+
+  if (isInclusionConnected) {
+    tools.push({
+      iconId: "fr-icon-lock-line",
+      text: "Se déconnecter",
+      buttonProps: {
+        onClick: () =>
+          dispatch(authSlice.actions.federatedIdentityDeletionTriggered()),
+      },
+    });
+  }
 
   if (isPeConnected) {
     tools.push({
@@ -57,9 +71,7 @@ export const LayoutHeader = () => {
       text: "Se déconnecter (PE Connect)",
       buttonProps: {
         onClick: () => {
-          dispatch(
-            authSlice.actions.federatedIdentityDeletionTriggered("other"),
-          );
+          dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
           if (currentRoute.name === "conventionImmersion") {
             const {
               fedId: _1,
