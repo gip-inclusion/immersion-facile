@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
+  ConventionMagicLinkRoutes,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
@@ -11,8 +12,11 @@ import {
   ScheduleDtoBuilder,
   conventionMagicLinkRoutes,
   currentJwtVersions,
+  expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
+import { HttpClient } from "shared-routes";
+import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import {
   GenerateConventionJwt,
@@ -46,6 +50,7 @@ describe("Magic link router", () => {
   let generateConventionJwt: GenerateConventionJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let inMemoryUow: InMemoryUnitOfWork;
+  let httpClient: HttpClient<ConventionMagicLinkRoutes>;
 
   beforeEach(async () => {
     ({
@@ -54,6 +59,10 @@ describe("Magic link router", () => {
       generateInclusionConnectJwt,
       inMemoryUow,
     } = await buildTestApp());
+    httpClient = createSupertestSharedClient(
+      conventionMagicLinkRoutes,
+      request,
+    );
     const initialConvention = conventionBuilder.build();
     inMemoryUow.conventionRepository.setConventions([initialConvention]);
     inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -65,10 +74,17 @@ describe("Magic link router", () => {
     describe("when beneficiary asks for modification", () => {
       it("can update the convention", async () => {
         const updatedConvention = conventionBuilder
-          .withBeneficiaryFirstName("Merguez")
           .withStatus("READY_TO_SIGN")
-          .withStatusJustification("justif")
+          .withActivities("Plein d'activitées cool !")
           .build();
+
+        inMemoryUow.conventionRepository.setConventions([
+          {
+            ...updatedConvention,
+            immersionActivities: "pas grand chose",
+            status: "DRAFT",
+          },
+        ]);
 
         const backOfficeJwt = generateConventionJwt({
           ...payloadMeta,
@@ -76,25 +92,51 @@ describe("Magic link router", () => {
           emailHash: "my-hash",
           applicationId: updatedConvention.id,
         });
-        const response = await request
-          .post(
-            conventionMagicLinkRoutes.updateConvention.url.replace(
-              ":conventionId",
-              updatedConvention.id,
-            ),
-          )
-          .send({
-            convention: updatedConvention,
-          })
-          .set({
-            authorization: backOfficeJwt,
-          });
 
-        expectToEqual(response.body, { id: updatedConvention.id });
-        expectToEqual(response.status, 200);
-        expectToEqual(inMemoryUow.conventionRepository.conventions, [
-          updatedConvention,
-        ]);
+        const response = await httpClient.updateConvention({
+          urlParams: { conventionId: updatedConvention.id },
+          body: { convention: updatedConvention },
+          headers: { authorization: backOfficeJwt },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 200,
+          body: { id: updatedConvention.id },
+        });
+      });
+    });
+
+    describe("User is not allowed", () => {
+      it("throws when user is not admin", async () => {
+        const updatedConvention = conventionBuilder
+          .withBeneficiaryFirstName("Merguez")
+          .withStatus("READY_TO_SIGN")
+          .withStatusJustification("Justif")
+          .build();
+
+        const user = new InclusionConnectedUserBuilder()
+          .withIsAdmin(false)
+          .build();
+
+        inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
+          [user],
+        );
+
+        const userJwt = generateInclusionConnectJwt({
+          userId: user.id,
+          version: currentJwtVersions.inclusion,
+        });
+
+        const response = await httpClient.updateConvention({
+          urlParams: { conventionId: updatedConvention.id },
+          body: { convention: updatedConvention },
+          headers: { authorization: userJwt },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 403,
+          body: { errors: `User '${user.id}' is not a backOffice user` },
+        });
       });
     });
 
@@ -106,26 +148,20 @@ describe("Magic link router", () => {
           .withStatusJustification("Justif")
           .build();
 
-        const backOfficeJwt = generateInclusionConnectJwt({
-          ...payloadMeta,
-          userId: "TODO create admin boUser and save it",
-        });
-        const response = await request
-          .post(
-            conventionMagicLinkRoutes.updateConvention.url.replace(
-              ":conventionId",
-              updatedConvention.id,
-            ),
-          )
-          .send({
-            convention: updatedConvention,
-          })
-          .set({
-            authorization: backOfficeJwt,
-          });
+        const backOfficeJwt = generateInclusionConnectJwt(
+          backofficeAdminJwtPayload,
+        );
 
-        expectToEqual(response.body, { id: updatedConvention.id });
-        expectToEqual(response.status, 200);
+        const response = await httpClient.updateConvention({
+          urlParams: { conventionId: updatedConvention.id },
+          body: { convention: updatedConvention },
+          headers: { authorization: backOfficeJwt },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 200,
+          body: { id: updatedConvention.id },
+        });
         expectToEqual(inMemoryUow.conventionRepository.conventions, [
           updatedConvention,
         ]);

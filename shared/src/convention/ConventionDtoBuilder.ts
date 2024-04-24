@@ -216,6 +216,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({ ...this.dto, agencyId });
   }
 
+  public withActivities(activities: string): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      immersionActivities: activities,
+    });
+  }
+
   public withBeneficiary(
     beneficiary: Beneficiary<InternshipKind>,
   ): ConventionDtoBuilder {
