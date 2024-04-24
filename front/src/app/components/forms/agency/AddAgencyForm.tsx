@@ -37,12 +37,12 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
+import errorSvg from "src/assets/img/error.svg";
+import successSvg from "src/assets/img/success.svg";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { AgencySubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { P, match } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
-import errorSvg from "../../../../assets/img/error.svg";
-import successSvg from "../../../../assets/img/success.svg";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";

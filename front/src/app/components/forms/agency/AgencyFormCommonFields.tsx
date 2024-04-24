@@ -1,7 +1,5 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
-// import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import React, { useEffect, useState } from "react";
-// import { LinkHome } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
   AddressDto,
@@ -11,7 +9,6 @@ import {
   emailSchema,
 } from "shared";
 import { UploadFile } from "src/app/components/UploadFile";
-// import { agencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
@@ -24,7 +21,6 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
-// import { routes } from "src/app/routes/routes";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
@@ -71,22 +67,6 @@ export const AgencyFormCommonFields = ({
 
   return (
     <>
-      {/* <Select
-        label={formContents.kind.label}
-        hint={formContents.kind.hintText}
-        options={agencyListOfOptions.sort((a, b) =>
-          a.label < b.label ? -1 : 0,
-        )}
-        placeholder={formContents.kind.placeholder}
-        nativeSelectProps={{
-          ...formContents.kind,
-          ...register("kind"),
-        }}
-        state={watch("kind") === "pole-emploi" ? "error" : "default"}
-        stateRelatedMessage={
-          watch("kind") === "pole-emploi" ? agencyErrorMessage : undefined
-        }
-      /> */}
       <Input
         label={formContents.agencySiret.label}
         hintText={formContents.agencySiret.hintText}
@@ -190,16 +170,6 @@ export const AgencyFormCommonFields = ({
     </>
   );
 };
-
-// const agencyErrorMessage = (
-//   <span>
-//     Attention, toutes les agences France Travail ont déjà été ajoutées par notre
-//     équipe sur Immersion Facilitée.{" "}
-//     <LinkHome {...routes.agencyDashboard().link}>
-//       Accéder à votre espace prescripteur.
-//     </LinkHome>
-//   </span>
-// );
 
 const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
   {
