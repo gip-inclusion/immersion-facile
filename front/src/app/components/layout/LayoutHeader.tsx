@@ -66,10 +66,19 @@ export const LayoutHeader = () => {
       iconId: "fr-icon-lock-line",
       text: "Se déconnecter (PE Connect)",
       buttonProps: {
-        onClick: () =>
+        onClick: () => {
           dispatch(
             authSlice.actions.federatedIdentityDeletionTriggered("other"),
-          ),
+          );
+          if (currentRoute.name === "conventionImmersion") {
+            const {
+              fedId: _1,
+              fedIdProvider: _2,
+              ...rest
+            } = currentRoute.params;
+            routes.conventionImmersion(rest).replace();
+          }
+        },
       },
     });
   }
