@@ -498,7 +498,7 @@ export const rejectStatusTransitionTests = ({
   const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
     splitCasesBetweenPassingAndFailing(allRoles, allowedMagicLinkRoles);
   const [
-    allowedInclusionConnectedUsersToUpdate,
+    _allowedInclusionConnectedUsersToUpdate,
     notAllowedInclusionConnectedUsersToUpdate,
   ] = splitCasesBetweenPassingAndFailing(
     allInclusionConnectedTestUsers,
@@ -604,24 +604,8 @@ export const acceptStatusTransitionTests = ({
   updateStatusParams: UpdateConventionStatusRequestDto;
 }) => {
   describe("Accepted", () => {
-    const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
-      splitCasesBetweenPassingAndFailing(allRoles, allowedMagicLinkRoles);
-    const [
-      allowedInclusionConnectedUsersToUpdate,
-      notAllowedInclusionConnectedUsersToUpdate,
-    ] = splitCasesBetweenPassingAndFailing(
-      allInclusionConnectedTestUsers,
-      allowedInclusionConnectedUsers,
-    );
-
-    const [authorizedInitialStatuses, forbiddenInitalStatuses] =
-      splitCasesBetweenPassingAndFailing(
-        conventionStatuses,
-        allowedInitialStatuses,
-      );
-
-    const someValidInitialStatus = authorizedInitialStatuses[0];
-    const someValidRole = allowedRolesToUpdate[0];
+    const someValidInitialStatus = allowedInitialStatuses[0];
+    const someValidRole = allowedMagicLinkRoles[0];
 
     const testAcceptsStatusUpdate = makeTestAcceptsStatusUpdate({
       updateStatusParams,
@@ -639,17 +623,17 @@ export const acceptStatusTransitionTests = ({
         }),
     );
 
-    if (allowedInclusionConnectedUsersToUpdate.length)
-      it.each(
-        allowedInclusionConnectedUsersToUpdate.map((userId) => ({ userId })),
-      )("Accepted from userId '$userId'", ({ userId }) =>
-        testAcceptsStatusUpdate({
-          userId,
-          initialStatus: someValidInitialStatus,
-        }),
+    if (allowedInclusionConnectedUsers.length)
+      it.each(allowedInclusionConnectedUsers.map((userId) => ({ userId })))(
+        "Accepted from userId '$userId'",
+        ({ userId }) =>
+          testAcceptsStatusUpdate({
+            userId,
+            initialStatus: someValidInitialStatus,
+          }),
       );
 
-    it.each(authorizedInitialStatuses.map((status) => ({ status })))(
+    it.each(allowedInitialStatuses.map((status) => ({ status })))(
       "Accepted from status $status",
       ({ status }) =>
         testAcceptsStatusUpdate({
