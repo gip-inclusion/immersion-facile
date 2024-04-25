@@ -2,6 +2,7 @@ import {
   EstablishmentJwtPayload,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   addressDtoToString,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -23,18 +24,10 @@ import {
 } from "../helpers/EstablishmentBuilders";
 import { RetrieveFormEstablishmentFromAggregates } from "./RetrieveFormEstablishmentFromAggregates";
 
-const backofficeAdminUser: InclusionConnectedUser = {
-  id: "backoffice-admin",
-  email: "jack.admin@mail.com",
-  firstName: "Jack",
-  lastName: "The Admin",
-  externalId: "jack-admin-external-id",
-  createdAt: new Date().toISOString(),
-  isBackofficeAdmin: true,
-  agencyRights: [],
-  dashboards: { agencies: {}, establishments: {} },
-  establishments: [],
-};
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withIsAdmin(true)
+  .withId("backoffice-admin")
+  .build();
 
 const backofficeAdminJwtPayload = {
   userId: backofficeAdminUser.id,

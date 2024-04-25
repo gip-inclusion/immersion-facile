@@ -54,25 +54,14 @@ export const LayoutHeader = () => {
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const tools: HeaderProps["quickAccessItems"] = [headerFooterDisplayItem];
 
-  if (isInclusionConnected) {
+  if (isPeConnected || isInclusionConnected) {
     tools.push({
       iconId: "fr-icon-lock-line",
-      text: "Se déconnecter",
-      buttonProps: {
-        onClick: () =>
-          dispatch(authSlice.actions.federatedIdentityDeletionTriggered()),
-      },
-    });
-  }
-
-  if (isPeConnected) {
-    tools.push({
-      iconId: "fr-icon-lock-line",
-      text: "Se déconnecter (PE Connect)",
+      text: isPeConnected ? "Se déconnecter (PE Connect)" : "Se déconnecter",
       buttonProps: {
         onClick: () => {
           dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
-          if (currentRoute.name === "conventionImmersion") {
+          if (isPeConnected && currentRoute.name === "conventionImmersion") {
             const {
               fedId: _1,
               fedIdProvider: _2,
@@ -84,6 +73,7 @@ export const LayoutHeader = () => {
       },
     });
   }
+
   const isCandidateRoute =
     currentRoute.name === routes.search().name ||
     currentRoute.name === routes.homeCandidates().name;

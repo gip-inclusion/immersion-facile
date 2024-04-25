@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   User,
   expectPromiseToFailWith,
   expectToEqual,
@@ -25,18 +26,10 @@ const user: User = {
   createdAt: new Date().toISOString(),
 };
 
-const backofficeAdminUser: InclusionConnectedUser = {
-  id: "backoffice-admin",
-  email: "jack.admin@mail.com",
-  firstName: "Jack",
-  lastName: "The Admin",
-  externalId: "jack-admin-external-id",
-  createdAt: new Date().toISOString(),
-  isBackofficeAdmin: true,
-  agencyRights: [],
-  dashboards: { agencies: {}, establishments: {} },
-  establishments: [],
-};
+const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  .withIsAdmin(true)
+  .withId("backoffice-admin")
+  .build();
 
 const backofficeAdminJwtPayload = {
   userId: backofficeAdminUser.id,

@@ -210,7 +210,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       body: {
         errors: "No establishment found with siret 12345678901234.",
       },
-      status: 400,
+      status: 404,
     });
   });
 
@@ -272,12 +272,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateBackOfficeJwt(
-          createBackOfficeJwtPayload({
-            durationDays: 1,
-            now: new Date(),
-          }),
-        ),
+        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
       },
       urlParams: {
         siret: TEST_OPEN_ESTABLISHMENT_1.siret,
