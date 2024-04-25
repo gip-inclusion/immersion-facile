@@ -25,14 +25,12 @@ import { Mode, OnStepChange, Step } from "../EstablishmentForm";
 
 export const AvailabilitySection = ({
   mode,
-  isSearchable,
   onStepChange,
   currentStep,
   setAvailableForImmersion,
   availableForImmersion,
 }: {
   mode: Mode;
-  isSearchable: boolean;
   onStepChange: OnStepChange;
   currentStep: Step;
   setAvailableForImmersion: (value: boolean) => void;
@@ -124,10 +122,9 @@ export const AvailabilitySection = ({
                 valueAsNumber: true,
               }),
               type: "number",
-              min: isSearchable ? 1 : 0,
+              min: 1,
               pattern: "\\d*",
             }}
-            disabled={!isSearchable}
             {...getFieldError("maxContactsPerWeek")}
           />
         )}

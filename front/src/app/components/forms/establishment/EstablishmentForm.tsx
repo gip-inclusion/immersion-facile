@@ -15,7 +15,6 @@ import {
   domElementIds,
   expiredMagicLinkErrorMessage,
   formEstablishmentSchema,
-  noContactPerWeek,
 } from "shared";
 import { AvailabilitySection } from "src/app/components/forms/establishment/sections/AvailabilitySection";
 import { BusinessContactSection } from "src/app/components/forms/establishment/sections/BusinessContactSection";
@@ -135,10 +134,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const currentRoute = isEstablishmentDashboard ? route : useRef(route).current;
 
   const debouncedFormValues = useDebounce(formValues);
-
-  const isSearchable =
-    Number.isNaN(formValues.maxContactsPerWeek) ||
-    formValues.maxContactsPerWeek > noContactPerWeek;
 
   useInitialSiret(
     (isEstablishmentCreation ||
@@ -395,7 +390,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 <h2>{steps[1].title}</h2>
                 <AvailabilitySection
                   mode={mode}
-                  isSearchable={isSearchable}
                   onStepChange={onStepChange}
                   currentStep={currentStep}
                   setAvailableForImmersion={setAvailableForImmersion}
@@ -437,7 +431,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   .with(1, () => (
                     <AvailabilitySection
                       mode={mode}
-                      isSearchable={isSearchable}
                       onStepChange={onStepChange}
                       currentStep={currentStep}
                       availableForImmersion={availableForImmersion}
