@@ -131,4 +131,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.request(`DELETE /repos/${{ github.repository }}/releases/v${{ github.run_number }}-rc`);
+            await github.request(`DELETE /repos/${{ github.repository }}/git/refs/tags/v${{ github.run_number }}-rc`);
