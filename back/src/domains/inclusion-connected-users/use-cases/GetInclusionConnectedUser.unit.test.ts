@@ -4,6 +4,7 @@ import {
   DiscussionBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   User,
   allAgencyRoles,
   expectPromiseToFailWith,
@@ -71,15 +72,11 @@ describe("GetUserAgencyDashboardUrl", () => {
   });
 
   it("returns an admin user without dashboard urls", async () => {
-    const adminUser: InclusionConnectedUser = {
-      ...john,
-      agencyRights: [],
-      dashboards: {
-        agencies: {},
-        establishments: {},
-      },
-      isBackofficeAdmin: true,
-    };
+    const adminUser = new InclusionConnectedUserBuilder()
+      .withIsAdmin(true)
+      .withId(john.id)
+      .build();
+
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
       adminUser,
     ]);
