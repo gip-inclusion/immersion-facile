@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
@@ -136,10 +137,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const debouncedFormValues = useDebounce(formValues);
 
   useInitialSiret(
-    (isEstablishmentCreation ||
-      isEstablishmentAdmin ||
-      isEstablishmentDashboard) &&
-      route.params.siret
+    (isEstablishmentCreation || isEstablishmentDashboard) && route.params.siret
       ? route.params.siret
       : "",
   );
@@ -389,6 +387,15 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           {match(currentStep)
             .with(null, () => (
               <>
+                <Button
+                  onClick={() => {
+                    routes.adminTab({ tab: "establishments" }).push();
+                  }}
+                  children="Retour au pilotage des établissements"
+                  type="button"
+                  priority="secondary"
+                  className={fr.cx("fr-mb-4w")}
+                />
                 <h1>Pilotage de l'entreprise {formValues.siret}</h1>
                 <h2>{steps[1].title}</h2>
                 <AvailabilitySection
