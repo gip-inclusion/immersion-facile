@@ -22,9 +22,7 @@ export const SiretFetcherInput = ({
     modifyLinkWasSent,
     sendModifyLinkFeedback,
     sendModifyEstablishmentLink,
-  } = useEstablishmentSiret({
-    shouldFetchEvenIfAlreadySaved: false,
-  });
+  } = useEstablishmentSiret();
 
   const shouldShowInputError = !isSiretAlreadySaved && currentSiret !== "";
   return (

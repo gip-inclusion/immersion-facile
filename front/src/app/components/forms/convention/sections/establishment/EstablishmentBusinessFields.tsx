@@ -12,15 +12,14 @@ import {
 } from "src/app/hooks/siret.hooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
-export const EstablishmentBusinessFields = ({
-  disabled,
-}: {
-  disabled: undefined | boolean;
-}): JSX.Element => {
-  const { currentSiret, updateSiret, siretErrorToDisplay, establishmentInfos } =
-    useSiretFetcher({
-      shouldFetchEvenIfAlreadySaved: true,
-    });
+export const EstablishmentBusinessFields = (): JSX.Element => {
+  const {
+    currentSiret,
+    updateSiret,
+    siretErrorToDisplay,
+    establishmentInfos,
+    isFetchingSiret,
+  } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: true });
   const convention = useAppSelector(conventionSelectors.convention);
 
   const { getValues, register, control } = useFormContext<ConventionDto>();
@@ -62,7 +61,7 @@ export const EstablishmentBusinessFields = ({
           // },
           value: currentSiret || values.siret,
         }}
-        disabled={disabled}
+        disabled={isFetchingSiret}
         state={siretErrorToDisplay ? "error" : undefined}
         stateRelatedMessage={siretErrorToDisplay}
         className={fr.cx("fr-mb-1w")}
