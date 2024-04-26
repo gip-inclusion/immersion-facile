@@ -97,6 +97,7 @@ export const maximumCalendarDayByInternshipKind: Record<
   immersion: 30,
   "mini-stage-cci": 5,
 };
+export const BENEFICIARY_MAXIMUM_AGE_REQUIREMENT = 120;
 export const IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT = 16;
 export const MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT = 10;
 export const IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS = 48;
