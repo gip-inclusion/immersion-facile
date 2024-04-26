@@ -333,7 +333,7 @@ describe("conventionDtoSchema", () => {
     ]);
   });
 
-  describe("constraint on dates", () => {
+  describe("constraints on convention start and end dates", () => {
     it("rejects misformatted submission dates", () => {
       const convention = new ConventionDtoBuilder()
         .withDateSubmission("not-a-date")
@@ -862,7 +862,7 @@ describe("conventionDtoSchema", () => {
     });
   });
 
-  describe("when beneficiary is too young", () => {
+  describe("constraints on beneficiary birthdate", () => {
     it('rejects when beneficiary age is under 16yr with internship kind "immersion"', () => {
       const immersionStartDate = new Date("2022-01-01");
       const beneficiary: Beneficiary<"immersion"> = {
@@ -912,6 +912,31 @@ describe("conventionDtoSchema", () => {
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
         "L'âge du bénéficiaire doit être au minimum de 10ans",
+      ]);
+    });
+
+    it("rejects when beneficiary age is greater than 120yr", () => {
+      const immersionStartDate = new Date("2022-01-01");
+      const beneficiary: Beneficiary<"immersion"> = {
+        birthdate: addDays(subYears(immersionStartDate, 300), 1).toISOString(),
+        email: "a@a.com",
+        firstName: "sdfgf",
+        lastName: "sdfs",
+        phone: "0011223344",
+        role: "beneficiary",
+        isRqth: false,
+      };
+
+      const convention = new ConventionDtoBuilder()
+        .withInternshipKind("immersion")
+        .withDateStart(immersionStartDate.toISOString())
+        .withDateEnd(new Date("2022-01-02").toISOString())
+        .withSchedule(reasonableSchedule)
+        .withBeneficiary(beneficiary)
+        .build();
+
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+        "Merci de vérifier votre date de naissance: avez-vous 299 ans ?",
       ]);
     });
 

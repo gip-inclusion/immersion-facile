@@ -37,6 +37,7 @@ import {
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
+  BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
   Beneficiary,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
@@ -340,6 +341,12 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
       );
     }
 
+    addIssueIfAgeMoreThanMaximumAge(
+      addIssue,
+      beneficiaryAgeAtConventionStart,
+      BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
+    );
+
     const message = validateSchedule({
       dateEnd: convention.dateEnd,
       dateStart: convention.dateStart,
@@ -568,6 +575,18 @@ const addIssueIfAgeLessThanMinimumAge = (
   if (beneficiaryAgeAtConventionStart < miniumAgeRequirement)
     addIssue(
       `L'âge du bénéficiaire doit être au minimum de ${miniumAgeRequirement}ans`,
+      getConventionFieldName("signatories.beneficiary.birthdate"),
+    );
+};
+
+const addIssueIfAgeMoreThanMaximumAge = (
+  addIssue: (message: string, path: string) => void,
+  beneficiaryAgeAtConventionStart: number,
+  maximumAgeRequirement: number,
+) => {
+  if (beneficiaryAgeAtConventionStart > maximumAgeRequirement)
+    addIssue(
+      `Merci de vérifier votre date de naissance: avez-vous ${beneficiaryAgeAtConventionStart} ans ?`,
       getConventionFieldName("signatories.beneficiary.birthdate"),
     );
 };
