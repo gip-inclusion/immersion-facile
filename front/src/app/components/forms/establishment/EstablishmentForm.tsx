@@ -357,6 +357,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   };
   return match(feedback)
     .with({ kind: "errored" }, (feedback) => {
+      if (feedback.errorMessage === expiredMagicLinkErrorMessage) {
+        throw new Error(feedback.errorMessage);
+      }
       throw new Error(
         `Entreprise non trouvée : ${JSON.parse(feedback.errorMessage).errors}`,
       );

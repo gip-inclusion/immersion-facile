@@ -182,32 +182,6 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
   it(`${displayRouteName(
     establishmentRoutes.getFormEstablishment,
-  )} 400 if missing establishment`, async () => {
-    const response = await httpClient.getFormEstablishment({
-      body: {},
-      headers: {
-        authorization: generateBackOfficeJwt(
-          createBackOfficeJwtPayload({
-            durationDays: 1,
-            now: new Date(),
-          }),
-        ),
-      },
-      urlParams: {
-        siret: TEST_OPEN_ESTABLISHMENT_1.siret,
-      },
-    });
-
-    expectHttpResponseToEqual(response, {
-      body: {
-        errors: "No establishment found with siret 12345678901234.",
-      },
-      status: 400,
-    });
-  });
-
-  it(`${displayRouteName(
-    establishmentRoutes.getFormEstablishment,
   )} 401 if not authenticated`, async () => {
     const response = await httpClient.getFormEstablishment({
       body: {},
@@ -255,6 +229,32 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         needsNewMagicLink: true,
       },
       status: 403,
+    });
+  });
+
+  it(`${displayRouteName(
+    establishmentRoutes.getFormEstablishment,
+  )} 404 if missing establishment`, async () => {
+    const response = await httpClient.getFormEstablishment({
+      body: {},
+      headers: {
+        authorization: generateBackOfficeJwt(
+          createBackOfficeJwtPayload({
+            durationDays: 1,
+            now: new Date(),
+          }),
+        ),
+      },
+      urlParams: {
+        siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+      },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: {
+        errors: "No establishment found with siret 12345678901234.",
+      },
+      status: 404,
     });
   });
 });

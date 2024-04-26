@@ -11,6 +11,7 @@ import {
 import {
   BadRequestError,
   ForbiddenError,
+  NotFoundError,
 } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -53,7 +54,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       );
 
     if (!establishmentAggregate)
-      throw new BadRequestError(`No establishment found with siret ${siret}.`);
+      throw new NotFoundError(`No establishment found with siret ${siret}.`);
 
     return establishmentAggragateToFormEstablishement(
       establishmentAggregate,
