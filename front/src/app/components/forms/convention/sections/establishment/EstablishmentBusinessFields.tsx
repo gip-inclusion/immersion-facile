@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import React, { useEffect } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -61,7 +62,17 @@ export const EstablishmentBusinessFields = ({
         disabled={disabled}
         state={siretErrorToDisplay ? "error" : undefined}
         stateRelatedMessage={siretErrorToDisplay}
+        className={fr.cx("fr-mb-1w")}
       />
+      <a
+        href="https://annuaire-entreprises.data.gouv.fr/"
+        target="_blank"
+        rel="noreferrer"
+        className={fr.cx("fr-link")}
+      >
+        <i className={fr.cx("fr-icon-information-fill", "fr-icon--sm")} />
+        Retrouver votre siret sur l'Annuaire des Entreprises
+      </a>
       <Input
         label={formContents.businessName.label}
         hintText={formContents.businessName.hintText}
@@ -72,6 +83,7 @@ export const EstablishmentBusinessFields = ({
             establishmentInfos?.businessName || convention?.businessName || "",
         }}
         disabled={true}
+        className={fr.cx("fr-mt-3w")}
       />
     </>
   );
