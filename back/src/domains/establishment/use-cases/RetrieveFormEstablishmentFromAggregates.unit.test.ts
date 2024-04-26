@@ -6,8 +6,8 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  BadRequestError,
   ForbiddenError,
+  NotFoundError,
 } from "../../../config/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -58,16 +58,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   it("throws an error if there is no establishment with this siret", async () => {
     await expectPromiseToFailWithError(
       useCase.execute(establishmentJwtPayload.siret, establishmentJwtPayload),
-      new BadRequestError("No establishment found with siret 12345678901234."),
-    );
-  });
-
-  it("throws an error if there is no establishment from form with this siret", async () => {
-    // Prepare : there is an establishment with the siret, but from LBB
-    // Act and assert
-    await expectPromiseToFailWithError(
-      useCase.execute(establishmentJwtPayload.siret, establishmentJwtPayload),
-      new BadRequestError("No establishment found with siret 12345678901234."),
+      new NotFoundError("No establishment found with siret 12345678901234."),
     );
   });
 
