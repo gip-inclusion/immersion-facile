@@ -8,15 +8,6 @@ import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGatewa
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import { AppEpic } from "src/core-logic/storeConfig/redux.helpers";
 
-const shouldTriggerSearch = (candidate: string) => {
-  try {
-    siretSchema.parse(candidate);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 type SiretEpic = AppEpic<SiretAction>;
 
 const toggleShouldFetchEvenIfAlreadySaved: SiretEpic = (action$, state$) =>
@@ -32,7 +23,7 @@ const triggerSiretFetchEpic: SiretEpic = (action$) =>
     filter(siretSlice.actions.siretModified.match),
     switchMap((action) =>
       iif(
-        () => shouldTriggerSearch(action.payload),
+        () => siretSchema.safeParse(action.payload).success,
         of(siretSlice.actions.siretInfoRequested(action.payload)),
         of(siretSlice.actions.siretWasNotValid()),
       ),
