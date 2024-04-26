@@ -106,11 +106,10 @@ export const useExistingSiret = (siret?: SiretDto | null) => {
   }, [siret, dispatch]);
 };
 
-export const useEstablishmentSiret = (
-  siretFetcherOptions: SiretFetcherOptions,
-) => {
-  const { currentSiret, updateSiret, siretErrorToDisplay } =
-    useSiretFetcher(siretFetcherOptions);
+export const useEstablishmentSiret = () => {
+  const { currentSiret, updateSiret, siretErrorToDisplay } = useSiretFetcher({
+    shouldFetchEvenIfAlreadySaved: false,
+  });
   const isSiretAlreadySaved = useAppSelector(
     siretSelectors.isSiretAlreadySaved,
   );

@@ -1,6 +1,7 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { ConventionDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -8,13 +9,10 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
-import { useSiretFetcher } from "src/app/hooks/siret.hooks";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
 export const EstablishementTutorFields = (): JSX.Element => {
-  const { isFetchingSiret } = useSiretFetcher({
-    shouldFetchEvenIfAlreadySaved: true,
-  });
   const { register, getValues, formState } = useFormContext<ConventionDto>();
   const values = getValues();
   const getFieldError = makeFieldError(formState);
@@ -22,6 +20,7 @@ export const EstablishementTutorFields = (): JSX.Element => {
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
+  const isFetchingSiret = useSelector(siretSelectors.isFetching);
   return (
     <>
       <Input
