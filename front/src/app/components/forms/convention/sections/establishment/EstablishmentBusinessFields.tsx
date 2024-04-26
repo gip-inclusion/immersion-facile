@@ -31,9 +31,12 @@ export const EstablishmentBusinessFields = ({
     control,
     name: "siret",
   });
+
   useEffect(() => {
-    updateSiret(currentSiretOnSiretField);
-  }, [currentSiretOnSiretField]);
+    if (currentSiret !== currentSiretOnSiretField) {
+      updateSiret(currentSiretOnSiretField);
+    }
+  }, [currentSiretOnSiretField, currentSiret]);
   // ====================
 
   useSiretRelatedField("businessName", {
