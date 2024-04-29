@@ -553,6 +553,7 @@ describe("PgConventionRepository", () => {
       .withId(conventionId)
       .withStatus("ACCEPTED_BY_COUNSELLOR")
       .withValidator({ firstname: "John", lastname: "Doe" })
+      .withCounsellor({ firstname: "Billy", lastname: "Idol" })
       .withBeneficiaryEmail("some.updated@email.com")
       .withStatusJustification("some justification")
       .withDateEnd(new Date("2021-01-20").toISOString())

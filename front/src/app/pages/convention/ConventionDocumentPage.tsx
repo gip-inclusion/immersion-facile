@@ -343,6 +343,16 @@ export const ConventionDocumentPage = ({
                   </strong>
                 </li>
               )}
+            {convention.validators?.agencyCounsellor && (
+              <li>
+                Examinée par :{" "}
+                <strong>
+                  {convention.validators?.agencyCounsellor.firstname}{" "}
+                  {convention.validators?.agencyCounsellor.lastname}
+                </strong>{" "}
+                (conseiller qui examine préalablement la demande de convention)
+              </li>
+            )}
             {convention.validators?.agencyValidator && (
               <li>
                 Validée par :{" "}
@@ -350,7 +360,7 @@ export const ConventionDocumentPage = ({
                   {convention.validators?.agencyValidator.firstname}{" "}
                   {convention.validators?.agencyValidator.lastname}
                 </strong>{" "}
-                (conseiller valideur)
+                (conseiller qui valide définitivement la demande de convention)
               </li>
             )}
           </ul>
