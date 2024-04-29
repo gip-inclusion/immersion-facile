@@ -184,6 +184,8 @@ export class PgConventionRepository implements ConventionRepository {
         validators: sql`${convention.validators}`,
         acquisition_campaign: convention.acquisitionCampaign,
         acquisition_keyword: convention.acquisitionKeyword,
+        establishment_number_employees:
+          convention.establishmentNumberEmployeesRange,
       })
       .execute();
   }
@@ -571,6 +573,8 @@ export class PgConventionRepository implements ConventionRepository {
         beneficiary_representative_id,
         business_advantages: convention.businessAdvantages,
         validators: sql`${convention.validators}`,
+        establishment_number_employees:
+          convention.establishmentNumberEmployeesRange,
       })
       .where("id", "=", convention.id)
       .execute();

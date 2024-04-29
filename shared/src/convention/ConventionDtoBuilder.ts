@@ -9,7 +9,7 @@ import {
   Weekday,
 } from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
-import { SiretDto } from "../siret/siret";
+import { NumberEmployeesRange, SiretDto } from "../siret/siret";
 import { DateString } from "../utils/date";
 import {
   Beneficiary,
@@ -670,6 +670,14 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       },
     };
     return new ConventionDtoBuilder(this.dto);
+  }
+  public withEstablishmentNumberOfEmployeesRange(
+    establishmentNumberEmployeesRange: NumberEmployeesRange | undefined,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      establishmentNumberEmployeesRange,
+    });
   }
 
   get #validators(): ConventionValidatorInputNames | undefined {

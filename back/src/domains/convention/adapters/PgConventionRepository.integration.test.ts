@@ -62,6 +62,7 @@ describe("PgConventionRepository", () => {
   it("Adds a new convention", async () => {
     const convention = new ConventionDtoBuilder()
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
+      .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
 
     expect(await conventionRepository.getById(convention.id)).toBeUndefined();
@@ -97,6 +98,7 @@ describe("PgConventionRepository", () => {
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .withDateStart(new Date("2023-01-02").toISOString())
       .withDateEnd(new Date("2023-01-06").toISOString())
+      .withEstablishmentNumberOfEmployeesRange("1-2")
       .withSchedule(reasonableSchedule)
       .build();
 
@@ -108,6 +110,7 @@ describe("PgConventionRepository", () => {
 
     const updatedConvention = new ConventionDtoBuilder(convention)
       .withBeneficiaryFirstName("Marvin")
+      .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
 
     await conventionRepository.update(updatedConvention);
@@ -159,6 +162,7 @@ describe("PgConventionRepository", () => {
     const existingConvention = new ConventionDtoBuilder()
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withId("11111111-1111-4111-1111-111111111111")
+      .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
 
     await conventionRepository.save(existingConvention);
@@ -623,6 +627,7 @@ describe("PgConventionRepository", () => {
     const convention = new ConventionDtoBuilder()
       .withId(idA)
       .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
     await conventionRepository.save(convention);
 
@@ -632,6 +637,7 @@ describe("PgConventionRepository", () => {
       .withBeneficiaryEmail("some.updated@email.com")
       .withStatusJustification("some justification")
       .withDateEnd(new Date("2021-01-20").toISOString())
+      .withEstablishmentNumberOfEmployeesRange("200-249")
       .build();
 
     await conventionRepository.update(updatedConvention);

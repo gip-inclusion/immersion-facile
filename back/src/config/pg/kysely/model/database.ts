@@ -205,6 +205,7 @@ interface Conventions extends WithAcquisition {
   renewed_from: string | null;
   renewed_justification: string | null;
   date_approval: Timestamp | null;
+  establishment_number_employees: string | null;
 }
 
 interface Actors {

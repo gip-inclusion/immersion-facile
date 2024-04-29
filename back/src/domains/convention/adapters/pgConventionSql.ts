@@ -204,6 +204,9 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
         internshipKind: ref("conventions.internship_kind"),
         businessAdvantages: ref("conventions.business_advantages"),
         statusJustification: ref("conventions.status_justification"),
+        establishmentNumberEmployeesRange: ref(
+          "conventions.establishment_number_employees",
+        ),
         establishmentTutor: jsonBuildObject({
           role: sql<"establishment-tutor">`'establishment-tutor'`,
           firstName: ref("et.first_name"),
