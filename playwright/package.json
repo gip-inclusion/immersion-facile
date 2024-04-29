@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test:local": "ADMIN_USER=admin ADMIN_PASSWORD=password playwright test",
-    "test:local-on-dev": "BASE_URL=https://dev.immersion-facile.beta.gouv.fr ADMIN_USER=admin ADMIN_PASSWORD=admin playwright test",
-    "test:ci": "CI=true BASE_URL=https://dev.immersion-facile.beta.gouv.fr ADMIN_USER=admin ADMIN_PASSWORD=admin EVENT_CRAWLER_PERIOD_MS=1000 playwright test",
-    "test:ci-v2": "CI=true ADMIN_USER=admin ADMIN_PASSWORD=password playwright test",
+    "test:local": "playwright test",
+    "test:local-on-dev": "BASE_URL=https://dev.immersion-facile.beta.gouv.fr playwright test",
+    "test:ci": "CI=true BASE_URL=https://dev.immersion-facile.beta.gouv.fr EVENT_CRAWLER_PERIOD_MS=1000 playwright test",
+    "test:ci-v2": "CI=true playwright test",
     "show-report": "playwright show-report",
     "install": "playwright install"
   },
