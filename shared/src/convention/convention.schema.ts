@@ -23,7 +23,7 @@ import {
 import { siretSchema } from "../siret/siret.schema";
 import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
 import { OmitFromExistingKeys, phoneRegExp } from "../utils";
-import { dateRegExp } from "../utils/date";
+import { DateString, dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
@@ -344,6 +344,7 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
     addIssueIfAgeMoreThanMaximumAge(
       addIssue,
       beneficiaryAgeAtConventionStart,
+      convention.dateSubmission,
       BENEFICIARY_MAXIMUM_AGE_REQUIREMENT,
     );
 
@@ -582,9 +583,14 @@ const addIssueIfAgeLessThanMinimumAge = (
 const addIssueIfAgeMoreThanMaximumAge = (
   addIssue: (message: string, path: string) => void,
   beneficiaryAgeAtConventionStart: number,
+  dateSubmission: DateString,
   maximumAgeRequirement: number,
 ) => {
-  if (beneficiaryAgeAtConventionStart > maximumAgeRequirement)
+  const onlyCheckConventionsCreatedBeforeDate = new Date("2024-04-30");
+  if (
+    beneficiaryAgeAtConventionStart > maximumAgeRequirement &&
+    new Date(dateSubmission) > onlyCheckConventionsCreatedBeforeDate
+  )
     addIssue(
       `Merci de vérifier votre date de naissance: avez-vous ${beneficiaryAgeAtConventionStart} ans ?`,
       getConventionFieldName("signatories.beneficiary.birthdate"),
