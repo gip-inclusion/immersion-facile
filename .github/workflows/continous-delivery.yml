@@ -54,6 +54,7 @@ jobs:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
       IC_USERNAME: ${{ secrets.IC_USERNAME }}
       IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
+      IC_ADMIN_PASSWORD: ${{ secrets.IC_ADMIN_PASSWORD }}
 
   create-wip-pre-release:
     runs-on: ubuntu-latest

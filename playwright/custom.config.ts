@@ -5,5 +5,7 @@ export const testConfig = {
     baseUrl: "https://recette.connect.inclusion.beta.gouv.fr",
     username: process.env.IC_USERNAME ?? "",
     password: process.env.IC_PASSWORD ?? "",
+    adminUsername: "admin+playwright@immersion-facile.beta.gouv.fr",
+    adminPassword: process.env.IC_ADMIN_PASSWORD ?? "",
   },
 };

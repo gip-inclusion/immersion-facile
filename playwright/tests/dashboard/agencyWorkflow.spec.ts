@@ -1,5 +1,5 @@
 import test, { expect } from "@playwright/test";
-import { AgencyId, domElementIds } from "shared";
+import { AgencyId, domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { fillAndSubmitBasicAgencyForm } from "../../utils/agency";
@@ -10,6 +10,7 @@ test.describe.configure({ mode: "serial" });
 
 test.describe("Agency dashboard workflow", () => {
   let agencyId: AgencyId | null = null;
+
   test("creates a new agency", async ({ page }) => {
     agencyId = await fillAndSubmitBasicAgencyForm(page, {
       siret: "34792240300030",
@@ -21,6 +22,7 @@ test.describe("Agency dashboard workflow", () => {
     ).toBeVisible();
     await expect(agencyId).not.toBeNull();
   });
+
   test(`should be able to register a new user for agency (${agencyId})`, async ({
     page,
   }) => {
@@ -40,7 +42,7 @@ test.describe("Agency dashboard workflow", () => {
       await page.locator(".fr-alert--success").first(),
     ).toBeVisible();
     await page.waitForTimeout(testConfig.timeForEventCrawler);
-    await loginWithInclusionConnect(page, "agencyDashboard");
+    await page.goto(frontRoutes.agencyDashboard);
     expect(
       await page.locator(
         `#${domElementIds.agencyDashboard.registerAgencies.form}`,
@@ -72,6 +74,7 @@ test.describe("Agency dashboard workflow", () => {
       )
       .click();
   });
+
   test("IC user can access to the agency dashboard", async ({ page }) => {
     await loginWithInclusionConnect(page, "agencyDashboard");
     await expect(

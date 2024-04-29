@@ -1,42 +1,13 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { AdminTab, adminTabsList, domElementIds, frontRoutes } from "shared";
-
-const adminUser = process.env.ADMIN_USER ?? "admin";
-const adminPassword = process.env.ADMIN_PASSWORD ?? "password";
-
-export const connectToAdmin = async (page: Page) => {
-  await page.goto(frontRoutes.admin);
-  await page.fill(
-    `#${domElementIds.admin.adminPrivateRoute.formLoginUserInput}`,
-    adminUser,
-  );
-  await page.fill(
-    `#${domElementIds.admin.adminPrivateRoute.formLoginPasswordInput}`,
-    adminPassword,
-  );
-  await expect(
-    page.locator(
-      `#${domElementIds.admin.adminPrivateRoute.formLoginUserInput}`,
-    ),
-  ).toHaveValue(adminUser);
-  await expect(
-    page.locator(
-      `#${domElementIds.admin.adminPrivateRoute.formLoginPasswordInput}`,
-    ),
-  ).toHaveValue(adminPassword);
-
-  await page.click(
-    `#${domElementIds.admin.adminPrivateRoute.formLoginSubmitButton}`,
-  );
-  await expect(page.locator(".fr-alert--error")).not.toBeVisible();
-};
+import { loginWithInclusionConnect } from "./inclusionConnect";
 
 export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
   const adminButton = await page.locator("#fr-header-main-navigation-button-4");
   const isUserAdminConnected = await adminButton.isVisible();
   if (!isUserAdminConnected) {
     await expect(isUserAdminConnected).toBe(false);
-    await connectToAdmin(page);
+    await loginWithInclusionConnect(page, "admin");
   }
   await expect(adminButton).toBeVisible();
   await adminButton.click();

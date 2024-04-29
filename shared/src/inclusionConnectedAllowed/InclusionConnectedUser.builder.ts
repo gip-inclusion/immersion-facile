@@ -1,4 +1,5 @@
 import { Builder } from "../Builder";
+import { Email } from "../email/email.dto";
 import {
   InclusionConnectedUser,
   UserId,
@@ -10,7 +11,7 @@ const defaultInculsionConnectUser: InclusionConnectedUser = {
   firstName: "Default",
   lastName: "User",
   externalId: "default-external-id",
-  createdAt: new Date().toISOString(),
+  createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
   agencyRights: [],
   dashboards: { agencies: {}, establishments: {} },
   establishments: [],
@@ -37,7 +38,22 @@ export class InclusionConnectedUserBuilder
     });
   }
 
+  withExternalId(externalId: string): InclusionConnectedUserBuilder {
+    return new InclusionConnectedUserBuilder({ ...this.#dto, externalId });
+  }
+
   withId(id: UserId) {
     return new InclusionConnectedUserBuilder({ ...this.#dto, id });
+  }
+
+  withFirstName(firstName: string) {
+    return new InclusionConnectedUserBuilder({ ...this.#dto, firstName });
+  }
+
+  withLastName(lastName: string) {
+    return new InclusionConnectedUserBuilder({ ...this.#dto, lastName });
+  }
+  withEmail(email: Email) {
+    return new InclusionConnectedUserBuilder({ ...this.#dto, email });
   }
 }

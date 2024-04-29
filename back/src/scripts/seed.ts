@@ -4,6 +4,7 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   FeatureFlags,
+  InclusionConnectedUserBuilder,
   cciAgencyId,
   conventionSchema,
   makeTextFeatureFlag,
@@ -13,6 +14,7 @@ import {
 } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createAppDependencies } from "../config/bootstrap/createAppDependencies";
+import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { SavedError } from "../domains/core/saved-errors/ports/SavedErrorRepository";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import {
@@ -30,21 +32,28 @@ const seed = async () => {
 
   const pool = deps.getPgPoolFn();
   const client = await pool.connect();
+  const db = makeKyselyDb(pool);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("Reset Db start");
   await client.query("DELETE FROM feature_flags");
-  await client.query("DELETE FROM conventions");
-  await client.query("DELETE FROM agency_groups__agencies");
-  await client.query("DELETE FROM agency_groups");
-  await client.query("DELETE FROM agencies");
-  await client.query("DELETE FROM discussions");
-  await client.query("DELETE FROM establishments_contacts");
-  await client.query("DELETE FROM form_establishments");
-  await client.query("DELETE FROM establishments CASCADE");
-  await client.query("DELETE FROM groups CASCADE");
+
+  await db.deleteFrom("users_ongoing_oauths").execute();
+  await db.deleteFrom("users").execute();
+  await db.deleteFrom("conventions").execute();
+  await db.deleteFrom("agency_groups__agencies").execute();
+  await db.deleteFrom("agency_groups").execute();
+  await db.deleteFrom("agencies").execute();
+  await db.deleteFrom("discussions").execute();
+  await db.deleteFrom("establishments_contacts").execute();
+  await db.deleteFrom("form_establishments").execute();
+  await db.deleteFrom("establishments").execute();
+  await db.deleteFrom("groups").execute();
+
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("Reset Db end");
+
+  await inclusionConnectUserSeed(db);
 
   await deps.uowPerformer.perform(async (uow) => {
     await featureFlagsSeed(uow);
@@ -55,6 +64,36 @@ const seed = async () => {
 
   client.release();
   await pool.end();
+};
+
+const inclusionConnectUserSeed = async (db: KyselyDb) => {
+  const adminUser = new InclusionConnectedUserBuilder()
+    .withIsAdmin(true)
+    .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
+    .withFirstName("Prénom Admin")
+    .withLastName("Nom Admin")
+    .withId("a63dd0e5-1626-4181-97ef-1fd58278b778")
+    .withExternalId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
+    .build();
+
+  await db
+    .insertInto("users")
+    .values({
+      id: adminUser.id,
+      email: adminUser.email,
+      first_name: adminUser.firstName,
+      last_name: adminUser.lastName,
+      external_id: adminUser.externalId,
+      created_at: adminUser.createdAt,
+    })
+    .execute();
+
+  await db
+    .insertInto("users_admins")
+    .values({
+      user_id: adminUser.id,
+    })
+    .execute();
 };
 
 const featureFlagsSeed = async (uow: UnitOfWork) => {
