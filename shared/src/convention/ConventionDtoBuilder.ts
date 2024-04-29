@@ -647,22 +647,27 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withValidator(
-    validator: ConventionValidatorInputName,
+    agencyValidator: ConventionValidatorInputName,
   ): ConventionDtoBuilder {
-    const validatorKind: keyof ConventionValidatorInputNames =
-      this.dto.status === "ACCEPTED_BY_COUNSELLOR"
-        ? "agencyCounsellor"
-        : "agencyValidator";
     this.dto = {
       ...this.dto,
-      validators: this.dto.validators
-        ? {
-            ...this.dto.validators,
-            [validatorKind]: validator,
-          }
-        : {
-            [validatorKind]: validator,
-          },
+      validators: {
+        ...this.dto.validators,
+        agencyValidator,
+      },
+    };
+    return new ConventionDtoBuilder(this.dto);
+  }
+
+  public withCounsellor(
+    agencyCounsellor: ConventionValidatorInputName,
+  ): ConventionDtoBuilder {
+    this.dto = {
+      ...this.dto,
+      validators: {
+        ...this.dto.validators,
+        agencyCounsellor,
+      },
     };
     return new ConventionDtoBuilder(this.dto);
   }
