@@ -651,6 +651,10 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  establishmentNumberEmployeesRange: {
+    label: "",
+    id: "",
+  },
 };
 
 type SidebarStepContent = {

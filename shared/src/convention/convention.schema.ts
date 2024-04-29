@@ -20,6 +20,7 @@ import {
   isSundayInSchedule,
   validateSchedule,
 } from "../schedule/ScheduleUtils";
+import { numberEmployeesRanges } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
 import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
 import { OmitFromExistingKeys, phoneRegExp } from "../utils";
@@ -243,6 +244,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     establishmentTutor: establishmentTutorSchema,
     validators: conventionValidatorsSchema.optional(),
     renewed: renewedSchema.optional(),
+    establishmentNumberEmployeesRange: z.enum(numberEmployeesRanges).optional(),
   })
   .and(withAcquisitionSchema);
 
