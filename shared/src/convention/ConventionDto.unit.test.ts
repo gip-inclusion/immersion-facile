@@ -915,7 +915,7 @@ describe("conventionDtoSchema", () => {
       ]);
     });
 
-    it("rejects when beneficiary age is greater than 120yr", () => {
+    describe("when beneficiary age is greater than 120yr", () => {
       const immersionStartDate = new Date("2022-01-01");
       const beneficiary: Beneficiary<"immersion"> = {
         birthdate: addDays(subYears(immersionStartDate, 300), 1).toISOString(),
@@ -927,17 +927,25 @@ describe("conventionDtoSchema", () => {
         isRqth: false,
       };
 
-      const convention = new ConventionDtoBuilder()
-        .withInternshipKind("immersion")
-        .withDateStart(immersionStartDate.toISOString())
-        .withDateEnd(new Date("2022-01-02").toISOString())
-        .withSchedule(reasonableSchedule)
-        .withBeneficiary(beneficiary)
-        .build();
+      it("accepts when convention is created before 2024-04-30", () => {
+        const convention = new ConventionDtoBuilder()
+          .withBeneficiary(beneficiary)
+          .withDateSubmission("2024-04-29")
+          .build();
 
-      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-        "Merci de vérifier votre date de naissance: avez-vous 299 ans ?",
-      ]);
+        expectConventionDtoToBeValid(convention);
+      });
+
+      it("rejects when convention is created after 2024-04-30", () => {
+        const convention = new ConventionDtoBuilder()
+          .withBeneficiary(beneficiary)
+          .withDateSubmission("2024-04-30 14:00:00")
+          .build();
+
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+          "Merci de vérifier votre date de naissance: avez-vous 299 ans ?",
+        ]);
+      });
     });
 
     describe("convention with no beneficiary representative for a beneficiary under 18", () => {
