@@ -14,7 +14,7 @@ import {
   AppellationCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
-import { SiretDto } from "../siret/siret";
+import { NumberEmployeesRange, SiretDto } from "../siret/siret";
 import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
 import { Flavor } from "../typeFlavors";
 import { DateString } from "../utils/date";
@@ -153,6 +153,7 @@ export type ConventionCommon = {
   immersionAppellation: AppellationAndRomeDto;
   immersionActivities: string;
   immersionSkills: string;
+  establishmentNumberEmployeesRange?: NumberEmployeesRange;
   establishmentTutor: EstablishmentTutor;
   validators?: ConventionValidatorInputNames;
 } & Partial<WithRenewed> &

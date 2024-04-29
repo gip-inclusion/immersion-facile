@@ -65,6 +65,7 @@ import {
   ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
@@ -155,6 +156,9 @@ export const ConventionForm = ({
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
+  const establishmentNumberEmployeesRange = useAppSelector(
+    siretSelectors.establishmentInfos,
+  )?.numberEmployeesRange;
   const dispatch = useDispatch();
   const getInitialFormValues = (mode: ConventionFormProps["mode"]) => {
     if (mode === "create") return initialValues;
@@ -220,9 +224,13 @@ export const ConventionForm = ({
     );
   };
   const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
-    const conventionToSave = {
+    const conventionToSave: ConventionReadDto = {
       ...values,
       workConditions: undefinedIfEmptyString(values.workConditions),
+      establishmentNumberEmployeesRange:
+        establishmentNumberEmployeesRange === ""
+          ? undefined
+          : establishmentNumberEmployeesRange,
     };
     dispatch(
       conventionSlice.actions.showSummaryChangeRequested({
