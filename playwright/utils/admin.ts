@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test";
-import { AdminTab, adminTabsList, domElementIds, frontRoutes } from "shared";
+import { AdminTab, adminTabsList, frontRoutes } from "shared";
 import { loginWithInclusionConnect } from "./inclusionConnect";
 
 export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
@@ -10,11 +10,7 @@ export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
     await loginWithInclusionConnect(page, "admin");
   }
   await expect(adminButton).toBeVisible();
-  await adminButton.click();
-  await page
-    .locator(`#${domElementIds.header.navLinks.admin.backOffice}`)
-    .click();
-  await adminButton.click(); // close admin submenu
+  await page.goto(frontRoutes.admin);
   await page.waitForTimeout(200); // wait for the submenu to close (its visibility makes hard to click on tabs)
   const tabLocator = await page
     .locator(".fr-tabs__list li")

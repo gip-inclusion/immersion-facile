@@ -4,6 +4,7 @@ import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
   getMagicLinkInEmailWrapper,
+  goToAdminTab,
   openEmailInAdmin,
 } from "../../utils/admin";
 import {
@@ -11,7 +12,6 @@ import {
   submitBasicConventionForm,
   submitEditConventionForm,
 } from "../../utils/convention";
-import { loginWithInclusionConnect } from "../../utils/inclusionConnect";
 
 test.describe.configure({ mode: "serial" });
 
@@ -25,7 +25,7 @@ test.describe("Convention creation and modification workflow", () => {
 
   test("get signatories magicLink urls from email", async ({ page }) => {
     const maxEmails = 2;
-    await loginWithInclusionConnect(page, "admin");
+    await goToAdminTab(page, "notifications");
     for (let index = 0; index < maxEmails; index++) {
       const emailWrapper = await openEmailInAdmin(
         page,
@@ -47,7 +47,7 @@ test.describe("Convention creation and modification workflow", () => {
     page,
   }) => {
     await signConvention(page, magicLinks[0]);
-    await loginWithInclusionConnect(page, "admin");
+    await goToAdminTab(page, "notifications");
     const emailWrapper = await openEmailInAdmin(
       page,
       "NEW_CONVENTION_AGENCY_NOTIFICATION",
@@ -89,7 +89,7 @@ test.describe("Convention creation and modification workflow", () => {
   });
 
   test("signatory edit the convention and re-submit it", async ({ page }) => {
-    await loginWithInclusionConnect(page, "admin");
+    await goToAdminTab(page, "notifications");
     const emailWrapper = await openEmailInAdmin(
       page,
       "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
@@ -109,7 +109,6 @@ test.describe("Convention creation and modification workflow", () => {
     const signatories = 4;
 
     test("get signatories magicLink urls from email", async ({ page }) => {
-      await loginWithInclusionConnect(page, "admin");
       for (let index = 0; index < signatories; index++) {
         const emailWrapper = await openEmailInAdmin(
           page,
@@ -145,7 +144,7 @@ test.describe("Convention creation and modification workflow", () => {
     });
 
     test("reviews and validate convention", async ({ page }) => {
-      await loginWithInclusionConnect(page, "admin");
+      await goToAdminTab(page, "notifications");
       const emailWrapper = await openEmailInAdmin(
         page,
         "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",

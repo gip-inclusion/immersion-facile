@@ -7,7 +7,15 @@ on:
         required: true
       API_KEY_OPEN_CAGE_DATA_GEOSEARCH:
         required: true
+      IC_ADMIN_PASSWORD:
+        required: true
+      IC_PASSWORD:
+        required: true
+      IC_USERNAME:
+        required: true
       SIRENE_BEARER_TOKEN:
+        required: true
+      INCLUSION_CONNECT_CLIENT_SECRET:
         required: true
 
 jobs:
@@ -92,6 +100,10 @@ jobs:
       IC_USERNAME: ${{ secrets.IC_USERNAME }}
       IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
       IC_ADMIN_PASSWORD: ${{ secrets.IC_ADMIN_PASSWORD }}
+      INCLUSION_CONNECT_GATEWAY: "HTTPS"
+      INCLUSION_CONNECT_CLIENT_ID: local_inclusion_connect
+      INCLUSION_CONNECT_CLIENT_SECRET: ${{ secrets.INCLUSION_CONNECT_CLIENT_SECRET }}
+      INCLUSION_CONNECT_BASE_URI: "https://recette.connect.inclusion.beta.gouv.fr/auth"
       API_KEY_OPEN_CAGE_DATA_GEOCODING: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOCODING }}
       API_KEY_OPEN_CAGE_DATA_GEOSEARCH: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOSEARCH }}
       POLE_EMPLOI_GATEWAY: IN_MEMORY
@@ -154,5 +166,4 @@ jobs:
         run: curl -X GET http://localhost:3000/api
       - name: Run playwright tests
         run: |
-          echo $DATABASE_URL 
           pnpm playwright test:ci-v2

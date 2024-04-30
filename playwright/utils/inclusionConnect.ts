@@ -54,8 +54,8 @@ export const loginWithInclusionConnect = async (
     await expect(page.url()).toContain(frontRoutes[routeName]);
   }
 
-  const inclusionConnectButton = page.locator(`#${loginButtonId}`);
-  await expect(await inclusionConnectButton).toBeVisible();
+  const inclusionConnectButton = await page.locator(`#${loginButtonId}`);
+  await expect(inclusionConnectButton).toBeVisible();
 
   await inclusionConnectButton.click();
   await page.waitForURL(`${testConfig.inclusionConnect.baseUrl}/**`);
@@ -70,5 +70,5 @@ export const loginWithInclusionConnect = async (
     })
     .click();
   await page.waitForURL(`${frontRoutes[routeName]}**`);
-  await expect(page.url()).toContain(frontRoutes[routeName]);
+  expect(page.url()).toContain(frontRoutes[routeName]);
 };
