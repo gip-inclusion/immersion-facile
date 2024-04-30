@@ -14,7 +14,11 @@ jobs:
     secrets:
       API_KEY_OPEN_CAGE_DATA_GEOCODING: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOCODING }}
       API_KEY_OPEN_CAGE_DATA_GEOSEARCH: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOSEARCH }}
+      IC_ADMIN_PASSWORD: ${{ secrets.IC_ADMIN_PASSWORD }}
+      IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
+      IC_USERNAME: ${{ secrets.IC_USERNAME }}
       SIRENE_BEARER_TOKEN: ${{ secrets.SIRENE_BEARER_TOKEN }}
+      INCLUSION_CONNECT_CLIENT_SECRET: ${{ secrets.INCLUSION_CONNECT_CLIENT_SECRET }}
 
   deploy-review-app:
     if: github.event.pull_request.draft == false && github.event.pull_request.state == 'open'
