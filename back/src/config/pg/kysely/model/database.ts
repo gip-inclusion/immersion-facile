@@ -133,9 +133,6 @@ interface GroupsSirets {
 interface Agencies extends WithAcquisition {
   id: string;
   name: string;
-  counsellor_emails: Json;
-  validator_emails: Json;
-  admin_emails: Json;
   questionnaire_url: string | null;
   email_signature: string;
   legacy_address: string | null;
@@ -322,7 +319,7 @@ interface Users {
   last_name: string;
   created_at: Generated<string>;
   updated_at: Generated<Timestamp>;
-  external_id: string;
+  external_id: string | null;
 }
 
 interface OngoingOauths {
@@ -487,6 +484,7 @@ interface UsersAgencies {
   user_id: string;
   agency_id: string;
   role: Generated<AgencyRole>;
+  is_notified_by_email: boolean;
 }
 
 interface DelegationContacts {
