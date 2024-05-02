@@ -50,7 +50,9 @@ const inclusionConnectedUser: InclusionConnectedUser = {
   email: "my-user@email.com",
   firstName: "John",
   lastName: "Doe",
-  agencyRights: [{ role: "validator", agency: peAgency }],
+  agencyRights: [
+    { role: "validator", agency: peAgency, isNotifiedByEmail: false },
+  ],
   dashboards: { agencies: {}, establishments: {} },
   externalId: "john-external-id",
   createdAt: new Date().toISOString(),
@@ -723,7 +725,6 @@ describe("convention e2e", () => {
 
       const agency = AgencyDtoBuilder.create(validConvention.agencyId)
         .withName("TEST-name")
-        .withAdminEmails(["admin@email.fr"])
         .withQuestionnaireUrl("https://TEST-questionnaireUrl")
         .withSignature("TEST-signature")
         .build();

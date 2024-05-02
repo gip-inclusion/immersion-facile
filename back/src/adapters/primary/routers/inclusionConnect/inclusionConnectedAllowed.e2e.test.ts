@@ -35,7 +35,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
   };
   const inclusionConnectedUserWithRights: InclusionConnectedUser = {
     ...inclusionConnectedUserWithoutRights,
-    agencyRights: [{ agency, role: "validator" }],
+    agencyRights: [{ agency, role: "validator", isNotifiedByEmail: false }],
   };
 
   let httpClient: HttpClient<InclusionConnectedAllowedRoutes>;
@@ -178,7 +178,9 @@ describe("InclusionConnectedAllowedRoutes", () => {
         await inMemoryUow.inclusionConnectedUserRepository.getById(userId),
         {
           ...inclusionConnectedUserWithRights,
-          agencyRights: [{ agency, role: "toReview" }],
+          agencyRights: [
+            { agency, role: "toReview", isNotifiedByEmail: false },
+          ],
         },
       );
     });
@@ -261,7 +263,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        agencyRights: [{ agency, role: "validator" }],
+        agencyRights: [{ agency, role: "validator", isNotifiedByEmail: false }],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "joe-external-id",
         createdAt: new Date().toISOString(),

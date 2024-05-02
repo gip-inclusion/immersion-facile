@@ -411,7 +411,7 @@ describe("Admin router", () => {
         email: "john@mail.com",
         firstName: "John",
         lastName: "Doe",
-        agencyRights: [{ agency, role: "toReview" }],
+        agencyRights: [{ agency, role: "toReview", isNotifiedByEmail: false }],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
@@ -441,7 +441,9 @@ describe("Admin router", () => {
       expectObjectsToMatch(
         inMemoryUow.inclusionConnectedUserRepository.agencyRightsByUserId,
         {
-          [inclusionConnectedUser.id]: [{ agency, role: updatedRole }],
+          [inclusionConnectedUser.id]: [
+            { agency, role: updatedRole, isNotifiedByEmail: false },
+          ],
         },
       );
     });
@@ -469,7 +471,7 @@ describe("Admin router", () => {
         email: "john@mail.com",
         firstName: "John",
         lastName: "Doe",
-        agencyRights: [{ agency, role: "toReview" }],
+        agencyRights: [{ agency, role: "toReview", isNotifiedByEmail: false }],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
@@ -504,7 +506,7 @@ describe("Admin router", () => {
         email: "john@mail.com",
         firstName: "John",
         lastName: "Doe",
-        agencyRights: [{ agency, role: "toReview" }],
+        agencyRights: [{ agency, role: "toReview", isNotifiedByEmail: false }],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),

@@ -19,6 +19,7 @@ export const allAgencyRoles = [
 export type AgencyRight = {
   agency: AgencyDto;
   role: AgencyRole;
+  isNotifiedByEmail: boolean;
 };
 
 export type UserId = Flavor<string, "UserId">;
@@ -28,7 +29,7 @@ export type User = {
   email: Email;
   firstName: string;
   lastName: string;
-  externalId: string;
+  externalId: string | null;
   createdAt: DateTimeIsoString;
 };
 

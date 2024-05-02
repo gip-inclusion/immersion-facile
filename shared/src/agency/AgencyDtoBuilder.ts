@@ -12,7 +12,7 @@ const defaultAddress: AddressDto = {
   postcode: "86000",
 };
 
-export const defaultValidatorEmail = "validator@mail.com";
+export const defaultValidatorEmail = "default.validator@mail.com";
 
 const emptyAgency: AgencyDto = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
@@ -22,7 +22,6 @@ const emptyAgency: AgencyDto = {
   counsellorEmails: [],
   validatorEmails: [defaultValidatorEmail],
   agencySiret: "12345678904444",
-  adminEmails: [],
   questionnaireUrl: "https://empty-questionnaire-url",
   signature: "empty-signature",
   coveredDepartments: [defaultAddress.departmentCode],
@@ -76,13 +75,6 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({
       ...this.#agency,
       coveredDepartments: departments,
-    });
-  }
-
-  public withAdminEmails(adminEmails: string[]) {
-    return new AgencyDtoBuilder({
-      ...this.#agency,
-      adminEmails,
     });
   }
 

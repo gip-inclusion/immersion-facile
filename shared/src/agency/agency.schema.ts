@@ -119,7 +119,6 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
     z.object({
       questionnaireUrl: absoluteUrlSchema.or(z.null()),
       status: agencyStatusSchema,
-      adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       rejectionJustification: zStringMinLength1.or(z.null()),
@@ -134,7 +133,6 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       agencySiret: siretSchema,
       questionnaireUrl: absoluteUrlSchema.or(z.null()),
       status: agencyStatusSchema,
-      adminEmails: z.array(zStringMinLength1),
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
       rejectionJustification: z.string().or(z.null()),

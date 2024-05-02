@@ -15,7 +15,6 @@ const agencyFieldToLabel: FieldsToLabel = {
   address: "Adresse",
   counsellorEmails: "Emails des conseillers",
   validatorEmails: "Emails des validateurs",
-  adminEmails: "Emails des administrateurs",
   questionnaireUrl: "URL du questionnaire",
   signature: "Signature",
   agencySiret: "Siret",
@@ -34,7 +33,7 @@ const formatAgencyStatus = (status: AgencyStatus) => {
     case "active":
       return "✅  ACTIVE";
     case "from-api-PE":
-      return "👩‍💼 API PE";
+      return "👩 API PE";
   }
 };
 

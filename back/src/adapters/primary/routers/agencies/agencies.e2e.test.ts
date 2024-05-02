@@ -237,7 +237,6 @@ describe("Agency routes", () => {
           {
             ...parisMissionLocaleParamsWithoutRefersToAgencyId,
             questionnaireUrl: parisMissionLocaleParams.questionnaireUrl,
-            adminEmails: [],
             status: "needsReview",
             refersToAgencyId: null,
             codeSafir: null,

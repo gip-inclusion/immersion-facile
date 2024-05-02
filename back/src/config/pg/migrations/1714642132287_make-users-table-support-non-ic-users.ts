@@ -96,7 +96,6 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.sql("DELETE FROM users WHERE users.external_id IS NULL;");
   pgm.alterColumn(usersTable, "external_id", { type: "text", notNull: true });
-
   pgm.renameColumn(
     agenciesTable,
     "validator_emails_backup",

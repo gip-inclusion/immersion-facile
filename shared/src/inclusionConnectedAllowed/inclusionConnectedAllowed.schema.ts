@@ -23,6 +23,7 @@ export const agencyRoleSchema = z.enum(allAgencyRoles);
 const agencyRightSchema: z.Schema<AgencyRight> = z.object({
   agency: agencySchema,
   role: agencyRoleSchema,
+  isNotifiedByEmail: z.boolean(),
 });
 
 export const withDiscussionSchemaId: z.Schema<WithDiscussionId> = z.object({

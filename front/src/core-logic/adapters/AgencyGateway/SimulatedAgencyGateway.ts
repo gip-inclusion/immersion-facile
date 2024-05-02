@@ -90,7 +90,6 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     this.#agencies[createAgencyDto.id] = {
       ...createAgencyDto,
       status: "needsReview",
-      adminEmails: [],
       questionnaireUrl: createAgencyDto.questionnaireUrl,
       codeSafir: null,
       rejectionJustification: null,

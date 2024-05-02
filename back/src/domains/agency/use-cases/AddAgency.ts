@@ -41,7 +41,6 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
             params.refersToAgencyId,
           )
         : params.validatorEmails,
-      adminEmails: [],
       status: "needsReview",
       questionnaireUrl: params.questionnaireUrl,
       codeSafir: null,

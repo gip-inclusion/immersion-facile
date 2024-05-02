@@ -98,6 +98,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
         {
           role: "toReview",
           agency,
+          isNotifiedByEmail: false,
         },
       ],
       externalId: "jean-external-id",
@@ -138,6 +139,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
         {
           role: "validator",
           agency,
+          isNotifiedByEmail: false,
         },
       ],
       externalId: "jean-external-id",

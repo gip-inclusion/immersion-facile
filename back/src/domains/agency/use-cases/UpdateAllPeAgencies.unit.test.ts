@@ -50,7 +50,6 @@ describe("UpdateAllPeAgencies use case", () => {
         name: "Agence Pôle emploi MOLSHEIM",
         counsellorEmails: [],
         validatorEmails: ["molsheim@pole-emploi.fr"],
-        adminEmails: [],
         coveredDepartments: [address.departmentCode],
         address,
         position: {
@@ -84,7 +83,6 @@ describe("UpdateAllPeAgencies use case", () => {
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [],
         validatorEmails: [commonEmail],
-        adminEmails: ["someAdmin@mail.com"],
         coveredDepartments: [address.departmentCode],
         address,
         position: {
@@ -134,7 +132,6 @@ describe("UpdateAllPeAgencies use case", () => {
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [commonEmail],
         validatorEmails: [],
-        adminEmails: ["someAdmin@mail.com"],
         coveredDepartments: [address.departmentCode],
         address,
         position: {
@@ -179,7 +176,6 @@ describe("UpdateAllPeAgencies use case", () => {
         name: "Agence Pôle emploi Molsheim",
         counsellorEmails: [],
         validatorEmails: ["existing@mail.com"],
-        adminEmails: ["someAdmin@mail.com"],
         coveredDepartments: [address.departmentCode],
         address,
         position: {
@@ -227,7 +223,6 @@ describe("UpdateAllPeAgencies use case", () => {
       name: "Agence Pôle emploi Molsheim",
       counsellorEmails: [],
       validatorEmails: ["existing@mail.com"],
-      adminEmails: ["someAdmin@mail.com"],
       coveredDepartments: [address.departmentCode],
       address,
       position: {
@@ -257,7 +252,6 @@ describe("UpdateAllPeAgencies use case", () => {
         name: "Agence Pôle emploi MOLSHEIM",
         counsellorEmails: [],
         validatorEmails: ["molsheim@pole-emploi.fr"],
-        adminEmails: [],
         coveredDepartments: [address.departmentCode],
         address,
         position: {

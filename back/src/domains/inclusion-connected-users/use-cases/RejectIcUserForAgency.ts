@@ -69,7 +69,7 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.update(updatedIcUser),
+      uow.inclusionConnectedUserRepository.updateAgencyRights(updatedIcUser),
       uow.outboxRepository.save(event),
     ]);
   }

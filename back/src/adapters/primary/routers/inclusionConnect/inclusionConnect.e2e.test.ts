@@ -180,7 +180,9 @@ describe("inclusion connection flow", () => {
         user!.id,
       );
 
-      expectToEqual(icUser?.agencyRights, [{ agency, role: "validator" }]);
+      expectToEqual(icUser?.agencyRights, [
+        { agency, role: "validator", isNotifiedByEmail: false },
+      ]);
     });
   });
 });

@@ -83,7 +83,7 @@ describe("RenewConvention", () => {
     email: "my-user@email.com",
     firstName: "John",
     lastName: "Doe",
-    agencyRights: [{ role: "validator", agency }],
+    agencyRights: [{ role: "validator", agency, isNotifiedByEmail: false }],
     dashboards: { agencies: {}, establishments: {} },
     externalId: "my-user-external-id",
     createdAt: new Date().toISOString(),
@@ -276,7 +276,9 @@ describe("RenewConvention", () => {
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         {
           ...inclusionConnectedUser,
-          agencyRights: [{ agency, role: "agencyOwner" }],
+          agencyRights: [
+            { agency, role: "agencyOwner", isNotifiedByEmail: false },
+          ],
         },
       ]);
       await expectPromiseToFailWithError(

@@ -6,6 +6,7 @@ import {
   InclusionConnectedUser,
   User,
   UserId,
+  defaultValidatorEmail,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
 } from "shared";
@@ -34,17 +35,35 @@ const user1: User = {
 const user2: User = {
   id: "44444444-4444-4444-4444-444444444444",
   firstName: "Jane",
-  lastName: "Doe",
-  email: "jane.doe@mail.com",
+  lastName: "Da",
+  email: "jane.da@mail.com",
   externalId: "jane-external-id",
   createdAt: new Date().toISOString(),
 };
 
+const defaultValidator: User = {
+  id: "will-be-erased-by-the-DB-uuid-on-creation",
+  email: defaultValidatorEmail,
+  firstName: "",
+  lastName: "",
+  createdAt: new Date().toISOString(),
+  externalId: null,
+};
+
+const withEmptyDashboards = {
+  dashboards: {
+    agencies: {},
+    establishments: {},
+  },
+};
+
 const agency1 = new AgencyDtoBuilder()
+  .withValidatorEmails([defaultValidator.email])
   .withId("11111111-1111-4bbb-1111-111111111111")
   .withName("Agence 1")
   .build();
 const agency2 = new AgencyDtoBuilder()
+  .withValidatorEmails([defaultValidator.email])
   .withId("22222222-2222-4bbb-2222-222222222222")
   .withName("Agence 2")
   .withKind("cci")
@@ -96,10 +115,7 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          ...withEmptyDashboards,
           isBackofficeAdmin: true,
         });
       });
@@ -111,10 +127,7 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          ...withEmptyDashboards,
         });
       });
     });
@@ -126,19 +139,18 @@ describe("PgInclusionConnectedUserRepository", () => {
         await insertUser(user1),
       ]);
 
-      const userId = user1.id;
-
       // create the link between the user and the agencies
-
       await insertAgencyRegistrationToUser({
         agencyId: agency1.id,
-        userId,
+        userId: user1.id,
         role: "toReview",
+        isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency2.id,
-        userId,
+        userId: user1.id,
         role: "validator",
+        isNotifiedByEmail: false,
       });
 
       const inclusionConnectedUser = await icUserRepository.getById(user1.id);
@@ -146,13 +158,10 @@ describe("PgInclusionConnectedUserRepository", () => {
         ...user1,
         establishments: [],
         agencyRights: [
-          { agency: agency1, role: "toReview" },
-          { agency: agency2, role: "validator" },
+          { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+          { agency: agency2, role: "validator", isNotifiedByEmail: false },
         ],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
+        ...withEmptyDashboards,
       });
     });
 
@@ -198,14 +207,13 @@ describe("PgInclusionConnectedUserRepository", () => {
         const icUserToSave: InclusionConnectedUser = {
           ...user1,
           establishments: [],
-          agencyRights: [{ role: "counsellor", agency: agency1 }],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          agencyRights: [
+            { role: "counsellor", agency: agency1, isNotifiedByEmail: false },
+          ],
+          ...withEmptyDashboards,
         };
 
-        await icUserRepository.update(icUserToSave);
+        await icUserRepository.updateAgencyRights(icUserToSave);
 
         const savedIcUser = await icUserRepository.getById(user1.id);
         expectToEqual(savedIcUser, icUserToSave);
@@ -218,13 +226,10 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          ...withEmptyDashboards,
         };
 
-        await icUserRepository.update(icUserToSave);
+        await icUserRepository.updateAgencyRights(icUserToSave);
 
         const savedIcUser = await icUserRepository.getById(user1.id);
         expectToEqual(savedIcUser, icUserToSave);
@@ -240,16 +245,13 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [
-            { agency: agency1, role: "validator" },
-            { agency: agency2, role: "toReview" },
+            { agency: agency1, role: "validator", isNotifiedByEmail: false },
+            { agency: agency2, role: "toReview", isNotifiedByEmail: false },
           ],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          ...withEmptyDashboards,
         };
 
-        await icUserRepository.update(icUserToSave);
+        await icUserRepository.updateAgencyRights(icUserToSave);
 
         const savedIcUser = await icUserRepository.getById(user1.id);
 
@@ -258,14 +260,13 @@ describe("PgInclusionConnectedUserRepository", () => {
         const updatedIcUserToSave: InclusionConnectedUser = {
           ...user1,
           establishments: [],
-          agencyRights: [{ agency: agency1, role: "validator" }],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          agencyRights: [
+            { agency: agency1, role: "validator", isNotifiedByEmail: false },
+          ],
+          ...withEmptyDashboards,
         };
 
-        await icUserRepository.update(updatedIcUserToSave);
+        await icUserRepository.updateAgencyRights(updatedIcUserToSave);
 
         const updatedSavedIcUser = await icUserRepository.getById(user1.id);
         expectToEqual(updatedSavedIcUser, updatedIcUserToSave);
@@ -281,6 +282,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         agencyId: agency1.id,
         userId: user1.id,
         role: "toReview",
+        isNotifiedByEmail: false,
       });
 
       const icUsers = await icUserRepository.getWithFilter({});
@@ -296,16 +298,19 @@ describe("PgInclusionConnectedUserRepository", () => {
         agencyId: agency1.id,
         userId: user1.id,
         role: "toReview",
+        isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency2.id,
         userId: user1.id,
         role: "validator",
+        isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency2.id,
         userId: user2.id,
         role: "toReview",
+        isNotifiedByEmail: false,
       });
 
       const icUsers = await icUserRepository.getWithFilter({
@@ -317,22 +322,18 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [
-            { agency: agency1, role: "toReview" },
-            { agency: agency2, role: "validator" },
+            { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+            { agency: agency2, role: "validator", isNotifiedByEmail: false },
           ],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          ...withEmptyDashboards,
         },
         {
           ...user2,
           establishments: [],
-          agencyRights: [{ agency: agency2, role: "toReview" }],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          agencyRights: [
+            { agency: agency2, role: "toReview", isNotifiedByEmail: false },
+          ],
+          ...withEmptyDashboards,
         },
       ]);
     });
@@ -346,16 +347,19 @@ describe("PgInclusionConnectedUserRepository", () => {
         agencyId: agency1.id,
         userId: user1.id,
         role: "validator",
+        isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency1.id,
         userId: user2.id,
         role: "toReview",
+        isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency2.id,
         userId: user1.id,
         role: "validator",
+        isNotifiedByEmail: false,
       });
 
       const icUsers = await icUserRepository.getWithFilter({
@@ -363,15 +367,31 @@ describe("PgInclusionConnectedUserRepository", () => {
         agencyId: agency1.id,
       });
 
-      expectArraysToEqualIgnoringOrder(icUsers, [
+      expectArraysToEqualIgnoringOrder(
+        icUsers.map((icUser) => icUser.email),
+        [user1.email, defaultValidator.email],
+      );
+
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      const icUser1 = icUsers.find((u) => u.email === user1.email)!;
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      const icDefaultValidator = icUsers.find(
+        (u) => u.email === defaultValidator.email,
+      )!;
+
+      expectToEqual(icUser1.agencyRights, [
         {
-          ...user1,
-          establishments: [],
-          agencyRights: [{ agency: agency1, role: "validator" }],
-          dashboards: {
-            agencies: {},
-            establishments: {},
-          },
+          role: "validator",
+          agency: agency1,
+          isNotifiedByEmail: false,
+        },
+      ]);
+
+      expectToEqual(icDefaultValidator.agencyRights, [
+        {
+          role: "validator",
+          agency: agency1,
+          isNotifiedByEmail: true,
         },
       ]);
     });
@@ -402,10 +422,12 @@ describe("PgInclusionConnectedUserRepository", () => {
     userId,
     agencyId,
     role,
+    isNotifiedByEmail,
   }: {
     userId: UserId;
     agencyId: AgencyId;
     role: AgencyRole;
+    isNotifiedByEmail: boolean;
   }) => {
     await db
       .insertInto("users__agencies")
@@ -413,6 +435,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         user_id: userId,
         agency_id: agencyId,
         role,
+        is_notified_by_email: isNotifiedByEmail,
       })
       .execute();
   };
