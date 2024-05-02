@@ -1,4 +1,10 @@
-import { AgencyId, AgencyRole, InclusionConnectedUser, UserId } from "shared";
+import {
+  AgencyId,
+  AgencyRight,
+  AgencyRole,
+  InclusionConnectedUser,
+  UserId,
+} from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
@@ -7,6 +13,10 @@ import {
   InclusionConnectedFilters,
   InclusionConnectedUserRepository,
 } from "../../../dashboard/port/InclusionConnectedUserRepository";
+import {
+  addEmailsToAgency,
+  getUsersWithAgencyRole,
+} from "./agencyUsers.helpers";
 
 export class PgInclusionConnectedUserRepository
   implements InclusionConnectedUserRepository
@@ -27,7 +37,7 @@ export class PgInclusionConnectedUserRepository
     return this.#getInclusionConnectedUsers({ agencyRole, agencyId });
   }
 
-  public async update(user: InclusionConnectedUser): Promise<void> {
+  public async updateAgencyRights(user: InclusionConnectedUser): Promise<void> {
     await executeKyselyRawSqlQuery(
       this.transaction,
       `
@@ -35,14 +45,16 @@ export class PgInclusionConnectedUserRepository
         `,
       [user.id],
     );
+
     if (user.agencyRights.length > 0)
       await this.transaction
         .insertInto("users__agencies")
         .values(
-          user.agencyRights.map(({ agency, role }) => ({
+          user.agencyRights.map(({ agency, role, isNotifiedByEmail }) => ({
             user_id: user.id,
             agency_id: agency.id,
             role,
+            is_notified_by_email: isNotifiedByEmail,
           })),
         )
         .execute();
@@ -55,6 +67,7 @@ export class PgInclusionConnectedUserRepository
   }): Promise<InclusionConnectedUser[]> {
     const buildAgencyRight = `JSON_BUILD_OBJECT(
        'role', users__agencies.role,
+       'isNotifiedByEmail', users__agencies.is_notified_by_email,
        'agency', JSON_BUILD_OBJECT(
           'id', agencies.id,
           'address', JSON_BUILD_OBJECT(
@@ -64,10 +77,8 @@ export class PgInclusionConnectedUserRepository
             'city', agencies.city
           ),
           'coveredDepartments', agencies.covered_departments,
-          'adminEmails', agencies.admin_emails,
           'agencySiret', agencies.agency_siret,
           'codeSafir', agencies.code_safir,
-          'counsellorEmails', agencies.counsellor_emails,
           'kind', agencies.kind,
           'logoUrl', agencies.logo_url,
           'name', agencies.name,
@@ -79,8 +90,7 @@ export class PgInclusionConnectedUserRepository
           'refersToAgencyId', agencies.refers_to_agency_id,
           'rejectionJustification', agencies.rejection_justification,
           'signature', agencies.email_signature,
-          'status', agencies.status,
-          'validatorEmails', agencies.validator_emails
+          'status', agencies.status
         )
       )`;
 
@@ -125,11 +135,31 @@ export class PgInclusionConnectedUserRepository
 
     if (response.rows.length === 0) return [];
 
+    const agencyIdsToFetch = [
+      ...new Set(
+        response.rows.reduce<AgencyId[]>((acc, row) => {
+          const agencyRights: AgencyRight[] = row.inclusion_user.agencyRights;
+          return [...acc, ...agencyRights.map(({ agency }) => agency.id)];
+        }, [] as AgencyId[]),
+      ),
+    ];
+
+    const usersWithAgencyRole = await getUsersWithAgencyRole(this.transaction, {
+      agencyIds: agencyIdsToFetch,
+      isNotifiedByEmail: true,
+    });
+
     return response.rows.map(
       ({
-        inclusion_user: { isBackofficeAdmin, createdAt, ...rest },
+        inclusion_user: { isBackofficeAdmin, createdAt, agencyRights, ...rest },
       }): InclusionConnectedUser => ({
         ...rest,
+        agencyRights: agencyRights.map(
+          (agencyRight: AgencyRight): AgencyRight => ({
+            ...agencyRight,
+            agency: addEmailsToAgency(usersWithAgencyRole)(agencyRight.agency),
+          }),
+        ),
         createdAt: new Date(createdAt).toISOString(),
         dashboards: {
           agencies: {},

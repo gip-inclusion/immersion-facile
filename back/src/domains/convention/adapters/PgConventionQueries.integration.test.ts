@@ -12,6 +12,7 @@ import {
   ConventionStatus,
   DATE_START,
   SiretDto,
+  defaultValidatorEmail,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
@@ -80,7 +81,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyKind: "autre",
         agencySiret: "11112222000033",
         agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidatorEmails: [defaultValidatorEmail],
       });
 
       // Act
@@ -109,7 +110,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencySiret: "11112222000033",
         withRefersToAgency: referringAgency,
         agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidatorEmails: [defaultValidatorEmail],
       });
 
       const result = await conventionQueries.getConventionById(conventionIdA);
@@ -130,7 +131,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyKind: "pole-emploi",
         agencySiret: "11112222000044",
         agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidatorEmails: [defaultValidatorEmail],
         conventionStartDate: new Date("2021-01-10").toISOString(),
         conventionStatus: "IN_REVIEW",
       });
@@ -142,7 +143,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyKind: "cci",
         agencySiret: "11112222000055",
         agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidatorEmails: [defaultValidatorEmail],
         conventionStartDate: new Date("2021-01-15").toISOString(),
         conventionStatus: "DRAFT",
       });
@@ -154,7 +155,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyKind: "mission-locale",
         agencySiret: "11112222000066",
         agencyCounsellorEmails: [],
-        agencyValidatorEmails: ["validator@mail.com"],
+        agencyValidatorEmails: [defaultValidatorEmail],
         conventionStartDate: new Date("2021-01-12").toISOString(),
         conventionStatus: "IN_REVIEW",
       });

@@ -100,7 +100,6 @@ describe("AddAgency use case", () => {
       expectToEqual(uow.agencyRepository.agencies, [
         {
           ...createParisMissionLocaleParams,
-          adminEmails: [],
           status: "needsReview",
           questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
           rejectionJustification: null,
@@ -119,7 +118,6 @@ describe("AddAgency use case", () => {
             agency: {
               ...createParisMissionLocaleParams,
               questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
-              adminEmails: [],
               status: "needsReview",
               rejectionJustification: null,
               codeSafir: null,
@@ -140,7 +138,6 @@ describe("AddAgency use case", () => {
       expectToEqual(uow.agencyRepository.agencies, [
         {
           ...poleEmploiParis,
-          adminEmails: [],
           status: "needsReview",
           codeSafir: null,
           rejectionJustification: null,
@@ -151,7 +148,6 @@ describe("AddAgency use case", () => {
     it("agengy with refers to should have validator emails from referral agency", async () => {
       const miloAgency: AgencyDto = {
         ...createParisMissionLocaleParams,
-        adminEmails: [],
         status: "needsReview",
         questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
         codeSafir: null,
@@ -166,7 +162,6 @@ describe("AddAgency use case", () => {
         {
           ...createAgencyWithRefersToParams,
           validatorEmails: miloAgency.validatorEmails,
-          adminEmails: [],
           status: "needsReview",
           codeSafir: null,
           rejectionJustification: null,

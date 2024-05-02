@@ -34,7 +34,6 @@ const agency1builder = AgencyDtoBuilder.create(
   .withCoveredDepartments(["75"])
   .withCounsellorEmails(["counsellor1@agency1.fr", "counsellor2@agency1.fr"])
   .withValidatorEmails(["validator1@agency1.fr", "validator2@agency1.fr"])
-  .withAdminEmails(["adminA@agency1.fr", "adminB@agency1.fr"])
   .withQuestionnaireUrl("http://questionnaire.agency1.fr")
   .withSignature("The team of agency1")
   .withLogoUrl("http://logo.agency1.fr");
@@ -52,7 +51,6 @@ const agency2builder = AgencyDtoBuilder.create(
   })
   .withCounsellorEmails(["counsellor1@agency2.fr", "counsellor2@agency2.fr"])
   .withValidatorEmails(["agency2@validator.com"]) // no validators
-  .withAdminEmails(["admin1@agency2.fr", "admin2@agency2.fr"])
   .withQuestionnaireUrl("http://questionnaire.agency2.fr")
   .withSignature("The team of agency2");
 
@@ -94,7 +92,10 @@ describe("PgAgencyRepository", () => {
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("users_ongoing_oauths").execute();
+    await db.deleteFrom("users__agencies").execute();
     await db.deleteFrom("agencies").execute();
+    await db.deleteFrom("users").execute();
 
     agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
   });

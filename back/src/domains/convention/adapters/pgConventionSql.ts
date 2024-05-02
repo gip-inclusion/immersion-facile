@@ -10,6 +10,7 @@ import {
   ConventionReadDto,
   DateString,
   Email,
+  OmitFromExistingKeys,
   RomeCode,
   RomeLabel,
   ScheduleDto,
@@ -24,6 +25,10 @@ import {
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
+import {
+  getEmailsFromUsersWithAgencyRoles,
+  getUsersWithAgencyRole,
+} from "../../core/authentication/inclusion-connect/adapters/agencyUsers.helpers";
 
 export const createConventionQueryBuilder = (transaction: KyselyDb) => {
   // biome-ignore format: reads better without formatting
@@ -225,7 +230,10 @@ export const getConventionAgencyFieldsForAgencies = async (
   agencyIds: AgencyId[],
 ): Promise<Record<AgencyId, ConventionAgencyFields>> => {
   const withAgencyFields: {
-    agencyFields: ConventionAgencyFields & { agencyId: AgencyId };
+    agencyFields: OmitFromExistingKeys<
+      ConventionAgencyFields,
+      "agencyCounsellorEmails" | "agencyValidatorEmails"
+    > & { agencyId: AgencyId };
   }[] = await transaction
     .selectFrom("agencies")
     .leftJoin(
@@ -241,12 +249,6 @@ export const getConventionAgencyFieldsForAgencies = async (
           agencyKind: ref("agencies.kind").$castTo<AgencyKind>(),
           agencyDepartment: ref("agencies.department_code"),
           agencySiret: ref("agencies.agency_siret"),
-          agencyCounsellorEmails: ref("agencies.counsellor_emails").$castTo<
-            Email[]
-          >(),
-          agencyValidatorEmails: ref("agencies.validator_emails").$castTo<
-            Email[]
-          >(),
           agencyRefersTo: eb
             .case()
             .when("agencies.refers_to_agency_id", "is not", null)
@@ -264,11 +266,30 @@ export const getConventionAgencyFieldsForAgencies = async (
     .where("agencies.id", "in", agencyIds)
     .execute();
 
+  const usersWithAgencyRole = await getUsersWithAgencyRole(transaction, {
+    agencyIds,
+    isNotifiedByEmail: true,
+  });
+
   return withAgencyFields.reduce(
-    (acc, agency) => ({
-      ...acc,
-      [agency.agencyFields.agencyId]: agency.agencyFields,
-    }),
+    (acc, { agencyFields }) => {
+      const completeAgencyFields: ConventionAgencyFields = {
+        ...agencyFields,
+        agencyCounsellorEmails: getEmailsFromUsersWithAgencyRoles(
+          usersWithAgencyRole,
+          { agencyIdToMatch: agencyFields.agencyId, roleToMatch: "counsellor" },
+        ),
+        agencyValidatorEmails: getEmailsFromUsersWithAgencyRoles(
+          usersWithAgencyRole,
+          { agencyIdToMatch: agencyFields.agencyId, roleToMatch: "validator" },
+        ),
+      };
+
+      return {
+        ...acc,
+        [agencyFields.agencyId]: completeAgencyFields,
+      };
+    },
     {} as Record<AgencyId, ConventionAgencyFields>,
   );
 };

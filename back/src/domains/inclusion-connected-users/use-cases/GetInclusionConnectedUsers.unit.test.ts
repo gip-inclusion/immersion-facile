@@ -19,8 +19,8 @@ const johnWithAgenciesToReview: InclusionConnectedUser = {
   lastName: "Lennon",
   createdAt: new Date().toISOString(),
   agencyRights: [
-    { agency: agency1, role: "toReview" },
-    { agency: agency2, role: "validator" },
+    { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+    { agency: agency2, role: "validator", isNotifiedByEmail: false },
   ],
   dashboards: {
     agencies: {},
@@ -36,8 +36,8 @@ const paulWithAllAgenciesReviewed: InclusionConnectedUser = {
   lastName: "McCartney",
   createdAt: new Date().toISOString(),
   agencyRights: [
-    { agency: agency1, role: "counsellor" },
-    { agency: agency2, role: "validator" },
+    { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
+    { agency: agency2, role: "validator", isNotifiedByEmail: false },
   ],
   dashboards: {
     agencies: {},

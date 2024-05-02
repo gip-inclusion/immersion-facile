@@ -103,7 +103,9 @@ describe("GetUserAgencyDashboardUrl", () => {
       uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         {
           ...john,
-          agencyRights: [{ agency, role: agencyUserRole }],
+          agencyRights: [
+            { agency, role: agencyUserRole, isNotifiedByEmail: false },
+          ],
           dashboards: {
             agencies: {},
             establishments: {},
@@ -117,7 +119,9 @@ describe("GetUserAgencyDashboardUrl", () => {
 
       expectToEqual(url, {
         ...john,
-        agencyRights: [{ agency, role: agencyUserRole }],
+        agencyRights: [
+          { agency, role: agencyUserRole, isNotifiedByEmail: false },
+        ],
         dashboards: {
           agencies: {
             agencyDashboardUrl: `http://stubAgencyUserDashboard/${
@@ -136,7 +140,11 @@ describe("GetUserAgencyDashboardUrl", () => {
       const storedInclusionConnectedUser: InclusionConnectedUser = {
         ...john,
         agencyRights: [
-          { agency: new AgencyDtoBuilder().build(), role: agencyUserRole },
+          {
+            agency: new AgencyDtoBuilder().build(),
+            role: agencyUserRole,
+            isNotifiedByEmail: false,
+          },
         ],
         dashboards: { agencies: {}, establishments: {} },
       };
@@ -166,10 +174,10 @@ describe("GetUserAgencyDashboardUrl", () => {
       {
         ...john,
         agencyRights: [
-          { agency: agency1, role: "counsellor" },
-          { agency: agency2, role: "validator" },
-          { agency: agency3, role: "toReview" },
-          { agency: agency4, role: "agencyOwner" },
+          { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
+          { agency: agency2, role: "validator", isNotifiedByEmail: false },
+          { agency: agency3, role: "toReview", isNotifiedByEmail: false },
+          { agency: agency4, role: "agencyOwner", isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
       },
@@ -182,10 +190,10 @@ describe("GetUserAgencyDashboardUrl", () => {
     expectToEqual(url, {
       ...john,
       agencyRights: [
-        { agency: agency1, role: "counsellor" },
-        { agency: agency2, role: "validator" },
-        { agency: agency3, role: "toReview" },
-        { agency: agency4, role: "agencyOwner" },
+        { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
+        { agency: agency2, role: "validator", isNotifiedByEmail: false },
+        { agency: agency3, role: "toReview", isNotifiedByEmail: false },
+        { agency: agency4, role: "agencyOwner", isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {
@@ -208,7 +216,9 @@ describe("GetUserAgencyDashboardUrl", () => {
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
       {
         ...john,
-        agencyRights: [{ agency: agency1, role: "counsellor" }],
+        agencyRights: [
+          { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
+        ],
         dashboards: { agencies: {}, establishments: {} },
       },
     ]);
@@ -223,7 +233,9 @@ describe("GetUserAgencyDashboardUrl", () => {
 
     expectToEqual(url, {
       ...john,
-      agencyRights: [{ agency: agency1, role: "counsellor" }],
+      agencyRights: [
+        { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
+      ],
       dashboards: {
         agencies: {
           agencyDashboardUrl: `http://stubAgencyUserDashboard/${

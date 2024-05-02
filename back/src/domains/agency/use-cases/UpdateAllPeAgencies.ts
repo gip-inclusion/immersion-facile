@@ -158,7 +158,6 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       validatorEmails: peReferentialAgency.contact?.email
         ? [peReferentialAgency.contact.email]
         : [],
-      adminEmails: [],
       ...normalizePosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
       coveredDepartments: [geocodedAddress.departmentCode],

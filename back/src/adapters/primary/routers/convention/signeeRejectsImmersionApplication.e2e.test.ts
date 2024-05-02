@@ -4,6 +4,7 @@ import {
   ConventionStatus,
   UpdateConventionStatusRequestDto,
   conventionMagicLinkRoutes,
+  defaultValidatorEmail,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectObjectsToMatch,
@@ -78,7 +79,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   expectToEqual(
     sentEmails.map((e) => e.recipients),
     [
-      ["validator@mail.com"],
+      [defaultValidatorEmail],
       [convention.signatories.beneficiary.email],
       [convention.signatories.establishmentRepresentative.email],
     ],

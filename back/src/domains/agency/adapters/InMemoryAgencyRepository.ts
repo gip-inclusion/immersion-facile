@@ -31,7 +31,6 @@ const testAgencies: AgencyDto[] = [
     kind: "immersion-facile",
     counsellorEmails: ["notificationsconventions@immersion-facile.fr"],
     validatorEmails: ["validator123@mail.com"],
-    adminEmails: ["contact@immersion-facile.fr"],
     signature: "Signature of Immersion Facile",
     agencySiret: "00000000000000",
     coveredDepartments: ["75"],
@@ -58,7 +57,6 @@ const testAgencies: AgencyDto[] = [
     kind: "pole-emploi",
     counsellorEmails: ["counsellor@agency1.fr"],
     validatorEmails: ["validator@agency1.fr"],
-    adminEmails: ["admin@agency1.fr"],
     questionnaireUrl: "http://questionnaire.agency1.fr",
     signature: "Signature of Test Agency 1",
     agencySiret: "00000000000000",
@@ -86,7 +84,6 @@ const testAgencies: AgencyDto[] = [
     agencySiret: "00000000000000",
     counsellorEmails: ["counsellor1@agency2.fr", "counsellor2@agency2.fr"],
     validatorEmails: ["validator1@agency2.fr", "validator2@agency2.fr"],
-    adminEmails: ["admin1@agency2.fr", "admin2@agency2.fr"],
     questionnaireUrl: "http://questionnaire.agency2.fr",
     signature: "Signature of Test Agency 2",
     coveredDepartments: ["68"],
@@ -113,7 +110,6 @@ const testAgencies: AgencyDto[] = [
     kind: "pole-emploi",
     counsellorEmails: [], // no counsellors
     validatorEmails: ["validator@agency3.fr"],
-    adminEmails: ["admin@agency3.fr"],
     questionnaireUrl: "http://questionnaire.agency3.fr",
     signature: "Signature of Test Agency 3",
     coveredDepartments: ["64"],
@@ -140,7 +136,6 @@ const testAgencies: AgencyDto[] = [
     kind: "autre",
     counsellorEmails: ["counsellor@agency4.fr"], // no counsellors
     validatorEmails: ["validator@agency3.fr"],
-    adminEmails: [],
     questionnaireUrl: "http://questionnaire.agency4.fr",
     signature: "Signature of Test Agency 4 accompagnante",
     coveredDepartments: ["64"],
@@ -167,7 +162,6 @@ const testAgencies: AgencyDto[] = [
     kind: "autre",
     counsellorEmails: ["counsellor@agency5.fr"], // no counsellors
     validatorEmails: ["validator@agency1.fr"],
-    adminEmails: [],
     questionnaireUrl: "http://questionnaire.agency5.fr",
     signature: "Signature of Test Agency 5 accompagnante",
     coveredDepartments: ["64"],

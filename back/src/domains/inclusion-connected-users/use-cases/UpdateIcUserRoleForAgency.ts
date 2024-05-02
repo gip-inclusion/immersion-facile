@@ -78,7 +78,7 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.update(updatedUser),
+      uow.inclusionConnectedUserRepository.updateAgencyRights(updatedUser),
       uow.outboxRepository.save(event),
     ]);
   }

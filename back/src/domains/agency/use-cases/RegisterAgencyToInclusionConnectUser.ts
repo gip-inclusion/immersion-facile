@@ -68,6 +68,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     user.agencyRights = agencies.map((agency) => ({
       agency,
       role: "toReview",
+      isNotifiedByEmail: false,
     }));
 
     const event = this.#createNewEvent({
@@ -76,7 +77,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.update(user),
+      uow.inclusionConnectedUserRepository.updateAgencyRights(user),
       uow.outboxRepository.save(event),
     ]);
   }

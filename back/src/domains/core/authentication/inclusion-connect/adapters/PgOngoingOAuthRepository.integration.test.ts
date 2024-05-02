@@ -60,7 +60,7 @@ describe("PgOngoingOAuthRepository", () => {
     const updatedOngoingOAuth: OngoingOAuth = {
       ...ongoingOAuth,
       userId: user.id,
-      externalId: user.externalId,
+      externalId: user.externalId ?? undefined,
       accessToken: "some-token",
     };
     await pgOngoingOAuthRepository.save(updatedOngoingOAuth);

@@ -1,5 +1,5 @@
 import { sql } from "kysely";
-import { User } from "shared";
+import { User, UserId } from "shared";
 import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { UserRepository } from "../port/UserRepositiory";
 
@@ -8,7 +8,7 @@ type PersistenceAuthenticatedUser = {
   email: string;
   first_name: string;
   last_name: string;
-  external_id: string;
+  external_id: string | null;
   created_at: string;
 };
 
@@ -26,7 +26,8 @@ export class PgUserRepository implements UserRepository {
 
   public async save(user: User): Promise<void> {
     const { id, email, firstName, lastName, externalId, createdAt } = user;
-    const existingUser = await this.findByExternalId(externalId);
+
+    const existingUser = await this.#findById(id);
 
     if (!existingUser) {
       await this.transaction
@@ -61,6 +62,15 @@ export class PgUserRepository implements UserRepository {
       .where("external_id", "=", externalId)
       .execute();
     return;
+  }
+
+  async #findById(userId: UserId) {
+    const response = await this.transaction
+      .selectFrom("users")
+      .selectAll()
+      .where("id", "=", userId)
+      .executeTakeFirst();
+    return toAuthenticatedUser(response);
   }
 }
 

@@ -35,7 +35,6 @@ export type CreateAgencyDto = {
 } & WithAcquisition;
 
 export type AgencyDtoSensitiveFields = {
-  adminEmails: Email[];
   status: AgencyStatus;
   codeSafir: CodeSafir | null;
   rejectionJustification: string | null;

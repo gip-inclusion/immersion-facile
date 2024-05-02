@@ -69,7 +69,7 @@ export class InMemoryInclusionConnectedUserRepository
     );
   }
 
-  public async update(user: InclusionConnectedUser): Promise<void> {
+  public async updateAgencyRights(user: InclusionConnectedUser): Promise<void> {
     this.agencyRightsByUserId[user.id] = user.agencyRights;
   }
 }

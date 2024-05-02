@@ -81,10 +81,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
       {
         agency: agencyWithoutCounsellorEmail,
         role: "toReview",
+        isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
         role: "toReview",
+        isNotifiedByEmail: false,
       },
     ],
     email: "icUserWithRoleToReview@mail.com",
@@ -100,10 +102,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
       {
         agency: agencyWithoutCounsellorEmail,
         role: "counsellor",
+        isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
         role: "counsellor",
+        isNotifiedByEmail: false,
       },
     ],
     email: "icUserWithRoleCounsellor@mail.com",
@@ -119,10 +123,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
       {
         agency: agencyWithoutCounsellorEmail,
         role: "validator",
+        isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
         role: "validator",
+        isNotifiedByEmail: false,
       },
     ],
     email: "icUserWithRoleValidator@mail.com",
@@ -139,10 +145,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
       {
         agency: agencyWithoutCounsellorEmail,
         role: "agencyOwner",
+        isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
         role: "agencyOwner",
+        isNotifiedByEmail: false,
       },
     ],
     email: "icUserWithRoleAgencyOwner@mail.com",

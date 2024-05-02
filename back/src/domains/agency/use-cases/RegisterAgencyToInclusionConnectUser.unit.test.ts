@@ -88,7 +88,9 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       {
         ...user,
-        agencyRights: [{ agency: agency1, role: "counsellor" }],
+        agencyRights: [
+          { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
+        ],
         dashboards: { agencies: {}, establishments: {} },
       },
     ]);
@@ -116,7 +118,9 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
 
       expectToEqual(inclusionConnectedUser, {
         ...user,
-        agencyRights: [{ agency: agency1, role: "toReview" }],
+        agencyRights: [
+          { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+        ],
         dashboards: { agencies: {}, establishments: {} },
       });
       expect(outboxRepository.events).toHaveLength(1);
@@ -140,8 +144,8 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       expectToEqual(inclusionConnectedUser, {
         ...user,
         agencyRights: [
-          { agency: agency1, role: "toReview" },
-          { agency: agency2, role: "toReview" },
+          { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+          { agency: agency2, role: "toReview", isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
       });

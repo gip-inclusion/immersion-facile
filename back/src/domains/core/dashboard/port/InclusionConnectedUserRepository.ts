@@ -9,5 +9,5 @@ export interface InclusionConnectedUserRepository {
     filter: InclusionConnectedFilters,
   ): Promise<InclusionConnectedUser[]>;
   getById(userId: string): Promise<InclusionConnectedUser | undefined>;
-  update(user: InclusionConnectedUser): Promise<void>;
+  updateAgencyRights(user: InclusionConnectedUser): Promise<void>;
 }

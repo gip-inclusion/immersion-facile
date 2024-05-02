@@ -70,11 +70,9 @@ export type TestAppAndDeps = {
 export const buildTestApp = async (
   appConfigOverrides?: AppConfig,
 ): Promise<TestAppAndDeps> => {
-  const adminEmail = "admin@email.fr";
   const validConvention = new ConventionDtoBuilder().build();
   const agency = AgencyDtoBuilder.create(validConvention.agencyId)
     .withName("TEST-name")
-    .withAdminEmails([adminEmail])
     .withQuestionnaireUrl("https://TEST-questionnaireUrl")
     .withSignature("TEST-signature")
     .build();

@@ -35,13 +35,13 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
     const agency: AgencyDto | undefined =
       await uow.agencyRepository.getBySafir(codeSafir);
     if (agency) {
-      await uow.inclusionConnectedUserRepository.update({
+      await uow.inclusionConnectedUserRepository.updateAgencyRights({
         ...icUser,
         agencyRights: [
           ...icUser.agencyRights.filter(
             (agencyRight) => agencyRight.agency.codeSafir !== codeSafir,
           ),
-          { agency, role: "validator" },
+          { agency, role: "validator", isNotifiedByEmail: false },
         ],
       });
       return;
@@ -60,7 +60,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
           icUser.agencyRights,
         );
 
-      await uow.inclusionConnectedUserRepository.update({
+      await uow.inclusionConnectedUserRepository.updateAgencyRights({
         ...icUser,
         agencyRights: [
           ...agencyRightsWithoutConflicts,
@@ -71,7 +71,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
             if (existingAgencyRight && existingAgencyRight.role !== "toReview")
               return existingAgencyRight;
 
-            return { agency, role: "counsellor" };
+            return { agency, role: "counsellor", isNotifiedByEmail: false };
           }),
         ],
       });

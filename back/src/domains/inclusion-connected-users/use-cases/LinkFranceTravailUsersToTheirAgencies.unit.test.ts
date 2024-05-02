@@ -78,14 +78,18 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       });
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
-        [defaultUser.id]: [{ agency, role: "validator" }],
+        [defaultUser.id]: [
+          { agency, role: "validator", isNotifiedByEmail: false },
+        ],
       });
     });
 
     it("don't add agency right to IC user if user already has rights on agency", async () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
-        agencyRights: [{ agency, role: "agencyOwner" }],
+        agencyRights: [
+          { agency, role: "agencyOwner", isNotifiedByEmail: false },
+        ],
         dashboards: {
           agencies: {},
           establishments: {},
@@ -101,14 +105,16 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       });
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
-        [icUser.id]: [{ agency, role: "agencyOwner" }],
+        [icUser.id]: [
+          { agency, role: "agencyOwner", isNotifiedByEmail: false },
+        ],
       });
     });
 
     it("replace agency right to IC user if user already has rights on agency and current right is toReview", async () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
-        agencyRights: [{ agency, role: "toReview" }],
+        agencyRights: [{ agency, role: "toReview", isNotifiedByEmail: false }],
         dashboards: {
           agencies: {},
           establishments: {},
@@ -124,7 +130,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       });
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
-        [icUser.id]: [{ agency, role: "validator" }],
+        [icUser.id]: [{ agency, role: "validator", isNotifiedByEmail: false }],
       });
     });
 
@@ -175,9 +181,21 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
         [icUser.id]: [
-          { agency: agency1InGroup, role: "counsellor" },
-          { agency: agency2InGroup, role: "counsellor" },
-          { agency: agency3InGroup, role: "counsellor" },
+          {
+            agency: agency1InGroup,
+            role: "counsellor",
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: agency2InGroup,
+            role: "counsellor",
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: agency3InGroup,
+            role: "counsellor",
+            isNotifiedByEmail: false,
+          },
         ],
       });
     });
@@ -187,8 +205,16 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [
-          { agency: agency1InGroup, role: "validator" },
-          { agency: agency2InGroup, role: "toReview" },
+          {
+            agency: agency1InGroup,
+            role: "validator",
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: agency2InGroup,
+            role: "toReview",
+            isNotifiedByEmail: false,
+          },
         ],
         dashboards: {
           agencies: {},
@@ -206,9 +232,21 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
         [icUser.id]: [
-          { agency: agency1InGroup, role: "validator" },
-          { agency: agency2InGroup, role: "counsellor" },
-          { agency: agency3InGroup, role: "counsellor" },
+          {
+            agency: agency1InGroup,
+            role: "validator",
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: agency2InGroup,
+            role: "counsellor",
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: agency3InGroup,
+            role: "counsellor",
+            isNotifiedByEmail: false,
+          },
         ],
       });
     });

@@ -27,12 +27,13 @@ describe("PgAuthenticatedUserRepository", () => {
 
   it("saves an authenticated user, than finds it from external_id, then updates it", async () => {
     const userExternalId = "my-external-id";
+    const userId = "11111111-1111-1111-1111-111111111111";
     const createdAt = new Date().toISOString();
     const user: User = {
       email: "joe@mail.com",
       lastName: "Doe",
       firstName: "John",
-      id: "11111111-1111-1111-1111-111111111111",
+      id: userId,
       externalId: userExternalId,
       createdAt,
     };
@@ -43,7 +44,7 @@ describe("PgAuthenticatedUserRepository", () => {
     expectToEqual(fetchedUser, user);
 
     const updatedUser: User = {
-      id: "11111111-1111-1111-1111-111111111111",
+      id: userId,
       email: "updated-mail@mail.com",
       lastName: "Dodo",
       firstName: "Johnny",
@@ -68,7 +69,10 @@ describe("PgAuthenticatedUserRepository", () => {
       };
       await pgUserRepository.save(user);
 
-      const response = await pgUserRepository.findByExternalId(user.externalId);
+      const response = await pgUserRepository.findByExternalId(
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        user.externalId!,
+      );
 
       expectToEqual(response, user);
     });
