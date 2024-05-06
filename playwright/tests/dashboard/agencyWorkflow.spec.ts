@@ -1,5 +1,5 @@
 import test, { expect } from "@playwright/test";
-import { AgencyId, domElementIds, frontRoutes } from "shared";
+import { AgencyId, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { fillAndSubmitBasicAgencyForm } from "../../utils/agency";
@@ -23,9 +23,7 @@ test.describe("Agency dashboard workflow", () => {
     await expect(agencyId).not.toBeNull();
   });
 
-  test(`should be able to register a new user for agency (${agencyId})`, async ({
-    page,
-  }) => {
+  test("activate agency in admin", async ({ page }) => {
     if (!agencyId) throw new Error("Agency ID is null");
     await goToAdminTab(page, "agencies");
     await page
@@ -42,8 +40,13 @@ test.describe("Agency dashboard workflow", () => {
       await page.locator(".fr-alert--success").first(),
     ).toBeVisible();
     await page.waitForTimeout(testConfig.timeForEventCrawler);
-    await page.goto(frontRoutes.agencyDashboard);
-    expect(
+  });
+
+  test(`an Ic user should be able to ask to be registered to an agency (${agencyId})`, async ({
+    page,
+  }) => {
+    await loginWithInclusionConnect(page, "agencyDashboard");
+    await expect(
       await page.locator(
         `#${domElementIds.agencyDashboard.registerAgencies.form}`,
       ),
@@ -62,6 +65,9 @@ test.describe("Agency dashboard workflow", () => {
     await expect(
       await page.locator(".fr-alert--success").first(),
     ).toBeVisible();
+  });
+
+  test("admin validates user registration to agency", async ({ page }) => {
     await goToAdminTab(page, "agencies");
     await page
       .locator(`#${domElementIds.admin.agencyTab.selectIcUserToReview}`)
@@ -73,6 +79,7 @@ test.describe("Agency dashboard workflow", () => {
         `[id^=${domElementIds.admin.agencyTab.registerIcUserToAgencyButton}]`,
       )
       .click();
+    await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
 
   test("IC user can access to the agency dashboard", async ({ page }) => {

@@ -31,6 +31,13 @@ export class InclusionConnectedUserBuilder
     return this.#dto;
   }
 
+  withCreatedAt(createdAt: Date): InclusionConnectedUserBuilder {
+    return new InclusionConnectedUserBuilder({
+      ...this.#dto,
+      createdAt: createdAt.toISOString(),
+    });
+  }
+
   withIsAdmin(isBackofficeAdmin: boolean): InclusionConnectedUserBuilder {
     return new InclusionConnectedUserBuilder({
       ...this.#dto,

@@ -51,8 +51,8 @@ export const submitBasicConventionForm = async (page: Page) => {
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.birthdate}`,
     faker.date
       .birthdate({
-        min: 18,
-        max: 65,
+        min: 1910,
+        max: 2005,
       })
       .toISOString()
       .split("T")[0],
