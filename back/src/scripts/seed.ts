@@ -67,8 +67,19 @@ const seed = async () => {
 };
 
 const inclusionConnectUserSeed = async (db: KyselyDb) => {
+  const icUser = new InclusionConnectedUserBuilder()
+    .withIsAdmin(false)
+    .withCreatedAt(new Date("2024-04-29"))
+    .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
+    .withFirstName("Prénom IcUser")
+    .withLastName("Nom IcUser")
+    .withId("0cd861bb-d538-4bac-83f1-256ff249a196")
+    .withExternalId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
+    .build();
+
   const adminUser = new InclusionConnectedUserBuilder()
     .withIsAdmin(true)
+    .withCreatedAt(new Date("2024-04-30"))
     .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom Admin")
     .withLastName("Nom Admin")
@@ -78,14 +89,16 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
 
   await db
     .insertInto("users")
-    .values({
-      id: adminUser.id,
-      email: adminUser.email,
-      first_name: adminUser.firstName,
-      last_name: adminUser.lastName,
-      external_id: adminUser.externalId,
-      created_at: adminUser.createdAt,
-    })
+    .values(
+      [adminUser, icUser].map((user) => ({
+        id: user.id,
+        email: user.email,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        external_id: user.externalId,
+        created_at: user.createdAt,
+      })),
+    )
     .execute();
 
   await db
