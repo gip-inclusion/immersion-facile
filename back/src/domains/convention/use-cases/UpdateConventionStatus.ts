@@ -6,6 +6,8 @@ import {
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
+  ExtractFromExisting,
+  Role,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
   UserId,
@@ -188,13 +190,17 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     userId: UserId,
     convention: ConventionDto,
   ): Promise<
-    AgencyRole | Extract<SignatoryRole, "establishment-representative">
+    | AgencyRole
+    | ExtractFromExisting<SignatoryRole, "establishment-representative">
+    | ExtractFromExisting<Role, "backOffice">
   > {
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)
       throw new NotFoundError(
         `User '${userId}' not found on inclusion connected user repository.`,
       );
+
+    if (user.isBackofficeAdmin) return "backOffice";
 
     if (user.email === convention.signatories.establishmentRepresentative.email)
       return "establishment-representative";

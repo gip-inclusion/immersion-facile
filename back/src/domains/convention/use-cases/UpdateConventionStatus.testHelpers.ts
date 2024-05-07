@@ -44,6 +44,7 @@ const allInclusionConnectedTestUsers = [
   "icUserWithRoleValidator",
   "icUserWithRoleAgencyOwner",
   "icUserWithRoleEstablishmentRepresentative",
+  "icUserWithRoleBackofficeAdmin",
 ] as const;
 
 type InclusionConnectedTestUser =
@@ -64,6 +65,17 @@ const makeUserIdMapInclusionConnectedUser: Record<
   InclusionConnectedTestUser,
   InclusionConnectedUser
 > = {
+  icUserWithRoleBackofficeAdmin: {
+    agencyRights: [],
+    email: "icUserWithRoleBackofficeAdmin@mail.com",
+    id: "icUserWithRoleBackofficeAdmin",
+    firstName: "icUserWithRoleBackofficeAdmin",
+    lastName: "BackofficeAdmin",
+    dashboards: { agencies: {}, establishments: {} },
+    externalId: "icUserWithRoleBackOfficeAdmin-external-id",
+    createdAt: new Date().toISOString(),
+    isBackofficeAdmin: true,
+  },
   icUserWithRoleToReview: {
     agencyRights: [
       {
@@ -389,12 +401,13 @@ const makeTestAcceptsStatusUpdate =
         expectedConvention,
       );
 
-      if (!role || role === "agencyOwner" || role === "toReview")
+      if (!role || role === "agencyOwner" || role === "toReview") {
         throw new Error(
-          `No supported role found according to ${JSON.stringify(
+          `Role '${role}' not supported according to ${JSON.stringify(
             testAcceptNewStatusParams,
           )}`,
         );
+      }
 
       const payload: ConventionRequiresModificationPayload =
         updateStatusParams.modifierRole === "validator" ||
@@ -539,25 +552,30 @@ export const rejectStatusTransitionTests = ({
     if (notAllowedInclusionConnectedUsersToUpdate.length) {
       it.each(
         notAllowedInclusionConnectedUsersToUpdate.map((userId) => ({ userId })),
-      )("Rejected from userId '$userId'", ({ userId }) =>
-        testRejectsStatusUpdate({
+      )("Rejected from userId '$userId'", ({ userId }) => {
+        const user = makeUserIdMapInclusionConnectedUser[userId];
+        const getRole = () => {
+          if (user.email === establishmentRepEmail)
+            return "establishment-representative";
+
+          if (user.isBackofficeAdmin) return "backOffice";
+
+          return user.agencyRights.find(
+            (agencyRight) =>
+              agencyRight.agency.id === agencyWithoutCounsellorEmail.id,
+          )?.role;
+        };
+
+        return testRejectsStatusUpdate({
           userId,
           initialStatus: someValidInitialStatus,
           expectedError: new ForbiddenError(
-            `Role '${
-              makeUserIdMapInclusionConnectedUser[userId].email ===
-              establishmentRepEmail
-                ? "establishment-representative"
-                : makeUserIdMapInclusionConnectedUser[userId].agencyRights.find(
-                    (agencyRight) =>
-                      agencyRight.agency.id === agencyWithoutCounsellorEmail.id,
-                  )?.role
-            }' is not allowed to go to status '${
+            `Role '${getRole()}' is not allowed to go to status '${
               updateStatusParams.status
             }' for convention '${updateStatusParams.conventionId}'.`,
           ),
-        }),
-      );
+        });
+      });
     }
 
     it.each(forbiddenInitalStatuses.map((status) => ({ status })))(
@@ -656,6 +674,9 @@ const defineRoleForTest = (
     "icUserWithRoleEstablishmentRepresentative"
   )
     return "establishment-representative";
+
+  if (testAcceptNewStatusParams.userId === "icUserWithRoleBackofficeAdmin")
+    return "backOffice";
 
   return makeUserIdMapInclusionConnectedUser[
     testAcceptNewStatusParams.userId
