@@ -22,7 +22,7 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const triggerEstablishmentLeadReminders = async () => {
-  logger.info("Starting to send Emails to establishment leads");
+  logger.info({ message: "Starting to send Emails to establishment leads" });
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
     connectionString: dbUrl,

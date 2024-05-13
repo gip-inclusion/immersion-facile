@@ -28,6 +28,7 @@ import {
 } from "../../retry-strategy/ports/RetryStrategy";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { SiretGateway } from "../ports/SirenGateway";
+import { Logger } from "pino";
 
 const logger = createLogger(__filename);
 
@@ -63,7 +64,9 @@ export class InseeSiretGateway implements SiretGateway {
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SiretEstablishmentDto | undefined> {
-    logger.debug({ siret, includeClosedEstablishments }, "get");
+    logger.debug({
+      message: `Fetching siret ${siret} with includeClosedEstablishments = ${includeClosedEstablishments}`,
+    });
 
     return this.#retryStrategy
       .apply(async () => {
@@ -87,19 +90,19 @@ export class InseeSiretGateway implements SiretGateway {
             if (error.response?.status === 404) {
               return;
             }
-            if (isRetryableError(logger, error))
+            if (isRetryableError(logger as Logger, error))
               throw new RetryableError(error);
-            logAxiosError(logger, error);
+            logAxiosError(logger as Logger, error);
           }
           throw error;
         }
       })
       .catch((error) => {
         const serviceName = "Sirene API";
-        logger.error(
-          { siret, error: castError(error) },
-          "Error fetching siret",
-        );
+        logger.error({
+          message: `Error fetching siret ${siret}`,
+          error: castError(error),
+        });
         if (error?.initialError?.status === 429)
           throw new TooManyRequestApiError(serviceName);
         throw new UnavailableApiError(serviceName);

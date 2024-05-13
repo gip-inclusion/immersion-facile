@@ -1,14 +1,13 @@
 import axios from "axios";
-import { Logger } from "pino";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createLogger } from "../utils/logger";
+import { createLogger, OpacifiedLogger } from "../utils/logger";
 
 export const handleEndOfScriptNotification = async <T>(
   name: string,
   config: AppConfig,
   script: () => Promise<T>,
   handleResults: (results: T) => string,
-  logger: Logger = createLogger(__filename),
+  logger: OpacifiedLogger = createLogger(__filename),
 ) => {
   const context = `${config.envType} - ${config.immersionFacileBaseUrl}\nScript [${name}]`;
   const start = new Date();
@@ -20,7 +19,7 @@ export const handleEndOfScriptNotification = async <T>(
       const reportTitle = `✅Success at ${end.toISOString()} - ${context}`;
       const reportContent = handleResults({ ...results, durationInSeconds });
 
-      logger.info({ reportContent, durationInSeconds }, reportTitle);
+      logger.info({ message: reportTitle, reportContent, durationInSeconds });
 
       const report = [
         reportTitle,

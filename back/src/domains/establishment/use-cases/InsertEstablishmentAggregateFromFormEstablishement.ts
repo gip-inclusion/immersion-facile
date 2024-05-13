@@ -18,9 +18,9 @@ const logger = createLogger(__filename);
 
 // prettier-ignore
 const makeLog = (siret: string) => (message: string) =>
-  logger.info(
-    `${new Date().toISOString()} - InsertEstablishmentAggregateFromForm - ${siret} - ${message}`,
-  );
+  logger.info({
+    message: `${new Date().toISOString()} - InsertEstablishmentAggregateFromForm - ${siret} - ${message}`,
+  });
 
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   WithFormEstablishmentDto,

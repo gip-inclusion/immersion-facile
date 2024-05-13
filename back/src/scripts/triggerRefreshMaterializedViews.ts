@@ -7,7 +7,7 @@ const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
 const triggerRefreshMaterializedViews = async () => {
-  logger.info("Starting to refresh materialized views");
+  logger.info({ message: "Starting to refresh materialized views" });
 
   const dbUrl = config.pgImmersionDbUrl;
 

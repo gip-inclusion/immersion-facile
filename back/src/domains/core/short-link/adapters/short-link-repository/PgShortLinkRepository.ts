@@ -17,7 +17,7 @@ export class PgShortLinkRepository
   implements ShortLinkRepository
 {
   public async save(shortLinkId: ShortLinkId, url: AbsoluteUrl): Promise<void> {
-    logger.info({ shortLinkId }, "pgShortLinkRepositorySaveTotal");
+    logger.info({ message: `pgShortLinkRepositorySave ${shortLinkId}` });
 
     const query = `INSERT INTO ${pgShortLinkRepositoryStructure.tableName}(${[
       pgShortLinkRepositoryStructure.columnNames.shortLinkId,
@@ -35,16 +35,15 @@ export class PgShortLinkRepository
           throw new Error(`${shortLinkId} was not saved on repository.`);
         const { short_link_id, created_at } =
           pgShortLinkRepositorySchema.parse(result);
-        logger.info(
-          { short_link_id, created_at },
-          "pgShortLinkRepositorySaveSuccess",
-        );
+        logger.info({
+          message: `pgShortLinkRepositorySaveSuccess with short_link_id = ${short_link_id} and created_at = ${created_at}`,
+        });
       })
       .catch((error) => {
-        logger.error(
-          { error: castError(error) },
-          "pgShortLinkRepositorySaveFailed",
-        );
+        logger.error({
+          error: castError(error),
+          message: "pgShortLinkRepositorySaveFailed",
+        });
         throw error;
       });
   }

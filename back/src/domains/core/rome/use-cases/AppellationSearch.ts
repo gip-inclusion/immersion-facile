@@ -59,7 +59,7 @@ export class AppellationSearch extends TransactionalUseCase<
       }),
     );
 
-    logger.info(appellationsWithMatch, " appellationsWithMatch ");
+    logger.info({ message: `appellationsWithMatch ${appellationsWithMatch}` });
     return appellationsWithMatch;
   }
 

@@ -13,12 +13,9 @@ export class NanoIdShortLinkIdGeneratorGateway
 
   public generate(): ShortLinkId {
     const id = nanoid(this.idSize);
-    logger.info(
-      {
-        shortlinkId: id,
-      },
-      "shortlink id generated",
-    );
+    logger.info({
+      message: `shortlink id generated: ${id}`,
+    });
     return id;
   }
 }

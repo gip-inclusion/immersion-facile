@@ -61,7 +61,10 @@ export class PgFormEstablishmentRepository
       .then((_) => Promise.resolve())
       .catch((error: unknown) => {
         const castedError = castError(error);
-        logger.error({ error: castedError }, "Cannot save form establishment ");
+        logger.error({
+          message: "Cannot save form establishment ",
+          error: castedError,
+        });
         notifyObjectDiscord({
           _message: `Cannot create form establishment with siret ${formEstablishment.siret}`,
           ...castedError,

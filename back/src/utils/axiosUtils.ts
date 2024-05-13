@@ -10,7 +10,7 @@ import { createLogger } from "./logger";
 const _logger = createLogger(__filename);
 
 export const createAxiosInstance = (
-  logger: Logger = _logger,
+  logger = _logger,
   config?: AxiosRequestConfig,
 ): AxiosInstance => {
   const axiosInstance = axios.create(config);

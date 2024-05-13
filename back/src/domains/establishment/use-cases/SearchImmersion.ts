@@ -9,6 +9,7 @@ import {
   SearchSortedBy,
   SiretDto,
   searchParamsSchema,
+  castError,
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
@@ -142,7 +143,7 @@ export class SearchImmersion extends TransactionalUseCase<
       sortedBy === "score"
         ? await Promise.all([
             uow.discussionRepository.getDiscussions({
-              sirets: sirets,
+              sirets,
               createdSince: oneYearAgo,
             }),
             uow.conventionQueries.getConventionsByFilters({
@@ -213,8 +214,11 @@ export class SearchImmersion extends TransactionalUseCase<
         lon,
         distanceKm,
       });
-    } catch (e) {
-      logger.error(e, "Error while searching on LBB");
+    } catch (error) {
+      logger.error({
+        message: "Error while searching on LBB",
+        error: castError(error),
+      });
       return [];
     }
   }
