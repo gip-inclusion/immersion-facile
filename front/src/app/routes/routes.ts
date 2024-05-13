@@ -72,6 +72,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     ({ tab }) => `/${frontRoutes.admin}/${tab}`,
   ),
+  rootDashboard: defineRoute(`/${frontRoutes.rootDashboard}`),
   agencyDashboard: defineRoute(
     {
       ...inclusionConnectedParams,

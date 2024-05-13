@@ -595,4 +595,12 @@ export const domElementIds = {
     },
   },
   searchDiagoriente: {},
+  rootDashboard: {
+    establishment: {
+      link: "im-root-dashboard__establishment-link",
+    },
+    agency: {
+      link: "im-root-dashboard__agency-link",
+    },
+  },
 } satisfies DomElementIds;
