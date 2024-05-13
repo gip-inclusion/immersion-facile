@@ -52,7 +52,16 @@ export const LayoutHeader = () => {
   );
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
-  const tools: HeaderProps["quickAccessItems"] = [headerFooterDisplayItem];
+  const tools: HeaderProps["quickAccessItems"] = [
+    headerFooterDisplayItem,
+    {
+      iconId: "fr-icon-account-line",
+      text: "Mon espace",
+      linkProps: {
+        ...routes.rootDashboard().link,
+      },
+    },
+  ];
 
   if (isPeConnected || isInclusionConnected) {
     tools.push({

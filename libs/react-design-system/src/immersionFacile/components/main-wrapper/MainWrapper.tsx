@@ -45,6 +45,7 @@ export const MainWrapper = ({
     hSpacing ? fr.cx(`fr-px-${hSpacing}w` as FrCxArg) : "",
     Styles.root,
     useBackground ? Styles.withBackground : "",
+    classes.customBackground,
     className,
     layout !== "fullscreen" ? fr.cx("fr-container", "fr-grid-row--center") : "",
   );
