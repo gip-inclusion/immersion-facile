@@ -11,7 +11,7 @@ export class InMemorySearchMadeRepository implements SearchMadeRepository {
   ) {}
 
   public async insertSearchMade(searchMadeEntity: SearchMadeEntity) {
-    logger.info(searchMadeEntity, "insertSearchMade");
+    logger.info({ message: "insertSearchMade", search: searchMadeEntity });
     this._searchesMadeEntities.push(searchMadeEntity);
     if (!searchMadeEntity.needsToBeSearched)
       this._processedSearchesMadeIds.add(searchMadeEntity.id);

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Pool } from "pg";
-import { FormEstablishmentDto, random, sleep } from "shared";
+import { castError, FormEstablishmentDto, random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { getTestPgPool } from "../config/pg/pgUtils";
@@ -31,10 +31,9 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   originPgConnectionString: string,
   destinationPgConnectionString: string,
 ) => {
-  logger.info(
-    { originPgConnectionString, destinationPgConnectionString },
-    "starting to convert form establishement to searchable data",
-  );
+  logger.info({
+    message: `starting to convert ${originPgConnectionString} form establishements to ${destinationPgConnectionString} searchable data`,
+  });
 
   // We create the use case transformFormEstablishementIntoSearchData
   const poolOrigin = new Pool({ connectionString: originPgConnectionString });
@@ -80,9 +79,9 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     (select siret from establishments where data_source = 'form')`,
     )
   ).rows;
-  logger.info(
-    `Found ${missingFormEstablishmentRows.length} in form tables that are not in establishments`,
-  );
+  logger.info({
+    message: `Found ${missingFormEstablishmentRows.length} in form tables that are not in establishments`,
+  });
 
   let succeed = 0;
   const failedSiret = [];
@@ -108,14 +107,14 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       await upsertAggregateFromForm.execute({
         formEstablishment: formEstablishmentDto,
       });
-      logger.info(
-        `Successfully added form with siret ${row.siret} to aggregate tables.`,
-      );
+      logger.info({
+        message: `Successfully added form with siret ${row.siret} to aggregate tables.`,
+      });
       succeed += 1;
     } catch (_) {
-      logger.warn(
-        `Could not add form with siret ${row.siret} to aggregate tables.`,
-      );
+      logger.warn({
+        message: `Could not add form with siret ${row.siret} to aggregate tables.`,
+      });
       failedSiret.push(row.siret);
     }
   }
@@ -135,11 +134,11 @@ transformPastFormEstablishmentsIntoSearchableData(
   config.pgImmersionDbUrl,
 ).then(
   () => {
-    logger.info("Script finished success");
+    logger.info({ message: "Script finished success" });
     process.exit(0);
   },
   (error: any) => {
-    logger.error(error, "Script failed");
+    logger.error({ error: castError(error), message: "Script failed" });
     process.exit(1);
   },
 );

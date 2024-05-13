@@ -13,7 +13,7 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const executeConventionReminder = () => {
-  logger.info("Starting convention reminder script");
+  logger.info({ message: "Starting convention reminder script" });
   const timeGateway = new RealTimeGateway();
 
   return new ConventionsReminder(

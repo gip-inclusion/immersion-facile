@@ -4,6 +4,7 @@ import { equals, keys } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
+  castError,
   LocationId,
   RomeCode,
   SearchResultDto,
@@ -66,7 +67,9 @@ export class PgEstablishmentAggregateRepository
 
   public async delete(siret: string): Promise<void> {
     try {
-      logger.info(`About to delete establishment with siret : ${siret}`);
+      logger.info({
+        message: `About to delete establishment with siret : ${siret}`,
+      });
 
       await this.#deleteEstablishmentContactBySiret(siret);
 
@@ -83,12 +86,14 @@ export class PgEstablishmentAggregateRepository
         throw new NotFoundError(
           `Establishment with siret ${siret} missing on Establishment Aggregate Repository.`,
         );
-      logger.info(`Deleted establishment successfully. Siret was : ${siret}`);
+      logger.info({
+        message: `Deleted establishment successfully. Siret was : ${siret}`,
+      });
     } catch (error: any) {
-      logger.info(
-        `Error when deleting establishment with siret ${siret} : ${error.message}`,
-      );
-      logger.info({ error }, "Full Error");
+      logger.info({
+        message: `Error when deleting establishment with siret ${siret} : ${error.message}`,
+      });
+      logger.info({ message: "Full Error", error });
       throw error;
     }
   }
@@ -845,9 +850,12 @@ export class PgEstablishmentAggregateRepository
       );
 
       await executeKyselyRawSqlQuery(this.transaction, insertContactsQuery);
-    } catch (e: any) {
-      logger.error(e, "Error inserting contacts");
-      throw e;
+    } catch (error) {
+      logger.error({
+        error: castError(error),
+        message: "Error inserting contacts",
+      });
+      throw error;
     }
   }
 

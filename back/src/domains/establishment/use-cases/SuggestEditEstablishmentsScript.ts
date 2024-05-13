@@ -38,9 +38,10 @@ export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
   }
 
   protected async _execute() {
-    logger.info(
-      "[triggerSuggestEditFormEstablishmentEvery6Months] Script started.",
-    );
+    logger.info({
+      message:
+        "[triggerSuggestEditFormEstablishmentEvery6Months] Script started.",
+    });
     const since = subMonths(this.#timeGateway.now(), NB_MONTHS_BEFORE_SUGGEST);
 
     const siretsToContact = await this.#uowPerformer.perform(async (uow) =>
@@ -52,13 +53,13 @@ export class SuggestEditEstablishmentsScript extends UseCase<void, Report> {
     if (siretsToContact.length === 0)
       return { numberOfEstablishmentsToContact: 0 };
 
-    logger.info(
-      `[triggerSuggestEditFormEstablishmentEvery6Months] Found ${
+    logger.info({
+      message: `[triggerSuggestEditFormEstablishmentEvery6Months] Found ${
         siretsToContact.length
       } establishments not updated since ${since} to contact, with siret : ${siretsToContact.join(
         ", ",
       )}`,
-    );
+    });
 
     const errors: Record<SiretDto, Error> = {};
 

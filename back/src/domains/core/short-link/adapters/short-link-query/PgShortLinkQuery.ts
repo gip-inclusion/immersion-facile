@@ -17,7 +17,7 @@ export class PgShortLinkQuery implements ShortLinkQuery {
   constructor(protected transaction: KyselyDb) {}
 
   public getById(shortLinkId: ShortLinkId): Promise<AbsoluteUrl> {
-    logger.info({ shortLinkId }, "PgShortLinkQueryGetByIdTotal");
+    logger.info({ message: `PgShortLinkQueryGetById ${shortLinkId}` });
     return executeKyselyRawSqlQuery<PgShortLinkRepositoryDto>(
       this.transaction,
       `SELECT * FROM ${pgShortLinkRepositoryStructure.tableName} WHERE ${pgShortLinkRepositoryStructure.columnNames.shortLinkId} = $1`,
@@ -27,17 +27,16 @@ export class PgShortLinkQuery implements ShortLinkQuery {
         const result = pgGetShortLinkByIdResultsSchema.parse(rows).at(0);
         if (!result)
           throw new Error(shortLinkIdNotFoundErrorMessage(shortLinkId));
-        logger.info(
-          { shortLinkId: result.short_link_id },
-          "PgShortLinkQueryGetByIdSuccess",
-        );
+        logger.info({
+          message: `PgShortLinkQueryGetByIdSuccess ${result.short_link_id}`,
+        });
         return result.url as AbsoluteUrl;
       })
       .catch((error) => {
-        logger.error(
-          { error: castError(error) },
-          "PgShortLinkQueryGetByIdError",
-        );
+        logger.error({
+          error: castError(error),
+          message: "PgShortLinkQueryGetByIdError",
+        });
         throw error;
       });
   }

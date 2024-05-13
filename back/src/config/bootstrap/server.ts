@@ -31,6 +31,7 @@ import { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./createAppDependencies";
 import { Gateways } from "./createGateways";
 import { startCrawler } from "./startCrawler";
+import { Logger } from "pino";
 
 const logger = createLogger(__filename);
 
@@ -58,7 +59,7 @@ export const createApp = async (
   const app = express();
   app.use(
     PinoHttp({
-      logger,
+      logger: logger as Logger,
       autoLogging: {
         ignore: (req) => req.url?.includes(metricsPageUrl) ?? false,
       },

@@ -20,10 +20,13 @@ export class InMemoryFormEstablishmentRepository
   public async create(dto: FormEstablishmentDto): Promise<void> {
     if (await this.getBySiret(dto.siret)) {
       const message = `Immersion DTO with siret ${dto.siret} is already in the list`;
-      logger.info({ dto }, message);
+      logger.info({ message, formEstablishment: dto });
       throw new ConflictError(message);
     }
-    logger.debug({ immersionOffer: dto }, "Creating a new Immersion Offer");
+    logger.debug({
+      message: "Creating a new Immersion Offer",
+      formEstablishment: dto,
+    });
     this.#formEstablishments.push(dto);
   }
 

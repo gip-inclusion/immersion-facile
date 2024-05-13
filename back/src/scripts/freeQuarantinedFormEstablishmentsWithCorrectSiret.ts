@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { random, sleep } from "shared";
+import { castError, random, sleep } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import {
   ExponentialBackoffRetryStrategy,
@@ -17,9 +17,10 @@ const timeGateway = new RealTimeGateway();
 const config = AppConfig.createFromEnv();
 
 const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
-  logger.info(
-    "Starting to free quarantined form establishments with correct siret",
-  );
+  logger.info({
+    message:
+      "Starting to free quarantined form establishments with correct siret",
+  });
 
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
@@ -42,9 +43,9 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
   const quarantinedFormEstablishmentAddedResult = await client.query(
     "SELECT id, payload FROM outbox WHERE topic='FormEstablishmentAdded' AND was_quarantined LIMIT 300",
   );
-  logger.info(
-    `Found ${quarantinedFormEstablishmentAddedResult.rowCount} events with topic 'FormEstablishmentAdded' in quarantined.`,
-  );
+  logger.info({
+    message: `Found ${quarantinedFormEstablishmentAddedResult.rowCount} events with topic 'FormEstablishmentAdded' in quarantined.`,
+  });
   for (const { payload, id } of quarantinedFormEstablishmentAddedResult.rows) {
     const siretIsCorrect = !!(await siretGateway.getEstablishmentBySiret(
       payload.siret,
@@ -54,11 +55,11 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
         "UPDATE outbox SET was_quarantined=false WHERE id=$1; ",
         [id],
       );
-      logger.info(`[OK] Event with id ${id} left quarantine !`);
+      logger.info({ message: `[OK] Event with id ${id} left quarantine !` });
     } else
-      logger.info(
-        `[NOK] Event with id ${id} stays in quarantine, since siret ${payload.siret} seems incorrect.`,
-      );
+      logger.info({
+        message: `[NOK] Event with id ${id} stays in quarantine, since siret ${payload.siret} seems incorrect.`,
+      });
   }
   client.release();
   await pool.end();
@@ -66,11 +67,11 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
 
 freeQuarantinedFormEstablishmentsWithCorrectSiret().then(
   () => {
-    logger.info("Script finished success");
+    logger.info({ message: "Script finished success" });
     process.exit(0);
   },
   (error: any) => {
-    logger.error(error, "Script failed");
+    logger.error({ error: castError(error), message: "Script failed" });
     process.exit(1);
   },
 );

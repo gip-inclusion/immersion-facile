@@ -12,6 +12,7 @@ import {
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";
+import { Logger } from "pino";
 
 const logger = createLogger(__filename);
 
@@ -48,7 +49,11 @@ export abstract class UseCase<
     const useCaseName = this.constructor.name;
     let validParams: Input;
     try {
-      validParams = validateAndParseZodSchema(this.inputSchema, params, logger);
+      validParams = validateAndParseZodSchema(
+        this.inputSchema,
+        params,
+        logger as Logger,
+      );
     } catch (e) {
       throw new BadRequestError(e);
     }
@@ -88,7 +93,7 @@ export abstract class TransactionalUseCase<
     const validParams = validateAndParseZodSchema(
       this.inputSchema,
       params,
-      logger,
+      logger as Logger,
     );
     const paramsHash = createParamsHash(useCaseName, validParams);
 

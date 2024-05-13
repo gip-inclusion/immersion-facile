@@ -102,7 +102,9 @@ export class InMemorySiretGateway implements SiretGateway {
           },
         };
 
-      logger.info({ siret, includeClosedEstablishments }, "get");
+      logger.info({
+        message: `Fetching siret ${siret} with includeClosedEstablishments = ${includeClosedEstablishments}`,
+      });
       const establishment = this.#repo[siret];
       if (!establishment) return;
       if (!establishment.isOpen && !includeClosedEstablishments) return;
@@ -110,7 +112,7 @@ export class InMemorySiretGateway implements SiretGateway {
       return establishment;
     } catch (error: any) {
       const serviceName = "Sirene API";
-      logger.error({ siret, error }, "Error fetching siret");
+      logger.error({ error, message: `Error fetching siret ${siret}` });
       if (error?.initialError?.status === 429)
         throw new TooManyRequestApiError(serviceName);
       throw new UnavailableApiError(serviceName);

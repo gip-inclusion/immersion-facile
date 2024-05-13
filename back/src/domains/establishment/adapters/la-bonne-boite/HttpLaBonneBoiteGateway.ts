@@ -1,5 +1,5 @@
 import Bottleneck from "bottleneck";
-import { SearchResultDto } from "shared";
+import { castError, SearchResultDto } from "shared";
 import { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
 import { PoleEmploiGateway } from "../../../convention/ports/PoleEmploiGateway";
@@ -38,7 +38,15 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     lon,
     rome,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
-    logger.warn({ distanceKm, lat, lon, rome }, "searchCompanies");
+    logger.warn({
+      message: "searchCompanies",
+      search: {
+        distanceKm,
+        lat,
+        lon,
+        romeCode: rome,
+      },
+    });
     return this.#limiter
       .schedule(async () =>
         this.poleEmploiGateway
@@ -75,10 +83,16 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
           .map((result) => result.toSearchResult()),
       )
       .catch((error) => {
-        logger.warn(
-          { error, distanceKm, lat, lon, rome },
-          "searchCompanies_error",
-        );
+        logger.error({
+          error: castError(error),
+          message: "searchCompanies_error",
+          search: {
+            distanceKm,
+            lat,
+            lon,
+            romeCode: rome,
+          },
+        });
         throw error;
       });
   }

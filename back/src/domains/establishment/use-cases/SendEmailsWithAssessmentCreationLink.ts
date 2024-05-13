@@ -64,11 +64,11 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
         "EmailWithLinkToCreateAssessmentSent",
       );
 
-    logger.info(
-      `[${now.toISOString()}]: About to send assessment email to ${
+    logger.info({
+      message: `[${now.toISOString()}]: About to send assessment email to ${
         conventions.length
       } establishments`,
-    );
+    });
     if (conventions.length === 0) return { numberOfImmersionEndingTomorrow: 0 };
 
     const errors: Record<ConventionId, Error> = {};

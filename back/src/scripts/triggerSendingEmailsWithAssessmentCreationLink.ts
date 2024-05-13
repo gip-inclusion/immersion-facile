@@ -16,7 +16,7 @@ const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
 const sendEmailsWithAssessmentCreationLinkScript = async () => {
-  logger.info("Starting to send Emails with assessment link");
+  logger.info({ message: "Starting to send Emails with assessment link" });
 
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({

@@ -18,7 +18,9 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const main = async () => {
-  logger.info("Executing pipeline: update-establishments-from-sirene");
+  logger.info({
+    message: "Executing pipeline: update-establishments-from-sirene",
+  });
 
   const timeGateway = new RealTimeGateway();
 

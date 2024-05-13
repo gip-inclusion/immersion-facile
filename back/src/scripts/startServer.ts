@@ -31,7 +31,7 @@ createApp(appConfig).then(
   ({ app, gateways }) => {
     const port = getPort();
     app.listen(port, "0.0.0.0", () => {
-      logger.info(`server started at http://localhost:${port}`);
+      logger.info({ message: `server started at http://localhost:${port}` });
       const intervalMs = appConfig.nodeProcessReportInterval;
       const eventLoopSamples: number[] = [];
       const maxSampleSize = Math.max(
@@ -56,7 +56,7 @@ createApp(appConfig).then(
     configureSentry(appConfig);
   },
   (error: any) => {
-    logger.error(error, "Server start failed");
+    logger.error({ message: "Server start failed", error });
     process.exit(1);
   },
 );

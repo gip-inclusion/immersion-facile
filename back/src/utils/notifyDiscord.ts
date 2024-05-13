@@ -35,9 +35,9 @@ export const notifyDiscord = (
       },
     )
     .catch((error) => {
-      logger.error(
-        `An error occurred when trying to send notification to discord : ${error.message}`,
-      );
+      logger.error({
+        message: `An error occurred when trying to send notification to discord : ${error.message}`,
+      });
       logger.error(error);
     });
 };

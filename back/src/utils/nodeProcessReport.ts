@@ -2,16 +2,17 @@ import { cpus } from "os";
 import { Logger } from "pino";
 import { cpuUsage, memoryUsage } from "process";
 import { TimeGateway } from "../domains/core/time-gateway/ports/TimeGateway";
+import { OpacifiedLogger } from "./logger";
 
 export const startSamplingEventLoopLag = (
   eventLoopLagSamples: number[],
   maxSampleSize: number,
   eventLoopSampleIntervalMs: number,
-  logger: Logger,
+  logger: OpacifiedLogger,
 ) => {
-  logger.info(
-    `Start sampling event loop lag at a frequency of ${eventLoopSampleIntervalMs}ms.`,
-  );
+  logger.info({
+    message: `Start sampling event loop lag at a frequency of ${eventLoopSampleIntervalMs}ms.`,
+  });
   const measureLag = () => {
     const start = process.hrtime();
     setImmediate(() => {
@@ -29,7 +30,7 @@ export const startSamplingEventLoopLag = (
 export const startPeriodicNodeProcessReport = (
   intervalMs: number,
   timeGateway: TimeGateway,
-  logger: Logger,
+  logger: OpacifiedLogger,
   eventLoopLagSamples: number[],
   maxSampleSize: number,
   previousTime: Date = timeGateway.now(),
@@ -40,14 +41,13 @@ export const startPeriodicNodeProcessReport = (
     const currentTime = timeGateway.now();
     const currentCpuUsage = cpuUsage(previousCpuUsage);
 
-    logger.info(
-      makeReport(
+    logger.info({
+      nodeProcessReport: makeReport(
         currentCpuUsage,
         (currentTime.getTime() - previousTime.getTime()) * 1000 * cpus().length,
         makeEventLoopLagMeanMs(eventLoopLagSamples),
       ),
-      "nodeRessourcesReport",
-    );
+    });
 
     if (eventLoopLagSamples.length >= maxSampleSize)
       eventLoopLagSamples.length = 0;
@@ -61,6 +61,16 @@ export const startPeriodicNodeProcessReport = (
       currentTime,
     );
   }, intervalMs);
+};
+
+export type NodeProcessReport = {
+  eventLoopMeanLagMs: string;
+  cpuUsage: {
+    system: number;
+    total: number;
+    user: number;
+  };
+  memoryUsage: { rss: number; heapTotal: number; heapUsed: number };
 };
 
 const makeReport = (

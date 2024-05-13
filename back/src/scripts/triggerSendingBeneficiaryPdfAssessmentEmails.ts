@@ -14,7 +14,7 @@ const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
 const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
-  logger.info("Starting to send Beneficiary assessment Emails ");
+  logger.info({ message: "Starting to send Beneficiary assessment Emails" });
 
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
