@@ -1,7 +1,7 @@
 import {
   AbsoluteUrl,
+  ConventionDto,
   ConventionId,
-  ConventionReadDto,
   SiretDto,
   castError,
   frontRoutes,
@@ -104,7 +104,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
   async #sendOneEmailWithEstablishmentLeadReminder(
     uow: UnitOfWork,
     config: AppConfig,
-    convention: ConventionReadDto,
+    convention: ConventionDto,
   ) {
     const now = this.#timeGateway.now();
     const registerEstablishmentShortLink = await makeShortLink({
@@ -177,5 +177,5 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
 const generateAddEstablishmentFormLink = ({
   config,
   convention,
-}: { config: AppConfig; convention: ConventionReadDto }): AbsoluteUrl =>
+}: { config: AppConfig; convention: ConventionDto }): AbsoluteUrl =>
   `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?siret=${convention.siret}&bcLastName=${convention.signatories.establishmentRepresentative.lastName}&bcFirstName=${convention.signatories.establishmentRepresentative.firstName}&bcPhone=${convention.signatories.establishmentRepresentative.phone}&bcEmail=${convention.signatories.establishmentRepresentative.email}`;

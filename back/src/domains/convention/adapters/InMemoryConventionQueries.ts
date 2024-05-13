@@ -89,7 +89,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public async getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
-  ): Promise<ConventionReadDto[]> {
+  ): Promise<ConventionDto[]> {
     this.getConventionsByFiltersCalled++;
     return this.conventionRepository.conventions
       .filter(makeApplyFiltersToConventions(filters))

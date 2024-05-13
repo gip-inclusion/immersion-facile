@@ -1,5 +1,5 @@
 import { ConventionReadDto } from "shared";
-import { ConventionQueries } from "../../convention/ports/ConventionQueries";
+import { InMemoryConventionQueries } from "../../convention/adapters/InMemoryConventionQueries";
 import { isSiretsListFilled } from "../entities/EstablishmentLeadEntity";
 import { EstablishmentLeadQueries } from "../ports/EstablishmentLeadQueries";
 import { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
@@ -10,7 +10,7 @@ export class InMemoryEstablishmentLeadQueries
 {
   constructor(
     private readonly establishmentLeadRepository: InMemoryEstablishmentLeadRepository,
-    private readonly conventionQueries: ConventionQueries,
+    private readonly conventionQueries: InMemoryConventionQueries,
   ) {}
 
   public async getLastConventionsByUniqLastEventKind(

@@ -1,5 +1,4 @@
-import { EventStatus } from "../../../../config/pg/kysely/model/database";
-import { DomainEvent } from "../events";
+import { DomainEvent, EventStatus } from "../events";
 
 export interface OutboxRepository {
   countAllEvents(params: { status: EventStatus }): Promise<number>;

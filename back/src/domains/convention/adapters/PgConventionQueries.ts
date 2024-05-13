@@ -2,13 +2,14 @@ import { addDays, subDays, subHours } from "date-fns";
 import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
+  ConventionDto,
   ConventionId,
   ConventionReadDto,
   ConventionScope,
   ConventionStatus,
   FindSimilarConventionsParams,
-  SiretDto,
   conventionReadSchema,
+  conventionSchema,
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
@@ -21,27 +22,15 @@ import {
   GetConventionsByFiltersQueries,
 } from "../ports/ConventionQueries";
 import {
-  createConventionReadQueryBuilder,
+  createConventionQueryBuilder,
+  getConventionAgencyFieldsForAgencies,
   getReadConventionById,
-  makeGetLastConventionWithSiretInList,
 } from "./pgConventionSql";
 
 const logger = createLogger(__filename);
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private transaction: KyselyDb) {}
-
-  public async getLatestConventionBySirets(
-    sirets: [SiretDto, ...SiretDto[]],
-  ): Promise<ConventionReadDto[]> {
-    return pipeWithValue(
-      createConventionReadQueryBuilder(this.transaction),
-      makeGetLastConventionWithSiretInList(sirets),
-      (builder) => builder.execute(),
-      andThen((results) => results.filter((result) => result.rn === "1")),
-      andThen(validateConventionReadResults),
-    );
-  }
 
   public async findSimilarConventions(
     params: FindSimilarConventionsParams,
@@ -55,7 +44,7 @@ export class PgConventionQueries implements ConventionQueries {
     ];
 
     //prettier-ignore
-    const pgResults = await createConventionReadQueryBuilder(this.transaction)
+    const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.siret", "=", params.siret)
       .where("conventions.immersion_appellation", "=", +params.codeAppellation)
       .where(
@@ -79,17 +68,14 @@ export class PgConventionQueries implements ConventionQueries {
       .limit(20)
       .execute();
 
-    return pgResults.map(
-      (pgResult) => conventionReadSchema.parse(pgResult.dto).id,
-    );
+    return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto).id);
   }
 
   public async getAllConventionsForThoseEndingThatDidntGoThrough(
     dateEnd: Date,
     sendingTopic: AssessmentEmailDomainTopic,
-  ): Promise<ConventionReadDto[]> {
-    // prettier-ignore
-    const pgResults = await createConventionReadQueryBuilder(this.transaction)
+  ): Promise<ConventionDto[]> {
+    const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.date_end", ">=", subHours(dateEnd, 24))
       .where("conventions.date_end", "<", dateEnd)
       .where("conventions.status", "in", validatedConventionStatuses)
@@ -105,9 +91,7 @@ export class PgConventionQueries implements ConventionQueries {
       .orderBy("conventions.date_start", "desc")
       .execute();
 
-    return pgResults.map((pgResult) =>
-      conventionReadSchema.parse(pgResult.dto),
-    );
+    return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto));
   }
 
   public async getConventionById(
@@ -118,12 +102,12 @@ export class PgConventionQueries implements ConventionQueries {
 
   public async getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
-  ): Promise<ConventionReadDto[]> {
+  ): Promise<ConventionDto[]> {
     return pipeWithValue(
-      createConventionReadQueryBuilder(this.transaction),
+      createConventionQueryBuilder(this.transaction),
       addFiltersToBuilder(filters),
       (builder) => builder.orderBy("conventions.date_start", "desc").execute(),
-      andThen(validateConventionReadResults),
+      andThen(validateConventionResults),
     );
   }
 
@@ -138,8 +122,8 @@ export class PgConventionQueries implements ConventionQueries {
     )
       return [];
 
-    return pipeWithValue(
-      createConventionReadQueryBuilder(this.transaction),
+    const conventions = await pipeWithValue(
+      createConventionQueryBuilder(this.transaction),
       addFiltersToBuilder(params.filters),
       (builder) =>
         params.scope.agencyKinds
@@ -150,13 +134,39 @@ export class PgConventionQueries implements ConventionQueries {
           .orderBy("conventions.date_start", "desc")
           .limit(params.limit)
           .execute(),
-      andThen(validateConventionReadResults),
     );
+
+    if (conventions.length === 0) return [];
+
+    const agencyIdsInResult = conventions.map(
+      (pgResult) => pgResult.dto.agencyId,
+    );
+    const uniqAgencyIds = [...new Set(agencyIdsInResult)];
+
+    const agencyFieldsByAgencyIds = await getConventionAgencyFieldsForAgencies(
+      this.transaction,
+      uniqAgencyIds,
+    );
+
+    return conventions.map((pgResult) => {
+      const agencyFields = agencyFieldsByAgencyIds[pgResult.dto.agencyId];
+      if (!agencyFields)
+        throw new Error(`Agency ${pgResult.dto.agencyId} not found`);
+
+      return validateAndParseZodSchema(
+        conventionReadSchema,
+        {
+          ...pgResult.dto,
+          ...agencyFields,
+        },
+        logger,
+      );
+    });
   }
 }
 
 type ConventionReadQueryBuilder = ReturnType<
-  typeof createConventionReadQueryBuilder
+  typeof createConventionQueryBuilder
 >;
 
 const addFiltersToBuilder =
@@ -210,11 +220,11 @@ const addFiltersToBuilder =
     );
   };
 
-export const validateConventionReadResults = (
+export const validateConventionResults = (
   pgResults: { dto: unknown }[],
-): ConventionReadDto[] =>
+): ConventionDto[] =>
   pgResults.map((pgResult) =>
-    validateAndParseZodSchema(conventionReadSchema, pgResult.dto, logger),
+    validateAndParseZodSchema(conventionSchema, pgResult.dto, logger),
   );
 
 type AddToBuilder = (

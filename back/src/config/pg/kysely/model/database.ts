@@ -32,7 +32,7 @@ export interface Database {
   users__agencies: UsersAgencies;
   users_admins: UsersAdmins;
   users_ongoing_oauths: OngoingOauths;
-  users: AuthenticatedUsers;
+  users: Users;
   view_appellations_dto: ViewAppellationsDto;
 }
 
@@ -58,6 +58,24 @@ type ImmersionObjectives =
   | "Initier une démarche de recrutement";
 
 type InternshipKind = "immersion" | "mini-stage-cci";
+
+type NumberEmployeesRange =
+  | ""
+  | "0"
+  | "1-2"
+  | "3-5"
+  | "6-9"
+  | "10-19"
+  | "20-49"
+  | "50-99"
+  | "100-199"
+  | "200-249"
+  | "250-499"
+  | "500-999"
+  | "1000-1999"
+  | "2000-4999"
+  | "5000-9999"
+  | "+10000";
 
 interface Discussions extends WithAcquisition {
   id: string;
@@ -206,7 +224,7 @@ interface Conventions extends WithAcquisition {
   renewed_from: string | null;
   renewed_justification: string | null;
   date_approval: Timestamp | null;
-  establishment_number_employees: string | null;
+  establishment_number_employees: NumberEmployeesRange | null;
 }
 
 interface Actors {
@@ -297,7 +315,7 @@ interface ApiConsumersSubscriptions {
   subscribed_event: string;
 }
 
-interface AuthenticatedUsers {
+interface Users {
   id: string;
   email: string;
   first_name: string;
@@ -317,7 +335,7 @@ interface OngoingOauths {
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
 }
-export interface Establishments extends WithAcquisition {
+interface Establishments extends WithAcquisition {
   additional_information: Generated<string | null>;
   created_at: Timestamp;
   customized_name: string | null;
@@ -341,7 +359,7 @@ export interface Establishments extends WithAcquisition {
   website: Generated<string | null>;
 }
 
-export interface PublicAppellationsData {
+interface PublicAppellationsData {
   ogr_appellation: Generated<number>;
   code_rome: string;
   libelle_appellation_long: string;
@@ -349,13 +367,13 @@ export interface PublicAppellationsData {
   libelle_appellation_long_tsvector: string | null;
   libelle_appellation_long_without_special_char: string;
 }
-export interface PublicRomesData {
+interface PublicRomesData {
   code_rome: string;
   libelle_rome: string;
   libelle_rome_tsvector: string | null;
 }
 
-export interface EstablishmentsLocations {
+interface EstablishmentsLocations {
   id: string;
   establishment_siret: string;
   post_code: string;
@@ -367,7 +385,7 @@ export interface EstablishmentsLocations {
   position: string;
 }
 
-export interface ImmersionOffers {
+interface ImmersionOffers {
   rome_code: string;
   siret: string;
   created_at: Generated<Timestamp>;
@@ -376,9 +394,9 @@ export interface ImmersionOffers {
   appellation_code: number;
 }
 
-export type ContactMode = "EMAIL" | "IN_PERSON" | "PHONE";
+type ContactMode = "EMAIL" | "IN_PERSON" | "PHONE";
 
-export interface EstablishmentsContacts {
+interface EstablishmentsContacts {
   uuid: string;
   lastname: string;
   firstname: string;
@@ -390,11 +408,11 @@ export interface EstablishmentsContacts {
   siret: string;
 }
 
-export type AgencyGroupKind = "france-travail";
+type AgencyGroupKind = "france-travail";
 
-export type AgencyGroupScope = "direction-régionale" | "direction-territoriale";
+type AgencyGroupScope = "direction-régionale" | "direction-territoriale";
 
-export interface AgencyGroups {
+interface AgencyGroups {
   id: Generated<number>;
   siret: string;
   name: string;
@@ -406,12 +424,12 @@ export interface AgencyGroups {
   code_safir: string;
 }
 
-export interface AgencyGroupsAgencies {
+interface AgencyGroupsAgencies {
   agency_group_id: number;
   agency_id: string;
 }
 
-export type EventStatus =
+type EventStatus =
   | "failed-but-will-retry"
   | "failed-to-many-times"
   | "in-process"
@@ -419,7 +437,7 @@ export type EventStatus =
   | "published"
   | "to-republish";
 
-export interface Outbox {
+interface Outbox {
   id: string;
   occurred_at: Timestamp;
   was_quarantined: Generated<boolean | null>;
@@ -428,7 +446,7 @@ export interface Outbox {
   status: EventStatus;
 }
 
-export interface Nps {
+interface Nps {
   id: Generated<number>;
   convention_id: string | null;
   role: string | null;
@@ -441,13 +459,13 @@ export interface Nps {
   created_at: Generated<Timestamp>;
 }
 
-export interface SearchesMadeAppellationCode {
+interface SearchesMadeAppellationCode {
   search_made_id: string;
   appellation_code: Generated<string | null>;
 }
 
-export type SortedBy = "date" | "distance" | "score";
-export interface SearchesMade extends WithAcquisition {
+type SortedBy = "date" | "distance" | "score";
+interface SearchesMade extends WithAcquisition {
   id: string;
   rome: string | null;
   lat: number;
@@ -465,19 +483,19 @@ export interface SearchesMade extends WithAcquisition {
 
 type AgencyRole = "agencyOwner" | "counsellor" | "toReview" | "validator";
 
-export interface UsersAgencies {
+interface UsersAgencies {
   user_id: string;
   agency_id: string;
   role: Generated<AgencyRole>;
 }
 
-export interface DelegationContacts {
+interface DelegationContacts {
   province: string;
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
   email: string;
 }
 
-export interface UsersAdmins {
+interface UsersAdmins {
   user_id: string;
 }

@@ -1,4 +1,5 @@
 import {
+  ConventionDto,
   ConventionId,
   ConventionReadDto,
   ConventionScope,
@@ -18,20 +19,17 @@ export type GetConventionsByFiltersQueries = {
 };
 
 export interface ConventionQueries {
-  getLatestConventionBySirets: (
-    sirets: [SiretDto, ...SiretDto[]],
-  ) => Promise<ConventionReadDto[]>;
   getConventionById: (
     id: ConventionId,
   ) => Promise<ConventionReadDto | undefined>;
   getAllConventionsForThoseEndingThatDidntGoThrough: (
     dateEnd: Date,
     sendingTopic: AssessmentEmailDomainTopic,
-  ) => Promise<ConventionReadDto[]>;
+  ) => Promise<ConventionDto[]>;
 
   getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
-  ): Promise<ConventionReadDto[]>;
+  ): Promise<ConventionDto[]>;
 
   getConventionsByScope(params: {
     scope: ConventionScope;

@@ -115,17 +115,7 @@ describe("PgEstablishmentLeadQueries", () => {
         await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
           kind: "to-be-reminded",
         });
-      expectToEqual(result, [
-        {
-          ...convention1,
-          agencyDepartment: agency.address.departmentCode,
-          agencyName: agency.name,
-          agencyKind: agency.kind,
-          agencySiret: agency.agencySiret,
-          agencyCounsellorEmails: agency.counsellorEmails,
-          agencyValidatorEmails: agency.validatorEmails,
-        },
-      ]);
+      expectToEqual(result, [convention1]);
     });
   });
 });
