@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { MainWrapper } from "react-design-system";
 import { HeroHeaderNavCard, NavCard } from "react-design-system";
+import { domElementIds } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 
@@ -11,7 +12,7 @@ const navCards: HeroHeaderNavCard[] = [
     title: "Je suis le représentant d'une entreprise",
     icon: "fr-icon-building-line",
     type: "candidate",
-    id: "temp-id",
+    id: domElementIds.rootDashboard.establishment.link,
     link: routes.establishmentDashboard().link,
     wrapperClassName: "root-dashboard-page",
   },
@@ -20,7 +21,7 @@ const navCards: HeroHeaderNavCard[] = [
     title: "Je représente une structure",
     icon: "fr-icon-map-pin-user-line",
     type: "agency",
-    id: "temp-id",
+    id: domElementIds.rootDashboard.agency.link,
     link: routes.agencyDashboard().link,
     wrapperClassName: "root-dashboard-page",
   },
