@@ -217,11 +217,13 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
+    if (ids.length === 0) return [];
     const agencies = await this.#getAgencyWithJsonBuiltQueryBuilder()
       .where("a.id", "in", ids)
       .orderBy("a.updated_at", "desc")
       .execute()
       .then(map((row) => row.agency));
+
     const missingIds = ids.filter(
       (id) => !agencies.some((agency) => agency.id === id),
     );
@@ -364,8 +366,8 @@ export class PgAgencyRepository implements AgencyRepository {
         agencySiret: ref("a.agency_siret"),
         codeSafir: ref("a.code_safir"),
         adminEmails: sql<Email[]>`${ref("a.admin_emails")}`,
-        signature: ref("a.email_signature"),
         refersToAgencyId: cast<AgencyId>(ref("a.refers_to_agency_id")),
+        signature: ref("a.email_signature"),
         rejectionJustification: ref("a.rejection_justification"),
       }).as("agency"),
     ]);

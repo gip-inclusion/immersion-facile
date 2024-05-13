@@ -1,7 +1,11 @@
 import { sql } from "kysely";
 import {
+  AgencyId,
+  AgencyKind,
   AppellationCode,
   AppellationLabel,
+  Beneficiary,
+  ConventionAgencyFields,
   ConventionId,
   ConventionReadDto,
   DateString,
@@ -21,19 +25,18 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 
-export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
+export const createConventionQueryBuilder = (transaction: KyselyDb) => {
   // biome-ignore format: reads better without formatting
   const builder = transaction
     .selectFrom("conventions")
-    .leftJoin("actors as b", "b.id", "conventions.beneficiary_id")
+    .innerJoin("actors as b", "b.id", "conventions.beneficiary_id")
     .leftJoin("actors as br", "br.id", "conventions.beneficiary_representative_id")
     .leftJoin("actors as bce", "bce.id", "conventions.beneficiary_current_employer_id")
-    .leftJoin("actors as er", "er.id", "conventions.establishment_representative_id")
-    .leftJoin("actors as et", "et.id", "conventions.establishment_tutor_id")
+    .innerJoin("actors as er", "er.id", "conventions.establishment_representative_id")
+    .innerJoin("actors as et", "et.id", "conventions.establishment_tutor_id")
     .leftJoin("partners_pe_connect as p", "p.convention_id", "conventions.id")
     .leftJoin("view_appellations_dto as vad", "vad.appellation_code", "conventions.immersion_appellation")
     .leftJoin("agencies", "agencies.id", "conventions.agency_id")
-    .leftJoin("agencies as referring_agencies", "agencies.refers_to_agency_id", "referring_agencies.id")
 
   return builder.select(({ ref, ...eb }) =>
     jsonStripNulls(
@@ -118,7 +121,7 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
               .then(sql`b.extra_fields ->> 'schoolPostcode'`)
               .else(null)
               .end(),
-          }),
+          }).$castTo<Beneficiary<"immersion">>(),
           beneficiaryCurrentEmployer: eb
             .case()
             .when("bce.id", "is", null)
@@ -130,7 +133,7 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
                 lastName: ref("bce.last_name"),
                 email: ref("bce.email"),
                 phone: ref("bce.phone"),
-                job: sql`bce.extra_fields ->> 'job'`,
+                job: sql`bce.extra_fields ->> 'job'`.$castTo<string>(),
                 businessSiret: sql`bce.extra_fields ->> 'businessSiret'`,
                 businessName: sql`bce.extra_fields ->> 'businessName'`,
                 signedAt: sql`date_to_iso(bce.signed_at)`,
@@ -167,23 +170,6 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
         businessName: ref("conventions.business_name"),
         workConditions: ref("conventions.work_conditions"),
         agencyId: ref("conventions.agency_id"),
-        agencyName: ref("agencies.name"),
-        agencyKind: ref("agencies.kind"),
-        agencyDepartment: ref("agencies.department_code"),
-        agencySiret: ref("agencies.agency_siret"),
-        agencyCounsellorEmails: ref("agencies.counsellor_emails"),
-        agencyValidatorEmails: ref("agencies.validator_emails"),
-        agencyRefersTo: eb
-          .case()
-          .when("agencies.refers_to_agency_id", "is not", null)
-          .then(
-            jsonBuildObject({
-              id: ref("agencies.refers_to_agency_id"),
-              name: ref("referring_agencies.name"),
-            }),
-          )
-          .else(null)
-          .end(),
         individualProtection: ref("conventions.individual_protection"),
         sanitaryPrevention: ref("conventions.sanitary_prevention"),
         sanitaryPreventionDescription: ref(
@@ -213,17 +199,19 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
           lastName: ref("et.last_name"),
           email: cast<Email>(ref("et.email")),
           phone: cast<string>(ref("et.phone")),
-          job: sql`et.extra_fields ->> 'job'`,
+          job: sql`et.extra_fields ->> 'job'`.$castTo<string>(),
         }),
         validators: ref("conventions.validators"),
         renewed: eb
           .case()
           .when("renewed_from", "is not", null)
           .then(
-            jsonBuildObject({
-              from: ref("renewed_from"),
-              justification: ref("renewed_justification"),
-            }),
+            jsonStripNulls(
+              jsonBuildObject({
+                from: ref("renewed_from").$castTo<string>(),
+                justification: ref("renewed_justification").$castTo<string>(),
+              }),
+            ),
           )
           .else(null)
           .end(),
@@ -232,27 +220,88 @@ export const createConventionReadQueryBuilder = (transaction: KyselyDb) => {
   );
 };
 
+export const getConventionAgencyFieldsForAgencies = async (
+  transaction: KyselyDb,
+  agencyIds: AgencyId[],
+): Promise<Record<AgencyId, ConventionAgencyFields>> => {
+  const withAgencyFields: {
+    agencyFields: ConventionAgencyFields & { agencyId: AgencyId };
+  }[] = await transaction
+    .selectFrom("agencies")
+    .leftJoin(
+      "agencies as referred_agencies",
+      "agencies.refers_to_agency_id",
+      "referred_agencies.id",
+    )
+    .select(({ ref, ...eb }) =>
+      jsonStripNulls(
+        jsonBuildObject({
+          agencyId: ref("agencies.id"),
+          agencyName: ref("agencies.name"),
+          agencyKind: ref("agencies.kind").$castTo<AgencyKind>(),
+          agencyDepartment: ref("agencies.department_code"),
+          agencySiret: ref("agencies.agency_siret"),
+          agencyCounsellorEmails: ref("agencies.counsellor_emails").$castTo<
+            Email[]
+          >(),
+          agencyValidatorEmails: ref("agencies.validator_emails").$castTo<
+            Email[]
+          >(),
+          agencyRefersTo: eb
+            .case()
+            .when("agencies.refers_to_agency_id", "is not", null)
+            .then(
+              jsonBuildObject({
+                id: ref("agencies.refers_to_agency_id").$castTo<AgencyId>(),
+                name: ref("referred_agencies.name").$castTo<string>(),
+              }),
+            )
+            .else(null)
+            .end(),
+        }),
+      ).as("agencyFields"),
+    )
+    .where("agencies.id", "in", agencyIds)
+    .execute();
+
+  return withAgencyFields.reduce(
+    (acc, agency) => ({
+      ...acc,
+      [agency.agencyFields.agencyId]: agency.agencyFields,
+    }),
+    {} as Record<AgencyId, ConventionAgencyFields>,
+  );
+};
+
 export const getReadConventionById = async (
   transaction: KyselyDb,
   conventionId: ConventionId,
 ): Promise<ConventionReadDto | undefined> => {
-  const pgConvention = await createConventionReadQueryBuilder(transaction)
+  const pgConvention = await createConventionQueryBuilder(transaction)
     .where("conventions.id", "=", conventionId)
     .executeTakeFirst();
-  return (
-    pgConvention &&
-    parseZodSchemaAndLogErrorOnParsingFailure(
-      conventionReadSchema,
-      pgConvention.dto,
-      createLogger(__filename),
-      {},
-    )
+
+  if (!pgConvention) return;
+
+  const agencyFieldsByAgencyIds = await getConventionAgencyFieldsForAgencies(
+    transaction,
+    [pgConvention.dto.agencyId],
+  );
+
+  return parseZodSchemaAndLogErrorOnParsingFailure(
+    conventionReadSchema,
+    {
+      ...pgConvention.dto,
+      ...agencyFieldsByAgencyIds[pgConvention.dto.agencyId],
+    },
+    createLogger(__filename),
+    {},
   );
 };
 
 export const makeGetLastConventionWithSiretInList =
   (sirets: [SiretDto, ...SiretDto[]]) =>
-  (builder: Awaited<ReturnType<typeof createConventionReadQueryBuilder>>) =>
+  (builder: Awaited<ReturnType<typeof createConventionQueryBuilder>>) =>
     builder
       .select(
         sql<string>`row_number() OVER (PARTITION BY conventions.siret ORDER BY conventions.date_validation DESC)`.as(

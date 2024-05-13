@@ -28,6 +28,7 @@ export class InMemoryOutboxQueries implements OutboxQueries {
       { allEvents: eventsToDebugInfo(allEvents) },
       "getAllUnpublishedEvents",
     );
+
     const unpublishedEvents = allEvents.filter(
       (event) => !event.wasQuarantined && event.publications.length === 0,
     );

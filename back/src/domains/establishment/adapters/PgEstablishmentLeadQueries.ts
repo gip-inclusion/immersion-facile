@@ -1,9 +1,9 @@
 import { andThen } from "ramda";
-import { ConventionReadDto, filter, pipeWithValue } from "shared";
+import { ConventionDto, filter, pipeWithValue } from "shared";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { validateConventionReadResults } from "../../convention/adapters/PgConventionQueries";
+import { validateConventionResults } from "../../convention/adapters/PgConventionQueries";
 import {
-  createConventionReadQueryBuilder,
+  createConventionQueryBuilder,
   makeGetLastConventionWithSiretInList,
 } from "../../convention/adapters/pgConventionSql";
 import { isSiretsListFilled } from "../entities/EstablishmentLeadEntity";
@@ -16,7 +16,7 @@ export class PgEstablishmentLeadQueries implements EstablishmentLeadQueries {
 
   public async getLastConventionsByUniqLastEventKind(
     params: EstablishmentLeadReminderParams,
-  ): Promise<ConventionReadDto[]> {
+  ): Promise<ConventionDto[]> {
     const withSiretList =
       await getEstablishmentLeadSiretsByUniqLastEventKindBuilder(
         this.transaction,
@@ -28,11 +28,11 @@ export class PgEstablishmentLeadQueries implements EstablishmentLeadQueries {
     if (!isSiretsListFilled(sirets)) return [];
 
     return pipeWithValue(
-      createConventionReadQueryBuilder(this.transaction),
+      createConventionQueryBuilder(this.transaction),
       makeGetLastConventionWithSiretInList(sirets),
       (builder) => builder.execute(),
       andThen(filter((conv) => conv.rn === "1")),
-      andThen(validateConventionReadResults),
+      andThen(validateConventionResults),
     );
   }
 }

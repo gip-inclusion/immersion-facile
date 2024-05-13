@@ -274,7 +274,7 @@ export type AgencyRefersToInConvention = {
   name: string;
 };
 
-export type ConventionReadDto = ConventionDto & {
+export type ConventionAgencyFields = {
   agencyName: string;
   agencyDepartment: string;
   agencyKind: AgencyKind;
@@ -283,6 +283,8 @@ export type ConventionReadDto = ConventionDto & {
   agencyValidatorEmails: string[];
   agencyRefersTo?: AgencyRefersToInConvention;
 };
+
+export type ConventionReadDto = ConventionDto & ConventionAgencyFields;
 
 export type WithConventionIdLegacy = {
   id: ConventionId;

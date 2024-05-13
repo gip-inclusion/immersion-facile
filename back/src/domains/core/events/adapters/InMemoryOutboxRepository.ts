@@ -1,7 +1,6 @@
 import { values } from "ramda";
-import { EventStatus } from "../../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../../utils/logger";
-import { DomainEvent } from "../events";
+import { DomainEvent, EventStatus } from "../events";
 import { OutboxRepository } from "../ports/OutboxRepository";
 
 const logger = createLogger(__filename);
