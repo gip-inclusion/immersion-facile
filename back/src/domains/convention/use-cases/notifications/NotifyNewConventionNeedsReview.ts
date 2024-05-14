@@ -187,6 +187,15 @@ const determineRecipients = (
 
   switch (status) {
     case "IN_REVIEW": {
+      if (hasCounsellorEmails)
+        return agency.counsellorEmails.map(
+          (email): Recipient => ({
+            role: "counsellor",
+            email,
+            peAdvisor: undefined,
+          }),
+        );
+
       if (peAdvisor) {
         const validatorRecipients = agency.validatorEmails.map(
           (email): Recipient => ({
@@ -211,15 +220,6 @@ const determineRecipients = (
           ...validatorRecipients,
         ];
       }
-
-      if (hasCounsellorEmails)
-        return agency.counsellorEmails.map(
-          (email): Recipient => ({
-            role: "counsellor",
-            email,
-            peAdvisor: undefined,
-          }),
-        );
 
       if (hasValidatorEmails)
         return agency.validatorEmails.map(

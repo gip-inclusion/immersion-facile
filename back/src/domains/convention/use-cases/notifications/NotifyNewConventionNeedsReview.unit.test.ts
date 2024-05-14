@@ -278,6 +278,76 @@ describe("NotifyConventionNeedsReview", () => {
       expectSavedNotificationsAndEvents({ emails: [] });
     });
 
+    it("sends notification to counsellors (when they exist), even if there is a peAdvisor", async () => {
+      const counsellorEmail = "some@counsellor.com";
+      const agency = new AgencyDtoBuilder(defaultAgency)
+        .withCounsellorEmails([counsellorEmail])
+        .build();
+      uow.agencyRepository.setAgencies([agency]);
+
+      const conventionInReviewWithPeAdvisor = new ConventionDtoBuilder(
+        defaultConvention,
+      )
+        .withStatus("IN_REVIEW")
+        .withAgencyId(agency.id)
+        .withFederatedIdentity(peIdentity)
+        .build();
+
+      const shortLinkIds = [
+        "shortlink1",
+        "shortlink2",
+        "shortlink3",
+        "shortlink4",
+      ];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
+      const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
+        _entityName: "ConventionPoleEmploiAdvisor",
+        advisor: {
+          email: peAdvisorEmail,
+          firstName: "Elsa",
+          lastName: "Oldenburg",
+          type: "CAPEMPLOI",
+        },
+        peExternalId: peIdentity.token,
+        conventionId: conventionInReviewWithPeAdvisor.id,
+      };
+
+      uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+        [userConventionAdvisor],
+      );
+
+      await notifyNewConventionNeedsReview.execute({
+        convention: conventionInReviewWithPeAdvisor,
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+            recipients: [counsellorEmail],
+            params: {
+              conventionId: conventionInReviewWithPeAdvisor.id,
+              internshipKind: conventionInReviewWithPeAdvisor.internshipKind,
+              beneficiaryFirstName:
+                conventionInReviewWithPeAdvisor.signatories.beneficiary
+                  .firstName,
+              beneficiaryLastName:
+                conventionInReviewWithPeAdvisor.signatories.beneficiary
+                  .lastName,
+              businessName: conventionInReviewWithPeAdvisor.businessName,
+              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              possibleRoleAction: "en vérifier l'éligibilité",
+              agencyLogoUrl: agency.logoUrl ?? undefined,
+              validatorName: "",
+              peAdvisor: undefined,
+            },
+          },
+        ],
+      });
+    });
+
     it("Sends notification email to peAdvisor and validators when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
       const agency = new AgencyDtoBuilder(defaultAgency)
         .withValidatorEmails(validatorEmails)
