@@ -23,6 +23,7 @@ import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlag
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { inclusionConnectedEpics } from "src/core-logic/domain/inclusionConnected/inclusionConnected.epics";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
+import { notificationSlice } from "src/core-logic/domain/notification/notification.slice";
 import { rootAppEpics } from "src/core-logic/domain/rootApp/rootApp.epics";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epics";
@@ -88,6 +89,7 @@ const appReducer = combineReducers({
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [geosearchSlice.name]: geosearchSlice.reducer,
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
+  [notificationSlice.name]: notificationSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,

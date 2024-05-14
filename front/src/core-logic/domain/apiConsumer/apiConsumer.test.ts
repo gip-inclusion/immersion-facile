@@ -92,6 +92,7 @@ describe("api consumer", () => {
         apiConsumerSlice.actions.saveApiConsumerRequested({
           apiConsumer: apiConsumer1,
           adminToken: "admin-jwt",
+          feedbackTopic: "api-consumer-global",
         }),
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
@@ -114,6 +115,7 @@ describe("api consumer", () => {
         apiConsumerSlice.actions.saveApiConsumerRequested({
           apiConsumer: apiConsumer1,
           adminToken: "admin-jwt",
+          feedbackTopic: "api-consumer-global",
         }),
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
@@ -121,9 +123,6 @@ describe("api consumer", () => {
       dependencies.adminGateway.saveApiConsumersResponse$.next("");
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
 
-      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-        kind: "updateSuccess",
-      });
       expect(
         apiConsumerSelectors.lastCreatedToken(store.getState()),
       ).toBeNull();
@@ -138,6 +137,7 @@ describe("api consumer", () => {
         apiConsumerSlice.actions.saveApiConsumerRequested({
           apiConsumer: apiConsumer1,
           adminToken: "adminToken",
+          feedbackTopic: "api-consumer-global",
         }),
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
@@ -146,11 +146,6 @@ describe("api consumer", () => {
         new Error(errorMessage),
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
-
-      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-        kind: "errored",
-        errorMessage,
-      });
     });
   });
 
@@ -162,6 +157,7 @@ describe("api consumer", () => {
       apiConsumerSlice.actions.saveApiConsumerRequested({
         apiConsumer: apiConsumer1,
         adminToken: "admin-jwt",
+        feedbackTopic: "api-consumer-global",
       }),
     );
 

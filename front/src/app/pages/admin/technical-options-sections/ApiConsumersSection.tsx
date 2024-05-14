@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { Input } from "@codegouvfr/react-dsfr/Input";
+import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { addYears } from "date-fns";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -17,6 +17,8 @@ import {
   toDisplayedDate,
 } from "shared";
 import { ApiConsumerForm } from "src/app/components/admin/technical-options/ApiConsumerForm";
+import { NotificationFeedback } from "src/app/components/notifications/NotificationFeedback";
+import { WithNotificationFeedbackReplacer } from "src/app/components/notifications/WithNotificationFeedback";
 import {
   formatApiConsumerContact,
   formatApiConsumerDescription,
@@ -29,14 +31,13 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
-import { P, match } from "ts-pattern";
+import { notificationSlice } from "src/core-logic/domain/notification/notification.slice";
 import { v4 as uuidV4 } from "uuid";
 
 export const ApiConsumersSection = () => {
   const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
 
   const isApiConsumerModalOpened = useIsModalOpen(apiConsumerModal);
-  const saveConsumerFeedback = useAppSelector(apiConsumerSelectors.feedback);
 
   const dispatch = useDispatch();
 
@@ -59,9 +60,9 @@ export const ApiConsumersSection = () => {
   }, [isApiConsumerModalOpened, dispatch, adminToken]);
 
   const [currentApiConsumerToEdit, setCurrentApiConsumerToEdit] =
-    useState<ApiConsumer>(defaultApiConsumerValues);
+    useState<ApiConsumer>(defaultApiConsumerValues(uuidV4()));
   const onApiConsumerAddClick = () => {
-    setCurrentApiConsumerToEdit(defaultApiConsumerValues);
+    setCurrentApiConsumerToEdit(defaultApiConsumerValues(uuidV4()));
     apiConsumerModal.open();
   };
 
@@ -76,6 +77,7 @@ export const ApiConsumersSection = () => {
 
   const onConfirmTokenModalClose = () => {
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
+    dispatch(notificationSlice.actions.clearNotificationsTriggered());
     adminToken &&
       dispatch(
         apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
@@ -104,7 +106,6 @@ export const ApiConsumersSection = () => {
     formatApiConsumerRights(apiConsumer.rights),
     makeApiConsumerActionButtons(apiConsumer, onEditButtonClick),
   ]);
-
   return (
     <>
       <h4>Consommateurs API</h4>
@@ -128,38 +129,28 @@ export const ApiConsumersSection = () => {
         </div>
       </div>
       {createPortal(
-        <apiConsumerModal.Component title="Ajout consommateur api">
-          {match({
-            lastCreatedToken,
-            saveConsumerFeedbackKind: saveConsumerFeedback.kind,
-          })
-            .with(
-              {
-                lastCreatedToken: P.not(P.nullish),
-                saveConsumerFeedbackKind: "createSuccess",
-              },
-              ({ lastCreatedToken }) => (
-                <ShowApiKeyToCopy
-                  lastCreatedToken={lastCreatedToken}
-                  onConfirmTokenModalClose={onConfirmTokenModalClose}
-                />
-              ),
-            )
-            .with({ saveConsumerFeedbackKind: "updateSuccess" }, () => (
-              <>
-                <Alert
-                  severity="success"
-                  title="Consommateur Api mis à jour !"
-                  className={"fr-mb-2w"}
-                />
-                <Button type="button" onClick={onConfirmTokenModalClose}>
-                  Fermer la fenêtre
-                </Button>
-              </>
-            ))
-            .otherwise(() => (
-              <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
-            ))}
+        <apiConsumerModal.Component
+          title="Ajout consommateur api"
+          concealingBackdrop
+        >
+          <WithNotificationFeedbackReplacer
+            topic="api-consumer-global"
+            renderFeedback={({ level }) => (
+              <Fragment key={`${level}-${currentApiConsumerToEdit.id}`}>
+                {level === "success" && lastCreatedToken && (
+                  <ShowApiKeyToCopy
+                    lastCreatedToken={lastCreatedToken}
+                    onConfirmTokenModalClose={onConfirmTokenModalClose}
+                  />
+                )}
+                {level === "success" && !lastCreatedToken && (
+                  <NotificationFeedback topic="api-consumer-global" />
+                )}
+              </Fragment>
+            )}
+          >
+            <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
+          </WithNotificationFeedbackReplacer>
         </apiConsumerModal.Component>,
         document.body,
       )}
@@ -217,8 +208,8 @@ const ShowApiKeyToCopy = ({
   );
 };
 
-const defaultApiConsumerValues: ApiConsumer = {
-  id: uuidV4(),
+const defaultApiConsumerValues = (id: string): ApiConsumer => ({
+  id,
   name: "",
   contact: {
     lastName: "",
@@ -243,7 +234,7 @@ const defaultApiConsumerValues: ApiConsumer = {
   },
   createdAt: toDateString(new Date()),
   expirationDate: toDateString(addYears(new Date(), 1)),
-};
+});
 
 const apiConsumerModal = createModal({
   id: "api-consumer-modal",
