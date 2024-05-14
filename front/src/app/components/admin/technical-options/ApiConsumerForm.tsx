@@ -49,6 +49,7 @@ export const ApiConsumerForm = ({
         apiConsumerSlice.actions.saveApiConsumerRequested({
           apiConsumer: values,
           adminToken,
+          feedbackTopic: "api-consumer-global",
         }),
       );
   };

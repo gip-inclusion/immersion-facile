@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ApiConsumer, ApiConsumerJwt, InclusionConnectJwt } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
+import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/notification/notification.slice";
 
 type ApiConsumerState = {
   isLoading: boolean;
@@ -40,28 +41,33 @@ export const apiConsumerSlice = createSlice({
     },
     saveApiConsumerRequested: (
       state,
-      _action: PayloadAction<{
+      _action: PayloadActionWithFeedbackTopic<{
         apiConsumer: ApiConsumer;
         adminToken: InclusionConnectJwt;
       }>,
     ) => {
       state.isLoading = true;
     },
-    createApiConsumerSucceeded: (
+    saveApiConsumerSucceeded: (
       state,
-      action: PayloadAction<ApiConsumerJwt>,
+      action: PayloadActionWithFeedbackTopic<{
+        apiConsumerJwt: ApiConsumerJwt;
+      }>,
     ) => {
       state.isLoading = false;
-      state.feedback = { kind: "createSuccess" };
-      state.lastCreatedToken = action.payload;
+      state.lastCreatedToken = action.payload.apiConsumerJwt;
     },
-    updateApiConsumerSucceeded: (state) => {
+    updateApiConsumerSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "updateSuccess" };
     },
-    saveApiConsumerFailed: (state, action: PayloadAction<string>) => {
+    saveApiConsumerFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
     clearLastCreatedToken: (state) => {
       state.lastCreatedToken = null;

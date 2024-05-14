@@ -31,18 +31,26 @@ const createApiConsumerEpic: ApiConsumerEpic = (
   action$.pipe(
     filter(apiConsumerSlice.actions.saveApiConsumerRequested.match),
     switchMap((action) =>
-      adminGateway.saveApiConsumer$(
-        action.payload.apiConsumer,
-        action.payload.adminToken,
-      ),
-    ),
-    map((token) =>
-      token
-        ? apiConsumerSlice.actions.createApiConsumerSucceeded(token)
-        : apiConsumerSlice.actions.updateApiConsumerSucceeded(),
-    ),
-    catchEpicError((error) =>
-      apiConsumerSlice.actions.saveApiConsumerFailed(error.message),
+      adminGateway
+        .saveApiConsumer$(action.payload.apiConsumer, action.payload.adminToken)
+        .pipe(
+          map((token) =>
+            token
+              ? apiConsumerSlice.actions.saveApiConsumerSucceeded({
+                  apiConsumerJwt: token,
+                  feedbackTopic: action.payload.feedbackTopic,
+                })
+              : apiConsumerSlice.actions.updateApiConsumerSucceeded({
+                  feedbackTopic: action.payload.feedbackTopic,
+                }),
+          ),
+          catchEpicError((error) =>
+            apiConsumerSlice.actions.saveApiConsumerFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
     ),
   );
 
