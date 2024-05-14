@@ -63,7 +63,10 @@ export const domElementIds = {
       quickAccess: {
         establishment: buildHeaderNavLinkId("quick-access-establishment"),
         agency: buildHeaderNavLinkId("quick-access-agency"),
+<<<<<<< HEAD
         myAccount: buildHeaderNavLinkId("quick-access-my-account"),
+=======
+>>>>>>> 1cc9a6884 (ButtonWithSubMenu to access dashboards)
       },
     },
   },
@@ -600,12 +603,4 @@ export const domElementIds = {
     },
   },
   searchDiagoriente: {},
-  rootDashboard: {
-    establishment: {
-      link: "im-root-dashboard__establishment-link",
-    },
-    agency: {
-      link: "im-root-dashboard__agency-link",
-    },
-  },
 } satisfies DomElementIds;
