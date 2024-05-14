@@ -385,48 +385,6 @@ describe("PgAgencyRepository", () => {
     });
   });
 
-  describe("getAgencyWithValidatorEmail", () => {
-    const agency1 = agency1builder.build();
-
-    it("returns undefined for empty table", async () => {
-      const result =
-        await agencyRepository.getAgencyWhereEmailMatches("notFound");
-      expect(result).toBeUndefined();
-    });
-
-    it("returns the first agency matching the validator email", async () => {
-      const agencyWithMatchingValidator = agency2builder
-        .withValidatorEmails(["matching.validator@mail.com"])
-        .build();
-
-      await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agencyWithMatchingValidator),
-      ]);
-
-      const matched = await agencyRepository.getAgencyWhereEmailMatches(
-        "matching.validator@mail.com",
-      );
-      expect(matched).toEqual(agencyWithMatchingValidator);
-    });
-
-    it("returns the first agency matching the counsellor email", async () => {
-      const agencyWithMatchingCounsellor = agency2builder
-        .withCounsellorEmails(["matching.counsellor@mail.com"])
-        .build();
-
-      await Promise.all([
-        agencyRepository.insert(agency1),
-        agencyRepository.insert(agencyWithMatchingCounsellor),
-      ]);
-
-      const matched = await agencyRepository.getAgencyWhereEmailMatches(
-        "matching.counsellor@mail.com",
-      );
-      expect(matched).toEqual(agencyWithMatchingCounsellor);
-    });
-  });
-
   describe("getAgenciesRelatedToAgency", () => {
     it("found related agencies", async () => {
       await agencyRepository.insert(agency1);

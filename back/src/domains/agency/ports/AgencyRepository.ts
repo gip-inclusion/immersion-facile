@@ -18,7 +18,6 @@ export interface AgencyRepository {
     limit?: number;
   }): Promise<AgencyDto[]>;
   getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]>;
-  getAgencyWhereEmailMatches(email: string): Promise<AgencyDto | undefined>;
   getById(id: AgencyId): Promise<AgencyDto | undefined>;
   getByIds(ids: AgencyId[]): Promise<AgencyDto[]>;
   getBySafir(safirCode: string): Promise<AgencyDto | undefined>;

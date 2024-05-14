@@ -77,9 +77,8 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
         continue;
       }
 
-      const matchedEmailAgency = await getAgencyWhereEmailMatches(
-        uow,
-        peReferentialAgency,
+      const matchedEmailAgency = await uow.agencyRepository.getBySafir(
+        peReferentialAgency.codeSafir,
       );
 
       if (matchedEmailAgency) {
@@ -193,17 +192,6 @@ const getNearestPeAgencies = async (
     },
   });
   return agencies.filter((agency) => agency.kind === "pole-emploi");
-};
-
-const getAgencyWhereEmailMatches = async (
-  uow: UnitOfWork,
-  peReferentialAgency: PeAgencyFromReferenciel,
-): Promise<AgencyDto | undefined> => {
-  if (!peReferentialAgency.contact?.email) return;
-
-  return uow.agencyRepository.getAgencyWhereEmailMatches(
-    peReferentialAgency.contact.email,
-  );
 };
 
 const updateAgency = async (

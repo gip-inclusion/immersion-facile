@@ -269,18 +269,6 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       .filter((agency) => agency.refersToAgencyId === id);
   }
 
-  public async getAgencyWhereEmailMatches(
-    email: string,
-  ): Promise<AgencyDto | undefined> {
-    return values(this.#agencies)
-      .filter(isTruthy)
-      .find(
-        (agency) =>
-          agency.validatorEmails.includes(email) ||
-          agency.counsellorEmails.includes(email),
-      );
-  }
-
   public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
     return this.#agencies[id];
   }

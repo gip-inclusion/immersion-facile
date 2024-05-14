@@ -99,7 +99,7 @@ describe("UpdateAllPeAgencies use case", () => {
         refersToAgencyId: null,
         logoUrl: null,
         rejectionJustification: null,
-        codeSafir: null,
+        codeSafir: "63019",
       };
 
       agencyRepository.setAgencies([initialAgency]);
@@ -149,7 +149,7 @@ describe("UpdateAllPeAgencies use case", () => {
         refersToAgencyId: null,
         logoUrl: null,
         rejectionJustification: null,
-        codeSafir: null,
+        codeSafir: "63019",
       };
 
       agencyRepository.setAgencies([initialAgency]);
