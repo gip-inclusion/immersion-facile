@@ -23,6 +23,7 @@ const simulatedAgencyDtos: AgencyRight[] = [
       .withName("Agence de Bourg en Bresse")
       .withId("fake-agency-id-1")
       .build(),
+    isNotifiedByEmail: true,
   },
   {
     role: "validator",
@@ -30,6 +31,7 @@ const simulatedAgencyDtos: AgencyRight[] = [
       .withName("Mission locale qu'on ne devrait pas voir")
       .withId("fake-agency-id-not-shown")
       .build(),
+    isNotifiedByEmail: true,
   },
   {
     role: "toReview",
@@ -37,6 +39,7 @@ const simulatedAgencyDtos: AgencyRight[] = [
       .withName("CCI de Quimper")
       .withId("fake-agency-id-3")
       .build(),
+    isNotifiedByEmail: true,
   },
 ];
 export class SimulatedAdminGateway implements AdminGateway {
@@ -115,6 +118,7 @@ export class SimulatedAdminGateway implements AdminGateway {
               .withName("Mission locale qui plante")
               .withId("non-existing-agency-id")
               .build(),
+            isNotifiedByEmail: true,
           },
         ],
         dashboards: { agencies: {}, establishments: {} },

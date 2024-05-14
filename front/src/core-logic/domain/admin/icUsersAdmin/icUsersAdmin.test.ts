@@ -28,15 +28,31 @@ const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
 const agency3 = new AgencyDtoBuilder().withId("agency-3").build();
 const agency4 = new AgencyDtoBuilder().withId("agency-4").build();
 
-const agency1Right: AgencyRight = { agency: agency1, role: "toReview" };
-const agency2Right: AgencyRight = { agency: agency2, role: "validator" };
+const agency1Right: AgencyRight = {
+  agency: agency1,
+  role: "toReview",
+  isNotifiedByEmail: true,
+};
+const agency2Right: AgencyRight = {
+  agency: agency2,
+  role: "validator",
+  isNotifiedByEmail: true,
+};
 const user1AgencyRights: Record<AgencyId, AgencyRight> = {
   [agency1.id]: agency1Right,
   [agency2.id]: agency2Right,
 };
 
-const agency3Right: AgencyRight = { agency: agency3, role: "toReview" };
-const agency4Right: AgencyRight = { agency: agency4, role: "toReview" };
+const agency3Right: AgencyRight = {
+  agency: agency3,
+  role: "toReview",
+  isNotifiedByEmail: true,
+};
+const agency4Right: AgencyRight = {
+  agency: agency4,
+  role: "toReview",
+  isNotifiedByEmail: true,
+};
 const user2AgencyRights: Record<AgencyId, AgencyRight> = {
   [agency3.id]: agency3Right,
   [agency4.id]: agency4Right,

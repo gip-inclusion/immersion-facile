@@ -35,6 +35,7 @@ describe("InclusionConnected", () => {
       {
         role: "agencyOwner",
         agency: new AgencyDtoBuilder().build(),
+        isNotifiedByEmail: true,
       },
     ],
     externalId: "fake-user-external-id",
