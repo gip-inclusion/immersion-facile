@@ -13,14 +13,12 @@ import {
   allAgencyStatuses,
   domElementIds,
   editAgencySchema,
-  emailSchema,
   toDotNotation,
 } from "shared";
 import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
 } from "src/app/components/forms/agency/AgencyFormCommonFields";
-import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
   formErrorsToFlatErrors,
@@ -60,7 +58,7 @@ export const EditAgencyForm = ({
     mode: "onTouched",
     defaultValues: agency,
   });
-  const { register, setValue, handleSubmit, formState, watch } = methods;
+  const { register, handleSubmit, formState } = methods;
 
   const getFieldError = makeFieldError(formState);
 
@@ -80,19 +78,9 @@ export const EditAgencyForm = ({
             addressInitialValue={agency.address}
             refersToOtherAgency={refersToOtherAgency}
           />
-          <MultipleEmailsInput
-            id={"agency-admin-emails"}
-            name="agency-admin-emails"
-            label="⚠️Emails administrateur de l'agence ⚠️"
-            description="Ces emails auront le droit d'accéder aux tableaux de bord et d'éditer les informations et accès du personnel de l'agence"
-            placeholder="admin.agence@mail.com"
-            valuesInList={watch("adminEmails")}
-            setValues={(values) => setValue("adminEmails", values)}
-            validationSchema={emailSchema}
-          />
 
           <Select
-            label="⚠️Statut de l'agence ⚠️"
+            label="!Statut de l'agence !"
             options={statusListOfOptions}
             placeholder="Sélectionner un statut"
             nativeSelectProps={{
@@ -102,7 +90,7 @@ export const EditAgencyForm = ({
           />
 
           <Input
-            label="⚠️Code Safir de l'agence ⚠️"
+            label="!Code Safir de l'agence !"
             nativeInputProps={{
               ...register("codeSafir"),
               placeholder: "Code Safir ",
