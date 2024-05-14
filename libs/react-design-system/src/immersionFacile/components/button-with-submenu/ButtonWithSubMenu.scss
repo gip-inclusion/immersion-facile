@@ -1,0 +1,13 @@
+.im-button-with-sub-menu {
+  position: relative;
+  &__menu {
+    max-height: 999px;
+    overflow: auto;
+    top: 100%;
+    right: 0;
+    max-width: 18rem;
+  }
+  &__list {
+    width: max-content;
+  }
+}

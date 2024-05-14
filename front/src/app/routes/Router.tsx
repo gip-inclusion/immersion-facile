@@ -8,7 +8,6 @@ import {
   agencyDashboardTabsList,
   establishmentDashboardTabsList,
 } from "shared";
-import { RootDashboardPage } from "src/app/pages/RootDashboardPage";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
@@ -162,7 +161,6 @@ const getPageByRouteName: {
   openApiDoc: () => <OpenApiDocPage />,
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
-  rootDashboard: () => <RootDashboardPage />,
   search: (route) => <SearchPage route={route} />,
   searchDiagoriente: (route) => (
     <SearchPage route={route} useNaturalLanguageForAppellations />

@@ -7,7 +7,7 @@ import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import React from "react";
-import { MaintenanceCallout } from "react-design-system";
+import { ButtonWithSubMenu, MaintenanceCallout } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
 import { commonContent } from "src/app/contents/commonContent";
@@ -45,6 +45,7 @@ export const LayoutHeader = () => {
     establishment: establishmentIds,
     agency: agencyIds,
     admin: adminIds,
+    quickAccess: quickAccessIds,
   } = domElementIds.header.navLinks;
 
   const isInclusionConnected = useAppSelector(
@@ -54,13 +55,27 @@ export const LayoutHeader = () => {
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const tools: HeaderProps["quickAccessItems"] = [
     headerFooterDisplayItem,
-    {
-      iconId: "fr-icon-account-line",
-      text: "Mon espace",
-      linkProps: {
-        ...routes.rootDashboard().link,
-      },
-    },
+    <ButtonWithSubMenu
+      navItems={[
+        {
+          text: "Je suis une entreprise",
+          isActive: false,
+          linkProps: {
+            ...routes.establishmentDashboard().link,
+            id: quickAccessIds.establishment,
+          },
+        },
+        {
+          text: "Je suis un prescripteur",
+          isActive: false,
+          linkProps: {
+            ...routes.agencyDashboard().link,
+            id: quickAccessIds.agency,
+          },
+        },
+      ]}
+      buttonLabel={"Mon espace"}
+    />,
   ];
 
   if (isPeConnected || isInclusionConnected) {
@@ -146,7 +161,7 @@ export const LayoutHeader = () => {
           },
         },
         {
-          text: "Référencer mon entreprise",
+          text: "Proposer une immersion",
           isActive: currentRoute.name === routes.formEstablishment().name,
           linkProps: {
             ...routes.formEstablishment().link,
@@ -162,7 +177,7 @@ export const LayoutHeader = () => {
           },
         },
         {
-          text: "Piloter mon entreprise",
+          text: "Mon espace",
           isActive:
             currentRoute.name ===
             routes.establishmentDashboard({ tab: "conventions" }).name,
@@ -187,7 +202,7 @@ export const LayoutHeader = () => {
           },
         },
         {
-          text: "Référencer mon organisme",
+          text: "Inscrire mon organisme",
           isActive: currentRoute.name === routes.addAgency().name,
           linkProps: {
             ...routes.addAgency().link,
@@ -203,7 +218,7 @@ export const LayoutHeader = () => {
           },
         },
         {
-          text: "Piloter mon organisme",
+          text: "Mon espace",
           isActive: false,
           linkProps: {
             ...routes.agencyDashboard().link,
