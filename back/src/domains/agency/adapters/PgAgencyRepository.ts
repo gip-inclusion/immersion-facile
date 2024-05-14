@@ -187,28 +187,6 @@ export class PgAgencyRepository implements AgencyRepository {
       .then(map((row) => row.agency));
   }
 
-  public async getAgencyWhereEmailMatches(email: string) {
-    const positionAsCoordinates = "ST_AsGeoJSON(position) AS position";
-    const validatorEmailsIncludesProvidedEmail =
-      "CAST(validator_emails AS text) ILIKE '%' || $1 || '%'";
-    const councellorEmailsIncludesProvidedEmail =
-      "CAST(counsellor_emails AS text) ILIKE '%' || $1 || '%'";
-
-    const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
-      this.transaction,
-      `SELECT id, name, status, kind, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
-        street_number_and_address, post_code, city, department_code, refers_to_agency_id, rejection_justification, covered_departments
-       FROM public.agencies
-       WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
-      [email],
-    );
-
-    const first = pgResult.rows[0];
-
-    if (!first) return;
-    return persistenceAgencyToAgencyDto(first);
-  }
-
   public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
     return this.#getAgencyWithJsonBuiltQueryBuilder()
       .where("a.id", "=", id)
