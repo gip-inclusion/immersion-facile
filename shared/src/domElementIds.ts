@@ -60,6 +60,10 @@ export const domElementIds = {
         backOffice: buildHeaderNavLinkId("admin-home"),
         emails: buildHeaderNavLinkId("admin-emails"),
       },
+      quickAccess: {
+        establishment: buildHeaderNavLinkId("quick-access-establishment"),
+        agency: buildHeaderNavLinkId("quick-access-agency"),
+      },
     },
   },
 
@@ -595,12 +599,4 @@ export const domElementIds = {
     },
   },
   searchDiagoriente: {},
-  rootDashboard: {
-    establishment: {
-      link: "im-root-dashboard__establishment-link",
-    },
-    agency: {
-      link: "im-root-dashboard__agency-link",
-    },
-  },
 } satisfies DomElementIds;

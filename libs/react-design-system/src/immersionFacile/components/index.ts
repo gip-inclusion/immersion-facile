@@ -1,3 +1,4 @@
+export * from "./button-with-submenu";
 export * from "./convention-document";
 export * from "./convention-form-layout";
 export * from "./convention-form-sidebar";
