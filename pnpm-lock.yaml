@@ -169,7 +169,7 @@ importers:
         specifier: ^1.19.2
         version: 1.19.2
       '@types/bun':
-        specifier: ^1.0.4
+        specifier: ^1.1.15
         version: 1.1.15
       '@types/express':
         specifier: ^4.17.17
@@ -226,7 +226,7 @@ importers:
         specifier: ^29.5.0
         version: 29.5.0(@babel/core@7.20.12)
       bun:
-        specifier: ^1.0.25
+        specifier: ^1.1.42
         version: 1.1.42
       extract-zip:
         specifier: ^2.0.1
@@ -661,7 +661,7 @@ importers:
         specifier: ^29.7.0
         version: 29.7.0
       '@types/bun':
-        specifier: ^1.0.4
+        specifier: ^1.1.15
         version: 1.1.15
       '@types/geojson':
         specifier: ^7946.0.10
@@ -682,7 +682,7 @@ importers:
         specifier: ^29.5.0
         version: 29.5.0(@babel/core@7.20.12)
       bun:
-        specifier: ^1.0.25
+        specifier: ^1.1.42
         version: 1.1.42
       date-fns:
         specifier: 2.28.0
