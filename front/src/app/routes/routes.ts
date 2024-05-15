@@ -98,6 +98,13 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.conventionDocument}`,
   ),
+  initiateConvention: defineRoute(
+    {
+      ...acquisitionParams,
+      skipFirstStep: param.query.optional.boolean,
+    },
+    () => `/${frontRoutes.initiateConvention}`,
+  ),
   conventionImmersion: defineRoute(
     {
       jwt: param.query.optional.string,

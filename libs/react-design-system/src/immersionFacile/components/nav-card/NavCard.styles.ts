@@ -2,6 +2,7 @@ import "./NavCard.scss";
 
 export default {
   root: "im-nav-card",
+  withBorder: "im-nav-card--with-border",
   default: "im-nav-card--default",
   title: "im-nav-card__title",
   candidate: "im-nav-card--candidate",

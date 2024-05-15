@@ -6,14 +6,22 @@ import { UserType, heroHeaderComponentName } from "../hero-header";
 import Styles from "./NavCard.styles";
 
 export type HeroHeaderNavCard = {
-  title: string;
+  title: React.ReactNode;
   icon?: FrIconClassName;
   overtitle?: string;
   type: UserType;
-  link?: Link;
+  link?: {
+    href: string;
+    id?: string;
+    onClick?: Link["onClick"];
+    target?: HTMLAnchorElement["target"];
+  };
+  onClick?: () => void;
   total?: number;
   id: string;
+  withBorder?: boolean;
   wrapperClassName?: string;
+  alternateTitle?: string;
 };
 
 export const NavCard = ({
@@ -25,12 +33,16 @@ export const NavCard = ({
   total,
   id,
   wrapperClassName = heroHeaderComponentName,
+  withBorder,
+  onClick,
+  alternateTitle,
 }: HeroHeaderNavCard) => {
   const { cx } = useStyles();
   return (
     <div
       className={cx(
-        `${wrapperClassName}__nav-card-wrapper`,
+        `${wrapperClassName}__wrapper`,
+        "fr-col",
         "fr-col-12",
         `fr-col-lg-${total ? 12 / total : 4}`,
       )}
@@ -41,15 +53,30 @@ export const NavCard = ({
           `${Styles.root}--${type}`,
           `${wrapperClassName}__nav-card`,
           `${wrapperClassName}__nav-card--${type}`,
+          withBorder && Styles.withBorder,
         )}
       >
-        <a
-          {...link}
-          id={id}
-          className={cx(Styles.link, `${wrapperClassName}__nav-card-link`)}
-        >
-          <span className={fr.cx("fr-sr-only")}>{title}</span>
-        </a>
+        {link && (
+          <a
+            {...link}
+            id={id}
+            className={cx(Styles.link, `${wrapperClassName}__nav-card-link`)}
+            title={alternateTitle ?? ""}
+          >
+            <span className={fr.cx("fr-sr-only")}>{title}</span>
+          </a>
+        )}
+        {onClick && (
+          <button
+            type="button"
+            onClick={onClick}
+            id={id}
+            className={cx(Styles.link, `${wrapperClassName}__nav-card-link`)}
+          >
+            <span className={fr.cx("fr-sr-only")}>{title}</span>
+          </button>
+        )}
+
         <span
           className={cx(
             Styles.overtitle,
