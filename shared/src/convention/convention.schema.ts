@@ -8,6 +8,7 @@ import {
 } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
+import { phoneSchema } from "../phone.schema";
 import { allModifierRoles, allRoles } from "../role/role.dto";
 import {
   appellationCodeSchema,
@@ -23,7 +24,7 @@ import {
 import { numberEmployeesRanges } from "../siret/siret";
 import { siretSchema } from "../siret/siret.schema";
 import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
-import { OmitFromExistingKeys, phoneRegExp } from "../utils";
+import { OmitFromExistingKeys } from "../utils";
 import { DateString, dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
@@ -104,10 +105,6 @@ export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
 
 const roleSchema = z.enum(allRoles);
-export const phoneSchema = zStringMinLength1.regex(
-  phoneRegExp,
-  localization.invalidPhone,
-);
 
 const modifierRoleSchema = z.enum(allModifierRoles);
 
