@@ -3,9 +3,6 @@
 import { values } from "ramda";
 import { Flavor } from "./typeFlavors";
 
-export const phoneRegExp = /^\+?[0-9]+$/;
-export const stringOfNumbers = /^\+?[0-9]+$/;
-
 export type SleepFn = typeof sleep;
 
 // sleep function is use to simulate latency for demo and dev purpose

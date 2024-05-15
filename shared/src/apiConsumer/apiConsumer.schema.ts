@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { callbackUrlSchema } from "../AbsoluteUrl";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
-import { phoneSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
+import { phoneSchema } from "../phone.schema";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { ApiConsumerJwt } from "../tokens/jwt.dto";
 import { dateRegExp } from "../utils/date";
