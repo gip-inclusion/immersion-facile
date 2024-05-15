@@ -55,6 +55,14 @@ export const LayoutHeader = () => {
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const tools: HeaderProps["quickAccessItems"] = [
     headerFooterDisplayItem,
+    {
+      text: "Remplir la demande de convention",
+      iconId: "fr-icon-file-text-line",
+      linkProps: {
+        ...routes.initiateConvention().link,
+        id: "TODO-ADD-ID",
+      },
+    },
     <ButtonWithSubMenu
       navItems={[
         {
@@ -142,7 +150,9 @@ export const LayoutHeader = () => {
           text: "Remplir la demande de convention",
           isActive: false,
           linkProps: {
-            ...routes.conventionImmersion().link,
+            ...routes.initiateConvention({
+              skipFirstStep: true,
+            }).link,
             id: candidateIds.formConvention,
           },
         },

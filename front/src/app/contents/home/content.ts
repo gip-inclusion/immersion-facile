@@ -111,7 +111,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-file-line",
         type: "candidate",
         id: domElementIds.homeCandidates.heroHeader.formConvention,
-        link: routes.conventionImmersion().link,
+        link: routes.initiateConvention({ skipFirstStep: true }).link,
       },
     ],
     establishment: [

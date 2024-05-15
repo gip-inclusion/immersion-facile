@@ -603,4 +603,12 @@ export const domElementIds = {
     },
   },
   searchDiagoriente: {},
+  initiateConvention: {
+    navCards: {
+      candidate: "im-initiate-convention-page__nav-card-candidate",
+      establishment: "im-initiate-convention-page__nav-card-establishment",
+      agency: "im-initiate-convention-page__nav-card-agency",
+      help: "im-initiate-convention-page__nav-card-help",
+    },
+  },
 } satisfies DomElementIds;

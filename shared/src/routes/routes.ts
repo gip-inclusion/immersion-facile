@@ -9,6 +9,7 @@ export const frontRoutes = {
   [allowedStartInclusionConnectLoginPages[0]]: "tableau-de-bord-agence",
   [allowedStartInclusionConnectLoginPages[1]]: "tableau-de-bord-etablissement",
   [allowedStartInclusionConnectLoginPages[2]]: "admin",
+  initiateConvention: "initier-convention",
   conventionImmersionRoute: "demande-immersion",
   conventionDocument: "convention-immersion",
   conventionMiniStageRoute: "demande-mini-stage",

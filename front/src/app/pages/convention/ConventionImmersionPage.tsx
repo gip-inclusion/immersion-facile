@@ -4,12 +4,7 @@ import { keys } from "ramda";
 import React, { useEffect, useMemo, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import {
-  FederatedIdentityProvider,
-  isPeConnectIdentity,
-  loginPeConnect,
-} from "shared";
-import { InitiateConventionSection } from "src/app/components/InitiateConventionSection";
+import { FederatedIdentityProvider, loginPeConnect } from "shared";
 import {
   ConventionForm,
   ConventionFormMode,
@@ -18,7 +13,6 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import illustrationShareConvention from "src/assets/img/share-convention.svg";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -119,7 +113,6 @@ export const ConventionImmersionPage = ({
 
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { isLoading } = useFeatureFlags();
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const {
     jwt: _,
     mtm_campaign: __,
@@ -130,28 +123,15 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     () => keys(routeParamsWithoutJwtAndTrackers).length > 0,
     [routeParamsWithoutJwtAndTrackers],
   );
-  const [shouldShowForm, setShouldShowForm] = useState(
-    isSharedConvention ||
-      (!!federatedIdentity && isPeConnectIdentity(federatedIdentity)),
-  );
+
   const mode: ConventionFormMode = "jwt" in route.params ? "edit" : "create";
-  useScrollToTop(shouldShowForm);
 
   return match({
     isLoading,
     mode,
-    shouldShowForm,
   })
     .with({ isLoading: true }, () => <Loader />)
-    .with({ shouldShowForm: false, mode: "create" }, () => (
-      <InitiateConventionSection
-        onNotPeConnectButtonClick={() => setShouldShowForm(true)}
-      />
-    ))
-    .with({ shouldShowForm: false, mode: "edit" }, () => (
-      <ConventionForm internshipKind="immersion" mode={mode} />
-    ))
-    .with({ shouldShowForm: true }, () => (
+    .with({ isLoading: false }, () => (
       <ConventionForm
         internshipKind="immersion"
         mode={isSharedConvention ? "edit" : mode}
