@@ -63,6 +63,7 @@ export const domElementIds = {
       quickAccess: {
         establishment: buildHeaderNavLinkId("quick-access-establishment"),
         agency: buildHeaderNavLinkId("quick-access-agency"),
+        myAccount: buildHeaderNavLinkId("quick-access-my-account"),
       },
     },
   },

@@ -74,6 +74,7 @@ export const LayoutHeader = () => {
           },
         },
       ]}
+      id={quickAccessIds.myAccount}
       buttonLabel={"Mon espace"}
     />,
   ];
