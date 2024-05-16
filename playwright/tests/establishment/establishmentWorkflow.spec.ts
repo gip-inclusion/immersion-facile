@@ -3,7 +3,7 @@ import { Page, expect, test } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
-import { fillAutocomplete } from "../../utils/utils";
+import { fillAutocomplete, phoneRegexp } from "../../utils/utils";
 
 const providedSiret = "41433740200039";
 
@@ -47,7 +47,7 @@ test.describe("Establishment creation and modification workflow", () => {
     );
     await page.fill(
       `#${domElementIds.establishment.create.businessContact.phone}`,
-      faker.string.numeric("06########"),
+      faker.helpers.fromRegExp(phoneRegexp),
     );
     await page.fill(
       `#${domElementIds.establishment.create.businessContact.email}`,
@@ -154,7 +154,7 @@ test.describe("Establishment creation and modification workflow", () => {
     );
     await page.fill(
       `#${domElementIds.establishment.edit.businessContact.phone}`,
-      faker.string.numeric("06########"),
+      faker.helpers.fromRegExp(phoneRegexp),
     );
     await page.fill(
       `#${domElementIds.establishment.edit.businessContact.email}`,

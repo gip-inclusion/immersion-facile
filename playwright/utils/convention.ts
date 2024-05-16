@@ -8,7 +8,11 @@ import {
   technicalRoutes,
 } from "shared";
 import { possibleAddressQueries, possibleJobs } from "./data";
-import { expectElementToBeVisible, fillAutocomplete } from "./utils";
+import {
+  expectElementToBeVisible,
+  fillAutocomplete,
+  phoneRegexp,
+} from "./utils";
 
 let currentStep = 1;
 
@@ -49,7 +53,7 @@ export const submitBasicConventionForm = async (page: Page) => {
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.phone}`,
-    faker.string.numeric("06########"),
+    faker.helpers.fromRegExp(phoneRegexp),
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.birthdate}`,
@@ -80,7 +84,7 @@ export const submitBasicConventionForm = async (page: Page) => {
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.phone}`,
-    faker.string.numeric("05########"),
+    faker.helpers.fromRegExp(phoneRegexp),
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.email}`,
@@ -222,7 +226,7 @@ export const submitEditConventionForm = async (
     .locator(
       `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.phone}`,
     )
-    .fill(faker.string.numeric("05########"));
+    .fill(faker.helpers.fromRegExp(phoneRegexp));
   await page
     .locator(
       `[for='${domElementIds.conventionImmersionRoute.conventionSection.isCurrentEmployer}-0']`,
@@ -270,7 +274,7 @@ export const submitEditConventionForm = async (
     .locator(
       `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.phone}`,
     )
-    .fill(faker.string.numeric("05########"));
+    .fill(faker.helpers.fromRegExp(phoneRegexp));
   await page
     .locator(
       `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.email}`,
