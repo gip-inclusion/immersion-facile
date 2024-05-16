@@ -28,7 +28,7 @@ export const SectionConventionNextSteps = () => {
             </p>
             <a
               className={fr.cx("fr-download__link", "fr-link--icon-right")}
-              href="https://aide.immersion-facile.beta.gouv.fr/fr/article/le-beneficiaire-lentreprise-ou-le-prescripteur-na-pas-recu-la-convention-a-signer-125bxxd/"
+              href="https://immersion-facile.beta.gouv.fr/aide/article/le-beneficiaire-lentreprise-ou-le-prescripteur-na-pas-recu-la-convention-a-signer-125bxxd/"
               target="_blank"
               rel="noreferrer"
             >
