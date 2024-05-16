@@ -13,15 +13,19 @@ import { expectElementToBeVisible, fillAutocomplete } from "./utils";
 let currentStep = 1;
 
 export const submitBasicConventionForm = async (page: Page) => {
-  await page.goto(frontRoutes.conventionImmersionRoute);
+  await page.goto(frontRoutes.initiateConvention);
   await expect(
     await page.request.get(technicalRoutes.featureFlags.url),
   ).toBeOK();
   const formButton = await page.locator(
-    `#${domElementIds.conventionImmersionRoute.initiateConventionSection.showFormButton}`,
+    `#${domElementIds.initiateConvention.navCards.candidate}`,
   );
   await formButton.waitFor();
   await formButton.click();
+  await page
+    .locator(`#${domElementIds.initiateConvention.otherStructureButton}`)
+    .click();
+  await page.waitForURL(`${frontRoutes.conventionImmersionRoute}**`);
   await page.selectOption(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
     "75",

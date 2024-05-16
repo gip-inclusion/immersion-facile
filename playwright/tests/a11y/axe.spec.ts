@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { domElementIds, frontRoutes } from "shared";
+import { frontRoutes } from "shared";
 
 test.describe("Axe detect accessibility issues on main pages", () => {
   test("Home", async ({ page }, testInfo) => {
@@ -21,9 +21,6 @@ test.describe("Axe detect accessibility issues on main pages", () => {
 
   test("Convention form", async ({ page }) => {
     await page.goto(frontRoutes.conventionImmersionRoute);
-    await page.click(
-      `#${domElementIds.conventionImmersionRoute.initiateConventionSection.showFormButton}`,
-    );
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     expect(accessibilityScanResults.violations).toEqual([]);
   });

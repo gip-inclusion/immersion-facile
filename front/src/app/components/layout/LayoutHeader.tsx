@@ -57,10 +57,10 @@ export const LayoutHeader = () => {
     headerFooterDisplayItem,
     {
       text: "Remplir la demande de convention",
-      iconId: "fr-icon-file-text-line",
+      iconId: "fr-icon-draft-line",
       linkProps: {
         ...routes.initiateConvention().link,
-        id: "TODO-ADD-ID",
+        id: quickAccessIds.initiateConvention,
       },
     },
     <ButtonWithSubMenu
@@ -128,7 +128,6 @@ export const LayoutHeader = () => {
     {
       text: "Candidats",
       isActive: isCandidateRoute,
-      //id: getHeaderNavLinkId("candidate-subnav-toggle"),
       menuLinks: [
         {
           text: "Accueil candidat",
@@ -160,7 +159,6 @@ export const LayoutHeader = () => {
     },
     {
       text: "Entreprises",
-      //id: getHeaderNavLinkId("establishment-subnav-toggle"),
       isActive: isEstablishmentRoute,
       menuLinks: [
         {
@@ -201,7 +199,6 @@ export const LayoutHeader = () => {
     },
     {
       text: "Prescripteurs",
-      //id: getHeaderNavLinkId("agency-subnav-toggle"),
       isActive: isAgencyRoute,
       menuLinks: [
         {
@@ -244,7 +241,6 @@ export const LayoutHeader = () => {
     links.push({
       text: "Admin",
       isActive: currentRoute.name === routes.admin({ tab: "conventions" }).name,
-      //id: getHeaderNavLinkId("admin-subnav-toggle"),
       menuLinks: [
         {
           text: "Backoffice",

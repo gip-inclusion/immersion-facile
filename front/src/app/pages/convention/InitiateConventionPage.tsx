@@ -26,6 +26,87 @@ export const InitiateConventionPage = () => {
           />
         }
       >
+        {!showCandidateOptions && (
+          <section>
+            <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+              <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
+                <NavCard
+                  title="Je vais faire une immersion dans une entreprise"
+                  icon="fr-icon-user-line"
+                  overtitle="Candidat"
+                  total={1}
+                  type="candidate"
+                  id={domElementIds.initiateConvention.navCards.candidate}
+                  onClick={() => setShowCandidateOptions(true)}
+                  withBorder
+                  alternateTitle="Je vais faire une immersion dans une entreprise : je suis un candidat et je souhaite remplir une convention"
+                />
+              </div>
+              <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
+                <NavCard
+                  title="Je vais accueillir un candidat dans mon entreprise"
+                  icon="fr-icon-building-line"
+                  overtitle="Entreprise"
+                  total={1}
+                  type="establishment"
+                  id={domElementIds.initiateConvention.navCards.establishment}
+                  link={routes.conventionImmersion().link}
+                  withBorder
+                  alternateTitle="Je vais accueillir un candidat dans mon entreprise : je suis un employeur et je souhaite initier une demande de convention"
+                />
+              </div>
+              <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
+                <NavCard
+                  title="J'accompagne un bénéficiaire d'immersion"
+                  icon="fr-icon-map-pin-user-line"
+                  overtitle="Prescripteur"
+                  total={1}
+                  type="agency"
+                  id={domElementIds.initiateConvention.navCards.agency}
+                  link={routes.conventionImmersion().link}
+                  withBorder
+                  alternateTitle="J'accompagne un bénéficiaire d'immersion : je suis un conseiller en insertion professionnelle (Mission locale, CAP Emploi, France Travail, etc) et je souhaite remplir une convention pour un candidat"
+                />
+              </div>
+              <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
+                <NavCard
+                  title="J'ai déjà rempli une convention mais j'ai un problème"
+                  icon="fr-icon-alarm-warning-line"
+                  overtitle="Tous"
+                  total={1}
+                  type="default"
+                  id={domElementIds.initiateConvention.navCards.help}
+                  link={{
+                    href: "https://tally.so/r/mBdQQe",
+                    target: "_blank",
+                  }}
+                  withBorder
+                  alternateTitle="J'ai déjà rempli une convention mais j'ai un problème, j'ai besoin d'aide"
+                />
+              </div>
+            </div>
+            <div
+              className={fr.cx(
+                "fr-mt-5w",
+                "fr-btns-group",
+                "fr-btns-group--center",
+              )}
+            >
+              <a
+                id={domElementIds.initiateConvention.dontKnowCategoryButton}
+                href="https://aide.immersion-facile.beta.gouv.fr/fr/category/guide-de-limmersion-v19aod/"
+                className={fr.cx(
+                  "fr-link",
+                  "fr-icon-arrow-right-line",
+                  "fr-link--icon-right",
+                )}
+              >
+                Je ne sais pas à quelle catégorie j'appartiens
+              </a>
+            </div>
+          </section>
+        )}
+
         {showCandidateOptions && (
           <section>
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -35,12 +116,11 @@ export const InitiateConventionPage = () => {
                   icon="fr-icon-parent-line"
                   type="candidate"
                   total={1}
-                  id="TODO-ADD-ID"
+                  id={domElementIds.initiateConvention.ftConnectButton}
                   link={{
                     href: `/api/${loginPeConnect}`,
-                    id: domElementIds.conventionImmersionRoute
-                      .initiateConventionSection.ftConnectButton,
                   }}
+                  alternateTitle="Je suis accompagné(e) par mon conseiller France Travail et je peux me connecter via FranceConnect"
                   withBorder
                 />
               </div>
@@ -50,10 +130,10 @@ export const InitiateConventionPage = () => {
                   icon="fr-icon-team-line"
                   type="candidate"
                   total={1}
-                  id="TODO-ADD-ID"
+                  id={domElementIds.initiateConvention.otherStructureButton}
                   link={routes.conventionImmersion().link}
                   withBorder
-                  alternateTitle="Si vous n'êtes pas accompagné par France Travail (CAP Emploi, Mission locales, etc), cliquez ici"
+                  alternateTitle="Je suis accompagné(e) par une autre structure : si vous n'êtes pas accompagné par France Travail (CAP Emploi, Mission locale, etc), cliquez ici"
                 />
               </div>
               <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
@@ -62,7 +142,8 @@ export const InitiateConventionPage = () => {
                   icon="fr-icon-alarm-warning-line"
                   type="candidate"
                   total={1}
-                  id="TODO-ADD-ID"
+                  alternateTitle="Je n'ai pas encore de structure d'accompagnement : je n'ai pas de conseiller en insertion professionnelle ou je ne suis pas accompagné par une structure d'insertion"
+                  id={domElementIds.initiateConvention.noStructureButton}
                   link={{
                     href: "https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/",
                     target: "_blank",
@@ -79,10 +160,7 @@ export const InitiateConventionPage = () => {
               )}
             >
               <a
-                id={
-                  domElementIds.conventionImmersionRoute
-                    .initiateConventionSection.canIFillOnline
-                }
+                id={domElementIds.initiateConvention.canIFillOnline}
                 href="https://tally.so/r/w2X7xV"
                 target="_blank"
                 className={fr.cx(
@@ -94,85 +172,6 @@ export const InitiateConventionPage = () => {
               >
                 Je ne sais pas si je peux remplir une convention en ligne dans
                 mon cas
-              </a>
-            </div>
-          </section>
-        )}
-        {!showCandidateOptions && (
-          <section>
-            <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-              <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                <NavCard
-                  title="Je vais faire une immersion dans une entreprise"
-                  icon="fr-icon-user-line"
-                  overtitle="Candidat"
-                  total={1}
-                  type="candidate"
-                  id={domElementIds.initiateConvention.navCards.candidate}
-                  onClick={() => setShowCandidateOptions(true)}
-                  withBorder
-                />
-              </div>
-              <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                <NavCard
-                  title="Je vais accueillir un candidat dans mon entreprise"
-                  icon="fr-icon-building-line"
-                  overtitle="Entreprise"
-                  total={1}
-                  type="establishment"
-                  id={domElementIds.initiateConvention.navCards.establishment}
-                  link={routes.conventionImmersion().link}
-                  withBorder
-                />
-              </div>
-              <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                <NavCard
-                  title="J'accompagne un bénéficiaire d'immersion"
-                  icon="fr-icon-map-pin-user-line"
-                  overtitle="Agence"
-                  total={1}
-                  type="agency"
-                  id={domElementIds.initiateConvention.navCards.agency}
-                  link={routes.conventionImmersion().link}
-                  withBorder
-                />
-              </div>
-              <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                <NavCard
-                  title="J'ai déjà rempli une convention mais j'ai un problème"
-                  icon="fr-icon-alarm-warning-line"
-                  overtitle="Tous"
-                  total={1}
-                  type="default"
-                  id={domElementIds.initiateConvention.navCards.help}
-                  link={{
-                    href: "https://tally.so/r/mBdQQe",
-                    target: "_blank",
-                  }}
-                  withBorder
-                />
-              </div>
-            </div>
-            <div
-              className={fr.cx(
-                "fr-mt-5w",
-                "fr-btns-group",
-                "fr-btns-group--center",
-              )}
-            >
-              <a
-                id={
-                  domElementIds.conventionImmersionRoute
-                    .initiateConventionSection.canIFillOnline
-                }
-                href="https://tally.so/r/w2X7xV"
-                className={fr.cx(
-                  "fr-link",
-                  "fr-icon-arrow-right-line",
-                  "fr-link--icon-right",
-                )}
-              >
-                Je ne sais pas à quelle catégorie j'appartiens
               </a>
             </div>
           </section>
