@@ -129,7 +129,6 @@ describe("conventionDtoSchema", () => {
           .build(),
         [
           "Obligatoire",
-          "Numéro de téléphone incorrect",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
@@ -149,7 +148,6 @@ describe("conventionDtoSchema", () => {
           .build(),
         [
           "Obligatoire",
-          "Numéro de téléphone incorrect",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
@@ -170,7 +168,6 @@ describe("conventionDtoSchema", () => {
           .build(),
         [
           "Obligatoire",
-          "Numéro de téléphone incorrect",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
@@ -194,13 +191,11 @@ describe("conventionDtoSchema", () => {
           .build(),
         [
           "Obligatoire",
-          "Numéro de téléphone incorrect",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
-          "Numéro de téléphone incorrect",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
@@ -221,7 +216,6 @@ describe("conventionDtoSchema", () => {
           .build(),
         [
           "Obligatoire",
-          "Numéro de téléphone incorrect",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
@@ -268,7 +262,6 @@ describe("conventionDtoSchema", () => {
         invalidConventionRead,
         [
           "Obligatoire",
-          "Numéro de téléphone incorrect",
           "Obligatoire",
           "Obligatoire",
           "Obligatoire",
@@ -293,7 +286,7 @@ describe("conventionDtoSchema", () => {
       .build();
 
     expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-      "Numéro de téléphone incorrect",
+      `Le numéro de téléphone '${convention.signatories.beneficiary.phone}' n'est pas valide.`,
     ]);
 
     const convention2 = new ConventionDtoBuilder()
@@ -301,7 +294,7 @@ describe("conventionDtoSchema", () => {
       .build();
 
     expectConventionInvalidWithIssueMessages(conventionSchema, convention2, [
-      "Numéro de téléphone incorrect",
+      `Le numéro de téléphone '${convention2.signatories.beneficiary.phone}' n'est pas valide.`,
     ]);
   });
 
@@ -311,7 +304,7 @@ describe("conventionDtoSchema", () => {
       .build();
 
     expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-      "Numéro de téléphone incorrect",
+      `Le numéro de téléphone '${convention.establishmentTutor.phone}' n'est pas valide.`,
     ]);
   });
 
@@ -772,7 +765,7 @@ describe("conventionDtoSchema", () => {
       email: "b@b.com",
       firstName: "dfssd",
       lastName: "fghfg",
-      phone: "022334455",
+      phone: "0756435789",
       role: "establishment-representative",
     };
     const beneficiaryStudent: Beneficiary<"mini-stage-cci"> = {
@@ -781,7 +774,7 @@ describe("conventionDtoSchema", () => {
       email: "a@a.com",
       firstName: "student",
       lastName: "student",
-      phone: "0011223344",
+      phone: "0656435789",
       role: "beneficiary",
       isRqth: false,
       schoolName: "École du quartier ouest",
@@ -792,7 +785,7 @@ describe("conventionDtoSchema", () => {
       email: "a@a.com",
       firstName: "sdfgf",
       lastName: "sdfs",
-      phone: "0011223344",
+      phone: "0656435789",
       role: "beneficiary",
       isRqth: false,
     };
@@ -870,7 +863,7 @@ describe("conventionDtoSchema", () => {
         email: "a@a.com",
         firstName: "sdfgf",
         lastName: "sdfs",
-        phone: "0011223344",
+        phone: "0656435789",
         role: "beneficiary",
         isRqth: false,
       };
@@ -896,7 +889,7 @@ describe("conventionDtoSchema", () => {
         email: "a@a.com",
         firstName: "sdfgf",
         lastName: "sdfs",
-        phone: "0011223344",
+        phone: "0656435789",
         role: "beneficiary",
         schoolName: "École du quartier ouest",
         schoolPostcode: "87000",
@@ -922,7 +915,7 @@ describe("conventionDtoSchema", () => {
         email: "a@a.com",
         firstName: "sdfgf",
         lastName: "sdfs",
-        phone: "0011223344",
+        phone: "0656435789",
         role: "beneficiary",
         isRqth: false,
       };
@@ -956,7 +949,7 @@ describe("conventionDtoSchema", () => {
           email: "a@a.com",
           firstName: "sdfgf",
           lastName: "sdfs",
-          phone: "0011223344",
+          phone: "0656435789",
           role: "beneficiary",
         };
 
@@ -981,7 +974,7 @@ describe("conventionDtoSchema", () => {
           email: "a@a.com",
           firstName: "sdfgf",
           lastName: "sdfs",
-          phone: "0011223344",
+          phone: "0656435789",
           role: "beneficiary",
         };
 

@@ -41,8 +41,8 @@ export const DATE_END = new Date("2021-01-15").toISOString();
 export const DATE_SIGNATURE = new Date("2021-01-04").toISOString();
 
 export const VALID_PHONES = [
-  "+33012345678",
-  "0601010101",
+  "+33123456780",
+  "+33601010101",
   "+18001231234",
   "+41800001853",
 ];
@@ -55,7 +55,7 @@ const beneficiary: Beneficiary<"immersion"> = {
   lastName: "Ocon",
   signedAt: DATE_SIGNATURE,
   emergencyContact: "Clariss Ocon",
-  emergencyContactPhone: "0663567896",
+  emergencyContactPhone: "+33663567896",
   emergencyContactEmail: "clariss.ocon@emergencycontact.com",
   financiaryHelp: "Un stage rémunéré au SMIC?",
   birthdate: "2002-10-05T14:48:00.000Z",
@@ -74,7 +74,7 @@ const establishmentRepresentative: EstablishmentRepresentative = {
   email: "establishment@example.com",
   firstName: "Billy",
   lastName: "Idol",
-  phone: "0602010203",
+  phone: "+33602010203",
   role: "establishment-representative",
   signedAt: DATE_SIGNATURE,
 };

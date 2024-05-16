@@ -176,7 +176,7 @@ describe("Update Convention", () => {
         firstName: "Bob",
         lastName: "Harrys",
         email: "bob.harry@mail.com",
-        phone: "0011223344",
+        phone: "+33112233445",
         job: "tutor",
       };
       const storedConvention = new ConventionDtoBuilder()
@@ -198,7 +198,7 @@ describe("Update Convention", () => {
           firstName: "Martin",
           lastName: "Hills",
           email: "martin.hills@mail.com",
-          phone: "0011223344",
+          phone: "+33112233445",
         })
         .build();
 
@@ -226,7 +226,7 @@ describe("Update Convention", () => {
           firstName: "Danny",
           lastName: "Clover",
           email: "danny@mail.com",
-          phone: "0011223344",
+          phone: "+33112233445",
           businessName: "business",
           businessSiret: "01234567891234",
           job: "Boss",

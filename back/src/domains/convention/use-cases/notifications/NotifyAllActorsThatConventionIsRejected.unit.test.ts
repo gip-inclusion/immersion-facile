@@ -21,7 +21,7 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
   email: "legal@representative.com",
   firstName: "The",
   lastName: "Representative",
-  phone: "1234567",
+  phone: "+33112233445",
 };
 
 const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
@@ -31,7 +31,7 @@ const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
   businessSiret: "01234567890123",
   email: "beneficiary-current-employer@gmail.com",
   job: "job",
-  phone: "0011223344",
+  phone: "+33112233445",
   role: "beneficiary-current-employer",
   signedAt: new Date().toISOString(),
   businessAddress: "Rue des Bouchers 67065 Strasbourg",

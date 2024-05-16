@@ -33,7 +33,7 @@ const validContactEntityV2: ContactEntity = {
   firstName: "Alain",
   email: "alain.prost@email.fr",
   job: "le big boss",
-  phone: "0612345678",
+  phone: "+33612345678",
   contactMethod: "EMAIL",
   copyEmails: [],
 };

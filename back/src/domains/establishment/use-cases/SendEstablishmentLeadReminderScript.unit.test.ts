@@ -188,7 +188,7 @@ describe("SendEstablishmentLeadReminder", () => {
       expect(
         await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
       ).toBe(
-        "http://localhost/establishment?siret=12345678901235&bcLastName=Idol&bcFirstName=Billy&bcPhone=0602010203&bcEmail=newestConvention.establishment@email.fr",
+        "http://localhost/establishment?siret=12345678901235&bcLastName=Idol&bcFirstName=Billy&bcPhone=+33602010203&bcEmail=newestConvention.establishment@email.fr",
       );
 
       expect(
@@ -299,7 +299,7 @@ describe("SendEstablishmentLeadReminder", () => {
       expect(
         await uow.shortLinkRepository.getById("addEstablishmentFormShortLink"),
       ).toBe(
-        "http://localhost/establishment?siret=12345678901236&bcLastName=Idol&bcFirstName=Billy&bcPhone=0602010203&bcEmail=establishment@example.com",
+        "http://localhost/establishment?siret=12345678901236&bcLastName=Idol&bcFirstName=Billy&bcPhone=+33602010203&bcEmail=establishment@example.com",
       );
 
       expect(
