@@ -25,12 +25,8 @@ test.describe("Home user flow", () => {
     await page.click(
       `#${domElementIds.homeCandidates.heroHeader.formConvention}`,
     );
-    const formButton = await page.locator(
-      `#${domElementIds.conventionImmersionRoute.initiateConventionSection.showFormButton}`,
-    );
-    await formButton.click();
     await expect(page.url()).toContain(
-      `/${frontRoutes.conventionImmersionRoute}`,
+      `/${frontRoutes.initiateConvention}?skipFirstStep=true`,
     );
   });
 
@@ -40,7 +36,9 @@ test.describe("Home user flow", () => {
     await page.click(
       `#${domElementIds.homeEstablishments.heroHeader.formConvention}`,
     );
-    await expect(page).toHaveURL(`/${frontRoutes.conventionImmersionRoute}`);
+    await expect(page.url()).toContain(
+      `/${frontRoutes.conventionImmersionRoute}`,
+    );
   });
 
   test("User flow: Agency -> register form", async ({ page }) => {
@@ -56,6 +54,8 @@ test.describe("Home user flow", () => {
     await page.click(
       `#${domElementIds.homeAgencies.heroHeader.formConvention}`,
     );
-    await expect(page).toHaveURL(`/${frontRoutes.conventionImmersionRoute}`);
+    await expect(page.url()).toContain(
+      `/${frontRoutes.conventionImmersionRoute}`,
+    );
   });
 });

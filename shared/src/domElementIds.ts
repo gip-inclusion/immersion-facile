@@ -63,10 +63,10 @@ export const domElementIds = {
       quickAccess: {
         establishment: buildHeaderNavLinkId("quick-access-establishment"),
         agency: buildHeaderNavLinkId("quick-access-agency"),
-<<<<<<< HEAD
         myAccount: buildHeaderNavLinkId("quick-access-my-account"),
-=======
->>>>>>> 1cc9a6884 (ButtonWithSubMenu to access dashboards)
+        initiateConvention: buildHeaderNavLinkId(
+          "quick-access-initiate-convention",
+        ),
       },
     },
   },
@@ -200,13 +200,6 @@ export const domElementIds = {
     shareFormSubmitButton: "im-convention-form__share-form-submit-button",
     copyLinkButton: "im-convention-form__copy-link-button",
     showFormButton: "im-convention-form__show-form-button",
-    initiateConventionSection: {
-      ftConnectButton: "im-convention-form__initiate__ft-connect-button",
-      showFormButton: "im-convention-form__initiate__show-form-button",
-      iHaveAProblemButton:
-        "im-convention-form__initiate__i-have-a-problem-button",
-      canIFillOnline: "im-convention-form__initiate__can-i-fill-online-link",
-    },
     submitFormButton: "im-convention-form__submit-form-button",
     submitFormButtonMobile: "im-convention-form__submit-form-button--mobile",
     confirmSubmitFormButton: "im-convention-form__confirm-submit-form-button",
@@ -610,5 +603,12 @@ export const domElementIds = {
       agency: "im-initiate-convention-page__nav-card-agency",
       help: "im-initiate-convention-page__nav-card-help",
     },
+    ftConnectButton: "im-convention-form__initiate-ft-connect-button",
+    iHaveAProblemButton: "im-convention-form__initiate-i-have-a-problem-button",
+    canIFillOnline: "im-convention-form__initiate-can-i-fill-online-link",
+    otherStructureButton: "im-convention-form__initiate-other-structure-button",
+    noStructureButton: "im-convention-form__initiate-no-structure-button",
+    dontKnowCategoryButton:
+      "im-convention-form__initiate-dont-know-category-button",
   },
 } satisfies DomElementIds;

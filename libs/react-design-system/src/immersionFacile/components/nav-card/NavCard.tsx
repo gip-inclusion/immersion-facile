@@ -12,7 +12,6 @@ export type HeroHeaderNavCard = {
   type: UserType;
   link?: {
     href: string;
-    id?: string;
     onClick?: Link["onClick"];
     target?: HTMLAnchorElement["target"];
   };
