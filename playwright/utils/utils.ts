@@ -1,6 +1,8 @@
 import { Page, expect } from "@playwright/test";
 import { testConfig } from "../custom.config";
 
+export const phoneRegexp = new RegExp(/[0][1-9][0-9]{8}/);
+
 export const expectElementToBeVisible = async (
   page: Page,
   selector: string,
