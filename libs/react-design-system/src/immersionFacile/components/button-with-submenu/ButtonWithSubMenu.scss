@@ -6,6 +6,9 @@
     top: 100%;
     right: 0;
     max-width: 18rem;
+    &--hidden {
+      display: none;
+    }
   }
   &__list {
     width: max-content;

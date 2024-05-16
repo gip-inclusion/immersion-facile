@@ -48,7 +48,7 @@ export const ButtonWithSubMenu = ({
         iconPosition="left"
         id={buttonId}
         nativeButtonProps={{
-          "aria-controls": `${buttonId}__submenu`,
+          "aria-controls": `${buttonId}-submenu`,
         }}
         onClick={() => {
           setIsOpen((isOpen) => !isOpen);
@@ -57,27 +57,26 @@ export const ButtonWithSubMenu = ({
       >
         {buttonLabel}
       </Button>
-      {isOpen && (
-        <div
-          className={cx(
-            fr.cx("fr-menu", "fr-collapse", "fr-collapse--expanded"),
-            Styles.menu,
-          )}
-        >
-          <ul
-            className={cx(fr.cx("fr-menu__list"), Styles.list)}
-            id={`${buttonId}__submenu`}
-          >
-            {navItems.map((item) => (
-              <li key={item.linkProps.id}>
-                <a className={fr.cx("fr-nav__link")} href={item.linkProps.href}>
-                  {item.text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+
+      <div
+        className={cx(
+          fr.cx("fr-menu"),
+          Styles.menu,
+          !isOpen && Styles.menuHidden,
+        )}
+        id={`${buttonId}-submenu`}
+        aria-hidden={!isOpen}
+      >
+        <ul className={cx(fr.cx("fr-menu__list"), Styles.list)}>
+          {navItems.map((item) => (
+            <li key={item.linkProps.id}>
+              <a className={fr.cx("fr-nav__link")} href={item.linkProps.href}>
+                {item.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
