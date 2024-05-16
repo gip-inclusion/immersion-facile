@@ -8,11 +8,14 @@ import Styles from "./ButtonWithSubMenu.styles";
 export const ButtonWithSubMenu = ({
   navItems,
   buttonLabel,
+  id,
 }: {
   navItems: MainNavigationProps.Item.Link[];
   buttonLabel: string;
+  id?: string;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const buttonId = id ?? "button-with-submenu";
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const { cx } = useStyles();
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   useLayoutEffect(() => {
@@ -43,7 +46,13 @@ export const ButtonWithSubMenu = ({
         className={cx(fr.cx("fr-m-md-0"))}
         iconId="fr-icon-account-line"
         iconPosition="left"
-        onClick={() => setIsOpen((isOpen) => !isOpen)}
+        id={buttonId}
+        nativeButtonProps={{
+          "aria-controls": `${buttonId}__submenu`,
+        }}
+        onClick={() => {
+          setIsOpen((isOpen) => !isOpen);
+        }}
         priority="tertiary"
       >
         {buttonLabel}
@@ -55,7 +64,10 @@ export const ButtonWithSubMenu = ({
             Styles.menu,
           )}
         >
-          <ul className={cx(fr.cx("fr-menu__list"), Styles.list)}>
+          <ul
+            className={cx(fr.cx("fr-menu__list"), Styles.list)}
+            id={`${buttonId}__submenu`}
+          >
             {navItems.map((item) => (
               <li key={item.linkProps.id}>
                 <a className={fr.cx("fr-nav__link")} href={item.linkProps.href}>
