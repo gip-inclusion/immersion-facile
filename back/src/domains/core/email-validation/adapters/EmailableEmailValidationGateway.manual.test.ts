@@ -1,20 +1,18 @@
 import axios from "axios";
-import { ValidateEmailStatus } from "shared";
+import { ValidateEmailStatus, expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 import { EmailableEmailValidationGateway } from "./EmailableEmailValidationGateway";
 import { emailableValidationRoutes } from "./EmailableEmailValidationGateway.routes";
 
-describe("Emailable email validation gateway", () => {
+describe("EmailableEmailValidationGateway", () => {
   let emailableEmailValidationGateway: EmailValidationGetaway;
 
   beforeEach(() => {
-    const apiKeyEmailable = AppConfig.createFromEnv().emailableApiKey;
-
     emailableEmailValidationGateway = new EmailableEmailValidationGateway(
       createAxiosSharedClient(emailableValidationRoutes, axios),
-      apiKeyEmailable,
+      AppConfig.createFromEnv().emailableApiKey,
     );
   });
 
@@ -27,6 +25,7 @@ describe("Emailable email validation gateway", () => {
         candidateEmail: "enguerran.weiss@beta.gouv.fr",
         expectedStatus: {
           isValid: true,
+          proposal: null,
           reason: "accepted_email",
         },
       },
@@ -34,6 +33,7 @@ describe("Emailable email validation gateway", () => {
         candidateEmail: "enguerranweiss@beta.gouv.fr",
         expectedStatus: {
           isValid: false,
+          proposal: null,
           reason: "rejected_email",
         },
       },
@@ -50,9 +50,10 @@ describe("Emailable email validation gateway", () => {
     it.each(candidates)(
       "Candidate email '$candidateEmail' should match expected given status",
       async ({ candidateEmail, expectedStatus }) => {
-        const emailStatus =
-          await emailableEmailValidationGateway.validateEmail(candidateEmail);
-        expect(emailStatus).toEqual(expectedStatus);
+        expectToEqual(
+          await emailableEmailValidationGateway.validateEmail(candidateEmail),
+          expectedStatus,
+        );
       },
       10000,
     );
