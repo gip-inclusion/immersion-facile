@@ -12,14 +12,15 @@ export const validateEmailReason = [
   "unavailable_smtp",
   "unexpected_error",
   "no_connect",
+  "service_unavailable",
 ] as const;
 
 export type ValidateEmailReason = (typeof validateEmailReason)[number];
 
 export type ValidateEmailStatus = {
   isValid: boolean;
-  proposal?: string | null;
-  reason?: ValidateEmailReason | null;
+  proposal: string | null;
+  reason: ValidateEmailReason | null;
 };
 
 export const validateMultipleEmailRegex =

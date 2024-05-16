@@ -26,29 +26,34 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   ) {}
 
   public async validateEmail(email: string): Promise<ValidateEmailStatus> {
-    return this.#limiter
-      .schedule(() =>
-        this.httpClient.validateEmail({
+    return this.#limiter.schedule(() =>
+      this.httpClient
+        .validateEmail({
           queryParams: {
             email,
             api_key: this.emailableApiKey,
           },
+        })
+        .then(
+          ({ body: { state, reason, did_you_mean } }) =>
+            ({
+              isValid: this.#isEmailValid(state, reason),
+              reason: reason ?? null,
+              proposal: did_you_mean ?? null,
+            }) satisfies ValidateEmailStatus,
+        )
+        .catch((error) => {
+          logger.error(
+            { email, error },
+            "validateEmail => Error while calling emailable API ",
+          );
+          return {
+            isValid: false,
+            proposal: null,
+            reason: "service_unavailable",
+          } satisfies ValidateEmailStatus;
         }),
-      )
-      .then(({ body }) => ({
-        isValid: this.#isEmailValid(body.state, body.reason),
-        reason: body.reason,
-        ...(body.did_you_mean && {
-          proposal: body.did_you_mean,
-        }),
-      }))
-      .catch((error) => {
-        logger.error(
-          { email, error },
-          "validateEmail => Error while calling emailable API ",
-        );
-        throw error;
-      });
+    );
   }
 
   #isEmailValid(
@@ -66,9 +71,10 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
       "unexpected_error",
       "no_connect",
     ];
-    return unacceptableStates.includes(state) ||
-      unacceptableReasons.includes(reason)
-      ? false
-      : true;
+
+    return (
+      !unacceptableStates.includes(state) &&
+      !unacceptableReasons.includes(reason)
+    );
   }
 }

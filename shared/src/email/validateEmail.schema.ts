@@ -15,6 +15,6 @@ export const validateEmailReasonSchema = z.enum(validateEmailReason);
 export const validateEmailResponseSchema: z.Schema<ValidateEmailStatus> =
   z.object({
     isValid: z.boolean(),
-    proposal: z.string().nullable().optional(),
+    proposal: z.string().or(z.null()),
     reason: validateEmailReasonSchema,
   });
