@@ -21,7 +21,7 @@ export const SearchInfoSection = () => (
         rien à voir avec vous, ne vous découragez pas ! Retrouvez{" "}
         <a
           href={
-            "https://aide.immersion-facile.beta.gouv.fr/fr/article/choisir-lobjet-et-rediger-un-email-de-motivation-pour-decrocher-une-immersion-xytzii/"
+            "https://immersion-facile.beta.gouv.fr/aide/article/choisir-lobjet-et-rediger-un-email-de-motivation-pour-decrocher-une-immersion-xytzii/"
           }
           rel="noreferrer"
           target="_blank"

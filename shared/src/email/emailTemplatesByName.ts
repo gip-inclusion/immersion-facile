@@ -1434,7 +1434,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
         },
-        subContent: `Vous pouvez préparer votre échange grâce à notre <a href="https://aide.immersion-facile.beta.gouv.fr/fr/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
+        subContent: `Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
         ${defaultSignature("immersion")}`,
       }),
     },

@@ -271,18 +271,18 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
     {
       title: "Comment trouver une entreprise accueillante ?",
       description: `A partir de la page candidat du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement sur la page...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
     },
     {
       title: "A quoi sert une immersion professionnelle ?",
       description:
         "Elle vous permet d’assurer le succès de votre projet professionnel en découvrant un métier en conditions réelles, de passer quelques jours en entreprise pour vérifier...",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
     },
     {
       title: "Comment contacter une entreprise pour demander une immersion ?",
       description: `SI une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
     },
   ],
   candidate: [
@@ -290,20 +290,20 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       title: "Qui peut bénéficier d'une Immersion Professionnelle (PMSMP) ?",
       description:
         "S’inscrivant dans une démarche préventive (bénéficiaire salarié en recherche d’emploi ou de réorientation professionnelle) et proactive (bénéficiaire privé d’emploi, inscrit ou non auprès de France Travail, anciennement Pôle emploi), les périodes...",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-beneficier-dune-immersion-professionnelle-pmsmp-jz1af4/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/qui-peut-beneficier-dune-immersion-professionnelle-pmsmp-jz1af4/",
     },
     {
       title:
         "Je n'ai pas de structure d'accompagnement et je veux faire une immersion",
       description:
         " Pour faire une immersion et avoir une convention, il faut que vous soyez accompagné(e) par un organisme qui sera responsable de cette convention...",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/",
     },
     {
       title: "Quelles sont les obligations à respecter pour une immersion ?",
       description:
         "Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
     },
   ],
   establishment: [
@@ -311,20 +311,20 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       title:
         "Comment référencer mon entreprise en tant qu'entreprise accueillante ?",
       description: `A partir de la page d'accueil du service Immersion Facilitée, cliquez sur le bouton "Vous représentez une entreprise", puis sur "Référencer mon Entreprise"...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-referencer-mon-entreprise-en-tant-quentreprise-accueillante-zr6rxv/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-referencer-mon-entreprise-en-tant-quentreprise-accueillante-zr6rxv/",
     },
     {
       title:
         "Ma structure peut-elle accueillir des immersions professionnelles ?",
       description:
         "Une immersion professionnelle (ou Période de mise en situation en milieu professionnel -PMSMP) peut se faire dans n’importe quel type d’établissement, y compris le secteur public ou associatif...",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/ma-structure-peut-elle-accueillir-des-immersions-professionnelles-1ccin58/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/ma-structure-peut-elle-accueillir-des-immersions-professionnelles-1ccin58/",
     },
     {
       title: "Quelles sont les obligations à respecter pour une immersion ?",
       description:
         "Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
     },
   ],
   agency: [
@@ -333,18 +333,18 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
         "Puis-je faire une demande de convention avec une entreprise non inscrite sur le site ?",
       description:
         "La réponse en trois mots : oui, bien sûr. Les entreprises accueillantes sont des entreprises que nous avons contactées et qui se sont engagées à accueillir des immersions...",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/puis-je-faire-une-demande-de-convention-avec-une-entreprise-non-inscrite-sur-le-site-f9z742/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/puis-je-faire-une-demande-de-convention-avec-une-entreprise-non-inscrite-sur-le-site-f9z742/",
     },
     {
       title: "Quelles sont les étapes de signature de la convention ?",
       description: `Etape 1 : Signature du bénéficiaire et de l'entreprise. Le bénéficiaire et L'entreprise reçoivent un email appelé "Immersion Facilitée : Confirmez une demande d'immersion" ...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-etapes-de-signature-de-la-convention-17hf59q/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-etapes-de-signature-de-la-convention-17hf59q/",
     },
     {
       title:
         "Le bénéficiaire, l'entreprise ou le prescripteur n'a pas reçu la convention à signer",
       description: `Que vous soyez bénéficiaire, entreprise accueillante ou prescripteur d'immersions, il est nécéssaire de pouvoir recevoir nos emails afin de signer éléctroniquement la convention....`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/le-beneficiaire-lentreprise-ou-le-prescripteur-na-pas-recu-la-convention-a-signer-125bxxd/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/le-beneficiaire-lentreprise-ou-le-prescripteur-na-pas-recu-la-convention-a-signer-125bxxd/",
     },
   ],
 };

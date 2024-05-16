@@ -61,7 +61,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
             <strong>
               Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
               <a
-                href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
                 target="_blank"
                 rel="noreferrer"
               >

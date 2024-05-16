@@ -47,7 +47,7 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => {
 
         <Button
           linkProps={{
-            href: "https://aide.immersion-facile.beta.gouv.fr/fr/",
+            href: "https://immersion-facile.beta.gouv.fr/aide/",
             target: "_blank",
             id: "im-section-faq__see-all-button",
           }}

@@ -19,7 +19,7 @@ const overFooterCols: OverFooterCols = [
     iconTitle: "fr-icon-questionnaire-fill",
     link: {
       label: "Accédez à notre FAQ",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/",
     },
     id: "faq-link",
   },

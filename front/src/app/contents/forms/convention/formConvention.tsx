@@ -199,7 +199,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     hintText: (
       <>
         <a
-          href="https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-remplir-la-demande-de-convention-xryn5j/#3-le-beneficiaire-est-actuellement-salarie-dune-entreprise-et-limmersion-va-se-derouler-pendant-le-temps-de-travail-habituel-optionnel"
+          href="https://immersion-facile.beta.gouv.fr/aide/article/comment-remplir-la-demande-de-convention-xryn5j/#3-le-beneficiaire-est-actuellement-salarie-dune-entreprise-et-limmersion-va-se-derouler-pendant-le-temps-de-travail-habituel-optionnel"
           target="_blank"
           rel="noreferrer"
         >
@@ -325,7 +325,7 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
       <>
         Il n'est pas obligatoire de le préciser, mais{" "}
         <a
-          href="https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-remplir-la-demande-de-convention-xryn5j/#3-le-candidat-a-une-reconnaissance-travailleur-handicape-rqth-ou-equivalent-optionnel"
+          href="https://immersion-facile.beta.gouv.fr/aide/article/comment-remplir-la-demande-de-convention-xryn5j/#3-le-candidat-a-une-reconnaissance-travailleur-handicape-rqth-ou-equivalent-optionnel"
           target="_blank"
           rel="noreferrer"
         >
@@ -682,7 +682,7 @@ export const sidebarStepContent = (
               <strong>
                 Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -743,7 +743,7 @@ export const sidebarStepContent = (
             <strong>
               Consultez les{" "}
               <a
-                href="https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/?bust=1690274462053"
+                href="https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/?bust=1690274462053"
                 rel="noreferrer"
                 target="_blank"
               >
@@ -771,7 +771,7 @@ export const sidebarStepContent = (
               <strong>
                 Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
                   target="_blank"
                   rel="noreferrer"
                 >

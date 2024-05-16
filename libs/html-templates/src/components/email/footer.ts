@@ -7,7 +7,7 @@ const defaultImmersionFooter = () => `<table>
   </tr>
   <tr>
     <td width="600" style="background-color: #F5F5FE; text-align: center; padding: 20px 50px; ">
-      <p style="font-size: 14px;">Vous recevez cet email, car cette adresse email a été renseigné dans une demande de convention sur le site Immersion Facilitée. Si vous rencontrez un problème, la plupart des solutions sont disponibles sur notre <a href="https://aide.immersion-facile.beta.gouv.fr/fr/">centre d'aide</a>. Vous y trouverez également un formulaire de contact pour joindre notre équipe support, qui vous répondra sous les meilleurs délais.</p>
+      <p style="font-size: 14px;">Vous recevez cet email, car cette adresse email a été renseigné dans une demande de convention sur le site Immersion Facilitée. Si vous rencontrez un problème, la plupart des solutions sont disponibles sur notre <a href="https://immersion-facile.beta.gouv.fr/aide/">centre d'aide</a>. Vous y trouverez également un formulaire de contact pour joindre notre équipe support, qui vous répondra sous les meilleurs délais.</p>
     </td>
   </tr>
   <tr>
@@ -23,7 +23,7 @@ export const cciCustomHtmlFooter = () => `<table>
   </tr>
   <tr>
     <td width="600" style="background-color: #F5F5FE; text-align: center; padding: 20px 50px; ">
-      <p style="font-size: 14px;">Vous recevez cet email, car cette adresse email a été renseigné dans une demande de convention sur le site Immersion Facilitée. Si vous rencontrez un problème, la plupart des solutions sont disponibles sur notre <a href="https://aide.immersion-facile.beta.gouv.fr/fr/">centre d'aide</a>. Vous y trouverez également un formulaire de contact pour joindre notre équipe support, qui vous répondra sous les meilleurs délais.</p>
+      <p style="font-size: 14px;">Vous recevez cet email, car cette adresse email a été renseigné dans une demande de convention sur le site Immersion Facilitée. Si vous rencontrez un problème, la plupart des solutions sont disponibles sur notre <a href="https://immersion-facile.beta.gouv.fr/aide/">centre d'aide</a>. Vous y trouverez également un formulaire de contact pour joindre notre équipe support, qui vous répondra sous les meilleurs délais.</p>
     </td>
   </tr>
   <tr>
