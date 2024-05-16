@@ -48,7 +48,7 @@ const convention = new ConventionDtoBuilder()
     businessName: "boss",
     role: "beneficiary-current-employer",
     email: beneficiaryCurrentEmployerEmail,
-    phone: "001223344",
+    phone: "+33611223344",
     firstName: "Harry",
     lastName: "Potter",
     job: "Magician",

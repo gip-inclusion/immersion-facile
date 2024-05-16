@@ -26,7 +26,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
     email: "amil@mail.com",
     firstName: "Esteban",
     lastName: "Ocon",
-    phone: "+33012345678",
+    phone: "+33612345678",
     job: "a job",
     contactMethod: "EMAIL",
     copyEmails: ["copy1@mail.com", "copy2@mail.com"],

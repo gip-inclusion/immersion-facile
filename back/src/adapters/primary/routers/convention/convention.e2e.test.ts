@@ -584,8 +584,8 @@ describe("convention e2e", () => {
             signatureEntreprise: true,
             siret: "12345678901234",
             statut: "REJETÉ",
-            telephone: "+33012345678",
-            telephoneTuteur: "0601010101",
+            telephone: "+33123456780",
+            telephoneTuteur: "+33601010101",
           },
         ]);
       },

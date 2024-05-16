@@ -418,7 +418,7 @@ describe("Convention slice", () => {
             firstName: "tutorName",
             lastName: "tutorLastName",
             job: "Tutor",
-            phone: "0611223344",
+            phone: "+33611223344",
             role: "establishment-tutor",
           };
           const establishmentRepresentative: EstablishmentRepresentative = {
@@ -605,7 +605,7 @@ describe("Convention slice", () => {
               firstName: "Current",
               lastName: "LastName",
               job: "job",
-              phone: "0011223344",
+              phone: "+33112233445",
               role: "beneficiary-current-employer",
               businessAddress: "20 rue des merguez ",
             })

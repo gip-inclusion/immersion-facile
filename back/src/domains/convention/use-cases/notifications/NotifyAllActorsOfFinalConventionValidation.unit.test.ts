@@ -41,7 +41,7 @@ const validatorEmail = "myValidator@mail.com";
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",
   email: beneficiaryRepresentativeEmail,
-  phone: "0665565432",
+  phone: "+33665565432",
   firstName: "Bob",
   lastName: "L'éponge",
 };
@@ -49,7 +49,7 @@ const currentEmployer: BeneficiaryCurrentEmployer = {
   businessName: "boss",
   role: "beneficiary-current-employer",
   email: beneficiaryCurrentEmployerEmail,
-  phone: "001223344",
+  phone: "+33611223344",
   firstName: "Harry",
   lastName: "Potter",
   job: "Magician",

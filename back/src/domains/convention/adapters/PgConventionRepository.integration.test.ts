@@ -25,7 +25,7 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
   email: "legal@representative.com",
   firstName: "The",
   lastName: "Representative",
-  phone: "1234567",
+  phone: "+33112233445",
 };
 
 const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
@@ -196,7 +196,7 @@ describe("PgConventionRepository", () => {
         lastName: "Bono",
         role: "beneficiary",
         email: "jean@bono.com",
-        phone: "0836656565",
+        phone: "+33836656565",
         ...extraFields,
       })
       .build();
@@ -224,7 +224,7 @@ describe("PgConventionRepository", () => {
         lastName: "Bono",
         role: "beneficiary",
         email: "jean@bono.com",
-        phone: "0836656565",
+        phone: "+33836656565",
         ...extraFields,
       })
       .build();
@@ -249,7 +249,7 @@ describe("PgConventionRepository", () => {
         lastName: "Bono",
         role: "beneficiary",
         email: "jean@bono.com",
-        phone: "0836656565",
+        phone: "+33836656565",
         ...extraFields,
       })
       .withFederatedIdentity({
@@ -304,7 +304,7 @@ describe("PgConventionRepository", () => {
         lastName: "Bono",
         role: "beneficiary",
         email: "jean@bono.com",
-        phone: "0836656565",
+        phone: "+33836656565",
         ...extraFields,
       })
       .withFederatedIdentity({
@@ -368,7 +368,7 @@ describe("PgConventionRepository", () => {
       firstName: "Rep",
       lastName: "Rep",
       email: "rep@rep.com",
-      phone: "0584548754",
+      phone: "+33584548754",
     };
 
     const tutor: EstablishmentTutor = {
@@ -521,7 +521,7 @@ describe("PgConventionRepository", () => {
       firstName: "NEW",
       lastName: "BOSS",
       job: "Boss",
-      phone: "0011223344",
+      phone: "+33112233445",
       role: "beneficiary-current-employer",
       businessAddress: "Rue des Bouchers 67065 Strasbourg",
     };

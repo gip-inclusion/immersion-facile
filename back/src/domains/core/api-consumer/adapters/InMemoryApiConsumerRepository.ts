@@ -16,7 +16,7 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
     lastName: "doe",
     emails: ["mail@mail.com"],
     job: "tech",
-    phone: "0611223344",
+    phone: "+33611223344",
   },
   rights: {
     searchEstablishment: {
@@ -45,7 +45,7 @@ export const unauthorizedApiConsumer: ApiConsumer = {
     lastName: "doe",
     emails: ["mail@mail.com"],
     job: "tech",
-    phone: "0611223344",
+    phone: "+33611223344",
   },
   rights: {
     searchEstablishment: {
@@ -73,7 +73,7 @@ export const outdatedApiConsumer: ApiConsumer = {
     lastName: "doe",
     emails: ["mail@mail.com"],
     job: "tech",
-    phone: "0611223344",
+    phone: "+33611223344",
   },
   createdAt: subYears(new Date(), 2).toISOString(),
   expirationDate: subYears(new Date(), 1).toISOString(),
@@ -147,7 +147,7 @@ const defaultApiConsumer: ApiConsumer = {
     lastName: "doe",
     emails: ["mail@mail.com"],
     job: "tech",
-    phone: "0611223344",
+    phone: "+33611223344",
   },
   createdAt: new Date().toISOString(),
   expirationDate: addYears(new Date(), 1).toISOString(),
