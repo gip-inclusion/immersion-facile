@@ -7,7 +7,7 @@ import {
   DotNestedKeys,
   ScheduleDto,
   prettyPrintSchedule,
-  toDateString,
+  toDisplayedDate,
 } from "shared";
 import { FormConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { FormFieldsObject } from "src/app/hooks/formContents.hooks";
@@ -234,7 +234,7 @@ const beneficiarySummary = (
       ],
       [
         fields["signatories.beneficiary.birthdate"].label,
-        convention.signatories.beneficiary.birthdate,
+        displayDate(convention.signatories.beneficiary.birthdate),
       ],
       ...(convention.internshipKind === "mini-stage-cci"
         ? ([
@@ -309,8 +309,8 @@ const immersionConditionsSummary = (
 ) =>
   (
     [
-      [fields.dateStart.label, toDateString(new Date(convention.dateStart))],
-      [fields.dateEnd.label, toDateString(new Date(convention.dateEnd))],
+      [fields.dateStart.label, displayDate(convention.dateStart)],
+      [fields.dateEnd.label, displayDate(convention.dateEnd)],
       [
         "Emploi du temps",
         prettyPrintScheduleAsJSX(convention.schedule, {
@@ -341,3 +341,8 @@ const immersionConditionsSummary = (
       [fields.immersionSkills.label, convention.immersionSkills],
     ] satisfies ConventionSummaryRow[]
   ).filter(filterEmptyRows);
+
+const displayDate = (date: string) =>
+  toDisplayedDate({
+    date: new Date(date),
+  });
