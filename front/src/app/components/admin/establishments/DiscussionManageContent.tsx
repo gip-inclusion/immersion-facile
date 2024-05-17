@@ -18,7 +18,7 @@ import { ConventionPresentation } from "src/app/components/forms/convention/conv
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
-  conventionInitialValuesFromUrl,
+  fetchConventionInitialValuesFromUrl,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
@@ -67,7 +67,7 @@ const DiscussionDetails = ({
   userEmail,
 }: { discussion: DiscussionReadDto; userEmail: Email }): JSX.Element => {
   const draftConvention = makeConventionFromDiscussion({
-    initialConvention: conventionInitialValuesFromUrl({
+    initialConvention: fetchConventionInitialValuesFromUrl({
       route: routes.conventionImmersion(),
       internshipKind: "immersion",
     }),
