@@ -15,6 +15,11 @@ import {
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
+import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
+import {
+  ContactEntityBuilder,
+  EstablishmentAggregateBuilder,
+} from "../../../../establishment/helpers/EstablishmentBuilders";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 
 const user1: User = {
@@ -70,6 +75,9 @@ describe("PgInclusionConnectedUserRepository", () => {
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agency_groups").execute();
     await db.deleteFrom("agencies").execute();
+    await db.deleteFrom("establishments").execute();
+    await db.deleteFrom("establishments_contacts").execute();
+    await db.deleteFrom("immersion_offers").execute();
 
     icUserRepository = new PgInclusionConnectedUserRepository(db);
     agencyRepository = new PgAgencyRepository(db);
@@ -86,6 +94,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         const adminUser = await icUserRepository.getById(user1.id);
         expectToEqual(adminUser, {
           ...user1,
+          establishments: [],
           agencyRights: [],
           dashboards: {
             agencies: {},
@@ -100,6 +109,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         const inclusionConnectedUser = await icUserRepository.getById(user1.id);
         expectToEqual(inclusionConnectedUser, {
           ...user1,
+          establishments: [],
           agencyRights: [],
           dashboards: {
             agencies: {},
@@ -134,6 +144,7 @@ describe("PgInclusionConnectedUserRepository", () => {
       const inclusionConnectedUser = await icUserRepository.getById(user1.id);
       expectToEqual(inclusionConnectedUser, {
         ...user1,
+        establishments: [],
         agencyRights: [
           { agency: agency1, role: "toReview" },
           { agency: agency2, role: "validator" },
@@ -145,12 +156,48 @@ describe("PgInclusionConnectedUserRepository", () => {
       });
     });
 
+    it("gets the icUser with the connected establishments when they exist", async () => {
+      const customizedEstablishmentName = "My awsome name";
+      const establishment = new EstablishmentAggregateBuilder()
+        .withEstablishmentCustomizedName(customizedEstablishmentName)
+        .withContact(new ContactEntityBuilder().withEmail(user1.email).build())
+        .build();
+
+      const establishmentRepository = new PgEstablishmentAggregateRepository(
+        db,
+      );
+
+      await establishmentRepository.insertEstablishmentAggregate(establishment);
+      await insertUser(user1);
+      await db
+        .insertInto("users_admins")
+        .values({ user_id: user1.id })
+        .execute();
+      const adminUser = await icUserRepository.getById(user1.id);
+      expectToEqual(adminUser, {
+        ...user1,
+        agencyRights: [],
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
+        isBackofficeAdmin: true,
+        establishments: [
+          {
+            siret: establishment.establishment.siret,
+            businessName: customizedEstablishmentName,
+          },
+        ],
+      });
+    });
+
     describe("addAgencyToUser", () => {
       it("adds an element in users__agencies table", async () => {
         await agencyRepository.insert(agency1);
         await insertUser(user1);
         const icUserToSave: InclusionConnectedUser = {
           ...user1,
+          establishments: [],
           agencyRights: [{ role: "counsellor", agency: agency1 }],
           dashboards: {
             agencies: {},
@@ -169,6 +216,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         await insertUser(user1);
         const icUserToSave: InclusionConnectedUser = {
           ...user1,
+          establishments: [],
           agencyRights: [],
           dashboards: {
             agencies: {},
@@ -190,6 +238,7 @@ describe("PgInclusionConnectedUserRepository", () => {
 
         const icUserToSave: InclusionConnectedUser = {
           ...user1,
+          establishments: [],
           agencyRights: [
             { agency: agency1, role: "validator" },
             { agency: agency2, role: "toReview" },
@@ -208,6 +257,7 @@ describe("PgInclusionConnectedUserRepository", () => {
 
         const updatedIcUserToSave: InclusionConnectedUser = {
           ...user1,
+          establishments: [],
           agencyRights: [{ agency: agency1, role: "validator" }],
           dashboards: {
             agencies: {},
@@ -265,6 +315,7 @@ describe("PgInclusionConnectedUserRepository", () => {
       expectArraysToEqualIgnoringOrder(icUsers, [
         {
           ...user1,
+          establishments: [],
           agencyRights: [
             { agency: agency1, role: "toReview" },
             { agency: agency2, role: "validator" },
@@ -276,6 +327,7 @@ describe("PgInclusionConnectedUserRepository", () => {
         },
         {
           ...user2,
+          establishments: [],
           agencyRights: [{ agency: agency2, role: "toReview" }],
           dashboards: {
             agencies: {},
@@ -314,6 +366,7 @@ describe("PgInclusionConnectedUserRepository", () => {
       expectArraysToEqualIgnoringOrder(icUsers, [
         {
           ...user1,
+          establishments: [],
           agencyRights: [{ agency: agency1, role: "validator" }],
           dashboards: {
             agencies: {},
