@@ -4,6 +4,15 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { ConventionDto, addressDtoToString } from "shared";
+import {
+  EmailValidationInput,
+  feedbackMessages,
+  validateEmailBlockReasons,
+} from "src/app/components/forms/commons/EmailValidationInput";
+import {
+  EmailValidationErrorsState,
+  SetEmailValidationErrorsState,
+} from "src/app/components/forms/convention/ConventionFormFields";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
   getFormContents,
@@ -11,7 +20,13 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { AddressAutocomplete } from "../../../autocomplete/AddressAutocomplete";
 
-export const BeneficiaryCurrentEmployerFields = (): JSX.Element => {
+export const BeneficiaryCurrentEmployerFields = ({
+  setEmailValidationErrors,
+  emailValidationErrors,
+}: {
+  setEmailValidationErrors: SetEmailValidationErrorsState;
+  emailValidationErrors: EmailValidationErrorsState;
+}): JSX.Element => {
   const { setValue, getValues, register, formState } =
     useFormContext<ConventionDto>();
   const values = getValues();
@@ -143,16 +158,30 @@ export const BeneficiaryCurrentEmployerFields = (): JSX.Element => {
         }}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.phone")}
       />
-      <Input
-        label={formFields["signatories.beneficiaryCurrentEmployer.email"].label}
+      <EmailValidationInput
         hintText={
           formFields["signatories.beneficiaryCurrentEmployer.email"].hintText
         }
+        label={formFields["signatories.beneficiaryCurrentEmployer.email"].label}
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.email"],
           ...register("signatories.beneficiaryCurrentEmployer.email"),
         }}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.email")}
+        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+          const { "Employeur actuel du bénéficiaire": _, ...rest } =
+            emailValidationErrors;
+
+          setEmailValidationErrors({
+            ...rest,
+            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+              ? {
+                  "Employeur actuel du bénéficiaire":
+                    feedbackMessages(proposal)[reason],
+                }
+              : {}),
+          });
+        }}
       />
     </>
   );

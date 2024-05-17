@@ -4,7 +4,14 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { ErrorNotifications } from "react-design-system";
 import { type SubmitHandler, get, useFormContext } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -59,6 +66,20 @@ type ConventionFieldsProps = {
 
 type StepSeverity = "error" | "success" | "info";
 
+export type EmailValidationErrorsState = Partial<
+  Record<
+    | "Bénéficiaire"
+    | "Employeur actuel du bénéficiaire"
+    | "Représentant légal du bénéficiaire"
+    | "Tuteur de l'entreprise"
+    | "Responsable d'entreprise",
+    string
+  >
+>;
+export type SetEmailValidationErrorsState = Dispatch<
+  SetStateAction<EmailValidationErrorsState>
+>;
+
 export const ConventionFormFields = ({
   onSubmit,
   mode,
@@ -91,6 +112,9 @@ export const ConventionFormFields = ({
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
 
+  const [emailValidationErrors, setEmailValidationErrors] =
+    useState<EmailValidationErrorsState>({});
+
   const {
     agencyId: agencyIdField,
     agencyDepartment: agencyDepartmentField,
@@ -122,7 +146,8 @@ export const ConventionFormFields = ({
   const t = useConventionTexts(conventionValues.internshipKind);
   const shouldSubmitButtonBeDisabled =
     isLoading ||
-    (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
+    (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted") ||
+    keys(emailValidationErrors).length > 0;
 
   const makeAccordionProps = (step: NumberOfSteps) => ({
     ref: (element: HTMLDivElement) => {
@@ -291,13 +316,18 @@ export const ConventionFormFields = ({
         >
           <BeneficiaryFormSection
             internshipKind={conventionValues.internshipKind}
+            emailValidationErrors={emailValidationErrors}
+            setEmailValidationErrors={setEmailValidationErrors}
           />
         </Accordion>
         <Accordion
           label={renderSectionTitle(t.establishmentSection.title, 3)}
           {...makeAccordionProps(3)}
         >
-          <EstablishmentFormSection />
+          <EstablishmentFormSection
+            emailValidationErrors={emailValidationErrors}
+            setEmailValidationErrors={setEmailValidationErrors}
+          />
         </Accordion>
         <Accordion
           label={renderSectionTitle(t.immersionHourLocationSection.title, 4)}
@@ -350,6 +380,28 @@ export const ConventionFormFields = ({
         errors={toDotNotation(formErrorsToFlatErrors(errors))}
         visible={submitCount !== 0 && Object.values(errors).length > 0}
       />
+      {keys(emailValidationErrors).length > 0 && (
+        <Alert
+          severity="error"
+          className={fr.cx("fr-my-2w")}
+          title="Certains emails ne sont pas valides"
+          description={
+            <>
+              <p>
+                Notre vérificateur d'email a détecté des emails non valides dans
+                votre convention.
+              </p>
+              <ul>
+                {keys(emailValidationErrors).map((key) => (
+                  <li>
+                    {key} : {emailValidationErrors[key]}
+                  </li>
+                ))}
+              </ul>
+            </>
+          }
+        />
+      )}
 
       <div className={fr.cx("fr-mt-4w")}>
         <Button
