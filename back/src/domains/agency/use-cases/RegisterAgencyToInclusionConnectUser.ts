@@ -65,19 +65,20 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
       );
     }
 
-    user.agencyRights = agencies.map((agency) => ({
-      agency,
-      role: "toReview",
-      isNotifiedByEmail: false,
-    }));
-
     const event = this.#createNewEvent({
       topic: "AgencyRegisteredToInclusionConnectedUser",
       payload: { userId: user.id, agencyIds },
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.updateAgencyRights(user),
+      uow.inclusionConnectedUserRepository.updateAgencyRights({
+        userId: user.id,
+        agencyRights: agencies.map((agency) => ({
+          agency,
+          role: "toReview",
+          isNotifiedByEmail: false,
+        })),
+      }),
       uow.outboxRepository.save(event),
     ]);
   }

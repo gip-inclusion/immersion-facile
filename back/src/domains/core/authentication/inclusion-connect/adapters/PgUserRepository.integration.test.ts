@@ -7,6 +7,18 @@ import {
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { PgUserRepository } from "./PgUserRepository";
 
+const userExternalId = "my-external-id";
+const userId = "11111111-1111-1111-1111-111111111111";
+const createdAt = new Date().toISOString();
+const user: User = {
+  email: "joe@mail.com",
+  lastName: "Doe",
+  firstName: "John",
+  id: userId,
+  externalId: userExternalId,
+  createdAt: createdAt,
+};
+
 describe("PgAuthenticatedUserRepository", () => {
   let pool: Pool;
   let db: KyselyDb;
@@ -26,18 +38,6 @@ describe("PgAuthenticatedUserRepository", () => {
   });
 
   it("saves an authenticated user, than finds it from external_id, then updates it", async () => {
-    const userExternalId = "my-external-id";
-    const userId = "11111111-1111-1111-1111-111111111111";
-    const createdAt = new Date().toISOString();
-    const user: User = {
-      email: "joe@mail.com",
-      lastName: "Doe",
-      firstName: "John",
-      id: userId,
-      externalId: userExternalId,
-      createdAt,
-    };
-
     await pgUserRepository.save(user);
 
     const fetchedUser = await pgUserRepository.findByExternalId(userExternalId);
@@ -59,20 +59,9 @@ describe("PgAuthenticatedUserRepository", () => {
 
   describe("findByExternalId", () => {
     it("returns an authenticated_user", async () => {
-      const user: User = {
-        email: "joe@mail.com",
-        lastName: "Doe",
-        firstName: "John",
-        id: "11111111-1111-1111-1111-111111111111",
-        externalId: "my-external-id",
-        createdAt: new Date().toISOString(),
-      };
       await pgUserRepository.save(user);
 
-      const response = await pgUserRepository.findByExternalId(
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        user.externalId!,
-      );
+      const response = await pgUserRepository.findByExternalId(userExternalId);
 
       expectToEqual(response, user);
     });

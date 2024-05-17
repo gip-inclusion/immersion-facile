@@ -63,14 +63,11 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
       role: params.role,
     };
 
-    const updatedUser = {
-      ...userToUpdate,
-      agencyRights: replaceElementWhere(
-        userToUpdate.agencyRights,
-        updatedAgencyRight,
-        ({ agency }) => agency.id === params.agencyId,
-      ),
-    };
+    const newAgencyRights = replaceElementWhere(
+      userToUpdate.agencyRights,
+      updatedAgencyRight,
+      ({ agency }) => agency.id === params.agencyId,
+    );
 
     const event: DomainEvent = this.#createNewEvent({
       topic: "IcUserAgencyRightChanged",
@@ -78,7 +75,10 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.updateAgencyRights(updatedUser),
+      uow.inclusionConnectedUserRepository.updateAgencyRights({
+        userId: params.userId,
+        agencyRights: newAgencyRights,
+      }),
       uow.outboxRepository.save(event),
     ]);
   }

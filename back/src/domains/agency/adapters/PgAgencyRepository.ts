@@ -265,11 +265,6 @@ export class PgAgencyRepository implements AgencyRepository {
       name: agency.name,
       status: agency.status,
       kind: agency.kind,
-      // counsellor_emails:
-      //   agency.counsellorEmails && JSON.stringify(agency.counsellorEmails),
-      // validator_emails:
-      //   agency.validatorEmails && JSON.stringify(agency.validatorEmails),
-      // admin_emails: agency.adminEmails && JSON.stringify(agency.adminEmails),
       questionnaire_url: agency.questionnaireUrl,
       email_signature: agency.signature,
       logo_url: agency.logoUrl,

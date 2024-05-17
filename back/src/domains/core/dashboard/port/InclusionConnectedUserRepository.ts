@@ -1,4 +1,10 @@
-import { AgencyId, InclusionConnectedUser, WithAgencyRole } from "shared";
+import {
+  AgencyId,
+  AgencyRight,
+  InclusionConnectedUser,
+  UserId,
+  WithAgencyRole,
+} from "shared";
 
 export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
   agencyId?: AgencyId;
@@ -9,5 +15,8 @@ export interface InclusionConnectedUserRepository {
     filter: InclusionConnectedFilters,
   ): Promise<InclusionConnectedUser[]>;
   getById(userId: string): Promise<InclusionConnectedUser | undefined>;
-  updateAgencyRights(user: InclusionConnectedUser): Promise<void>;
+  updateAgencyRights(params: {
+    userId: UserId;
+    agencyRights: AgencyRight[];
+  }): Promise<void>;
 }

@@ -1,10 +1,11 @@
-import type {
+import {
   AgencyDto,
   AgencyId,
   AgencyRole,
   Email,
   OmitFromExistingKeys,
   UserId,
+  pipeWithValue,
 } from "shared";
 import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 
@@ -32,28 +33,30 @@ export const getUsersWithAgencyRole = async (
   },
 ): Promise<UserWithAgencyRole[]> => {
   if (agencyIds.length === 0) return [];
-  let builder = transaction
-    .selectFrom("users__agencies")
-    .innerJoin("users", "users.id", "users__agencies.user_id")
-    .where("agency_id", "in", agencyIds)
-    .where((eb) =>
-      eb.or([eb("role", "=", "validator"), eb("role", "=", "counsellor")]),
-    );
 
-  if (isNotifiedByEmail !== undefined) {
-    builder = builder.where("is_notified_by_email", "=", isNotifiedByEmail);
-  }
-
-  return builder
-    .orderBy("users.email")
-    .select([
-      "users.id as userId",
-      "users.email",
-      "users__agencies.role",
-      "users__agencies.agency_id as agencyId",
-      "users__agencies.is_notified_by_email as isNotifiedByEmail",
-    ])
-    .execute();
+  return pipeWithValue(
+    transaction
+      .selectFrom("users__agencies")
+      .innerJoin("users", "users.id", "users__agencies.user_id")
+      .where("agency_id", "in", agencyIds)
+      .where((eb) =>
+        eb.or([eb("role", "=", "validator"), eb("role", "=", "counsellor")]),
+      )
+      .orderBy("users.email")
+      .select([
+        "users.id as userId",
+        "users.email",
+        "users__agencies.role",
+        "users__agencies.agency_id as agencyId",
+        "users__agencies.is_notified_by_email as isNotifiedByEmail",
+      ]),
+    (builder) => {
+      if (isNotifiedByEmail !== undefined)
+        return builder.where("is_notified_by_email", "=", isNotifiedByEmail);
+      return builder;
+    },
+    (builder) => builder.execute(),
+  );
 };
 
 type AgencyMatchingCriteria = {
