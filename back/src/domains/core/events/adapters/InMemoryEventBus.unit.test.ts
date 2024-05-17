@@ -164,7 +164,7 @@ describe("InMemoryEventBus", () => {
     });
   });
 
-  describe("when republishing an already published event", () => {
+  describe("when republishing an already published event that has failed", () => {
     const initialPublishDate = new Date("2022-01-01");
     const failedSubscriptionId = "failedSubscription";
     const eventToRePublish: DomainEvent = {
@@ -320,6 +320,45 @@ describe("InMemoryEventBus", () => {
 
       expect(outboxRepository.events).toHaveLength(1);
       expectObjectsToMatch(outboxRepository.events[0], expectedEvent);
+    });
+  });
+
+  describe("when forcing an event to republish", () => {
+    it("republishes the event and executes all the subscriptions (even if some ", async () => {
+      const initialPublishDate = new Date("2022-01-01");
+      const eventToRePublish: DomainEvent = {
+        ...domainEvt,
+        wasQuarantined: false,
+        status: "to-republish",
+        publications: [
+          {
+            publishedAt: initialPublishDate.toISOString(),
+            failures: [],
+          },
+        ],
+      };
+      const rePublishDate = new Date("2022-02-02");
+      timeGateway.setNextDate(rePublishDate);
+      const eventsOnFirstHandler = spyOnTopic(
+        anEventBus,
+        "ConventionSubmittedByBeneficiary",
+        "workingSubscription",
+      );
+
+      expect(eventsOnFirstHandler).toHaveLength(0);
+
+      await anEventBus.publish(eventToRePublish);
+
+      expect(outboxRepository.events).toHaveLength(1);
+      expectToEqual(outboxRepository.events[0], {
+        ...eventToRePublish,
+        status: "published",
+        publications: [
+          ...eventToRePublish.publications,
+          { publishedAt: rePublishDate.toISOString(), failures: [] },
+        ],
+      });
+      expect(eventsOnFirstHandler).toHaveLength(1);
     });
   });
 });
