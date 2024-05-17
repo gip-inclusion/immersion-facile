@@ -1,9 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
+import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { Badge } from "@codegouvfr/react-dsfr/Badge";
+import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { keys } from "ramda";
 import React, {
   Dispatch,
   SetStateAction,
@@ -12,8 +11,17 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ErrorNotifications } from "react-design-system";
-import { type SubmitHandler, get, useFormContext } from "react-hook-form";
+import {
+  ConventionFormLayout,
+  ConventionFormSidebar,
+  ErrorNotifications,
+} from "react-design-system";
+import {
+  FormProvider,
+  SubmitHandler,
+  UseFormReturn,
+  get,
+} from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AgencyKindFilter,
@@ -24,16 +32,29 @@ import {
   addressDtoToString,
   domElementIds,
   isPeConnectIdentity,
+  keys,
   miniStageRestrictedDepartments,
   toDotNotation,
 } from "shared";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
   AgencySelector,
   departmentOptions,
 } from "src/app/components/forms/commons/AgencySelector";
+import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import {
+  ConventionFormMode,
+  SupportedConventionRoutes,
+} from "src/app/components/forms/convention/ConventionForm";
+import { undefinedIfEmptyString } from "src/app/components/forms/convention/conventionHelpers";
+import { BeneficiaryFormSection } from "src/app/components/forms/convention/sections/beneficiary/BeneficiaryFormSection";
+import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
+import { ImmersionDetailsSection } from "src/app/components/forms/convention/sections/immersion-details/ImmersionDetailsSection";
+import { ScheduleSection } from "src/app/components/forms/convention/sections/schedule/ScheduleSection";
 import {
   formConventionFieldsLabels,
   formUiSections,
+  sidebarStepContent,
 } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
@@ -52,27 +73,17 @@ import {
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { AddressAutocomplete } from "../autocomplete/AddressAutocomplete";
-import { ConventionFormMode } from "./ConventionForm";
-import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
-import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
-import { ImmersionDetailsSection } from "./sections/immersion-details/ImmersionDetailsSection";
-import { ScheduleSection } from "./sections/schedule/ScheduleSection";
-
-type ConventionFieldsProps = {
-  onSubmit: SubmitHandler<ConventionReadDto>;
-  mode: ConventionFormMode;
-};
+import { useStyles } from "tss-react/dsfr";
+import { ShareConventionLink } from "./ShareConventionLink";
 
 type StepSeverity = "error" | "success" | "info";
-
 export type EmailValidationErrorsState = Partial<
   Record<
     | "Bénéficiaire"
-    | "Employeur actuel du bénéficiaire"
-    | "Représentant légal du bénéficiaire"
+    | "Responsable d'entreprise"
     | "Tuteur de l'entreprise"
-    | "Responsable d'entreprise",
+    | "Représentant légal du bénéficiaire"
+    | "Employeur actuel du bénéficiaire",
     string
   >
 >;
@@ -81,39 +92,89 @@ export type SetEmailValidationErrorsState = Dispatch<
 >;
 
 export const ConventionFormFields = ({
-  onSubmit,
+  methods,
   mode,
-}: ConventionFieldsProps): JSX.Element => {
-  const {
-    setValue,
-    getValues,
-    handleSubmit,
-    formState: { errors, submitCount, isSubmitted },
-    trigger,
-    clearErrors,
-    getFieldState,
-  } = useFormContext<ConventionReadDto>();
+}: {
+  methods: UseFormReturn<ConventionReadDto>;
+  mode: ConventionFormMode;
+}) => {
+  const { cx } = useStyles();
+  const dispatch = useDispatch();
+  const route = useRoute() as SupportedConventionRoutes;
+
   const currentStep = useAppSelector(conventionSelectors.currentStep);
-  const conventionValues = getValues();
-  const { getFormFields, getFormErrors } = getFormContents(
-    formConventionFieldsLabels(conventionValues.internshipKind),
-  );
   const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
   const preselectedAgencyId = useAppSelector(
     conventionSelectors.preselectedAgencyId,
   );
+  const submitFeedback = useAppSelector(conventionSelectors.feedback);
+
+  const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
+  const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
+  const establishmentNumberEmployeesRange = useAppSelector(
+    siretSelectors.establishmentInfos,
+  )?.numberEmployeesRange;
+
+  const agencyOptions = useSelector(agenciesSelectors.options);
+  const agenciesFeedback = useSelector(agenciesSelectors.feedback);
+  const isAgenciesLoading = useSelector(agenciesSelectors.isLoading);
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+
+  const {
+    getValues,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitted, submitCount },
+    trigger,
+    clearErrors,
+    getFieldState,
+    setValue,
+  } = methods;
+
+  const conventionValues = getValues();
+
+  const { getFormFields, getFormErrors } = getFormContents(
+    formConventionFieldsLabels(conventionValues.internshipKind),
+  );
+  const formContents = getFormFields();
+
+  const t = useConventionTexts(conventionValues.internshipKind);
+
+  const sidebarContent = sidebarStepContent(
+    conventionValues.internshipKind ?? "immersion",
+  );
+
+  const onSubmit: SubmitHandler<ConventionReadDto> = (convention) => {
+    const conventionToSave: ConventionReadDto = {
+      ...convention,
+      workConditions: undefinedIfEmptyString(convention.workConditions),
+      establishmentNumberEmployeesRange:
+        establishmentNumberEmployeesRange === ""
+          ? undefined
+          : establishmentNumberEmployeesRange,
+    };
+    dispatch(
+      conventionSlice.actions.showSummaryChangeRequested({
+        showSummary: true,
+        convention: conventionToSave,
+      }),
+    );
+  };
+
   const accordionsRef = useRef<Array<HTMLDivElement | null>>([]);
-  const route = useRoute();
-  const isLoading = useAppSelector(conventionSelectors.isLoading);
+
   const [stepsStatus, setStepsStatus] = useState<Record<
     number,
     StepSeverity
   > | null>(null);
-  const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
-  const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
 
   const [emailValidationErrors, setEmailValidationErrors] =
     useState<EmailValidationErrorsState>({});
+
+  const shouldSubmitButtonBeDisabled =
+    isLoading ||
+    (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted") ||
+    keys(emailValidationErrors).length > 0;
 
   const {
     agencyId: agencyIdField,
@@ -121,33 +182,36 @@ export const ConventionFormFields = ({
     agencyKind: agencyKindField,
   } = getFormFields();
 
-  useEffect(() => {
-    outOfReduxDependencies.localDeviceRepository.delete(
-      "partialConventionInUrl",
+  const onDepartmentCodeChangedMemoized = useCallback(
+    (departmentCode: DepartmentCode) =>
+      dispatch(
+        agenciesSlice.actions.fetchAgencyOptionsRequested({
+          kind: makeListAgencyOptionsKindFilter({
+            internshipKind: conventionValues.internshipKind,
+            shouldListAll: false,
+            federatedIdentity,
+          }),
+          departmentCode,
+        }),
+      ),
+    [dispatch, conventionValues.internshipKind, federatedIdentity],
+  );
+
+  const renderSectionTitle = (title: string, step: number) => {
+    const baseText = currentStep === step ? <strong>{title}</strong> : title;
+    return (
+      <>
+        {baseText}
+        {renderStatusBadge(step)}
+      </>
     );
-    dispatch(conventionSlice.actions.setCurrentStep(1));
-  }, []);
+  };
 
-  useEffect(() => {
-    if (mode === "edit") {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      validateSteps();
-    }
-  }, [conventionValues.id]);
-
-  useEffect(() => {
-    if (route.name === "conventionCustomAgency" && preselectedAgencyId) {
-      setValue("agencyId", preselectedAgencyId);
-    }
-  }, [preselectedAgencyId]);
-
-  const dispatch = useDispatch();
-  const formContents = getFormFields();
-  const t = useConventionTexts(conventionValues.internshipKind);
-  const shouldSubmitButtonBeDisabled =
-    isLoading ||
-    (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted") ||
-    keys(emailValidationErrors).length > 0;
+  const renderStatusBadge = (step: number) => (
+    <Badge severity={getBadgeData(step).severity} className={fr.cx("fr-ml-2w")}>
+      {getBadgeData(step).label}
+    </Badge>
+  );
 
   const makeAccordionProps = (step: NumberOfSteps) => ({
     ref: (element: HTMLDivElement) => {
@@ -155,7 +219,7 @@ export const ConventionFormFields = ({
       return element;
     },
     onExpandedChange: async () => {
-      await validateSteps();
+      await validateSteps("clearAllErrors");
       setTimeout(() => {
         // we need to wait for the accordion to shrink / expand before scrolling (otherwise the scroll is not accurate)
         accordionsRef.current[step - 1]?.scrollIntoView({
@@ -187,28 +251,21 @@ export const ConventionFormFields = ({
     return stepsStatus?.[step] ? badgeData[stepsStatus[step]] : badgeData.info;
   };
 
-  const renderStatusBadge = (step: number) => (
-    <Badge severity={getBadgeData(step).severity} className={fr.cx("fr-ml-2w")}>
-      {getBadgeData(step).label}
-    </Badge>
+  const shouldLockToPeAgencies = !!(
+    route.name === "conventionImmersion" &&
+    route.params.jwt &&
+    isPeConnectIdentity(
+      conventionValues?.signatories.beneficiary.federatedIdentity,
+    )
   );
 
-  const renderSectionTitle = (title: string, step: number) => {
-    const baseText = currentStep === step ? <strong>{title}</strong> : title;
-    return (
-      <>
-        {baseText}
-        {renderStatusBadge(step)}
-      </>
-    );
-  };
-
-  const validateSteps = async (shouldClearError = true) => {
+  const validateSteps = async (type: "clearAllErrors" | "doNotClear") => {
     const stepsDataValue = await Promise.all(
       formUiSections.map((_, step) => getStepData(step + 1)),
     );
     setStepsStatus(stepsDataValue.reduce((acc, curr) => ({ ...acc, ...curr })));
-    if (shouldClearError) {
+    if (type === "clearAllErrors") {
+      console.info("CLEAR ALL ERRORS");
       clearErrors();
     }
   };
@@ -243,186 +300,288 @@ export const ConventionFormFields = ({
       [step]: getStepStatus(),
     };
   };
-  const shouldLockToPeAgencies = !!(
-    route.name === "conventionImmersion" &&
-    route.params.jwt &&
-    isPeConnectIdentity(
-      conventionValues?.signatories.beneficiary.federatedIdentity,
-    )
-  );
 
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  useEffect(() => {
+    outOfReduxDependencies.localDeviceRepository.delete(
+      "partialConventionInUrl",
+    );
+    dispatch(conventionSlice.actions.setCurrentStep(1));
+  }, []);
 
-  const onDepartmentCodeChangedMemoized = useCallback(
-    (departmentCode: DepartmentCode) =>
-      dispatch(
-        agenciesSlice.actions.fetchAgencyOptionsRequested({
-          kind: makeListAgencyOptionsKindFilter({
-            internshipKind: conventionValues.internshipKind,
-            shouldListAll: false,
-            federatedIdentity,
-          }),
-          departmentCode,
-        }),
-      ),
-    [dispatch, conventionValues.internshipKind, federatedIdentity],
-  );
+  useEffect(() => {
+    if (mode !== "create") {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      validateSteps("clearAllErrors");
+    }
+  }, [conventionValues.id]);
 
-  const agencyOptions = useSelector(agenciesSelectors.options);
-  const agenciesFeedback = useSelector(agenciesSelectors.feedback);
-  const isAgenciesLoading = useSelector(agenciesSelectors.isLoading);
+  useEffect(() => {
+    if (route.name === "conventionCustomAgency" && preselectedAgencyId) {
+      setValue("agencyId", preselectedAgencyId);
+    }
+  }, [preselectedAgencyId]);
 
   return (
-    <>
-      <input
-        type="hidden"
-        {...formContents["signatories.beneficiary.federatedIdentity"]}
-      />
-      <div className={fr.cx("fr-accordions-group")}>
-        {route.name !== "conventionCustomAgency" && (
-          <Accordion
-            label={renderSectionTitle(t.agencySection.title, 1)}
-            {...makeAccordionProps(1)}
-          >
-            <AgencySelector
-              fields={{
-                agencyDepartmentField,
-                agencyIdField,
-                agencyKindField,
-              }}
-              shouldLockToPeAgencies={shouldLockToPeAgencies}
-              shouldFilterDelegationPrescriptionAgencyKind={false}
-              shouldShowAgencyKindField={
-                conventionValues?.internshipKind === "immersion"
-              }
-              agencyDepartmentOptions={
-                conventionValues?.internshipKind === "immersion"
-                  ? departmentOptions
-                  : departmentOptions.filter((department) =>
-                      miniStageRestrictedDepartments.includes(department.value),
+    <FormProvider {...methods}>
+      <ConventionFormLayout
+        form={
+          <>
+            <div className={cx("fr-text")}>{t.intro.welcome}</div>
+            <Alert
+              severity="info"
+              small
+              description={
+                route.params.jwt
+                  ? t.intro.conventionModificationNotification(
+                      conventionValues.statusJustification,
                     )
+                  : t.intro.conventionCreationNotification
               }
-              onDepartmentCodeChangedMemoized={onDepartmentCodeChangedMemoized}
-              agencyOptions={agencyOptions}
-              isLoading={isAgenciesLoading}
-              isFetchAgencyOptionsError={agenciesFeedback.kind === "errored"}
             />
-          </Accordion>
-        )}
 
-        <Accordion
-          label={renderSectionTitle(t.beneficiarySection.title, 2)}
-          {...makeAccordionProps(2)}
-        >
-          <BeneficiaryFormSection
-            internshipKind={conventionValues.internshipKind}
-            emailValidationErrors={emailValidationErrors}
-            setEmailValidationErrors={setEmailValidationErrors}
-          />
-        </Accordion>
-        <Accordion
-          label={renderSectionTitle(t.establishmentSection.title, 3)}
-          {...makeAccordionProps(3)}
-        >
-          <EstablishmentFormSection
-            emailValidationErrors={emailValidationErrors}
-            setEmailValidationErrors={setEmailValidationErrors}
-          />
-        </Accordion>
-        <Accordion
-          label={renderSectionTitle(t.immersionHourLocationSection.title, 4)}
-          {...makeAccordionProps(4)}
-        >
-          <ScheduleSection />
-          <AddressAutocomplete
-            {...formContents.immersionAddress}
-            initialSearchTerm={
-              conventionValues.immersionAddress ??
-              establishmentInfos?.businessAddress
-            }
-            setFormValue={({ address }) =>
-              setValue("immersionAddress", addressDtoToString(address))
-            }
-            disabled={isFetchingSiret}
-          />
-        </Accordion>
-        <Accordion
-          label={renderSectionTitle(t.immersionDetailsSection.title, 5)}
-          {...makeAccordionProps(5)}
-        >
-          <ImmersionDetailsSection />
-        </Accordion>
-      </div>
+            <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
+              Tous les champs marqués d'une astérisque (*) sont obligatoires.
+            </p>
 
-      <Alert
-        small
-        severity="warning"
-        className={fr.cx("fr-my-2w")}
-        description={
-          <ol>
-            <li>
-              Une fois le formulaire envoyé, chaque signataire de la convention
-              va recevoir un email.
-            </li>
-            <li>
-              Pensez à vérifier votre boîte email et votre dossier de spams.
-            </li>
-            <li>
-              Pensez également à informer les autres signataires de la
-              convention qu'ils devront vérifier leur boîte email et leur
-              dossier de spams.
-            </li>
-          </ol>
+            <form
+              id={domElementIds.conventionImmersionRoute.form({ mode })}
+              data-matomo-name={domElementIds.conventionImmersionRoute.form({
+                mode,
+              })}
+            >
+              <>
+                <>
+                  <input
+                    type="hidden"
+                    {...formContents[
+                      "signatories.beneficiary.federatedIdentity"
+                    ]}
+                  />
+                  <div className={fr.cx("fr-accordions-group")}>
+                    {route.name !== "conventionCustomAgency" && (
+                      <Accordion
+                        label={renderSectionTitle(t.agencySection.title, 1)}
+                        {...makeAccordionProps(1)}
+                      >
+                        <AgencySelector
+                          fields={{
+                            agencyDepartmentField,
+                            agencyIdField,
+                            agencyKindField,
+                          }}
+                          shouldLockToPeAgencies={shouldLockToPeAgencies}
+                          shouldFilterDelegationPrescriptionAgencyKind={false}
+                          shouldShowAgencyKindField={
+                            conventionValues?.internshipKind === "immersion"
+                          }
+                          agencyDepartmentOptions={
+                            conventionValues?.internshipKind === "immersion"
+                              ? departmentOptions
+                              : departmentOptions.filter((department) =>
+                                  miniStageRestrictedDepartments.includes(
+                                    department.value,
+                                  ),
+                                )
+                          }
+                          onDepartmentCodeChangedMemoized={
+                            onDepartmentCodeChangedMemoized
+                          }
+                          agencyOptions={agencyOptions}
+                          isLoading={isAgenciesLoading}
+                          isFetchAgencyOptionsError={
+                            agenciesFeedback.kind === "errored"
+                          }
+                        />
+                      </Accordion>
+                    )}
+
+                    <Accordion
+                      label={renderSectionTitle(t.beneficiarySection.title, 2)}
+                      {...makeAccordionProps(2)}
+                    >
+                      <BeneficiaryFormSection
+                        internshipKind={conventionValues.internshipKind}
+                        emailValidationErrors={emailValidationErrors}
+                        setEmailValidationErrors={setEmailValidationErrors}
+                      />
+                    </Accordion>
+                    <Accordion
+                      label={renderSectionTitle(
+                        t.establishmentSection.title,
+                        3,
+                      )}
+                      {...makeAccordionProps(3)}
+                    >
+                      <EstablishmentFormSection
+                        emailValidationErrors={emailValidationErrors}
+                        setEmailValidationErrors={setEmailValidationErrors}
+                      />
+                    </Accordion>
+                    <Accordion
+                      label={renderSectionTitle(
+                        t.immersionHourLocationSection.title,
+                        4,
+                      )}
+                      {...makeAccordionProps(4)}
+                    >
+                      <ScheduleSection />
+                      <AddressAutocomplete
+                        {...formContents.immersionAddress}
+                        initialSearchTerm={
+                          conventionValues.immersionAddress ??
+                          establishmentInfos?.businessAddress
+                        }
+                        setFormValue={({ address }) =>
+                          setValue(
+                            "immersionAddress",
+                            addressDtoToString(address),
+                          )
+                        }
+                        disabled={isFetchingSiret}
+                      />
+                    </Accordion>
+                    <Accordion
+                      label={renderSectionTitle(
+                        t.immersionDetailsSection.title,
+                        5,
+                      )}
+                      {...makeAccordionProps(5)}
+                    >
+                      <ImmersionDetailsSection />
+                    </Accordion>
+                  </div>
+
+                  <Alert
+                    small
+                    severity="warning"
+                    className={fr.cx("fr-my-2w")}
+                    description={
+                      <ol>
+                        <li>
+                          Une fois le formulaire envoyé, chaque signataire de la
+                          convention va recevoir un email.
+                        </li>
+                        <li>
+                          Pensez à vérifier votre boîte email et votre dossier
+                          de spams.
+                        </li>
+                        <li>
+                          Pensez également à informer les autres signataires de
+                          la convention qu'ils devront vérifier leur boîte email
+                          et leur dossier de spams.
+                        </li>
+                      </ol>
+                    }
+                  />
+                  <ErrorNotifications
+                    labels={getFormErrors()}
+                    errors={toDotNotation(formErrorsToFlatErrors(errors))}
+                    visible={
+                      submitCount !== 0 && Object.values(errors).length > 0
+                    }
+                  />
+                  {keys(emailValidationErrors).length > 0 && (
+                    <Alert
+                      severity="error"
+                      className={fr.cx("fr-my-2w")}
+                      title="Certains emails ne sont pas valides"
+                      description={
+                        <>
+                          <p>
+                            Notre vérificateur d'email a détecté des emails non
+                            valides dans votre convention.
+                          </p>
+                          <ul>
+                            {keys(emailValidationErrors).map((key) => (
+                              <li>
+                                {key} : {emailValidationErrors[key]}
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      }
+                    />
+                  )}
+                </>
+              </>
+              <div className={fr.cx("fr-mt-4w")}>
+                <Button
+                  disabled={shouldSubmitButtonBeDisabled}
+                  iconId="fr-icon-checkbox-circle-line"
+                  iconPosition="left"
+                  type="button"
+                  nativeButtonProps={{
+                    id: domElementIds.conventionImmersionRoute.submitFormButton,
+                  }}
+                  onClick={(e) => {
+                    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+                    console.log("beforeHandleSubmit", {
+                      errors,
+                      isValid,
+                    });
+                    return handleSubmit(onSubmit, (errors) => {
+                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+                      validateSteps("doNotClear");
+                      // eslint-disable-next-line no-console
+                      console.error(conventionValues, errors);
+                    })(e);
+                  }}
+                >
+                  Vérifier la demande
+                </Button>
+              </div>
+              <ConventionFeedbackNotification
+                submitFeedback={submitFeedback}
+                signatories={conventionValues.signatories}
+              />
+            </form>
+          </>
+        }
+        sidebar={
+          <ConventionFormSidebar
+            currentStep={currentStep}
+            sidebarContent={sidebarContent}
+            sidebarFooter={
+              <div
+                className={fr.cx(
+                  "fr-btns-group",
+                  "fr-btns-group--center",
+                  "fr-btns-group--inline",
+                  "fr-btns-group--sm",
+                  "fr-btns-group--icon-left",
+                )}
+              >
+                <ShareConventionLink />
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+                    console.log("beforeHandleSubmit", {
+                      errors,
+                      isValid,
+                    });
+                    return methods.handleSubmit((a) => {
+                      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+                      console.log("afterHandleSubmitSuccess", {
+                        errors,
+                        isValid,
+                      });
+                      onSubmit(a);
+                    });
+                  }}
+                  id={
+                    domElementIds.conventionImmersionRoute
+                      .submitFormButtonMobile
+                  }
+                >
+                  Vérifier la demande
+                </Button>
+              </div>
+            }
+          />
         }
       />
-      <ErrorNotifications
-        labels={getFormErrors()}
-        errors={toDotNotation(formErrorsToFlatErrors(errors))}
-        visible={submitCount !== 0 && Object.values(errors).length > 0}
-      />
-      {keys(emailValidationErrors).length > 0 && (
-        <Alert
-          severity="error"
-          className={fr.cx("fr-my-2w")}
-          title="Certains emails ne sont pas valides"
-          description={
-            <>
-              <p>
-                Notre vérificateur d'email a détecté des emails non valides dans
-                votre convention.
-              </p>
-              <ul>
-                {keys(emailValidationErrors).map((key) => (
-                  <li>
-                    {key} : {emailValidationErrors[key]}
-                  </li>
-                ))}
-              </ul>
-            </>
-          }
-        />
-      )}
-
-      <div className={fr.cx("fr-mt-4w")}>
-        <Button
-          disabled={shouldSubmitButtonBeDisabled}
-          iconId="fr-icon-checkbox-circle-line"
-          iconPosition="left"
-          type="button"
-          nativeButtonProps={{
-            id: domElementIds.conventionImmersionRoute.submitFormButton,
-          }}
-          onClick={handleSubmit(onSubmit, (errors) => {
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            validateSteps(false);
-            // eslint-disable-next-line no-console
-            console.error(getValues(), errors);
-          })}
-        >
-          Vérifier la demande
-        </Button>
-      </div>
-    </>
+    </FormProvider>
   );
 };
 

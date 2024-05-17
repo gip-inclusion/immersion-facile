@@ -1,23 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
-import {
-  ConventionFormLayout,
-  ConventionFormSidebar,
-  Loader,
-  SubmitConfirmationSection,
-} from "react-design-system";
+import { Loader, SubmitConfirmationSection } from "react-design-system";
 import { createPortal } from "react-dom";
-import {
-  FormProvider,
-  SubmitHandler,
-  UseFormReturn,
-  useForm,
-} from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   Beneficiary,
@@ -36,12 +25,7 @@ import {
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
-import {
-  ConventionPresentation,
-  undefinedIfEmptyString,
-} from "src/app/components/forms/convention/conventionHelpers";
-import { sidebarStepContent } from "src/app/contents/forms/convention/formConvention";
-import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
@@ -54,23 +38,17 @@ import { type ConventionMiniStagePageRoute } from "src/app/pages/convention/Conv
 import { type ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import {
-  conventionInitialValuesFromUrl,
+  fetchConventionInitialValuesFromUrl,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import {
-  ConventionSubmitFeedback,
-  conventionSlice,
-} from "src/core-logic/domain/convention/convention.slice";
-import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { match } from "ts-pattern";
-import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
 import { ConventionSummary } from "./ConventionSummary";
-import { ShareConventionLink } from "./ShareConventionLink";
 import { useUpdateConventionValuesInUrl } from "./useUpdateConventionValuesInUrl";
 
 const {
@@ -115,7 +93,7 @@ type ConventionFormProps = {
   mode: ConventionFormMode;
 };
 
-type SupportedRoutes =
+export type SupportedConventionRoutes =
   | ConventionImmersionPageRoute
   | ConventionMiniStagePageRoute
   | ConventionCustomAgencyPageRoute
@@ -125,27 +103,23 @@ export const ConventionForm = ({
   internshipKind,
   mode,
 }: ConventionFormProps) => {
-  const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const currentStep = useAppSelector(conventionSelectors.currentStep);
   const showSummary = useAppSelector(conventionSelectors.showSummary);
 
-  const route = useRoute() as SupportedRoutes;
-  const conventionProperties = conventionInitialValuesFromUrl({
+  const route = useRoute() as SupportedConventionRoutes;
+  const conventionInitialValuesFromUrl = fetchConventionInitialValuesFromUrl({
     route,
     internshipKind,
   });
-  const sidebarContent = sidebarStepContent(
-    conventionProperties?.internshipKind ?? "immersion",
-  );
   const acquisitionParams = useGetAcquisitionParams();
+  //TODO: pourquoi un useState sans setter avec juste valeurs initiales pour créer initialValues ???
   const [initialValues] = useState<ConventionPresentation>({
-    ...conventionProperties,
+    ...conventionInitialValuesFromUrl,
     ...acquisitionParams,
     signatories: {
-      ...conventionProperties.signatories,
+      ...conventionInitialValuesFromUrl.signatories,
       beneficiary: makeInitialBenefiaryForm(
-        conventionProperties.signatories.beneficiary,
+        conventionInitialValuesFromUrl.signatories.beneficiary,
         federatedIdentity,
       ),
     },
@@ -154,27 +128,21 @@ export const ConventionForm = ({
   useExistingSiret(initialValues.siret);
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
-  const isLoading = useAppSelector(conventionSelectors.isLoading);
   const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
-  const establishmentNumberEmployeesRange = useAppSelector(
-    siretSelectors.establishmentInfos,
-  )?.numberEmployeesRange;
   const dispatch = useDispatch();
-  const getInitialFormValues = (mode: ConventionFormProps["mode"]) => {
-    if (mode === "create") return initialValues;
-    return fetchedConvention || initialValues;
-  };
 
+  //TODO: tentative de déplacer methods uniquement dans ConventionFormFields ???
   const methods = useForm<ConventionReadDto>({
-    defaultValues: getInitialFormValues(mode),
+    defaultValues:
+      mode === "create" ? initialValues : fetchedConvention || initialValues,
     resolver: zodResolver(conventionSchema),
     mode: "onTouched",
   });
-  const { getValues, reset } = methods;
   const formSuccessfullySubmitted = submitFeedback.kind === "justSubmitted";
 
-  useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(getValues()));
-  useMatomo(conventionProperties.internshipKind);
+  //TODO: à déplacer dans ConventionFormFields ???
+  useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(methods.getValues())); // TODO: a placer dans ConventionFormFields???
+  useMatomo(conventionInitialValuesFromUrl.internshipKind);
   useScrollToTop(formSuccessfullySubmitted);
 
   useEffect(() => {
@@ -207,45 +175,19 @@ export const ConventionForm = ({
     };
   }, [dispatch, mode, route.params.jwt]);
 
+  //TODO: à placer dans ConventionFormFields ????
   useEffect(() => {
     if (fetchedConvention) {
-      reset(fetchedConvention);
+      methods.reset(fetchedConvention);
     }
-  }, [fetchedConvention, reset]);
+  }, [fetchedConvention, methods.reset]);
 
-  const onConfirmSubmit = () => {
-    if (!fetchedConvention) return;
-    // TODO : show feedback if convention is null
-    dispatch(
-      conventionSlice.actions.saveConventionRequested({
-        ...fetchedConvention,
-        status: "READY_TO_SIGN",
-      }),
-    );
-  };
-  const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
-    const conventionToSave: ConventionReadDto = {
-      ...values,
-      workConditions: undefinedIfEmptyString(values.workConditions),
-      establishmentNumberEmployeesRange:
-        establishmentNumberEmployeesRange === ""
-          ? undefined
-          : establishmentNumberEmployeesRange,
-    };
-    dispatch(
-      conventionSlice.actions.showSummaryChangeRequested({
-        showSummary: true,
-        convention: conventionToSave,
-      }),
-    );
-  };
   const reduxFormUiReady =
     useWaitForReduxFormUiReadyBeforeInitialisation(initialValues);
 
-  const t = useConventionTexts(initialValues.internshipKind);
-
   const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
     useCopyButton();
+
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
       {match({
@@ -260,6 +202,25 @@ export const ConventionForm = ({
           fetchedConvention?.status !== "DRAFT",
       })
         .with({ reduxFormUiReady: false }, () => <Loader />)
+        .with(
+          {
+            formSuccessfullySubmitted: false,
+          },
+          ({ showSummary }) =>
+            showSummary ? (
+              <ConventionSummarySection />
+            ) : (
+              <ConventionFormFields methods={methods} mode={mode} />
+            ),
+        )
+        .with({ formSuccessfullySubmitted: true }, () => (
+          <SubmitConfirmationSection
+            idToCopy={methods.getValues().id} //TODO: Le form est soumis donc on a la convention dans redux, on peut choper l'id dans redux au lieu du form????
+            copyButtonIsDisabled={copyButtonIsDisabled}
+            copyButtonLabel={copyButtonLabel}
+            onCopyButtonClick={onCopyButtonClick}
+          />
+        ))
         .with({ shouldRedirectToError: true }, () => (
           <>
             {route.params.jwt && fetchConventionError && (
@@ -270,14 +231,6 @@ export const ConventionForm = ({
             )}
           </>
         ))
-        .with({ formSuccessfullySubmitted: true }, () => (
-          <SubmitConfirmationSection
-            idToCopy={getValues().id}
-            copyButtonIsDisabled={copyButtonIsDisabled}
-            copyButtonLabel={copyButtonLabel}
-            onCopyButtonClick={onCopyButtonClick}
-          />
-        ))
         .with({ conventionCantBeEdited: true }, () => (
           <Alert
             severity="error"
@@ -285,99 +238,6 @@ export const ConventionForm = ({
             description="Cette convention ne peut plus être modifiée car elle a déjà été signée, validée ou refusée."
           />
         ))
-        .with(
-          {
-            showSummary: true,
-            formSuccessfullySubmitted: false,
-          },
-          () => (
-            <ConventionSummarySection
-              methods={methods}
-              onConfirmSubmit={onConfirmSubmit}
-              isLoading={isLoading}
-              submitFeedback={submitFeedback}
-            />
-          ),
-        )
-        .with(
-          {
-            showSummary: false,
-            formSuccessfullySubmitted: false,
-          },
-          () => (
-            <FormProvider {...methods}>
-              <ConventionFormLayout
-                form={
-                  <>
-                    <div className={cx("fr-text")}>{t.intro.welcome}</div>
-                    <Alert
-                      severity="info"
-                      small
-                      description={
-                        route.params.jwt
-                          ? t.intro.conventionModificationNotification(
-                              fetchedConvention?.statusJustification,
-                            )
-                          : t.intro.conventionCreationNotification
-                      }
-                    />
-
-                    <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
-                      Tous les champs marqués d'une astérisque (*) sont
-                      obligatoires.
-                    </p>
-
-                    <form
-                      id={domElementIds.conventionImmersionRoute.form({
-                        mode,
-                      })}
-                      data-matomo-name={domElementIds.conventionImmersionRoute.form(
-                        {
-                          mode,
-                        },
-                      )}
-                    >
-                      <ConventionFormFields onSubmit={onSubmit} mode={mode} />
-                      <ConventionFeedbackNotification
-                        submitFeedback={submitFeedback}
-                        signatories={getValues("signatories")}
-                      />
-                    </form>
-                  </>
-                }
-                sidebar={
-                  <ConventionFormSidebar
-                    currentStep={currentStep}
-                    sidebarContent={sidebarContent}
-                    sidebarFooter={
-                      <div
-                        className={fr.cx(
-                          "fr-btns-group",
-                          "fr-btns-group--center",
-                          "fr-btns-group--inline",
-                          "fr-btns-group--sm",
-                          "fr-btns-group--icon-left",
-                        )}
-                      >
-                        <ShareConventionLink />
-                        <Button
-                          type="submit"
-                          onClick={methods.handleSubmit(onSubmit)}
-                          id={
-                            domElementIds.conventionImmersionRoute
-                              .submitFormButtonMobile
-                          }
-                        >
-                          Vérifier la demande
-                        </Button>
-                      </div>
-                    }
-                  />
-                }
-              />
-            </FormProvider>
-          ),
-        )
         .exhaustive()}
     </div>
   );
@@ -402,16 +262,11 @@ const makeInitialBenefiaryForm = (
   };
 };
 
-const ConventionSummarySection = (props: {
-  isLoading: boolean;
-  submitFeedback: ConventionSubmitFeedback;
-  methods: UseFormReturn<ConventionReadDto>;
-  onConfirmSubmit: () => void;
-}) => {
-  const { getValues } = props.methods;
+const ConventionSummarySection = () => {
   const dispatch = useDispatch();
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const convention = useAppSelector(conventionSelectors.convention);
+  const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const similarConventionIds = useAppSelector(
     conventionSelectors.similarConventionIds,
   );
@@ -434,14 +289,30 @@ const ConventionSummarySection = (props: {
     );
   }, []);
 
+  const onConfirmSubmit = () => {
+    if (!convention) return;
+    // TODO : show feedback if convention is null
+    dispatch(
+      conventionSlice.actions.saveConventionRequested({
+        ...convention,
+        status: "READY_TO_SIGN",
+      }),
+    );
+  };
+
   return (
     <section>
-      {props.isLoading && <Loader />}
+      {
+        //TODO il y a déjà un LOADER dans le composant parent. Nécéssaire?
+        isLoading && <Loader />
+      }
       <ConventionSummary />
-      <ConventionFeedbackNotification
-        submitFeedback={props.submitFeedback}
-        signatories={getValues("signatories")}
-      />
+      {convention && (
+        <ConventionFeedbackNotification
+          submitFeedback={submitFeedback}
+          signatories={convention.signatories}
+        />
+      )}
       {shouldShowDuplicateWarning && (
         <DuplicateConventionAlert similarConventionIds={similarConventionIds} />
       )}
@@ -464,10 +335,10 @@ const ConventionSummarySection = (props: {
           },
           {
             children: "Envoyer la convention",
-            onClick: (event) =>
+            onClick: () =>
               shouldShowDuplicateWarning
                 ? openConfirmDuplicateConventionModal()
-                : props.methods.handleSubmit(props.onConfirmSubmit)(event),
+                : onConfirmSubmit(),
             nativeButtonProps: {
               id: domElementIds.conventionImmersionRoute
                 .confirmSubmitFormButton,
@@ -495,7 +366,7 @@ const ConventionSummarySection = (props: {
               },
               {
                 children: "Valider (au risque de créer un doublon)",
-                onClick: props.methods.handleSubmit(props.onConfirmSubmit),
+                onClick: onConfirmSubmit,
                 nativeButtonProps: {
                   disabled: isLoading,
                 },
