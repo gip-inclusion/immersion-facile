@@ -37,6 +37,7 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
       this.#httpClient.search({
         queryParams: {
           q: siret,
+          mtm_campaign: "immersion-facilitee",
         },
       }),
     );
