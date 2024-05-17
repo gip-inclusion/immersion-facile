@@ -324,6 +324,17 @@ export class EstablishmentAggregateBuilder
     });
   }
 
+  public withEstablishmentCustomizedName(name: string | undefined) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withCustomizedName(name)
+        .build(),
+    });
+  }
+
   public withEstablishmentUpdatedAt(updatedAt: Date) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,

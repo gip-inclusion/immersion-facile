@@ -85,11 +85,15 @@ export class PgInclusionConnectedUserRepository
       )`;
 
     const agencyRightsJsonAgg = `JSONB_AGG(
-      CASE
-        WHEN agencies.id IS NOT NULL THEN ${buildAgencyRight}
-        ELSE NULL
-      END
+      ${buildAgencyRight}) FILTER (WHERE agencies.id IS NOT NULL
     )`;
+
+    const establishmentsJsonAgg = `JSONB_AGG(
+      JSON_BUILD_OBJECT(
+          'siret', establishments.siret,
+          'businessName', COALESCE(establishments.customized_name, establishments.name)
+        )
+    ) FILTER (WHERE establishments.siret IS NOT NULL)`;
 
     const whereClause = getWhereClause(filters);
 
@@ -102,18 +106,17 @@ export class PgInclusionConnectedUserRepository
         'firstName', users.first_name,
         'lastName', users.last_name,
         'createdAt', users.created_at,
-        'agencyRights', 
-            CASE 
-              WHEN ${agencyRightsJsonAgg} = '[null]' THEN '[]' 
-              ELSE ${agencyRightsJsonAgg} 
-            END ,
         'externalId', users.external_id,
+        'agencyRights', COALESCE(${agencyRightsJsonAgg}, '[]'),
+        'establishments', COALESCE(${establishmentsJsonAgg}, '[]'),
         'isBackofficeAdmin', BOOL_OR(users_admins.user_id IS NOT NULL)
       ) as inclusion_user
       FROM users
       LEFT JOIN users__agencies ON users.id = users__agencies.user_id
-      LEFT JOIN agencies ON users__agencies.agency_id = agencies.id
       LEFT JOIN users_admins ON users.id = users_admins.user_id
+      LEFT JOIN agencies ON users__agencies.agency_id = agencies.id
+      LEFT JOIN establishments_contacts ec ON users.email = ec.email
+      LEFT JOIN establishments ON ec.siret = establishments.siret
       ${whereClause.statement}
       GROUP BY users.id;
     `,
@@ -121,6 +124,7 @@ export class PgInclusionConnectedUserRepository
     );
 
     if (response.rows.length === 0) return [];
+
     return response.rows.map(
       ({
         inclusion_user: { isBackofficeAdmin, createdAt, ...rest },
