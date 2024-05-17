@@ -204,7 +204,7 @@ describe("PgInclusionConnectedUserRepository", () => {
       it("adds an element in users__agencies table", async () => {
         await agencyRepository.insert(agency1);
         await insertUser(user1);
-        const icUserToSave: InclusionConnectedUser = {
+        const icUserToUpdate: InclusionConnectedUser = {
           ...user1,
           establishments: [],
           agencyRights: [
@@ -213,10 +213,13 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...withEmptyDashboards,
         };
 
-        await icUserRepository.updateAgencyRights(icUserToSave);
+        await icUserRepository.updateAgencyRights({
+          userId: icUserToUpdate.id,
+          agencyRights: icUserToUpdate.agencyRights,
+        });
 
         const savedIcUser = await icUserRepository.getById(user1.id);
-        expectToEqual(savedIcUser, icUserToSave);
+        expectToEqual(savedIcUser, icUserToUpdate);
       });
 
       it("Delete an element in users__agencies table when no agency rights are provided", async () => {
@@ -229,7 +232,10 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...withEmptyDashboards,
         };
 
-        await icUserRepository.updateAgencyRights(icUserToSave);
+        await icUserRepository.updateAgencyRights({
+          userId: icUserToSave.id,
+          agencyRights: icUserToSave.agencyRights,
+        });
 
         const savedIcUser = await icUserRepository.getById(user1.id);
         expectToEqual(savedIcUser, icUserToSave);
@@ -251,7 +257,10 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...withEmptyDashboards,
         };
 
-        await icUserRepository.updateAgencyRights(icUserToSave);
+        await icUserRepository.updateAgencyRights({
+          userId: icUserToSave.id,
+          agencyRights: icUserToSave.agencyRights,
+        });
 
         const savedIcUser = await icUserRepository.getById(user1.id);
 
@@ -266,7 +275,10 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...withEmptyDashboards,
         };
 
-        await icUserRepository.updateAgencyRights(updatedIcUserToSave);
+        await icUserRepository.updateAgencyRights({
+          userId: updatedIcUserToSave.id,
+          agencyRights: updatedIcUserToSave.agencyRights,
+        });
 
         const updatedSavedIcUser = await icUserRepository.getById(user1.id);
         expectToEqual(updatedSavedIcUser, updatedIcUserToSave);

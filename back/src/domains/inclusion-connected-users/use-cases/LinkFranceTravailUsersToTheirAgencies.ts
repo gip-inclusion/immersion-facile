@@ -36,7 +36,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
       await uow.agencyRepository.getBySafir(codeSafir);
     if (agency) {
       await uow.inclusionConnectedUserRepository.updateAgencyRights({
-        ...icUser,
+        userId,
         agencyRights: [
           ...icUser.agencyRights.filter(
             (agencyRight) => agencyRight.agency.codeSafir !== codeSafir,
@@ -61,7 +61,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
         );
 
       await uow.inclusionConnectedUserRepository.updateAgencyRights({
-        ...icUser,
+        userId,
         agencyRights: [
           ...agencyRightsWithoutConflicts,
           ...agencies.map((agency): AgencyRight => {

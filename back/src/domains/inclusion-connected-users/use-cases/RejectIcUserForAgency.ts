@@ -1,6 +1,5 @@
 import {
   InclusionConnectJwtPayload,
-  InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
@@ -58,18 +57,16 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
       (agencyRight) => agencyRight.agency.id !== params.agencyId,
     );
 
-    const updatedIcUser: InclusionConnectedUser = {
-      ...icUser,
-      agencyRights: updatedAgencyRights,
-    };
-
     const event: DomainEvent = this.#createNewEvent({
       topic: "IcUserAgencyRightRejected",
       payload: params,
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.updateAgencyRights(updatedIcUser),
+      uow.inclusionConnectedUserRepository.updateAgencyRights({
+        userId: icUser.id,
+        agencyRights: updatedAgencyRights,
+      }),
       uow.outboxRepository.save(event),
     ]);
   }

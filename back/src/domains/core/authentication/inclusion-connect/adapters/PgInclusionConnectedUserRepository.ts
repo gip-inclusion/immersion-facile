@@ -37,21 +37,24 @@ export class PgInclusionConnectedUserRepository
     return this.#getInclusionConnectedUsers({ agencyRole, agencyId });
   }
 
-  public async updateAgencyRights(user: InclusionConnectedUser): Promise<void> {
+  public async updateAgencyRights({
+    userId,
+    agencyRights,
+  }: { userId: UserId; agencyRights: AgencyRight[] }): Promise<void> {
     await executeKyselyRawSqlQuery(
       this.transaction,
       `
         DELETE FROM users__agencies WHERE user_id = $1
         `,
-      [user.id],
+      [userId],
     );
 
-    if (user.agencyRights.length > 0)
+    if (agencyRights.length > 0)
       await this.transaction
         .insertInto("users__agencies")
         .values(
-          user.agencyRights.map(({ agency, role, isNotifiedByEmail }) => ({
-            user_id: user.id,
+          agencyRights.map(({ agency, role, isNotifiedByEmail }) => ({
+            user_id: userId,
             agency_id: agency.id,
             role,
             is_notified_by_email: isNotifiedByEmail,
