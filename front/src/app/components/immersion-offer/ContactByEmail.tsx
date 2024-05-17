@@ -5,7 +5,7 @@ import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AppellationDto,
@@ -27,7 +27,11 @@ import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { Route } from "type-route";
-import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
+import {
+  EmailValidationInput,
+  feedbackMessages,
+  validateEmailBlockReasons,
+} from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
   appellations: AppellationDto[];
@@ -78,6 +82,11 @@ export const ContactByEmail = ({
     setTranscientDataForScope,
     getPreferUseTranscientDataForScope,
   } = useTranscientDataFromStorage("contact-establishment", false);
+
+  const [invalidEmailMessage, setInvalidEmailMessage] = useState<string | null>(
+    null,
+  );
+
   const transcientDataForScope = getTranscientDataForScope();
   const preferUseTranscientData = getPreferUseTranscientDataForScope();
   const acquisitionParams = useGetAcquisitionParams();
@@ -220,6 +229,13 @@ export const ContactByEmail = ({
               ...register("potentialBeneficiaryEmail"),
             }}
             {...getFieldError("potentialBeneficiaryEmail")}
+            onEmailValidationFeedback={({ isValid, reason, proposal }) =>
+              setInvalidEmailMessage(
+                !isValid && reason && validateEmailBlockReasons.includes(reason)
+                  ? feedbackMessages(proposal)[reason]
+                  : null,
+              )
+            }
           />
           <Input
             label={inputsLabelsByKey.potentialBeneficiaryPhone}
@@ -244,7 +260,10 @@ export const ContactByEmail = ({
               {
                 type: "submit",
                 priority: "primary",
-                disabled: isSubmitting || activeError.isActive,
+                disabled:
+                  isSubmitting ||
+                  activeError.isActive ||
+                  invalidEmailMessage !== null,
                 nativeButtonProps: {
                   id: domElementIds.search.contactByMailButton,
                 },
@@ -252,6 +271,13 @@ export const ContactByEmail = ({
               },
             ]}
           />
+          {invalidEmailMessage !== null && (
+            <Alert
+              severity="error"
+              title="Email invalide"
+              description={`L'émail de contact que vous avez utilisé dans le formulaire de contact a été invalidé par notre vérificateur d'émail pour la raison suivante: ${invalidEmailMessage}`}
+            />
+          )}
           {activeError.isActive && (
             <Alert
               severity="error"
