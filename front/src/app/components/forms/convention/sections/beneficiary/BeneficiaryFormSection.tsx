@@ -13,6 +13,10 @@ import {
   levelsOfEducation,
 } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import {
+  EmailValidationErrorsState,
+  SetEmailValidationErrorsState,
+} from "src/app/components/forms/convention/ConventionFormFields";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
@@ -23,16 +27,25 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { EmailValidationInput } from "../../../commons/EmailValidationInput";
+import {
+  EmailValidationInput,
+  feedbackMessages,
+  validateEmailBlockReasons,
+} from "../../../commons/EmailValidationInput";
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContactFields";
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";
 
 type beneficiaryFormSectionProperties = {
   internshipKind: InternshipKind;
+  setEmailValidationErrors: SetEmailValidationErrorsState;
+  emailValidationErrors: EmailValidationErrorsState;
 };
+
 export const BeneficiaryFormSection = ({
   internshipKind,
+  setEmailValidationErrors,
+  emailValidationErrors,
 }: beneficiaryFormSectionProperties): JSX.Element => {
   const [isMinorAccordingToAge, setIsMinorAccordingToAge] = useState(false);
   const isMinorOrProtected = useAppSelector(conventionSelectors.isMinor);
@@ -161,6 +174,18 @@ export const BeneficiaryFormSection = ({
           ...(userFieldsAreFilled ? { value: connectedUser.email } : {}),
         }}
         {...getFieldError("signatories.beneficiary.email")}
+        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+          const { Bénéficiaire: _, ...rest } = emailValidationErrors;
+
+          setEmailValidationErrors({
+            ...rest,
+            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+              ? {
+                  Bénéficiaire: feedbackMessages(proposal)[reason],
+                }
+              : {}),
+          });
+        }}
       />
 
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
@@ -255,7 +280,12 @@ export const BeneficiaryFormSection = ({
         />
       )}
 
-      {isMinorOrProtected && <BeneficiaryRepresentativeFields />}
+      {isMinorOrProtected && (
+        <BeneficiaryRepresentativeFields
+          emailValidationErrors={emailValidationErrors}
+          setEmailValidationErrors={setEmailValidationErrors}
+        />
+      )}
 
       <RadioButtons
         legend={formContents["signatories.beneficiary.isRqth"].label}
@@ -303,7 +333,12 @@ export const BeneficiaryFormSection = ({
             }))}
           />
 
-          {hasCurrentEmployer && <BeneficiaryCurrentEmployerFields />}
+          {hasCurrentEmployer && (
+            <BeneficiaryCurrentEmployerFields
+              emailValidationErrors={emailValidationErrors}
+              setEmailValidationErrors={setEmailValidationErrors}
+            />
+          )}
         </>
       )}
     </>

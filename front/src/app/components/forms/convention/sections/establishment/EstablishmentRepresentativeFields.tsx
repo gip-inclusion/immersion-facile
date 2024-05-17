@@ -3,15 +3,29 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { ConventionDto } from "shared";
+import { ConventionReadDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import {
+  EmailValidationErrorsState,
+  SetEmailValidationErrorsState,
+} from "src/app/components/forms/convention/ConventionFormFields";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { EmailValidationInput } from "../../../commons/EmailValidationInput";
+import {
+  EmailValidationInput,
+  feedbackMessages,
+  validateEmailBlockReasons,
+} from "../../../commons/EmailValidationInput";
 
-export const EstablishmentRepresentativeFields = (): JSX.Element => {
-  const { getValues, register } = useFormContext<ConventionDto>();
+export const EstablishmentRepresentativeFields = ({
+  setEmailValidationErrors,
+  emailValidationErrors,
+}: {
+  setEmailValidationErrors: SetEmailValidationErrorsState;
+  emailValidationErrors: EmailValidationErrorsState;
+}): JSX.Element => {
+  const { getValues, register } = useFormContext<ConventionReadDto>();
   const values = getValues();
   const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
@@ -53,6 +67,20 @@ export const EstablishmentRepresentativeFields = (): JSX.Element => {
           ...register("signatories.establishmentRepresentative.email"),
         }}
         disabled={isFetchingSiret}
+        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+          const { "Responsable d'entreprise": _, ...rest } =
+            emailValidationErrors;
+
+          setEmailValidationErrors({
+            ...rest,
+            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+              ? {
+                  "Responsable d'entreprise":
+                    feedbackMessages(proposal)[reason],
+                }
+              : {}),
+          });
+        }}
       />
       {values.signatories.establishmentRepresentative?.email && (
         <ConventionEmailWarning />

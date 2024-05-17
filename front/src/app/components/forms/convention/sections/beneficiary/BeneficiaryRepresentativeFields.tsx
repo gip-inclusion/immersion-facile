@@ -3,17 +3,31 @@ import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { ConventionReadDto, filterNotFalsy } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import {
+  EmailValidationErrorsState,
+  SetEmailValidationErrorsState,
+} from "src/app/components/forms/convention/ConventionFormFields";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
-import { EmailValidationInput } from "../../../commons/EmailValidationInput";
+import {
+  EmailValidationInput,
+  feedbackMessages,
+  validateEmailBlockReasons,
+} from "../../../commons/EmailValidationInput";
 
-type BeneficiaryRepresentativeFieldsProps = { disabled?: boolean };
+type BeneficiaryRepresentativeFieldsProps = {
+  disabled?: boolean;
+  setEmailValidationErrors: SetEmailValidationErrorsState;
+  emailValidationErrors: EmailValidationErrorsState;
+};
 
 export const BeneficiaryRepresentativeFields = ({
   disabled,
+  setEmailValidationErrors,
+  emailValidationErrors,
 }: BeneficiaryRepresentativeFieldsProps) => {
   const { register, getValues, setValue, watch, formState } =
     useFormContext<ConventionReadDto>();
@@ -104,6 +118,20 @@ export const BeneficiaryRepresentativeFields = ({
           ...register("signatories.beneficiaryRepresentative.email"),
         }}
         {...getFieldError("signatories.beneficiaryRepresentative.email")}
+        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+          const { "Représentant légal du bénéficiaire": _, ...rest } =
+            emailValidationErrors;
+
+          setEmailValidationErrors({
+            ...rest,
+            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+              ? {
+                  "Représentant légal du bénéficiaire":
+                    feedbackMessages(proposal)[reason],
+                }
+              : {}),
+          });
+        }}
       />
       {values.signatories.beneficiaryRepresentative?.email && (
         <ConventionEmailWarning />

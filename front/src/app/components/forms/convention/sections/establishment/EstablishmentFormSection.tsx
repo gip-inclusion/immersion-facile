@@ -5,6 +5,10 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { ConventionDto } from "shared";
+import {
+  EmailValidationErrorsState,
+  SetEmailValidationErrorsState,
+} from "src/app/components/forms/convention/ConventionFormFields";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -18,7 +22,13 @@ import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
 
-export const EstablishmentFormSection = (): JSX.Element => {
+export const EstablishmentFormSection = ({
+  setEmailValidationErrors,
+  emailValidationErrors,
+}: {
+  setEmailValidationErrors: SetEmailValidationErrorsState;
+  emailValidationErrors: EmailValidationErrorsState;
+}): JSX.Element => {
   useTutorIsEstablishmentRepresentative();
 
   const dispatch = useDispatch();
@@ -70,9 +80,15 @@ export const EstablishmentFormSection = (): JSX.Element => {
         }))}
         disabled={isFetchingSiret}
       />
-      <EstablishementTutorFields />
+      <EstablishementTutorFields
+        emailValidationErrors={emailValidationErrors}
+        setEmailValidationErrors={setEmailValidationErrors}
+      />
       {!isTutorEstablishmentRepresentative && (
-        <EstablishmentRepresentativeFields />
+        <EstablishmentRepresentativeFields
+          emailValidationErrors={emailValidationErrors}
+          setEmailValidationErrors={setEmailValidationErrors}
+        />
       )}
     </>
   );

@@ -2,18 +2,33 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { ConventionDto } from "shared";
+import { ConventionReadDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import {
+  EmailValidationErrorsState,
+  SetEmailValidationErrorsState,
+} from "src/app/components/forms/convention/ConventionFormFields";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { EmailValidationInput } from "../../../commons/EmailValidationInput";
+import {
+  EmailValidationInput,
+  feedbackMessages,
+  validateEmailBlockReasons,
+} from "../../../commons/EmailValidationInput";
 
-export const EstablishementTutorFields = (): JSX.Element => {
-  const { register, getValues, formState } = useFormContext<ConventionDto>();
+export const EstablishementTutorFields = ({
+  setEmailValidationErrors,
+  emailValidationErrors,
+}: {
+  setEmailValidationErrors: SetEmailValidationErrorsState;
+  emailValidationErrors: EmailValidationErrorsState;
+}): JSX.Element => {
+  const { register, getValues, formState } =
+    useFormContext<ConventionReadDto>();
   const values = getValues();
   const getFieldError = makeFieldError(formState);
   const { getFormFields } = getFormContents(
@@ -71,6 +86,19 @@ export const EstablishementTutorFields = (): JSX.Element => {
           ...register("establishmentTutor.email"),
         }}
         {...getFieldError("establishmentTutor.email")}
+        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+          const { "Tuteur de l'entreprise": _, ...rest } =
+            emailValidationErrors;
+
+          setEmailValidationErrors({
+            ...rest,
+            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+              ? {
+                  "Tuteur de l'entreprise": feedbackMessages(proposal)[reason],
+                }
+              : {}),
+          });
+        }}
       />
       {values.establishmentTutor?.email && <ConventionEmailWarning />}
     </>
