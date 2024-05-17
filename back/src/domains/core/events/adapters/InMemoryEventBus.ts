@@ -210,9 +210,10 @@ const getSubscriptionIdsToPublish = (
   callbacksById: SubscriptionsForTopic,
 ): SubscriptionId[] => {
   const lastPublication = event.publications.at(-1);
-  return lastPublication
-    ? lastPublication.failures.map(prop("subscriptionId"))
-    : keys(callbacksById);
+  if (!lastPublication || event.status === "to-republish")
+    return keys(callbacksById);
+
+  return lastPublication.failures.map(prop("subscriptionId"));
 };
 
 const monitorAbsenceOfCallback = (event: DomainEvent) => {
