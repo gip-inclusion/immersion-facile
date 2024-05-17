@@ -53,8 +53,10 @@ type AnnuaireDesEntreprisesSiretGatewayResponse = {
   total_pages: number;
 };
 
-const annuaireDesEntreprisesQueryParamsSchema: z.Schema<{ q: string }> =
-  z.any();
+const annuaireDesEntreprisesQueryParamsSchema: z.Schema<{
+  q: string;
+  mtm_campaign: "immersion-facilitee";
+}> = z.any();
 
 export const annuaireDesEntreprisesSiretRoutes = defineRoutes({
   search: defineRoute({
