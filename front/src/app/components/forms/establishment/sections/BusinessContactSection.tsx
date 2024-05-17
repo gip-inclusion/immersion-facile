@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { domElementIds } from "shared";
 import { BusinessContact } from "../BusinessContact";
 import { Mode, OnStepChange, Step } from "../EstablishmentForm";
@@ -9,15 +9,20 @@ export const BusinessContactSection = ({
   onStepChange,
   currentStep,
   mode,
+  setInvalidEmailMessage,
 }: {
   onStepChange: OnStepChange;
   currentStep: Step;
   mode: Mode;
+  setInvalidEmailMessage: Dispatch<SetStateAction<string | null>>;
 }) => {
   const isStepMode = currentStep !== null;
   return (
     <section className={fr.cx("fr-mb-4w")}>
-      <BusinessContact mode={mode} />
+      <BusinessContact
+        mode={mode}
+        setInvalidEmailMessage={setInvalidEmailMessage}
+      />
       {isStepMode && (
         <ButtonsGroup
           inlineLayoutWhen="always"

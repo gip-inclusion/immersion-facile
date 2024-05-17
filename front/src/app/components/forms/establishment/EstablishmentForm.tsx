@@ -115,6 +115,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const [availableForImmersion, setAvailableForImmersion] = useState<
     boolean | undefined
   >(undefined);
+  const [invalidEmailMessage, setInvalidEmailMessage] = useState<string | null>(
+    null,
+  );
 
   const [currentStep, setCurrentStep] = useState<Step>(
     isEstablishmentAdmin || isEstablishmentDashboard ? null : 0,
@@ -416,6 +419,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   mode={mode}
                   onStepChange={onStepChange}
                   currentStep={currentStep}
+                  setInvalidEmailMessage={setInvalidEmailMessage}
                 />
                 <h2>{steps[4].title}</h2>
                 <DetailsSection
@@ -423,6 +427,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   isEstablishmentAdmin={isEstablishmentAdmin}
                   currentStep={currentStep}
                   onStepChange={onStepChange}
+                  invalidEmailMessage={invalidEmailMessage}
                 />
               </>
             ))
@@ -459,6 +464,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                       mode={mode}
                       onStepChange={onStepChange}
                       currentStep={currentStep}
+                      setInvalidEmailMessage={setInvalidEmailMessage}
                     />
                   ))
                   .with(4, () => (
@@ -467,6 +473,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                       mode={mode}
                       currentStep={currentStep}
                       onStepChange={onStepChange}
+                      invalidEmailMessage={invalidEmailMessage}
                     />
                   ))
                   .exhaustive()}
