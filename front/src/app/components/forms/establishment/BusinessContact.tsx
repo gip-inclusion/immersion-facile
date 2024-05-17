@@ -4,7 +4,7 @@ import {
   RadioButtons,
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { UseFormRegisterReturn, useFormContext } from "react-hook-form";
 import { DotNestedKeys, FormEstablishmentDto, emailSchema } from "shared";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
@@ -13,9 +13,12 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
+import {
+  EmailValidationInput,
+  feedbackMessages,
+  validateEmailBlockReasons,
+} from "../commons/EmailValidationInput";
 import { Mode } from "./EstablishmentForm";
-
-import { EmailValidationInput } from "../commons/EmailValidationInput";
 
 const preferredContactMethodOptions = (
   register: UseFormRegisterReturn<string>,
@@ -48,7 +51,12 @@ const preferredContactMethodOptions = (
 export const BusinessContact = ({
   readOnly,
   mode,
-}: { readOnly?: boolean; mode: Mode }) => {
+  setInvalidEmailMessage,
+}: {
+  readOnly?: boolean;
+  mode: Mode;
+  setInvalidEmailMessage: Dispatch<SetStateAction<string | null>>;
+}) => {
   const { getFormFields } = getFormContents(
     formEstablishmentFieldsLabels(mode),
   );
@@ -112,6 +120,13 @@ export const BusinessContact = ({
         {...getFieldError(
           "businessContact.email" as DotNestedKeys<FormEstablishmentDto>,
         )} // seems we have an issue with our DotNestedKeys
+        onEmailValidationFeedback={({ isValid, reason, proposal }) =>
+          setInvalidEmailMessage(
+            !isValid && reason && validateEmailBlockReasons.includes(reason)
+              ? feedbackMessages(proposal)[reason]
+              : null,
+          )
+        }
       />
       <MultipleEmailsInput
         disabled={readOnly}

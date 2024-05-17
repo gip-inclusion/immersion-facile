@@ -43,11 +43,13 @@ export const DetailsSection = ({
   isEstablishmentAdmin,
   currentStep,
   onStepChange,
+  invalidEmailMessage,
 }: {
   isEstablishmentAdmin: boolean;
   mode: Mode;
   currentStep: Step;
   onStepChange: OnStepChange;
+  invalidEmailMessage: string | null;
 }) => {
   const adminJwt = useAdminToken();
   const dispatch = useDispatch();
@@ -93,7 +95,7 @@ export const DetailsSection = ({
       iconId: "fr-icon-checkbox-circle-line",
       iconPosition: "right",
       type: "submit",
-      disabled: isSubmitting,
+      disabled: isSubmitting || invalidEmailMessage !== null,
       id: domElementIds.establishment[mode].submitFormButton,
     },
   ];
@@ -273,6 +275,14 @@ export const DetailsSection = ({
           severity="error"
           title="Erreur lors de la suppression"
           description="Veuillez nous excuser. Un problème est survenu lors de la suppression de l'entreprise."
+        />
+      )}
+
+      {invalidEmailMessage !== null && (
+        <Alert
+          severity="error"
+          title="Email invalide"
+          description={`L'émail de contact de l'entreprise a été invalidé par notre vérificateur d'émail pour la raison suivante: ${invalidEmailMessage}`}
         />
       )}
 
