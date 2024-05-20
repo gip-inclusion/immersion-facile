@@ -98,9 +98,12 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     if (icIdTokenPayload.nonce !== existingOngoingOAuth.nonce)
       throw new ForbiddenError("Nonce mismatch");
 
-    const existingAuthenticatedUser = await uow.userRepository.findByExternalId(
-      icIdTokenPayload.sub,
-    );
+    const existingInclusionConnectedUser =
+      await uow.userRepository.findByExternalId(icIdTokenPayload.sub);
+
+    const existingUser =
+      existingInclusionConnectedUser ??
+      (await uow.userRepository.findByEmail(icIdTokenPayload.email));
 
     const newOrUpdatedAuthenticatedUser: User = {
       ...this.#makeAuthenticatedUser(
@@ -108,8 +111,8 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         this.#timeGateway.now(),
         icIdTokenPayload,
       ),
-      ...(existingAuthenticatedUser && {
-        id: existingAuthenticatedUser.id,
+      ...(existingUser && {
+        id: existingUser.id,
       }),
     };
 

@@ -1,5 +1,5 @@
 import { sql } from "kysely";
-import { User, UserId } from "shared";
+import { Email, User, UserId } from "shared";
 import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { UserRepository } from "../port/UserRepositiory";
 
@@ -20,6 +20,15 @@ export class PgUserRepository implements UserRepository {
       .selectFrom("users")
       .selectAll()
       .where("external_id", "=", externalId)
+      .executeTakeFirst();
+    return toAuthenticatedUser(response);
+  }
+
+  public async findByEmail(email: Email): Promise<User | undefined> {
+    const response = await this.transaction
+      .selectFrom("users")
+      .selectAll()
+      .where("email", "ilike", email)
       .executeTakeFirst();
     return toAuthenticatedUser(response);
   }

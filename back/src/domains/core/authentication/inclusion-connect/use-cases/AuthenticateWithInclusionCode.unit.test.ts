@@ -172,6 +172,41 @@ describe("AuthenticateWithInclusionCode use case", () => {
           },
         ]);
       });
+      it("also work if the existing user was not inclusion connected (no externalId)", async () => {
+        const { alreadyExistingUser } =
+          addAlreadyExistingAuthenticatedUserInRepo({
+            externalId: null,
+          });
+        const { initialOngoingOAuth } = makeSuccessfulAuthenticationConditions({
+          email: alreadyExistingUser.email,
+        });
+
+        expectObjectInArrayToMatch(uow.userRepository.users, [
+          {
+            id: alreadyExistingUser.id,
+            email: alreadyExistingUser.email,
+            firstName: alreadyExistingUser.firstName,
+            lastName: alreadyExistingUser.lastName,
+            externalId: null,
+          },
+        ]);
+
+        await authenticateWithInclusionCode.execute({
+          code: "my-inclusion-code",
+          state: initialOngoingOAuth.state,
+          page: "agencyDashboard",
+        });
+
+        expectObjectInArrayToMatch(uow.userRepository.users, [
+          {
+            id: alreadyExistingUser.id,
+            email: alreadyExistingUser.email,
+            firstName: defaultExpectedIcIdTokenPayload.given_name,
+            lastName: defaultExpectedIcIdTokenPayload.family_name,
+            externalId: defaultExpectedIcIdTokenPayload.sub,
+          },
+        ]);
+      });
     });
 
     describe("handle dynamic login pages", () => {
@@ -236,8 +271,12 @@ describe("AuthenticateWithInclusionCode use case", () => {
   });
 
   const makeSuccessfulAuthenticationConditions = (
-    expectedIcIdTokenPayload = defaultExpectedIcIdTokenPayload,
+    params?: Partial<InclusionConnectIdTokenPayload>,
   ) => {
+    const expectedIcIdTokenPayload = {
+      ...defaultExpectedIcIdTokenPayload,
+      ...params,
+    };
     const initialOngoingOAuth: OngoingOAuth = {
       provider: "inclusionConnect",
       state: "my-state",
@@ -262,13 +301,20 @@ describe("AuthenticateWithInclusionCode use case", () => {
     };
   };
 
-  const addAlreadyExistingAuthenticatedUserInRepo = () => {
+  const addAlreadyExistingAuthenticatedUserInRepo = (
+    options: {
+      externalId?: string | null;
+    } = {},
+  ) => {
     const alreadyExistingUser: User = {
       id: "already-existing-id",
       email: "johnny-d@gmail.com",
       firstName: "Johnny",
       lastName: "Doe Existing",
-      externalId: defaultExpectedIcIdTokenPayload.sub,
+      externalId:
+        options.externalId !== undefined
+          ? options.externalId
+          : defaultExpectedIcIdTokenPayload.sub,
       createdAt: new Date().toISOString(),
     };
     uow.userRepository.users = [alreadyExistingUser];
