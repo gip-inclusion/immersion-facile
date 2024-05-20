@@ -56,7 +56,8 @@ export class PgUserRepository implements UserRepository {
     if (
       existingUser.firstName === firstName &&
       existingUser.lastName === lastName &&
-      existingUser.email === email
+      existingUser.email === email &&
+      existingUser.externalId === externalId
     )
       return;
 
@@ -66,9 +67,10 @@ export class PgUserRepository implements UserRepository {
         first_name: firstName,
         last_name: lastName,
         email,
+        external_id: externalId,
         updated_at: sql`now()`,
       })
-      .where("external_id", "=", externalId)
+      .where("id", "=", id)
       .execute();
     return;
   }

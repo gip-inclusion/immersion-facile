@@ -57,6 +57,22 @@ describe("PgAuthenticatedUserRepository", () => {
     expectToEqual(fetchedUpdatedUser, updatedUser);
   });
 
+  describe("when user already exists but not inclusion connected", () => {
+    it("adds the missing data to the entry", async () => {
+      const userNotIcConnected: User = {
+        ...user,
+        firstName: "",
+        lastName: "",
+        externalId: null,
+      };
+      await pgUserRepository.save(userNotIcConnected);
+
+      await pgUserRepository.save(user);
+      const fetchedUpdatedUser = await pgUserRepository.findByEmail(user.email);
+      expectToEqual(fetchedUpdatedUser, user);
+    });
+  });
+
   describe("findByExternalId", () => {
     it("returns an user", async () => {
       await pgUserRepository.save(user);
