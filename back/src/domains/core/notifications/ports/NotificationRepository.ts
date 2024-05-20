@@ -14,6 +14,8 @@ export type EmailNotificationFilters = {
 };
 
 export interface NotificationRepository {
+  getSmsByIds: (ids: NotificationId[]) => Promise<SmsNotification[]>;
+  getEmailsByIds: (ids: NotificationId[]) => Promise<EmailNotification[]>;
   save: (notification: Notification) => Promise<void>;
   saveBatch: (notifications: Notification[]) => Promise<void>;
   getByIdAndKind: (

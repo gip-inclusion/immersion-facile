@@ -22,6 +22,15 @@ export const removeAtIndex = <T>(array: T[], indexToRemove: number): T[] => [
   ...array.slice(indexToRemove + 1),
 ];
 
+export const executeInSequence = async <T>(
+  array: T[],
+  cb: (t: T) => Promise<void>,
+) => {
+  for (const element of array) {
+    await cb(element);
+  }
+};
+
 export type TypeFromTuple<T extends unknown[]> = T[number];
 
 export type NotEmptyArray<T> = [T, ...T[]];

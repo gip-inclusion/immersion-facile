@@ -75,6 +75,7 @@ import {
 } from "../../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
 import { SendNotification } from "../../domains/core/notifications/useCases/SendNotification";
+import { SendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
 import { HtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { AppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
 import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
@@ -167,6 +168,10 @@ export const createUseCases = (
         uowPerformer,
       ),
       sendNotification: new SendNotification(
+        uowPerformer,
+        gateways.notification,
+      ),
+      sendNotificationsInBatch: new SendNotificationInBatch(
         uowPerformer,
         gateways.notification,
       ),

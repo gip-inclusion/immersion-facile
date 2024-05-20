@@ -25,6 +25,14 @@ export class InMemoryNotificationRepository implements NotificationRepository {
   // for tests purposes
   public notifications: Notification[] = [];
 
+  async getSmsByIds(ids: NotificationId[]): Promise<SmsNotification[]> {
+    return getNotificationsMatchingKindAndIds("sms", this.notifications, ids);
+  }
+
+  async getEmailsByIds(ids: NotificationId[]): Promise<EmailNotification[]> {
+    return getNotificationsMatchingKindAndIds("email", this.notifications, ids);
+  }
+
   public deleteAllEmailAttachements(): Promise<number> {
     throw new Error("Not implemented");
   }
@@ -33,9 +41,9 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     id: NotificationId,
     kind: NotificationKind,
   ): Promise<Notification | undefined> {
-    return this.notifications
-      .filter((notification) => notification.kind === kind)
-      .find((notification) => notification.id === id);
+    return getNotificationsMatchingKindAndIds(kind, this.notifications, [
+      id,
+    ])[0];
   }
 
   public async getEmailsByFilters(filters: EmailNotificationFilters = {}) {
@@ -80,6 +88,16 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     this.notifications.push(...notifications);
   }
 }
+
+const getNotificationsMatchingKindAndIds = <K extends NotificationKind>(
+  kind: K,
+  notifications: Notification[],
+  ids: NotificationId[],
+): Extract<Notification, { kind: K }>[] =>
+  notifications.filter(
+    (notification) =>
+      notification.kind === kind && ids.includes(notification.id),
+  ) as Extract<Notification, { kind: K }>[];
 
 export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention =
   ({

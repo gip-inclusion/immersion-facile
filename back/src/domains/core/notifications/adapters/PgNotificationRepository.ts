@@ -53,6 +53,14 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
+  getSmsByIds(_ids: NotificationId[]): Promise<SmsNotification[]> {
+    throw new Error("Method not implemented.");
+  }
+
+  getEmailsByIds(_ids: NotificationId[]): Promise<EmailNotification[]> {
+    throw new Error("Method not implemented.");
+  }
+
   public async getEmailsByFilters({
     since,
     emailKind,
