@@ -75,6 +75,10 @@ export class InMemoryNotificationRepository implements NotificationRepository {
   public async save(notification: Notification): Promise<void> {
     this.notifications.push(notification);
   }
+
+  public async saveBatch(notifications: Notification[]): Promise<void> {
+    this.notifications.push(...notifications);
+  }
 }
 
 export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention =

@@ -58,6 +58,10 @@ export type NotificationAddedEvent = GenericEvent<
   "NotificationAdded",
   WithNotificationIdAndKind
 >;
+export type NotificationBatchAddedEvent = GenericEvent<
+  "NotificationBatchAdded",
+  WithNotificationIdAndKind[]
+>;
 
 export type UserAuthenticatedPayload = {
   userId: string;
@@ -68,6 +72,7 @@ export type UserAuthenticatedPayload = {
 // prettier-ignore
 export type DomainEvent =
   | NotificationAddedEvent
+  | NotificationBatchAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto>

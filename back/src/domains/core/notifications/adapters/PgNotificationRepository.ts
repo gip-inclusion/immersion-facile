@@ -1,4 +1,3 @@
-import format from "pg-format";
 import { uniq } from "ramda";
 import {
   EmailNotification,
@@ -7,21 +6,17 @@ import {
   NotificationKind,
   NotificationsByKind,
   SmsNotification,
-  TemplatedEmail,
-  castError,
   exhaustiveCheck,
 } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { createLogger } from "../../../../utils/logger";
 import {
   EmailNotificationFilters,
   NotificationRepository,
 } from "../ports/NotificationRepository";
 
-const logger = createLogger(__filename);
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
     private transaction: KyselyDb,
@@ -155,6 +150,53 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
+  public async saveBatch(notifications: Notification[]): Promise<void> {
+    const { smsNotifications, emailNotifications } = notifications.reduce(
+      (acc, notification) => {
+        if (notification.kind === "sms")
+          return {
+            ...acc,
+            smsNotifications: [...acc.smsNotifications, notification],
+          };
+
+        return {
+          ...acc,
+          emailNotifications: [...acc.emailNotifications, notification],
+        };
+      },
+      {
+        smsNotifications: [] as SmsNotification[],
+        emailNotifications: [] as EmailNotification[],
+      },
+    );
+
+    await this.#saveSmsNotifications(smsNotifications);
+    await this.#saveEmailNotifications(emailNotifications);
+
+    // switch (notification.kind) {
+    //   case "sms":
+    //     return this.#saveSmsNotification(notification);
+    //   case "email": {
+    //     const recipients = uniq(notification.templatedContent.recipients);
+    //     return this.#saveEmailNotification({
+    //       ...notification,
+    //       templatedContent: {
+    //         ...notification.templatedContent,
+    //         recipients,
+    //         cc: uniq(notification.templatedContent.cc ?? []).filter(
+    //           (ccEmail) => !recipients.includes(ccEmail),
+    //         ),
+    //       },
+    //     });
+    //   }
+    //   default:
+    //     return exhaustiveCheck(notification, {
+    //       variableName: "notificationKind",
+    //       throwIfReached: true,
+    //     });
+    // }
+  }
+
   async #getSmsNotificationById(id: NotificationId): Promise<SmsNotification> {
     const response = await executeKyselyRawSqlQuery(
       this.transaction,
@@ -169,116 +211,121 @@ export class PgNotificationRepository implements NotificationRepository {
   }
 
   async #saveEmailNotification(notification: EmailNotification) {
-    await this.#insertNotificationEmail(notification);
-    await this.#insertEmailRecipients("to", notification);
-    await this.#insertEmailRecipients("cc", notification);
-    await this.#insertEmailAttachments(notification);
+    await this.#saveEmailNotifications([notification]);
+  }
+
+  async #saveEmailNotifications(notifications: EmailNotification[]) {
+    const notificationsWithDeduplicatedRecipients = notifications.map(
+      (notification) => {
+        const recipients = uniq(notification.templatedContent.recipients);
+        return {
+          ...notification,
+          templatedContent: {
+            ...notification.templatedContent,
+            recipients,
+            cc: uniq(notification.templatedContent.cc ?? []).filter(
+              (ccEmail) => !recipients.includes(ccEmail),
+            ),
+          },
+        };
+      },
+    );
+
+    await this.#insertEmailNotifications(
+      notificationsWithDeduplicatedRecipients,
+    );
+    await this.#insertEmailsRecipients(notificationsWithDeduplicatedRecipients);
+    await this.#insertEmailAttachments(notificationsWithDeduplicatedRecipients);
   }
 
   async #saveSmsNotification(notification: SmsNotification): Promise<void> {
-    const {
-      id,
-      createdAt,
-      followedIds,
-      templatedContent: { kind, recipientPhone, params },
-    } = notification;
+    await this.#saveSmsNotifications([notification]);
+  }
 
-    await executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-      INSERT INTO notifications_sms (id, sms_kind, recipient_phone, created_at, convention_id, establishment_siret, agency_id, params) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    `,
-      // prettier-ignore
-      [
-        id,
-        kind,
-        recipientPhone,
-        createdAt,
-        followedIds.conventionId,
-        followedIds.establishmentSiret,
-        followedIds.agencyId,
-        params,
-      ],
+  async #saveSmsNotifications(notifications: SmsNotification[]): Promise<void> {
+    if (notifications.length === 0) return;
+
+    await this.transaction
+      .insertInto("notifications_sms")
+      .values(
+        notifications.map((notification) => ({
+          id: notification.id,
+          created_at: notification.createdAt,
+          sms_kind: notification.templatedContent.kind,
+          recipient_phone: notification.templatedContent.recipientPhone,
+          convention_id: notification.followedIds.conventionId,
+          establishment_siret: notification.followedIds.establishmentSiret,
+          agency_id: notification.followedIds.agencyId,
+          params: JSON.stringify(notification.templatedContent.params),
+        })),
+      )
+      .execute();
+  }
+
+  async #insertEmailAttachments(notifications: EmailNotification[]) {
+    const notificationsWithAttachments = notifications.filter(
+      (notification) =>
+        notification.templatedContent.attachments &&
+        notification.templatedContent.attachments.length > 0,
     );
+    if (!notificationsWithAttachments.length) return;
+
+    await this.transaction
+      .insertInto("notifications_email_attachments")
+      .values(
+        notificationsWithAttachments.flatMap((notification) =>
+          (notification.templatedContent.attachments ?? []).map(
+            (attachment) => ({
+              notifications_email_id: notification.id,
+              attachment: JSON.stringify(attachment),
+            }),
+          ),
+        ),
+      )
+      .execute();
   }
 
-  async #insertEmailAttachments({
-    id,
-    templatedContent: { attachments },
-  }: EmailNotification) {
-    if (!attachments || attachments.length === 0) return;
-    if (attachments.length > 0) {
-      const query =
-        "INSERT INTO notifications_email_attachments (notifications_email_id, attachment) VALUES %L";
-      const values = attachments.map((attachment) => [id, attachment]);
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        format(query, values),
-      ).catch((error) => {
-        logger.error(
-          { query, values, error: castError(error) },
-          "PgNotificationRepository_insertEmailAttachments_QueryErrored",
-        );
-        throw error;
-      });
-    }
+  async #insertEmailsRecipients(notifications: EmailNotification[]) {
+    await this.transaction
+      .insertInto("notifications_email_recipients")
+      .values(
+        notifications.flatMap((notification) => [
+          ...notification.templatedContent.recipients.map((recipient) => ({
+            notifications_email_id: notification.id,
+            email: recipient,
+            recipient_type: "to" as const,
+          })),
+          ...(notification.templatedContent.cc ?? []).map((ccRecipient) => ({
+            notifications_email_id: notification.id,
+            email: ccRecipient,
+            recipient_type: "cc" as const,
+          })),
+        ]),
+      )
+      .execute();
   }
 
-  async #insertEmailRecipients(
-    recipientKind: "to" | "cc",
-    { id, templatedContent }: EmailNotification,
-  ) {
-    const values = recipientsByKind(id, recipientKind, templatedContent);
-    if (values.length > 0) {
-      const query =
-        "INSERT INTO notifications_email_recipients (notifications_email_id, email, recipient_type) VALUES %L";
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        format(query, values),
-      ).catch((error) => {
-        logger.error(
-          { query, values, error: castError(error) },
-          `PgNotificationRepository_insertEmailRecipients_${recipientKind}_QueryErrored`,
-        );
-        throw error;
-      });
-    }
-  }
-
-  async #insertNotificationEmail({
-    id,
-    createdAt,
-    followedIds,
-    templatedContent,
-  }: EmailNotification) {
-    const query = `
-    INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params, reply_to_name, reply_to_email, sender_email, sender_name)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-  `;
-    // prettier-ignore
-    const values = [
-      id,
-      templatedContent.kind,
-      createdAt,
-      followedIds.conventionId,
-      followedIds.establishmentSiret,
-      followedIds.agencyId,
-      templatedContent.params,
-      templatedContent.replyTo?.name,
-      templatedContent.replyTo?.email,
-      templatedContent.sender?.email,
-      templatedContent.sender?.name,
-    ];
-    await executeKyselyRawSqlQuery(this.transaction, query, values).catch(
-      (error) => {
-        logger.error(
-          { query, values, error: castError(error) },
-          "PgNotificationRepository_insertNotificationEmail_QueryErrored",
-        );
-        throw error;
-      },
-    );
+  async #insertEmailNotifications(notifications: EmailNotification[]) {
+    await this.transaction
+      .insertInto("notifications_email")
+      .values(
+        notifications.map(
+          ({ id, createdAt, followedIds, templatedContent }) => ({
+            id: id,
+            created_at: createdAt,
+            email_kind: templatedContent.kind,
+            convention_id: followedIds.conventionId,
+            establishment_siret: followedIds.establishmentSiret,
+            agency_id: followedIds.agencyId,
+            params: JSON.stringify(templatedContent.params),
+            reply_to_name: templatedContent.replyTo?.name,
+            reply_to_email: templatedContent.replyTo?.email,
+            sender_email: templatedContent.sender?.email,
+            sender_name: templatedContent.sender?.name,
+          }),
+        ),
+      )
+      .execute();
   }
 
   async #getEmailNotificationById(
@@ -350,15 +397,3 @@ const buildEmailNotificationObject = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
                     END
             )
         ))`;
-
-const recipientsByKind = (
-  id: NotificationId,
-  recipientKind: "to" | "cc",
-  { recipients, cc }: TemplatedEmail,
-): [id: NotificationId, recipient: string, recipientkind: "to" | "cc"][] => {
-  if (recipientKind === "to")
-    return recipients.map((recipient) => [id, recipient, recipientKind]);
-  if (recipientKind === "cc" && cc)
-    return cc.map((ccRecipient) => [id, ccRecipient, recipientKind]);
-  return [];
-};

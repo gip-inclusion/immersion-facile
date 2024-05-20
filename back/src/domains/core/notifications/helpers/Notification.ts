@@ -17,6 +17,9 @@ export type WithNotificationIdAndKind = {
   kind: NotificationKind;
 };
 
+type NotificationContentAndFollowedIds = NotificationContent &
+  Pick<Notification, "followedIds">;
+
 export type SaveNotificationAndRelatedEvent = ReturnType<
   typeof makeSaveNotificationAndRelatedEvent
 >;
@@ -31,8 +34,7 @@ export const makeSaveNotificationAndRelatedEvent =
   ) =>
   async (
     uow: UnitOfWork,
-    notificationContent: NotificationContent &
-      Pick<Notification, "followedIds">,
+    notificationContent: NotificationContentAndFollowedIds,
   ): Promise<Notification> => {
     const now = timeGateway.now().toISOString();
 
@@ -57,4 +59,42 @@ export const makeSaveNotificationAndRelatedEvent =
     ]);
 
     return notification;
+  };
+
+export const makeSaveNotificationsBatchAndRelatedEvent =
+  (
+    uuidGenerator: UuidGenerator,
+    timeGateway: TimeGateway,
+    createNewEvent: CreateNewEvent = makeCreateNewEvent({
+      uuidGenerator,
+      timeGateway,
+    }),
+  ) =>
+  async (
+    uow: UnitOfWork,
+    notificationContent: NotificationContentAndFollowedIds[],
+  ): Promise<Notification[]> => {
+    const now = timeGateway.now().toISOString();
+
+    const notifications = notificationContent.map((content) => ({
+      ...content,
+      id: uuidGenerator.new(),
+      createdAt: now,
+    }));
+
+    const event = createNewEvent({
+      topic: "NotificationBatchAdded",
+      occurredAt: now,
+      payload: notifications.map((notification) => ({
+        id: notification.id,
+        kind: notification.kind,
+      })),
+    });
+
+    await Promise.all([
+      uow.notificationRepository.saveBatch(notifications),
+      uow.outboxRepository.save(event),
+    ]);
+
+    return notifications;
   };

@@ -57,7 +57,7 @@ export const makeShortLink = async ({
   longLink,
 }: ProvidesShortLinkProperties): Promise<AbsoluteUrl> => {
   const conventionSignShortLinkId: ShortLinkId =
-    await shortLinkIdGeneratorGateway.generate();
+    shortLinkIdGeneratorGateway.generate();
 
   await uow.shortLinkRepository.save(conventionSignShortLinkId, longLink);
 
