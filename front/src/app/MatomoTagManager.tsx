@@ -12,6 +12,7 @@ export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
   // biome-ignore lint/suspicious/noAssignInExpressions: This is a Matomo script
   const _paq = ((window as any)._paq = (window as any)._paq || []);
   const appendMatomoScript = useCallback(() => {
+    appendDiagorienteABTest(_paq);
     _paq.push(["requireCookieConsent"]);
     _mtm.push({ "mtm.startTime": new Date().getTime(), event: "mtm.Start" });
     // to debug, go to http://localhost:3000/?mtmPreviewMode=gXlljpZ7&mtmSetDebugFlag=1
@@ -36,4 +37,42 @@ export const MatomoTagManager = ({ containerUrl }: MatomoTagManagerProps) => {
   }, [containerUrl, appendMatomoScript, consent, _paq]);
 
   return null;
+};
+
+const appendDiagorienteABTest = (_paq: any) => {
+  _paq.push([
+    "AbTesting::create",
+    {
+      name: "recherche-diagoriente",
+      percentage: 100,
+      includedTargets: [
+        {
+          attribute: "url",
+          inverted: "0",
+          type: "regexp",
+          value: "immersion-facile\\.beta\\.gouv\\.fr\\/recherche($|\\?.*)",
+        },
+      ],
+      excludedTargets: [],
+      variations: [
+        {
+          name: "original",
+          activate: () => {
+            // console.log("AB test diagoriente original activated");
+          },
+        },
+        {
+          name: "diagoriente",
+          percentage: 50,
+          activate: (event: any) => {
+            // console.log("AB test diagoriente variation activated");
+            event.redirect(
+              "https://immersion-facile.beta.gouv.fr/recherche-diagoriente",
+            );
+          },
+        },
+      ],
+      trigger: () => true,
+    },
+  ]);
 };
