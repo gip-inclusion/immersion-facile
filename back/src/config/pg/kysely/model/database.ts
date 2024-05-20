@@ -1,4 +1,5 @@
 import { ColumnType, Generated } from "kysely";
+import { RecipientType } from "kysely-codegen/dist/db";
 import { AbsoluteUrl, ConventionId } from "shared";
 
 export interface Database {
@@ -21,6 +22,10 @@ export interface Database {
   groups__sirets: GroupsSirets;
   groups: Groups;
   immersion_offers: ImmersionOffers;
+  notifications_email_attachments: NotificationsEmailAttachments;
+  notifications_email_recipients: NotificationsEmailRecipients;
+  notifications_email: NotificationsEmail;
+  notifications_sms: NotificationsSms;
   nps: Nps;
   outbox: Outbox;
   partners_pe_connect: PartnersPeConnect;
@@ -494,4 +499,41 @@ interface DelegationContacts {
 
 interface UsersAdmins {
   user_id: string;
+}
+
+interface NotificationsEmail {
+  id: string;
+  email_kind: string;
+  created_at: Timestamp;
+  convention_id: string | null;
+  establishment_siret: string | null;
+  agency_id: string | null;
+  params: Json | null;
+  reply_to_name: string | null;
+  reply_to_email: string | null;
+  sender_email: string | null;
+  sender_name: string | null;
+}
+
+interface NotificationsEmailAttachments {
+  id: Generated<number>;
+  notifications_email_id: string;
+  attachment: Json;
+}
+
+interface NotificationsEmailRecipients {
+  notifications_email_id: string;
+  email: string;
+  recipient_type: RecipientType;
+}
+
+interface NotificationsSms {
+  id: string;
+  sms_kind: string;
+  created_at: Timestamp;
+  recipient_phone: string;
+  convention_id: string | null;
+  establishment_siret: string | null;
+  agency_id: string | null;
+  params: Json | null;
 }

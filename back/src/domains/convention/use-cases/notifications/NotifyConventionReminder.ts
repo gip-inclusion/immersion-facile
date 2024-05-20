@@ -219,6 +219,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         this.#makeSignatoryReminderEmail(actor, conventionRead, uow, kind),
       ),
     );
+
     const templatedSms = await Promise.all(
       smsSignatories.map((signatory) =>
         this.#prepareSmsReminderParams(signatory, conventionRead, uow, kind),
