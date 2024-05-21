@@ -280,9 +280,10 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       url: "https://immersion-facile.beta.gouv.fr/aide/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
     },
     {
-      title: "Comment contacter une entreprise pour demander une immersion ?",
-      description: `SI une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire...`,
-      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+      title: "Comment signer ma convention ou envoyer un lien de signature ?",
+      description:
+        "Pour signer votre convention vous devez connaitre votre ID de convention et utiliser le mail que vous nous avez indiqué...",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-signer-ma-convention-ou-envoyer-un-lien-de-signature-125bxxd/",
     },
   ],
   candidate: [
