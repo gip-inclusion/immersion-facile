@@ -127,7 +127,7 @@ describe("GetInclusionConnectedUsers", () => {
     const agency = new AgencyDtoBuilder().build();
     const icUser: InclusionConnectedUser = {
       ...user,
-      agencyRights: [{ agency, role: "toReview", isNotifiedByEmail: false }],
+      agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
       dashboards: {
         agencies: {},
         establishments: {},
@@ -151,7 +151,7 @@ describe("GetInclusionConnectedUsers", () => {
 
     expectToEqual(await inclusionConnectedUserRepository.getById(user.id), {
       ...user,
-      agencyRights: [{ agency, role: newRole, isNotifiedByEmail: false }],
+      agencyRights: [{ agency, roles: [newRole], isNotifiedByEmail: false }],
       dashboards: {
         agencies: {},
         establishments: {},
@@ -163,7 +163,7 @@ describe("GetInclusionConnectedUsers", () => {
     const agency = new AgencyDtoBuilder().build();
     const icUser: InclusionConnectedUser = {
       ...user,
-      agencyRights: [{ agency, role: "toReview", isNotifiedByEmail: false }],
+      agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
       dashboards: {
         agencies: {},
         establishments: {},

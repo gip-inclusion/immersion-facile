@@ -16,13 +16,15 @@ import {
   ConventionStatus,
   ConventionSupportedJwt,
   DateIntervalDto,
+  ExcludeFromExisting,
   InclusionConnectJwt,
   RenewConventionParams,
   Role,
   UpdateConventionStatusRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
-  isAllowedRole,
+  getRequesterRole,
+  hasAllowedRole,
   isConventionRenewed,
   isConventionValidated,
   reasonableSchedule,
@@ -73,7 +75,7 @@ export type JwtKindProps =
 type ConventionManageActionsProps = {
   jwtParams: JwtKindProps;
   convention: ConventionReadDto;
-  role: Role;
+  roles: Role[];
   submitFeedback: ConventionSubmitFeedback;
 };
 
@@ -84,13 +86,13 @@ const renewModal = createModal({
 
 export const ConventionManageActions = ({
   convention,
-  role,
+  roles,
   submitFeedback,
   jwtParams,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
-  const icUserRole = useAppSelector(
-    inclusionConnectedSelectors.userRoleForFetchedConvention,
+  const icUserRoles = useAppSelector(
+    inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
   const feedback = useAppSelector(conventionSelectors.feedback);
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
@@ -114,10 +116,17 @@ export const ConventionManageActions = ({
     "PARTIALLY_SIGNED",
   ];
   const shouldShowSignatureAction =
-    icUserRole === "establishment-representative" &&
+    icUserRoles.includes("establishment-representative") &&
     !convention.signatories.establishmentRepresentative.signedAt &&
     jwtParams.kind !== "backoffice" &&
     allowedToSignStatuses.includes(convention.status);
+
+  const requesterRole = getRequesterRole(
+    roles.filter(
+      (role): role is ExcludeFromExisting<Role, "agencyOwner"> =>
+        role !== "agencyOwner",
+    ),
+  );
 
   return (
     <div
@@ -150,28 +159,28 @@ export const ConventionManageActions = ({
           justifyContent: "center",
         }}
       >
-        {isAllowedTransition(convention, "REJECTED", role) && (
+        {isAllowedTransition(convention, "REJECTED", roles) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
             newStatus="REJECTED"
             convention={convention}
             onSubmit={createOnSubmitWithFeedbackKind("rejected")}
-            currentSignatoryRole={role}
+            currentSignatoryRole={requesterRole}
             modalTitle={t.verification.rejectConvention}
           >
             {t.verification.rejectConvention}
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention, "DEPRECATED", role) && (
+        {isAllowedTransition(convention, "DEPRECATED", roles) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
             newStatus="DEPRECATED"
             onSubmit={createOnSubmitWithFeedbackKind("deprecated")}
             convention={convention}
-            currentSignatoryRole={role}
+            currentSignatoryRole={requesterRole}
             modalTitle={t.verification.markAsDeprecated}
           >
             {t.verification.markAsDeprecated}
@@ -187,7 +196,7 @@ export const ConventionManageActions = ({
           />
         )}
 
-        {isAllowedTransition(convention, "DRAFT", role) && (
+        {isAllowedTransition(convention, "DRAFT", roles) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
@@ -196,21 +205,21 @@ export const ConventionManageActions = ({
               "modificationAskedFromCounsellorOrValidator",
             )}
             convention={convention}
-            currentSignatoryRole={role}
+            currentSignatoryRole={requesterRole}
             modalTitle={t.verification.modifyConventionTitle}
           >
             {t.verification.modifyConvention}
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention, "ACCEPTED_BY_COUNSELLOR", role) && (
+        {isAllowedTransition(convention, "ACCEPTED_BY_COUNSELLOR", roles) && (
           <VerificationActionButton
             initialStatus={convention.status}
             newStatus="ACCEPTED_BY_COUNSELLOR"
             convention={convention}
             onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
             disabled={disabled || convention.status !== "IN_REVIEW"}
-            currentSignatoryRole={role}
+            currentSignatoryRole={requesterRole}
             onCloseValidatorModalWithoutValidatorInfo={
               setValidatorWarningMessage
             }
@@ -226,7 +235,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention, "ACCEPTED_BY_VALIDATOR", role) && (
+        {isAllowedTransition(convention, "ACCEPTED_BY_VALIDATOR", roles) && (
           <VerificationActionButton
             initialStatus={convention.status}
             newStatus="ACCEPTED_BY_VALIDATOR"
@@ -237,7 +246,7 @@ export const ConventionManageActions = ({
               (convention.status !== "IN_REVIEW" &&
                 convention.status !== "ACCEPTED_BY_COUNSELLOR")
             }
-            currentSignatoryRole={role}
+            currentSignatoryRole={requesterRole}
             onCloseValidatorModalWithoutValidatorInfo={
               setValidatorWarningMessage
             }
@@ -253,7 +262,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention, "CANCELLED", role) && (
+        {isAllowedTransition(convention, "CANCELLED", roles) && (
           <>
             <VerificationActionButton
               initialStatus={convention.status}
@@ -263,7 +272,7 @@ export const ConventionManageActions = ({
               disabled={
                 disabled || convention.status !== "ACCEPTED_BY_VALIDATOR"
               }
-              currentSignatoryRole={role}
+              currentSignatoryRole={requesterRole}
               modalTitle={
                 convention.status === "CANCELLED"
                   ? t.verification.conventionAlreadyCancelled
@@ -301,7 +310,10 @@ export const ConventionManageActions = ({
 
         {isConventionValidated(convention) &&
           !isConventionRenewed(convention) &&
-          isAllowedRole(["counsellor", "validator"], role) && (
+          hasAllowedRole({
+            allowedRoles: ["counsellor", "validator"],
+            candidateRoles: roles,
+          }) && (
             <Button
               iconId="fr-icon-file-add-line"
               className={fr.cx("fr-m-1w")}
@@ -441,13 +453,15 @@ export const RenewConventionForm = ({
 const isAllowedTransition = (
   convention: ConventionReadDto,
   targetStatus: ConventionStatus,
-  actingRole: Role,
+  actingRoles: Role[],
 ): boolean => {
   const transitionConfig = statusTransitionConfigs[targetStatus];
 
   return (
     transitionConfig.validInitialStatuses.includes(convention.status) &&
-    transitionConfig.validRoles.includes(actingRole) &&
+    actingRoles.some((actingRole) =>
+      transitionConfig.validRoles.includes(actingRole),
+    ) &&
     (!transitionConfig.refine?.(convention).isError ?? true)
   );
 };

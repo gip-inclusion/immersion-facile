@@ -51,7 +51,7 @@ const inclusionConnectedUser: InclusionConnectedUser = {
   firstName: "John",
   lastName: "Doe",
   agencyRights: [
-    { role: "validator", agency: peAgency, isNotifiedByEmail: false },
+    { roles: ["validator"], agency: peAgency, isNotifiedByEmail: false },
   ],
   dashboards: { agencies: {}, establishments: {} },
   externalId: "john-external-id",

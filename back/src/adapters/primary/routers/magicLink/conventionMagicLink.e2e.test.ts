@@ -343,7 +343,9 @@ describe("Magic link router", () => {
         email: "my-user@email.com",
         firstName: "John",
         lastName: "Doe",
-        agencyRights: [{ role: "validator", agency, isNotifiedByEmail: false }],
+        agencyRights: [
+          { roles: ["validator"], agency, isNotifiedByEmail: false },
+        ],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),

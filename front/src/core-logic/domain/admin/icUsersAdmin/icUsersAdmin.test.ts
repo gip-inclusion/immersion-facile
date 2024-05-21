@@ -30,12 +30,12 @@ const agency4 = new AgencyDtoBuilder().withId("agency-4").build();
 
 const agency1Right: AgencyRight = {
   agency: agency1,
-  role: "toReview",
+  roles: ["toReview"],
   isNotifiedByEmail: true,
 };
 const agency2Right: AgencyRight = {
   agency: agency2,
-  role: "validator",
+  roles: ["validator"],
   isNotifiedByEmail: true,
 };
 const user1AgencyRights: Record<AgencyId, AgencyRight> = {
@@ -45,12 +45,12 @@ const user1AgencyRights: Record<AgencyId, AgencyRight> = {
 
 const agency3Right: AgencyRight = {
   agency: agency3,
-  role: "toReview",
+  roles: ["toReview"],
   isNotifiedByEmail: true,
 };
 const agency4Right: AgencyRight = {
   agency: agency4,
-  role: "toReview",
+  roles: ["toReview"],
   isNotifiedByEmail: true,
 };
 const user2AgencyRights: Record<AgencyId, AgencyRight> = {

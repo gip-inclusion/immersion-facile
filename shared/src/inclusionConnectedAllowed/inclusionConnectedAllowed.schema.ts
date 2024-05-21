@@ -22,7 +22,7 @@ export const agencyRoleSchema = z.enum(allAgencyRoles);
 
 const agencyRightSchema: z.Schema<AgencyRight> = z.object({
   agency: agencySchema,
-  role: agencyRoleSchema,
+  roles: z.array(agencyRoleSchema),
   isNotifiedByEmail: z.boolean(),
 });
 

@@ -60,7 +60,7 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
 
     const updatedAgencyRight: AgencyRight = {
       ...agencyRightToUpdate,
-      role: params.role,
+      roles: [params.role],
     };
 
     const newAgencyRights = replaceElementWhere(

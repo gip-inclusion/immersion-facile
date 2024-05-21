@@ -478,12 +478,10 @@ interface SearchesMade extends WithAcquisition {
   number_of_results: number | null;
 }
 
-type AgencyRole = "agencyOwner" | "counsellor" | "toReview" | "validator";
-
 interface UsersAgencies {
   user_id: string;
   agency_id: string;
-  role: Generated<AgencyRole>;
+  roles: Json;
   is_notified_by_email: boolean;
 }
 

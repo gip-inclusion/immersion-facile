@@ -75,7 +75,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
         userId: user.id,
         agencyRights: agencies.map((agency) => ({
           agency,
-          role: "toReview",
+          roles: ["toReview"],
           isNotifiedByEmail: false,
         })),
       }),

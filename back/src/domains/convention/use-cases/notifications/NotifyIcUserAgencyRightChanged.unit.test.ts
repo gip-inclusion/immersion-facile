@@ -96,7 +96,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       },
       agencyRights: [
         {
-          role: "toReview",
+          roles: ["toReview"],
           agency,
           isNotifiedByEmail: false,
         },
@@ -137,7 +137,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       },
       agencyRights: [
         {
-          role: "validator",
+          roles: ["validator"],
           agency,
           isNotifiedByEmail: false,
         },

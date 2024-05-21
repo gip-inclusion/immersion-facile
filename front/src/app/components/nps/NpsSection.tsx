@@ -4,11 +4,11 @@ import { ConventionReadDto, Role, npsFormIds } from "shared";
 
 type NpsSectionProps = {
   convention: ConventionReadDto;
-  role: Role;
+  roles: Role[];
 };
 export const NpsSection = ({
   convention,
-  role,
+  roles,
 }: NpsSectionProps): JSX.Element => {
   const npsShowStatuses: (typeof convention.status)[] = [
     "IN_REVIEW",
@@ -17,17 +17,18 @@ export const NpsSection = ({
   ];
   return (
     <>
-      {role !== "backOffice" && npsShowStatuses.includes(convention.status) && (
-        <NPSForm
-          mode="embed"
-          formId={npsFormIds.conventionVerification}
-          conventionInfos={{
-            id: convention.id,
-            role,
-            status: convention.status,
-          }}
-        />
-      )}
+      {!roles.includes("backOffice") &&
+        npsShowStatuses.includes(convention.status) && (
+          <NPSForm
+            mode="embed"
+            formId={npsFormIds.conventionVerification}
+            conventionInfos={{
+              id: convention.id,
+              role: roles[0], // the tally does not support multiple roles
+              status: convention.status,
+            }}
+          />
+        )}
     </>
   );
 };

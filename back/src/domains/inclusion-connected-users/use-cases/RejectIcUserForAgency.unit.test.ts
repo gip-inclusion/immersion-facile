@@ -62,7 +62,7 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -110,7 +110,7 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -137,7 +137,7 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -169,7 +169,7 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, role: "toReview", isNotifiedByEmail: false },
+        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -209,8 +209,8 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, role: "toReview", isNotifiedByEmail: false },
-        { agency: agency2, role: "toReview", isNotifiedByEmail: false },
+        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+        { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -236,7 +236,7 @@ describe("reject IcUser for agency", () => {
 
     expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
       [icUser.id]: [
-        { agency: agency2, role: "toReview", isNotifiedByEmail: false },
+        { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
       ],
       [backofficeAdminUser.id]: [],
     });

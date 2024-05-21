@@ -26,33 +26,31 @@ export const ConventionManageContent = ({
   jwtParams,
 }: WithConventionId & { jwtParams: JwtKindProps }): JSX.Element => {
   const route = useRoute();
-  const inclusionConnectedRole = useAppSelector(
-    inclusionConnectedSelectors.userRoleForFetchedConvention,
+  const inclusionConnectedRoles = useAppSelector(
+    inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
 
-  const role: Role | undefined = match({
+  const roles: Role[] = match({
     name: route.name,
-    inclusionConnectedRole,
+    inclusionConnectedRoles,
   })
-    .with(
-      { name: "manageConvention" },
-      () =>
-        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-          jwtParams.jwt,
-        ).role,
-    )
-    .with({ name: "manageConventionAdmin" }, (): Role => "backOffice")
+    .with({ name: "manageConvention" }, (): Role[] => [
+      decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+        jwtParams.jwt,
+      ).role,
+    ])
+    .with({ name: "manageConventionAdmin" }, (): Role[] => ["backOffice"])
     .with(
       {
         name: "manageConventionInclusionConnected",
         inclusionConnectedRole: P.not(P.nullish),
       },
-      ({ inclusionConnectedRole }): Role =>
-        inclusionConnectedRole === "agencyOwner"
-          ? "validator"
-          : inclusionConnectedRole,
+      ({ inclusionConnectedRoles }): Role[] =>
+        inclusionConnectedRoles.includes("agencyOwner")
+          ? ["validator"]
+          : inclusionConnectedRoles,
     )
-    .otherwise(() => undefined);
+    .otherwise((): Role[] => []);
 
   const { convention, fetchConventionError, submitFeedback, isLoading } =
     useConvention({ jwt: jwtParams.jwt, conventionId });
@@ -78,7 +76,7 @@ export const ConventionManageContent = ({
       .replace();
   }
   if (isLoading) return <Loader />;
-  if (!role)
+  if (!roles.length)
     return <p>Vous n'êtes pas autorisé à accéder à cette convention</p>;
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
 
@@ -88,10 +86,10 @@ export const ConventionManageContent = ({
       <ConventionManageActions
         jwtParams={jwtParams}
         convention={convention}
-        role={role}
+        roles={roles}
         submitFeedback={submitFeedback}
       />
-      <NpsSection convention={convention} role={role} />
+      <NpsSection convention={convention} roles={roles} />
     </>
   );
 };

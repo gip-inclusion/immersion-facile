@@ -104,7 +104,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         {
           ...john,
           agencyRights: [
-            { agency, role: agencyUserRole, isNotifiedByEmail: false },
+            { agency, roles: [agencyUserRole], isNotifiedByEmail: false },
           ],
           dashboards: {
             agencies: {},
@@ -120,7 +120,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       expectToEqual(url, {
         ...john,
         agencyRights: [
-          { agency, role: agencyUserRole, isNotifiedByEmail: false },
+          { agency, roles: [agencyUserRole], isNotifiedByEmail: false },
         ],
         dashboards: {
           agencies: {
@@ -142,7 +142,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         agencyRights: [
           {
             agency: new AgencyDtoBuilder().build(),
-            role: agencyUserRole,
+            roles: [agencyUserRole],
             isNotifiedByEmail: false,
           },
         ],
@@ -174,10 +174,10 @@ describe("GetUserAgencyDashboardUrl", () => {
       {
         ...john,
         agencyRights: [
-          { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
-          { agency: agency2, role: "validator", isNotifiedByEmail: false },
-          { agency: agency3, role: "toReview", isNotifiedByEmail: false },
-          { agency: agency4, role: "agencyOwner", isNotifiedByEmail: false },
+          { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
+          { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
+          { agency: agency3, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency: agency4, roles: ["agencyOwner"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
       },
@@ -190,10 +190,10 @@ describe("GetUserAgencyDashboardUrl", () => {
     expectToEqual(url, {
       ...john,
       agencyRights: [
-        { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
-        { agency: agency2, role: "validator", isNotifiedByEmail: false },
-        { agency: agency3, role: "toReview", isNotifiedByEmail: false },
-        { agency: agency4, role: "agencyOwner", isNotifiedByEmail: false },
+        { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
+        { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
+        { agency: agency3, roles: ["toReview"], isNotifiedByEmail: false },
+        { agency: agency4, roles: ["agencyOwner"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {
@@ -217,7 +217,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       {
         ...john,
         agencyRights: [
-          { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
+          { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
       },
@@ -234,7 +234,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     expectToEqual(url, {
       ...john,
       agencyRights: [
-        { agency: agency1, role: "counsellor", isNotifiedByEmail: false },
+        { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {

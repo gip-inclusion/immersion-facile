@@ -83,7 +83,7 @@ describe("RenewConvention", () => {
     email: "my-user@email.com",
     firstName: "John",
     lastName: "Doe",
-    agencyRights: [{ role: "validator", agency, isNotifiedByEmail: false }],
+    agencyRights: [{ roles: ["validator"], agency, isNotifiedByEmail: false }],
     dashboards: { agencies: {}, establishments: {} },
     externalId: "my-user-external-id",
     createdAt: new Date().toISOString(),
@@ -277,7 +277,7 @@ describe("RenewConvention", () => {
         {
           ...inclusionConnectedUser,
           agencyRights: [
-            { agency, role: "agencyOwner", isNotifiedByEmail: false },
+            { agency, roles: ["agencyOwner"], isNotifiedByEmail: false },
           ],
         },
       ]);

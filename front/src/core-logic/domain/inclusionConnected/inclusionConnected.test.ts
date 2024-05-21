@@ -33,7 +33,7 @@ describe("InclusionConnected", () => {
     },
     agencyRights: [
       {
-        role: "agencyOwner",
+        roles: ["agencyOwner"],
         agency: new AgencyDtoBuilder().build(),
         isNotifiedByEmail: true,
       },

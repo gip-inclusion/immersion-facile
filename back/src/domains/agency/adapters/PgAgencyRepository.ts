@@ -37,6 +37,7 @@ import {
   AgencyWithoutEmails,
   addEmailsToAgency,
   getUsersWithAgencyRole,
+  usersAgenciesRolesInclude,
 } from "../../core/authentication/inclusion-connect/adapters/agencyUsers.helpers";
 import {
   AgencyRepository,
@@ -340,7 +341,7 @@ export class PgAgencyRepository implements AgencyRepository {
     if (agency.counsellorEmails) {
       await this.transaction
         .deleteFrom("users__agencies")
-        .where("role", "=", "counsellor")
+        .where(usersAgenciesRolesInclude("counsellor"))
         .where("is_notified_by_email", "=", true)
         .where("agency_id", "=", agency.id)
         .execute();
@@ -355,7 +356,7 @@ export class PgAgencyRepository implements AgencyRepository {
     if (agency.validatorEmails) {
       await this.transaction
         .deleteFrom("users__agencies")
-        .where("role", "=", "validator")
+        .where(usersAgenciesRolesInclude("validator"))
         .where("is_notified_by_email", "=", true)
         .where("agency_id", "=", agency.id)
         .execute();
@@ -402,7 +403,7 @@ export class PgAgencyRepository implements AgencyRepository {
       .values({
         user_id: userId,
         agency_id: agencyId,
-        role,
+        roles: JSON.stringify([role]),
         is_notified_by_email: true,
       })
       .onConflict((oc) =>

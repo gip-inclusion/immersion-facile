@@ -4,6 +4,7 @@ import {
   AgencyGroup,
   AgencyRight,
   InclusionConnectedUser,
+  agencyRoleIsNotToReview,
 } from "shared";
 import { z } from "zod";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
@@ -41,7 +42,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
           ...icUser.agencyRights.filter(
             (agencyRight) => agencyRight.agency.codeSafir !== codeSafir,
           ),
-          { agency, role: "validator", isNotifiedByEmail: false },
+          { agency, roles: ["validator"], isNotifiedByEmail: false },
         ],
       });
       return;
@@ -68,10 +69,13 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
             const existingAgencyRight = agencyRightsWithConflicts.find(
               (agencyRight) => agencyRight.agency.id === agency.id,
             );
-            if (existingAgencyRight && existingAgencyRight.role !== "toReview")
+            if (
+              existingAgencyRight &&
+              agencyRoleIsNotToReview(existingAgencyRight.roles)
+            )
               return existingAgencyRight;
 
-            return { agency, role: "counsellor", isNotifiedByEmail: false };
+            return { agency, roles: ["counsellor"], isNotifiedByEmail: false };
           }),
         ],
       });
@@ -85,5 +89,6 @@ const isIcUserAlreadyHasValidRight = (
   codeSafir: string,
 ) =>
   icUser.agencyRights.some(
-    ({ agency, role }) => agency.codeSafir === codeSafir && role !== "toReview",
+    ({ agency, roles }) =>
+      agency.codeSafir === codeSafir && agencyRoleIsNotToReview(roles),
   );

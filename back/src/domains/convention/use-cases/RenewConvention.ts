@@ -1,4 +1,5 @@
 import {
+  AgencyRole,
   ConventionDto,
   ConventionId,
   ConventionRelatedJwtPayload,
@@ -47,16 +48,16 @@ export class RenewConvention extends TransactionalUseCase<
     if (!conventionInRepo)
       throw new NotFoundError(`Convention with id '${renewed.from}' not found`);
 
-    const role = await this.#roleByPayload(
+    const roles = await this.#rolesByPayload(
       jwtPayload,
       uow,
       conventionInRepo,
       renewed.from,
     );
 
-    if (!allowedRoles.includes(role))
+    if (!allowedRoles.some((allowedRole) => roles.includes(allowedRole)))
       throw new ForbiddenError(
-        `The role '${role}' is not allowed to renew convention`,
+        `The role '${roles}' is not allowed to renew convention`,
       );
 
     if (conventionInRepo.status !== "ACCEPTED_BY_VALIDATOR")
@@ -77,18 +78,18 @@ export class RenewConvention extends TransactionalUseCase<
     });
   }
 
-  async #roleByPayload(
+  async #rolesByPayload(
     jwtPayload: ConventionRelatedJwtPayload,
     uow: UnitOfWork,
     convention: ConventionDto,
     from: ConventionId,
-  ): Promise<Role> {
+  ): Promise<(Role | AgencyRole)[]> {
     if ("role" in jwtPayload) {
       if (from !== jwtPayload.applicationId)
         throw new ForbiddenError(
           "This token is not allowed to renew this convention",
         );
-      return jwtPayload.role;
+      return [jwtPayload.role];
     }
 
     const inclusionConnectedUser =
@@ -98,19 +99,12 @@ export class RenewConvention extends TransactionalUseCase<
         `Inclusion connected user '${jwtPayload.userId}' not found.`,
       );
 
-    if (inclusionConnectedUser.isBackofficeAdmin) return "backOffice";
+    if (inclusionConnectedUser.isBackofficeAdmin) return ["backOffice"];
 
-    const agencyRights = inclusionConnectedUser.agencyRights.find(
+    const agencyRight = inclusionConnectedUser.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === convention.agencyId,
     );
-    if (
-      !agencyRights ||
-      agencyRights.role === "agencyOwner" ||
-      agencyRights.role === "toReview"
-    )
-      throw new ForbiddenError(
-        `You don't have suffisiant rights on agency '${convention.agencyId}'.`,
-      );
-    return agencyRights.role;
+
+    return agencyRight ? agencyRight.roles : [];
   }
 }

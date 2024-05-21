@@ -18,7 +18,7 @@ export const allAgencyRoles = [
 
 export type AgencyRight = {
   agency: AgencyDto;
-  role: AgencyRole;
+  roles: AgencyRole[];
   isNotifiedByEmail: boolean;
 };
 

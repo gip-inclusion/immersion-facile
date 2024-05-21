@@ -101,9 +101,9 @@ export class GetConvention extends TransactionalUseCase<
     if (!user)
       throw new NotFoundError(`No user found with id '${authPayload.userId}'`);
 
-    const role = getIcUserRoleForAccessingConvention(convention, user);
+    const roles = getIcUserRoleForAccessingConvention(convention, user);
 
-    if (!role)
+    if (!roles.length)
       throw new ForbiddenError(
         `User with id '${authPayload.userId}' is not allowed to access convention with id '${convention.id}'`,
       );

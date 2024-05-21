@@ -1,6 +1,7 @@
 import { Builder } from "../Builder";
 import { Email } from "../email/email.dto";
 import {
+  AgencyRight,
   InclusionConnectedUser,
   UserId,
 } from "./inclusionConnectedAllowed.dto";
@@ -62,5 +63,9 @@ export class InclusionConnectedUserBuilder
   }
   withEmail(email: Email) {
     return new InclusionConnectedUserBuilder({ ...this.#dto, email });
+  }
+
+  withAgencyRights(agencyRights: AgencyRight[]) {
+    return new InclusionConnectedUserBuilder({ ...this.#dto, agencyRights });
   }
 }

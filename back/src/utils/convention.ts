@@ -20,6 +20,9 @@ export const conventionEmailsByRole = (
       ),
   counsellor: agency.counsellorEmails,
   validator: agency.validatorEmails,
+  agencyOwner: new BadRequestError(
+    "Le responsable d'agence n'a pas de liens magiques.",
+  ),
   "establishment-representative": [
     convention.signatories.establishmentRepresentative.email,
   ],

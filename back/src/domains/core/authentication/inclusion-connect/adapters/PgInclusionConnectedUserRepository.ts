@@ -53,10 +53,10 @@ export class PgInclusionConnectedUserRepository
       await this.transaction
         .insertInto("users__agencies")
         .values(
-          agencyRights.map(({ agency, role, isNotifiedByEmail }) => ({
+          agencyRights.map(({ agency, roles, isNotifiedByEmail }) => ({
             user_id: userId,
             agency_id: agency.id,
-            role,
+            roles: JSON.stringify(roles),
             is_notified_by_email: isNotifiedByEmail,
           })),
         )

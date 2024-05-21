@@ -79,7 +79,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
         [defaultUser.id]: [
-          { agency, role: "validator", isNotifiedByEmail: false },
+          { agency, roles: ["validator"], isNotifiedByEmail: false },
         ],
       });
     });
@@ -88,7 +88,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [
-          { agency, role: "agencyOwner", isNotifiedByEmail: false },
+          { agency, roles: ["agencyOwner"], isNotifiedByEmail: false },
         ],
         dashboards: {
           agencies: {},
@@ -106,7 +106,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
         [icUser.id]: [
-          { agency, role: "agencyOwner", isNotifiedByEmail: false },
+          { agency, roles: ["agencyOwner"], isNotifiedByEmail: false },
         ],
       });
     });
@@ -114,7 +114,9 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
     it("replace agency right to IC user if user already has rights on agency and current right is toReview", async () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
-        agencyRights: [{ agency, role: "toReview", isNotifiedByEmail: false }],
+        agencyRights: [
+          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+        ],
         dashboards: {
           agencies: {},
           establishments: {},
@@ -130,7 +132,9 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       });
 
       expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
-        [icUser.id]: [{ agency, role: "validator", isNotifiedByEmail: false }],
+        [icUser.id]: [
+          { agency, roles: ["validator"], isNotifiedByEmail: false },
+        ],
       });
     });
 
@@ -183,7 +187,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         [icUser.id]: [
           {
             agency: agency1InGroup,
-            role: "counsellor",
+            roles: ["counsellor"],
             isNotifiedByEmail: false,
           },
           {
@@ -207,12 +211,12 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         agencyRights: [
           {
             agency: agency1InGroup,
-            role: "validator",
+            roles: ["validator"],
             isNotifiedByEmail: false,
           },
           {
             agency: agency2InGroup,
-            role: "toReview",
+            roles: ["toReview"],
             isNotifiedByEmail: false,
           },
         ],
@@ -234,7 +238,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         [icUser.id]: [
           {
             agency: agency1InGroup,
-            role: "validator",
+            roles: ["validator"],
             isNotifiedByEmail: false,
           },
           {

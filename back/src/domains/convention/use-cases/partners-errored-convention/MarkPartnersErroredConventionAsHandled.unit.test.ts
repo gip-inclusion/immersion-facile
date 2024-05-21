@@ -57,7 +57,7 @@ describe("mark partners errored convention as handled", () => {
     email: "my-user@email.com",
     firstName: "John",
     lastName: "Doe",
-    agencyRights: [{ role: "validator", agency, isNotifiedByEmail: false }],
+    agencyRights: [{ roles: ["validator"], agency, isNotifiedByEmail: false }],
     dashboards: {
       agencies: {},
       establishments: {},
