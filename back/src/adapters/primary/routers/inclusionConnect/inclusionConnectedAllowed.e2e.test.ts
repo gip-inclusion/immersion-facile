@@ -35,7 +35,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
   };
   const inclusionConnectedUserWithRights: InclusionConnectedUser = {
     ...inclusionConnectedUserWithoutRights,
-    agencyRights: [{ agency, role: "validator", isNotifiedByEmail: false }],
+    agencyRights: [{ agency, roles: ["validator"], isNotifiedByEmail: false }],
   };
 
   let httpClient: HttpClient<InclusionConnectedAllowedRoutes>;
@@ -179,7 +179,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         {
           ...inclusionConnectedUserWithRights,
           agencyRights: [
-            { agency, role: "toReview", isNotifiedByEmail: false },
+            { agency, roles: ["toReview"], isNotifiedByEmail: false },
           ],
         },
       );
@@ -263,7 +263,9 @@ describe("InclusionConnectedAllowedRoutes", () => {
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        agencyRights: [{ agency, role: "validator", isNotifiedByEmail: false }],
+        agencyRights: [
+          { agency, roles: ["validator"], isNotifiedByEmail: false },
+        ],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "joe-external-id",
         createdAt: new Date().toISOString(),

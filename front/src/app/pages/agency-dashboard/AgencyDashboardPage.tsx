@@ -167,26 +167,8 @@ export const AgencyDashboardPage = ({
           {
             currentUser: {
               agencyRights: P.when(
-                all(
-                  (agencyRight: AgencyRight) => agencyRight.role === "toReview",
-                ),
-              ),
-            },
-          },
-          () => (
-            <Alert
-              severity="info"
-              title="En attente de validation"
-              description="Votre demande d'accès à l'outil est en cours de validation par l'administration. Vous recevrez un email dès que votre accès sera validé."
-            />
-          ),
-        )
-        .with(
-          {
-            currentUser: {
-              agencyRights: P.when(
-                all(
-                  (agencyRight: AgencyRight) => agencyRight.role === "toReview",
+                all((agencyRight: AgencyRight) =>
+                  agencyRight.roles.includes("toReview"),
                 ),
               ),
             },

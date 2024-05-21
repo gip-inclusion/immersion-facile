@@ -24,7 +24,7 @@ export type AuthenticatedUserQueryParams = {
   token: string;
 } & Pick<User, "email" | "firstName" | "lastName">;
 
-export type InclusionConnectConventionManageAllowedRoles =
+type InclusionConnectConventionManageAllowedRole =
   | ExcludeFromExisting<AgencyRole, "toReview">
   | ExtractFromExisting<SignatoryRole, "establishment-representative">
   | "backOffice";
@@ -32,14 +32,21 @@ export type InclusionConnectConventionManageAllowedRoles =
 export const getIcUserRoleForAccessingConvention = (
   convention: ConventionDto,
   user: InclusionConnectedUser,
-): InclusionConnectConventionManageAllowedRoles | null => {
-  if (user.isBackofficeAdmin) return "backOffice";
+): InclusionConnectConventionManageAllowedRole[] => {
+  if (user.isBackofficeAdmin) return ["backOffice"];
   if (convention.signatories.establishmentRepresentative.email === user.email)
-    return "establishment-representative";
+    return ["establishment-representative"];
   const agencyRight = user.agencyRights.find(
     (agencyRight) => agencyRight.agency.id === convention.agencyId,
   );
-  if (!agencyRight) return null;
-  if (agencyRight.role === "toReview") return null;
-  return agencyRight.role;
+
+  if (agencyRight && agencyRoleIsNotToReview(agencyRight.roles))
+    return agencyRight.roles;
+
+  return [];
 };
+
+export const agencyRoleIsNotToReview = (
+  agencyRoles: AgencyRole[],
+): agencyRoles is ExcludeFromExisting<AgencyRole, "toReview">[] =>
+  !agencyRoles.includes("toReview");

@@ -19,18 +19,25 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfTransitionNotAllowed = ({
   targetStatus,
-  role,
+  roles,
   conventionRead,
 }: {
   targetStatus: ConventionStatus;
-  role: Role;
+  roles: Role[];
   conventionRead: ConventionReadDto;
 }) => {
   const config = statusTransitionConfigs[targetStatus];
 
-  if (!config.validRoles.includes(role))
+  if (
+    !oneOfTheRolesIsAllowed({
+      allowedRoles: config.validRoles,
+      rolesToValidate: roles,
+    })
+  )
     throw new ForbiddenError(
-      `Role '${role}' is not allowed to go to status '${targetStatus}' for convention '${conventionRead.id}'.`,
+      `Roles '${roles.toString()}' are not allowed to go to status '${targetStatus}' for convention '${
+        conventionRead.id
+      }'.`,
     );
 
   if (!config.validInitialStatuses.includes(conventionRead.status))
@@ -43,6 +50,14 @@ export const throwIfTransitionNotAllowed = ({
     if (isError) throw new ForbiddenError(errorMessage);
   }
 };
+
+const oneOfTheRolesIsAllowed = ({
+  allowedRoles,
+  rolesToValidate,
+}: { allowedRoles: Role[]; rolesToValidate: Role[] }) =>
+  rolesToValidate.some((roleToValidate) =>
+    allowedRoles.includes(roleToValidate),
+  );
 
 export async function retrieveConventionWithAgency(
   uow: UnitOfWork,

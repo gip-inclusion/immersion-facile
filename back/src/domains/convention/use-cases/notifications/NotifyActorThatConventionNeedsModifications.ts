@@ -189,6 +189,7 @@ const requesterNameByRole = (
     validator: agency.name,
     "establishment-tutor": new Error(wrongRequesterUser),
     backOffice: "L'équipe Immerssion Facilité",
+    agencyOwner: "Le responsable d'agence",
   };
   return strategy[requesterRole];
 };

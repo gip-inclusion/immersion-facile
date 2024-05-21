@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import {
   AgencyDto,
   AgencyId,
@@ -13,7 +14,7 @@ export type UserWithAgencyRole = {
   userId: UserId;
   email: Email;
   agencyId: AgencyId;
-  role: AgencyRole;
+  roles: AgencyRole[];
   isNotifiedByEmail: boolean;
 };
 
@@ -21,6 +22,9 @@ export type AgencyWithoutEmails = OmitFromExistingKeys<
   AgencyDto,
   "validatorEmails" | "counsellorEmails"
 >;
+
+export const usersAgenciesRolesInclude = (agencyRole: AgencyRole) =>
+  sql<any>`jsonb_path_exists(roles, '$ ? (@ == "${agencyRole}")')`;
 
 export const getUsersWithAgencyRole = async (
   transaction: KyselyDb,
@@ -43,7 +47,7 @@ export const getUsersWithAgencyRole = async (
       .select([
         "users.id as userId",
         "users.email",
-        "users__agencies.role",
+        sql<AgencyRole[]>`users__agencies.roles`.as("roles"),
         "users__agencies.agency_id as agencyId",
         "users__agencies.is_notified_by_email as isNotifiedByEmail",
       ]),
@@ -67,7 +71,8 @@ export const getEmailsFromUsersWithAgencyRoles = (
 ) => {
   return usersWithAgencyRole
     .filter(
-      (user) => user.agencyId === agencyIdToMatch && user.role === roleToMatch,
+      (user) =>
+        user.agencyId === agencyIdToMatch && user.roles.includes(roleToMatch),
     )
     .map((user) => user.email);
 };

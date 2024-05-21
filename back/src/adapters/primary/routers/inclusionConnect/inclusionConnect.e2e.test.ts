@@ -181,7 +181,7 @@ describe("inclusion connection flow", () => {
       );
 
       expectToEqual(icUser?.agencyRights, [
-        { agency, role: "validator", isNotifiedByEmail: false },
+        { agency, roles: ["validator"], isNotifiedByEmail: false },
       ]);
     });
   });

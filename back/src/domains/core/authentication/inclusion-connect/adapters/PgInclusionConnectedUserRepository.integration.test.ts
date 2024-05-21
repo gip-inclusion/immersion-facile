@@ -143,13 +143,13 @@ describe("PgInclusionConnectedUserRepository", () => {
       await insertAgencyRegistrationToUser({
         agencyId: agency1.id,
         userId: user1.id,
-        role: "toReview",
+        roles: ["toReview"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency2.id,
         userId: user1.id,
-        role: "validator",
+        roles: ["validator"],
         isNotifiedByEmail: false,
       });
 
@@ -158,8 +158,8 @@ describe("PgInclusionConnectedUserRepository", () => {
         ...user1,
         establishments: [],
         agencyRights: [
-          { agency: agency1, role: "toReview", isNotifiedByEmail: false },
-          { agency: agency2, role: "validator", isNotifiedByEmail: false },
+          { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
         ],
         ...withEmptyDashboards,
       });
@@ -234,7 +234,11 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [
-            { role: "counsellor", agency: agency1, isNotifiedByEmail: false },
+            {
+              roles: ["counsellor"],
+              agency: agency1,
+              isNotifiedByEmail: false,
+            },
           ],
           ...withEmptyDashboards,
         };
@@ -277,8 +281,8 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [
-            { agency: agency1, role: "validator", isNotifiedByEmail: false },
-            { agency: agency2, role: "toReview", isNotifiedByEmail: false },
+            { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+            { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
           ],
           ...withEmptyDashboards,
         };
@@ -296,7 +300,7 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [
-            { agency: agency1, role: "validator", isNotifiedByEmail: false },
+            { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
           ],
           ...withEmptyDashboards,
         };
@@ -319,7 +323,7 @@ describe("PgInclusionConnectedUserRepository", () => {
       await insertAgencyRegistrationToUser({
         agencyId: agency1.id,
         userId: user1.id,
-        role: "toReview",
+        roles: ["toReview"],
         isNotifiedByEmail: false,
       });
 
@@ -335,19 +339,19 @@ describe("PgInclusionConnectedUserRepository", () => {
       await insertAgencyRegistrationToUser({
         agencyId: agency1.id,
         userId: user1.id,
-        role: "toReview",
+        roles: ["toReview"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency2.id,
         userId: user1.id,
-        role: "validator",
+        roles: ["validator"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency2.id,
         userId: user2.id,
-        role: "toReview",
+        roles: ["toReview"],
         isNotifiedByEmail: false,
       });
 
@@ -360,8 +364,8 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [
-            { agency: agency1, role: "toReview", isNotifiedByEmail: false },
-            { agency: agency2, role: "validator", isNotifiedByEmail: false },
+            { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+            { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
           ],
           ...withEmptyDashboards,
         },
@@ -369,7 +373,7 @@ describe("PgInclusionConnectedUserRepository", () => {
           ...user2,
           establishments: [],
           agencyRights: [
-            { agency: agency2, role: "toReview", isNotifiedByEmail: false },
+            { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
           ],
           ...withEmptyDashboards,
         },
@@ -384,19 +388,19 @@ describe("PgInclusionConnectedUserRepository", () => {
       await insertAgencyRegistrationToUser({
         agencyId: agency1.id,
         userId: user1.id,
-        role: "validator",
+        roles: ["validator"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency1.id,
         userId: user2.id,
-        role: "toReview",
+        roles: ["toReview"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser({
         agencyId: agency2.id,
         userId: user1.id,
-        role: "validator",
+        roles: ["validator"],
         isNotifiedByEmail: false,
       });
 
@@ -419,7 +423,7 @@ describe("PgInclusionConnectedUserRepository", () => {
 
       expectToEqual(icUser1.agencyRights, [
         {
-          role: "validator",
+          roles: ["validator"],
           agency: agency1,
           isNotifiedByEmail: false,
         },
@@ -427,7 +431,7 @@ describe("PgInclusionConnectedUserRepository", () => {
 
       expectToEqual(icDefaultValidator.agencyRights, [
         {
-          role: "validator",
+          roles: ["validator"],
           agency: agency1,
           isNotifiedByEmail: true,
         },
@@ -459,12 +463,12 @@ describe("PgInclusionConnectedUserRepository", () => {
   const insertAgencyRegistrationToUser = async ({
     userId,
     agencyId,
-    role,
+    roles,
     isNotifiedByEmail,
   }: {
     userId: UserId;
     agencyId: AgencyId;
-    role: AgencyRole;
+    roles: AgencyRole[];
     isNotifiedByEmail: boolean;
   }) => {
     await db
@@ -472,7 +476,7 @@ describe("PgInclusionConnectedUserRepository", () => {
       .values({
         user_id: userId,
         agency_id: agencyId,
-        role,
+        roles: JSON.stringify(roles),
         is_notified_by_email: isNotifiedByEmail,
       })
       .execute();

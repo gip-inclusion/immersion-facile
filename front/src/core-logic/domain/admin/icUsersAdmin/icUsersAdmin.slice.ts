@@ -88,7 +88,16 @@ export const icUsersAdminSlice = createSlice({
       const { userId, agencyId, role } = action.payload;
       state.isUpdatingIcUserAgency = false;
       state.feedback.kind = "agencyRegisterToUserSuccess";
-      state.icUsersNeedingReview[userId].agencyRights[agencyId].role = role;
+      if (
+        !state.icUsersNeedingReview[userId].agencyRights[
+          agencyId
+        ].roles.includes(role)
+      ) {
+        state.icUsersNeedingReview[userId].agencyRights[agencyId].roles = [
+          ...state.icUsersNeedingReview[userId].agencyRights[agencyId].roles,
+          role,
+        ];
+      }
     },
     registerAgencyWithRoleToUserFailed: (
       state,

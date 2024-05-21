@@ -38,11 +38,17 @@ export class InMemoryInclusionConnectedUserRepository
     // TODO: gestion des filtres optionnels à améliorer
     return this.userRepository.users
       .filter((user) =>
-        this.agencyRightsByUserId[user.id].some(({ role, agency }) =>
-          agencyId
-            ? role === agencyRole && agency.id === agencyId
-            : role === agencyRole,
-        ),
+        this.agencyRightsByUserId[user.id].some(({ roles, agency }) => {
+          if (agencyId) {
+            if (agency.id !== agencyId) return false;
+          }
+
+          if (agencyRole) {
+            if (!roles.includes(agencyRole)) return false;
+          }
+
+          return true;
+        }),
       )
       .map((user) => ({
         ...user,

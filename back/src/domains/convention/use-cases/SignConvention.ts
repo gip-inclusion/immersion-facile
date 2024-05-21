@@ -81,7 +81,7 @@ export class SignConvention extends TransactionalUseCase<
       this.#timeGateway.now().toISOString(),
     );
     throwIfTransitionNotAllowed({
-      role,
+      roles: [role],
       targetStatus: signedConvention.status,
       conventionRead: initialConventionRead,
     });

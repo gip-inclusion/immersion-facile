@@ -8,6 +8,7 @@ import {
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
+  ExcludeFromExisting,
   InclusionConnectedUser,
   Role,
   UpdateConventionStatusRequestDto,
@@ -80,12 +81,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
     agencyRights: [
       {
         agency: agencyWithoutCounsellorEmail,
-        role: "toReview",
+        roles: ["toReview"],
         isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
-        role: "toReview",
+        roles: ["toReview"],
         isNotifiedByEmail: false,
       },
     ],
@@ -101,12 +102,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
     agencyRights: [
       {
         agency: agencyWithoutCounsellorEmail,
-        role: "counsellor",
+        roles: ["counsellor"],
         isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
-        role: "counsellor",
+        roles: ["counsellor"],
         isNotifiedByEmail: false,
       },
     ],
@@ -122,12 +123,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
     agencyRights: [
       {
         agency: agencyWithoutCounsellorEmail,
-        role: "validator",
+        roles: ["validator"],
         isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
-        role: "validator",
+        roles: ["validator"],
         isNotifiedByEmail: false,
       },
     ],
@@ -144,12 +145,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
     agencyRights: [
       {
         agency: agencyWithoutCounsellorEmail,
-        role: "agencyOwner",
+        roles: ["agencyOwner"],
         isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
-        role: "agencyOwner",
+        roles: ["agencyOwner"],
         isNotifiedByEmail: false,
       },
     ],
@@ -404,14 +405,14 @@ const makeTestAcceptsStatusUpdate =
         throw new Error(
           `Expected domain topic ${expectedDomainTopic} not supported with convention status ${updateStatusParams.status}`,
         );
-      const role = defineRoleForTest(
+      const roles = defineRolesForTest(
         testAcceptNewStatusParams,
         expectedConvention,
       );
 
-      if (!role || role === "agencyOwner" || role === "toReview") {
+      if (agencyRolesEmptyOrContainsToReviewOrAgencyOwner(roles)) {
         throw new Error(
-          `Role '${role}' not supported according to ${JSON.stringify(
+          `Roles '${roles}' not supported according to ${JSON.stringify(
             testAcceptNewStatusParams,
           )}`,
         );
@@ -423,14 +424,14 @@ const makeTestAcceptsStatusUpdate =
           ? {
               convention: expectedConvention,
               justification: updateStatusParams.statusJustification,
-              requesterRole: role,
+              requesterRole: roles[0],
               modifierRole: updateStatusParams.modifierRole,
               agencyActorEmail: "agency-actor@gmail.com",
             }
           : {
               convention: expectedConvention,
               justification: updateStatusParams.statusJustification,
-              requesterRole: role,
+              requesterRole: roles[0],
               modifierRole: updateStatusParams.modifierRole,
             };
 
@@ -562,23 +563,25 @@ export const rejectStatusTransitionTests = ({
         notAllowedInclusionConnectedUsersToUpdate.map((userId) => ({ userId })),
       )("Rejected from userId '$userId'", ({ userId }) => {
         const user = makeUserIdMapInclusionConnectedUser[userId];
-        const getRole = () => {
+        const getRoles = () => {
           if (user.email === establishmentRepEmail)
-            return "establishment-representative";
+            return ["establishment-representative"];
 
-          if (user.isBackofficeAdmin) return "backOffice";
+          if (user.isBackofficeAdmin) return ["backOffice"];
 
-          return user.agencyRights.find(
-            (agencyRight) =>
-              agencyRight.agency.id === agencyWithoutCounsellorEmail.id,
-          )?.role;
+          return (
+            user.agencyRights.find(
+              (agencyRight) =>
+                agencyRight.agency.id === agencyWithoutCounsellorEmail.id,
+            )?.roles ?? []
+          );
         };
 
         return testRejectsStatusUpdate({
           userId,
           initialStatus: someValidInitialStatus,
           expectedError: new ForbiddenError(
-            `Role '${getRole()}' is not allowed to go to status '${
+            `Role '${getRoles()}' is not allowed to go to status '${
               updateStatusParams.status
             }' for convention '${updateStatusParams.conventionId}'.`,
           ),
@@ -670,25 +673,44 @@ export const acceptStatusTransitionTests = ({
   });
 };
 
-const defineRoleForTest = (
+const defineRolesForTest = (
   testAcceptNewStatusParams: TestAcceptNewStatusParams,
   expectedConvention: ConventionDto,
-): Role | AgencyRole | undefined => {
+): Role[] => {
   if ("role" in testAcceptNewStatusParams)
-    return testAcceptNewStatusParams.role;
+    return [testAcceptNewStatusParams.role];
 
   if (
     testAcceptNewStatusParams.userId ===
     "icUserWithRoleEstablishmentRepresentative"
   )
-    return "establishment-representative";
+    return ["establishment-representative"];
 
   if (testAcceptNewStatusParams.userId === "icUserWithRoleBackofficeAdmin")
-    return "backOffice";
+    return ["backOffice"];
 
-  return makeUserIdMapInclusionConnectedUser[
-    testAcceptNewStatusParams.userId
-  ].agencyRights.find(
-    (agencyRight) => agencyRight.agency.id === expectedConvention.agencyId,
-  )?.role;
+  const roles =
+    makeUserIdMapInclusionConnectedUser[
+      testAcceptNewStatusParams.userId
+    ].agencyRights.find(
+      (agencyRight) => agencyRight.agency.id === expectedConvention.agencyId,
+    )?.roles ?? [];
+
+  if (!agencyRolesEmptyOrContainsToReviewOrAgencyOwner(roles)) {
+    throw new Error(
+      `Roles '${roles}' not supported according to ${JSON.stringify(
+        testAcceptNewStatusParams,
+      )}`,
+    );
+  }
+
+  return roles;
 };
+
+export const agencyRolesEmptyOrContainsToReviewOrAgencyOwner = (
+  roles: (AgencyRole | Role)[],
+): roles is ExcludeFromExisting<
+  AgencyRole | Role,
+  "toReview" | "agencyOwner"
+>[] =>
+  !roles.length || roles.includes("toReview") || roles.includes("agencyOwner");

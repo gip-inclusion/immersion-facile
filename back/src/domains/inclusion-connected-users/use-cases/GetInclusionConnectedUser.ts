@@ -7,6 +7,7 @@ import {
   InclusionConnectedUser,
   WithDashboards,
   WithEstablismentsSiretAndName,
+  agencyRoleIsNotToReview,
 } from "shared";
 import { z } from "zod";
 import {
@@ -156,7 +157,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     user: InclusionConnectedUser,
   ): Promise<AgencyDashboards> {
     const agencyIdsWithEnoughPrivileges = user.agencyRights
-      .filter(({ role }) => role !== "toReview")
+      .filter(({ roles }) => agencyRoleIsNotToReview(roles))
       .map(({ agency }) => agency.id);
 
     const hasAtLeastOnePeAgency = user.agencyRights.some(

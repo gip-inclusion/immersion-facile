@@ -51,7 +51,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [
-            { role: "toReview", agency, isNotifiedByEmail: false },
+            { roles: ["toReview"], agency, isNotifiedByEmail: false },
           ],
           dashboards: { agencies: {}, establishments: {} },
           externalId: "john-external-id",
@@ -130,7 +130,7 @@ describe("Get Convention", () => {
             agencyRights: [
               {
                 agency: new AgencyDtoBuilder().withId("another-agency").build(),
-                role: "validator",
+                roles: ["validator"],
                 isNotifiedByEmail: false,
               },
             ],
@@ -201,7 +201,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [
-            { role: "validator", agency, isNotifiedByEmail: false },
+            { roles: ["validator"], agency, isNotifiedByEmail: false },
           ],
           dashboards: { agencies: {}, establishments: {} },
           externalId: "john-external-id",
@@ -345,7 +345,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [
-            { agency, role: "validator", isNotifiedByEmail: false },
+            { agency, roles: ["validator"], isNotifiedByEmail: false },
           ],
           dashboards: { agencies: {}, establishments: {} },
           externalId: "john-external-id",

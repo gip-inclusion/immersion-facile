@@ -6,13 +6,13 @@ import {
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
-  ExtractFromExisting,
+  ExcludeFromExisting,
   Role,
-  SignatoryRole,
   UpdateConventionStatusRequestDto,
   UserId,
   WithConventionIdLegacy,
   backOfficeEmail,
+  getRequesterRole,
   reviewedConventionStatuses,
   stringToMd5,
   updateConventionStatusRequestSchema,
@@ -83,22 +83,13 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     if (!agency)
       throw new NotFoundError(agencyMissingMessage(conventionRead.agencyId));
 
-    const role =
+    const roles =
       "role" in payload
-        ? payload.role
-        : await this.#agencyRoleFromUserIdAndAgencyId(
-            uow,
-            payload.userId,
-            conventionRead,
-          );
-
-    if (role === "toReview" || role === "agencyOwner")
-      throw new ForbiddenError(
-        `Role '${role}' is not allowed to go to status '${params.status}' for convention '${conventionRead.id}'.`,
-      );
+        ? [payload.role]
+        : await this.#rolesFromUserId(uow, payload.userId, conventionRead);
 
     throwIfTransitionNotAllowed({
-      role,
+      roles,
       targetStatus: params.status,
       conventionRead,
     });
@@ -161,7 +152,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
               params.modifierRole === "validator" ||
                 params.modifierRole === "counsellor"
                 ? {
-                    requesterRole: role,
+                    requesterRole: getRequesterRole(roles),
                     convention: updatedConvention,
                     justification: params.statusJustification,
                     modifierRole: params.modifierRole,
@@ -172,7 +163,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
                     ),
                   }
                 : {
-                    requesterRole: role,
+                    requesterRole: getRequesterRole(roles),
                     convention: updatedConvention,
                     justification: params.statusJustification,
                     modifierRole: params.modifierRole,
@@ -185,34 +176,36 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     return { id: updatedId };
   }
 
-  async #agencyRoleFromUserIdAndAgencyId(
+  async #rolesFromUserId(
     uow: UnitOfWork,
     userId: UserId,
     convention: ConventionDto,
-  ): Promise<
-    | AgencyRole
-    | ExtractFromExisting<SignatoryRole, "establishment-representative">
-    | ExtractFromExisting<Role, "backOffice">
-  > {
+  ): Promise<ExcludeFromExisting<Role, "agencyOwner">[]> {
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)
       throw new NotFoundError(
         `User '${userId}' not found on inclusion connected user repository.`,
       );
 
-    if (user.isBackofficeAdmin) return "backOffice";
+    if (user.isBackofficeAdmin) return ["backOffice"];
 
     if (user.email === convention.signatories.establishmentRepresentative.email)
-      return "establishment-representative";
+      return ["establishment-representative"];
 
-    const userAgencyRights = user.agencyRights.find(
+    const userAgencyRight = user.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === convention.agencyId,
     );
-    if (!userAgencyRights)
+    if (!userAgencyRight)
       throw new ForbiddenError(
         `User '${userId}' has no role on agency '${convention.agencyId}'.`,
       );
-    return userAgencyRights.role;
+
+    return userAgencyRight.roles.filter(
+      (
+        role,
+      ): role is ExcludeFromExisting<AgencyRole, "agencyOwner" | "toReview"> =>
+        role !== "agencyOwner" && role !== "toReview",
+    );
   }
 
   async #agencyEmailFromUserIdAndAgencyId(

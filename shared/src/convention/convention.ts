@@ -153,8 +153,11 @@ export const isConventionRenewed = (
 export const isConventionValidated = (convention: ConventionDto) =>
   convention.status === "ACCEPTED_BY_VALIDATOR";
 
-export const isAllowedRole = (allowedRoles: Role[], candidateRole: Role) =>
-  allowedRoles.includes(candidateRole);
+export const hasAllowedRole = ({
+  allowedRoles,
+  candidateRoles,
+}: { allowedRoles: Role[]; candidateRoles: Role[] }) =>
+  candidateRoles.some((candidateRole) => allowedRoles.includes(candidateRole));
 
 const processedDataBySignatoryRole: Record<
   SignatoryRole,

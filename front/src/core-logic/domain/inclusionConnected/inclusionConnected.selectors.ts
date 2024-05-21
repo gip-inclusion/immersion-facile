@@ -22,18 +22,18 @@ const feedback = createSelector(
   (state) => state.feedback,
 );
 
-const userRoleForFetchedConvention = createSelector(
+const userRolesForFetchedConvention = createSelector(
   currentUser,
   conventionSelectors.convention,
   (icUser, convention) =>
     convention && icUser
       ? getIcUserRoleForAccessingConvention(convention, icUser)
-      : null,
+      : [],
 );
 
 export const inclusionConnectedSelectors = {
   isLoading,
   currentUser,
   feedback,
-  userRoleForFetchedConvention,
+  userRolesForFetchedConvention,
 };
