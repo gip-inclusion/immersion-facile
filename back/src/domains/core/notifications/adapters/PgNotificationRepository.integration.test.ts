@@ -1,5 +1,5 @@
 import { subHours } from "date-fns";
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import {
   EmailAttachment,
   EmailNotification,
@@ -9,7 +9,10 @@ import {
   TemplatedSms,
   expectToEqual,
 } from "shared";
-import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { PgNotificationRepository } from "./PgNotificationRepository";
 
@@ -105,27 +108,27 @@ const maxRetrievedNotifications = 2;
 
 describe("PgNotificationRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let pgNotificationRepository: PgNotificationRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
   });
 
   beforeEach(async () => {
+    db = makeKyselyDb(pool);
     pgNotificationRepository = new PgNotificationRepository(
-      makeKyselyDb(pool),
+      db,
       maxRetrievedNotifications,
     );
-    await client.query("DELETE FROM notifications_sms");
-    await client.query("DELETE FROM notifications_email_recipients");
-    await client.query("DELETE FROM notifications_email_attachments");
-    await client.query("DELETE FROM notifications_email");
+
+    await db.deleteFrom("notifications_sms").executeTakeFirst();
+    await db.deleteFrom("notifications_email_recipients").executeTakeFirst();
+    await db.deleteFrom("notifications_email_attachments").executeTakeFirst();
+    await db.deleteFrom("notifications_email").executeTakeFirst();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
@@ -279,6 +282,39 @@ describe("PgNotificationRepository", () => {
         email: emailNotifications[2].templatedContent.recipients[0],
       });
       expectToEqual(response, [emailNotifications[2]]);
+    });
+  });
+
+  describe("getEmailsByIds", () => {
+    it("returns [] when no ids are provided", async () => {
+      const response = await pgNotificationRepository.getEmailsByIds([]);
+      expectToEqual(response, []);
+    });
+
+    it("returns the emails notifications with the provided ids", async () => {
+      await Promise.all(
+        emailNotifications.map((notif) => pgNotificationRepository.save(notif)),
+      );
+      const response = await pgNotificationRepository.getEmailsByIds([
+        emailNotifications[0].id,
+        emailNotifications[1].id,
+      ]);
+      expectToEqual(response, [emailNotifications[0], emailNotifications[1]]);
+    });
+  });
+
+  describe("getSmsByIds", () => {
+    it("returns [] when no ids are provided", async () => {
+      const response = await pgNotificationRepository.getSmsByIds([]);
+      expectToEqual(response, []);
+    });
+
+    it("returns the sms notifications with the provided ids", async () => {
+      await pgNotificationRepository.save(smsNotification);
+      const response = await pgNotificationRepository.getSmsByIds([
+        smsNotification.id,
+      ]);
+      expectToEqual(response, [smsNotification]);
     });
   });
 

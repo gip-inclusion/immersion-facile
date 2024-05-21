@@ -35,7 +35,7 @@ import {
 const logger = createLogger(__filename);
 
 const brevoMaxEmailRequestsPerSeconds = 2_000;
-const brevoMaxSmsRequestsPerHours = 200;
+const brevoMaxSmsRequestsPerHours = 200; // seems it is now 200 per seconds (not hours) : https://developers.brevo.com/docs/api-limits
 
 const ONE_SECOND_MS = 1_000;
 const ONE_HOUR_MS = ONE_SECOND_MS * 3_600;

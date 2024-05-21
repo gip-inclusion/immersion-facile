@@ -92,7 +92,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               appellationLabel,
               potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
               potentialBeneficiaryLastName: potentialBeneficiary.lastName,
-              immersionObjective: discussion.immersionObjective,
+              immersionObjective: discussion.immersionObjective ?? undefined,
               potentialBeneficiaryPhone:
                 potentialBeneficiary.phone ?? "pas de téléphone fourni",
               potentialBeneficiaryResumeLink: potentialBeneficiary.resumeLink,

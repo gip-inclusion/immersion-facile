@@ -120,7 +120,7 @@ describe("NotifyContactRequest", () => {
                 discussion.potentialBeneficiary.firstName,
               potentialBeneficiaryLastName:
                 discussion.potentialBeneficiary.lastName,
-              immersionObjective: discussion.immersionObjective,
+              immersionObjective: discussion.immersionObjective ?? undefined,
               potentialBeneficiaryPhone:
                 discussion.potentialBeneficiary.phone ??
                 "pas de téléphone fourni",
