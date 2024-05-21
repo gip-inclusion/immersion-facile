@@ -103,7 +103,7 @@ export type EmailParamsByEmailType = {
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
     potentialBeneficiaryPhone: string;
-    immersionObjective: ImmersionObjective | null;
+    immersionObjective: ImmersionObjective | undefined;
     potentialBeneficiaryResumeLink?: string;
     message: string;
     replyToEmail: Email;
@@ -147,7 +147,7 @@ export type EmailParamsByEmailType = {
     internshipKind: InternshipKind;
   };
   NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
-    immersionObjective: ImmersionObjective | null;
+    immersionObjective: ImmersionObjective | undefined;
     conventionId: ConventionId;
     dateEnd: string;
     dateStart: string;

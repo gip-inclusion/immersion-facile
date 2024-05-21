@@ -46,18 +46,19 @@ export class SendNotificationInBatch extends TransactionalUseCase<
     const emailNotifications =
       await uow.notificationRepository.getEmailsByIds(emailNotificationIds);
 
-    await executeInSequence(smsNotifications, (notification) =>
-      this.notificationGateway.sendSms(
-        notification.templatedContent,
-        notification.id,
+    await Promise.all([
+      executeInSequence(smsNotifications, (notification) =>
+        this.notificationGateway.sendSms(
+          notification.templatedContent,
+          notification.id,
+        ),
       ),
-    );
-
-    await executeInSequence(emailNotifications, (notification) =>
-      this.notificationGateway.sendEmail(
-        notification.templatedContent,
-        notification.id,
+      executeInSequence(emailNotifications, (notification) =>
+        this.notificationGateway.sendEmail(
+          notification.templatedContent,
+          notification.id,
+        ),
       ),
-    );
+    ]);
   }
 }
