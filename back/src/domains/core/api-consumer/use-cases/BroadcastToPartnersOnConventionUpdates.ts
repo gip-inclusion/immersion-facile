@@ -116,7 +116,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
       );
 
       if (response.title === "Partner subscription errored") {
-        logger.error(response);
+        logger.error({ response });
 
         await uow.errorRepository.save({
           consumerId: apiConsumer.id,
@@ -136,7 +136,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
         return;
       }
 
-      logger.info(response);
+      logger.info({ response });
       return;
     };
   }

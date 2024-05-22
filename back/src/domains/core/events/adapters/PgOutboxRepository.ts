@@ -1,5 +1,5 @@
 import { differenceWith } from "ramda";
-import { DateString, castError, propEq, replaceArrayElement } from "shared";
+import { DateString, propEq, replaceArrayElement } from "shared";
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
@@ -77,10 +77,11 @@ export class PgOutboxRepository implements OutboxRepository {
         topic: event.topic,
         wasQuarantined: event.wasQuarantined.toString(),
       });
-      logger.info(
-        { topic: event.topic, wasQuarantined: event.wasQuarantined.toString() },
-        "eventsSavedBeforePublish",
-      );
+      logger.info({
+        topic: event.topic,
+        wasQuarantined: event.wasQuarantined.toString(),
+        message: "eventsSavedBeforePublish",
+      });
     }
   }
 
@@ -111,14 +112,7 @@ export class PgOutboxRepository implements OutboxRepository {
       status,
     });
 
-    await builder.execute().catch((error) => {
-      const { query, parameters } = builder.compile();
-      logger.error(
-        { query, values: parameters, error: castError(error) },
-        "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
-      );
-      throw error;
-    });
+    await builder.execute();
 
     return { ...event, publications: [] }; // publications will be added after in process
   }

@@ -92,10 +92,10 @@ export class BrevoNotificationGateway implements NotificationGateway {
     notificationId?: NotificationId,
   ) {
     if (email.recipients.length === 0) {
-      logger.error(
-        { emailType: email.kind, emailParams: email.params },
-        "No recipient for provided email",
-      );
+      logger.error({
+        notificationId,
+        message: "No recipient for provided email",
+      });
       throw new BadRequestError("No recipient for provided email");
     }
     const cc = this.#filterAllowListAndConvertToRecipients(email.cc);
@@ -122,37 +122,25 @@ export class BrevoNotificationGateway implements NotificationGateway {
 
     const emailType = email.kind;
     counterSendTransactEmailTotal.inc({ emailType });
-    logger.info(
-      {
-        to: emailData.to,
-        type: email.kind,
-        subject: emailData.subject ?? "Sans objet",
-        cc: emailData.cc,
-        params: email.params,
-      },
-      "sendTransactEmailTotal",
-    );
+    logger.info({
+      notificationId,
+      message: "sendTransactEmailTotal",
+    });
 
     return this.#sendTransacEmail(emailData)
       .then((_response) => {
         counterSendTransactEmailSuccess.inc({ emailType });
-        logger.info(
-          { to: emailData.to, type: email.kind },
-          "sendTransactEmailSuccess",
-        );
+        logger.info({
+          notificationId,
+          message: "sendTransactEmailSuccess",
+        });
       })
       .catch((error) => {
         counterSendTransactEmailError.inc({ emailType });
-        logger.error(
-          {
-            to: emailData.to,
-            type: email.kind,
-            errorMessage: error?.response?.data ?? error?.message,
-            notificationId,
-            notificationKind: "email",
-          },
-          "sendTransactEmailError",
-        );
+        logger.error({
+          notificationId,
+          message: "sendTransactEmailError",
+        });
         throw error;
       });
   }
@@ -161,12 +149,10 @@ export class BrevoNotificationGateway implements NotificationGateway {
     { kind, params, recipientPhone }: TemplatedSms,
     notificationId?: NotificationId,
   ): Promise<void> {
-    logger.info(
-      {
-        phone: recipientPhone,
-      },
-      "sendTransactSmsTotal",
-    );
+    logger.info({
+      notificationId,
+      message: "sendTransactSmsTotal",
+    });
 
     return this.#sendTransacSms({
       content: smsTemplatesByName[kind].createContent(params as any),
@@ -174,23 +160,17 @@ export class BrevoNotificationGateway implements NotificationGateway {
       recipient: recipientPhone,
     })
       .then((_response) =>
-        logger.info(
-          {
-            phone: recipientPhone,
-          },
-          "sendTransactSmsSuccess",
-        ),
+        logger.info({
+          notificationId,
+          message: "sendTransactSmsSuccess",
+        }),
       )
       .catch((error) => {
-        logger.error(
-          {
-            phone: recipientPhone,
-            notificationId,
-            notificationKind: "sms",
-            error,
-          },
-          "sendTransactSmsError",
-        );
+        logger.error({
+          notificationId,
+          error,
+          message: "sendTransactSmsError",
+        });
         throw error;
       });
   }

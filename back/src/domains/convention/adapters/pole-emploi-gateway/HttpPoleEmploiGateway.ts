@@ -104,7 +104,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             )
             .then((response) => response.data)
             .catch((error) => {
-              logger.error(error, "Raw error getting access token");
+              logger.error({
+                error,
+                message: "Raw error getting access token",
+              });
               if (isRetryableError(logger, error))
                 throw new RetryableError(error);
               logAxiosError(logger, error);

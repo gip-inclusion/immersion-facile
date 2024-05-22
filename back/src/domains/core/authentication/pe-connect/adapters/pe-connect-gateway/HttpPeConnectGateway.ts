@@ -1,11 +1,6 @@
 import axios from "axios";
 import Bottleneck from "bottleneck";
-import { Logger } from "pino";
-import {
-  HTTP_STATUS,
-  parseZodSchemaAndLogErrorOnParsingFailure,
-  queryParamsAsString,
-} from "shared";
+import { HTTP_STATUS, queryParamsAsString } from "shared";
 import { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
 import { UnhandledError } from "../../../../../../config/helpers/unhandledError";
@@ -16,8 +11,9 @@ import {
   getUserInfoCounter,
   getUserStatutInfoCounter,
 } from "../../../../../../utils/counters";
-import { createLogger } from "../../../../../../utils/logger";
+import { OpacifiedLogger, createLogger } from "../../../../../../utils/logger";
 import { notifyObjectDiscord } from "../../../../../../utils/notifyDiscord";
+import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../../utils/schema.utils";
 import { AccessTokenDto } from "../../dto/AccessToken.dto";
 import { PeConnectAdvisorDto } from "../../dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../dto/PeConnectUser.dto";
@@ -45,7 +41,10 @@ import {
 const logger = createLogger(__filename);
 
 const counterApiKind = "peConnect";
-const makePeConnectLogger = (logger: Logger, counterType: CounterType) => ({
+const makePeConnectLogger = (
+  logger: OpacifiedLogger,
+  counterType: CounterType,
+) => ({
   success: (contents: object) =>
     logger.info({
       ...contents,
@@ -359,15 +358,13 @@ const managePeConnectError = (
       new Error("Not an error class"),
     );
   if (axios.isAxiosError(error)) {
-    logger.error(
-      {
-        routeName,
-        context,
-        message: error?.message,
-        body: error?.response?.data,
-      },
-      "PE CONNECT ERROR",
-    );
+    logger.error({
+      routeName,
+      context,
+      message: "PE CONNECT ERROR",
+      errorMessage: error?.message,
+      body: error?.response?.data,
+    });
     const handledError = peConnectAxiosErrorStrategy(error, routeName).get(
       true,
     );

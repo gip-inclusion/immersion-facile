@@ -301,7 +301,7 @@ export class PgAgencyRepository implements AgencyRepository {
       // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
       // See https://www.postgresql.org/docs/10/errcodes-appendix.html
       if (error.code === "23505") {
-        logger.error(error, error.detail);
+        logger.error({ error });
         return undefined;
       }
       throw error;

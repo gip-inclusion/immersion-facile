@@ -1,5 +1,5 @@
-import { Logger } from "pino";
 import { z } from "zod";
+import { OpacifiedLogger } from "../../utils/logger";
 
 export abstract class HttpError extends Error {
   public abstract httpCode: number;
@@ -99,26 +99,26 @@ export class UnavailableApiError extends HttpError {
 
 export const validateAndParseZodSchema = <T>(
   inputSchema: z.Schema<T>,
-  params: any,
-  logger: Logger,
+  data: any,
+  logger: OpacifiedLogger,
 ): T => {
   try {
-    return inputSchema.parse(params);
+    return inputSchema.parse(data);
   } catch (e) {
-    logger.error("ValidateAndParseZodSchema failed with: ", params);
+    logger.error({ data, message: "ValidateAndParseZodSchema failed" });
     throw new BadRequestError(e);
   }
 };
 
 export const validateAndParseZodSchemaV2 = <T>(
   inputSchema: z.Schema<T>,
-  params: unknown,
-  logger: Logger,
+  data: unknown,
+  logger: OpacifiedLogger,
 ): T => {
   try {
-    return inputSchema.parse(params);
+    return inputSchema.parse(data);
   } catch (e) {
-    logger.error("ValidateAndParseZodSchema failed with: ", params);
+    logger.error({ data, message: "ValidateAndParseZodSchema failed" });
     const error = e as z.ZodError;
     const issues = error.issues.map(
       (issue) => `${issue.path.join(".")}: ${issue.message}`,

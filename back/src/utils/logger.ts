@@ -1,15 +1,25 @@
 import path from "path";
+import { Request } from "express";
+import { QueryResult } from "kysely";
 import pino, { Logger } from "pino";
 import {
   AgencyDto,
+  AgencyId,
+  ApiConsumerName,
   ConventionDto,
   ConventionId,
+  ConventionJwtPayload,
   FormEstablishmentDto,
+  Role,
 } from "shared";
-import { NodeProcessReport } from "./nodeProcessReport";
+import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
+import { Recipient } from "../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
+import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
+import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
+import { DomainTopic, EventToDebugInfo } from "../domains/core/events/events";
 import { SearchMade } from "../domains/establishment/entities/SearchMadeEntity";
-import { QueryResult } from "kysely";
-import { QueryResultRow } from "pg";
+import { PartialResponse } from "./axiosUtils";
+import { NodeProcessReport } from "./nodeProcessReport";
 
 const getLogLevel = () => {
   // Allow command-line overrides of the log level.
@@ -47,12 +57,69 @@ type SQLError = {
 };
 
 type LoggerParams = Partial<{
+  _title: string;
   agency: Partial<AgencyDto>;
+  agencyId: AgencyId;
+  api: string;
+  apiAddress: "IN_MEMORY" | "OPEN_CAGE_DATA";
+  authorisationStatus: AuthorisationStatus;
+  body: object;
+  consumerName: ApiConsumerName;
+  context: Record<string, string>;
   convention: Partial<ConventionDto>;
-  formEstablishment: Partial<FormEstablishmentDto>;
-  search: Partial<SearchMade>;
-  nodeProcessReport: NodeProcessReport;
+  conventionId: ConventionId;
+  counterType: string;
+  crawlingPeriodMs: number;
+  data: unknown;
+  durationInSeconds: number;
+  email: string;
   error: Error | Partial<SQLError>;
+  errorMessage: string;
+  errorType: string;
+  eventId: string;
+  events: EventToDebugInfo[];
+  formEstablishment: Partial<FormEstablishmentDto>;
+  host: string;
+  httpStatus: number;
+  jwt: string;
+  markEventsAsInProcessDurationInSeconds: number;
+  method: string;
+  newOutboxSize: number;
+  nodeProcessReport: NodeProcessReport;
+  notificationGateway: "IN_MEMORY" | "BREVO";
+  notificationId: string;
+  numberOfEvent: number;
+  pathname: string;
+  payload: ConventionJwtPayload;
+  peConvention: {
+    peId: string;
+    originalId: string;
+  };
+  processEventsDurationInSeconds: number;
+  query: string;
+  recipients: Recipient[];
+  reportContent: string;
+  repositories: "IN_MEMORY" | "PG";
+  request: Pick<Request, "path" | "method" | "body">;
+  requestId: string;
+  response: PartialResponse | SubscriberResponse;
+  retrieveEventsDurationInSeconds: number;
+  role: Role;
+  romeRepository: "IN_MEMORY" | "PG";
+  route: string;
+  routeName: string;
+  search: Partial<SearchMade>;
+  siretGateway: "IN_MEMORY" | "HTTPS" | "INSEE" | "ANNUAIRE_DES_ENTREPRISES";
+  stack: string;
+  status: string;
+  subscriptionId: string;
+  token: string;
+  topic: DomainTopic;
+  type: string;
+  typeOfEvents: TypeOfEvent;
+  useCaseName: string;
+  values: unknown[];
+  wasQuarantined: string;
 }>;
 
 export type OpacifiedLogger = {

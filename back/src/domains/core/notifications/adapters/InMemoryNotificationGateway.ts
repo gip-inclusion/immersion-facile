@@ -1,11 +1,9 @@
 import { prop } from "ramda";
 import { DateString, TemplatedEmail, TemplatedSms } from "shared";
-import { createLogger } from "../../../../utils/logger";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { NotificationGateway } from "../ports/NotificationGateway";
 
-const logger = createLogger(__filename);
 export const sendSmsErrorPhoneNumber = "0699999999";
 export class InMemoryNotificationGateway implements NotificationGateway {
   public attachment: Buffer = Buffer.from("");
@@ -36,10 +34,6 @@ export class InMemoryNotificationGateway implements NotificationGateway {
   }
 
   public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
-    logger.info(
-      templatedEmail.params,
-      `sending email : ${templatedEmail.kind}`,
-    );
     this.#pushEmail(templatedEmail);
   }
 

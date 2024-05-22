@@ -1,6 +1,6 @@
 import axios from "axios";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createLogger, OpacifiedLogger } from "../utils/logger";
+import { OpacifiedLogger, createLogger } from "../utils/logger";
 
 export const handleEndOfScriptNotification = async <T>(
   name: string,
@@ -36,7 +36,7 @@ export const handleEndOfScriptNotification = async <T>(
       const durationInSeconds = (end.getTime() - start.getTime()) / 1000;
       const reportTitle = `❌Failure at ${end.toISOString()} - ${context}`;
 
-      logger.error({ error, durationInSeconds }, reportTitle);
+      logger.error({ error, durationInSeconds, message: reportTitle });
       return notifyDiscordPipelineReport(
         [
           reportTitle,

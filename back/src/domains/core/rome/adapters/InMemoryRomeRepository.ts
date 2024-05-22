@@ -5,11 +5,8 @@ import {
   RomeDto,
   cartographeAppellationAndRome,
 } from "shared";
-import { createLogger } from "../../../../utils/logger";
 import { normalize } from "../../../../utils/textSearch";
 import { RomeRepository } from "../ports/RomeRepository";
-
-const logger = createLogger(__filename);
 
 const defaultAppellations: AppellationAndRomeDto[] = [
   {
@@ -93,7 +90,6 @@ export class InMemoryRomeRepository implements RomeRepository {
   public async searchAppellation(
     query: string,
   ): Promise<AppellationAndRomeDto[]> {
-    logger.info({ query }, "searchAppellation");
     const normalizedQuery = normalize(query);
     return this.appellations.filter((appellation) =>
       normalize(appellation.appellationLabel).includes(normalizedQuery),
@@ -101,7 +97,6 @@ export class InMemoryRomeRepository implements RomeRepository {
   }
 
   public async searchRome(query: string): Promise<RomeDto[]> {
-    logger.info({ query }, "searchRome");
     const normalizedQuery = normalize(query);
     return this.appellations
       .filter((appellationDto) =>

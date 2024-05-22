@@ -22,16 +22,18 @@ const logger = createLogger(__filename);
 const convertRouteToLog = (originalUrl: string) =>
   `/${originalUrl.split("/")[1]}`;
 
+export type AuthorisationStatus =
+  | "authorised"
+  | "unauthorisedId"
+  | "incorrectJwt"
+  | "expiredToken"
+  | "consumerNotFound"
+  | "tooManyRequests"
+  | "unauthenticated";
+
 type TotalCountProps = {
   consumerName?: ApiConsumerName;
-  authorisationStatus:
-    | "authorised"
-    | "unauthorisedId"
-    | "incorrectJwt"
-    | "expiredToken"
-    | "consumerNotFound"
-    | "tooManyRequests"
-    | "unauthenticated";
+  authorisationStatus: AuthorisationStatus;
 };
 
 const createIncTotalCountForRequest =
@@ -44,15 +46,13 @@ const createIncTotalCountForRequest =
       consumerName,
       authorisationStatus,
     });
-    logger.info(
-      {
-        route,
-        method: req.method,
-        consumerName,
-        authorisationStatus,
-      },
-      "apiKeyAuthMiddlewareRequestsTotal",
-    );
+    logger.info({
+      route,
+      method: req.method,
+      consumerName,
+      authorisationStatus,
+      message: "apiKeyAuthMiddlewareRequestsTotal",
+    });
   };
 
 const responseError = (
@@ -93,12 +93,14 @@ export const makeMagicLinkAuthMiddleware = (
 
       next();
     } catch (err) {
+      const castedError = castError(err);
       const unsafePayload = jwt.decode(maybeJwt) as ConventionJwtPayload;
       if (err instanceof TokenExpiredError) {
-        logger.warn(
-          { token: maybeJwt, payload: unsafePayload },
-          "token expired",
-        );
+        logger.warn({
+          token: maybeJwt,
+          payload: unsafePayload,
+          message: "token expired",
+        });
         return unsafePayload
           ? sendNeedsRenewedLinkError(res, err)
           : sendAuthenticationError(res, err);
@@ -106,7 +108,7 @@ export const makeMagicLinkAuthMiddleware = (
 
       try {
         verifyDeprecatedJwt(maybeJwt);
-        return sendNeedsRenewedLinkError(res, err);
+        return sendNeedsRenewedLinkError(res, castedError);
       } catch (error) {
         return sendAuthenticationError(res, castError(error));
       }
@@ -114,26 +116,26 @@ export const makeMagicLinkAuthMiddleware = (
   };
 };
 
-const sendAuthenticationError = (res: Response, err: Error) => {
-  logger.error({ err }, "authentication failed");
+const sendAuthenticationError = (res: Response, error: Error) => {
+  logger.error({ error, message: "authentication failed" });
   res.status(401);
   return res.json({
     error: "Provided token is invalid",
   });
 };
 
-const sendNeedsRenewedLinkError = (res: Response, err: unknown) => {
-  logger.info({ err }, "unsupported or expired magic link used");
+const sendNeedsRenewedLinkError = (res: Response, error: Error) => {
+  logger.info({ error, message: "unsupported or expired magic link used" });
   res.status(403);
-  return err instanceof Error
+  return error instanceof Error
     ? res.json({
         message:
-          err.message === "jwt expired"
+          error.message === "jwt expired"
             ? expiredMagicLinkErrorMessage
-            : err.message,
+            : error.message,
         needsNewMagicLink: true,
       })
-    : res.json({ message: JSON.stringify(err), needsNewMagicLink: true });
+    : res.json({ message: JSON.stringify(error), needsNewMagicLink: true });
 };
 
 export const verifyJwtConfig = <K extends JwtKind>(config: AppConfig) => {
@@ -223,12 +225,11 @@ export const makeConsumerMiddleware = (
           );
         });
     } catch (error) {
-      logger.error(
-        {
-          error,
-        },
-        `makeApiKeyAuthMiddlewareV2 : ${castError(error).message}`,
-      );
+      const castedError = castError(error);
+      logger.error({
+        error: castedError,
+        message: `makeApiKeyAuthMiddlewareV2 : ${castedError.message}`,
+      });
       incTotalCountForRequest({
         authorisationStatus: "incorrectJwt",
       });

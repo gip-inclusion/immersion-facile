@@ -16,6 +16,7 @@ import {
   EventFailure,
   EventPublication,
   SubscriptionId,
+  eventsToDebugInfo,
 } from "../events";
 import { EventBus, EventCallback } from "../ports/EventBus";
 
@@ -37,16 +38,10 @@ export class InMemoryEventBus implements EventBus {
   public async publish(event: DomainEvent) {
     const publishedAt = this.timeGateway.now().toISOString();
     const publishedEvent = await this.#publish(event, publishedAt);
-    logger.info(
-      {
-        eventId: publishedEvent.id,
-        topic: publishedEvent.topic,
-        occurredAt: publishedEvent.occurredAt,
-        publicationsBefore: event.publications,
-        publicationsAfter: publishedEvent.publications,
-      },
-      "Saving published event",
-    );
+    logger.info({
+      events: eventsToDebugInfo([publishedEvent]),
+      message: "Saving published event",
+    });
     await this.uowPerformer.perform((uow) =>
       uow.outboxRepository.save(publishedEvent),
     );
@@ -57,7 +52,7 @@ export class InMemoryEventBus implements EventBus {
     subscriptionId: SubscriptionId,
     callback: EventCallback<T>,
   ) {
-    logger.info({ domainTopic }, "subscribe");
+    logger.info({ topic: domainTopic, message: "subscribe" });
     if (!this.subscriptions[domainTopic]) {
       this.subscriptions[domainTopic] = {};
     }
@@ -67,10 +62,12 @@ export class InMemoryEventBus implements EventBus {
       this.subscriptions[domainTopic]!;
 
     if (subscriptionsForTopic[subscriptionId]) {
-      logger.warn(
-        { domainTopic, subscriptionId },
-        "Subscription with this id already exists. It will be override",
-      );
+      logger.warn({
+        topic: domainTopic,
+        subscriptionId,
+        message:
+          "Subscription with this id already exists. It will be override",
+      });
     }
 
     if (callback) {
@@ -84,11 +81,11 @@ export class InMemoryEventBus implements EventBus {
   ): Promise<DomainEvent> {
     // the publication happens here, an event is expected in return,
     // with the publication added to the event
-    logger.info({ event }, "publish");
+    logger.info({ eventId: event.id, message: "publish" });
 
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
-    logger.info({ topic }, "publishedEventsTotal");
+    logger.info({ topic, message: "publishedEventsTotal" });
 
     const callbacksById: SubscriptionsForTopic | undefined =
       this.subscriptions[topic];
@@ -117,7 +114,7 @@ export class InMemoryEventBus implements EventBus {
 
     if (failures.length === 0) {
       counterPublishedEventsSuccess.inc({ topic });
-      logger.info({ topic }, "publishedEventsSuccess");
+      logger.info({ topic, message: "publishedEventsSuccess" });
       return {
         ...event,
         publications,
@@ -129,7 +126,7 @@ export class InMemoryEventBus implements EventBus {
     const wasMaxNumberOfErrorsReached = event.publications.length >= 3;
     if (wasMaxNumberOfErrorsReached) {
       const message = "Failed too many times, event will be Quarantined";
-      logger.error({ event }, message);
+      logger.error({ eventId: event.id, message });
       const { payload: _, publications: __, ...restEvent } = event;
       notifyObjectDiscord({
         event: {
@@ -172,10 +169,11 @@ const makeExecuteSubscriptionMatchingSubscriptionId =
   ) =>
   async (subscriptionId: SubscriptionId): Promise<void | EventFailure> => {
     const subscription = subscriptionsForTopic[subscriptionId];
-    logger.info(
-      { eventId: event.id, topic: event.topic },
-      `Sending an event for ${subscriptionId}`,
-    );
+    logger.info({
+      eventId: event.id,
+      topic: event.topic,
+      message: `Sending an event for ${subscriptionId}`,
+    });
 
     try {
       await subscription(event);
@@ -211,7 +209,10 @@ const getSubscriptionIdsToPublish = (
 };
 
 const monitorAbsenceOfCallback = (event: DomainEvent) => {
-  logger.warn({ eventTopic: event.topic }, "No Callbacks exist for topic.");
+  logger.warn({
+    topic: event.topic,
+    message: "No Callbacks exist for topic.",
+  });
 };
 
 const monitorErrorInCallback = (error: any, event: DomainEvent) => {
@@ -220,14 +221,12 @@ const monitorErrorInCallback = (error: any, event: DomainEvent) => {
     topic: event.topic,
     errorType: "callback_failed",
   });
-  logger.error(
-    {
-      topic: event.topic,
-      event,
-      error: error.message || JSON.stringify(error),
-    },
-    "publishedEventsError",
-  );
+  logger.error({
+    topic: event.topic,
+    eventId: event.id,
+    error: error.message || JSON.stringify(error),
+    message: "publishedEventsError",
+  });
 };
 
 const getLastPublication = (event: DomainEvent): EventPublication | undefined =>

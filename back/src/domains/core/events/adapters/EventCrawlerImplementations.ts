@@ -16,6 +16,8 @@ const maxEventsProcessedInParallel = 5;
 const neverPublishedOutboxLimit = 1500;
 const crawlerMaxBatchSize = 300;
 
+export type TypeOfEvent = "unpublished" | "failed";
+
 export class BasicEventCrawler implements EventCrawler {
   constructor(
     private uowPerformer: UnitOfWorkPerformer,
@@ -66,15 +68,13 @@ export class BasicEventCrawler implements EventCrawler {
     const durationInSeconds = calculateDurationInSecondsFrom(startDate);
 
     if (events.length) {
-      logger.warn(
-        {
-          durationInSeconds,
-          typeOfEvents: "failed",
-          numberOfEvent: events.length,
-          events: eventsToDebugInfo(events),
-        },
-        `retryFailedEvents | ${events.length} events to process`,
-      );
+      logger.warn({
+        durationInSeconds,
+        typeOfEvents: "failed",
+        numberOfEvent: events.length,
+        events: eventsToDebugInfo(events),
+        message: `retryFailedEvents | ${events.length} events to process`,
+      });
     }
     await this.#publishEvents(events);
   }
@@ -91,9 +91,7 @@ export class BasicEventCrawler implements EventCrawler {
       const timer = setTimeout(() => {
         const warning = {
           message: "Processing event group is taking long",
-          events: eventGroup.map((event) => {
-            return { eventId: event.id, topic: event.topic };
-          }),
+          events: eventsToDebugInfo(eventGroup),
         };
         notifyObjectDiscord(warning);
         logger.warn(warning);
@@ -107,9 +105,7 @@ export class BasicEventCrawler implements EventCrawler {
     }
   }
 
-  async #retrieveEvents(
-    type: "unpublished" | "failed",
-  ): Promise<DomainEvent[]> {
+  async #retrieveEvents(type: TypeOfEvent): Promise<DomainEvent[]> {
     try {
       const events = await this.uowPerformer.perform((uow) =>
         type === "unpublished"
@@ -158,10 +154,11 @@ export class RealEventCrawler
   }
 
   public override startCrawler() {
-    logger.info(
-      { crawlingPeriodMs: this.crawlingPeriodMs },
-      "RealEventCrawler.startCrawler: processing events at regular intervals",
-    );
+    logger.info({
+      crawlingPeriodMs: this.crawlingPeriodMs,
+      message:
+        "RealEventCrawler.startCrawler: processing events at regular intervals",
+    });
 
     // old version :
     // setInterval(async () => {
@@ -171,7 +168,10 @@ export class RealEventCrawler
       setTimeout(() => {
         this.processNewEvents()
           .catch((error) => {
-            logger.error({ error }, "RealEventCrawler.processNewEvents failed");
+            logger.error({
+              error,
+              message: "RealEventCrawler.processNewEvents failed",
+            });
           })
           .finally(() => processNewEvents());
       }, this.crawlingPeriodMs);
@@ -187,10 +187,10 @@ export class RealEventCrawler
       setTimeout(() => {
         this.retryFailedEvents()
           .catch((error) => {
-            logger.error(
-              { error },
-              "RealEventCrawler.retryFailedEvents failed",
-            );
+            logger.error({
+              error,
+              message: "RealEventCrawler.retryFailedEvents failed",
+            });
           })
           .finally(() => retryFailedEvents());
       }, retryErrorsPeriodMs);

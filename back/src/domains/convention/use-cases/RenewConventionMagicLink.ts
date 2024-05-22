@@ -145,10 +145,10 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   async #getAgency(uow: UnitOfWork, convention: ConventionDto) {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
     if (agency) return agency;
-    logger.error(
-      { agencyId: convention.agencyId },
-      "No Agency Config found for this agency code",
-    );
+    logger.error({
+      agencyId: convention.agencyId,
+      message: "No Agency Config found for this agency code",
+    });
     throw new BadRequestError(convention.agencyId);
   }
 

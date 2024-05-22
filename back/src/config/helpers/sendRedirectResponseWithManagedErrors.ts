@@ -21,19 +21,17 @@ export const sendRedirectResponseWithManagedErrors = async (
     return res.status(302).redirect(await callback());
   } catch (error: any) {
     const stack = JSON.stringify(error.stack, null, 2);
-    logger.error(
-      {
-        error,
-        errorMessage: error.message,
-        stack,
-        request: {
-          path: req.path,
-          method: req.method,
-          body: req.body,
-        },
+    logger.error({
+      error,
+      errorMessage: error.message,
+      stack,
+      request: {
+        path: req.path,
+        method: req.method,
+        body: req.body,
       },
-      "Redirect error",
-    );
+      message: "Redirect error",
+    });
 
     if (error instanceof ManagedRedirectError)
       return handleManagedRedirectResponseError(error, res);

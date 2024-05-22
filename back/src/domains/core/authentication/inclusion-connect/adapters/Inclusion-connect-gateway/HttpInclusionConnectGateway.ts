@@ -44,10 +44,10 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
           ),
       }))
       .catch((error) => {
-        logger.error(
-          { body: error?.response?.data },
-          "Error trying to get Access Token",
-        );
+        logger.error({
+          body: error?.response?.data,
+          message: "Error trying to get Access Token",
+        });
         throw error;
       });
   }
