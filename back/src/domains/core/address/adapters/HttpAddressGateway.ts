@@ -100,7 +100,7 @@ export class HttpAddressGateway implements AddressGateway {
     } finally {
       calculateDurationInSecondsFrom(startDate);
       logger.info({
-        method: "lookupLocationName",
+        message: "HttpAddressGateway.lookupLocationName",
         query,
         durationInSeconds: calculateDurationInSecondsFrom(startDate),
       });
@@ -138,7 +138,7 @@ export class HttpAddressGateway implements AddressGateway {
     } finally {
       calculateDurationInSecondsFrom(startDate);
       logger.info({
-        method: "lookupStreetAddress",
+        message: "HttpAddressGateway.lookupStreetAddress",
         query,
         durationInSeconds: calculateDurationInSecondsFrom(startDate),
       });

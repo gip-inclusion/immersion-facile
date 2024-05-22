@@ -48,7 +48,11 @@ const createIncTotalCountForRequest =
     });
     logger.info({
       route,
-      method: req.method,
+      request: {
+        method: req.method,
+        path: route,
+        body: req.body,
+      },
       consumerName,
       authorisationStatus,
       message: "apiKeyAuthMiddlewareRequestsTotal",
