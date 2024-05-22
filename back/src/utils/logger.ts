@@ -61,7 +61,7 @@ type LoggerParams = Partial<{
   _title: string;
   agencyId: AgencyId;
   api: string;
-  apiAddress: "IN_MEMORY" | "OPEN_CAGE_DATA";
+
   authorisationStatus: AuthorisationStatus;
   body: object;
   consumerName: ApiConsumerName;
@@ -86,7 +86,7 @@ type LoggerParams = Partial<{
   method: string;
   newOutboxSize: number;
   nodeProcessReport: NodeProcessReport;
-  notificationGateway: "IN_MEMORY" | "BREVO";
+
   notificationId: string;
   numberOfEvent: number;
   pathname: string;
@@ -99,17 +99,24 @@ type LoggerParams = Partial<{
   query: string;
   recipients: Recipient[];
   reportContent: string;
-  repositories: "IN_MEMORY" | "PG";
+  adapters: {
+    repositories: "IN_MEMORY" | "PG";
+    notificationGateway: "IN_MEMORY" | "BREVO";
+    apiAddress: "IN_MEMORY" | "OPEN_CAGE_DATA";
+    siretGateway: "IN_MEMORY" | "HTTPS" | "INSEE" | "ANNUAIRE_DES_ENTREPRISES";
+    romeRepository: "IN_MEMORY" | "PG";
+  };
+
   request: Pick<Request, "path" | "method" | "body">;
   requestId: string;
   response: PartialResponse | SubscriberResponse;
   retrieveEventsDurationInSeconds: number;
   role: Role;
-  romeRepository: "IN_MEMORY" | "PG";
+
   route: string;
   routeName: string;
   search: Partial<SearchMade>;
-  siretGateway: "IN_MEMORY" | "HTTPS" | "INSEE" | "ANNUAIRE_DES_ENTREPRISES";
+
   stack: string;
   status: string;
   subscriptionId: string;
