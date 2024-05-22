@@ -13,7 +13,6 @@ import {
 } from "shared";
 import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
-import { Recipient } from "../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
 import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
 import { DomainTopic, EventToDebugInfo } from "../domains/core/events/events";
@@ -91,7 +90,6 @@ type LoggerParams = Partial<{
   }>;
   processEventsDurationInSeconds: number;
   query: string;
-  recipients: Recipient[];
   reportContent: string;
   adapters: {
     repositories: "IN_MEMORY" | "PG";
@@ -168,7 +166,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       peConnect,
       processEventsDurationInSeconds,
       query,
-      recipients,
       reportContent,
       request,
       requestId,
@@ -218,7 +215,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         peConnect,
         processEventsDurationInSeconds,
         query,
-        recipients,
         reportContent,
         request,
         requestId,
