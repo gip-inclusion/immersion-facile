@@ -70,7 +70,9 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
 
     const peUserAndAdvisor: PeUserAndAdvisor = {
       user,
-      advisor: user.isJobseeker ? chooseValidAdvisor(advisors) : undefined,
+      advisor: user.isJobseeker
+        ? chooseValidAdvisor(user, advisors)
+        : undefined,
     };
 
     if (peUserAndAdvisor.user.isJobseeker)

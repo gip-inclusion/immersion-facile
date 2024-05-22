@@ -362,8 +362,7 @@ const managePeConnectError = (
       routeName,
       context,
       message: "PE CONNECT ERROR",
-      errorMessage: error?.message,
-      body: error?.response?.data,
+      error,
     });
     const handledError = peConnectAxiosErrorStrategy(error, routeName).get(
       true,

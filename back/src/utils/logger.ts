@@ -1,4 +1,5 @@
 import path from "path";
+import { AxiosError } from "axios";
 import { Request } from "express";
 import { QueryResult } from "kysely";
 import pino, { Logger } from "pino";
@@ -9,6 +10,7 @@ import {
   ConventionId,
   ConventionJwtPayload,
   FormEstablishmentDto,
+  PeExternalId,
   Role,
 } from "shared";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
@@ -61,7 +63,6 @@ type LoggerParams = Partial<{
   _title: string;
   agencyId: AgencyId;
   api: string;
-
   authorisationStatus: AuthorisationStatus;
   body: object;
   consumerName: ApiConsumerName;
@@ -73,9 +74,8 @@ type LoggerParams = Partial<{
   data: unknown;
   durationInSeconds: number;
   email: string;
-  error: Error | Partial<SQLError>;
-  errorMessage: string;
-  errorType: string;
+  error: Error | Partial<SQLError> | AxiosError;
+  peExternalId: PeExternalId;
   eventId: string;
   events: EventToDebugInfo[];
   formEstablishment: Partial<FormEstablishmentDto>;
@@ -86,7 +86,6 @@ type LoggerParams = Partial<{
   method: string;
   newOutboxSize: number;
   nodeProcessReport: NodeProcessReport;
-
   notificationId: string;
   numberOfEvent: number;
   pathname: string;
@@ -106,18 +105,14 @@ type LoggerParams = Partial<{
     siretGateway: "IN_MEMORY" | "HTTPS" | "INSEE" | "ANNUAIRE_DES_ENTREPRISES";
     romeRepository: "IN_MEMORY" | "PG";
   };
-
   request: Pick<Request, "path" | "method" | "body">;
   requestId: string;
   response: PartialResponse | SubscriberResponse;
   retrieveEventsDurationInSeconds: number;
   role: Role;
-
   route: string;
   routeName: string;
   search: Partial<SearchMade>;
-
-  stack: string;
   status: string;
   subscriptionId: string;
   token: string;
