@@ -3,7 +3,6 @@ import { Request } from "express";
 import { QueryResult } from "kysely";
 import pino, { Logger } from "pino";
 import {
-  AgencyDto,
   AgencyId,
   ApiConsumerName,
   ConventionDto,
@@ -42,6 +41,8 @@ const devTransport = {
 
 const rootLogger = pino({
   level: getLogLevel(),
+  // TODO : for testing
+  transport: devTransport,
   // ...(process.env.NODE_ENV !== "production" ? { transport: devTransport } : {}),
 });
 
@@ -58,7 +59,6 @@ type SQLError = {
 
 type LoggerParams = Partial<{
   _title: string;
-  agency: Partial<AgencyDto>;
   agencyId: AgencyId;
   api: string;
   apiAddress: "IN_MEMORY" | "OPEN_CAGE_DATA";
@@ -141,7 +141,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
   const makeLogFunction =
     (method: keyof OpacifiedLogger): LoggerFunction =>
     ({
-      agency,
       convention,
       formEstablishment,
       search,
@@ -152,7 +151,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       if (method === "level") return {};
 
       const parsedConvention = { id: convention?.id };
-      const parsedAgency = { id: agency?.id };
       const parsedFormEstablishment = {
         businessName: formEstablishment?.businessName,
         siret: formEstablishment?.siret,
@@ -161,7 +159,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       //TODO: sanitize error
       logger[method](
         {
-          agency: parsedAgency,
           convention: parsedConvention,
           formEstablishment: parsedFormEstablishment,
           search,

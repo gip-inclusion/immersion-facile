@@ -1,15 +1,15 @@
-import { createLogger, legacyCreateLogger } from "./logger";
 import { AgencyDtoBuilder } from "shared";
+import { createLogger } from "./logger";
 
 describe("Test logger 2", () => {
   const logger = createLogger("filename");
-  const legacyCreateLog = legacyCreateLogger("filename");
+  // const legacyCreateLog = legacyCreateLogger("filename");
 
   it("test log", () => {
     const agency = new AgencyDtoBuilder().build();
 
     logger.info({
-      agency: { name: "toto", id: "agency-id" },
+      agencyId: agency.id,
       message: "test message",
     });
     // legacyCreateLog.info({ agency }, "toto message");
