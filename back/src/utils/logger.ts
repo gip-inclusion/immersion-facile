@@ -6,7 +6,6 @@ import pino, { Logger } from "pino";
 import {
   AgencyId,
   ApiConsumerName,
-  ConventionDto,
   ConventionId,
   ConventionJwtPayload,
   FormEstablishmentDto,
@@ -67,7 +66,6 @@ type LoggerParams = Partial<{
   body: object;
   consumerName: ApiConsumerName;
   context: Record<string, string>;
-  convention: Partial<ConventionDto>;
   conventionId: ConventionId;
   counterType: string;
   crawlingPeriodMs: number;
@@ -83,7 +81,6 @@ type LoggerParams = Partial<{
   httpStatus: number;
   jwt: string;
   markEventsAsInProcessDurationInSeconds: number;
-  method: string;
   newOutboxSize: number;
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
@@ -143,32 +140,117 @@ export const createLogger = (filename: string): OpacifiedLogger => {
   const makeLogFunction =
     (method: keyof OpacifiedLogger): LoggerFunction =>
     ({
-      convention,
-      formEstablishment,
-      search,
-      nodeProcessReport,
-      message,
+      _title,
+      adapters,
+      agencyId,
+      api,
+      authorisationStatus,
+      body,
+      consumerName,
+      context,
+      conventionId,
+      counterType,
+      crawlingPeriodMs,
+      data,
+      durationInSeconds,
+      email,
       error,
+      eventId,
+      events,
+      formEstablishment,
+      host,
+      httpStatus,
+      jwt,
+      markEventsAsInProcessDurationInSeconds,
+      message,
+      newOutboxSize,
+      nodeProcessReport,
+      notificationId,
+      numberOfEvent,
+      pathname,
+      payload,
+      peConvention,
+      peExternalId,
+      processEventsDurationInSeconds,
+      query,
+      recipients,
+      reportContent,
+      request,
+      requestId,
+      response,
+      retrieveEventsDurationInSeconds,
+      role,
+      route,
+      routeName,
+      search,
+      status,
+      subscriptionId,
+      token,
+      topic,
+      type,
+      typeOfEvents,
+      useCaseName,
+      values,
+      wasQuarantined,
     }) => {
       if (method === "level") return {};
 
-      const parsedConvention = { id: convention?.id };
-      const parsedFormEstablishment = {
-        businessName: formEstablishment?.businessName,
-        siret: formEstablishment?.siret,
+      //TODO: sanitize error
+      const opacifiedLogContent = {
+        _title,
+        adapters,
+        agencyId,
+        api,
+        authorisationStatus,
+        body,
+        consumerName,
+        context,
+        conventionId,
+        counterType,
+        crawlingPeriodMs,
+        data,
+        durationInSeconds,
+        email,
+        error,
+        eventId,
+        events,
+        formEstablishment: opacifiedFormEstablishment(formEstablishment),
+        host,
+        httpStatus,
+        jwt,
+        markEventsAsInProcessDurationInSeconds,
+        newOutboxSize,
+        nodeProcessReport,
+        notificationId,
+        numberOfEvent,
+        pathname,
+        payload,
+        peConvention,
+        peExternalId,
+        processEventsDurationInSeconds,
+        query,
+        recipients,
+        reportContent,
+        request,
+        requestId,
+        response,
+        retrieveEventsDurationInSeconds,
+        role,
+        route,
+        routeName,
+        search,
+        status,
+        subscriptionId,
+        token,
+        topic,
+        type,
+        typeOfEvents,
+        useCaseName,
+        values,
+        wasQuarantined,
       };
 
-      //TODO: sanitize error
-      logger[method](
-        {
-          convention: parsedConvention,
-          formEstablishment: parsedFormEstablishment,
-          search,
-          nodeProcessReport,
-          error,
-        },
-        message,
-      );
+      logger[method](opacifiedLogContent, message);
     };
 
   return {
@@ -182,3 +264,11 @@ export const createLogger = (filename: string): OpacifiedLogger => {
     level: "",
   };
 };
+function opacifiedFormEstablishment(
+  formEstablishment: Partial<FormEstablishmentDto> | undefined,
+) {
+  return {
+    businessName: formEstablishment?.businessName,
+    siret: formEstablishment?.siret,
+  };
+}

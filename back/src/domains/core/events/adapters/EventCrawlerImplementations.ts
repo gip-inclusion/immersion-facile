@@ -80,9 +80,9 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public startCrawler() {
-    logger.warn(
-      "BasicEventCrawler.startCrawler: NO AUTOMATIC EVENT PROCESSING!",
-    );
+    logger.warn({
+      message: "BasicEventCrawler.startCrawler: NO AUTOMATIC EVENT PROCESSING!",
+    });
   }
 
   async #publishEvents(events: DomainEvent[]) {
@@ -118,8 +118,7 @@ export class BasicEventCrawler implements EventCrawler {
     } catch (error: any) {
       logger.error({
         error,
-        method: "Crawler retrieveEvents",
-        status: "error",
+        message: `${this.constructor.name}.retrieveEvents failed`,
         typeOfEvents: type,
       });
 
