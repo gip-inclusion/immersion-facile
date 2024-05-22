@@ -88,12 +88,6 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
       return;
     }
 
-    logger.info({
-      recipients,
-      conventionId: convention.id,
-      message: "Sending Mail to review an immersion",
-    });
-
     const emails: TemplatedEmail[] = await Promise.all(
       recipients.map(async (recipient) => {
         const makeShortMagicLink = prepareMagicShortLinkMaker({
@@ -149,12 +143,6 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
         }),
       ),
     );
-
-    logger.info({
-      recipients,
-      conventionId: convention.id,
-      message: "Mail to review an immersion sent",
-    });
   }
 }
 
