@@ -121,11 +121,9 @@ export class BasicEventCrawler implements EventCrawler {
         method: "Crawler retrieveEvents",
         status: "error",
         typeOfEvents: type,
-        errorMessage: error?.message,
       });
 
       notifyObjectDiscord({
-        errorMessage: error?.message,
         error,
       });
       return [];

@@ -1,3 +1,4 @@
+import { Logger } from "pino";
 import {
   ConventionJwtPayload,
   calculateDurationInSecondsFrom,
@@ -12,7 +13,6 @@ import {
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";
-import { Logger } from "pino";
 
 const logger = createLogger(__filename);
 
@@ -116,7 +116,7 @@ export abstract class TransactionalUseCase<
         status: "error",
         durationInSeconds,
         ...(paramsHash ? { paramsHash } : {}),
-        errorMessage: castError(error).message,
+        message: castError(error).message,
       });
       throw error;
     }

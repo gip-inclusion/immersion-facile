@@ -8,6 +8,7 @@ import {
   PeConnectAdvisorDto,
   PeConnectImmersionAdvisorDto,
 } from "../dto/PeConnectAdvisor.dto";
+import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
 
 export const conventionPoleEmploiUserAdvisorFromDto = (
   dto: PeUserAndAdvisor,
@@ -31,6 +32,7 @@ const onlyValidAdvisorsForImmersion = (
 const logger = createLogger(__filename);
 
 export const chooseValidAdvisor = (
+  user: PeConnectUserDto,
   advisors: PeConnectAdvisorDto[],
 ): PeConnectImmersionAdvisorDto | undefined => {
   const sortedValidAdvisors: PeConnectImmersionAdvisorDto[] = advisors
@@ -41,8 +43,8 @@ export const chooseValidAdvisor = (
   if (!preferredAdvisor) {
     getAdvisorsInfoCounter.error.inc({ errorType: "peConnectNoValidAdvisor" });
     logger.error({
-      errorType: "peConnectNoValidAdvisor",
-      message: "getAdvisorsInfo",
+      peExternalId: user.peExternalId,
+      message: "getAdvisorsInfo - peConnectNoValidAdvisor",
     });
     return undefined;
   }
