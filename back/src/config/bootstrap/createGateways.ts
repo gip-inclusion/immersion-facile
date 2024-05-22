@@ -120,12 +120,15 @@ export const createGateways = async (
   uuidGenerator: UuidGenerator,
   // eslint-disable-next-line @typescript-eslint/require-await
 ) => {
+  //TODO: toujours nécéssaire de log ces configs d'adapters?
   logger.info({
-    notificationGateway: config.notificationGateway,
-    repositories: config.repositories,
-    romeRepository: config.romeRepository,
-    siretGateway: config.siretGateway,
-    apiAddress: config.apiAddress,
+    adapters: {
+      notificationGateway: config.notificationGateway,
+      repositories: config.repositories,
+      romeRepository: config.romeRepository,
+      siretGateway: config.siretGateway,
+      apiAddress: config.apiAddress,
+    },
   });
 
   const createAxiosHttpClientForExternalAPIs =
