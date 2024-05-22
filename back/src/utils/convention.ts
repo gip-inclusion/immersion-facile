@@ -6,6 +6,7 @@ export const conventionEmailsByRole = (
   agency: AgencyDto,
 ): Record<Role, string[] | Error> => ({
   backOffice: new BadRequestError("Le backoffice n'a pas de liens magiques."),
+  toReview: new BadRequestError("Le role toReview n'a pas de liens magiques."),
   beneficiary: [convention.signatories.beneficiary.email],
   "beneficiary-current-employer": convention.signatories
     .beneficiaryCurrentEmployer

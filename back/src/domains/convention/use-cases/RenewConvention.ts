@@ -105,6 +105,11 @@ export class RenewConvention extends TransactionalUseCase<
       (agencyRight) => agencyRight.agency.id === convention.agencyId,
     );
 
-    return agencyRight ? agencyRight.roles : [];
+    if (!agencyRight)
+      throw new ForbiddenError(
+        `You don't have sufficient rights on agency '${convention.agencyId}'.`,
+      );
+
+    return agencyRight.roles;
   }
 }

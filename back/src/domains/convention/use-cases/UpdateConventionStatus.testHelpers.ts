@@ -551,7 +551,9 @@ export const rejectStatusTransitionTests = ({
             role,
             initialStatus: someValidInitialStatus,
             expectedError: new ForbiddenError(
-              `Role '${role}' is not allowed to go to status '${updateStatusParams.status}' for convention '${updateStatusParams.conventionId}'.`,
+              `Roles '${[role]}' are not allowed to go to status '${
+                updateStatusParams.status
+              }' for convention '${updateStatusParams.conventionId}'.`,
             ),
           });
         },
@@ -581,7 +583,7 @@ export const rejectStatusTransitionTests = ({
           userId,
           initialStatus: someValidInitialStatus,
           expectedError: new ForbiddenError(
-            `Role '${getRoles()}' is not allowed to go to status '${
+            `Roles '${getRoles()}' are not allowed to go to status '${
               updateStatusParams.status
             }' for convention '${updateStatusParams.conventionId}'.`,
           ),
@@ -696,7 +698,7 @@ const defineRolesForTest = (
       (agencyRight) => agencyRight.agency.id === expectedConvention.agencyId,
     )?.roles ?? [];
 
-  if (!agencyRolesEmptyOrContainsToReviewOrAgencyOwner(roles)) {
+  if (agencyRolesEmptyOrContainsToReviewOrAgencyOwner(roles)) {
     throw new Error(
       `Roles '${roles}' not supported according to ${JSON.stringify(
         testAcceptNewStatusParams,
@@ -713,4 +715,6 @@ export const agencyRolesEmptyOrContainsToReviewOrAgencyOwner = (
   AgencyRole | Role,
   "toReview" | "agencyOwner"
 >[] =>
-  !roles.length || roles.includes("toReview") || roles.includes("agencyOwner");
+  roles.length === 0 ||
+  roles.includes("toReview") ||
+  roles.includes("agencyOwner");

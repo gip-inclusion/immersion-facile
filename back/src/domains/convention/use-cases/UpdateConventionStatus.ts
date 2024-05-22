@@ -1,12 +1,10 @@
 import {
   AgencyId,
-  AgencyRole,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
-  ExcludeFromExisting,
   Role,
   UpdateConventionStatusRequestDto,
   UserId,
@@ -180,7 +178,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     uow: UnitOfWork,
     userId: UserId,
     convention: ConventionDto,
-  ): Promise<ExcludeFromExisting<Role, "agencyOwner">[]> {
+  ): Promise<Role[]> {
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)
       throw new NotFoundError(
@@ -200,12 +198,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         `User '${userId}' has no role on agency '${convention.agencyId}'.`,
       );
 
-    return userAgencyRight.roles.filter(
-      (
-        role,
-      ): role is ExcludeFromExisting<AgencyRole, "agencyOwner" | "toReview"> =>
-        role !== "agencyOwner" && role !== "toReview",
-    );
+    return userAgencyRight.roles;
   }
 
   async #agencyEmailFromUserIdAndAgencyId(

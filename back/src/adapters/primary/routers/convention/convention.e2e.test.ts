@@ -682,7 +682,7 @@ describe("convention e2e", () => {
       expectHttpResponseToEqual(response, {
         body: {
           errors:
-            "Role 'establishment-representative' is not allowed to go to status 'ACCEPTED_BY_VALIDATOR' for convention 'a99eaca1-ee70-4c90-b3f4-668d492f7392'.",
+            "Roles 'establishment-representative' are not allowed to go to status 'ACCEPTED_BY_VALIDATOR' for convention 'a99eaca1-ee70-4c90-b3f4-668d492f7392'.",
         },
         status: 403,
       });
