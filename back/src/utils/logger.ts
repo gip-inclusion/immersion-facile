@@ -8,7 +8,6 @@ import {
   ApiConsumerName,
   ConventionId,
   ConventionJwtPayload,
-  FormEstablishmentDto,
   PeExternalId,
   Role,
 } from "shared";
@@ -73,7 +72,6 @@ type LoggerParams = Partial<{
   error: Error | Partial<SQLError> | AxiosError;
   eventId: string;
   events: EventToDebugInfo[];
-  formEstablishment: Partial<FormEstablishmentDto>;
   host: string;
   httpStatus: number;
   jwt: string;
@@ -156,7 +154,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       error,
       eventId,
       events,
-      formEstablishment,
       host,
       httpStatus,
       jwt,
@@ -208,7 +205,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         error,
         eventId,
         events,
-        formEstablishment: opacifiedFormEstablishment(formEstablishment),
         host,
         httpStatus,
         jwt,
@@ -256,11 +252,3 @@ export const createLogger = (filename: string): OpacifiedLogger => {
     level: "",
   };
 };
-function opacifiedFormEstablishment(
-  formEstablishment: Partial<FormEstablishmentDto> | undefined,
-) {
-  return {
-    businessName: formEstablishment?.businessName,
-    siret: formEstablishment?.siret,
-  };
-}

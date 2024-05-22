@@ -3,14 +3,11 @@ import {
   ConflictError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { createLogger } from "../../../utils/logger";
 import {
   FormEstablishmentRepository,
   formEstablishementUpdateFailedErrorMessage,
   formEstablishmentNotFoundErrorMessage,
 } from "../ports/FormEstablishmentRepository";
-
-const logger = createLogger(__filename);
 
 export class InMemoryFormEstablishmentRepository
   implements FormEstablishmentRepository
@@ -20,13 +17,9 @@ export class InMemoryFormEstablishmentRepository
   public async create(dto: FormEstablishmentDto): Promise<void> {
     if (await this.getBySiret(dto.siret)) {
       const message = `Immersion DTO with siret ${dto.siret} is already in the list`;
-      logger.info({ message, formEstablishment: dto });
       throw new ConflictError(message);
     }
-    logger.debug({
-      message: "Creating a new Immersion Offer",
-      formEstablishment: dto,
-    });
+
     this.#formEstablishments.push(dto);
   }
 
