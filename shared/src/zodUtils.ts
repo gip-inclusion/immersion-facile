@@ -1,4 +1,3 @@
-import { Logger } from "pino";
 import { z } from "zod";
 import { timeHHmmRegExp } from "./utils/date";
 
@@ -120,22 +119,22 @@ export const zToNumber = z.coerce.number();
 
 export const zUuidLike = z.string().length(36);
 
-export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
-  schema: z.Schema<T>,
-  data: unknown,
-  logger: Logger,
-  context: Record<string, string>,
-): T => {
-  try {
-    return schema.parse(data);
-  } catch (error) {
-    logger.error(
-      { payload: { context, data, error } },
-      `Parsing failed with schema '${schema.constructor.name}'`,
-    );
-    throw error;
-  }
-};
+// export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
+//   schema: z.Schema<T>,
+//   data: unknown,
+//   logger: Logger,
+//   context: Record<string, string>,
+// ): T => {
+//   try {
+//     return schema.parse(data);
+//   } catch (error) {
+//     logger.error(
+//       { payload: { context, data, error } },
+//       `Parsing failed with schema '${schema.constructor.name}'`,
+//     );
+//     throw error;
+//   }
+// };
 
 export const emptyObjectSchema: z.Schema<Record<string, never>> = z
   .object({})

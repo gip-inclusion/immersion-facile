@@ -10,10 +10,10 @@ export class InMemoryOutboxQueries implements OutboxQueries {
 
   public async getFailedEvents(): Promise<DomainEvent[]> {
     const allEvents = this.outboxRepository.events;
-    logger.debug(
-      { allEvents: eventsToDebugInfo(allEvents) },
-      "getAllFailedEvents",
-    );
+    logger.debug({
+      events: eventsToDebugInfo(allEvents),
+      message: "getAllFailedEvents",
+    });
 
     return allEvents.filter((event) => {
       const lastPublication = event.publications[event.publications.length - 1];
@@ -24,20 +24,20 @@ export class InMemoryOutboxQueries implements OutboxQueries {
 
   public async getEventsToPublish() {
     const allEvents = this.outboxRepository.events;
-    logger.debug(
-      { allEvents: eventsToDebugInfo(allEvents) },
-      "getAllUnpublishedEvents",
-    );
+    logger.debug({
+      events: eventsToDebugInfo(allEvents),
+      message: "getAllUnpublishedEvents",
+    });
 
     const unpublishedEvents = allEvents.filter(
       (event) => !event.wasQuarantined && event.publications.length === 0,
     );
 
     if (unpublishedEvents.length > 0) {
-      logger.info(
-        { events: eventsToDebugInfo(unpublishedEvents) },
-        "getAllUnpublishedEvents: found unpublished events",
-      );
+      logger.info({
+        events: eventsToDebugInfo(unpublishedEvents),
+        message: "getAllUnpublishedEvents: found unpublished events",
+      });
     }
     return unpublishedEvents;
   }

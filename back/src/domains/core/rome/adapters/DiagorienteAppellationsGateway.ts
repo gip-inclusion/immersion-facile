@@ -40,10 +40,10 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
   ) {}
 
   async searchAppellations(query: string): Promise<AppellationDto[]> {
-    logger.info({}, "searchAppellations - start");
+    logger.info({ message: "searchAppellations - start" });
     const tokenData = await this.getAccessToken();
     return this.#limiter.schedule(() => {
-      logger.info({}, "searchAppellations - call");
+      logger.info({ message: "searchAppellations - call" });
       return this.httpClient
         .searchAppellations({
           queryParams: { query, nb_results: maxResults, tags: ["ROME4"] },
@@ -52,11 +52,11 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
           },
         })
         .then(({ body }) => {
-          logger.info({}, "searchAppellations - success");
+          logger.info({ message: "searchAppellations - success" });
           return diagorienteRawResponseToAppellationDto(body);
         })
         .catch((error) => {
-          logger.error({}, "searchAppellations - error");
+          logger.error({ message: "searchAppellations - error", error });
           throw error;
         });
     });
@@ -64,7 +64,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
 
   public getAccessToken(): Promise<DiagorienteAccessTokenResponse> {
     return this.caching.caching(diagorienteTokenScope, () => {
-      logger.info({}, "getAccessToken - start");
+      logger.info({ message: "getAccessToken - start" });
       return this.#limiter.schedule(() =>
         this.httpClient
           .getAccessToken({
@@ -78,11 +78,11 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
             },
           })
           .then(({ body }) => {
-            logger.info({}, "getAccessToken - success");
+            logger.info({ message: "getAccessToken - success" });
             return body;
           })
           .catch((error) => {
-            logger.error({}, "getAccessToken - error");
+            logger.error({ error, message: "getAccessToken - error" });
             throw error;
           }),
       );

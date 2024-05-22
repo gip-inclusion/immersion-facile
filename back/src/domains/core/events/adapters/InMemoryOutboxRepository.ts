@@ -1,4 +1,5 @@
 import { values } from "ramda";
+import { keys } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { DomainEvent, EventStatus } from "../events";
 import { OutboxRepository } from "../ports/OutboxRepository";
@@ -21,10 +22,11 @@ export class InMemoryOutboxRepository implements OutboxRepository {
 
   public async save(event: DomainEvent): Promise<void> {
     this._events[event.id] = event;
-    logger.info(
-      { newEvent: event, newOutboxSize: this._events.length },
-      "save",
-    );
+    logger.info({
+      eventId: event.id,
+      newOutboxSize: keys(this._events).length,
+      message: "save",
+    });
   }
 
   public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {

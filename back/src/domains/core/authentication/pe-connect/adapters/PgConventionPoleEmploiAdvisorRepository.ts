@@ -1,13 +1,10 @@
-import {
-  ConventionId,
-  PeExternalId,
-  parseZodSchemaAndLogErrorOnParsingFailure,
-} from "shared";
+import { ConventionId, PeExternalId } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../../utils/logger";
+import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../utils/schema.utils";
 import {
   ConventionPoleEmploiUserAdvisorDto,
   ConventionPoleEmploiUserAdvisorEntity,

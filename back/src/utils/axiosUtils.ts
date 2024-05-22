@@ -4,8 +4,7 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
-import { Logger } from "pino";
-import { createLogger } from "./logger";
+import { OpacifiedLogger, createLogger } from "./logger";
 
 const _logger = createLogger(__filename);
 
@@ -15,10 +14,10 @@ export const createAxiosInstance = (
 ): AxiosInstance => {
   const axiosInstance = axios.create(config);
   axiosInstance.interceptors.response.use((response) => {
-    logger.debug(
-      { response: extractPartialResponse(response) },
-      "Received HTTP response",
-    );
+    logger.debug({
+      response: extractPartialResponse(response),
+      message: "Received HTTP response",
+    });
     return response;
   });
   return axiosInstance;
@@ -28,7 +27,7 @@ const QUOTA_EXEEDED_STATUSES = new Set([429, 503]);
 const TIMEOUT_CODES = new Set(["ETIMEDOUT", "ECONNABORTED"]);
 
 export const isRetryableError = (
-  logger: Logger,
+  logger: OpacifiedLogger,
   error: AxiosError,
 ): boolean => {
   if (
@@ -47,28 +46,43 @@ export const isRetryableError = (
 };
 
 export const logAxiosError = (
-  logger: Logger,
+  logger: OpacifiedLogger,
   error: AxiosError,
   msg?: string,
 ) => {
   const message = `${msg || "Axios error"}: ${error}`;
   if (error.response) {
-    logger.error({ response: extractPartialResponse(error.response) }, message);
+    logger.error({ response: extractPartialResponse(error.response), message });
   } else {
     logger.error(message);
   }
 };
 
-const extractPartialRequest = (request: AxiosRequestConfig) => ({
-  method: request.method,
-  url: request.url,
-  params: request.params as unknown,
-  timeout: request.timeout,
-});
-
-const extractPartialResponse = (response: AxiosResponse) => ({
+export type PartialResponse = {
+  status: number;
+  statusText: string;
+  data: unknown;
+  request: PartialRequest;
+};
+const extractPartialResponse = (response: AxiosResponse): PartialResponse => ({
   status: response.status,
   statusText: response.statusText,
   data: response.data as unknown,
   request: extractPartialRequest(response.config ?? response.request),
+});
+
+export type PartialRequest = {
+  method: string | undefined;
+  url: string | undefined;
+  params: unknown;
+  timeout: number | undefined;
+};
+
+const extractPartialRequest = (
+  request: AxiosRequestConfig,
+): PartialRequest => ({
+  method: request.method,
+  url: request.url,
+  params: request.params as unknown,
+  timeout: request.timeout,
 });

@@ -40,7 +40,10 @@ export const chooseValidAdvisor = (
   const preferredAdvisor = sortedValidAdvisors.at(0);
   if (!preferredAdvisor) {
     getAdvisorsInfoCounter.error.inc({ errorType: "peConnectNoValidAdvisor" });
-    logger.error({ errorType: "peConnectNoValidAdvisor" }, "getAdvisorsInfo");
+    logger.error({
+      errorType: "peConnectNoValidAdvisor",
+      message: "getAdvisorsInfo",
+    });
     return undefined;
   }
 

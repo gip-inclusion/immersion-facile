@@ -80,18 +80,16 @@ const logErrorAndNotifyDiscord = (
   { path, method, body }: Request,
   otherContent: object,
 ): void => {
-  logger.error(
-    {
-      type,
-      request: {
-        path,
-        method,
-        body,
-      },
-      ...otherContent,
+  logger.error({
+    type,
+    request: {
+      path,
+      method,
+      body,
     },
-    _message,
-  );
+    ...otherContent,
+    message: _message,
+  });
   notifyObjectDiscord({
     _message,
     type,

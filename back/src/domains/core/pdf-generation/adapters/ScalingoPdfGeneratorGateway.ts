@@ -51,7 +51,7 @@ export class ScalingoPdfGeneratorGateway implements PdfGeneratorGateway {
 
   public async make(htmlContent: string): Promise<string> {
     const requestId = this.#uuidGenerator.new();
-    logger.info({ requestId }, "Generating pdf");
+    logger.info({ requestId, message: "Generating pdf" });
 
     const response = await this.#httpClient.generate({
       headers: { authorization: this.#apiKey },
@@ -66,7 +66,7 @@ export class ScalingoPdfGeneratorGateway implements PdfGeneratorGateway {
         `[requestId : ${requestId}] Pdf generation failed with status ${response.status} - ${response.body}`,
       );
 
-    logger.info({ requestId }, "Pdf generated successfully");
+    logger.info({ requestId, message: "Pdf generated successfully" });
 
     return response.body;
   }

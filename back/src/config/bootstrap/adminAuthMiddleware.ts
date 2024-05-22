@@ -33,10 +33,11 @@ export const makeAdminAuthMiddleware = (
       if ("name" in error && error.name === "TokenExpiredError") {
         return res.status(401).json({ error: "Token is expired" });
       }
-      logger.error(
-        { error, jwt: req.headers.authorization },
-        "Provided token is invalid",
-      );
+      logger.error({
+        error,
+        jwt: req.headers.authorization,
+        message: "Provided token is invalid",
+      });
       res.status(401);
       return res.json({
         error: "Provided token is invalid",

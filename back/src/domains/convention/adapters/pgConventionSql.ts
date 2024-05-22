@@ -16,7 +16,6 @@ import {
   ScheduleDto,
   SiretDto,
   conventionReadSchema,
-  parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
 import {
   KyselyDb,
@@ -25,6 +24,7 @@ import {
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
+import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../utils/schema.utils";
 import {
   getEmailsFromUsersWithAgencyRoles,
   getUsersWithAgencyRole,

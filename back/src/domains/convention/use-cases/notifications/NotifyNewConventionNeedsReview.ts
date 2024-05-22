@@ -59,10 +59,10 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
     const agency = await uow.agencyRepository.getById(convention.agencyId);
 
     if (!agency) {
-      logger.error(
-        { agencyId: convention.agencyId },
-        "No Agency Config found for this agency code",
-      );
+      logger.error({
+        agencyId: convention.agencyId,
+        message: "No Agency Config found for this agency code",
+      });
       return;
     }
     const conventionAdvisorEntity =
@@ -79,24 +79,21 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
     logger.debug(`conventionDto.status : ${convention.status}`);
 
     if (!recipients) {
-      logger.error(
-        {
-          conventionId: convention.id,
-          status: convention.status,
-          agencyId: convention.agencyId,
-        },
-        "Unable to find appropriate recipient for validation notification.",
-      );
+      logger.error({
+        conventionId: convention.id,
+        status: convention.status,
+        agencyId: convention.agencyId,
+        message:
+          "Unable to find appropriate recipient for validation notification.",
+      });
       return;
     }
 
-    logger.info(
-      {
-        recipients,
-        conventionId: convention.id,
-      },
-      "Sending Mail to review an immersion",
-    );
+    logger.info({
+      recipients,
+      conventionId: convention.id,
+      message: "Sending Mail to review an immersion",
+    });
 
     const emails: TemplatedEmail[] = await Promise.all(
       recipients.map(async (recipient) => {
@@ -154,17 +151,15 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
       ),
     );
 
-    logger.info(
-      {
-        recipients,
-        conventionId: convention.id,
-      },
-      "Mail to review an immersion sent",
-    );
+    logger.info({
+      recipients,
+      conventionId: convention.id,
+      message: "Mail to review an immersion sent",
+    });
   }
 }
 
-type Recipient = {
+export type Recipient = {
   role: Role;
   email: string;
   peAdvisor:
