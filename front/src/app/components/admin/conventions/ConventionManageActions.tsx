@@ -31,6 +31,10 @@ import {
   toDotNotation,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import {
+  RemindSignatoriesButton,
+  isRemindingAllowed,
+} from "src/app/components/forms/convention/RemindSignatoriesButton";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -174,6 +178,15 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
+        {isRemindingAllowed(convention, role) && (
+          <RemindSignatoriesButton
+            convention={convention}
+            priority="primary"
+            id={domElementIds.manageConvention.remindSignatoriesButton}
+            className={fr.cx("fr-m-1w")}
+          />
+        )}
+
         {isAllowedTransition(convention, "DRAFT", role) && (
           <VerificationActionButton
             disabled={disabled}
@@ -285,6 +298,7 @@ export const ConventionManageActions = ({
             </Button>
           </>
         )}
+
         {isConventionValidated(convention) &&
           !isConventionRenewed(convention) &&
           isAllowedRole(["counsellor", "validator"], role) && (

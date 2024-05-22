@@ -1,11 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
   ConventionDto,
@@ -19,7 +18,6 @@ import {
   updateConventionStatusRequestSchema,
 } from "shared";
 import { ModalWrapperProps } from "src/app/components/forms/convention/VerificationActionButton";
-import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 export const JustificationModalContent = ({
@@ -28,7 +26,6 @@ export const JustificationModalContent = ({
   newStatus,
   convention,
   currentSignatoryRole,
-  onModalPropsChange,
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
@@ -37,21 +34,6 @@ export const JustificationModalContent = ({
   currentSignatoryRole: Role;
   onModalPropsChange: (props: Partial<ModalWrapperProps>) => void;
 }) => {
-  const t = useConventionTexts(convention?.internshipKind ?? "immersion");
-  const [areSignaturesMissing, setAreSignaturesMissing] = useState<
-    boolean | null
-  >(null);
-
-  useEffect(() => {
-    if (newStatus === "DRAFT") {
-      onModalPropsChange({
-        title: areSignaturesMissing
-          ? "Relancer les signataires"
-          : t.verification.modifyConventionTitle,
-      });
-    }
-  }, [areSignaturesMissing]);
-
   const { register, handleSubmit, formState } = useForm<
     Partial<UpdateConventionStatusRequestDto>
   >({
@@ -102,96 +84,6 @@ export const JustificationModalContent = ({
         : []),
     ];
   };
-
-  if (areSignaturesMissing === null) {
-    return (
-      <>
-        <p>
-          Vous avez constaté un problème dans les informations renseignées sur
-          la convention ?
-        </p>
-        <ButtonsGroup
-          buttons={[
-            {
-              type: "button",
-              priority: "secondary",
-              id: domElementIds.manageConvention.justificationModalResendButton,
-              onClick: () => setAreSignaturesMissing(true),
-              children: "Je veux juste relancer des signataires manquants",
-            },
-            {
-              type: "button",
-              priority: "secondary",
-              id: domElementIds.manageConvention
-                .justificationModalRequestEditButton,
-              onClick: () => setAreSignaturesMissing(false),
-              children:
-                "Il y un autre problème sur le contenu de la convention",
-            },
-          ]}
-        />
-      </>
-    );
-  }
-
-  if (areSignaturesMissing === true) {
-    const signatoriesWithMissingSignature = conventionSignatories.filter(
-      ({ signedAt }) => signedAt === undefined,
-    );
-
-    const signatoryEmailsWithMissingSignature =
-      signatoriesWithMissingSignature.map(({ email }) => email);
-
-    const emailTitle = "Signature manquante pour la convention d'immersion";
-    const emailBody = `Bonjour,
-
-    Vous avez initié une convention d'immersion professionnelle via le site d'immersion facilité (${convention.id}). Mais vous n'avez pas encore signé cette convention.
-    
-    Pouvez-vous effectuer cette signature via le mail reçu d'immersion facilitée ?
-    
-    Je vous remercie d'avance,
-    
-    Cordialement,
-    `;
-
-    return (
-      <div>
-        {signatoryEmailsWithMissingSignature.length === 0 ? (
-          <p>
-            <strong>
-              Tous les signataires ont bien signé, pas la peine de les relancer.
-            </strong>
-          </p>
-        ) : (
-          <>
-            <div>
-              Les signataires suivants n'ont pas encore signé :
-              <ul>
-                {signatoriesWithMissingSignature.map((signatory) => (
-                  <li key={signatory.email}>
-                    <strong>{signatoryTitleByRole[signatory.role]} :</strong>{" "}
-                    {signatory.firstName} {signatory.lastName} -{" "}
-                    {signatory.email} - {signatory.phone}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Button
-              linkProps={{
-                href: `mailto:${signatoryEmailsWithMissingSignature.join(
-                  ",",
-                )}?subject=${encodeURI(emailTitle)}&body=${encodeURI(
-                  emailBody,
-                )}`,
-              }}
-            >
-              Relancer les signataires qui n'ont pas signé
-            </Button>
-          </>
-        )}
-      </div>
-    );
-  }
 
   return (
     <>
