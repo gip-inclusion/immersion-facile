@@ -319,6 +319,10 @@ export const domElementIds = {
     validatorModal: "im-validator-modal",
     cancelModal: "im-cancel-modal",
     renewModal: "im-renew-modal",
+    remindSignatoriesButton:
+      "im-convention-validation__open-remind-signatories-modal-button",
+    remindSignatoriesModal:
+      "im-convention-validation__remind-signatories-modal",
     openSignModalButton: "im-convention-validation__open-sign-modal-button",
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
     submitRenewModalButton:
@@ -557,6 +561,8 @@ export const domElementIds = {
       "im-convention-to-sign__open-modification-modal-button",
     submitModificationrequestButton:
       "im-convention-to-sign__submit-modification-request-button",
+    remindSignatoriesButton:
+      "im-convention-to-sign__open-remind-signatories-modal-button",
   },
   editFormEstablishmentRoute: {},
   error: {},
