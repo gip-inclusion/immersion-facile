@@ -47,7 +47,6 @@ const createIncTotalCountForRequest =
       authorisationStatus,
     });
     logger.info({
-      route,
       request: {
         method: req.method,
         path: route,

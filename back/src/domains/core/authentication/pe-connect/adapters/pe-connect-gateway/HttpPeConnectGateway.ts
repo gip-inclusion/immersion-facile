@@ -359,9 +359,8 @@ const managePeConnectError = (
     );
   if (axios.isAxiosError(error)) {
     logger.error({
-      routeName,
       context,
-      message: "PE CONNECT ERROR",
+      message: `PE CONNECT ERROR - ${routeName}`,
       error,
     });
     const handledError = peConnectAxiosErrorStrategy(error, routeName).get(
