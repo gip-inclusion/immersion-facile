@@ -107,8 +107,6 @@ type LoggerParams = Partial<{
   response: PartialResponse | SubscriberResponse;
   retrieveEventsDurationInSeconds: number;
   role: Role;
-  route: string;
-  routeName: string;
   search: Partial<SearchMade>;
   status: string;
   subscriptionId: string;
@@ -180,8 +178,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       response,
       retrieveEventsDurationInSeconds,
       role,
-      route,
-      routeName,
       search,
       status,
       subscriptionId,
@@ -236,8 +232,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         response,
         retrieveEventsDurationInSeconds,
         role,
-        route,
-        routeName,
         search,
         status,
         subscriptionId,
