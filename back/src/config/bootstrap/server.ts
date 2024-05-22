@@ -1,7 +1,6 @@
 import bodyParser from "body-parser";
 import express, { Express } from "express";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
-import { Logger } from "pino";
 import PinoHttp from "pino-http";
 import { createAddressRouter } from "../../adapters/primary/routers/address/createAddressRouter";
 import { createAdminRouter } from "../../adapters/primary/routers/admin/createAdminRouter";
@@ -27,13 +26,13 @@ import {
 } from "../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
-import { createLogger } from "../../utils/logger";
+import { legacyCreateLogger } from "../../utils/logger";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./createAppDependencies";
 import { Gateways } from "./createGateways";
 import { startCrawler } from "./startCrawler";
 
-const logger = createLogger(__filename);
+const logger = legacyCreateLogger(__filename);
 
 const metricsPageUrl = "__metrics";
 const metrics = expressPrometheusMiddleware({
@@ -59,7 +58,7 @@ export const createApp = async (
   const app = express();
   app.use(
     PinoHttp({
-      logger: logger as Logger,
+      logger,
       autoLogging: {
         ignore: (req) => req.url?.includes(metricsPageUrl) ?? false,
       },
