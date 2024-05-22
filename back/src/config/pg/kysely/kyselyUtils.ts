@@ -10,6 +10,7 @@ import {
 } from "kysely";
 import { Pool, QueryResultRow } from "pg";
 import { Falsy } from "ramda";
+import { createLogger } from "../../../utils/logger";
 import { Database } from "./model/database";
 
 export const jsonBuildObject = <O extends Record<string, Expression<unknown>>>(
@@ -40,10 +41,24 @@ export const executeKyselyRawSqlQuery = <T extends QueryResultRow>(
   values?: any[],
 ) => transaction.executeQuery<T>(CompiledQuery.raw(sqlQuery, values));
 
-export const makeKyselyDb = (pool: Pool): Kysely<Database> =>
-  new Kysely<Database>({
+export const makeKyselyDb = (pool: Pool): Kysely<Database> => {
+  const logger = createLogger(__filename);
+  return new Kysely<Database>({
     dialect: new PostgresDialect({ pool }),
+    log(event): void {
+      if (event.level === "error") {
+        const error: any = event.error;
+        logger.error({
+          message: "SQL ERROR",
+          durationMs: event.queryDurationMillis,
+          error: "message" in error ? error.message : error,
+          sql: event.query.sql,
+          params: event.query.parameters,
+        });
+      }
+    },
   });
+};
 
 export const cast = <Cast>(query: ExpressionWrapper<any, any, any>) =>
   sql<Cast>`${query}`;
