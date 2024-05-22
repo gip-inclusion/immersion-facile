@@ -15,25 +15,27 @@ import {
   ConventionFormLayout,
   ConventionFormSidebar,
   ErrorNotifications,
+  Loader,
 } from "react-design-system";
-import {
-  FormProvider,
-  SubmitHandler,
-  UseFormReturn,
-  get,
-} from "react-hook-form";
+import { FormProvider, SubmitHandler, get, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AgencyKindFilter,
+  Beneficiary,
   ConventionReadDto,
   DepartmentCode,
   FederatedIdentity,
   InternshipKind,
   addressDtoToString,
+  conventionSchema,
   domElementIds,
+  hasBeneficiaryCurrentEmployer,
+  isBeneficiaryMinor,
+  isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
   keys,
   miniStageRestrictedDepartments,
+  notJobSeeker,
   toDotNotation,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
@@ -41,12 +43,6 @@ import {
   AgencySelector,
   departmentOptions,
 } from "src/app/components/forms/commons/AgencySelector";
-import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
-import {
-  ConventionFormMode,
-  SupportedConventionRoutes,
-} from "src/app/components/forms/convention/ConventionForm";
-import { undefinedIfEmptyString } from "src/app/components/forms/convention/conventionHelpers";
 import { BeneficiaryFormSection } from "src/app/components/forms/convention/sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "src/app/components/forms/convention/sections/immersion-details/ImmersionDetailsSection";
@@ -61,12 +57,34 @@ import {
   formErrorsToFlatErrors,
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
+
+import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import {
+  ConventionPresentation,
+  undefinedIfEmptyString,
+} from "src/app/components/forms/convention/conventionHelpers";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { isValid } from "date-fns";
+import {
+  ConventionFormMode,
+  SupportedConventionRoutes,
+} from "src/app/components/forms/convention/ConventionForm";
+import { useUpdateConventionValuesInUrl } from "src/app/components/forms/convention/useUpdateConventionValuesInUrl";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useExistingSiret } from "src/app/hooks/siret.hooks";
+import { useMatomo } from "src/app/hooks/useMatomo";
+import {
+  fetchConventionInitialValuesFromUrl,
+  makeValuesToWatchInUrl,
+} from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   NumberOfSteps,
@@ -92,15 +110,17 @@ export type SetEmailValidationErrorsState = Dispatch<
 >;
 
 export const ConventionFormFields = ({
-  methods,
   mode,
+  internshipKind,
 }: {
-  methods: UseFormReturn<ConventionReadDto>;
+  internshipKind: InternshipKind;
   mode: ConventionFormMode;
 }) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const route = useRoute() as SupportedConventionRoutes;
+
+  const fetchedConvention = useAppSelector(conventionSelectors.convention);
 
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
@@ -120,16 +140,47 @@ export const ConventionFormFields = ({
   const agenciesFeedback = useSelector(agenciesSelectors.feedback);
   const isAgenciesLoading = useSelector(agenciesSelectors.isLoading);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const conventionInitialValuesFromUrl = fetchConventionInitialValuesFromUrl({
+    route,
+    internshipKind,
+  });
+  const acquisitionParams = useGetAcquisitionParams();
+
+  const initialValues = useRef<ConventionPresentation>({
+    ...conventionInitialValuesFromUrl,
+    ...acquisitionParams,
+    signatories: {
+      ...conventionInitialValuesFromUrl.signatories,
+      beneficiary: makeInitialBenefiaryForm(
+        conventionInitialValuesFromUrl.signatories.beneficiary,
+        federatedIdentity,
+      ),
+    },
+  }).current;
+  useExistingSiret(initialValues.siret);
+
+  const reduxFormUiReady =
+    useWaitForReduxFormUiReadyBeforeInitialisation(initialValues);
+  const defaultValues =
+    mode === "create" ? initialValues : fetchedConvention || initialValues;
+  const methods = useForm<ConventionReadDto>({
+    defaultValues,
+    resolver: zodResolver(conventionSchema),
+    mode: "onTouched",
+  });
 
   const {
-    getValues,
     handleSubmit,
-    formState: { errors, isValid, isSubmitted, submitCount },
+    setValue,
     trigger,
     clearErrors,
+    getValues,
     getFieldState,
-    setValue,
+    formState: { errors, submitCount, isSubmitted },
+    reset,
   } = methods;
+
+  useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(getValues()));
 
   const conventionValues = getValues();
 
@@ -301,6 +352,8 @@ export const ConventionFormFields = ({
     };
   };
 
+  useMatomo(conventionInitialValuesFromUrl.internshipKind);
+
   useEffect(() => {
     outOfReduxDependencies.localDeviceRepository.delete(
       "partialConventionInUrl",
@@ -321,7 +374,16 @@ export const ConventionFormFields = ({
     }
   }, [preselectedAgencyId]);
 
-  return (
+  //TODO: à placer dans ConventionFormFields ????
+  useEffect(() => {
+    if (fetchedConvention) {
+      reset(fetchedConvention);
+    }
+  }, [fetchedConvention, methods.reset]);
+
+  return !reduxFormUiReady ? (
+    <Loader />
+  ) : (
     <FormProvider {...methods}>
       <ConventionFormLayout
         form={
@@ -599,4 +661,49 @@ const makeListAgencyOptionsKindFilter = ({
   return federatedIdentity && isPeConnectIdentity(federatedIdentity)
     ? "immersionPeOnly"
     : "miniStageExcluded";
+};
+
+const makeInitialBenefiaryForm = (
+  beneficiary: Beneficiary<"immersion" | "mini-stage-cci">,
+  federatedIdentityWithUser: FederatedIdentityWithUser | null,
+): Beneficiary<"immersion" | "mini-stage-cci"> => {
+  const { federatedIdentity, ...beneficiaryOtherProperties } = beneficiary;
+  const peConnectIdentity =
+    federatedIdentityWithUser && isPeConnectIdentity(federatedIdentityWithUser)
+      ? federatedIdentityWithUser
+      : undefined;
+  const federatedIdentityValue = federatedIdentity ?? peConnectIdentity;
+
+  return {
+    ...beneficiaryOtherProperties,
+    ...(federatedIdentityValue?.token !== notJobSeeker && {
+      federatedIdentity: federatedIdentityValue,
+    }),
+  };
+};
+
+const useWaitForReduxFormUiReadyBeforeInitialisation = (
+  initialValues: ConventionPresentation,
+) => {
+  const [reduxFormUiReady, setReduxFormUiReady] = useState<boolean>(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(
+      conventionSlice.actions.isMinorChanged(isBeneficiaryMinor(initialValues)),
+    );
+    dispatch(
+      conventionSlice.actions.isCurrentEmployerChanged(
+        hasBeneficiaryCurrentEmployer(initialValues),
+      ),
+    );
+    dispatch(
+      conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
+        isEstablishmentTutorIsEstablishmentRepresentative(initialValues),
+      ),
+    );
+    setReduxFormUiReady(true);
+  }, [dispatch, initialValues]);
+
+  return reduxFormUiReady;
 };
