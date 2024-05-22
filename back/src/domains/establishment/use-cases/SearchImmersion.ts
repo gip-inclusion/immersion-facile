@@ -8,8 +8,8 @@ import {
   SearchResultDto,
   SearchSortedBy,
   SiretDto,
-  searchParamsSchema,
   castError,
+  searchParamsSchema,
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";

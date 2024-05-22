@@ -33,11 +33,12 @@ export class PgRomeRepository implements RomeRepository {
         try {
           return res.rows[0].code_rome;
         } catch (_) {
-          logger.error(
-            { message: `could not fetch rome code with given appellation ${romeCodeAppellation}`, error: {
+          logger.error({
+            message: `could not fetch rome code with given appellation ${romeCodeAppellation}`,
+            error: {
               result: res,
-              } },
-          );
+            },
+          });
 
           return;
         }
@@ -80,9 +81,10 @@ export class PgRomeRepository implements RomeRepository {
     )
       .then((res) => res.rows.map(convertRowToAppellationDto))
       .catch((error) => {
-        logger.error(
-          { error: { error: castError(error), query }, message: "searchAppellation error" },
-        );
+        logger.error({
+          error: { error: castError(error), query },
+          message: "searchAppellation error",
+        });
         return [];
       });
   }

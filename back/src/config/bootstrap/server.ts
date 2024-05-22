@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import express, { Express } from "express";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
+import { Logger } from "pino";
 import PinoHttp from "pino-http";
 import { createAddressRouter } from "../../adapters/primary/routers/address/createAddressRouter";
 import { createAdminRouter } from "../../adapters/primary/routers/admin/createAdminRouter";
@@ -31,7 +32,6 @@ import { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./createAppDependencies";
 import { Gateways } from "./createGateways";
 import { startCrawler } from "./startCrawler";
-import { Logger } from "pino";
 
 const logger = createLogger(__filename);
 

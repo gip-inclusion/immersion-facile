@@ -1,6 +1,7 @@
 import axios from "axios";
 import Bottleneck from "bottleneck";
 import { format, formatISO, secondsToMilliseconds } from "date-fns";
+import { Logger } from "pino";
 import {
   NafDto,
   NumberEmployeesRange,
@@ -28,7 +29,6 @@ import {
 } from "../../retry-strategy/ports/RetryStrategy";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { SiretGateway } from "../ports/SirenGateway";
-import { Logger } from "pino";
 
 const logger = createLogger(__filename);
 
