@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Pool } from "pg";
-import { castError, FormEstablishmentDto, random, sleep } from "shared";
+import { FormEstablishmentDto, castError, random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { getTestPgPool } from "../config/pg/pgUtils";

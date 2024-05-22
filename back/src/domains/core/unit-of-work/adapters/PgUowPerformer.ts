@@ -1,5 +1,6 @@
 import { Kysely } from "kysely";
 import { Pool } from "pg";
+import { castError } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
@@ -8,7 +9,6 @@ import { Database } from "../../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../../utils/logger";
 import { UnitOfWork } from "../ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
-import { castError } from "shared";
 
 const logger = createLogger(__filename);
 

@@ -1,5 +1,4 @@
 import { cpus } from "os";
-import { Logger } from "pino";
 import { cpuUsage, memoryUsage } from "process";
 import { TimeGateway } from "../domains/core/time-gateway/ports/TimeGateway";
 import { OpacifiedLogger } from "./logger";

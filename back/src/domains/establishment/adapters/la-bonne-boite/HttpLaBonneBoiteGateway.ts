@@ -1,5 +1,5 @@
 import Bottleneck from "bottleneck";
-import { castError, SearchResultDto } from "shared";
+import { SearchResultDto, castError } from "shared";
 import { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
 import { PoleEmploiGateway } from "../../../convention/ports/PoleEmploiGateway";

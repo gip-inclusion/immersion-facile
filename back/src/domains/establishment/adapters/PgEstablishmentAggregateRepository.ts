@@ -4,12 +4,12 @@ import { equals, keys } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
-  castError,
   LocationId,
   RomeCode,
   SearchResultDto,
   SearchSortedBy,
   SiretDto,
+  castError,
 } from "shared";
 import {
   BadRequestError,
