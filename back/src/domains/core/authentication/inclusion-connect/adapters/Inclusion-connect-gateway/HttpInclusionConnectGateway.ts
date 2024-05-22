@@ -45,7 +45,7 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
       }))
       .catch((error) => {
         logger.error({
-          body: error?.response?.data,
+          error,
           message: "Error trying to get Access Token",
         });
         throw error;

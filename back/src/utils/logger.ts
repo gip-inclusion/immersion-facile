@@ -12,6 +12,7 @@ import {
   PeExternalId,
   Role,
 } from "shared";
+import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
 import { Recipient } from "../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
@@ -63,17 +64,13 @@ type LoggerParams = Partial<{
   agencyId: AgencyId;
   api: string;
   authorisationStatus: AuthorisationStatus;
-  body: object;
   consumerName: ApiConsumerName;
   context: Record<string, string>;
   conventionId: ConventionId;
-  counterType: string;
   crawlingPeriodMs: number;
-  data: unknown;
   durationInSeconds: number;
   email: string;
   error: Error | Partial<SQLError> | AxiosError;
-  peExternalId: PeExternalId;
   eventId: string;
   events: EventToDebugInfo[];
   formEstablishment: Partial<FormEstablishmentDto>;
@@ -87,10 +84,13 @@ type LoggerParams = Partial<{
   numberOfEvent: number;
   pathname: string;
   payload: ConventionJwtPayload;
-  peConvention: {
-    peId: string;
-    originalId: string;
-  };
+  schemaParsingInput: unknown;
+  peConnect: Partial<{
+    peId: ConventionId;
+    originalId: ConventionId;
+    peExternalId: PeExternalId;
+    isJobSeeker: boolean;
+  }>;
   processEventsDurationInSeconds: number;
   query: string;
   recipients: Recipient[];
@@ -104,11 +104,11 @@ type LoggerParams = Partial<{
   };
   request: Pick<Request, "path" | "method" | "body">;
   requestId: string;
-  response: PartialResponse | SubscriberResponse;
+  response: PartialResponse | SubscriberResponse | HttpResponse<any, any>;
   retrieveEventsDurationInSeconds: number;
   role: Role;
   search: Partial<SearchMade>;
-  status: string;
+  status: "success" | "total" | "error";
   subscriptionId: string;
   token: string;
   topic: DomainTopic;
@@ -130,7 +130,11 @@ export type OpacifiedLogger = {
   level: string;
 };
 
-type LoggerFunction = (params: LoggerParams & { message?: string }) => void;
+export type LoggerParamsWithMessage = LoggerParams & {
+  message?: string;
+};
+
+type LoggerFunction = (params: LoggerParamsWithMessage) => void;
 
 export const createLogger = (filename: string): OpacifiedLogger => {
   const logger = rootLogger.child({ name: path.basename(filename) });
@@ -143,13 +147,10 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       agencyId,
       api,
       authorisationStatus,
-      body,
       consumerName,
       context,
       conventionId,
-      counterType,
       crawlingPeriodMs,
-      data,
       durationInSeconds,
       email,
       error,
@@ -167,8 +168,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       numberOfEvent,
       pathname,
       payload,
-      peConvention,
-      peExternalId,
+      peConnect,
       processEventsDurationInSeconds,
       query,
       recipients,
@@ -178,6 +178,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       response,
       retrieveEventsDurationInSeconds,
       role,
+      schemaParsingInput,
       search,
       status,
       subscriptionId,
@@ -198,13 +199,10 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         agencyId,
         api,
         authorisationStatus,
-        body,
         consumerName,
         context,
         conventionId,
-        counterType,
         crawlingPeriodMs,
-        data,
         durationInSeconds,
         email,
         error,
@@ -221,8 +219,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         numberOfEvent,
         pathname,
         payload,
-        peConvention,
-        peExternalId,
+        peConnect,
         processEventsDurationInSeconds,
         query,
         recipients,
@@ -232,6 +229,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         response,
         retrieveEventsDurationInSeconds,
         role,
+        schemaParsingInput,
         search,
         status,
         subscriptionId,

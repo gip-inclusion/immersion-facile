@@ -32,7 +32,7 @@ const onlyValidAdvisorsForImmersion = (
 const logger = createLogger(__filename);
 
 export const chooseValidAdvisor = (
-  user: PeConnectUserDto,
+  { peExternalId }: PeConnectUserDto,
   advisors: PeConnectAdvisorDto[],
 ): PeConnectImmersionAdvisorDto | undefined => {
   const sortedValidAdvisors: PeConnectImmersionAdvisorDto[] = advisors
@@ -43,7 +43,9 @@ export const chooseValidAdvisor = (
   if (!preferredAdvisor) {
     getAdvisorsInfoCounter.error.inc({ errorType: "peConnectNoValidAdvisor" });
     logger.error({
-      peExternalId: user.peExternalId,
+      peConnect: {
+        peExternalId,
+      },
       message: "getAdvisorsInfo - peConnectNoValidAdvisor",
     });
     return undefined;

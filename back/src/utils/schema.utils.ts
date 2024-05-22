@@ -4,16 +4,16 @@ import { OpacifiedLogger } from "./logger";
 
 export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
   schema: z.Schema<T>,
-  data: unknown,
+  schemaParsingInput: unknown,
   logger: OpacifiedLogger,
   context: Record<string, string>,
 ): T => {
   try {
-    return schema.parse(data);
+    return schema.parse(schemaParsingInput);
   } catch (error) {
     logger.error({
       context,
-      data,
+      schemaParsingInput,
       error: castError(error),
       message: `Parsing failed with schema '${schema.constructor.name}'`,
     });

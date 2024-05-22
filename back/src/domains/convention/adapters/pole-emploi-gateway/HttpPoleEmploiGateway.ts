@@ -10,7 +10,10 @@ import {
   isRetryableError,
   logAxiosError,
 } from "../../../../utils/axiosUtils";
-import { createLogger } from "../../../../utils/logger";
+import {
+  LoggerParamsWithMessage,
+  createLogger,
+} from "../../../../utils/logger";
 import {
   notifyDiscord,
   notifyObjectDiscord,
@@ -123,8 +126,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   ): Promise<PoleEmploiBroadcastResponse> {
     logger.info({
       _title: "PeBroadcast",
-      status: "start",
-      peConvention: {
+      status: "total",
+      peConnect: {
         peId: poleEmploiConvention.id,
         originalId: poleEmploiConvention.originalId,
       },
@@ -142,7 +145,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           _title: "PeBroadcast",
           status: "success",
           httpStatus: response.status,
-          peConvention: {
+          peConnect: {
             peId: poleEmploiConvention.id,
             originalId: poleEmploiConvention.originalId,
           },
@@ -164,9 +167,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         if (!axios.isAxiosError(error)) {
           logger.error({
             _title: "PeBroadcast",
-            status: "notAxiosError",
+            status: "error",
+            message: "notAxiosError",
             error,
-            peConvention: {
+            peConnect: {
               peId: poleEmploiConvention.id,
               originalId: poleEmploiConvention.originalId,
             },
@@ -190,9 +194,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         if (!error.response) {
           logger.error({
             _title: "PeBroadcast",
-            status: "noResponseInAxiosError",
+            status: "error",
+            message: "noResponseInAxiosError",
             error,
-            peConvention: {
+            peConnect: {
               peId: poleEmploiConvention.id,
               originalId: poleEmploiConvention.originalId,
             },
@@ -220,10 +225,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         if (error.response.status === 404) {
           logger.error({
             _title: "PeBroadcast",
-            status: "notFoundOrMismatch",
+            status: "error",
+            message: `notFoundOrMismatch - ${message}`,
             httpStatus: error.response.status,
-            message,
-            peConvention: {
+            peConnect: {
               peId: poleEmploiConvention.id,
               originalId: poleEmploiConvention.originalId,
             },
@@ -237,17 +242,15 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           };
         }
 
-        const errorObject = {
+        const errorObject: LoggerParamsWithMessage = {
           _title: "PeBroadcast",
-          status: "unknownAxiosError",
+          status: "error",
+          error,
           httpStatus: error.response.status,
-          message: error.message,
-          axiosBody: error.response.data as unknown,
-          peConvention: {
+          peConnect: {
             peId: poleEmploiConvention.id,
             originalId: poleEmploiConvention.originalId,
           },
-          detailledError: error.toJSON(),
         };
         logger.error(errorObject);
         notifyObjectDiscord(errorObject);

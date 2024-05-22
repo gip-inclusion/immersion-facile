@@ -81,7 +81,6 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
     if (!recipients) {
       logger.error({
         conventionId: convention.id,
-        status: convention.status,
         agencyId: convention.agencyId,
         message:
           "Unable to find appropriate recipient for validation notification.",
