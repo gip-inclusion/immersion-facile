@@ -11,7 +11,11 @@ import {
   getUserInfoCounter,
   getUserStatutInfoCounter,
 } from "../../../../../../utils/counters";
-import { OpacifiedLogger, createLogger } from "../../../../../../utils/logger";
+import {
+  LoggerParamsWithMessage,
+  OpacifiedLogger,
+  createLogger,
+} from "../../../../../../utils/logger";
 import { notifyObjectDiscord } from "../../../../../../utils/notifyDiscord";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../../utils/schema.utils";
 import { AccessTokenDto } from "../../dto/AccessToken.dto";
@@ -45,26 +49,26 @@ const makePeConnectLogger = (
   logger: OpacifiedLogger,
   counterType: CounterType,
 ) => ({
-  success: (contents: object) =>
+  success: ({ message, ...rest }: LoggerParamsWithMessage) =>
     logger.info({
-      ...contents,
+      ...rest,
       status: "success",
       api: counterApiKind,
-      counterType,
+      message: `${counterType} - ${message}`,
     }),
-  total: (contents: object) =>
+  total: ({ message, ...rest }: LoggerParamsWithMessage) =>
     logger.info({
-      ...contents,
+      ...rest,
       status: "total",
       api: counterApiKind,
-      counterType,
+      message: `${counterType} - ${message}`,
     }),
-  error: (contents: object) =>
+  error: ({ message, ...rest }: LoggerParamsWithMessage) =>
     logger.error({
-      ...contents,
+      ...rest,
       status: "error",
       api: counterApiKind,
-      counterType,
+      message: `${counterType} - ${message}`,
     }),
 });
 
@@ -127,7 +131,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        log.error({ response, errorKind: "Response status is not 200." });
+        log.error({ response, message: "Response status is not 200." });
         return undefined;
       }
       const externalAccessToken = parseZodSchemaAndLogErrorOnParsingFailure(
@@ -148,7 +152,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           counter.error.inc({
             errorType: error.message,
           });
-          log.error({ errorType: error.message });
+          log.error({ error });
         },
         (payload) => notifyDiscordOnNotError(payload),
       );
@@ -196,7 +200,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     const log = getUserStatutInfoLogger;
     try {
       counter.total.inc();
-      log.total({ peExternalId });
+      log.total({ peConnect: { peExternalId } });
       const response = await this.#limiter.schedule(() =>
         this.httpClient.getUserStatutInfo({
           headers,
@@ -208,8 +212,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         });
         log.error({
           response,
-          peExternalId,
-          errorKind: "Response status is not 200.",
+          peConnect: { peExternalId },
+          message: "Response status is not 200.",
         });
         return false;
       }
@@ -225,14 +229,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         externalPeConnectStatut.codeStatutIndividu,
       );
       counter.success.inc();
-      log.success({ peExternalId, isJobSeeker });
+      log.success({ peConnect: { peExternalId, isJobSeeker } });
       return isJobSeeker;
     } catch (error) {
       errorChecker(
         error,
         (error) => {
           counter.error.inc({ errorType: error.message });
-          log.error({ errorType: error.message });
+          log.error({ error });
         },
         (payload) => notifyDiscordOnNotError(payload),
       );
@@ -261,7 +265,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        log.error({ response, errorKind: "Response status is not 200." });
+        log.error({ response, message: "Response status is not 200." });
         return undefined;
       }
       const externalPeConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
@@ -280,7 +284,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         error,
         (error) => {
           counter.error.inc({ errorType: error.message });
-          log.error({ errorType: error.message });
+          log.error({ error });
         },
         (payload) => notifyDiscordOnNotError(payload),
       );
@@ -308,7 +312,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        log.error({ response, errorKind: "Response status is not 200." });
+        log.error({ response, message: "Response status is not 200." });
         return [];
       }
       const externalPeConnectAdvisors =
@@ -328,7 +332,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         error,
         (error) => {
           counter.error.inc({ errorType: error.message });
-          log.error({ errorType: error.message });
+          log.error({ error });
         },
         (payload) => notifyDiscordOnNotError(payload),
       );
