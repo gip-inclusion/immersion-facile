@@ -94,7 +94,6 @@ export const icUsersAdminSlice = createSlice({
         ].roles.includes(role)
       ) {
         state.icUsersNeedingReview[userId].agencyRights[agencyId].roles = [
-          ...state.icUsersNeedingReview[userId].agencyRights[agencyId].roles,
           role,
         ];
       }

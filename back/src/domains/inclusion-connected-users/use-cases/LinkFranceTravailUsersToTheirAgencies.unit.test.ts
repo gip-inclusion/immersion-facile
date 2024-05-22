@@ -192,12 +192,12 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
           },
           {
             agency: agency2InGroup,
-            role: "counsellor",
+            roles: ["counsellor"],
             isNotifiedByEmail: false,
           },
           {
             agency: agency3InGroup,
-            role: "counsellor",
+            roles: ["counsellor"],
             isNotifiedByEmail: false,
           },
         ],
@@ -243,12 +243,12 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
           },
           {
             agency: agency2InGroup,
-            role: "counsellor",
+            roles: ["counsellor"],
             isNotifiedByEmail: false,
           },
           {
             agency: agency3InGroup,
-            role: "counsellor",
+            roles: ["counsellor"],
             isNotifiedByEmail: false,
           },
         ],

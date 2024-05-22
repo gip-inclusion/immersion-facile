@@ -266,7 +266,7 @@ describe("RenewConvention", () => {
       await expectPromiseToFailWithError(
         renewConvention.execute(renewConventionParams, inclusionConnectPayload),
         new ForbiddenError(
-          `You don't have suffisiant rights on agency '${existingValidatedConvention.agencyId}'.`,
+          `You don't have sufficient rights on agency '${existingValidatedConvention.agencyId}'.`,
         ),
       );
     });
@@ -284,7 +284,7 @@ describe("RenewConvention", () => {
       await expectPromiseToFailWithError(
         renewConvention.execute(renewConventionParams, inclusionConnectPayload),
         new ForbiddenError(
-          `You don't have suffisiant rights on agency '${existingValidatedConvention.agencyId}'.`,
+          "The role 'agencyOwner' is not allowed to renew convention",
         ),
       );
     });
