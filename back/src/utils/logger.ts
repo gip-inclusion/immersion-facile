@@ -56,7 +56,6 @@ type LoggerParams = Partial<{
   conventionId: ConventionId;
   crawlingPeriodMs: number;
   durationInSeconds: number;
-  email: string;
   error: Error | Partial<SQLError> | AxiosError;
   eventId: string;
   events: EventToDebugInfo[];
@@ -131,7 +130,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       conventionId,
       crawlingPeriodMs,
       durationInSeconds,
-      email,
       error,
       eventId,
       events,
@@ -175,7 +173,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         conventionId,
         crawlingPeriodMs,
         durationInSeconds,
-        email,
         error,
         eventId,
         events,
