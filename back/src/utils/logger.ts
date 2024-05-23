@@ -7,7 +7,6 @@ import {
   AgencyId,
   ApiConsumerName,
   ConventionId,
-  ConventionJwtPayload,
   PeExternalId,
   Role,
 } from "shared";
@@ -73,14 +72,12 @@ type LoggerParams = Partial<{
   events: EventToDebugInfo[];
   host: string;
   httpStatus: number;
-  jwt: string;
   markEventsAsInProcessDurationInSeconds: number;
   newOutboxSize: number;
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
   numberOfEvent: number;
   pathname: string;
-  payload: ConventionJwtPayload;
   schemaParsingInput: unknown;
   peConnect: Partial<{
     peId: ConventionId;
@@ -154,7 +151,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       events,
       host,
       httpStatus,
-      jwt,
       markEventsAsInProcessDurationInSeconds,
       message,
       newOutboxSize,
@@ -162,7 +158,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       notificationId,
       numberOfEvent,
       pathname,
-      payload,
       peConnect,
       processEventsDurationInSeconds,
       query,
@@ -204,14 +199,12 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         events,
         host,
         httpStatus,
-        jwt,
         markEventsAsInProcessDurationInSeconds,
         newOutboxSize,
         nodeProcessReport,
         notificationId,
         numberOfEvent,
         pathname,
-        payload,
         peConnect,
         processEventsDurationInSeconds,
         query,

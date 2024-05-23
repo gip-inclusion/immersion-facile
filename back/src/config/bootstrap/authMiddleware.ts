@@ -3,7 +3,6 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
   ApiConsumerName,
-  ConventionJwtPayload,
   ExtractFromExisting,
   PayloadKey,
   castError,
@@ -97,13 +96,9 @@ export const makeMagicLinkAuthMiddleware = (
       next();
     } catch (err) {
       const castedError = castError(err);
-      const unsafePayload = jwt.decode(maybeJwt) as ConventionJwtPayload;
+
       if (err instanceof TokenExpiredError) {
-        logger.warn({
-          token: maybeJwt,
-          payload: unsafePayload,
-          message: "token expired",
-        });
+        const unsafePayload = jwt.decode(maybeJwt);
         return unsafePayload
           ? sendNeedsRenewedLinkError(res, err)
           : sendAuthenticationError(res, err);

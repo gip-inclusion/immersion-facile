@@ -1,10 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
-import { createLogger } from "../../utils/logger";
 import { NotFoundError } from "../helpers/httpErrors";
-
-const logger = createLogger(__filename);
 
 export const makeAdminAuthMiddleware = (
   jwtPublicKey: string,
@@ -30,17 +27,11 @@ export const makeAdminAuthMiddleware = (
 
       return next();
     } catch (error: any) {
-      if ("name" in error && error.name === "TokenExpiredError") {
-        return res.status(401).json({ error: "Token is expired" });
-      }
-      logger.error({
-        error,
-        jwt: req.headers.authorization,
-        message: "Provided token is invalid",
-      });
-      res.status(401);
-      return res.json({
-        error: "Provided token is invalid",
+      return res.status(401).json({
+        error:
+          "name" in error && error.name === "TokenExpiredError"
+            ? "Token is expired"
+            : "Provided token is invalid",
       });
     }
   };
