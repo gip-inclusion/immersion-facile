@@ -58,7 +58,6 @@ type SQLError = {
 
 type LoggerParams = Partial<{
   agencyId: AgencyId;
-  api: string;
   authorisationStatus: AuthorisationStatus;
   consumerName: ApiConsumerName;
   context: Record<string, string>;
@@ -136,7 +135,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
     ({
       adapters,
       agencyId,
-      api,
       authorisationStatus,
       consumerName,
       context,
@@ -183,7 +181,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       const opacifiedLogContent = {
         adapters,
         agencyId,
-        api,
         authorisationStatus,
         consumerName,
         context,

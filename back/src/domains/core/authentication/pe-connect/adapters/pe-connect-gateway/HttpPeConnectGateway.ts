@@ -53,22 +53,19 @@ const makePeConnectLogger = (
     logger.info({
       ...rest,
       status: "success",
-      api: counterApiKind,
-      message: `${counterType} - ${message}`,
+      message: `${counterApiKind} - ${counterType} - ${message}`,
     }),
   total: ({ message, ...rest }: LoggerParamsWithMessage) =>
     logger.info({
       ...rest,
       status: "total",
-      api: counterApiKind,
-      message: `${counterType} - ${message}`,
+      message: `${counterApiKind} - ${counterType} - ${message}`,
     }),
   error: ({ message, ...rest }: LoggerParamsWithMessage) =>
     logger.error({
       ...rest,
       status: "error",
-      api: counterApiKind,
-      message: `${counterType} - ${message}`,
+      message: `${counterApiKind} - ${counterType} - ${message}`,
     }),
 });
 
