@@ -59,7 +59,6 @@ type LoggerParams = Partial<{
   error: Error | Partial<SQLError> | AxiosError;
   events: Partial<EventToDebugInfo>[];
   httpStatus: number;
-  markEventsAsInProcessDurationInSeconds: number;
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
   numberOfEvent: number;
@@ -130,7 +129,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       error,
       events,
       httpStatus,
-      markEventsAsInProcessDurationInSeconds,
       message,
       nodeProcessReport,
       notificationId,
@@ -170,7 +168,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         error,
         events,
         httpStatus,
-        markEventsAsInProcessDurationInSeconds,
         nodeProcessReport,
         notificationId,
         numberOfEvent,
