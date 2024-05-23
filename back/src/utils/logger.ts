@@ -74,26 +74,28 @@ type LoggerParams = Partial<{
   request: Pick<Request, "path" | "method" | "body">;
   requestId: string;
   response: PartialResponse | SubscriberResponse | HttpResponse<any, any>;
-  role: Role;
-  search: Partial<SearchMade>;
   status: "success" | "total" | "error" | AuthorisationStatus;
   subscriptionId: string;
-  token: string;
-  topic: DomainTopic;
-  type: string;
-  typeOfEvents: TypeOfEvent;
   useCaseName: string;
-  wasQuarantined: string;
   //------- à vérifier
+  role: Role;
   context: Record<string, string>;
   values: unknown[];
+  httpStatus: number;
+  type: string;
+  // --------------------------------
   crawlingPeriodMs: number;
   durationInSeconds: number;
   processEventsDurationInSeconds: number;
   retrieveEventsDurationInSeconds: number;
-  httpStatus: number;
+  // --------------------------------
   events: Partial<EventToDebugInfo>[];
   numberOfEvent: number;
+  topic: DomainTopic;
+  wasQuarantined: string;
+  typeOfEvents: TypeOfEvent;
+  // --------------------------------
+  search: Partial<SearchMade>;
 }>;
 
 export type OpacifiedLogger = {
@@ -144,7 +146,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       search,
       status,
       subscriptionId,
-      token,
       topic,
       type,
       typeOfEvents,
@@ -180,7 +181,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         search,
         status,
         subscriptionId,
-        token,
         topic,
         type,
         typeOfEvents,
