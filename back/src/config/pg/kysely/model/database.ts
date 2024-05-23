@@ -162,7 +162,7 @@ interface SavedErrors {
   consumer_id: string | null;
   consumer_name: string;
   service_name: string;
-  message: string;
+  feedback: Json;
   params: Record<string, unknown> | null;
   occurred_at: Timestamp;
   handled_by_agency: Generated<boolean>;

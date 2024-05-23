@@ -1,10 +1,11 @@
 import { ApiConsumerId, ApiConsumerName, ConventionId } from "shared";
+import { Feedback } from "../../api-consumer/ports/SubscribersGateway";
 
 export type SavedError = {
   serviceName: string;
   consumerId: ApiConsumerId | null;
   consumerName: ApiConsumerName;
-  message: string;
+  feedback: Feedback;
   params?: Record<string, unknown>;
   occurredAt: Date;
   handledByAgency: boolean;

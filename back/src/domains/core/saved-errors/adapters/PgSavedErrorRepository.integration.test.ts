@@ -1,3 +1,5 @@
+import axios, { isAxiosError } from "axios";
+import MockAdapter from "axios-mock-adapter";
 import { Kysely } from "kysely/dist/cjs/kysely";
 import { Pool } from "pg";
 import {
@@ -16,19 +18,44 @@ import {
 } from "../ports/SavedErrorRepository";
 import { PgSavedErrorRepository } from "./PgSavedErrorRepository";
 
-const makeSavedError = (
+const makeSavedError = async (
   serviceName: string,
   conventionId: ConventionId,
+  errorMode: "timeout" | "response-error",
   handledByAgency?: boolean,
-): SavedError => ({
-  consumerId: null,
-  consumerName: "my-consumer",
-  serviceName,
-  message: "Some message",
-  params: { conventionId, httpStatus: 500 },
-  occurredAt: new Date(),
-  handledByAgency: handledByAgency ? handledByAgency : false,
-});
+): Promise<SavedError> => {
+  const mock = new MockAdapter(axios);
+  const url = "www.url.fr";
+
+  if (errorMode === "timeout") {
+    mock.onGet(url).timeout();
+  } else {
+    mock.onGet(url).reply(404, { message: "Error messasge" });
+  }
+
+  const error = await axios
+    .get(url)
+    .then(() => {
+      throw new Error();
+    })
+    .catch((error) => {
+      if (isAxiosError(error)) return error;
+      throw error;
+    });
+
+  return {
+    consumerId: null,
+    consumerName: "my-consumer",
+    serviceName,
+    feedback: {
+      message: "Some message",
+      response: error.response ? error.response : error,
+    },
+    params: { conventionId, httpStatus: 500 },
+    occurredAt: new Date(),
+    handledByAgency: handledByAgency ? handledByAgency : false,
+  };
+};
 
 describe("PgSavedErrorRepository", () => {
   let pool: Pool;
@@ -49,9 +76,13 @@ describe("PgSavedErrorRepository", () => {
     await pool.end();
   });
 
-  it("saves an error in the repository", async () => {
+  it("saves an axios response error in the repository", async () => {
     const conventionId = "someId";
-    const savedError = makeSavedError("osef", conventionId);
+    const savedError = await makeSavedError(
+      "osef",
+      conventionId,
+      "response-error",
+    );
     await pgErrorRepository.save(savedError);
 
     const response = await kyselyDb
@@ -62,7 +93,34 @@ describe("PgSavedErrorRepository", () => {
     expectObjectInArrayToMatch(response, [
       {
         handled_by_agency: savedError.handledByAgency,
-        message: savedError.message,
+        feedback: {
+          message: savedError.feedback.message,
+          response: JSON.parse(JSON.stringify(savedError.feedback.response)),
+        },
+        occurred_at: savedError.occurredAt,
+        params: savedError.params,
+        service_name: savedError.serviceName,
+      },
+    ]);
+  });
+
+  it("saves an axios timeout error in the repository", async () => {
+    const conventionId = "someId";
+    const savedError = await makeSavedError("osef", conventionId, "timeout");
+    await pgErrorRepository.save(savedError);
+
+    const response = await kyselyDb
+      .selectFrom("saved_errors")
+      .selectAll()
+      .execute();
+
+    expectObjectInArrayToMatch(response, [
+      {
+        handled_by_agency: savedError.handledByAgency,
+        feedback: {
+          message: savedError.feedback.message,
+          response: JSON.parse(JSON.stringify(savedError.feedback.response)),
+        },
         occurred_at: savedError.occurredAt,
         params: savedError.params,
         service_name: savedError.serviceName,
@@ -75,18 +133,25 @@ describe("PgSavedErrorRepository", () => {
 
     it(`mark errored convention as handle when convention exist and service name is '${broadcastToPeServiceName}'`, async () => {
       const conventionId2 = "someId";
-      const savedError1 = makeSavedError(
+      const savedError1 = await makeSavedError(
         broadcastToPeServiceName,
         conventionId1,
+        "response-error",
       );
-      const savedError2 = makeSavedError(
+      const savedError2 = await makeSavedError(
         broadcastToPeServiceName,
         conventionId1,
+        "response-error",
       );
-      const savedError3 = makeSavedError("osef", conventionId1);
-      const savedError4 = makeSavedError(
+      const savedError3 = await makeSavedError(
+        "osef",
+        conventionId1,
+        "response-error",
+      );
+      const savedError4 = await makeSavedError(
         broadcastToPeServiceName,
         conventionId2,
+        "response-error",
       );
 
       await pgErrorRepository.save(savedError1);
@@ -108,7 +173,7 @@ describe("PgSavedErrorRepository", () => {
         pgSavedErrors.map(
           (pgSavedError): SavedError => ({
             serviceName: pgSavedError.service_name,
-            message: pgSavedError.message,
+            feedback: pgSavedError.feedback as any,
             params: pgSavedError.params ?? undefined,
             occurredAt: pgSavedError.occurred_at,
             handledByAgency: pgSavedError.handled_by_agency,
@@ -121,7 +186,13 @@ describe("PgSavedErrorRepository", () => {
           { ...savedError2, handledByAgency: true },
           savedError3,
           savedError4,
-        ],
+        ].map(({ feedback, ...rest }) => ({
+          ...rest,
+          feedback: {
+            message: feedback.message,
+            response: JSON.parse(JSON.stringify(feedback.response)),
+          },
+        })),
       );
     });
 
@@ -135,9 +206,10 @@ describe("PgSavedErrorRepository", () => {
     });
 
     it("Throw when the saved error is already mark as handle", async () => {
-      const savedError1 = makeSavedError(
+      const savedError1 = await makeSavedError(
         broadcastToPeServiceName,
         conventionId1,
+        "response-error",
         true,
       );
       await pgErrorRepository.save(savedError1);

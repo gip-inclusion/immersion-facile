@@ -31,7 +31,7 @@ export class PgSavedErrorRepository implements SavedErrorRepository {
   public async save(savedError: SavedError): Promise<void> {
     const {
       serviceName,
-      message,
+      feedback,
       params,
       occurredAt,
       handledByAgency,
@@ -45,7 +45,7 @@ export class PgSavedErrorRepository implements SavedErrorRepository {
         service_name: serviceName,
         consumer_name: consumerName,
         consumer_id: consumerId,
-        message,
+        feedback: sql`CAST(${JSON.stringify(feedback)} AS JSONB)`,
         params: params ?? null,
         occurred_at: occurredAt,
         handled_by_agency: handledByAgency,
