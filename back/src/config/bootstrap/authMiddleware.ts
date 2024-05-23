@@ -52,7 +52,7 @@ const createIncTotalCountForRequest =
         body: req.body,
       },
       consumerName,
-      authorisationStatus,
+      status: authorisationStatus,
       message: "apiKeyAuthMiddlewareRequestsTotal",
     });
   };
