@@ -44,8 +44,6 @@ export class BasicEventCrawler implements EventCrawler {
 
     const processStartDate = new Date();
     await this.#markEventsAsInProcess(events);
-    const markEventsAsInProcessDurationInSeconds =
-      calculateDurationInSecondsFrom(processStartDate);
     await this.#publishEvents(events);
     const processEventsDurationInSeconds =
       calculateDurationInSecondsFrom(processStartDate);
@@ -54,7 +52,6 @@ export class BasicEventCrawler implements EventCrawler {
       logger.info({
         retrieveEventsDurationInSeconds,
         processEventsDurationInSeconds,
-        markEventsAsInProcessDurationInSeconds,
         typeOfEvents: "unpublished",
         numberOfEvent: events.length,
         events: eventsToDebugInfo(events),
