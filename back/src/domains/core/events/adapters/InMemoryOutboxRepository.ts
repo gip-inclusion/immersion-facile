@@ -1,5 +1,4 @@
 import { values } from "ramda";
-import { keys } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { DomainEvent, EventStatus } from "../events";
 import { OutboxRepository } from "../ports/OutboxRepository";
@@ -24,7 +23,6 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     this._events[event.id] = event;
     logger.info({
       events: [{ eventId: event.id }],
-      newOutboxSize: keys(this._events).length,
       message: "save",
     });
   }

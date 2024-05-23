@@ -60,7 +60,6 @@ type LoggerParams = Partial<{
   events: Partial<EventToDebugInfo>[];
   httpStatus: number;
   markEventsAsInProcessDurationInSeconds: number;
-  newOutboxSize: number;
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
   numberOfEvent: number;
@@ -133,7 +132,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       httpStatus,
       markEventsAsInProcessDurationInSeconds,
       message,
-      newOutboxSize,
       nodeProcessReport,
       notificationId,
       numberOfEvent,
@@ -173,7 +171,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         events,
         httpStatus,
         markEventsAsInProcessDurationInSeconds,
-        newOutboxSize,
         nodeProcessReport,
         notificationId,
         numberOfEvent,
