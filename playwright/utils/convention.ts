@@ -130,12 +130,37 @@ export const submitBasicConventionForm = async (page: Page) => {
   await confirmCreateConventionFormSubmit(page);
 };
 
-export const signConvention = async (page: Page, magicLink: string) => {
+export const signConvention = async (
+  page: Page,
+  magicLinks: string[],
+  signatoryIndex: number,
+) => {
   // eslint-disable-next-line no-console
-  console.info("Signing convention with magic link ==>", magicLink);
+  console.info(
+    "Signing convention with magic link ==>",
+    magicLinks[signatoryIndex],
+  );
 
-  await page.goto(magicLink);
+  await page.goto(magicLinks[signatoryIndex]);
   await expect(page.locator(".fr-alert--success")).toBeHidden();
+  if (signatoryIndex === 1) {
+    await expect(
+      page.locator(
+        `#${domElementIds.conventionToSign.remindSignatoriesButton}`,
+      ),
+    ).toBeVisible();
+    await page.click(
+      `#${domElementIds.conventionToSign.remindSignatoriesButton}`,
+    );
+    await expect(
+      page.locator(`#${domElementIds.manageConvention.remindSignatoriesModal}`),
+    ).toBeVisible();
+    await page
+      .locator(
+        `#${domElementIds.manageConvention.remindSignatoriesModal} .fr-btn--close`,
+      )
+      .click();
+  }
   await expect(
     page.locator(`#${domElementIds.conventionToSign.openSignModalButton}`),
   ).toBeVisible();
@@ -143,6 +168,7 @@ export const signConvention = async (page: Page, magicLink: string) => {
     page.locator(`#${domElementIds.conventionToSign.openSignModalButton}`),
   ).toBeEnabled();
   await page.click(`#${domElementIds.conventionToSign.openSignModalButton}`);
+
   await expect(
     page.locator(`#${domElementIds.conventionToSign.submitButton}`),
   ).toBeEnabled();
