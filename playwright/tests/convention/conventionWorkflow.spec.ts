@@ -46,7 +46,7 @@ test.describe("Convention creation and modification workflow", () => {
   test("signs convention for first signatory and validator requires modification", async ({
     page,
   }) => {
-    await signConvention(page, magicLinks[0]);
+    await signConvention(page, magicLinks, 0);
     await goToAdminTab(page, "notifications");
     const emailWrapper = await openEmailInAdmin(
       page,
@@ -65,10 +65,6 @@ test.describe("Convention creation and modification workflow", () => {
         `#${domElementIds.manageConvention.conventionValidationRequestEditButton}`,
       )
       .click();
-    await page
-      .locator(`#${domElementIds.manageConvention.draftModal}`)
-      .getByRole("button", { name: "Il y un autre problème sur le" })
-      .click();
 
     await page.selectOption(
       `#${domElementIds.manageConvention.modifierRoleSelect}`,
@@ -80,9 +76,7 @@ test.describe("Convention creation and modification workflow", () => {
       )
       .fill("Justification");
     await page
-      .locator(
-        `#${domElementIds.manageConvention.justificationModalSubmitButton}`,
-      )
+      .locator(`#${domElementIds.manageConvention.draftModalSubmitButton}`)
       .click();
     await expect(page.locator(".fr-alert--success")).toBeVisible();
     await page.waitForTimeout(testConfig.timeForEventCrawler);
@@ -127,19 +121,46 @@ test.describe("Convention creation and modification workflow", () => {
     });
 
     test("signs convention for signatory 1", async ({ page }) => {
-      await signConvention(page, signatoriesMagicLinks[0]);
+      await signConvention(page, signatoriesMagicLinks, 0);
     });
 
     test("signs convention for signatory 2", async ({ page }) => {
-      await signConvention(page, signatoriesMagicLinks[1]);
+      await signConvention(page, signatoriesMagicLinks, 1);
+    });
+    test("validator can remind missing signatories", async ({ page }) => {
+      await goToAdminTab(page, "notifications");
+      const emailWrapper = await openEmailInAdmin(
+        page,
+        "NEW_CONVENTION_AGENCY_NOTIFICATION",
+        0,
+      );
+      const href = await getMagicLinkInEmailWrapper(emailWrapper);
+      expect(href).not.toBe(null);
+      if (!href) return;
+      await page.goto(href);
+      const remindSignatories = page.locator(
+        `#${domElementIds.manageConvention.remindSignatoriesButton}`,
+      );
+      await expect(remindSignatories).toBeVisible();
+      await remindSignatories.click();
+      await expect(
+        page.locator(
+          `#${domElementIds.manageConvention.remindSignatoriesModal}`,
+        ),
+      ).toBeVisible();
+      await page
+        .locator(
+          `#${domElementIds.manageConvention.remindSignatoriesModal} .fr-btn--close`,
+        )
+        .click();
     });
 
     test("signs convention for signatory 3", async ({ page }) => {
-      await signConvention(page, signatoriesMagicLinks[2]);
+      await signConvention(page, signatoriesMagicLinks, 2);
     });
 
     test("signs convention for signatory 4", async ({ page }) => {
-      await signConvention(page, signatoriesMagicLinks[3]);
+      await signConvention(page, signatoriesMagicLinks, 3);
       await page.waitForTimeout(testConfig.timeForEventCrawler);
     });
 

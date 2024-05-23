@@ -148,16 +148,14 @@ export const JustificationModalContent = ({
                 priority: "secondary",
                 onClick: closeModal,
                 nativeButtonProps: {
-                  id: domElementIds.manageConvention
-                    .justificationModalCancelButton,
+                  id: cancelButtonIdByStatus[newStatus],
                 },
                 children: "Annuler",
               },
               {
                 type: "submit",
                 nativeButtonProps: {
-                  id: domElementIds.manageConvention
-                    .justificationModalSubmitButton,
+                  id: submitButtonIdByStatus[newStatus],
                 },
                 children: confirmByStatus[newStatus],
               },
@@ -181,4 +179,24 @@ const confirmByStatus: Record<ConventionStatusWithJustification, string> = {
   REJECTED: "Confirmer le refus",
   CANCELLED: "Confirmer l'annulation",
   DEPRECATED: "Confirmer que la demande est obsolète",
+};
+
+const submitButtonIdByStatus: Record<
+  ConventionStatusWithJustification,
+  string
+> = {
+  DRAFT: domElementIds.manageConvention.draftModalSubmitButton,
+  REJECTED: domElementIds.manageConvention.rejectedModalSubmitButton,
+  CANCELLED: domElementIds.manageConvention.cancelModalSubmitButton,
+  DEPRECATED: domElementIds.manageConvention.deprecatedModalSubmitButton,
+};
+
+const cancelButtonIdByStatus: Record<
+  ConventionStatusWithJustification,
+  string
+> = {
+  DRAFT: domElementIds.manageConvention.draftModalCancelButton,
+  REJECTED: domElementIds.manageConvention.rejectedModalCancelButton,
+  CANCELLED: domElementIds.manageConvention.cancelModalCancelButton,
+  DEPRECATED: domElementIds.manageConvention.deprecatedModalCancelButton,
 };
