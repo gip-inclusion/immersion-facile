@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   AgencyRole,
+  IcUserRoleForAgencyParams,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
@@ -65,7 +66,7 @@ describe("GetInclusionConnectedUsers", () => {
   it("throws Forbidden if no jwt token provided", async () => {
     await expectPromiseToFailWith(
       updateIcUserRoleForAgency.execute({
-        role: "counsellor",
+        roles: ["counsellor"],
         agencyId: "agency-1",
         userId: user.id,
       }),
@@ -76,7 +77,7 @@ describe("GetInclusionConnectedUsers", () => {
   it("throws Forbidden if token payload is not backoffice token", async () => {
     await expectPromiseToFailWith(
       updateIcUserRoleForAgency.execute(
-        { role: "counsellor", agencyId: "agency-1", userId: "john-123" },
+        { roles: ["counsellor"], agencyId: "agency-1", userId: "john-123" },
         { userId: user.id },
       ),
       `User '${user.id}' is not a backOffice user`,
@@ -87,7 +88,7 @@ describe("GetInclusionConnectedUsers", () => {
     await expectPromiseToFailWith(
       updateIcUserRoleForAgency.execute(
         {
-          role: "counsellor",
+          roles: ["counsellor"],
           agencyId: "agency-1",
           userId: "john-123",
         },
@@ -113,7 +114,7 @@ describe("GetInclusionConnectedUsers", () => {
     await expectPromiseToFailWith(
       updateIcUserRoleForAgency.execute(
         {
-          role: "counsellor",
+          roles: ["counsellor"],
           agencyId: "agency-1",
           userId: user.id,
         },
@@ -142,7 +143,7 @@ describe("GetInclusionConnectedUsers", () => {
 
     await updateIcUserRoleForAgency.execute(
       {
-        role: newRole,
+        roles: [newRole],
         agencyId: agency.id,
         userId: user.id,
       },
@@ -175,12 +176,12 @@ describe("GetInclusionConnectedUsers", () => {
       icUser,
     ]);
     const newRole: AgencyRole = "validator";
-    const IcUserRoleForAgency = {
+    const icUserRoleForAgency: IcUserRoleForAgencyParams = {
       userId: user.id,
       agencyId: agency.id,
-      role: newRole,
+      roles: [newRole],
     };
-    await updateIcUserRoleForAgency.execute(IcUserRoleForAgency, {
+    await updateIcUserRoleForAgency.execute(icUserRoleForAgency, {
       userId: backofficeAdminUser.id,
     } as InclusionConnectJwtPayload);
 
@@ -190,7 +191,55 @@ describe("GetInclusionConnectedUsers", () => {
       outboxRepo.events[0],
       createNewEvent({
         topic: "IcUserAgencyRightChanged",
-        payload: IcUserRoleForAgency,
+        payload: icUserRoleForAgency,
+      }),
+    );
+  });
+
+  it("can change to more than one role", async () => {
+    const agency = new AgencyDtoBuilder().build();
+    const icUser: InclusionConnectedUser = {
+      ...user,
+      agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
+    };
+
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+      icUser,
+    ]);
+
+    const icUserRoleForAgency: IcUserRoleForAgencyParams = {
+      roles: ["counsellor", "validator", "agencyOwner"],
+      agencyId: agency.id,
+      userId: user.id,
+    };
+
+    await updateIcUserRoleForAgency.execute(icUserRoleForAgency, {
+      userId: backofficeAdminUser.id,
+    } as InclusionConnectJwtPayload);
+
+    expectToEqual(await inclusionConnectedUserRepository.getById(user.id), {
+      ...user,
+      agencyRights: [
+        { agency, roles: icUserRoleForAgency.roles, isNotifiedByEmail: false },
+      ],
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
+    });
+
+    expect(outboxRepo.events).toHaveLength(1);
+
+    expectToEqual(
+      outboxRepo.events[0],
+      createNewEvent({
+        topic: "IcUserAgencyRightChanged",
+        payload: icUserRoleForAgency,
       }),
     );
   });

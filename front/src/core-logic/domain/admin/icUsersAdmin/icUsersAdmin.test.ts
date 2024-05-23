@@ -203,7 +203,7 @@ describe("Agency registration for authenticated users", () => {
       const payload: IcUserRoleForAgencyParams = {
         agencyId: "agency-3",
         userId: user2Id,
-        role: "validator",
+        roles: ["validator"],
       };
 
       expectToEqual(
@@ -236,9 +236,9 @@ describe("Agency registration for authenticated users", () => {
       const payload: IcUserRoleForAgencyParams = {
         agencyId: "agency-3",
         userId: "user-id",
-        role: "validator",
+        roles: ["validator"],
       };
-      const errorMessage = `Error registering user ${payload.userId} to agency ${payload.agencyId} with role ${payload.role}`;
+      const errorMessage = `Error registering user ${payload.userId} to agency ${payload.agencyId} with roles ${payload.roles}`;
 
       store.dispatch(
         icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested(

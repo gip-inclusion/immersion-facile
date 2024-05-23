@@ -19,7 +19,7 @@ export const icUserRoleForAgencyParamsSchema: z.Schema<IcUserRoleForAgencyParams
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,
-    role: agencyRoleSchema,
+    roles: z.array(agencyRoleSchema),
   });
 
 export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleForAgencyParams> =

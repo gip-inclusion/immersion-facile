@@ -69,7 +69,7 @@ export class PgInclusionConnectedUserRepository
     agencyId?: AgencyId;
   }): Promise<InclusionConnectedUser[]> {
     const buildAgencyRight = `JSON_BUILD_OBJECT(
-       'role', users__agencies.role,
+       'roles', users__agencies.roles,
        'isNotifiedByEmail', users__agencies.is_notified_by_email,
        'agency', JSON_BUILD_OBJECT(
           'id', agencies.id,
@@ -199,11 +199,10 @@ const getWhereClause = (filters: Filters): WhereClause => {
 
   if (filters.agencyRole) {
     searchClause = `${searchClause} ${searchParams.length > 0 ? "AND" : ""} users.id IN (
-        SELECT user_id FROM users__agencies WHERE users__agencies.role = $${
+        SELECT user_id FROM users__agencies WHERE users__agencies.roles @> $${
           searchParams.length + 1
-        }
-        )`;
-    searchParams = [...searchParams, filters.agencyRole];
+        })`;
+    searchParams = [...searchParams, JSON.stringify([filters.agencyRole])];
   }
 
   if (filters.agencyId) {

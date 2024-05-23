@@ -9,13 +9,13 @@ import { OmitFromExistingKeys } from "../utils";
 
 export type IcUserRoleForAgencyParams = {
   agencyId: AgencyId;
-  role: AgencyRole;
+  roles: AgencyRole[];
   userId: UserId;
 };
 
 export type RejectIcUserRoleForAgencyParams = OmitFromExistingKeys<
   IcUserRoleForAgencyParams,
-  "role"
+  "roles"
 > & {
   justification: string;
 };

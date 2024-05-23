@@ -19,7 +19,7 @@ import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGener
 import { NotifyIcUserAgencyRightChanged } from "./NotifyIcUserAgencyRightChanged";
 
 const icUserRoleParams: IcUserRoleForAgencyParams = {
-  role: "counsellor",
+  roles: ["counsellor"],
   agencyId: "agency-1",
   userId: "jbab-123",
 };
@@ -148,7 +148,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
 
     await notifyIcUserAgencyRightChanged.execute({
-      role: "toReview",
+      roles: ["toReview"],
       agencyId: "agency-1",
       userId: "jbab-123",
     });

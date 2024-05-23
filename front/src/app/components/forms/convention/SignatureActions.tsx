@@ -116,7 +116,7 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
             </Button>
           </li>
         )}
-        {isRemindingAllowed(convention, signatory.role) && (
+        {isRemindingAllowed(convention, [signatory.role]) && (
           <li>
             <RemindSignatoriesButton
               convention={convention}

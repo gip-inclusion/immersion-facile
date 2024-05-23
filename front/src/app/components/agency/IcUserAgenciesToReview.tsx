@@ -62,7 +62,7 @@ function AgencyReviewForm({
       icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested({
         agencyId: agency.id,
         userId: selectedUserId,
-        role: selectedRole,
+        roles: [selectedRole],
       }),
     );
   };

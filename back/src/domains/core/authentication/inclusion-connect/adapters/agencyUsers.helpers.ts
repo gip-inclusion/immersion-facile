@@ -23,8 +23,8 @@ export type AgencyWithoutEmails = OmitFromExistingKeys<
   "validatorEmails" | "counsellorEmails"
 >;
 
-export const usersAgenciesRolesInclude = (agencyRole: AgencyRole) =>
-  sql<any>`jsonb_path_exists(roles, '$ ? (@ == "${agencyRole}")')`;
+export const usersAgenciesRolesIncludeValidator = sql<any>`jsonb_path_exists(roles, '$ ? (@ == "validator")')`;
+export const usersAgenciesRolesIncludeCounsellor = sql<any>`jsonb_path_exists(roles, '$ ? (@ == "counsellor")')`;
 
 export const getUsersWithAgencyRole = async (
   transaction: KyselyDb,
