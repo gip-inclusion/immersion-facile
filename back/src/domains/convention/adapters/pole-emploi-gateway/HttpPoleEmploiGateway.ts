@@ -125,7 +125,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     poleEmploiConvention: PoleEmploiConvention,
   ): Promise<PoleEmploiBroadcastResponse> {
     logger.info({
-      _title: "PeBroadcast",
+      message: "PeBroadcast",
       status: "total",
       peConnect: {
         peId: poleEmploiConvention.id,
@@ -142,7 +142,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     return this.#postPoleEmploiConvention(poleEmploiConvention)
       .then((response): PoleEmploiBroadcastResponse => {
         logger.info({
-          _title: "PeBroadcast",
+          message: "PeBroadcast",
           status: "success",
           httpStatus: response.status,
           peConnect: {
@@ -166,9 +166,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         const error = castError(err);
         if (!axios.isAxiosError(error)) {
           logger.error({
-            _title: "PeBroadcast",
+            message: "PeBroadcast - notAxiosError",
             status: "error",
-            message: "notAxiosError",
             error,
             peConnect: {
               peId: poleEmploiConvention.id,
@@ -193,9 +192,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
         if (!error.response) {
           logger.error({
-            _title: "PeBroadcast",
+            message: "PeBroadcast - noResponseInAxiosError",
             status: "error",
-            message: "noResponseInAxiosError",
             error,
             peConnect: {
               peId: poleEmploiConvention.id,
@@ -224,9 +222,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
         if (error.response.status === 404) {
           logger.error({
-            _title: "PeBroadcast",
+            message: `PeBroadcast - notFoundOrMismatch - ${message}`,
             status: "error",
-            message: `notFoundOrMismatch - ${message}`,
             httpStatus: error.response.status,
             peConnect: {
               peId: poleEmploiConvention.id,
@@ -243,7 +240,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         }
 
         const errorObject: LoggerParamsWithMessage = {
-          _title: "PeBroadcast",
+          message: "PeBroadcast",
           status: "error",
           error,
           httpStatus: error.response.status,
