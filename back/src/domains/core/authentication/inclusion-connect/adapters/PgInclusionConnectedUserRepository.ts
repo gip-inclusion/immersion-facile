@@ -97,15 +97,14 @@ export class PgInclusionConnectedUserRepository
         )
       )`;
 
-    const agencyRightsJsonAgg = `JSONB_AGG(
-      ${buildAgencyRight}) FILTER (WHERE agencies.id IS NOT NULL
-    )`;
+    const agencyRightsJsonAgg = `JSONB_AGG(${buildAgencyRight}) FILTER (WHERE agencies.id IS NOT NULL)`;
 
     const establishmentsJsonAgg = `JSONB_AGG(
       JSON_BUILD_OBJECT(
           'siret', establishments.siret,
-          'businessName', COALESCE(establishments.customized_name, establishments.name)
+          'businessName', COALESCE(NULLIF(establishments.customized_name, ''), establishments.name)
         )
+        ORDER BY establishments.siret
     ) FILTER (WHERE establishments.siret IS NOT NULL)`;
 
     const whereClause = getWhereClause(filters);

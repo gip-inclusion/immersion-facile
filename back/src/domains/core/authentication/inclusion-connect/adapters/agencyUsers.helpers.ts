@@ -39,9 +39,6 @@ export const getUsersWithAgencyRole = async (
       .selectFrom("users__agencies")
       .innerJoin("users", "users.id", "users__agencies.user_id")
       .where("agency_id", "in", agencyIds)
-      .where((eb) =>
-        eb.or([eb("role", "=", "validator"), eb("role", "=", "counsellor")]),
-      )
       .orderBy("users.email")
       .select([
         "users.id as userId",

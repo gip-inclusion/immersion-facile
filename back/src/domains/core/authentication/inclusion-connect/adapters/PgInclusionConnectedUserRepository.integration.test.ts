@@ -166,17 +166,39 @@ describe("PgInclusionConnectedUserRepository", () => {
     });
 
     it("gets the icUser with the connected establishments when they exist", async () => {
-      const customizedEstablishmentName = "My awsome name";
-      const establishment = new EstablishmentAggregateBuilder()
-        .withEstablishmentCustomizedName(customizedEstablishmentName)
-        .withContact(new ContactEntityBuilder().withEmail(user1.email).build())
+      const contact1 = new ContactEntityBuilder()
+        .withEmail(user1.email)
+        .build();
+      const customizedEstablishment1Name = "My awsome name";
+      const establishment1 = new EstablishmentAggregateBuilder()
+        .withEstablishmentCustomizedName(customizedEstablishment1Name)
+        .withContact(contact1)
+        .build();
+
+      const contact2 = new ContactEntityBuilder()
+        .withId("22222222-2222-4bbb-2222-222222222222")
+        .withEmail(user1.email)
+        .build();
+
+      const establishment2Name = "Establishment 2";
+      const establishment2 = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("12345678901234")
+        .withLocationId("11111111-1111-4111-1111-111111111111")
+        .withEstablishmentCustomizedName("")
+        .withEstablishmentName(establishment2Name)
+        .withContact(contact2)
         .build();
 
       const establishmentRepository = new PgEstablishmentAggregateRepository(
         db,
       );
 
-      await establishmentRepository.insertEstablishmentAggregate(establishment);
+      await establishmentRepository.insertEstablishmentAggregate(
+        establishment1,
+      );
+      await establishmentRepository.insertEstablishmentAggregate(
+        establishment2,
+      );
       await insertUser(user1);
       await db
         .insertInto("users_admins")
@@ -193,8 +215,12 @@ describe("PgInclusionConnectedUserRepository", () => {
         isBackofficeAdmin: true,
         establishments: [
           {
-            siret: establishment.establishment.siret,
-            businessName: customizedEstablishmentName,
+            siret: establishment2.establishment.siret,
+            businessName: establishment2Name,
+          },
+          {
+            siret: establishment1.establishment.siret,
+            businessName: customizedEstablishment1Name,
           },
         ],
       });
