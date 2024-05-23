@@ -23,7 +23,7 @@ export class InMemoryOutboxRepository implements OutboxRepository {
   public async save(event: DomainEvent): Promise<void> {
     this._events[event.id] = event;
     logger.info({
-      eventId: event.id,
+      events: [{ eventId: event.id }],
       newOutboxSize: keys(this._events).length,
       message: "save",
     });

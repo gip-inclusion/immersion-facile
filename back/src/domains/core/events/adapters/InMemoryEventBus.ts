@@ -81,7 +81,7 @@ export class InMemoryEventBus implements EventBus {
   ): Promise<DomainEvent> {
     // the publication happens here, an event is expected in return,
     // with the publication added to the event
-    logger.info({ eventId: event.id, message: "publish" });
+    logger.info({ events: [{ eventId: event.id }], message: "publish" });
 
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
@@ -126,7 +126,7 @@ export class InMemoryEventBus implements EventBus {
     const wasMaxNumberOfErrorsReached = event.publications.length >= 3;
     if (wasMaxNumberOfErrorsReached) {
       const message = "Failed too many times, event will be Quarantined";
-      logger.error({ eventId: event.id, message });
+      logger.error({ events: [{ eventId: event.id }], message });
       const { payload: _, publications: __, ...restEvent } = event;
       notifyObjectDiscord({
         event: {
@@ -170,7 +170,7 @@ const makeExecuteSubscriptionMatchingSubscriptionId =
   async (subscriptionId: SubscriptionId): Promise<void | EventFailure> => {
     const subscription = subscriptionsForTopic[subscriptionId];
     logger.info({
-      eventId: event.id,
+      events: [{ eventId: event.id }],
       topic: event.topic,
       message: `Sending an event for ${subscriptionId}`,
     });
@@ -223,7 +223,7 @@ const monitorErrorInCallback = (error: any, event: DomainEvent) => {
   });
   logger.error({
     topic: event.topic,
-    eventId: event.id,
+    events: [{ eventId: event.id }],
     error: error.message || JSON.stringify(error),
     message: "publishedEventsError",
   });
