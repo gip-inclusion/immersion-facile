@@ -149,9 +149,7 @@ export class RealEventCrawler
 
   public override startCrawler() {
     logger.info({
-      crawlingPeriodMs: this.crawlingPeriodMs,
-      message:
-        "RealEventCrawler.startCrawler: processing events at regular intervals",
+      message: `RealEventCrawler.startCrawler: processing events at regular intervals (every ${this.crawlingPeriodMs}ms)`,
     });
 
     // old version :
