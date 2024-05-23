@@ -37,7 +37,8 @@ import {
   AgencyWithoutEmails,
   addEmailsToAgency,
   getUsersWithAgencyRole,
-  usersAgenciesRolesInclude,
+  usersAgenciesRolesIncludeCounsellor,
+  usersAgenciesRolesIncludeValidator,
 } from "../../core/authentication/inclusion-connect/adapters/agencyUsers.helpers";
 import {
   AgencyRepository,
@@ -341,7 +342,7 @@ export class PgAgencyRepository implements AgencyRepository {
     if (agency.counsellorEmails) {
       await this.transaction
         .deleteFrom("users__agencies")
-        .where(usersAgenciesRolesInclude("counsellor"))
+        .where(usersAgenciesRolesIncludeCounsellor)
         .where("is_notified_by_email", "=", true)
         .where("agency_id", "=", agency.id)
         .execute();
@@ -356,7 +357,7 @@ export class PgAgencyRepository implements AgencyRepository {
     if (agency.validatorEmails) {
       await this.transaction
         .deleteFrom("users__agencies")
-        .where(usersAgenciesRolesInclude("validator"))
+        .where(usersAgenciesRolesIncludeValidator)
         .where("is_notified_by_email", "=", true)
         .where("agency_id", "=", agency.id)
         .execute();

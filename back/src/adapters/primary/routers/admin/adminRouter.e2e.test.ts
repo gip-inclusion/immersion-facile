@@ -430,7 +430,7 @@ describe("Admin router", () => {
         body: {
           agencyId: agency.id,
           userId: inclusionConnectedUser.id,
-          role: updatedRole,
+          roles: [updatedRole],
         },
         headers: { authorization: token },
       });
@@ -455,7 +455,7 @@ describe("Admin router", () => {
         body: {
           agencyId: "yo",
           userId: "yolo",
-          role: "counsellor",
+          roles: ["counsellor"],
         },
         headers: { authorization: "" },
       });
@@ -487,7 +487,7 @@ describe("Admin router", () => {
         body: {
           agencyId: agency.id,
           userId: inclusionConnectedUser.id,
-          role: updatedRole,
+          roles: [updatedRole],
         },
         headers: { authorization: token },
       });

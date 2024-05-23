@@ -41,7 +41,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
     if (!user)
       throw new NotFoundError(`User with id ${params.userId} not found`);
 
-    if (params.role !== "toReview")
+    if (!params.roles.includes("toReview"))
       await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {

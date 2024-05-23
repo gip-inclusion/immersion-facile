@@ -51,7 +51,7 @@ export const RemindSignatoriesButton = ({
 
 export const isRemindingAllowed = (
   convention: ConventionDto,
-  actingRole: Role,
+  actingRoles: Role[],
 ): boolean => {
   const remindingAllowedStatus = ["READY_TO_SIGN", "PARTIALLY_SIGNED"];
   const validRemindingRoles = [
@@ -63,7 +63,7 @@ export const isRemindingAllowed = (
 
   return (
     remindingAllowedStatus.includes(convention.status) &&
-    validRemindingRoles.includes(actingRole)
+    actingRoles.some((actingRole) => validRemindingRoles.includes(actingRole))
   );
 };
 

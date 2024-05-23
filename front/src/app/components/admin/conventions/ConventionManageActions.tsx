@@ -187,7 +187,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isRemindingAllowed(convention, role) && (
+        {isRemindingAllowed(convention, roles) && (
           <RemindSignatoriesButton
             convention={convention}
             priority="primary"
