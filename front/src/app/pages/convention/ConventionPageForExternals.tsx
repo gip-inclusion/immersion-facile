@@ -1,6 +1,6 @@
 import React from "react";
 import { MainWrapper } from "react-design-system";
-import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
+import { ConventionFormWrapper } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
@@ -30,11 +30,11 @@ export const ConventionPageForExternals = ({
   }
 
   return externalConsumer.isIframe ? (
-    <ConventionForm internshipKind="immersion" mode="create" />
+    <ConventionFormWrapper internshipKind="immersion" mode="create" />
   ) : (
     <HeaderFooterLayout>
       <MainWrapper layout="default">
-        <ConventionForm internshipKind="immersion" mode="create" />
+        <ConventionFormWrapper internshipKind="immersion" mode="create" />
       </MainWrapper>
     </HeaderFooterLayout>
   );

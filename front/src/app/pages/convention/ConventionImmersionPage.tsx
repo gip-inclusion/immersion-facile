@@ -6,9 +6,9 @@ import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { FederatedIdentityProvider, loginPeConnect } from "shared";
 import {
-  ConventionForm,
   ConventionFormMode,
-} from "src/app/components/forms/convention/ConventionForm";
+  ConventionFormWrapper,
+} from "src/app/components/forms/convention/ConventionFormWrapper";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -132,7 +132,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   })
     .with({ isLoading: true }, () => <Loader />)
     .with({ isLoading: false }, () => (
-      <ConventionForm
+      <ConventionFormWrapper
         internshipKind="immersion"
         mode={isSharedConvention ? "edit" : mode}
       />
