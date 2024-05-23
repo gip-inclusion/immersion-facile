@@ -3,13 +3,7 @@ import { AxiosError } from "axios";
 import { Request } from "express";
 import { QueryResult } from "kysely";
 import pino, { Logger } from "pino";
-import {
-  AgencyId,
-  ApiConsumerName,
-  ConventionId,
-  PeExternalId,
-  Role,
-} from "shared";
+import { AgencyId, ConventionId, PeExternalId, Role } from "shared";
 import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
@@ -58,7 +52,6 @@ type SQLError = {
 
 type LoggerParams = Partial<{
   agencyId: AgencyId;
-  consumerName: ApiConsumerName;
   context: Record<string, string>;
   conventionId: ConventionId;
   crawlingPeriodMs: number;
@@ -134,7 +127,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
     ({
       adapters,
       agencyId,
-      consumerName,
       context,
       conventionId,
       crawlingPeriodMs,
@@ -179,7 +171,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       const opacifiedLogContent = {
         adapters,
         agencyId,
-        consumerName,
         context,
         conventionId,
         crawlingPeriodMs,

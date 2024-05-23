@@ -51,9 +51,8 @@ const createIncTotalCountForRequest =
         path: route,
         body: req.body,
       },
-      consumerName,
       status: authorisationStatus,
-      message: "apiKeyAuthMiddlewareRequestsTotal",
+      message: `apiKeyAuthMiddlewareRequestsTotal for ${consumerName}`,
     });
   };
 
