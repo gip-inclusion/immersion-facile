@@ -11,6 +11,7 @@ import {
   Postcode,
   StreetNumberAndAddress,
   calculateDurationInSecondsFrom,
+  castError,
   filterNotFalsy,
   getDepartmentCodeFromDepartmentNameOrCity,
   lookupSearchResultsSchema,
@@ -76,12 +77,13 @@ export class HttpAddressGateway implements AddressGateway {
   ): Promise<LookupSearchResult[]> {
     const startDate = new Date();
     const queryMinLength = 3;
-    try {
-      if (query.length < queryMinLength)
-        throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
 
-      const { body } = await this.#limiter.schedule(() =>
-        this.httpClient.geosearch({
+    return this.#limiter
+      .schedule(() => {
+        if (query.length < queryMinLength)
+          throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
+
+        return this.httpClient.geosearch({
           headers: {
             "OpenCage-Geosearch-Key": this.geosearchApiKey,
             Origin: "https://immersion-facile.beta.gouv.fr", // OC Geosearch needs an Origin that fits to API key domain (with https://)
@@ -93,56 +95,76 @@ export class HttpAddressGateway implements AddressGateway {
             limit: "10",
             q: query,
           },
-        }),
-      );
-
-      return lookupSearchResultsSchema.parse(toLookupSearchResults(body));
-    } finally {
-      calculateDurationInSecondsFrom(startDate);
-      logger.info({
-        message: "HttpAddressGateway.lookupLocationName",
-        query,
-        durationInSeconds: calculateDurationInSecondsFrom(startDate),
+        });
+      })
+      .then((response) => {
+        const lookupSearchResult = lookupSearchResultsSchema.parse(
+          toLookupSearchResults(response.body),
+        );
+        logger.info({
+          message: "HttpAddressGateway.lookupLocationName",
+          response,
+          durationInSeconds: calculateDurationInSecondsFrom(startDate),
+        });
+        return lookupSearchResult;
+      })
+      .catch((error: unknown) => {
+        logger.error({
+          message: "HttpAddressGateway.lookupLocationName",
+          error: castError(error),
+          durationInSeconds: calculateDurationInSecondsFrom(startDate),
+        });
+        throw error;
       });
-    }
   }
 
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressAndPosition[]> {
     const startDate = new Date();
-    try {
-      if (
-        query.replace(lookupStreetAddressSpecialCharsRegex, "").length <
-        lookupStreetAddressQueryMinLength
-      )
-        throw new Error(
-          errorMessage.minimumCharErrorMessage(
-            lookupStreetAddressQueryMinLength,
-          ),
-        );
-      const { body } = await this.#limiter.schedule(() =>
-        this.httpClient.geocoding({
+
+    return this.#limiter
+      .schedule(() => {
+        if (
+          query.replace(lookupStreetAddressSpecialCharsRegex, "").length <
+          lookupStreetAddressQueryMinLength
+        )
+          throw new Error(
+            errorMessage.minimumCharErrorMessage(
+              lookupStreetAddressQueryMinLength,
+            ),
+          );
+
+        return this.httpClient.geocoding({
           queryParams: {
             countrycode: franceAndAttachedTerritoryCountryCodes,
             key: this.geocodingApiKey,
             language,
             q: query,
           },
-        }),
-      );
+        });
+      })
+      .then((response) => {
+        const features = response.body.features
+          .map((feature) => this.#toAddressAndPosition(feature))
+          .filter(filterNotFalsy);
 
-      return body.features
-        .map((feature) => this.#toAddressAndPosition(feature))
-        .filter(filterNotFalsy);
-    } finally {
-      calculateDurationInSecondsFrom(startDate);
-      logger.info({
-        message: "HttpAddressGateway.lookupStreetAddress",
-        query,
-        durationInSeconds: calculateDurationInSecondsFrom(startDate),
+        logger.info({
+          message: "HttpAddressGateway.lookupStreetAddress",
+          response,
+          durationInSeconds: calculateDurationInSecondsFrom(startDate),
+        });
+
+        return features;
+      })
+      .catch((error: unknown) => {
+        logger.error({
+          message: "HttpAddressGateway.lookupStreetAddress",
+          error: castError(error),
+          durationInSeconds: calculateDurationInSecondsFrom(startDate),
+        });
+        throw error;
       });
-    }
   }
 
   #toAddressAndPosition(
