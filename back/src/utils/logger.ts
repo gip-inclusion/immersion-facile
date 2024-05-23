@@ -52,16 +52,10 @@ type SQLError = {
 
 type LoggerParams = Partial<{
   agencyId: AgencyId;
-  context: Record<string, string>;
   conventionId: ConventionId;
-  crawlingPeriodMs: number;
-  durationInSeconds: number;
   error: Error | Partial<SQLError> | AxiosError;
-  events: Partial<EventToDebugInfo>[];
-  httpStatus: number;
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
-  numberOfEvent: number;
   schemaParsingInput: unknown;
   peConnect: Partial<{
     peId: ConventionId;
@@ -69,8 +63,6 @@ type LoggerParams = Partial<{
     peExternalId: PeExternalId;
     isJobSeeker: boolean;
   }>;
-  processEventsDurationInSeconds: number;
-  query: string;
   reportContent: string;
   adapters: {
     repositories: "IN_MEMORY" | "PG";
@@ -82,7 +74,6 @@ type LoggerParams = Partial<{
   request: Pick<Request, "path" | "method" | "body">;
   requestId: string;
   response: PartialResponse | SubscriberResponse | HttpResponse<any, any>;
-  retrieveEventsDurationInSeconds: number;
   role: Role;
   search: Partial<SearchMade>;
   status: "success" | "total" | "error" | AuthorisationStatus;
@@ -92,8 +83,17 @@ type LoggerParams = Partial<{
   type: string;
   typeOfEvents: TypeOfEvent;
   useCaseName: string;
-  values: unknown[];
   wasQuarantined: string;
+  //------- à vérifier
+  context: Record<string, string>;
+  values: unknown[];
+  crawlingPeriodMs: number;
+  durationInSeconds: number;
+  processEventsDurationInSeconds: number;
+  retrieveEventsDurationInSeconds: number;
+  httpStatus: number;
+  events: Partial<EventToDebugInfo>[];
+  numberOfEvent: number;
 }>;
 
 export type OpacifiedLogger = {
@@ -134,7 +134,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       numberOfEvent,
       peConnect,
       processEventsDurationInSeconds,
-      query,
       reportContent,
       request,
       requestId,
@@ -171,7 +170,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         numberOfEvent,
         peConnect,
         processEventsDurationInSeconds,
-        query,
         reportContent,
         request,
         requestId,
