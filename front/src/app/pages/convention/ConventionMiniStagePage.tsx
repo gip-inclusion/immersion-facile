@@ -1,6 +1,6 @@
 import React from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
-import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
+import { ConventionFormWrapper } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
@@ -18,7 +18,7 @@ export const ConventionMiniStagePage = () => {
         <PageHeader title={t.intro.conventionTitle} theme="default" />
       }
     >
-      <ConventionForm internshipKind="mini-stage-cci" mode="create" />
+      <ConventionFormWrapper internshipKind="mini-stage-cci" mode="create" />
     </MainWrapper>
   );
 };

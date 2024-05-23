@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
+import { ConventionFormWrapper } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -19,7 +19,7 @@ export const ConventionCustomAgencyPage = () => {
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
-        <ConventionForm internshipKind="immersion" mode="create" />
+        <ConventionFormWrapper internshipKind="immersion" mode="create" />
       </MainWrapper>
     </HeaderFooterLayout>
   );

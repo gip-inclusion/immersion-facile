@@ -16,7 +16,7 @@ import { ConventionEmailWarning } from "src/app/components/forms/convention/Conv
 import {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
-} from "src/app/components/forms/convention/ConventionFormFields";
+} from "src/app/components/forms/convention/ConventionForm";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {

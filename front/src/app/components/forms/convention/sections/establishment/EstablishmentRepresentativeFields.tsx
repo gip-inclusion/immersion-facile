@@ -8,7 +8,7 @@ import { ConventionEmailWarning } from "src/app/components/forms/convention/Conv
 import {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
-} from "src/app/components/forms/convention/ConventionFormFields";
+} from "src/app/components/forms/convention/ConventionForm";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
