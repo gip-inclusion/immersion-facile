@@ -84,16 +84,15 @@ type LoggerParams = Partial<{
   httpStatus: number;
   type: string;
   // --------------------------------
-  crawlingPeriodMs: number;
   durationInSeconds: number;
-  processEventsDurationInSeconds: number;
-  retrieveEventsDurationInSeconds: number;
   // --------------------------------
   events: Partial<EventToDebugInfo>[];
   numberOfEvent: number;
   topic: DomainTopic;
   wasQuarantined: string;
   typeOfEvents: TypeOfEvent;
+  processEventsDurationInSeconds: number; // regrouper avec retrieveEventsDurationInSeconds
+  retrieveEventsDurationInSeconds: number;
   // --------------------------------
   search: Partial<SearchMade>;
 }>;
@@ -125,7 +124,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       agencyId,
       context,
       conventionId,
-      crawlingPeriodMs,
       durationInSeconds,
       error,
       events,
@@ -161,7 +159,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         agencyId,
         context,
         conventionId,
-        crawlingPeriodMs,
         durationInSeconds,
         error,
         events,
