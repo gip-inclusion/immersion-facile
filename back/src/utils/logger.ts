@@ -62,7 +62,6 @@ type LoggerParams = Partial<{
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
   numberOfEvent: number;
-  pathname: string;
   schemaParsingInput: unknown;
   peConnect: Partial<{
     peId: ConventionId;
@@ -133,7 +132,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       nodeProcessReport,
       notificationId,
       numberOfEvent,
-      pathname,
       peConnect,
       processEventsDurationInSeconds,
       query,
@@ -171,7 +169,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         nodeProcessReport,
         notificationId,
         numberOfEvent,
-        pathname,
         peConnect,
         processEventsDurationInSeconds,
         query,

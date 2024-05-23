@@ -80,8 +80,7 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
     if (!pgPool) {
       const { host, pathname } = new URL(config.pgImmersionDbUrl);
       logger.info({
-        pathname,
-        message: `creating postgresql connection pool from ${host}`,
+        message: `creating postgresql connection pool from host=${host} and pathname=${pathname}`,
       });
       pgPool = new Pool({
         connectionString: config.pgImmersionDbUrl,
