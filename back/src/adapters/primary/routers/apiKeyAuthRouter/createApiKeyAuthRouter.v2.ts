@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { andThen, keys, map } from "ramda";
 import {
+  ApiConsumer,
   LocationId,
   SiretDto,
+  WithAcquisition,
   eventToRightName,
   isApiConsumerAllowed,
   pipeWithValue,
@@ -124,7 +126,9 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
             getFirstLocationIdOrThrow(deps.uowPerformer, req.body.siret),
           ),
           andThen((contactRequest) =>
-            deps.useCases.contactEstablishment.execute(contactRequest),
+            deps.useCases.contactEstablishment.execute(
+              addAcquisitionParams(contactRequest, req.apiConsumer),
+            ),
           ),
         );
       }),
@@ -249,3 +253,16 @@ const getFirstLocationIdOrThrow = async (
     );
   });
 };
+
+const addAcquisitionParams = <T>(
+  obj: T,
+  apiConsumer: ApiConsumer | undefined,
+): T & WithAcquisition => ({
+  ...obj,
+  ...(apiConsumer
+    ? {
+        acquisitionCampaign: "api-consumer",
+        acquisitionKeyword: `${apiConsumer.id} - ${apiConsumer.name}`,
+      }
+    : {}),
+});
