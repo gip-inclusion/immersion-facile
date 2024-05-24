@@ -127,6 +127,9 @@ describe("GetUserAgencyDashboardUrl", () => {
             agencyDashboardUrl: `http://stubAgencyUserDashboard/${
               john.id
             }/${timeGateway.now()}`,
+            erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+              john.id
+            }/${timeGateway.now()}`,
           },
           establishments: {},
         },
@@ -201,44 +204,6 @@ describe("GetUserAgencyDashboardUrl", () => {
             john.id
           }/${timeGateway.now()}`,
           erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
-            john.id
-          }/${timeGateway.now()}`,
-        },
-        establishments: {},
-      },
-    });
-  });
-
-  it("doesn't return errored convention dashboard url when user has no agency of kind PE", async () => {
-    const agencyBuilder = new AgencyDtoBuilder();
-    const agency1 = agencyBuilder.withId("1111").withKind("cci").build();
-
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      {
-        ...john,
-        agencyRights: [
-          { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
-      },
-    ]);
-    const url = await getInclusionConnectedUser.execute(
-      undefined,
-      inclusionConnectJwtPayload,
-    );
-
-    expect(
-      url.dashboards.agencies.erroredConventionsDashboardUrl,
-    ).toBeUndefined();
-
-    expectToEqual(url, {
-      ...john,
-      agencyRights: [
-        { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
-      ],
-      dashboards: {
-        agencies: {
-          agencyDashboardUrl: `http://stubAgencyUserDashboard/${
             john.id
           }/${timeGateway.now()}`,
         },
