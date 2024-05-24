@@ -189,7 +189,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             }: ${JSON.stringify(error)}`,
           );
 
-          throw error;
+          return {
+            status: 500,
+            message: JSON.stringify(error),
+          };
         }
 
         const message = !error.response.data?.message
