@@ -63,6 +63,9 @@ jobs:
           fi
       - name: Wait for the postgresql to be ready
         run: sleep 60
+      - name: Update domain env variable
+        run: |
+          scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} env-set "DOMAIN=if-dev-front-pr${{ inputs.pull_request_id }}.osc-fr1.scalingo.io"
       - name: Remove sslmode from $SCALINGO_POSTGRESQL_URL
         run: |
           current_db_url=$(scalingo --app if-dev-back-pr${{ inputs.pull_request_id }} env | grep 'SCALINGO_POSTGRESQL_URL=' | cut -d '=' -f2-)
