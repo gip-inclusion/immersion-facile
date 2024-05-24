@@ -248,22 +248,6 @@ export const ConventionForm = ({
     [dispatch, conventionValues.internshipKind, federatedIdentity],
   );
 
-  const renderSectionTitle = (title: string, step: number) => {
-    const baseText = currentStep === step ? <strong>{title}</strong> : title;
-    return (
-      <>
-        {baseText}
-        {renderStatusBadge(step)}
-      </>
-    );
-  };
-
-  const renderStatusBadge = (step: number) => (
-    <Badge severity={getBadgeData(step).severity} className={fr.cx("fr-ml-2w")}>
-      {getBadgeData(step).label}
-    </Badge>
-  );
-
   const makeAccordionProps = (step: NumberOfSteps) => ({
     ref: (element: HTMLDivElement) => {
       accordionsRef.current[step - 1] = element;
@@ -282,25 +266,6 @@ export const ConventionForm = ({
     expanded: currentStep === step,
     id: `im-convention-form__step-${step - 1}`,
   });
-  const getBadgeData = (
-    step: number,
-  ): {
-    severity: StepSeverity;
-    label: string;
-  } => {
-    const badgeData: Record<
-      StepSeverity,
-      {
-        severity: StepSeverity;
-        label: string;
-      }
-    > = {
-      error: { severity: "error", label: "Erreur" },
-      success: { severity: "success", label: "Complet" },
-      info: { severity: "info", label: "À compléter" },
-    };
-    return stepsStatus?.[step] ? badgeData[stepsStatus[step]] : badgeData.info;
-  };
 
   const shouldLockToPeAgencies = !!(
     route.name === "conventionImmersion" &&
@@ -422,7 +387,14 @@ export const ConventionForm = ({
                   <div className={fr.cx("fr-accordions-group")}>
                     {route.name !== "conventionCustomAgency" && (
                       <Accordion
-                        label={renderSectionTitle(t.agencySection.title, 1)}
+                        label={
+                          <RenderSectionTitle
+                            title={t.agencySection.title}
+                            step={1}
+                            currentStep={currentStep}
+                            stepsStatus={stepsStatus}
+                          />
+                        }
                         {...makeAccordionProps(1)}
                       >
                         <AgencySelector
@@ -458,7 +430,14 @@ export const ConventionForm = ({
                     )}
 
                     <Accordion
-                      label={renderSectionTitle(t.beneficiarySection.title, 2)}
+                      label={
+                        <RenderSectionTitle
+                          title={t.beneficiarySection.title}
+                          step={2}
+                          currentStep={currentStep}
+                          stepsStatus={stepsStatus}
+                        />
+                      }
                       {...makeAccordionProps(2)}
                     >
                       <BeneficiaryFormSection
@@ -468,10 +447,14 @@ export const ConventionForm = ({
                       />
                     </Accordion>
                     <Accordion
-                      label={renderSectionTitle(
-                        t.establishmentSection.title,
-                        3,
-                      )}
+                      label={
+                        <RenderSectionTitle
+                          title={t.establishmentSection.title}
+                          step={3}
+                          currentStep={currentStep}
+                          stepsStatus={stepsStatus}
+                        />
+                      }
                       {...makeAccordionProps(3)}
                     >
                       <EstablishmentFormSection
@@ -480,10 +463,14 @@ export const ConventionForm = ({
                       />
                     </Accordion>
                     <Accordion
-                      label={renderSectionTitle(
-                        t.immersionHourLocationSection.title,
-                        4,
-                      )}
+                      label={
+                        <RenderSectionTitle
+                          title={t.immersionHourLocationSection.title}
+                          step={4}
+                          currentStep={currentStep}
+                          stepsStatus={stepsStatus}
+                        />
+                      }
                       {...makeAccordionProps(4)}
                     >
                       <ScheduleSection />
@@ -503,10 +490,14 @@ export const ConventionForm = ({
                       />
                     </Accordion>
                     <Accordion
-                      label={renderSectionTitle(
-                        t.immersionDetailsSection.title,
-                        5,
-                      )}
+                      label={
+                        <RenderSectionTitle
+                          title={t.immersionDetailsSection.title}
+                          step={5}
+                          currentStep={currentStep}
+                          stepsStatus={stepsStatus}
+                        />
+                      }
                       {...makeAccordionProps(5)}
                     >
                       <ImmersionDetailsSection />
@@ -706,4 +697,39 @@ const useWaitForReduxFormUiReadyBeforeInitialisation = (
   }, [dispatch, initialValues]);
 
   return reduxFormUiReady;
+};
+
+const RenderSectionTitle = ({
+  title,
+  step,
+  stepsStatus,
+  currentStep,
+}: {
+  title: string;
+  step: number;
+  stepsStatus: Record<number, StepSeverity> | null;
+  currentStep: NumberOfSteps;
+}) => {
+  const badgeData: Record<
+    StepSeverity,
+    {
+      severity: StepSeverity;
+      label: string;
+    }
+  > = {
+    error: { severity: "error", label: "Erreur" },
+    success: { severity: "success", label: "Complet" },
+    info: { severity: "info", label: "À compléter" },
+  };
+
+  const { label, severity } = badgeData[stepsStatus?.[step] ?? "info"];
+
+  return (
+    <>
+      {currentStep === step ? <strong>{title}</strong> : title}
+      <Badge severity={severity} className={fr.cx("fr-ml-2w")}>
+        {label}
+      </Badge>
+    </>
+  );
 };
