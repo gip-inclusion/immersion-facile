@@ -33,7 +33,7 @@ type ConventionRoutes =
   | ConventionCustomAgencyPageRoute
   | ConventionImmersionForExternalsRoute;
 
-export const fetchConventionInitialValuesFromUrl = ({
+export const getConventionInitialValuesFromUrl = ({
   route,
   internshipKind,
 }: {

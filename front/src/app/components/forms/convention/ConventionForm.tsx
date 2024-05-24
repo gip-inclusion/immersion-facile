@@ -76,7 +76,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { useMatomo } from "src/app/hooks/useMatomo";
 import {
-  fetchConventionInitialValuesFromUrl,
+  getConventionInitialValuesFromUrl,
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { useRoute } from "src/app/routes/routes";
@@ -140,7 +140,7 @@ export const ConventionForm = ({
   const agenciesFeedback = useSelector(agenciesSelectors.feedback);
   const isAgenciesLoading = useSelector(agenciesSelectors.isLoading);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const conventionInitialValuesFromUrl = fetchConventionInitialValuesFromUrl({
+  const conventionInitialValuesFromUrl = getConventionInitialValuesFromUrl({
     route,
     internshipKind,
   });
