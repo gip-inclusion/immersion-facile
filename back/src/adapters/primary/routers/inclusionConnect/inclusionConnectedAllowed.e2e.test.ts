@@ -86,6 +86,9 @@ describe("InclusionConnectedAllowedRoutes", () => {
               agencyDashboardUrl: `http://stubAgencyUserDashboard/${
                 inclusionConnectedUserWithRights.id
               }/${gateways.timeGateway.now()}`,
+              erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+                inclusionConnectedUserWithRights.id
+              }/${gateways.timeGateway.now()}`,
             },
             establishments: {
               conventions: {

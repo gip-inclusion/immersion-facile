@@ -160,10 +160,6 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
       .filter(({ roles }) => agencyRoleIsNotToReview(roles))
       .map(({ agency }) => agency.id);
 
-    const hasAtLeastOnePeAgency = user.agencyRights.some(
-      ({ agency }) => agency.kind === "pole-emploi",
-    );
-
     return {
       ...(agencyIdsWithEnoughPrivileges.length > 0
         ? {
@@ -173,7 +169,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
             ),
           }
         : {}),
-      ...(agencyIdsWithEnoughPrivileges.length > 0 && hasAtLeastOnePeAgency
+      ...(agencyIdsWithEnoughPrivileges.length > 0
         ? {
             erroredConventionsDashboardUrl:
               await this.#dashboardGateway.getErroredConventionsDashboardUrl(
