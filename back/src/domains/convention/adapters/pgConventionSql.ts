@@ -329,4 +329,5 @@ export const makeGetLastConventionWithSiretInList =
           "rn",
         ),
       )
+      .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .where("conventions.siret", "in", sirets);

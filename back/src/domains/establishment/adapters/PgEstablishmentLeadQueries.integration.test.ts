@@ -13,6 +13,7 @@ const siret1 = "12345678901234";
 const siret2 = "12345671234567";
 const conventionId1 = "a99eaca1-ee70-4c90-b3f4-777777777777";
 const conventionId2 = "a99eaca1-ee70-4c90-b3f4-888888888888";
+const conventionId3 = "a99eaca1-ee70-4c90-b3f4-999999999999";
 const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
 
 const agency = new AgencyDtoBuilder().withId(agencyId).build();
@@ -29,6 +30,14 @@ const convention2 = new ConventionDtoBuilder()
   .withAgencyId(agencyId)
   .withSiret(siret2)
   .withStatus("ACCEPTED_BY_VALIDATOR")
+  .build();
+
+const convention3 = new ConventionDtoBuilder()
+  .withId(conventionId3)
+  .withAgencyId(agencyId)
+  .withSiret(siret1)
+  .withoutDateValidation()
+  .withStatus("DEPRECATED")
   .build();
 
 const establishmentLead1: EstablishmentLead = {
@@ -107,6 +116,7 @@ describe("PgEstablishmentLeadQueries", () => {
       await Promise.all([
         conventionRepository.save(convention1),
         conventionRepository.save(convention2),
+        conventionRepository.save(convention3),
         establishmentLeadRepository.save(establishmentLead1),
         establishmentLeadRepository.save(establishmentLead2),
       ]);
