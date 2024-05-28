@@ -39,5 +39,6 @@
   }
   &__logo {
     max-height: 5.75rem;
+    box-shadow: none !important; // overriding DSFR border
   }
 }
