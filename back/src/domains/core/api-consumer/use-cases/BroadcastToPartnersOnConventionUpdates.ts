@@ -122,7 +122,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
           consumerId: apiConsumer.id,
           consumerName: apiConsumer.name,
           handledByAgency: false,
-          message: response.message,
+          feedback: response.feedback,
           occurredAt: this.#timeGateway.now(),
           params: {
             callbackUrl: response.callbackUrl,
