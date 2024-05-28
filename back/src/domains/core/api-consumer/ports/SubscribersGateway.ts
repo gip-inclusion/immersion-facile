@@ -23,7 +23,7 @@ type NotifyResponseCommon = {
 
 type NotifyResponseError = NotifyResponseCommon & {
   title: "Partner subscription errored";
-  feedback: Feedback;
+  subscriberErrorFeedback: SubscriberErrorFeedback;
 };
 
 type NotifyResponseSuccess = NotifyResponseCommon & {
@@ -31,7 +31,7 @@ type NotifyResponseSuccess = NotifyResponseCommon & {
 };
 
 export type SubscriberResponse = NotifyResponseError | NotifyResponseSuccess;
-export type Feedback = {
+export type SubscriberErrorFeedback = {
   message: string;
   response?: AxiosResponse<any, any> | AxiosError<any, any>;
 };

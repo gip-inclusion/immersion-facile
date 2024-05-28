@@ -122,7 +122,7 @@ describe("Broadcasts events to pole-emploi", () => {
           conventionId: convention.id,
           httpStatus: 404,
         },
-        feedback: {
+        subscriberErrorFeedback: {
           message: "Ops, something is bad",
         },
         occurredAt: now,

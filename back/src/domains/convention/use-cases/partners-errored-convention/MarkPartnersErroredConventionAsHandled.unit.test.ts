@@ -102,7 +102,7 @@ describe("mark partners errored convention as handled", () => {
         conventionId,
         httpStatus: 404,
       },
-      feedback: { message: "Ops, something is bad" },
+      subscriberErrorFeedback: { message: "Ops, something is bad" },
       occurredAt: timeGateway.now(),
       handledByAgency: false,
     };
@@ -152,7 +152,7 @@ describe("mark partners errored convention as handled", () => {
         conventionId,
         httpStatus: 404,
       },
-      feedback: {
+      subscriberErrorFeedback: {
         message: "Ops, something is bad",
       },
       occurredAt: timeGateway.now(),
@@ -167,7 +167,7 @@ describe("mark partners errored convention as handled", () => {
         conventionId,
         httpStatus: 404,
       },
-      feedback: { message: "Ops, something is bad AGAIN" },
+      subscriberErrorFeedback: { message: "Ops, something is bad AGAIN" },
       occurredAt: timeGateway.now(),
       handledByAgency: false,
     };
@@ -180,7 +180,7 @@ describe("mark partners errored convention as handled", () => {
         conventionId,
         httpStatus: 404,
       },
-      feedback: {
+      subscriberErrorFeedback: {
         message: "yolo",
       },
       occurredAt: timeGateway.now(),
@@ -259,7 +259,7 @@ describe("mark partners errored convention as handled", () => {
         conventionId,
         httpStatus: 404,
       },
-      feedback: { message: "Ops, something is bad" },
+      subscriberErrorFeedback: { message: "Ops, something is bad" },
       occurredAt: timeGateway.now(),
       handledByAgency: true,
     };

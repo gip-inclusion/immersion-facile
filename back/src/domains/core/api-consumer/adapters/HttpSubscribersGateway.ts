@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import { SubscriptionParams, castError } from "shared";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
-  Feedback,
+  SubscriberErrorFeedback,
   SubscriberResponse,
   SubscribersGateway,
 } from "../ports/SubscribersGateway";
@@ -50,7 +50,9 @@ export class HttpSubscribersGateway implements SubscribersGateway {
             ? makeFeedbackFromError(error)
             : {
                 status: 500,
-                feedback: { message: `not an axios error ${error.message}` },
+                subscriberErrorFeedback: {
+                  message: `not an axios error ${error.message}`,
+                },
               }),
         };
       });
@@ -61,19 +63,21 @@ const makeFeedbackFromError = (
   error: AxiosError<any, any>,
 ): {
   status: number | undefined;
-  feedback: Feedback;
+  subscriberErrorFeedback: SubscriberErrorFeedback;
 } =>
   error.response
     ? {
         status: error.response.status,
-        feedback: responseToFeedback(error.response),
+        subscriberErrorFeedback: responseToFeedback(error.response),
       }
     : {
         status: undefined,
-        feedback: { message: error.message, response: error },
+        subscriberErrorFeedback: { message: error.message, response: error },
       };
 
-const responseToFeedback = (response: AxiosResponse<any, any>): Feedback => {
+const responseToFeedback = (
+  response: AxiosResponse<any, any>,
+): SubscriberErrorFeedback => {
   if (response.data) {
     if (typeof response.data === "string") return { message: response.data };
     if (

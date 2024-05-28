@@ -286,7 +286,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         serviceName: broadcastToPeServiceName,
         consumerName: "France Travail",
         consumerId: null,
-        feedback: { message: "Some message" },
+        subscriberErrorFeedback: { message: "Some message" },
         params: { conventionId, httpStatus: 500 },
         occurredAt: new Date("2023-10-26T12:00:00.000"),
         handledByAgency: false,
@@ -306,7 +306,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           serviceName: broadcastToPeServiceName,
           consumerName: "France Travail",
           consumerId: null,
-          feedback: {
+          subscriberErrorFeedback: {
             message: "Some message",
           },
           params: { conventionId, httpStatus: 500 },

@@ -1,8 +1,8 @@
 import { ConventionStatus, DateString } from "shared";
-import { Feedback } from "../../core/api-consumer/ports/SubscribersGateway";
+import { SubscriberErrorFeedback } from "../../core/api-consumer/ports/SubscribersGateway";
 
 // This is an interface contract with Pole Emploi (conventions broadcast).
-// ⚠️ Beware of NOT breaking contract ! ⚠️
+// ! Beware of NOT breaking contract ! !
 // Doc is here : https://pad.incubateur.net/6p38o0mNRfmc8WuJ77Xr0w?view
 
 export const conventionStatusToPoleEmploiStatus: Record<
@@ -67,7 +67,7 @@ export type PoleEmploiConvention = {
 type PeBroadcastSuccessResponse = { status: 200 | 201 };
 type PeBroadcastErrorResponse = {
   status: Exclude<number, 200 | 201>;
-  feedback: Feedback;
+  feedback: SubscriberErrorFeedback;
 };
 
 export type PoleEmploiBroadcastResponse =

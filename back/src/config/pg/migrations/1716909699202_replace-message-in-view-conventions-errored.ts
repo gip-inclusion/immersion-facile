@@ -6,11 +6,11 @@ export const shorthands: ColumnDefinitions | undefined = undefined;
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.dropView("view_conventions_errored");
   pgm.addColumn("saved_errors", {
-    feedback: { type: "jsonb" },
+    subscriber_error_feedback: { type: "jsonb" },
   });
   pgm.sql(`
     UPDATE saved_errors
-    SET feedback = JSON_BUILD_OBJECT(
+    SET subscriber_error_feedback = JSON_BUILD_OBJECT(
       'message', message ::jsonb ->> 'message',
       'response', message
     )
@@ -20,7 +20,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   `);
   pgm.sql(`
     UPDATE saved_errors
-    SET feedback = JSON_BUILD_OBJECT(
+    SET subscriber_error_feedback = JSON_BUILD_OBJECT(
       'message', message::text
     )
     WHERE "message" LIKE '{"cause%'
@@ -38,9 +38,9 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
   });
   pgm.sql(`
     UPDATE saved_errors
-    SET message = COALESCE(feedback ->> 'response', feedback ->> 'message')
+    SET message = COALESCE(subscriber_error_feedback ->> 'response', subscriber_error_feedback ->> 'message')
   `);
-  pgm.dropColumn("saved_errors", "feedback");
+  pgm.dropColumn("saved_errors", "subscriber_error_feedback");
   createViewConventionsErrored(pgm, "down");
 }
 
@@ -59,7 +59,7 @@ const createViewConventionsErrored = (
                               se.service_name,
                               ${
                                 migrationDirection === "up"
-                                  ? "se.feedback"
+                                  ? "se.subscriber_error_feedback"
                                   : "se.message"
                               },
                               se.params,
@@ -81,7 +81,7 @@ const createViewConventionsErrored = (
 SELECT c.id,
        ${
          migrationDirection === "up"
-           ? "re.feedback ->> 'message'"
+           ? "re.subscriber_error_feedback ->> 'message'"
            : "re.message"
        } as "message",
        a.name                                                           AS "Structure",
