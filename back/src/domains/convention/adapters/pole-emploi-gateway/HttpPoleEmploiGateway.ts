@@ -130,7 +130,6 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     if (this.#isDev) {
       return {
         status: 200,
-        message: "this is a fake response for dev mode",
       };
     }
 
@@ -145,7 +144,15 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             originalId: poleEmploiConvention.originalId,
           },
         });
-        return { status: response.status as 200 | 201 };
+
+        return {
+          status: response.status,
+          ...([200, 201].includes(response.status)
+            ? {}
+            : {
+                feedback: { message: "Unsupported response status", response },
+              }),
+        } satisfies PoleEmploiBroadcastResponse;
       })
       .catch((err) => {
         const error = castError(err);
@@ -168,8 +175,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
           return {
             status: 500,
-            message: JSON.stringify(error),
-          };
+            feedback: {
+              message: `not an axios error ${error.message}`,
+            },
+          } satisfies PoleEmploiBroadcastResponse;
         }
 
         if (!error.response) {
@@ -191,8 +200,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
           return {
             status: 500,
-            message: JSON.stringify(error),
-          };
+            feedback: { message: error.message, response: error },
+          } satisfies PoleEmploiBroadcastResponse;
         }
 
         const message = !error.response.data?.message
@@ -212,8 +221,11 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           });
           return {
             status: 404,
-            message,
-          };
+            feedback: {
+              message,
+              response: error.response,
+            },
+          } satisfies PoleEmploiBroadcastResponse;
         }
 
         const errorObject = {
@@ -233,8 +245,11 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
         return {
           status: error.response.status,
-          message,
-        };
+          feedback: {
+            response: error.response,
+            message,
+          },
+        } satisfies PoleEmploiBroadcastResponse;
       });
   }
 

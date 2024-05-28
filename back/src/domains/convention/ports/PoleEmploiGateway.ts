@@ -1,4 +1,5 @@
 import { ConventionStatus, DateString } from "shared";
+import { Feedback } from "../../core/api-consumer/ports/SubscribersGateway";
 
 // This is an interface contract with Pole Emploi (conventions broadcast).
 // ⚠️ Beware of NOT breaking contract ! ⚠️
@@ -64,7 +65,10 @@ export type PoleEmploiConvention = {
 };
 
 type PeBroadcastSuccessResponse = { status: 200 | 201 };
-type PeBroadcastErrorResponse = { status: number; message: string };
+type PeBroadcastErrorResponse = {
+  status: Exclude<number, 200 | 201>;
+  feedback: Feedback;
+};
 
 export type PoleEmploiBroadcastResponse =
   | PeBroadcastSuccessResponse

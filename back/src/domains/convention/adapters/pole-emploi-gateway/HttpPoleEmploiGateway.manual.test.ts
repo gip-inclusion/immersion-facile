@@ -1,6 +1,6 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { expectPromiseToFail, expectToEqual } from "shared";
+import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   AccessTokenConfig,
@@ -14,6 +14,7 @@ import {
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGetAccessTokenResponse,
+  isBroadcastResponseOk,
 } from "../../ports/PoleEmploiGateway";
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "./PoleEmploiRoutes";
@@ -40,8 +41,10 @@ describe("HttpPoleEmploiGateway", () => {
       },
       expected: {
         status: 404,
-        message:
-          "Identifiant National DE trouvé mais écart sur la date de naissance",
+        feedback: {
+          message:
+            "Identifiant National DE trouvé mais écart sur la date de naissance",
+        },
       },
     },
     {
@@ -54,7 +57,7 @@ describe("HttpPoleEmploiGateway", () => {
       },
       expected: {
         status: 404,
-        message: "Identifiant National DE non trouvé",
+        feedback: { message: '"Identifiant National DE non trouvé"' },
       },
     },
     {
@@ -85,8 +88,18 @@ describe("HttpPoleEmploiGateway", () => {
         ...fields,
       });
 
-      expectToEqual(response, expected);
-      expectToEqual(response.status, expected.status);
+      if (isBroadcastResponseOk(response)) {
+        if (!isBroadcastResponseOk(expected))
+          throw new Error("Should not occurs");
+        expectToEqual(response, expected);
+      } else {
+        if (isBroadcastResponseOk(expected))
+          throw new Error("Should not occurs");
+        const { status, feedback } = response;
+        expectToEqual(status, expected.status);
+        expectToEqual(feedback.message, expected.feedback.message);
+        expect(feedback.response).toBeDefined();
+      }
     },
   );
 
@@ -132,9 +145,16 @@ describe("HttpPoleEmploiGateway", () => {
       .onPost(routes.broadcastConvention.url)
       .timeout();
 
-    await expectPromiseToFail(
-      poleEmploiGateway.notifyOnConventionUpdated(peConvention),
-    );
+    const response =
+      await poleEmploiGateway.notifyOnConventionUpdated(peConvention);
+
+    if (isBroadcastResponseOk(response))
+      throw new Error("PE broadcast OK must not occurs");
+
+    const { status, feedback } = response;
+    expectToEqual(status, 500);
+    expectToEqual(feedback.message, "timeout of 0ms exceeded");
+    expect(feedback.response).toBeDefined();
   });
 });
 

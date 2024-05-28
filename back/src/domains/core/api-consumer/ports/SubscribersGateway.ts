@@ -1,3 +1,4 @@
+import { AxiosError, AxiosResponse } from "axios";
 import {
   AbsoluteUrl,
   ConventionId,
@@ -22,7 +23,7 @@ type NotifyResponseCommon = {
 
 type NotifyResponseError = NotifyResponseCommon & {
   title: "Partner subscription errored";
-  message: string;
+  feedback: Feedback;
 };
 
 type NotifyResponseSuccess = NotifyResponseCommon & {
@@ -30,6 +31,10 @@ type NotifyResponseSuccess = NotifyResponseCommon & {
 };
 
 export type SubscriberResponse = NotifyResponseError | NotifyResponseSuccess;
+export type Feedback = {
+  message: string;
+  response?: AxiosResponse<any, any> | AxiosError<any, any>;
+};
 
 export interface SubscribersGateway {
   notify: (
