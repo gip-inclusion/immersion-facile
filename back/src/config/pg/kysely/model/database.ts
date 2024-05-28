@@ -1,5 +1,4 @@
 import { ColumnType, Generated } from "kysely";
-import { RecipientType } from "kysely-codegen/dist/db";
 import { AbsoluteUrl, ConventionId } from "shared";
 
 export interface Database {
@@ -521,6 +520,7 @@ interface NotificationsEmailAttachments {
   attachment: Json;
 }
 
+type RecipientType = "cc" | "to";
 interface NotificationsEmailRecipients {
   notifications_email_id: string;
   email: string;
