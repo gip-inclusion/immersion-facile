@@ -198,7 +198,7 @@ describe("Broadcast to partners on updated convention", () => {
       conventionStatus: "ACCEPTED_BY_VALIDATOR",
       conventionId: "lala",
       status: 200,
-      feedback: { message: "ca va très mal" },
+      subscriberErrorFeedback: { message: "ca va très mal" },
     };
 
     subscribersGateway.simulatedResponse = errorResponse;
@@ -209,7 +209,7 @@ describe("Broadcast to partners on updated convention", () => {
       consumerId: apiConsumer1.id,
       consumerName: apiConsumer1.name,
       handledByAgency: false,
-      feedback: errorResponse.feedback,
+      subscriberErrorFeedback: errorResponse.subscriberErrorFeedback,
       occurredAt: now,
       params: {
         callbackUrl: errorResponse.callbackUrl,

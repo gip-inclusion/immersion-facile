@@ -47,7 +47,7 @@ const makeSavedError = async (
     consumerId: null,
     consumerName: "my-consumer",
     serviceName,
-    feedback: {
+    subscriberErrorFeedback: {
       message: "Some message",
       response: error.response ? error.response : error,
     },
@@ -93,9 +93,11 @@ describe("PgSavedErrorRepository", () => {
     expectObjectInArrayToMatch(response, [
       {
         handled_by_agency: savedError.handledByAgency,
-        feedback: {
-          message: savedError.feedback.message,
-          response: JSON.parse(JSON.stringify(savedError.feedback.response)),
+        subscriber_error_feedback: {
+          message: savedError.subscriberErrorFeedback.message,
+          response: JSON.parse(
+            JSON.stringify(savedError.subscriberErrorFeedback.response),
+          ),
         },
         occurred_at: savedError.occurredAt,
         params: savedError.params,
@@ -117,9 +119,11 @@ describe("PgSavedErrorRepository", () => {
     expectObjectInArrayToMatch(response, [
       {
         handled_by_agency: savedError.handledByAgency,
-        feedback: {
-          message: savedError.feedback.message,
-          response: JSON.parse(JSON.stringify(savedError.feedback.response)),
+        subscriber_error_feedback: {
+          message: savedError.subscriberErrorFeedback.message,
+          response: JSON.parse(
+            JSON.stringify(savedError.subscriberErrorFeedback.response),
+          ),
         },
         occurred_at: savedError.occurredAt,
         params: savedError.params,
@@ -173,7 +177,8 @@ describe("PgSavedErrorRepository", () => {
         pgSavedErrors.map(
           (pgSavedError): SavedError => ({
             serviceName: pgSavedError.service_name,
-            feedback: pgSavedError.feedback as any,
+            subscriberErrorFeedback:
+              pgSavedError.subscriber_error_feedback as any,
             params: pgSavedError.params ?? undefined,
             occurredAt: pgSavedError.occurred_at,
             handledByAgency: pgSavedError.handled_by_agency,
@@ -186,11 +191,13 @@ describe("PgSavedErrorRepository", () => {
           { ...savedError2, handledByAgency: true },
           savedError3,
           savedError4,
-        ].map(({ feedback, ...rest }) => ({
+        ].map(({ subscriberErrorFeedback, ...rest }) => ({
           ...rest,
-          feedback: {
-            message: feedback.message,
-            response: JSON.parse(JSON.stringify(feedback.response)),
+          subscriberErrorFeedback: {
+            message: subscriberErrorFeedback.message,
+            response: JSON.parse(
+              JSON.stringify(subscriberErrorFeedback.response),
+            ),
           },
         })),
       );
