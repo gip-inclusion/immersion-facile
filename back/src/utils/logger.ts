@@ -79,7 +79,6 @@ type LoggerParams = Partial<{
   useCaseName: string;
   //------- à vérifier
   context: Record<string, string>;
-  httpStatus: number;
   // --------------------------------
   durationInSeconds: number;
   // --------------------------------
@@ -124,7 +123,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       durationInSeconds,
       error,
       events,
-      httpStatus,
       message,
       nodeProcessReport,
       notificationId,
@@ -156,7 +154,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         durationInSeconds,
         error,
         events,
-        httpStatus,
         nodeProcessReport,
         notificationId,
         numberOfEvent,
