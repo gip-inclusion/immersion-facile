@@ -34,11 +34,12 @@ import {
 
 const logger = createLogger(__filename);
 
+// to keep align with Brevo Entreprise API limits : https://developers.brevo.com/docs/api-limits#enterprise-rate-limiting
+
 const brevoMaxEmailRequestsPerSeconds = 2_000;
-const brevoMaxSmsRequestsPerHours = 200; // seems it is now 200 per seconds (not hours) : https://developers.brevo.com/docs/api-limits
+const brevoMaxSmsRequestsPerSeconds = 200;
 
 const ONE_SECOND_MS = 1_000;
-const ONE_HOUR_MS = ONE_SECOND_MS * 3_600;
 
 // documentation https://developers.brevo.com/reference/sendtransacemail
 export class BrevoNotificationGateway implements NotificationGateway {
@@ -51,9 +52,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
   });
 
   #smslimiter = new Bottleneck({
-    reservoir: brevoMaxSmsRequestsPerHours,
-    reservoirRefreshInterval: ONE_HOUR_MS, // number of ms
-    reservoirRefreshAmount: brevoMaxSmsRequestsPerHours,
+    reservoir: brevoMaxSmsRequestsPerSeconds,
+    reservoirRefreshInterval: ONE_SECOND_MS, // number of ms
+    reservoirRefreshAmount: brevoMaxSmsRequestsPerSeconds,
     minTime: 1000,
     maxConcurrent: 1,
   });
