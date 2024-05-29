@@ -13,6 +13,7 @@ import {
   ApiConsumerRights,
   ConventionScope,
   NoScope,
+  domElementIds,
 } from "shared";
 
 const apiConsumerKindSeverity: Record<ApiConsumerKind, AlertProps.Severity> = {
@@ -131,7 +132,14 @@ export const makeApiConsumerActionButtons = (
   apiConsumer: ApiConsumer,
   onClick: (apiConsumer: ApiConsumer) => void,
 ) => (
-  <Button size="small" type="button" onClick={() => onClick(apiConsumer)}>
+  <Button
+    size="small"
+    type="button"
+    onClick={() => onClick(apiConsumer)}
+    id={domElementIds.admin.technicalOptionsTab.editApiConsumerButton({
+      apiConsumerId: apiConsumer.id,
+    })}
+  >
     Éditer
   </Button>
 );
