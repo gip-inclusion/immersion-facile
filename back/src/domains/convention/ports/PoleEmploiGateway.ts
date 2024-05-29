@@ -67,7 +67,7 @@ export type PoleEmploiConvention = {
 type PeBroadcastSuccessResponse = { status: 200 | 201 };
 type PeBroadcastErrorResponse = {
   status: Exclude<number, 200 | 201>;
-  feedback: SubscriberErrorFeedback;
+  subscriberErrorFeedback: SubscriberErrorFeedback;
 };
 
 export type PoleEmploiBroadcastResponse =

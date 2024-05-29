@@ -104,7 +104,7 @@ describe("Broadcasts events to pole-emploi", () => {
 
     poleEmploiGateWay.setNextResponse({
       status: 404,
-      feedback: { message: "Ops, something is bad" },
+      subscriberErrorFeedback: { message: "Ops, something is bad" },
     });
     const now = new Date();
     timeGateway.setNextDate(now);
