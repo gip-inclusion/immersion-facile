@@ -3,7 +3,7 @@ import Bottleneck from "bottleneck";
 import { HTTP_STATUS, queryParamsAsString } from "shared";
 import { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
-import { UnhandledError } from "../../../../../../config/helpers/unhandledError";
+import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
 import {
   CounterType,
   exchangeCodeForAccessTokenCounter,
