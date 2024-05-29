@@ -8,7 +8,11 @@ import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
 import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
-import { DomainTopic, EventToDebugInfo } from "../domains/core/events/events";
+import {
+  DomainEvent,
+  DomainTopic,
+  eventsToDebugInfo,
+} from "../domains/core/events/events";
 import { SearchMade } from "../domains/establishment/entities/SearchMadeEntity";
 import { PartialResponse } from "./axiosUtils";
 import { NodeProcessReport } from "./nodeProcessReport";
@@ -53,7 +57,14 @@ type SQLError = {
 type LoggerParams = Partial<{
   agencyId: AgencyId;
   conventionId: ConventionId;
+  crawlerInfo: {
+    numberOfEvents?: number;
+    typeOfEvents: TypeOfEvent;
+    processEventsDurationInSeconds?: number; // regrouper avec retrieveEventsDurationInSeconds
+    retrieveEventsDurationInSeconds?: number;
+  };
   error: Error | Partial<SQLError> | AxiosError;
+  events: DomainEvent[];
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
   schemaParsingInput: unknown;
@@ -81,13 +92,9 @@ type LoggerParams = Partial<{
   // --------------------------------
   durationInSeconds: number;
   // --------------------------------
-  events: Partial<EventToDebugInfo>[];
-  numberOfEvent: number;
+
   topic: DomainTopic;
   wasQuarantined: string;
-  typeOfEvents: TypeOfEvent;
-  processEventsDurationInSeconds: number; // regrouper avec retrieveEventsDurationInSeconds
-  retrieveEventsDurationInSeconds: number;
   // --------------------------------
   search: Partial<SearchMade>;
 }>;
@@ -124,20 +131,17 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       message,
       nodeProcessReport,
       notificationId,
-      numberOfEvent,
+      crawlerInfo,
       peConnect,
-      processEventsDurationInSeconds,
       reportContent,
       request,
       requestId,
       response,
-      retrieveEventsDurationInSeconds,
       schemaParsingInput,
       search,
       status,
       subscriptionId,
       topic,
-      typeOfEvents,
       useCaseName,
       wasQuarantined,
     }) => {
@@ -150,23 +154,20 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         conventionId,
         durationInSeconds,
         error,
-        events,
+        events: events && eventsToDebugInfo(events),
         nodeProcessReport,
         notificationId,
-        numberOfEvent,
+        crawlerInfo,
         peConnect,
-        processEventsDurationInSeconds,
         reportContent,
         request,
         requestId,
         response,
-        retrieveEventsDurationInSeconds,
         schemaParsingInput,
         search,
         status,
         subscriptionId,
         topic,
-        typeOfEvents,
         useCaseName,
         wasQuarantined,
       };

@@ -1,5 +1,5 @@
 import { createLogger } from "../../../../utils/logger";
-import { DomainEvent, eventsToDebugInfo } from "../events";
+import { DomainEvent } from "../events";
 import { OutboxQueries } from "../ports/OutboxQueries";
 import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 
@@ -11,7 +11,7 @@ export class InMemoryOutboxQueries implements OutboxQueries {
   public async getFailedEvents(): Promise<DomainEvent[]> {
     const allEvents = this.outboxRepository.events;
     logger.debug({
-      events: eventsToDebugInfo(allEvents),
+      events: allEvents,
       message: "getAllFailedEvents",
     });
 
@@ -25,7 +25,7 @@ export class InMemoryOutboxQueries implements OutboxQueries {
   public async getEventsToPublish() {
     const allEvents = this.outboxRepository.events;
     logger.debug({
-      events: eventsToDebugInfo(allEvents),
+      events: allEvents,
       message: "getAllUnpublishedEvents",
     });
 
@@ -35,7 +35,7 @@ export class InMemoryOutboxQueries implements OutboxQueries {
 
     if (unpublishedEvents.length > 0) {
       logger.info({
-        events: eventsToDebugInfo(unpublishedEvents),
+        events: unpublishedEvents,
         message: "getAllUnpublishedEvents: found unpublished events",
       });
     }
