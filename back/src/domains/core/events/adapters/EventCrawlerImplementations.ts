@@ -1,12 +1,15 @@
 import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
-import { createLogger } from "../../../../utils/logger";
+import {
+  LoggerParamsWithMessage,
+  createLogger,
+} from "../../../../utils/logger";
 import {
   notifyDiscord,
   notifyObjectDiscord,
 } from "../../../../utils/notifyDiscord";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
-import { DomainEvent, EventStatus, eventsToDebugInfo } from "../events";
+import { DomainEvent, EventStatus } from "../events";
 import { EventBus } from "../ports/EventBus";
 import { EventCrawler } from "../ports/EventCrawler";
 
@@ -50,11 +53,13 @@ export class BasicEventCrawler implements EventCrawler {
 
     if (events.length) {
       logger.info({
-        retrieveEventsDurationInSeconds,
-        processEventsDurationInSeconds,
-        typeOfEvents: "unpublished",
-        numberOfEvent: events.length,
-        events: eventsToDebugInfo(events),
+        events,
+        crawlerInfo: {
+          numberOfEvents: events.length,
+          processEventsDurationInSeconds,
+          retrieveEventsDurationInSeconds,
+          typeOfEvents: "unpublished",
+        },
       });
     }
   }
@@ -62,18 +67,27 @@ export class BasicEventCrawler implements EventCrawler {
   public async retryFailedEvents(): Promise<void> {
     const startDate = new Date();
     const events = await this.#retrieveEvents("failed");
-    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+    const retrieveEventsDurationInSeconds =
+      calculateDurationInSecondsFrom(startDate);
+
+    const processStartDate = new Date();
+    // Pourquoi on ne ferait pas ici : await this.#markEventsAsInProcess(events); ???
+    await this.#publishEvents(events);
+    const processEventsDurationInSeconds =
+      calculateDurationInSecondsFrom(processStartDate);
 
     if (events.length) {
       logger.warn({
-        durationInSeconds,
-        typeOfEvents: "failed",
-        numberOfEvent: events.length,
-        events: eventsToDebugInfo(events),
+        events,
+        crawlerInfo: {
+          numberOfEvents: events.length,
+          processEventsDurationInSeconds,
+          retrieveEventsDurationInSeconds,
+          typeOfEvents: "failed",
+        },
         message: `retryFailedEvents | ${events.length} events to process`,
       });
     }
-    await this.#publishEvents(events);
   }
 
   public startCrawler() {
@@ -88,7 +102,7 @@ export class BasicEventCrawler implements EventCrawler {
       const timer = setTimeout(() => {
         const warning = {
           message: "Processing event group is taking long",
-          events: eventsToDebugInfo(eventGroup),
+          events: eventGroup,
         };
         notifyObjectDiscord(warning);
         logger.warn(warning);
@@ -103,27 +117,30 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   async #retrieveEvents(type: TypeOfEvent): Promise<DomainEvent[]> {
-    try {
-      const events = await this.uowPerformer.perform((uow) =>
+    return this.uowPerformer
+      .perform((uow) =>
         type === "unpublished"
           ? uow.outboxQueries.getEventsToPublish({
               limit: crawlerMaxBatchSize,
             })
           : uow.outboxQueries.getFailedEvents({ limit: crawlerMaxBatchSize }),
-      );
-      return events;
-    } catch (error: any) {
-      logger.error({
-        error,
-        message: `${this.constructor.name}.retrieveEvents failed`,
-        typeOfEvents: type,
-      });
+      )
+      .catch((error) => {
+        const params: LoggerParamsWithMessage = {
+          error,
+          message: `${this.constructor.name}.retrieveEvents failed`,
+          crawlerInfo: {
+            typeOfEvents: type,
+          },
+        };
 
-      notifyObjectDiscord({
-        error,
+        logger.error(params);
+        notifyObjectDiscord({
+          params,
+        });
+
+        return [];
       });
-      return [];
-    }
   }
 
   #markEventsAsInProcess(events: DomainEvent[]) {

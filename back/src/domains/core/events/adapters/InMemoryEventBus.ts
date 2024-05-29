@@ -16,7 +16,6 @@ import {
   EventFailure,
   EventPublication,
   SubscriptionId,
-  eventsToDebugInfo,
 } from "../events";
 import { EventBus, EventCallback } from "../ports/EventBus";
 
@@ -39,7 +38,7 @@ export class InMemoryEventBus implements EventBus {
     const publishedAt = this.timeGateway.now().toISOString();
     const publishedEvent = await this.#publish(event, publishedAt);
     logger.info({
-      events: eventsToDebugInfo([publishedEvent]),
+      events: [publishedEvent],
       message: "Saving published event",
     });
     await this.uowPerformer.perform((uow) =>
@@ -81,7 +80,7 @@ export class InMemoryEventBus implements EventBus {
   ): Promise<DomainEvent> {
     // the publication happens here, an event is expected in return,
     // with the publication added to the event
-    logger.info({ events: [{ eventId: event.id }], message: "publish" });
+    logger.info({ events: [event], message: "publish" });
 
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
@@ -126,7 +125,7 @@ export class InMemoryEventBus implements EventBus {
     const wasMaxNumberOfErrorsReached = event.publications.length >= 3;
     if (wasMaxNumberOfErrorsReached) {
       const message = "Failed too many times, event will be Quarantined";
-      logger.error({ events: [{ eventId: event.id }], message });
+      logger.error({ events: [event], message });
       const { payload: _, publications: __, ...restEvent } = event;
       notifyObjectDiscord({
         event: {
@@ -170,7 +169,7 @@ const makeExecuteSubscriptionMatchingSubscriptionId =
   async (subscriptionId: SubscriptionId): Promise<void | EventFailure> => {
     const subscription = subscriptionsForTopic[subscriptionId];
     logger.info({
-      events: [{ eventId: event.id }],
+      events: [event],
       topic: event.topic,
       message: `Sending an event for ${subscriptionId}`,
     });
@@ -223,7 +222,7 @@ const monitorErrorInCallback = (error: any, event: DomainEvent) => {
   });
   logger.error({
     topic: event.topic,
-    events: [{ eventId: event.id }],
+    events: [event],
     error: error.message || JSON.stringify(error),
     message: "publishedEventsError",
   });
