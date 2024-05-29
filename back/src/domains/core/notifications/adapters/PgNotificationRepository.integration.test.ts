@@ -113,10 +113,10 @@ describe("PgNotificationRepository", () => {
 
   beforeAll(async () => {
     pool = getTestPgPool();
+    db = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
-    db = makeKyselyDb(pool);
     pgNotificationRepository = new PgNotificationRepository(
       db,
       maxRetrievedNotifications,
