@@ -12,7 +12,7 @@ import {
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
-} from "../../../../utils/makeExpectSavedNotificationsAndEvents";
+} from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { InMemoryNotificationGateway } from "../../../core/notifications/adapters/InMemoryNotificationGateway";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";

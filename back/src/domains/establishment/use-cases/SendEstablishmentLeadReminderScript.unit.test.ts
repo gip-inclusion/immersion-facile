@@ -11,7 +11,7 @@ import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
-} from "../../../utils/makeExpectSavedNotificationsAndEvents";
+} from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";

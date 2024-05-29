@@ -12,7 +12,7 @@ import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
-} from "../../../../utils/makeExpectSavedNotificationsAndEvents";
+} from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";

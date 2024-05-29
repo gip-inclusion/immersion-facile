@@ -22,11 +22,11 @@ import {
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
-  ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../../utils/makeExpectSavedNotificationsAndEvents";
+  ExpectSavedNotificationsBatchAndEvent,
+  makeExpectSavedNotificationsBatchAndEvent,
+} from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { ReminderKind } from "../../../core/events/eventPayload.dto";
-import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import { makeSaveNotificationsBatchAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
@@ -61,7 +61,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   let timeGateway: CustomTimeGateway;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
-  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let expectSavedNotificationsBatchAndEvent: ExpectSavedNotificationsBatchAndEvent;
 
   beforeEach(() => {
     config = new AppConfigBuilder().build();
@@ -69,20 +69,19 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     const uuidGenerator = new UuidV4Generator();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
+    const saveNotificationsBatchAndRelatedEvent =
+      makeSaveNotificationsBatchAndRelatedEvent(uuidGenerator, timeGateway);
 
-    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
-      uow.notificationRepository,
-      uow.outboxRepository,
-    );
+    expectSavedNotificationsBatchAndEvent =
+      makeExpectSavedNotificationsBatchAndEvent(
+        uow.notificationRepository,
+        uow.outboxRepository,
+      );
 
     useCase = new NotifyConventionReminder(
       new InMemoryUowPerformer(uow),
       timeGateway,
-      saveNotificationAndRelatedEvent,
+      saveNotificationsBatchAndRelatedEvent,
       fakeGenerateMagicLinkUrlFn,
       shortLinkIdGeneratorGateway,
       config,
@@ -105,7 +104,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       );
 
       //Assert
-      expectSavedNotificationsAndEvents({
+      expectSavedNotificationsBatchAndEvent({
         emails: [],
       });
     });
@@ -125,7 +124,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       );
 
       //Assert
-      expectSavedNotificationsAndEvents({
+      expectSavedNotificationsBatchAndEvent({
         emails: [],
       });
     });
@@ -196,7 +195,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [
             makeAgencyFirstReminderEmail({
               email: councellor1Email,
@@ -251,7 +250,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [],
         });
       });
@@ -320,7 +319,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [
             makeAgencyLastReminderEmail({
               email: councellor1Email,
@@ -371,7 +370,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         );
 
         //Assert
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [],
         });
       });
@@ -438,7 +437,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [
             makeSignatoriesFirstReminderEmail({
               actor: convention.signatories.beneficiary,
@@ -527,7 +526,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [
             makeSignatoriesFirstReminderEmail({
               actor: convention.signatories.beneficiary,
@@ -612,7 +611,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [
             makeSignatoriesFirstReminderEmail({
               actor: convention.signatories.beneficiary,
@@ -659,7 +658,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, kind),
           ),
         );
-        expectSavedNotificationsAndEvents({ emails: [] });
+        expectSavedNotificationsBatchAndEvent({ emails: [] });
       });
     });
   });
@@ -718,7 +717,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [
             makeSignatoriesLastReminderEmail({
               actor: convention.signatories.beneficiary,
@@ -793,7 +792,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [
             makeSignatoriesLastReminderEmail({
               actor: convention.signatories.beneficiary,
@@ -847,7 +846,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectSavedNotificationsAndEvents({});
+        expectSavedNotificationsBatchAndEvent({});
       });
     });
   });
@@ -995,7 +994,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedNotificationsAndEvents({
+        expectSavedNotificationsBatchAndEvent({
           emails: [
             makeSignatoriesFirstReminderEmail({
               actor: convention.signatories.beneficiary,

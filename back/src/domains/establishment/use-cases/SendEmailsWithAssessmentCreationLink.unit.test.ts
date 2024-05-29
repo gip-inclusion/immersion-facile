@@ -3,7 +3,7 @@ import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
-} from "../../../utils/makeExpectSavedNotificationsAndEvents";
+} from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";

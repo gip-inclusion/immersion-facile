@@ -30,7 +30,10 @@ import {
   ReminderKind,
 } from "../../../core/events/eventPayload.dto";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import {
+  NotificationContentAndFollowedIds,
+  SaveNotificationsBatchAndRelatedEvent,
+} from "../../../core/notifications/helpers/Notification";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -64,7 +67,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
   readonly #timeGateway: TimeGateway;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  readonly #saveNotificationsBatchAndRelatedEvent: SaveNotificationsBatchAndRelatedEvent;
 
   readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
 
@@ -75,7 +78,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     timeGateway: TimeGateway,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    saveNotificationAndRelatedEvent: SaveNotificationsBatchAndRelatedEvent,
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     config: AppConfig,
@@ -84,7 +87,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     this.#config = config;
     this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#saveNotificationsBatchAndRelatedEvent =
+      saveNotificationAndRelatedEvent;
     this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
     this.#timeGateway = timeGateway;
   }
@@ -163,29 +167,33 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       throw new ForbiddenError(
         forbiddenUnsupportedStatusMessage(conventionRead, reminderKind),
       );
-    await Promise.all(
-      [
-        ...agency.counsellorEmails.map(
-          (email) =>
-            ({
-              role: "counsellor",
-              email,
-            }) satisfies EmailWithRole,
-        ),
-        ...agency.validatorEmails.map(
-          (email) =>
-            ({
-              role: "validator",
-              email,
-            }) satisfies EmailWithRole,
-        ),
-      ].map((emailWithRole) =>
-        this.#sendAgencyReminderEmails(
-          emailWithRole,
-          conventionRead,
-          agency,
-          uow,
-          reminderKind,
+
+    await this.#saveNotificationsBatchAndRelatedEvent(
+      uow,
+      await Promise.all(
+        [
+          ...agency.counsellorEmails.map(
+            (email) =>
+              ({
+                role: "counsellor",
+                email,
+              }) satisfies EmailWithRole,
+          ),
+          ...agency.validatorEmails.map(
+            (email) =>
+              ({
+                role: "validator",
+                email,
+              }) satisfies EmailWithRole,
+          ),
+        ].map((emailWithRole) =>
+          this.#createAgencyReminderEmail(
+            emailWithRole,
+            conventionRead,
+            agency,
+            uow,
+            reminderKind,
+          ),
         ),
       ),
     );
@@ -232,16 +240,16 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       establishmentSiret: conventionRead.siret,
     };
 
-    await Promise.all([
-      ...templatedEmails.map((email) =>
-        this.#saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationsBatchAndRelatedEvent(uow, [
+      ...templatedEmails.map(
+        (email): NotificationContentAndFollowedIds => ({
           kind: "email",
           followedIds,
           templatedContent: email,
         }),
       ),
-      ...templatedSms.map((sms) =>
-        this.#saveNotificationAndRelatedEvent(uow, {
+      ...templatedSms.map(
+        (sms): NotificationContentAndFollowedIds => ({
           kind: "sms",
           followedIds,
           templatedContent: sms,
@@ -278,13 +286,13 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     };
   }
 
-  async #sendAgencyReminderEmails(
+  async #createAgencyReminderEmail(
     { email, role }: EmailWithRole,
     convention: ConventionReadDto,
     agency: AgencyDto,
     uow: UnitOfWork,
     kind: AgenciesReminderKind,
-  ): Promise<void> {
+  ): Promise<NotificationContentAndFollowedIds> {
     const makeShortMagicLink = prepareMagicShortLinkMaker({
       config: this.#config,
       conventionMagicLinkPayload: {
@@ -332,7 +340,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             },
           };
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+    return {
       kind: "email",
       followedIds: {
         conventionId: convention.id,
@@ -340,9 +348,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         establishmentSiret: convention.siret,
       },
       templatedContent: templatedEmail,
-    });
-
-    return;
+    };
   }
 }
 
