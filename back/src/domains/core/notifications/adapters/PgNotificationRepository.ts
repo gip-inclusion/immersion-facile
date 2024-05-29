@@ -59,27 +59,7 @@ export class PgNotificationRepository implements NotificationRepository {
 
   async getSmsByIds(ids: NotificationId[]): Promise<SmsNotification[]> {
     if (!ids.length) return [];
-    return this.transaction
-      .selectFrom("notifications_sms")
-      .select(({ ref }) =>
-        jsonStripNulls(
-          jsonBuildObject({
-            id: ref("id"),
-            kind: sql<"sms">`'sms'`,
-            createdAt: sql<string>`TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
-            followedIds: jsonBuildObject({
-              conventionId: ref("convention_id"),
-              establishmentId: ref("establishment_siret"),
-              agencyId: ref("agency_id"),
-            }),
-            templatedContent: jsonBuildObject({
-              kind: ref("sms_kind"),
-              recipientPhone: ref("recipient_phone"),
-              params: ref("params"),
-            }).$castTo<TemplatedSms>(),
-          }),
-        ).as("notif"),
-      )
+    return getSmsNotificationBuilder(this.transaction)
       .where("id", "in", ids)
       .execute()
       .then(map((row) => row.notif));
@@ -98,30 +78,26 @@ export class PgNotificationRepository implements NotificationRepository {
     emailKind,
     email,
   }: EmailNotificationFilters = {}): Promise<EmailNotification[]> {
-    const idsToFetchBuilder = this.transaction
-      .selectFrom("notifications_email as e")
-      .select("id")
-      .innerJoin(
-        "notifications_email_recipients as r",
-        "e.id",
-        "r.notifications_email_id",
-      )
-      .groupBy("e.id")
-      .orderBy("e.created_at", "desc");
-
-    const idsToFetch = await pipeWithValue(
-      idsToFetchBuilder,
+    const subQuery = pipeWithValue(
+      this.transaction
+        .selectFrom("notifications_email as e")
+        .select("id")
+        .innerJoin(
+          "notifications_email_recipients as r",
+          "e.id",
+          "r.notifications_email_id",
+        )
+        .groupBy("e.id")
+        .orderBy("e.created_at", "desc"),
       (b) => (since ? b.where("e.created_at", ">=", since) : b),
       (b) => (emailKind ? b.where("e.email_kind", "=", emailKind) : b),
       (b) => (email ? b.where("r.email", "=", email) : b),
       (b) => b.limit(this.maxRetrievedNotifications),
-    )
-      .execute()
-      .then((rows) => rows.map((row) => row.id));
+    );
 
     return getEmailsNotificationBuilder(this.transaction)
       .where("e.created_at", ">", sql`NOW() - INTERVAL '2 day'`)
-      .where("e.id", "in", idsToFetch)
+      .where("e.id", "in", subQuery)
       .orderBy("e.created_at", "desc")
       .execute()
       .then(map((row) => row.notif));
@@ -189,7 +165,9 @@ export class PgNotificationRepository implements NotificationRepository {
     ]);
   }
 
-  async #getSmsNotificationById(id: NotificationId): Promise<SmsNotification> {
+  async #getSmsNotificationById(
+    id: NotificationId,
+  ): Promise<SmsNotification | undefined> {
     const templatedSms = await this.getSmsByIds([id]);
     return templatedSms[0];
   }
@@ -314,8 +292,9 @@ export class PgNotificationRepository implements NotificationRepository {
 
   async #getEmailNotificationById(
     id: NotificationId,
-  ): Promise<EmailNotification> {
-    return this.getEmailsByIds([id]).then((emails) => emails[0]);
+  ): Promise<EmailNotification | undefined> {
+    const emails = await this.getEmailsByIds([id]);
+    return emails[0];
   }
 }
 
