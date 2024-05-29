@@ -1,4 +1,3 @@
-import { sql } from "kysely";
 import { SiretDto } from "shared";
 import { P, match } from "ts-pattern";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
@@ -143,10 +142,11 @@ export const getEstablishmentLeadSiretsByUniqLastEventKindBuilder = (
       qb
         .selectFrom("establishment_lead_events")
         .select("siret")
-        .where(
-          "siret",
-          "in",
-          sql`(SELECT siret from last_events_by_siret where "kind" = ${kind})`,
+        .where("siret", "in", (qb) =>
+          qb
+            .selectFrom("last_events_by_siret")
+            .select("siret")
+            .where("kind", "=", kind),
         )
         .where("kind", "=", kind)
         .groupBy("siret")
@@ -154,10 +154,10 @@ export const getEstablishmentLeadSiretsByUniqLastEventKindBuilder = (
     )
     .selectFrom("last_events_by_siret")
     .select("siret")
-    .where(
-      "siret",
-      "in",
-      sql`(SELECT siret from events_with_kind_that_happens_last_and_once)`,
+    .where("siret", "in", (qb) =>
+      qb
+        .selectFrom("events_with_kind_that_happens_last_and_once")
+        .select("siret"),
     );
 
   if (beforeDate) {
