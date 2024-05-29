@@ -64,7 +64,9 @@ export type PartialResponse = {
   data: unknown;
   request: PartialRequest;
 };
-const extractPartialResponse = (response: AxiosResponse): PartialResponse => ({
+export const extractPartialResponse = (
+  response: AxiosResponse,
+): PartialResponse => ({
   status: response.status,
   statusText: response.statusText,
   data: response.data as unknown,
