@@ -74,7 +74,6 @@ export class PgConventionPoleEmploiAdvisorRepository
           conventionPoleEmploiUserAdvisorDtoSchema,
           conventionPeUserAdvisor,
           logger,
-          { conventionPeUserAdvisor: JSON.stringify(conventionPeUserAdvisor) },
         ),
       )
     );
