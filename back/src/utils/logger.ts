@@ -8,11 +8,7 @@ import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
 import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
-import {
-  DomainEvent,
-  DomainTopic,
-  eventsToDebugInfo,
-} from "../domains/core/events/events";
+import { DomainEvent, DomainTopic } from "../domains/core/events/events";
 import { SearchMade } from "../domains/establishment/entities/SearchMadeEntity";
 import { PartialResponse } from "./axiosUtils";
 import { NodeProcessReport } from "./nodeProcessReport";
@@ -87,14 +83,10 @@ type LoggerParams = Partial<{
   response: PartialResponse | SubscriberResponse | HttpResponse<any, any>;
   status: "success" | "total" | "error" | AuthorisationStatus;
   subscriptionId: string;
+  topic: DomainTopic;
   useCaseName: string;
   //------- à vérifier
-  // --------------------------------
   durationInSeconds: number;
-  // --------------------------------
-
-  topic: DomainTopic;
-  wasQuarantined: string;
   // --------------------------------
   search: Partial<SearchMade>;
 }>;
@@ -143,7 +135,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       subscriptionId,
       topic,
       useCaseName,
-      wasQuarantined,
     }) => {
       if (method === "level") return {};
 
@@ -154,7 +145,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         conventionId,
         durationInSeconds,
         error,
-        events: events && eventsToDebugInfo(events),
+        events: events && sanitizeEvents(events),
         nodeProcessReport,
         notificationId,
         crawlerInfo,
@@ -169,7 +160,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         subscriptionId,
         topic,
         useCaseName,
-        wasQuarantined,
       };
 
       logger[method](opacifiedLogContent, message);
@@ -186,3 +176,18 @@ export const createLogger = (filename: string): OpacifiedLogger => {
     level: "",
   };
 };
+
+const sanitizeEvents = (events: DomainEvent[]) =>
+  events.map(({ publications, id, topic, wasQuarantined }: DomainEvent) => {
+    const publishCount = publications.length;
+    const lastPublication = publications[publishCount - 1];
+
+    return {
+      eventId: id,
+      topic: topic,
+      wasQuarantined: wasQuarantined,
+      lastPublishedAt: lastPublication?.publishedAt,
+      failedSubscribers: lastPublication?.failures,
+      publishCount,
+    };
+  });

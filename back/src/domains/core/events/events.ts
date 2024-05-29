@@ -148,29 +148,3 @@ export type AssessmentEmailDomainTopic = ExtractFromExisting<
   DomainTopic,
   "EmailWithLinkToCreateAssessmentSent" | "BeneficiaryAssessmentEmailSent"
 >;
-
-export type EventToDebugInfo = {
-  eventId: string;
-  topic: DomainTopic;
-  wasQuarantined: boolean;
-  lastPublishedAt: DateString;
-  failedSubscribers: EventFailure[];
-  publishCount: number;
-};
-
-const eventToDebugInfo = (event: DomainEvent) => {
-  const publishCount = event.publications.length;
-  const lastPublication = event.publications[publishCount - 1];
-
-  return {
-    eventId: event.id,
-    topic: event.topic,
-    wasQuarantined: event.wasQuarantined,
-    lastPublishedAt: lastPublication?.publishedAt,
-    failedSubscribers: lastPublication?.failures,
-    publishCount,
-  };
-};
-
-export const eventsToDebugInfo = (events: DomainEvent[]) =>
-  events.map(eventToDebugInfo);

@@ -79,7 +79,7 @@ export class PgOutboxRepository implements OutboxRepository {
       });
       logger.info({
         topic: event.topic,
-        wasQuarantined: event.wasQuarantined.toString(),
+        events: [event],
         message: "eventsSavedBeforePublish",
       });
     }
