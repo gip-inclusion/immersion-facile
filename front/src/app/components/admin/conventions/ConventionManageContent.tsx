@@ -13,7 +13,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { P, match } from "ts-pattern";
+import { match } from "ts-pattern";
 import { NpsSection } from "../../nps/NpsSection";
 import {
   ConventionManageActions,
@@ -41,10 +41,7 @@ export const ConventionManageContent = ({
     ])
     .with({ name: "manageConventionAdmin" }, (): Role[] => ["backOffice"])
     .with(
-      {
-        name: "manageConventionInclusionConnected",
-        inclusionConnectedRole: P.not(P.nullish),
-      },
+      { name: "manageConventionInclusionConnected" },
       ({ inclusionConnectedRoles }): Role[] =>
         inclusionConnectedRoles.includes("agencyOwner")
           ? ["validator"]
