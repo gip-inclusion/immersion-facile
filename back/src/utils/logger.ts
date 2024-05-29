@@ -80,9 +80,7 @@ type LoggerParams = Partial<{
   //------- à vérifier
   role: Role;
   context: Record<string, string>;
-  values: unknown[];
   httpStatus: number;
-  type: string;
   // --------------------------------
   durationInSeconds: number;
   // --------------------------------
@@ -145,10 +143,8 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       status,
       subscriptionId,
       topic,
-      type,
       typeOfEvents,
       useCaseName,
-      values,
       wasQuarantined,
     }) => {
       if (method === "level") return {};
@@ -179,10 +175,8 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         status,
         subscriptionId,
         topic,
-        type,
         typeOfEvents,
         useCaseName,
-        values,
         wasQuarantined,
       };
 
