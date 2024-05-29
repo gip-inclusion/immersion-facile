@@ -134,7 +134,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     }
 
     return this.#postPoleEmploiConvention(poleEmploiConvention)
-      .then((response) => {
+      .then((response): PoleEmploiBroadcastResponse => {
         logger.info({
           _title: "PeBroadcast",
           status: "success",
@@ -155,9 +155,9 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
                   response,
                 },
               }),
-        } satisfies PoleEmploiBroadcastResponse;
+        };
       })
-      .catch((err) => {
+      .catch((err): PoleEmploiBroadcastResponse => {
         const error = castError(err);
         if (!axios.isAxiosError(error)) {
           logger.error({
@@ -181,7 +181,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             subscriberErrorFeedback: {
               message: `not an axios error ${error.message}`,
             },
-          } satisfies PoleEmploiBroadcastResponse;
+          };
         }
 
         if (!error.response) {
@@ -207,7 +207,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
               message: error.message,
               response: error,
             },
-          } satisfies PoleEmploiBroadcastResponse;
+          };
         }
 
         const message = !error.response.data?.message
@@ -231,7 +231,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
               message,
               response: error.response,
             },
-          } satisfies PoleEmploiBroadcastResponse;
+          };
         }
 
         const errorObject = {
@@ -255,7 +255,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             response: error.response,
             message,
           },
-        } satisfies PoleEmploiBroadcastResponse;
+        };
       });
   }
 
