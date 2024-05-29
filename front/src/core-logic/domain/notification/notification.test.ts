@@ -2,9 +2,10 @@ import { expectToEqual, keys } from "shared";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { notificationsSelectors } from "src/core-logic/domain/notification/notification.selectors";
 import {
-  NotificationLevel,
+  ActionKindAndLevel,
   NotificationTopic,
   feedbackMapping,
+  getLevelFromActionKindAndLevel,
 } from "src/core-logic/domain/notification/notification.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
@@ -31,7 +32,7 @@ describe("Notifications", () => {
       ).toHaveLength(1);
       expectNotificationStoreByTopicToEqual({
         topic: "api-consumer-global",
-        level: "success",
+        kindAndLevel: "create.success",
       });
     });
     it("stores notification with level error from other slice", () => {
@@ -48,21 +49,21 @@ describe("Notifications", () => {
       ).toHaveLength(1);
       expectNotificationStoreByTopicToEqual({
         topic: "api-consumer-global",
-        level: "error",
+        kindAndLevel: "create.error",
       });
     });
   });
   const expectNotificationStoreByTopicToEqual = ({
     topic,
-    level,
-  }: { topic: NotificationTopic; level: NotificationLevel }) =>
+    kindAndLevel,
+  }: { topic: NotificationTopic; kindAndLevel: ActionKindAndLevel }) =>
     expectToEqual(
       notificationsSelectors.notifications(store.getState())[topic],
       {
-        level,
-        title: feedbackMapping[topic][level]?.title,
+        level: getLevelFromActionKindAndLevel(kindAndLevel),
+        title: feedbackMapping[topic][kindAndLevel]?.title,
         // biome-ignore lint/style/noNonNullAssertion:
-        message: feedbackMapping[topic][level]!.message,
+        message: feedbackMapping[topic][kindAndLevel]!.message,
       },
     );
 });

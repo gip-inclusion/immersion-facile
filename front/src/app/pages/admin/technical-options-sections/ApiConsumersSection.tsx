@@ -18,7 +18,7 @@ import {
 } from "shared";
 import { ApiConsumerForm } from "src/app/components/admin/technical-options/ApiConsumerForm";
 import { NotificationFeedback } from "src/app/components/notifications/NotificationFeedback";
-import { WithNotificationFeedbackReplacer } from "src/app/components/notifications/WithNotificationFeedback";
+import { WithNotificationFeedbackReplacer } from "src/app/components/notifications/WithNotificationFeedbackReplacer";
 import {
   formatApiConsumerContact,
   formatApiConsumerDescription,
@@ -52,6 +52,7 @@ export const ApiConsumersSection = () => {
   useEffect(() => {
     if (isApiConsumerModalOpened) return;
     dispatch(apiConsumerSlice.actions.clearFeedbackTriggered());
+    dispatch(notificationSlice.actions.clearNotificationsTriggered());
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
     adminToken &&
       dispatch(
@@ -77,7 +78,6 @@ export const ApiConsumersSection = () => {
 
   const onConfirmTokenModalClose = () => {
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
-    dispatch(notificationSlice.actions.clearNotificationsTriggered());
     adminToken &&
       dispatch(
         apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
