@@ -316,7 +316,6 @@ export const getReadConventionById = async (
       ...agencyFieldsByAgencyIds[pgConvention.dto.agencyId],
     },
     createLogger(__filename),
-    {},
   );
 };
 

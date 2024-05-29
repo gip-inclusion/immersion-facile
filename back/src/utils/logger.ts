@@ -78,7 +78,6 @@ type LoggerParams = Partial<{
   subscriptionId: string;
   useCaseName: string;
   //------- à vérifier
-  context: Record<string, string>;
   // --------------------------------
   durationInSeconds: number;
   // --------------------------------
@@ -118,7 +117,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
     ({
       adapters,
       agencyId,
-      context,
       conventionId,
       durationInSeconds,
       error,
@@ -149,7 +147,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       const opacifiedLogContent = {
         adapters,
         agencyId,
-        context,
         conventionId,
         durationInSeconds,
         error,

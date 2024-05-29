@@ -135,9 +135,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         externalAccessTokenSchema,
         response.body,
         logger,
-        {
-          token: authorizationCode,
-        },
       );
       counter.success.inc();
       log.success({});
@@ -218,9 +215,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         externalPeConnectUserStatutSchema,
         response.body,
         logger,
-        {
-          token: headers.Authorization,
-        },
       );
       const isJobSeeker = isJobSeekerFromStatus(
         externalPeConnectStatut.codeStatutIndividu,
@@ -269,9 +263,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         externalPeConnectUserSchema,
         response.body,
         logger,
-        {
-          token: headers.Authorization,
-        },
       );
       counter.success.inc();
       log.success({});
@@ -317,9 +308,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           externalPeConnectAdvisorsSchema,
           response.body,
           logger,
-          {
-            token: headers.Authorization,
-          },
         );
       counter.success.inc();
       log.success({});
@@ -360,7 +348,6 @@ const managePeConnectError = (
     );
   if (axios.isAxiosError(error)) {
     logger.error({
-      context,
       message: `PE CONNECT ERROR - ${routeName}`,
       error,
     });
