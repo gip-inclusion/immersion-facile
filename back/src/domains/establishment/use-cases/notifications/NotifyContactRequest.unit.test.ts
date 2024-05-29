@@ -13,7 +13,7 @@ import {
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
-} from "../../../../utils/makeExpectSavedNotificationsAndEvents";
+} from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { InMemoryRomeRepository } from "../../../core/rome/adapters/InMemoryRomeRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";

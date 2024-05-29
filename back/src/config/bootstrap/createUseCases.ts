@@ -73,7 +73,10 @@ import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../domains/core/jwt";
-import { makeSaveNotificationAndRelatedEvent } from "../../domains/core/notifications/helpers/Notification";
+import {
+  makeSaveNotificationAndRelatedEvent,
+  makeSaveNotificationsBatchAndRelatedEvent,
+} from "../../domains/core/notifications/helpers/Notification";
 import { SendNotification } from "../../domains/core/notifications/useCases/SendNotification";
 import { SendNotificationInBatch } from "../../domains/core/notifications/useCases/SendNotificationInBatch";
 import { HtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
@@ -138,6 +141,14 @@ export const createUseCases = (
     gateways.timeGateway,
     createNewEvent,
   );
+
+  const saveNotificationsBatchAndRelatedEvent =
+    makeSaveNotificationsBatchAndRelatedEvent(
+      uuidGenerator,
+      gateways.timeGateway,
+      createNewEvent,
+    );
+
   const addFormEstablishment = new AddFormEstablishment(
     uowPerformer,
     createNewEvent,
@@ -278,7 +289,7 @@ export const createUseCases = (
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
         gateways.timeGateway,
-        saveNotificationAndRelatedEvent,
+        saveNotificationsBatchAndRelatedEvent,
         generateConventionMagicLinkUrl,
         gateways.shortLinkGenerator,
         config,

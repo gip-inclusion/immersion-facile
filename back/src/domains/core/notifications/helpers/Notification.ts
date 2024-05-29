@@ -17,7 +17,7 @@ export type WithNotificationIdAndKind = {
   kind: NotificationKind;
 };
 
-type NotificationContentAndFollowedIds = NotificationContent &
+export type NotificationContentAndFollowedIds = NotificationContent &
   Pick<Notification, "followedIds">;
 
 export type SaveNotificationAndRelatedEvent = ReturnType<
@@ -61,6 +61,9 @@ export const makeSaveNotificationAndRelatedEvent =
     return notification;
   };
 
+export type SaveNotificationsBatchAndRelatedEvent = ReturnType<
+  typeof makeSaveNotificationsBatchAndRelatedEvent
+>;
 export const makeSaveNotificationsBatchAndRelatedEvent =
   (
     uuidGenerator: UuidGenerator,
@@ -72,11 +75,11 @@ export const makeSaveNotificationsBatchAndRelatedEvent =
   ) =>
   async (
     uow: UnitOfWork,
-    notificationContent: NotificationContentAndFollowedIds[],
+    notificationsContent: NotificationContentAndFollowedIds[],
   ): Promise<Notification[]> => {
     const now = timeGateway.now().toISOString();
 
-    const notifications = notificationContent.map((content) => ({
+    const notifications = notificationsContent.map((content) => ({
       ...content,
       id: uuidGenerator.new(),
       createdAt: now,
