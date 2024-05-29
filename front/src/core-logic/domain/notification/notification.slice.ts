@@ -30,7 +30,7 @@ type FeedbackWithActionName = {
 
 type ActionKind = "create" | "update" | "fetch" | "delete";
 
-type ActionKindAndLevel = `${ActionKind}.${Notification["level"]}`;
+export type ActionKindAndLevel = `${ActionKind}.${Notification["level"]}`;
 
 type PayloadWithFeedbackTopic = { feedbackTopic: NotificationTopic };
 
@@ -128,7 +128,7 @@ const isActionWithFeedbackTopic =
     "feedbackTopic" in action.payload &&
     action.type === actionType;
 
-const getLevelFromActionKindAndLevel = (
+export const getLevelFromActionKindAndLevel = (
   actionKindAndLevel: ActionKindAndLevel,
 ) => {
   const level = actionKindAndLevel.split(".")[1];
