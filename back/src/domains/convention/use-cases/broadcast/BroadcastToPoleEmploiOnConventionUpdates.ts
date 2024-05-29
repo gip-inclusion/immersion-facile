@@ -116,7 +116,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
         consumerId: null,
         consumerName: "France Travail",
         serviceName: broadcastToPeServiceName,
-        subscriberErrorFeedback: response.feedback,
+        subscriberErrorFeedback: response.subscriberErrorFeedback,
         params: { conventionId: convention.id, httpStatus: response.status },
         occurredAt: this.timeGateway.now(),
         handledByAgency: false,

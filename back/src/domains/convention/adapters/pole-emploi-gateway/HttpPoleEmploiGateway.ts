@@ -150,7 +150,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           ...([200, 201].includes(response.status)
             ? {}
             : {
-                feedback: { message: "Unsupported response status", response },
+                subscriberErrorFeedback: {
+                  message: "Unsupported response status",
+                  response,
+                },
               }),
         } satisfies PoleEmploiBroadcastResponse;
       })
@@ -175,7 +178,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
           return {
             status: 500,
-            feedback: {
+            subscriberErrorFeedback: {
               message: `not an axios error ${error.message}`,
             },
           } satisfies PoleEmploiBroadcastResponse;
@@ -200,7 +203,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
           return {
             status: 500,
-            feedback: { message: error.message, response: error },
+            subscriberErrorFeedback: {
+              message: error.message,
+              response: error,
+            },
           } satisfies PoleEmploiBroadcastResponse;
         }
 
@@ -221,7 +227,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           });
           return {
             status: 404,
-            feedback: {
+            subscriberErrorFeedback: {
               message,
               response: error.response,
             },
@@ -245,7 +251,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
         return {
           status: error.response.status,
-          feedback: {
+          subscriberErrorFeedback: {
             response: error.response,
             message,
           },

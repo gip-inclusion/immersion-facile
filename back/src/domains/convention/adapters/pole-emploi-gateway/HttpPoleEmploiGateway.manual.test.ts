@@ -41,7 +41,7 @@ describe("HttpPoleEmploiGateway", () => {
       },
       expected: {
         status: 404,
-        feedback: {
+        subscriberErrorFeedback: {
           message:
             "Identifiant National DE trouvé mais écart sur la date de naissance",
         },
@@ -57,7 +57,9 @@ describe("HttpPoleEmploiGateway", () => {
       },
       expected: {
         status: 404,
-        feedback: { message: '"Identifiant National DE non trouvé"' },
+        subscriberErrorFeedback: {
+          message: '"Identifiant National DE non trouvé"',
+        },
       },
     },
     {
@@ -95,10 +97,13 @@ describe("HttpPoleEmploiGateway", () => {
       } else {
         if (isBroadcastResponseOk(expected))
           throw new Error("Should not occurs");
-        const { status, feedback } = response;
+        const { status, subscriberErrorFeedback } = response;
         expectToEqual(status, expected.status);
-        expectToEqual(feedback.message, expected.feedback.message);
-        expect(feedback.response).toBeDefined();
+        expectToEqual(
+          subscriberErrorFeedback.message,
+          expected.subscriberErrorFeedback.message,
+        );
+        expect(subscriberErrorFeedback.response).toBeDefined();
       }
     },
   );
@@ -151,10 +156,10 @@ describe("HttpPoleEmploiGateway", () => {
     if (isBroadcastResponseOk(response))
       throw new Error("PE broadcast OK must not occurs");
 
-    const { status, feedback } = response;
+    const { status, subscriberErrorFeedback } = response;
     expectToEqual(status, 500);
-    expectToEqual(feedback.message, "timeout of 0ms exceeded");
-    expect(feedback.response).toBeDefined();
+    expectToEqual(subscriberErrorFeedback.message, "timeout of 0ms exceeded");
+    expect(subscriberErrorFeedback.response).toBeDefined();
   });
 });
 
