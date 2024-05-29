@@ -2,7 +2,11 @@ import { frontRoutes } from "./routes/routes";
 
 type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
 
-type FrontRouteParametrizedKeys = "mode" | "currentStep";
+type FrontRouteParametrizedKeys =
+  | "mode"
+  | "currentStep"
+  | "rightName"
+  | "apiConsumerId";
 
 type FrontRouteParametrizedValue = (
   params: Partial<Record<FrontRouteParametrizedKeys, string | number>>,
@@ -507,6 +511,38 @@ export const domElementIds = {
   },
 
   admin: {
+    technicalOptionsTab: {
+      addApiConsumerButton: "im-technical-options__add-api-consumer-button",
+      editApiConsumerButton: ({ apiConsumerId }) =>
+        `im-technical-options__edit-api-consumer-button--${apiConsumerId}`,
+      apiConsumerModal: "im-technical-options__api-consumer-modal",
+      apiConsumerNameInput: "im-technical-options__api-consumer-name-input",
+      apiConsumerContactLastNameInput:
+        "im-technical-options__api-consumer-contact-last-name-input",
+      apiConsumerContactFirstNameInput:
+        "im-technical-options__api-consumer-contact-first-name-input",
+      apiConsumerContactJobInput:
+        "im-technical-options__api-consumer-contact-job-input",
+      apiConsumerContactPhoneInput:
+        "im-technical-options__api-consumer-contact-phone-input",
+      apiConsumerContactEmailsInput:
+        "im-technical-options__api-consumer-contact-emails-input",
+      apiConsumerDescriptionInput:
+        "im-technical-options__api-consumer-description-input",
+      apiConsumerExpirationDateInput:
+        "im-technical-options__api-consumer-expiration-date-input",
+      apiConsumerRightInput: ({ rightName }) =>
+        `im-technical-options__api-consumer-right-input--${rightName}`,
+      apiConsumerConventionScopeInput:
+        "im-technical-options__api-consumer-convention-scope-input",
+      apiConsumerConventionScopeAgencyKindsInput:
+        "im-technical-options__api-consumer-convention-scope-agency-kinds-input",
+      apiConsumerConventionScopeAgencyIdsInput:
+        "im-technical-options__api-consumer-convention-scope-agency-ids-input",
+
+      apiConsumerSubmitButton:
+        "im-technical-options__api-consumer-submit-button",
+    },
     login: {
       inclusionConnectButton: "im-login-form__inclusion-connect-button--admin",
     },

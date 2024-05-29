@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import {
   ApiConsumer,
   ApiConsumerJwt,
+  domElementIds,
   toDateString,
   toDisplayedDate,
 } from "shared";
@@ -109,7 +110,11 @@ export const ApiConsumersSection = () => {
   return (
     <>
       <h4>Consommateurs API</h4>
-      <Button type="button" onClick={onApiConsumerAddClick}>
+      <Button
+        type="button"
+        onClick={onApiConsumerAddClick}
+        id={domElementIds.admin.technicalOptionsTab.addApiConsumerButton}
+      >
         Ajouter un nouveau consommateur
       </Button>
       <div className={fr.cx("fr-grid-row")}>
@@ -237,6 +242,6 @@ const defaultApiConsumerValues = (id: string): ApiConsumer => ({
 });
 
 const apiConsumerModal = createModal({
-  id: "api-consumer-modal",
+  id: domElementIds.admin.technicalOptionsTab.apiConsumerModal,
   isOpenedByDefault: false,
 });

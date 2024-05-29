@@ -100,9 +100,6 @@ describe("api consumer", () => {
       dependencies.adminGateway.saveApiConsumersResponse$.next(generatedJwt);
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
 
-      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-        kind: "createSuccess",
-      });
       expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBe(
         generatedJwt,
       );

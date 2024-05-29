@@ -16,6 +16,7 @@ import {
   apiConsumerKinds,
   apiConsumerSchema,
   conventionScopeKeys,
+  domElementIds,
 } from "shared";
 import { allAgencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
@@ -65,31 +66,50 @@ export const ApiConsumerForm = ({
         label="Nom du consommateur"
         nativeInputProps={{
           ...register("name"),
+          id: domElementIds.admin.technicalOptionsTab.apiConsumerNameInput,
         }}
         {...getFieldError("name")}
       />
       <Input
         label="Nom du contact"
-        nativeInputProps={{ ...register("contact.lastName") }}
+        nativeInputProps={{
+          ...register("contact.lastName"),
+          id: domElementIds.admin.technicalOptionsTab
+            .apiConsumerContactLastNameInput,
+        }}
         {...getFieldError("contact.lastName")}
       />
       <Input
         label="Prénom du contact"
-        nativeInputProps={{ ...register("contact.firstName") }}
+        nativeInputProps={{
+          ...register("contact.firstName"),
+          id: domElementIds.admin.technicalOptionsTab
+            .apiConsumerContactFirstNameInput,
+        }}
         {...getFieldError("contact.firstName")}
       />
       <Input
         label="Poste du contact"
-        nativeInputProps={{ ...register("contact.job") }}
+        nativeInputProps={{
+          ...register("contact.job"),
+          id: domElementIds.admin.technicalOptionsTab
+            .apiConsumerContactJobInput,
+        }}
         {...getFieldError("contact.job")}
       />
       <Input
         label="Téléphone du contact"
-        nativeInputProps={{ ...register("contact.phone") }}
+        nativeInputProps={{
+          ...register("contact.phone"),
+          id: domElementIds.admin.technicalOptionsTab
+            .apiConsumerContactPhoneInput,
+        }}
         {...getFieldError("contact.phone")}
       />
       <MultipleEmailsInput
-        id="api-consumer-emails"
+        id={
+          domElementIds.admin.technicalOptionsTab.apiConsumerContactEmailsInput
+        }
         label="Emails du contact"
         valuesInList={values.contact.emails}
         summaryHintText="Voici les emails qui seront ajoutés en contact pour ce consommateur API :"
@@ -102,13 +122,22 @@ export const ApiConsumerForm = ({
       <Input
         label="Description"
         textArea
-        nativeTextAreaProps={{ ...register("description") }}
+        nativeTextAreaProps={{
+          ...register("description"),
+          id: domElementIds.admin.technicalOptionsTab
+            .apiConsumerDescriptionInput,
+        }}
         {...getFieldError("description")}
       />
       <input type="hidden" {...register("createdAt")} />
       <Input
         label="Date d'expiration"
-        nativeInputProps={{ ...register("expirationDate"), type: "date" }}
+        nativeInputProps={{
+          ...register("expirationDate"),
+          type: "date",
+          id: domElementIds.admin.technicalOptionsTab
+            .apiConsumerExpirationDateInput,
+        }}
         {...getFieldError("expirationDate")}
       />
       <ul>
@@ -117,6 +146,11 @@ export const ApiConsumerForm = ({
             {rightName}
             <Checkbox
               orientation="horizontal"
+              id={domElementIds.admin.technicalOptionsTab.apiConsumerRightInput(
+                {
+                  rightName,
+                },
+              )}
               className={fr.cx("fr-mt-1w")}
               options={apiConsumerKinds.map((apiConsumerKind) => ({
                 label: apiConsumerKind,
@@ -143,6 +177,10 @@ export const ApiConsumerForm = ({
               <>
                 <RadioButtons
                   legend="Scopes de la convention"
+                  id={
+                    domElementIds.admin.technicalOptionsTab
+                      .apiConsumerConventionScopeInput
+                  }
                   options={conventionScopeKeys.map((scopeKey) => ({
                     label: scopeKey,
                     nativeInputProps: {
@@ -183,6 +221,8 @@ export const ApiConsumerForm = ({
                       },
                       defaultValue: values.rights.convention.scope.agencyKinds,
                       multiple: true,
+                      id: domElementIds.admin.technicalOptionsTab
+                        .apiConsumerConventionScopeAgencyKindsInput,
                     }}
                     options={allAgencyListOfOptions}
                   />
@@ -208,6 +248,8 @@ export const ApiConsumerForm = ({
                             .map((agencyId) => agencyId.trim()),
                         );
                       },
+                      id: domElementIds.admin.technicalOptionsTab
+                        .apiConsumerConventionScopeAgencyIdsInput,
                     }}
                     {...getFieldError("rights.convention.scope.agencyIds")}
                   />
@@ -217,7 +259,11 @@ export const ApiConsumerForm = ({
           </li>
         ))}
       </ul>
-      <Button>Envoyer</Button>
+      <Button
+        id={domElementIds.admin.technicalOptionsTab.apiConsumerSubmitButton}
+      >
+        Envoyer
+      </Button>
     </form>
   );
 };
