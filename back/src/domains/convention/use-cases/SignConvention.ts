@@ -15,7 +15,6 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DomainTopic } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -23,8 +22,6 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
-
-const logger = createLogger(__filename);
 
 const domainTopicByTargetStatusMap: Partial<
   Record<ConventionStatus, DomainTopic>
@@ -67,8 +64,6 @@ export class SignConvention extends TransactionalUseCase<
     if (!initialConventionRead) throw new NotFoundError(conventionId);
 
     const role = await this.#getRole(jwtPayload, uow, initialConventionRead);
-
-    logger.debug({ conventionId, role });
 
     if (!role || !isAllowedToSign(role))
       throw new ForbiddenError(

@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import { Request } from "express";
 import { QueryResult } from "kysely";
 import pino, { Logger } from "pino";
-import { AgencyId, ConventionId, PeExternalId, Role } from "shared";
+import { AgencyId, ConventionId, PeExternalId } from "shared";
 import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
@@ -78,7 +78,6 @@ type LoggerParams = Partial<{
   subscriptionId: string;
   useCaseName: string;
   //------- à vérifier
-  role: Role;
   context: Record<string, string>;
   httpStatus: number;
   // --------------------------------
@@ -137,7 +136,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       requestId,
       response,
       retrieveEventsDurationInSeconds,
-      role,
       schemaParsingInput,
       search,
       status,
@@ -169,7 +167,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         requestId,
         response,
         retrieveEventsDurationInSeconds,
-        role,
         schemaParsingInput,
         search,
         status,
