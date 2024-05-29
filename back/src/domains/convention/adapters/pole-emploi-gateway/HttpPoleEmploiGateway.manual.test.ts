@@ -22,16 +22,6 @@ import { createPoleEmploiRoutes } from "./PoleEmploiRoutes";
 describe("HttpPoleEmploiGateway", () => {
   it.each([
     {
-      testMessage: "the email and dateNaissance are known to be valid for PE",
-      fields: {
-        id: "30000000002",
-        email: "8166843978@PE-TEST.FR",
-        dateNaissance: "1994-10-22T00:00:00",
-        peConnectId: undefined,
-      },
-      expected: { status: 200 }, // careful, if id is new, it will be 201
-    },
-    {
       testMessage: "the email exists in PE but the dateNaissance is wrong",
       fields: {
         id: "30000000003",
@@ -62,6 +52,46 @@ describe("HttpPoleEmploiGateway", () => {
         },
       },
     },
+  ] satisfies TestCase[])(
+    "Should have status $expected.status when $testMessage",
+    async ({ fields, expected }) => {
+      const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
+        createPeAxiosSharedClient(config),
+        cachingGateway,
+        config.peApiUrl,
+        config.poleEmploiAccessTokenConfig,
+        noRetries,
+      );
+
+      const response = await httpPoleEmploiGateway.notifyOnConventionUpdated({
+        ...peConvention,
+        ...fields,
+      });
+
+      if (isBroadcastResponseOk(response) || isBroadcastResponseOk(expected))
+        throw new Error("Should not occurs");
+
+      const { status, subscriberErrorFeedback } = response;
+      expectToEqual(status, expected.status);
+      expectToEqual(
+        subscriberErrorFeedback.message,
+        expected.subscriberErrorFeedback.message,
+      );
+      expect(subscriberErrorFeedback.response).toBeDefined();
+    },
+  );
+
+  it.each([
+    {
+      testMessage: "the email and dateNaissance are known to be valid for PE",
+      fields: {
+        id: "30000000002",
+        email: "8166843978@PE-TEST.FR",
+        dateNaissance: "1994-10-22T00:00:00",
+        peConnectId: undefined,
+      },
+      expected: { status: 200 }, // careful, if id is new, it will be 201
+    },
     {
       testMessage: "data is not known but there is a peConnectId",
       fields: {
@@ -90,21 +120,9 @@ describe("HttpPoleEmploiGateway", () => {
         ...fields,
       });
 
-      if (isBroadcastResponseOk(response)) {
-        if (!isBroadcastResponseOk(expected))
-          throw new Error("Should not occurs");
-        expectToEqual(response, expected);
-      } else {
-        if (isBroadcastResponseOk(expected))
-          throw new Error("Should not occurs");
-        const { status, subscriberErrorFeedback } = response;
-        expectToEqual(status, expected.status);
-        expectToEqual(
-          subscriberErrorFeedback.message,
-          expected.subscriberErrorFeedback.message,
-        );
-        expect(subscriberErrorFeedback.response).toBeDefined();
-      }
+      if (!isBroadcastResponseOk(expected))
+        throw new Error("Should not occurs");
+      expectToEqual(response, expected);
     },
   );
 
