@@ -96,10 +96,10 @@ async function updateTable(
       { ids: [], phones: [] },
     );
 
-    const updateQuery = `UPDATE actors
-    SET phone = unnested.phone
-    FROM (SELECT unnest($1::int[]) as id, unnest($2::text[]) as phone) as unnested
-    WHERE actors.id = unnested.id;`;
+    const updateQuery = `UPDATE ${tableName}
+    SET ${columnName} = unnested.phone
+    FROM (SELECT unnest($1::${tableName === "actors" ? "int[]" : "uuid[]"}) as id, unnest($2::text[]) as phone) as unnested
+    WHERE ${tableName}.${primaryKey} = unnested.id;`;
 
     console.timeEnd("typescript process");
     console.time("update query");
