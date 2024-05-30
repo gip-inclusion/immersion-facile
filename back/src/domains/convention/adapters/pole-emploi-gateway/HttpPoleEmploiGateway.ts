@@ -145,17 +145,16 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           },
         });
 
-        return {
-          status: response.status,
-          ...([200, 201].includes(response.status)
-            ? {}
-            : {
-                subscriberErrorFeedback: {
-                  message: "Unsupported response status",
-                  response,
-                },
-              }),
-        };
+        if ([200, 201].includes(response.status))
+          return {
+            status: response.status,
+          };
+
+        throw new Error(
+          `Unsupported response status ${
+            response.status
+          } with body '${JSON.stringify(response.body)}'`,
+        );
       })
       .catch((err): PoleEmploiBroadcastResponse => {
         const error = castError(err);
@@ -179,7 +178,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           return {
             status: 500,
             subscriberErrorFeedback: {
-              message: `not an axios error ${error.message}`,
+              message: `Not an axios error: ${error.message}`,
+              error,
             },
           };
         }
@@ -205,7 +205,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             status: 500,
             subscriberErrorFeedback: {
               message: error.message,
-              response: error,
+              error,
             },
           };
         }
@@ -229,7 +229,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             status: 404,
             subscriberErrorFeedback: {
               message,
-              response: error.response,
+              error,
             },
           };
         }
@@ -252,7 +252,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         return {
           status: error.response.status,
           subscriberErrorFeedback: {
-            response: error.response,
+            error,
             message,
           },
         };

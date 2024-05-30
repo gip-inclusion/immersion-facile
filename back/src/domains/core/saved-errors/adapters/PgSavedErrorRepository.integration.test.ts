@@ -1,5 +1,4 @@
 import axios, { isAxiosError } from "axios";
-import MockAdapter from "axios-mock-adapter";
 import { Kysely } from "kysely/dist/cjs/kysely";
 import { Pool } from "pg";
 import {
@@ -17,45 +16,6 @@ import {
   broadcastToPeServiceName,
 } from "../ports/SavedErrorRepository";
 import { PgSavedErrorRepository } from "./PgSavedErrorRepository";
-
-const makeSavedError = async (
-  serviceName: string,
-  conventionId: ConventionId,
-  errorMode: "timeout" | "response-error",
-  handledByAgency?: boolean,
-): Promise<SavedError> => {
-  const mock = new MockAdapter(axios);
-  const url = "www.url.fr";
-
-  if (errorMode === "timeout") {
-    mock.onGet(url).timeout();
-  } else {
-    mock.onGet(url).reply(404, { message: "Error messasge" });
-  }
-
-  const error = await axios
-    .get(url)
-    .then(() => {
-      throw new Error();
-    })
-    .catch((error) => {
-      if (isAxiosError(error)) return error;
-      throw error;
-    });
-
-  return {
-    consumerId: null,
-    consumerName: "my-consumer",
-    serviceName,
-    subscriberErrorFeedback: {
-      message: "Some message",
-      response: error.response ? error.response : error,
-    },
-    params: { conventionId, httpStatus: 500 },
-    occurredAt: new Date(),
-    handledByAgency: handledByAgency ? handledByAgency : false,
-  };
-};
 
 describe("PgSavedErrorRepository", () => {
   let pool: Pool;
@@ -95,8 +55,8 @@ describe("PgSavedErrorRepository", () => {
         handled_by_agency: savedError.handledByAgency,
         subscriber_error_feedback: {
           message: savedError.subscriberErrorFeedback.message,
-          response: JSON.parse(
-            JSON.stringify(savedError.subscriberErrorFeedback.response),
+          error: JSON.parse(
+            JSON.stringify(savedError.subscriberErrorFeedback.error),
           ),
         },
         occurred_at: savedError.occurredAt,
@@ -121,8 +81,38 @@ describe("PgSavedErrorRepository", () => {
         handled_by_agency: savedError.handledByAgency,
         subscriber_error_feedback: {
           message: savedError.subscriberErrorFeedback.message,
-          response: JSON.parse(
-            JSON.stringify(savedError.subscriberErrorFeedback.response),
+          error: JSON.parse(
+            JSON.stringify(savedError.subscriberErrorFeedback.error),
+          ),
+        },
+        occurred_at: savedError.occurredAt,
+        params: savedError.params,
+        service_name: savedError.serviceName,
+      },
+    ]);
+  });
+
+  it("saves a not axios error in the repository", async () => {
+    const conventionId = "someId";
+    const savedError = await makeSavedError(
+      "osef",
+      conventionId,
+      "not-axios-error",
+    );
+    await pgErrorRepository.save(savedError);
+
+    const response = await kyselyDb
+      .selectFrom("saved_errors")
+      .selectAll()
+      .execute();
+
+    expectObjectInArrayToMatch(response, [
+      {
+        handled_by_agency: savedError.handledByAgency,
+        subscriber_error_feedback: {
+          message: savedError.subscriberErrorFeedback.message,
+          error: JSON.parse(
+            JSON.stringify(savedError.subscriberErrorFeedback.error),
           ),
         },
         occurred_at: savedError.occurredAt,
@@ -195,9 +185,7 @@ describe("PgSavedErrorRepository", () => {
           ...rest,
           subscriberErrorFeedback: {
             message: subscriberErrorFeedback.message,
-            response: JSON.parse(
-              JSON.stringify(subscriberErrorFeedback.response),
-            ),
+            error: JSON.parse(JSON.stringify(subscriberErrorFeedback.error)),
           },
         })),
       );
@@ -230,3 +218,38 @@ describe("PgSavedErrorRepository", () => {
     });
   });
 });
+
+const makeSavedError = async (
+  serviceName: string,
+  conventionId: ConventionId,
+  errorMode: "timeout" | "response-error" | "not-axios-error",
+  handledByAgency?: boolean,
+): Promise<SavedError> => {
+  const error = await axios
+    .get(
+      errorMode === "timeout"
+        ? "http://sdlmfhjsdflmsdhfmsldjfhsd.com"
+        : "https://www.google.com/yolo?hl=fr&tab=ww",
+    )
+    .then(() => {
+      throw new Error("Should not occurs");
+    })
+    .catch((error) => {
+      if (isAxiosError(error)) return error;
+      throw error;
+    });
+
+  return {
+    consumerId: null,
+    consumerName: "my-consumer",
+    serviceName,
+    subscriberErrorFeedback: {
+      message: "Some message",
+      error:
+        errorMode === "not-axios-error" ? new Error("Not axios error") : error,
+    },
+    params: { conventionId, httpStatus: 500 },
+    occurredAt: new Date(),
+    handledByAgency: handledByAgency ? handledByAgency : false,
+  };
+};

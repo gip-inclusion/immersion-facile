@@ -1,4 +1,3 @@
-import { AxiosError, AxiosResponse } from "axios";
 import {
   AbsoluteUrl,
   ConventionId,
@@ -33,7 +32,7 @@ type NotifyResponseSuccess = NotifyResponseCommon & {
 export type SubscriberResponse = NotifyResponseError | NotifyResponseSuccess;
 export type SubscriberErrorFeedback = {
   message: string;
-  response?: AxiosResponse<any, any> | AxiosError<any, any>;
+  error?: Error;
 };
 
 export interface SubscribersGateway {
