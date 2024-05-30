@@ -1334,7 +1334,10 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         legals:
           "* Pour les entreprises de 20 salariés et plus, les personnes en situation de handicap accueillies en immersion sont comptabilisées au titre de l'obligation d'emploi.",
         buttons: [
-          { label: "Mettre à jour ma fiche établissement", url: editFrontUrl },
+          {
+            label: "Mettre à jour ma fiche établissement",
+            url: `${editFrontUrl}&mtm_campaign=transactionnel-etablissement-suggestion-mise-a-jour`,
+          },
         ],
         highlight: {
           content: `Nouveautés ! Il est maintenant possible de :
@@ -1360,7 +1363,12 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
 
       Vous pouvez ajouter ou supprimer des métiers, modifier l'adresse de l'entreprise,  les coordonnées du référent “Immersion” dans votre entreprise ou le mode de contact souhaité, etc.  
       `,
-        buttons: [{ label: "Modifier ma fiche entreprise", url: editFrontUrl }],
+        buttons: [
+          {
+            label: "Modifier ma fiche entreprise",
+            url: `${editFrontUrl}&mtm_campaign=transactionnel-etablissement-lien-edition`,
+          },
+        ],
         highlight: {
           content: `Si vous n'êtes pas à l'origine de cette demande, nous vous recommandons de nous contacter rapidement par mail : ${immersionFacileContactEmail}.`,
         },
