@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { SubscriptionParams, castError } from "shared";
 import {
   ConventionUpdatedSubscriptionCallbackBody,
@@ -51,7 +51,8 @@ export class HttpSubscribersGateway implements SubscribersGateway {
             : {
                 status: 500,
                 subscriberErrorFeedback: {
-                  message: `not an axios error ${error.message}`,
+                  message: `Not an axios error: '${error.message}'`,
+                  error,
                 },
               }),
         };
@@ -68,28 +69,30 @@ const makeFeedbackFromError = (
   error.response
     ? {
         status: error.response.status,
-        subscriberErrorFeedback: responseToFeedback(error.response),
+        subscriberErrorFeedback: errorToFeedback(error),
       }
     : {
         status: undefined,
-        subscriberErrorFeedback: { message: error.message, response: error },
+        subscriberErrorFeedback: { message: error.message, error },
       };
 
-const responseToFeedback = (
-  response: AxiosResponse<any, any>,
+const errorToFeedback = (
+  error: AxiosError<any, any>,
 ): SubscriberErrorFeedback => {
-  if (response.data) {
-    if (typeof response.data === "string") return { message: response.data };
+  if (!error.response) return { message: error.message, error };
+  if (error.response.data) {
+    if (typeof error.response.data === "string")
+      return { message: error.response.data, error };
     if (
-      typeof response.data === "object" &&
-      "message" in response.data &&
-      typeof response.data.message === "string"
+      typeof error.response.data === "object" &&
+      "message" in error.response.data &&
+      typeof error.response.data.message === "string"
     ) {
-      return { message: response.data.message, response };
+      return { message: error.response.data.message, error };
     }
   }
   return {
     message: "Pas d'informations mais des données techniques disponibles",
-    response,
+    error,
   };
 };

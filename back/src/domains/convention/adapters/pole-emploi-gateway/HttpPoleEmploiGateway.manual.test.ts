@@ -77,7 +77,7 @@ describe("HttpPoleEmploiGateway", () => {
         subscriberErrorFeedback.message,
         expected.subscriberErrorFeedback.message,
       );
-      expect(subscriberErrorFeedback.response).toBeDefined();
+      expect(subscriberErrorFeedback.error).toBeDefined();
     },
   );
 
@@ -126,7 +126,7 @@ describe("HttpPoleEmploiGateway", () => {
     },
   );
 
-  it("throw error axios timeout", async () => {
+  it("error feedback axios timeout", async () => {
     const peApiUrl = "https://fake-pe.fr";
     const peEnterpriseUrl = "https://fake-pe-enterprise.fr";
     const routes = createPoleEmploiRoutes(peApiUrl);
@@ -177,7 +177,64 @@ describe("HttpPoleEmploiGateway", () => {
     const { status, subscriberErrorFeedback } = response;
     expectToEqual(status, 500);
     expectToEqual(subscriberErrorFeedback.message, "timeout of 0ms exceeded");
-    expect(subscriberErrorFeedback.response).toBeDefined();
+    expect(subscriberErrorFeedback.error).toBeDefined();
+  });
+
+  it("error feedback on bad response code", async () => {
+    const peApiUrl = "https://fake-pe.fr";
+    const peEnterpriseUrl = "https://fake-pe-enterprise.fr";
+    const routes = createPoleEmploiRoutes(peApiUrl);
+
+    const httpClient = createAxiosSharedClient(routes, axios, {
+      skipResponseValidation: true,
+    });
+
+    const cachingGateway =
+      new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
+        new RealTimeGateway(),
+        "expires_in",
+      );
+
+    const accessTokenConfig: AccessTokenConfig = {
+      immersionFacileBaseUrl: "https://",
+      peApiUrl,
+      peAuthCandidatUrl: "https://",
+      peEnterpriseUrl,
+      clientId: "",
+      clientSecret: "",
+    };
+
+    const poleEmploiGateway = new HttpPoleEmploiGateway(
+      httpClient,
+      cachingGateway,
+      peApiUrl,
+      accessTokenConfig,
+      noRetries,
+    );
+
+    const mock = new MockAdapter(axios);
+
+    mock
+      .onPost(
+        `${peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+      )
+      .reply(200, { access_token: "yolo" })
+      .onPost(routes.broadcastConvention.url)
+      .reply(204, { message: "yolo" });
+
+    const response =
+      await poleEmploiGateway.notifyOnConventionUpdated(peConvention);
+
+    if (isBroadcastResponseOk(response))
+      throw new Error("PE broadcast OK must not occurs");
+
+    const { status, subscriberErrorFeedback } = response;
+    expectToEqual(status, 500);
+    expectToEqual(
+      subscriberErrorFeedback.message,
+      'Not an axios error: Unsupported response status 204 with body \'{"message":"yolo"}\'',
+    );
+    expect(subscriberErrorFeedback.error).toBeDefined();
   });
 });
 

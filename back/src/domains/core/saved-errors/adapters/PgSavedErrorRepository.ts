@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import { sql } from "kysely";
 import { ConventionId } from "shared";
 import { NotFoundError } from "../../../../config/helpers/httpErrors";
@@ -45,9 +46,16 @@ export class PgSavedErrorRepository implements SavedErrorRepository {
         service_name: serviceName,
         consumer_name: consumerName,
         consumer_id: consumerId,
-        subscriber_error_feedback: sql`CAST(${JSON.stringify(
-          subscriberErrorFeedback,
-        )} AS JSONB)`,
+        subscriber_error_feedback: JSON.stringify({
+          message: subscriberErrorFeedback.message,
+          ...(subscriberErrorFeedback.error
+            ? {
+                error: isAxiosError(subscriberErrorFeedback.error)
+                  ? subscriberErrorFeedback.error.toJSON()
+                  : JSON.stringify(subscriberErrorFeedback.error),
+              }
+            : {}),
+        }),
         params: params ?? null,
         occurred_at: occurredAt,
         handled_by_agency: handledByAgency,
