@@ -1,24 +1,20 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { MigrationBuilder } from "node-pg-migrate";
 
 const tableName = "saved_errors";
 const columnName = "subscriber_error_feedback";
 
-const oldProperty = "response";
-const newProperty = "error";
-
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(`
     UPDATE ${tableName}
-    SET ${columnName} = ${columnName} - '${oldProperty}'  || jsonb_build_object('${newProperty}', ${columnName} -> '${oldProperty}')
-    WHERE ${columnName} ? '${oldProperty}'
+    SET ${columnName} = ${columnName} - 'response'  || jsonb_build_object('error', ${columnName} -> 'response')
+    WHERE ${columnName} ? 'response'
   `);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(`
     UPDATE ${tableName}
-    SET ${columnName} = ${columnName} - '${newProperty}'  || jsonb_build_object('${oldProperty}', ${columnName} -> '${newProperty}')
-    WHERE ${columnName} ? '${newProperty}'
+    SET ${columnName} = ${columnName} - 'error'  || jsonb_build_object('response', ${columnName} -> 'error')
+    WHERE ${columnName} ? 'error'
   `);
 }
