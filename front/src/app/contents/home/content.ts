@@ -108,26 +108,30 @@ export const heroHeaderNavCards: (
       },
       {
         title: "Remplir la demande de convention",
-        icon: "fr-icon-file-line",
+        icon: "fr-icon-draft-line",
         type: "candidate",
         id: domElementIds.homeCandidates.heroHeader.formConvention,
         link: routes.initiateConvention({ skipFirstStep: true }).link,
+        alternateTitle:
+          "Remplir la demande de convention : en quelques minutes, sans avoir besoin de créer un compte.",
       },
     ],
     establishment: [
       {
-        title: "Référencer ou modifier mon entreprise",
-        icon: "fr-icon-hotel-line",
+        title: "Proposer une immersion ou modifier mon entreprise",
+        icon: "fr-icon-award-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.addEstablishmentForm,
         link: {
           href: "",
           onClick: onSiretModalOpenClick,
         },
+        alternateTitle:
+          "Proposer une immersion ou modifier mon entreprise : mon entreprise apparaîtra dans les résultats de recherche des candidats.",
       },
       {
         title: "Remplir la demande de convention",
-        icon: "fr-icon-file-text-line",
+        icon: "fr-icon-draft-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.formConvention,
         link: {
@@ -138,18 +142,22 @@ export const heroHeaderNavCards: (
             routes.conventionImmersion().push();
           },
         },
+        alternateTitle:
+          "Remplir la demande de convention : en quelques minutes, sans avoir besoin de créer un compte.",
       },
       {
-        title: "Piloter mon entreprise",
-        icon: "fr-icon-line-chart-line",
+        title: "Mon espace",
+        icon: "fr-icon-admin-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.establishmentDashboard,
         link: routes.establishmentDashboard({ tab: "conventions" }).link,
+        alternateTitle:
+          "Mon espace : espace personnel nominatif où retrouver mes conventions, échanges avec les candidats, etc.",
       },
     ],
     agency: [
       {
-        title: "Référencer mon organisme",
+        title: "Inscrire mon organisme",
         icon: "fr-icon-hotel-line",
         type: "agency",
         id: domElementIds.homeAgencies.heroHeader.addAgencyForm,
@@ -157,7 +165,7 @@ export const heroHeaderNavCards: (
       },
       {
         title: "Remplir la demande de convention",
-        icon: "fr-icon-file-text-line",
+        icon: "fr-icon-draft-line",
         id: domElementIds.homeAgencies.heroHeader.formConvention,
         type: "agency",
         link: {
@@ -168,13 +176,17 @@ export const heroHeaderNavCards: (
             routes.conventionImmersion().push();
           },
         },
+        alternateTitle:
+          "Remplir la demande de convention : en quelques minutes, sans avoir besoin de créer un compte.",
       },
       {
-        title: "Piloter mon organisme",
-        icon: "fr-icon-line-chart-line",
+        title: "Mon espace",
+        icon: "fr-icon-admin-line",
         type: "agency",
         id: domElementIds.homeAgencies.heroHeader.agencyDashboard,
         link: routes.agencyDashboard().link,
+        alternateTitle:
+          "Mon espace : espace personnel nominatif où retrouver mes conventions et statistiques.",
       },
     ],
   };
