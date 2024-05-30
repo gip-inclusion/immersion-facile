@@ -52,7 +52,11 @@ export class PgSavedErrorRepository implements SavedErrorRepository {
             ? {
                 error: isAxiosError(subscriberErrorFeedback.error)
                   ? subscriberErrorFeedback.error.toJSON()
-                  : JSON.stringify(subscriberErrorFeedback.error),
+                  : // Why?  >> https://stackoverflow.com/questions/18391212/is-it-not-possible-to-stringify-an-error-using-json-stringify
+                    JSON.stringify(
+                      subscriberErrorFeedback.error,
+                      Object.getOwnPropertyNames(subscriberErrorFeedback.error),
+                    ),
               }
             : {}),
         }),

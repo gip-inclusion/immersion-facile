@@ -14,6 +14,7 @@ import {
 } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createAppDependencies } from "../config/bootstrap/createAppDependencies";
+import { ForbiddenError } from "../config/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { SavedError } from "../domains/core/saved-errors/ports/SavedErrorRepository";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
@@ -341,7 +342,10 @@ const conventionSeed = async (uow: UnitOfWork) => {
 
   const savedError: SavedError = {
     handledByAgency: false,
-    subscriberErrorFeedback: { message: "message de la seed" },
+    subscriberErrorFeedback: {
+      message: "message de la seed",
+      error: new ForbiddenError("Une erreur dans la seed"),
+    },
     consumerId: null,
     consumerName: "Fake consumer",
     occurredAt: addDays(new Date(peConvention.dateSubmission), 2),
