@@ -6,6 +6,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import {
   ManageConventionAdminForm,
+  domElementIds,
   manageConventionAdminFormSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
@@ -58,6 +59,10 @@ export const ManageConventionFormSection = ({
             title="Piloter la convention"
             disabled={!isValid}
             className={fr.cx("fr-mt-2w")}
+            id={
+              domElementIds.establishmentDashboard.manageConventionForm
+                .submitButton
+            }
           >
             Piloter la convention
           </Button>

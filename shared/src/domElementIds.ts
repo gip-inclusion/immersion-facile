@@ -603,6 +603,12 @@ export const domElementIds = {
       replyToCandidateByEmail:
         "im-manage-establishment__reply-to-candidate-by-email",
     },
+    manageConventionForm: {
+      submitButton: "im-manage-establishment__manage-convention-submit-button",
+    },
+    manageDiscussion: {
+      submitButton: "im-manage-establishment__manage-discussion-submit-button",
+    },
   },
   searchDiagoriente: {},
   initiateConvention: {
