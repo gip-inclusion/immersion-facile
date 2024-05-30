@@ -154,7 +154,7 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     isEngagedEnterprise: csvBooleanSchema,
     businessContact_job: zStringMinLength1,
     businessContact_email: zStringMinLength1,
-    businessContact_phone: zStringMinLength1,
+    businessContact_phone: phoneSchema,
     businessContact_lastName: zStringMinLength1,
     businessContact_firstName: zStringMinLength1,
     businessContact_contactMethod: contactMethodSchema,

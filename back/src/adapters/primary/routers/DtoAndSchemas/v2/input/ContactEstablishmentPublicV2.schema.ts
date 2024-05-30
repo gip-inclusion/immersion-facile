@@ -4,6 +4,7 @@ import {
   conventionObjectiveOptions,
   emailSchema,
   localization,
+  phoneSchema,
   siretSchema,
   zEnumValidation,
   zStringPossiblyEmpty,
@@ -35,7 +36,7 @@ const contactEstablishmentByMailSchema = z.object({
   ...commonFields,
   contactMode: preferEmailContactSchema,
   message: zTrimmedString,
-  potentialBeneficiaryPhone: zTrimmedString,
+  potentialBeneficiaryPhone: phoneSchema,
   immersionObjective: immersionObjectiveSchema.nullable(),
   potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
 });

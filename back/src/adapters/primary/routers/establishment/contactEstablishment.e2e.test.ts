@@ -33,7 +33,7 @@ const validRequest: ContactEstablishmentRequestDto = {
   potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
   message: "message_to_send",
   immersionObjective: "Confirmer un projet professionnel",
-  potentialBeneficiaryPhone: "0654783402",
+  potentialBeneficiaryPhone: "+33654783402",
   locationId: establishment.locations[0].id,
 };
 

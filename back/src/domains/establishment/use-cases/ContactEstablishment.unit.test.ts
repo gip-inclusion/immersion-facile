@@ -77,7 +77,7 @@ const validEmailRequest: ContactEstablishmentRequestDto = {
   contactMode: "EMAIL",
   message: "message_to_send",
   immersionObjective: "Confirmer un projet professionnel",
-  potentialBeneficiaryPhone: "0654783402",
+  potentialBeneficiaryPhone: "+33654783402",
 };
 
 const establishmentAggregateWithEmailContact =
@@ -334,7 +334,7 @@ describe("ContactEstablishment", () => {
           firstName: "Antoine",
           lastName: "Tourasse",
           email: "antoine.tourasse@email.com",
-          phone: "0654678976",
+          phone: "+33654783402",
           resumeLink: "http://fakelink.com",
         },
         establishmentContact: {
@@ -368,7 +368,7 @@ describe("ContactEstablishment", () => {
           firstName: "Antoine",
           lastName: "Tourasse",
           email: "antoine.tourasse@email.com",
-          phone: "0654678976",
+          phone: "+33654783402",
           resumeLink: "http://fakelink.com",
         },
         establishmentContact: {
@@ -404,7 +404,7 @@ describe("ContactEstablishment", () => {
       contactMode: "EMAIL",
       message: "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
       immersionObjective: "Confirmer un projet professionnel",
-      potentialBeneficiaryPhone: "0654783402",
+      potentialBeneficiaryPhone: "+33654783402",
       locationId: establishment.locations[0].id,
     };
     await contactEstablishment.execute(secondContactRequestDto);

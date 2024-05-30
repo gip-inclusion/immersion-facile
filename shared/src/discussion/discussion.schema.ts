@@ -2,6 +2,7 @@ import { z } from "zod";
 import { addressSchema } from "../address/address.schema";
 import { immersionObjectiveSchema } from "../convention/convention.schema";
 import { contactMethodSchema } from "../formEstablishment/FormEstablishment.schema";
+import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { dateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -38,7 +39,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> = z.object({
     firstName: zStringMinLength1,
     lastName: zStringMinLength1,
     resumeLink: zStringPossiblyEmpty,
-    phone: zStringPossiblyEmpty,
+    phone: phoneSchema.optional(),
     email: zStringPossiblyEmpty,
   }),
   establishmentContact: z.object({
