@@ -3,7 +3,11 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { WithDiscussionId, withDiscussionSchemaId } from "shared";
+import {
+  WithDiscussionId,
+  domElementIds,
+  withDiscussionSchemaId,
+} from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes } from "src/app/routes/routes";
 
@@ -46,6 +50,9 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
             title="Piloter la mise en relation"
             disabled={!isValid}
             className={fr.cx("fr-mt-2w")}
+            id={
+              domElementIds.establishmentDashboard.manageDiscussion.submitButton
+            }
           >
             Piloter la mise en relation
           </Button>
