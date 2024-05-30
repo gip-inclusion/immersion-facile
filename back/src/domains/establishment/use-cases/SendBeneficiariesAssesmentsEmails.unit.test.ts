@@ -3,8 +3,8 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import { makeTestDomainEvent } from "../../core/events/test.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -114,10 +114,12 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
       .withId(id)
       .build();
     await uow.conventionRepository.save(conventionEndingTomorrow);
-    await uow.outboxRepository.save({
-      topic: "BeneficiaryAssessmentEmailSent",
-      payload: { id: conventionEndingTomorrow.id },
-    } as DomainEvent);
+    await uow.outboxRepository.save(
+      makeTestDomainEvent({
+        topic: "BeneficiaryAssessmentEmailSent",
+        payload: { id: conventionEndingTomorrow.id },
+      }),
+    );
 
     timeGateway.setNextDate(new Date("2021-05-21T08:00:00.000Z"));
 
