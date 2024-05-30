@@ -19,8 +19,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.dropIndex("outbox", "topic");
-  pgm.dropIndex("outbox", "outbox_payload_agency_id_index");
-  pgm.dropIndex("outbox", "outbox_payload_convention_id_index");
-  pgm.dropIndex("outbox", "outbox_payload_formEstablishment_siret_index");
-  pgm.dropIndex("outbox", "outbox_payload_id_index");
+  pgm.sql(`
+    DROP index outbox_payload_agency_id_index;
+    DROP index outbox_payload_convention_id_index;
+    DROP index "outbox_payload_formEstablishment_siret_index";
+    DROP index outbox_payload_id_index;
+  `);
 }
