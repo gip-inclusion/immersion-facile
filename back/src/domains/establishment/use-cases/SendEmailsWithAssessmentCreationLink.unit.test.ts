@@ -4,8 +4,8 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import { makeTestDomainEvent } from "../../core/events/test.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -119,10 +119,12 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       .withId(id)
       .build();
     await uow.conventionRepository.save(immersionApplicationEndingYesterday);
-    await uow.outboxRepository.save({
-      topic: "EmailWithLinkToCreateAssessmentSent",
-      payload: { id: immersionApplicationEndingYesterday.id },
-    } as DomainEvent);
+    await uow.outboxRepository.save(
+      makeTestDomainEvent({
+        topic: "EmailWithLinkToCreateAssessmentSent",
+        payload: { id: immersionApplicationEndingYesterday.id },
+      }),
+    );
 
     timeGateway.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
 
