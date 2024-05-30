@@ -4,6 +4,7 @@ import {
   conventionObjectiveOptions,
 } from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
+import { phoneSchema } from "../phone.schema";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
@@ -44,7 +45,7 @@ export const contactEstablishmentByMailFormSchema: z.Schema<ContactEstablishment
     ...commonFields,
     contactMode: preferEmailContactSchema,
     message: zTrimmedString,
-    potentialBeneficiaryPhone: zTrimmedString,
+    potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema,
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
   });
@@ -54,7 +55,7 @@ export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMa
     ...commonFields,
     contactMode: preferEmailContactSchema,
     message: zTrimmedString,
-    potentialBeneficiaryPhone: zTrimmedString,
+    potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
   });
