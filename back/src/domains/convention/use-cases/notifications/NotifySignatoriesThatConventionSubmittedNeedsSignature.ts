@@ -58,9 +58,10 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
     uow: UnitOfWork,
   ): Promise<void> {
     if (convention.status === "PARTIALLY_SIGNED") {
-      logger.info(
-        "Skipping sending signature-requiring establishment representative confirmation as convention is already partially signed",
-      );
+      logger.info({
+        message:
+          "Skipping sending signature-requiring establishment representative confirmation as convention is already partially signed",
+      });
       return;
     }
 

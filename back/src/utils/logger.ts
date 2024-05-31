@@ -9,7 +9,8 @@ import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
 import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
 import { DomainEvent, DomainTopic } from "../domains/core/events/events";
-import { SearchMade } from "../domains/establishment/entities/SearchMadeEntity";
+import { SearchMadeEntity } from "../domains/establishment/entities/SearchMadeEntity";
+import { LaBonneBoiteRequestParams } from "../domains/establishment/ports/LaBonneBoiteGateway";
 import { PartialResponse } from "./axiosUtils";
 import { NodeProcessReport } from "./nodeProcessReport";
 
@@ -81,6 +82,7 @@ type LoggerParams = Partial<{
   request: Pick<Request, "path" | "method" | "body">;
   requestId: string;
   response: PartialResponse | SubscriberResponse | HttpResponse<any, any>;
+  search: LaBonneBoiteRequestParams | SearchMadeEntity;
   status: "success" | "total" | "error" | AuthorisationStatus;
   subscriptionId: string;
   topic: DomainTopic;
@@ -88,7 +90,6 @@ type LoggerParams = Partial<{
   //------- à vérifier
   durationInSeconds: number;
   // --------------------------------
-  search: Partial<SearchMade>;
 }>;
 
 export type OpacifiedLogger = {

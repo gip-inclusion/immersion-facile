@@ -62,7 +62,7 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
         );
 
         if (msSinceStart >= this.retryDeadlineMs) {
-          logger.warn("Retry deadline exceeded");
+          logger.warn({ message: "Retry deadline exceeded" });
           throw error.initialError;
         }
 

@@ -4,10 +4,7 @@ import {
   LoggerParamsWithMessage,
   createLogger,
 } from "../../../../utils/logger";
-import {
-  notifyDiscord,
-  notifyObjectDiscord,
-} from "../../../../utils/notifyDiscord";
+import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { DomainEvent, EventStatus } from "../events";
 import { EventBus } from "../ports/EventBus";
@@ -35,8 +32,11 @@ export class BasicEventCrawler implements EventCrawler {
       uow.outboxRepository.countAllEvents({ status }),
     );
     if (count <= limit) return;
-    logger.error(`${status} outbox ${count} exceeds ${limit}`);
-    notifyDiscord(`${status} outbox ${count} exceeds ${limit}`);
+    const params: LoggerParamsWithMessage = {
+      message: `${status} outbox ${count} exceeds ${limit}`,
+    };
+    logger.error(params);
+    notifyObjectDiscord(params);
   }
 
   public async processNewEvents(): Promise<void> {

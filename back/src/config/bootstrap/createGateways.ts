@@ -345,9 +345,9 @@ const createDocumentGateway = (config: AppConfig): DocumentGateway => {
       return new NotImplementedDocumentGateway();
     default: {
       const exhaustiveCheck: never = config.documentGateway;
-      logger.error(
-        "Should not have been reached (Document Gateway declaration)",
-      );
+      logger.error({
+        message: "Should not have been reached (Document Gateway declaration)",
+      });
       return exhaustiveCheck;
     }
   }
