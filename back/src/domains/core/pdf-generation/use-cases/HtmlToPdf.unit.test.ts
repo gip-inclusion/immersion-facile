@@ -4,7 +4,10 @@ import {
   expectToEqual,
 } from "shared";
 import { ZodError } from "zod";
-import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
+import {
+  BadRequestError,
+  UnauthorizedError,
+} from "../../../../config/helpers/httpErrors";
 import { InMemoryPdfGeneratorGateway } from "../adapters/InMemoryPdfGeneratorGateway";
 import { HtmlToPdf } from "./HtmlToPdf";
 
@@ -31,18 +34,20 @@ describe("HtmlToPdf", () => {
   it("returns an error if the html content is empty", async () => {
     await expectPromiseToFailWithError(
       htmlToPdf.execute("", jwtPayload),
-      new Error(
-        `Error: ${new ZodError([
-          {
-            code: "too_small",
-            minimum: 1,
-            type: "string",
-            inclusive: true,
-            exact: false,
-            message: "Obligatoire",
-            path: [],
-          },
-        ])}`,
+      new BadRequestError(
+        new BadRequestError(
+          new ZodError([
+            {
+              code: "too_small",
+              minimum: 1,
+              type: "string",
+              inclusive: true,
+              exact: false,
+              message: "Obligatoire",
+              path: [],
+            },
+          ]),
+        ),
       ),
     );
   });
