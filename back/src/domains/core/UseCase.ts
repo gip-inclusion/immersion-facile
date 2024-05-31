@@ -115,6 +115,9 @@ export abstract class TransactionalUseCase<
           useCaseName,
           status: "error",
           durationInSeconds: calculateDurationInSecondsFrom(startDate),
+          // TODO : le logger autorise tout param si on le passe en spread
+          // toto: "yolo", >>> KO
+          // ...{ toto: "yolo" }, >>> PASS
           ...(paramsHash ? { paramsHash } : {}),
           message: castError(error).message,
         });
