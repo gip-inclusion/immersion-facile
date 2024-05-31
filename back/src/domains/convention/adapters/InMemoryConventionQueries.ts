@@ -12,7 +12,6 @@ import {
   validatedConventionStatuses,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
-import { createLogger } from "../../../utils/logger";
 import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { AssessmentEmailDomainTopic } from "../../core/events/events";
@@ -21,8 +20,6 @@ import {
   GetConventionsByFiltersQueries,
 } from "../ports/ConventionQueries";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
-
-const logger = createLogger(__filename);
 
 export class InMemoryConventionQueries implements ConventionQueries {
   constructor(
@@ -76,7 +73,6 @@ export class InMemoryConventionQueries implements ConventionQueries {
   public async getConventionById(
     id: ConventionId,
   ): Promise<ConventionReadDto | undefined> {
-    logger.info("getAll");
     const convention = this.conventionRepository.conventions.find(
       propEq("id", id),
     );

@@ -34,11 +34,11 @@ export const isRetryableError = (
     error.response?.status &&
     QUOTA_EXEEDED_STATUSES.has(error.response?.status)
   ) {
-    logger.warn(`Request quota exceeded: ${error}`);
+    logger.warn({ message: "Request quota exceeded", error });
     return true;
   }
   if (error.code && TIMEOUT_CODES.has(error.code)) {
-    logger.warn(`Request timed out: ${error}`);
+    logger.warn({ message: "Request timed out", error });
     return true;
   }
 
@@ -51,11 +51,11 @@ export const logAxiosError = (
   msg?: string,
 ) => {
   const message = `${msg || "Axios error"}: ${error}`;
-  if (error.response) {
-    logger.error({ response: extractPartialResponse(error.response), message });
-  } else {
-    logger.error(message);
-  }
+  logger.error(
+    error.response
+      ? { response: extractPartialResponse(error.response), message }
+      : { message },
+  );
 };
 
 export type PartialResponse = {

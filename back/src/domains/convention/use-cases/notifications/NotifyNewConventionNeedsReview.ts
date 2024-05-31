@@ -76,7 +76,6 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
       agency,
       peAdvisor,
     );
-    logger.debug(`conventionDto.status : ${convention.status}`);
 
     if (!recipients) {
       logger.error({

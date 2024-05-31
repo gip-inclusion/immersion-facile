@@ -44,7 +44,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
         distanceKm,
         lat,
         lon,
-        romeCode: rome,
+        rome,
       },
     });
     return this.#limiter
@@ -90,7 +90,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
             distanceKm,
             lat,
             lon,
-            romeCode: rome,
+            rome,
           },
         });
         throw error;
