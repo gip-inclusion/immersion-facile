@@ -67,6 +67,7 @@ type LoggerParams = Partial<{
     processEventsDurationInSeconds?: number; // regrouper avec retrieveEventsDurationInSeconds
     retrieveEventsDurationInSeconds?: number;
   };
+  durationInSeconds: number;
   error: Error | Partial<SQLError> | AxiosError;
   events: DomainEvent[];
   nodeProcessReport: NodeProcessReport;
@@ -87,9 +88,6 @@ type LoggerParams = Partial<{
   subscriptionId: string;
   topic: DomainTopic;
   useCaseName: string;
-  //------- à vérifier
-  durationInSeconds: number;
-  // --------------------------------
 }>;
 
 export type OpacifiedLogger = {
