@@ -102,15 +102,13 @@ export const validateAndParseZodSchema = <T>(
   schemaParsingInput: any,
   logger: OpacifiedLogger,
 ): T => {
-  try {
-    return inputSchema.parse(schemaParsingInput);
-  } catch (e) {
-    logger.error({
-      schemaParsingInput,
-      message: `ValidateAndParseZodSchema failed - ${inputSchema.constructor.name}`,
-    });
-    throw new BadRequestError(e);
-  }
+  const result = inputSchema.safeParse(schemaParsingInput);
+  if (result.success) return result.data;
+  logger.error({
+    schemaParsingInput,
+    message: `ValidateAndParseZodSchema failed - ${inputSchema.constructor.name}`,
+  });
+  throw new BadRequestError(result.error);
 };
 
 export const validateAndParseZodSchemaV2 = <T>(
@@ -118,17 +116,16 @@ export const validateAndParseZodSchemaV2 = <T>(
   schemaParsingInput: unknown,
   logger: OpacifiedLogger,
 ): T => {
-  try {
-    return inputSchema.parse(schemaParsingInput);
-  } catch (e) {
-    logger.error({
-      schemaParsingInput,
-      message: `ValidateAndParseZodSchema failed - ${inputSchema.constructor.name}`,
-    });
-    const error = e as z.ZodError;
-    const issues = error.issues.map(
+  const result = inputSchema.safeParse(schemaParsingInput);
+  if (result.success) return result.data;
+  logger.error({
+    schemaParsingInput,
+    message: `ValidateAndParseZodSchema failed - ${inputSchema.constructor.name}`,
+  });
+  throw new BadRequestError(
+    "Schema validation failed",
+    result.error.issues.map(
       (issue) => `${issue.path.join(".")}: ${issue.message}`,
-    );
-    throw new BadRequestError("Schema validation failed", issues);
-  }
+    ),
+  );
 };

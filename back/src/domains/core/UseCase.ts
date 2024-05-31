@@ -55,6 +55,8 @@ export abstract class UseCase<
         logger as Logger,
       );
     } catch (e) {
+      //TODO: Quelque chose ne va pas. Ici ça reviens à faire:
+      // throw new BadRequestError(new BadRequestError(new ZodError(...)))
       throw new BadRequestError(e);
     }
     const result = await this._execute(validParams, jwtPayload);
