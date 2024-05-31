@@ -52,6 +52,13 @@ type SQLError = {
 };
 
 type LoggerParams = Partial<{
+  adapters: {
+    repositories: "IN_MEMORY" | "PG";
+    notificationGateway: "IN_MEMORY" | "BREVO";
+    apiAddress: "IN_MEMORY" | "OPEN_CAGE_DATA";
+    siretGateway: "IN_MEMORY" | "HTTPS" | "INSEE" | "ANNUAIRE_DES_ENTREPRISES";
+    romeRepository: "IN_MEMORY" | "PG";
+  };
   agencyId: AgencyId;
   conventionId: ConventionId;
   crawlerInfo: {
@@ -64,7 +71,6 @@ type LoggerParams = Partial<{
   events: DomainEvent[];
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
-  schemaParsingInput: unknown;
   peConnect: Partial<{
     peId: ConventionId;
     originalId: ConventionId;
@@ -72,16 +78,10 @@ type LoggerParams = Partial<{
     isJobSeeker: boolean;
   }>;
   reportContent: string;
-  adapters: {
-    repositories: "IN_MEMORY" | "PG";
-    notificationGateway: "IN_MEMORY" | "BREVO";
-    apiAddress: "IN_MEMORY" | "OPEN_CAGE_DATA";
-    siretGateway: "IN_MEMORY" | "HTTPS" | "INSEE" | "ANNUAIRE_DES_ENTREPRISES";
-    romeRepository: "IN_MEMORY" | "PG";
-  };
   request: Pick<Request, "path" | "method" | "body">;
   requestId: string;
   response: PartialResponse | SubscriberResponse | HttpResponse<any, any>;
+  schemaParsingInput: unknown;
   search: LaBonneBoiteRequestParams | SearchMadeEntity;
   status: "success" | "total" | "error" | AuthorisationStatus;
   subscriptionId: string;
@@ -118,13 +118,13 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       adapters,
       agencyId,
       conventionId,
+      crawlerInfo,
       durationInSeconds,
       error,
       events,
       message,
       nodeProcessReport,
       notificationId,
-      crawlerInfo,
       peConnect,
       reportContent,
       request,
@@ -144,12 +144,12 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         adapters,
         agencyId,
         conventionId,
+        crawlerInfo,
         durationInSeconds,
         error,
         events: events && sanitizeEvents(events),
         nodeProcessReport,
         notificationId,
-        crawlerInfo,
         peConnect,
         reportContent,
         request,
