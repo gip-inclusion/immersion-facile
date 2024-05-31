@@ -1,4 +1,5 @@
 import axios from "axios";
+import { calculateDurationInSecondsFrom } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { OpacifiedLogger, createLogger } from "../utils/logger";
 
@@ -13,10 +14,9 @@ export const handleEndOfScriptNotification = async <T>(
   const start = new Date();
   return script()
     .then((results) => {
-      const end = new Date();
-      const durationInSeconds = (end.getTime() - start.getTime()) / 1000;
+      const durationInSeconds = calculateDurationInSecondsFrom(start);
 
-      const reportTitle = `✅Success at ${end.toISOString()} - ${context}`;
+      const reportTitle = `✅Success at ${new Date().toISOString()} - ${context}`;
       const reportContent = handleResults({ ...results, durationInSeconds });
 
       logger.info({ message: reportTitle, reportContent, durationInSeconds });
@@ -32,9 +32,8 @@ export const handleEndOfScriptNotification = async <T>(
       return notifyDiscordPipelineReport(report).finally(() => process.exit(0));
     })
     .catch((error) => {
-      const end = new Date();
-      const durationInSeconds = (end.getTime() - start.getTime()) / 1000;
-      const reportTitle = `❌Failure at ${end.toISOString()} - ${context}`;
+      const durationInSeconds = calculateDurationInSecondsFrom(start);
+      const reportTitle = `❌Failure at ${new Date().toISOString()} - ${context}`;
 
       logger.error({ error, durationInSeconds, message: reportTitle });
       return notifyDiscordPipelineReport(

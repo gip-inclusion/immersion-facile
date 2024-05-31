@@ -50,7 +50,7 @@ export const makeKyselyDb = (pool: Pool): Kysely<Database> => {
         const error: any = event.error;
         logger.error({
           message: "SQL ERROR",
-          durationInSeconds: event.queryDurationMillis,
+          durationInSeconds: event.queryDurationMillis / 1000,
           error: {
             error: "message" in error ? error.message : error,
             query: event.query.sql,
