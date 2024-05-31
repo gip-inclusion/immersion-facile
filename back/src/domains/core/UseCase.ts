@@ -93,32 +93,30 @@ export abstract class TransactionalUseCase<
     const validParams = validateAndParseZodSchema(
       this.inputSchema,
       params,
-      logger as Logger,
+      logger,
     );
     const paramsHash = createParamsHash(useCaseName, validParams);
 
-    try {
-      const result = await this.uowPerformer.perform((uow) =>
-        this._execute(validParams, uow, jwtPayload),
-      );
-      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-      logger.info({
-        useCaseName,
-        durationInSeconds,
-        status: "success",
-        ...(paramsHash ? { paramsHash } : {}),
+    return this.uowPerformer
+      .perform((uow) => this._execute(validParams, uow, jwtPayload))
+      .then((result) => {
+        logger.info({
+          useCaseName,
+          status: "success",
+          durationInSeconds: calculateDurationInSecondsFrom(startDate),
+          ...(paramsHash ? { paramsHash } : {}),
+        });
+        return result;
+      })
+      .catch((error) => {
+        logger.error({
+          useCaseName,
+          status: "error",
+          durationInSeconds: calculateDurationInSecondsFrom(startDate),
+          ...(paramsHash ? { paramsHash } : {}),
+          message: castError(error).message,
+        });
+        throw error;
       });
-      return result;
-    } catch (error) {
-      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-      logger.error({
-        useCaseName,
-        status: "error",
-        durationInSeconds,
-        ...(paramsHash ? { paramsHash } : {}),
-        message: castError(error).message,
-      });
-      throw error;
-    }
   }
 }
