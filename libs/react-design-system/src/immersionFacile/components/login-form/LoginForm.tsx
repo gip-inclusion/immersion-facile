@@ -40,7 +40,12 @@ const LoginFormSection = ({
 export const LoginForm = ({ sections }: LoginFormProps) => {
   const { cx } = useStyles();
   return (
-    <div className={cx(fr.cx("fr-py-6w", "fr-px-12w"), Styles.inner)}>
+    <div
+      className={cx(
+        fr.cx("fr-py-6w", "fr-px-4w", "fr-px-md-12w"),
+        Styles.inner,
+      )}
+    >
       {sections.map((props: LoginFormSectionProps, index) => (
         <LoginFormSection key={props.title} {...props} index={index} />
       ))}
