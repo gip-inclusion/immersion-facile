@@ -4,15 +4,9 @@ import {
   parsePhoneNumber,
 } from "libphonenumber-js";
 import { z } from "zod";
-import { localization, zStringMinLength1 } from "./zodUtils";
+import { zStringMinLength1 } from "./zodUtils";
 
 const supportedCountryCode: CountryCode[] = ["FR", "NC", "PF", "WF", "PM"];
-
-export const phoneRegExp = /^\+?[0-9]+$/;
-export const emergencyContactPhoneSchema = zStringMinLength1.regex(
-  phoneRegExp,
-  localization.invalidPhone,
-);
 
 export const phoneSchema = zStringMinLength1.transform((phone, ctx) => {
   const countryCode = supportedCountryCode.find((countryCode) =>
