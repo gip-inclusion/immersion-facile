@@ -8,7 +8,7 @@ import {
 } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
-import { emergencyContactPhoneSchema, phoneSchema } from "../phone.schema";
+import { phoneSchema } from "../phone.schema";
 import { allModifierRoles, allRoles } from "../role/role.dto";
 import {
   appellationCodeSchema,
@@ -127,9 +127,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
     z.object({
       role: z.literal("beneficiary"),
       emergencyContact: zStringPossiblyEmpty,
-      emergencyContactPhone: emergencyContactPhoneSchema
-        .optional()
-        .or(z.literal("")),
+      emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
       emergencyContactEmail: emailPossiblyEmptySchema,
       federatedIdentity: peConnectIdentitySchema.optional(),
       financiaryHelp: zStringPossiblyEmpty,
