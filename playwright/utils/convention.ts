@@ -7,7 +7,7 @@ import {
   peParisAgencyId,
   technicalRoutes,
 } from "shared";
-import { possibleAddressQueries, possibleJobs } from "./data";
+import { getRandomizedData } from "./data";
 import {
   expectElementToBeVisible,
   fillAutocomplete,
@@ -49,7 +49,7 @@ export const submitBasicConventionForm = async (page: Page) => {
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.email}`,
-    faker.internet.email(),
+    "recette+beneficiary@immersion-facile.beta.gouv.fr",
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.phone}`,
@@ -88,7 +88,7 @@ export const submitBasicConventionForm = async (page: Page) => {
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.email}`,
-    faker.internet.email(),
+    "recette+establishment-tutor@immersion-facile.beta.gouv.fr",
   );
   await openNextSection(page); // Open place / hour section
   await page.fill(
@@ -105,10 +105,7 @@ export const submitBasicConventionForm = async (page: Page) => {
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
-    value:
-      possibleAddressQueries[
-        Math.floor(Math.random() * possibleAddressQueries.length)
-      ],
+    value: getRandomizedData("addressQueries"),
   });
 
   await openNextSection(page); // Open immersion details section
@@ -125,7 +122,7 @@ export const submitBasicConventionForm = async (page: Page) => {
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
-    value: possibleJobs[Math.floor(Math.random() * possibleJobs.length)],
+    value: getRandomizedData("jobs"),
   });
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
@@ -221,7 +218,7 @@ export const submitEditConventionForm = async (
     .locator(
       `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.email}`,
     )
-    .fill(faker.internet.email());
+    .fill("recette+beneficiary-rep@immersion-facile.beta.gouv.fr");
   await page
     .locator(
       `#${domElementIds.conventionImmersionRoute.beneficiaryRepresentativeSection.phone}`,
@@ -250,10 +247,7 @@ export const submitEditConventionForm = async (
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.businessAddress}`,
-    value:
-      possibleAddressQueries[
-        Math.floor(Math.random() * possibleAddressQueries.length)
-      ],
+    value: getRandomizedData("addressQueries"),
   });
   await page
     .locator(
@@ -279,7 +273,7 @@ export const submitEditConventionForm = async (
     .locator(
       `#${domElementIds.conventionImmersionRoute.beneficiaryCurrentEmployerSection.email}`,
     )
-    .fill(faker.internet.email());
+    .fill("recette+current-employer@immersion-facile.beta.gouv.fr");
 
   await openConventionAccordionSection(page, 2);
   await page
