@@ -51,7 +51,7 @@ test.describe("Establishment creation and modification workflow", () => {
     );
     await page.fill(
       `#${domElementIds.establishment.create.businessContact.email}`,
-      faker.internet.email(),
+      "recette+establishment@immersion-facile.beta.gouv.fr",
     );
     await page
       .locator(
@@ -158,7 +158,7 @@ test.describe("Establishment creation and modification workflow", () => {
     );
     await page.fill(
       `#${domElementIds.establishment.edit.businessContact.email}`,
-      faker.internet.email(),
+      "recette+establishment-edit@immersion-facile.beta.gouv.fr",
     );
 
     await goToNextStep(page, 3, "edit");
