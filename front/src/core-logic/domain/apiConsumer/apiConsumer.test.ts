@@ -54,9 +54,7 @@ describe("api consumer", () => {
 
       dependencies.adminGateway.apiConsumers$.next([apiConsumer1]);
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
-      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-        kind: "fetchSuccess",
-      });
+
       expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), [
         apiConsumer1,
       ]);
@@ -75,10 +73,6 @@ describe("api consumer", () => {
       );
 
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
-      expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-        kind: "errored",
-        errorMessage: "failed retrieving api consumers",
-      });
     });
   });
 
@@ -172,9 +166,6 @@ describe("api consumer", () => {
   const expectInitialStateUnchanged = () => {
     expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), []);
     expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
-    expectToEqual(apiConsumerSelectors.feedback(store.getState()), {
-      kind: "idle",
-    });
     expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBeNull();
   };
 });

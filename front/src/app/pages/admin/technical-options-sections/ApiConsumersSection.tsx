@@ -52,7 +52,6 @@ export const ApiConsumersSection = () => {
 
   useEffect(() => {
     if (isApiConsumerModalOpened) return;
-    dispatch(apiConsumerSlice.actions.clearFeedbackTriggered());
     dispatch(notificationSlice.actions.clearNotificationsTriggered());
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
     adminToken &&
