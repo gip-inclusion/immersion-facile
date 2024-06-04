@@ -275,7 +275,7 @@ export const ContactByEmail = ({
             <Alert
               severity="error"
               title="Email invalide"
-              description={`L'émail de contact que vous avez utilisé dans le formulaire de contact a été invalidé par notre vérificateur d'émail pour la raison suivante: ${invalidEmailMessage}`}
+              description={`L'email de contact que vous avez utilisé dans le formulaire de contact a été invalidé par notre vérificateur d'email pour la raison suivante : ${invalidEmailMessage}`}
             />
           )}
           {activeError.isActive && (

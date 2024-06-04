@@ -282,7 +282,7 @@ export const DetailsSection = ({
         <Alert
           severity="error"
           title="Email invalide"
-          description={`L'émail de contact de l'entreprise a été invalidé par notre vérificateur d'émail pour la raison suivante: ${invalidEmailMessage}`}
+          description={`L'email de contact de l'entreprise a été invalidé par notre vérificateur d'email pour la raison suivante : ${invalidEmailMessage}`}
         />
       )}
 
