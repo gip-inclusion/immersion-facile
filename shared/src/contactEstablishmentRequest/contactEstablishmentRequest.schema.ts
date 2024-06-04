@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { withAcquisitionSchema } from "../acquisition.dto";
 import {
   ImmersionObjective,
   conventionObjectiveOptions,
@@ -73,11 +74,13 @@ export const contactEstablishmentInPersonSchema: z.Schema<ContactEstablishmentIn
   });
 
 export const contactEstablishmentRequestSchema: z.Schema<ContactEstablishmentRequestDto> =
-  z.union([
-    contactEstablishmentByMailSchema,
-    contactEstablishmentByPhoneSchema,
-    contactEstablishmentInPersonSchema,
-  ]);
+  z
+    .union([
+      contactEstablishmentByMailSchema,
+      contactEstablishmentByPhoneSchema,
+      contactEstablishmentInPersonSchema,
+    ])
+    .and(withAcquisitionSchema);
 
 export const contactEstablishmentEventPayloadSchema: z.Schema<ContactEstablishmentEventPayload> =
   z.object({ discussionId: z.string() });
