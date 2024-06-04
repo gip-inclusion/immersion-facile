@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import { z } from "zod";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { assessmentSchema } from "../assessment/assessment.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
@@ -45,6 +46,15 @@ export const conventionMagicLinkRoutes = defineRoutes({
       400: httpErrorSchema,
       403: renewMagicLinkResponseSchema.or(legacyHttpErrorSchema),
       404: legacyHttpErrorSchema,
+      500: z.object({
+        errors: z.array(
+          z.object({
+            code: z.string(),
+            message: z.string(),
+            path: z.array(z.string()),
+          }),
+        ),
+      }),
     },
   }),
   getConventionStatusDashboard: defineRoute({

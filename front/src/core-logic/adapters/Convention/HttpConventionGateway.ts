@@ -129,7 +129,11 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 403 }, ({ body }) => {
               throw new Error("message" in body ? body.message : body.errors);
             })
-
+            .with({ status: 500 }, ({ body }) => {
+              throw new Error(
+                body.errors.map((error) => error.message).join(", "),
+              );
+            })
             .otherwise(otherwiseThrow),
         ),
     );

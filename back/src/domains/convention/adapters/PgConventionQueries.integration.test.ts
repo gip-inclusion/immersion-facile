@@ -13,9 +13,11 @@ import {
   DATE_START,
   SiretDto,
   defaultValidatorEmail,
+  expectPromiseToFailWithError,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
+import { ZodError } from "zod";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
@@ -115,6 +117,31 @@ describe("Pg implementation of ConventionQueries", () => {
 
       const result = await conventionQueries.getConventionById(conventionIdA);
       expectToEqual(result, expectedConventionRead);
+    });
+
+    it("throw an error if convention schema does not match", async () => {
+      await insertAgencyAndConvention({
+        conventionId: conventionIdA,
+        agencyId: conventionIdA,
+        agencyName: "agency A",
+        agencyDepartment: "75",
+        agencyKind: "autre",
+        agencySiret: "wrongFormat",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: [defaultValidatorEmail],
+      });
+
+      await expectPromiseToFailWithError(
+        conventionQueries.getConventionById(conventionIdA),
+        new ZodError([
+          {
+            validation: "regex",
+            code: "invalid_string",
+            message: "SIRET doit être composé de 14 chiffres",
+            path: ["agencySiret"],
+          },
+        ]),
+      );
     });
   });
 
