@@ -1,4 +1,4 @@
-import { expectToEqual } from "shared";
+import { expectObjectsToMatch, expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
@@ -200,7 +200,7 @@ describe("POST contact-establishment public V2 route", () => {
     expectToEqual(status, 400);
   });
 
-  it("contacts the establishment when everything goes right", async () => {
+  it("contacts the establishment when everything goes right, and stores the consumer in acquisition params", async () => {
     inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
       new EstablishmentAggregateBuilder()
         .withEstablishment(
@@ -233,6 +233,13 @@ describe("POST contact-establishment public V2 route", () => {
 
     expectToEqual(body, "");
     expectToEqual(status, 201);
+    expect(inMemoryUow.discussionRepository.discussions).toHaveLength(1);
+    const discussion = inMemoryUow.discussionRepository.discussions[0];
+    expectObjectsToMatch(discussion, {
+      siret: contactEstablishment.siret,
+      acquisitionCampaign: "api-consumer",
+      acquisitionKeyword: `${authorizedUnJeuneUneSolutionApiConsumer.id} - ${authorizedUnJeuneUneSolutionApiConsumer.name}`,
+    });
   });
 
   it("contacts the establishment when everything goes right even without location id", async () => {
