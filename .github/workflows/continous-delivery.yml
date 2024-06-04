@@ -35,30 +35,30 @@ jobs:
     with:
       tag: "v${{ github.run_number }}"
 
-  deploy-dev:
-    name: Deploy dev
-    needs: [ validation, tag, build-front-artefact, build-back-artefact ]
-    uses: ./.github/workflows/deploy-to-scalingo.yml
-    with:
-      environment: dev
-      tag: "v${{ github.run_number }}"
-      isPreRelease: true
-    secrets:
-      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
-      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+  #  deploy-dev:
+  #    name: Deploy dev
+  #    needs: [ validation, tag, build-front-artefact, build-back-artefact ]
+  #    uses: ./.github/workflows/deploy-to-scalingo.yml
+  #    with:
+  #      environment: dev
+  #      tag: "v${{ github.run_number }}"
+  #      isPreRelease: true
+  #    secrets:
+  #      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+  #      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-  run-playwright-on-dev:
-    name: Run Playwright on dev
-    needs: deploy-dev
-    uses: ./.github/workflows/playwright-run.yml
-    with:
-      environment: dev
-      tag: "v${{ github.run_number }}"
-    secrets:
-      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
-      IC_USERNAME: ${{ secrets.IC_USERNAME }}
-      IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
-      IC_ADMIN_PASSWORD: ${{ secrets.IC_ADMIN_PASSWORD }}
+  #  run-playwright-on-dev:
+  #    name: Run Playwright on dev
+  #    needs: deploy-dev
+  #    uses: ./.github/workflows/playwright-run.yml
+  #    with:
+  #      environment: dev
+  #      tag: "v${{ github.run_number }}"
+  #    secrets:
+  #      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+  #      IC_USERNAME: ${{ secrets.IC_USERNAME }}
+  #      IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
+  #      IC_ADMIN_PASSWORD: ${{ secrets.IC_ADMIN_PASSWORD }}
 
   create-wip-pre-release:
     runs-on: ubuntu-latest
@@ -96,7 +96,7 @@ jobs:
 
   deploy-staging:
     name: Deploy staging
-    needs: [ deploy-dev ]
+    needs: [ validation, tag, build-front-artefact, build-back-artefact ]
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
       environment: staging
