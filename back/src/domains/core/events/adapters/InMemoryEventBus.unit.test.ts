@@ -1,3 +1,4 @@
+import { addMinutes } from "date-fns";
 import {
   ConventionDtoBuilder,
   expectObjectsToMatch,
@@ -181,6 +182,15 @@ describe("InMemoryEventBus", () => {
             },
           ],
         },
+        {
+          publishedAt: addMinutes(initialPublishDate, 15).toISOString(),
+          failures: [
+            {
+              subscriptionId: "other-id",
+              errorMessage: "Initially Failed",
+            },
+          ],
+        },
       ],
     };
 
@@ -201,21 +211,7 @@ describe("InMemoryEventBus", () => {
       const expectedEvent: DomainEvent = {
         ...domainEvt,
         wasQuarantined: false,
-        publications: [
-          {
-            publishedAt: initialPublishDate.toISOString(),
-            failures: [
-              {
-                subscriptionId: failedSubscriptionId,
-                errorMessage: "Initially Failed",
-              },
-            ],
-          },
-          {
-            publishedAt: rePublishDate.toISOString(),
-            failures: [],
-          },
-        ],
+        publications: eventToRePublish.publications,
         status: "published",
       };
 

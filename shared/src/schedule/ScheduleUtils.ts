@@ -363,7 +363,7 @@ export const calculateWeeklyHours = (
             : previousValue,
         0,
       )
-      .toFixed(1),
+      .toFixed(2),
   );
 
 export const defaultTimePeriods: TimePeriodsDto = [
