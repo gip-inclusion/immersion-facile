@@ -380,6 +380,52 @@ describe("ScheduleUtils", () => {
         );
       });
     });
+
+    it("calculate and shows totals hours correctly", () => {
+      const interval: DateIntervalDto = {
+        start: new Date("2024-06-03"),
+        end: new Date("2024-06-06"),
+      };
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(interval)
+        .withComplexSchedule([
+          {
+            date: new Date("2024-06-03").toISOString(),
+            timePeriods: [
+              { start: "09:00", end: "12:45" },
+              { start: "13:15", end: "17:00" },
+            ],
+          },
+          {
+            date: new Date("2024-06-04").toISOString(),
+            timePeriods: [
+              { start: "09:00", end: "12:45" },
+              { start: "13:15", end: "17:30" },
+            ],
+          },
+          {
+            date: new Date("2024-06-05").toISOString(),
+            timePeriods: [{ start: "09:00", end: "12:15" }],
+          },
+          {
+            date: new Date("2024-06-06").toISOString(),
+            timePeriods: [
+              { start: "09:00", end: "12:45" },
+              { start: "13:15", end: "17:00" },
+            ],
+          },
+        ])
+        .build();
+
+      expectToEqual(
+        prettyPrintSchedule(schedule, interval),
+        `Heures de travail hebdomadaires : 26.25
+lundi : 09:00-12:45, 13:15-17:00
+mardi : 09:00-12:45, 13:15-17:30
+mercredi : 09:00-12:15
+jeudi : 09:00-12:45, 13:15-17:00`,
+      );
+    });
   });
 
   describe("calculateTotalDurationInDays", () => {
