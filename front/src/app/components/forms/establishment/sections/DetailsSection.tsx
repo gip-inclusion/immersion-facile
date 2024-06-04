@@ -274,6 +274,7 @@ export const DetailsSection = ({
         <Alert
           severity="error"
           title="Erreur lors de la suppression"
+          className={fr.cx("fr-mb-2w")}
           description="Veuillez nous excuser. Un problème est survenu lors de la suppression de l'entreprise."
         />
       )}
@@ -282,6 +283,7 @@ export const DetailsSection = ({
         <Alert
           severity="error"
           title="Email invalide"
+          className={fr.cx("fr-mb-2w")}
           description={`L'email de contact de l'entreprise a été invalidé par notre vérificateur d'email pour la raison suivante : ${invalidEmailMessage}`}
         />
       )}
