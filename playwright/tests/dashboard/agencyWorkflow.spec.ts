@@ -15,7 +15,7 @@ test.describe("Agency dashboard workflow", () => {
     agencyId = await fillAndSubmitBasicAgencyForm(page, {
       siret: "34792240300030",
       customizedName: "Handicap emploi !",
-      rawAddress: "1 avenue jean-marie verne 01000 Bourg-en-Bresse",
+      rawAddress: "1 Avenue Jean-Marie Verne 01000 Bourg-en-Bresse",
     });
     await expect(
       await page.locator(".fr-alert--success").first(),
