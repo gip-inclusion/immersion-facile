@@ -16,6 +16,7 @@ import {
   domElementIds,
   expiredMagicLinkErrorMessage,
   formEstablishmentSchema,
+  safeTryJsonParse,
 } from "shared";
 import { AvailabilitySection } from "src/app/components/forms/establishment/sections/AvailabilitySection";
 import { BusinessContactSection } from "src/app/components/forms/establishment/sections/BusinessContactSection";
@@ -361,8 +362,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       if (feedback.errorMessage === expiredMagicLinkErrorMessage) {
         throw new Error(feedback.errorMessage);
       }
+      const errorMessage = safeTryJsonParse(feedback.errorMessage);
       throw new Error(
-        `Entreprise non trouvée : ${JSON.parse(feedback.errorMessage).errors}`,
+        `Entreprise non trouvée : ${
+          typeof errorMessage === "string"
+            ? errorMessage
+            : errorMessage.payload.errors
+        }`,
       );
     })
     .with({ kind: "deleteSuccess" }, () => (

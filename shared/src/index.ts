@@ -92,6 +92,7 @@ export * from "./schedule/Schedule.dto";
 export * from "./schedule/Schedule.schema";
 export * from "./schedule/ScheduleDtoBuilder";
 export * from "./schedule/ScheduleDtoBuilder";
+export * from "./utils/json";
 export * from "./schedule/ScheduleUtils";
 export * from "./search/search.routes";
 export * from "./search/search.utils";
