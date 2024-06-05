@@ -7,7 +7,7 @@ import {
   FeedbackTopic,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
-type NotificationFeedbackProps = {
+type FeedbackProps = {
   topic: FeedbackTopic;
   render?: (props: {
     level: FeedbackLevel;
@@ -17,10 +17,7 @@ type NotificationFeedbackProps = {
   children?: React.ReactNode;
 };
 
-export const NotificationFeedback = ({
-  topic,
-  render,
-}: NotificationFeedbackProps) => {
+export const Feedback = ({ topic, render }: FeedbackProps) => {
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
   const feedback = feedbacks[topic];
   if (!feedback) return null;

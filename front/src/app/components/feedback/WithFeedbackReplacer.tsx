@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { NotificationFeedback } from "src/app/components/notifications/NotificationFeedback";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
@@ -9,7 +9,7 @@ import {
   feedbackSlice,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
-type NotificationFeedbackProps = {
+type WithFeedbackReplacerProps = {
   topic: FeedbackTopic;
   renderFeedback?: (props: {
     level: FeedbackLevel;
@@ -19,11 +19,11 @@ type NotificationFeedbackProps = {
   children?: JSX.Element;
 };
 
-export const WithNotificationFeedbackReplacer = ({
+export const WithFeedbackReplacer = ({
   topic,
   children,
   renderFeedback,
-}: NotificationFeedbackProps) => {
+}: WithFeedbackReplacerProps) => {
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
   const feedback = feedbacks[topic];
   const dispatch = useDispatch();
@@ -40,6 +40,6 @@ export const WithNotificationFeedbackReplacer = ({
       message: feedback.message,
     })
   ) : (
-    <NotificationFeedback topic={topic} />
+    <Feedback topic={topic} />
   );
 };

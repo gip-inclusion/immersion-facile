@@ -18,8 +18,8 @@ import {
   toDisplayedDate,
 } from "shared";
 import { ApiConsumerForm } from "src/app/components/admin/technical-options/ApiConsumerForm";
-import { NotificationFeedback } from "src/app/components/notifications/NotificationFeedback";
-import { WithNotificationFeedbackReplacer } from "src/app/components/notifications/WithNotificationFeedbackReplacer";
+import { Feedback } from "src/app/components/feedback/Feedback";
+import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import {
   formatApiConsumerContact,
   formatApiConsumerDescription,
@@ -137,7 +137,7 @@ export const ApiConsumersSection = () => {
           title="Ajout consommateur api"
           concealingBackdrop
         >
-          <WithNotificationFeedbackReplacer
+          <WithFeedbackReplacer
             topic="api-consumer-global"
             renderFeedback={({ level }) => (
               <Fragment key={`${level}-${currentApiConsumerToEdit.id}`}>
@@ -148,13 +148,13 @@ export const ApiConsumersSection = () => {
                   />
                 )}
                 {level === "success" && !lastCreatedToken && (
-                  <NotificationFeedback topic="api-consumer-global" />
+                  <Feedback topic="api-consumer-global" />
                 )}
               </Fragment>
             )}
           >
             <ApiConsumerForm initialValues={currentApiConsumerToEdit} />
-          </WithNotificationFeedbackReplacer>
+          </WithFeedbackReplacer>
         </apiConsumerModal.Component>,
         document.body,
       )}

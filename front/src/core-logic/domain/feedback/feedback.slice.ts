@@ -20,7 +20,7 @@ export type FeedbackTopic = (typeof topics)[number];
 
 type Feedbacks = Partial<Record<FeedbackTopic, Feedback>>;
 
-const initialNotifications: Feedbacks = {};
+const initialFeedbacks: Feedbacks = {};
 
 type FeedbackWithActionName = {
   action: ActionCreatorWithPayload<any, string>;
@@ -67,10 +67,10 @@ export const feedbackMapping: Record<
 
 export const feedbackSlice = createSlice({
   name: "feedbacks",
-  initialState: initialNotifications,
+  initialState: initialFeedbacks,
   reducers: {
     clearFeedbacksTriggered: () => {
-      return initialNotifications;
+      return initialFeedbacks;
     },
   },
   extraReducers: (builder) => {
