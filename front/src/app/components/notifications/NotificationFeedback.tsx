@@ -1,16 +1,16 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { notificationsSelectors } from "src/core-logic/domain/notification/notification.selectors";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  NotificationLevel,
-  NotificationTopic,
-} from "src/core-logic/domain/notification/notification.slice";
+  FeedbackLevel,
+  FeedbackTopic,
+} from "src/core-logic/domain/feedback/feedback.slice";
 
 type NotificationFeedbackProps = {
-  topic: NotificationTopic;
+  topic: FeedbackTopic;
   render?: (props: {
-    level: NotificationLevel;
+    level: FeedbackLevel;
     title?: string;
     message: string;
   }) => JSX.Element;
@@ -21,21 +21,21 @@ export const NotificationFeedback = ({
   topic,
   render,
 }: NotificationFeedbackProps) => {
-  const notifications = useAppSelector(notificationsSelectors.notifications);
-  const notification = notifications[topic];
-  if (!notification) return null;
+  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
+  const feedback = feedbacks[topic];
+  if (!feedback) return null;
   if (render) {
     return render({
-      level: notification.level,
-      title: notification.title,
-      message: notification.message,
+      level: feedback.level,
+      title: feedback.title,
+      message: feedback.message,
     });
   }
   return (
     <Alert
-      severity={notification.level}
-      title={notification.title}
-      description={notification.message}
+      severity={feedback.level}
+      title={feedback.title}
+      description={feedback.message}
       small
     />
   );

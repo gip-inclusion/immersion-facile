@@ -18,9 +18,7 @@ const retrieveApiConsumersEpic: ApiConsumerEpic = (
     filter(apiConsumerSlice.actions.retrieveApiConsumersRequested.match),
     switchMap((action) => adminGateway.getAllApiConsumers$(action.payload)),
     map(apiConsumerSlice.actions.retrieveApiConsumersSucceeded),
-    catchEpicError((error) =>
-      apiConsumerSlice.actions.retrieveApiConsumersFailed(error.message),
-    ),
+    catchEpicError(() => apiConsumerSlice.actions.retrieveApiConsumersFailed()),
   );
 
 const createApiConsumerEpic: ApiConsumerEpic = (

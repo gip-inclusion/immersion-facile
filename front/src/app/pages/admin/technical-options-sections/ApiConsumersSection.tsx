@@ -32,7 +32,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
-import { notificationSlice } from "src/core-logic/domain/notification/notification.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
 
 export const ApiConsumersSection = () => {
@@ -52,7 +52,7 @@ export const ApiConsumersSection = () => {
 
   useEffect(() => {
     if (isApiConsumerModalOpened) return;
-    dispatch(notificationSlice.actions.clearNotificationsTriggered());
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     dispatch(apiConsumerSlice.actions.clearLastCreatedToken());
     adminToken &&
       dispatch(
