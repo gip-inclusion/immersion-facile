@@ -1,6 +1,7 @@
 import { ApiConsumer, expectToEqual } from "shared";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   TestDependencies,
   createTestStore,
@@ -97,6 +98,14 @@ describe("api consumer", () => {
       expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBe(
         generatedJwt,
       );
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "api-consumer-global": {
+          level: "success",
+          title: "Le consommateur d'API a bien été créé.",
+          message:
+            "Le consommateur d'API a bien été créé, il peut commencer à utiliser l'api",
+        },
+      });
     });
 
     it("updates an api consumer", () => {
@@ -117,6 +126,14 @@ describe("api consumer", () => {
       expect(
         apiConsumerSelectors.lastCreatedToken(store.getState()),
       ).toBeNull();
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "api-consumer-global": {
+          level: "success",
+          title: "Le consommateur d'API a bien été mis à jour.",
+          message:
+            "Le consommateur d'API a bien été mis à jour, il peut continuer à utiliser l'api",
+        },
+      });
     });
 
     it("fails on create api consumer gateway error", () => {
@@ -137,6 +154,14 @@ describe("api consumer", () => {
         new Error(errorMessage),
       );
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "api-consumer-global": {
+          level: "error",
+          title: "Problème lors de la création du consommateur d'API",
+          message:
+            "Une erreur est survenue lors de la création du consommateur d'API",
+        },
+      });
     });
   });
 

@@ -2,17 +2,17 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { NotificationFeedback } from "src/app/components/notifications/NotificationFeedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { notificationsSelectors } from "src/core-logic/domain/notification/notification.selectors";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  NotificationLevel,
-  NotificationTopic,
-  notificationSlice,
-} from "src/core-logic/domain/notification/notification.slice";
+  FeedbackLevel,
+  FeedbackTopic,
+  feedbackSlice,
+} from "src/core-logic/domain/feedback/feedback.slice";
 
 type NotificationFeedbackProps = {
-  topic: NotificationTopic;
+  topic: FeedbackTopic;
   renderFeedback?: (props: {
-    level: NotificationLevel;
+    level: FeedbackLevel;
     title?: string;
     message: string;
   }) => JSX.Element;
@@ -24,20 +24,20 @@ export const WithNotificationFeedbackReplacer = ({
   children,
   renderFeedback,
 }: NotificationFeedbackProps) => {
-  const notifications = useAppSelector(notificationsSelectors.notifications);
-  const notification = notifications[topic];
+  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
+  const feedback = feedbacks[topic];
   const dispatch = useDispatch();
   useEffect(() => {
     return () => {
-      dispatch(notificationSlice.actions.clearNotificationsTriggered());
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     };
   }, [dispatch]);
-  if (!notification && children) return children;
-  return renderFeedback && notification ? (
+  if (!feedback && children) return children;
+  return renderFeedback && feedback ? (
     renderFeedback({
-      level: notification.level,
-      title: notification.title,
-      message: notification.message,
+      level: feedback.level,
+      title: feedback.title,
+      message: feedback.message,
     })
   ) : (
     <NotificationFeedback topic={topic} />

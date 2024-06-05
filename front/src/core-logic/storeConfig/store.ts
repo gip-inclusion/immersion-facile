@@ -21,9 +21,9 @@ import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { inclusionConnectedEpics } from "src/core-logic/domain/inclusionConnected/inclusionConnected.epics";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
-import { notificationSlice } from "src/core-logic/domain/notification/notification.slice";
 import { rootAppEpics } from "src/core-logic/domain/rootApp/rootApp.epics";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epics";
@@ -89,7 +89,7 @@ const appReducer = combineReducers({
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [geosearchSlice.name]: geosearchSlice.reducer,
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
-  [notificationSlice.name]: notificationSlice.reducer,
+  [feedbackSlice.name]: feedbackSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,

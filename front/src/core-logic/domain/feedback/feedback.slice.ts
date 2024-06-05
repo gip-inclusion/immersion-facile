@@ -8,31 +8,31 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 
 const topics = ["api-consumer-global"] as const;
 
-export type NotificationLevel = "info" | "success" | "warning" | "error";
+export type FeedbackLevel = "info" | "success" | "warning" | "error";
 
-type Notification = {
-  level: NotificationLevel;
+type Feedback = {
+  level: FeedbackLevel;
   message: string;
   title?: string;
 };
 
-export type NotificationTopic = (typeof topics)[number];
+export type FeedbackTopic = (typeof topics)[number];
 
-type Notifications = Partial<Record<NotificationTopic, Notification>>;
+type Feedbacks = Partial<Record<FeedbackTopic, Feedback>>;
 
-const initialNotifications: Notifications = {};
+const initialNotifications: Feedbacks = {};
 
 type FeedbackWithActionName = {
   action: ActionCreatorWithPayload<any, string>;
-  title: Notification["title"];
-  message: Notification["message"];
+  title: Feedback["title"];
+  message: Feedback["message"];
 };
 
 type ActionKind = "create" | "update" | "fetch" | "delete";
 
-export type ActionKindAndLevel = `${ActionKind}.${Notification["level"]}`;
+export type ActionKindAndLevel = `${ActionKind}.${Feedback["level"]}`;
 
-type PayloadWithFeedbackTopic = { feedbackTopic: NotificationTopic };
+type PayloadWithFeedbackTopic = { feedbackTopic: FeedbackTopic };
 
 // biome-ignore lint/complexity/noBannedTypes: need to use {}
 export type PayloadActionWithFeedbackTopic<P = {}> = PayloadAction<
@@ -40,7 +40,7 @@ export type PayloadActionWithFeedbackTopic<P = {}> = PayloadAction<
 >;
 
 export const feedbackMapping: Record<
-  NotificationTopic,
+  FeedbackTopic,
   Partial<Partial<Record<ActionKindAndLevel, FeedbackWithActionName>>>
 > = {
   "api-consumer-global": {
@@ -65,11 +65,11 @@ export const feedbackMapping: Record<
   },
 };
 
-export const notificationSlice = createSlice({
-  name: "notifications",
+export const feedbackSlice = createSlice({
+  name: "feedbacks",
   initialState: initialNotifications,
   reducers: {
-    clearNotificationsTriggered: () => {
+    clearFeedbacksTriggered: () => {
       return initialNotifications;
     },
   },
@@ -132,5 +132,5 @@ export const getLevelFromActionKindAndLevel = (
   actionKindAndLevel: ActionKindAndLevel,
 ) => {
   const level = actionKindAndLevel.split(".")[1];
-  return level as NotificationLevel;
+  return level as FeedbackLevel;
 };
