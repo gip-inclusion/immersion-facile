@@ -2,7 +2,7 @@ import path from "path";
 import { AxiosError } from "axios";
 import { Request } from "express";
 import { QueryResult } from "kysely";
-import pino, { Logger } from "pino";
+import pino, { Logger, LoggerOptions } from "pino";
 import { AgencyId, ConventionId, PeExternalId } from "shared";
 import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
@@ -14,16 +14,10 @@ import { LaBonneBoiteRequestParams } from "../domains/establishment/ports/LaBonn
 import { PartialResponse } from "./axiosUtils";
 import { NodeProcessReport } from "./nodeProcessReport";
 
-const getLogLevel = () => {
-  // Allow command-line overrides of the log level.
-  if (process.env.LOG_LEVEL) return process.env.LOG_LEVEL;
-  // Avoid distracting log output during test execution.
-  // if (process.env.NODE_ENV === "test") return "fatal";
-  // Default to level "info"
-  return "info";
-};
+const level: LoggerOptions["level"] =
+  process.env.LOG_LEVEL || process.env.NODE_ENV === "test" ? "fatal" : "info";
 
-const devTransport = {
+const devTransport: LoggerOptions["transport"] = {
   target: "pino-pretty",
   options: {
     colorize: true,
@@ -34,16 +28,13 @@ const devTransport = {
 };
 
 const rootLogger = pino({
-  level: getLogLevel(),
-  // TODO : for testing
-  transport: devTransport,
-  // ...(process.env.NODE_ENV !== "production" ? { transport: devTransport } : {}),
+  level,
+  ...(process.env.NODE_ENV !== "production" ? { transport: devTransport } : {}),
 });
 
 // Example use: const logger = createLogger(__filename);
-export const legacyCreateLogger = (filename: string): Logger => {
-  return rootLogger.child({ name: path.basename(filename) });
-};
+export const legacyCreateLogger = (filename: string): Logger =>
+  rootLogger.child({ name: path.basename(filename) });
 
 type SQLError = {
   query: string;
@@ -64,7 +55,7 @@ type LoggerParams = Partial<{
   crawlerInfo: {
     numberOfEvents?: number;
     typeOfEvents: TypeOfEvent;
-    processEventsDurationInSeconds?: number; // regrouper avec retrieveEventsDurationInSeconds
+    processEventsDurationInSeconds?: number;
     retrieveEventsDurationInSeconds?: number;
   };
   durationInSeconds: number;
