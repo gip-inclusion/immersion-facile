@@ -13,6 +13,7 @@ import {
   ScheduleDto,
   appellationCodeSchema,
   isBeneficiaryStudent,
+  keys,
   mergeObjectsExceptFalsyValues,
   reasonableSchedule,
   toDateString,
@@ -144,58 +145,6 @@ const withDevPrefilledValues = (
   };
 };
 
-const conventionFormKeysInUrl: ConventionFormKeysInUrl[] = [
-  "email",
-  "firstName",
-  "lastName",
-  "phone",
-  "birthdate",
-  "isRqth",
-  "financiaryHelp",
-  "led",
-  "schoolName",
-  "schoolPostcode",
-  "emergencyContact",
-  "emergencyContactPhone",
-  "dateStart",
-  "dateEnd",
-  "siret",
-  "businessName",
-  "etFirstName",
-  "etLastName",
-  "etJob",
-  "etEmail",
-  "etPhone",
-  "erFirstName",
-  "erLastName",
-  "erEmail",
-  "erPhone",
-  "brFirstName",
-  "brLastName",
-  "brEmail",
-  "brPhone",
-  "bceSiret",
-  "bceBusinessName",
-  "bceBusinessAddress",
-  "bceFirstName",
-  "bceLastName",
-  "bceEmail",
-  "bcePhone",
-  "bceJob",
-  "businessAdvantages",
-  "agencyId",
-  "immersionAddress",
-  "sanitaryPrevention",
-  "individualProtection",
-  "sanitaryPreventionDescription",
-  "immersionObjective",
-  "immersionActivities",
-  "immersionSkills",
-  "workConditions",
-  "schedule",
-  "immersionAppellation",
-];
-
 const conventionToConventionInUrl = (
   convention: ConventionPresentation,
 ): ConventionParamsInUrl => {
@@ -264,7 +213,7 @@ const conventionToConventionInUrl = (
 export const makeValuesToWatchInUrl = (convention: ConventionPresentation) => {
   const conventionInUrl = conventionToConventionInUrl(convention);
   const keysToWatch: ConventionFormKeysInUrl[] = [
-    ...conventionFormKeysInUrl,
+    ...keys(conventionValuesFromUrl),
     "agencyDepartment",
   ];
   return keysToWatch.reduce(
