@@ -3,10 +3,11 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { differenceInYears } from "date-fns";
 import { keys } from "ramda";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  BeneficiaryRepresentative,
   ConventionReadDto,
   InternshipKind,
   isBeneficiaryStudent,
@@ -64,6 +65,15 @@ export const BeneficiaryFormSection = ({
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
+  const initialBeneficiaryRepresentative = useRef(
+    values.signatories.beneficiaryRepresentative,
+  ).current;
+
+  useEffect(() => {
+    if (hasBeneficiaryRepresentativeData(initialBeneficiaryRepresentative)) {
+      dispatch(conventionSlice.actions.isMinorChanged(true));
+    }
+  }, [initialBeneficiaryRepresentative]);
 
   useEffect(() => {
     if (userFieldsAreFilled) {
@@ -75,19 +85,6 @@ export const BeneficiaryFormSection = ({
       keys(valuesToUpdate).forEach((key) => setValue(key, valuesToUpdate[key]));
     }
   }, [userFieldsAreFilled]);
-
-  useEffect(() => {
-    const initialValues = values.signatories.beneficiaryRepresentative;
-    setValue(
-      "signatories.beneficiaryRepresentative",
-      isMinorOrProtected && initialValues
-        ? {
-            ...initialValues,
-            role: "beneficiary-representative",
-          }
-        : undefined,
-    );
-  }, [isMinorOrProtected]);
 
   useEffect(() => {
     const initialValues = values.signatories.beneficiaryCurrentEmployer;
@@ -269,10 +266,19 @@ export const BeneficiaryFormSection = ({
               checked:
                 Boolean(option.nativeInputProps.value) === isMinorOrProtected,
               onChange: () => {
-                dispatch(
-                  conventionSlice.actions.isMinorChanged(
-                    Boolean(option.nativeInputProps.value),
-                  ),
+                const value = Boolean(option.nativeInputProps.value);
+                dispatch(conventionSlice.actions.isMinorChanged(value));
+                setValue(
+                  "signatories.beneficiaryRepresentative",
+                  value
+                    ? {
+                        firstName: "",
+                        lastName: "",
+                        phone: "",
+                        email: "",
+                        role: "beneficiary-representative",
+                      }
+                    : undefined,
                 );
               },
             },
@@ -282,8 +288,8 @@ export const BeneficiaryFormSection = ({
 
       {isMinorOrProtected && (
         <BeneficiaryRepresentativeFields
-          emailValidationErrors={emailValidationErrors}
           setEmailValidationErrors={setEmailValidationErrors}
+          emailValidationErrors={emailValidationErrors}
         />
       )}
 
@@ -342,5 +348,17 @@ export const BeneficiaryFormSection = ({
         </>
       )}
     </>
+  );
+};
+
+const hasBeneficiaryRepresentativeData = (
+  beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
+): beneficiaryRepresentative is BeneficiaryRepresentative => {
+  return !!(
+    beneficiaryRepresentative &&
+    (beneficiaryRepresentative.firstName ||
+      beneficiaryRepresentative.lastName ||
+      beneficiaryRepresentative.phone ||
+      beneficiaryRepresentative.email)
   );
 };

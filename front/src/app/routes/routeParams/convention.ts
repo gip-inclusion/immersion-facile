@@ -153,6 +153,8 @@ const conventionFormKeysInUrl: ConventionFormKeysInUrl[] = [
   "isRqth",
   "financiaryHelp",
   "led",
+  "schoolName",
+  "schoolPostcode",
   "emergencyContact",
   "emergencyContactPhone",
   "dateStart",
@@ -206,8 +208,12 @@ const conventionToConventionInUrl = (
     },
     ...flatValues
   } = convention;
-  const levelOfEducation = isBeneficiaryStudent(beneficiary)
-    ? beneficiary.levelOfEducation
+  const beneficiarySchoolInformations = isBeneficiaryStudent(beneficiary)
+    ? {
+        led: beneficiary.levelOfEducation,
+        schoolName: beneficiary.schoolName,
+        schoolPostcode: beneficiary.schoolPostcode,
+      }
     : undefined;
 
   return {
@@ -245,7 +251,9 @@ const conventionToConventionInUrl = (
     email: beneficiary.email,
     phone: beneficiary.phone,
     businessAdvantages: flatValues.businessAdvantages,
-    ...(levelOfEducation ? { led: levelOfEducation } : {}),
+    ...(beneficiarySchoolInformations
+      ? { ...beneficiarySchoolInformations }
+      : {}),
     emergencyContact: beneficiary.emergencyContact,
     emergencyContactPhone: beneficiary.emergencyContactPhone,
     fedId: beneficiary.federatedIdentity?.token,
@@ -308,6 +316,8 @@ export const conventionValuesFromUrl = {
   phone: param.query.optional.string,
   financiaryHelp: param.query.optional.string,
   led: param.query.optional.string,
+  schoolName: param.query.optional.string,
+  schoolPostcode: param.query.optional.string,
   emergencyContact: param.query.optional.string,
   emergencyContactPhone: param.query.optional.string,
   emergencyContactEmail: param.query.optional.string,
@@ -456,6 +466,8 @@ const conventionPresentationFromParams = (
       emergencyContactPhone: params.emergencyContactPhone ?? "",
       emergencyContactEmail: params.emergencyContactEmail ?? "",
       levelOfEducation: (params.led as LevelOfEducation) ?? "",
+      schoolName: params.schoolName ?? "",
+      schoolPostcode: params.schoolPostcode ?? "",
       financiaryHelp: params.financiaryHelp ?? "",
       birthdate: params.birthdate ?? "",
       isRqth: params.isRqth ?? false,
