@@ -93,12 +93,11 @@ export class InMemoryEventBus implements EventBus {
     const callbacksById: SubscriptionsForTopic | undefined =
       this.subscriptions[topic];
 
-    if (isUndefined(callbacksById))
-      return publishEventWithNoCallbacks(event, publishedAt);
+    if (!callbacksById) return publishEventWithNoCallbacks(event, publishedAt);
 
     const failuresOrUndefined: (EventFailure | void)[] = await Promise.all(
       getSubscriptionIdsToPublish(event, callbacksById).map(
-        makeExecuteCbMatchingSubscriptionId(
+        makeExecuteSubscriptionMatchingSubscriptionId(
           event,
           callbacksById,
           this.throwOnPublishFailure,
@@ -131,11 +130,11 @@ export class InMemoryEventBus implements EventBus {
     if (wasMaxNumberOfErrorsReached) {
       const message = "Failed too many times, event will be Quarantined";
       logger.error({ event }, message);
-      const { payload: _, publications, ...restEvent } = event;
+      const { payload: _, publications: __, ...restEvent } = event;
       notifyObjectDiscord({
         event: {
           ...restEvent,
-          lastPublication: publications.at(-1),
+          lastPublication: getLastPublication(event),
         },
         message,
       });
@@ -152,10 +151,6 @@ export class InMemoryEventBus implements EventBus {
   }
 }
 
-const isUndefined = (
-  callbacksById: SubscriptionsForTopic | undefined,
-): callbacksById is undefined => callbacksById === undefined;
-
 const publishEventWithNoCallbacks = (
   event: DomainEvent,
   publishedAt: DateString,
@@ -169,23 +164,22 @@ const publishEventWithNoCallbacks = (
   };
 };
 
-const makeExecuteCbMatchingSubscriptionId =
+const makeExecuteSubscriptionMatchingSubscriptionId =
   (
     event: DomainEvent,
-    callbacksById: SubscriptionsForTopic,
+    subscriptionsForTopic: SubscriptionsForTopic,
     throwOnPublishFailure: boolean,
   ) =>
   async (subscriptionId: SubscriptionId): Promise<void | EventFailure> => {
-    const cb = callbacksById[subscriptionId];
+    const subscription = subscriptionsForTopic[subscriptionId];
     logger.info(
       { eventId: event.id, topic: event.topic },
       `Sending an event for ${subscriptionId}`,
     );
 
     try {
-      await cb(event);
+      await subscription(event);
     } catch (error: any) {
-      Sentry.captureException(error);
       monitorErrorInCallback(error, event);
       if (throwOnPublishFailure) {
         throw new Error(
@@ -209,11 +203,10 @@ const getSubscriptionIdsToPublish = (
   event: DomainEvent,
   callbacksById: SubscriptionsForTopic,
 ): SubscriptionId[] => {
-  const lastPublication = event.publications.at(-1);
-  if (!lastPublication || event.status === "to-republish")
-    return keys(callbacksById);
-
-  return lastPublication.failures.map(prop("subscriptionId"));
+  const lastPublication = getLastPublication(event);
+  return !lastPublication || event.status === "to-republish"
+    ? keys(callbacksById)
+    : lastPublication.failures.map(prop("subscriptionId"));
 };
 
 const monitorAbsenceOfCallback = (event: DomainEvent) => {
@@ -221,6 +214,7 @@ const monitorAbsenceOfCallback = (event: DomainEvent) => {
 };
 
 const monitorErrorInCallback = (error: any, event: DomainEvent) => {
+  Sentry.captureException(error);
   counterPublishedEventsError.inc({
     topic: event.topic,
     errorType: "callback_failed",
@@ -234,3 +228,8 @@ const monitorErrorInCallback = (error: any, event: DomainEvent) => {
     "publishedEventsError",
   );
 };
+
+const getLastPublication = (event: DomainEvent): EventPublication | undefined =>
+  event.publications
+    .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
+    .at(-1);

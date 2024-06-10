@@ -1,15 +1,18 @@
-import {
-  ConventionDtoBuilder,
-  expectObjectsToMatch,
-  expectToEqual,
-} from "shared";
+import { ConventionDtoBuilder, expectArraysToMatch } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
-import type { DomainEvent, DomainTopic, EventFailure } from "../events";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../unit-of-work/adapters/createInMemoryUow";
+import type {
+  DomainEvent,
+  DomainTopic,
+  EventFailure,
+  EventPublication,
+} from "../events";
 import { EventBus } from "../ports/EventBus";
 import { InMemoryEventBus } from "./InMemoryEventBus";
-import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 
 const domainEvt: DomainEvent = {
   id: "anId",
@@ -22,16 +25,14 @@ const domainEvt: DomainEvent = {
 };
 
 describe("InMemoryEventBus", () => {
-  let anEventBus: InMemoryEventBus;
+  let eventBus: InMemoryEventBus;
   let timeGateway: CustomTimeGateway;
-  let outboxRepository: InMemoryOutboxRepository;
+  let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     timeGateway = new CustomTimeGateway();
-    const uow = createInMemoryUow();
-    outboxRepository = uow.outboxRepository;
-    const uowPerformer = new InMemoryUowPerformer(uow);
-    anEventBus = new InMemoryEventBus(timeGateway, uowPerformer);
+    uow = createInMemoryUow();
+    eventBus = new InMemoryEventBus(timeGateway, new InMemoryUowPerformer(uow));
   });
 
   describe("Publish to an existing topic", () => {
@@ -41,19 +42,19 @@ describe("InMemoryEventBus", () => {
       timeGateway.setNextDate(publishDate);
 
       // Act
-      await anEventBus.publish(domainEvt);
+      await eventBus.publish(domainEvt);
 
       // Assert
-      expect(outboxRepository.events).toHaveLength(1);
-
-      expectObjectsToMatch(outboxRepository.events[0], {
-        ...domainEvt,
-        wasQuarantined: false,
-        publications: [
-          { publishedAt: publishDate.toISOString(), failures: [] },
-        ],
-        status: "published",
-      });
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          ...domainEvt,
+          wasQuarantined: false,
+          publications: [
+            { publishedAt: publishDate.toISOString(), failures: [] },
+          ],
+          status: "published",
+        },
+      ]);
     });
 
     it("Publishes to a new topic and check we have only one spyed event", async () => {
@@ -61,27 +62,26 @@ describe("InMemoryEventBus", () => {
       const publishDate = new Date("2022-01-01");
       timeGateway.setNextDate(publishDate);
       const publishedEvents = spyOnTopic(
-        anEventBus,
+        eventBus,
         "ConventionSubmittedByBeneficiary",
         "subscription1",
       );
 
       // Act
-      await anEventBus.publish(domainEvt);
+      await eventBus.publish(domainEvt);
 
       // Assert
-      expect(publishedEvents).toHaveLength(1);
-      expectObjectsToMatch(publishedEvents[0], domainEvt);
-      expect(outboxRepository.events).toHaveLength(1);
-
-      expectObjectsToMatch(outboxRepository.events[0], {
-        ...domainEvt,
-        wasQuarantined: false,
-        publications: [
-          { publishedAt: publishDate.toISOString(), failures: [] },
-        ],
-        status: "published",
-      });
+      expectArraysToMatch(publishedEvents, [domainEvt]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          ...domainEvt,
+          wasQuarantined: false,
+          publications: [
+            { publishedAt: publishDate.toISOString(), failures: [] },
+          ],
+          status: "published",
+        },
+      ]);
     });
   });
 
@@ -90,31 +90,32 @@ describe("InMemoryEventBus", () => {
     const publishDate = new Date("2022-01-01");
     timeGateway.setNextDate(publishDate);
     const eventsOnFirstHandler = spyOnTopic(
-      anEventBus,
+      eventBus,
       "ConventionSubmittedByBeneficiary",
       "subscription1",
     );
     const eventsOnSecondHandler = spyOnTopic(
-      anEventBus,
+      eventBus,
       "ConventionSubmittedByBeneficiary",
       "subscription2",
     );
 
     // Act
-    await anEventBus.publish(domainEvt);
+    await eventBus.publish(domainEvt);
 
     // Assert
-    expect(eventsOnFirstHandler).toHaveLength(1);
-    expect(eventsOnFirstHandler[0]).toEqual(domainEvt);
-    expect(eventsOnSecondHandler).toHaveLength(1);
-    expect(eventsOnSecondHandler[0]).toEqual(domainEvt);
-
-    expectToEqual(outboxRepository.events[0], {
-      ...domainEvt,
-      wasQuarantined: false,
-      publications: [{ publishedAt: publishDate.toISOString(), failures: [] }],
-      status: "published",
-    });
+    expectArraysToMatch(eventsOnFirstHandler, [domainEvt]);
+    expectArraysToMatch(eventsOnSecondHandler, [domainEvt]);
+    expectArraysToMatch(uow.outboxRepository.events, [
+      {
+        ...domainEvt,
+        wasQuarantined: false,
+        publications: [
+          { publishedAt: publishDate.toISOString(), failures: [] },
+        ],
+        status: "published",
+      },
+    ]);
   });
 
   describe("when one of the handlers fails", () => {
@@ -123,12 +124,12 @@ describe("InMemoryEventBus", () => {
       const publishDate = new Date("2022-01-01");
       timeGateway.setNextDate(publishDate);
       const eventsOnFirstHandler = spyOnTopic(
-        anEventBus,
+        eventBus,
         "ConventionSubmittedByBeneficiary",
         "workingSubscription",
       );
 
-      anEventBus.subscribe(
+      eventBus.subscribe(
         "ConventionSubmittedByBeneficiary",
         "failingSubscription",
         async (_) => {
@@ -137,7 +138,7 @@ describe("InMemoryEventBus", () => {
       );
 
       // Act
-      await anEventBus.publish(domainEvt);
+      await eventBus.publish(domainEvt);
 
       // Assert
       const expectedEvent: DomainEvent = {
@@ -147,20 +148,24 @@ describe("InMemoryEventBus", () => {
         status: "never-published",
       };
 
-      expectToEqual(eventsOnFirstHandler, [expectedEvent]);
-
-      expectObjectsToMatch(outboxRepository.events[0], {
-        ...expectedEvent,
-        publications: [
-          {
-            publishedAt: publishDate.toISOString(),
-            failures: [
-              { subscriptionId: "failingSubscription", errorMessage: "Failed" },
-            ],
-          },
-        ],
-        status: "failed-but-will-retry",
-      });
+      expectArraysToMatch(eventsOnFirstHandler, [expectedEvent]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          ...expectedEvent,
+          publications: [
+            {
+              publishedAt: publishDate.toISOString(),
+              failures: [
+                {
+                  subscriptionId: "failingSubscription",
+                  errorMessage: "Failed",
+                },
+              ],
+            },
+          ],
+          status: "failed-but-will-retry",
+        },
+      ]);
     });
   });
 
@@ -189,39 +194,38 @@ describe("InMemoryEventBus", () => {
       const rePublishDate = new Date("2022-01-02");
       timeGateway.setNextDate(rePublishDate);
       const eventsOnInitiallyFailedHandler = spyOnTopic(
-        anEventBus,
+        eventBus,
         "ConventionSubmittedByBeneficiary",
         failedSubscriptionId,
       );
 
       // Act
-      await anEventBus.publish(eventToRePublish);
+      await eventBus.publish(eventToRePublish);
 
       // Assert
-      const expectedEvent: DomainEvent = {
-        ...domainEvt,
-        wasQuarantined: false,
-        publications: [
-          {
-            publishedAt: initialPublishDate.toISOString(),
-            failures: [
-              {
-                subscriptionId: failedSubscriptionId,
-                errorMessage: "Initially Failed",
-              },
-            ],
-          },
-          {
-            publishedAt: rePublishDate.toISOString(),
-            failures: [],
-          },
-        ],
-        status: "published",
-      };
-
-      expect(eventsOnInitiallyFailedHandler).toHaveLength(1);
-      expectObjectsToMatch(eventsOnInitiallyFailedHandler[0], eventToRePublish);
-      expectObjectsToMatch(outboxRepository.events[0], expectedEvent);
+      expectArraysToMatch(eventsOnInitiallyFailedHandler, [eventToRePublish]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          ...domainEvt,
+          wasQuarantined: false,
+          publications: [
+            {
+              publishedAt: initialPublishDate.toISOString(),
+              failures: [
+                {
+                  subscriptionId: failedSubscriptionId,
+                  errorMessage: "Initially Failed",
+                },
+              ],
+            },
+            {
+              publishedAt: rePublishDate.toISOString(),
+              failures: [],
+            },
+          ],
+          status: "published",
+        },
+      ]);
     });
 
     it("only re-executes the subscriptions that failed", async () => {
@@ -229,37 +233,86 @@ describe("InMemoryEventBus", () => {
       const rePublishDate = new Date("2022-01-02");
       timeGateway.setNextDate(rePublishDate);
       const eventsOnFirstHandler = spyOnTopic(
-        anEventBus,
+        eventBus,
         "ConventionSubmittedByBeneficiary",
         "workingSubscription",
       );
       const eventsOnInitiallyFailedHandler = spyOnTopic(
-        anEventBus,
+        eventBus,
         "ConventionSubmittedByBeneficiary",
         failedSubscriptionId,
       );
 
       // Act
-      await anEventBus.publish(eventToRePublish);
+      await eventBus.publish(eventToRePublish);
 
       // Assert
-      const expectedEvent: DomainEvent = {
+      expectArraysToMatch(eventsOnFirstHandler, []);
+      expectArraysToMatch(eventsOnInitiallyFailedHandler, [eventToRePublish]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          ...eventToRePublish,
+          wasQuarantined: false,
+          publications: [
+            ...eventToRePublish.publications,
+            { publishedAt: rePublishDate.toISOString(), failures: [] },
+          ],
+          status: "published",
+        },
+      ]);
+    });
+
+    it("does the work on the last publications even if it is not ordered in event publication", async () => {
+      // Prepare
+      const publications: EventPublication[] = [
+        { publishedAt: new Date("2022-01-02").toISOString(), failures: [] },
+        {
+          publishedAt: new Date("2022-01-01").toISOString(),
+          failures: [
+            {
+              errorMessage: "Initially Failed",
+              subscriptionId: failedSubscriptionId,
+            },
+          ],
+        },
+      ];
+
+      const publishedEventWithNotOrderedPublications: DomainEvent = {
         ...eventToRePublish,
         wasQuarantined: false,
-        publications: [
-          ...eventToRePublish.publications,
-          { publishedAt: rePublishDate.toISOString(), failures: [] },
-        ],
+        publications,
         status: "published",
       };
+      const eventsOnInitiallyFailedHandler = spyOnTopic(
+        eventBus,
+        "ConventionSubmittedByBeneficiary",
+        failedSubscriptionId,
+      );
 
-      expect(eventsOnFirstHandler).toHaveLength(0);
-      expect(eventsOnInitiallyFailedHandler).toHaveLength(1);
-      expectObjectsToMatch(eventsOnInitiallyFailedHandler[0], eventToRePublish);
-      expectObjectsToMatch(outboxRepository.events[0], expectedEvent);
+      // Act
+      const rePublishDate = new Date("2022-02-03");
+      timeGateway.setNextDate(rePublishDate);
+      await eventBus.publish(publishedEventWithNotOrderedPublications);
+
+      // Assert
+      expectArraysToMatch(eventsOnInitiallyFailedHandler, [
+        publishedEventWithNotOrderedPublications,
+      ]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          ...eventToRePublish,
+          wasQuarantined: false,
+          publications: [
+            ...publications,
+            { publishedAt: rePublishDate.toISOString(), failures: [] },
+          ],
+          status: "published",
+        },
+      ]);
     });
 
     it("puts the event in quarantine if it fails at the 4th try", async () => {
+      // Prepare
       const failures: EventFailure[] = [
         {
           subscriptionId: failedSubscriptionId,
@@ -288,7 +341,7 @@ describe("InMemoryEventBus", () => {
 
       const rePublishDate = new Date("2022-01-04");
       timeGateway.setNextDate(rePublishDate);
-      anEventBus.subscribe(
+      eventBus.subscribe(
         "ConventionSubmittedByBeneficiary",
         failedSubscriptionId,
         () => {
@@ -297,34 +350,34 @@ describe("InMemoryEventBus", () => {
       );
 
       // Act
-      await anEventBus.publish(eventPublished3TimesAlready);
+      await eventBus.publish(eventPublished3TimesAlready);
 
       // Assert
-      const expectedEvent: DomainEvent = {
-        ...domainEvt,
-        wasQuarantined: true,
-        status: "failed-to-many-times",
-        publications: [
-          ...eventPublished3TimesAlready.publications,
-          {
-            publishedAt: rePublishDate.toISOString(),
-            failures: [
-              {
-                subscriptionId: failedSubscriptionId,
-                errorMessage: "4th failure",
-              },
-            ],
-          },
-        ],
-      };
-
-      expect(outboxRepository.events).toHaveLength(1);
-      expectObjectsToMatch(outboxRepository.events[0], expectedEvent);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          ...domainEvt,
+          wasQuarantined: true,
+          status: "failed-to-many-times",
+          publications: [
+            ...eventPublished3TimesAlready.publications,
+            {
+              publishedAt: rePublishDate.toISOString(),
+              failures: [
+                {
+                  subscriptionId: failedSubscriptionId,
+                  errorMessage: "4th failure",
+                },
+              ],
+            },
+          ],
+        },
+      ]);
     });
   });
 
   describe("when forcing an event to republish", () => {
-    it("republishes the event and executes all the subscriptions (even if some ", async () => {
+    it("republishes the event and executes all the subscriptions (even if some have succeeded)", async () => {
+      // Prepare
       const initialPublishDate = new Date("2022-01-01");
       const eventToRePublish: DomainEvent = {
         ...domainEvt,
@@ -340,25 +393,28 @@ describe("InMemoryEventBus", () => {
       const rePublishDate = new Date("2022-02-02");
       timeGateway.setNextDate(rePublishDate);
       const eventsOnFirstHandler = spyOnTopic(
-        anEventBus,
+        eventBus,
         "ConventionSubmittedByBeneficiary",
         "workingSubscription",
       );
 
-      expect(eventsOnFirstHandler).toHaveLength(0);
+      expectArraysToMatch(eventsOnFirstHandler, []);
 
-      await anEventBus.publish(eventToRePublish);
+      // Act
+      await eventBus.publish(eventToRePublish);
 
-      expect(outboxRepository.events).toHaveLength(1);
-      expectToEqual(outboxRepository.events[0], {
-        ...eventToRePublish,
-        status: "published",
-        publications: [
-          ...eventToRePublish.publications,
-          { publishedAt: rePublishDate.toISOString(), failures: [] },
-        ],
-      });
-      expect(eventsOnFirstHandler).toHaveLength(1);
+      // Assert
+      expectArraysToMatch(eventsOnFirstHandler, [eventToRePublish]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          ...eventToRePublish,
+          status: "published",
+          publications: [
+            ...eventToRePublish.publications,
+            { publishedAt: rePublishDate.toISOString(), failures: [] },
+          ],
+        },
+      ]);
     });
   });
 });
