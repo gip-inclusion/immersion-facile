@@ -164,8 +164,8 @@ export class PgOutboxRepository implements OutboxRepository {
 
 export const storedEventRowsToDomainEvent = (
   eventRowsForEvent: StoredEventRow[],
-): DomainEvent =>
-  eventRowsForEvent.reduce(
+): DomainEvent => {
+  const event = eventRowsForEvent.reduce(
     (acc, row): DomainEvent => {
       if (!row.published_at) {
         return {
@@ -227,6 +227,11 @@ export const storedEventRowsToDomainEvent = (
     },
     { publications: [] } as unknown as DomainEvent,
   );
+
+  event.publications.sort((a, b) => a.publishedAt.localeCompare(b.publishedAt));
+
+  return event;
+};
 
 const storedEventOutboxToDomainEvent = (row: StoredEventRow): DomainEvent => ({
   id: row.id,

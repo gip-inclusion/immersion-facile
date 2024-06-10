@@ -51,13 +51,13 @@ export class PgOutboxQueries implements OutboxQueries {
      SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
        outbox_publications.id as publication_id, published_at,
        subscription_id, error_message
-     FROM outbox
+          FROM outbox
      LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
      LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-     WHERE outbox.id IN ${selectEventIdsStillFailing}
-     ORDER BY outbox_failures.subscription_id ASC
-     LIMIT ${params.limit}
-    `,
+          WHERE outbox.id IN ${selectEventIdsStillFailing}
+          ORDER BY outbox.occurred_at, outbox_publications.published_at, outbox_failures.subscription_id, outbox_failures.id ASC
+          LIMIT ${params.limit}
+      `,
     );
 
     return convertRowsToDomainEvents(rows);
@@ -72,13 +72,13 @@ export class PgOutboxQueries implements OutboxQueries {
     SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
       outbox_publications.id as publication_id, published_at,
       subscription_id, error_message
-    FROM outbox
+          FROM outbox
     LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
     LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
     WHERE was_quarantined = false AND status IN ('never-published', 'to-republish')
-    ORDER BY occurred_at ASC
-    LIMIT ${params.limit}
-    `,
+          ORDER BY occurred_at ASC
+          LIMIT ${params.limit}
+      `,
     );
 
     return convertRowsToDomainEvents(rows);
