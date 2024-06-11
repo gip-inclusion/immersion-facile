@@ -14,6 +14,7 @@ import {
   WithConventionDto,
   WithConventionIdLegacy,
   WithFormEstablishmentDto,
+  WithOptionalUserId,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentEntity";
@@ -69,28 +70,27 @@ export type UserAuthenticatedPayload = {
   codeSafir: string | null;
 };
 
-// prettier-ignore
+type WithConventionAndOptionalUserId = WithConventionDto & WithOptionalUserId;
+
+// biome-ignore format: better readability without formatting
 export type DomainEvent =
   | NotificationAddedEvent
   | NotificationBatchAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
-  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto>
-  | GenericEvent<"ConventionSubmittedAfterModification", WithConventionDto>
-  | GenericEvent<"ConventionPartiallySigned", WithConventionDto>
-  | GenericEvent<"ConventionFullySigned", WithConventionDto>
-  | GenericEvent<"ConventionAcceptedByCounsellor", WithConventionDto>
-  | GenericEvent<"ConventionAcceptedByValidator", WithConventionDto>
+  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionSubmittedAfterModification", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionPartiallySigned", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionFullySigned", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionAcceptedByCounsellor", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionAcceptedByValidator", WithConventionAndOptionalUserId>
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
 
   // UNHAPPY PATHS
-  | GenericEvent<"ConventionRejected", WithConventionDto>
-  | GenericEvent<"ConventionCancelled", WithConventionDto>
-  | GenericEvent<
-      "ConventionRequiresModification",
-      ConventionRequiresModificationPayload
-    >
-  | GenericEvent<"ConventionDeprecated", WithConventionDto>
+  | GenericEvent<"ConventionRejected", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionCancelled", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionRequiresModification", ConventionRequiresModificationPayload>
+  | GenericEvent<"ConventionDeprecated", WithConventionAndOptionalUserId>
 
   // MAGIC LINK RENEWAL
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>
@@ -98,15 +98,9 @@ export type DomainEvent =
   // FORM ESTABLISHMENT RELATED
   | GenericEvent<"FormEstablishmentAdded", WithFormEstablishmentDto>
   | GenericEvent<"FormEstablishmentEdited", WithFormEstablishmentDto>
-  | GenericEvent<
-      "ContactRequestedByBeneficiary",
-      ContactEstablishmentEventPayload
-    >
+  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload>
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload>
-  | GenericEvent<
-      "NewEstablishmentAggregateInsertedFromForm",
-      WithEstablishmentAggregate
-    >
+  | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate>
 
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
@@ -123,24 +117,18 @@ export type DomainEvent =
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
   // PECONNECT related
-  | GenericEvent<"FederatedIdentityBoundToConvention", WithConventionDto>
-  | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto>
+  | GenericEvent<"FederatedIdentityBoundToConvention", WithConventionAndOptionalUserId>
+  | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionAndOptionalUserId>
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload>
-  | GenericEvent<
-      "AgencyRegisteredToInclusionConnectedUser",
-      { userId: UserId; agencyIds: AgencyId[] }
-    >
+  | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: UserId; agencyIds: AgencyId[] }>
   | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams>
   | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams>
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string }>
   // ERRORED CONVENTION RELATED
-  | GenericEvent<
-      "PartnerErroredConventionMarkedAsHandled",
-      { conventionId: ConventionId; userId: UserId }
-    >;
+  | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId }>;
 
 export type DomainTopic = DomainEvent["topic"];
 
