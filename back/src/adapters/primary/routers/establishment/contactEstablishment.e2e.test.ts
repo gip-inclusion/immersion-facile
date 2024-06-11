@@ -93,7 +93,7 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
     expectArraysToMatch(inMemoryUow.outboxRepository.events, [
       {
         topic: "ContactRequestedByBeneficiary",
-        payload: { ...validRequest, discussionId },
+        payload: { ...validRequest, discussionId, triggeredBy: undefined },
       },
     ]);
 

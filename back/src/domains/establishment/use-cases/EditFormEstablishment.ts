@@ -40,6 +40,40 @@ export class EditFormEstablishment extends TransactionalUseCase<
 
     if ("siret" in jwtPayload && jwtPayload.siret !== formEstablishment.siret)
       throw new ForbiddenError("Siret mismatch in JWT payload and form");
+
+    const user = await this.#getUserIfExistAndAllowed(
+      uow,
+      jwtPayload,
+      formEstablishment,
+    );
+
+    await Promise.all([
+      uow.formEstablishmentRepository.update(formEstablishment),
+      uow.outboxRepository.save(
+        this.#createNewEvent({
+          topic: "FormEstablishmentEdited",
+          payload: {
+            formEstablishment,
+            triggeredBy: user
+              ? {
+                  kind: "inclusion-connected",
+                  userId: user.id,
+                }
+              : {
+                  kind: "establishment-magic-link",
+                  siret: formEstablishment.siret,
+                },
+          },
+        }),
+      ),
+    ]);
+  }
+
+  async #getUserIfExistAndAllowed(
+    uow: UnitOfWork,
+    jwtPayload: EstablishmentDomainPayload | InclusionConnectDomainJwtPayload,
+    formEstablishment: FormEstablishmentDto,
+  ) {
     if ("userId" in jwtPayload) {
       const user = await uow.inclusionConnectedUserRepository.getById(
         jwtPayload.userId,
@@ -50,17 +84,8 @@ export class EditFormEstablishment extends TransactionalUseCase<
         );
 
       throwIfIcUserNotAllowed(user, formEstablishment);
+      return user;
     }
-
-    await Promise.all([
-      uow.formEstablishmentRepository.update(formEstablishment),
-      uow.outboxRepository.save(
-        this.#createNewEvent({
-          topic: "FormEstablishmentEdited",
-          payload: { formEstablishment },
-        }),
-      ),
-    ]);
   }
 }
 

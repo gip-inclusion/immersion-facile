@@ -1,13 +1,22 @@
-import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
+import {
+  FormEstablishmentDto,
+  InclusionConnectedUser,
+  formEstablishmentSchema,
+} from "shared";
 import { ConflictError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";
 import { SiretGateway } from "../../core/sirene/ports/SirenGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-export class AddFormEstablishment extends TransactionalUseCase<FormEstablishmentDto> {
+export class AddFormEstablishment extends TransactionalUseCase<
+  FormEstablishmentDto,
+  void,
+  InclusionConnectedUser
+> {
   protected inputSchema = formEstablishmentSchema;
 
   readonly #createNewEvent: CreateNewEvent;
@@ -28,6 +37,7 @@ export class AddFormEstablishment extends TransactionalUseCase<FormEstablishment
   protected async _execute(
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
+    currentUser?: InclusionConnectedUser,
   ): Promise<void> {
     const existingFormEstablishment =
       await uow.formEstablishmentRepository.getBySiret(dto.siret);
@@ -53,9 +63,17 @@ export class AddFormEstablishment extends TransactionalUseCase<FormEstablishment
           : dto.businessNameCustomized,
     };
 
+    const triggeredBy: TriggeredBy | undefined = currentUser && {
+      kind: "inclusion-connected",
+      userId: currentUser.id,
+    };
+
     const event = this.#createNewEvent({
       topic: "FormEstablishmentAdded",
-      payload: { formEstablishment: correctFormEstablishment },
+      payload: {
+        formEstablishment: correctFormEstablishment,
+        triggeredBy,
+      },
     });
 
     await Promise.all([

@@ -141,7 +141,11 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     await uow.outboxRepository.save(
       this.#createNewEvent({
         topic: "ContactRequestedByBeneficiary",
-        payload: { ...contactRequest, discussionId: discussion.id },
+        payload: {
+          ...contactRequest,
+          discussionId: discussion.id,
+          triggeredBy: undefined,
+        },
       }),
     );
   }

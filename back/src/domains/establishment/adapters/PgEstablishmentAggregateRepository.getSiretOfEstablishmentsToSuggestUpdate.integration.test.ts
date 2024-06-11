@@ -71,6 +71,10 @@ describe("PgScriptsQueries", () => {
         payload: {
           siret: establishmentWithLinkSentEvent.establishment.siret,
           version: 1,
+          triggeredBy: {
+            kind: "establishment-magic-link",
+            siret: establishmentWithLinkSentEvent.establishment.siret,
+          },
         },
         occurredAt: addDays(before, 1).toISOString(),
         publications: [],
