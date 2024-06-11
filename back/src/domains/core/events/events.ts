@@ -74,11 +74,9 @@ export type TriggeredBy =
   | { kind: "inclusion-connected"; userId: UserId }
   | { kind: "magic-link"; role: Role };
 
-type WithTriggeredBy = {
+export type WithTriggeredBy = {
   triggeredBy: TriggeredBy | undefined;
 };
-
-type WithConventionAndOptionalUserId = WithConventionDto & WithTriggeredBy;
 
 // biome-ignore format: better readability without formatting
 export type DomainEvent =
@@ -86,19 +84,19 @@ export type DomainEvent =
   | NotificationBatchAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
-  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionAndOptionalUserId>
-  | GenericEvent<"ConventionSubmittedAfterModification", WithConventionAndOptionalUserId>
-  | GenericEvent<"ConventionPartiallySigned", WithConventionAndOptionalUserId>
-  | GenericEvent<"ConventionFullySigned", WithConventionAndOptionalUserId>
-  | GenericEvent<"ConventionAcceptedByCounsellor", WithConventionAndOptionalUserId>
-  | GenericEvent<"ConventionAcceptedByValidator", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionSubmittedAfterModification", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionPartiallySigned", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionFullySigned", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionAcceptedByCounsellor", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionAcceptedByValidator", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
 
   // UNHAPPY PATHS
-  | GenericEvent<"ConventionRejected", WithConventionAndOptionalUserId>
-  | GenericEvent<"ConventionCancelled", WithConventionAndOptionalUserId>
-  | GenericEvent<"ConventionRequiresModification", ConventionRequiresModificationPayload>
-  | GenericEvent<"ConventionDeprecated", WithConventionAndOptionalUserId>
+  | GenericEvent<"ConventionRejected", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionRequiresModification", ConventionRequiresModificationPayload & WithTriggeredBy>
+  | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
 
   // MAGIC LINK RENEWAL
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>
@@ -125,8 +123,8 @@ export type DomainEvent =
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
   // PECONNECT related
-  | GenericEvent<"FederatedIdentityBoundToConvention", WithConventionAndOptionalUserId>
-  | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionAndOptionalUserId>
+  | GenericEvent<"FederatedIdentityBoundToConvention", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto & WithTriggeredBy>
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload>

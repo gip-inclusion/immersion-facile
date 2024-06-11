@@ -306,7 +306,13 @@ describe("Update Convention", () => {
         uow.outboxRepository.events[0],
         createNewEvent({
           topic: "ConventionSubmittedAfterModification",
-          payload: { convention: inReviewConvention },
+          payload: {
+            convention: inReviewConvention,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: backofficeAdminUser.id,
+            },
+          },
         }),
       );
 
