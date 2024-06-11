@@ -8,13 +8,13 @@ import {
   Flavor,
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
+  Role,
   UserId,
   WithAgencyDto,
   WithAssessmentDto,
   WithConventionDto,
   WithConventionIdLegacy,
   WithFormEstablishmentDto,
-  WithOptionalUserId,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentEntity";
@@ -70,7 +70,15 @@ export type UserAuthenticatedPayload = {
   codeSafir: string | null;
 };
 
-type WithConventionAndOptionalUserId = WithConventionDto & WithOptionalUserId;
+export type TriggeredBy =
+  | { kind: "inclusion-connected"; userId: UserId }
+  | { kind: "magic-link"; role: Role };
+
+type WithTriggeredBy = {
+  triggeredBy: TriggeredBy;
+};
+
+type WithConventionAndOptionalUserId = WithConventionDto & WithTriggeredBy;
 
 // biome-ignore format: better readability without formatting
 export type DomainEvent =
