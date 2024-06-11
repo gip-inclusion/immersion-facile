@@ -1,25 +1,22 @@
 import {
   AgencyRight,
   IcUserRoleForAgencyParams,
-  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
   icUserRoleForAgencyParamsSchema,
   replaceElementWhere,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { throwIfNotAdmin } from "../../core/authentication/inclusion-connect/helpers/ic-user.helpers";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfIcUserNotBackofficeAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
   IcUserRoleForAgencyParams,
   void,
-  InclusionConnectDomainJwtPayload
+  InclusionConnectedUser
 > {
   protected inputSchema = icUserRoleForAgencyParamsSchema;
 
@@ -37,12 +34,9 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
   protected async _execute(
     params: IcUserRoleForAgencyParams,
     uow: UnitOfWork,
-    jwtPayload: InclusionConnectDomainJwtPayload,
+    currentUser: InclusionConnectedUser,
   ): Promise<void> {
-    if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
-
-    await throwIfIcUserNotBackofficeAdmin(uow, jwtPayload);
-
+    throwIfNotAdmin(currentUser);
     const userToUpdate = await uow.inclusionConnectedUserRepository.getById(
       params.userId,
     );

@@ -1,12 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import { makeVerifyJwtES256 } from "../../domains/core/jwt";
+import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { createLogger } from "../../utils/logger";
+import { NotFoundError } from "../helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
-export const makeAdminAuthMiddleware = (jwtPublicKey: string) => {
+export const makeAdminAuthMiddleware = (
+  jwtPublicKey: string,
+  uowPerformer: UnitOfWorkPerformer,
+) => {
   const verifyJwt = makeVerifyJwtES256<"inclusionConnect">(jwtPublicKey);
-  return (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
       return res.status(401).json({ error: "You need to authenticate first" });
     }
@@ -15,7 +20,14 @@ export const makeAdminAuthMiddleware = (jwtPublicKey: string) => {
       if (!payload.userId)
         return res.status(401).json({ errors: "Accès refusé" });
 
-      req.payloads = { inclusion: payload };
+      const currentIcUser = await uowPerformer.perform((uow) =>
+        uow.inclusionConnectedUserRepository.getById(payload.userId),
+      );
+      if (!currentIcUser)
+        throw new NotFoundError(`No user found with id : ${payload.userId}`);
+
+      req.payloads = { inclusion: payload, currentUser: currentIcUser };
+
       return next();
     } catch (error: any) {
       if ("name" in error && error.name === "TokenExpiredError") {

@@ -18,6 +18,7 @@ export const currentJwtVersions: Record<PayloadKey, number> = {
   convention: 1,
   establishment: 1,
   inclusion: 1,
+  currentUser: 1, // useless, just for typecheck
 };
 
 export type JwtDto = {

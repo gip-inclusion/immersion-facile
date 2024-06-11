@@ -66,9 +66,10 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res.status(204), () =>
         deps.useCases.deleteEstablishment.execute(
           req.params,
-          req.payloads?.inclusion,
+          req.payloads?.currentUser,
         ),
       ),
   );
+
   return establishmentRouter;
 };

@@ -1,5 +1,8 @@
 import { ConventionId } from "../convention/convention.dto";
-import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import {
+  InclusionConnectedUser,
+  UserId,
+} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { Role } from "../role/role.dto";
 import { SiretDto } from "../siret/siret";
 import { ValueOf } from "../utils";
@@ -53,6 +56,7 @@ export type JwtPayloads = {
   convention?: ConventionJwtPayload;
   establishment?: EstablishmentJwtPayload;
   inclusion?: InclusionConnectJwtPayload;
+  currentUser?: InclusionConnectedUser;
 };
 export type PayloadKey = keyof JwtPayloads;
 export type PayloadOption = ValueOf<Required<JwtPayloads>>;

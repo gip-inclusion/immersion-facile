@@ -102,7 +102,10 @@ export const createAppDependencies = async (config: AppConfig) => {
       gateways.timeGateway,
       config,
     ),
-    adminAuthMiddleware: await makeAdminAuthMiddleware(config.jwtPublicKey),
+    adminAuthMiddleware: await makeAdminAuthMiddleware(
+      config.jwtPublicKey,
+      uowPerformer,
+    ),
     generateEditEstablishmentJwt,
     generateConventionJwt,
     generateApiConsumerJwt,

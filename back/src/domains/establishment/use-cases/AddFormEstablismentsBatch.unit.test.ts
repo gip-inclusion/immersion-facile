@@ -3,10 +3,16 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   GroupOptions,
+  InclusionConnectedUserBuilder,
   defaultValidFormEstablishment,
   expectObjectsToMatch,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import {
+  ForbiddenError,
+  UnauthorizedError,
+} from "../../../config/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
@@ -25,6 +31,14 @@ import { InMemoryFormEstablishmentRepository } from "../adapters/InMemoryFormEst
 import { InMemoryGroupRepository } from "../adapters/InMemoryGroupRepository";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
+
+const icUserNotAdmin = new InclusionConnectedUserBuilder()
+  .withIsAdmin(false)
+  .build();
+
+const icUserAdmin = new InclusionConnectedUserBuilder()
+  .withIsAdmin(true)
+  .build();
 
 const groupOptions: GroupOptions = {
   heroHeader: {
@@ -94,9 +108,24 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     );
   });
 
+  it("throws Unauthorized if no currentUser is provided", async () => {
+    await expectPromiseToFailWithError(
+      addFormEstablishmentBatch.execute(formEstablishmentBatch),
+      new UnauthorizedError(),
+    );
+  });
+
+  it("throws Forbidden if currentUser user is not admin", async () => {
+    await expectPromiseToFailWithError(
+      addFormEstablishmentBatch.execute(formEstablishmentBatch, icUserNotAdmin),
+      new ForbiddenError("Insufficient privileges for this user"),
+    );
+  });
+
   it("Adds two formEstablishments successfully and returns report", async () => {
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
+      icUserAdmin,
     );
 
     const formEstablishmentsInRepo = await formEstablishmentRepo.getAll();
@@ -123,6 +152,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
+      icUserAdmin,
     );
 
     expectToEqual(report, {
@@ -141,7 +171,10 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   it("Saves an event with topic : 'FormEstablishmentAdded'", async () => {
     uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
 
-    await addFormEstablishmentBatch.execute(formEstablishmentBatch);
+    await addFormEstablishmentBatch.execute(
+      formEstablishmentBatch,
+      icUserAdmin,
+    );
 
     expect(outboxRepo.events).toHaveLength(2);
     expectObjectsToMatch(outboxRepo.events[0], {
@@ -163,7 +196,10 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   it("creates the establishmentGroup with the sirets of the establishments", async () => {
     uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
 
-    await addFormEstablishmentBatch.execute(formEstablishmentBatch);
+    await addFormEstablishmentBatch.execute(
+      formEstablishmentBatch,
+      icUserAdmin,
+    );
 
     expect(groupRepository.groupEntities).toHaveLength(1);
     expectToEqual(groupRepository.groupEntities[0], {
@@ -192,6 +228,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
+      icUserAdmin,
     );
 
     expectToEqual(report, {

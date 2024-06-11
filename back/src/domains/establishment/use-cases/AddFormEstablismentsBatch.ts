@@ -1,13 +1,14 @@
 import {
-  CommonJwtPayload,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
+  InclusionConnectedUser,
   castError,
   formEstablishmentBatchSchema,
   slugify,
   splitInChunks,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
+import { throwIfNotAdmin } from "../../core/authentication/inclusion-connect/helpers/ic-user.helpers";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { GroupEntity } from "../entities/GroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
@@ -15,7 +16,7 @@ import { AddFormEstablishment } from "./AddFormEstablishment";
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,
   EstablishmentBatchReport,
-  CommonJwtPayload
+  InclusionConnectedUser
 > {
   protected inputSchema = formEstablishmentBatchSchema;
 
@@ -26,12 +27,16 @@ export class AddFormEstablishmentBatch extends UseCase<
     super();
   }
 
-  protected async _execute({
-    formEstablishments,
-    groupName,
-    description,
-    title,
-  }: FormEstablishmentBatchDto): Promise<EstablishmentBatchReport> {
+  protected async _execute(
+    {
+      formEstablishments,
+      groupName,
+      description,
+      title,
+    }: FormEstablishmentBatchDto,
+    currentUser: InclusionConnectedUser,
+  ): Promise<EstablishmentBatchReport> {
+    throwIfNotAdmin(currentUser);
     const group: GroupEntity = {
       slug: slugify(groupName),
       name: groupName,

@@ -1,30 +1,25 @@
 import {
-  InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
   WithAgencyRole,
   withAgencyRoleSchema,
 } from "shared";
-import { ForbiddenError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { throwIfNotAdmin } from "../../core/authentication/inclusion-connect/helpers/ic-user.helpers";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { throwIfIcUserNotBackofficeAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class GetInclusionConnectedUsers extends TransactionalUseCase<
   WithAgencyRole,
   InclusionConnectedUser[],
-  InclusionConnectDomainJwtPayload
+  InclusionConnectedUser
 > {
   protected inputSchema = withAgencyRoleSchema;
 
   protected async _execute(
     { agencyRole }: WithAgencyRole,
     uow: UnitOfWork,
-    jwtPayload?: InclusionConnectDomainJwtPayload,
+    currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser[]> {
-    if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
-
-    await throwIfIcUserNotBackofficeAdmin(uow, jwtPayload);
-
+    throwIfNotAdmin(currentUser);
     return uow.inclusionConnectedUserRepository.getWithFilter({ agencyRole });
   }
 }

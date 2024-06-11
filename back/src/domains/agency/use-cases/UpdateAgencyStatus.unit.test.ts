@@ -1,12 +1,11 @@
 import {
   AgencyDtoBuilder,
-  InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
   UpdateAgencyStatusParamsWithoutId,
   expectPromiseToFailWithError,
 } from "shared";
 import {
-  ConflictError,
+  ForbiddenError,
   NotFoundError,
   UnauthorizedError,
 } from "../../../config/helpers/httpErrors";
@@ -26,10 +25,6 @@ const nextUuid = "event-uuid";
 const backofficeAdmin = new InclusionConnectedUserBuilder()
   .withIsAdmin(true)
   .build();
-
-const backofficeJwtPayload: InclusionConnectDomainJwtPayload = {
-  userId: backofficeAdmin.id,
-};
 
 describe("Update agency status", () => {
   let updateAgencyStatus: UpdateAgencyStatus;
@@ -77,7 +72,7 @@ describe("Update agency status", () => {
             id: existingAgency.id,
             ...testParams,
           },
-          backofficeJwtPayload,
+          backofficeAdmin,
         );
 
         // Assert
@@ -111,58 +106,25 @@ describe("Update agency status", () => {
       );
     });
 
+    it("returns Forbbiden if user is not admin", async () => {
+      await expectPromiseToFailWithError(
+        updateAgencyStatus.execute(
+          { id: existingAgency.id, status: "active" },
+          { ...backofficeAdmin, isBackofficeAdmin: false },
+        ),
+        new ForbiddenError("Insufficient privileges for this user"),
+      );
+    });
+
     it("returns 404 if agency not found", async () => {
       const agencyId = "not-found-id";
       await expectPromiseToFailWithError(
         updateAgencyStatus.execute(
           { id: agencyId, status: "active" },
-          backofficeJwtPayload,
+          backofficeAdmin,
         ),
         new NotFoundError(`No agency found with id ${agencyId}`),
       );
-    });
-
-    it("returns HTTP 409 if attempt to update to another existing agency (with same address and kind, and a status 'active' or 'from-api-PE', (except if user is admin))", async () => {
-      const user = new InclusionConnectedUserBuilder()
-        .withId("not-admin-id")
-        .withIsAdmin(false)
-        .build();
-
-      const backofficeAdmin = new InclusionConnectedUserBuilder()
-        .withId("admin-id")
-        .withIsAdmin(true)
-        .build();
-
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        user,
-        backofficeAdmin,
-      ]);
-
-      const agencyToUpdate = new AgencyDtoBuilder()
-        .withId("agency-to-update-id")
-        .withStatus("needsReview")
-        .withAddress(existingAgency.address)
-        .withKind(existingAgency.kind)
-        .build();
-
-      uow.agencyRepository.setAgencies([agencyToUpdate, existingAgency]);
-
-      await expectPromiseToFailWithError(
-        updateAgencyStatus.execute(
-          { id: agencyToUpdate.id, status: "active" },
-          { userId: user.id },
-        ),
-        new ConflictError(
-          "Une autre agence du même type existe avec la même adresse",
-        ),
-      );
-
-      // if user is admin, no conflict error
-      const resultWithoutError = await updateAgencyStatus.execute(
-        { id: agencyToUpdate.id, status: "active" },
-        { userId: backofficeAdmin.id },
-      );
-      expect(resultWithoutError).toBeUndefined();
     });
   });
 });

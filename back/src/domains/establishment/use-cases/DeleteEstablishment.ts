@@ -1,20 +1,17 @@
 import {
-  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
   SiretDto,
   addressDtoToString,
   siretSchema,
 } from "shared";
 import { z } from "zod";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { throwIfNotAdmin } from "../../core/authentication/inclusion-connect/helpers/ic-user.helpers";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfIcUserNotBackofficeAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
 import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
 
 type DeleteEstablishmentPayload = {
@@ -29,7 +26,7 @@ const deleteEstablishmentPayloadSchema: z.Schema<DeleteEstablishmentPayload> =
 export class DeleteEstablishment extends TransactionalUseCase<
   DeleteEstablishmentPayload,
   void,
-  InclusionConnectDomainJwtPayload
+  InclusionConnectedUser
 > {
   protected inputSchema = deleteEstablishmentPayloadSchema;
 
@@ -44,10 +41,9 @@ export class DeleteEstablishment extends TransactionalUseCase<
   public async _execute(
     { siret }: DeleteEstablishmentPayload,
     uow: UnitOfWork,
-    jwtPayload?: InclusionConnectDomainJwtPayload,
+    currentUser: InclusionConnectedUser,
   ): Promise<void> {
-    if (!jwtPayload) throw new ForbiddenError("Jwt payload not provided");
-    await throwIfIcUserNotBackofficeAdmin(uow, jwtPayload);
+    throwIfNotAdmin(currentUser);
 
     const groupsWithSiret = await uow.groupRepository.groupsWithSiret(siret);
 
