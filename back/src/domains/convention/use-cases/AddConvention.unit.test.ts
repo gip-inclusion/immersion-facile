@@ -72,7 +72,7 @@ describe("Add Convention", () => {
         id,
         occurredAt: occurredAt.toISOString(),
         topic: "ConventionSubmittedByBeneficiary",
-        payload: { convention: validConvention },
+        payload: { convention: validConvention, triggeredBy: undefined },
         publications: [],
         status: "never-published",
         wasQuarantined: false,

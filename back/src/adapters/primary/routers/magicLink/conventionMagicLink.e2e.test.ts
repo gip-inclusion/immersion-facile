@@ -527,8 +527,7 @@ describe("Magic link router", () => {
 
       expectToEqual(response.status, 403);
       expectToEqual(response.body, {
-        errors:
-          "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
+        errors: `User '${icUser.id}' is not the establishment representative for convention '${convention.id}'`,
       });
     });
   });
