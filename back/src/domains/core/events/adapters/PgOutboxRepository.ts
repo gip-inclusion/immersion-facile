@@ -1,9 +1,6 @@
 import { differenceWith } from "ramda";
 import { DateString, castError, propEq, replaceArrayElement } from "shared";
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
 import type {
@@ -167,22 +164,29 @@ export class PgOutboxRepository implements OutboxRepository {
   }
 
   async #getEventById(id: string): Promise<DomainEvent | undefined> {
-    const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
-      this.transaction,
-      `
-        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
-          outbox_publications.id as publication_id, published_at,
-          subscription_id, error_message 
-        FROM outbox
-        LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
-        LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-        WHERE outbox.id = $1
-        ORDER BY published_at ASC
-      `,
-      [id],
-    );
-    if (!rows.length) return;
-    return storedEventRowsToDomainEvent(rows);
+    const results = await this.transaction
+      .selectFrom("outbox")
+      .leftJoin("outbox_publications", "outbox.id", "event_id")
+      .leftJoin("outbox_failures", "outbox_publications.id", "publication_id")
+      .select([
+        "outbox.id as id",
+        "occurred_at",
+        "was_quarantined",
+        "topic",
+        "payload",
+        "status",
+        "outbox_publications.id as publication_id",
+        "published_at",
+        "subscription_id",
+        "error_message",
+      ])
+      .where("outbox.id", "=", id)
+      .orderBy("published_at asc")
+      .execute();
+
+    return !results.length
+      ? undefined
+      : storedEventRowsToDomainEvent(results as StoredEventRow[]);
   }
 }
 
