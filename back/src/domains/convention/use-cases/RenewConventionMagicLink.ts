@@ -197,6 +197,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
                 frontRoutes.conventionStatusDashboard,
               ),
               conventionId,
+              triggeredBy: { kind: "magic-link", role },
             },
           }),
         );

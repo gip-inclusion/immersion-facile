@@ -29,6 +29,7 @@ describe("Notify Discord", () => {
         magicLink: "http://0000magicLink00000",
         conventionStatusLink: "http://0000conventionStatusLink00000",
         conventionId: "123",
+        triggeredBy: undefined,
       },
       status: "failed-but-will-retry",
       publications: [
