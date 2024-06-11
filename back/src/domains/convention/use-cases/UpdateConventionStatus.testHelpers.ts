@@ -470,7 +470,10 @@ const makeTestAcceptsStatusUpdate =
         expectedDomainTopic,
         {
           topic: "ConventionRequiresModification",
-          payload,
+          payload: {
+            ...payload,
+            triggeredBy,
+          },
         },
         outboxRepository,
       );

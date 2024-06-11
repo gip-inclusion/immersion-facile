@@ -14,6 +14,7 @@ import {
   UnauthorizedError,
 } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -62,12 +63,23 @@ export class UpdateConvention extends TransactionalUseCase<
       );
     }
 
+    const triggeredBy: TriggeredBy =
+      "userId" in jwtPayload
+        ? {
+            kind: "inclusion-connected",
+            userId: jwtPayload.userId,
+          }
+        : {
+            kind: "magic-link",
+            role: jwtPayload.role,
+          };
+
     await Promise.all([
       uow.conventionRepository.update(convention),
       uow.outboxRepository.save(
         this.createNewEvent({
           topic: "ConventionSubmittedAfterModification",
-          payload: { convention },
+          payload: { convention, triggeredBy },
         }),
       ),
     ]);

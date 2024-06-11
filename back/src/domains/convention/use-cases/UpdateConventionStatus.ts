@@ -24,7 +24,11 @@ import {
 import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
-import { DomainTopic, TriggeredBy } from "../../core/events/events";
+import {
+  DomainTopic,
+  TriggeredBy,
+  WithTriggeredBy,
+} from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -174,12 +178,14 @@ export class UpdateConventionStatus extends TransactionalUseCase<
                       payload,
                       conventionRead,
                     ),
+                    triggeredBy,
                   }
                 : {
                     requesterRole: getRequesterRole(roles),
                     convention: updatedConvention,
                     justification: params.statusJustification,
                     modifierRole: params.modifierRole,
+                    triggeredBy,
                   },
             )
           : this.#createEvent(updatedConvention, domainTopic, triggeredBy);
@@ -277,7 +283,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   }
 
   #createRequireModificationEvent(
-    payload: ConventionRequiresModificationPayload,
+    payload: ConventionRequiresModificationPayload & WithTriggeredBy,
   ) {
     return this.createNewEvent({
       topic: "ConventionRequiresModification",
