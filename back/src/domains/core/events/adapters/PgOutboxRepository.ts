@@ -1,4 +1,3 @@
-import format from "pg-format";
 import { differenceWith } from "ramda";
 import { DateString, castError, propEq, replaceArrayElement } from "shared";
 import {
@@ -46,17 +45,18 @@ export class PgOutboxRepository implements OutboxRepository {
   }
 
   public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {
-    if (!events.length) return;
-    const query = format(
-      `
-        UPDATE outbox
-        SET status = 'in-process'
-        WHERE id IN %L
-    `,
-      [events.map((event) => event.id)],
-    );
-
-    await executeKyselyRawSqlQuery(this.transaction, query);
+    if (events.length)
+      await this.transaction
+        .updateTable("outbox")
+        .set({
+          status: "in-process",
+        })
+        .where(
+          "id",
+          "in",
+          events.map(({ id }) => id),
+        )
+        .execute();
   }
 
   public async save(event: DomainEvent): Promise<void> {
