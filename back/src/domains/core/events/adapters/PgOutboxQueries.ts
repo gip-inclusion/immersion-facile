@@ -1,9 +1,6 @@
 import { groupBy, map, prop, values } from "ramda";
 import { pipeWithValue } from "shared";
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { DomainEvent } from "../events";
 import { OutboxQueries } from "../ports/OutboxQueries";
 import {
@@ -60,14 +57,14 @@ export class PgOutboxQueries implements OutboxQueries {
       )
       .select([
         "outbox.id as id",
-        "outbox.occurred_at",
-        "outbox.was_quarantined",
-        "outbox.topic",
-        "outbox.payload",
-        "outbox.status",
+        "occurred_at",
+        "was_quarantined",
+        "topic",
+        "payload",
+        "status",
         "outbox_publications.id as publication_id",
-        "outbox_publications.published_at",
-        "outbox_failures.subscription_id",
+        "published_at",
+        "subscription_id",
         "error_message",
       ])
       .where("outbox.id", "in", ({ selectFrom }) =>
@@ -101,22 +98,37 @@ export class PgOutboxQueries implements OutboxQueries {
   public async getEventsToPublish(params: { limit: number }): Promise<
     DomainEvent[]
   > {
-    const { rows } = await executeKyselyRawSqlQuery<StoredEventRow>(
-      this.transaction,
-      `
-    SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
-      outbox_publications.id as publication_id, published_at,
-      subscription_id, error_message
-          FROM outbox
-    LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
-    LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-    WHERE was_quarantined = false AND status IN ('never-published', 'to-republish')
-          ORDER BY occurred_at ASC
-          LIMIT ${params.limit}
-      `,
-    );
+    const results = await this.transaction
+      .selectFrom("outbox")
+      .leftJoin(
+        "outbox_publications",
+        "outbox.id",
+        "outbox_publications.event_id",
+      )
+      .leftJoin(
+        "outbox_failures",
+        "outbox_publications.id",
+        "outbox_failures.publication_id",
+      )
+      .select([
+        "outbox.id as id",
+        "occurred_at",
+        "was_quarantined",
+        "topic",
+        "payload",
+        "status",
+        "outbox_publications.id as publication_id",
+        "published_at",
+        "subscription_id",
+        "error_message",
+      ])
+      .where("was_quarantined", "=", false)
+      .where("status", "in", ["never-published", "to-republish"])
+      .orderBy("occurred_at asc")
+      .limit(params.limit)
+      .execute();
 
-    return convertRowsToDomainEvents(rows);
+    return convertRowsToDomainEvents(results as StoredEventRow[]);
   }
 }
 
