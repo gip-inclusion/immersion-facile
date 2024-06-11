@@ -17,7 +17,10 @@ import { InMemoryEventBus } from "./InMemoryEventBus";
 const domainEvt: DomainEvent = {
   id: "anId",
   topic: "ConventionSubmittedByBeneficiary",
-  payload: { convention: new ConventionDtoBuilder().build() },
+  payload: {
+    convention: new ConventionDtoBuilder().build(),
+    triggeredBy: undefined,
+  },
   occurredAt: "a date",
   wasQuarantined: false,
   status: "never-published",
