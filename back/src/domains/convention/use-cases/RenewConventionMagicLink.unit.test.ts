@@ -144,7 +144,7 @@ describe("RenewConventionMagicLink use case", () => {
           renewalEvent.payload as RenewMagicLinkPayload & WithTriggeredBy;
         expect(dispatchedPayload.emails).toEqual([expectedEmails]);
         expectToEqual(dispatchedPayload.triggeredBy, {
-          kind: "magic-link",
+          kind: "convention-magic-link",
           role: expectedRole,
         });
 

@@ -146,7 +146,13 @@ describe("Edit Form Establishment", () => {
         {
           id: uuidGenerator.new(),
           occurredAt: timeGateway.now().toISOString(),
-          payload: { formEstablishment: updatedFormEstablishment },
+          payload: {
+            formEstablishment: updatedFormEstablishment,
+            triggeredBy: {
+              kind: "convention-magic-link",
+              role: "establishment-representative",
+            },
+          },
           status: "never-published",
           publications: [],
           topic: "FormEstablishmentEdited",

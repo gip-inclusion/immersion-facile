@@ -97,7 +97,7 @@ export class SignConvention extends TransactionalUseCase<
           convention: signedConvention,
           triggeredBy: icUser
             ? { kind: "inclusion-connected", userId: icUser.id }
-            : { kind: "magic-link", role: role },
+            : { kind: "convention-magic-link", role: role },
         },
       });
       await uow.outboxRepository.save(event);

@@ -159,7 +159,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
             userId: user.id,
           }
         : {
-            kind: "magic-link",
+            kind: "convention-magic-link",
             role: roleInPayload,
           };
 

@@ -382,7 +382,10 @@ const makeTestAcceptsStatusUpdate =
 
     const triggeredBy: TriggeredBy =
       "role" in testAcceptNewStatusParams
-        ? { kind: "magic-link", role: testAcceptNewStatusParams.role }
+        ? {
+            kind: "convention-magic-link",
+            role: testAcceptNewStatusParams.role,
+          }
         : {
             kind: "inclusion-connected",
             userId: testAcceptNewStatusParams.userId,
