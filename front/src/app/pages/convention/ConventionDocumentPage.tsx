@@ -146,13 +146,20 @@ export const ConventionDocumentPage = ({
         new RegExp(/<img src="\//gm),
         `<img src="${window.location.origin}/`,
       );
+  const prepareContentForPdfGenerator = (content: string) => {
+    const contentWithoutScripts = content.replace(
+      /((<(\s*)(script)(\s*)(\/*)(\s*)>((.|\n)*?)<(\s*)(\/+)(\s*)(script)(\s*)>)|<(\s*)(\/*)(\s*)(script)(\s*)(\/*)(\s*)>)*/gi,
+      "",
+    );
+    return replaceContentsUrlWithAbsoluteUrl(contentWithoutScripts);
+  };
 
   const onDownloadPdfClick = async () => {
     try {
       setIsPdfLoading(true);
       const pdfContent =
         await outOfReduxDependencies.technicalGateway.htmlToPdf(
-          replaceContentsUrlWithAbsoluteUrl(document.documentElement.outerHTML),
+          prepareContentForPdfGenerator(document.documentElement.outerHTML),
           jwt,
         );
       const downloadLink = document.createElement("a");
