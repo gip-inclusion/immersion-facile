@@ -42,7 +42,7 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<With
       : uow.outboxRepository.save(
           this.#createNewEvent({
             topic: "FederatedIdentityNotBoundToConvention",
-            payload: { convention },
+            payload: { convention, triggeredBy: undefined },
           }),
         );
   }
@@ -60,14 +60,14 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<With
       await uow.outboxRepository.save(
         this.#createNewEvent({
           topic: "FederatedIdentityBoundToConvention",
-          payload: { convention },
+          payload: { convention, triggeredBy: undefined },
         }),
       );
     } catch (_error) {
       await uow.outboxRepository.save(
         this.#createNewEvent({
           topic: "FederatedIdentityNotBoundToConvention",
-          payload: { convention },
+          payload: { convention, triggeredBy: undefined },
         }),
       );
     }
