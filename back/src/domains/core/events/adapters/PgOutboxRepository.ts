@@ -130,21 +130,38 @@ export class PgOutboxRepository implements OutboxRepository {
     eventId: string,
     { publishedAt, failures }: EventPublication,
   ) {
-    const { rows } = await executeKyselyRawSqlQuery<{ id: string }>(
-      this.transaction,
-      "INSERT INTO outbox_publications(event_id, published_at) VALUES($1, $2) RETURNING id",
-      [eventId, publishedAt],
-    );
+    const results = await this.transaction
+      .insertInto("outbox_publications")
+      .values({ event_id: eventId, published_at: publishedAt })
+      .returning("id")
+      .execute();
 
-    const publicationId = rows[0].id;
+    const publicationId = results.at(0)?.id;
 
+    if (!publicationId)
+      throw new Error(`saveNewPublication of event ${eventId} failed`);
+
+    // TODO: Cette implem ne fonctionne pas, elle permettrait d'injecter tout en une fois
+    // await this.transaction
+    //   .insertInto("outbox_failures")
+    //   .values(
+    //     failures.map(({ subscriptionId, errorMessage }) => ({
+    //       publication_id: publicationId,
+    //       subscription_id: subscriptionId,
+    //       error_message: errorMessage,
+    //     })),
+    //   )
+    //   .execute();
     await Promise.all(
       failures.map(({ subscriptionId, errorMessage }) =>
-        executeKyselyRawSqlQuery(
-          this.transaction,
-          "INSERT INTO outbox_failures(publication_id, subscription_id, error_message) VALUES($1, $2, $3)",
-          [publicationId, subscriptionId, errorMessage],
-        ),
+        this.transaction
+          .insertInto("outbox_failures")
+          .values({
+            publication_id: publicationId,
+            subscription_id: subscriptionId,
+            error_message: errorMessage,
+          })
+          .execute(),
       ),
     );
   }
