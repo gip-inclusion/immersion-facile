@@ -99,7 +99,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
 
   // MAGIC LINK RENEWAL
-  | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>
+  | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload & WithTriggeredBy>
 
   // FORM ESTABLISHMENT RELATED
   | GenericEvent<"FormEstablishmentAdded", WithFormEstablishmentDto>

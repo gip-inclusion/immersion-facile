@@ -19,6 +19,7 @@ import {
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { someAgenciesMissingMessage } from "../../agency/ports/AgencyRepository";
+import { WithTriggeredBy } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../../core/jwt";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -139,8 +140,13 @@ describe("RenewConventionMagicLink use case", () => {
         const renewalEvent = uow.outboxRepository.events[0];
         expect(renewalEvent.topic).toBe("MagicLinkRenewalRequested");
 
-        const dispatchedPayload = renewalEvent.payload as RenewMagicLinkPayload;
+        const dispatchedPayload =
+          renewalEvent.payload as RenewMagicLinkPayload & WithTriggeredBy;
         expect(dispatchedPayload.emails).toEqual([expectedEmails]);
+        expectToEqual(dispatchedPayload.triggeredBy, {
+          kind: "magic-link",
+          role: expectedRole,
+        });
 
         expectToEqual(
           [dispatchedPayload.magicLink, dispatchedPayload.conventionStatusLink],
