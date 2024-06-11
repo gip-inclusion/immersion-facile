@@ -152,7 +152,7 @@ describe("UpdateConventionStatus", () => {
             requesterRole,
             modifierRole: "beneficiary",
             triggeredBy: {
-              kind: "magic-link",
+              kind: "convention-magic-link",
               role: requesterRole,
             },
           },

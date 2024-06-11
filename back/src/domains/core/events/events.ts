@@ -72,7 +72,7 @@ export type UserAuthenticatedPayload = {
 
 export type TriggeredBy =
   | { kind: "inclusion-connected"; userId: UserId }
-  | { kind: "magic-link"; role: Role };
+  | { kind: "convention-magic-link"; role: Role };
 
 export type WithTriggeredBy = {
   triggeredBy: TriggeredBy | undefined;
@@ -102,11 +102,11 @@ export type DomainEvent =
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload & WithTriggeredBy>
 
   // FORM ESTABLISHMENT RELATED
-  | GenericEvent<"FormEstablishmentAdded", WithFormEstablishmentDto>
-  | GenericEvent<"FormEstablishmentEdited", WithFormEstablishmentDto>
-  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload>
-  | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload>
-  | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate>
+  | GenericEvent<"FormEstablishmentAdded", WithFormEstablishmentDto & WithTriggeredBy>
+  | GenericEvent<"FormEstablishmentEdited", WithFormEstablishmentDto & WithTriggeredBy>
+  | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
+  | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload & WithTriggeredBy>
+  | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>
 
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>

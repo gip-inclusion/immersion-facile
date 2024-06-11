@@ -308,7 +308,7 @@ describe("Sign convention", () => {
             payload: {
               convention: expectedConvention,
               triggeredBy: {
-                kind: "magic-link",
+                kind: "convention-magic-link",
                 role: "establishment-representative",
               },
             },
@@ -367,7 +367,7 @@ describe("Sign convention", () => {
             payload: {
               convention: expectedConvention,
               triggeredBy: {
-                kind: "magic-link",
+                kind: "convention-magic-link",
                 role: "establishment-representative",
               },
             },
@@ -421,7 +421,7 @@ describe("Sign convention", () => {
             payload: {
               convention: expectedConvention,
               triggeredBy: {
-                kind: "magic-link",
+                kind: "convention-magic-link",
                 role: "establishment-representative",
               },
             },

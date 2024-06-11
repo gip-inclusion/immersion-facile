@@ -277,6 +277,7 @@ describe("Insert Establishment aggregate from form data", () => {
     expect(uow.outboxRepository.events).toHaveLength(1);
     expectToEqual(uow.outboxRepository.events[0].payload, {
       establishmentAggregate,
+      triggeredBy: undefined,
     });
   });
 });

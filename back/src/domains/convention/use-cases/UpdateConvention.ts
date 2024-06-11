@@ -70,7 +70,7 @@ export class UpdateConvention extends TransactionalUseCase<
             userId: jwtPayload.userId,
           }
         : {
-            kind: "magic-link",
+            kind: "convention-magic-link",
             role: jwtPayload.role,
           };
 
