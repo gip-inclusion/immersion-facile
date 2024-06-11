@@ -34,28 +34,28 @@ describe("PgOutboxQueries for crawling purposes", () => {
     convention = new ConventionDtoBuilder().build();
     neverPublished1 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     neverPublished2 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
     });
 
     uuidGenerator.setNextUuid("cbcbcc99-9c0b-bbbb-bb6d-6bb9bd38cccc");
     timeGateway.setNextDate(new Date("2021-11-15T10:02:00.000Z"));
     neverPublished3 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
     });
 
     timeGateway.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     alreadyProcessedEvent = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
       status: "published",
     });
@@ -64,14 +64,14 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     quarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     eventFailedToRerun = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
       publications: [
         {
           publishedAt: "2021-11-15T08:00:00.000Z",
@@ -93,7 +93,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     withFailureButEventuallySuccessfulEvent = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
       status: "published",
       publications: [
         {
@@ -110,7 +110,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     failedButQuarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
       status: "failed-but-will-retry",
       publications: [
         {
@@ -129,7 +129,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dbdbdc99-9d0d-dddd-dd6d-6dd9dd38dbdb");
     inProcessEvent = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
       status: "in-process",
     });
 
@@ -196,7 +196,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("cccccc77-9c0c-cccc-cc6d-6cc9cd38cccc");
     const eventToRepublish = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
       publications: [{ publishedAt: "2020-11-05T08:30:00.000Z", failures: [] }],
       status: "to-republish",
     });
@@ -260,7 +260,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     timeGateway.setNextDate(new Date("2021-11-15T10:02:00.000Z"));
     const anotherEventFailedToRerun = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
       publications: [
         {
           publishedAt: "2021-11-10T08:00:00.000Z",

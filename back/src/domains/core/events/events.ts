@@ -75,7 +75,7 @@ export type TriggeredBy =
   | { kind: "magic-link"; role: Role };
 
 type WithTriggeredBy = {
-  triggeredBy: TriggeredBy;
+  triggeredBy: TriggeredBy | undefined;
 };
 
 type WithConventionAndOptionalUserId = WithConventionDto & WithTriggeredBy;
