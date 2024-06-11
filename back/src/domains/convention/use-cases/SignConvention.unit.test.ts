@@ -90,7 +90,7 @@ describe("Sign convention", () => {
             emailHash: "toto",
           },
         ),
-        new NotFoundError("add5c20e-6dd2-45af-affe-927358005251"),
+        new NotFoundError(conventionId),
       );
     });
 
@@ -132,7 +132,7 @@ describe("Sign convention", () => {
           email: "other@mail.com",
           firstName: "Billy",
           lastName: "Idol",
-          id: "id",
+          id: "my-user-id",
           externalId: "billy-external-id",
           createdAt: new Date().toISOString(),
         };
@@ -150,7 +150,7 @@ describe("Sign convention", () => {
             },
           ),
           new ForbiddenError(
-            "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
+            `User '${icUser.id}' is not the establishment representative for convention '${conventionId}'`,
           ),
         );
       });
@@ -305,7 +305,13 @@ describe("Sign convention", () => {
         expectEventsInOutbox([
           {
             topic: "ConventionPartiallySigned",
-            payload: { convention: expectedConvention },
+            payload: {
+              convention: expectedConvention,
+              triggeredBy: {
+                kind: "magic-link",
+                role: "establishment-representative",
+              },
+            },
           },
         ]);
       });
@@ -358,7 +364,13 @@ describe("Sign convention", () => {
         expectEventsInOutbox([
           {
             topic: "ConventionPartiallySigned",
-            payload: { convention: expectedConvention },
+            payload: {
+              convention: expectedConvention,
+              triggeredBy: {
+                kind: "magic-link",
+                role: "establishment-representative",
+              },
+            },
           },
         ]);
       });
@@ -406,14 +418,20 @@ describe("Sign convention", () => {
         expectEventsInOutbox([
           {
             topic: "ConventionFullySigned",
-            payload: { convention: expectedConvention },
+            payload: {
+              convention: expectedConvention,
+              triggeredBy: {
+                kind: "magic-link",
+                role: "establishment-representative",
+              },
+            },
           },
         ]);
       });
     });
   });
 
-  const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
+  const conventionId: ConventionId = "abd5c20e-6dd2-45af-affe-927358005251";
   const prepareAgencyAndConventionWithStatus = (status: ConventionStatus) => {
     const agency = new AgencyDtoBuilder().build();
 

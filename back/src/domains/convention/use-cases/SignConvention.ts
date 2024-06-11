@@ -3,6 +3,7 @@ import {
   ConventionDto,
   ConventionStatus,
   InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
   Role,
   SignatoryRole,
   WithConventionId,
@@ -63,9 +64,13 @@ export class SignConvention extends TransactionalUseCase<
       await uow.conventionQueries.getConventionById(conventionId);
     if (!initialConventionRead) throw new NotFoundError(conventionId);
 
-    const role = await this.#getRole(jwtPayload, uow, initialConventionRead);
+    const { role, icUser } = await this.#getRoleAndIcUser(
+      jwtPayload,
+      uow,
+      initialConventionRead,
+    );
 
-    if (!role || !isAllowedToSign(role))
+    if (!isAllowedToSign(role))
       throw new ForbiddenError(
         "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
       );
@@ -88,7 +93,12 @@ export class SignConvention extends TransactionalUseCase<
     if (domainTopic) {
       const event = this.#createNewEvent({
         topic: domainTopic,
-        payload: { convention: signedConvention },
+        payload: {
+          convention: signedConvention,
+          triggeredBy: icUser
+            ? { kind: "inclusion-connected", userId: icUser.id }
+            : { kind: "magic-link", role: role },
+        },
       });
       await uow.outboxRepository.save(event);
     }
@@ -96,18 +106,29 @@ export class SignConvention extends TransactionalUseCase<
     return { id: signedId };
   }
 
-  async #getRole(
+  async #getRoleAndIcUser(
     jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
     uow: UnitOfWork,
     initialConvention: ConventionDto,
-  ): Promise<Role | undefined> {
-    if ("role" in jwtPayload) return jwtPayload.role;
+  ): Promise<{ role: Role; icUser: InclusionConnectedUser | undefined }> {
+    if ("role" in jwtPayload)
+      return { role: jwtPayload.role, icUser: undefined };
     const icUser = await uow.inclusionConnectedUserRepository.getById(
       jwtPayload.userId,
     );
-    return icUser?.email ===
+    if (!icUser)
+      throw new NotFoundError(`No user found with id '${jwtPayload.userId}'`);
+
+    if (
+      icUser.email !==
       initialConvention.signatories.establishmentRepresentative.email
-      ? initialConvention.signatories.establishmentRepresentative.role
-      : undefined;
+    )
+      throw new ForbiddenError(
+        `User '${icUser.id}' is not the establishment representative for convention '${initialConvention.id}'`,
+      );
+    return {
+      role: initialConvention.signatories.establishmentRepresentative.role,
+      icUser,
+    };
   }
 }
