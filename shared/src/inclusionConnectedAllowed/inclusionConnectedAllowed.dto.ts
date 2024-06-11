@@ -81,12 +81,6 @@ export type InclusionConnectedUser = User &
   WithEstablishments &
   WithDashboards & { isBackofficeAdmin?: boolean };
 
-export type WithUserId = {
-  userId: UserId;
-};
-
-export type WithOptionalUserId = Partial<WithUserId>;
-
 export type WithAgencyIds = {
   agencies: AgencyId[];
 };

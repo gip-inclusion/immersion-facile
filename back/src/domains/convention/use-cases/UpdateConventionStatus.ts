@@ -5,6 +5,7 @@ import {
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
+  InclusionConnectedUser,
   Role,
   UpdateConventionStatusRequestDto,
   UserId,
@@ -23,7 +24,7 @@ import {
 import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
-import { DomainTopic } from "../../core/events/events";
+import { DomainTopic, TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -81,10 +82,14 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     if (!agency)
       throw new NotFoundError(agencyMissingMessage(conventionRead.agencyId));
 
-    const roles =
-      "role" in payload
-        ? [payload.role]
-        : await this.#rolesFromUserId(uow, payload.userId, conventionRead);
+    const { user, roleInPayload } = await this.#getRoleInPayloadOrUser(
+      uow,
+      payload,
+    );
+
+    const roles = roleInPayload
+      ? [roleInPayload]
+      : await this.#rolesFromUser(user, conventionRead);
 
     throwIfTransitionNotAllowed({
       roles,
@@ -143,9 +148,19 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     if (!updatedId) throw new NotFoundError(updatedId);
 
     const domainTopic = domainTopicByTargetStatusMap[params.status];
-    if (domainTopic)
-      await uow.outboxRepository.save({
-        ...(params.status === "DRAFT"
+    if (domainTopic) {
+      const triggeredBy: TriggeredBy = user
+        ? {
+            kind: "inclusion-connected",
+            userId: user.id,
+          }
+        : {
+            kind: "magic-link",
+            role: roleInPayload,
+          };
+
+      const event =
+        params.status === "DRAFT"
           ? this.#createRequireModificationEvent(
               params.modifierRole === "validator" ||
                 params.modifierRole === "counsellor"
@@ -167,25 +182,46 @@ export class UpdateConventionStatus extends TransactionalUseCase<
                     modifierRole: params.modifierRole,
                   },
             )
-          : this.#createEvent(updatedConvention, domainTopic)),
+          : this.#createEvent(updatedConvention, domainTopic, triggeredBy);
+
+      await uow.outboxRepository.save({
+        ...event,
         occurredAt: conventionUpdatedAt,
       });
+    }
 
     return { id: updatedId };
   }
 
-  async #rolesFromUserId(
+  async #getRoleInPayloadOrUser(
     uow: UnitOfWork,
-    userId: UserId,
-    convention: ConventionDto,
-  ): Promise<Role[]> {
+    payload: UpdateConventionStatusSupportedJwtPayload,
+  ): Promise<
+    | { user: InclusionConnectedUser; roleInPayload: undefined }
+    | { user: undefined; roleInPayload: Role }
+  > {
+    if ("role" in payload)
+      return { roleInPayload: payload.role, user: undefined };
+
     const roles: Role[] = [];
-    const user = await uow.inclusionConnectedUserRepository.getById(userId);
+    const user = await uow.inclusionConnectedUserRepository.getById(
+      payload.userId,
+    );
     if (!user)
       throw new NotFoundError(
-        `User '${userId}' not found on inclusion connected user repository.`,
+        `User '${payload.userId}' not found in inclusion connected user repository.`,
       );
 
+    return {
+      user,
+      roleInPayload: undefined,
+    };
+  }
+
+  async #rolesFromUser(
+    user: InclusionConnectedUser,
+    convention: ConventionDto,
+  ): Promise<Role[]> {
     if (user.isBackofficeAdmin) roles.push("backOffice");
 
     if (user.email === convention.signatories.establishmentRepresentative.email)
@@ -197,7 +233,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
 
     if (!userAgencyRight && roles.length === 0) {
       throw new ForbiddenError(
-        `User '${userId}' has no role on agency '${convention.agencyId}'.`,
+        `User '${user.id}' has no role on agency '${convention.agencyId}'.`,
       );
     }
 
@@ -226,10 +262,17 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     return user.email;
   }
 
-  #createEvent(updatedConventionDto: ConventionDto, domainTopic: DomainTopic) {
+  #createEvent(
+    updatedConventionDto: ConventionDto,
+    domainTopic: DomainTopic,
+    triggeredBy: TriggeredBy,
+  ) {
     return this.createNewEvent({
       topic: domainTopic,
-      payload: { convention: updatedConventionDto },
+      payload: {
+        convention: updatedConventionDto,
+        triggeredBy,
+      },
     });
   }
 

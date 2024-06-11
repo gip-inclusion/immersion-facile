@@ -27,7 +27,7 @@ import {
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
-import { DomainTopic } from "../../core/events/events";
+import { DomainTopic, TriggeredBy } from "../../core/events/events";
 import {
   NarrowEvent,
   makeCreateNewEvent,
@@ -379,6 +379,15 @@ const makeTestAcceptsStatusUpdate =
         : {
             userId: testAcceptNewStatusParams.userId,
           };
+
+    const triggeredBy: TriggeredBy =
+      "role" in testAcceptNewStatusParams
+        ? { kind: "magic-link", role: testAcceptNewStatusParams.role }
+        : {
+            kind: "inclusion-connected",
+            userId: testAcceptNewStatusParams.userId,
+          };
+
     const storedConvention = await executeUpdateConventionStatusUseCase({
       jwtPayload: jwt,
       updateStatusParams,
@@ -470,7 +479,10 @@ const makeTestAcceptsStatusUpdate =
         expectedDomainTopic,
         {
           topic: expectedDomainTopic,
-          payload: { convention: expectedConvention },
+          payload: {
+            convention: expectedConvention,
+            triggeredBy,
+          },
         },
         outboxRepository,
       );
