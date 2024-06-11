@@ -67,7 +67,10 @@ export class AddFormEstablishmentBatch extends UseCase<
       await Promise.all(
         chunkOfFormEstablishments.map(async (formEstablishment) => {
           try {
-            await this.addFormEstablishmentUseCase.execute(formEstablishment);
+            await this.addFormEstablishmentUseCase.execute(
+              formEstablishment,
+              currentUser,
+            );
             report.numberOfSuccess += 1;
           } catch (error) {
             report.failures.push({

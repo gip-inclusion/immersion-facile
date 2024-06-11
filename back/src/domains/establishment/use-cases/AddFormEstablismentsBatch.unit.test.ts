@@ -182,6 +182,10 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       topic: "FormEstablishmentAdded",
       payload: {
         formEstablishment: formEstablishmentBatch.formEstablishments[0],
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: icUserAdmin.id,
+        },
       },
     });
     expectObjectsToMatch(outboxRepo.events[1], {
@@ -189,6 +193,10 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       topic: "FormEstablishmentAdded",
       payload: {
         formEstablishment: formEstablishmentBatch.formEstablishments[1],
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: icUserAdmin.id,
+        },
       },
     });
   });

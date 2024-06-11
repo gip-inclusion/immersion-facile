@@ -149,8 +149,8 @@ describe("Edit Form Establishment", () => {
           payload: {
             formEstablishment: updatedFormEstablishment,
             triggeredBy: {
-              kind: "convention-magic-link",
-              role: "establishment-representative",
+              kind: "establishment-magic-link",
+              siret: establishmentPayload.siret,
             },
           },
           status: "never-published",
@@ -185,7 +185,13 @@ describe("Edit Form Establishment", () => {
         {
           id: uuidGenerator.new(),
           occurredAt: timeGateway.now().toISOString(),
-          payload: { formEstablishment: updatedFormEstablishment },
+          payload: {
+            formEstablishment: updatedFormEstablishment,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: backofficeAdminUser.id,
+            },
+          },
           status: "never-published",
           publications: [],
           topic: "FormEstablishmentEdited",

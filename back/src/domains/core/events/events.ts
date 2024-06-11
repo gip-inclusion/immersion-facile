@@ -9,6 +9,7 @@ import {
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
   Role,
+  SiretDto,
   UserId,
   WithAgencyDto,
   WithAssessmentDto,
@@ -72,7 +73,8 @@ export type UserAuthenticatedPayload = {
 
 export type TriggeredBy =
   | { kind: "inclusion-connected"; userId: UserId }
-  | { kind: "convention-magic-link"; role: Role };
+  | { kind: "convention-magic-link"; role: Role }
+  | { kind: "establishment-magic-link"; siret: SiretDto };
 
 export type WithTriggeredBy = {
   triggeredBy: TriggeredBy | undefined;
