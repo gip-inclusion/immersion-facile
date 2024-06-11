@@ -94,27 +94,34 @@ export class PgOutboxRepository implements OutboxRepository {
 
     const eventAlreadyInDb = await this.#getEventById(event.id);
     if (eventAlreadyInDb) {
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        "UPDATE outbox SET was_quarantined = $2, status = $3 WHERE id = $1",
-        [id, wasQuarantined, status],
-      );
+      await this.transaction
+        .updateTable("outbox")
+        .set({
+          was_quarantined: wasQuarantined,
+          status,
+        })
+        .where("id", "=", id)
+        .execute();
       return { ...eventAlreadyInDb, wasQuarantined: event.wasQuarantined };
     }
 
-    const query = `INSERT INTO outbox(
-        id, occurred_at, was_quarantined, topic, payload, status
-      ) VALUES($1, $2, $3, $4, $5, $6)`;
-    const values = [id, occurredAt, wasQuarantined, topic, payload, status];
-    await executeKyselyRawSqlQuery(this.transaction, query, values).catch(
-      (error) => {
-        logger.error(
-          { query, values, error: castError(error) },
-          "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
-        );
-        throw error;
-      },
-    );
+    const builder = this.transaction.insertInto("outbox").values({
+      id,
+      occurred_at: occurredAt,
+      was_quarantined: wasQuarantined,
+      topic,
+      payload: JSON.stringify(payload),
+      status,
+    });
+
+    await builder.execute().catch((error) => {
+      const { query, parameters } = builder.compile();
+      logger.error(
+        { query, values: parameters, error: castError(error) },
+        "PgOutboxRepository_insertEventOnOutbox_QueryErrored",
+      );
+      throw error;
+    });
 
     return { ...event, publications: [] }; // publications will be added after in process
   }
