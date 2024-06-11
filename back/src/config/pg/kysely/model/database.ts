@@ -27,6 +27,8 @@ export interface Database {
   notifications_sms: NotificationsSms;
   nps: Nps;
   outbox: Outbox;
+  outbox_failures: OutboxFailures;
+  outbox_publications: OutboxPublications;
   partners_pe_connect: PartnersPeConnect;
   public_appellations_data: PublicAppellationsData;
   public_romes_data: PublicRomesData;
@@ -536,4 +538,17 @@ interface NotificationsSms {
   establishment_siret: string | null;
   agency_id: string | null;
   params: Json | null;
+}
+
+interface OutboxFailures {
+  id: Generated<number>;
+  publication_id: number;
+  subscription_id: string;
+  error_message: string | null;
+}
+
+interface OutboxPublications {
+  id: Generated<number>;
+  event_id: string;
+  published_at: Timestamp;
 }
