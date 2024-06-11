@@ -1,12 +1,13 @@
 import {
   AgencyDtoBuilder,
-  InclusionConnectJwtPayload,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   User,
   expectPromiseToFailWith,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { UnauthorizedError } from "../../../config/helpers/httpErrors";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -30,10 +31,6 @@ const backofficeAdminUser = new InclusionConnectedUserBuilder()
   .withIsAdmin(true)
   .withId("backoffice-admin")
   .build();
-
-const backofficeAdminJwtPayload = {
-  userId: backofficeAdminUser.id,
-} as InclusionConnectJwtPayload;
 
 describe("reject IcUser for agency", () => {
   let uow: InMemoryUnitOfWork;
@@ -70,13 +67,13 @@ describe("reject IcUser for agency", () => {
       },
     };
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       rejectIcUserForAgencyUsecase.execute({
         userId: icUser.id,
         agencyId: agency1.id,
         justification: "osef",
       }),
-      "No JWT token provided",
+      new UnauthorizedError(),
     );
   });
 
@@ -98,9 +95,9 @@ describe("reject IcUser for agency", () => {
           agencyId: "osef",
           justification: "osef",
         },
-        { userId: currentUser.id } as InclusionConnectJwtPayload,
+        currentUser,
       ),
-      "User 'not-an-admin-id' is not a backOffice user",
+      "Insufficient privileges for this user",
     );
   });
 
@@ -125,7 +122,7 @@ describe("reject IcUser for agency", () => {
           agencyId: agency1.id,
           justification: "osef",
         },
-        backofficeAdminJwtPayload,
+        backofficeAdminUser,
       ),
       `No user found with id: ${icUser.id}`,
     );
@@ -157,46 +154,9 @@ describe("reject IcUser for agency", () => {
           agencyId: agency1.id,
           justification: "osef",
         },
-        backofficeAdminJwtPayload,
+        backofficeAdminUser,
       ),
       `No agency found with id: ${agency1.id}`,
-    );
-  });
-
-  it("Throw when wrong jwt were provided", async () => {
-    const agency1 = new AgencyDtoBuilder().withId("agency1").build();
-
-    const icUser: InclusionConnectedUser = {
-      ...user,
-      agencyRights: [
-        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
-      ],
-      dashboards: {
-        agencies: {},
-        establishments: {},
-      },
-    };
-
-    const randomUser: InclusionConnectedUser = {
-      ...backofficeAdminUser,
-      isBackofficeAdmin: false,
-      id: "random-user-id",
-    };
-
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      randomUser,
-    ]);
-
-    await expectPromiseToFailWith(
-      rejectIcUserForAgencyUsecase.execute(
-        {
-          userId: icUser.id,
-          agencyId: agency1.id,
-          justification: "osef",
-        },
-        { userId: randomUser.id } as InclusionConnectJwtPayload,
-      ),
-      `User '${randomUser.id}' is not a backOffice user`,
     );
   });
 
@@ -231,7 +191,7 @@ describe("reject IcUser for agency", () => {
         agencyId: agency1.id,
         justification: "osef",
       },
-      backofficeAdminJwtPayload,
+      backofficeAdminUser,
     );
 
     expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {

@@ -1,24 +1,20 @@
 import {
-  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
   PartialAgencyDto,
   UpdateAgencyStatusParams,
   updateAgencyStatusParamsSchema,
 } from "shared";
-import {
-  NotFoundError,
-  UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { throwIfNotAdmin } from "../../core/authentication/inclusion-connect/helpers/ic-user.helpers";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { getIcUserOrThrow } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
-import { throwConflictErrorOnSimilarAgencyFound } from "../entities/Agency";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyStatusParams,
   void,
-  InclusionConnectDomainJwtPayload
+  InclusionConnectedUser
 > {
   protected inputSchema = updateAgencyStatusParamsSchema;
 
@@ -35,9 +31,9 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
   public async _execute(
     updateAgencyStatusParams: UpdateAgencyStatusParams,
     uow: UnitOfWork,
-    jwtPayload?: InclusionConnectDomainJwtPayload,
+    currentUser: InclusionConnectedUser,
   ): Promise<void> {
-    if (!jwtPayload) throw new UnauthorizedError();
+    throwIfNotAdmin(currentUser);
     const existingAgency = await uow.agencyRepository.getById(
       updateAgencyStatusParams.id,
     );
@@ -45,14 +41,6 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
       throw new NotFoundError(
         `No agency found with id ${updateAgencyStatusParams.id}`,
       );
-
-    const user = await getIcUserOrThrow(uow, jwtPayload.userId);
-    if (!user.isBackofficeAdmin) {
-      await throwConflictErrorOnSimilarAgencyFound({
-        uow,
-        agency: existingAgency,
-      });
-    }
 
     const updatedAgencyParams: PartialAgencyDto = {
       id: updateAgencyStatusParams.id,

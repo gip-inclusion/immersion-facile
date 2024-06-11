@@ -1,15 +1,14 @@
 import {
   FormEstablishmentDtoBuilder,
   GroupOptions,
-  InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   addressDtoToString,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
-  ForbiddenError,
   NotFoundError,
+  UnauthorizedError,
 } from "../../../config/helpers/httpErrors";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -33,10 +32,6 @@ import { DeleteEstablishment } from "./DeleteEstablishment";
 const backofficeAdminUser = new InclusionConnectedUserBuilder()
   .withIsAdmin(true)
   .build();
-
-const backofficeAdminJwtPayload = {
-  userId: backofficeAdminUser.id,
-} as InclusionConnectJwtPayload;
 
 const groupOptions: GroupOptions = {
   heroHeader: {
@@ -94,7 +89,7 @@ describe("Delete Establishment", () => {
         deleteEstablishment.execute({
           siret: establishmentAggregate.establishment.siret,
         }),
-        new ForbiddenError("Jwt payload not provided"),
+        new UnauthorizedError(),
       );
     });
 
@@ -104,7 +99,7 @@ describe("Delete Establishment", () => {
           {
             siret: establishmentAggregate.establishment.siret,
           },
-          backofficeAdminJwtPayload,
+          backofficeAdminUser,
         ),
         new NotFoundError(
           establishmentNotFoundErrorMessage(
@@ -123,7 +118,7 @@ describe("Delete Establishment", () => {
           {
             siret: formEstablishment.siret,
           },
-          backofficeAdminJwtPayload,
+          backofficeAdminUser,
         ),
         new NotFoundError(
           formEstablishmentNotFoundErrorMessage(formEstablishment.siret),
@@ -153,7 +148,7 @@ describe("Delete Establishment", () => {
         {
           siret: establishmentAggregate.establishment.siret,
         },
-        backofficeAdminJwtPayload,
+        backofficeAdminUser,
       );
 
       expectToEqual(

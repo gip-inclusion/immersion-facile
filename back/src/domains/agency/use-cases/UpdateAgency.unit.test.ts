@@ -9,7 +9,7 @@ import {
 } from "shared";
 import {
   BadRequestError,
-  ConflictError,
+  ForbiddenError,
   UnauthorizedError,
 } from "../../../config/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
@@ -59,7 +59,7 @@ describe("Update agency", () => {
     );
   });
 
-  it("throws Unauthorized if no jwtPayload provided", async () => {
+  it("throws Unauthorized if no current user", async () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWithError(
       updateAgency.execute(agency),
@@ -67,10 +67,18 @@ describe("Update agency", () => {
     );
   });
 
+  it("throws Forbidden if current user is not admin", async () => {
+    const agency = new AgencyDtoBuilder().build();
+    await expectPromiseToFailWithError(
+      updateAgency.execute(agency, icUser),
+      new ForbiddenError("Insufficient privileges for this user"),
+    );
+  });
+
   it("Fails trying to update if no matching agency was found", async () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWith(
-      updateAgency.execute(agency, { userId: backofficeAdmin.id }),
+      updateAgency.execute(agency, backofficeAdmin),
       `No agency found with id : ${agency.id}`,
     );
   });
@@ -89,7 +97,7 @@ describe("Update agency", () => {
       })
       .build();
     await expectPromiseToFail(
-      updateAgency.execute(updatedAgency, { userId: backofficeAdmin.id }),
+      updateAgency.execute(updatedAgency, backofficeAdmin),
     );
   });
 
@@ -121,35 +129,9 @@ describe("Update agency", () => {
     );
 
     await expectPromiseToFailWithError(
-      updateAgency.execute(updatedAgency, { userId: backofficeAdmin.id }),
+      updateAgency.execute(updatedAgency, backofficeAdmin),
       new BadRequestError(expectedErrorMessage),
     );
-  });
-
-  it("fails to update if attempt to update to another existing agency (with same address and kind, and a status 'active' or 'from-api-PE'", async () => {
-    const existingAgency = new AgencyDtoBuilder().build();
-    const updatedAgency = new AgencyDtoBuilder()
-      .withId("agency-to-update-id")
-      .withStatus("needsReview")
-      .withAddress(existingAgency.address)
-      .withKind(existingAgency.kind)
-      .build();
-
-    agencyRepository.setAgencies([updatedAgency, existingAgency]);
-
-    // conflict error when user is not admin
-    await expectPromiseToFailWithError(
-      updateAgency.execute(updatedAgency, { userId: icUser.id }),
-      new ConflictError(
-        "Une autre agence du même type existe avec la même adresse",
-      ),
-    );
-
-    // no conflict error if user is admin
-    const result = await updateAgency.execute(updatedAgency, {
-      userId: backofficeAdmin.id,
-    });
-    expect(result).toBeUndefined();
   });
 
   it("Updates agency and create corresponding event", async () => {
@@ -162,9 +144,7 @@ describe("Update agency", () => {
       .withValidatorEmails(["new-validator@mail.com"])
       .build();
 
-    const response = await updateAgency.execute(updatedAgency, {
-      userId: backofficeAdmin.id,
-    });
+    const response = await updateAgency.execute(updatedAgency, backofficeAdmin);
     expect(response).toBeUndefined();
     expectToEqual(agencyRepository.agencies, [updatedAgency]);
 

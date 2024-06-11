@@ -1,9 +1,13 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUser,
-  expectPromiseToFailWith,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import {
+  ForbiddenError,
+  UnauthorizedError,
+} from "../../../config/helpers/httpErrors";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
@@ -77,22 +81,10 @@ describe("GetInclusionConnectedUsers", () => {
     getInclusionConnectedUsers = new GetInclusionConnectedUsers(uowPerformer);
   });
 
-  it("throws Forbidden if no jwt token provided", async () => {
-    await expectPromiseToFailWith(
+  it("throws Unauthorized if no jwt token provided", async () => {
+    await expectPromiseToFailWithError(
       getInclusionConnectedUsers.execute({ agencyRole: "toReview" }),
-      "No JWT token provided",
-    );
-  });
-
-  it("throws Forbidden if IC backoffice user not found", async () => {
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([]);
-
-    await expectPromiseToFailWith(
-      getInclusionConnectedUsers.execute(
-        { agencyRole: "toReview" },
-        { userId: notBackofficeAdminUser.id },
-      ),
-      "User 'not-backoffice-admin' not found",
+      new UnauthorizedError(),
     );
   });
 
@@ -101,12 +93,12 @@ describe("GetInclusionConnectedUsers", () => {
       notBackofficeAdminUser,
     ]);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       getInclusionConnectedUsers.execute(
         { agencyRole: "toReview" },
-        { userId: notBackofficeAdminUser.id },
+        notBackofficeAdminUser,
       ),
-      "User 'not-backoffice-admin' is not a backOffice user",
+      new ForbiddenError("Insufficient privileges for this user"),
     );
   });
 
@@ -118,7 +110,7 @@ describe("GetInclusionConnectedUsers", () => {
     ]);
     const users = await getInclusionConnectedUsers.execute(
       { agencyRole: "toReview" },
-      { userId: backofficeAdminUser.id },
+      backofficeAdminUser,
     );
 
     expectToEqual(users, [johnWithAgenciesToReview]);

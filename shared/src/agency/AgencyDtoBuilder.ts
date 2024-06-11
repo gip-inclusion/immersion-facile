@@ -64,7 +64,7 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
       address,
       coveredDepartments: [
         ...new Set([
-          address.departmentCode,
+          ...(address.departmentCode ? [address.departmentCode] : []),
           ...this.#agency.coveredDepartments,
         ]),
       ],

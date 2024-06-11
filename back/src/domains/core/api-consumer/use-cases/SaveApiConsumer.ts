@@ -5,25 +5,22 @@ import {
   ApiConsumerRight,
   ApiConsumerRights,
   CreateWebhookSubscription,
-  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
   WriteApiConsumerParams,
   writeApiConsumerSchema,
 } from "shared";
-import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
-import { throwIfIcUserNotBackofficeAdmin } from "../../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
 import { TransactionalUseCase } from "../../UseCase";
+import { throwIfNotAdmin } from "../../authentication/inclusion-connect/helpers/ic-user.helpers";
 import { CreateNewEvent } from "../../events/ports/EventBus";
 import { GenerateApiConsumerJwt } from "../../jwt";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 
-export const EXPIRATION_IN_YEARS = 2;
-
 export class SaveApiConsumer extends TransactionalUseCase<
   WriteApiConsumerParams,
   ApiConsumerJwt | undefined,
-  InclusionConnectDomainJwtPayload
+  InclusionConnectedUser
 > {
   protected inputSchema = writeApiConsumerSchema;
 
@@ -48,10 +45,9 @@ export class SaveApiConsumer extends TransactionalUseCase<
   protected async _execute(
     input: WriteApiConsumerParams,
     uow: UnitOfWork,
-    payload?: InclusionConnectDomainJwtPayload,
+    currentUser: InclusionConnectedUser,
   ): Promise<ApiConsumerJwt | undefined> {
-    if (!payload) throw new UnauthorizedError();
-    await throwIfIcUserNotBackofficeAdmin(uow, payload);
+    throwIfNotAdmin(currentUser);
 
     const existingApiConsumer = await uow.apiConsumerRepository.getById(
       input.id,

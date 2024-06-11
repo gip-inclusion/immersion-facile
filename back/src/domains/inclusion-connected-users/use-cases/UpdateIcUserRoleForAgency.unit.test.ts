@@ -2,12 +2,16 @@ import {
   AgencyDtoBuilder,
   AgencyRole,
   IcUserRoleForAgencyParams,
-  InclusionConnectJwtPayload,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   expectPromiseToFailWith,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import {
+  ForbiddenError,
+  UnauthorizedError,
+} from "../../../config/helpers/httpErrors";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
@@ -64,37 +68,23 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("throws Forbidden if no jwt token provided", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       updateIcUserRoleForAgency.execute({
         roles: ["counsellor"],
         agencyId: "agency-1",
         userId: user.id,
       }),
-      "No JWT token provided",
+      new UnauthorizedError(),
     );
   });
 
   it("throws Forbidden if token payload is not backoffice token", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       updateIcUserRoleForAgency.execute(
         { roles: ["counsellor"], agencyId: "agency-1", userId: "john-123" },
-        { userId: user.id },
+        user,
       ),
-      `User '${user.id}' is not a backOffice user`,
-    );
-  });
-
-  it("throws not found if user does not exist", async () => {
-    await expectPromiseToFailWith(
-      updateIcUserRoleForAgency.execute(
-        {
-          roles: ["counsellor"],
-          agencyId: "agency-1",
-          userId: "john-123",
-        },
-        { userId: backofficeAdminUser.id } as InclusionConnectJwtPayload,
-      ),
-      "User with id john-123 not found",
+      new ForbiddenError("Insufficient privileges for this user"),
     );
   });
 
@@ -118,7 +108,7 @@ describe("GetInclusionConnectedUsers", () => {
           agencyId: "agency-1",
           userId: user.id,
         },
-        { userId: backofficeAdminUser.id } as InclusionConnectJwtPayload,
+        backofficeAdminUser,
       ),
       `Agency with id agency-1 is not registered for user with id ${user.id}`,
     );
@@ -147,7 +137,7 @@ describe("GetInclusionConnectedUsers", () => {
         agencyId: agency.id,
         userId: user.id,
       },
-      { userId: backofficeAdminUser.id } as InclusionConnectJwtPayload,
+      backofficeAdminUser,
     );
 
     expectToEqual(await inclusionConnectedUserRepository.getById(user.id), {
@@ -181,9 +171,10 @@ describe("GetInclusionConnectedUsers", () => {
       agencyId: agency.id,
       roles: [newRole],
     };
-    await updateIcUserRoleForAgency.execute(icUserRoleForAgency, {
-      userId: backofficeAdminUser.id,
-    } as InclusionConnectJwtPayload);
+    await updateIcUserRoleForAgency.execute(
+      icUserRoleForAgency,
+      backofficeAdminUser,
+    );
 
     expect(outboxRepo.events).toHaveLength(1);
 
@@ -218,9 +209,10 @@ describe("GetInclusionConnectedUsers", () => {
       userId: user.id,
     };
 
-    await updateIcUserRoleForAgency.execute(icUserRoleForAgency, {
-      userId: backofficeAdminUser.id,
-    } as InclusionConnectJwtPayload);
+    await updateIcUserRoleForAgency.execute(
+      icUserRoleForAgency,
+      backofficeAdminUser,
+    );
 
     expectToEqual(await inclusionConnectedUserRepository.getById(user.id), {
       ...user,

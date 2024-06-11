@@ -39,7 +39,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
 
   sharedAdminRouter.updateFeatureFlags(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res.status(201), () =>
-      deps.useCases.setFeatureFlag.execute(req.body),
+      deps.useCases.setFeatureFlag.execute(req.body, req.payloads?.currentUser),
     ),
   );
 
@@ -47,7 +47,10 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.adminAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.addFormEstablishmentBatch.execute(req.body),
+        deps.useCases.addFormEstablishmentBatch.execute(
+          req.body,
+          req.payloads?.currentUser,
+        ),
       ),
   );
 
@@ -55,7 +58,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.adminAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getIcUsers.execute(req.query, req.payloads?.inclusion),
+        deps.useCases.getIcUsers.execute(req.query, req.payloads?.currentUser),
       ),
   );
 
@@ -65,7 +68,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.updateIcUserRoleForAgency.execute(
           req.body,
-          req.payloads?.inclusion,
+          req.payloads?.currentUser,
         ),
       ),
   );
@@ -76,14 +79,17 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.rejectIcUserForAgency.execute(
           req.body,
-          req.payloads?.inclusion,
+          req.payloads?.currentUser,
         ),
       ),
   );
 
   sharedAdminRouter.saveApiConsumer(deps.adminAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.saveApiConsumer.execute(req.body, req.payloads?.inclusion),
+      deps.useCases.saveApiConsumer.execute(
+        req.body,
+        req.payloads?.currentUser,
+      ),
     ),
   );
 
@@ -106,7 +112,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
           ...req.body,
           id: req.params.agencyId,
         },
-        req.payloads?.inclusion,
+        req.payloads?.currentUser,
       ),
     ),
   );
@@ -115,7 +121,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     sendHttpResponse(req, res, () =>
       deps.useCases.updateAgencyAdmin.execute(
         req.body,
-        req.payloads?.inclusion,
+        req.payloads?.currentUser,
       ),
     ),
   );

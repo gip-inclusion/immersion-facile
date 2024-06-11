@@ -67,7 +67,7 @@ describe("SaveApiConsumer", () => {
         createApiConsumerParamsFromApiConsumer(
           authorizedUnJeuneUneSolutionApiConsumer,
         ),
-        { userId: backofficeAdmin.id },
+        backofficeAdmin,
       );
 
       expectToEqual(
@@ -147,9 +147,10 @@ describe("SaveApiConsumer", () => {
         },
       };
 
-      const result = await saveApiConsumer.execute(updatedConsumer, {
-        userId: backofficeAdmin.id,
-      });
+      const result = await saveApiConsumer.execute(
+        updatedConsumer,
+        backofficeAdmin,
+      );
 
       expectToEqual(result, undefined);
       expectToEqual(uow.apiConsumerRepository.consumers, [
@@ -196,11 +197,9 @@ describe("SaveApiConsumer", () => {
           createApiConsumerParamsFromApiConsumer(
             authorizedUnJeuneUneSolutionApiConsumer,
           ),
-          {
-            userId: simpleUser.id,
-          },
+          simpleUser,
         ),
-        new ForbiddenError(`User '${simpleUser.id}' is not a backOffice user`),
+        new ForbiddenError("Insufficient privileges for this user"),
       );
 
       expectToEqual(uow.apiConsumerRepository.consumers, []);
