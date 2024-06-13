@@ -151,7 +151,13 @@ describe("Update agency", () => {
     expect(outboxRepository.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepository.events[0], {
       topic: "AgencyUpdated",
-      payload: { agency: updatedAgency },
+      payload: {
+        agency: updatedAgency,
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: backofficeAdmin.id,
+        },
+      },
     });
   });
 });

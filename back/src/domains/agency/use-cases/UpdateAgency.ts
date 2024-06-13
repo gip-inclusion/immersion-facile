@@ -39,7 +39,13 @@ export class UpdateAgency extends TransactionalUseCase<
     await uow.outboxRepository.save(
       this.#createNewEvent({
         topic: "AgencyUpdated",
-        payload: { agency },
+        payload: {
+          agency,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: currentUser.id,
+          },
+        },
       }),
     );
   }

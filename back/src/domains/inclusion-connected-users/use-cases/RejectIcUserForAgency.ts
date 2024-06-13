@@ -54,7 +54,13 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
 
     const event: DomainEvent = this.#createNewEvent({
       topic: "IcUserAgencyRightRejected",
-      payload: params,
+      payload: {
+        ...params,
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: currentUser.id,
+        },
+      },
     });
 
     await Promise.all([
