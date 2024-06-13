@@ -87,7 +87,13 @@ describe("SaveApiConsumer", () => {
           id: uuidGenerator.new(),
           occurredAt: justAfterToday.toISOString(),
           topic: "ApiConsumerSaved",
-          payload: { consumerId: authorizedUnJeuneUneSolutionApiConsumer.id },
+          payload: {
+            consumerId: authorizedUnJeuneUneSolutionApiConsumer.id,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: backofficeAdmin.id,
+            },
+          },
           publications: [],
           status: "never-published",
           wasQuarantined: false,
@@ -166,7 +172,13 @@ describe("SaveApiConsumer", () => {
           id: uuidGenerator.new(),
           occurredAt: today.toISOString(),
           topic: "ApiConsumerSaved",
-          payload: { consumerId: authorizedApiConsumerWithSubscription.id },
+          payload: {
+            consumerId: authorizedApiConsumerWithSubscription.id,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: backofficeAdmin.id,
+            },
+          },
           publications: [],
           status: "never-published",
           wasQuarantined: false,

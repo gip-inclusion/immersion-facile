@@ -139,7 +139,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       status: "failed-but-will-retry",
       wasQuarantined: false,
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention },
+      payload: { convention, triggeredBy: undefined },
       publications: [
         {
           publishedAt: "2021-11-15T08:00:00.000Z",

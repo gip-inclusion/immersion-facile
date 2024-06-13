@@ -64,7 +64,13 @@ export class SaveApiConsumer extends TransactionalUseCase<
     await uow.outboxRepository.save(
       this.#createNewEvent({
         topic: "ApiConsumerSaved",
-        payload: { consumerId: input.id },
+        payload: {
+          consumerId: input.id,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: currentUser.id,
+          },
+        },
       }),
     );
 

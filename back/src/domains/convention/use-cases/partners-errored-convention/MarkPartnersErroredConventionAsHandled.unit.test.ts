@@ -134,6 +134,10 @@ describe("mark partners errored convention as handled", () => {
         payload: {
           conventionId,
           userId,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: icJwtDomainPayload.userId,
+          },
         },
       }),
     ]);
@@ -221,6 +225,10 @@ describe("mark partners errored convention as handled", () => {
         payload: {
           conventionId,
           userId,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: icJwtDomainPayload.userId,
+          },
         },
       }),
     ]);
