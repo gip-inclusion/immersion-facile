@@ -1,4 +1,9 @@
-import { ConventionDtoBuilder, ConventionId, expectToEqual } from "shared";
+import {
+  ConventionDtoBuilder,
+  ConventionId,
+  expectObjectsToMatch,
+  expectToEqual,
+} from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -105,10 +110,10 @@ describe("SendEmailWithAssessmentCreationLink", () => {
     expect(uow.outboxRepository.events[1].payload).toMatchObject({
       id,
     });
-    expectToEqual(
-      uow.outboxRepository.events[1].topic,
-      "EmailWithLinkToCreateAssessmentSent",
-    );
+    expectObjectsToMatch(uow.outboxRepository.events[1], {
+      topic: "EmailWithLinkToCreateAssessmentSent",
+      payload: { id },
+    });
   });
 
   it("Does not send an email to immersions having already received one", async () => {
