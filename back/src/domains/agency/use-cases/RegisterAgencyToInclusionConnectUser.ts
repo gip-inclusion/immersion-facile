@@ -67,7 +67,14 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
 
     const event = this.#createNewEvent({
       topic: "AgencyRegisteredToInclusionConnectedUser",
-      payload: { userId: user.id, agencyIds },
+      payload: {
+        userId: user.id,
+        agencyIds,
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: user.id,
+        },
+      },
     });
 
     await Promise.all([

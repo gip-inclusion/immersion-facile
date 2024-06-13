@@ -1,4 +1,8 @@
-import { AgencyDtoBuilder, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  InclusionConnectedUserBuilder,
+  expectToEqual,
+} from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -10,7 +14,9 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UpdateAgencyReferingToUpdatedAgency } from "./UpdateAgencyReferingToUpdatedAgency";
+import { UpdateAgencyReferringToUpdatedAgency } from "./UpdateAgencyReferringToUpdatedAgency";
+
+const icUser = new InclusionConnectedUserBuilder().build();
 
 describe("UpdateAgencyReferingToUpdatedAgency", () => {
   const updatedAgency = new AgencyDtoBuilder()
@@ -33,7 +39,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
     .build();
 
   let uow: InMemoryUnitOfWork;
-  let usecase: UpdateAgencyReferingToUpdatedAgency;
+  let updateAgencyReferringToUpdatedAgency: UpdateAgencyReferringToUpdatedAgency;
   let createNewEvent: CreateNewEvent;
   let uuidGenerator: TestUuidGenerator;
 
@@ -44,10 +50,11 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
       timeGateway: new CustomTimeGateway(),
       uuidGenerator,
     });
-    usecase = new UpdateAgencyReferingToUpdatedAgency(
-      new InMemoryUowPerformer(uow),
-      createNewEvent,
-    );
+    updateAgencyReferringToUpdatedAgency =
+      new UpdateAgencyReferringToUpdatedAgency(
+        new InMemoryUowPerformer(uow),
+        createNewEvent,
+      );
   });
 
   describe("right paths", () => {
@@ -59,7 +66,10 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
         agencyRefersToUpdatedAgency2,
       ]);
 
-      await usecase.execute({ agency: updatedAgency });
+      await updateAgencyReferringToUpdatedAgency.execute(
+        { agency: updatedAgency },
+        icUser,
+      );
 
       expectToEqual(uow.agencyRepository.agencies, [
         updatedAgency,
@@ -82,6 +92,10 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
                 ...agencyRefersToUpdatedAgency1,
                 validatorEmails: updatedAgency.validatorEmails,
               },
+              triggeredBy: {
+                kind: "inclusion-connected",
+                userId: icUser.id,
+              },
             },
           }),
           id: "event1",
@@ -93,6 +107,10 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
               agency: {
                 ...agencyRefersToUpdatedAgency2,
                 validatorEmails: updatedAgency.validatorEmails,
+              },
+              triggeredBy: {
+                kind: "inclusion-connected",
+                userId: icUser.id,
               },
             },
           }),
@@ -107,7 +125,9 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
         agencyNotReferingToUpdatedAgency,
       ]);
 
-      await usecase.execute({ agency: updatedAgency });
+      await updateAgencyReferringToUpdatedAgency.execute({
+        agency: updatedAgency,
+      });
 
       expectToEqual(uow.agencyRepository.agencies, [
         updatedAgency,

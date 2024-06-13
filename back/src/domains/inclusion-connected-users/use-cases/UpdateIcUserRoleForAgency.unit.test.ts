@@ -182,7 +182,13 @@ describe("GetInclusionConnectedUsers", () => {
       outboxRepo.events[0],
       createNewEvent({
         topic: "IcUserAgencyRightChanged",
-        payload: icUserRoleForAgency,
+        payload: {
+          ...icUserRoleForAgency,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: backofficeAdminUser.id,
+          },
+        },
       }),
     );
   });
@@ -231,7 +237,13 @@ describe("GetInclusionConnectedUsers", () => {
       outboxRepo.events[0],
       createNewEvent({
         topic: "IcUserAgencyRightChanged",
-        payload: icUserRoleForAgency,
+        payload: {
+          ...icUserRoleForAgency,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: backofficeAdminUser.id,
+          },
+        },
       }),
     );
   });

@@ -62,7 +62,13 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
             updateAgencyStatusParams.status === "active"
               ? "AgencyActivated"
               : "AgencyRejected",
-          payload: { agency: { ...existingAgency, ...updatedAgencyParams } },
+          payload: {
+            agency: { ...existingAgency, ...updatedAgencyParams },
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: currentUser.id,
+            },
+          },
         }),
       );
     }

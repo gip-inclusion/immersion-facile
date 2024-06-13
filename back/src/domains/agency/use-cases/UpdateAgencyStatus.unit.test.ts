@@ -85,7 +85,13 @@ describe("Update agency status", () => {
             testParams.status === "active"
               ? "AgencyActivated"
               : "AgencyRejected",
-          payload: { agency: { ...existingAgency, ...testParams } },
+          payload: {
+            agency: { ...existingAgency, ...testParams },
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: backofficeAdmin.id,
+            },
+          },
         });
       },
     );

@@ -65,7 +65,13 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
 
     const event: DomainEvent = this.#createNewEvent({
       topic: "IcUserAgencyRightChanged",
-      payload: params,
+      payload: {
+        ...params,
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: currentUser.id,
+        },
+      },
     });
 
     await Promise.all([

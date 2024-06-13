@@ -126,7 +126,11 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       expect(outboxRepository.events).toHaveLength(1);
       expectObjectsToMatch(outboxRepository.events[0], {
         topic: "AgencyRegisteredToInclusionConnectedUser",
-        payload: { userId, agencyIds: [agencyId1] },
+        payload: {
+          userId,
+          agencyIds: [agencyId1],
+          triggeredBy: { kind: "inclusion-connected", userId },
+        },
       });
     });
 
@@ -152,7 +156,11 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       expect(outboxRepository.events).toHaveLength(1);
       expectObjectsToMatch(outboxRepository.events[0], {
         topic: "AgencyRegisteredToInclusionConnectedUser",
-        payload: { userId, agencyIds: [agencyId1, agencyId2] },
+        payload: {
+          userId,
+          agencyIds: [agencyId1, agencyId2],
+          triggeredBy: { kind: "inclusion-connected", userId },
+        },
       });
     });
   });

@@ -114,10 +114,10 @@ export type DomainEvent =
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
 
   // AGENCY RELATED
-  | GenericEvent<"NewAgencyAdded", WithAgencyDto>
-  | GenericEvent<"AgencyActivated", WithAgencyDto>
-  | GenericEvent<"AgencyUpdated", WithAgencyDto>
-  | GenericEvent<"AgencyRejected", WithAgencyDto>
+  | GenericEvent<"NewAgencyAdded", WithAgencyDto & WithTriggeredBy>
+  | GenericEvent<"AgencyActivated", WithAgencyDto & WithTriggeredBy>
+  | GenericEvent<"AgencyUpdated", WithAgencyDto & WithTriggeredBy>
+  | GenericEvent<"AgencyRejected", WithAgencyDto & WithTriggeredBy>
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"AssessmentCreated", WithAssessmentDto>
@@ -130,9 +130,9 @@ export type DomainEvent =
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload>
-  | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: UserId; agencyIds: AgencyId[] }>
-  | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams>
-  | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams>
+  | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: UserId; agencyIds: AgencyId[] } & WithTriggeredBy>
+  | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams & WithTriggeredBy>
+  | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams & WithTriggeredBy>
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string }>
   // ERRORED CONVENTION RELATED

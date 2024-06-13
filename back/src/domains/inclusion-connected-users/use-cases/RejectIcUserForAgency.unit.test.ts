@@ -210,6 +210,10 @@ describe("reject IcUser for agency", () => {
           userId: icUser.id,
           agencyId: agency1.id,
           justification: "osef",
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: backofficeAdminUser.id,
+          },
         },
         publications: [],
         status: "never-published",

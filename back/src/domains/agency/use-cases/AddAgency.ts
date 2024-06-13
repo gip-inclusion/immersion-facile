@@ -61,7 +61,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
       uow.outboxRepository.save(
         this.#createNewEvent({
           topic: "NewAgencyAdded",
-          payload: { agency },
+          payload: { agency, triggeredBy: undefined },
         }),
       ),
     ]);

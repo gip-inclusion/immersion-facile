@@ -1,12 +1,18 @@
-import { AgencyDto, WithAgencyDto, withAgencySchema } from "shared";
+import {
+  AgencyDto,
+  InclusionConnectedUser,
+  WithAgencyDto,
+  withAgencySchema,
+} from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-export class UpdateAgencyReferingToUpdatedAgency extends TransactionalUseCase<
+export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   WithAgencyDto,
-  void
+  void,
+  InclusionConnectedUser
 > {
   protected inputSchema = withAgencySchema;
 
@@ -20,8 +26,12 @@ export class UpdateAgencyReferingToUpdatedAgency extends TransactionalUseCase<
     this.#createNewEvent = createNewEvent;
   }
 
-  public async _execute(params: WithAgencyDto, uow: UnitOfWork): Promise<void> {
-    const updatedReleatedAgencies: AgencyDto[] = (
+  public async _execute(
+    params: WithAgencyDto,
+    uow: UnitOfWork,
+    currentUser: InclusionConnectedUser,
+  ): Promise<void> {
+    const updatedRelatedAgencies: AgencyDto[] = (
       await uow.agencyRepository.getAgenciesRelatedToAgency(params.agency.id)
     ).map((agency) => ({
       ...agency,
@@ -29,12 +39,18 @@ export class UpdateAgencyReferingToUpdatedAgency extends TransactionalUseCase<
     }));
 
     await Promise.all(
-      updatedReleatedAgencies.flatMap((agency) => [
+      updatedRelatedAgencies.flatMap((agency) => [
         uow.agencyRepository.update(agency),
         uow.outboxRepository.save(
           this.#createNewEvent({
             topic: "AgencyUpdated",
-            payload: { agency },
+            payload: {
+              agency,
+              triggeredBy: {
+                kind: "inclusion-connected",
+                userId: currentUser.id,
+              },
+            },
           }),
         ),
       ]),
