@@ -4,33 +4,25 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { TransactionalUseCase } from "../../core/UseCase";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
   AssessmentEntity,
   createAssessmentEntity,
 } from "../entities/AssessmentEntity";
 
-export class CreateAssessment extends TransactionalUseCase<AssessmentDto> {
-  protected inputSchema = assessmentSchema;
+type WithCreateNewEvent = { createNewEvent: CreateNewEvent };
 
-  #createNewEvent: CreateNewEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-  }
-
-  public async _execute(
-    dto: AssessmentDto,
-    uow: UnitOfWork,
-    conventionJwtPayload?: ConventionJwtPayload,
-  ): Promise<void> {
+export type CreateAssessment = ReturnType<typeof makeCreateAssessment>;
+export const makeCreateAssessment = createTransactionalUseCase<
+  AssessmentDto,
+  void,
+  ConventionJwtPayload | undefined,
+  WithCreateNewEvent
+>(
+  { useCaseName: "CreateAssessment", inputSchema: assessmentSchema },
+  async (dto, { uow, deps }, conventionJwtPayload) => {
     if (!conventionJwtPayload)
       throw new ForbiddenError("No magic link provided");
     throwForbiddenIfNotAllow(dto, conventionJwtPayload);
@@ -40,7 +32,7 @@ export class CreateAssessment extends TransactionalUseCase<AssessmentDto> {
       dto,
     );
 
-    const event = this.#createNewEvent({
+    const event = deps.createNewEvent({
       topic: "AssessmentCreated",
       payload: {
         assessment: dto,
@@ -55,8 +47,8 @@ export class CreateAssessment extends TransactionalUseCase<AssessmentDto> {
       uow.assessmentRepository.save(assessmentEntity),
       uow.outboxRepository.save(event),
     ]);
-  }
-}
+  },
+);
 
 const validateConventionAndCreateAssessmentEntity = async (
   uow: UnitOfWork,

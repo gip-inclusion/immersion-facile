@@ -16,6 +16,74 @@ import { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";
 
 const logger = createLogger(__filename);
 
+type CreateTransactionalUseCase = <
+  Input,
+  Output = void,
+  UserIdentity = void,
+  Dependencies = void,
+>(
+  {
+    useCaseName,
+    inputSchema,
+  }: {
+    useCaseName: string;
+    inputSchema: z.ZodSchema<Input>;
+  },
+  cb: (
+    params: Input,
+    { uow, deps }: { uow: UnitOfWork; deps: Dependencies },
+    userIdentity: UserIdentity,
+  ) => Promise<Output>,
+) => (
+  config: {
+    uowPerformer: UnitOfWorkPerformer;
+  } & (Dependencies extends void
+    ? Record<string, any>
+    : { deps: Dependencies }),
+) => {
+  useCaseName: string;
+  execute: (params: Input, userIdentity: UserIdentity) => Promise<Output>;
+};
+
+export const createTransactionalUseCase: CreateTransactionalUseCase =
+  ({ useCaseName, inputSchema }, cb) =>
+  ({ uowPerformer, deps }) => ({
+    useCaseName,
+    execute: async (inputParams, userIdentity) => {
+      const startDate = new Date();
+      const validParams = validateAndParseZodSchema(
+        inputSchema,
+        inputParams,
+        logger,
+      );
+      const paramsHash = createParamsHash(useCaseName, validParams);
+
+      try {
+        const result = await uowPerformer.perform((uow) =>
+          cb(validParams, { uow, deps }, userIdentity),
+        );
+        const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+        logger.info({
+          useCaseName,
+          durationInSeconds,
+          status: "success",
+          ...(paramsHash ? { paramsHash } : {}),
+        });
+        return result;
+      } catch (error) {
+        const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+        logger.error({
+          useCaseName,
+          status: "error",
+          durationInSeconds,
+          ...(paramsHash ? { paramsHash } : {}),
+          errorMessage: castError(error).message,
+        });
+        throw error;
+      }
+    },
+  });
+
 const createParamsHash = (
   useCaseName: string,
   params: unknown,

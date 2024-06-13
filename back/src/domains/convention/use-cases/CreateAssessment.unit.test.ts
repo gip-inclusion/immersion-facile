@@ -24,7 +24,7 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { InMemoryAssessmentRepository } from "../adapters/InMemoryAssessmentRepository";
 import { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
-import { CreateAssessment } from "./CreateAssessment";
+import { CreateAssessment, makeCreateAssessment } from "./CreateAssessment";
 
 const conventionId = "conventionId";
 
@@ -64,18 +64,19 @@ describe("CreateAssessment", () => {
       .withId(conventionId)
       .build();
     conventionRepository.setConventions([convention]);
-    createAssessment = new CreateAssessment(
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway: new CustomTimeGateway(),
+      uuidGenerator: new TestUuidGenerator(),
+    });
+    createAssessment = makeCreateAssessment({
       uowPerformer,
-      makeCreateNewEvent({
-        timeGateway: new CustomTimeGateway(),
-        uuidGenerator: new TestUuidGenerator(),
-      }),
-    );
+      deps: { createNewEvent },
+    });
   });
 
   it("throws forbidden if no magicLink payload is provided", async () => {
     await expectPromiseToFailWithError(
-      createAssessment.execute(assessment),
+      createAssessment.execute(assessment, undefined),
       new ForbiddenError("No magic link provided"),
     );
   });

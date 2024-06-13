@@ -1,12 +1,14 @@
-import { WebhookSubscription, expectPromiseToFailWithError } from "shared";
-import { ForbiddenError } from "../../../../config/helpers/httpErrors";
+import { WebhookSubscription } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
-import { ListActiveSubscriptions } from "./ListActiveSubscriptions";
+import {
+  ListActiveSubscriptions,
+  makeListActiveSubscriptions,
+} from "./ListActiveSubscriptions";
 
 describe("ListActiveSubscriptions", () => {
   let uow: InMemoryUnitOfWork;
@@ -14,16 +16,8 @@ describe("ListActiveSubscriptions", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    listActiveSubscriptions = new ListActiveSubscriptions(
-      new InMemoryUowPerformer(uow),
-    );
-  });
-
-  it("throws a forbidden error when jwtPayload is not provided", async () => {
-    await expectPromiseToFailWithError(
-      listActiveSubscriptions.execute(),
-      new ForbiddenError("Accès refusé"),
-    );
+    const uowPerformer = new InMemoryUowPerformer(uow);
+    listActiveSubscriptions = makeListActiveSubscriptions({ uowPerformer });
   });
 
   it("returns empty list if no subscriptions", async () => {
