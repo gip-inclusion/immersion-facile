@@ -129,14 +129,14 @@ export type DomainEvent =
   | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto & WithTriggeredBy>
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
-  | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload>
+  | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
   | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: UserId; agencyIds: AgencyId[] } & WithTriggeredBy>
   | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams & WithTriggeredBy>
   | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams & WithTriggeredBy>
   // API CONSUMER related
-  | GenericEvent<"ApiConsumerSaved", { consumerId: string }>
+  | GenericEvent<"ApiConsumerSaved", { consumerId: string } & WithTriggeredBy>
   // ERRORED CONVENTION RELATED
-  | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId }>;
+  | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId } & WithTriggeredBy>;
 
 export type DomainTopic = DomainEvent["topic"];
 

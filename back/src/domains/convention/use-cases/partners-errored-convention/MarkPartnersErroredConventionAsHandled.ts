@@ -45,12 +45,13 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
     if (!conventionToMarkAsHandled)
       throw new NotFoundError(conventionMissingMessage(params.conventionId));
 
-    const icUser = await uow.inclusionConnectedUserRepository.getById(userId);
-    if (!icUser)
+    const currentUser =
+      await uow.inclusionConnectedUserRepository.getById(userId);
+    if (!currentUser)
       throw new NotFoundError(
         `User '${userId}' not found on inclusion connected user repository.`,
       );
-    const userAgencyRights = icUser.agencyRights.find(
+    const userAgencyRights = currentUser.agencyRights.find(
       (agencyRight) =>
         agencyRight.agency.id === conventionToMarkAsHandled.agencyId,
     );
@@ -71,6 +72,10 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
         payload: {
           conventionId: params.conventionId,
           userId,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: currentUser.id,
+          },
         },
         occurredAt: conventionMarkAsHandledAt,
       }),

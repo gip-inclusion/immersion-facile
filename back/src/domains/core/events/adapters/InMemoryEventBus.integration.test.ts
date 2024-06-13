@@ -22,6 +22,10 @@ const domainEvt: DomainEvent = {
       conventionId: "a convention id",
       establishmentFeedback: "Super top",
     },
+    triggeredBy: {
+      kind: "inclusion-connected",
+      userId: "user-123",
+    },
   },
   occurredAt: "a date",
   wasQuarantined: false,

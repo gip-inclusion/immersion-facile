@@ -133,6 +133,10 @@ describe("AuthenticateWithInclusionCode use case", () => {
               provider: "inclusionConnect",
               userId,
               codeSafir: null,
+              triggeredBy: {
+                kind: "inclusion-connected",
+                userId,
+              },
             },
           },
         ]);

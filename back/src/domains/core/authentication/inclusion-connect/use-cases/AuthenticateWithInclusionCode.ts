@@ -140,6 +140,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
           userId: newOrUpdatedAuthenticatedUser.id,
           provider: ongoingOAuth.provider,
           codeSafir: icIdTokenPayload.structure_pe ?? null,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: newOrUpdatedAuthenticatedUser.id,
+          },
         },
       }),
     );

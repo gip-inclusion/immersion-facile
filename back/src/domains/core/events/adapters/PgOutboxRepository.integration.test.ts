@@ -226,11 +226,17 @@ describe("PgOutboxRepository", () => {
       });
       const event2 = createNewEvent({
         topic: "ApiConsumerSaved",
-        payload: { consumerId: "consumerId" },
+        payload: {
+          consumerId: "consumerId",
+          triggeredBy: { kind: "inclusion-connected", userId: "Bob" },
+        },
       });
       const event3 = createNewEvent({
         topic: "ApiConsumerSaved",
-        payload: { consumerId: "other-consumer-id" },
+        payload: {
+          consumerId: "other-consumer-id",
+          triggeredBy: { kind: "inclusion-connected", userId: "Jane" },
+        },
       });
 
       await storeInOutbox([event1, event2, event3]);
