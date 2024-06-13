@@ -1,27 +1,22 @@
 import { keys } from "ramda";
 import { ApiConsumer, WebhookSubscription } from "shared";
 import { z } from "zod";
-import { ForbiddenError } from "../../../../config/helpers/httpErrors";
-import { TransactionalUseCase } from "../../UseCase";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import { createTransactionalUseCase } from "../../UseCase";
 
-export class ListActiveSubscriptions extends TransactionalUseCase<
+export type ListActiveSubscriptions = ReturnType<
+  typeof makeListActiveSubscriptions
+>;
+
+export const makeListActiveSubscriptions = createTransactionalUseCase<
   void,
   WebhookSubscription[],
   ApiConsumer
-> {
-  protected inputSchema = z.void();
-
-  protected async _execute(
-    _: void,
-    _uow: UnitOfWork,
-    apiConsumer?: ApiConsumer,
-  ): Promise<WebhookSubscription[]> {
-    if (!apiConsumer) throw new ForbiddenError();
-
+>(
+  { useCaseName: "ListActiveSubscriptions", inputSchema: z.void() },
+  (_, _uow, apiConsumer) => {
     const subscriptions = keys(apiConsumer.rights).flatMap(
       (rightName) => apiConsumer.rights[rightName].subscriptions,
     );
     return Promise.resolve(subscriptions);
-  }
-}
+  },
+);

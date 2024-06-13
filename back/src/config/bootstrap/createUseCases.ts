@@ -15,7 +15,7 @@ import { UpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-c
 import { UpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
 import { AddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
-import { CreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
+import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
@@ -52,7 +52,7 @@ import { LookupLocation } from "../../domains/core/address/use-cases/LookupLocat
 import { LookupStreetAddress } from "../../domains/core/address/use-cases/LookupStreetAddress";
 import { BroadcastToPartnersOnConventionUpdates } from "../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
 import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/DeleteSubscription";
-import { ListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
+import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
@@ -250,7 +250,6 @@ export const createUseCases = (
       ),
 
       // Conventions
-      createAssessment: new CreateAssessment(uowPerformer, createNewEvent),
       addConvention,
       getConvention: new GetConvention(uowPerformer),
       getConventionForApiConsumer: new GetConventionForApiConsumer(
@@ -536,7 +535,6 @@ export const createUseCases = (
           gateways.subscribersGateway,
           gateways.timeGateway,
         ),
-      listActiveSubscriptions: new ListActiveSubscriptions(uowPerformer),
       subscribeToWebhook: new SubscribeToWebhook(
         uowPerformer,
         uuidGenerator,
@@ -602,6 +600,13 @@ export const createUseCases = (
             await uow.conventionQueries.findSimilarConventions(params),
         })),
     }),
+    createAssessment: makeCreateAssessment({
+      uowPerformer,
+      deps: { createNewEvent },
+    }),
+    listActiveSubscriptions: makeListActiveSubscriptions({
+      uowPerformer,
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
@@ -638,7 +643,7 @@ const createInstantiatedUseCase = <Input = void, Output = void>(params: {
 }): InstantiatedUseCase<Input, Output, unknown> => params;
 
 const instantiatedUseCasesFromFunctions = <
-  T extends Record<string, (params: any) => Promise<unknown>>,
+  T extends Record<string, (...params: any[]) => Promise<unknown>>,
 >(
   lamdas: T,
 ): {
