@@ -31,6 +31,8 @@ export class CreateAssessment extends TransactionalUseCase<AssessmentDto> {
     uow: UnitOfWork,
     conventionJwtPayload?: ConventionJwtPayload,
   ): Promise<void> {
+    if (!conventionJwtPayload)
+      throw new ForbiddenError("No magic link provided");
     throwForbiddenIfNotAllow(dto, conventionJwtPayload);
 
     const assessmentEntity = await validateConventionAndCreateAssessmentEntity(
@@ -40,7 +42,13 @@ export class CreateAssessment extends TransactionalUseCase<AssessmentDto> {
 
     const event = this.#createNewEvent({
       topic: "AssessmentCreated",
-      payload: { assessment: dto },
+      payload: {
+        assessment: dto,
+        triggeredBy: {
+          kind: "convention-magic-link",
+          role: conventionJwtPayload.role,
+        },
+      },
     });
 
     await Promise.all([
@@ -75,9 +83,8 @@ const validateConventionAndCreateAssessmentEntity = async (
 
 const throwForbiddenIfNotAllow = (
   dto: AssessmentDto,
-  conventionJwtPayload?: ConventionJwtPayload,
+  conventionJwtPayload: ConventionJwtPayload,
 ) => {
-  if (!conventionJwtPayload) throw new ForbiddenError("No magic link provided");
   if (conventionJwtPayload.role !== "establishment-tutor")
     throw new ForbiddenError(
       "Only an establishment tutor can create an assessment",

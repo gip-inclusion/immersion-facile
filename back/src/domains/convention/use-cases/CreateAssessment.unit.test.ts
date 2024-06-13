@@ -169,7 +169,13 @@ describe("CreateAssessment", () => {
     expect(outboxRepository.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepository.events[0], {
       topic: "AssessmentCreated",
-      payload: { assessment },
+      payload: {
+        assessment,
+        triggeredBy: {
+          kind: "convention-magic-link",
+          role: validPayload.role,
+        },
+      },
     });
   });
 });
