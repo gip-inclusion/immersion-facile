@@ -1,23 +1,19 @@
-import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
   FeatureFlags,
   InclusionConnectedUserBuilder,
-  cciAgencyId,
   conventionSchema,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
-  peParisAgencyId,
   reasonableSchedule,
 } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createAppDependencies } from "../config/bootstrap/createAppDependencies";
-import { ForbiddenError } from "../config/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
-import { SavedError } from "../domains/core/saved-errors/ports/SavedErrorRepository";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
+import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -25,6 +21,9 @@ import {
   OfferEntityBuilder,
 } from "../domains/establishment/helpers/EstablishmentBuilders";
 import { establishmentAggragateToFormEstablishement } from "../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
+
+export const peAgencyId = new UuidV4Generator().new();
+export const cciAgencyId = new UuidV4Generator().new();
 
 /* eslint-disable no-console */
 const seed = async () => {
@@ -75,7 +74,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom IcUser")
     .withLastName("Nom IcUser")
-    .withId("0cd861bb-d538-4bac-83f1-256ff249a196")
+    .withId(new UuidV4Generator().new())
     .withExternalId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
     .build();
 
@@ -85,7 +84,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom Admin")
     .withLastName("Nom Admin")
-    .withId("a63dd0e5-1626-4181-97ef-1fd58278b778")
+    .withId(new UuidV4Generator().new())
     .withExternalId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
     .build();
 
@@ -138,7 +137,7 @@ const agencySeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding agencies...");
   const peParisAgency = new AgencyDtoBuilder()
-    .withId(peParisAgencyId)
+    .withId(peAgencyId)
     .withName("Agence Pôle Emploi Paris")
     .withQuestionnaireUrl("https://questionnaire.seed")
     .withSignature("Seed signature")
@@ -183,7 +182,7 @@ const establishmentSeed = async (uow: UnitOfWork) => {
       new EstablishmentEntityBuilder()
         .withLocations([
           {
-            id: "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01",
+            id: new UuidV4Generator().new(),
             address: {
               city: "Villetaneuse",
               postcode: "93430",
@@ -193,7 +192,7 @@ const establishmentSeed = async (uow: UnitOfWork) => {
             position: { lat: 48.956, lon: 2.345 },
           },
           {
-            id: "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02",
+            id: new UuidV4Generator().new(),
             address: {
               city: "Paris",
               postcode: "75001",
@@ -313,19 +312,19 @@ const conventionSeed = async (uow: UnitOfWork) => {
   console.log("seeding conventions...");
 
   const peConvention = new ConventionDtoBuilder()
-    .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
+    .withId(new UuidV4Generator().new())
     .withInternshipKind("immersion")
     .withDateStart(new Date("2023-03-27").toISOString())
     .withDateEnd(new Date("2023-03-28").toISOString())
     .withStatus("READY_TO_SIGN")
-    .withAgencyId(peParisAgencyId)
+    .withAgencyId(peAgencyId)
     .withSchedule(reasonableSchedule)
     .build();
 
   conventionSchema.parse(peConvention);
 
   const cciConvention = new ConventionDtoBuilder()
-    .withId("4d7f9ded-fa25-462a-a290-caeaa192c555")
+    .withId(new UuidV4Generator().new())
     .withInternshipKind("mini-stage-cci")
     .withDateStart(new Date("2023-05-01").toISOString())
     .withDateEnd(new Date("2023-05-03").toISOString())
@@ -340,20 +339,6 @@ const conventionSeed = async (uow: UnitOfWork) => {
     uow.conventionRepository.save(peConvention),
     uow.conventionRepository.save(cciConvention),
   ]);
-
-  const savedError: SavedError = {
-    handledByAgency: false,
-    subscriberErrorFeedback: {
-      message: "message de la seed",
-      error: new ForbiddenError("Une erreur dans la seed"),
-    },
-    consumerId: null,
-    consumerName: "Fake consumer",
-    occurredAt: addDays(new Date(peConvention.dateSubmission), 2),
-    serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
-    params: { httpStatus: 404, conventionId: peConvention.id },
-  };
-  await uow.errorRepository.save(savedError);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
