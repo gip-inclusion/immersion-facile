@@ -1,9 +1,13 @@
 import {
   AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  ConventionReadDto,
   InclusionConnectedUser,
   WithAgencyIds,
+  expectArraysToEqualIgnoringOrder,
   expectToEqual,
 } from "shared";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import {
   InclusionConnectedFeedback,
@@ -238,6 +242,48 @@ describe("InclusionConnected", () => {
       );
       expectFeedbackToEqual({ kind: "errored", errorMessage });
       expectIsLoadingToBe(false);
+    });
+  });
+
+  describe("when a convention is in store", () => {
+    const convention: ConventionReadDto = {
+      ...new ConventionDtoBuilder().build(),
+      agencyName: "Agence de test",
+      agencyDepartment: "75",
+      agencyKind: "mission-locale",
+      agencySiret: "11112222000033",
+      agencyCounsellorEmails: [],
+      agencyValidatorEmails: [],
+    };
+
+    const adminUser: InclusionConnectedUser = {
+      ...inclusionConnectedUser,
+      agencyRights: [
+        {
+          roles: ["agencyOwner", "validator"],
+          agency: new AgencyDtoBuilder().build(),
+          isNotifiedByEmail: true,
+        },
+      ],
+      isBackofficeAdmin: true,
+    };
+
+    beforeEach(() => {
+      store.dispatch(
+        conventionSlice.actions.fetchConventionSucceeded(convention),
+      );
+      store.dispatch(
+        inclusionConnectedSlice.actions.currentUserFetchSucceeded(adminUser),
+      );
+    });
+
+    it("user can have multiple roles", () => {
+      expectArraysToEqualIgnoringOrder(
+        inclusionConnectedSelectors.userRolesForFetchedConvention(
+          store.getState(),
+        ),
+        ["backOffice", "agencyOwner", "validator"],
+      );
     });
   });
 
