@@ -33,17 +33,18 @@ export const getIcUserRoleForAccessingConvention = (
   convention: ConventionDto,
   user: InclusionConnectedUser,
 ): InclusionConnectConventionManageAllowedRole[] => {
-  if (user.isBackofficeAdmin) return ["backOffice"];
+  const roles: InclusionConnectConventionManageAllowedRole[] = [];
+  if (user.isBackofficeAdmin) roles.push("backOffice");
   if (convention.signatories.establishmentRepresentative.email === user.email)
-    return ["establishment-representative"];
+    roles.push("establishment-representative");
   const agencyRight = user.agencyRights.find(
     (agencyRight) => agencyRight.agency.id === convention.agencyId,
   );
 
   if (agencyRight && agencyRoleIsNotToReview(agencyRight.roles))
-    return agencyRight.roles;
+    roles.push(...agencyRight.roles);
 
-  return [];
+  return roles;
 };
 
 export const agencyRoleIsNotToReview = (
