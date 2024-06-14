@@ -54,11 +54,9 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
         nativeInputProps={{
           ...formContents.siret,
           ...register("siret"),
-          // NOT WORKING SINCE PREVIOUS UPDATE
-          // PROBABLY MISSING SET FROM VALUE ON CHANGE
-          // onChange: (event) => {
-          //   updateSiret(event.target.value);
-          // },
+          onBlur: (event) => {
+            updateSiret(event.target.value);
+          },
           value: currentSiret || values.siret,
         }}
         disabled={isFetchingSiret}
