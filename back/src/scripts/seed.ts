@@ -50,6 +50,7 @@ const seed = async () => {
   await db.deleteFrom("form_establishments").execute();
   await db.deleteFrom("establishments").execute();
   await db.deleteFrom("groups").execute();
+  await db.deleteFrom("feature_flags").execute();
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("Reset Db end");
