@@ -138,29 +138,18 @@ export class PgOutboxRepository implements OutboxRepository {
     if (!publicationId)
       throw new Error(`saveNewPublication of event ${eventId} failed`);
 
-    // TODO: Cette implem ne fonctionne pas, elle permettrait d'injecter tout en une fois
-    // await this.transaction
-    //   .insertInto("outbox_failures")
-    //   .values(
-    //     failures.map(({ subscriptionId, errorMessage }) => ({
-    //       publication_id: publicationId,
-    //       subscription_id: subscriptionId,
-    //       error_message: errorMessage,
-    //     })),
-    //   )
-    //   .execute();
-    await Promise.all(
-      failures.map(({ subscriptionId, errorMessage }) =>
-        this.transaction
-          .insertInto("outbox_failures")
-          .values({
-            publication_id: publicationId,
-            subscription_id: subscriptionId,
-            error_message: errorMessage,
-          })
-          .execute(),
-      ),
-    );
+    if (failures.length === 0) return;
+
+    await this.transaction
+      .insertInto("outbox_failures")
+      .values(
+        failures.map(({ subscriptionId, errorMessage }) => ({
+          publication_id: publicationId,
+          subscription_id: subscriptionId,
+          error_message: errorMessage,
+        })),
+      )
+      .execute();
   }
 
   async #getEventById(id: string): Promise<DomainEvent | undefined> {
