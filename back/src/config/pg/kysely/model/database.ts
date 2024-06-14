@@ -17,6 +17,7 @@ export interface Database {
   establishments_locations: EstablishmentsLocations;
   establishments: Establishments;
   exchanges: Exchanges;
+  feature_flags: FeatureFlags;
   form_establishments: PgFormEstablishments;
   groups__sirets: GroupsSirets;
   groups: Groups;
@@ -552,4 +553,11 @@ interface OutboxPublications {
   id: Generated<number>;
   event_id: string;
   published_at: Timestamp;
+}
+
+interface FeatureFlags {
+  flag_name: string;
+  is_active: boolean;
+  kind: Generated<string>;
+  value: Json | null;
 }
