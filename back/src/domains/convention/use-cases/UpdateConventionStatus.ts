@@ -179,26 +179,31 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     userId: UserId,
     convention: ConventionDto,
   ): Promise<Role[]> {
+    const roles: Role[] = [];
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)
       throw new NotFoundError(
         `User '${userId}' not found on inclusion connected user repository.`,
       );
 
-    if (user.isBackofficeAdmin) return ["backOffice"];
+    if (user.isBackofficeAdmin) roles.push("backOffice");
 
     if (user.email === convention.signatories.establishmentRepresentative.email)
-      return ["establishment-representative"];
+      roles.push("establishment-representative");
 
     const userAgencyRight = user.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === convention.agencyId,
     );
-    if (!userAgencyRight)
+
+    if (!userAgencyRight && roles.length === 0) {
       throw new ForbiddenError(
         `User '${userId}' has no role on agency '${convention.agencyId}'.`,
       );
+    }
 
-    return userAgencyRight.roles;
+    if (userAgencyRight) roles.push(...userAgencyRight.roles);
+
+    return roles;
   }
 
   async #agencyEmailFromUserIdAndAgencyId(
