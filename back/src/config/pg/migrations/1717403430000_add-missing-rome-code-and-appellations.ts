@@ -518,14 +518,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
-  const appellationCodesToRemove = romeDatas.flatMap(({ appellations }) =>
-    appellations.map(({ appellationCode }) => `'${appellationCode}'`),
-  );
   await pgm.db.query(`
     DELETE FROM public_appellations_data 
-    WHERE public_appellations_data.ogr_appellation in (${appellationCodesToRemove.join(
-      ", ",
-    )})
+    WHERE public_appellations_data.code_rome in (${romeDatas
+      .map((romeData) => `'${romeData.romeCode}'`)
+      .join(", ")})
  `);
 
   await pgm.db.query(`
