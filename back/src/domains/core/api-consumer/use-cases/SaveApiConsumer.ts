@@ -9,8 +9,8 @@ import {
   WriteApiConsumerParams,
   writeApiConsumerSchema,
 } from "shared";
+import { throwIfNotAdmin } from "../../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
 import { TransactionalUseCase } from "../../UseCase";
-import { throwIfNotAdmin } from "../../authentication/inclusion-connect/helpers/ic-user.helpers";
 import { CreateNewEvent } from "../../events/ports/EventBus";
 import { GenerateApiConsumerJwt } from "../../jwt";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";

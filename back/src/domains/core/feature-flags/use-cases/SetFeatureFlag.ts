@@ -3,8 +3,8 @@ import {
   SetFeatureFlagParam,
   setFeatureFlagSchema,
 } from "shared";
+import { throwIfNotAdmin } from "../../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
 import { TransactionalUseCase } from "../../UseCase";
-import { throwIfNotAdmin } from "../../authentication/inclusion-connect/helpers/ic-user.helpers";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export class SetFeatureFlag extends TransactionalUseCase<

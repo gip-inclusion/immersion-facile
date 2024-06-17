@@ -8,8 +8,8 @@ import {
   splitInChunks,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
-import { throwIfNotAdmin } from "../../core/authentication/inclusion-connect/helpers/ic-user.helpers";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
 import { GroupEntity } from "../entities/GroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 
