@@ -2,32 +2,41 @@ import { z } from "zod";
 import {
   DiagorienteAccessTokenResponse,
   DiagorienteRawResponse,
-} from "./DiagorienteAppellationsGateway";
+} from "./DiagorienteAppellationsGateway.routes";
 
 export const diagorienteQueryParamsSchema = z.object({
   query: z.string(),
   nb_results: z.number(),
+  tags: z
+    .array(z.enum(["ROME4", "alternance"]))
+    .min(1)
+    .optional(),
 });
 
 export const diagorienteRawResponseSchema: z.Schema<DiagorienteRawResponse> =
   z.object({
-    search_id: z.string(),
-    original_query: z.array(z.string()),
-    rewritten_query: z.array(z.string()),
     search_results: z.array(
       z.object({
-        position: z.number(),
-        item: z.object({
-          type: z.string(),
-          key: z.string(),
+        text: z.string(),
+        similarity: z.number(),
+        data: z.object({
           _key: z.string(),
+          _id: z.string(),
+          _rev: z.string(),
           titre: z.string(),
-          rome: z.string(),
+          tags: z.array(z.unknown()),
           code_ogr: z.string(),
-          naf: z.array(z.string()),
-          niveau: z.string(),
+          transition_ecologique: z.boolean(),
+          transition_numerique: z.boolean(),
+          transition_demographique: z.boolean(),
+          metier_avenir: z.boolean(),
+          metier_art: z.boolean(),
+          metier_en_tension: z.boolean(),
+          metier_resilience: z.boolean(),
+          principale: z.boolean(),
+          description: z.null(),
+          id: z.string(),
         }),
-        score_matching: z.number(),
       }),
     ),
   });

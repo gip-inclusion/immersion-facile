@@ -1,132 +1,185 @@
-import { AppellationMatchDto } from "shared";
+import { expectToEqual } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryAppellationsGateway } from "../adapters/InMemoryAppellationsGateway";
 import { InMemoryRomeRepository } from "../adapters/InMemoryRomeRepository";
-import { AppellationsGateway } from "../ports/AppellationsGateway";
-import { RomeRepository } from "../ports/RomeRepository";
 import { AppellationSearch } from "./AppellationSearch";
 
 describe("AppellationSearch", () => {
-  let romeRepo: RomeRepository;
-  let appellationsGateway: AppellationsGateway;
+  let romeRepo: InMemoryRomeRepository;
+  let appellationsGateway: InMemoryAppellationsGateway;
+  let useCase: AppellationSearch;
 
   beforeEach(() => {
     romeRepo = new InMemoryRomeRepository();
     appellationsGateway = new InMemoryAppellationsGateway();
+    useCase = new AppellationSearch(
+      new InMemoryUowPerformer({
+        ...createInMemoryUow(),
+        romeRepository: romeRepo,
+      }),
+      appellationsGateway,
+    );
   });
 
-  const createUseCase = () => {
-    const uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
-      romeRepository: romeRepo,
-    });
-    return new AppellationSearch(uowPerformer, appellationsGateway);
-  };
-
   it("returns the list of found matches with ranges", async () => {
-    const response = await createUseCase().execute({
-      searchText: "lapins",
-      fetchAppellationsFromNaturalLanguage: false,
-    });
-    const expected: AppellationMatchDto[] = [
-      {
-        appellation: {
-          appellationCode: "14704",
-          appellationLabel: "Éleveur / Éleveuse de lapins angoras",
-          romeCode: "A1409",
-          romeLabel: "Élevage",
+    expectToEqual(
+      await useCase.execute({
+        searchText: "lapins",
+        fetchAppellationsFromNaturalLanguage: false,
+      }),
+      [
+        {
+          appellation: {
+            appellationCode: "14704",
+            appellationLabel: "Éleveur / Éleveuse de lapins angoras",
+            romeCode: "A1409",
+            romeLabel: "Élevage",
+          },
+          matchRanges: [{ startIndexInclusive: 22, endIndexExclusive: 28 }],
         },
-        matchRanges: [{ startIndexInclusive: 22, endIndexExclusive: 28 }],
-      },
-    ];
-    expect(response).toEqual(expected);
+      ],
+    );
   });
 
   it("returns the list of found matches with ranges from minimum search caracters", async () => {
-    const response = await createUseCase().execute({
-      searchText: "lap",
-      fetchAppellationsFromNaturalLanguage: false,
-    });
-    const expected: AppellationMatchDto[] = [
-      {
-        appellation: {
-          appellationCode: "14704",
-          appellationLabel: "Éleveur / Éleveuse de lapins angoras",
-          romeCode: "A1409",
-          romeLabel: "Élevage",
+    expectToEqual(
+      await useCase.execute({
+        searchText: "lap",
+        fetchAppellationsFromNaturalLanguage: false,
+      }),
+      [
+        {
+          appellation: {
+            appellationCode: "14704",
+            appellationLabel: "Éleveur / Éleveuse de lapins angoras",
+            romeCode: "A1409",
+            romeLabel: "Élevage",
+          },
+          matchRanges: [{ startIndexInclusive: 22, endIndexExclusive: 25 }],
         },
-        matchRanges: [{ startIndexInclusive: 22, endIndexExclusive: 25 }],
-      },
-    ];
-    expect(response).toEqual(expected);
+      ],
+    );
   });
 
   it("issues no queries for short search texts", async () => {
-    const mockSearchMetierFn = jest.fn();
-    const mockSearchAppellationFn = jest.fn();
-    const mockAppellationToCodeMetier = jest.fn();
-    const mockGetFullAppellationsFromCodes = jest.fn();
-    romeRepo = {
-      searchRome: mockSearchMetierFn,
-      searchAppellation: mockSearchAppellationFn,
-      appellationToCodeMetier: mockAppellationToCodeMetier,
-      getAppellationAndRomeDtosFromAppellationCodes:
-        mockGetFullAppellationsFromCodes,
-    };
-
-    const response = await createUseCase().execute({
-      searchText: "l",
-      fetchAppellationsFromNaturalLanguage: false,
-    });
-    expect(mockSearchMetierFn.mock.calls).toHaveLength(0);
-    expect(mockSearchAppellationFn.mock.calls).toHaveLength(0);
-    expect(response).toEqual([]);
+    expectToEqual(
+      await useCase.execute({
+        searchText: "l",
+        fetchAppellationsFromNaturalLanguage: false,
+      }),
+      [],
+    );
   });
 
   it("returns empty list when no match is found", async () => {
-    expect(
-      await createUseCase().execute({
+    expectToEqual(
+      await useCase.execute({
         searchText: "unknown_search_term",
         fetchAppellationsFromNaturalLanguage: false,
       }),
-    ).toEqual([]);
+      [],
+    );
   });
   describe("with natural language search", () => {
     it("returns the list of found matches with ranges", async () => {
-      const response = await createUseCase().execute({
-        searchText: "secret",
-        fetchAppellationsFromNaturalLanguage: true,
-      });
-      const expected: AppellationMatchDto[] = [
+      appellationsGateway.setNextSearchAppelationsResult([
+        { appellationCode: "19364", appellationLabel: "Secrétaire" },
         {
-          appellation: {
-            romeCode: "M1607",
-            appellationCode: "19364",
-            appellationLabel: "Secrétaire",
-            romeLabel: "Secrétariat",
-          },
-          matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 6 }],
+          appellationCode: "19367",
+          appellationLabel: "Secrétaire bureautique spécialisé / spécialisée",
+        },
+      ]);
+
+      romeRepo.appellations = [
+        {
+          romeCode: "M1607",
+          appellationCode: "19364",
+          appellationLabel: "Secrétaire",
+          romeLabel: "Secrétariat",
         },
         {
-          appellation: {
-            romeCode: "M1607",
-            appellationCode: "19367",
-            appellationLabel: "Secrétaire bureautique spécialisé / spécialisée",
-            romeLabel: "Secrétariat",
-          },
-          matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 6 }],
+          romeCode: "M1607",
+          appellationCode: "19367",
+          appellationLabel: "Secrétaire bureautique spécialisé / spécialisée",
+          romeLabel: "Secrétariat",
         },
       ];
-      expect(response).toEqual(expected);
+
+      expectToEqual(
+        await useCase.execute({
+          searchText: "secret",
+          fetchAppellationsFromNaturalLanguage: true,
+        }),
+        [
+          {
+            appellation: {
+              romeCode: "M1607",
+              appellationCode: "19364",
+              appellationLabel: "Secrétaire",
+              romeLabel: "Secrétariat",
+            },
+            matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 6 }],
+          },
+          {
+            appellation: {
+              romeCode: "M1607",
+              appellationCode: "19367",
+              appellationLabel:
+                "Secrétaire bureautique spécialisé / spécialisée",
+              romeLabel: "Secrétariat",
+            },
+            matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 6 }],
+          },
+        ],
+      );
     });
+
+    it("do not return results if missing on rome repo like ROME 4 results", async () => {
+      appellationsGateway.setNextSearchAppelationsResult([
+        { appellationCode: "19364", appellationLabel: "Secrétaire" },
+        {
+          appellationCode: "19367",
+          appellationLabel: "Secrétaire bureautique spécialisé / spécialisée",
+        },
+      ]);
+
+      romeRepo.appellations = [
+        {
+          romeCode: "M1607",
+          appellationCode: "19364",
+          appellationLabel: "Secrétaire",
+          romeLabel: "Secrétariat",
+        },
+      ];
+
+      expectToEqual(
+        await useCase.execute({
+          searchText: "secret",
+          fetchAppellationsFromNaturalLanguage: true,
+        }),
+        [
+          {
+            appellation: {
+              romeCode: "M1607",
+              appellationCode: "19364",
+              appellationLabel: "Secrétaire",
+              romeLabel: "Secrétariat",
+            },
+            matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 6 }],
+          },
+        ],
+      );
+    });
+
     it("returns empty array if no match", async () => {
-      const response = await createUseCase().execute({
-        searchText: "unknown_search_term",
-        fetchAppellationsFromNaturalLanguage: true,
-      });
-      const expected: AppellationMatchDto[] = [];
-      expect(response).toEqual(expected);
+      expectToEqual(
+        await useCase.execute({
+          searchText: "unknown_search_term",
+          fetchAppellationsFromNaturalLanguage: true,
+        }),
+        [],
+      );
     });
   });
 });
