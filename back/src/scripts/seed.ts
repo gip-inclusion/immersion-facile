@@ -1,5 +1,4 @@
 import {
-  AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
   FeatureFlags,
@@ -21,9 +20,7 @@ import {
   OfferEntityBuilder,
 } from "../domains/establishment/helpers/EstablishmentBuilders";
 import { establishmentAggragateToFormEstablishement } from "../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
-
-export const peAgencyId = new UuidV4Generator().new();
-export const cciAgencyId = new UuidV4Generator().new();
+import { getRandomAgencyId, insertAgencySeed } from "./seed.helpers";
 
 /* eslint-disable no-console */
 const seed = async () => {
@@ -136,40 +133,24 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
 const agencySeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding agencies...");
-  const peParisAgency = new AgencyDtoBuilder()
-    .withId(peAgencyId)
-    .withName("Agence Pôle Emploi Paris")
-    .withQuestionnaireUrl("https://questionnaire.seed")
-    .withSignature("Seed signature")
-    .withKind("pole-emploi")
-    .withStatus("active")
-    .withAddress({
-      city: "Paris",
-      departmentCode: "75",
-      postcode: "75001",
-      streetNumberAndAddress: "1 rue de Rivoli",
-    })
-    .build();
+  const agenciesCountByKind = 50;
 
-  const cciAgency = new AgencyDtoBuilder()
-    .withId(cciAgencyId)
-    .withName("CCI Carnac")
-    .withQuestionnaireUrl("https://questionnaire.seed")
-    .withSignature("Seed signature")
-    .withKind("cci")
-    .withStatus("active")
-    .withAddress({
-      city: "Plouharnel",
-      departmentCode: "56",
-      postcode: "56340",
-      streetNumberAndAddress: "5 Kerhueno",
-    })
-    .build();
+  const insertQueries = [...Array(agenciesCountByKind).keys()].flatMap(() => {
+    return [
+      insertAgencySeed({ uow, kind: "pole-emploi" }),
+      insertAgencySeed({ uow, kind: "cci" }),
+      insertAgencySeed({ uow, kind: "mission-locale" }),
+      insertAgencySeed({ uow, kind: "cap-emploi" }),
+      insertAgencySeed({ uow, kind: "conseil-departemental" }),
+      insertAgencySeed({ uow, kind: "prepa-apprentissage" }),
+      insertAgencySeed({ uow, kind: "structure-IAE" }),
+      insertAgencySeed({ uow, kind: "autre" }),
+      insertAgencySeed({ uow, kind: "operateur-cep" }),
+    ];
+  });
 
-  await Promise.all([
-    uow.agencyRepository.insert(peParisAgency),
-    uow.agencyRepository.insert(cciAgency),
-  ]);
+  await Promise.all(insertQueries);
+
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
 };
@@ -317,7 +298,7 @@ const conventionSeed = async (uow: UnitOfWork) => {
     .withDateStart(new Date("2023-03-27").toISOString())
     .withDateEnd(new Date("2023-03-28").toISOString())
     .withStatus("READY_TO_SIGN")
-    .withAgencyId(peAgencyId)
+    .withAgencyId(getRandomAgencyId({ kind: "pole-emploi" }))
     .withSchedule(reasonableSchedule)
     .build();
 
@@ -329,7 +310,7 @@ const conventionSeed = async (uow: UnitOfWork) => {
     .withDateStart(new Date("2023-05-01").toISOString())
     .withDateEnd(new Date("2023-05-03").toISOString())
     .withStatus("READY_TO_SIGN")
-    .withAgencyId(cciAgencyId)
+    .withAgencyId(getRandomAgencyId({ kind: "cci" }))
     .withSchedule(reasonableSchedule)
     .build();
 
