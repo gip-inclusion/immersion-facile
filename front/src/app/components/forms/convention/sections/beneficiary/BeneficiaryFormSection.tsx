@@ -110,6 +110,12 @@ export const BeneficiaryFormSection = ({
         new Date(value),
       );
       const newIsMinor = age < 18;
+      newIsMinor
+        ? setValue(
+            "signatories.beneficiaryRepresentative.role",
+            "beneficiary-representative",
+          )
+        : setValue("signatories.beneficiaryRepresentative", undefined);
       setIsMinorAccordingToAge(newIsMinor);
       dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
     },
