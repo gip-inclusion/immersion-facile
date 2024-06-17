@@ -72,8 +72,11 @@ export const convertAdeEstablishmentToSirenEstablishmentDto = (
 ): SiretEstablishmentDto => ({
   siret: adeEstablishment.matching_etablissements[0].siret,
   businessName:
-    adeEstablishment.matching_etablissements[0].nom_commercial ??
-    adeEstablishment.nom_complet,
+    adeEstablishment.matching_etablissements[0].nom_commercial &&
+    adeEstablishment.matching_etablissements[0].nom_commercial?.trim().length >
+      0
+      ? adeEstablishment.matching_etablissements[0].nom_commercial
+      : adeEstablishment.nom_complet,
   businessAddress: adeEstablishment.matching_etablissements[0].adresse,
   nafDto: {
     code: (

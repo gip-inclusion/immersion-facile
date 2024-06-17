@@ -76,4 +76,25 @@ describe("convertAdeEstablishmentToSirenEstablishmentDto", () => {
       numberEmployeesRange: "1-2",
     });
   });
+
+  it("falls back to nom_complet if response contains an empty nom_commercial", async () => {
+    const response = await convertAdeEstablishmentToSirenEstablishmentDto({
+      ...validEstablishment,
+      matching_etablissements: [
+        {
+          ...validEstablishment.matching_etablissements[0],
+          nom_commercial: " ",
+        },
+      ],
+    });
+
+    expectToEqual(response, {
+      siret: "12345678901234",
+      businessName: validEstablishment.nom_complet,
+      businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+      nafDto: { code: "783Z", nomenclature: "NAFRev2" },
+      isOpen: true,
+      numberEmployeesRange: "1-2",
+    });
+  });
 });
