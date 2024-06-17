@@ -41,12 +41,12 @@ import {
 } from "../../domains/core/pdf-generation/adapters/ScalingoPdfGeneratorGateway";
 import { PdfGeneratorGateway } from "../../domains/core/pdf-generation/ports/PdfGeneratorGateway";
 import { noRetries } from "../../domains/core/retry-strategy/ports/RetryStrategy";
+import { DiagorienteAppellationsGateway } from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway";
 import {
   DiagorienteAccessTokenResponse,
-  DiagorienteAppellationsGateway,
+  diagorienteAppellationsRoutes,
   diagorienteTokenScope,
-} from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway";
-import { diagorienteAppellationsRoutes } from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway.routes";
+} from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway.routes";
 import { InMemoryAppellationsGateway } from "../../domains/core/rome/adapters/InMemoryAppellationsGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";

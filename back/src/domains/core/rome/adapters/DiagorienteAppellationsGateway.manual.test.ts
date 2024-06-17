@@ -5,13 +5,15 @@ import axios from "axios";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
-import { AppellationsGateway } from "../ports/AppellationsGateway";
+import {
+  DiagorienteAppellationsGateway,
+  requestMinTime,
+} from "./DiagorienteAppellationsGateway";
 import {
   DiagorienteAccessTokenResponse,
-  DiagorienteAppellationsGateway,
+  diagorienteAppellationsRoutes,
   diagorienteTokenScope,
-} from "./DiagorienteAppellationsGateway";
-import { diagorienteAppellationsRoutes } from "./DiagorienteAppellationsGateway.routes";
+} from "./DiagorienteAppellationsGateway.routes";
 
 const cachingGateway =
   new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
@@ -20,9 +22,10 @@ const cachingGateway =
   );
 
 describe("DiagorienteAppellationsGateway", () => {
-  let appellationsGateway: AppellationsGateway;
-  const config = AppConfig.createFromEnv();
+  let appellationsGateway: DiagorienteAppellationsGateway;
+
   beforeEach(() => {
+    const config = AppConfig.createFromEnv();
     appellationsGateway = new DiagorienteAppellationsGateway(
       createAxiosSharedClient(diagorienteAppellationsRoutes, axios),
       cachingGateway,
@@ -50,39 +53,95 @@ describe("DiagorienteAppellationsGateway", () => {
     expect(originalToken).toEqual(newToken);
   });
 
-  it("returns matching results for query", async () => {
-    const response = await appellationsGateway.searchAppellations("Dév");
-    expectObjectsToMatch(response, [
-      {
-        appellationLabel: "Technicien / Technicienne informatique",
-        appellationCode: "20168",
-        romeCode: "M1810",
-        romeLabel: "M1810",
-      },
-      {
-        appellationLabel: "Responsable qualité web",
-        appellationCode: "38832",
-        romeCode: "M1802",
-        romeLabel: "M1802",
-      },
-      {
-        appellationLabel: "Technicien / Technicienne en communication",
-        appellationCode: "20044",
-        romeCode: "M1807",
-        romeLabel: "M1807",
-      },
-      {
-        appellationLabel: "Opérateur / Opératrice informatique",
-        appellationCode: "17238",
-        romeCode: "M1810",
-        romeLabel: "M1810",
-      },
-      {
-        appellationLabel: "Responsable sécurité informatique",
-        appellationCode: "19180",
-        romeCode: "M1802",
-        romeLabel: "M1802",
-      },
-    ]);
-  });
+  const parallelCalls = 100;
+  it.each([
+    {
+      search: "Dév",
+      results: [
+        {
+          appellationLabel: "Nez",
+          appellationCode: "16989",
+        },
+        {
+          appellationLabel: "Dee-jay",
+          appellationCode: "13916",
+        },
+        {
+          appellationLabel: "Délaineur / Délaineuse",
+          appellationCode: "13923",
+        },
+        {
+          appellationLabel: "Déligneur / Déligneuse",
+          appellationCode: "13945",
+        },
+        {
+          appellationLabel: "Déménageur / Déménageuse",
+          appellationCode: "13947",
+        },
+      ],
+    },
+    {
+      search: "ux",
+      results: [
+        {
+          appellationLabel: "Mareyeur / Mareyeuse",
+          appellationCode: "16391",
+        },
+        {
+          appellationLabel: "Élagueur / Élagueuse",
+          appellationCode: "14608",
+        },
+        {
+          appellationLabel: "Scieur / Scieuse",
+          appellationCode: "19323",
+        },
+        {
+          appellationLabel: "Liégeur / Liégeuse",
+          appellationCode: "16185",
+        },
+        {
+          appellationLabel: "Licier / Licière",
+          appellationCode: "16183",
+        },
+      ],
+    },
+    {
+      search: "Secrétaire",
+      results: [
+        {
+          appellationLabel: "Secrétaire",
+          appellationCode: "19364",
+        },
+        {
+          appellationLabel: "Secrétaire bureautique",
+          appellationCode: "19368",
+        },
+        {
+          appellationLabel: "Secrétaire généraliste",
+          appellationCode: "19395",
+        },
+        {
+          appellationLabel: "Secrétaire administratif / administrative",
+          appellationCode: "19365",
+        },
+        {
+          appellationLabel: "Secrétaire juridique",
+          appellationCode: "19396",
+        },
+      ],
+    },
+  ])(
+    `returns matching results for ${parallelCalls} parralel query with term $search`,
+    async ({ results, search }) => {
+      await Promise.all(
+        [...Array(parallelCalls)].map(async (_) => {
+          expectObjectsToMatch(
+            await appellationsGateway.searchAppellations(search),
+            results,
+          );
+        }),
+      );
+    },
+    parallelCalls * requestMinTime * 10,
+  );
 });

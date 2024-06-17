@@ -1,7 +1,5 @@
-import { AppellationAndRomeDto } from "shared";
-import { DiagorienteAccessTokenResponse } from "../adapters/DiagorienteAppellationsGateway";
+import { AppellationDto } from "shared";
 
 export interface AppellationsGateway {
-  searchAppellations(query: string): Promise<AppellationAndRomeDto[]>;
-  getAccessToken(): Promise<DiagorienteAccessTokenResponse>;
+  searchAppellations(query: string): Promise<AppellationDto[]>;
 }
