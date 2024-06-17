@@ -8,6 +8,7 @@ import {
   ConventionReadDto,
   DateIntervalDto,
   Weekday,
+  convertLocaleDateToUtcTimezoneDate,
   isStringDate,
   maximumCalendarDayByInternshipKind,
   reasonableSchedule,
@@ -71,14 +72,16 @@ export const ScheduleSection = () => {
         end: new Date(values.dateEnd),
       };
 
+      const inputValueAsDate = new Date(inputValue);
+
       if (inputName === "dateStart") {
-        newDates.start = new Date(inputValue);
+        newDates.start = inputValueAsDate;
         if (differenceInDays(newDates.end, newDates.start) <= 0)
           newDates.end = newDates.start;
       }
 
       if (inputName === "dateEnd") {
-        newDates.end = new Date(inputValue);
+        newDates.end = inputValueAsDate;
         if (differenceInDays(newDates.end, newDates.start) <= 0)
           newDates.start = newDates.end;
       }
@@ -124,8 +127,16 @@ export const ScheduleSection = () => {
   }, []);
 
   useEffect(() => {
-    setDateStartInputValue(toDateString(new Date(values.dateStart)));
-    setDateEndInputValue(toDateString(new Date(values.dateEnd)));
+    setDateStartInputValue(
+      toDateString(
+        convertLocaleDateToUtcTimezoneDate(new Date(values.dateStart)),
+      ),
+    );
+    setDateEndInputValue(
+      toDateString(
+        convertLocaleDateToUtcTimezoneDate(new Date(values.dateEnd)),
+      ),
+    );
   }, [values.dateStart, values.dateEnd]);
 
   return (

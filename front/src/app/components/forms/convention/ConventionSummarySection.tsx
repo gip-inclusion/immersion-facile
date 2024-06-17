@@ -6,6 +6,7 @@ import {
   DateIntervalDto,
   DotNestedKeys,
   ScheduleDto,
+  convertLocaleDateToUtcTimezoneDate,
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
@@ -344,5 +345,5 @@ const immersionConditionsSummary = (
 
 const displayDate = (date: string) =>
   toDisplayedDate({
-    date: new Date(date),
+    date: convertLocaleDateToUtcTimezoneDate(new Date(date)),
   });
