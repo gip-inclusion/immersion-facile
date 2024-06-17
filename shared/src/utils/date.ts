@@ -1,5 +1,5 @@
 // Matches valid dates of the format 'yyyy-mm-dd'.
-import { format, isValid } from "date-fns";
+import { addHours, format, isValid } from "date-fns";
 import { Flavor } from "../typeFlavors";
 
 export type DateString = Flavor<string, "DateString">;
@@ -25,3 +25,6 @@ export const toDisplayedDate = ({
   }`;
 
 export const isStringDate = (string: string) => isValid(new Date(string));
+
+export const convertLocaleDateToUtcTimezoneDate = (date: Date): Date =>
+  addHours(date, date.getTimezoneOffset() / 60);
