@@ -21,7 +21,7 @@ export const makeCreateAssessment = createTransactionalUseCase<
   ConventionJwtPayload | undefined,
   WithCreateNewEvent
 >(
-  { useCaseName: "CreateAssessment", inputSchema: assessmentSchema },
+  { name: "CreateAssessment", inputSchema: assessmentSchema },
   async (dto, { uow, deps }, conventionJwtPayload) => {
     if (!conventionJwtPayload)
       throw new ForbiddenError("No magic link provided");
