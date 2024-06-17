@@ -6,6 +6,7 @@ import {
 import {
   ForbiddenError,
   NotFoundError,
+  UnauthorizedError,
 } from "../../../config/helpers/httpErrors";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -27,4 +28,10 @@ export const getIcUserOrThrow = async (
   const user = await uow.inclusionConnectedUserRepository.getById(userId);
   if (!user) throw new NotFoundError(`User '${userId}' not found`);
   return user;
+};
+
+export const throwIfNotAdmin = (user: InclusionConnectedUser | undefined) => {
+  if (!user) throw new UnauthorizedError();
+  if (!user.isBackofficeAdmin)
+    throw new ForbiddenError("Insufficient privileges for this user");
 };

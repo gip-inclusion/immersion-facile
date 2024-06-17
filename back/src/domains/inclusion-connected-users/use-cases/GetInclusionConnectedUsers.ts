@@ -4,8 +4,8 @@ import {
   withAgencyRoleSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { throwIfNotAdmin } from "../../core/authentication/inclusion-connect/helpers/ic-user.helpers";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class GetInclusionConnectedUsers extends TransactionalUseCase<
   WithAgencyRole,
