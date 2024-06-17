@@ -55,6 +55,7 @@ describe("UpdateConventionStatus", () => {
         "icUserWithRoleValidator",
         "icUserWithRoleEstablishmentRepresentative",
         "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "READY_TO_SIGN",
@@ -84,6 +85,7 @@ describe("UpdateConventionStatus", () => {
         "icUserWithRoleValidator",
         "icUserWithRoleEstablishmentRepresentative",
         "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "READY_TO_SIGN",
@@ -380,7 +382,10 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionAcceptedByValidator",
       allowedMagicLinkRoles: ["validator"],
-      allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleValidator",
+        "icUserWithRoleBackofficeAdminAndValidator",
+      ],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
       updatedFields: {
         dateValidation: validationDate.toISOString(),
@@ -401,7 +406,10 @@ describe("UpdateConventionStatus", () => {
         lastname: "Validator Lastname",
       },
       allowedMagicLinkRoles: ["validator"],
-      allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleValidator",
+        "icUserWithRoleBackofficeAdminAndValidator",
+      ],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
     });
 
@@ -415,7 +423,10 @@ describe("UpdateConventionStatus", () => {
         },
         expectedDomainTopic: "ConventionAcceptedByValidator",
         allowedMagicLinkRoles: ["validator"],
-        allowedInclusionConnectedUsers: ["icUserWithRoleValidator"],
+        allowedInclusionConnectedUsers: [
+          "icUserWithRoleValidator",
+          "icUserWithRoleBackofficeAdminAndValidator",
+        ],
         allowedInitialStatuses: ["ACCEPTED_BY_COUNSELLOR"],
         updatedFields: {
           dateValidation: validationDate.toISOString(),
@@ -445,6 +456,7 @@ describe("UpdateConventionStatus", () => {
         "icUserWithRoleValidator",
         "icUserWithRoleCounsellor",
         "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
@@ -464,6 +476,7 @@ describe("UpdateConventionStatus", () => {
         "icUserWithRoleValidator",
         "icUserWithRoleCounsellor",
         "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
@@ -487,6 +500,7 @@ describe("UpdateConventionStatus", () => {
       allowedInclusionConnectedUsers: [
         "icUserWithRoleValidator",
         "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
@@ -500,6 +514,7 @@ describe("UpdateConventionStatus", () => {
       allowedInclusionConnectedUsers: [
         "icUserWithRoleValidator",
         "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
@@ -519,6 +534,7 @@ describe("UpdateConventionStatus", () => {
         "icUserWithRoleCounsellor",
         "icUserWithRoleValidator",
         "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",

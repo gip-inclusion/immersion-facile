@@ -46,6 +46,7 @@ const allInclusionConnectedTestUsers = [
   "icUserWithRoleAgencyOwner",
   "icUserWithRoleEstablishmentRepresentative",
   "icUserWithRoleBackofficeAdmin",
+  "icUserWithRoleBackofficeAdminAndValidator",
 ] as const;
 
 type InclusionConnectedTestUser =
@@ -138,6 +139,27 @@ const makeUserIdMapInclusionConnectedUser: Record<
     lastName: "Validator",
     dashboards: { agencies: {}, establishments: {} },
     externalId: "icUserWithRoleValidator-external-id",
+    createdAt: new Date().toISOString(),
+  },
+  icUserWithRoleBackofficeAdminAndValidator: {
+    agencyRights: [
+      {
+        agency: agencyWithoutCounsellorEmail,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      },
+      {
+        agency: agencyWithCounsellorEmails,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      },
+    ],
+    email: "icUserWithRoleBackofficeAdminAndValidator@mail.com",
+    firstName: "icUserWithRoleBackofficeAdminAndValidator",
+    id: "icUserWithRoleBackofficeAdminAndValidator",
+    lastName: "Validator",
+    dashboards: { agencies: {}, establishments: {} },
+    externalId: "icUserWithRoleBackofficeAdminAndValidator-external-id",
     createdAt: new Date().toISOString(),
   },
 
