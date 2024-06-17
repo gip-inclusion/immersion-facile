@@ -12,7 +12,7 @@ export const makeListActiveSubscriptions = createTransactionalUseCase<
   WebhookSubscription[],
   ApiConsumer
 >(
-  { useCaseName: "ListActiveSubscriptions", inputSchema: z.void() },
+  { name: "ListActiveSubscriptions", inputSchema: z.void() },
   (_, _uow, apiConsumer) => {
     const subscriptions = keys(apiConsumer.rights).flatMap(
       (rightName) => apiConsumer.rights[rightName].subscriptions,

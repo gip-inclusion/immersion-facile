@@ -23,10 +23,10 @@ type CreateTransactionalUseCase = <
   Dependencies = void,
 >(
   {
-    useCaseName,
+    name,
     inputSchema,
   }: {
-    useCaseName: string;
+    name: string;
     inputSchema: z.ZodSchema<Input>;
   },
   cb: (
@@ -46,9 +46,9 @@ type CreateTransactionalUseCase = <
 };
 
 export const createTransactionalUseCase: CreateTransactionalUseCase =
-  ({ useCaseName, inputSchema }, cb) =>
+  ({ name, inputSchema }, cb) =>
   ({ uowPerformer, deps }) => ({
-    useCaseName,
+    useCaseName: name,
     execute: async (inputParams, userIdentity) => {
       const startDate = new Date();
       const validParams = validateAndParseZodSchema(
@@ -56,31 +56,29 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
         inputParams,
         logger,
       );
-      const paramsHash = createParamsHash(useCaseName, validParams);
+      const paramsHash = createParamsHash(name, validParams);
 
-      try {
-        const result = await uowPerformer.perform((uow) =>
-          cb(validParams, { uow, deps }, userIdentity),
-        );
-        const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-        logger.info({
-          useCaseName,
-          durationInSeconds,
-          status: "success",
-          ...(paramsHash ? { paramsHash } : {}),
+      return uowPerformer
+        .perform((uow) => cb(validParams, { uow, deps }, userIdentity))
+        .then((result) => {
+          logger.info({
+            useCaseName: name,
+            status: "success",
+            durationInSeconds: calculateDurationInSecondsFrom(startDate),
+            ...(paramsHash ? { paramsHash } : {}),
+          });
+          return result;
+        })
+        .catch((error) => {
+          logger.error({
+            useCaseName: name,
+            status: "error",
+            durationInSeconds: calculateDurationInSecondsFrom(startDate),
+            ...(paramsHash ? { paramsHash } : {}),
+            message: castError(error).message,
+          });
+          throw error;
         });
-        return result;
-      } catch (error) {
-        const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-        logger.error({
-          useCaseName,
-          status: "error",
-          durationInSeconds,
-          ...(paramsHash ? { paramsHash } : {}),
-          errorMessage: castError(error).message,
-        });
-        throw error;
-      }
     },
   });
 
