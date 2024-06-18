@@ -6,6 +6,7 @@ import {
   FormEstablishmentSource,
   defaultMaxContactsPerWeek,
 } from "shared";
+import { AcquisitionParams } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
 import { ValueSerializer, param } from "type-route";
 import { v4 as uuidV4 } from "uuid";
@@ -100,33 +101,44 @@ export const formEstablishmentQueryParamsToFormEstablishmentDto = (
   },
 });
 
-export const formEstablishmentDtoToFormEstablishmentQueryParams = (
-  formEstablishmentDto: FormEstablishmentDto,
-): FormEstablishmentParamsInUrl => ({
-  source: formEstablishmentDto.source,
-  siret: formEstablishmentDto.siret,
-  bName: formEstablishmentDto.businessName,
-  bNameCustomized: formEstablishmentDto.businessNameCustomized,
-  bAddresses: formEstablishmentDto.businessAddresses.map(
-    ({ rawAddress }) => rawAddress,
-  ),
-  isEngagedEnterprise: formEstablishmentDto.isEngagedEnterprise,
-  fitForDisabledWorkers: formEstablishmentDto.fitForDisabledWorkers,
-  maxContactsPerWeek:
-    formEstablishmentDto.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
-  nafCode: formEstablishmentDto.naf?.code ?? "",
-  nafNomenclature: formEstablishmentDto.naf?.nomenclature ?? "",
-  bcLastName: formEstablishmentDto.businessContact.lastName,
-  bcFirstName: formEstablishmentDto.businessContact.firstName,
-  bcJob: formEstablishmentDto.businessContact.job,
-  bcPhone: formEstablishmentDto.businessContact.phone,
-  bcEmail: formEstablishmentDto.businessContact.email,
-  bcContactMethod: formEstablishmentDto.businessContact.contactMethod ?? "",
-  website: formEstablishmentDto.website,
-  additionalInformation: formEstablishmentDto.additionalInformation,
-  appellations: formEstablishmentDto.appellations,
-  bcCopyEmails: formEstablishmentDto.businessContact.copyEmails,
-});
+export const formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams =
+  (
+    params: FormEstablishmentDto & AcquisitionParams,
+  ): FormEstablishmentParamsInUrl & AcquisitionParams => {
+    return {
+      source: params.source,
+      siret: params.siret,
+      bName: params.businessName,
+      bNameCustomized: params.businessNameCustomized,
+      bAddresses: params.businessAddresses.map(({ rawAddress }) => rawAddress),
+      isEngagedEnterprise: params.isEngagedEnterprise,
+      fitForDisabledWorkers: params.fitForDisabledWorkers,
+      maxContactsPerWeek:
+        params.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
+      nafCode: params.naf?.code ?? "",
+      nafNomenclature: params.naf?.nomenclature ?? "",
+      bcLastName: params.businessContact.lastName,
+      bcFirstName: params.businessContact.firstName,
+      bcJob: params.businessContact.job,
+      bcPhone: params.businessContact.phone,
+      bcEmail: params.businessContact.email,
+      bcContactMethod: params.businessContact.contactMethod ?? "",
+      website: params.website,
+      additionalInformation: params.additionalInformation,
+      appellations: params.appellations,
+      bcCopyEmails: params.businessContact.copyEmails,
+      ...(params.mtm_campaign
+        ? {
+            mtm_campaign: params.mtm_campaign,
+          }
+        : {}),
+      ...(params.mtm_kwd
+        ? {
+            mtm_kwd: params.mtm_kwd,
+          }
+        : {}),
+    };
+  };
 
 export const createInitialFormValues = (
   routeParams: FormEstablishmentParamsInUrl,

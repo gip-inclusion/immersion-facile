@@ -30,7 +30,7 @@ import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import {
-  formEstablishmentDtoToFormEstablishmentQueryParams,
+  formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams,
   formEstablishmentQueryParamsToFormEstablishmentDto,
 } from "src/app/routes/routeParams/formEstablishment";
 import { establishmentParams, routes, useRoute } from "src/app/routes/routes";
@@ -256,7 +256,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       );
       routes
         .formEstablishment(
-          formEstablishmentDtoToFormEstablishmentQueryParams({
+          formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams({
             ...filteredParams,
             ...debouncedFormValues,
           }),
