@@ -106,6 +106,7 @@ interface Discussions extends WithAcquisition {
   department_code: string;
   city: string;
   business_name: string;
+  convention_id: ConventionId | null;
 }
 
 type ExchangeRole = "establishment" | "potentialBeneficiary";
