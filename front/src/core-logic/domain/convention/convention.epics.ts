@@ -22,7 +22,7 @@ const saveConventionEpic: ConventionEpic = (
       const conventionState = state$.value.convention;
       const { jwt } = conventionState;
       return jwt
-        ? conventionGateway.updateConvention$(payload, jwt)
+        ? conventionGateway.updateConvention$(payload.convention, jwt)
         : conventionGateway.createConvention$(payload);
     }),
     map(conventionSlice.actions.saveConventionSucceeded),

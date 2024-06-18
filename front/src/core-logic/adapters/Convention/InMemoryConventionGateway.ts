@@ -1,5 +1,6 @@
 import { Observable, Subject, from } from "rxjs";
 import {
+  AddConventionInput,
   AgencyOption,
   ConventionDto,
   ConventionDtoBuilder,
@@ -57,7 +58,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   constructor(private simulatedLatency?: number) {}
 
-  public createConvention$(_convention: ConventionDto): Observable<void> {
+  public createConvention$(_params: AddConventionInput): Observable<void> {
     this.addConventionCallCount++;
     return this.addConventionResult$;
   }

@@ -6,6 +6,7 @@ import {
   ConventionReadDto,
   ConventionSupportedJwt,
   DashboardUrlAndName,
+  DiscussionId,
   FindSimilarConventionsParams,
   InclusionConnectJwt,
   RenewConventionParams,
@@ -22,7 +23,10 @@ export interface ConventionGateway {
     jwt: string,
   ): Observable<DashboardUrlAndName>;
 
-  createConvention$(conventionDto: ConventionDto): Observable<void>;
+  createConvention$(params: {
+    convention: ConventionDto;
+    discussionId?: DiscussionId;
+  }): Observable<void>;
   getSimilarConventions$(
     findSimilarConventionsParams: FindSimilarConventionsParams,
   ): Observable<ConventionId[]>;

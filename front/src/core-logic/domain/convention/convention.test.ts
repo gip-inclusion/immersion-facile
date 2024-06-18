@@ -58,8 +58,10 @@ describe("Convention slice", () => {
         .build();
       store.dispatch(
         conventionSlice.actions.saveConventionRequested({
-          ...convention,
-          ...conventionReadDtoRemainingProps,
+          convention: {
+            ...convention,
+            ...conventionReadDtoRemainingProps,
+          },
         }),
       );
       expectConventionState({
@@ -102,8 +104,10 @@ describe("Convention slice", () => {
       const convention = new ConventionDtoBuilder().build();
       store.dispatch(
         conventionSlice.actions.saveConventionRequested({
-          ...convention,
-          ...conventionReadDtoRemainingProps,
+          convention: {
+            ...convention,
+            ...conventionReadDtoRemainingProps,
+          },
         }),
       );
       expectConventionState({
@@ -122,8 +126,10 @@ describe("Convention slice", () => {
       const convention = new ConventionDtoBuilder().build();
       store.dispatch(
         conventionSlice.actions.saveConventionRequested({
-          ...convention,
-          ...conventionReadDtoRemainingProps,
+          convention: {
+            ...convention,
+            ...conventionReadDtoRemainingProps,
+          },
         }),
       );
       expectConventionState({
