@@ -1,7 +1,7 @@
 import { AuthenticatedUserQueryParams, ValueOf, frontRoutes } from "shared";
 import { icUserAgencyDashboardTabSerializer } from "src/app/routes/routeParams/agencyDashboardTabs";
 import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
-import { createRouter, defineRoute, param } from "type-route";
+import { ValueSerializer, createRouter, defineRoute, param } from "type-route";
 import { adminTabSerializer } from "./routeParams/adminTabs";
 import {
   appellationAndRomeDtoArraySerializer,
@@ -16,6 +16,16 @@ const createInclusionConnectedParams = <
 >(
   t: T,
 ) => t;
+
+export type AcquisitionParams = Partial<{
+  [K in AcquisitionParamsKeys]: (typeof acquisitionParams)[K]["~internal"]["valueSerializer"] extends ValueSerializer<
+    infer T
+  >
+    ? T
+    : never;
+}>;
+
+type AcquisitionParamsKeys = keyof typeof acquisitionParams;
 
 const inclusionConnectedParams = createInclusionConnectedParams({
   page: param.query.optional.string,
