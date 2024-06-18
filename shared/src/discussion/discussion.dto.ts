@@ -42,7 +42,6 @@ type DiscussionDtoBase = {
   createdAt: DateString;
   siret: SiretDto;
   businessName: string;
-  appellationCode: AppellationCode;
   immersionObjective: ImmersionObjective | null;
   address: AddressDto;
   exchanges: Exchange[];
@@ -52,14 +51,11 @@ type DiscussionDtoBase = {
 
 export type DiscussionDto = DiscussionDtoBase & {
   establishmentContact: DiscussionEstablishmentContact;
+  appellationCode: AppellationCode;
 } & WithAcquisition;
 
-export type DiscussionReadDto = OmitFromExistingKeys<
-  DiscussionDtoBase,
-  "appellationCode"
-> & {
+export type DiscussionReadDto = DiscussionDtoBase & {
   appellation: AppellationAndRomeDto;
-} & {
   establishmentContact: OmitFromExistingKeys<
     DiscussionEstablishmentContact,
     "email" | "copyEmails" | "phone"

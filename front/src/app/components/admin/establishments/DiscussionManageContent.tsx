@@ -35,29 +35,31 @@ export const DiscussionManageContent = ({
     authSelectors.inclusionConnectToken,
   );
   const connectedUser = useAppSelector(authSelectors.connectedUser);
-  const discussionHook = useDiscussion(discussionId, inclusionConnectedJwt);
+  const { discussion, isLoading, fetchError } = useDiscussion(
+    discussionId,
+    inclusionConnectedJwt,
+  );
 
-  return match(discussionHook)
-    .with({ isLoading: true }, () => <Loader />)
-    .with({ fetchError: P.not(P.nullish) }, ({ fetchError }) => {
-      throw new Error(fetchError);
-    })
-    .with({ discussion: P.nullish }, () => (
+  if (isLoading) return <Loader />;
+  if (fetchError) throw new Error(fetchError);
+
+  return match(discussion)
+    .with(null, () => (
       <Alert
         severity="warning"
         title={`La discussion ${discussionId} n'est pas trouvée.`}
       />
     ))
-    .with({ discussion: P.not(P.nullish) }, ({ discussion }) =>
-      connectedUser ? (
+    .with(P.not(null), (discussion) => {
+      return connectedUser ? (
         <DiscussionDetails
           discussion={discussion}
           userEmail={connectedUser.email}
         />
       ) : (
         <Alert severity="error" title={`Vous n'êtes pas connecté.`} />
-      ),
-    )
+      );
+    })
     .exhaustive();
 };
 
