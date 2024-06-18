@@ -1,8 +1,6 @@
 import {
   AddConventionInput,
-  ConventionDto,
   ConventionStatus,
-  DiscussionId,
   WithConventionIdLegacy,
   addConventionInputSchema,
 } from "shared";
@@ -52,15 +50,13 @@ export class AddConvention extends TransactionalUseCase<
     await uow.conventionRepository.save(convention);
     await uow.conventionExternalIdRepository.save(convention.id);
 
-    if (discussionId)
-      await updateDiscussion(uow, {
-        discussionId,
-        convention,
-      });
-
     const event = this.#createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention, triggeredBy: undefined },
+      payload: {
+        convention,
+        triggeredBy: undefined,
+        ...(discussionId ? { discussionId } : {}),
+      },
     });
 
     await uow.outboxRepository.save(event);
@@ -68,19 +64,3 @@ export class AddConvention extends TransactionalUseCase<
     return { id: convention.id };
   }
 }
-
-const updateDiscussion = async (
-  uow: UnitOfWork,
-  {
-    discussionId,
-    convention,
-  }: { convention: ConventionDto; discussionId: DiscussionId },
-) => {
-  const discussion = await uow.discussionRepository.getById(discussionId);
-  if (!discussion) return;
-  if (discussion.siret !== convention.siret) return;
-  await uow.discussionRepository.update({
-    ...discussion,
-    conventionId: convention.id,
-  });
-};

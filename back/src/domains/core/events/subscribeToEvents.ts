@@ -27,6 +27,7 @@ const getUseCasesByTopics = (
   // "Happy case" for immersion application.
   ConventionSubmittedByBeneficiary: [
     useCases.bindConventionToFederatedIdentity,
+    useCases.markDiscussionLinkedToConvention,
   ],
 
   // Convention Federated Identities

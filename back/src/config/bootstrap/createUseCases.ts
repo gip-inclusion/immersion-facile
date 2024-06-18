@@ -105,6 +105,7 @@ import { SearchImmersion } from "../../domains/establishment/use-cases/SearchImm
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { AddExchangeToDiscussionAndTransferEmail } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussionAndTransferEmail";
 import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
+import { MarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -251,6 +252,9 @@ export const createUseCases = (
 
       // Conventions
       addConvention,
+      markDiscussionLinkedToConvention: new MarkDiscussionLinkedToConvention(
+        uowPerformer,
+      ),
       getConvention: new GetConvention(uowPerformer),
       getConventionForApiConsumer: new GetConventionForApiConsumer(
         uowPerformer,
