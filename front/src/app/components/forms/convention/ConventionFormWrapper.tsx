@@ -189,8 +189,11 @@ const ConventionSummarySection = () => {
     // TODO : show feedback if convention is null
     dispatch(
       conventionSlice.actions.saveConventionRequested({
-        ...convention,
-        status: "READY_TO_SIGN",
+        convention: {
+          ...convention,
+          status: "READY_TO_SIGN",
+        },
+        discussionId: undefined, // TODO, handle discussionId, if provided in params for example
       }),
     );
   };

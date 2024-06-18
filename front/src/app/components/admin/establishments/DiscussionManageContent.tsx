@@ -63,7 +63,6 @@ export const DiscussionManageContent = ({
 
 const DiscussionDetails = ({
   discussion,
-
   userEmail,
 }: { discussion: DiscussionReadDto; userEmail: Email }): JSX.Element => {
   const draftConvention = makeConventionFromDiscussion({

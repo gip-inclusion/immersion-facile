@@ -6,6 +6,7 @@ import {
   ConventionJwt,
   ConventionReadDto,
   ConventionSupportedJwt,
+  DiscussionId,
   FindSimilarConventionsParams,
   InclusionConnectJwt,
   RenewConventionParams,
@@ -126,10 +127,13 @@ export const conventionSlice = createSlice({
     // Save convention
     saveConventionRequested: (
       state,
-      action: PayloadAction<ConventionReadDto>,
+      action: PayloadAction<{
+        convention: ConventionReadDto;
+        discussionId?: DiscussionId;
+      }>,
     ) => {
       state.isLoading = true;
-      state.convention = action.payload;
+      state.convention = action.payload.convention;
     },
     saveConventionSucceeded: (state) => {
       state.isLoading = false;

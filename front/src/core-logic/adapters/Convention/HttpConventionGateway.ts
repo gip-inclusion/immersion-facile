@@ -1,5 +1,6 @@
 import { Observable, from } from "rxjs";
 import {
+  AddConventionInput,
   ConventionDto,
   ConventionId,
   ConventionJwt,
@@ -29,11 +30,11 @@ export class HttpConventionGateway implements ConventionGateway {
     private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionRoutes>,
   ) {}
 
-  public createConvention$(conventionDto: ConventionDto): Observable<void> {
+  public createConvention$(params: AddConventionInput): Observable<void> {
     return from(
       this.unauthenticatedHttpClient
         .createConvention({
-          body: conventionDto,
+          body: params,
         })
         .then((response) =>
           match(response)

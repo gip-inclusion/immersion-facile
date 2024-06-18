@@ -52,5 +52,5 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> = z.object({
     contactMethod: contactMethodSchema,
   }),
   exchanges: z.array(exchangeSchema),
-  conventionId: conventionIdSchema.optional(),
+  conventionId: conventionIdSchema,
 });
