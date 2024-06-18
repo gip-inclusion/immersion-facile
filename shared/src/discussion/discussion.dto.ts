@@ -227,4 +227,11 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       siret,
     });
   }
+
+  withConventionId(id: ConventionId) {
+    return new DiscussionBuilder({
+      ...this.discussion,
+      conventionId: id,
+    });
+  }
 }

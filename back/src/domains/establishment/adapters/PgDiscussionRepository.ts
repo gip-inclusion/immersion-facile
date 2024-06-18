@@ -192,6 +192,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
               city: qb.ref("city"),
             }),
             exchanges: qb.ref("exchanges"),
+            conventionId: qb.ref("convention_id"),
           }),
         ).as("discussion"),
       ]);
@@ -315,4 +316,5 @@ const discussionToPg = (
   potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
   acquisition_campaign: discussion.acquisitionCampaign,
   acquisition_keyword: discussion.acquisitionKeyword,
+  convention_id: discussion.conventionId,
 });

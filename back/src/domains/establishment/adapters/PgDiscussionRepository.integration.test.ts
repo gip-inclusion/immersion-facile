@@ -74,6 +74,7 @@ describe("PgDiscussionRepository", () => {
     .withSiret(siret)
     .withExchanges([])
     .withCreatedAt(discussionCreatedAt)
+    .withConventionId("some-convention-id")
     .build();
 
   it.each([
