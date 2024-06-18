@@ -209,7 +209,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     if ("role" in payload)
       return { roleInPayload: payload.role, user: undefined };
 
-    const roles: Role[] = [];
     const user = await uow.inclusionConnectedUserRepository.getById(
       payload.userId,
     );
@@ -228,6 +227,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     user: InclusionConnectedUser,
     convention: ConventionDto,
   ): Promise<Role[]> {
+    const roles: Role[] = [];
     if (user.isBackofficeAdmin) roles.push("backOffice");
 
     if (user.email === convention.signatories.establishmentRepresentative.email)
