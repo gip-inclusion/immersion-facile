@@ -62,7 +62,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 ) => {
   await request
     .post(unauthenticatedConventionRoutes.createConvention.url)
-    .send(convention)
+    .send({ convention })
     .expect(200);
 
   await expectStoreImmersionToHaveStatus(

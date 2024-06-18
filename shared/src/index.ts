@@ -20,6 +20,7 @@ export * from "./assessment/assessment.schema";
 export * from "./Builder";
 export * from "./contactEstablishmentRequest/contactEstablishmentRequest.dto";
 export * from "./contactEstablishmentRequest/contactEstablishmentRequest.schema";
+export * from "./convention/addConventionInput";
 export * from "./convention/convention";
 export * from "./convention/convention.dto";
 export * from "./convention/convention.routes";

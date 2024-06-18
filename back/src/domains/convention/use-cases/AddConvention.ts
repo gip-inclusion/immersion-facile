@@ -1,8 +1,10 @@
 import {
+  AddConventionInput,
   ConventionDto,
   ConventionStatus,
+  DiscussionId,
   WithConventionIdLegacy,
-  conventionSchema,
+  addConventionInputSchema,
 } from "shared";
 import { ForbiddenError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -13,10 +15,10 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class AddConvention extends TransactionalUseCase<
-  ConventionDto,
+  AddConventionInput,
   WithConventionIdLegacy
 > {
-  protected inputSchema = conventionSchema;
+  protected inputSchema = addConventionInputSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -33,7 +35,7 @@ export class AddConvention extends TransactionalUseCase<
   }
 
   protected async _execute(
-    convention: ConventionDto,
+    { convention, discussionId }: AddConventionInput,
     uow: UnitOfWork,
   ): Promise<WithConventionIdLegacy> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
@@ -50,6 +52,12 @@ export class AddConvention extends TransactionalUseCase<
     await uow.conventionRepository.save(convention);
     await uow.conventionExternalIdRepository.save(convention.id);
 
+    if (discussionId)
+      await updateDiscussion(uow, {
+        discussionId,
+        convention,
+      });
+
     const event = this.#createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
       payload: { convention, triggeredBy: undefined },
@@ -60,3 +68,19 @@ export class AddConvention extends TransactionalUseCase<
     return { id: convention.id };
   }
 }
+
+const updateDiscussion = async (
+  uow: UnitOfWork,
+  {
+    discussionId,
+    convention,
+  }: { convention: ConventionDto; discussionId: DiscussionId },
+) => {
+  const discussion = await uow.discussionRepository.getById(discussionId);
+  if (!discussion) return;
+  if (discussion.siret !== convention.siret) return;
+  await uow.discussionRepository.update({
+    ...discussion,
+    conventionId: convention.id,
+  });
+};

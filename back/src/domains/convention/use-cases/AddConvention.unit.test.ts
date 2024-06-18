@@ -1,14 +1,15 @@
 import {
   ConventionDtoBuilder,
+  DiscussionBuilder,
   conventionStatuses,
   expectPromiseToFailWithError,
+  expectToEqual,
 } from "shared";
 import {
   BadRequestError,
   ConflictError,
   ForbiddenError,
 } from "../../../config/helpers/httpErrors";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { DomainEvent } from "../../core/events/events";
 import {
   CreateNewEvent,
@@ -20,26 +21,25 @@ import {
 } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
 import { AddConvention } from "./AddConvention";
+
+const validConvention = new ConventionDtoBuilder().build();
 
 describe("Add Convention", () => {
   let addConvention: AddConvention;
-  let conventionRepository: InMemoryConventionRepository;
-  let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
-  let outboxRepository: InMemoryOutboxRepository;
-  let timeGateway: CustomTimeGateway;
-  const validConvention = new ConventionDtoBuilder().build();
   let siretGateway: InMemorySiretGateway;
-  let uowPerformer: InMemoryUowPerformer;
+  let timeGateway: CustomTimeGateway;
+  let uow: InMemoryUnitOfWork;
+  let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    conventionRepository = uow.conventionRepository;
-    outboxRepository = uow.outboxRepository;
+    uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({
@@ -47,7 +47,7 @@ describe("Add Convention", () => {
       uuidGenerator,
     });
     siretGateway = new InMemorySiretGateway();
-    uowPerformer = new InMemoryUowPerformer(uow);
+    const uowPerformer = new InMemoryUowPerformer(uow);
     addConvention = new AddConvention(
       uowPerformer,
       createNewEvent,
@@ -61,11 +61,13 @@ describe("Add Convention", () => {
     timeGateway.setNextDate(occurredAt);
     uuidGenerator.setNextUuid(id);
 
-    expect(await addConvention.execute(validConvention)).toEqual({
+    expect(
+      await addConvention.execute({ convention: validConvention }),
+    ).toEqual({
       id: validConvention.id,
     });
 
-    const storedInRepo = conventionRepository.conventions;
+    const storedInRepo = uow.conventionRepository.conventions;
     expect(storedInRepo[0]).toEqual(validConvention);
     expectDomainEventsToBeInOutbox([
       {
@@ -81,20 +83,69 @@ describe("Add Convention", () => {
   });
 
   it("rejects conventions where the ID is already in use", async () => {
-    await conventionRepository.save(validConvention);
+    await uow.conventionRepository.save(validConvention);
 
     await expectPromiseToFailWithError(
-      addConvention.execute(validConvention),
+      addConvention.execute({ convention: validConvention }),
       new ConflictError(
         `Convention with id ${validConvention.id} already exists`,
       ),
     );
   });
 
+  describe("When Linked discussion is provided", () => {
+    it("does not crash if discussion is not found", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret("11110000222200")
+        .build();
+
+      await addConvention.execute({
+        convention: validConvention,
+        discussionId: discussion.id,
+      });
+
+      expectToEqual(uow.conventionRepository.conventions, [validConvention]);
+    });
+
+    it("does not update the discussion if the siret does not match", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret("11110000222200")
+        .build();
+
+      uow.discussionRepository.discussions = [discussion];
+
+      await addConvention.execute({
+        convention: validConvention,
+        discussionId: discussion.id,
+      });
+
+      expectToEqual(uow.discussionRepository.discussions, [discussion]);
+    });
+
+    it("updates the discussion when siret matches", async () => {
+      const discussion = new DiscussionBuilder()
+        .withSiret(validConvention.siret)
+        .build();
+
+      uow.discussionRepository.discussions = [discussion];
+
+      await addConvention.execute({
+        convention: validConvention,
+        discussionId: discussion.id,
+      });
+
+      expectToEqual(uow.discussionRepository.discussions, [
+        { ...discussion, conventionId: validConvention.id },
+      ]);
+    });
+  });
+
   describe("Status validation", () => {
     // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
     it("allows applications submitted as DRAFT", async () => {
-      expect(await addConvention.execute(validConvention)).toEqual({
+      expect(
+        await addConvention.execute({ convention: validConvention }),
+      ).toEqual({
         id: validConvention.id,
       });
     });
@@ -102,8 +153,10 @@ describe("Add Convention", () => {
     it("allows applications submitted as READY_TO_SIGN", async () => {
       expect(
         await addConvention.execute({
-          ...validConvention,
-          status: "READY_TO_SIGN",
+          convention: {
+            ...validConvention,
+            status: "READY_TO_SIGN",
+          },
         }),
       ).toEqual({
         id: validConvention.id,
@@ -118,8 +171,10 @@ describe("Add Convention", () => {
         }
         await expectPromiseToFailWithError(
           addConvention.execute({
-            ...validConvention,
-            status,
+            convention: {
+              ...validConvention,
+              status,
+            },
           }),
           new ForbiddenError(),
         );
@@ -146,7 +201,7 @@ describe("Add Convention", () => {
       siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);
 
       await expectPromiseToFailWithError(
-        addConvention.execute(validConvention),
+        addConvention.execute({ convention: validConvention }),
         new BadRequestError(
           `Ce SIRET (${validConvention.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
         ),
@@ -156,7 +211,9 @@ describe("Add Convention", () => {
     it("accepts applications with SIRETs that  correspond to active businesses", async () => {
       siretGateway.setSirenEstablishment(siretRawActiveEstablishment);
 
-      expect(await addConvention.execute(validConvention)).toEqual({
+      expect(
+        await addConvention.execute({ convention: validConvention }),
+      ).toEqual({
         id: validConvention.id,
       });
     });
@@ -166,13 +223,13 @@ describe("Add Convention", () => {
       siretGateway.setError(error);
 
       await expectPromiseToFailWithError(
-        addConvention.execute(validConvention),
+        addConvention.execute({ convention: validConvention }),
         new Error("Le service Sirene API n'est pas disponible"),
       );
     });
   });
 
   const expectDomainEventsToBeInOutbox = (expected: DomainEvent[]) => {
-    expect(outboxRepository.events).toEqual(expected);
+    expect(uow.outboxRepository.events).toEqual(expected);
   };
 });

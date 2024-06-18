@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
 import {
+  AddConventionInput,
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
@@ -125,7 +126,7 @@ describe("convention e2e", () => {
       expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
       const response = await unauthenticatedRequest.createConvention({
-        body: convention,
+        body: { convention },
       });
 
       expectHttpResponseToEqual(response, {
@@ -140,7 +141,7 @@ describe("convention e2e", () => {
       const response = await unauthenticatedRequest.createConvention({
         body: {
           invalid_params: true,
-        } as unknown as ConventionDto,
+        } as unknown as AddConventionInput,
       });
 
       expectHttpResponseToEqual(response, {
@@ -148,25 +149,7 @@ describe("convention e2e", () => {
           message:
             "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /demandes-immersion",
           status: 400,
-          issues: [
-            "id : Required",
-            "status : Required",
-            "agencyId : Obligatoire",
-            "dateSubmission : Obligatoire",
-            "dateStart : Obligatoire",
-            "dateEnd : Obligatoire",
-            "siret : Obligatoire",
-            "businessName : Obligatoire",
-            "schedule : Required",
-            "individualProtection : Obligatoire",
-            "sanitaryPrevention : Obligatoire",
-            "immersionAddress : Obligatoire",
-            "immersionObjective : Vous devez choisir un objectif d'immersion",
-            "immersionAppellation : Required",
-            "immersionActivities : Obligatoire",
-            "establishmentTutor : Required",
-            "internshipKind : Invalid discriminator value. Expected 'immersion' | 'mini-stage-cci'",
-          ],
+          issues: ["convention : Required"],
         },
         status: 400,
       });
@@ -176,9 +159,7 @@ describe("convention e2e", () => {
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await unauthenticatedRequest.createConvention({
-        body: {
-          ...convention,
-        },
+        body: { convention },
       });
 
       expectHttpResponseToEqual(response, {
