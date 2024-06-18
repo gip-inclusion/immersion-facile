@@ -3,7 +3,6 @@ import {
   DiscussionBuilder,
   conventionStatuses,
   expectPromiseToFailWithError,
-  expectToEqual,
 } from "shared";
 import {
   BadRequestError,
@@ -82,6 +81,41 @@ describe("Add Convention", () => {
     ]);
   });
 
+  it("also sends the discussionId in the event, if initialy provided to the use case", async () => {
+    const discussion = new DiscussionBuilder().build();
+    const occurredAt = new Date("2021-10-15T15:00");
+    const id = "eventId";
+    timeGateway.setNextDate(occurredAt);
+    uuidGenerator.setNextUuid(id);
+
+    expect(
+      await addConvention.execute({
+        convention: validConvention,
+        discussionId: discussion.id,
+      }),
+    ).toEqual({
+      id: validConvention.id,
+    });
+
+    const storedInRepo = uow.conventionRepository.conventions;
+    expect(storedInRepo[0]).toEqual(validConvention);
+    expectDomainEventsToBeInOutbox([
+      {
+        id,
+        occurredAt: occurredAt.toISOString(),
+        topic: "ConventionSubmittedByBeneficiary",
+        payload: {
+          convention: validConvention,
+          discussionId: discussion.id,
+          triggeredBy: undefined,
+        },
+        publications: [],
+        status: "never-published",
+        wasQuarantined: false,
+      },
+    ]);
+  });
+
   it("rejects conventions where the ID is already in use", async () => {
     await uow.conventionRepository.save(validConvention);
 
@@ -91,53 +125,6 @@ describe("Add Convention", () => {
         `Convention with id ${validConvention.id} already exists`,
       ),
     );
-  });
-
-  describe("When Linked discussion is provided", () => {
-    it("does not crash if discussion is not found", async () => {
-      const discussion = new DiscussionBuilder()
-        .withSiret("11110000222200")
-        .build();
-
-      await addConvention.execute({
-        convention: validConvention,
-        discussionId: discussion.id,
-      });
-
-      expectToEqual(uow.conventionRepository.conventions, [validConvention]);
-    });
-
-    it("does not update the discussion if the siret does not match", async () => {
-      const discussion = new DiscussionBuilder()
-        .withSiret("11110000222200")
-        .build();
-
-      uow.discussionRepository.discussions = [discussion];
-
-      await addConvention.execute({
-        convention: validConvention,
-        discussionId: discussion.id,
-      });
-
-      expectToEqual(uow.discussionRepository.discussions, [discussion]);
-    });
-
-    it("updates the discussion when siret matches", async () => {
-      const discussion = new DiscussionBuilder()
-        .withSiret(validConvention.siret)
-        .build();
-
-      uow.discussionRepository.discussions = [discussion];
-
-      await addConvention.execute({
-        convention: validConvention,
-        discussionId: discussion.id,
-      });
-
-      expectToEqual(uow.discussionRepository.discussions, [
-        { ...discussion, conventionId: validConvention.id },
-      ]);
-    });
   });
 
   describe("Status validation", () => {

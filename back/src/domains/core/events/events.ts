@@ -15,6 +15,7 @@ import {
   WithAssessmentDto,
   WithConventionDto,
   WithConventionIdLegacy,
+  WithDiscussionId,
   WithFormEstablishmentDto,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
@@ -86,7 +87,7 @@ export type DomainEvent =
   | NotificationBatchAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
-  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionSubmittedByBeneficiary", WithConventionDto & Partial<WithDiscussionId> & WithTriggeredBy>
   | GenericEvent<"ConventionSubmittedAfterModification", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionPartiallySigned", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionFullySigned", WithConventionDto & WithTriggeredBy>
