@@ -9,9 +9,9 @@ import {
   legacyUnauthenticatedErrorSchema,
 } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
+import { addConventionInputSchema } from "./addConventionInput";
 import {
   conventionReadSchema,
-  conventionSchema,
   findSimilarConventionsParamsSchema,
   findSimilarConventionsResponseSchema,
   renewConventionParamsSchema,
@@ -105,7 +105,7 @@ export const unauthenticatedConventionRoutes = defineRoutes({
   createConvention: defineRoute({
     url: "/demandes-immersion",
     method: "post",
-    requestBodySchema: conventionSchema,
+    requestBodySchema: addConventionInputSchema,
     responses: {
       200: withConventionIdLegacySchema,
       400: httpErrorSchema,

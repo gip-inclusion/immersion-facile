@@ -68,13 +68,15 @@ export class RenewConvention extends TransactionalUseCase<
     //Ohh boy
     //TODO : should use event instead of sub usecase execution
     await this.addConvention.execute({
-      ...clearSignaturesAndValidationDate(conventionInRepo),
-      id,
-      dateStart,
-      dateEnd,
-      schedule,
-      renewed,
-      status: "READY_TO_SIGN",
+      convention: {
+        ...clearSignaturesAndValidationDate(conventionInRepo),
+        id,
+        dateStart,
+        dateEnd,
+        schedule,
+        renewed,
+        status: "READY_TO_SIGN",
+      },
     });
   }
 

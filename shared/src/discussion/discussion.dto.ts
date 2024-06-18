@@ -1,7 +1,7 @@
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto } from "../address/address.dto";
-import { ImmersionObjective } from "../convention/convention.dto";
+import { ConventionId, ImmersionObjective } from "../convention/convention.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import {
   AppellationAndRomeDto,
@@ -47,6 +47,7 @@ type DiscussionDtoBase = {
   address: AddressDto;
   exchanges: Exchange[];
   potentialBeneficiary: DiscussionPotentialBeneficiary;
+  conventionId?: ConventionId;
 };
 
 export type DiscussionDto = DiscussionDtoBase & {

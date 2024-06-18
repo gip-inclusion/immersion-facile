@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { addressSchema } from "../address/address.schema";
-import { immersionObjectiveSchema } from "../convention/convention.schema";
+import {
+  conventionIdSchema,
+  immersionObjectiveSchema,
+} from "../convention/convention.schema";
 import { contactMethodSchema } from "../formEstablishment/FormEstablishment.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
@@ -49,4 +52,5 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> = z.object({
     contactMethod: contactMethodSchema,
   }),
   exchanges: z.array(exchangeSchema),
+  conventionId: conventionIdSchema.optional(),
 });

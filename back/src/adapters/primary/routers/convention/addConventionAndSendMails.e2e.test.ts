@@ -52,7 +52,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     const res = await request
       .post(unauthenticatedConventionRoutes.createConvention.url)
-      .send(validConvention);
+      .send({ convention: validConvention });
 
     expectResponseBody(res, { id: validConvention.id });
     expect(
@@ -191,7 +191,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   const result = await request
     .post(unauthenticatedConventionRoutes.createConvention.url)
-    .send(convention);
+    .send({ convention });
 
   expect(result.status).toBe(200);
 
