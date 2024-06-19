@@ -9,11 +9,11 @@ export const searchSortedByOptions = ["distance", "date", "score"] as const;
 export type SearchSortedBy = (typeof searchSortedByOptions)[number];
 
 export type SearchQueryParamsDto = {
-  longitude: number;
-  latitude: number;
+  longitude?: number;
+  latitude?: number;
   appellationCodes?: AppellationCode[];
   rome?: RomeCode;
-  distanceKm: number;
+  distanceKm?: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
   place?: string;

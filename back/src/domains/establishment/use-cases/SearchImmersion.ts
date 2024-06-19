@@ -196,9 +196,9 @@ export class SearchImmersion extends TransactionalUseCase<
       distanceKm,
     }: {
       appellationCodes: AppellationCode[];
-      lat: number;
-      lon: number;
-      distanceKm: number;
+      lat?: number;
+      lon?: number;
+      distanceKm?: number;
     },
   ) {
     const matches =

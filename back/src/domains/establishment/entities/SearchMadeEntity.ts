@@ -11,9 +11,9 @@ export type SearchMadeId = Flavor<string, "SearchMadeId">;
 export type SearchMade = {
   appellationCodes?: string[];
   romeCode?: string;
-  distanceKm: number;
-  lat: number;
-  lon: number;
+  distanceKm?: number;
+  lat?: number;
+  lon?: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
   place?: string;
