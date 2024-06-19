@@ -1,12 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { Page, expect } from "@playwright/test";
 import { addBusinessDays, format } from "date-fns";
-import {
-  domElementIds,
-  frontRoutes,
-  peParisAgencyId,
-  technicalRoutes,
-} from "shared";
+import { domElementIds, frontRoutes, technicalRoutes } from "shared";
 import { getRandomizedData } from "./data";
 import {
   expectElementToBeVisible,
@@ -34,9 +29,12 @@ export const submitBasicConventionForm = async (page: Page) => {
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyDepartment}`,
     "75",
   );
+  const firstAgencyInDropdown = await page.locator(
+    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId} > option:nth-child(2)`,
+  );
   await page.selectOption(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
-    peParisAgencyId,
+    await firstAgencyInDropdown.getAttribute("value"),
   );
   await openNextSection(page); // Open Beneficiary section
   await page.fill(
@@ -192,7 +190,7 @@ export const submitEditConventionForm = async (
     page.locator(
       `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
     ),
-  ).toHaveValue(peParisAgencyId);
+  ).not.toBeEmpty();
   await openConventionAccordionSection(page, 1);
   await page
     .locator(

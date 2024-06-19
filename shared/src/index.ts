@@ -101,7 +101,6 @@ export * from "./search/SearchQueryParams.dto";
 export * from "./search/SearchQueryParams.schema";
 export * from "./search/SearchResult.dto";
 export * from "./search/SearchResult.schema";
-export * from "./seedSharedData";
 export * from "./ShareLinkByEmailDto";
 export * from "./siret/siret";
 export * from "./siret/siret.schema";
