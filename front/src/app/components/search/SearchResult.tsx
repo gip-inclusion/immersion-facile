@@ -163,8 +163,8 @@ const SearchResultComponent = ({
               type="button"
               nativeButtonProps={{
                 id: voluntaryToImmersion
-                  ? `${domElementIds.search.lbbSearchResultButton}-${establishment.siret}`
-                  : `${domElementIds.search.searchResultButton}-${establishment.siret}`,
+                  ? `${domElementIds.search.searchResultButton}-${establishment.siret}`
+                  : `${domElementIds.search.lbbSearchResultButton}-${establishment.siret}`,
               }}
               iconId="fr-icon-mail-fill"
               disabled={preview}
