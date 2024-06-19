@@ -99,7 +99,7 @@ test.describe("Establishment creation and modification workflow", () => {
     await fillAutocomplete({
       page,
       locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
-      value: "28 rue du moulin",
+      value: "28 rue des mimosas",
     });
 
     await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
