@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import test, { expect } from "@playwright/test";
-import { domElementIds } from "shared";
+import { ConventionDto, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
   getMagicLinkInEmailWrapper,
@@ -8,6 +8,7 @@ import {
   openEmailInAdmin,
 } from "../../utils/admin";
 import {
+  ConventionSubmitted,
   signConvention,
   submitBasicConventionForm,
   submitEditConventionForm,
@@ -17,9 +18,10 @@ test.describe.configure({ mode: "serial" });
 
 test.describe("Convention creation and modification workflow", () => {
   const magicLinks: string[] = [];
+  let conventionSubmitted: ConventionSubmitted | void;
 
   test("creates a new convention", async ({ page }) => {
-    await submitBasicConventionForm(page);
+    conventionSubmitted = await submitBasicConventionForm(page);
     await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
 
@@ -95,7 +97,7 @@ test.describe("Convention creation and modification workflow", () => {
     if (!href) return;
 
     await page.goto(href);
-    await submitEditConventionForm(page, href);
+    await submitEditConventionForm(page, href, conventionSubmitted);
   });
 
   test.describe("signs convention for signatories", () => {

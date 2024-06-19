@@ -1,7 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { Page, expect } from "@playwright/test";
 import { addBusinessDays, format } from "date-fns";
-import { domElementIds, frontRoutes, technicalRoutes } from "shared";
+import {
+  AgencyId,
+  domElementIds,
+  frontRoutes,
+  technicalRoutes,
+} from "shared";
 import { getRandomizedData } from "./data";
 import {
   expectElementToBeVisible,
@@ -11,7 +16,13 @@ import {
 
 let currentStep = 1;
 
-export const submitBasicConventionForm = async (page: Page) => {
+export type ConventionSubmitted = {
+  agencyId: AgencyId;
+};
+
+export const submitBasicConventionForm = async (
+  page: Page,
+): Promise<ConventionSubmitted | void> => {
   await page.goto(frontRoutes.initiateConvention);
   await expect(
     await page.request.get(technicalRoutes.featureFlags.url),
@@ -32,9 +43,13 @@ export const submitBasicConventionForm = async (page: Page) => {
   const firstAgencyInDropdown = await page.locator(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId} > option:nth-child(2)`,
   );
+  const agencyId: AgencyId | null =
+    await firstAgencyInDropdown.getAttribute("value");
+  expect(agencyId).not.toBeNull();
+  if (!agencyId) return;
   await page.selectOption(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
-    await firstAgencyInDropdown.getAttribute("value"),
+    agencyId,
   );
   await openNextSection(page); // Open Beneficiary section
   await page.fill(
@@ -127,6 +142,10 @@ export const submitBasicConventionForm = async (page: Page) => {
     faker.word.words(8),
   );
   await confirmCreateConventionFormSubmit(page);
+
+  return {
+    agencyId,
+  };
 };
 
 export const signConvention = async (
@@ -178,6 +197,7 @@ export const signConvention = async (
 export const submitEditConventionForm = async (
   page: Page,
   magicLink: string,
+  conventionSubmitted: ConventionSubmitted | void,
 ) => {
   await page.goto(magicLink);
   const agencyIdSelect = page.locator(
@@ -186,11 +206,14 @@ export const submitEditConventionForm = async (
   await agencyIdSelect.locator("option").locator("nth=1").waitFor({
     state: "hidden",
   });
-  await expect(
-    page.locator(
-      `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
-    ),
-  ).not.toBeEmpty();
+  expect(conventionSubmitted).not.toBeUndefined();
+  if (conventionSubmitted?.agencyId) {
+    await expect(
+      page.locator(
+        `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
+      ),
+    ).toHaveValue(conventionSubmitted.agencyId);
+  }
   await openConventionAccordionSection(page, 1);
   await page
     .locator(
