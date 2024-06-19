@@ -148,7 +148,11 @@ export const SearchPage = ({
           >
             <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
               <AppellationAutocomplete
-                label="Je recherche le métier :"
+                label={
+                  useNaturalLanguageForAppellations
+                    ? "Je recherche le métier ou la compétence :"
+                    : "Je recherche le métier :"
+                }
                 initialValue={
                   formValues.appellations
                     ? formValues.appellations[0]
@@ -166,7 +170,11 @@ export const SearchPage = ({
                   setValue("appellations", undefined);
                 }}
                 id={domElementIds.search.appellationAutocomplete}
-                placeholder="Ex: boulanger, styliste, etc"
+                placeholder={
+                  useNaturalLanguageForAppellations
+                    ? "Ex: boulanger, faire du pain, etc"
+                    : "Ex: boulanger, styliste, etc"
+                }
                 useNaturalLanguage={useNaturalLanguageForAppellations}
               />
             </div>
