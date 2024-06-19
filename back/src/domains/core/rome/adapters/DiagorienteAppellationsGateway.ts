@@ -1,5 +1,5 @@
 import Bottleneck from "bottleneck";
-import { AppellationDto } from "shared";
+import { AppellationDto, appellationCodeSchema } from "shared";
 import { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
@@ -46,7 +46,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
       logger.info({ message: "searchAppellations - call" });
       return this.httpClient
         .searchAppellations({
-          queryParams: { query, nb_results: maxResults, tags: ["ROME4"] },
+          queryParams: { query, nb_results: maxResults * 2, tags: ["ROME4"] },
           headers: {
             Authorization: `Bearer ${tokenData.access_token}`,
           },
@@ -93,7 +93,12 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
 const diagorienteRawResponseToAppellationDto = (
   response: DiagorienteRawResponse,
 ): AppellationDto[] =>
-  response.search_results.map((result) => ({
-    appellationLabel: result.data.titre,
-    appellationCode: result.data.code_ogr,
-  }));
+  response.search_results
+    .filter(
+      ({ data }) => appellationCodeSchema.safeParse(data.code_ogr).success,
+    )
+    .filter((_, index) => index <= maxResults - 1)
+    .map(({ data }) => ({
+      appellationLabel: data.titre,
+      appellationCode: data.code_ogr,
+    }));

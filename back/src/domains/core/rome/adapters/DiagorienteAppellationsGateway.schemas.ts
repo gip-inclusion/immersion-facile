@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   DiagorienteAccessTokenResponse,
   DiagorienteRawResponse,
+  DiagorienteResultData,
 } from "./DiagorienteAppellationsGateway.routes";
 
 export const diagorienteQueryParamsSchema = z.object({
@@ -13,30 +14,18 @@ export const diagorienteQueryParamsSchema = z.object({
     .optional(),
 });
 
+const data: z.Schema<DiagorienteResultData> = z.object({
+  titre: z.string(),
+  code_ogr: z.string(),
+});
+
 export const diagorienteRawResponseSchema: z.Schema<DiagorienteRawResponse> =
   z.object({
     search_results: z.array(
       z.object({
         text: z.string(),
         similarity: z.number(),
-        data: z.object({
-          _key: z.string(),
-          _id: z.string(),
-          _rev: z.string(),
-          titre: z.string(),
-          tags: z.array(z.unknown()),
-          code_ogr: z.string(),
-          transition_ecologique: z.boolean(),
-          transition_numerique: z.boolean(),
-          transition_demographique: z.boolean(),
-          metier_avenir: z.boolean(),
-          metier_art: z.boolean(),
-          metier_en_tension: z.boolean(),
-          metier_resilience: z.boolean(),
-          principale: z.boolean(),
-          description: z.null(),
-          id: z.string(),
-        }),
+        data: data,
       }),
     ),
   });

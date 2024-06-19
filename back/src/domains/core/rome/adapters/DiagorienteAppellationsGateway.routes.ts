@@ -41,23 +41,24 @@ export type DiagorienteSearchResult = {
   data: DiagorienteResultData;
 };
 
+// Use only useful props since diagoriente API props are not stable
 export type DiagorienteResultData = {
-  _key: string;
-  _id: string;
-  _rev: string;
+  // _key: string;
+  // _id: string;
+  // _rev: string;
   titre: string;
-  tags: unknown[];
+  // tags: unknown[];
   code_ogr: string;
-  transition_ecologique: boolean;
-  transition_numerique: boolean;
-  transition_demographique: boolean;
-  metier_avenir: boolean;
-  metier_art: boolean;
-  metier_en_tension: boolean;
-  metier_resilience: boolean;
-  principale: boolean;
-  description: unknown;
-  id: string;
+  // transition_ecologique: boolean;
+  // transition_numerique: boolean;
+  // transition_demographique: boolean;
+  // metier_avenir: boolean;
+  // metier_art: boolean;
+  // metier_en_tension: boolean;
+  // metier_resilience: boolean;
+  // principale: boolean;
+  // description: unknown;
+  // id: string;
 };
 
 export type DiagorienteAccessTokenResponse = {
