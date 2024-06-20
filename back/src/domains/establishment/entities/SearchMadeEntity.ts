@@ -8,17 +8,18 @@ import {
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
-export type SearchMade = {
+export type SearchMadeWithoutGeoParams = {
   appellationCodes?: string[];
   romeCode?: string;
-  distanceKm?: number;
-  lat?: number;
-  lon?: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
   place?: string;
   establishmentSearchableBy?: EstablishmentSearchableByValue;
 } & WithAcquisition;
+
+export type SearchMadeWithGeoParams = GeoParams & SearchMadeWithoutGeoParams;
+
+export type SearchMade = SearchMadeWithGeoParams | SearchMadeWithoutGeoParams;
 
 export type SearchMadeEntity = {
   id: SearchMadeId;
@@ -26,3 +27,19 @@ export type SearchMadeEntity = {
   apiConsumerName?: ApiConsumerName;
   numberOfResults: number;
 } & SearchMade;
+
+export type GeoParams = {
+  lat: number;
+  lon: number;
+  distanceKm: number;
+};
+
+export const hasSearchMadeGeoParams = (
+  searchMade: SearchMade,
+): searchMade is SearchMadeWithGeoParams => {
+  return (
+    (searchMade as SearchMadeWithGeoParams).lat !== undefined &&
+    (searchMade as SearchMadeWithGeoParams).lon !== undefined &&
+    (searchMade as SearchMadeWithGeoParams).distanceKm !== undefined
+  );
+};

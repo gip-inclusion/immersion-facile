@@ -11,7 +11,7 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
-import { GeoPositionDto, SearchSortedBy, domElementIds } from "shared";
+import { SearchSortedBy, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -24,7 +24,6 @@ import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchPageParams,
-  SearchStatus,
   initialState,
 } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
@@ -60,22 +59,11 @@ export const SearchPage = ({
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const acquisitionParams = useGetAcquisitionParams();
   const initialValues: SearchPageParams = {
-    latitude: 0,
-    longitude: 0,
-    distanceKm: 10,
     place: "",
-    sortedBy: "distance",
+    sortedBy: "score",
     appellations: undefined,
     ...acquisitionParams,
   };
-  const availableForSearchRequest = (
-    searchStatus: SearchStatus,
-    { lat, lon }: GeoPositionDto,
-  ): boolean =>
-    searchStatus !== "initialFetch" &&
-    searchStatus !== "extraFetch" &&
-    lon !== 0 &&
-    lat !== 0;
 
   const filterFormValues = (values: SearchPageParams) =>
     keys(values).reduce(
@@ -210,9 +198,6 @@ export const SearchPage = ({
 
             <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
               <Button
-                disabled={
-                  !availableForSearchRequest(searchStatus, { lat, lon })
-                }
                 type="submit"
                 nativeButtonProps={{
                   id: domElementIds.search.searchSubmitButton,

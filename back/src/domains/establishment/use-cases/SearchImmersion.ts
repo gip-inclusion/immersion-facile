@@ -18,7 +18,7 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { SearchMade } from "../entities/SearchMadeEntity";
+import { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";
 import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
@@ -72,18 +72,17 @@ export class SearchImmersion extends TransactionalUseCase<
       acquisitionCampaign,
       acquisitionKeyword,
     };
-
+    const geoParams = { lat, lon, distanceKm };
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([
       uow.establishmentAggregateRepository.searchImmersionResults({
         searchMade,
         maxResults: 100,
       }),
-      shouldFetchLBB(appellationCodes, voluntaryToImmersion)
+      shouldFetchLBB(appellationCodes, voluntaryToImmersion) &&
+      hasSearchGeoParams(geoParams)
         ? this.#searchOnLbb(uow, {
             appellationCodes: appellationCodes as AppellationCode[],
-            lat,
-            lon,
-            distanceKm,
+            ...geoParams,
           })
         : Promise.resolve([]),
     ]);
@@ -96,12 +95,12 @@ export class SearchImmersion extends TransactionalUseCase<
       numberOfResults:
         voluntaryToImmersion !== false
           ? repositorySearchResults.length
-          : lbbSearchResults.length,
+          : (lbbSearchResults ?? []).length,
     });
 
     const isDeletedBySiret =
       await uow.deletedEstablishmentRepository.areSiretsDeleted(
-        lbbSearchResults.map((result) => result.siret),
+        (lbbSearchResults ?? []).map((result) => result.siret),
       );
 
     const searchResultsInRepo =
@@ -113,7 +112,7 @@ export class SearchImmersion extends TransactionalUseCase<
           )
         : [];
 
-    const lbbAllowedResults = lbbSearchResults
+    const lbbAllowedResults = (lbbSearchResults ?? [])
       .filter(isSiretAlreadyInStoredResults(searchResultsInRepo))
       .filter(isEstablishmentNotDeleted(isDeletedBySiret));
 
@@ -189,18 +188,11 @@ export class SearchImmersion extends TransactionalUseCase<
 
   async #searchOnLbb(
     uow: UnitOfWork,
-    {
-      appellationCodes,
-      lat,
-      lon,
-      distanceKm,
-    }: {
+    params: {
       appellationCodes: AppellationCode[];
-      lat?: number;
-      lon?: number;
-      distanceKm?: number;
-    },
+    } & GeoParams,
   ) {
+    const { appellationCodes, ...geoParams } = params;
     const matches =
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
         appellationCodes,
@@ -211,23 +203,26 @@ export class SearchImmersion extends TransactionalUseCase<
       throw new Error(
         `No Rome code matching appellation codes ${appellationCodes}`,
       );
-
-    try {
-      return await this.laBonneBoiteAPI.searchCompanies({
-        rome: romeCode,
-        lat,
-        lon,
-        distanceKm,
-      });
-    } catch (error) {
-      logger.error({
-        message: "Error while searching on LBB",
-        error: castError(error),
-      });
-      return [];
-    }
+    if (hasSearchGeoParams(geoParams))
+      try {
+        return await this.laBonneBoiteAPI.searchCompanies({
+          rome: romeCode,
+          ...geoParams,
+        });
+      } catch (error) {
+        logger.error({
+          message: "Error while searching on LBB",
+          error: castError(error),
+        });
+        return [];
+      }
   }
 }
+
+export const hasSearchGeoParams = (
+  geoParams: Partial<GeoParams>,
+): geoParams is GeoParams =>
+  !!geoParams.lat && !!geoParams.lon && !!geoParams.distanceKm;
 
 const shouldFetchLBB = (
   appellationCodes: AppellationCode[] | undefined,

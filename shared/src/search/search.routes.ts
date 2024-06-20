@@ -7,7 +7,7 @@ import {
 } from "../httpClient/httpErrors.schema";
 import { searchResultQuerySchema } from "../siretAndAppellation/SiretAndAppellation.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
-import { searchQueryParamsSchema } from "./SearchQueryParams.schema";
+import { searchParamsSchema } from "./SearchQueryParams.schema";
 import { searchResultSchema, searchResultsSchema } from "./SearchResult.schema";
 
 export type SearchRoutes = typeof searchImmersionRoutes;
@@ -23,7 +23,7 @@ export const searchImmersionRoutes = defineRoutes({
   search: defineRoute({
     method: "get",
     url: "/immersion-offers",
-    queryParamsSchema: searchQueryParamsSchema,
+    queryParamsSchema: searchParamsSchema,
     responses: {
       200: searchResultsSchema,
       400: httpErrorSchema.or(legacyHttpErrorSchema),
