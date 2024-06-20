@@ -13,7 +13,10 @@ import {
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../config/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
@@ -1033,6 +1036,63 @@ describe("PgEstablishmentAggregateRepository", () => {
         },
       ]);
     });
+    it("should return immersion offers even without lat/lon/distanceKm search", async () => {
+      const establishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("78000403200029")
+        .withContactId("11111111-1111-4444-1111-111111110001")
+        .withOffers([cuvisteOffer, artisteCirqueOffer])
+        .withLocations([bassompierreSaintesLocation, veauxLocation])
+        .build();
+
+      // Prepare
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate,
+      );
+
+      // Act
+      const searchResults: SearchResultDto[] =
+        await pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {},
+        });
+      const readableResults = searchResults.map(toReadableSearchResult);
+
+      // Assert
+      expect(readableResults).toHaveLength(4);
+    });
+    it("should throw on a search made with sortedBy distance and no geo params are provided", async () => {
+      // Assert
+      await expectPromiseToFailWithError(
+        pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {
+            sortedBy: "distance",
+          },
+        }),
+        new BadRequestError("Cannot search by distance without geo params"),
+      );
+    });
+    it("should throw if only one of the geo params is provided (lat/lon/distanceKm)", async () => {
+      const establishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("78000403200029")
+        .withContactId("11111111-1111-4444-1111-111111110001")
+        .withOffers([cuvisteOffer, artisteCirqueOffer])
+        .withLocations([bassompierreSaintesLocation, veauxLocation])
+        .build();
+
+      // Prepare
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate,
+      );
+
+      // Act
+      const searchResults: SearchResultDto[] =
+        await pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {},
+        });
+      const readableResults = searchResults.map(toReadableSearchResult);
+
+      // Assert
+      expect(readableResults).toHaveLength(4);
+    });
   });
 
   describe("insertEstablishmentAggregates", () => {
@@ -1848,10 +1908,12 @@ describe("PgEstablishmentAggregateRepository", () => {
 });
 
 const toReadableSearchResult = ({
+  siret,
   address,
   rome,
   distance_m,
 }: SearchResultDto) => ({
+  siret,
   address: `${address?.streetNumberAndAddress} ${address?.postcode} ${address?.city}`,
   rome,
   distance_m,

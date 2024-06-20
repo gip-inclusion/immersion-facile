@@ -117,9 +117,9 @@ describe("PgSearchesMadeRepository", () => {
     return (
       searchMadeResult && {
         id: searchMadeResult.id,
-        distanceKm: searchMadeResult.distance,
-        lat: searchMadeResult.lat,
-        lon: searchMadeResult.lon,
+        distanceKm: optional(searchMadeResult.distance),
+        lat: optional(searchMadeResult.lat),
+        lon: optional(searchMadeResult.lon),
         sortedBy: optional(searchMadeResult.sorted_by),
         voluntaryToImmersion: optional(searchMadeResult.voluntary_to_immersion),
         place: optional(searchMadeResult.address),

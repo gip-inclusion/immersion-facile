@@ -17,6 +17,7 @@ import {
 } from "../../../config/helpers/httpErrors";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
   SearchImmersionParams,
@@ -160,32 +161,38 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   public async searchImmersionResults({
-    searchMade: { lat, lon, appellationCodes, establishmentSearchableBy },
+    searchMade,
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this.#establishmentAggregates
       .filter((aggregate) => aggregate.establishment.isOpen)
       .filter((aggregate) =>
-        establishmentSearchableBy
-          ? aggregate.establishment.searchableBy[establishmentSearchableBy]
+        searchMade.establishmentSearchableBy
+          ? aggregate.establishment.searchableBy[
+              searchMade.establishmentSearchableBy
+            ]
           : true,
       )
       .flatMap((aggregate) =>
         uniqBy((offer) => offer.romeCode, aggregate.offers)
           .filter(
             (offer) =>
-              !appellationCodes ||
-              appellationCodes.includes(offer.appellationCode),
+              !searchMade.appellationCodes ||
+              searchMade.appellationCodes.includes(offer.appellationCode),
           )
           .map((offer) =>
             buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation(
               {
                 establishmentAgg: aggregate,
                 searchedAppellationCode: offer.appellationCode,
-                position: {
-                  lat,
-                  lon,
-                },
+                ...(hasSearchMadeGeoParams(searchMade)
+                  ? {
+                      position: {
+                        lat: searchMade.lat,
+                        lon: searchMade.lon,
+                      },
+                    }
+                  : {}),
               },
             ),
           ),

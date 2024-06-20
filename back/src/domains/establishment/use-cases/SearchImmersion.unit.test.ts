@@ -7,6 +7,7 @@ import {
   DiscussionBuilder,
   Exchange,
   SearchQueryParamsDto,
+  SearchQueryParamsWithGeoParams,
   SearchResultDto,
   addressStringToDto,
   expectToEqual,
@@ -134,7 +135,6 @@ describe("SearchImmersionUseCase", () => {
 
   it("stores searches made", async () => {
     await searchImmersionUseCase.execute(searchSecretariatInMetzRequestDto);
-
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
@@ -147,6 +147,132 @@ describe("SearchImmersionUseCase", () => {
         numberOfResults: 0,
       },
     ]);
+  });
+
+  describe("searches without geo params", () => {
+    beforeEach(() => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishment,
+        establishmentAcceptingOnlyStudent,
+        establishmentAcceptingOnlyJobSeeker,
+      ];
+    });
+
+    it("gets results for search made without geo params and stores search made", async () => {
+      const response = await searchImmersionUseCase.execute(
+        searchWithMinimalParams,
+      );
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          secretariatOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          boulangerOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          secretariatOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          boulangerOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          secretariatOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          boulangerOffer.romeCode,
+        ),
+      ]);
+
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        {
+          id: "searchMadeUuid",
+          appellationCodes: undefined,
+          needsToBeSearched: true,
+          numberOfResults: 6,
+          sortedBy: "date",
+        },
+      ]);
+    });
+    it("gets results for search made with appellations but without geo params", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchWithMinimalParams,
+        appellationCodes: [secretariatOffer.appellationCode],
+      });
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          secretariatOffer.romeCode,
+        ),
+
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          secretariatOffer.romeCode,
+        ),
+
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          secretariatOffer.romeCode,
+        ),
+      ]);
+
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        {
+          id: "searchMadeUuid",
+          needsToBeSearched: true,
+          numberOfResults: 3,
+          appellationCodes: [secretariatOffer.appellationCode],
+          sortedBy: "date",
+        },
+      ]);
+    });
+
+    it("gets all results for search made with appellations but no geo params", async () => {
+      const response = await searchImmersionUseCase.execute(
+        searchWithMinimalParams,
+      );
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          secretariatOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          boulangerOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          secretariatOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          boulangerOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          secretariatOffer.romeCode,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          boulangerOffer.romeCode,
+        ),
+      ]);
+
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        {
+          id: "searchMadeUuid",
+          appellationCodes: undefined,
+          needsToBeSearched: true,
+          numberOfResults: 6,
+          sortedBy: "date",
+        },
+      ]);
+    });
   });
 
   it("gets all results around if no rome is provided", async () => {
@@ -655,6 +781,7 @@ describe("SearchImmersionUseCase", () => {
         606885,
       ),
     ]);
+
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
         id: "searchMadeUuid",
@@ -916,6 +1043,7 @@ describe("SearchImmersionUseCase", () => {
 
       const response = await searchImmersionUseCase.execute({
         ...searchSecretariatInMetzRequestDto,
+        ...searchInMetzParams,
         sortedBy: "distance",
       });
 
@@ -1241,7 +1369,11 @@ const lbbCompanyVO = new LaBonneBoiteCompanyDtoBuilder()
   .withDistanceKm(1)
   .build();
 
-const searchInMetzParams: SearchQueryParamsDto = {
+const searchWithMinimalParams: SearchQueryParamsDto = {
+  sortedBy: "date",
+};
+
+const searchInMetzParams: SearchQueryParamsWithGeoParams = {
   distanceKm: 30,
   longitude: 6.17602,
   latitude: 49.119146,

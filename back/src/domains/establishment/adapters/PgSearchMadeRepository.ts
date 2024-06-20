@@ -1,7 +1,11 @@
 import { uniq } from "ramda";
 import { AppellationCode } from "shared";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { SearchMadeEntity, SearchMadeId } from "../entities/SearchMadeEntity";
+import {
+  SearchMadeEntity,
+  SearchMadeId,
+  hasSearchMadeGeoParams,
+} from "../entities/SearchMadeEntity";
 import { SearchMadeRepository } from "../ports/SearchMadeRepository";
 
 export class PgSearchMadeRepository implements SearchMadeRepository {
@@ -24,11 +28,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
       .values({
         id: searchMade.id,
         rome: searchMade.romeCode,
-        lat: searchMade.lat,
-        lon: searchMade.lon,
-        distance: searchMade.distanceKm,
         needstobesearched: searchMade.needsToBeSearched,
-        gps: `POINT(${searchMade.lon} ${searchMade.lat})`,
         voluntary_to_immersion: searchMade.voluntaryToImmersion,
         api_consumer_name: searchMade.apiConsumerName,
         sorted_by: searchMade.sortedBy,
@@ -36,6 +36,19 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         number_of_results: searchMade.numberOfResults,
         acquisition_keyword: searchMade.acquisitionKeyword,
         acquisition_campaign: searchMade.acquisitionCampaign,
+        ...(hasSearchMadeGeoParams(searchMade)
+          ? {
+              lat: searchMade.lat,
+              lon: searchMade.lon,
+              distance: searchMade.distanceKm,
+              gps: `POINT(${searchMade.lon} ${searchMade.lat})`,
+            }
+          : {
+              lat: 0,
+              lon: 0,
+              distance: 0,
+              gps: "POINT(0 0)",
+            }),
       })
       .execute();
   }

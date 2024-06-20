@@ -15,7 +15,6 @@ export type SearchParams = OmitFromExistingKeys<
   SearchQueryParamsDto,
   "voluntaryToImmersion"
 >;
-// > ;
 
 type SearchFeedback = SubmitFeedBack<"success">;
 

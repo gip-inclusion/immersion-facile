@@ -1,5 +1,6 @@
 import {
   Group,
+  SearchQueryParamsWithGeoParams,
   SearchResultDto,
   SearchRoutes,
   SiretDto,
@@ -22,6 +23,49 @@ import {
   defaultNafCode,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { buildTestApp } from "../../../../utils/buildTestApp";
+
+const siret1 = "12345678901234";
+const siret2 = "11111111111111";
+const siret3 = "12341234123455";
+
+const toSearchImmersionResults = (
+  params: { siret: SiretDto; offer: OfferEntity }[],
+  withDistance: number | false = 0,
+): SearchResultDto[] =>
+  params.map(({ siret, offer }) => ({
+    naf: defaultNafCode,
+    nafLabel: "NAFRev2",
+    name: "Company inside repository",
+    website: "www.jobs.fr",
+    additionalInformation: "",
+    rome: offer.romeCode,
+    romeLabel: "test_rome_label",
+    appellations: [
+      {
+        appellationLabel: offer.appellationLabel,
+        appellationCode: offer.appellationCode,
+        score: 4.5,
+      },
+    ],
+    siret,
+    voluntaryToImmersion: true,
+    contactMode: "EMAIL",
+    numberOfEmployeeRange: "10-19",
+    address: defaultLocation.address,
+    position: defaultLocation.position,
+    locationId: defaultLocation.id,
+    ...(withDistance !== false ? { distance_m: withDistance } : {}),
+  }));
+
+const offer1 = new OfferEntityBuilder()
+  .withRomeCode("A1409")
+  .withAppellationCode("14704")
+  .build();
+
+const offer2 = new OfferEntityBuilder()
+  .withRomeCode("A1203")
+  .withAppellationCode("16067")
+  .build();
 
 const immersionOffer = new OfferEntityBuilder().build();
 const establishmentAggregate1 = new EstablishmentAggregateBuilder()
@@ -183,48 +227,6 @@ describe("search-immersion route", () => {
     });
 
     describe("with filter establishmentSearchableBy", () => {
-      const siret1 = "12345678901234";
-      const siret2 = "11111111111111";
-      const siret3 = "12341234123455";
-
-      const toSearchImmersionResults = (
-        params: { siret: SiretDto; offer: OfferEntity }[],
-      ): SearchResultDto[] =>
-        params.map(({ siret, offer }) => ({
-          naf: defaultNafCode,
-          nafLabel: "NAFRev2",
-          name: "Company inside repository",
-          website: "www.jobs.fr",
-          additionalInformation: "",
-          rome: offer.romeCode,
-          romeLabel: "test_rome_label",
-          appellations: [
-            {
-              appellationLabel: offer.appellationLabel,
-              appellationCode: offer.appellationCode,
-              score: 4.5,
-            },
-          ],
-          siret,
-          voluntaryToImmersion: true,
-          contactMode: "EMAIL",
-          numberOfEmployeeRange: "10-19",
-          distance_m: 0,
-          address: defaultLocation.address,
-          position: defaultLocation.position,
-          locationId: defaultLocation.id,
-        }));
-
-      const offer1 = new OfferEntityBuilder()
-        .withRomeCode("A1409")
-        .withAppellationCode("14704")
-        .build();
-
-      const offer2 = new OfferEntityBuilder()
-        .withRomeCode("A1203")
-        .withAppellationCode("16067")
-        .build();
-
       beforeEach(async () => {
         inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
           new EstablishmentAggregateBuilder()
@@ -344,6 +346,103 @@ describe("search-immersion route", () => {
           message:
             "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
         },
+      });
+    });
+    describe("without geo params", () => {
+      beforeEach(async () => {
+        inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret1)
+            .withOffers([offer1])
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(siret1)
+                .withWebsite("www.jobs.fr")
+                .build(),
+            )
+            .build(),
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret2)
+            .withOffers([offer2])
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(siret2)
+                .withWebsite("www.jobs.fr")
+                .withSearchableBy({ students: true, jobSeekers: false })
+                .build(),
+            )
+            .build(),
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(siret3)
+            .withOffers([offer1])
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(siret3)
+                .withWebsite("www.jobs.fr")
+                .withSearchableBy({ students: false, jobSeekers: true })
+                .build(),
+            )
+            .build(),
+        ];
+      });
+      it("should return 400 if distance is supplied but no lat/lon/distanceKm", async () => {
+        const result = await httpClient.search({
+          queryParams: {
+            appellationCodes: ["14704"],
+            sortedBy: "distance",
+          } as SearchQueryParamsWithGeoParams, // forcing the type to check the error
+        });
+        expectHttpResponseToEqual(result, {
+          status: 400,
+          body: {
+            status: 400,
+            issues: [
+              "latitude : Expected number, received nan",
+              "longitude : Expected number, received nan",
+              "distanceKm : Expected number, received nan",
+            ],
+            message:
+              "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
+          },
+        });
+      });
+      it("should return results if no geo params are set and no appellations", async () => {
+        const results = await httpClient.search({
+          queryParams: {
+            sortedBy: "score",
+          },
+        });
+
+        expectHttpResponseToEqual(results, {
+          status: 200,
+          body: toSearchImmersionResults(
+            [
+              { siret: siret1, offer: offer1 },
+              { siret: siret2, offer: offer2 },
+              { siret: siret3, offer: offer1 },
+            ],
+            false,
+          ),
+        });
+      });
+      it("should return results if no geo params are set but appellations are supplied", async () => {
+        const results = await httpClient.search({
+          queryParams: {
+            sortedBy: "date",
+            appellationCodes: [offer1.appellationCode],
+          },
+        });
+
+        expectHttpResponseToEqual(results, {
+          status: 200,
+          body: toSearchImmersionResults(
+            [
+              { siret: siret1, offer: offer1 },
+              { siret: siret3, offer: offer1 },
+            ],
+            false,
+          ),
+        });
       });
     });
   });

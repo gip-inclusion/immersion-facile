@@ -475,17 +475,17 @@ type SortedBy = "date" | "distance" | "score";
 interface SearchesMade extends WithAcquisition {
   id: string;
   rome: string | null;
-  lat: number;
-  lon: number;
-  distance: number;
   needstobesearched: boolean | null;
   update_date: Generated<Timestamp | null>;
-  gps: string | null;
   voluntary_to_immersion: boolean | null;
   api_consumer_name: string | null;
   sorted_by: Generated<SortedBy | null>;
   address: string | null;
   number_of_results: number | null;
+  lat: number | null;
+  lon: number | null;
+  distance: number | null;
+  gps: string | null;
 }
 
 interface UsersAgencies {

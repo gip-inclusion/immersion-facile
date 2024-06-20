@@ -3,6 +3,8 @@ import { andThen, keys, map } from "ramda";
 import {
   ApiConsumer,
   LocationId,
+  OmitFromExistingKeys,
+  SearchSortedBy,
   SiretDto,
   WithAcquisition,
   eventToRightName,
@@ -23,6 +25,7 @@ import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { conventionReadToConventionReadPublicV2 } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.dto";
 import { getConventionsByFiltersV2ToDomain } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
+import { SearchParamsPublicV2 } from "../DtoAndSchemas/v2/input/SearchParamsPublicV2.dto";
 import { domainToSearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
@@ -64,11 +67,21 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
           throw new ForbiddenError();
         return pipeWithValue(
           req.query,
-          (searchImmersionRequest) =>
-            deps.useCases.searchImmersion.execute(
-              searchImmersionRequest,
+          (searchImmersionRequest) => {
+            const searchImmersionRequestWithSortedBy: OmitFromExistingKeys<
+              SearchParamsPublicV2,
+              "sortedBy"
+            > & {
+              sortedBy: SearchSortedBy;
+            } = {
+              ...searchImmersionRequest,
+              sortedBy: searchImmersionRequest.sortedBy ?? "distance",
+            };
+            return deps.useCases.searchImmersion.execute(
+              searchImmersionRequestWithSortedBy,
               req.apiConsumer,
-            ),
+            );
+          },
           andThen(map(domainToSearchImmersionResultPublicV2)),
         );
       }),

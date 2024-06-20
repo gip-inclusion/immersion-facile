@@ -1,6 +1,6 @@
 import { sql } from "kysely";
 import format from "pg-format";
-import { equals, keys } from "ramda";
+import { equals, keys, pick } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
@@ -34,6 +34,7 @@ import {
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
+import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
 
 const logger = createLogger(__filename);
 
@@ -598,15 +599,92 @@ export class PgEstablishmentAggregateRepository
         LIMIT $3`,
       romeCodes,
     ); // Formats optional litterals %1$L
-    const immersionSearchResultDtos =
-      await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        selectedOffersSubQuery,
-        [
-          `POINT(${searchMade.lon} ${searchMade.lat})`,
-          searchMade.distanceKm * 1000, // Formats parameters $1, $2
-          maxResults,
-        ],
-      );
+
+    const selectedOffersWithoutGeoParamsSubQuery = format(
+      `WITH
+        active_establishments_within_area AS (
+          SELECT
+              e.siret,
+              e.fit_for_disabled_workers,
+              date_to_iso(e.next_availability_date) as next_availability_date,
+              e.additional_information,
+              e.customized_name,
+              e.is_searchable,
+              e.naf_code,
+              e.name,
+              e.number_employees,
+              e.website,
+              loc.*
+          FROM establishments e
+          LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
+          WHERE is_open 
+          ${andSearchableByFilter}
+        ),
+        matching_offers AS (
+          SELECT 
+            aewa.siret, 
+            aewa.position,
+            aewa.lat,
+            aewa.lon,
+            aewa.city,
+            aewa.street_number_and_address,
+            aewa.department_code,
+            aewa.post_code,
+            aewa.id as location_id,
+            rome_code, 
+            prd.libelle_rome AS rome_label, 
+            aewa.fit_for_disabled_workers,
+            aewa.next_availability_date,
+            aewa.additional_information,
+            aewa.customized_name,
+            aewa.is_searchable,
+            aewa.naf_code,
+            aewa.name,
+            aewa.number_employees,
+            aewa.website,
+            ${buildAppellationsArray},
+            ${
+              searchMade.sortedBy === "score"
+                ? "MAX(io.score) AS max_score,"
+                : ""
+            }
+            MAX(created_at) AS max_created_at
+            
+          FROM active_establishments_within_area aewa 
+          LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
+          LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
+          LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
+          ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
+          GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
+              aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id,
+              aewa.next_availability_date, aewa.additional_information, aewa.customized_name, aewa.is_searchable, aewa.naf_code, aewa.name, aewa.number_employees, aewa.website)
+        )
+        SELECT *, 
+        (
+          ROW_NUMBER () OVER (${sortExpression})
+        )::integer AS row_number 
+        FROM matching_offers
+        ${sortExpression}
+        LIMIT $1`,
+      romeCodes,
+    ); // Formats optional litterals %1$L
+
+    const geoParams = pick(["lat", "lon", "distanceKm"], searchMade);
+
+    const immersionSearchResultDtos = hasSearchGeoParams(geoParams)
+      ? await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+          selectedOffersSubQuery,
+          [
+            `POINT(${geoParams.lon} ${geoParams.lat})`,
+            geoParams.distanceKm * 1000, // Formats parameters $1, $2
+            maxResults,
+          ],
+        )
+      : await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+          selectedOffersWithoutGeoParamsSubQuery,
+          [maxResults],
+          false,
+        );
     return immersionSearchResultDtos.map((dto) => ({
       ...dto,
       voluntaryToImmersion: true,
@@ -753,6 +831,7 @@ export class PgEstablishmentAggregateRepository
   async #selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
     selectedOffersSubQuery: string,
     selectedOffersSubQueryParams: any[],
+    shouldSetDistance = true,
   ): Promise<SearchImmersionResult[]> {
     // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
@@ -761,6 +840,7 @@ export class PgEstablishmentAggregateRepository
       this.transaction,
       makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         selectedOffersSubQuery,
+        shouldSetDistance,
       ),
       selectedOffersSubQueryParams,
     );
@@ -998,11 +1078,12 @@ const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
     case "score":
       return "ORDER BY max_score DESC, RANDOM()";
     default: // undefined
-      return "ORDER BY RANDOM()";
+      throw new BadRequestError("sortedBy must be defined");
   }
 };
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m
+  shouldSetDistance = false,
 ) => `
 WITH 
   unique_establishments_contacts AS ( 
@@ -1019,7 +1100,7 @@ WITH
       JSON_BUILD_OBJECT(
         'rome', io.rome_code,
         'siret', io.siret,
-        'distance_m', io.distance_m,
+        ${shouldSetDistance ? `'distance_m', io.distance_m,` : ""}
         'isSearchable',io.is_searchable,
         'nextAvailabilityDate', io.next_availability_date,
         'name', io.name,
