@@ -16,12 +16,27 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
   public async getDiscussions({
     createdSince,
     sirets,
+    lastAnsweredByCandidate,
   }: GetDiscussionsParams): Promise<DiscussionDto[]> {
     this.discussionCallsCount++;
     const filters: Array<(discussion: DiscussionDto) => boolean> = [
-      ({ siret }) => (sirets ? sirets.includes(siret) : true),
+      ({ siret }) =>
+        sirets && siret.length > 0 ? sirets.includes(siret) : true,
       ({ createdAt }) =>
         createdSince ? new Date(createdAt) >= createdSince : true,
+      ({ exchanges }) => {
+        if (!lastAnsweredByCandidate) return true;
+        const mostRecentExchange = exchanges.reduce((a, b) =>
+          a.sentAt > b.sentAt ? a : b,
+        );
+        const sendAt = new Date(mostRecentExchange.sentAt);
+
+        return (
+          mostRecentExchange.sender === "potentialBeneficiary" &&
+          sendAt >= lastAnsweredByCandidate.from &&
+          sendAt <= lastAnsweredByCandidate.to
+        );
+      },
     ];
     const discussions = this.discussions.filter((discussion) =>
       filters.every((filter) => filter(discussion)),
