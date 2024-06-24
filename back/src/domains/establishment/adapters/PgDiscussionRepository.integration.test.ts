@@ -8,6 +8,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
@@ -25,7 +26,6 @@ const styliste: AppellationAndRomeDto = {
   romeCode: "B1805",
   romeLabel: "Stylisme",
   appellationCode: "19540",
-
   appellationLabel: "Styliste",
 };
 
@@ -34,8 +34,6 @@ const offer = new OfferEntityBuilder()
   .withAppellationCode(styliste.appellationCode)
   .withAppellationLabel(styliste.appellationLabel)
   .build();
-
-const siret = "01234567891011";
 
 describe("PgDiscussionRepository", () => {
   let pool: Pool;
@@ -61,347 +59,359 @@ describe("PgDiscussionRepository", () => {
     await pool.end();
   });
 
-  const discussionCreatedAt = new Date("2023-07-07");
+  const date = new Date("2023-07-07");
 
-  const discussionWithExchanges = new DiscussionBuilder()
-    .withSiret(siret)
-    .withEstablishmentContact({
-      email: "TEST@email.com",
-    })
-    .withCreatedAt(discussionCreatedAt)
+  const discussionWithLastExchangeByPotentialBeneficiary =
+    new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret("00000000000001")
+      .withEstablishmentContact({
+        email: "TEST@email.com",
+      })
+      .withExchanges([
+        {
+          message: "",
+          sender: "potentialBeneficiary",
+          recipient: "establishment",
+          sentAt: date.toISOString(),
+          subject: "",
+        },
+      ])
+      .withCreatedAt(date)
+      .build();
+  const discussionWithLastExchangeByEstablishment = new DiscussionBuilder()
+    .withId(uuid())
+    .withSiret("00000000000003")
+    .withExchanges([
+      {
+        message: "",
+        recipient: "potentialBeneficiary",
+        sender: "establishment",
+        sentAt: date.toISOString(),
+        subject: "",
+      },
+    ])
+    .withCreatedAt(date)
     .build();
   const discussionWithoutExchanges = new DiscussionBuilder()
-    .withSiret(siret)
+    .withId(uuid())
+    .withSiret("00000000000002")
     .withExchanges([])
-    .withCreatedAt(discussionCreatedAt)
     .withConventionId("some-convention-id")
+    .withCreatedAt(addDays(date, -1))
     .build();
 
-  it.each([
-    {
-      discussion: discussionWithExchanges,
-      hasDiscussionMatchingParams: {
-        siret: discussionWithExchanges.siret,
-        appellationCode: discussionWithExchanges.appellationCode,
-        potentialBeneficiaryEmail:
-          discussionWithExchanges.potentialBeneficiary.email,
-        since: discussionCreatedAt,
+  describe("getDiscussions", () => {
+    //TODO getDiscussions with lastAnsweredByCandidate parameter
+    it.each([
+      {
+        params: {
+          sirets: [discussionWithLastExchangeByPotentialBeneficiary.siret],
+        },
+        result: [discussionWithLastExchangeByPotentialBeneficiary],
       },
-      hasDiscussionMatchingResult: true,
-      testName: "discussion with exchange",
-      getDiscussionsParams: {
-        sirets: [discussionWithExchanges.siret],
+      {
+        params: {
+          createdSince: addDays(date, -2),
+        },
+        result: [
+          discussionWithLastExchangeByPotentialBeneficiary,
+          discussionWithLastExchangeByEstablishment,
+          discussionWithoutExchanges,
+        ],
       },
-      getDiscussionsResults: [discussionWithExchanges],
-    },
-    {
-      discussion: discussionWithExchanges,
-      hasDiscussionMatchingParams: {
-        siret: discussionWithExchanges.siret,
-        appellationCode: discussionWithExchanges.appellationCode,
-        potentialBeneficiaryEmail:
-          discussionWithExchanges.potentialBeneficiary.email,
-        since: addDays(discussionCreatedAt, 1),
+      {
+        params: {
+          lastAnsweredByCandidate: {
+            from: addDays(date, -1),
+            to: date,
+          },
+        },
+        result: [discussionWithLastExchangeByPotentialBeneficiary],
       },
-      hasDiscussionMatchingResult: false,
-      testName: "discussion with exchange with match since creation date +1",
-      getDiscussionsParams: {
-        sirets: [discussionWithExchanges.siret],
-        createdSince: new Date(discussionWithExchanges.createdAt),
+      {
+        params: {
+          sirets: [discussionWithoutExchanges.siret],
+          lastAnsweredByCandidate: {
+            from: addDays(date, -1),
+            to: date,
+          },
+        },
+        result: [],
       },
-      getDiscussionsResults: [discussionWithExchanges],
-    },
-    {
-      discussion: discussionWithoutExchanges,
-      hasDiscussionMatchingParams: {
-        siret: discussionWithExchanges.siret,
-        appellationCode: discussionWithExchanges.appellationCode,
-        potentialBeneficiaryEmail:
-          discussionWithExchanges.potentialBeneficiary.email,
-        since: discussionCreatedAt,
-      },
-      hasDiscussionMatchingResult: true,
-      testName: "discussion without exchange initialy",
-      getDiscussionsParams: {
-        sirets: [],
-      },
-      getDiscussionsResults: [],
-    },
-    {
-      discussion: discussionWithoutExchanges,
-      hasDiscussionMatchingParams: {
-        siret: discussionWithExchanges.siret,
-        appellationCode: discussionWithExchanges.appellationCode,
-        potentialBeneficiaryEmail:
-          discussionWithExchanges.potentialBeneficiary.email,
-        since: addDays(discussionCreatedAt, 1),
-      },
-      hasDiscussionMatchingResult: false,
-      testName:
-        "discussion without exchange initialy with match since creation date +1",
-      getDiscussionsParams: {
-        sirets: [],
-      },
-      getDiscussionsResults: [],
-    },
-    {
-      discussion: discussionWithExchanges,
-      hasDiscussionMatchingParams: {
-        siret: discussionWithExchanges.siret,
-      },
-      hasDiscussionMatchingResult: true,
-      testName: "match with Siret",
-      getDiscussionsParams: { sirets: [] },
-      getDiscussionsResults: [],
-    },
-    {
-      discussion: discussionWithExchanges,
-      hasDiscussionMatchingParams: {
-        siret: "00000000000000",
-      },
-      hasDiscussionMatchingResult: false,
-      testName: "don't match with Siret",
-      getDiscussionsParams: { sirets: [] },
-      getDiscussionsResults: [],
-    },
-    {
-      discussion: discussionWithExchanges,
-      hasDiscussionMatchingParams: {
-        appellationCode: discussionWithExchanges.appellationCode,
-      },
-      hasDiscussionMatchingResult: true,
-      testName: "match with appellationCode",
-      getDiscussionsParams: { sirets: [] },
-      getDiscussionsResults: [],
-    },
-    {
-      discussion: discussionWithExchanges,
-      hasDiscussionMatchingParams: {
-        potentialBeneficiaryEmail:
-          discussionWithExchanges.potentialBeneficiary.email,
-      },
-      hasDiscussionMatchingResult: true,
-      testName: "match with potentialBeneficiaryEmail",
-      getDiscussionsParams: { sirets: [] },
-      getDiscussionsResults: [],
-    },
-    {
-      discussion: discussionWithExchanges,
-      hasDiscussionMatchingParams: {
-        since: discussionCreatedAt,
-      },
-      hasDiscussionMatchingResult: true,
-      testName: "match with since",
-      getDiscussionsParams: { sirets: [] },
-      getDiscussionsResults: [],
-    },
-    {
-      discussion: discussionWithExchanges,
-      hasDiscussionMatchingParams: {
-        establishmentRepresentativeEmail:
-          discussionWithExchanges.establishmentContact.email.toUpperCase(),
-      },
-      hasDiscussionMatchingResult: true,
-      testName: "match with establishmentRepresentativeEmail",
-      getDiscussionsParams: { sirets: [] },
-      getDiscussionsResults: [],
-    },
-  ] satisfies {
-    discussion: DiscussionDto;
-    hasDiscussionMatchingParams: Partial<HasDiscussionMatchingParams>;
-    hasDiscussionMatchingResult: boolean;
-    getDiscussionsParams: GetDiscussionsParams;
-    getDiscussionsResults: DiscussionDto[] | Error;
-    testName: string;
-  }[])(
-    "Methode insert, update, getById and hasDiscussionMatching $testName",
-    async ({
-      discussion,
-      hasDiscussionMatchingParams,
-      hasDiscussionMatchingResult,
-      getDiscussionsParams,
-      getDiscussionsResults,
-    }) => {
-      expectToEqual(
-        await pgDiscussionRepository.getById(discussion.id),
-        undefined,
-      );
+    ] satisfies {
+      params: GetDiscussionsParams;
+      result: DiscussionDto[] | Error;
+    }[])(
+      `getDiscussions return $result.length discussion with params:
+        $params
+        `,
+      async ({ params, result }) => {
+        await Promise.all(
+          [
+            discussionWithLastExchangeByPotentialBeneficiary,
+            discussionWithLastExchangeByEstablishment,
+            discussionWithoutExchanges,
+          ].map((discussion) => pgDiscussionRepository.insert(discussion)),
+        );
 
-      await pgDiscussionRepository.insert(discussion);
-      expectToEqual(
-        await pgDiscussionRepository.getById(discussion.id),
-        discussion,
-      );
+        result instanceof Error
+          ? expectPromiseToFailWithError(
+              pgDiscussionRepository.getDiscussions(params, 3),
+              result,
+            )
+          : expectToEqual(
+              await pgDiscussionRepository.getDiscussions(params, 3),
+              result,
+            );
+      },
+    );
+  });
 
-      getDiscussionsResults instanceof Error
-        ? expectPromiseToFailWithError(
-            pgDiscussionRepository.getDiscussions(getDiscussionsParams),
-            getDiscussionsResults,
-          )
-        : expectToEqual(
-            await pgDiscussionRepository.getDiscussions(getDiscussionsParams),
-            getDiscussionsResults,
-          );
+  describe("hasDiscussionMatching", () => {
+    it.each([
+      {
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        params: {
+          siret: discussionWithLastExchangeByPotentialBeneficiary.siret,
+        },
+        result: true,
+      },
+      {
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        params: {
+          siret: discussionWithoutExchanges.siret,
+        },
+        result: false,
+      },
+      {
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        params: {
+          appellationCode:
+            discussionWithLastExchangeByPotentialBeneficiary.appellationCode,
+        },
+        result: true,
+      },
+      {
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        params: {
+          potentialBeneficiaryEmail:
+            discussionWithLastExchangeByPotentialBeneficiary
+              .potentialBeneficiary.email,
+        },
+        result: true,
+      },
+      {
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        params: {
+          since: new Date(
+            discussionWithLastExchangeByPotentialBeneficiary.createdAt,
+          ),
+        },
+        result: true,
+      },
+      {
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        params: {
+          establishmentRepresentativeEmail:
+            discussionWithLastExchangeByPotentialBeneficiary.establishmentContact.email.toUpperCase(),
+        },
+        result: true,
+      },
+      {
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        params: {
+          siret: discussionWithLastExchangeByPotentialBeneficiary.siret,
+          appellationCode:
+            discussionWithLastExchangeByPotentialBeneficiary.appellationCode,
+          potentialBeneficiaryEmail:
+            discussionWithLastExchangeByPotentialBeneficiary
+              .potentialBeneficiary.email,
+          since: date,
+        },
+        result: true,
+      },
+      {
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        params: {
+          siret: discussionWithLastExchangeByPotentialBeneficiary.siret,
+          appellationCode:
+            discussionWithLastExchangeByPotentialBeneficiary.appellationCode,
+          potentialBeneficiaryEmail:
+            discussionWithLastExchangeByPotentialBeneficiary
+              .potentialBeneficiary.email,
+          since: addDays(date, 1),
+        },
+        result: false,
+      },
+      {
+        discussionInRepo: discussionWithoutExchanges,
+        params: {
+          siret: discussionWithoutExchanges.siret,
+          appellationCode: discussionWithoutExchanges.appellationCode,
+          potentialBeneficiaryEmail:
+            discussionWithoutExchanges.potentialBeneficiary.email,
+          since: new Date(discussionWithoutExchanges.createdAt),
+        },
+        result: true,
+      },
+      {
+        discussionInRepo: discussionWithoutExchanges,
+        params: {
+          siret: discussionWithLastExchangeByPotentialBeneficiary.siret,
+          appellationCode:
+            discussionWithLastExchangeByPotentialBeneficiary.appellationCode,
+          potentialBeneficiaryEmail:
+            discussionWithLastExchangeByPotentialBeneficiary
+              .potentialBeneficiary.email,
+          since: addDays(new Date(discussionWithoutExchanges.createdAt), 1),
+        },
+        result: false,
+      },
+    ] satisfies {
+      discussionInRepo: DiscussionDto;
+      params: Partial<HasDiscussionMatchingParams>;
+      result: boolean;
+    }[])(
+      `hasDiscussionMatching '$result'
+          with params: '$params'`,
+      async ({ discussionInRepo, params, result }) => {
+        await pgDiscussionRepository.insert(discussionInRepo);
 
-      const updatedDiscussion1: DiscussionDto = new DiscussionBuilder(
-        discussion,
-      )
-        .withImmersionObjective("Initier une démarche de recrutement")
+        expectToEqual(
+          await pgDiscussionRepository.hasDiscussionMatching(params),
+          result,
+        );
+      },
+    );
+  });
+
+  describe("insert/update/getById", () => {
+    it("insert with acquisitionCampaign and acquisitionKeyword", async () => {
+      const acquisitionParams = {
+        acquisitionCampaign: "campagne",
+        acquisitionKeyword: "mot-clé",
+      } satisfies WithAcquisition;
+      const siret = "01234567891011";
+      const discussion = new DiscussionBuilder()
+        .withSiret(siret)
+        .withCreatedAt(new Date("2023-07-07"))
+        .withAcquisition(acquisitionParams)
         .build();
 
-      await pgDiscussionRepository.update(updatedDiscussion1);
+      await pgDiscussionRepository.insert(discussion);
+
       expectToEqual(
-        await pgDiscussionRepository.getById(discussion.id),
-        updatedDiscussion1,
+        await db
+          .selectFrom("discussions")
+          .select(["acquisition_campaign", "acquisition_keyword"])
+          .executeTakeFirst(),
+        {
+          acquisition_campaign: acquisitionParams.acquisitionCampaign,
+          acquisition_keyword: acquisitionParams.acquisitionKeyword,
+        },
+      );
+    });
+
+    it("Deletes messages from old discussions", async () => {
+      const siret = "12212222333344";
+      const since = new Date("2023-03-05");
+
+      await establishmentAggregateRepo.insertEstablishmentAggregate(
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(siret)
+          .withContactId("12345678-1111-2222-3333-444444444455")
+          .withOffers([offer])
+          .build(),
       );
 
-      const updatedDiscussion2 = new DiscussionBuilder(updatedDiscussion1)
+      const discussion1 = new DiscussionBuilder()
+        .withSiret(siret)
+        .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120104")
+        .withCreatedAt(new Date("2023-11-11"))
         .withExchanges([
-          ...updatedDiscussion1.exchanges,
           {
             subject: "mon nouveau sujet",
             message: "mon nouveau message",
             recipient: "potentialBeneficiary",
-            sentAt: new Date().toISOString(),
+            sentAt: new Date("2023-11-11").toISOString(),
+            sender: "establishment",
+          },
+        ])
+        .build();
+      const discussionOld = new DiscussionBuilder()
+        .withSiret(siret)
+        .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120103")
+        .withCreatedAt(new Date("2022-11-11"))
+        .withExchanges([
+          {
+            subject: "mon nouveau sujet",
+            message: "mon nouveau message",
+            recipient: "potentialBeneficiary",
+            sentAt: new Date("2022-11-11").toISOString(),
             sender: "establishment",
           },
         ])
         .build();
 
-      await pgDiscussionRepository.update(updatedDiscussion2);
-      expectToEqual(
-        await pgDiscussionRepository.getById(discussion.id),
-        updatedDiscussion2,
-      );
+      await Promise.all([
+        pgDiscussionRepository.insert(discussion1),
+        pgDiscussionRepository.insert(discussionOld),
+      ]);
 
-      expectToEqual(
-        await pgDiscussionRepository.hasDiscussionMatching(
-          hasDiscussionMatchingParams,
-        ),
-        hasDiscussionMatchingResult,
-      );
-    },
-  );
+      const numberOfUpdatedMessages =
+        await pgDiscussionRepository.deleteOldMessages(since);
 
-  it("Method insert with acquisitionCampaign and acquisitionKeyword", async () => {
-    const acquisitionParams = {
-      acquisitionCampaign: "campagne",
-      acquisitionKeyword: "mot-clé",
-    } satisfies WithAcquisition;
-    const siret = "01234567891011";
-    const discussion = new DiscussionBuilder()
-      .withSiret(siret)
-      .withCreatedAt(new Date("2023-07-07"))
-      .withAcquisition(acquisitionParams)
-      .build();
-
-    await pgDiscussionRepository.insert(discussion);
-
-    expectToEqual(
-      await db
-        .selectFrom("discussions")
-        .select(["acquisition_campaign", "acquisition_keyword"])
-        .executeTakeFirst(),
-      {
-        acquisition_campaign: acquisitionParams.acquisitionCampaign,
-        acquisition_keyword: acquisitionParams.acquisitionKeyword,
-      },
-    );
+      expectToEqual(numberOfUpdatedMessages, 1);
+      await expectMessageToBeDeleted(discussion1, "mon nouveau message");
+      await expectMessageToBeDeleted(discussionOld, "Supprimé car trop ancien");
+    });
   });
 
-  it("Method countDiscussionsForSiretSince", async () => {
-    const siret = "11112222333344";
-    const since = new Date("2023-03-05");
+  describe("countDiscussionsForSiretSince", () => {
+    it("right path", async () => {
+      const siret = "11112222333344";
+      const since = new Date("2023-03-05");
 
-    await establishmentAggregateRepo.insertEstablishmentAggregate(
-      new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret(siret)
-        .withContactId("12345678-1111-2222-3333-444444444444")
-        .withOffers([offer])
-        .build(),
-    );
+      await establishmentAggregateRepo.insertEstablishmentAggregate(
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(siret)
+          .withContactId("12345678-1111-2222-3333-444444444444")
+          .withOffers([offer])
+          .build(),
+      );
 
-    const discussion1 = new DiscussionBuilder()
-      .withSiret(siret)
-      .withId("bbbbbd2c-6f02-11ec-90d6-0242ac120003")
-      .withCreatedAt(new Date("2023-03-05"))
-      .build();
+      const discussion1 = new DiscussionBuilder()
+        .withSiret(siret)
+        .withId("bbbbbd2c-6f02-11ec-90d6-0242ac120003")
+        .withCreatedAt(new Date("2023-03-05"))
+        .build();
 
-    const discussion2 = new DiscussionBuilder()
-      .withSiret(siret)
-      .withId("cccccd2c-6f02-11ec-90d6-0242ac120003")
-      .withCreatedAt(new Date("2023-03-07"))
-      .build();
+      const discussion2 = new DiscussionBuilder()
+        .withSiret(siret)
+        .withId("cccccd2c-6f02-11ec-90d6-0242ac120003")
+        .withCreatedAt(new Date("2023-03-07"))
+        .build();
 
-    const discussionToOld = new DiscussionBuilder()
-      .withSiret(siret)
-      .withId("aaaaad2c-6f02-11ec-90d6-0242ac120003")
-      .withCreatedAt(new Date("2023-03-04"))
-      .build();
+      const discussionToOld = new DiscussionBuilder()
+        .withSiret(siret)
+        .withId("aaaaad2c-6f02-11ec-90d6-0242ac120003")
+        .withCreatedAt(new Date("2023-03-04"))
+        .build();
 
-    await Promise.all([
-      pgDiscussionRepository.insert(discussion1),
-      pgDiscussionRepository.insert(discussion2),
-      pgDiscussionRepository.insert(discussionToOld),
-    ]);
+      await Promise.all([
+        pgDiscussionRepository.insert(discussion1),
+        pgDiscussionRepository.insert(discussion2),
+        pgDiscussionRepository.insert(discussionToOld),
+      ]);
 
-    const numberOfDiscussions =
-      await pgDiscussionRepository.countDiscussionsForSiretSince(siret, since);
-    expect(numberOfDiscussions).toBe(2);
-  });
-
-  it("Deletes messages from old discussions", async () => {
-    const siret = "12212222333344";
-    const since = new Date("2023-03-05");
-
-    await establishmentAggregateRepo.insertEstablishmentAggregate(
-      new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret(siret)
-        .withContactId("12345678-1111-2222-3333-444444444455")
-        .withOffers([offer])
-        .build(),
-    );
-
-    const discussion1 = new DiscussionBuilder()
-      .withSiret(siret)
-      .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120104")
-      .withCreatedAt(new Date("2023-11-11"))
-      .withExchanges([
-        {
-          subject: "mon nouveau sujet",
-          message: "mon nouveau message",
-          recipient: "potentialBeneficiary",
-          sentAt: new Date("2023-11-11").toISOString(),
-          sender: "establishment",
-        },
-      ])
-      .build();
-    const discussionOld = new DiscussionBuilder()
-      .withSiret(siret)
-      .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120103")
-      .withCreatedAt(new Date("2022-11-11"))
-      .withExchanges([
-        {
-          subject: "mon nouveau sujet",
-          message: "mon nouveau message",
-          recipient: "potentialBeneficiary",
-          sentAt: new Date("2022-11-11").toISOString(),
-          sender: "establishment",
-        },
-      ])
-      .build();
-
-    await Promise.all([
-      pgDiscussionRepository.insert(discussion1),
-      pgDiscussionRepository.insert(discussionOld),
-    ]);
-
-    const numberOfUpdatedMessages =
-      await pgDiscussionRepository.deleteOldMessages(since);
-
-    expectToEqual(numberOfUpdatedMessages, 1);
-    await expectMessageToBeDeleted(discussion1, "mon nouveau message");
-    await expectMessageToBeDeleted(discussionOld, "Supprimé car trop ancien");
+      const numberOfDiscussions =
+        await pgDiscussionRepository.countDiscussionsForSiretSince(
+          siret,
+          since,
+        );
+      expect(numberOfDiscussions).toBe(2);
+    });
   });
 
   const expectMessageToBeDeleted = async (

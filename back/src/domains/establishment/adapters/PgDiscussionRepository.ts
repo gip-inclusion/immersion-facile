@@ -53,7 +53,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     discussionId: DiscussionId,
   ): Promise<DiscussionDto | undefined> {
     const pgResult = await this.#makeDiscussionQueryBuilder()
-      .where("id", "=", discussionId)
+      .where("discussions.id", "=", discussionId)
       .executeTakeFirst();
 
     return pgResult
@@ -62,21 +62,34 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }
 
   public async getDiscussions(
-    params: GetDiscussionsParams,
+    { createdSince, lastAnsweredByCandidate, sirets }: GetDiscussionsParams,
+    limit: number,
   ): Promise<DiscussionDto[]> {
-    if (params.sirets.length === 0) return [];
-
-    const pgResults = await pipeWithValue(
+    const queryBuilder = pipeWithValue(
       this.#makeDiscussionQueryBuilder(),
-      (builder) =>
-        params.createdSince
-          ? builder.where("discussions.created_at", ">=", params.createdSince)
-          : builder,
-      (builder) =>
-        params.sirets
-          ? builder.where("discussions.siret", "in", params.sirets)
-          : builder,
-    ).execute();
+      (b) =>
+        createdSince
+          ? b.where("discussions.created_at", ">=", createdSince)
+          : b,
+      (b) =>
+        sirets && sirets?.length > 0
+          ? b.where("discussions.siret", "in", sirets)
+          : b,
+      (b) =>
+        lastAnsweredByCandidate
+          ? b
+              .where("last_exchanges.sender", "=", "potentialBeneficiary")
+              .where((eb) =>
+                eb.between(
+                  "last_exchanges.sent_at",
+                  lastAnsweredByCandidate.from,
+                  lastAnsweredByCandidate.to,
+                ),
+              )
+          : b,
+    ).limit(limit);
+
+    const pgResults = await queryBuilder.execute();
 
     return pgResults.map(({ discussion }) =>
       this.#makeDiscussionDtoFromPgDiscussion(discussion),
@@ -135,6 +148,26 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
   #makeDiscussionQueryBuilder() {
     return this.transaction
+      .with("last_exchanges", (db) =>
+        db
+          .selectFrom(({ selectFrom }) =>
+            selectFrom("exchanges")
+              .select(({ fn }) => [
+                "discussion_id",
+                "sent_at",
+                "sender",
+                fn
+                  .agg<number>("rank")
+                  .over((ob) =>
+                    ob.partitionBy("discussion_id").orderBy("sent_at", "desc"),
+                  )
+                  .as("rn"),
+              ])
+              .as("sub"),
+          )
+          .select(["discussion_id", "sent_at", "sender"])
+          .where("rn", "=", 1),
+      )
       .with("exchanges_by_id", (db) =>
         db
           .selectFrom("exchanges")
@@ -156,6 +189,11 @@ export class PgDiscussionRepository implements DiscussionRepository {
       )
       .selectFrom("discussions")
       .leftJoin("exchanges_by_id", "discussion_id", "id")
+      .leftJoin(
+        "last_exchanges",
+        "last_exchanges.discussion_id",
+        "discussions.id",
+      )
       .select((qb) => [
         jsonStripNulls(
           jsonBuildObject({
