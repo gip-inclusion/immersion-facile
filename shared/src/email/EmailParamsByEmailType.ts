@@ -6,6 +6,7 @@ import {
   InternshipKind,
   Renewed,
 } from "../convention/convention.dto";
+import { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import { Email } from "./email.dto";
 
@@ -145,6 +146,13 @@ export type EmailParamsByEmailType = {
     establishmentTutorName: string;
     assessmentCreationLink: string;
     internshipKind: InternshipKind;
+  };
+  ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    beneficiaryReplyToEmail: string;
+    appelationLabel: AppellationLabel;
+    mode: "3days" | "7days";
   };
   NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
     immersionObjective: ImmersionObjective | undefined;

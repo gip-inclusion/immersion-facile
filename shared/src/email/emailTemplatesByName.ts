@@ -29,6 +29,33 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
+    ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
+      niceName: "Etablissement - Relance mise en relation",
+      tags: ["relance_MER"],
+      createEmailVariables: ({
+        appelationLabel,
+        beneficiaryReplyToEmail: beneficiaryEmail,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        mode,
+      }) => ({
+        subject: `[Demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}] Ce candidat attend toujours votre réponse.`,
+        greetings: `Répondez vite à ${beneficiaryFirstName}`,
+        content: `${beneficiaryFirstName} vous a contacté il y a ${
+          mode === "3days" ? "3" : "7"
+        } jours pour une demande d\`immersion pour le métier de ${appelationLabel}.
+<b>Votre réponse est importante</b> : ${beneficiaryFirstName} a choisi votre entreprise, et une immersion est souvent clé dans le parcours des candidat.e.s.
+Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
+        buttons: [
+          {
+            label: `Répondre à ${beneficiaryFirstName}`,
+            url: `mailto:${beneficiaryEmail}`,
+          },
+        ],
+        subContent: `A très vite sur Immersion Facilitée,
+L'équipe d'Immersion Facilitée`,
+      }),
+    },
     SHARE_DRAFT_CONVENTION_BY_LINK: {
       niceName: "Convention - Partage du formulaire par lien",
       tags: ["partage de convention"],
