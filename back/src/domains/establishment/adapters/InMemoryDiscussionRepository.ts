@@ -13,11 +13,10 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
 
   public discussionCallsCount = 0;
 
-  public async getDiscussions({
-    createdSince,
-    sirets,
-    lastAnsweredByCandidate,
-  }: GetDiscussionsParams): Promise<DiscussionDto[]> {
+  public async getDiscussions(
+    { createdSince, sirets, lastAnsweredByCandidate }: GetDiscussionsParams,
+    limit: number,
+  ): Promise<DiscussionDto[]> {
     this.discussionCallsCount++;
     const filters: Array<(discussion: DiscussionDto) => boolean> = [
       ({ siret }) =>
@@ -38,9 +37,9 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
         );
       },
     ];
-    const discussions = this.discussions.filter((discussion) =>
-      filters.every((filter) => filter(discussion)),
-    );
+    const discussions = this.discussions
+      .filter((discussion) => filters.every((filter) => filter(discussion)))
+      .filter((_, index) => index < limit);
 
     return discussions;
   }
