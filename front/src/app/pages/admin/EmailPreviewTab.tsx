@@ -352,6 +352,13 @@ export const defaultEmailValueByEmailKind: {
     assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
     internshipKind: "immersion",
   },
+  ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
+    appelationLabel: "Conducteur Poids Lourd",
+    beneficiaryFirstName: "Coco",
+    beneficiaryLastName: "Channel",
+    beneficiaryReplyToEmail: "coco.chanel@notExistEmail.com",
+    mode: "3days",
+  },
   ESTABLISHMENT_DELETED: {
     businessAddresses: [
       addressDtoToString({
