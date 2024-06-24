@@ -139,6 +139,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.conventionToSign}`,
   ),
+  //TODO: Why this route still exist?
   debugPopulateDB: defineRoute(
     { count: param.path.number },
     (params) => `/debug/populate/${params.count}`,
