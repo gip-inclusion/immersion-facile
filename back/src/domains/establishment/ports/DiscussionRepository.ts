@@ -26,7 +26,10 @@ export interface DiscussionRepository {
   insert: (discussion: DiscussionDto) => Promise<void>;
   update: (discussion: DiscussionDto) => Promise<void>;
   getById: (discussionId: DiscussionId) => Promise<DiscussionDto | undefined>;
-  getDiscussions(params: GetDiscussionsParams): Promise<DiscussionDto[]>;
+  getDiscussions(
+    params: GetDiscussionsParams,
+    limit: number,
+  ): Promise<DiscussionDto[]>;
   countDiscussionsForSiretSince: (
     siret: SiretDto,
     since: Date,

@@ -29,7 +29,7 @@ import {
 
 describe("ContactRequestReminder", () => {
   const now = new Date();
-  const replyDomain = "@replydomain.fr";
+  const domain = "domain.fr";
   const [
     discussionWith2DaysSinceBeneficiairyExchange,
     discussionWith3DaysSinceBeneficiairyExchange,
@@ -84,7 +84,7 @@ describe("ContactRequestReminder", () => {
       uowPerformer,
       makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
       timeGateway,
-      replyDomain,
+      domain,
     );
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
@@ -120,12 +120,12 @@ describe("ContactRequestReminder", () => {
         emails: [
           makeEstablishmentContactRequestReminder(
             discussionWith3DaysSinceBeneficiairyExchange,
-            replyDomain,
+            domain,
             "3days",
           ),
           makeEstablishmentContactRequestReminder(
             discussionWith4DaysSinceBeneficiairyExchange,
-            replyDomain,
+            domain,
             "3days",
           ),
         ],
@@ -148,12 +148,12 @@ describe("ContactRequestReminder", () => {
         emails: [
           makeEstablishmentContactRequestReminder(
             discussionWith7DaysSinceBeneficiairyExchange,
-            replyDomain,
+            domain,
             "7days",
           ),
           makeEstablishmentContactRequestReminder(
             discussionWith8DaysSinceBeneficiairyExchange,
-            replyDomain,
+            domain,
             "7days",
           ),
         ],
@@ -164,13 +164,13 @@ describe("ContactRequestReminder", () => {
 
 const makeEstablishmentContactRequestReminder = (
   discussion: DiscussionDto,
-  replyDomain: string,
+  domain: string,
   mode: ContactRequestReminderMode,
 ): TemplatedEmail => {
-  const replyEmail1 = createOpaqueEmail(
+  const replyEmail = createOpaqueEmail(
     discussion.id,
     "potentialBeneficiary",
-    replyDomain,
+    `reply.${domain}`,
   );
   return {
     kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
@@ -178,13 +178,13 @@ const makeEstablishmentContactRequestReminder = (
       appelationLabel: cartographeAppellationAndRome.appellationLabel,
       beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
       beneficiaryLastName: discussion.potentialBeneficiary.lastName,
-      beneficiaryReplyToEmail: replyEmail1,
+      beneficiaryReplyToEmail: replyEmail,
       mode,
     },
     recipients: [discussion.establishmentContact.email],
     sender: immersionFacileNoReplyEmailSender,
     replyTo: {
-      email: replyEmail1,
+      email: replyEmail,
       name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
     },
   };

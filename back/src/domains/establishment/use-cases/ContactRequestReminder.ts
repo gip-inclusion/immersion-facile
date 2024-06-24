@@ -16,6 +16,8 @@ import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPer
 
 export type ContactRequestReminderMode = "3days" | "7days";
 
+const MAX_DISCUSSIONS = 5000;
+
 export class ContactRequestReminder extends TransactionalUseCase<
   ContactRequestReminderMode,
   void
@@ -28,11 +30,11 @@ export class ContactRequestReminder extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private timeGateway: TimeGateway,
-    replyDomain: string,
+    domain: string,
   ) {
     super(uowPerformer);
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#replyDomain = replyDomain;
+    this.#replyDomain = `reply.${domain}`;
   }
 
   public async _execute(
@@ -40,12 +42,15 @@ export class ContactRequestReminder extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     const now = this.timeGateway.now();
-    const discussions = await uow.discussionRepository.getDiscussions({
-      lastAnsweredByCandidate: {
-        from: addDays(now, mode === "3days" ? -4 : -8),
-        to: addDays(now, mode === "3days" ? -3 : -7),
+    const discussions = await uow.discussionRepository.getDiscussions(
+      {
+        lastAnsweredByCandidate: {
+          from: addDays(now, mode === "3days" ? -4 : -8),
+          to: addDays(now, mode === "3days" ? -3 : -7),
+        },
       },
-    });
+      MAX_DISCUSSIONS,
+    );
 
     const notifications = await Promise.all(
       discussions.map((discussion) =>
