@@ -17,8 +17,9 @@ export type HasDiscussionMatchingParams = {
 };
 
 export type GetDiscussionsParams = {
-  sirets: SiretDto[];
+  sirets?: SiretDto[];
   createdSince?: Date;
+  lastAnsweredByCandidate?: { from: Date; to: Date };
 };
 
 export interface DiscussionRepository {
