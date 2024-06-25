@@ -183,6 +183,7 @@ const makeEstablishmentContactRequestReminder = (
       beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
       beneficiaryLastName: discussion.potentialBeneficiary.lastName,
       beneficiaryReplyToEmail: replyEmail,
+      domain,
       mode,
     },
     recipients: [discussion.establishmentContact.email],

@@ -24,7 +24,7 @@ export class ContactRequestReminder extends TransactionalUseCase<
 > {
   protected inputSchema = z.enum(["3days", "7days"]);
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-  #replyDomain: string;
+  #domain: string;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -34,7 +34,7 @@ export class ContactRequestReminder extends TransactionalUseCase<
   ) {
     super(uowPerformer);
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#replyDomain = `reply.${domain}`;
+    this.#domain = domain;
   }
 
   public async _execute(
@@ -85,7 +85,7 @@ export class ContactRequestReminder extends TransactionalUseCase<
     const replyTo = createOpaqueEmail(
       discussion.id,
       "potentialBeneficiary",
-      this.#replyDomain,
+      `reply.${this.#domain}`,
     );
     return appelation
       ? ({
@@ -98,6 +98,7 @@ export class ContactRequestReminder extends TransactionalUseCase<
               beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
               beneficiaryLastName: discussion.potentialBeneficiary.lastName,
               beneficiaryReplyToEmail: replyTo,
+              domain: this.#domain,
               mode,
             },
             replyTo: {

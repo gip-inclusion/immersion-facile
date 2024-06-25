@@ -152,6 +152,7 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     beneficiaryReplyToEmail: string;
     appelationLabel: AppellationLabel;
+    domain: string;
     mode: "3days" | "7days";
   };
   NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {

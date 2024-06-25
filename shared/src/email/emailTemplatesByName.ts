@@ -1,5 +1,6 @@
 import { EmailButtonProps, createTemplatesByName } from "html-templates";
 import { ConventionId, InternshipKind } from "../convention/convention.dto";
+import { frontRoutes } from "../routes/routes";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { advices } from "./advices";
@@ -34,22 +35,28 @@ export const emailTemplatesByName =
       tags: ["relance_MER"],
       createEmailVariables: ({
         appelationLabel,
-        beneficiaryReplyToEmail: beneficiaryEmail,
+        beneficiaryReplyToEmail,
         beneficiaryFirstName,
         beneficiaryLastName,
         mode,
+        domain,
       }) => ({
         subject: `[Demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}] Ce candidat attend toujours votre réponse.`,
         greetings: `Répondez vite à ${beneficiaryFirstName}`,
         content: `${beneficiaryFirstName} vous a contacté il y a ${
           mode === "3days" ? "3" : "7"
         } jours pour une demande d\`immersion pour le métier de ${appelationLabel}.
-<b>Votre réponse est importante</b> : ${beneficiaryFirstName} a choisi votre entreprise, et une immersion est souvent clé dans le parcours des candidat.e.s.
+<b>Votre réponse est importante</b> : ${beneficiaryFirstName} a choisi votre entreprise et une immersion est souvent clé dans le parcours des candidates ou les candidats.
 Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         buttons: [
           {
             label: `Répondre à ${beneficiaryFirstName}`,
-            url: `mailto:${beneficiaryEmail}`,
+            url: `mailto:${beneficiaryReplyToEmail}`,
+          },
+          {
+            label: "Connexion à votre espace entreprise",
+            target: "_blank",
+            url: `https://${domain}/${frontRoutes.establishmentDashboard}`,
           },
         ],
         subContent: `A très vite sur Immersion Facilitée,
