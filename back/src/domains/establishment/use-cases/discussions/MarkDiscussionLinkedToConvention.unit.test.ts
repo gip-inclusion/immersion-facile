@@ -1,4 +1,10 @@
-import { ConventionDtoBuilder, DiscussionBuilder, expectToEqual } from "shared";
+import {
+  ConventionDtoBuilder,
+  DiscussionBuilder,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
+import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -24,32 +30,26 @@ describe("MarkDiscussionLinkedToConvention", () => {
     });
   });
 
-  it("does nothing if discussion is not found", async () => {
-    const discussion = new DiscussionBuilder()
-      .withSiret("11110000222200")
-      .build();
-
+  it("does nothing if discussionId is not provided", async () => {
     await markDiscussionLinkedToConvention.execute({
       convention,
-      discussionId: discussion.id,
     });
 
     expectToEqual(uow.discussionRepository.discussions, []);
   });
 
-  it("does not update the discussion if the siret does not match", async () => {
+  it("throws NotFoundError if discussion is not found", async () => {
     const discussion = new DiscussionBuilder()
       .withSiret("11110000222200")
       .build();
 
-    uow.discussionRepository.discussions = [discussion];
-
-    await markDiscussionLinkedToConvention.execute({
-      convention,
-      discussionId: discussion.id,
-    });
-
-    expectToEqual(uow.discussionRepository.discussions, [discussion]);
+    await expectPromiseToFailWithError(
+      markDiscussionLinkedToConvention.execute({
+        convention,
+        discussionId: discussion.id,
+      }),
+      new NotFoundError(`No discussion found with id: ${discussion.id}`),
+    );
   });
 
   it("updates the discussion when siret matches the one of the convention", async () => {
