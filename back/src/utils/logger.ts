@@ -1,8 +1,14 @@
 import path from "path";
-import { AxiosError } from "axios";
+import {
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  isAxiosError,
+} from "axios";
 import { Request } from "express";
 import { QueryResult } from "kysely";
 import pino, { Logger, LoggerOptions } from "pino";
+import { complement, isNil, pickBy } from "ramda";
 import { AgencyId, ConventionId, PeExternalId } from "shared";
 import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
@@ -11,7 +17,6 @@ import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImpleme
 import { DomainEvent, DomainTopic } from "../domains/core/events/events";
 import { SearchMadeEntity } from "../domains/establishment/entities/SearchMadeEntity";
 import { LaBonneBoiteRequestParams } from "../domains/establishment/ports/LaBonneBoiteGateway";
-import { PartialResponse } from "./axiosUtils";
 import { NodeProcessReport } from "./nodeProcessReport";
 
 const level: LoggerOptions["level"] =
@@ -70,11 +75,14 @@ type LoggerParams = Partial<{
     isJobSeeker: boolean;
   }>;
   reportContent: string;
-  request: Pick<Request, "path" | "method" | "body">;
+  request: Pick<Request, "path" | "method"> & { body: unknown | "sanitized" };
   requestId: string;
-  response: PartialResponse | SubscriberResponse | HttpResponse<any, any>;
+  sharedRouteResponse: HttpResponse<any, any>;
+  axiosResponse: AxiosResponse;
+  subscriberResponse: SubscriberResponse;
   schemaParsingInput: unknown;
-  search: LaBonneBoiteRequestParams | SearchMadeEntity;
+  searchLBB: LaBonneBoiteRequestParams;
+  searchMade: SearchMadeEntity;
   status: "success" | "total" | "error" | AuthorisationStatus;
   subscriptionId: string;
   topic: DomainTopic;
@@ -118,41 +126,53 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       reportContent,
       request,
       requestId,
-      response,
+      sharedRouteResponse,
+      subscriberResponse,
+      axiosResponse,
       schemaParsingInput,
-      search,
+      searchMade,
+      searchLBB,
       status,
       subscriptionId,
       topic,
       useCaseName,
+      ...rest
     }) => {
+      const _noValuesForgotten: Record<string, never> = rest;
       if (method === "level") return {};
 
-      //TODO: sanitize error
       const opacifiedLogContent = {
         adapters,
         agencyId,
         conventionId,
         crawlerInfo,
         durationInSeconds,
-        error,
-        events: events && sanitizeEvents(events),
+        error: sanitizeError(error),
+        events: sanitizeEvents(events),
         nodeProcessReport,
         notificationId,
         peConnect,
         reportContent,
         request,
         requestId,
-        response,
+        sharedRouteResponse: sanitizeSharedRouteResponse(sharedRouteResponse),
+        subscriberResponse,
+        axiosResponse: sanitizeAxiosResponse(axiosResponse),
         schemaParsingInput,
-        search,
+        searchMade,
+        searchLBB,
         status,
         subscriptionId,
         topic,
         useCaseName,
       };
 
-      logger[method](opacifiedLogContent, message);
+      const opacifiedWithoutNullOrUndefined = pickBy(
+        complement(isNil),
+        opacifiedLogContent,
+      );
+
+      logger[method](opacifiedWithoutNullOrUndefined, message);
     };
 
   return {
@@ -167,17 +187,90 @@ export const createLogger = (filename: string): OpacifiedLogger => {
   };
 };
 
-const sanitizeEvents = (events: DomainEvent[]) =>
-  events.map(({ publications, id, topic, wasQuarantined }: DomainEvent) => {
-    const publishCount = publications.length;
-    const lastPublication = publications[publishCount - 1];
+const sanitize =
+  <T>(cb: (t: T) => Partial<T>) =>
+  (params: T | undefined) => {
+    if (!params) return;
+    return cb(params);
+  };
+
+const sanitizeError = sanitize<
+  Error | Partial<SQLError> | AxiosError<unknown, any>
+>((error) => {
+  if (isAxiosError(error))
+    return {
+      message: `Axios error : ${error.message}`,
+      response: sanitizeAxiosResponse(error.response),
+    };
+
+  return error;
+});
+
+const sanitizeAxiosResponse = sanitize<AxiosResponse>((response) => {
+  const req = response.config ?? response.request;
+
+  if (response.status >= 200 && response.status < 400) {
+    return {
+      status: response.status,
+      method: req.method,
+      url: req.url,
+    };
+  }
+
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    data: response.data as unknown,
+    request: extractPartialRequest(req),
+  };
+});
+
+const sanitizeSharedRouteResponse = sanitize<HttpResponse<any, any>>(
+  (response) => {
+    if (response.status >= 200 && response.status < 400) {
+      return {
+        status: response.status,
+      };
+    }
 
     return {
-      eventId: id,
-      topic: topic,
-      wasQuarantined: wasQuarantined,
-      lastPublishedAt: lastPublication?.publishedAt,
-      failedSubscribers: lastPublication?.failures,
-      publishCount,
+      status: response.status,
+      body: response.body,
     };
-  });
+  },
+);
+
+export type PartialRequest = {
+  method: string | undefined;
+  url: string | undefined;
+  params: unknown;
+  timeout: number | undefined;
+};
+
+const extractPartialRequest = (
+  request: AxiosRequestConfig,
+): PartialRequest => ({
+  method: request.method,
+  url: request.url,
+  params: request.params as unknown,
+  timeout: request.timeout,
+});
+
+const sanitizeEvents = (events: DomainEvent[] | undefined) => {
+  if (!events) return;
+  return events.map(
+    ({ publications, id, topic, wasQuarantined }: DomainEvent) => {
+      const publishCount = publications.length;
+      const lastPublication = publications[publishCount - 1];
+
+      return {
+        eventId: id,
+        topic: topic,
+        wasQuarantined: wasQuarantined,
+        lastPublishedAt: lastPublication?.publishedAt,
+        failedSubscribers: lastPublication?.failures,
+        publishCount,
+      };
+    },
+  );
+};

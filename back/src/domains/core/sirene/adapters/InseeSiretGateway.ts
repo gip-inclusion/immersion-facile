@@ -20,7 +20,6 @@ import {
 import {
   createAxiosInstance,
   isRetryableError,
-  logAxiosError,
 } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 import {
@@ -92,7 +91,9 @@ export class InseeSiretGateway implements SiretGateway {
             }
             if (isRetryableError(logger as Logger, error))
               throw new RetryableError(error);
-            logAxiosError(logger as Logger, error);
+            logger.error({
+              error,
+            });
           }
           throw error;
         }

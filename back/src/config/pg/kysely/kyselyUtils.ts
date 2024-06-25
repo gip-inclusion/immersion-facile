@@ -11,6 +11,7 @@ import {
 import { Pool, QueryResultRow } from "pg";
 import { Falsy } from "ramda";
 import { createLogger } from "../../../utils/logger";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { Database } from "./model/database";
 
 export const jsonBuildObject = <O extends Record<string, Expression<unknown>>>(
@@ -48,14 +49,16 @@ export const makeKyselyDb = (pool: Pool): Kysely<Database> => {
     log(event): void {
       if (event.level === "error") {
         const error: any = event.error;
-        logger.error({
+        const params = {
           message: "SQL ERROR",
           durationInSeconds: event.queryDurationMillis / 1000,
           error: {
             error: "message" in error ? error.message : error,
             query: event.query.sql,
           },
-        });
+        };
+        notifyObjectDiscord(params);
+        logger.error(params);
       }
     },
   });

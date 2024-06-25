@@ -39,6 +39,7 @@ const createIncTotalCountForRequest =
   (req: Request) =>
   ({ consumerName, authorisationStatus }: TotalCountProps) => {
     const route = convertRouteToLog(req.originalUrl);
+    // TODO : remove prometheus counters
     apiKeyAuthMiddlewareRequestsTotal.inc({
       route,
       method: req.method,
@@ -49,7 +50,7 @@ const createIncTotalCountForRequest =
       request: {
         method: req.method,
         path: route,
-        body: req.body,
+        body: "sanitized",
       },
       status: authorisationStatus,
       message: `apiKeyAuthMiddlewareRequestsTotal for ${consumerName}`,
