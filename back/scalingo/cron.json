@@ -21,6 +21,14 @@
       "size": "M"
     },
     {
+      "command": "15 08 * * * pnpm back run trigger-contact-request-reminder-3d",
+      "size": "M"
+    },
+    {
+      "command": "30 08 * * * pnpm back run trigger-contact-request-reminder-7d",
+      "size": "M"
+    },
+    {
       "command": "49 20 * * * pnpm back run trigger-sending-emails-with-assessment-creation-link",
       "size": "M"
     },

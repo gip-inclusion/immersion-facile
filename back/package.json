@@ -32,6 +32,8 @@
     "test": "NODE_OPTIONS='--max_old_space_size=4096' jest --testRegex='^((?!(integration|manual)).)*.test.ts$'",
     "transform-past-form-establishments-into-searchable-data": "ts-node src/scripts/transformPastFormEstablishmentsIntoSearchableData.ts",
     "trigger-convention-reminder": "ts-node src/scripts/triggerConventionReminder.ts",
+    "trigger-contact-request-reminder-3d": "ts-node src/scripts/triggerContactRequestReminder3Days.ts",
+    "trigger-contact-request-reminder-7d": "ts-node src/scripts/triggerContactRequestReminder7Days.ts",
     "trigger-delete-email-attachements": "ts-node src/scripts/triggerDeleteEmailAttachements.ts",
     "trigger-establishment-leads-reminders": "ts-node src/scripts/triggerEstablishmentLeadReminders.ts",
     "trigger-mark-old-convention-as-deprecated": "ts-node src/scripts/triggerMarkOldConventionAsDeprecated.ts",
