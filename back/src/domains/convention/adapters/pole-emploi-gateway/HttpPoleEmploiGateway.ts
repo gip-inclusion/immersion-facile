@@ -7,9 +7,7 @@ import { HttpClient } from "shared-routes";
 import { AccessTokenConfig } from "../../../../config/bootstrap/appConfig";
 import {
   createAxiosInstance,
-  extractPartialResponse,
   isRetryableError,
-  logAxiosError,
 } from "../../../../utils/axiosUtils";
 import {
   LoggerParamsWithMessage,
@@ -114,7 +112,6 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
               });
               if (isRetryableError(logger, error))
                 throw new RetryableError(error);
-              logAxiosError(logger, error);
               throw error;
             }),
         ),
@@ -145,7 +142,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         logger.info({
           message: "PeBroadcast",
           status: "success",
-          response,
+          sharedRouteResponse: response,
           peConnect: {
             peId: poleEmploiConvention.id,
             originalId: poleEmploiConvention.originalId,
@@ -225,7 +222,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           logger.error({
             message: `PeBroadcast - notFoundOrMismatch - ${message}`,
             status: "error",
-            response: extractPartialResponse(error.response),
+            axiosResponse: error.response,
             peConnect: {
               peId: poleEmploiConvention.id,
               originalId: poleEmploiConvention.originalId,
@@ -244,7 +241,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           message: "PeBroadcast",
           status: "error",
           error,
-          response: extractPartialResponse(error.response),
+          axiosResponse: error.response,
           peConnect: {
             peId: poleEmploiConvention.id,
             originalId: poleEmploiConvention.originalId,

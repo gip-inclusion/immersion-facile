@@ -128,7 +128,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        log.error({ response, message: "Response status is not 200." });
+        log.error({
+          sharedRouteResponse: response,
+          message: "exchangeCodeForAccessToken - Response status is not 200.",
+        });
         return undefined;
       }
       const externalAccessToken = parseZodSchemaAndLogErrorOnParsingFailure(
@@ -205,9 +208,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           errorType: `Bad response status code ${response.status}`,
         });
         log.error({
-          response,
+          sharedRouteResponse: response,
           peConnect: { peExternalId },
-          message: "Response status is not 200.",
+          message: "getUserStatutInfo -Response status is not 200.",
         });
         return false;
       }
@@ -256,7 +259,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        log.error({ response, message: "Response status is not 200." });
+        log.error({
+          sharedRouteResponse: response,
+          message: "getUserInfo -Response status is not 200.",
+        });
         return undefined;
       }
       const externalPeConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
@@ -300,7 +306,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        log.error({ response, message: "Response status is not 200." });
+        log.error({
+          sharedRouteResponse: response,
+          message: "getAdvisorsInfo - Response status is not 200.",
+        });
         return [];
       }
       const externalPeConnectAdvisors =

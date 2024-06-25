@@ -40,7 +40,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
     logger.warn({
       message: "searchCompanies",
-      search: {
+      searchLBB: {
         distanceKm,
         lat,
         lon,
@@ -86,7 +86,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
         logger.error({
           error: castError(error),
           message: "searchCompanies_error",
-          search: {
+          searchLBB: {
             distanceKm,
             lat,
             lon,

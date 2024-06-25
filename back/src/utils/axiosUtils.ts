@@ -1,9 +1,4 @@
-import axios, {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import { OpacifiedLogger, createLogger } from "./logger";
 
 const _logger = createLogger(__filename);
@@ -15,7 +10,7 @@ export const createAxiosInstance = (
   const axiosInstance = axios.create(config);
   axiosInstance.interceptors.response.use((response) => {
     logger.debug({
-      response: extractPartialResponse(response),
+      axiosResponse: response,
       message: "Received HTTP response",
     });
     return response;
@@ -44,47 +39,3 @@ export const isRetryableError = (
 
   return false;
 };
-
-export const logAxiosError = (
-  logger: OpacifiedLogger,
-  error: AxiosError,
-  msg?: string,
-) => {
-  const message = `${msg || "Axios error"}: ${error}`;
-  logger.error(
-    error.response
-      ? { response: extractPartialResponse(error.response), message }
-      : { message },
-  );
-};
-
-export type PartialResponse = {
-  status: number;
-  statusText: string;
-  data: unknown;
-  request: PartialRequest;
-};
-export const extractPartialResponse = (
-  response: AxiosResponse,
-): PartialResponse => ({
-  status: response.status,
-  statusText: response.statusText,
-  data: response.data as unknown,
-  request: extractPartialRequest(response.config ?? response.request),
-});
-
-export type PartialRequest = {
-  method: string | undefined;
-  url: string | undefined;
-  params: unknown;
-  timeout: number | undefined;
-};
-
-const extractPartialRequest = (
-  request: AxiosRequestConfig,
-): PartialRequest => ({
-  method: request.method,
-  url: request.url,
-  params: request.params as unknown,
-  timeout: request.timeout,
-});
