@@ -357,6 +357,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryFirstName: "Coco",
     beneficiaryLastName: "Channel",
     beneficiaryReplyToEmail: "coco.chanel@notExistEmail.com",
+    domain: "immersion-facile.beta.gouv.fr",
     mode: "3days",
   },
   ESTABLISHMENT_DELETED: {
