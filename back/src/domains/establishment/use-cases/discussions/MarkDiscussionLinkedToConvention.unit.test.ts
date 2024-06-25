@@ -4,7 +4,10 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { MarkDiscussionLinkedToConvention } from "./MarkDiscussionLinkedToConvention";
+import {
+  MarkDiscussionLinkedToConvention,
+  makeMarkDiscussionLinkedToConvention,
+} from "./MarkDiscussionLinkedToConvention";
 
 const convention = new ConventionDtoBuilder().build();
 
@@ -16,9 +19,9 @@ describe("MarkDiscussionLinkedToConvention", () => {
     uow = createInMemoryUow();
 
     const uowPerformer = new InMemoryUowPerformer(uow);
-    markDiscussionLinkedToConvention = new MarkDiscussionLinkedToConvention(
+    markDiscussionLinkedToConvention = makeMarkDiscussionLinkedToConvention({
       uowPerformer,
-    );
+    });
   });
 
   it("does nothing if discussion is not found", async () => {
