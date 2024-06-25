@@ -20,7 +20,7 @@ const MAX_DISCUSSIONS = 5000;
 
 export class ContactRequestReminder extends TransactionalUseCase<
   ContactRequestReminderMode,
-  void
+  number
 > {
   protected inputSchema = z.enum(["3days", "7days"]);
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
@@ -40,7 +40,7 @@ export class ContactRequestReminder extends TransactionalUseCase<
   public async _execute(
     mode: ContactRequestReminderMode,
     uow: UnitOfWork,
-  ): Promise<void> {
+  ): Promise<number> {
     const now = this.timeGateway.now();
     const discussions = await uow.discussionRepository.getDiscussions(
       {
@@ -52,22 +52,24 @@ export class ContactRequestReminder extends TransactionalUseCase<
       MAX_DISCUSSIONS,
     );
 
-    const notifications = await Promise.all(
+    const maybeNotifications = await Promise.all(
       discussions.map((discussion) =>
         this.#makeNotifications(uow, discussion, mode),
       ),
     );
 
-    await Promise.all(
-      notifications
-        .filter(
-          (notifications): notifications is NotificationContentAndFollowedIds =>
-            notifications !== null,
-        )
-        .map((notification) =>
-          this.#saveNotificationAndRelatedEvent(uow, notification),
-        ),
+    const notifications = maybeNotifications.filter(
+      (notifications): notifications is NotificationContentAndFollowedIds =>
+        notifications !== null,
     );
+
+    await Promise.all(
+      notifications.map((notification) =>
+        this.#saveNotificationAndRelatedEvent(uow, notification),
+      ),
+    );
+
+    return notifications.length;
   }
 
   async #makeNotifications(
