@@ -50,16 +50,16 @@ export const DiscussionManageContent = ({
         title={`La discussion ${discussionId} n'est pas trouvée.`}
       />
     ))
-    .with(P.not(null), (discussion) => {
-      return connectedUser ? (
+    .with(P.not(null), (discussion) =>
+      connectedUser ? (
         <DiscussionDetails
           discussion={discussion}
           userEmail={connectedUser.email}
         />
       ) : (
         <Alert severity="error" title={`Vous n'êtes pas connecté.`} />
-      );
-    })
+      ),
+    )
     .exhaustive();
 };
 

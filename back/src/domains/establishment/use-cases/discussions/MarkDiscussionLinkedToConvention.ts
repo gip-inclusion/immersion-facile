@@ -1,4 +1,5 @@
 import { AddConventionInput, addConventionInputSchema } from "shared";
+import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 
 export type MarkDiscussionLinkedToConvention = ReturnType<
@@ -13,8 +14,8 @@ export const makeMarkDiscussionLinkedToConvention =
     async ({ discussionId, convention }, { uow }) => {
       if (!discussionId) return;
       const discussion = await uow.discussionRepository.getById(discussionId);
-      if (!discussion) return;
-      if (discussion.siret !== convention.siret) return;
+      if (!discussion)
+        throw new NotFoundError(`No discussion found with id: ${discussionId}`);
       await uow.discussionRepository.update({
         ...discussion,
         conventionId: convention.id,
