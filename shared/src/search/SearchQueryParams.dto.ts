@@ -4,23 +4,27 @@ import {
   AppellationCode,
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { OneKeyNeedsAnother } from "../utils";
 
 export const searchSortedByOptions = ["distance", "date", "score"] as const;
 export type SearchSortedBy = (typeof searchSortedByOptions)[number];
 
-export type GeoQueryParamsWithSortedBy<T extends SearchSortedBy> = {
-  longitude: number;
+type LatLon = {
   latitude: number;
-  distanceKm: number;
-  sortedBy: T;
+  longitude: number;
 };
 
-export type GeoQueryOptionalParamsWithSortedBy<T extends SearchSortedBy> = {
-  longitude?: number;
-  latitude?: number;
-  distanceKm?: number;
-  sortedBy: T;
+type LatLonDistance = LatLon & {
+  distanceKm: number;
 };
+
+export type GeoQueryParamsWithSortedBy<T extends SearchSortedBy> = {
+  sortedBy: T;
+} & LatLonDistance;
+
+export type GeoQueryOptionalParamsWithSortedBy<T extends SearchSortedBy> = {
+  sortedBy: T;
+} & OneKeyNeedsAnother<Partial<LatLonDistance>, "latitude", "longitude">;
 
 type SearchQueryCommonParamsDto = {
   appellationCodes?: AppellationCode[];

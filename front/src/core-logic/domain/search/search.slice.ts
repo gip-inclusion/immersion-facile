@@ -11,15 +11,10 @@ import { SubmitFeedBack } from "../SubmitFeedback";
 
 export type SearchResultPayload = SearchResultQuery | SearchResultDto;
 
-export type SearchParams = OmitFromExistingKeys<
-  SearchQueryParamsDto,
-  "voluntaryToImmersion"
->;
-
 type SearchFeedback = SubmitFeedBack<"success">;
 
 export type SearchPageParams = OmitFromExistingKeys<
-  SearchParams,
+  SearchQueryParamsDto,
   "appellationCodes" | "rome"
 > & {
   appellations?: AppellationAndRomeDto[];
@@ -54,7 +49,7 @@ export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    searchRequested: (state, _action: PayloadAction<SearchParams>) => {
+    searchRequested: (state, _action: PayloadAction<SearchQueryParamsDto>) => {
       state.searchStatus = "initialFetch";
       state.searchResults = [];
     },
@@ -62,7 +57,7 @@ export const searchSlice = createSlice({
       state,
       action: PayloadAction<{
         results: SearchResultDto[];
-        searchParams: SearchParams;
+        searchParams: SearchQueryParamsDto;
       }>,
     ) => {
       state.searchResults = action.payload.results;
