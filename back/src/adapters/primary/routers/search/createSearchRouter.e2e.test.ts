@@ -141,7 +141,7 @@ describe("search-immersion route", () => {
             distanceKm: 30,
             longitude: 2.34999,
             latitude: 48.8531,
-            sortedBy: "distance",
+            sortedBy: "date",
           },
         });
 

@@ -186,3 +186,7 @@ export const castError = (error: unknown): Error =>
 type Filter = <T>(predicate: (element: T) => boolean) => (array: T[]) => T[];
 
 export const filter: Filter = (predicate) => (array) => array.filter(predicate);
+
+export type OneKeyNeedsAnother<T, K1 extends keyof T, K2 extends keyof T> =
+  | (T & Required<Pick<T, K1 | K2>>)
+  | (T & Partial<Record<K1 | K2, never>>);
