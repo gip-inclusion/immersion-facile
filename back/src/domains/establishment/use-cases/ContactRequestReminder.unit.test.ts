@@ -98,8 +98,10 @@ describe("ContactRequestReminder", () => {
         discussionWith2DaysSinceBeneficiairyExchange,
         discussionWith6DaysSinceBeneficiairyExchange,
       ];
-      await contactRequestReminder.execute("3days");
-      await contactRequestReminder.execute("7days");
+      const reminderQty3d = await contactRequestReminder.execute("3days");
+      const reminderQty7d = await contactRequestReminder.execute("7days");
+      expectToEqual(reminderQty3d, 0);
+      expectToEqual(reminderQty7d, 0);
       expectToEqual(uow.outboxRepository.events, []);
     });
   });
@@ -114,8 +116,9 @@ describe("ContactRequestReminder", () => {
         discussionWith7DaysSinceBeneficiairyExchange,
         discussionWith8DaysSinceBeneficiairyExchange,
       ];
-      await contactRequestReminder.execute("3days");
+      const reminderQty = await contactRequestReminder.execute("3days");
 
+      expectToEqual(reminderQty, 2);
       expectSavedNotificationsAndEvents({
         emails: [
           makeEstablishmentContactRequestReminder(
@@ -142,8 +145,9 @@ describe("ContactRequestReminder", () => {
         discussionWith8DaysSinceBeneficiairyExchange,
       ];
 
-      await contactRequestReminder.execute("7days");
+      const reminderQty = await contactRequestReminder.execute("7days");
 
+      expectToEqual(reminderQty, 2);
       expectSavedNotificationsAndEvents({
         emails: [
           makeEstablishmentContactRequestReminder(
