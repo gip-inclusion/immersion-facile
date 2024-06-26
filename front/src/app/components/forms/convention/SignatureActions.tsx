@@ -135,7 +135,7 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
               closeModal={closeRequestModificationModal}
               newStatus={newStatus}
               convention={convention}
-              currentSignatoryRole={currentSignatoryRole}
+              currentSignatoryRoles={[currentSignatoryRole]}
               onModalPropsChange={(newProps) => {
                 setModalProps({
                   ...modalProps,

@@ -25,13 +25,13 @@ export const JustificationModalContent = ({
   closeModal,
   newStatus,
   convention,
-  currentSignatoryRole,
+  currentSignatoryRoles,
 }: {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   closeModal: () => void;
   newStatus: ConventionStatusWithJustification;
   convention: ConventionDto;
-  currentSignatoryRole: Role;
+  currentSignatoryRoles: Role[];
   onModalPropsChange: (props: Partial<ModalWrapperProps>) => void;
 }) => {
   const { register, handleSubmit, formState } = useForm<
@@ -58,27 +58,28 @@ export const JustificationModalContent = ({
   );
   const getSignatoryOptions = () => {
     const signatoryOptions = conventionSignatories.map((signatory) =>
-      signatory && signatory.role !== currentSignatoryRole
+      signatory && currentSignatoryRoles.includes(signatory.role)
         ? {
+            label: "Vous même",
+            value: signatory.role,
+          }
+        : {
             label: `${signatory.firstName} ${signatory.lastName} - ${
               signatoryTitleByRole[signatory.role]
             }`,
             value: signatory.role,
-          }
-        : {
-            label: "Vous même",
-            value: currentSignatoryRole,
           },
     );
-
     return [
       ...signatoryOptions,
-      ...(currentSignatoryRole === "validator" ||
-      currentSignatoryRole === "counsellor"
+      ...(currentSignatoryRoles.includes("validator") ||
+      currentSignatoryRoles.includes("counsellor")
         ? [
             {
               label: "Vous même",
-              value: currentSignatoryRole,
+              value: currentSignatoryRoles.includes("validator")
+                ? "validator"
+                : "counsellor",
             },
           ]
         : []),

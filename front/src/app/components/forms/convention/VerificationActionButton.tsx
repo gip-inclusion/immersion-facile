@@ -30,7 +30,7 @@ export type VerificationActionButtonProps = {
   newStatus: VerificationActions;
   children: string;
   convention: ConventionDto;
-  currentSignatoryRole: Role;
+  currentSignatoryRoles: Role[];
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
@@ -140,7 +140,7 @@ export const VerificationActionButton = ({
   children,
   onSubmit,
   convention,
-  currentSignatoryRole,
+  currentSignatoryRoles,
   initialStatus,
   onCloseValidatorModalWithoutValidatorInfo,
   modalTitle,
@@ -191,7 +191,7 @@ export const VerificationActionButton = ({
           newStatus={newStatus}
           onSubmit={onSubmit}
           convention={convention}
-          currentSignatoryRole={currentSignatoryRole}
+          currentSignatoryRoles={currentSignatoryRoles}
           onCloseValidatorModalWithoutValidatorInfo={
             onCloseValidatorModalWithoutValidatorInfo
           }
@@ -207,7 +207,7 @@ export type ModalWrapperProps = {
   newStatus: VerificationActions;
   onSubmit: VerificationActionButtonProps["onSubmit"];
   convention: ConventionDto;
-  currentSignatoryRole: Role;
+  currentSignatoryRoles: Role[];
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
@@ -218,7 +218,7 @@ const ModalWrapper = (props: ModalWrapperProps) => {
     newStatus,
     convention,
     initialStatus,
-    currentSignatoryRole,
+    currentSignatoryRoles,
     onSubmit,
     onCloseValidatorModalWithoutValidatorInfo,
   } = props;
@@ -253,7 +253,7 @@ const ModalWrapper = (props: ModalWrapperProps) => {
             closeModal={closeModal}
             newStatus={newStatus}
             convention={convention}
-            currentSignatoryRole={currentSignatoryRole}
+            currentSignatoryRoles={currentSignatoryRoles}
             onModalPropsChange={onModalPropsChange}
           />
         )}
