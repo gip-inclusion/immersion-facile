@@ -15,6 +15,7 @@ export interface Database {
   establishment_lead_events: EstablishmentLeadEvents;
   establishments_contacts: EstablishmentsContacts;
   establishments_locations: EstablishmentsLocations;
+  establishments_deleted: EstablishmentsDeleted;
   establishments: Establishments;
   exchanges: Exchanges;
   feature_flags: FeatureFlags;
@@ -560,4 +561,10 @@ interface FeatureFlags {
   is_active: boolean;
   kind: Generated<string>;
   value: Json | null;
+}
+
+interface EstablishmentsDeleted {
+  siret: string | null;
+  created_at: Timestamp;
+  deleted_at: Timestamp;
 }
