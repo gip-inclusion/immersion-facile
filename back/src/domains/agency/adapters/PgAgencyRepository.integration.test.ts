@@ -600,6 +600,19 @@ describe("PgAgencyRepository", () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(2);
     });
 
+    it("save correct agency right even if user is counsellor and validator", async () => {
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+      const userEmail = "user@mail.com";
+      const agency = agency1builder
+        .withCounsellorEmails([userEmail])
+        .withValidatorEmails([userEmail])
+        .build();
+      await agencyRepository.insert(agency);
+      const allActiveAgencies = await agencyRepository.getAgencies({});
+      expect(allActiveAgencies).toHaveLength(1);
+      expect(allActiveAgencies[0]).toEqual(agency);
+    });
+
     it("keeps the acquisitions fields when provided", async () => {
       const withAcquisition = {
         acquisitionKeyword: "keyword",

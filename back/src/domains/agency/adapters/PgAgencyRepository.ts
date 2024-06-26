@@ -287,14 +287,20 @@ export class PgAgencyRepository implements AgencyRepository {
       await this.transaction.insertInto("agencies").values(pgAgency).execute();
 
       await Promise.all(
-        agency.counsellorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(email, agency.id, "counsellor"),
+        agency.validatorEmails.map(async (email) =>
+          this.#addUserAndAgencyRights(
+            email,
+            agency.id,
+            agency.counsellorEmails.includes(email)
+              ? ["counsellor", "validator"]
+              : ["validator"],
+          ),
         ),
       );
 
       await Promise.all(
-        agency.validatorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(email, agency.id, "validator"),
+        agency.counsellorEmails.map(async (email) =>
+          this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
         ),
       );
     } catch (error: any) {
@@ -339,21 +345,6 @@ export class PgAgencyRepository implements AgencyRepository {
       .where("id", "=", agency.id)
       .execute();
 
-    if (agency.counsellorEmails) {
-      await this.transaction
-        .deleteFrom("users__agencies")
-        .where(usersAgenciesRolesIncludeCounsellor)
-        .where("is_notified_by_email", "=", true)
-        .where("agency_id", "=", agency.id)
-        .execute();
-
-      await Promise.all(
-        agency.counsellorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(email, agency.id, "counsellor"),
-        ),
-      );
-    }
-
     if (agency.validatorEmails) {
       await this.transaction
         .deleteFrom("users__agencies")
@@ -364,7 +355,28 @@ export class PgAgencyRepository implements AgencyRepository {
 
       await Promise.all(
         agency.validatorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(email, agency.id, "validator"),
+          this.#addUserAndAgencyRights(
+            email,
+            agency.id,
+            agency.counsellorEmails?.includes(email)
+              ? ["counsellor", "validator"]
+              : ["validator"],
+          ),
+        ),
+      );
+    }
+
+    if (agency.counsellorEmails) {
+      await this.transaction
+        .deleteFrom("users__agencies")
+        .where(usersAgenciesRolesIncludeCounsellor)
+        .where("is_notified_by_email", "=", true)
+        .where("agency_id", "=", agency.id)
+        .execute();
+
+      await Promise.all(
+        agency.counsellorEmails.map(async (email) =>
+          this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
         ),
       );
     }
@@ -373,7 +385,7 @@ export class PgAgencyRepository implements AgencyRepository {
   async #addUserAndAgencyRights(
     email: Email,
     agencyId: AgencyId,
-    role: AgencyRole,
+    roles: AgencyRole[],
   ) {
     const result = await this.transaction
       .insertInto("users")
@@ -404,7 +416,7 @@ export class PgAgencyRepository implements AgencyRepository {
       .values({
         user_id: userId,
         agency_id: agencyId,
-        roles: JSON.stringify([role]),
+        roles: JSON.stringify(roles),
         is_notified_by_email: true,
       })
       .onConflict((oc) =>
