@@ -93,7 +93,11 @@ export const LayoutHeader = () => {
       text: isPeConnected ? "Se déconnecter (PE Connect)" : "Se déconnecter",
       buttonProps: {
         onClick: () => {
-          dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
+          dispatch(
+            authSlice.actions.federatedIdentityDeletionTriggered({
+              mode: "device-and-inclusion",
+            }),
+          );
           if (isPeConnected && currentRoute.name === "conventionImmersion") {
             const {
               fedId: _1,
