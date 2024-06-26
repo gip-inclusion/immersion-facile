@@ -40,17 +40,14 @@ export const ConventionManageContent = ({
     ])
     .with(
       { name: "manageConventionAdmin" },
-      ({ inclusionConnectedRoles }): Role[] =>
-        inclusionConnectedRoles.includes("agencyOwner")
-          ? ["backOffice", "validator"]
-          : ["backOffice", ...inclusionConnectedRoles],
+      ({ inclusionConnectedRoles }): Role[] => [
+        "backOffice",
+        ...inclusionConnectedRoles,
+      ],
     )
     .with(
       { name: "manageConventionInclusionConnected" },
-      ({ inclusionConnectedRoles }): Role[] =>
-        inclusionConnectedRoles.includes("agencyOwner")
-          ? ["validator"]
-          : inclusionConnectedRoles,
+      ({ inclusionConnectedRoles }): Role[] => inclusionConnectedRoles,
     )
     .otherwise((): Role[] => []);
 
