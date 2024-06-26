@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   AppellationAndRomeDto,
-  OmitFromExistingKeys,
+  SearchQueryBaseWithoutAppellationsAndRomeDto,
   SearchQueryParamsDto,
   SearchResultDto,
   SearchResultQuery,
@@ -13,10 +13,7 @@ export type SearchResultPayload = SearchResultQuery | SearchResultDto;
 
 type SearchFeedback = SubmitFeedBack<"success">;
 
-export type SearchPageParams = OmitFromExistingKeys<
-  SearchQueryParamsDto,
-  "appellationCodes" | "rome"
-> & {
+export type SearchPageParams = SearchQueryBaseWithoutAppellationsAndRomeDto & {
   appellations?: AppellationAndRomeDto[];
 } & WithAcquisition;
 

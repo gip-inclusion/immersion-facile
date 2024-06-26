@@ -42,3 +42,6 @@ export const looksLikeSiret = (input: string) => {
 };
 
 export const removeSpaces = (str: string) => str.replace(/\s/g, "");
+
+export const isStringEmpty = (str: string) =>
+  str !== "" && str.trim().length === 0;
