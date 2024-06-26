@@ -193,7 +193,7 @@ const ConventionSummarySection = () => {
           ...convention,
           status: "READY_TO_SIGN",
         },
-        discussionId: undefined, // TODO, handle discussionId, if provided in params for example
+        discussionId: route.params.discussionId,
       }),
     );
   };

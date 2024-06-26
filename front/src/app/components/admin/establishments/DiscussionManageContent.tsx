@@ -6,6 +6,7 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import React from "react";
 import { ExchangeMessage, Loader } from "react-design-system";
 import {
+  DiscussionId,
   DiscussionReadDto,
   Email,
   WithDiscussionId,
@@ -119,7 +120,8 @@ const DiscussionDetails = ({
                 .activateDraftConvention,
               priority: "tertiary",
               linkProps: {
-                href: makeDraftConventionLink(draftConvention).href,
+                href: makeDraftConventionLink(draftConvention, discussion.id)
+                  .href,
                 target: "_blank",
               },
               children: "Pré-remplir la convention pour cette mise en relation",
@@ -187,9 +189,13 @@ const DiscussionDetails = ({
   );
 };
 
-const makeDraftConventionLink = (convention: ConventionPresentation) =>
+const makeDraftConventionLink = (
+  convention: ConventionPresentation,
+  discussionId: DiscussionId,
+) =>
   routes.conventionImmersion({
     ...makeValuesToWatchInUrl(convention),
+    discussionId,
     mtm_campaign: "mise_en_relation_activation_convention",
   }).link;
 

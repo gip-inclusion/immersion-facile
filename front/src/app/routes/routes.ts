@@ -42,6 +42,7 @@ export const acquisitionParams = {
 
 export const conventionParams = {
   ...conventionValuesFromUrl,
+  discussionId: param.query.optional.string,
   ...acquisitionParams,
 };
 
