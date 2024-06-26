@@ -29,7 +29,6 @@ export const ConventionManageContent = ({
   const inclusionConnectedRoles = useAppSelector(
     inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
-
   const roles: Role[] = match({
     name: route.name,
     inclusionConnectedRoles,
@@ -39,7 +38,13 @@ export const ConventionManageContent = ({
         jwtParams.jwt,
       ).role,
     ])
-    .with({ name: "manageConventionAdmin" }, (): Role[] => ["backOffice"])
+    .with(
+      { name: "manageConventionAdmin" },
+      ({ inclusionConnectedRoles }): Role[] =>
+        inclusionConnectedRoles.includes("agencyOwner")
+          ? ["backOffice", "validator"]
+          : ["backOffice", ...inclusionConnectedRoles],
+    )
     .with(
       { name: "manageConventionInclusionConnected" },
       ({ inclusionConnectedRoles }): Role[] =>

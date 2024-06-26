@@ -23,7 +23,6 @@ import {
   UpdateConventionStatusRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
-  getRequesterRole,
   hasAllowedRole,
   isConventionRenewed,
   isConventionValidated,
@@ -121,11 +120,9 @@ export const ConventionManageActions = ({
     jwtParams.kind !== "backoffice" &&
     allowedToSignStatuses.includes(convention.status);
 
-  const requesterRole = getRequesterRole(
-    roles.filter(
-      (role): role is ExcludeFromExisting<Role, "agencyOwner"> =>
-        role !== "agencyOwner",
-    ),
+  const requesterRoles = roles.filter(
+    (role): role is ExcludeFromExisting<Role, "agencyOwner"> =>
+      role !== "agencyOwner",
   );
 
   return (
@@ -166,7 +163,7 @@ export const ConventionManageActions = ({
             newStatus="REJECTED"
             convention={convention}
             onSubmit={createOnSubmitWithFeedbackKind("rejected")}
-            currentSignatoryRole={requesterRole}
+            currentSignatoryRoles={requesterRoles}
             modalTitle={t.verification.rejectConvention}
           >
             {t.verification.rejectConvention}
@@ -180,7 +177,7 @@ export const ConventionManageActions = ({
             newStatus="DEPRECATED"
             onSubmit={createOnSubmitWithFeedbackKind("deprecated")}
             convention={convention}
-            currentSignatoryRole={requesterRole}
+            currentSignatoryRoles={requesterRoles}
             modalTitle={t.verification.markAsDeprecated}
           >
             {t.verification.markAsDeprecated}
@@ -205,7 +202,7 @@ export const ConventionManageActions = ({
               "modificationAskedFromCounsellorOrValidator",
             )}
             convention={convention}
-            currentSignatoryRole={requesterRole}
+            currentSignatoryRoles={requesterRoles}
             modalTitle={t.verification.modifyConventionTitle}
           >
             {t.verification.modifyConvention}
@@ -219,7 +216,7 @@ export const ConventionManageActions = ({
             convention={convention}
             onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
             disabled={disabled || convention.status !== "IN_REVIEW"}
-            currentSignatoryRole={requesterRole}
+            currentSignatoryRoles={requesterRoles}
             onCloseValidatorModalWithoutValidatorInfo={
               setValidatorWarningMessage
             }
@@ -246,7 +243,7 @@ export const ConventionManageActions = ({
               (convention.status !== "IN_REVIEW" &&
                 convention.status !== "ACCEPTED_BY_COUNSELLOR")
             }
-            currentSignatoryRole={requesterRole}
+            currentSignatoryRoles={requesterRoles}
             onCloseValidatorModalWithoutValidatorInfo={
               setValidatorWarningMessage
             }
@@ -272,7 +269,7 @@ export const ConventionManageActions = ({
               disabled={
                 disabled || convention.status !== "ACCEPTED_BY_VALIDATOR"
               }
-              currentSignatoryRole={requesterRole}
+              currentSignatoryRoles={requesterRoles}
               modalTitle={
                 convention.status === "CANCELLED"
                   ? t.verification.conventionAlreadyCancelled
