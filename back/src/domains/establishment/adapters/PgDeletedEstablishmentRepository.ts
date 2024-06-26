@@ -1,9 +1,5 @@
-import format from "pg-format";
 import { SiretDto } from "shared";
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import {
   DeletedEstablishementDto,
   DeletedEstablishmentRepository,
@@ -21,20 +17,19 @@ export class PgDeletedEstablishmentRepository
   public async areSiretsDeleted(
     siretsToCheck: SiretDto[],
   ): Promise<Record<SiretDto, boolean>> {
-    const query = `
-      SELECT DISTINCT siret
-      FROM establishments_deleted
-      WHERE siret = ANY($1)
-    `;
-    const result = await executeKyselyRawSqlQuery<{ siret: SiretDto }>(
-      this.#transaction,
-      query,
-      [siretsToCheck],
-    );
+    if (siretsToCheck.length === 0) return {};
+
+    const result = await this.#transaction
+      .selectFrom("establishments_deleted")
+      .select("siret")
+      .distinct()
+      .where("siret", "in", siretsToCheck)
+      .execute();
+
     return siretsToCheck.reduce<Record<SiretDto, boolean>>(
       (acc, siretToCheck) => ({
         ...acc,
-        [siretToCheck]: result.rows.some((row) => row.siret === siretToCheck),
+        [siretToCheck]: result.some((row) => row.siret === siretToCheck),
       }),
       {},
     );
@@ -43,19 +38,13 @@ export class PgDeletedEstablishmentRepository
   public async save(
     deleteEstablishment: DeletedEstablishementDto,
   ): Promise<void> {
-    const query = format(
-      `INSERT INTO establishments_deleted (
-        siret, created_at, deleted_at
-        ) VALUES %L`,
-      [
-        [
-          deleteEstablishment.siret,
-          deleteEstablishment.createdAt,
-          deleteEstablishment.deletedAt,
-        ],
-      ],
-    );
-
-    await executeKyselyRawSqlQuery(this.#transaction, query);
+    await this.#transaction
+      .insertInto("establishments_deleted")
+      .values({
+        siret: deleteEstablishment.siret,
+        created_at: deleteEstablishment.createdAt,
+        deleted_at: deleteEstablishment.deletedAt,
+      })
+      .execute();
   }
 }
