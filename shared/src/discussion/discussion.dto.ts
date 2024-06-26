@@ -89,7 +89,7 @@ const defaultDiscussion: DiscussionDto = {
     firstName: "ali",
     lastName: "baba",
     email: "ali-baba@gmail.com",
-    phone: "06545334567",
+    phone: "+33654533456",
     resumeLink: undefined,
   },
   establishmentContact: {
@@ -99,7 +99,7 @@ const defaultDiscussion: DiscussionDto = {
     firstName: "estab",
     lastName: "lishment",
     job: "job",
-    phone: "06545334567",
+    phone: "+33654533457",
   },
   exchanges: [
     {
