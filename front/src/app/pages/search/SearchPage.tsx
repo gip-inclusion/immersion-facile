@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Loader,
   MainWrapper,
@@ -11,7 +11,7 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
-import { SearchSortedBy, domElementIds } from "shared";
+import { LatLonDistance, domElementIds, isStringEmpty } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -38,12 +38,6 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
   }),
 );
 
-const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
-  { value: "distance", label: "Par proximité" },
-  { value: "date", label: "Par date de publication" },
-  // { value: "score", label: "Par pertinence" },
-];
-
 export const SearchPage = ({
   route,
   useNaturalLanguageForAppellations,
@@ -55,13 +49,21 @@ export const SearchPage = ({
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
-  const triggerSearch = useSearchUseCase(route);
+  const requestSearch = useSearchUseCase(route);
+  const [searchMade, setSearchMade] = useState<SearchPageParams | null>(null);
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
+  const innerSearchResultWrapper = useRef<HTMLDivElement>(null);
+  const [searchResultsHeight, setSearchResultsHeight] = useState<
+    number | undefined
+  >(innerSearchResultWrapper.current?.offsetHeight);
   const acquisitionParams = useGetAcquisitionParams();
   const initialValues: SearchPageParams = {
     place: "",
-    sortedBy: "score",
+    sortedBy: "date",
     appellations: undefined,
+    distanceKm: undefined,
+    latitude: undefined,
+    longitude: undefined,
     ...acquisitionParams,
   };
 
@@ -86,9 +88,9 @@ export const SearchPage = ({
   });
   const { handleSubmit, setValue, register, control, getValues } = methods;
   const formValues = getValues();
-  const [lat, lon] = useWatch({
+  const [lat, lon, distanceKm] = useWatch({
     control,
-    name: ["latitude", "longitude"],
+    name: ["latitude", "longitude", "distanceKm"],
   });
 
   const availableForInitialSearchRequest =
@@ -105,6 +107,13 @@ export const SearchPage = ({
       </>
     );
   };
+
+  const triggerSearch = (values: SearchPageParams) => {
+    setSearchResultsHeight(innerSearchResultWrapper.current?.offsetHeight);
+    setSearchMade(values);
+    requestSearch(filterFormValues(values));
+  };
+
   useEffect(() => {
     if (availableForInitialSearchRequest) {
       triggerSearch(filterFormValues(formValues));
@@ -181,6 +190,10 @@ export const SearchPage = ({
                   setValue("latitude", initialValues.latitude);
                   setValue("longitude", initialValues.latitude);
                   setValue("place", initialValues.place);
+                  if (formValues.sortedBy === "distance") {
+                    setValue("sortedBy", "date");
+                  }
+                  setValue("distanceKm", initialValues.distanceKm);
                 }}
               />
             </div>
@@ -189,9 +202,22 @@ export const SearchPage = ({
                 label="Distance maximum"
                 placeholder="Distance"
                 options={radiusOptions}
+                disabled={!lat || !lon}
                 nativeSelectProps={{
                   ...register("distanceKm"),
+                  title:
+                    !lat || !lon
+                      ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
+                      : undefined,
                   id: domElementIds.search.distanceSelect,
+                  value: `${distanceKm}`,
+                  onChange: (event) => {
+                    const value = parseInt(event.currentTarget.value);
+                    setValue("distanceKm", value);
+                    if (!value) {
+                      setValue("sortedBy", "date");
+                    }
+                  },
                 }}
               />
             </div>
@@ -202,75 +228,64 @@ export const SearchPage = ({
                 nativeButtonProps={{
                   id: domElementIds.search.searchSubmitButton,
                 }}
+                disabled={!canSubmitSearch(formValues)}
               >
                 Rechercher
               </Button>
             </div>
           </form>
         </PageHeader>
-        <div className={fr.cx("fr-pt-6w")} ref={searchResultsWrapper}>
-          {searchStatus === "ok" && (
-            <>
+        <div ref={searchResultsWrapper} style={{ height: searchResultsHeight }}>
+          {searchStatus === "ok" && searchMade !== null && (
+            <div
+              ref={innerSearchResultWrapper}
+              className={fr.cx("fr-pt-6w", "fr-pb-1w")}
+            >
               <div className={fr.cx("fr-container")}>
                 <div
                   className={fr.cx(
                     "fr-grid-row",
                     "fr-grid-row--gutters",
+                    "fr-grid-row--middle",
                     "fr-mb-4w",
                   )}
                 >
-                  <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
-                    <fieldset
-                      className={fr.cx(
-                        "fr-fieldset",
-                        "fr-fieldset--inline",
-                        "fr-mb-0",
-                      )}
-                    >
-                      <legend
-                        className={fr.cx(
-                          "fr-fieldset__legend",
-                          "fr-text--regular",
-                        )}
-                        id={domElementIds.search.sortFilter}
-                      >
-                        Trier les résultats :
-                      </legend>
-                      <div className={fr.cx("fr-fieldset__content")}>
-                        {sortedByOptions.map((option, index) => (
-                          <div
-                            className={fr.cx("fr-radio-group")}
-                            key={option.value}
-                          >
-                            <input
-                              type="radio"
-                              id={`${domElementIds.search.searchSortOptionBase}${index}`}
-                              name="search-sort-option"
-                              value={option.value}
-                              checked={routeParams.sortedBy === option.value}
-                              onChange={() => {
-                                triggerSearch({
-                                  ...formValues,
-                                  sortedBy: option.value,
-                                });
-                              }}
-                            />
-                            <label
-                              className={cx(fr.cx("fr-label"))}
-                              htmlFor={`${domElementIds.search.searchSortOptionBase}${index}`}
-                            >
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </fieldset>
+                  <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
+                    {areValidGeoParams(searchMade) && (
+                      <Select
+                        label=""
+                        options={[
+                          {
+                            value: "date" as const,
+                            label: "Trier par date de publication",
+                          },
+                          {
+                            value: "distance" as const,
+                            label: "Trier par proximité",
+                          },
+                        ]}
+                        nativeSelectProps={{
+                          value: searchMade.sortedBy,
+                          onChange: (event) => {
+                            const value = isStringEmpty(
+                              event.currentTarget.value,
+                            )
+                              ? "date"
+                              : event.currentTarget.value;
+                            triggerSearch({
+                              ...searchMade,
+                              sortedBy: value,
+                            });
+                          },
+                        }}
+                      />
+                    )}
                   </div>
                   <div
                     className={cx(
                       fr.cx(
                         "fr-col-12",
-                        "fr-col-md-4",
+                        "fr-col-md-9",
                         "fr-grid-row",
                         "fr-grid-row--right",
                       ),
@@ -306,21 +321,55 @@ export const SearchPage = ({
                 </div>
               </div>
               <SearchListResults />
-            </>
+            </div>
           )}
           {searchStatus === "extraFetch" ||
             (searchStatus === "initialFetch" && <Loader />)}
 
-          <SearchInfoSection />
-          <SectionAccordion />
-          <SectionTextEmbed
-            videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
-            videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
-            videoDescription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.vtt"
-            videoTranscription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.txt"
-          />
+          {searchMade === null && (
+            <div className={fr.cx("fr-pt-10w")}>
+              <SearchInfoSection />
+              <SectionAccordion />
+              <SectionTextEmbed
+                videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
+                videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
+                videoDescription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.vtt"
+                videoTranscription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.txt"
+              />
+            </div>
+          )}
         </div>
       </MainWrapper>
     </HeaderFooterLayout>
   );
+};
+
+const areValidGeoParams = (
+  geoParams: Partial<LatLonDistance>,
+): geoParams is LatLonDistance => {
+  return (
+    geoParams.latitude !== undefined &&
+    geoParams.longitude !== undefined &&
+    geoParams.distanceKm !== undefined &&
+    geoParams.distanceKm > 0
+  );
+};
+
+const areEmptyGeoParams = (
+  geoParams: Partial<LatLonDistance>,
+): geoParams is Partial<LatLonDistance> => {
+  return (
+    geoParams.latitude === undefined &&
+    geoParams.longitude === undefined &&
+    geoParams.distanceKm === undefined
+  );
+};
+
+const canSubmitSearch = (values: SearchPageParams) => {
+  const geoParams = {
+    latitude: values.latitude,
+    longitude: values.longitude,
+    distanceKm: values.distanceKm,
+  };
+  return areValidGeoParams(geoParams) || areEmptyGeoParams(geoParams);
 };

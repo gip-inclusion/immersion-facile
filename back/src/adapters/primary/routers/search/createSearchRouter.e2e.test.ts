@@ -141,7 +141,7 @@ describe("search-immersion route", () => {
             distanceKm: 30,
             longitude: 2.34999,
             latitude: 48.8531,
-            sortedBy: "date",
+            sortedBy: "distance",
           },
         });
 
@@ -390,7 +390,7 @@ describe("search-immersion route", () => {
           queryParams: {
             appellationCodes: ["14704"],
             sortedBy: "distance",
-          } as SearchQueryParamsWithGeoParams, // forcing the type to check the error
+          } as unknown as SearchQueryParamsWithGeoParams, // forcing the type to check the error
         });
         expectHttpResponseToEqual(result, {
           status: 400,
@@ -398,6 +398,27 @@ describe("search-immersion route", () => {
             status: 400,
             issues: [
               "latitude : Expected number, received nan",
+              "longitude : Expected number, received nan",
+              "distanceKm : Expected number, received nan",
+            ],
+            message:
+              "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /immersion-offers",
+          },
+        });
+      });
+      it("should return 400 if distance is supplied but only lat", async () => {
+        const result = await httpClient.search({
+          queryParams: {
+            appellationCodes: ["14704"],
+            sortedBy: "distance",
+            latitude: 48.8531,
+          } as unknown as SearchQueryParamsWithGeoParams, // forcing the type to check the error
+        });
+        expectHttpResponseToEqual(result, {
+          status: 400,
+          body: {
+            status: 400,
+            issues: [
               "longitude : Expected number, received nan",
               "distanceKm : Expected number, received nan",
             ],

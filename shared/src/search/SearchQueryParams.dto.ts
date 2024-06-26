@@ -4,7 +4,6 @@ import {
   AppellationCode,
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { OneKeyNeedsAnother } from "../utils";
 
 export const searchSortedByOptions = ["distance", "date", "score"] as const;
 export type SearchSortedBy = (typeof searchSortedByOptions)[number];
@@ -14,7 +13,7 @@ type LatLon = {
   longitude: number;
 };
 
-type LatLonDistance = LatLon & {
+export type LatLonDistance = LatLon & {
   distanceKm: number;
 };
 
@@ -24,15 +23,18 @@ export type GeoQueryParamsWithSortedBy<T extends SearchSortedBy> = {
 
 export type GeoQueryOptionalParamsWithSortedBy<T extends SearchSortedBy> = {
   sortedBy: T;
-} & OneKeyNeedsAnother<Partial<LatLonDistance>, "latitude", "longitude">;
+} & Partial<LatLonDistance>;
 
 type SearchQueryCommonParamsDto = {
-  appellationCodes?: AppellationCode[];
-  rome?: RomeCode;
   voluntaryToImmersion?: boolean;
   place?: string;
   establishmentSearchableBy?: EstablishmentSearchableByValue;
 } & WithAcquisition;
+
+type SearchQueryParamsAppellationsAndRome = {
+  appellationCodes?: AppellationCode[];
+  rome?: RomeCode;
+};
 
 export type SearchQueryWithOptionalGeoParamsDto = SearchQueryCommonParamsDto &
   GeoQueryOptionalParamsWithSortedBy<"date" | "score">;
@@ -40,6 +42,10 @@ export type SearchQueryWithOptionalGeoParamsDto = SearchQueryCommonParamsDto &
 export type SearchQueryParamsWithGeoParams = SearchQueryCommonParamsDto &
   GeoQueryParamsWithSortedBy<"distance">;
 
+export type SearchQueryBaseWithoutAppellationsAndRomeDto =
+  | SearchQueryParamsWithGeoParams
+  | SearchQueryWithOptionalGeoParamsDto;
+
 export type SearchQueryParamsDto =
-  | SearchQueryWithOptionalGeoParamsDto
-  | SearchQueryParamsWithGeoParams;
+  SearchQueryBaseWithoutAppellationsAndRomeDto &
+    SearchQueryParamsAppellationsAndRome;

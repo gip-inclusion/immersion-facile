@@ -336,6 +336,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const searchResults: SearchResultDto[] =
           await pgEstablishmentAggregateRepository.searchImmersionResults({
             searchMade: {
+              sortedBy: "date",
               distanceKm: 100,
               // Center of Saintes
               lat: 45.7461575,
@@ -709,6 +710,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       const searchResults: SearchResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
           searchMade: {
+            sortedBy: "date",
             distanceKm: 50,
             // Center of Saintes
             lat: 45.7461575,
@@ -771,6 +773,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       const searchResults: SearchResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
           searchMade: {
+            sortedBy: "date",
             distanceKm: 100,
             // Center of Saintes
             lat: 45.7461575,
@@ -1052,7 +1055,9 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Act
       const searchResults: SearchResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: {},
+          searchMade: {
+            sortedBy: "date",
+          },
         });
       const readableResults = searchResults.map(toReadableSearchResult);
 
@@ -1086,7 +1091,9 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Act
       const searchResults: SearchResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
-          searchMade: {},
+          searchMade: {
+            sortedBy: "date",
+          },
         });
       const readableResults = searchResults.map(toReadableSearchResult);
 
@@ -1908,12 +1915,10 @@ describe("PgEstablishmentAggregateRepository", () => {
 });
 
 const toReadableSearchResult = ({
-  siret,
   address,
   rome,
   distance_m,
 }: SearchResultDto) => ({
-  siret,
   address: `${address?.streetNumberAndAddress} ${address?.postcode} ${address?.city}`,
   rome,
   distance_m,

@@ -27,7 +27,10 @@ import {
   EstablishmentEntity,
 } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
-import { SearchMade } from "../entities/SearchMadeEntity";
+import {
+  SearchMade,
+  hasSearchMadeGeoParams,
+} from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
@@ -528,7 +531,7 @@ export class PgEstablishmentAggregateRepository
           searchMade.establishmentSearchableBy === "jobSeekers"
         })`
       : "";
-    const sortExpression = makeOrderByStatement(searchMade.sortedBy);
+    const sortExpression = makeOrderByStatement(searchMade);
     const selectedOffersSubQuery = format(
       `WITH
         active_establishments_within_area AS (
@@ -835,7 +838,6 @@ export class PgEstablishmentAggregateRepository
   ): Promise<SearchImmersionResult[]> {
     // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
-
     const pgResult = await executeKyselyRawSqlQuery(
       this.transaction,
       makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -1069,17 +1071,21 @@ export class PgEstablishmentAggregateRepository
   }
 }
 
-const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
-  switch (sortedBy) {
-    case "distance":
-      return "ORDER BY distance_m ASC, RANDOM()";
-    case "date":
-      return "ORDER BY max_created_at DESC, RANDOM()";
-    case "score":
-      return "ORDER BY max_score DESC, RANDOM()";
-    default: // undefined
-      throw new BadRequestError("sortedBy must be defined");
+const makeOrderByStatement = (searchMade: SearchMade): string => {
+  if (!searchMade.sortedBy)
+    throw new BadRequestError("sortedBy must be defined");
+  if (
+    !hasSearchMadeGeoParams(searchMade) &&
+    searchMade.sortedBy === "distance"
+  ) {
+    throw new BadRequestError("Cannot search by distance without geo params");
   }
+  const sortQueryBySortedByValue: Record<SearchSortedBy, string> = {
+    distance: "ORDER BY distance_m ASC, RANDOM()",
+    date: "ORDER BY max_created_at DESC, RANDOM()",
+    score: "ORDER BY max_score DESC, RANDOM()",
+  };
+  return sortQueryBySortedByValue[searchMade.sortedBy];
 };
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m

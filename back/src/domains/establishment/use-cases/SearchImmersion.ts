@@ -222,7 +222,10 @@ export class SearchImmersion extends TransactionalUseCase<
 export const hasSearchGeoParams = (
   geoParams: Partial<GeoParams>,
 ): geoParams is GeoParams =>
-  !!geoParams.lat && !!geoParams.lon && !!geoParams.distanceKm;
+  !!geoParams.lat &&
+  !!geoParams.lon &&
+  !!geoParams.distanceKm &&
+  geoParams.distanceKm > 0;
 
 const shouldFetchLBB = (
   appellationCodes: AppellationCode[] | undefined,
