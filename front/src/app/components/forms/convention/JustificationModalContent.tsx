@@ -58,15 +58,15 @@ export const JustificationModalContent = ({
   );
   const getSignatoryOptions = () => {
     const signatoryOptions = conventionSignatories.map((signatory) =>
-      signatory && currentSignatoryRoles.includes(signatory.role)
+      signatory && !currentSignatoryRoles.includes(signatory.role)
         ? {
-            label: "Vous même",
-            value: signatory.role,
-          }
-        : {
             label: `${signatory.firstName} ${signatory.lastName} - ${
               signatoryTitleByRole[signatory.role]
             }`,
+            value: signatory.role,
+          }
+        : {
+            label: "Vous même",
             value: signatory.role,
           },
     );
