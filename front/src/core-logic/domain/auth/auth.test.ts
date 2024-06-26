@@ -63,7 +63,11 @@ describe("Auth slice", () => {
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
-    store.dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
+    store.dispatch(
+      authSlice.actions.federatedIdentityDeletionTriggered({
+        mode: "device-and-inclusion",
+      }),
+    );
     dependencies.inclusionConnectedGateway.getLogoutUrlResponse$.next(
       "http://yolo-logout.com",
     );
@@ -88,7 +92,38 @@ describe("Auth slice", () => {
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
-    store.dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
+    store.dispatch(
+      authSlice.actions.federatedIdentityDeletionTriggered({
+        mode: "device-only",
+      }),
+    );
+    dependencies.inclusionConnectedGateway.getLogoutUrlResponse$.next(
+      "http://yolo-logout.com",
+    );
+    expectFederatedIdentityToEqual(null);
+    expectFederatedIdentityInDevice(undefined);
+    expectPartialConventionInUrlInDevice(undefined);
+    expectToEqual(dependencies.navigationGateway.wentToUrls, []);
+  });
+
+  it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for without redirects to provider logout page (when provider is not 'inclusionConnect')", () => {
+    ({ store, dependencies } = createTestStore({
+      auth: {
+        federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+      },
+    }));
+    dependencies.localDeviceRepository.set(
+      "federatedIdentityWithUser",
+      inclusionConnectedFederatedIdentity,
+    );
+    dependencies.localDeviceRepository.set("partialConventionInUrl", {
+      firstName: "BOB",
+    });
+    store.dispatch(
+      authSlice.actions.federatedIdentityDeletionTriggered({
+        mode: "device-and-inclusion",
+      }),
+    );
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
     expectPartialConventionInUrlInDevice(undefined);

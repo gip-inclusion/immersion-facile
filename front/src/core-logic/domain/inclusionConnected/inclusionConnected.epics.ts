@@ -1,4 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
+import { AuthAction } from "src/core-logic/domain/auth/auth.epics";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -8,29 +9,27 @@ import {
 } from "src/core-logic/storeConfig/redux.helpers";
 
 type InclusionConnectedAction = ActionOfSlice<typeof inclusionConnectedSlice>;
+type InclusionConnectedEpic = AppEpic<InclusionConnectedAction | AuthAction>;
 
-const federatedIdentityFoundInDeviceEpic: AppEpic<InclusionConnectedAction> = (
-  action$,
-) =>
+const federatedIdentityFoundInDeviceEpic: InclusionConnectedEpic = (action$) =>
   action$.pipe(
     filter(authSlice.actions.federatedIdentityFoundInDevice.match),
     filter((action) => action.payload?.provider === "inclusionConnect"),
     map(() => inclusionConnectedSlice.actions.currentUserFetchRequested()),
   );
 
-const federatedIdentityFromStoreToDeviceStorageSucceededEpic: AppEpic<
-  InclusionConnectedAction
-> = (action$) =>
-  action$.pipe(
-    filter(
-      authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded
-        .match,
-    ),
-    filter((action) => action.payload?.provider === "inclusionConnect"),
-    map(() => inclusionConnectedSlice.actions.currentUserFetchRequested()),
-  );
+const federatedIdentityFromStoreToDeviceStorageSucceededEpic: InclusionConnectedEpic =
+  (action$) =>
+    action$.pipe(
+      filter(
+        authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded
+          .match,
+      ),
+      filter((action) => action.payload?.provider === "inclusionConnect"),
+      map(() => inclusionConnectedSlice.actions.currentUserFetchRequested()),
+    );
 
-const getCurrentUserEpic: AppEpic<InclusionConnectedAction> = (
+const getCurrentUserEpic: InclusionConnectedEpic = (
   action$,
   state$,
   { inclusionConnectedGateway },
@@ -45,14 +44,16 @@ const getCurrentUserEpic: AppEpic<InclusionConnectedAction> = (
     map(inclusionConnectedSlice.actions.currentUserFetchSucceeded),
     catchEpicError((error) =>
       error?.message.includes("jwt expired")
-        ? authSlice.actions.federatedIdentityDeletionTriggered()
+        ? authSlice.actions.federatedIdentityDeletionTriggered({
+            mode: "device-only",
+          })
         : inclusionConnectedSlice.actions.currentUserFetchFailed(
             error?.message,
           ),
     ),
   );
 
-const registerAgenciesEpic: AppEpic<InclusionConnectedAction> = (
+const registerAgenciesEpic: InclusionConnectedEpic = (
   action$,
   state$,
   { inclusionConnectedGateway },

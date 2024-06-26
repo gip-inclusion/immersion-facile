@@ -53,9 +53,9 @@ const logoutFromInclusionConnect: AuthEpic = (
   action$.pipe(
     filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
     filter(
-      () =>
+      (action) =>
         state$.value.auth.federatedIdentityWithUser?.provider ===
-        "inclusionConnect",
+          "inclusionConnect" && action.payload.mode === "device-and-inclusion",
     ),
     switchMap(() => inclusionConnectedGateway.getLogoutUrl$()),
     map((logoutUrl) => {
