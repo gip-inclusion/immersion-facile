@@ -65,7 +65,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     { createdSince, lastAnsweredByCandidate, sirets }: GetDiscussionsParams,
     limit: number,
   ): Promise<DiscussionDto[]> {
-    const queryBuilder = pipeWithValue(
+    const results = await pipeWithValue(
       this.#makeDiscussionQueryBuilder(),
       (b) =>
         createdSince
@@ -87,11 +87,11 @@ export class PgDiscussionRepository implements DiscussionRepository {
                 ),
               )
           : b,
-    ).limit(limit);
+    )
+      .limit(limit)
+      .execute();
 
-    const pgResults = await queryBuilder.execute();
-
-    return pgResults.map(({ discussion }) =>
+    return results.map(({ discussion }) =>
       this.#makeDiscussionDtoFromPgDiscussion(discussion),
     );
   }

@@ -20,11 +20,11 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   ContactRequestReminder,
   ContactRequestReminderMode,
+  makeContactRequestReminder,
 } from "./ContactRequestReminder";
 
 describe("ContactRequestReminder", () => {
@@ -66,26 +66,26 @@ describe("ContactRequestReminder", () => {
   );
 
   let contactRequestReminder: ContactRequestReminder;
-  let uowPerformer: UnitOfWorkPerformer;
-  let uuidGenerator: TestUuidGenerator;
-  let timeGateway: CustomTimeGateway;
   let uow: InMemoryUnitOfWork;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
-    uow = createInMemoryUow();
-    uowPerformer = new InMemoryUowPerformer(uow);
-    timeGateway = new CustomTimeGateway(now);
-    uuidGenerator = new TestUuidGenerator();
-
+    const timeGateway = new CustomTimeGateway(now);
+    const uuidGenerator = new TestUuidGenerator();
     uuidGenerator.setNextUuids(["1", "2"]);
 
-    contactRequestReminder = new ContactRequestReminder(
-      uowPerformer,
-      makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
-      timeGateway,
-      domain,
-    );
+    uow = createInMemoryUow();
+    contactRequestReminder = makeContactRequestReminder({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        domain,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          uuidGenerator,
+          timeGateway,
+        ),
+        timeGateway,
+      },
+    });
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -98,8 +98,14 @@ describe("ContactRequestReminder", () => {
         discussionWith2DaysSinceBeneficiairyExchange,
         discussionWith6DaysSinceBeneficiairyExchange,
       ];
-      const reminderQty3d = await contactRequestReminder.execute("3days");
-      const reminderQty7d = await contactRequestReminder.execute("7days");
+      const reminderQty3d = await contactRequestReminder.execute(
+        "3days",
+        undefined,
+      );
+      const reminderQty7d = await contactRequestReminder.execute(
+        "7days",
+        undefined,
+      );
       expectToEqual(reminderQty3d, 0);
       expectToEqual(reminderQty7d, 0);
       expectToEqual(uow.outboxRepository.events, []);
@@ -116,7 +122,10 @@ describe("ContactRequestReminder", () => {
         discussionWith7DaysSinceBeneficiairyExchange,
         discussionWith8DaysSinceBeneficiairyExchange,
       ];
-      const reminderQty = await contactRequestReminder.execute("3days");
+      const reminderQty = await contactRequestReminder.execute(
+        "3days",
+        undefined,
+      );
 
       expectToEqual(reminderQty, 2);
       expectSavedNotificationsAndEvents({
@@ -145,7 +154,10 @@ describe("ContactRequestReminder", () => {
         discussionWith8DaysSinceBeneficiairyExchange,
       ];
 
-      const reminderQty = await contactRequestReminder.execute("7days");
+      const reminderQty = await contactRequestReminder.execute(
+        "7days",
+        undefined,
+      );
 
       expectToEqual(reminderQty, 2);
       expectSavedNotificationsAndEvents({

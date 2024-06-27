@@ -39,7 +39,7 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
     ];
     const discussions = this.discussions
       .filter((discussion) => filters.every((filter) => filter(discussion)))
-      .filter((_, index) => index < limit);
+      .slice(0, limit);
 
     return discussions;
   }

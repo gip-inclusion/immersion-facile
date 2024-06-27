@@ -92,7 +92,7 @@ import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddE
 import { AddFormEstablishment } from "../../domains/establishment/use-cases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
-import { ContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
+import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { EditFormEstablishment } from "../../domains/establishment/use-cases/EditFormEstablishment";
 import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
@@ -320,12 +320,6 @@ export const createUseCases = (
       editFormEstablishment: new EditFormEstablishment(
         uowPerformer,
         createNewEvent,
-      ),
-      contactRequestReminder: new ContactRequestReminder(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-        gateways.timeGateway,
-        config.immersionFacileDomain,
       ),
       retrieveFormEstablishmentFromAggregates:
         new RetrieveFormEstablishmentFromAggregates(uowPerformer),
@@ -616,6 +610,14 @@ export const createUseCases = (
       uowPerformer,
     }),
     markDiscussionLinkedToConvention: makeMarkDiscussionLinkedToConvention({
+      uowPerformer,
+    }),
+    contactRequestReminder: makeContactRequestReminder({
+      deps: {
+        domain: config.immersionFacileDomain,
+        saveNotificationAndRelatedEvent,
+        timeGateway: gateways.timeGateway,
+      },
       uowPerformer,
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
