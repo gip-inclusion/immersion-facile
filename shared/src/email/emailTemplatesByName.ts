@@ -713,7 +713,7 @@ L'équipe d'Immersion Facilitée`,
           kind: "info",
           content: `${
             internshipKind === "immersion"
-              ? "À la fin de l'immersion, nous vous remercions de compléter la fiche bilan de l'immersion, et de l'envoyer au conseiller qui a signé la convention (Pôle Emploi, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion,"
+              ? "À la fin de l'immersion, nous vous remercions de compléter la fiche bilan de l'immersion, et de l'envoyer au conseiller qui a signé la convention (France Travail, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion,"
               : "À la fin du mini stage, nous vous remercions de compléter la fiche bilan du mini stage, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage, "
           } puis envoyée à <a href= "mailto:${agencyReferentEmail}" target="_blank">${agencyReferentEmail}</a>.`,
         },

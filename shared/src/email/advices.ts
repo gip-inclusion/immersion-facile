@@ -19,7 +19,7 @@ export const advices = `
       
       <strong>Comment expliquer simplement ce qu’est une immersion ?</strong>
       - C’est un stage d’observation, strictement encadré d’un point de vue juridique qui permet de découvrir un métier, confirmer son projet professionnel ou se faire connaître auprès d'un recruteur.
-      - Vous conservez votre statut et êtes couvert par votre Pôle emploi, votre Mission Locale ou le Conseil départemental, Cap Emploi, etc. (en fonction de votre situation).
+      - Vous conservez votre statut et êtes couvert par votre agence France Travail, votre Mission Locale ou le Conseil départemental, Cap Emploi, etc. (en fonction de votre situation).
       - Pendant la durée de l'immersion, vous conservez votre indemnité habituelle. L'entreprise n'a pas à vous défrayer.
       - Le rôle de celui qui vous accueillera est de vous présenter le métier et de vérifier avec vous que ce métier vous convient en vous faisant des retours les plus objectifs possibles.
       - Pendant la durée de votre présence, vous pouvez aider les salariés en donnant un coup de main.
