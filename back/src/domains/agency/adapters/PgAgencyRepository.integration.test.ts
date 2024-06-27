@@ -552,8 +552,8 @@ describe("PgAgencyRepository", () => {
         .withAddress({
           departmentCode: "75",
           city: "Paris",
-          postcode: "",
-          streetNumberAndAddress: "",
+          postcode: "75000",
+          streetNumberAndAddress: "au fond à droite",
         })
         .build();
 
@@ -570,9 +570,7 @@ describe("PgAgencyRepository", () => {
       });
 
       // Assert
-      expect(agencies[0].address.departmentCode).toEqual(
-        cergyAgency.address.departmentCode,
-      );
+      expectToEqual(agencies, [cergyAgency]);
     });
   });
 
