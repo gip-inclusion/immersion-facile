@@ -608,9 +608,7 @@ describe("PgAgencyRepository", () => {
         .withValidatorEmails([userEmail])
         .build();
       await agencyRepository.insert(agency);
-      const allActiveAgencies = await agencyRepository.getAgencies({});
-      expect(allActiveAgencies).toHaveLength(1);
-      expect(allActiveAgencies[0]).toEqual(agency);
+      expectToEqual(await agencyRepository.getAgencies({}), [agency]);
     });
 
     it("keeps the acquisitions fields when provided", async () => {
