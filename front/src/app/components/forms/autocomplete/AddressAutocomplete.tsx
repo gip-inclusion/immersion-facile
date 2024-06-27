@@ -108,7 +108,6 @@ export const AddressAutocomplete = ({
           if (value === "") {
             setOptions([]);
             setIsSearching(false);
-            return;
           }
           setSearchTerm(value);
         }}
