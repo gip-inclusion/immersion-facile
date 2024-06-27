@@ -1,10 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import { v4 as uuid } from "uuid";
-import {
-  executeKyselyRawSqlQuery,
-  makeKyselyDb,
-} from "../../../config/pg/kysely/kyselyUtils";
+import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
@@ -34,16 +31,10 @@ describe("PgConventionExternalIdRepository", () => {
       transaction,
     );
     pgAgencyRepository = new PgAgencyRepository(transaction);
-    await executeKyselyRawSqlQuery(
-      transaction,
-      "DELETE FROM convention_external_ids",
-    );
-    await executeKyselyRawSqlQuery(transaction, "DELETE FROM conventions");
-    await executeKyselyRawSqlQuery(
-      transaction,
-      "DELETE FROM agency_groups__agencies",
-    );
-    await executeKyselyRawSqlQuery(transaction, "DELETE FROM agencies");
+    await transaction.deleteFrom("convention_external_ids").execute();
+    await transaction.deleteFrom("conventions").execute();
+    await transaction.deleteFrom("agency_groups__agencies").execute();
+    await transaction.deleteFrom("agencies").execute();
   });
 
   describe("save", () => {

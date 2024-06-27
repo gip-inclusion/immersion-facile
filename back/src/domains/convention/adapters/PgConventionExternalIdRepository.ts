@@ -1,8 +1,5 @@
 import { ConventionExternalId, ConventionId } from "shared";
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { ConventionExternalIdRepository } from "../ports/ConventionExternalIdRepository";
 
 export class PgConventionExternalIdRepository
@@ -13,23 +10,19 @@ export class PgConventionExternalIdRepository
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ConventionExternalId | undefined> {
-    const results = await executeKyselyRawSqlQuery(
-      this.transaction,
-      "SELECT external_id FROM convention_external_ids WHERE convention_id = $1 LIMIT 1",
-      [conventionId],
-    );
-    const externalIdAsNumber = results.rows[0]?.external_id as
-      | number
-      | undefined;
+    const result = await this.transaction
+      .selectFrom("convention_external_ids")
+      .select("external_id")
+      .where("convention_id", "=", conventionId)
+      .executeTakeFirst();
 
-    return externalIdAsNumber?.toString().padStart(11, "0");
+    return result?.external_id.toString().padStart(11, "0");
   }
 
   public async save(conventionId: ConventionId): Promise<void> {
-    await executeKyselyRawSqlQuery(
-      this.transaction,
-      "INSERT INTO convention_external_ids(convention_id) VALUES($1)",
-      [conventionId],
-    );
+    await this.transaction
+      .insertInto("convention_external_ids")
+      .values({ convention_id: conventionId })
+      .execute();
   }
 }
