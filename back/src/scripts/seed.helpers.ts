@@ -1,10 +1,4 @@
-import {
-  AddressDto,
-  AgencyDtoBuilder,
-  AgencyId,
-  AgencyKind,
-  miniStageRestrictedDepartments,
-} from "shared";
+import { AddressDto, AgencyDtoBuilder, AgencyId, AgencyKind } from "shared";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { seedAddresses } from "./seedAddresses";
@@ -22,17 +16,8 @@ let agencyIds: Record<AgencyKind, AgencyId[]> = {
   "operateur-cep": [],
 };
 
-export const getRandomAddress = (params?: {
-  isCciAgency: boolean;
-}): AddressDto => {
-  if (params?.isCciAgency) {
-    const addressesForCci = seedAddresses.filter(({ departmentCode }) =>
-      miniStageRestrictedDepartments.includes(departmentCode),
-    );
-    return addressesForCci[Math.floor(Math.random() * addressesForCci.length)];
-  }
-  return seedAddresses[Math.floor(Math.random() * seedAddresses.length)];
-};
+export const getRandomAddress = (): AddressDto =>
+  seedAddresses[Math.floor(Math.random() * seedAddresses.length)];
 
 export const getRandomAgencyId = ({ kind }: { kind: AgencyKind }) => {
   const ids = agencyIds[kind];
@@ -43,7 +28,7 @@ export const insertAgencySeed = async ({
   uow,
   kind,
 }: { uow: UnitOfWork; kind: AgencyKind }): Promise<void> => {
-  const address = getRandomAddress({ isCciAgency: kind === "cci" });
+  const address = getRandomAddress();
   const agencyName = `Agence ${kind} ${address.city}`;
   const agencyId = new UuidV4Generator().new();
   const agency = new AgencyDtoBuilder()

@@ -34,7 +34,6 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
   keys,
-  miniStageRestrictedDepartments,
   notJobSeeker,
   toDotNotation,
 } from "shared";
@@ -408,15 +407,7 @@ export const ConventionForm = ({
                           shouldShowAgencyKindField={
                             conventionValues?.internshipKind === "immersion"
                           }
-                          agencyDepartmentOptions={
-                            conventionValues?.internshipKind === "immersion"
-                              ? departmentOptions
-                              : departmentOptions.filter((department) =>
-                                  miniStageRestrictedDepartments.includes(
-                                    department.value,
-                                  ),
-                                )
-                          }
+                          agencyDepartmentOptions={departmentOptions}
                           onDepartmentCodeChangedMemoized={
                             onDepartmentCodeChangedMemoized
                           }
