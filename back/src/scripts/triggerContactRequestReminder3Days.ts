@@ -4,7 +4,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notificatio
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ContactRequestReminder } from "../domains/establishment/use-cases/ContactRequestReminder";
+import { makeContactRequestReminder } from "../domains/establishment/use-cases/ContactRequestReminder";
 import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
@@ -17,12 +17,18 @@ const executeContactRequestReminder = () => {
   });
   const timeGateway = new RealTimeGateway();
 
-  return new ContactRequestReminder(
-    createUowPerformer(config, createGetPgPoolFn(config)).uowPerformer,
-    makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-    timeGateway,
-    config.immersionFacileDomain,
-  ).execute("3days");
+  return makeContactRequestReminder({
+    deps: {
+      domain: config.immersionFacileDomain,
+      saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+        new UuidV4Generator(),
+        timeGateway,
+      ),
+      timeGateway: timeGateway,
+    },
+    uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+      .uowPerformer,
+  }).execute("3days", undefined);
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
