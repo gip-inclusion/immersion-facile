@@ -47,55 +47,48 @@ export class PgEstablishmentAggregateRepository
   ) {
     if (offersWithSiret.length === 0) return;
 
-    const immersionOfferFields: any[][] = offersWithSiret.map(
-      (offerWithSiret) => [
-        offerWithSiret.romeCode,
-        offerWithSiret.appellationCode,
-        offerWithSiret.siret,
-        offerWithSiret.score,
-        offerWithSiret.createdAt,
-      ],
-    );
-    const query = format(
-      `INSERT INTO immersion_offers (
-          rome_code, appellation_code, siret, score, created_at
-        ) VALUES %L`,
-      immersionOfferFields,
-    );
-    await executeKyselyRawSqlQuery(this.transaction, query);
+    await this.transaction
+      .insertInto("immersion_offers")
+      .values(
+        offersWithSiret.map((offerWithSiret) => ({
+          rome_code: offerWithSiret.romeCode,
+          appellation_code: parseInt(offerWithSiret.appellationCode),
+          siret: offerWithSiret.siret,
+          score: offerWithSiret.score,
+          created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
+        })),
+      )
+      .execute();
   }
 
   public async delete(siret: string): Promise<void> {
-    try {
-      logger.info({
-        message: `About to delete establishment with siret : ${siret}`,
-      });
+    logger.info({
+      message: `About to delete establishment with siret : ${siret}`,
+    });
 
-      await this.#deleteEstablishmentContactBySiret(siret);
+    await this.#deleteEstablishmentContactBySiret(siret);
 
-      const { numAffectedRows } = await executeKyselyRawSqlQuery(
-        this.transaction,
-        `
-        DELETE
-        FROM establishments
-        WHERE siret = $1;
-      `,
-        [siret],
-      );
-      if (Number(numAffectedRows) !== 1)
-        throw new NotFoundError(
-          `Establishment with siret ${siret} missing on Establishment Aggregate Repository.`,
-        );
-      logger.info({
-        message: `Deleted establishment successfully. Siret was : ${siret}`,
+    return this.transaction
+      .deleteFrom("establishments")
+      .where("siret", "=", siret)
+      .returning("siret")
+      .execute()
+      .then((result) => {
+        if (result.length !== 1)
+          throw new NotFoundError(
+            `Establishment with siret ${siret} missing on Establishment Aggregate Repository.`,
+          );
+        logger.info({
+          message: `Deleted establishment successfully. Siret was : ${siret}`,
+        });
+      })
+      .catch((error) => {
+        logger.info({
+          message: `Error when deleting establishment with siret ${siret} : ${error.message}`,
+        });
+        logger.info({ message: "Full Error", error });
+        throw error;
       });
-    } catch (error: any) {
-      logger.info({
-        message: `Error when deleting establishment with siret ${siret} : ${error.message}`,
-      });
-      logger.info({ message: "Full Error", error });
-      throw error;
-    }
   }
 
   public async getEstablishmentAggregateBySiret(
@@ -667,31 +660,34 @@ export class PgEstablishmentAggregateRepository
     inseeCheckDate: Date,
     params: UpdateEstablishmentsWithInseeDataParams,
   ): Promise<void> {
-    const queries = keys(params).map((siret) => {
-      const values = params[siret];
-      return format(
-        `
-            UPDATE establishments
-            SET last_insee_check_date = %1$L 
-              ${values?.isOpen !== undefined ? ", is_open=%3$L" : ""}
-              ${values?.nafDto ? ", naf_code=%4$L" : ""}
-              ${values?.nafDto ? ", naf_nomenclature=%5$L" : ""}
-              ${values?.name ? ", name=%6$L" : ""}
-              ${values?.numberEmployeesRange ? ", number_employees=%7$L" : ""}
-            WHERE siret = %2$L;`,
-        inseeCheckDate.toISOString(),
-        siret,
-        ...[
-          values?.isOpen,
-          values?.nafDto?.code,
-          values?.nafDto?.nomenclature,
-          values?.name,
-          values?.numberEmployeesRange,
-        ],
-      );
-    });
+    for (const [siret, values] of Object.entries(params)) {
+      const isOpen =
+        values?.isOpen !== undefined ? { is_open: values.isOpen } : {};
+      const name = values?.name !== undefined ? { name: values.name } : {};
+      const nafDto =
+        values?.nafDto !== undefined
+          ? {
+              naf_code: values.nafDto.code,
+              naf_nomenclature: values.nafDto.nomenclature,
+            }
+          : {};
+      const numberEmployees =
+        values?.numberEmployeesRange !== undefined
+          ? { number_employees: values.numberEmployeesRange }
+          : {};
 
-    await executeKyselyRawSqlQuery(this.transaction, queries.join("\n"));
+      await this.transaction
+        .updateTable("establishments")
+        .set({
+          last_insee_check_date: inseeCheckDate,
+          ...isOpen,
+          ...nafDto,
+          ...name,
+          ...numberEmployees,
+        })
+        .where("siret", "=", siret)
+        .execute();
+    }
   }
 
   async #updateEstablishmentEntity(
@@ -748,15 +744,10 @@ export class PgEstablishmentAggregateRepository
   }
 
   async #deleteEstablishmentContactBySiret(siret: SiretDto): Promise<void> {
-    await executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-        DELETE
-        FROM establishments_contacts
-        WHERE siret = $1
-      `,
-      [siret],
-    );
+    await this.transaction
+      .deleteFrom("establishments_contacts")
+      .where("siret", "=", siret)
+      .execute();
   }
 
   async #selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
@@ -826,37 +817,36 @@ export class PgEstablishmentAggregateRepository
       .execute();
   }
 
-  async #insertContactFromAggregate(aggregate: EstablishmentAggregate) {
-    const contact = aggregate.contact;
+  async #insertContactFromAggregate(
+    aggregate: EstablishmentAggregate,
+  ): Promise<void> {
+    const { contact } = aggregate;
     if (!contact) return;
-    const contactFields = [
-      contact.id,
-      contact.lastName,
-      contact.firstName,
-      contact.email,
-      contact.job,
-      contact.phone,
-      contact.contactMethod,
-      JSON.stringify(contact.copyEmails),
-      aggregate.establishment.siret,
-    ];
 
-    try {
-      const insertContactsQuery = format(
-        `INSERT INTO establishments_contacts (
-        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails, siret
-      ) VALUES ( %L )`,
-        contactFields,
-      );
-
-      await executeKyselyRawSqlQuery(this.transaction, insertContactsQuery);
-    } catch (error) {
-      logger.error({
-        error: castError(error),
-        message: "Error inserting contacts",
+    return this.transaction
+      .insertInto("establishments_contacts")
+      .values({
+        uuid: contact.id,
+        firstname: contact.firstName,
+        lastname: contact.lastName,
+        email: contact.email,
+        job: contact.job,
+        phone: contact.phone,
+        contact_mode: contact.contactMethod,
+        copy_emails: sql`${JSON.stringify(contact.copyEmails)}`,
+        siret: aggregate.establishment.siret,
+      })
+      .execute()
+      .then(() => {
+        return;
+      })
+      .catch((error) => {
+        logger.error({
+          error: castError(error),
+          message: "Error inserting contacts",
+        });
+        throw error;
       });
-      throw error;
-    }
   }
 
   async #getRomeCodeFromAppellationCode(
@@ -864,21 +854,19 @@ export class PgEstablishmentAggregateRepository
   ): Promise<RomeCode[] | undefined> {
     if (!appellationCodes) return;
 
-    const result = await executeKyselyRawSqlQuery(
-      this.transaction,
-      format(
-        `SELECT code_rome
-        from public_appellations_data
-        where ogr_appellation in (%L)`,
-        appellationCodes,
-      ),
-    );
+    const result = await this.transaction
+      .selectFrom("public_appellations_data")
+      .select("code_rome")
+      .where(
+        "ogr_appellation",
+        "in",
+        appellationCodes.map((appellationCode) => parseInt(appellationCode)),
+      )
+      .execute();
 
-    const romeCodes: RomeCode[] | undefined =
-      result.rows.length > 0
-        ? result.rows.map(({ code_rome }) => code_rome)
-        : undefined;
-    if (!romeCodes)
+    const romeCodes: RomeCode[] = result.map(({ code_rome }) => code_rome);
+
+    if (romeCodes.length === 0)
       throw new Error(
         `No Rome code found for appellation codes ${appellationCodes}`,
       );
@@ -902,21 +890,18 @@ export class PgEstablishmentAggregateRepository
     );
 
     if (offersToAdd.length > 0)
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        format(
-          `INSERT INTO immersion_offers (
-            rome_code, appellation_code, score, created_at, siret
-          ) VALUES %L`,
-          offersToAdd.map((offerToAdd) => [
-            offerToAdd.romeCode,
-            offerToAdd.appellationCode,
-            offerToAdd.score,
-            offerToAdd.createdAt,
+      await this.transaction
+        .insertInto("immersion_offers")
+        .values(
+          offersToAdd.map((offerToAdd) => ({
+            rome_code: offerToAdd.romeCode,
+            appellation_code: parseInt(offerToAdd.appellationCode),
+            score: offerToAdd.score,
+            created_at: sql`${offerToAdd.createdAt.toISOString()}`,
             siret,
-          ]),
-        ),
-      );
+          })),
+        )
+        .execute();
 
     const offersToRemove = existingOffers.filter(
       (updatedOffer) =>
@@ -928,33 +913,29 @@ export class PgEstablishmentAggregateRepository
       .filter((offer) => !offer.appellationCode)
       .map((offer) => offer.romeCode);
 
-    if (offersToRemoveByRomeCode.length > 0) {
-      const queryToRemoveOffersFromRome = format(
-        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code IS NULL AND rome_code IN (%L); `,
-        siret,
-        offersToRemoveByRomeCode,
-      );
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        queryToRemoveOffersFromRome,
-      );
-    }
+    if (offersToRemoveByRomeCode.length > 0)
+      await this.transaction
+        .deleteFrom("immersion_offers")
+        .where("siret", "=", siret)
+        .where("appellation_code", "is", null)
+        .where("rome_code", "in", offersToRemoveByRomeCode)
+        .execute();
 
-    const offersToRemoveByRomeAppellation = offersToRemove
+    const offersToRemoveByAppelationCode = offersToRemove
       .filter((offer) => !!offer.appellationCode)
       .map((offer) => offer.appellationCode);
 
-    if (offersToRemoveByRomeAppellation.length > 0) {
-      const queryToRemoveOffersFromAppellationCode = format(
-        `DELETE FROM immersion_offers WHERE siret = '%s' AND appellation_code::text IN (%L); `,
-        siret,
-        offersToRemoveByRomeAppellation,
-      );
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        queryToRemoveOffersFromAppellationCode,
-      );
-    }
+    if (offersToRemoveByAppelationCode.length > 0)
+      await this.transaction
+        .deleteFrom("immersion_offers")
+        .where("siret", "=", siret)
+        .where(
+          "appellation_code",
+          "in",
+          offersToRemoveByAppelationCode.map((appelationCode) =>
+            parseInt(appelationCode),
+          ),
+        );
   }
 
   async #updateContactFromAggregates(
@@ -967,61 +948,44 @@ export class PgEstablishmentAggregateRepository
       !!updatedAggregate.contact &&
       !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
     ) {
-      await executeKyselyRawSqlQuery(
-        this.transaction,
-        ` UPDATE establishments_contacts
-          SET lastname = $1, 
-            firstname = $2, 
-            email = $3, 
-            job = $4, 
-            phone = $5, 
-            contact_mode = $6, 
-            copy_emails = $7,
-            siret = $8
-          WHERE uuid = $9`,
-        [
-          updatedAggregate.contact.lastName,
-          updatedAggregate.contact.firstName,
-          updatedAggregate.contact.email,
-          updatedAggregate.contact.job,
-          updatedAggregate.contact.phone,
-          updatedAggregate.contact.contactMethod,
-          JSON.stringify(updatedAggregate.contact.copyEmails),
-          updatedAggregate.establishment.siret,
-          existingAggregate.contact.id,
-        ],
-      );
+      await this.transaction
+        .updateTable("establishments_contacts")
+        .set({
+          lastname: updatedAggregate.contact.lastName,
+          firstname: updatedAggregate.contact.firstName,
+          email: updatedAggregate.contact.email,
+          job: updatedAggregate.contact.job,
+          phone: updatedAggregate.contact.phone,
+          contact_mode: updatedAggregate.contact.contactMethod,
+          copy_emails: sql`${JSON.stringify(
+            updatedAggregate.contact.copyEmails,
+          )}`,
+          siret: updatedAggregate.establishment.siret,
+        })
+        .where("uuid", "=", existingAggregate.contact.id)
+        .execute();
     }
   }
 
   async #insertLocations(aggregate: EstablishmentAggregate) {
-    const convertPositionToStGeography = ({ lat, lon }: any) =>
-      `ST_GeographyFromText('POINT(${lon} ${lat})')`;
-
-    const locationFields = aggregate.establishment.locations.map(
-      ({ address, id, position }) => [
-        id,
-        aggregate.establishment.siret,
-        address.city,
-        address.departmentCode,
-        address.postcode,
-        address.streetNumberAndAddress,
-        position.lat,
-        position.lon,
-        convertPositionToStGeography(position),
-      ],
-    );
-
-    const insertLocationsQuery = fixStGeographyEscapingInQuery(
-      format(
-        `INSERT INTO establishments_locations (
-        id, establishment_siret, city, department_code, post_code, street_number_and_address, lat, lon, position
-      ) VALUES %L`,
-        locationFields,
-      ),
-    );
-
-    await executeKyselyRawSqlQuery(this.transaction, insertLocationsQuery);
+    await this.transaction
+      .insertInto("establishments_locations")
+      .values((eb) =>
+        aggregate.establishment.locations.map(({ position, address, id }) => ({
+          id: id,
+          establishment_siret: aggregate.establishment.siret,
+          city: address.city,
+          department_code: address.departmentCode,
+          post_code: address.postcode,
+          street_number_and_address: address.streetNumberAndAddress,
+          lat: position.lat,
+          lon: position.lon,
+          position: eb.fn("ST_GeographyFromText", [
+            sql`${`POINT(${position.lon} ${position.lat})`}`,
+          ]),
+        })),
+      )
+      .execute();
   }
 }
 
@@ -1117,14 +1081,6 @@ const buildAppellationsArray = `(JSON_AGG(JSON_BUILD_OBJECT(
               'appellationLabel', libelle_appellation_long,
               'score', io.score
             ) ORDER BY ogr_appellation)) AS appellations`;
-
-const reStGeographyFromText =
-  /'ST_GeographyFromText\(''POINT\((-?\d+(\.\d+)?)\s(-?\d+(\.\d+)?)\)''\)'/g;
-
-// Remove any repeated single quotes ('') inside ST_GeographyFromText.
-// TODO : find a better way than that : This is due to the Literal formatting that turns all simple quote into double quote.
-const fixStGeographyEscapingInQuery = (query: string) =>
-  query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
 
 const withEstablishmentAggregateSubQuery = `
 establishment_locations_agg AS (
