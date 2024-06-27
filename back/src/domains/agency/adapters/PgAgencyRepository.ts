@@ -1,5 +1,4 @@
-import { InsertObject, sql } from "kysely";
-import format from "pg-format";
+import { sql } from "kysely";
 import { map } from "ramda";
 import {
   AbsoluteUrl,
@@ -7,8 +6,6 @@ import {
   AgencyDto,
   AgencyId,
   AgencyKind,
-  AgencyKindFilter,
-  AgencyPositionFilter,
   AgencyRole,
   AgencyStatus,
   DepartmentCode,
@@ -17,7 +14,7 @@ import {
   GetAgenciesFilter,
   PartialAgencyDto,
   agencySchema,
-  filterNotFalsy,
+  pipeWithValue,
 } from "shared";
 import { z } from "zod";
 import {
@@ -28,10 +25,8 @@ import {
 import {
   KyselyDb,
   cast,
-  executeKyselyRawSqlQuery,
   jsonBuildObject,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import {
   AgencyWithoutEmails,
@@ -48,78 +43,6 @@ import {
 const logger = createLogger(__filename);
 
 const MAX_AGENCIES_RETURNED = 200;
-type InsertPgAgency = InsertObject<Database, "agencies">;
-
-type AgencyColumns =
-  | "admin_emails"
-  | "agency_siret"
-  | "city"
-  | "code_safir"
-  | "counsellor_emails"
-  | "department_code"
-  | "email_signature"
-  | "id"
-  | "kind"
-  | "logo_url"
-  | "name"
-  | "position"
-  | "post_code"
-  | "questionnaire_url"
-  | "status"
-  | "street_number_and_address"
-  | "validator_emails"
-  | "refers_to_agency_id"
-  | "rejection_justification"
-  | "covered_departments";
-
-type PersistenceAgency = Record<AgencyColumns, any>;
-
-const makeAgencyKindFilterSQL = (
-  agencyKindFilter?: AgencyKindFilter,
-): string | undefined => {
-  if (agencyKindFilter === "immersionPeOnly") return "kind = 'pole-emploi'";
-  if (agencyKindFilter === "immersionWithoutPe")
-    return "kind != 'pole-emploi' AND kind != 'cci'";
-  if (agencyKindFilter === "miniStageOnly") return "kind = 'cci'";
-  if (agencyKindFilter === "miniStageExcluded") return "kind != 'cci'";
-  if (agencyKindFilter === "withoutRefersToAgency")
-    return "refers_to_agency_id IS NULL";
-};
-
-const makeNameFilterSQL = (name?: string): string | undefined => {
-  if (!name) return;
-  return format("name ILIKE '%' || %1$L || '%'", name);
-};
-
-const makeSiretFilterSQL = (siret?: string): string | undefined => {
-  if (!siret) return;
-  return format("agency_siret = %1$L", siret);
-};
-
-const makeDepartmentCodeFilterSQL = (
-  departmentCode?: DepartmentCode,
-): string | undefined => {
-  if (!departmentCode) return;
-  return format("covered_departments @> %L", `["${departmentCode}"]`);
-};
-
-const makePositionFilterSQL = (
-  positionFilter?: AgencyPositionFilter,
-): string | undefined => {
-  if (!positionFilter) return;
-  if (typeof positionFilter.distance_km !== "number")
-    throw new Error("distance_km must be a number");
-  return `ST_Distance(${STPointStringFromPosition(
-    positionFilter.position,
-  )}, position) <= ${positionFilter.distance_km * 1000}`;
-};
-
-const makeStatusFilterSQL = (
-  statusFilter?: AgencyStatus[],
-): string | undefined => {
-  if (!statusFilter) return;
-  return format("status IN (%1$L)", statusFilter);
-};
 
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private transaction: KyselyDb) {}
@@ -153,41 +76,89 @@ export class PgAgencyRepository implements AgencyRepository {
     filters?: GetAgenciesFilter;
     limit?: number;
   }): Promise<AgencyDto[]> {
-    const filtersSQL = [
-      makeDepartmentCodeFilterSQL(filters.departmentCode),
-      makeNameFilterSQL(filters.nameIncludes),
-      makeAgencyKindFilterSQL(filters.kind),
-      makePositionFilterSQL(filters.position),
-      makeStatusFilterSQL(filters.status),
-      makeSiretFilterSQL(filters.siret),
-    ].filter(filterNotFalsy);
+    const { departmentCode, kind, nameIncludes, position, siret, status } =
+      filters;
+    const results = await pipeWithValue(
+      this.transaction
+        .selectFrom("agencies")
+        .selectAll()
+        .select((eb) => eb.fn("ST_AsGeoJSON", ["position"]).as("position")),
+      (b) =>
+        departmentCode
+          ? b.where("covered_departments", "@>", `["${departmentCode}"]`)
+          : b,
+      (b) => (nameIncludes ? b.where("name", "ilike", `%${nameIncludes}%`) : b),
+      (b) => {
+        if (kind === "immersionPeOnly")
+          return b.where("kind", "=", "pole-emploi");
+        if (kind === "immersionWithoutPe")
+          return b
+            .where("kind", "!=", "pole-emploi")
+            .where("kind", "!=", "cci");
+        if (kind === "miniStageOnly") return b.where("kind", "=", "cci");
+        if (kind === "miniStageExcluded") return b.where("kind", "!=", "cci");
+        if (kind === "withoutRefersToAgency")
+          return b.where("refers_to_agency_id", "is", null);
+        return b;
+      },
+      (b) => (status ? b.where("status", "in", status) : b),
+      (b) => (siret ? b.where("agency_siret", "=", siret) : b),
+      (b) =>
+        b.limit(
+          Math.min(limit ?? MAX_AGENCIES_RETURNED, MAX_AGENCIES_RETURNED),
+        ),
+      (b) =>
+        position
+          ? b
+              .select(({ fn }) =>
+                fn("ST_Distance", [
+                  fn("ST_GeographyFromText", [
+                    sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
+                  ]),
+                  "position",
+                ]).as("distance-km"),
+              )
+              .where(
+                ({ fn }) =>
+                  fn("ST_Distance", [
+                    fn("ST_GeographyFromText", [
+                      sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
+                    ]),
+                    "position",
+                  ]),
+                "<=",
+                position.distance_km * 1000,
+              )
+              .orderBy(["distance-km", "agencies.position"])
+          : b,
+    ).execute();
 
-    const whereClause =
-      filtersSQL.length > 0 ? `WHERE ${filtersSQL.join(" AND ")}` : "";
-    const limitClause = `LIMIT ${Math.min(
-      limit ?? MAX_AGENCIES_RETURNED,
-      MAX_AGENCIES_RETURNED,
-    )}`;
-    const sortClause = filters.position
-      ? `ORDER BY ST_Distance(${STPointStringFromPosition(
-          filters.position.position,
-        )}, position)`
-      : "";
-
-    const query = [
-      "SELECT *, ST_AsGeoJSON(position) AS position FROM agencies",
-      ...(whereClause ? [whereClause] : []),
-      ...(sortClause ? [sortClause] : []),
-      ...(limitClause ? [limitClause] : []),
-    ].join("\n");
-
-    const pgResult = await executeKyselyRawSqlQuery<PersistenceAgency>(
-      this.transaction,
-      query,
-    );
-
-    const agenciesWithoutEmails = pgResult.rows.map(
-      persistenceAgencyToAgencyDto,
+    const agenciesWithoutEmails: AgencyWithoutEmails[] = results.map(
+      (result) => ({
+        coveredDepartments: result.covered_departments as DepartmentCode[],
+        address: {
+          city: result.city,
+          departmentCode: result.department_code,
+          postcode: result.post_code,
+          streetNumberAndAddress: result.street_number_and_address,
+        },
+        agencySiret: result.agency_siret,
+        codeSafir: result.code_safir,
+        id: result.id,
+        kind: result.kind as AgencyKind,
+        logoUrl: result.questionnaire_url
+          ? (result.logo_url as AbsoluteUrl)
+          : null,
+        name: result.name,
+        position: parseGeoJson(result.position),
+        questionnaireUrl: result.questionnaire_url
+          ? (result.questionnaire_url as AbsoluteUrl)
+          : null,
+        signature: result.email_signature,
+        status: result.status as AgencyStatus,
+        rejectionJustification: result.rejection_justification,
+        refersToAgencyId: result.refers_to_agency_id,
+      }),
     );
 
     const agencies = await this.#addEmailsToAgencies(agenciesWithoutEmails);
@@ -262,29 +233,32 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
-    const pgAgency: InsertPgAgency = {
-      id: agency.id,
-      name: agency.name,
-      status: agency.status,
-      kind: agency.kind,
-      questionnaire_url: agency.questionnaireUrl,
-      email_signature: agency.signature,
-      logo_url: agency.logoUrl,
-      position: sql`ST_MakePoint(${agency.position.lon}, ${agency.position.lat})`,
-      agency_siret: agency.agencySiret,
-      code_safir: agency.codeSafir,
-      street_number_and_address: agency.address?.streetNumberAndAddress,
-      post_code: agency.address?.postcode,
-      city: agency.address?.city,
-      department_code: agency.address?.departmentCode,
-      covered_departments: JSON.stringify(agency.coveredDepartments),
-      refers_to_agency_id: agency.refersToAgencyId,
-      acquisition_campaign: agency.acquisitionCampaign,
-      acquisition_keyword: agency.acquisitionKeyword,
-    };
-
     try {
-      await this.transaction.insertInto("agencies").values(pgAgency).execute();
+      await this.transaction
+        .insertInto("agencies")
+        .values(({ fn }) => ({
+          id: agency.id,
+          name: agency.name,
+          status: agency.status,
+          kind: agency.kind,
+          questionnaire_url: agency.questionnaireUrl,
+          email_signature: agency.signature,
+          logo_url: agency.logoUrl,
+          position: fn("ST_MakePoint", [
+            sql`${agency.position.lon}, ${agency.position.lat}`,
+          ]),
+          agency_siret: agency.agencySiret,
+          code_safir: agency.codeSafir,
+          street_number_and_address: agency.address.streetNumberAndAddress,
+          post_code: agency.address.postcode,
+          city: agency.address.city,
+          department_code: agency.address.departmentCode,
+          covered_departments: JSON.stringify(agency.coveredDepartments),
+          refers_to_agency_id: agency.refersToAgencyId,
+          acquisition_campaign: agency.acquisitionCampaign,
+          acquisition_keyword: agency.acquisitionKeyword,
+        }))
+        .execute();
 
       await Promise.all(
         agency.validatorEmails.map(async (email) =>
@@ -319,7 +293,7 @@ export class PgAgencyRepository implements AgencyRepository {
   public async update(agency: PartialAgencyDto): Promise<void> {
     await this.transaction
       .updateTable("agencies")
-      .set({
+      .set(({ fn }) => ({
         name: agency.name,
         status: agency.status,
         kind: agency.kind,
@@ -327,7 +301,9 @@ export class PgAgencyRepository implements AgencyRepository {
         email_signature: agency.signature,
         logo_url: agency.logoUrl,
         position: agency.position
-          ? sql`ST_MakePoint(${agency.position.lon}, ${agency.position.lat})`
+          ? fn("ST_MakePoint", [
+              sql`${agency.position.lon}, ${agency.position.lat}`,
+            ])
           : undefined,
         agency_siret: agency.agencySiret,
         code_safir: agency.codeSafir,
@@ -341,7 +317,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         updated_at: sql`NOW()`,
         rejection_justification: agency.rejectionJustification,
-      })
+      }))
       .where("id", "=", agency.id)
       .execute();
 
@@ -484,33 +460,6 @@ export class PgAgencyRepository implements AgencyRepository {
       }).as("agency"),
     ]);
 }
-
-const STPointStringFromPosition = (position: GeoPositionDto) =>
-  `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
-
-const persistenceAgencyToAgencyDto = (
-  params: PersistenceAgency,
-): AgencyWithoutEmails => ({
-  coveredDepartments: params.covered_departments,
-  address: {
-    streetNumberAndAddress: params.street_number_and_address,
-    postcode: params.post_code,
-    departmentCode: params.department_code,
-    city: params.city,
-  },
-  agencySiret: params.agency_siret,
-  codeSafir: params.code_safir,
-  id: params.id,
-  kind: params.kind,
-  logoUrl: params.logo_url,
-  name: params.name,
-  position: parseGeoJson(params.position),
-  questionnaireUrl: params.questionnaire_url,
-  signature: params.email_signature,
-  status: params.status,
-  rejectionJustification: params.rejection_justification,
-  refersToAgencyId: params.refers_to_agency_id,
-});
 
 const parseGeoJson = (raw: string): GeoPositionDto => {
   const json = JSON.parse(raw);
