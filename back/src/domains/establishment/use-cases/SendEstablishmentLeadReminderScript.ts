@@ -111,7 +111,11 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
       uow,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       config: this.#config,
-      longLink: generateAddEstablishmentFormLink({ config, convention }),
+      longLink: generateAddEstablishmentFormLink({
+        config,
+        convention,
+        acquisitionCampaign: "transactionnel-etablissement-rappel-inscription",
+      }),
     });
 
     const unsubscribeToEmailLink = this.#generateConventionMagicLinkUrl({
@@ -177,5 +181,10 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
 const generateAddEstablishmentFormLink = ({
   config,
   convention,
-}: { config: AppConfig; convention: ConventionDto }): AbsoluteUrl =>
-  `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?siret=${convention.siret}&bcLastName=${convention.signatories.establishmentRepresentative.lastName}&bcFirstName=${convention.signatories.establishmentRepresentative.firstName}&bcPhone=${convention.signatories.establishmentRepresentative.phone}&bcEmail=${convention.signatories.establishmentRepresentative.email}`;
+  acquisitionCampaign,
+}: {
+  config: AppConfig;
+  convention: ConventionDto;
+  acquisitionCampaign: string;
+}): AbsoluteUrl =>
+  `${config.immersionFacileBaseUrl}/${frontRoutes.establishment}?siret=${convention.siret}&bcLastName=${convention.signatories.establishmentRepresentative.lastName}&bcFirstName=${convention.signatories.establishmentRepresentative.firstName}&bcPhone=${convention.signatories.establishmentRepresentative.phone}&bcEmail=${convention.signatories.establishmentRepresentative.email}&mtm_campaign=${acquisitionCampaign}`;
