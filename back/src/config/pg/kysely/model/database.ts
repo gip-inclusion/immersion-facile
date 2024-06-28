@@ -1,5 +1,5 @@
 import { ColumnType, Generated } from "kysely";
-import { AbsoluteUrl, ConventionId } from "shared";
+import { AbsoluteUrl, ConventionId, DiscussionStatus } from "shared";
 
 export interface Database {
   actors: Actors;
@@ -110,6 +110,9 @@ interface Discussions extends WithAcquisition {
   city: string;
   business_name: string;
   convention_id: ConventionId | null;
+  status: DiscussionStatus;
+  rejection_kind: string | null;
+  rejection_reason: string | null;
 }
 
 type ExchangeRole = "establishment" | "potentialBeneficiary";

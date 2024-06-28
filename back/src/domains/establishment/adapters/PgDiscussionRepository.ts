@@ -4,7 +4,10 @@ import {
   ContactMethod,
   DiscussionDto,
   DiscussionId,
+  DiscussionStatus,
+  DiscussionStatusWithRejection,
   Exchange,
+  RejectionKind,
   SiretDto,
   pipeWithValue,
 } from "shared";
@@ -89,6 +92,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
               )
           : b,
     )
+      .orderBy("discussions.created_at", "desc")
       .limit(limit)
       .execute();
 
@@ -97,41 +101,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     );
   }
 
-  #makeDiscussionDtoFromPgDiscussion(discussion: {
-    id: string;
-    createdAt: Date;
-    siret: string;
-    businessName: string;
-    appellationCode: string;
-    immersionObjective:
-      | "Confirmer un projet professionnel"
-      | "Découvrir un métier ou un secteur d'activité"
-      | "Initier une démarche de recrutement"
-      | undefined;
-    potentialBeneficiary: {
-      firstName: string;
-      lastName: string;
-      email: string;
-      phone: string | undefined;
-      resumeLink: string | undefined;
-    };
-    establishmentContact: {
-      contactMethod: "EMAIL" | "PHONE" | "IN_PERSON";
-      firstName: string;
-      lastName: string;
-      email: string;
-      phone: string;
-      job: string;
-      copyEmails: string[];
-    };
-    address: {
-      streetNumberAndAddress: string;
-      postcode: string;
-      departmentCode: string;
-      city: string;
-    };
-    exchanges: Exchange[] | undefined;
-  }): DiscussionDto {
+  #makeDiscussionDtoFromPgDiscussion(discussion: PgDiscussion): DiscussionDto {
     return (
       discussion && {
         ...discussion,
@@ -143,6 +113,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
               sentAt: new Date(exchange.sentAt).toISOString(),
             }))
           : [],
+        ...makeDiscussionStatusAndRejection(discussion),
       }
     );
   }
@@ -233,6 +204,9 @@ export class PgDiscussionRepository implements DiscussionRepository {
             }),
             exchanges: qb.ref("exchanges"),
             conventionId: qb.ref("convention_id"),
+            status: sql<DiscussionStatus>`${qb.ref("status")}`,
+            rejectionKind: sql<RejectionKind>`${qb.ref("rejection_kind")}`,
+            rejectionReason: qb.ref("rejection_reason"),
           }),
         ).as("discussion"),
       ]);
@@ -332,32 +306,124 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
 const discussionToPg = (
   discussion: DiscussionDto,
-): InsertObject<Database, "discussions"> => ({
-  id: discussion.id,
-  appellation_code: +discussion.appellationCode,
-  business_name: discussion.businessName,
-  city: discussion.address.city,
-  created_at: discussion.createdAt,
-  department_code: discussion.address.departmentCode,
-  establishment_contact_copy_emails: JSON.stringify(
-    discussion.establishmentContact.copyEmails,
-  ),
-  establishment_contact_email: discussion.establishmentContact.email,
-  establishment_contact_first_name: discussion.establishmentContact.firstName,
-  establishment_contact_job: discussion.establishmentContact.job,
-  establishment_contact_last_name: discussion.establishmentContact.lastName,
-  establishment_contact_phone: discussion.establishmentContact.phone,
-  immersion_objective: discussion.immersionObjective,
-  postcode: discussion.address.postcode,
-  potential_beneficiary_email: discussion.potentialBeneficiary.email,
-  potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
-  potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
-  potential_beneficiary_resume_link: discussion.potentialBeneficiary.resumeLink,
-  street_number_and_address: discussion.address.streetNumberAndAddress,
-  siret: discussion.siret,
-  contact_method: discussion.establishmentContact.contactMethod,
-  potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
-  acquisition_campaign: discussion.acquisitionCampaign,
-  acquisition_keyword: discussion.acquisitionKeyword,
-  convention_id: discussion.conventionId,
-});
+): InsertObject<Database, "discussions"> => {
+  return {
+    id: discussion.id,
+    appellation_code: +discussion.appellationCode,
+    business_name: discussion.businessName,
+    city: discussion.address.city,
+    created_at: discussion.createdAt,
+    department_code: discussion.address.departmentCode,
+    establishment_contact_copy_emails: JSON.stringify(
+      discussion.establishmentContact.copyEmails,
+    ),
+    establishment_contact_email: discussion.establishmentContact.email,
+    establishment_contact_first_name: discussion.establishmentContact.firstName,
+    establishment_contact_job: discussion.establishmentContact.job,
+    establishment_contact_last_name: discussion.establishmentContact.lastName,
+    establishment_contact_phone: discussion.establishmentContact.phone,
+    immersion_objective: discussion.immersionObjective,
+    postcode: discussion.address.postcode,
+    potential_beneficiary_email: discussion.potentialBeneficiary.email,
+    potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
+    potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
+    potential_beneficiary_resume_link:
+      discussion.potentialBeneficiary.resumeLink,
+    street_number_and_address: discussion.address.streetNumberAndAddress,
+    siret: discussion.siret,
+    contact_method: discussion.establishmentContact.contactMethod,
+    potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
+    acquisition_campaign: discussion.acquisitionCampaign,
+    acquisition_keyword: discussion.acquisitionKeyword,
+    convention_id: discussion.conventionId,
+    ...discussionStatusWithRejectionToPg(
+      makeDiscussionStatusAndRejection(discussion),
+    ),
+  };
+};
+
+const makeDiscussionStatusAndRejection = (
+  discussion: DiscussionDto | PgDiscussion,
+): DiscussionStatusWithRejection =>
+  discussion.status === "REJECTED"
+    ? {
+        status: "REJECTED",
+        ...(discussion.rejectionKind === "OTHER"
+          ? {
+              rejectionKind: "OTHER",
+              rejectionReason: discussion.rejectionReason ?? "",
+            }
+          : {
+              rejectionKind: discussion.rejectionKind ?? "UNABLE_TO_HELP",
+            }),
+      }
+    : {
+        status: "PENDING",
+      };
+
+const discussionStatusWithRejectionToPg = (
+  discussionStatusWithRejection: DiscussionStatusWithRejection,
+): {
+  status: DiscussionStatus;
+  rejection_kind: RejectionKind | null;
+  rejection_reason: string | null;
+} => {
+  const { status } = discussionStatusWithRejection;
+  if (status === "REJECTED") {
+    return {
+      status: status,
+      rejection_kind:
+        discussionStatusWithRejection.rejectionKind === "OTHER"
+          ? "OTHER"
+          : "UNABLE_TO_HELP",
+      rejection_reason:
+        discussionStatusWithRejection.rejectionKind === "OTHER"
+          ? discussionStatusWithRejection.rejectionReason
+          : null,
+    };
+  }
+  return {
+    status: status,
+    rejection_kind: null,
+    rejection_reason: null,
+  };
+};
+
+type PgDiscussion = {
+  id: string;
+  createdAt: Date;
+  siret: string;
+  businessName: string;
+  appellationCode: string;
+  immersionObjective:
+    | "Confirmer un projet professionnel"
+    | "Découvrir un métier ou un secteur d'activité"
+    | "Initier une démarche de recrutement"
+    | undefined;
+  potentialBeneficiary: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string | undefined;
+    resumeLink: string | undefined;
+  };
+  establishmentContact: {
+    contactMethod: "EMAIL" | "PHONE" | "IN_PERSON";
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    job: string;
+    copyEmails: string[];
+  };
+  address: {
+    streetNumberAndAddress: string;
+    postcode: string;
+    departmentCode: string;
+    city: string;
+  };
+  exchanges: Exchange[] | undefined;
+  status: DiscussionStatus;
+  rejectionKind: Exclude<RejectionKind, null> | undefined;
+  rejectionReason: string | undefined;
+};

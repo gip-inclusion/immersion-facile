@@ -109,6 +109,7 @@ import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishmen
 import { AddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
 import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
+import { makeRejectDiscussionAndSendNotification } from "../../domains/establishment/use-cases/discussions/RejectDiscussionAndSendNotification";
 import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
@@ -634,6 +635,15 @@ export const createUseCases = (
     getEstablishmentStats: makeGetEstablishmentStats({
       uowPerformer,
     }),
+    rejectDiscussionAndSendNotification:
+      makeRejectDiscussionAndSendNotification({
+        uowPerformer,
+        deps: {
+          replyDomain: `reply.${config.immersionFacileDomain}`,
+          saveNotificationAndRelatedEvent,
+          timeGateway: gateways.timeGateway,
+        },
+      }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

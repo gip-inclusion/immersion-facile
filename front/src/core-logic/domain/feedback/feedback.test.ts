@@ -1,5 +1,6 @@
 import { expectToEqual, keys } from "shared";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
+import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   ActionKindAndLevel,
@@ -50,6 +51,23 @@ describe("Feedbacks", () => {
       expectFeedbackStoreByTopicToEqual({
         topic: "api-consumer-global",
         kindAndLevel: "create.error",
+      });
+    });
+    it("stores feedback with fetch level error from another slice", () => {
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {});
+
+      store.dispatch(
+        discussionSlice.actions.fetchDiscussionFailed({
+          errorMessage: "fake error message",
+          feedbackTopic: "dashboard-discussion",
+        }),
+      );
+      expect(keys(feedbacksSelectors.feedbacks(store.getState()))).toHaveLength(
+        1,
+      );
+      expectFeedbackStoreByTopicToEqual({
+        topic: "dashboard-discussion",
+        kindAndLevel: "fetch.error",
       });
     });
   });

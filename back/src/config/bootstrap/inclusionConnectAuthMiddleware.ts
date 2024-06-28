@@ -3,7 +3,7 @@ import { makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { NotFoundError } from "../helpers/httpErrors";
 
-export const makeAdminAuthMiddleware = (
+export const makeInclusionConnectAuthMiddleware = (
   jwtPublicKey: string,
   uowPerformer: UnitOfWorkPerformer,
 ) => {

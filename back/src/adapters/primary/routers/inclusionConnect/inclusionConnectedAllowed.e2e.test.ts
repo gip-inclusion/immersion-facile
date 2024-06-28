@@ -373,7 +373,132 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
     });
   });
+  describe(`${displayRouteName(
+    inclusionConnectedAllowedRoutes.rejectDiscussion,
+  )}`, () => {
+    it("400 - throws if discussion is already rejected", async () => {
+      const user = new InclusionConnectedUserBuilder().build();
+      const discussion = new DiscussionBuilder()
+        .withEstablishmentContact({
+          email: user.email,
+        })
+        .withStatus("REJECTED")
+        .build();
+      const existingToken = generateInclusionConnectJwt({
+        userId: user.id,
+        version: currentJwtVersions.inclusion,
+      });
+      inMemoryUow.discussionRepository.discussions = [discussion];
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        user,
+      ]);
 
+      const response = await httpClient.rejectDiscussion({
+        headers: { authorization: existingToken },
+        urlParams: {
+          discussionId: discussion.id,
+        },
+        body: {
+          status: "REJECTED",
+          rejectionKind: "OTHER",
+          rejectionReason: "No reason",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          errors: `Can't reject discussion ${discussion.id} because it is already rejected`,
+        },
+      });
+    });
+    it("401 - throws if user is not known", async () => {
+      const discussion = new DiscussionBuilder().build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      const response = await httpClient.rejectDiscussion({
+        headers: { authorization: "" },
+        urlParams: {
+          discussionId: discussion.id,
+        },
+        body: {
+          status: "REJECTED",
+          rejectionKind: "OTHER",
+          rejectionReason: "No reason",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: {
+          error: "You need to authenticate first",
+        },
+      });
+    });
+    it("403 - throws if user is not bound to discussion", async () => {
+      const user = new InclusionConnectedUserBuilder().build();
+      const discussion = new DiscussionBuilder().build();
+      const existingToken = generateInclusionConnectJwt({
+        userId: user.id,
+        version: currentJwtVersions.inclusion,
+      });
+      inMemoryUow.discussionRepository.discussions = [discussion];
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        user,
+      ]);
+
+      const response = await httpClient.rejectDiscussion({
+        headers: { authorization: existingToken },
+        urlParams: {
+          discussionId: discussion.id,
+        },
+        body: {
+          status: "REJECTED",
+          rejectionKind: "OTHER",
+          rejectionReason: "No reason",
+        },
+      });
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          errors: `User is not allowed to reject discussion ${discussion.id}`,
+        },
+      });
+    });
+    it("200 - rejects discussion", async () => {
+      const user = new InclusionConnectedUserBuilder().build();
+      const discussion = new DiscussionBuilder()
+        .withEstablishmentContact({
+          email: user.email,
+        })
+        .build();
+      const existingToken = generateInclusionConnectJwt({
+        userId: user.id,
+        version: currentJwtVersions.inclusion,
+      });
+      inMemoryUow.discussionRepository.discussions = [discussion];
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        user,
+      ]);
+
+      const response = await httpClient.rejectDiscussion({
+        headers: { authorization: existingToken },
+        urlParams: {
+          discussionId: discussion.id,
+        },
+        body: {
+          status: "REJECTED",
+          rejectionKind: "OTHER",
+          rejectionReason: "No reason",
+        },
+      });
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+    });
+  });
   describe(`${displayRouteName(
     inclusionConnectedAllowedRoutes.broadcastConventionAgain,
   )}`, () => {

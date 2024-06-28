@@ -638,6 +638,18 @@ export const domElementIds = {
         "im-manage-establishment__convert-discussion-to-draft-convention",
       replyToCandidateByEmail:
         "im-manage-establishment__reply-to-candidate-by-email",
+      rejectApplicationModal:
+        "im-manage-establishment__reject-application-modal",
+      rejectApplicationOpenModal:
+        "im-manage-establishment__reject-application-button-open-modal",
+      rejectApplicationJustificationKindInput:
+        "im-manage-establishment__reject-application-justification-kind-input",
+      rejectApplicationJustificationTextInput:
+        "im-manage-establishment__reject-application-justification-text-input",
+      rejectApplicationSubmitButton:
+        "im-manage-establishment__reject-application-submit-button",
+      rejectApplicationCancelButton:
+        "im-manage-establishment__reject-application-cancel-button",
     },
     manageConventionForm: {
       submitButton: "im-manage-establishment__manage-convention-submit-button",

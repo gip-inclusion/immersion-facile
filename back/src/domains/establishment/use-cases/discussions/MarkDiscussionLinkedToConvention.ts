@@ -19,6 +19,7 @@ export const makeMarkDiscussionLinkedToConvention =
       await uow.discussionRepository.update({
         ...discussion,
         conventionId: convention.id,
+        status: "ACCEPTED",
       });
     },
   );

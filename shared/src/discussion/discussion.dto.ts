@@ -47,6 +47,38 @@ type DiscussionDtoBase = {
   exchanges: Exchange[];
   potentialBeneficiary: DiscussionPotentialBeneficiary;
   conventionId?: ConventionId;
+} & (DiscussionAccepted | DiscussionStatusWithRejection);
+
+export type DiscussionStatus = DiscussionDto["status"];
+export type RejectionKind = DiscussionRejected["rejectionKind"];
+
+export type DiscussionStatusWithRejection =
+  | DiscussionRejected
+  | DiscussionPending;
+
+export type WithDiscussionRejection =
+  | RejectionWithoutReason
+  | RejectionWithReason;
+
+export type DiscussionAccepted = {
+  status: "ACCEPTED";
+};
+
+export type DiscussionRejected = {
+  status: "REJECTED";
+} & WithDiscussionRejection;
+
+type RejectionWithoutReason = {
+  rejectionKind: "UNABLE_TO_HELP" | "NO_TIME";
+};
+
+type RejectionWithReason = {
+  rejectionKind: "OTHER";
+  rejectionReason: string;
+};
+
+export type DiscussionPending = {
+  status: "PENDING";
 };
 
 export type DiscussionDto = DiscussionDtoBase & {
@@ -117,6 +149,7 @@ const defaultDiscussion: DiscussionDto = {
       attachments: [],
     },
   ],
+  status: "PENDING",
 };
 
 export const cartographeAppellationAndRome: AppellationAndRomeDto = {
@@ -240,5 +273,38 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       ...this.discussion,
       conventionId: id,
     });
+  }
+  withStatus(
+    status: DiscussionStatus,
+    rejectionKind?: RejectionKind,
+    rejectionReason?: string,
+  ) {
+    let discussion: DiscussionDto = {
+      ...this.discussion,
+      status: "PENDING",
+    };
+    if (status === "REJECTED" && !rejectionKind) {
+      discussion = {
+        ...discussion,
+        status,
+        rejectionKind: "UNABLE_TO_HELP",
+      };
+    }
+    if (status === "REJECTED" && rejectionKind && rejectionKind !== "OTHER") {
+      discussion = {
+        ...discussion,
+        status,
+        rejectionKind,
+      };
+    }
+    if (status === "REJECTED" && rejectionKind && rejectionKind === "OTHER") {
+      discussion = {
+        ...discussion,
+        status,
+        rejectionKind,
+        rejectionReason: rejectionReason ?? "default rejection reason",
+      };
+    }
+    return new DiscussionBuilder(discussion);
   }
 }

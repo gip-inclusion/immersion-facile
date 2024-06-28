@@ -302,6 +302,7 @@ describe("ContactEstablishment", () => {
             attachments: [],
           },
         ],
+        status: "PENDING",
       },
     ]);
   });
@@ -362,6 +363,7 @@ describe("ContactEstablishment", () => {
             attachments: [],
           },
         ],
+        status: "PENDING",
       },
       {
         id: "discussion1",
@@ -398,6 +400,7 @@ describe("ContactEstablishment", () => {
           },
         ],
         immersionObjective: "Confirmer un projet professionnel",
+        status: "PENDING",
       },
     ];
 
