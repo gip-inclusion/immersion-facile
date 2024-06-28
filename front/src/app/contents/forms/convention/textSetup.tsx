@@ -73,14 +73,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
         </>
       ) : (
         <>
-          <p>
-            <strong>
-              Attention, le formulaire de demande de convention est déployé
-              uniquement en Bretagne, Pays de Loire, Occitanie et Nouvelle
-              Aquitaine
-            </strong>
-          </p>
-          <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
+          <p className={fr.cx("fr-text--xs")}>
             La convention doit être établie, signée par toutes les parties et
             visée par la Chambre de Commerce et d’Industrie <u>avant</u> le
             démarrage de la période d’observation en milieu professionnel. Sans
