@@ -112,24 +112,13 @@ const DiscussionDetails = ({
           ) : null}
         </p>
         <ButtonsGroup
-          buttonsEquisized
-          alignment="center"
+          inlineLayoutWhen="always"
+          buttonsSize="small"
           buttons={[
             {
               id: domElementIds.establishmentDashboard.discussion
-                .activateDraftConvention,
-              priority: "tertiary",
-              linkProps: {
-                href: makeDraftConventionLink(draftConvention, discussion.id)
-                  .href,
-                target: "_blank",
-              },
-              children: "Pré-remplir la convention pour cette mise en relation",
-            },
-            {
-              id: domElementIds.establishmentDashboard.discussion
                 .replyToCandidateByEmail,
-              priority: "tertiary",
+              priority: "primary",
               linkProps: {
                 href: `mailto:${createOpaqueEmail(
                   discussion.id,
@@ -140,7 +129,49 @@ const DiscussionDetails = ({
                 )}`,
                 target: "_blank",
               },
-              children: "Envoyer un message au candidat par email",
+              children: "Répondre au candidat",
+            },
+            {
+              id: domElementIds.establishmentDashboard.discussion
+                .activateDraftConvention,
+              priority: "tertiary",
+              linkProps: {
+                href: makeMailtoLink({
+                  email: createOpaqueEmail(
+                    discussion.id,
+                    "potentialBeneficiary",
+                    window.location.hostname,
+                  ),
+                  subject: `L'entreprise ${discussion.businessName} vous invite à finaliser votre demande de convention d'immersion`,
+                  body: `Félicitations ${
+                    discussion.potentialBeneficiary.firstName
+                  },\n\nL'entreprise ${
+                    discussion.businessName
+                  } a accepté votre candidature et vous invite à: \n\n • vérifier les informations préremplies dans la demande de convention \n\n • compléter les informations manquantes \n\n • valider la demande de convention \n\n Voici <a href="${
+                    makeDraftConventionLink(draftConvention, discussion.id).href
+                  }">le lien pour accéder à la demande de convention préremplie</a>.\n\n Bonne journée,\nL'équipe Immersion Facilitée`,
+                }),
+                target: "_blank",
+              },
+              children: "Pré-remplir la convention pour cette mise en relation",
+            },
+            {
+              id: domElementIds.establishmentDashboard.discussion
+                .rejectApplication,
+              priority: "tertiary",
+              linkProps: {
+                href: makeMailtoLink({
+                  email: createOpaqueEmail(
+                    discussion.id,
+                    "potentialBeneficiary",
+                    window.location.hostname,
+                  ),
+                  subject: `Refus de la demande d'immersion chez ${discussion.businessName}`,
+                  body: `Bonjour ${discussion.potentialBeneficiary.firstName},\n\nVotre demande d'immersion chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel} n'a pas été retenue.\n\nCordialement,\n${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName}`,
+                }),
+                target: "_blank",
+              },
+              children: "Pré-remplir la convention pour cette mise en relation",
             },
           ]}
         />
@@ -239,3 +270,16 @@ const makeConventionFromDiscussion = ({
   immersionAppellation: discussion.appellation,
   immersionAddress: addressDtoToString(discussion.address),
 });
+
+const makeMailtoLink = ({
+  email,
+  subject,
+  body,
+}: {
+  email: Email;
+  subject: string;
+  body?: string;
+}) =>
+  `mailto:${email}?subject=${encodeURI(subject)}${
+    body ? `&body=${encodeURI(body)}` : ""
+  }`;
