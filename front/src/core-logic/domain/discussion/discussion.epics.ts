@@ -16,12 +16,21 @@ const fetchDiscussionByIdEpic: DiscussionEpic = (
 ) =>
   action$.pipe(
     filter(discussionSlice.actions.fetchDiscussionRequested.match),
-    switchMap(({ payload }) =>
-      inclusionConnectedGateway.getDiscussionById$(payload),
-    ),
-    map(discussionSlice.actions.fetchDiscussionSucceeded),
-    catchEpicError((error) =>
-      discussionSlice.actions.fetchDiscussionFailed(error.message),
+    switchMap((action) =>
+      inclusionConnectedGateway.getDiscussionById$(action.payload).pipe(
+        map((discussion) =>
+          discussionSlice.actions.fetchDiscussionSucceeded({
+            discussion,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          discussionSlice.actions.fetchDiscussionFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
     ),
   );
 

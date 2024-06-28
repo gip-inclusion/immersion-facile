@@ -98,14 +98,32 @@ describe("PgDiscussionRepository", () => {
         attachments: [],
       },
     ])
-    .withCreatedAt(date)
+    .withCreatedAt(addDays(date, -1))
     .build();
   const discussionWithoutExchanges = new DiscussionBuilder()
     .withId(uuid())
     .withSiret("00000000000002")
     .withExchanges([])
     .withConventionId("some-convention-id")
-    .withCreatedAt(addDays(date, -1))
+    .withCreatedAt(addDays(date, -2))
+    .build();
+
+  const discussionWithRejectedStatusAndReason = new DiscussionBuilder()
+    .withId(uuid())
+    .withSiret("00000000000004")
+    .withExchanges([])
+    .withConventionId("some-other-convention-id")
+    .withStatus("REJECTED", "OTHER", "my custom reason")
+    .withCreatedAt(addDays(date, -3))
+    .build();
+
+  const discussionWithAcceptedStatus = new DiscussionBuilder()
+    .withId(uuid())
+    .withSiret("00000000000005")
+    .withExchanges([])
+    .withConventionId("another-convention-id")
+    .withStatus("ACCEPTED")
+    .withCreatedAt(addDays(date, -4))
     .build();
 
   describe("getDiscussions", () => {
@@ -119,12 +137,14 @@ describe("PgDiscussionRepository", () => {
       },
       {
         params: {
-          createdSince: addDays(date, -2),
+          createdSince: addDays(date, -4),
         },
         result: [
           discussionWithLastExchangeByPotentialBeneficiary,
           discussionWithLastExchangeByEstablishment,
           discussionWithoutExchanges,
+          discussionWithRejectedStatusAndReason,
+          discussionWithAcceptedStatus,
         ],
       },
       {
@@ -159,16 +179,18 @@ describe("PgDiscussionRepository", () => {
             discussionWithLastExchangeByPotentialBeneficiary,
             discussionWithLastExchangeByEstablishment,
             discussionWithoutExchanges,
+            discussionWithRejectedStatusAndReason,
+            discussionWithAcceptedStatus,
           ].map((discussion) => pgDiscussionRepository.insert(discussion)),
         );
 
         result instanceof Error
           ? expectPromiseToFailWithError(
-              pgDiscussionRepository.getDiscussions(params, 3),
+              pgDiscussionRepository.getDiscussions(params, 5),
               result,
             )
           : expectToEqual(
-              await pgDiscussionRepository.getDiscussions(params, 3),
+              await pgDiscussionRepository.getDiscussions(params, 5),
               result,
             );
       },

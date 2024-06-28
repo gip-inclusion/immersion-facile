@@ -4,7 +4,7 @@ import { createExpressSharedRouter } from "shared-routes/express";
 import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
-import { createInclusionConnectedMiddleware } from "./createInclusionConnectedMiddleware";
+import { createLegacyInclusionConnectedMiddleware } from "./createLegacyInclusionConnectedMiddleware";
 
 export const createInclusionConnectedAllowedRouter = (
   deps: AppDependencies,
@@ -16,7 +16,7 @@ export const createInclusionConnectedAllowedRouter = (
     inclusionConnectedRouter,
   );
 
-  const inclusionConnectedMiddleware = createInclusionConnectedMiddleware(
+  const inclusionConnectedMiddleware = createLegacyInclusionConnectedMiddleware(
     deps.config.jwtPublicKey,
   );
 
@@ -83,6 +83,21 @@ export const createInclusionConnectedAllowedRouter = (
           req.payloads?.inclusion,
         ),
       ),
+  );
+
+  inclusionConnectedSharedRoutes.rejectDiscussion(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        if (!req.payloads?.currentUser) throw new UnauthorizedError();
+        return deps.useCases.rejectDiscussionAndSendNotification.execute(
+          {
+            discussionId: req.params.discussionId,
+            ...req.body,
+          },
+          req.payloads.currentUser,
+        );
+      }),
   );
 
   return inclusionConnectedRouter;

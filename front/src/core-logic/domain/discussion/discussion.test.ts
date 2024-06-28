@@ -1,5 +1,6 @@
 import { DiscussionBuilder, DiscussionReadDto, expectToEqual } from "shared";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   TestDependencies,
   createTestStore,
@@ -30,6 +31,7 @@ describe("Discussion slice", () => {
       discussionSlice.actions.fetchDiscussionRequested({
         jwt,
         discussionId: "missing-discussion-id",
+        feedbackTopic: "dashboard-discussion",
       }),
     );
 
@@ -54,6 +56,7 @@ describe("Discussion slice", () => {
       discussionSlice.actions.fetchDiscussionRequested({
         jwt,
         discussionId: discussion.id,
+        feedbackTopic: "dashboard-discussion",
       }),
     );
 
@@ -77,6 +80,7 @@ describe("Discussion slice", () => {
       discussionSlice.actions.fetchDiscussionRequested({
         jwt,
         discussionId: discussion.id,
+        feedbackTopic: "dashboard-discussion",
       }),
     );
 
@@ -89,7 +93,14 @@ describe("Discussion slice", () => {
 
     expectDiscussionSelector({
       ...defaultStartingDiscussionState,
-      fetchError: discussionFetchError.message,
+    });
+    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+      "dashboard-discussion": {
+        level: "error",
+        title: "Problème lors de la récupération des discussions",
+        message:
+          "Une erreur est survenue lors de la récupération des discussions",
+      },
     });
   });
 
@@ -100,6 +111,7 @@ describe("Discussion slice", () => {
       discussionSlice.actions.fetchDiscussionRequested({
         jwt,
         discussionId: discussion.id,
+        feedbackTopic: "dashboard-discussion",
       }),
     );
 
@@ -114,6 +126,7 @@ describe("Discussion slice", () => {
       discussionSlice.actions.fetchDiscussionRequested({
         jwt,
         discussionId: discussion.id,
+        feedbackTopic: "dashboard-discussion",
       }),
     );
 
@@ -121,6 +134,79 @@ describe("Discussion slice", () => {
       ...defaultStartingDiscussionState,
       isLoading: true,
       discussion: null,
+    });
+  });
+
+  describe("discussion reject", () => {
+    it("discussion reject succeeded", () => {
+      expectDiscussionSelector(defaultStartingDiscussionState);
+
+      store.dispatch(
+        discussionSlice.actions.updateDiscussionStatusRequested({
+          jwt,
+          discussionId: discussion.id,
+          feedbackTopic: "dashboard-discussion",
+          status: "REJECTED",
+          rejectionKind: "NO_TIME",
+        }),
+      );
+
+      expectDiscussionSelector({
+        ...defaultStartingDiscussionState,
+        isLoading: true,
+      });
+
+      feedGatewayWithDiscussionOrError(discussionFetchError);
+
+      expectDiscussionSelector({
+        ...defaultStartingDiscussionState,
+      });
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "dashboard-discussion-rejection": {
+          level: "error",
+          title: "La candidature a bien été rejetée.",
+          message:
+            "La candidature a bien été rejetée, un email a été envoyé au candidat",
+        },
+      });
+    });
+
+    it("discussion reject failed", () => {
+      expectDiscussionSelector(defaultStartingDiscussionState);
+
+      store.dispatch(
+        discussionSlice.actions.updateDiscussionStatusRequested({
+          jwt,
+          discussionId: discussion.id,
+          feedbackTopic: "dashboard-discussion",
+          status: "REJECTED",
+          rejectionKind: "NO_TIME",
+        }),
+      );
+
+      expectDiscussionSelector({
+        ...defaultStartingDiscussionState,
+        isLoading: true,
+      });
+
+      store.dispatch(
+        discussionSlice.actions.updateDiscussionStatusFailed({
+          feedbackTopic: "dashboard-discussion-rejection",
+          errorMessage: "Rejection failed",
+        }),
+      );
+
+      expectDiscussionSelector({
+        ...defaultStartingDiscussionState,
+      });
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "dashboard-discussion-rejection": {
+          level: "error",
+          title: "La candidature a bien été rejetée.",
+          message:
+            "La candidature a bien été rejetée, un email a été envoyé au candidat",
+        },
+      });
     });
   });
 

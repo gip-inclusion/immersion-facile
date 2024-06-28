@@ -5,7 +5,10 @@ import {
   markPartnersErroredConventionAsHandledRequestSchema,
   withConventionIdSchema,
 } from "../convention/convention.schema";
-import { discussionReadSchema } from "../discussion/discussion.schema";
+import {
+  discussionReadSchema,
+  discussionRejectionSchema,
+} from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,
@@ -79,6 +82,19 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       200: discussionReadSchema,
       401: legacyHttpErrorSchema,
       403: legacyHttpErrorSchema,
+      404: legacyHttpErrorSchema,
+    },
+  }),
+  rejectDiscussion: defineRoute({
+    method: "patch",
+    url: "/discussion-for-establishment/:discussionId/reject",
+    ...withAuthorizationHeaders,
+    requestBodySchema: discussionRejectionSchema,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: legacyUnauthenticatedErrorSchema,
+      403: legacyUnauthenticatedErrorSchema,
       404: legacyHttpErrorSchema,
     },
   }),

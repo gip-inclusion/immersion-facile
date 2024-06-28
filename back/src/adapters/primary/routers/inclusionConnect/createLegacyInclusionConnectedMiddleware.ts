@@ -5,7 +5,7 @@ import {
 } from "../../../../config/bootstrap/middlewareHelpers";
 import { makeVerifyJwtES256 } from "../../../../domains/core/jwt";
 
-export const createInclusionConnectedMiddleware = (jwtSecret: string) => {
+export const createLegacyInclusionConnectedMiddleware = (jwtSecret: string) => {
   const verifyJwt = makeVerifyJwtES256<"inclusionConnect">(jwtSecret);
 
   return (req: Request, res: Response, next: NextFunction) => {

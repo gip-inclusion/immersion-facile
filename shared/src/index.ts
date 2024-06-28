@@ -33,6 +33,7 @@ export * from "./dashboard/establishmentDashboardTabs";
 export * from "./dashboard/agencyDashboardTabs";
 export * from "./discussion/discussion.dto";
 export * from "./discussion/discussion.schema";
+export * from "./discussion/discussion.content";
 export * from "./domElementIds";
 export * from "./email/email";
 export * from "./email/email.dto";

@@ -6,8 +6,14 @@ import {
 import { keys } from "shared";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 
-const topics = ["api-consumer-global", "broadcast-convention-again"] as const;
+const topics = [
+  "api-consumer-global",
+  "dashboard-discussion",
+  "dashboard-discussion-rejection",
+  "broadcast-convention-again",
+] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
 
@@ -76,6 +82,27 @@ export const feedbackMapping: Record<
       title: "Problème rencontré lors de la rediffusion au partenaire.",
       message:
         "Une erreur est survenue. Veuillez consulter le tableau de bord.",
+    },
+  },
+  "dashboard-discussion-rejection": {
+    "update.success": {
+      action: discussionSlice.actions.updateDiscussionStatusSucceeded,
+      title: "La candidature a bien été rejetée.",
+      message:
+        "La candidature a bien été rejetée, un email a été envoyé au candidat",
+    },
+  },
+  "dashboard-discussion": {
+    "fetch.success": {
+      action: discussionSlice.actions.fetchDiscussionSucceeded,
+      title: "Les discussions ont bien été récupérées.",
+      message: "Les discussions ont bien été récupérées",
+    },
+    "fetch.error": {
+      action: discussionSlice.actions.fetchDiscussionFailed,
+      title: "Problème lors de la récupération des discussions",
+      message:
+        "Une erreur est survenue lors de la récupération des discussions",
     },
   },
 };

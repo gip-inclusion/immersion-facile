@@ -1,6 +1,7 @@
 import {
   ConventionDtoBuilder,
   DiscussionBuilder,
+  DiscussionDto,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -56,6 +57,11 @@ describe("MarkDiscussionLinkedToConvention", () => {
     const discussion = new DiscussionBuilder()
       .withSiret(convention.siret)
       .build();
+    const expectedUpdatedDiscussion: DiscussionDto = {
+      ...discussion,
+      status: "ACCEPTED",
+      conventionId: convention.id,
+    };
 
     uow.discussionRepository.discussions = [discussion];
 
@@ -65,7 +71,7 @@ describe("MarkDiscussionLinkedToConvention", () => {
     });
 
     expectToEqual(uow.discussionRepository.discussions, [
-      { ...discussion, conventionId: convention.id },
+      expectedUpdatedDiscussion,
     ]);
   });
 });

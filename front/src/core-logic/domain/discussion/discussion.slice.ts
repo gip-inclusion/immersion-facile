@@ -1,10 +1,21 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { DiscussionId, DiscussionReadDto, InclusionConnectJwt } from "shared";
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  DiscussionId,
+  DiscussionReadDto,
+  DiscussionRejected,
+  InclusionConnectJwt,
+} from "shared";
+import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type FetchDiscussionRequestedPayload = {
   jwt: InclusionConnectJwt;
   discussionId: DiscussionId;
 };
+
+export type RejectDiscussionRequestedPayload = {
+  jwt: InclusionConnectJwt;
+  discussionId: DiscussionId;
+} & DiscussionRejected;
 
 export type DiscussionState = {
   discussion: DiscussionReadDto | null;
@@ -24,20 +35,44 @@ export const discussionSlice = createSlice({
   reducers: {
     fetchDiscussionRequested: (
       state,
-      _action: PayloadAction<FetchDiscussionRequestedPayload>,
+      _action: PayloadActionWithFeedbackTopic<FetchDiscussionRequestedPayload>,
     ) => {
       state.isLoading = true;
       state.discussion = null;
     },
     fetchDiscussionSucceeded: (
       state,
-      action: PayloadAction<DiscussionReadDto | undefined>,
+      action: PayloadActionWithFeedbackTopic<{
+        discussion: DiscussionReadDto | undefined;
+      }>,
     ) => {
-      state.discussion = action.payload ?? null;
+      state.discussion = action.payload.discussion ?? null;
       state.isLoading = false;
     },
-    fetchDiscussionFailed: (state, action: PayloadAction<string>) => {
-      state.fetchError = action.payload;
+    fetchDiscussionFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isLoading = false;
+    },
+    updateDiscussionStatusRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<RejectDiscussionRequestedPayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    updateDiscussionStatusSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
+      state.isLoading = false;
+    },
+    updateDiscussionStatusFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        errorMessage: string;
+      }>,
+    ) => {
       state.isLoading = false;
     },
   },

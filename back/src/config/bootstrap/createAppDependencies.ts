@@ -13,7 +13,6 @@ import {
   makeHandleManagedRedirectResponseError,
   makeHandleRawRedirectResponseError,
 } from "../helpers/handleRedirectResponseError";
-import { makeAdminAuthMiddleware } from "./adminAuthMiddleware";
 import { AppConfig } from "./appConfig";
 import {
   makeConsumerMiddleware,
@@ -22,6 +21,7 @@ import {
 import { createEventCrawler } from "./createEventCrawler";
 import { createGateways, createGetPgPoolFn } from "./createGateways";
 import { createUseCases } from "./createUseCases";
+import { makeInclusionConnectAuthMiddleware } from "./inclusionConnectAuthMiddleware";
 
 const uuidGenerator = new UuidV4Generator();
 
@@ -102,7 +102,7 @@ export const createAppDependencies = async (config: AppConfig) => {
       gateways.timeGateway,
       config,
     ),
-    adminAuthMiddleware: await makeAdminAuthMiddleware(
+    inclusionConnectAuthMiddleware: await makeInclusionConnectAuthMiddleware(
       config.jwtPublicKey,
       uowPerformer,
     ),
