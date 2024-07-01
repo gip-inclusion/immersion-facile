@@ -83,6 +83,7 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
       await uow.establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
         kind,
         beforeDate,
+        maxResults: 1000,
       });
 
     logger.info({ message: `processing ${conventions.length} conventions` });

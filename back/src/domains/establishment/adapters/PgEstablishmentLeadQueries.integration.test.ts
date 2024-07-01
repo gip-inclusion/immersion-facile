@@ -107,6 +107,7 @@ describe("PgEstablishmentLeadQueries", () => {
       const result =
         await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
           kind: "to-be-reminded",
+          maxResults: 1000,
         });
       expectToEqual(result, []);
     });
@@ -124,8 +125,37 @@ describe("PgEstablishmentLeadQueries", () => {
       const result =
         await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
           kind: "to-be-reminded",
+          maxResults: 1000,
         });
       expectToEqual(result, [convention1]);
+    });
+
+    it("gives a number of result respecting provided maximum", async () => {
+      const establishmentLeadForConvention2: EstablishmentLead = {
+        siret: convention2.siret,
+        lastEventKind: "to-be-reminded",
+        events: [
+          {
+            conventionId: convention2.id,
+            kind: "to-be-reminded",
+            occurredAt: new Date(),
+          },
+        ],
+      };
+      await agencyRepo.insert(agency);
+      await Promise.all([
+        conventionRepository.save(convention1),
+        conventionRepository.save(convention2),
+        establishmentLeadRepository.save(establishmentLead1),
+        establishmentLeadRepository.save(establishmentLeadForConvention2),
+      ]);
+
+      const result =
+        await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
+          kind: "to-be-reminded",
+          maxResults: 1,
+        });
+      expectToEqual(result, [convention2]);
     });
   });
 });
