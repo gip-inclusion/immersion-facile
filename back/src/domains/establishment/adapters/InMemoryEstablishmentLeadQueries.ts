@@ -1,8 +1,10 @@
 import { ConventionReadDto } from "shared";
 import { InMemoryConventionQueries } from "../../convention/adapters/InMemoryConventionQueries";
 import { isSiretsListFilled } from "../entities/EstablishmentLeadEntity";
-import { EstablishmentLeadQueries } from "../ports/EstablishmentLeadQueries";
-import { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
+import {
+  EstablishmentLeadQueries,
+  GetLastConventionsByUniqLastEventKindParams,
+} from "../ports/EstablishmentLeadQueries";
 import { InMemoryEstablishmentLeadRepository } from "./InMemoryEstablishmentLeadRepository";
 
 export class InMemoryEstablishmentLeadQueries
@@ -14,7 +16,7 @@ export class InMemoryEstablishmentLeadQueries
   ) {}
 
   public async getLastConventionsByUniqLastEventKind(
-    params: EstablishmentLeadReminderParams,
+    params: GetLastConventionsByUniqLastEventKindParams,
   ): Promise<ConventionReadDto[]> {
     const sirets =
       await this.establishmentLeadRepository.getSiretsByUniqLastEventKind(

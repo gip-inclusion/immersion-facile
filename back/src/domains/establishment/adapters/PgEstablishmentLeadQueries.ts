@@ -7,21 +7,25 @@ import {
   makeGetLastConventionWithSiretInList,
 } from "../../convention/adapters/pgConventionSql";
 import { isSiretsListFilled } from "../entities/EstablishmentLeadEntity";
-import { EstablishmentLeadQueries } from "../ports/EstablishmentLeadQueries";
-import { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
+import {
+  EstablishmentLeadQueries,
+  GetLastConventionsByUniqLastEventKindParams,
+} from "../ports/EstablishmentLeadQueries";
 import { getEstablishmentLeadSiretsByUniqLastEventKindBuilder } from "./PgEstablishmentLeadRepository";
 
 export class PgEstablishmentLeadQueries implements EstablishmentLeadQueries {
   constructor(private transaction: KyselyDb) {}
 
   public async getLastConventionsByUniqLastEventKind(
-    params: EstablishmentLeadReminderParams,
+    params: GetLastConventionsByUniqLastEventKindParams,
   ): Promise<ConventionDto[]> {
     const withSiretList =
       await getEstablishmentLeadSiretsByUniqLastEventKindBuilder(
         this.transaction,
         params,
-      ).execute();
+      )
+        .limit(params.maxResults)
+        .execute();
 
     const sirets = withSiretList.map(({ siret }) => siret);
 
