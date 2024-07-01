@@ -10,6 +10,7 @@ import {
 import { z } from "zod";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -22,6 +23,8 @@ import {
   EstablishmentLeadEventKind,
   establishmentLeadEventKind,
 } from "../entities/EstablishmentLeadEntity";
+
+const logger = createLogger(__filename);
 
 export type SendEstablishmentLeadReminderOutput = {
   errors?: Record<SiretDto, Error>;
@@ -81,6 +84,8 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
         kind,
         beforeDate,
       });
+
+    logger.info({ message: `processing ${conventions.length} conventions` });
 
     const errors: Record<ConventionId, Error> = {};
     await Promise.all(
