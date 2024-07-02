@@ -1,0 +1,80 @@
+name: Generate new release (from latest release)
+
+on:
+  workflow_call:
+    inputs:
+      release_tag:
+        type: string
+        required: true
+      prerelease:
+        type: boolean
+        required: true
+
+jobs:
+  tag-version:
+    name: Create release ${{ inputs.release_tag }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        if: ${{ inputs.prerelease }}
+        uses: actions/checkout@v4
+      - name: Create RC tag if prerelease
+        if: ${{ inputs.prerelease }}
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git tag -a "${{ inputs.release_tag }}" -m "Deployment RC tag"
+          git push --tags
+      - name: Generate release notes from latest release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const latestRelease = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
+            const latestTag = latestRelease.data.tag_name;
+            const releaseTag = "${{ inputs.release_tag }}";
+
+            const releaseNotes = await github.request(`POST /repos/${{ github.repository }}/releases/generate-notes`, {
+              tag_name: releaseTag,
+              previous_tag_name: latestTag
+              });
+              
+            const isPrerelease = ${{ inputs.prerelease }};
+
+            const result = await github.request(`POST /repos/${{ github.repository }}/releases`, {
+              tag_name: releaseTag,
+              prerelease: isPrerelease,
+              make_latest: (!isPrerelease).toString(),
+              name: releaseNotes.data.name,
+              body: releaseNotes.data.body,
+            });
+      - name: Delete old prereleases (if pre-release)
+        if: ${{ inputs.prerelease }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const lastPreReleaseTag = '${{ inputs.release_tag }}';
+            const releases = await github.request(`GET /repos/${{ github.repository }}/releases`);
+
+            const oldPrereleases = releases.data
+              .filter(release => release.prerelease && release.tag_name !== lastPreReleaseTag);
+
+            console.info(`Found ${oldPrereleases.length} old prereleases. Deleting them...`);
+
+            for (const release of oldPrereleases) {
+              console.info(`Deleting prerelease: ${release.tag_name} and the corresponding tag`);
+              await github.request(`DELETE /repos/${{ github.repository }}/releases/${release.id}`);
+              await github.request(`DELETE /repos/${{ github.repository }}/git/refs/tags/${release.tag_name}`);
+            }
+      - name: "Delete corresponding pre-release (if NOT pre-release)"
+        if: ${{ !inputs.prerelease }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prerelease = await github.request(`GET /repos/${{ github.repository }}/releases/tags/${{ inputs.release_tag }}-rc`);
+            if (prerelease.data && prerelease.data.id) {
+              await github.request(`DELETE /repos/${{ github.repository }}/releases/${prerelease.data.id}`);
+              await github.request(`DELETE /repos/${{ github.repository }}/git/refs/tags/${prerelease.data.tag_name}`);
+            }
