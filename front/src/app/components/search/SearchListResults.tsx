@@ -74,7 +74,7 @@ export const SearchListResults = () => {
           {hasResults &&
             displayedResults.map((searchResult) => (
               <SearchResult
-                key={`${searchResult.siret}-${searchResult.rome}-${searchResult.address.postcode}`} // Should be unique !
+                key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
                 establishment={searchResult}
                 onButtonClick={() => {
                   const appellations = searchResult.appellations;

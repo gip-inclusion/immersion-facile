@@ -532,145 +532,23 @@ export class PgEstablishmentAggregateRepository
         })`
       : "";
     const sortExpression = makeOrderByStatement(searchMade);
-    const selectedOffersSubQuery = format(
-      `WITH
-        active_establishments_within_area AS (
-          SELECT
-              e.siret,
-              e.fit_for_disabled_workers,
-              date_to_iso(e.next_availability_date) as next_availability_date,
-              e.additional_information,
-              e.customized_name,
-              e.is_searchable,
-              e.naf_code,
-              e.name,
-              e.number_employees,
-              e.website,
-              loc.*
-          FROM establishments e
-          LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
-          WHERE is_open 
-          ${andSearchableByFilter}
-          AND ST_DWithin(loc.position, ST_GeographyFromText($1), $2)
-        ),
-        matching_offers AS (
-          SELECT 
-            aewa.siret, 
-            aewa.position,
-            aewa.lat,
-            aewa.lon,
-            aewa.city,
-            aewa.street_number_and_address,
-            aewa.department_code,
-            aewa.post_code,
-            aewa.id as location_id,
-            rome_code, 
-            prd.libelle_rome AS rome_label, 
-            ST_Distance(aewa.position, ST_GeographyFromText($1)) AS distance_m,
-            aewa.fit_for_disabled_workers,
-            aewa.next_availability_date,
-            aewa.additional_information,
-            aewa.customized_name,
-            aewa.is_searchable,
-            aewa.naf_code,
-            aewa.name,
-            aewa.number_employees,
-            aewa.website,
-            ${buildAppellationsArray},
-            ${
-              searchMade.sortedBy === "score"
-                ? "MAX(io.score) AS max_score,"
-                : ""
-            }
-            MAX(created_at) AS max_created_at
-            
-          FROM active_establishments_within_area aewa 
-          LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
-          LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
-          LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-          ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
-          GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
-              aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id,
-              aewa.next_availability_date, aewa.additional_information, aewa.customized_name, aewa.is_searchable, aewa.naf_code, aewa.name, aewa.number_employees, aewa.website)
-        )
-        SELECT *, 
-        (
-          ROW_NUMBER () OVER (${sortExpression})
-        )::integer AS row_number 
-        FROM matching_offers
-        ${sortExpression}
-        LIMIT $3`,
+    const selectedOffersSubQuery = makeSelectedOffersSubQuery({
+      withGeoParams: true,
       romeCodes,
-    ); // Formats optional litterals %1$L
+      andSearchableByFilter,
+      buildAppellationsArray,
+      sortExpression,
+      searchMade,
+    });
 
-    const selectedOffersWithoutGeoParamsSubQuery = format(
-      `WITH
-        active_establishments_within_area AS (
-          SELECT
-              e.siret,
-              e.fit_for_disabled_workers,
-              date_to_iso(e.next_availability_date) as next_availability_date,
-              e.additional_information,
-              e.customized_name,
-              e.is_searchable,
-              e.naf_code,
-              e.name,
-              e.number_employees,
-              e.website,
-              loc.*
-          FROM establishments e
-          LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
-          WHERE is_open 
-          ${andSearchableByFilter}
-        ),
-        matching_offers AS (
-          SELECT 
-            aewa.siret, 
-            aewa.position,
-            aewa.lat,
-            aewa.lon,
-            aewa.city,
-            aewa.street_number_and_address,
-            aewa.department_code,
-            aewa.post_code,
-            aewa.id as location_id,
-            rome_code, 
-            prd.libelle_rome AS rome_label, 
-            aewa.fit_for_disabled_workers,
-            aewa.next_availability_date,
-            aewa.additional_information,
-            aewa.customized_name,
-            aewa.is_searchable,
-            aewa.naf_code,
-            aewa.name,
-            aewa.number_employees,
-            aewa.website,
-            ${buildAppellationsArray},
-            ${
-              searchMade.sortedBy === "score"
-                ? "MAX(io.score) AS max_score,"
-                : ""
-            }
-            MAX(created_at) AS max_created_at
-            
-          FROM active_establishments_within_area aewa 
-          LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
-          LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
-          LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-          ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
-          GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
-              aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id,
-              aewa.next_availability_date, aewa.additional_information, aewa.customized_name, aewa.is_searchable, aewa.naf_code, aewa.name, aewa.number_employees, aewa.website)
-        )
-        SELECT *, 
-        (
-          ROW_NUMBER () OVER (${sortExpression})
-        )::integer AS row_number 
-        FROM matching_offers
-        ${sortExpression}
-        LIMIT $1`,
+    const selectedOffersWithoutGeoParamsSubQuery = makeSelectedOffersSubQuery({
+      withGeoParams: false,
       romeCodes,
-    ); // Formats optional litterals %1$L
+      andSearchableByFilter,
+      buildAppellationsArray,
+      sortExpression,
+      searchMade,
+    });
 
     const geoParams = pick(["lat", "lon", "distanceKm"], searchMade);
 
@@ -1188,3 +1066,94 @@ establishment_locations_agg AS (
   FROM establishments_locations
   GROUP BY establishment_siret 
 )`;
+
+const makeSelectedOffersSubQuery = ({
+  withGeoParams,
+  romeCodes,
+  andSearchableByFilter,
+  buildAppellationsArray,
+  sortExpression,
+  searchMade,
+}: {
+  withGeoParams: boolean;
+  romeCodes: string | RomeCode[] | undefined;
+  andSearchableByFilter: string;
+  buildAppellationsArray: string;
+  sortExpression: string;
+  searchMade: SearchMade;
+}) => {
+  const query = `
+    WITH
+    active_establishments_within_area AS (
+      SELECT
+          e.siret,
+          e.fit_for_disabled_workers,
+          date_to_iso(e.next_availability_date) as next_availability_date,
+          e.additional_information,
+          e.customized_name,
+          e.is_searchable,
+          e.naf_code,
+          e.name,
+          e.number_employees,
+          e.website,
+          loc.*
+      FROM establishments e
+      LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
+      WHERE is_open 
+      ${andSearchableByFilter}
+      ${
+        withGeoParams
+          ? "AND ST_DWithin(loc.position, ST_GeographyFromText($1), $2)"
+          : ""
+      }
+    ),
+    matching_offers AS (
+      SELECT 
+        aewa.siret, 
+        aewa.position,
+        aewa.lat,
+        aewa.lon,
+        aewa.city,
+        aewa.street_number_and_address,
+        aewa.department_code,
+        aewa.post_code,
+        aewa.id as location_id,
+        rome_code, 
+        prd.libelle_rome AS rome_label, 
+        ${
+          withGeoParams
+            ? "ST_Distance(aewa.position, ST_GeographyFromText($1)) AS distance_m,"
+            : ""
+        }
+        aewa.fit_for_disabled_workers,
+        aewa.next_availability_date,
+        aewa.additional_information,
+        aewa.customized_name,
+        aewa.is_searchable,
+        aewa.naf_code,
+        aewa.name,
+        aewa.number_employees,
+        aewa.website,
+        ${buildAppellationsArray},
+        ${searchMade.sortedBy === "score" ? "MAX(io.score) AS max_score," : ""}
+        MAX(created_at) AS max_created_at
+        
+      FROM active_establishments_within_area aewa 
+      LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
+      LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
+      LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
+      ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
+      GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
+          aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id,
+          aewa.next_availability_date, aewa.additional_information, aewa.customized_name, aewa.is_searchable, aewa.naf_code, aewa.name, aewa.number_employees, aewa.website)
+    )
+    SELECT *, 
+    (
+      ROW_NUMBER () OVER (${sortExpression})
+    )::integer AS row_number 
+    FROM matching_offers
+    ${sortExpression}
+    LIMIT ${withGeoParams ? "$3" : "$1"}`;
+
+  return format(query, romeCodes);
+};
