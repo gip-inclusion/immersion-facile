@@ -67,6 +67,15 @@ jobs:
     env:
       PRE_RELEASE_TAG: v${{ github.run_number }}-rc
     steps:
+      - name: "Get previously latest tag"
+        id: previous-latest
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const release = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
+            console.log(`Latest release : ${JSON.stringify(release)}`);
+            return { latestTag: release.data.tag_name };
       - name: "Generate release candidate on github"
         uses: softprops/action-gh-release@v2
         with:
@@ -75,6 +84,8 @@ jobs:
           tag_name: ${{ env.PRE_RELEASE_TAG }}
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          target_commitish: ${{ steps.previous-latest.outputs.latestTag }}
+          make_latest: false
       - name: Delete old prereleases
         uses: actions/github-script@v7
         with:
@@ -124,6 +135,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ deploy-prod ]
     steps:
+      - name: "Get previously latest tag"
+        id: previous-latest
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const release = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
+            console.log(`Latest release : ${JSON.stringify(release)}`);
+            return { latestTag: release.data.tag_name };
       - name: "Generate release on github"
         uses: softprops/action-gh-release@v2
         with:
@@ -131,6 +151,8 @@ jobs:
           tag_name: v${{ github.run_number }}
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          target_commitish: ${{ steps.previous-latest.outputs.latestTag }}
+          make_latest: true
       - name: "Delete corresponding pre-release"
         uses: actions/github-script@v7
         with:
