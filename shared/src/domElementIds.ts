@@ -638,6 +638,7 @@ export const domElementIds = {
         "im-manage-establishment__convert-discussion-to-draft-convention",
       replyToCandidateByEmail:
         "im-manage-establishment__reply-to-candidate-by-email",
+      rejectApplication: "im-manage-establishment__reject-application-button",
     },
     manageConventionForm: {
       submitButton: "im-manage-establishment__manage-convention-submit-button",
