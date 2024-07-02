@@ -74,8 +74,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const release = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
-            console.log(`Latest release : ${JSON.stringify(release)}`);
-            return { latestTag: release.data.tag_name };
+            core.setOutput('latestTag', release.data.tag_name);
       - name: "Generate release candidate on github"
         uses: softprops/action-gh-release@v2
         with:
@@ -142,8 +141,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const release = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
-            console.log(`Latest release : ${JSON.stringify(release)}`);
-            return { latestTag: release.data.tag_name };
+            core.setOutput('latestTag', release.data.tag_name);
       - name: "Generate release on github"
         uses: softprops/action-gh-release@v2
         with:
