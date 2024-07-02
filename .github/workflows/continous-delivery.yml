@@ -81,10 +81,17 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const release = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
-            const latestTag = release.data.tag_name;
-            const commit = await github.request(`GET /repos/${{ github.repository }}/git/ref/tags/${latestTag}`);
-            core.setOutput('latestTagCommitSha', commit.data.object.sha);
+            try {
+              const release = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
+              console.log(`Latest release: ${JSON.stringify(release.data, null, 2)}`);
+              const latestTag = release.data.tag_name;
+
+              const commit = await github.request(`GET /repos/${{ github.repository }}/git/ref/tags/${latestTag}`);
+              console.log(`Commit for latest tag: ${JSON.stringify(commit.data, null, 2)}`);
+              core.setOutput('latestTagCommitSha', commit.data.object.sha);
+            } catch (error) {
+              core.setFailed(`Error fetching latest release or commit: ${error.message}`);
+            }
       - name: "Generate release candidate on github"
         uses: softprops/action-gh-release@v2
         with:
