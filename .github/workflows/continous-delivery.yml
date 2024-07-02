@@ -67,6 +67,14 @@ jobs:
     env:
       PRE_RELEASE_TAG: v${{ github.run_number }}-rc
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Create RC tag
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git tag -a "${{ env.PRE_RELEASE_TAG }}" -m "Deployment RC tag"
+          git push --tags
       - name: "Get previously latest tag"
         id: previous-latest
         uses: actions/github-script@v7
