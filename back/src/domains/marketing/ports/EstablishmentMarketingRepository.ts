@@ -11,4 +11,8 @@ export type EstablishmentMarketingRepository = {
   save(
     marketingEstablishmentContact: MarketingEstablishmentContactEntity,
   ): Promise<void>;
+
+  getBySiret(
+    siret: SiretDto,
+  ): Promise<MarketingEstablishmentContactEntity | undefined>;
 };

@@ -7,6 +7,12 @@ import {
 export class InMemoryEstablishementMarketingRepository
   implements EstablishmentMarketingRepository
 {
+  async getBySiret(
+    siret: SiretDto,
+  ): Promise<MarketingEstablishmentContactEntity | undefined> {
+    return this.#contacts[siret];
+  }
+
   async save(
     marketingEstablishmentContact: MarketingEstablishmentContactEntity,
   ): Promise<void> {
