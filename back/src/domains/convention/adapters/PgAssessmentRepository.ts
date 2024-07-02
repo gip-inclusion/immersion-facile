@@ -1,16 +1,7 @@
-import { AssessmentStatus, ConventionId, assessmentSchema } from "shared";
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../config/pg/kysely/kyselyUtils";
+import { ConventionId, assessmentSchema } from "shared";
+import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { AssessmentRepository } from "../ports/AssessmentRepository";
-
-interface PgAssessment {
-  convention_id: string;
-  status: AssessmentStatus;
-  establishment_feedback: string;
-}
 
 export class PgAssessmentRepository implements AssessmentRepository {
   constructor(private transaction: KyselyDb) {}
@@ -18,18 +9,18 @@ export class PgAssessmentRepository implements AssessmentRepository {
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<AssessmentEntity | undefined> {
-    const result = await executeKyselyRawSqlQuery<PgAssessment>(
-      this.transaction,
-      "SELECT * FROM immersion_assessments WHERE convention_id = $1",
-      [conventionId],
-    );
-    const pgAssessment = result.rows[0];
-    if (!pgAssessment) return;
+    const result = await this.transaction
+      .selectFrom("immersion_assessments")
+      .selectAll()
+      .where("convention_id", "=", conventionId)
+      .executeTakeFirst();
+
+    if (!result) return;
 
     const dto = assessmentSchema.parse({
-      conventionId: pgAssessment.convention_id,
-      establishmentFeedback: pgAssessment.establishment_feedback,
-      status: pgAssessment.status,
+      conventionId: result.convention_id,
+      establishmentFeedback: result.establishment_feedback,
+      status: result.status,
     });
 
     return {
@@ -38,21 +29,25 @@ export class PgAssessmentRepository implements AssessmentRepository {
     };
   }
 
-  public async save(assessment: AssessmentEntity): Promise<void> {
-    const { status, conventionId, establishmentFeedback } = assessment;
+  public async save({
+    status,
+    conventionId,
+    establishmentFeedback,
+  }: AssessmentEntity): Promise<void> {
+    await this.transaction
+      .insertInto("immersion_assessments")
+      .values({
+        convention_id: conventionId,
+        status,
+        establishment_feedback: establishmentFeedback,
+      })
+      .execute()
+      .catch((error) => {
+        if (error?.message.includes(noConventionMatchingErrorMessage))
+          throw new Error(`No convention found for id ${conventionId}`);
 
-    await executeKyselyRawSqlQuery(
-      this.transaction,
-      `INSERT INTO immersion_assessments(
-        convention_id, status, establishment_feedback
-      ) VALUES($1, $2, $3)`,
-      [conventionId, status, establishmentFeedback],
-    ).catch((error) => {
-      if (error?.message.includes(noConventionMatchingErrorMessage))
-        throw new Error(`No convention found for id ${conventionId}`);
-
-      throw error;
-    });
+        throw error;
+      });
   }
 }
 

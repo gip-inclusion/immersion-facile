@@ -23,6 +23,7 @@ export interface Database {
   groups__sirets: GroupsSirets;
   groups: Groups;
   immersion_offers: ImmersionOffers;
+  immersion_assessments: ImmersionAssessments;
   notifications_email_attachments: NotificationsEmailAttachments;
   notifications_email_recipients: NotificationsEmailRecipients;
   notifications_email: NotificationsEmail;
@@ -567,4 +568,11 @@ interface EstablishmentsDeleted {
   siret: string | null;
   created_at: Timestamp;
   deleted_at: Timestamp;
+}
+interface ImmersionAssessments {
+  convention_id: string;
+  status: string;
+  establishment_feedback: string;
+  created_at: Generated<Timestamp | null>;
+  updated_at: Generated<Timestamp | null>;
 }
