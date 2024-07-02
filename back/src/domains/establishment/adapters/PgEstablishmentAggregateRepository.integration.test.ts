@@ -773,7 +773,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       const searchResults: SearchResultDto[] =
         await pgEstablishmentAggregateRepository.searchImmersionResults({
           searchMade: {
-            sortedBy: "date",
+            sortedBy: "distance",
             distanceKm: 100,
             // Center of Saintes
             lat: 45.7461575,

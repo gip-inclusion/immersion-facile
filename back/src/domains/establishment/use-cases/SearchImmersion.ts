@@ -95,12 +95,12 @@ export class SearchImmersion extends TransactionalUseCase<
       numberOfResults:
         voluntaryToImmersion !== false
           ? repositorySearchResults.length
-          : (lbbSearchResults ?? []).length,
+          : lbbSearchResults.length,
     });
 
     const isDeletedBySiret =
       await uow.deletedEstablishmentRepository.areSiretsDeleted(
-        (lbbSearchResults ?? []).map((result) => result.siret),
+        lbbSearchResults.map((result) => result.siret),
       );
 
     const searchResultsInRepo =
@@ -112,7 +112,7 @@ export class SearchImmersion extends TransactionalUseCase<
           )
         : [];
 
-    const lbbAllowedResults = (lbbSearchResults ?? [])
+    const lbbAllowedResults = lbbSearchResults
       .filter(isSiretAlreadyInStoredResults(searchResultsInRepo))
       .filter(isEstablishmentNotDeleted(isDeletedBySiret));
 
@@ -191,7 +191,7 @@ export class SearchImmersion extends TransactionalUseCase<
     params: {
       appellationCodes: AppellationCode[];
     } & GeoParams,
-  ) {
+  ): Promise<SearchResultDto[]> {
     const { appellationCodes, ...geoParams } = params;
     const matches =
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
@@ -216,6 +216,7 @@ export class SearchImmersion extends TransactionalUseCase<
         });
         return [];
       }
+    return [];
   }
 }
 

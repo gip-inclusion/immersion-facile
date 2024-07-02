@@ -30,7 +30,7 @@ const siret3 = "12341234123455";
 
 const toSearchImmersionResults = (
   params: { siret: SiretDto; offer: OfferEntity }[],
-  withDistance: number | false = 0,
+  withDistance: number | false,
 ): SearchResultDto[] =>
   params.map(({ siret, offer }) => ({
     naf: defaultNafCode,
@@ -278,10 +278,13 @@ describe("search-immersion route", () => {
 
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: toSearchImmersionResults([
-            { siret: siret1, offer: offer1 },
-            { siret: siret2, offer: offer2 },
-          ]),
+          body: toSearchImmersionResults(
+            [
+              { siret: siret1, offer: offer1 },
+              { siret: siret2, offer: offer2 },
+            ],
+            0,
+          ),
         });
       });
 
@@ -299,10 +302,13 @@ describe("search-immersion route", () => {
 
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: toSearchImmersionResults([
-            { siret: siret1, offer: offer1 },
-            { siret: siret3, offer: offer1 },
-          ]),
+          body: toSearchImmersionResults(
+            [
+              { siret: siret1, offer: offer1 },
+              { siret: siret3, offer: offer1 },
+            ],
+            0,
+          ),
         });
       });
 
@@ -319,11 +325,14 @@ describe("search-immersion route", () => {
 
         expectHttpResponseToEqual(result, {
           status: 200,
-          body: toSearchImmersionResults([
-            { siret: siret1, offer: offer1 },
-            { siret: siret2, offer: offer2 },
-            { siret: siret3, offer: offer1 },
-          ]),
+          body: toSearchImmersionResults(
+            [
+              { siret: siret1, offer: offer1 },
+              { siret: siret2, offer: offer2 },
+              { siret: siret3, offer: offer1 },
+            ],
+            0,
+          ),
         });
       });
     });
