@@ -1,6 +1,7 @@
 import {
   Builder,
   ContactMethod,
+  Email,
   EstablishmentSearchableBy,
   FormEstablishmentSource,
   Location,
@@ -254,6 +255,15 @@ export class EstablishmentAggregateBuilder
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact,
+    });
+  }
+
+  public withContactEmail(email: Email) {
+    const contact = this.aggregate.contact;
+    if (!contact) throw new Error("no contact on establishment aggregate");
+    return new EstablishmentAggregateBuilder().withContact({
+      ...contact,
+      email,
     });
   }
 
