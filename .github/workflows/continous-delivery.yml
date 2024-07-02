@@ -82,7 +82,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const release = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
-            core.setOutput('latestTag', release.data.tag_name);
+            const latestTag = release.data.tag_name;
+            const commit = await github.request(`GET /repos/${{ github.repository }}/git/ref/tags/${latestTag}`);
+            core.setOutput('latestTagCommitSha', commit.data.object.sha);
       - name: "Generate release candidate on github"
         uses: softprops/action-gh-release@v2
         with:
@@ -91,7 +93,7 @@ jobs:
           tag_name: ${{ env.PRE_RELEASE_TAG }}
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          target_commitish: ${{ steps.previous-latest.outputs.latestTag }}
+          target_commitish: ${{ steps.previous-latest.outputs.latestTagCommitSha }}
           make_latest: false
       - name: Delete old prereleases
         uses: actions/github-script@v7
@@ -114,7 +116,11 @@ jobs:
 
   deploy-staging:
     name: Deploy staging
-    needs: [ validation, tag, build-front-artefact, build-back-artefact ]
+    needs:
+      - validation
+      - tag
+      - build-front-artefact
+      - build-back-artefact
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
       environment: staging
@@ -126,7 +132,8 @@ jobs:
 
   deploy-prod:
     name: Deploy prod
-    needs: [ deploy-staging ]
+    needs:
+      - deploy-staging
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
       environment: prod
@@ -140,7 +147,8 @@ jobs:
   create-release-notes:
     name: Create release notes
     runs-on: ubuntu-latest
-    needs: [ deploy-prod ]
+    needs:
+      - deploy-prod
     steps:
       - name: "Get previously latest tag"
         id: previous-latest
@@ -149,7 +157,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const release = await github.request(`GET /repos/${{ github.repository }}/releases/latest`);
-            core.setOutput('latestTag', release.data.tag_name);
+            const latestTag = release.data.tag_name;
+            const commit = await github.request(`GET /repos/${{ github.repository }}/git/ref/tags/${latestTag}`);
+            core.setOutput('latestTagCommitSha', commit.data.object.sha);
       - name: "Generate release on github"
         uses: softprops/action-gh-release@v2
         with:
@@ -157,7 +167,7 @@ jobs:
           tag_name: v${{ github.run_number }}
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          target_commitish: ${{ steps.previous-latest.outputs.latestTag }}
+          target_commitish: ${{ steps.previous-latest.outputs.latestTagCommitSha }}
           make_latest: true
       - name: "Delete corresponding pre-release"
         uses: actions/github-script@v7
