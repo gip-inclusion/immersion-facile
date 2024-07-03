@@ -37,14 +37,19 @@ jobs:
             const releaseNotes = await github.request(`POST /repos/${{ github.repository }}/releases/generate-notes`, {
               tag_name: releaseTag,
               previous_tag_name: latestTag
-              });
-              
+            });
+            
             const isPrerelease = ${{ inputs.prerelease }};
+            
+            console.log({
+              latestTag,
+              releaseTag,
+              isPrerelease,
+            })
 
             const result = await github.request(`POST /repos/${{ github.repository }}/releases`, {
               tag_name: releaseTag,
               prerelease: isPrerelease,
-              make_latest: (!isPrerelease).toString(),
               name: releaseNotes.data.name,
               body: releaseNotes.data.body,
             });
