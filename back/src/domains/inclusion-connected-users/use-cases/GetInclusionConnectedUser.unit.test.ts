@@ -94,6 +94,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       "agencyOwner",
       "validator",
       "counsellor",
+      "agency-viewer",
     ]);
 
   it.each(agencyRolesAllowedToGetDashboard)(

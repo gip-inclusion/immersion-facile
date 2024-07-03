@@ -14,6 +14,7 @@ export const allAgencyRoles = [
   "validator",
   "agencyOwner",
   "toReview",
+  "agency-viewer",
 ] as const;
 
 export type AgencyRight = {

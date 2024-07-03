@@ -187,10 +187,11 @@ const requesterNameByRole = (
     "establishment-representative": `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName} (le représentant légal de l'entreprise)`,
     counsellor: agency.name,
     validator: agency.name,
-    "establishment-tutor": new Error(wrongRequesterUser),
-    toReview: new Error(wrongRequesterUser),
     backOffice: "L'équipe Immerssion Facilité",
     agencyOwner: "Le responsable d'agence",
+    "establishment-tutor": new Error(wrongRequesterUser),
+    "agency-viewer": new Error(wrongRequesterUser),
+    toReview: new Error(wrongRequesterUser),
   };
   return strategy[requesterRole];
 };
