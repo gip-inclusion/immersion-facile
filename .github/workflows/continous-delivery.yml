@@ -61,6 +61,8 @@ jobs:
   #      IC_ADMIN_PASSWORD: ${{ secrets.IC_ADMIN_PASSWORD }}
 
   create-wip-pre-release:
+    needs:
+      - tag
     name: Create pre-release
     uses: ./.github/workflows/generate-release.yml
     with:
@@ -98,6 +100,8 @@ jobs:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   create-release:
+    needs:
+      - deploy-prod
     name: Create release
     uses: ./.github/workflows/generate-release.yml
     with:
