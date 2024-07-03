@@ -9,7 +9,12 @@ import { Request } from "express";
 import { QueryResult } from "kysely";
 import pino, { Logger, LoggerOptions } from "pino";
 import { complement, isNil, pickBy } from "ramda";
-import { AgencyId, ConventionId, PeExternalId } from "shared";
+import {
+  AgencyId,
+  ConventionId,
+  PeExternalId,
+  SearchQueryParamsDto,
+} from "shared";
 import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
@@ -83,6 +88,7 @@ type LoggerParams = Partial<{
   schemaParsingInput: unknown;
   searchLBB: LaBonneBoiteRequestParams;
   searchMade: SearchMadeEntity;
+  searchParams: SearchQueryParamsDto | undefined;
   status: "success" | "total" | "error" | AuthorisationStatus;
   subscriptionId: string;
   topic: DomainTopic;
@@ -136,6 +142,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       subscriptionId,
       topic,
       useCaseName,
+      searchParams,
       ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
@@ -165,6 +172,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         subscriptionId,
         topic,
         useCaseName,
+        searchParams,
       };
 
       const opacifiedWithoutNullOrUndefined = pickBy(

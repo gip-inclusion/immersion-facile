@@ -1,9 +1,9 @@
 import { Logger } from "pino";
 import {
   ConventionJwtPayload,
+  SearchQueryParamsDto,
   calculateDurationInSecondsFrom,
   castError,
-  stringToMd5,
 } from "shared";
 import { z } from "zod";
 import {
@@ -56,7 +56,7 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
         inputParams,
         logger,
       );
-      const paramsHash = createParamsHash(name, validParams);
+      const searchParams = getSearchParams(name, validParams);
 
       return uowPerformer
         .perform((uow) => cb(validParams, { uow, deps }, userIdentity))
@@ -65,7 +65,6 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
             useCaseName: name,
             status: "success",
             durationInSeconds: calculateDurationInSecondsFrom(startDate),
-            ...(paramsHash ? { paramsHash } : {}),
           });
           return result;
         })
@@ -74,7 +73,7 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
             useCaseName: name,
             status: "error",
             durationInSeconds: calculateDurationInSecondsFrom(startDate),
-            ...(paramsHash ? { paramsHash } : {}),
+            searchParams,
             message: castError(error).message,
           });
           throw error;
@@ -82,15 +81,11 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
     },
   });
 
-const createParamsHash = (
+const getSearchParams = (
   useCaseName: string,
   params: unknown,
-): string | undefined => {
-  if (
-    useCaseName === "CallLaBonneBoiteAndUpdateRepositories" ||
-    useCaseName === "SearchImmersion"
-  )
-    return stringToMd5(JSON.stringify(params));
+): SearchQueryParamsDto | undefined => {
+  if (useCaseName === "SearchImmersion") return params as SearchQueryParamsDto;
 };
 
 export abstract class UseCase<
@@ -163,7 +158,7 @@ export abstract class TransactionalUseCase<
       params,
       logger,
     );
-    const paramsHash = createParamsHash(useCaseName, validParams);
+    const searchParams = getSearchParams(useCaseName, validParams);
 
     return this.uowPerformer
       .perform((uow) => this._execute(validParams, uow, jwtPayload))
@@ -172,7 +167,6 @@ export abstract class TransactionalUseCase<
           useCaseName,
           status: "success",
           durationInSeconds: calculateDurationInSecondsFrom(startDate),
-          ...(paramsHash ? { paramsHash } : {}),
         });
         return result;
       })
@@ -181,10 +175,7 @@ export abstract class TransactionalUseCase<
           useCaseName,
           status: "error",
           durationInSeconds: calculateDurationInSecondsFrom(startDate),
-          // TODO : le logger autorise tout param si on le passe en spread
-          // toto: "yolo", >>> KO
-          // ...{ toto: "yolo" }, >>> PASS
-          ...(paramsHash ? { paramsHash } : {}),
+          searchParams,
           message: castError(error).message,
         });
         throw error;
