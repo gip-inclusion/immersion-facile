@@ -198,6 +198,7 @@ const labelByRole: Record<AgencyRole, string> = {
   validator: "Validateur",
   agencyOwner: "Administrateur d'agence",
   toReview: "À valider",
+  "agency-viewer": "Lecteur",
 };
 
 const {

@@ -16,6 +16,7 @@ export const allRoles = [
   "backOffice",
   "agencyOwner",
   "toReview",
+  "agency-viewer",
 ] as const;
 
 export const allSignatoryRoles = [

@@ -1,12 +1,16 @@
 import { AgencyDto, ConventionDto, Role } from "shared";
 import { BadRequestError } from "../config/helpers/httpErrors";
 
+const hasNoMagicLink = (role: Role) =>
+  `Le rôle "${role}" n'a pas de liens magiques.`;
+
 export const conventionEmailsByRole = (
   convention: ConventionDto,
   agency: AgencyDto,
 ): Record<Role, string[] | Error> => ({
-  backOffice: new BadRequestError("Le backoffice n'a pas de liens magiques."),
-  toReview: new BadRequestError("Le role toReview n'a pas de liens magiques."),
+  backOffice: new BadRequestError(hasNoMagicLink("backOffice")),
+  toReview: new BadRequestError(hasNoMagicLink("toReview")),
+  "agency-viewer": new BadRequestError(hasNoMagicLink("agency-viewer")),
   beneficiary: [convention.signatories.beneficiary.email],
   "beneficiary-current-employer": convention.signatories
     .beneficiaryCurrentEmployer
