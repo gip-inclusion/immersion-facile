@@ -12,6 +12,7 @@ import { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/c
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
+  publicApiV2EstablishmentStatsRoutes,
   publicApiV2SearchEstablishmentRoutes,
   publicApiV2WebhooksRoutes,
 } from "./publicApiV2.routes";
@@ -102,6 +103,7 @@ const apiKeyAuth = "apiKeyAuth";
 
 const searchSection = "Recherche d'entreprise accueillante et mise en contact";
 const conventionSection = "Accès aux conventions";
+const establishmentStatsSection = "Statistiques sur les entreprises";
 const webhookSection = "Souscriptions aux webhooks";
 
 const generateOpenApi = (envType: string) =>
@@ -109,6 +111,7 @@ const generateOpenApi = (envType: string) =>
     {
       [searchSection]: publicApiV2SearchEstablishmentRoutes,
       [conventionSection]: publicApiV2ConventionRoutes,
+      [establishmentStatsSection]: publicApiV2EstablishmentStatsRoutes,
       [webhookSection]: publicApiV2WebhooksRoutes,
     },
     {

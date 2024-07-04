@@ -12,6 +12,7 @@ import { InMemoryDiscussionRepository } from "../../../establishment/adapters/In
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentLeadQueries } from "../../../establishment/adapters/InMemoryEstablishmentLeadQueries";
 import { InMemoryEstablishmentLeadRepository } from "../../../establishment/adapters/InMemoryEstablishmentLeadRepository";
+import { InMemoryEstablishmentQueries } from "../../../establishment/adapters/InMemoryEstablishmentQueries";
 import { InMemoryFormEstablishmentRepository } from "../../../establishment/adapters/InMemoryFormEstablishmentRepository";
 import { InMemoryGroupRepository } from "../../../establishment/adapters/InMemoryGroupRepository";
 import { InMemorySearchMadeRepository } from "../../../establishment/adapters/InMemorySearchMadeRepository";
@@ -57,6 +58,7 @@ export const createInMemoryUow = () => {
     discussionRepository: new InMemoryDiscussionRepository(),
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
+    establishmentQueries: new InMemoryEstablishmentQueries(),
     groupRepository: new InMemoryGroupRepository(),
     errorRepository: new InMemorySavedErrorRepository(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),

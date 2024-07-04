@@ -235,6 +235,11 @@ const defaultApiConsumerValues = (id: string): ApiConsumer => ({
       },
       subscriptions: [],
     },
+    establishmentStats: {
+      kinds: ["READ"],
+      scope: "no-scope",
+      subscriptions: [],
+    },
   },
   createdAt: toDateString(new Date()),
   expirationDate: toDateString(addYears(new Date(), 1)),

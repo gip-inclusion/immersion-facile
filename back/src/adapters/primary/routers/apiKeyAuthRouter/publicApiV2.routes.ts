@@ -11,6 +11,7 @@ import {
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
+import { EstablishmentStat } from "../../../../domains/establishment/use-cases/GetEstablishmentStats";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";
 import { conventionReadPublicV2Schema } from "../DtoAndSchemas/v2/input/ConventionReadPublicV2.schema";
 import { getConventionsByFiltersQueryParamsV2Schema } from "../DtoAndSchemas/v2/input/GetConventionByFiltersQueriesV2.schema";
@@ -90,13 +91,6 @@ export const publicApiV2ConventionRoutes = defineRoutes({
     },
   }),
 });
-
-type EstablishmentStat = {
-  siret: string;
-  name: string;
-  numberOfConventions: number;
-  isReferenced: boolean;
-};
 
 const establishmentStatSchema: z.Schema<EstablishmentStat> = z.object({
   siret: z.string(),
