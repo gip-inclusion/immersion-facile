@@ -1,8 +1,10 @@
 import {
+  createPaginatedSchema,
   createWebhookSubscriptionSchema,
   emptyObjectSchema,
   expressEmptyResponseBody,
   httpErrorSchema,
+  paginationQueryParamsSchema,
   searchResultSchema,
   searchResultsSchema,
   withAuthorizationHeaders,
@@ -81,6 +83,40 @@ export const publicApiV2ConventionRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(conventionReadPublicV2Schema),
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      429: httpErrorSchema,
+    },
+  }),
+});
+
+type EstablishmentStat = {
+  siret: string;
+  name: string;
+  numberOfConventions: number;
+  isReferenced: boolean;
+};
+
+const establishmentStatSchema: z.Schema<EstablishmentStat> = z.object({
+  siret: z.string(),
+  name: z.string(),
+  numberOfConventions: z.number(),
+  isReferenced: z.boolean(),
+});
+
+export const paginatedEstablishmentStatsSchema = createPaginatedSchema(
+  establishmentStatSchema,
+);
+
+export const publicApiV2EstablishmentStatsRoutes = defineRoutes({
+  getEstablishmentStats: defineRoute({
+    method: "get",
+    url: "/v2/establishments/stats",
+    queryParamsSchema: paginationQueryParamsSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: paginatedEstablishmentStatsSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
