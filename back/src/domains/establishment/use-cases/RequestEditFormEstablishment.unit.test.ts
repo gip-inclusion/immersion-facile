@@ -1,9 +1,5 @@
 import { addHours, addSeconds } from "date-fns";
-import {
-  EstablishmentJwtPayload,
-  TemplatedEmail,
-  expectPromiseToFailWithError,
-} from "shared";
+import { EstablishmentJwtPayload, TemplatedEmail } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -98,20 +94,6 @@ describe("RequestUpdateFormEstablishment", () => {
       saveNotificationAndRelatedEvent,
       timeGateway,
       generateEditFormEstablishmentUrl,
-    );
-  });
-
-  it("Throws an error if contact email is unknown", async () => {
-    // Prepare
-    uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret =
-      //eslint-disable-next-line @typescript-eslint/require-await
-      async (_siret: string) =>
-        new EstablishmentAggregateBuilder().withoutContact().build();
-
-    // Act and assert
-    await expectPromiseToFailWithError(
-      requestEditFormEstablishment.execute(siret),
-      Error("Email du contact introuvable."),
     );
   });
 

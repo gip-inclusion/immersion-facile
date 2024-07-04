@@ -905,10 +905,7 @@ export class PgEstablishmentAggregateRepository
     },
     updatedAggregate: EstablishmentAggregate,
   ) {
-    if (
-      !!updatedAggregate.contact &&
-      !contactsEqual(updatedAggregate.contact, existingAggregate.contact)
-    ) {
+    if (!contactsEqual(updatedAggregate.contact, existingAggregate.contact)) {
       await this.transaction
         .updateTable("establishments_contacts")
         .set({

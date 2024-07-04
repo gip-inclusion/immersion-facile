@@ -40,7 +40,7 @@ export type EstablishmentEntity = {
 export type EstablishmentAggregate = {
   establishment: EstablishmentEntity;
   offers: OfferEntity[];
-  contact?: ContactEntity;
+  contact: ContactEntity;
 };
 
 export type WithEstablishmentAggregate = {
