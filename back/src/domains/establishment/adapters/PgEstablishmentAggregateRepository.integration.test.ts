@@ -1394,34 +1394,6 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
     });
 
-    it("creates an establishment contact", async () => {
-      const contactBuilder = new ContactEntityBuilder().withId(
-        "11111111-1111-4111-1111-111111111111",
-      );
-      const originalEstablishmentAggregate = new EstablishmentAggregateBuilder()
-        .withContact(undefined)
-        .build();
-      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-        originalEstablishmentAggregate,
-      );
-      const updatedAt = new Date();
-      const updatedAggregate = new EstablishmentAggregateBuilder()
-        .withContact(contactBuilder.withContactMethod("IN_PERSON").build())
-        .build();
-
-      await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
-        updatedAggregate,
-        updatedAt,
-      );
-
-      expectToEqual(
-        await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
-          updatedAggregate.establishment.siret,
-        ),
-        updatedAggregate,
-      );
-    });
-
     it("updates an establishment contact", async () => {
       const contactBuilder = new ContactEntityBuilder().withId(
         "11111111-1111-4111-1111-111111111111",

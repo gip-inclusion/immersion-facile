@@ -64,15 +64,9 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     if (!establishmentAggregate)
       throw new NotFoundError(`No establishment found with siret: ${siret}`);
 
-    const establishmentContact = establishmentAggregate.contact;
-    if (!establishmentContact)
-      throw new NotFoundError(
-        `No contact found for establishment with siret: ${siret}`,
-      );
-
-    if (contactMode !== establishmentContact.contactMethod)
+    if (contactMode !== establishmentAggregate.contact.contactMethod)
       throw new BadRequestError(
-        `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${establishmentContact.contactMethod}`,
+        `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${establishmentAggregate.contact.contactMethod}`,
       );
 
     if (
@@ -124,7 +118,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
     const discussion = this.#createDiscussion({
       contactRequest,
-      contact: establishmentContact,
+      contact: establishmentAggregate.contact,
       establishment: establishmentAggregate.establishment,
       now,
     });

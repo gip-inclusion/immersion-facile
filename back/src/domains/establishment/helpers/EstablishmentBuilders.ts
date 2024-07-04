@@ -250,7 +250,7 @@ export class EstablishmentAggregateBuilder
     return this.aggregate;
   }
 
-  public withContact(contact: ContactEntity | undefined) {
+  public withContact(contact: ContactEntity) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact,
@@ -420,13 +420,6 @@ export class EstablishmentAggregateBuilder
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       offers,
-    });
-  }
-
-  public withoutContact() {
-    return new EstablishmentAggregateBuilder({
-      ...this.aggregate,
-      contact: undefined,
     });
   }
 

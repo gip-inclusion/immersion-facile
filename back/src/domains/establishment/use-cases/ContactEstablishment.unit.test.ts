@@ -492,28 +492,6 @@ describe("ContactEstablishment", () => {
       );
     });
 
-    it("throws NotFoundError without contact id", async () => {
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder().withSiret(siret).build(),
-          )
-          .withoutContact() // no contact
-          .withOffers([immersionOffer])
-          .build(),
-      );
-
-      await expectPromiseToFailWithError(
-        contactEstablishment.execute({
-          ...validRequest,
-          contactMode: "PHONE",
-        }),
-        new NotFoundError(
-          "No contact found for establishment with siret: 11112222333344",
-        ),
-      );
-    });
-
     it("throws NotFoundError when no establishments found with given siret", async () => {
       await expectPromiseToFailWithError(
         contactEstablishment.execute({

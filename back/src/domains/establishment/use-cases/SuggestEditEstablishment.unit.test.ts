@@ -1,6 +1,5 @@
 import {
   EstablishmentJwtPayload,
-  expectPromiseToFailWithError,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
@@ -94,20 +93,6 @@ describe("SuggestEditEstablishment", () => {
       saveNotificationAndRelatedEvent,
       timeGateway,
       generateEditFormEstablishmentUrl,
-    );
-  });
-
-  it("Throws an error if contact email is unknown", async () => {
-    // Prepare
-    uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret =
-      //eslint-disable-next-line @typescript-eslint/require-await
-      async (_siret: string) =>
-        new EstablishmentAggregateBuilder().withoutContact().build();
-
-    // Act and assert
-    await expectPromiseToFailWithError(
-      suggestEditEstablishment.execute(siret),
-      Error("Email du contact introuvable, pour le siret : 12345678912345"),
     );
   });
 
