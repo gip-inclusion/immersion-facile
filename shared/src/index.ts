@@ -73,6 +73,8 @@ export * from "./naf";
 export * from "./notifications/notifications.dto";
 export * from "./npsForms";
 export * from "./phone.schema";
+export * from "./pagination/pagination.dto";
+export * from "./pagination/pagination.schema";
 export * from "./pipeWithValue";
 export * from "./ramdaExtensions/notEqual";
 export * from "./ramdaExtensions/path";
