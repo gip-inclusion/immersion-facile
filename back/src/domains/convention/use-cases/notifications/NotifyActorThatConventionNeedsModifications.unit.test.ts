@@ -152,7 +152,7 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
         requesterRole: "backOffice",
         modifierRole: "beneficiary",
         email: [convention.signatories.beneficiary.email],
-        requesterName: "L'équipe Immerssion Facilité",
+        requesterName: "L'équipe Immersion Facilitée",
       },
     ])(
       "Notify $modifierRole that application needs modification.",
