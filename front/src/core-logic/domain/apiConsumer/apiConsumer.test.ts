@@ -31,6 +31,11 @@ const apiConsumer1: ApiConsumer = {
       },
       subscriptions: [],
     },
+    establishmentStats: {
+      kinds: ["READ"],
+      scope: "no-scope",
+      subscriptions: [],
+    },
   },
   createdAt: new Date().toISOString(),
   expirationDate: new Date().toISOString(),

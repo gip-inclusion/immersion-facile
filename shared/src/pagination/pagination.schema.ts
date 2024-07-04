@@ -1,10 +1,21 @@
 import { z } from "zod";
-import type { DataWithPagination, Pagination } from "./pagination.dto";
+import {
+  DataWithPagination,
+  Pagination,
+  PaginationQueryParams,
+} from "./pagination.dto";
 
-export type PaginationQueryParams = z.infer<typeof paginationQueryParamsSchema>;
-export const paginationQueryParamsSchema = z.object({
-  page: z.number().positive().min(1).default(1),
-  perPage: z.number().min(1).max(5_000).default(100),
+export const paginationQueryParamsSchema: z.Schema<PaginationQueryParams> =
+  z.object({
+    page: z.number().positive().min(1).optional(),
+    perPage: z.number().min(1).max(5_000).optional(),
+  });
+
+export const paginationRequiredQueryParamsSchema: z.Schema<
+  Required<PaginationQueryParams>
+> = z.object({
+  page: z.number().positive().min(1),
+  perPage: z.number().min(1).max(5_000),
 });
 
 const paginationSchema: z.Schema<Pagination> = z.object({

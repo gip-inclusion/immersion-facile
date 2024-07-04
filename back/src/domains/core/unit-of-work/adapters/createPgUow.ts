@@ -13,6 +13,7 @@ import { PgDiscussionRepository } from "../../../establishment/adapters/PgDiscus
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { PgEstablishmentLeadQueries } from "../../../establishment/adapters/PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "../../../establishment/adapters/PgEstablishmentLeadRepository";
+import { PgEstablishmentQueries } from "../../../establishment/adapters/PgEstablishmentQueries";
 import { PgFormEstablishmentRepository } from "../../../establishment/adapters/PgFormEstablishmentRepository";
 import { PgGroupRepository } from "../../../establishment/adapters/PgGroupRepository";
 import { PgSearchMadeRepository } from "../../../establishment/adapters/PgSearchMadeRepository";
@@ -54,6 +55,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       transaction,
     ),
+    establishmentQueries: new PgEstablishmentQueries(transaction),
     establishmentLeadRepository: new PgEstablishmentLeadRepository(transaction),
     establishmentLeadQueries: new PgEstablishmentLeadQueries(transaction),
     groupRepository: new PgGroupRepository(transaction),

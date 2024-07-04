@@ -189,7 +189,7 @@ const defaultApiConsumer: ApiConsumer = {
       subscriptions: [],
     },
   },
-  description: "a",
+  description: "Default ApiConsumer description for test",
 };
 
 export class ApiConsumerBuilder implements Builder<ApiConsumer> {
@@ -206,11 +206,17 @@ export class ApiConsumerBuilder implements Builder<ApiConsumer> {
   public withConventionRight(
     conventionRight: ApiConsumerRights["convention"],
   ): ApiConsumerBuilder {
+    return this.withRights({
+      convention: conventionRight,
+    });
+  }
+
+  public withRights(rights: Partial<ApiConsumerRights>): ApiConsumerBuilder {
     return new ApiConsumerBuilder({
       ...this.#dto,
       rights: {
         ...this.#dto.rights,
-        convention: conventionRight,
+        ...rights,
       },
     });
   }

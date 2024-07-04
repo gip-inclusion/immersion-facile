@@ -8,16 +8,18 @@ import {
   SiretDto,
   WithAcquisition,
   errorMessages,
+  defaultPageInPagination,
+  defaultPerPageInPagination,
   eventToRightName,
   isApiConsumerAllowed,
   pipeWithValue,
-  paginationQueryParamsSchema,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import {
   ForbiddenError,
   NotFoundError,
+  UnauthorizedError,
   validateAndParseZodSchemaV2,
 } from "../../../../config/helpers/httpErrors";
 import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";
@@ -203,8 +205,18 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     deps.apiConsumerMiddleware,
     (req, res) =>
       sendHttpResponseForApiV2(req, res, async () => {
-        const { page, perPage } = paginationQueryParamsSchema.parse(req.query);
-        throw new Error("Not implemented");
+        if (!req.apiConsumer) throw new UnauthorizedError();
+
+        const page = req.query.page ?? defaultPageInPagination;
+        const perPage = req.query.perPage ?? defaultPerPageInPagination;
+
+        return deps.useCases.getEstablishmentStats.execute(
+          {
+            page,
+            perPage,
+          },
+          req.apiConsumer,
+        );
       }),
   );
 

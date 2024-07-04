@@ -95,6 +95,7 @@ import { ContactEstablishment } from "../../domains/establishment/use-cases/Cont
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { EditFormEstablishment } from "../../domains/establishment/use-cases/EditFormEstablishment";
+import { makeGetEstablishmentStats } from "../../domains/establishment/use-cases/GetEstablishmentStats";
 import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { InsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
@@ -618,6 +619,9 @@ export const createUseCases = (
         saveNotificationAndRelatedEvent,
         timeGateway: gateways.timeGateway,
       },
+      uowPerformer,
+    }),
+    getEstablishmentStats: makeGetEstablishmentStats({
       uowPerformer,
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;

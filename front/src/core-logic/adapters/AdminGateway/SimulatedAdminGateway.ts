@@ -194,6 +194,11 @@ const apiConsumers: ApiConsumer[] = [
         },
         subscriptions: [],
       },
+      establishmentStats: {
+        kinds: ["READ"],
+        scope: "no-scope",
+        subscriptions: [],
+      },
     },
   },
   {
@@ -220,6 +225,11 @@ const apiConsumers: ApiConsumer[] = [
         scope: {
           agencyIds: ["fake-agency-id-1"],
         },
+        subscriptions: [],
+      },
+      establishmentStats: {
+        kinds: ["READ"],
+        scope: "no-scope",
         subscriptions: [],
       },
     },
