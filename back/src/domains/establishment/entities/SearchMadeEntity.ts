@@ -5,6 +5,7 @@ import {
   SearchSortedBy,
   WithAcquisition,
 } from "shared";
+import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
@@ -37,9 +38,6 @@ export type GeoParams = {
 export const hasSearchMadeGeoParams = (
   searchMade: SearchMade,
 ): searchMade is SearchMadeWithGeoParams => {
-  return (
-    (searchMade as SearchMadeWithGeoParams).lat !== undefined &&
-    (searchMade as SearchMadeWithGeoParams).lon !== undefined &&
-    (searchMade as SearchMadeWithGeoParams).distanceKm !== undefined
-  );
+  const searchMadeWithGeoParams = searchMade as SearchMadeWithGeoParams;
+  return hasSearchGeoParams(searchMadeWithGeoParams);
 };
