@@ -1072,7 +1072,9 @@ describe("PgEstablishmentAggregateRepository", () => {
             sortedBy: "distance",
           },
         }),
-        new BadRequestError("Cannot search by distance without geo params"),
+        new BadRequestError(
+          "Cannot search by distance with invalid geo params",
+        ),
       );
     });
     it("should throw if only one of the geo params is provided (lat/lon/distanceKm)", async () => {
@@ -1099,6 +1101,55 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       // Assert
       expect(readableResults).toHaveLength(4);
+    });
+    it("should throw if all geo params value is 0 and sorted by distance", async () => {
+      // Assert
+      await expectPromiseToFailWithError(
+        pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {
+            sortedBy: "distance",
+            lat: 0,
+            lon: 0,
+            distanceKm: 0,
+          },
+        }),
+        new BadRequestError(
+          "Cannot search by distance with invalid geo params",
+        ),
+      );
+    });
+
+    it("should throw if lat / lon are 0 but distanceKm is provided and not 0 and sorted by distance", async () => {
+      // Assert
+      await expectPromiseToFailWithError(
+        pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {
+            sortedBy: "distance",
+            lat: 0,
+            lon: 0,
+            distanceKm: 10,
+          },
+        }),
+        new BadRequestError(
+          "Cannot search by distance with invalid geo params",
+        ),
+      );
+    });
+    it("should throw if one of the geo params value is 0", async () => {
+      // Assert
+      await expectPromiseToFailWithError(
+        pgEstablishmentAggregateRepository.searchImmersionResults({
+          searchMade: {
+            sortedBy: "distance",
+            lat: 0,
+            lon: 45,
+            distanceKm: 10,
+          },
+        }),
+        new BadRequestError(
+          "Cannot search by distance with invalid geo params",
+        ),
+      );
     });
   });
 

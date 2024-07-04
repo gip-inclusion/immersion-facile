@@ -956,7 +956,9 @@ const makeOrderByStatement = (searchMade: SearchMade): string => {
     !hasSearchMadeGeoParams(searchMade) &&
     searchMade.sortedBy === "distance"
   ) {
-    throw new BadRequestError("Cannot search by distance without geo params");
+    throw new BadRequestError(
+      "Cannot search by distance with invalid geo params",
+    );
   }
   const sortQueryBySortedByValue: Record<SearchSortedBy, string> = {
     distance: "ORDER BY distance_m ASC, RANDOM()",
