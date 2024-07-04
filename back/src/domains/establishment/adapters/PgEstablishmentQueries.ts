@@ -1,15 +1,55 @@
-import { DataWithPagination } from "shared";
+import { DataWithPagination, PaginationQueryParams } from "shared";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { EstablishmentQueries } from "../ports/EstablishmentQueries";
 import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
 
 export class PgEstablishmentQueries implements EstablishmentQueries {
-  constructor(private transaction: KyselyDb) {}
+  #transaction: KyselyDb;
+  constructor(transaction: KyselyDb) {
+    this.#transaction = transaction;
+  }
 
-  public async getEstablishmentStats(_pagination: {
-    page: number;
-    perPage: number;
-  }): Promise<DataWithPagination<EstablishmentStat>> {
-    throw new Error("Method not implemented.");
+  public async getEstablishmentStats({
+    page,
+    perPage,
+  }: Required<PaginationQueryParams>): Promise<
+    DataWithPagination<EstablishmentStat>
+  > {
+    const { totalRecords } = (await this.#transaction
+      .selectFrom("conventions")
+      .groupBy("siret")
+      .select(({ fn }) => fn.count<string>("siret").over().as("totalRecords"))
+      .executeTakeFirst()) ?? { totalRecords: 0 };
+
+    const establishmentStats = await this.#transaction
+      .selectFrom("conventions as c")
+      .leftJoin("establishments as e", "c.siret", "e.siret")
+      .groupBy(["c.siret", "c.business_name", "e.siret"])
+      .orderBy("siret")
+      .select((qb) => [
+        "c.siret as siret",
+        "c.business_name as name",
+        qb.fn.count<number>("c.siret").as("numberOfConventions"),
+        qb
+          .case()
+          .when("e.siret", "is", null)
+          .then(false)
+          .else(true)
+          .end()
+          .as("isReferenced"),
+      ])
+      .limit(perPage)
+      .offset((page - 1) * perPage)
+      .execute();
+
+    return {
+      data: establishmentStats,
+      pagination: {
+        totalRecords: +totalRecords,
+        totalPages: Math.ceil(Math.max(+totalRecords, 1) / perPage),
+        numberPerPage: perPage,
+        currentPage: page,
+      },
+    };
   }
 }
