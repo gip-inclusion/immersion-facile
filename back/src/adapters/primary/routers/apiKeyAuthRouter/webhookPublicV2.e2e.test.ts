@@ -123,6 +123,11 @@ describe("Webhook routes", () => {
             scope: "no-scope",
             subscriptions: [],
           },
+          establishmentStats: {
+            kinds: [],
+            scope: "no-scope",
+            subscriptions: [],
+          },
         },
       };
       inMemoryUow.apiConsumerRepository.consumers = [
@@ -194,6 +199,11 @@ describe("Webhook routes", () => {
             scope: "no-scope",
             subscriptions: [],
           },
+          establishmentStats: {
+            kinds: [],
+            scope: "no-scope",
+            subscriptions: [],
+          },
         },
       };
       inMemoryUow.apiConsumerRepository.consumers = [
@@ -258,6 +268,11 @@ describe("Webhook routes", () => {
             subscriptions: [subscription],
           },
           searchEstablishment: {
+            kinds: [],
+            scope: "no-scope",
+            subscriptions: [],
+          },
+          establishmentStats: {
             kinds: [],
             scope: "no-scope",
             subscriptions: [],

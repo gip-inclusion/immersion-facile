@@ -1410,6 +1410,11 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
       },
       subscriptions: [],
     },
+    establishmentStats: {
+      kinds: ["READ"],
+      scope: "no-scope",
+      subscriptions: [],
+    },
   },
 };
 

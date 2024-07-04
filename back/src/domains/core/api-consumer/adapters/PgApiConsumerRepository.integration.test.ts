@@ -31,6 +31,11 @@ const apiConsumer: ApiConsumer = {
       },
       subscriptions: [],
     },
+    establishmentStats: {
+      kinds: ["READ"],
+      scope: "no-scope",
+      subscriptions: [],
+    },
   },
 };
 
@@ -89,6 +94,11 @@ describe("PgApiConsumerRepository", () => {
           scope: {
             agencyKinds: [],
           },
+          subscriptions: [],
+        },
+        establishmentStats: {
+          kinds: ["READ"],
+          scope: "no-scope",
           subscriptions: [],
         },
       },

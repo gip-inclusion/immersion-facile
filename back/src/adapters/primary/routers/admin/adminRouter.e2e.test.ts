@@ -622,6 +622,11 @@ describe("Admin router", () => {
             },
             subscriptions: [],
           },
+          establishmentStats: {
+            kinds: [],
+            scope: "no-scope",
+            subscriptions: [],
+          },
         },
       };
 
