@@ -11,6 +11,7 @@ import {
   eventToRightName,
   isApiConsumerAllowed,
   pipeWithValue,
+  paginationQueryParamsSchema,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
@@ -202,6 +203,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     deps.apiConsumerMiddleware,
     (req, res) =>
       sendHttpResponseForApiV2(req, res, async () => {
+        const { page, perPage } = paginationQueryParamsSchema.parse(req.query);
         throw new Error("Not implemented");
       }),
   );

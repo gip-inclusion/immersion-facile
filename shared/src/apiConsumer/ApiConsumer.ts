@@ -38,11 +38,13 @@ export type ApiConsumerRightName = (typeof apiConsumerRightNames)[number];
 export const apiConsumerRightNames = [
   "searchEstablishment",
   "convention",
+  "establishmentStats",
 ] as const;
 
 export type GenericApiConsumerRights<S extends CreateWebhookSubscription> = {
   searchEstablishment: ApiConsumerRight<NoScope, S>;
   convention: ApiConsumerRight<ConventionScope, S>;
+  establishmentStats: ApiConsumerRight<NoScope, never>;
 };
 
 export type WriteApiConsumerRights =
@@ -136,14 +138,19 @@ export const createApiConsumerParamsFromApiConsumer = (
 ): WriteApiConsumerParams => ({
   id: apiConsumer.id,
   rights: {
+    searchEstablishment: {
+      kinds: apiConsumer.rights.searchEstablishment.kinds,
+      scope: apiConsumer.rights.searchEstablishment.scope,
+      subscriptions: [],
+    },
     convention: {
       kinds: apiConsumer.rights.convention.kinds,
       scope: apiConsumer.rights.convention.scope,
       subscriptions: [],
     },
-    searchEstablishment: {
-      kinds: apiConsumer.rights.searchEstablishment.kinds,
-      scope: apiConsumer.rights.searchEstablishment.scope,
+    establishmentStats: {
+      kinds: apiConsumer.rights.establishmentStats.kinds,
+      scope: apiConsumer.rights.establishmentStats.scope,
       subscriptions: [],
     },
   },

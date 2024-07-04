@@ -31,6 +31,11 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
       },
       subscriptions: [],
     },
+    establishmentStats: {
+      kinds: ["READ"],
+      scope: "no-scope",
+      subscriptions: [],
+    },
   },
   description: "a",
 };
@@ -58,7 +63,11 @@ export const unauthorizedApiConsumer: ApiConsumer = {
       scope: {
         agencyIds: [],
       },
-
+      subscriptions: [],
+    },
+    establishmentStats: {
+      kinds: ["READ"],
+      scope: "no-scope",
       subscriptions: [],
     },
   },
@@ -90,6 +99,11 @@ export const outdatedApiConsumer: ApiConsumer = {
       },
       subscriptions: [],
     },
+    establishmentStats: {
+      kinds: ["READ"],
+      scope: "no-scope",
+      subscriptions: [],
+    },
   },
   description: "",
 };
@@ -106,6 +120,11 @@ export const authorizedSubscriptionApiConsumer: ApiConsumer = {
     },
     searchEstablishment: {
       kinds: [],
+      scope: "no-scope",
+      subscriptions: [],
+    },
+    establishmentStats: {
+      kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],
     },
@@ -162,6 +181,11 @@ const defaultApiConsumer: ApiConsumer = {
       scope: {
         agencyIds: [],
       },
+      subscriptions: [],
+    },
+    establishmentStats: {
+      kinds: ["READ"],
+      scope: "no-scope",
       subscriptions: [],
     },
   },
