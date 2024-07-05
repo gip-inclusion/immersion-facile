@@ -1,5 +1,11 @@
-import { ColumnType, Generated } from "kysely";
-import { AbsoluteUrl, ConventionId, DiscussionStatus } from "shared";
+import { ColumnType, Generated, JSONColumnType } from "kysely";
+import {
+  AbsoluteUrl,
+  ConventionId,
+  DateTimeIsoString,
+  DiscussionStatus,
+  Email,
+} from "shared";
 
 export interface Database {
   actors: Actors;
@@ -24,6 +30,7 @@ export interface Database {
   groups: Groups;
   immersion_offers: ImmersionOffers;
   immersion_assessments: ImmersionAssessments;
+  marketing_establishment_contacts: MarketingEstablishmentContacts;
   notifications_email_attachments: NotificationsEmailAttachments;
   notifications_email_recipients: NotificationsEmailRecipients;
   notifications_email: NotificationsEmail;
@@ -579,4 +586,17 @@ interface ImmersionAssessments {
   establishment_feedback: string;
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
+}
+
+interface MarketingEstablishmentContacts {
+  siret: string;
+  email: string;
+  contact_history: JSONColumnType<
+    {
+      firstName: string; //PRENOM
+      lastName: string; //NOM
+      email: Email;
+      createdAt: DateTimeIsoString;
+    }[]
+  >;
 }
