@@ -1,7 +1,6 @@
 import {
   AbsoluteUrl,
   EmailAttachment,
-  Flavor,
   Phone,
   absoluteUrlSchema,
   emailAttachmentSchema,
@@ -9,38 +8,6 @@ import {
   smsRecipientPhoneSchema,
 } from "shared";
 import { z } from "zod";
-
-export type ApiKey = Flavor<string, "ApiKey">;
-const apiKeySchema = z.string().nonempty();
-
-type ApplicationJsonType = "application/json";
-const applicationJsonSchema = z.literal("application/json");
-
-type ApplicationOctetStreamType = "application/octet-stream";
-const applicationOctetStreamSchema = z.literal("application/octet-stream");
-
-export type BrevoHeaders = {
-  accept: ApplicationJsonType;
-  "content-type": ApplicationJsonType;
-  "api-key": ApiKey;
-};
-
-type BrevoBinaryContentHeaders = {
-  accept: ApplicationOctetStreamType;
-  "api-key": ApiKey;
-};
-
-export const brevoHeaderSchema: z.Schema<BrevoHeaders> = z.object({
-  accept: applicationJsonSchema,
-  "content-type": applicationJsonSchema,
-  "api-key": apiKeySchema,
-});
-
-export const brevoHeaderBinaryContentSchema: z.Schema<BrevoBinaryContentHeaders> =
-  z.object({
-    accept: applicationOctetStreamSchema,
-    "api-key": apiKeySchema,
-  });
 
 export type RecipientOrSender = {
   name?: string;
