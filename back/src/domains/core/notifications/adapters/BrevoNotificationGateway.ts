@@ -16,6 +16,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import {
   counterSendTransactEmailError,
   counterSendTransactEmailSuccess,
@@ -25,8 +26,6 @@ import { createLogger } from "../../../../utils/logger";
 import { NotificationGateway } from "../ports/NotificationGateway";
 import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import {
-  ApiKey,
-  BrevoHeaders,
   RecipientOrSender,
   SendTransactEmailRequestBody,
   SendTransactSmsRequestBody,

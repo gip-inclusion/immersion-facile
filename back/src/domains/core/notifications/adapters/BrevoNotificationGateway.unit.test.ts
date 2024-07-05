@@ -3,12 +3,10 @@ import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { makeEmailAllowListPredicate } from "../../../../config/bootstrap/appConfig";
 import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
 import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
-import {
-  BrevoHeaders,
-  SendTransactEmailRequestBody,
-} from "./BrevoNotificationGateway.schemas";
+import { SendTransactEmailRequestBody } from "./BrevoNotificationGateway.schemas";
 
 const sender = { name: "bob", email: "Machin@mail.com" };
 

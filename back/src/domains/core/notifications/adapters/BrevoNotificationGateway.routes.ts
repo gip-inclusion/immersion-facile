@@ -1,9 +1,11 @@
-import { AbsoluteUrl } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import {
+  apiBrevoUrl,
   brevoHeaderBinaryContentSchema,
   brevoHeaderSchema,
+} from "../../../../utils/apiBrevoUrl";
+import {
   sendTransactEmailRequestBodySchema,
   sendTransactEmailResponseSchema,
   sendTransactSmsRequestBodySchema,
@@ -12,8 +14,6 @@ import {
 
 export type BrevoNotificationGatewayRoutes =
   typeof brevoNotificationGatewayRoutes;
-
-const apiBrevoUrl: AbsoluteUrl = "https://api.sendinblue.com/v3";
 
 export const brevoNotificationGatewayRoutes = defineRoutes({
   sendTransactEmail: defineRoute({
