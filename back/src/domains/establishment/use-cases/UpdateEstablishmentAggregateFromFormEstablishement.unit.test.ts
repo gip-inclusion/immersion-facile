@@ -4,6 +4,7 @@ import {
   LocationId,
   SiretDto,
   addressDtoToString,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWith,
   expectToEqual,
 } from "shared";
@@ -11,6 +12,7 @@ import {
   InMemoryAddressGateway,
   rueGuillaumeTellDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -47,6 +49,7 @@ describe("Update Establishment aggregate from form data", () => {
         addressGateway,
         uuidGenerator,
         timeGateway,
+        makeCreateNewEvent({ timeGateway, uuidGenerator }),
       );
   });
 
@@ -54,6 +57,7 @@ describe("Update Establishment aggregate from form data", () => {
     await expectPromiseToFailWith(
       updateEstablishmentAggregateFromFormUseCase.execute({
         formEstablishment: FormEstablishmentDtoBuilder.valid().build(),
+        triggeredBy: null,
       }),
       "Cannot update establishment that does not exist.",
     );
@@ -135,6 +139,7 @@ describe("Update Establishment aggregate from form data", () => {
     // Act : execute use-case with same siret
     await updateEstablishmentAggregateFromFormUseCase.execute({
       formEstablishment: updatedFormEstablishment,
+      triggeredBy: null,
     });
 
     // Assert
@@ -183,5 +188,12 @@ describe("Update Establishment aggregate from form data", () => {
           .build(),
       ],
     );
+
+    expectObjectInArrayToMatch(uow.outboxRepository.events, [
+      {
+        topic: "UpdatedEstablishmentAggregateInsertedFromForm",
+        payload: { siret, triggeredBy: null },
+      },
+    ]);
   });
 });

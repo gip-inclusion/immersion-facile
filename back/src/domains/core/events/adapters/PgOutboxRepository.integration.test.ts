@@ -65,7 +65,7 @@ describe("PgOutboxRepository", () => {
       uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
       const alreadyProcessedEvent = createNewEvent({
         topic: "ConventionSubmittedByBeneficiary",
-        payload: { convention, triggeredBy: undefined },
+        payload: { convention, triggeredBy: null },
         publications: [
           { publishedAt: "2021-11-15T08:30:00.000Z", failures: [] },
         ],
@@ -87,7 +87,7 @@ describe("PgOutboxRepository", () => {
       const convention = new ConventionDtoBuilder().build();
       const event = createNewEvent({
         topic: "ConventionSubmittedByBeneficiary",
-        payload: { convention, triggeredBy: undefined },
+        payload: { convention, triggeredBy: null },
       });
 
       // act (when event does not exist in db)
@@ -152,7 +152,7 @@ describe("PgOutboxRepository", () => {
       const convention = new ConventionDtoBuilder().build();
       const event = createNewEvent({
         topic: quarantinedTopic,
-        payload: { convention, triggeredBy: undefined },
+        payload: { convention, triggeredBy: null },
         status: "published",
       });
 
@@ -175,7 +175,7 @@ describe("PgOutboxRepository", () => {
       timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
       const eventFailedToRerun = createNewEvent({
         topic: "ConventionSubmittedByBeneficiary",
-        payload: { convention, triggeredBy: undefined },
+        payload: { convention, triggeredBy: null },
         status: "failed-but-will-retry",
         publications: [
           {
@@ -222,7 +222,7 @@ describe("PgOutboxRepository", () => {
       ]);
       const event1 = createNewEvent({
         topic: "ConventionSubmittedByBeneficiary",
-        payload: { convention, triggeredBy: undefined },
+        payload: { convention, triggeredBy: null },
       });
       const event2 = createNewEvent({
         topic: "ApiConsumerSaved",

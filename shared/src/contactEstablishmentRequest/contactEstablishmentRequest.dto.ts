@@ -34,4 +34,5 @@ export type ContactEstablishmentRequestDto =
 
 export type ContactEstablishmentEventPayload = {
   discussionId: DiscussionId;
+  siret: SiretDto;
 };

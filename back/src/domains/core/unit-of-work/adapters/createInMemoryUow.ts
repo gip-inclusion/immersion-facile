@@ -15,6 +15,7 @@ import { InMemoryEstablishmentLeadRepository } from "../../../establishment/adap
 import { InMemoryFormEstablishmentRepository } from "../../../establishment/adapters/InMemoryFormEstablishmentRepository";
 import { InMemoryGroupRepository } from "../../../establishment/adapters/InMemoryGroupRepository";
 import { InMemorySearchMadeRepository } from "../../../establishment/adapters/InMemorySearchMadeRepository";
+import { InMemoryEstablishementMarketingRepository } from "../../../marketing/adapters/InMemoryEstablishmentMarketingRepository";
 import { InMemoryApiConsumerRepository } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/InMemoryOngoingOAuthRepository";
@@ -85,6 +86,8 @@ export const createInMemoryUow = () => {
       new InMemoryConventionExternalIdRepository(),
     npsRepository: new InMemoryNpsRepository(),
     statisticQueries: new InMemoryStatisticQueries(),
+    establishmentMarketingRepository:
+      new InMemoryEstablishementMarketingRepository(),
   } satisfies UnitOfWork;
 };
 

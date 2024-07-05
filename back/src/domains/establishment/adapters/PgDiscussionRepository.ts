@@ -65,10 +65,10 @@ export class PgDiscussionRepository implements DiscussionRepository {
       : undefined;
   }
 
-  public async getDiscussions(
-    { createdSince, lastAnsweredByCandidate, sirets }: GetDiscussionsParams,
-    limit: number,
-  ): Promise<DiscussionDto[]> {
+  public async getDiscussions({
+    filters: { createdSince, lastAnsweredByCandidate, sirets },
+    limit,
+  }: GetDiscussionsParams): Promise<DiscussionDto[]> {
     const results = await pipeWithValue(
       this.#makeDiscussionQueryBuilder(),
       (b) =>

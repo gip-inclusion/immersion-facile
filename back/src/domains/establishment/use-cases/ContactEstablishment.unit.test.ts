@@ -126,8 +126,9 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid EMAIL contact request", async () => {
+    const establishment = establishmentAggregateWithEmailContact.build();
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      establishmentAggregateWithEmailContact.build(),
+      establishment,
     );
 
     const discussionId = "discussion_id";
@@ -144,7 +145,11 @@ describe("ContactEstablishment", () => {
         id: eventId,
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
-        payload: { ...validEmailRequest, discussionId, triggeredBy: undefined },
+        payload: {
+          siret: establishment.establishment.siret,
+          discussionId,
+          triggeredBy: null,
+        },
         status: "never-published",
         publications: [],
         wasQuarantined: false,
@@ -153,22 +158,23 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid PHONE contact request", async () => {
+    const establishment = new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withSiret(siret)
+          .withLocations([location])
+          .build(),
+      )
+      .withContact(
+        new ContactEntityBuilder()
+          .withId(contactId)
+          .withContactMethod("PHONE")
+          .build(),
+      )
+      .withOffers([immersionOffer])
+      .build();
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret(siret)
-            .withLocations([location])
-            .build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withId(contactId)
-            .withContactMethod("PHONE")
-            .build(),
-        )
-        .withOffers([immersionOffer])
-        .build(),
+      establishment,
     );
 
     const discussionId = "discussion_id";
@@ -189,7 +195,11 @@ describe("ContactEstablishment", () => {
         id: eventId,
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
-        payload: { ...validPhoneRequest, discussionId, triggeredBy: undefined },
+        payload: {
+          siret,
+          discussionId,
+          triggeredBy: null,
+        },
         publications: [],
         status: "never-published",
         wasQuarantined: false,
@@ -235,9 +245,9 @@ describe("ContactEstablishment", () => {
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
         payload: {
-          ...validInPersonRequest,
+          siret,
           discussionId,
-          triggeredBy: undefined,
+          triggeredBy: null,
         },
         publications: [],
         status: "never-published",

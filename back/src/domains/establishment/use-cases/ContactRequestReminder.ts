@@ -33,15 +33,15 @@ export const makeContactRequestReminder = createTransactionalUseCase<
   { name: "ContactRequestReminder", inputSchema: z.enum(["3days", "7days"]) },
   async (mode, { uow, deps }, _) => {
     const now = deps.timeGateway.now();
-    const discussions = await uow.discussionRepository.getDiscussions(
-      {
+    const discussions = await uow.discussionRepository.getDiscussions({
+      filters: {
         lastAnsweredByCandidate: {
           from: addDays(now, mode === "3days" ? -4 : -8),
           to: addDays(now, mode === "3days" ? -3 : -7),
         },
       },
-      MAX_DISCUSSIONS,
-    );
+      limit: MAX_DISCUSSIONS,
+    });
 
     const maybeNotifications = await Promise.all(
       discussions.map((discussion) =>

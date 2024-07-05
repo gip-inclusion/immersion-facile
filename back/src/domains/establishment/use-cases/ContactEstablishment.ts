@@ -136,9 +136,9 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       this.#createNewEvent({
         topic: "ContactRequestedByBeneficiary",
         payload: {
-          ...contactRequest,
+          siret: discussion.siret,
           discussionId: discussion.id,
-          triggeredBy: undefined,
+          triggeredBy: null,
         },
       }),
     );

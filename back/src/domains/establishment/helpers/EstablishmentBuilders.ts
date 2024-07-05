@@ -1,6 +1,7 @@
 import {
   Builder,
   ContactMethod,
+  Email,
   EstablishmentSearchableBy,
   FormEstablishmentSource,
   Location,
@@ -254,6 +255,13 @@ export class EstablishmentAggregateBuilder
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact,
+    });
+  }
+
+  public withContactEmail(email: Email) {
+    return new EstablishmentAggregateBuilder().withContact({
+      ...this.aggregate.contact,
+      email,
     });
   }
 

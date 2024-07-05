@@ -19,6 +19,7 @@ export * from "./assessment/assessment.dto";
 export * from "./assessment/assessment.schema";
 export * from "./Builder";
 export * from "./contactEstablishmentRequest/contactEstablishmentRequest.dto";
+export * from "./role/role.schema";
 export * from "./contactEstablishmentRequest/contactEstablishmentRequest.schema";
 export * from "./convention/addConventionInput";
 export * from "./convention/convention";

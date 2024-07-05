@@ -19,7 +19,7 @@ const domainEvt: DomainEvent = {
   topic: "ConventionSubmittedByBeneficiary",
   payload: {
     convention: new ConventionDtoBuilder().build(),
-    triggeredBy: undefined,
+    triggeredBy: null,
   },
   occurredAt: "a date",
   wasQuarantined: false,

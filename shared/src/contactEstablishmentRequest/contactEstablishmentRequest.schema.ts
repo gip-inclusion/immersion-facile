@@ -83,4 +83,4 @@ export const contactEstablishmentRequestSchema: z.Schema<ContactEstablishmentReq
     .and(withAcquisitionSchema);
 
 export const contactEstablishmentEventPayloadSchema: z.Schema<ContactEstablishmentEventPayload> =
-  z.object({ discussionId: z.string() });
+  z.object({ discussionId: z.string(), siret: siretSchema });

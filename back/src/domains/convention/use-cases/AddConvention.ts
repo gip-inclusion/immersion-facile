@@ -57,7 +57,7 @@ export class AddConvention extends TransactionalUseCase<
       topic: "ConventionSubmittedByBeneficiary",
       payload: {
         convention,
-        triggeredBy: undefined,
+        triggeredBy: null,
         ...(discussionId ? { discussionId } : {}),
       },
     });

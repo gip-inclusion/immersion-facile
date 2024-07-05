@@ -28,6 +28,7 @@ import { InMemoryUnitOfWork } from "../domains/core/unit-of-work/adapters/create
 import { UuidGenerator } from "../domains/core/uuid-generator/ports/UuidGenerator";
 import { InMemoryLaBonneBoiteGateway } from "../domains/establishment/adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
 import { InMemoryPassEmploiGateway } from "../domains/establishment/adapters/pass-emploi/InMemoryPassEmploiGateway";
+import { InMemoryEstablishmentMarketingGateway } from "../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {
@@ -47,6 +48,7 @@ export type InMemoryGateways = {
   shortLinkGenerator: DeterministShortLinkIdGeneratorGateway;
   subscribersGateway: InMemorySubscribersGateway;
   appellationsGateway: InMemoryAppellationsGateway;
+  establishmentMarketingGateway: InMemoryEstablishmentMarketingGateway;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :

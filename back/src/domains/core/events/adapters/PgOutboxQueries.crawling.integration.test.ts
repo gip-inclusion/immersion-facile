@@ -35,7 +35,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     neverPublished1 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
       status: "never-published",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
@@ -43,7 +43,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     neverPublished2 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
       status: "never-published",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
     });
 
     uuidGenerator.setNextUuid("cbcbcc99-9c0b-bbbb-bb6d-6bb9bd38cccc");
@@ -51,7 +51,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     neverPublished3 = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
       status: "never-published",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
     });
 
     timeGateway.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
@@ -59,7 +59,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     alreadyProcessedEvent = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
       status: "published",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
     });
 
@@ -68,14 +68,14 @@ describe("PgOutboxQueries for crawling purposes", () => {
     quarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
       status: "failed-but-will-retry",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
     timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     eventFailedToRerun = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
       status: "failed-but-will-retry",
       publications: [
         {
@@ -98,7 +98,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     withFailureButEventuallySuccessfulEvent = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
       status: "published",
       publications: [
         {
@@ -115,7 +115,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     failedButQuarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
       status: "failed-but-will-retry",
       publications: [
         {
@@ -134,7 +134,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     uuidGenerator.setNextUuid("dbdbdc99-9d0d-dddd-dd6d-6dd9dd38dbdb");
     inProcessEvent = createNewEvent({
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
       status: "in-process",
     });
 
@@ -144,7 +144,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       status: "failed-but-will-retry",
       wasQuarantined: false,
       topic: "ConventionSubmittedByBeneficiary",
-      payload: { convention, triggeredBy: undefined },
+      payload: { convention, triggeredBy: null },
       publications: [
         {
           publishedAt: "2021-11-15T08:00:00.000Z",
@@ -202,7 +202,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       uuidGenerator.setNextUuid("cccccc77-9c0c-cccc-cc6d-6cc9cd38cccc");
       const eventToRepublish = createNewEvent({
         topic: "ConventionSubmittedByBeneficiary",
-        payload: { convention, triggeredBy: undefined },
+        payload: { convention, triggeredBy: null },
         publications: [
           { publishedAt: "2020-11-05T08:30:00.000Z", failures: [] },
         ],
@@ -270,7 +270,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       timeGateway.setNextDate(new Date("2021-11-15T10:02:00.000Z"));
       const anotherEventFailedToRerun = createNewEvent({
         topic: "ConventionSubmittedByBeneficiary",
-        payload: { convention, triggeredBy: undefined },
+        payload: { convention, triggeredBy: null },
         publications: [
           {
             publishedAt: "2021-11-10T08:00:00.000Z",
