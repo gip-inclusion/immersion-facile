@@ -7,7 +7,7 @@ import {
 } from "../convention/convention.schema";
 import {
   discussionReadSchema,
-  discussionRejectionSchema,
+  discutionRejectedSchema,
 } from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
@@ -85,11 +85,11 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       404: legacyHttpErrorSchema,
     },
   }),
-  rejectDiscussion: defineRoute({
+  updateDiscussionStatus: defineRoute({
     method: "patch",
-    url: "/discussion-for-establishment/:discussionId/reject",
+    url: "/discussion-for-establishment/:discussionId",
     ...withAuthorizationHeaders,
-    requestBodySchema: discussionRejectionSchema,
+    requestBodySchema: discutionRejectedSchema,
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,

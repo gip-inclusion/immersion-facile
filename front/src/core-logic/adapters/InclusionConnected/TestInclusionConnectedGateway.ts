@@ -3,6 +3,7 @@ import {
   AbsoluteUrl,
   AgencyId,
   DiscussionReadDto,
+  DiscussionRejected,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
@@ -21,6 +22,8 @@ export class TestInclusionConnectedGateway
   public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
   public registerAgenciesToCurrentUserResponse$ = new Subject<undefined>();
+
+  public updateDiscussionStatusResponse$ = new Subject<void>();
 
   public getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
     return this.currentUser$;
@@ -48,5 +51,14 @@ export class TestInclusionConnectedGateway
     _token: string,
   ): Observable<void> {
     return this.registerAgenciesToCurrentUserResponse$;
+  }
+
+  public updateDiscussionStatus$(
+    _payload: {
+      jwt: string;
+      discussionId: string;
+    } & DiscussionRejected,
+  ): Observable<void> {
+    return this.updateDiscussionStatusResponse$;
   }
 }

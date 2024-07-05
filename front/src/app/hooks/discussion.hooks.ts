@@ -16,6 +16,7 @@ export const useDiscussion = (
         discussionSlice.actions.fetchDiscussionRequested({
           discussionId,
           jwt: inclusionConnectedJwt,
+          feedbackTopic: "dashboard-discussion",
         }),
       );
   }, [dispatch, discussionId, inclusionConnectedJwt]);

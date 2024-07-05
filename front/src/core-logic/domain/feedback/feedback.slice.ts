@@ -87,9 +87,14 @@ export const feedbackMapping: Record<
   "dashboard-discussion-rejection": {
     "update.success": {
       action: discussionSlice.actions.updateDiscussionStatusSucceeded,
-      title: "La candidature a bien été rejetée.",
+      title: "La candidature a bien été rejetée",
       message:
         "La candidature a bien été rejetée, un email a été envoyé au candidat",
+    },
+    "update.error": {
+      action: discussionSlice.actions.updateDiscussionStatusFailed,
+      title: "Problème lors du rejet de la candidature",
+      message: "Une erreur est survenue lors du rejet de la candidature",
     },
   },
   "dashboard-discussion": {

@@ -3,6 +3,7 @@ import { DiscussionStatus, RejectionKind } from "shared";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createType("discussion_status", [
+    "ACCEPTED",
     "PENDING",
     "REJECTED",
   ] satisfies DiscussionStatus[]);

@@ -53,6 +53,7 @@ export type DiscussionStatus = DiscussionDto["status"];
 export type RejectionKind = DiscussionRejected["rejectionKind"];
 
 export type DiscussionStatusWithRejection =
+  | DiscussionAccepted
   | DiscussionRejected
   | DiscussionPending;
 
@@ -308,3 +309,21 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     return new DiscussionBuilder(discussion);
   }
 }
+
+export const makeRejection = ({
+  rejectionKind,
+  rejectionReason,
+}: {
+  rejectionKind: RejectionKind;
+  rejectionReason?: string;
+}) => {
+  if (rejectionKind === "OTHER") {
+    return {
+      rejectionKind,
+      rejectionReason: rejectionReason ?? "default rejection reason",
+    };
+  }
+  return {
+    rejectionKind,
+  };
+};

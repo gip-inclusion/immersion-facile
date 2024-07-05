@@ -247,6 +247,9 @@ const establishmentSeed = async (uow: UnitOfWork) => {
     new DiscussionBuilder()
       .withId(discussionId)
       .withSiret(franceMerguez.establishment.siret)
+      .withEstablishmentContact({
+        email: "recette+playwright@immersion-facile.beta.gouv.fr",
+      })
       .withPotentialBeneficiary({
         resumeLink: "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
       })

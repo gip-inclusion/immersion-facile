@@ -4,6 +4,7 @@ import {
   AgencyId,
   ConventionSupportedJwt,
   DiscussionReadDto,
+  DiscussionRejected,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
@@ -23,4 +24,10 @@ export interface InclusionConnectedGateway {
     payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined>;
   getLogoutUrl$(): Observable<AbsoluteUrl>;
+  updateDiscussionStatus$(
+    payload: {
+      jwt: ConventionSupportedJwt;
+      discussionId: string;
+    } & DiscussionRejected,
+  ): Observable<void>;
 }

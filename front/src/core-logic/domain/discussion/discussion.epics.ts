@@ -34,4 +34,31 @@ const fetchDiscussionByIdEpic: DiscussionEpic = (
     ),
   );
 
-export const discussionEpics = [fetchDiscussionByIdEpic];
+const updateDiscussionStatusEpic: DiscussionEpic = (
+  action$,
+  _state$,
+  { inclusionConnectedGateway },
+) =>
+  action$.pipe(
+    filter(discussionSlice.actions.updateDiscussionStatusRequested.match),
+    switchMap((action) =>
+      inclusionConnectedGateway.updateDiscussionStatus$(action.payload).pipe(
+        map(() =>
+          discussionSlice.actions.updateDiscussionStatusSucceeded({
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          discussionSlice.actions.updateDiscussionStatusFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
+export const discussionEpics = [
+  fetchDiscussionByIdEpic,
+  updateDiscussionStatusEpic,
+];
