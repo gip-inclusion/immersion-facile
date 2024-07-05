@@ -49,17 +49,19 @@ export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
     }),
   ]);
 
-const discutionRejectedSchema = z
+export const discutionRejectedSchema = z
   .object({
     status: z.literal("REJECTED"),
   })
   .and(discussionRejectionSchema);
 
-const discussionPendingSchema = z.object({ status: z.literal("PENDING") });
+const discussionNotRejectedSchema = z.object({
+  status: z.enum(["PENDING", "ACCEPTED"]),
+});
 
 const discussionStatusSchema = z.union([
   discutionRejectedSchema,
-  discussionPendingSchema,
+  discussionNotRejectedSchema,
 ]);
 
 export const discussionReadSchema: z.Schema<DiscussionReadDto> = z

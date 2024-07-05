@@ -4,6 +4,7 @@ export * from "./convention-form-layout";
 export * from "./convention-form-sidebar";
 export * from "./convention-renewed-informations";
 export * from "./crisp-chat";
+export * from "./discussion-meta";
 export * from "./error-notifications";
 export * from "./field";
 export * from "./file";

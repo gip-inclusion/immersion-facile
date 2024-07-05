@@ -57,17 +57,16 @@ describe("Feedbacks", () => {
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {});
 
       store.dispatch(
-        discussionSlice.actions.fetchDiscussionFailed({
-          errorMessage: "fake error message",
-          feedbackTopic: "dashboard-discussion",
+        discussionSlice.actions.updateDiscussionStatusSucceeded({
+          feedbackTopic: "dashboard-discussion-rejection",
         }),
       );
       expect(keys(feedbacksSelectors.feedbacks(store.getState()))).toHaveLength(
         1,
       );
       expectFeedbackStoreByTopicToEqual({
-        topic: "dashboard-discussion",
-        kindAndLevel: "fetch.error",
+        topic: "dashboard-discussion-rejection",
+        kindAndLevel: "update.success",
       });
     });
   });

@@ -8,6 +8,7 @@ import {
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
+  BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../../config/helpers/httpErrors";
@@ -93,6 +94,38 @@ describe("RejectDiscussionAndSendNotification", () => {
       ),
       new ForbiddenError(
         `User is not allowed to reject discussion ${discussion.id}`,
+      ),
+    );
+  });
+
+  it("throws BadRequestError if discussion is already rejected", async () => {
+    const originalDiscussion: DiscussionDto = {
+      ...discussion,
+      status: "REJECTED",
+      rejectionKind: "UNABLE_TO_HELP",
+    };
+
+    await uow.discussionRepository.insert(originalDiscussion);
+    expectUpdatedDiscussionToBeRejected({
+      status: "REJECTED",
+      rejectionKind: "UNABLE_TO_HELP",
+      updatedDiscussion: originalDiscussion,
+    });
+
+    const rerejectedDiscussion = {
+      ...originalDiscussion,
+    };
+
+    await expectPromiseToFailWithError(
+      rejectPotentialBeneficiaryOnDiscussion.execute(
+        {
+          discussionId: rerejectedDiscussion.id,
+          rejectionKind: "UNABLE_TO_HELP",
+        },
+        authorizedUser,
+      ),
+      new BadRequestError(
+        `Can't reject discussion ${rerejectedDiscussion.id} because it is already rejected`,
       ),
     );
   });

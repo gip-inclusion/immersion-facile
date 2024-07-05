@@ -3,9 +3,11 @@ import {
   AbsoluteUrl,
   AgencyId,
   DiscussionReadDto,
+  DiscussionRejected,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  makeRejection,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -98,6 +100,35 @@ export class HttpInclusionConnectedGateway
           match(response)
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public updateDiscussionStatus$(
+    params: {
+      jwt: string;
+      discussionId: string;
+    } & DiscussionRejected,
+  ): Observable<void> {
+    const { jwt, discussionId, status } = params;
+    return from(
+      this.httpClient
+        .updateDiscussionStatus({
+          headers: { authorization: jwt },
+          urlParams: { discussionId },
+          body: {
+            status,
+            ...makeRejection({ ...params }),
+          },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, logBodyAndThrow)
+            .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 403 }, logBodyAndThrow)
+            .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

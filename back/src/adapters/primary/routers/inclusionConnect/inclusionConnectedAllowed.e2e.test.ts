@@ -399,7 +399,6 @@ describe("InclusionConnectedAllowedRoutes", () => {
           discussionId: discussion.id,
         },
         body: {
-          status: "REJECTED",
           rejectionKind: "OTHER",
           rejectionReason: "No reason",
         },
@@ -423,7 +422,6 @@ describe("InclusionConnectedAllowedRoutes", () => {
           discussionId: discussion.id,
         },
         body: {
-          status: "REJECTED",
           rejectionKind: "OTHER",
           rejectionReason: "No reason",
         },
@@ -454,7 +452,6 @@ describe("InclusionConnectedAllowedRoutes", () => {
           discussionId: discussion.id,
         },
         body: {
-          status: "REJECTED",
           rejectionKind: "OTHER",
           rejectionReason: "No reason",
         },
@@ -488,7 +485,6 @@ describe("InclusionConnectedAllowedRoutes", () => {
           discussionId: discussion.id,
         },
         body: {
-          status: "REJECTED",
           rejectionKind: "OTHER",
           rejectionReason: "No reason",
         },

@@ -5,10 +5,12 @@ import {
   discussionIdSchema,
   discussionRejectionSchema,
   immersionFacileNoReplyEmailSender,
+  makeRejection,
   rejectDiscussionEmailParams,
 } from "shared";
 import { z } from "zod";
 import {
+  BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../../config/helpers/httpErrors";
@@ -51,6 +53,12 @@ export const makeRejectDiscussionAndSendNotification =
       if (!discussion)
         throw new NotFoundError(`No discussion found with id: ${discussionId}`);
 
+      if (discussion.status === "REJECTED") {
+        throw new BadRequestError(
+          `Can't reject discussion ${discussionId} because it is already rejected`,
+        );
+      }
+
       if (currentUser.email !== discussion.establishmentContact.email) {
         throw new ForbiddenError(
           `User is not allowed to reject discussion ${discussionId}`,
@@ -59,7 +67,7 @@ export const makeRejectDiscussionAndSendNotification =
       await uow.discussionRepository.update({
         ...discussion,
         status: "REJECTED",
-        ...makeRejection(rejectionKind, rejectionReason),
+        ...makeRejection({ rejectionKind, rejectionReason }),
       });
 
       await deps.saveNotificationAndRelatedEvent(uow, {
@@ -95,18 +103,3 @@ export const makeRejectDiscussionAndSendNotification =
       });
     },
   );
-
-const makeRejection = (
-  rejectionKind: RejectionKind,
-  rejectionReason?: string,
-) => {
-  if (rejectionKind === "OTHER") {
-    return {
-      rejectionKind,
-      rejectionReason: rejectionReason ?? "default rejection reason",
-    };
-  }
-  return {
-    rejectionKind,
-  };
-};

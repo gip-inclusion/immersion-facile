@@ -344,8 +344,8 @@ const discussionToPg = (
 
 const makeDiscussionStatusAndRejection = (
   discussion: DiscussionDto | PgDiscussion,
-): DiscussionStatusWithRejection =>
-  discussion.status === "REJECTED"
+): DiscussionStatusWithRejection => {
+  return discussion.status === "REJECTED"
     ? {
         status: "REJECTED",
         ...(discussion.rejectionKind === "OTHER"
@@ -358,8 +358,9 @@ const makeDiscussionStatusAndRejection = (
             }),
       }
     : {
-        status: "PENDING",
+        status: discussion.status,
       };
+};
 
 const discussionStatusWithRejectionToPg = (
   discussionStatusWithRejection: DiscussionStatusWithRejection,

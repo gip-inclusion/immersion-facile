@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
-import Button from "@codegouvfr/react-dsfr/Button";
+import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Card } from "@codegouvfr/react-dsfr/Card";
 import Input from "@codegouvfr/react-dsfr/Input";
@@ -9,12 +9,14 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { ExchangeMessage, Loader } from "react-design-system";
+import { DiscussionMeta, ExchangeMessage, Loader } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   DiscussionId,
   DiscussionReadDto,
+  DiscussionStatus,
   Email,
   RejectionKind,
   WithDiscussionId,
@@ -96,6 +98,83 @@ const DiscussionDetails = ({
     userEmail,
   });
 
+  const statusBadgeData: Record<
+    DiscussionStatus,
+    {
+      severity: "new" | "error" | "success";
+      label: string;
+    }
+  > = {
+    ACCEPTED: {
+      severity: "success",
+      label: "Candidature acceptée",
+    },
+    REJECTED: {
+      severity: "error",
+      label: "Candidature rejetée",
+    },
+    PENDING: {
+      severity: "new",
+      label: "Candidature en cours",
+    },
+  };
+
+  const statusBadge = statusBadgeData[discussion.status];
+  const candidateContactButtons: [ButtonProps, ...ButtonProps[]] = [
+    {
+      id: domElementIds.establishmentDashboard.discussion
+        .replyToCandidateByEmail,
+      priority: "primary",
+      linkProps: {
+        href: `mailto:${createOpaqueEmail(
+          discussion.id,
+          "potentialBeneficiary",
+          window.location.hostname,
+        )}?subject=${encodeURI(
+          `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
+        )}`,
+        target: "_blank",
+      },
+      children: "Répondre au candidat",
+    },
+  ];
+  if (discussion.status === "PENDING") {
+    candidateContactButtons.push(
+      {
+        id: domElementIds.establishmentDashboard.discussion
+          .activateDraftConvention,
+        priority: "tertiary",
+        linkProps: {
+          href: makeMailtoLink({
+            email: createOpaqueEmail(
+              discussion.id,
+              "potentialBeneficiary",
+              window.location.hostname,
+            ),
+            subject: `L'entreprise ${discussion.businessName} vous invite à finaliser votre demande de convention d'immersion`,
+            body: `Félicitations ${
+              discussion.potentialBeneficiary.firstName
+            },\n\nL'entreprise ${
+              discussion.businessName
+            } a accepté votre candidature et vous invite à: \n\n • vérifier les informations préremplies dans la demande de convention \n\n • compléter les informations manquantes \n\n • valider la demande de convention \n\n Voici <a href="${
+              makeDraftConventionLink(draftConvention, discussion.id).href
+            }">le lien pour accéder à la demande de convention préremplie</a>.\n\n Bonne journée,\nL'équipe Immersion Facilitée`,
+          }),
+          target: "_blank",
+        },
+        children: "Pré-remplir la convention pour cette mise en relation",
+      },
+      {
+        id: domElementIds.establishmentDashboard.discussion
+          .rejectApplicationOpenModal,
+        priority: "secondary",
+        type: "button",
+        onClick: () => openRejectApplicationModal(),
+        children: "Refuser la candidature",
+      },
+    );
+  }
+
   return (
     <>
       <header>
@@ -113,12 +192,16 @@ const DiscussionDetails = ({
           Discussion avec {discussion.potentialBeneficiary.firstName}{" "}
           {discussion.potentialBeneficiary.lastName}
         </h1>
-        <p>
-          {discussion.immersionObjective} ·{" "}
-          {discussion.appellation.appellationLabel}
-          {discussion.potentialBeneficiary.resumeLink ? (
-            <>
-              {" · "}
+        <DiscussionMeta
+          children={[
+            <p
+              className={fr.cx("fr-badge", `fr-badge--${statusBadge.severity}`)}
+            >
+              {statusBadge.label}
+            </p>,
+            discussion.immersionObjective,
+            discussion.appellation.appellationLabel,
+            discussion.potentialBeneficiary.resumeLink && (
               <a
                 href={discussion.potentialBeneficiary.resumeLink}
                 title={"CV du candidat"}
@@ -127,64 +210,13 @@ const DiscussionDetails = ({
               >
                 CV
               </a>
-            </>
-          ) : null}
-        </p>
+            ),
+          ]}
+        />
         <ButtonsGroup
           inlineLayoutWhen="always"
           buttonsSize="small"
-          buttons={[
-            {
-              id: domElementIds.establishmentDashboard.discussion
-                .replyToCandidateByEmail,
-              priority: "primary",
-              linkProps: {
-                href: `mailto:${createOpaqueEmail(
-                  discussion.id,
-                  "potentialBeneficiary",
-                  window.location.hostname,
-                )}?subject=${encodeURI(
-                  `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
-                )}`,
-                target: "_blank",
-              },
-              children: "Répondre au candidat",
-            },
-            {
-              id: domElementIds.establishmentDashboard.discussion
-                .activateDraftConvention,
-              priority: "tertiary",
-              linkProps: {
-                href: makeMailtoLink({
-                  email: createOpaqueEmail(
-                    discussion.id,
-                    "potentialBeneficiary",
-                    window.location.hostname,
-                  ),
-                  subject: `L'entreprise ${discussion.businessName} vous invite à finaliser votre demande de convention d'immersion`,
-                  body: `Félicitations ${
-                    discussion.potentialBeneficiary.firstName
-                  },\n\nL'entreprise ${
-                    discussion.businessName
-                  } a accepté votre candidature et vous invite à: \n\n • vérifier les informations préremplies dans la demande de convention \n\n • compléter les informations manquantes \n\n • valider la demande de convention \n\n Voici <a href="${
-                    makeDraftConventionLink(draftConvention, discussion.id).href
-                  }">le lien pour accéder à la demande de convention préremplie</a>.\n\n Bonne journée,\nL'équipe Immersion Facilitée`,
-                }),
-                target: "_blank",
-              },
-              children: "Pré-remplir la convention pour cette mise en relation",
-            },
-            {
-              id: domElementIds.establishmentDashboard.discussion
-                .rejectApplicationOpenModal,
-              priority: "tertiary",
-              linkProps: {
-                onClick: openRejectApplicationModal,
-                href: "#",
-              },
-              children: "Refuser la candidature",
-            },
-          ]}
+          buttons={candidateContactButtons}
         />
       </header>
       {discussion.exchanges.map(({ sender, sentAt, subject, message }) => (
@@ -310,6 +342,9 @@ const RejectApplicationForm = ({
   const { register, watch, handleSubmit } = useForm<WithDiscussionRejection>({
     resolver: zodResolver(discussionRejectionSchema),
   });
+  const inclusionConnectedJwt = useAppSelector(
+    authSelectors.inclusionConnectToken,
+  );
   const dispatch = useDispatch();
   const watchedFormValues = watch();
   const [dataToSend, setDataToSend] =
@@ -330,6 +365,7 @@ const RejectApplicationForm = ({
       value: "OTHER",
     },
   ];
+  if (!inclusionConnectedJwt) throw new Error("No jwt found");
   return dataToSend ? (
     <>
       <p>
@@ -368,9 +404,13 @@ const RejectApplicationForm = ({
             children: "Rejeter la candidature et notifier le candidat",
             onClick: () =>
               dispatch(
-                discussionSlice.actions.updateDiscussionStatusRequested(
-                  dataToSend,
-                ),
+                discussionSlice.actions.updateDiscussionStatusRequested({
+                  discussionId: discussion.id,
+                  status: "REJECTED",
+                  feedbackTopic: "dashboard-discussion-rejection",
+                  ...dataToSend,
+                  jwt: inclusionConnectedJwt,
+                }),
               ),
           },
         ]}
@@ -379,7 +419,7 @@ const RejectApplicationForm = ({
     </>
   ) : (
     <form
-      onSubmit={handleSubmit(setDataToSend, (errors) => console.log(errors))}
+      onSubmit={handleSubmit(setDataToSend, (errors) => console.error(errors))}
     >
       <Select
         label="Pour quel motif souhaitez-vous refuser cette candidature ?"
@@ -393,7 +433,7 @@ const RejectApplicationForm = ({
       {watchedFormValues.rejectionKind === "OTHER" && (
         <Input textArea label="Précisez" />
       )}
-      <Feedback topic="establishment-discussion-rejection" />
+      <Feedback topic="dashboard-discussion-rejection" />
       <ButtonsGroup
         buttons={[
           {

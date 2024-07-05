@@ -85,7 +85,7 @@ export const createInclusionConnectedAllowedRouter = (
       ),
   );
 
-  inclusionConnectedSharedRoutes.rejectDiscussion(
+  inclusionConnectedSharedRoutes.updateDiscussionStatus(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {

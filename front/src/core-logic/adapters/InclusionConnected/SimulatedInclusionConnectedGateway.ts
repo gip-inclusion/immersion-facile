@@ -4,6 +4,7 @@ import {
   AgencyId,
   DiscussionBuilder,
   DiscussionReadDto,
+  DiscussionRejected,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
@@ -65,5 +66,14 @@ export class SimulatedInclusionConnectedGateway
           new Error(`Agency Id ${agencyIds[agencyIdInError]} not found`),
         )
       : of(undefined).pipe(delay(this.simulatedLatency));
+  }
+
+  public updateDiscussionStatus$(
+    _payload: {
+      jwt: string;
+      discussionId: string;
+    } & DiscussionRejected,
+  ): Observable<void> {
+    return of(undefined).pipe(delay(this.simulatedLatency));
   }
 }

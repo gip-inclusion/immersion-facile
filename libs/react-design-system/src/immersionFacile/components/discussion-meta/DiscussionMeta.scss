@@ -1,0 +1,14 @@
+.im-discussion-meta {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  &__item {
+    & + & {
+      margin-left: .5rem;
+      &::before {
+        content: '•';
+        margin-right: .5rem;
+      }
+    }
+  }
+}

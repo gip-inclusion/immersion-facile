@@ -137,15 +137,15 @@ describe("Discussion slice", () => {
     });
   });
 
-  describe("discussion reject", () => {
-    it("discussion reject succeeded", () => {
+  describe("dashboard discussion reject", () => {
+    it("dashboard discussion reject succeeded", () => {
       expectDiscussionSelector(defaultStartingDiscussionState);
 
       store.dispatch(
         discussionSlice.actions.updateDiscussionStatusRequested({
           jwt,
           discussionId: discussion.id,
-          feedbackTopic: "dashboard-discussion",
+          feedbackTopic: "dashboard-discussion-rejection",
           status: "REJECTED",
           rejectionKind: "NO_TIME",
         }),
@@ -156,15 +156,14 @@ describe("Discussion slice", () => {
         isLoading: true,
       });
 
-      feedGatewayWithDiscussionOrError(discussionFetchError);
+      dependencies.inclusionConnectedGateway.updateDiscussionStatusResponse$.next();
 
-      expectDiscussionSelector({
-        ...defaultStartingDiscussionState,
-      });
+      expectToEqual(discussionSelectors.isLoading(store.getState()), false);
+
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "dashboard-discussion-rejection": {
-          level: "error",
-          title: "La candidature a bien été rejetée.",
+          level: "success",
+          title: "La candidature a bien été rejetée",
           message:
             "La candidature a bien été rejetée, un email a été envoyé au candidat",
         },
@@ -178,7 +177,7 @@ describe("Discussion slice", () => {
         discussionSlice.actions.updateDiscussionStatusRequested({
           jwt,
           discussionId: discussion.id,
-          feedbackTopic: "dashboard-discussion",
+          feedbackTopic: "dashboard-discussion-rejection",
           status: "REJECTED",
           rejectionKind: "NO_TIME",
         }),
@@ -189,11 +188,8 @@ describe("Discussion slice", () => {
         isLoading: true,
       });
 
-      store.dispatch(
-        discussionSlice.actions.updateDiscussionStatusFailed({
-          feedbackTopic: "dashboard-discussion-rejection",
-          errorMessage: "Rejection failed",
-        }),
+      dependencies.inclusionConnectedGateway.updateDiscussionStatusResponse$.error(
+        discussionFetchError,
       );
 
       expectDiscussionSelector({
@@ -202,9 +198,8 @@ describe("Discussion slice", () => {
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "dashboard-discussion-rejection": {
           level: "error",
-          title: "La candidature a bien été rejetée.",
-          message:
-            "La candidature a bien été rejetée, un email a été envoyé au candidat",
+          title: "Problème lors du rejet de la candidature",
+          message: "Une erreur est survenue lors du rejet de la candidature",
         },
       });
     });
