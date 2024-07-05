@@ -15,6 +15,7 @@ import { EstablishmentLeadRepository } from "../../../establishment/ports/Establ
 import { FormEstablishmentRepository } from "../../../establishment/ports/FormEstablishmentRepository";
 import { GroupRepository } from "../../../establishment/ports/GroupRepository";
 import { SearchMadeRepository } from "../../../establishment/ports/SearchMadeRepository";
+import { EstablishmentMarketingRepository } from "../../../marketing/ports/EstablishmentMarketingRepository";
 import { ApiConsumerRepository } from "../../api-consumer/ports/ApiConsumerRepository";
 import { OngoingOAuthRepository } from "../../authentication/inclusion-connect/port/OngoingOAuthRepositiory";
 import { UserRepository } from "../../authentication/inclusion-connect/port/UserRepositiory";
@@ -47,6 +48,7 @@ export type UnitOfWork = {
   establishmentAggregateRepository: EstablishmentAggregateRepository;
   establishmentLeadQueries: EstablishmentLeadQueries;
   establishmentLeadRepository: EstablishmentLeadRepository;
+  establishmentMarketingRepository: EstablishmentMarketingRepository;
   featureFlagRepository: FeatureFlagRepository;
   formEstablishmentRepository: FormEstablishmentRepository;
   groupRepository: GroupRepository;

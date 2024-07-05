@@ -52,7 +52,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       .build();
     const expectedEvent = createNewEvent({
       topic: "FederatedIdentityNotBoundToConvention",
-      payload: { convention: conventionDtoFromEvent, triggeredBy: undefined },
+      payload: { convention: conventionDtoFromEvent, triggeredBy: null },
     });
     await associatePeConnectFederatedIdentity.execute({
       convention: conventionDtoFromEvent,
@@ -81,7 +81,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
     const expectedEvent = createNewEvent({
       topic: "FederatedIdentityNotBoundToConvention",
-      payload: { convention: conventionDtoFromEvent, triggeredBy: undefined },
+      payload: { convention: conventionDtoFromEvent, triggeredBy: null },
     });
     expectObjectsToMatch(outboxRepo.events, [expectedEvent]);
   });
@@ -138,7 +138,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     expect(outboxRepo.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepo.events[0], {
       topic: "FederatedIdentityBoundToConvention",
-      payload: { convention: conventionDtoFromEvent, triggeredBy: undefined },
+      payload: { convention: conventionDtoFromEvent, triggeredBy: null },
     });
   });
 
@@ -170,7 +170,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     expect(outboxRepo.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepo.events[0], {
       topic: "FederatedIdentityBoundToConvention",
-      payload: { convention: conventionDtoFromEvent, triggeredBy: undefined },
+      payload: { convention: conventionDtoFromEvent, triggeredBy: null },
     });
   });
 
@@ -194,7 +194,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     expectToEqual(outboxRepo.events, [
       createNewEvent({
         topic: "FederatedIdentityNotBoundToConvention",
-        payload: { convention: conventionDtoFromEvent, triggeredBy: undefined },
+        payload: { convention: conventionDtoFromEvent, triggeredBy: null },
       }),
     ]);
   });

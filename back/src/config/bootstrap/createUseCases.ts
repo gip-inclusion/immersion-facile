@@ -119,6 +119,7 @@ import { GetInclusionConnectedUsers } from "../../domains/inclusion-connected-us
 import { LinkFranceTravailUsersToTheirAgencies } from "../../domains/inclusion-connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import { RejectIcUserForAgency } from "../../domains/inclusion-connected-users/use-cases/RejectIcUserForAgency";
 import { UpdateIcUserRoleForAgency } from "../../domains/inclusion-connected-users/use-cases/UpdateIcUserRoleForAgency";
+import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import { NotFoundError } from "../helpers/httpErrors";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
@@ -337,6 +338,7 @@ export const createUseCases = (
           gateways.addressApi,
           uuidGenerator,
           gateways.timeGateway,
+          createNewEvent,
         ),
       insertEstablishmentAggregateFromForm:
         new InsertEstablishmentAggregateFromForm(
@@ -643,6 +645,14 @@ export const createUseCases = (
           saveNotificationAndRelatedEvent,
           timeGateway: gateways.timeGateway,
         },
+      }),
+    updateMarketingEstablishmentContactList:
+      makeUpdateMarketingEstablishmentContactList({
+        deps: {
+          establishmentMarketingGateway: gateways.establishmentMarketingGateway,
+          timeGateway: gateways.timeGateway,
+        },
+        uowPerformer,
       }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };

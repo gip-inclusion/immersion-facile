@@ -122,7 +122,7 @@ describe("AddAgency use case", () => {
               rejectionJustification: null,
               codeSafir: null,
             },
-            triggeredBy: undefined,
+            triggeredBy: null,
           },
         }),
       ]);

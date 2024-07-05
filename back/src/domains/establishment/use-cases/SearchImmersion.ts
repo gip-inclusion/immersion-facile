@@ -143,13 +143,13 @@ export class SearchImmersion extends TransactionalUseCase<
     const [discussions, conventions] =
       sortedBy === "score"
         ? await Promise.all([
-            uow.discussionRepository.getDiscussions(
-              {
+            uow.discussionRepository.getDiscussions({
+              filters: {
                 sirets,
                 createdSince: oneYearAgo,
               },
-              MAX_DISCUSSIONS,
-            ),
+              limit: MAX_DISCUSSIONS,
+            }),
             uow.conventionQueries.getConventionsByFilters({
               withSirets: sirets,
               withStatuses: ["ACCEPTED_BY_VALIDATOR"],

@@ -92,6 +92,7 @@ describe("NotifyContactRequest", () => {
       const discussion = await prepareDiscussionInRepository("EMAIL");
       const validEmailPayload: ContactEstablishmentEventPayload = {
         discussionId: discussion.id,
+        siret: discussion.siret,
       };
 
       await notifyContactRequest.execute(validEmailPayload);
@@ -139,6 +140,7 @@ describe("NotifyContactRequest", () => {
       const discussion = await prepareDiscussionInRepository("PHONE");
       const validPhonePayload: ContactEstablishmentEventPayload = {
         discussionId: discussion.id,
+        siret: discussion.siret,
       };
 
       await notifyContactRequest.execute(validPhonePayload);
@@ -168,6 +170,7 @@ describe("NotifyContactRequest", () => {
       const discussion = await prepareDiscussionInRepository("IN_PERSON");
       const validInPersonPayload: ContactEstablishmentEventPayload = {
         discussionId: discussion.id,
+        siret: discussion.siret,
       };
 
       await notifyContactRequest.execute(validInPersonPayload);
@@ -198,6 +201,7 @@ describe("NotifyContactRequest", () => {
     it("Missing discussion", async () => {
       const validInPersonPayload: ContactEstablishmentEventPayload = {
         discussionId,
+        siret: "12345678901234",
       };
 
       await expectPromiseToFailWithError(
@@ -212,6 +216,7 @@ describe("NotifyContactRequest", () => {
       const discussion = await prepareDiscussionInRepository("EMAIL");
       const validContactRequestByMail: ContactEstablishmentEventPayload = {
         discussionId: discussion.id,
+        siret: discussion.siret,
       };
 
       romeRepository.appellations = [];

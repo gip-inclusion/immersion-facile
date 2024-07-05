@@ -17,6 +17,7 @@ import { InMemoryNotificationRepository } from "../../core/notifications/adapter
 import {
   AssessmentEmailKind,
   ConventionQueries,
+  ConventionSortByDate,
   GetConventionsByFiltersQueries,
 } from "../ports/ConventionQueries";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
@@ -90,11 +91,23 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public async getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
+    sortByDate?: ConventionSortByDate,
   ): Promise<ConventionDto[]> {
     this.getConventionsByFiltersCalled++;
-    return this.conventionRepository.conventions
+    const conventions = this.conventionRepository.conventions
       .filter(makeApplyFiltersToConventions(filters))
       .map((convention) => this.#addAgencyDataToConvention(convention));
+
+    return conventions.sort((previous, current) => {
+      const sort = sortByDate ?? "dateStart";
+      const previousDate = previous[sort];
+      const currentDate = current[sort];
+
+      if (!previousDate) return 1;
+      if (!currentDate) return -1;
+
+      return new Date(previousDate).getTime() - new Date(currentDate).getTime();
+    });
   }
 
   public async getConventionsByScope(params: {

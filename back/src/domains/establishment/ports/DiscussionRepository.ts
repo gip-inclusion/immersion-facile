@@ -17,19 +17,19 @@ export type HasDiscussionMatchingParams = {
 };
 
 export type GetDiscussionsParams = {
-  sirets?: SiretDto[];
-  createdSince?: Date;
-  lastAnsweredByCandidate?: { from: Date; to: Date };
+  filters: {
+    sirets?: SiretDto[];
+    createdSince?: Date;
+    lastAnsweredByCandidate?: { from: Date; to: Date };
+  };
+  limit: number;
 };
 
 export interface DiscussionRepository {
   insert: (discussion: DiscussionDto) => Promise<void>;
   update: (discussion: DiscussionDto) => Promise<void>;
   getById: (discussionId: DiscussionId) => Promise<DiscussionDto | undefined>;
-  getDiscussions(
-    params: GetDiscussionsParams,
-    limit: number,
-  ): Promise<DiscussionDto[]>;
+  getDiscussions(params: GetDiscussionsParams): Promise<DiscussionDto[]>;
   countDiscussionsForSiretSince: (
     siret: SiretDto,
     since: Date,

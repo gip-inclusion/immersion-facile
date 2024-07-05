@@ -63,10 +63,12 @@ export class AddFormEstablishment extends TransactionalUseCase<
           : dto.businessNameCustomized,
     };
 
-    const triggeredBy: TriggeredBy | undefined = currentUser && {
-      kind: "inclusion-connected",
-      userId: currentUser.id,
-    };
+    const triggeredBy: TriggeredBy | null = currentUser
+      ? {
+          kind: "inclusion-connected",
+          userId: currentUser.id,
+        }
+      : null;
 
     const event = this.#createNewEvent({
       topic: "FormEstablishmentAdded",

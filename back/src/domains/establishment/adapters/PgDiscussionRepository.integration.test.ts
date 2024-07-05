@@ -131,13 +131,19 @@ describe("PgDiscussionRepository", () => {
     it.each([
       {
         params: {
-          sirets: [discussionWithLastExchangeByPotentialBeneficiary.siret],
+          filters: {
+            sirets: [discussionWithLastExchangeByPotentialBeneficiary.siret],
+          },
+          limit: 5,
         },
         result: [discussionWithLastExchangeByPotentialBeneficiary],
       },
       {
         params: {
-          createdSince: addDays(date, -4),
+          filters: {
+            createdSince: addDays(date, -4),
+          },
+          limit: 5,
         },
         result: [
           discussionWithLastExchangeByPotentialBeneficiary,
@@ -149,20 +155,26 @@ describe("PgDiscussionRepository", () => {
       },
       {
         params: {
-          lastAnsweredByCandidate: {
-            from: addDays(date, -1),
-            to: date,
+          filters: {
+            lastAnsweredByCandidate: {
+              from: addDays(date, -1),
+              to: date,
+            },
           },
+          limit: 5,
         },
         result: [discussionWithLastExchangeByPotentialBeneficiary],
       },
       {
         params: {
-          sirets: [discussionWithoutExchanges.siret],
-          lastAnsweredByCandidate: {
-            from: addDays(date, -1),
-            to: date,
+          filters: {
+            sirets: [discussionWithoutExchanges.siret],
+            lastAnsweredByCandidate: {
+              from: addDays(date, -1),
+              to: date,
+            },
           },
+          limit: 5,
         },
         result: [],
       },
@@ -186,11 +198,11 @@ describe("PgDiscussionRepository", () => {
 
         result instanceof Error
           ? expectPromiseToFailWithError(
-              pgDiscussionRepository.getDiscussions(params, 5),
+              pgDiscussionRepository.getDiscussions(params),
               result,
             )
           : expectToEqual(
-              await pgDiscussionRepository.getDiscussions(params, 5),
+              await pgDiscussionRepository.getDiscussions(params),
               result,
             );
       },

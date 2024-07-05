@@ -23,7 +23,13 @@ const getUseCasesByTopics = (
   useCases: UseCases,
 ): UseCaseSubscriptionsByTopics => ({
   NotificationAdded: [useCases.sendNotification],
-  ExchangeAddedToDiscussion: [useCases.sendExchangeToRecipient],
+  ExchangeAddedToDiscussion: [
+    useCases.sendExchangeToRecipient,
+    {
+      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
+      execute: useCases.updateMarketingEstablishmentContactList.execute,
+    },
+  ],
   NotificationBatchAdded: [useCases.sendNotificationsInBatch],
   // "Happy case" for immersion application.
   ConventionSubmittedByBeneficiary: [
@@ -71,6 +77,11 @@ const getUseCasesByTopics = (
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
     useCases.addEstablishmentLead,
+    {
+      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
+      execute: ({ convention: { siret } }) =>
+        useCases.updateMarketingEstablishmentContactList.execute({ siret }),
+    },
   ],
 
   // Edge cases for immersion application.
@@ -104,14 +115,34 @@ const getUseCasesByTopics = (
   ],
   FormEstablishmentEdited: [useCases.updateEstablishmentAggregateFromForm],
   FormEstablishmentEditLinkSent: [],
+  UpdatedEstablishmentAggregateInsertedFromForm: [
+    {
+      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
+      execute: useCases.updateMarketingEstablishmentContactList.execute,
+    },
+  ],
   NewEstablishmentAggregateInsertedFromForm: [
     useCases.notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm,
+    {
+      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
+      execute: ({
+        establishmentAggregate: {
+          establishment: { siret },
+        },
+      }) => useCases.updateMarketingEstablishmentContactList.execute({ siret }),
+    },
   ],
   // Establishment lead related
   EstablishmentLeadReminderSent: [],
 
   // Search related
-  ContactRequestedByBeneficiary: [useCases.notifyContactRequest],
+  ContactRequestedByBeneficiary: [
+    useCases.notifyContactRequest,
+    {
+      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
+      execute: useCases.updateMarketingEstablishmentContactList.execute,
+    },
+  ],
 
   // Magic link renewal.
   MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],

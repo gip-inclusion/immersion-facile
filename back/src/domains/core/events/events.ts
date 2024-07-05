@@ -17,7 +17,11 @@ import {
   WithDiscussionId,
   WithFormEstablishmentDto,
   WithSiretDto,
+  roleSchema,
+  siretSchema,
+  userIdSchema,
 } from "shared";
+import { z } from "zod";
 import { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentEntity";
 import { IdentityProvider } from "../authentication/inclusion-connect/entities/OngoingOAuth";
@@ -77,9 +81,25 @@ export type TriggeredBy =
   | { kind: "convention-magic-link"; role: Role }
   | { kind: "establishment-magic-link"; siret: SiretDto };
 
+export const triggeredBySchema: z.Schema<TriggeredBy> = z.discriminatedUnion(
+  "kind",
+  [
+    z.object({ kind: z.literal("inclusion-connected"), userId: userIdSchema }),
+    z.object({ kind: z.literal("convention-magic-link"), role: roleSchema }),
+    z.object({
+      kind: z.literal("establishment-magic-link"),
+      siret: siretSchema,
+    }),
+  ],
+);
+
 export type WithTriggeredBy = {
-  triggeredBy: TriggeredBy | undefined;
+  triggeredBy: TriggeredBy | null;
 };
+
+export const withTriggeredBySchema: z.Schema<WithTriggeredBy> = z.object({
+  triggeredBy: triggeredBySchema.or(z.null()),
+});
 
 // biome-ignore format: better readability without formatting
 export type DomainEvent =
@@ -111,6 +131,7 @@ export type DomainEvent =
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload & WithTriggeredBy>
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>
+  | GenericEvent<"UpdatedEstablishmentAggregateInsertedFromForm", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
 
   // ESTABLISHMENT LEAD RELATED

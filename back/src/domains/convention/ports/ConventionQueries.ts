@@ -25,6 +25,11 @@ export type AssessmentEmailKind = ExtractFromExisting<
   | "BENEFICIARY_ASSESSMENT_NOTIFICATION"
 >;
 
+export type ConventionSortByDate = keyof Pick<
+  ConventionDto,
+  "dateValidation" | "dateStart"
+>;
+
 export interface ConventionQueries {
   getConventionById: (
     id: ConventionId,
@@ -36,6 +41,7 @@ export interface ConventionQueries {
 
   getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
+    sortByDate?: ConventionSortByDate,
   ): Promise<ConventionDto[]>;
 
   getConventionsByScope(params: {

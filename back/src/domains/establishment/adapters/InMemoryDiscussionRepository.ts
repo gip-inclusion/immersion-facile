@@ -13,18 +13,22 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
 
   public discussionCallsCount = 0;
 
-  public async getDiscussions(
-    { createdSince, sirets, lastAnsweredByCandidate }: GetDiscussionsParams,
-    limit: number,
-  ): Promise<DiscussionDto[]> {
+  public async getDiscussions({
+    filters,
+    limit,
+  }: GetDiscussionsParams): Promise<DiscussionDto[]> {
     this.discussionCallsCount++;
-    const filters: Array<(discussion: DiscussionDto) => boolean> = [
+    const discussionFilters: Array<(discussion: DiscussionDto) => boolean> = [
       ({ siret }) =>
-        sirets && siret.length > 0 ? sirets.includes(siret) : true,
+        filters.sirets && siret.length > 0
+          ? filters.sirets.includes(siret)
+          : true,
       ({ createdAt }) =>
-        createdSince ? new Date(createdAt) >= createdSince : true,
+        filters.createdSince
+          ? new Date(createdAt) >= filters.createdSince
+          : true,
       ({ exchanges }) => {
-        if (!lastAnsweredByCandidate) return true;
+        if (!filters.lastAnsweredByCandidate) return true;
         const mostRecentExchange = exchanges.reduce((a, b) =>
           a.sentAt > b.sentAt ? a : b,
         );
@@ -32,13 +36,15 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
 
         return (
           mostRecentExchange.sender === "potentialBeneficiary" &&
-          sendAt >= lastAnsweredByCandidate.from &&
-          sendAt <= lastAnsweredByCandidate.to
+          sendAt >= filters.lastAnsweredByCandidate.from &&
+          sendAt <= filters.lastAnsweredByCandidate.to
         );
       },
     ];
     const discussions = this.discussions
-      .filter((discussion) => filters.every((filter) => filter(discussion)))
+      .filter((discussion) =>
+        discussionFilters.every((filter) => filter(discussion)),
+      )
       .slice(0, limit);
 
     return discussions;

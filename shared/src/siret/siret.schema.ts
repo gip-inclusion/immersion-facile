@@ -5,16 +5,24 @@ import { zStringMinLength1 } from "../zodUtils";
 import {
   GetSiretInfo,
   GetSiretRequestDto,
+  NumberEmployeesRange,
   SiretDto,
   SiretEstablishmentDto,
+  WithSiretDto,
   numberEmployeesRanges,
   siretInfoErrors,
   siretRegex,
 } from "./siret";
 
+export const numberOfEmployeesRangeSchema: z.Schema<NumberEmployeesRange> =
+  z.enum(numberEmployeesRanges);
+
 export const siretSchema: z.Schema<SiretDto> = zStringMinLength1
   .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
   .transform(removeSpaces);
+export const withSiretSchema: z.Schema<WithSiretDto> = z.object({
+  siret: siretSchema,
+});
 
 const getSiretResponseSchema: z.Schema<SiretEstablishmentDto> = z.object({
   siret: siretSchema,
