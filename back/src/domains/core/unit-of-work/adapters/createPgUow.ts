@@ -16,6 +16,7 @@ import { PgEstablishmentLeadRepository } from "../../../establishment/adapters/P
 import { PgFormEstablishmentRepository } from "../../../establishment/adapters/PgFormEstablishmentRepository";
 import { PgGroupRepository } from "../../../establishment/adapters/PgGroupRepository";
 import { PgSearchMadeRepository } from "../../../establishment/adapters/PgSearchMadeRepository";
+import { PgEstablishmentMarketingRepository } from "../../../marketing/adapters/PgEstablishmentMarketingRepository";
 import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
 import { PgInclusionConnectedUserRepository } from "../../authentication/inclusion-connect/adapters/PgInclusionConnectedUserRepository";
 import { PgOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/PgOngoingOAuthRepository";
@@ -71,6 +72,9 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     outboxRepository: new PgOutboxRepository(transaction),
     romeRepository: new PgRomeRepository(transaction),
     searchMadeRepository: new PgSearchMadeRepository(transaction),
+    establishmentMarketingRepository: new PgEstablishmentMarketingRepository(
+      transaction,
+    ),
     shortLinkQuery: shortLinkRepository,
     shortLinkRepository,
     statisticQueries: new PgStatisticQueries(transaction),
