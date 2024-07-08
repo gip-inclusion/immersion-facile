@@ -19,7 +19,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../domains/establishment/helpers/EstablishmentBuilders";
-import { establishmentAggragateToFormEstablishement } from "../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
+import { establishmentAggregateToFormEstablishement } from "../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { getRandomAgencyId, insertAgencySeed } from "./seed.helpers";
 
 /* eslint-disable no-console */
@@ -276,7 +276,7 @@ const establishmentSeed = async (uow: UnitOfWork) => {
           establishmentAggregate.establishment.siret,
         );
       await uow.formEstablishmentRepository.create(
-        establishmentAggragateToFormEstablishement(
+        establishmentAggregateToFormEstablishement(
           establishmentAggregate,
           offersAsAppellationDto,
         ),

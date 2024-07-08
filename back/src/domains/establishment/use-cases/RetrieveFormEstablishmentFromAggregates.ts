@@ -65,7 +65,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     uow: UnitOfWork,
     establishmentAggregate: EstablishmentAggregate,
   ) {
-    return establishmentAggragateToFormEstablishement(
+    return establishmentAggregateToFormEstablishement(
       establishmentAggregate,
       await uow.establishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
         establishmentAggregate.establishment.siret,
@@ -74,7 +74,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   }
 }
 
-export const establishmentAggragateToFormEstablishement = (
+export const establishmentAggregateToFormEstablishement = (
   establishmentAggregate: EstablishmentAggregate,
   appellations: AppellationAndRomeDto[],
 ): FormEstablishmentDto => {
@@ -102,9 +102,6 @@ export const establishmentAggragateToFormEstablishement = (
     maxContactsPerWeek: establishmentAggregate.establishment.maxContactsPerWeek,
     nextAvailabilityDate:
       establishmentAggregate.establishment.nextAvailabilityDate,
-    searchableBy: {
-      jobSeekers: true,
-      students: true,
-    },
+    searchableBy: establishmentAggregate.establishment.searchableBy,
   } satisfies FormEstablishmentDto;
 };
