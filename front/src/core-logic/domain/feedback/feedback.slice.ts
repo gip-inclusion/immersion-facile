@@ -18,6 +18,7 @@ const topics = [
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
 
 type Feedback = {
+  on: ActionKind;
   level: FeedbackLevel;
   message: string;
   title?: string;
@@ -152,8 +153,14 @@ export const feedbackSlice = createSlice({
                     actionKindAndLevel
                   ];
                 if (!feedbackForActionTopic) return;
+                const { level, actionKind } =
+                  getLevelAndActionKindFromActionKindAndLevel(
+                    actionKindAndLevel,
+                  );
+
                 state[action.payload.feedbackTopic] = {
-                  level: getLevelFromActionKindAndLevel(actionKindAndLevel),
+                  on: actionKind,
+                  level,
                   message: feedbackForActionTopic.message,
                   title: feedbackForActionTopic.title,
                 };
@@ -175,9 +182,15 @@ const isActionWithFeedbackTopic =
     "feedbackTopic" in action.payload &&
     action.type === actionType;
 
-export const getLevelFromActionKindAndLevel = (
+export const getLevelAndActionKindFromActionKindAndLevel = (
   actionKindAndLevel: ActionKindAndLevel,
-) => {
-  const level = actionKindAndLevel.split(".")[1];
-  return level as FeedbackLevel;
+): {
+  level: FeedbackLevel;
+  actionKind: ActionKind;
+} => {
+  const [actionKind, level] = actionKindAndLevel.split(".") as [
+    ActionKind,
+    FeedbackLevel,
+  ];
+  return { level, actionKind };
 };

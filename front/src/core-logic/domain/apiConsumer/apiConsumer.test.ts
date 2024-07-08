@@ -105,6 +105,7 @@ describe("api consumer", () => {
       );
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "api-consumer-global": {
+          on: "create",
           level: "success",
           title: "Le consommateur d'API a bien été créé.",
           message:
@@ -133,6 +134,7 @@ describe("api consumer", () => {
       ).toBeNull();
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "api-consumer-global": {
+          on: "update",
           level: "success",
           title: "Le consommateur d'API a bien été mis à jour.",
           message:
@@ -161,6 +163,7 @@ describe("api consumer", () => {
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "api-consumer-global": {
+          on: "create",
           level: "error",
           title: "Problème lors de la création du consommateur d'API",
           message:

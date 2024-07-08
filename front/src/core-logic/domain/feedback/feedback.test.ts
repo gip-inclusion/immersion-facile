@@ -6,7 +6,7 @@ import {
   ActionKindAndLevel,
   FeedbackTopic,
   feedbackMapping,
-  getLevelFromActionKindAndLevel,
+  getLevelAndActionKindFromActionKindAndLevel,
 } from "src/core-logic/domain/feedback/feedback.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
@@ -75,7 +75,8 @@ describe("Feedbacks", () => {
     kindAndLevel,
   }: { topic: FeedbackTopic; kindAndLevel: ActionKindAndLevel }) =>
     expectToEqual(feedbacksSelectors.feedbacks(store.getState())[topic], {
-      level: getLevelFromActionKindAndLevel(kindAndLevel),
+      on: getLevelAndActionKindFromActionKindAndLevel(kindAndLevel).actionKind,
+      level: getLevelAndActionKindFromActionKindAndLevel(kindAndLevel).level,
       title: feedbackMapping[topic][kindAndLevel]?.title,
       // biome-ignore lint/style/noNonNullAssertion:
       message: feedbackMapping[topic][kindAndLevel]!.message,
