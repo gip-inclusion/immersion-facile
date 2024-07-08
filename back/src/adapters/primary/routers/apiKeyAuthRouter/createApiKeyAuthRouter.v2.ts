@@ -33,8 +33,8 @@ import { SearchParamsPublicV2 } from "../DtoAndSchemas/v2/input/SearchParamsPubl
 import { domainToSearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
-  publicApiV2EstablishmentStatsRoutes,
   publicApiV2SearchEstablishmentRoutes,
+  publicApiV2StatisticsRoutes,
   publicApiV2WebhooksRoutes,
 } from "./publicApiV2.routes";
 
@@ -53,8 +53,8 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     v2ExpressRouter,
   );
 
-  const establishmentStatsV2Router = createExpressSharedRouter(
-    publicApiV2EstablishmentStatsRoutes,
+  const statisticsV2Router = createExpressSharedRouter(
+    publicApiV2StatisticsRoutes,
     v2ExpressRouter,
   );
 
@@ -201,7 +201,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     }),
   );
 
-  establishmentStatsV2Router.getEstablishmentStats(
+  statisticsV2Router.getEstablishmentStats(
     deps.apiConsumerMiddleware,
     (req, res) =>
       sendHttpResponseForApiV2(req, res, async () => {

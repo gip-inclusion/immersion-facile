@@ -12,8 +12,8 @@ import { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/c
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
-  publicApiV2EstablishmentStatsRoutes,
   publicApiV2SearchEstablishmentRoutes,
+  publicApiV2StatisticsRoutes,
   publicApiV2WebhooksRoutes,
 } from "./publicApiV2.routes";
 
@@ -103,7 +103,7 @@ const apiKeyAuth = "apiKeyAuth";
 
 const searchSection = "Recherche d'entreprise accueillante et mise en contact";
 const conventionSection = "Accès aux conventions";
-const establishmentStatsSection = "Statistiques sur les entreprises";
+const statisticsSection = "Statistiques";
 const webhookSection = "Souscriptions aux webhooks";
 
 const generateOpenApi = (envType: string) =>
@@ -111,7 +111,7 @@ const generateOpenApi = (envType: string) =>
     {
       [searchSection]: publicApiV2SearchEstablishmentRoutes,
       [conventionSection]: publicApiV2ConventionRoutes,
-      [establishmentStatsSection]: publicApiV2EstablishmentStatsRoutes,
+      [statisticsSection]: publicApiV2StatisticsRoutes,
       [webhookSection]: publicApiV2WebhooksRoutes,
     },
     {
@@ -194,6 +194,26 @@ const subscribeToWebhookExample: CreateWebhookSubscription = {
   subscribedEvent: "convention.updated",
   callbackHeaders: {
     authorization: "my-token",
+  },
+};
+
+const errorDescriptionsAndSchemas = {
+  "400": {
+    description: "Erreur dans le contrat d'api'",
+  },
+  "401": {
+    description: "Utilisateur non authentifié",
+    example: error401Example,
+  },
+  "403": {
+    description:
+      "Accès non autorisé (veuillez vérifier que vous avez les droits)",
+    example: error403Example,
+  },
+  "429": {
+    description:
+      "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
+    example: error429Example,
   },
 };
 
@@ -474,6 +494,54 @@ export const createOpenApiSpecV2 = (envType: string) =>
                 "Trop d'appels en cours. Veuillez réessayer dans quelques instants",
               example: error429Example,
             },
+          },
+        },
+      },
+    },
+    [statisticsSection]: {
+      getEstablishmentStats: {
+        summary: "Récupérer les statistiques d'entreprises",
+        description:
+          "Permets de récupérer des statistiques sur les entreprises, le nombre de conventions, si elles sont référencées chez Immersion Facilitée, etc...",
+        extraDocs: {
+          queryParams: {
+            page: {
+              description: "Le numéro de page",
+              example: 1,
+            },
+            perPage: {
+              description: "Le nombre de résultats par page",
+              example: 50,
+            },
+          },
+          responses: {
+            "200": {
+              description:
+                "Retourne une liste paginée de valeurs par entreprise.",
+              example: {
+                data: [
+                  {
+                    siret: "11110000111100",
+                    name: "Entreprise 1",
+                    numberOfConventions: 4,
+                    isReferenced: true,
+                  },
+                  {
+                    siret: "22220000222200",
+                    name: "Entreprise 2",
+                    numberOfConventions: 1,
+                    isReferenced: false,
+                  },
+                ],
+                pagination: {
+                  totalRecords: 2,
+                  totalPages: 1,
+                  numberPerPage: 50,
+                  currentPage: 1,
+                },
+              },
+            },
+            ...errorDescriptionsAndSchemas,
           },
         },
       },

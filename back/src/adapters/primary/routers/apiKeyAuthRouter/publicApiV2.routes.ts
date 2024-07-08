@@ -103,10 +103,10 @@ export const paginatedEstablishmentStatsSchema = createPaginatedSchema(
   establishmentStatSchema,
 );
 
-export const publicApiV2EstablishmentStatsRoutes = defineRoutes({
+export const publicApiV2StatisticsRoutes = defineRoutes({
   getEstablishmentStats: defineRoute({
     method: "get",
-    url: "/v2/establishments/stats",
+    url: "/v2/statistics/establishments",
     queryParamsSchema: paginationQueryParamsSchema,
     ...withAuthorizationHeaders,
     responses: {
