@@ -1,4 +1,5 @@
 import { DataWithPagination, PaginationQueryParams } from "shared";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { StatisticQueries } from "../ports/StatisticQueries";
 import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
@@ -20,6 +21,14 @@ export class PgStatisticQueries implements StatisticQueries {
       .groupBy("siret")
       .select(({ fn }) => fn.count<string>("siret").over().as("totalRecords"))
       .executeTakeFirst()) ?? { totalRecords: 0 };
+
+    const totalPages = Math.ceil(Math.max(+totalRecords, 1) / perPage);
+
+    if (page > totalPages) {
+      throw new BadRequestError(
+        `Page number is more than the total number of pages (required page: ${page} > total pages: ${totalPages}, with ${perPage} results / page)`,
+      );
+    }
 
     const establishmentStats = await this.#transaction
       .selectFrom("conventions as c")
@@ -46,7 +55,7 @@ export class PgStatisticQueries implements StatisticQueries {
       data: establishmentStats,
       pagination: {
         totalRecords: +totalRecords,
-        totalPages: Math.ceil(Math.max(+totalRecords, 1) / perPage),
+        totalPages,
         numberPerPage: perPage,
         currentPage: page,
       },

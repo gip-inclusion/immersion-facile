@@ -1,9 +1,8 @@
-import { DataWithPagination } from "shared";
+import { DataWithPagination, PaginationQueryParams } from "shared";
 import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
 
 export interface StatisticQueries {
-  getEstablishmentStats(pagination: {
-    page: number;
-    perPage: number;
-  }): Promise<DataWithPagination<EstablishmentStat>>;
+  getEstablishmentStats(
+    pagination: Required<PaginationQueryParams>,
+  ): Promise<DataWithPagination<EstablishmentStat>>;
 }
