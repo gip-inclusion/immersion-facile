@@ -122,6 +122,19 @@ describe("PgFormEstablishmentRepository", () => {
         isEngagedEnterprise: true,
         website: "http://web.site",
         nextAvailabilityDate: new Date().toISOString(),
+        searchableBy: {
+          jobSeekers: true,
+          students: false,
+        },
+        maxContactsPerWeek: 5,
+        appellations: [
+          {
+            romeCode: "D1103",
+            appellationCode: "33333",
+            romeLabel: "Boucherie",
+            appellationLabel: "Boucher / Bouchère",
+          },
+        ],
       };
       await formEstablishmentRepository.update(updatedFormEstablishment);
       expectToEqual(await formEstablishmentRepository.getAll(), [

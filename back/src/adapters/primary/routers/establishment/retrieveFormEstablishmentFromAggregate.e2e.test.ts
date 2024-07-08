@@ -44,6 +44,10 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     .withEstablishment(
       new EstablishmentEntityBuilder()
         .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
+        .withSearchableBy({
+          jobSeekers: true,
+          students: false,
+        })
         .withLocations([
           {
             address: rueSaintHonoreDto,
@@ -131,7 +135,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         businessContact: establishmentAggregate.contact!,
         searchableBy: {
           jobSeekers: true,
-          students: true,
+          students: false,
         },
         fitForDisabledWorkers: false,
       },

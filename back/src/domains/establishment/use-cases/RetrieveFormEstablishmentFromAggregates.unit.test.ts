@@ -69,6 +69,10 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   it("returns a reconstructed form if establishment with siret exists with dataSource=form & establishment jwt payload", async () => {
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
+      .withSearchableBy({
+        jobSeekers: true,
+        students: false,
+      })
       .build();
     const contact = new ContactEntityBuilder().build();
     const offer = new OfferEntityBuilder()
@@ -115,7 +119,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       maxContactsPerWeek: establishment.maxContactsPerWeek,
       searchableBy: {
         jobSeekers: true,
-        students: true,
+        students: false,
       },
       fitForDisabledWorkers: false,
     });

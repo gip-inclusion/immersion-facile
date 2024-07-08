@@ -895,7 +895,8 @@ export class PgEstablishmentAggregateRepository
           offersToRemoveByAppelationCode.map((appelationCode) =>
             parseInt(appelationCode),
           ),
-        );
+        )
+        .execute();
   }
 
   async #updateContactFromAggregates(

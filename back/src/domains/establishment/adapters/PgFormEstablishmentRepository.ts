@@ -129,6 +129,10 @@ export class PgFormEstablishmentRepository
         professions: JSON.stringify(formEstablishment.appellations),
         source: formEstablishment.source,
         website: formEstablishment.website ?? null, // TO DISCUSS : was missing on not kysely legacy update query
+        acquisition_campaign: formEstablishment.acquisitionCampaign,
+        acquisition_keyword: formEstablishment.acquisitionKeyword,
+        searchable_by_job_seekers: formEstablishment.searchableBy.jobSeekers,
+        searchable_by_students: formEstablishment.searchableBy.students,
       })
       .where("siret", "=", formEstablishment.siret)
       .returning("siret")

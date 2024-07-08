@@ -24,6 +24,7 @@ import {
   rueGuillaumeTellDto,
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
+import { ContactEntity } from "../entities/ContactEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 import {
   ContactEntityBuilder,
@@ -31,6 +32,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
   defaultLocation,
+  validContactEntityV2,
 } from "../helpers/EstablishmentBuilders";
 import { EstablishmentAggregateFilters } from "../ports/EstablishmentAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -1339,12 +1341,20 @@ describe("PgEstablishmentAggregateRepository", () => {
       // Prepare
       const originalEstablishmentAggregate = new EstablishmentAggregateBuilder()
         .withEstablishmentCreatedAt(new Date("2021-01-15"))
+        .withEstablishmentSiret("78000403200029")
         .build();
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         originalEstablishmentAggregate,
       );
       const updatedAt = new Date();
+      const originalContact = validContactEntityV2;
+      const updatedContact = new ContactEntityBuilder({
+        ...originalContact,
+        lastName: "new-last-name",
+        phone: "+33600000000",
+      } satisfies ContactEntity).build();
       const updatedAggregate = new EstablishmentAggregateBuilder()
+        .withContact(updatedContact)
         .withLocations([
           {
             id: "22222222-ee70-4c90-b3f4-668d492f7395",
@@ -1358,7 +1368,12 @@ describe("PgEstablishmentAggregateRepository", () => {
           },
         ])
         .withMaxContactsPerWeek(7)
+        .withEstablishmentSiret("78000403200029")
         .withEstablishmentUpdatedAt(updatedAt)
+        .withSearchableBy({
+          jobSeekers: true,
+          students: false,
+        })
         .build();
 
       await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
@@ -1366,18 +1381,17 @@ describe("PgEstablishmentAggregateRepository", () => {
         updatedAt,
       );
 
-      expectToEqual(
+      const actualEstablishmentAggregate =
         await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
-          updatedAggregate.establishment.siret,
-        ),
-        {
-          ...updatedAggregate,
-          establishment: {
-            ...updatedAggregate.establishment,
-            createdAt: originalEstablishmentAggregate.establishment.createdAt,
-          },
+          originalEstablishmentAggregate.establishment.siret,
+        );
+      expectToEqual(actualEstablishmentAggregate, {
+        ...updatedAggregate,
+        establishment: {
+          ...updatedAggregate.establishment,
+          createdAt: originalEstablishmentAggregate.establishment.createdAt,
         },
-      );
+      });
     });
 
     it("creates an establishment contact", async () => {

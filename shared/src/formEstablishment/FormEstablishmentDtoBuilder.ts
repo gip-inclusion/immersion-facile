@@ -5,6 +5,7 @@ import { SiretDto } from "../siret/siret";
 import {
   BusinessContactDto,
   EstablishmentCSVRow,
+  EstablishmentSearchableBy,
   FormEstablishmentAddress,
   FormEstablishmentDto,
   FormEstablishmentSource,
@@ -181,6 +182,13 @@ export class FormEstablishmentDtoBuilder
 
   public withAcquisition(params: WithAcquisition) {
     return new FormEstablishmentDtoBuilder({ ...this.#dto, ...params });
+  }
+
+  public withSearchableBy({ jobSeekers, students }: EstablishmentSearchableBy) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      searchableBy: { jobSeekers, students },
+    });
   }
 }
 

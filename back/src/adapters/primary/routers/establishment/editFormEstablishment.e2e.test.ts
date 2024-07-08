@@ -1,6 +1,7 @@
 import { addDays, millisecondsToSeconds, subYears } from "date-fns";
 import {
   EstablishmentRoutes,
+  FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
@@ -80,6 +81,46 @@ describe("Edit form establishments", () => {
     expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
     expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
       formEstablishment,
+    ]);
+  });
+
+  it("200 - Updates establishment with new data", async () => {
+    const updatedFormEstablishment: FormEstablishmentDto = {
+      ...formEstablishment,
+      maxContactsPerWeek: 5,
+      searchableBy: {
+        jobSeekers: false,
+        students: true,
+      },
+      appellations: [
+        {
+          romeCode: "D1103",
+          appellationCode: "33333",
+          romeLabel: "Boucherie",
+          appellationLabel: "Boucher / Bouchère",
+        },
+      ],
+    };
+    const response = await httpClient.updateFormEstablishment({
+      body: updatedFormEstablishment,
+      headers: {
+        authorization: generateEditEstablishmentJwt(
+          createEstablishmentJwtPayload({
+            siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+            durationDays: 1,
+            now: new Date(),
+          }),
+        ),
+      },
+    });
+
+    expectHttpResponseToEqual(response, {
+      body: "",
+      status: 200,
+    });
+    expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+    expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
+      updatedFormEstablishment,
     ]);
   });
 
