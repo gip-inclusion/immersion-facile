@@ -542,6 +542,14 @@ export const createOpenApiSpecV2 = (envType: string) =>
               },
             },
             ...errorDescriptionsAndSchemas,
+            "400": {
+              description: "Erreur dans le contrat d'api'",
+              example: {
+                status: 400,
+                message:
+                  "Page number is more than the total number of pages (required page: 2000 > total pages: 10, with 50 results / page)",
+              },
+            },
           },
         },
       },

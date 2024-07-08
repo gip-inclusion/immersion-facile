@@ -1,6 +1,12 @@
 import crypto from "crypto";
 import { Pool } from "pg";
-import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import {
   KyselyDb,
   makeKyselyDb,
@@ -63,46 +69,60 @@ describe("PgStatisticQueries", () => {
     });
 
     describe("when there are conventions", () => {
-      it("returns data with array and pagination", async () => {
-        const agency = new AgencyDtoBuilder().build();
+      const agency = new AgencyDtoBuilder().build();
+      const establishmentAggregate = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("33330000333300")
+        .build();
+      const conventionSiret1A = new ConventionDtoBuilder()
+        .withId(crypto.randomUUID())
+        .withSiret("11110000111100")
+        .withAgencyId(agency.id)
+        .build();
+      const conventionSiret1B = new ConventionDtoBuilder()
+        .withId(crypto.randomUUID())
+        .withSiret("11110000111100")
+        .withAgencyId(agency.id)
+        .build();
+      const convention2 = new ConventionDtoBuilder()
+        .withId(crypto.randomUUID())
+        .withSiret("22220000222200")
+        .withAgencyId(agency.id)
+        .build();
+      const convention3 = new ConventionDtoBuilder()
+        .withId(crypto.randomUUID())
+        .withSiret(establishmentAggregate.establishment.siret)
+        .withAgencyId(agency.id)
+        .build();
+
+      beforeEach(async () => {
         await pgAgencyRepository.insert(agency);
-        const conventionSiret1A = new ConventionDtoBuilder()
-          .withId(crypto.randomUUID())
-          .withSiret("11110000111100")
-          .withAgencyId(agency.id)
-          .build();
-        const conventionSiret1B = new ConventionDtoBuilder()
-          .withId(crypto.randomUUID())
-          .withSiret("11110000111100")
-          .withAgencyId(agency.id)
-          .build();
-        const convention2 = new ConventionDtoBuilder()
-          .withId(crypto.randomUUID())
-          .withSiret("22220000222200")
-          .withAgencyId(agency.id)
-          .build();
-
-        const establishmentAggregate = new EstablishmentAggregateBuilder()
-          .withEstablishmentSiret("33330000333300")
-          .build();
-
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentAggregate,
         );
-
-        const convention3 = new ConventionDtoBuilder()
-          .withId(crypto.randomUUID())
-          .withSiret(establishmentAggregate.establishment.siret)
-          .withAgencyId(agency.id)
-          .build();
-
         await Promise.all([
           pgConventionRepository.save(conventionSiret1A),
           pgConventionRepository.save(conventionSiret1B),
           pgConventionRepository.save(convention2),
           pgConventionRepository.save(convention3),
         ]);
+      });
 
+      it("throws BadRequest if page number is heigher than totalPages", async () => {
+        const queryParams = {
+          page: 10,
+          perPage: 2,
+        };
+        await expectPromiseToFailWithError(
+          pgStatisticQueries.getEstablishmentStats(queryParams),
+          new BadRequestError(
+            `Page number is more than the total number of pages (required page: ${
+              queryParams.page
+            } > total pages: ${2}, with ${queryParams.perPage} results / page)`,
+          ),
+        );
+      });
+
+      it("returns data with array and pagination", async () => {
         const page1Result = await pgStatisticQueries.getEstablishmentStats({
           page: 1,
           perPage: 2,
