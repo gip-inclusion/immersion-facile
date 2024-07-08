@@ -235,7 +235,7 @@ const defaultApiConsumerValues = (id: string): ApiConsumer => ({
       },
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],

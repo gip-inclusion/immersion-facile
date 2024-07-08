@@ -31,7 +31,7 @@ export const authorizedUnJeuneUneSolutionApiConsumer: ApiConsumer = {
       },
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],
@@ -65,7 +65,7 @@ export const unauthorizedApiConsumer: ApiConsumer = {
       },
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],
@@ -99,7 +99,7 @@ export const outdatedApiConsumer: ApiConsumer = {
       },
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],
@@ -123,7 +123,7 @@ export const authorizedSubscriptionApiConsumer: ApiConsumer = {
       scope: "no-scope",
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],
@@ -183,7 +183,7 @@ const defaultApiConsumer: ApiConsumer = {
       },
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],

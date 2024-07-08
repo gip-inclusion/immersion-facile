@@ -1,7 +1,7 @@
 import { DataWithPagination } from "shared";
 import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
 
-export interface EstablishmentQueries {
+export interface StatisticQueries {
   getEstablishmentStats(pagination: {
     page: number;
     perPage: number;

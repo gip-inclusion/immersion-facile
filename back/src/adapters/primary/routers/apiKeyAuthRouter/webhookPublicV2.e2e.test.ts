@@ -123,7 +123,7 @@ describe("Webhook routes", () => {
             scope: "no-scope",
             subscriptions: [],
           },
-          establishmentStats: {
+          statistics: {
             kinds: [],
             scope: "no-scope",
             subscriptions: [],
@@ -199,7 +199,7 @@ describe("Webhook routes", () => {
             scope: "no-scope",
             subscriptions: [],
           },
-          establishmentStats: {
+          statistics: {
             kinds: [],
             scope: "no-scope",
             subscriptions: [],
@@ -272,7 +272,7 @@ describe("Webhook routes", () => {
             scope: "no-scope",
             subscriptions: [],
           },
-          establishmentStats: {
+          statistics: {
             kinds: [],
             scope: "no-scope",
             subscriptions: [],

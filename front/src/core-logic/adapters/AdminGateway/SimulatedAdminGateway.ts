@@ -194,7 +194,7 @@ const apiConsumers: ApiConsumer[] = [
         },
         subscriptions: [],
       },
-      establishmentStats: {
+      statistics: {
         kinds: ["READ"],
         scope: "no-scope",
         subscriptions: [],
@@ -227,7 +227,7 @@ const apiConsumers: ApiConsumer[] = [
         },
         subscriptions: [],
       },
-      establishmentStats: {
+      statistics: {
         kinds: ["READ"],
         scope: "no-scope",
         subscriptions: [],

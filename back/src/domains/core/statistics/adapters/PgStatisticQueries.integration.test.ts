@@ -1,16 +1,19 @@
 import crypto from "crypto";
 import { Pool } from "pg";
 import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
-import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
-import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
-import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
-import { PgEstablishmentQueries } from "./PgEstablishmentQueries";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../config/pg/kysely/kyselyUtils";
+import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
+import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
+import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
+import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
+import { PgStatisticQueries } from "./PgStatisticQueries";
 
-describe("PgEstablishmentQueries", () => {
-  let pgEstablishmentQueries: PgEstablishmentQueries;
+describe("PgStatisticQueries", () => {
+  let pgStatisticQueries: PgStatisticQueries;
   let pgConventionRepository: PgConventionRepository;
   let pgAgencyRepository: PgAgencyRepository;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
@@ -23,7 +26,7 @@ describe("PgEstablishmentQueries", () => {
 
   beforeEach(async () => {
     db = makeKyselyDb(pool);
-    pgEstablishmentQueries = new PgEstablishmentQueries(db);
+    pgStatisticQueries = new PgStatisticQueries(db);
     pgConventionRepository = new PgConventionRepository(db);
     pgAgencyRepository = new PgAgencyRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
@@ -42,7 +45,7 @@ describe("PgEstablishmentQueries", () => {
     describe("when no establishment stats", () => {
       it("returns data with empty array and pagination", async () => {
         const paginatedEstablishmentStats =
-          await pgEstablishmentQueries.getEstablishmentStats({
+          await pgStatisticQueries.getEstablishmentStats({
             page: 1,
             perPage: 10,
           });
@@ -100,7 +103,7 @@ describe("PgEstablishmentQueries", () => {
           pgConventionRepository.save(convention3),
         ]);
 
-        const page1Result = await pgEstablishmentQueries.getEstablishmentStats({
+        const page1Result = await pgStatisticQueries.getEstablishmentStats({
           page: 1,
           perPage: 2,
         });
@@ -128,7 +131,7 @@ describe("PgEstablishmentQueries", () => {
           },
         });
 
-        const page2Result = await pgEstablishmentQueries.getEstablishmentStats({
+        const page2Result = await pgStatisticQueries.getEstablishmentStats({
           page: 2,
           perPage: 2,
         });

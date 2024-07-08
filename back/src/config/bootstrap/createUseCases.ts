@@ -85,6 +85,7 @@ import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
 import { ShortLinkId } from "../../domains/core/short-link/ports/ShortLinkQuery";
 import { GetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
+import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cases/GetEstablishmentStats";
 import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
@@ -95,7 +96,6 @@ import { ContactEstablishment } from "../../domains/establishment/use-cases/Cont
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
 import { EditFormEstablishment } from "../../domains/establishment/use-cases/EditFormEstablishment";
-import { makeGetEstablishmentStats } from "../../domains/establishment/use-cases/GetEstablishmentStats";
 import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { InsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";

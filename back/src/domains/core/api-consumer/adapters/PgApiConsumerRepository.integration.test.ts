@@ -31,7 +31,7 @@ const apiConsumer: ApiConsumer = {
       },
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],
@@ -96,7 +96,7 @@ describe("PgApiConsumerRepository", () => {
           },
           subscriptions: [],
         },
-        establishmentStats: {
+        statistics: {
           kinds: ["READ"],
           scope: "no-scope",
           subscriptions: [],

@@ -1410,7 +1410,7 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
       },
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],
