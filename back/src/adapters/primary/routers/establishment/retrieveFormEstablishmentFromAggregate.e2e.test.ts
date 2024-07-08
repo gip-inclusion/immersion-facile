@@ -187,10 +187,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           establishmentAggregate.establishment.maxContactsPerWeek,
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         businessContact: establishmentAggregate.contact!,
-        searchableBy: {
-          jobSeekers: true,
-          students: true,
-        },
+        searchableBy: establishmentAggregate.establishment.searchableBy,
         fitForDisabledWorkers: false,
       },
       status: 200,
