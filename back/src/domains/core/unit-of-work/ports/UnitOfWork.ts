@@ -12,7 +12,6 @@ import { DiscussionRepository } from "../../../establishment/ports/DiscussionRep
 import { EstablishmentAggregateRepository } from "../../../establishment/ports/EstablishmentAggregateRepository";
 import { EstablishmentLeadQueries } from "../../../establishment/ports/EstablishmentLeadQueries";
 import { EstablishmentLeadRepository } from "../../../establishment/ports/EstablishmentLeadRepository";
-import { EstablishmentQueries } from "../../../establishment/ports/EstablishmentQueries";
 import { FormEstablishmentRepository } from "../../../establishment/ports/FormEstablishmentRepository";
 import { GroupRepository } from "../../../establishment/ports/GroupRepository";
 import { SearchMadeRepository } from "../../../establishment/ports/SearchMadeRepository";
@@ -29,6 +28,7 @@ import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { SavedErrorRepository } from "../../saved-errors/ports/SavedErrorRepository";
 import { ShortLinkQuery } from "../../short-link/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../../short-link/ports/ShortLinkRepository";
+import { StatisticQueries } from "../../statistics/ports/StatisticQueries";
 
 export type UnitOfWork = {
   agencyGroupRepository: AgencyGroupRepository;
@@ -45,7 +45,6 @@ export type UnitOfWork = {
   discussionRepository: DiscussionRepository;
   errorRepository: SavedErrorRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
-  establishmentQueries: EstablishmentQueries;
   establishmentLeadQueries: EstablishmentLeadQueries;
   establishmentLeadRepository: EstablishmentLeadRepository;
   featureFlagRepository: FeatureFlagRepository;
@@ -61,5 +60,6 @@ export type UnitOfWork = {
   searchMadeRepository: SearchMadeRepository;
   shortLinkQuery: ShortLinkQuery;
   shortLinkRepository: ShortLinkRepository;
+  statisticQueries: StatisticQueries;
   userRepository: UserRepository;
 };

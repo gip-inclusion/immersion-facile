@@ -12,7 +12,6 @@ import { InMemoryDiscussionRepository } from "../../../establishment/adapters/In
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentLeadQueries } from "../../../establishment/adapters/InMemoryEstablishmentLeadQueries";
 import { InMemoryEstablishmentLeadRepository } from "../../../establishment/adapters/InMemoryEstablishmentLeadRepository";
-import { InMemoryEstablishmentQueries } from "../../../establishment/adapters/InMemoryEstablishmentQueries";
 import { InMemoryFormEstablishmentRepository } from "../../../establishment/adapters/InMemoryFormEstablishmentRepository";
 import { InMemoryGroupRepository } from "../../../establishment/adapters/InMemoryGroupRepository";
 import { InMemorySearchMadeRepository } from "../../../establishment/adapters/InMemorySearchMadeRepository";
@@ -28,6 +27,7 @@ import { InMemoryNotificationRepository } from "../../notifications/adapters/InM
 import { InMemoryRomeRepository } from "../../rome/adapters/InMemoryRomeRepository";
 import { InMemorySavedErrorRepository } from "../../saved-errors/adapters/InMemorySavedErrorRepository";
 import { InMemoryShortLinkRepository } from "../../short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
+import { InMemoryStatisticQueries } from "../../statistics/adapters/InMemoryStatisticQueries";
 import { UnitOfWork } from "../ports/UnitOfWork";
 
 export const createInMemoryUow = () => {
@@ -58,7 +58,6 @@ export const createInMemoryUow = () => {
     discussionRepository: new InMemoryDiscussionRepository(),
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
-    establishmentQueries: new InMemoryEstablishmentQueries(),
     groupRepository: new InMemoryGroupRepository(),
     errorRepository: new InMemorySavedErrorRepository(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
@@ -84,6 +83,7 @@ export const createInMemoryUow = () => {
     conventionExternalIdRepository:
       new InMemoryConventionExternalIdRepository(),
     npsRepository: new InMemoryNpsRepository(),
+    statisticQueries: new InMemoryStatisticQueries(),
   } satisfies UnitOfWork;
 };
 

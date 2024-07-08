@@ -2,13 +2,13 @@ import { expectPromiseToFailWithError } from "shared";
 import {
   BadRequestError,
   ForbiddenError,
-} from "../../../config/helpers/httpErrors";
-import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+} from "../../../../config/helpers/httpErrors";
+import { ApiConsumerBuilder } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
-} from "../../core/unit-of-work/adapters/createInMemoryUow";
+} from "../../unit-of-work/adapters/createInMemoryUow";
 import {
   GetEstablishmentStats,
   makeGetEstablishmentStats,
@@ -27,7 +27,7 @@ describe("GetEstablishmentStats", () => {
   it("throws Forbidden if ApiConsumer does not have 'READ' right on establishmentStats", async () => {
     const apiConsumerWithoutReadRight = new ApiConsumerBuilder()
       .withRights({
-        establishmentStats: { kinds: [], scope: "no-scope", subscriptions: [] },
+        statistics: { kinds: [], scope: "no-scope", subscriptions: [] },
       })
       .build();
 
@@ -48,7 +48,7 @@ describe("GetEstablishmentStats", () => {
   it("throws BadRequest if perPage is greater than the max allowed", async () => {
     const apiConsumer = new ApiConsumerBuilder()
       .withRights({
-        establishmentStats: {
+        statistics: {
           kinds: ["READ"],
           scope: "no-scope",
           subscriptions: [],

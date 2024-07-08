@@ -46,7 +46,7 @@ const createApiConsumer = (
   rights: {
     searchEstablishment: { kinds: [], scope: "no-scope", subscriptions: [] },
     convention: conventionRight,
-    establishmentStats: { kinds: [], scope: "no-scope", subscriptions: [] },
+    statistics: { kinds: [], scope: "no-scope", subscriptions: [] },
   },
 });
 

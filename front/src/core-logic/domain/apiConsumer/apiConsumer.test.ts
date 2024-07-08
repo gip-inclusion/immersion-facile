@@ -31,7 +31,7 @@ const apiConsumer1: ApiConsumer = {
       },
       subscriptions: [],
     },
-    establishmentStats: {
+    statistics: {
       kinds: ["READ"],
       scope: "no-scope",
       subscriptions: [],

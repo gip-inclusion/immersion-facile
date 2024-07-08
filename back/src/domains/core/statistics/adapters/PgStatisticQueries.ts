@@ -1,9 +1,9 @@
 import { DataWithPagination, PaginationQueryParams } from "shared";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { EstablishmentQueries } from "../ports/EstablishmentQueries";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { StatisticQueries } from "../ports/StatisticQueries";
 import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
 
-export class PgEstablishmentQueries implements EstablishmentQueries {
+export class PgStatisticQueries implements StatisticQueries {
   #transaction: KyselyDb;
   constructor(transaction: KyselyDb) {
     this.#transaction = transaction;

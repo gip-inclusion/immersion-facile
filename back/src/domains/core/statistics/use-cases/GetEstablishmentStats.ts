@@ -4,8 +4,8 @@ import {
   PaginationQueryParams,
   paginationRequiredQueryParamsSchema,
 } from "shared";
-import { ForbiddenError } from "../../../config/helpers/httpErrors";
-import { createTransactionalUseCase } from "../../core/UseCase";
+import { ForbiddenError } from "../../../../config/helpers/httpErrors";
+import { createTransactionalUseCase } from "../../UseCase";
 
 export type EstablishmentStat = {
   siret: string;
@@ -27,10 +27,10 @@ export const makeGetEstablishmentStats = createTransactionalUseCase<
     inputSchema: paginationRequiredQueryParamsSchema,
   },
   async (paginationParams, { uow }, apiConsumer) => {
-    if (!apiConsumer.rights.establishmentStats.kinds.includes("READ"))
+    if (!apiConsumer.rights.statistics.kinds.includes("READ"))
       throw new ForbiddenError(
         "You don't have sufficient rights to access this route. Contact support if you want more privileges.",
       );
-    return uow.establishmentQueries.getEstablishmentStats(paginationParams);
+    return uow.statisticQueries.getEstablishmentStats(paginationParams);
   },
 );

@@ -64,9 +64,7 @@ const createSearchEstablishmentRightSchema = noScopeRightSchema.and(
   }),
 );
 
-const establishmentStatsRightSchema = noScopeRightSchema.and(
-  withNoSubscriptionSchema,
-);
+const statisticsRightSchema = noScopeRightSchema.and(withNoSubscriptionSchema);
 
 const searchEstablishmentRightSchema = noScopeRightSchema.and(
   z.object({ subscriptions: z.array(webhookSubscriptionSchema) }),
@@ -101,16 +99,16 @@ const conventionRightSchema = conventionRightCommonSchema.and(
 
 const writeApiConsumerRightsSchema: z.Schema<WriteApiConsumerRights> = z.object(
   {
-    establishmentStats: establishmentStatsRightSchema,
     searchEstablishment: createSearchEstablishmentRightSchema,
     convention: createConventionRightSchema,
+    statistics: statisticsRightSchema,
   },
 );
 
 const apiConsumerRightsSchema: z.Schema<ApiConsumer["rights"]> = z.object({
-  establishmentStats: establishmentStatsRightSchema,
   searchEstablishment: searchEstablishmentRightSchema,
   convention: conventionRightSchema,
+  statistics: statisticsRightSchema,
 });
 
 const commonApiConsumerShape = {

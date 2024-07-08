@@ -1,8 +1,8 @@
 import { DataWithPagination } from "shared";
-import { EstablishmentQueries } from "../ports/EstablishmentQueries";
+import { StatisticQueries } from "../ports/StatisticQueries";
 import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
 
-export class InMemoryEstablishmentQueries implements EstablishmentQueries {
+export class InMemoryStatisticQueries implements StatisticQueries {
   public async getEstablishmentStats(_paginationParams: {
     page: number;
     perPage: number;
