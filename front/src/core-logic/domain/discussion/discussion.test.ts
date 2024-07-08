@@ -96,6 +96,7 @@ describe("Discussion slice", () => {
     });
     expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
       "dashboard-discussion": {
+        on: "fetch",
         level: "error",
         title: "Problème lors de la récupération des discussions",
         message:
@@ -162,6 +163,7 @@ describe("Discussion slice", () => {
 
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "dashboard-discussion-rejection": {
+          on: "update",
           level: "success",
           title: "La candidature a bien été rejetée",
           message:
@@ -197,6 +199,7 @@ describe("Discussion slice", () => {
       });
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "dashboard-discussion-rejection": {
+          on: "update",
           level: "error",
           title: "Problème lors du rejet de la candidature",
           message: "Une erreur est survenue lors du rejet de la candidature",

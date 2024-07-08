@@ -8,6 +8,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { renderContent } from "html-templates/src/components/email";
 import React from "react";
 import { DiscussionMeta, ExchangeMessage, Loader } from "react-design-system";
 import { createPortal } from "react-dom";
@@ -31,6 +32,7 @@ import {
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
+import { useFeebackEventCallback } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   getConventionInitialValuesFromUrl,
@@ -61,7 +63,13 @@ export const DiscussionManageContent = ({
     discussionId,
     inclusionConnectedJwt,
   );
-
+  useFeebackEventCallback(
+    "dashboard-discussion-rejection",
+    "update.success",
+    () => {
+      window.location.reload();
+    },
+  );
   if (isLoading) return <Loader />;
   if (fetchError) throw new Error(fetchError);
 
@@ -145,21 +153,7 @@ const DiscussionDetails = ({
           .activateDraftConvention,
         priority: "tertiary",
         linkProps: {
-          href: makeMailtoLink({
-            email: createOpaqueEmail(
-              discussion.id,
-              "potentialBeneficiary",
-              window.location.hostname,
-            ),
-            subject: `L'entreprise ${discussion.businessName} vous invite à finaliser votre demande de convention d'immersion`,
-            body: `Félicitations ${
-              discussion.potentialBeneficiary.firstName
-            },\n\nL'entreprise ${
-              discussion.businessName
-            } a accepté votre candidature et vous invite à: \n\n • vérifier les informations préremplies dans la demande de convention \n\n • compléter les informations manquantes \n\n • valider la demande de convention \n\n Voici <a href="${
-              makeDraftConventionLink(draftConvention, discussion.id).href
-            }">le lien pour accéder à la demande de convention préremplie</a>.\n\n Bonne journée,\nL'équipe Immersion Facilitée`,
-          }),
+          href: makeDraftConventionLink(draftConvention, discussion.id).href,
           target: "_blank",
         },
         children: "Pré-remplir la convention pour cette mise en relation",
@@ -321,19 +315,6 @@ const makeConventionFromDiscussion = ({
   immersionAddress: addressDtoToString(discussion.address),
 });
 
-const makeMailtoLink = ({
-  email,
-  subject,
-  body,
-}: {
-  email: Email;
-  subject: string;
-  body?: string;
-}) =>
-  `mailto:${email}?subject=${encodeURI(subject)}${
-    body ? `&body=${encodeURI(body)}` : ""
-  }`;
-
 const RejectApplicationForm = ({
   discussion,
 }: {
@@ -380,12 +361,20 @@ const RejectApplicationForm = ({
           }).subject
         }`}
         className={fr.cx("fr-mb-2w")}
-        desc={`Contenu : ${
-          rejectDiscussionEmailParams({
-            discussion,
-            ...dataToSend,
-          }).htmlContent
-        }`}
+        desc={
+          <div
+            dangerouslySetInnerHTML={{
+              __html:
+                renderContent(
+                  rejectDiscussionEmailParams({
+                    discussion,
+                    ...dataToSend,
+                  }).htmlContent,
+                  { wrapInTable: false },
+                ) ?? "",
+            }}
+          />
+        }
       />
       <ButtonsGroup
         buttons={[

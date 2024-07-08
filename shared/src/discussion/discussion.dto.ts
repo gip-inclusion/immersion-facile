@@ -284,6 +284,12 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       ...this.discussion,
       status: "PENDING",
     };
+    if (status === "ACCEPTED") {
+      discussion = {
+        ...discussion,
+        status,
+      };
+    }
     if (status === "REJECTED" && !rejectionKind) {
       discussion = {
         ...discussion,
