@@ -92,6 +92,10 @@ describe("Update Establishment aggregate from form data", () => {
         new OfferEntityBuilder().build(),
         new OfferEntityBuilder().build(),
       ])
+      .withSearchableBy({
+        jobSeekers: false,
+        students: true,
+      })
       .withContact(contact)
       .build();
 
@@ -104,7 +108,7 @@ describe("Update Establishment aggregate from form data", () => {
     const updatedContact = new ContactEntityBuilder()
       .withEmail("new.contact@gmail.com")
       .build();
-    const updatedAppelation: AppellationAndRomeDto = {
+    const updatedAppellation: AppellationAndRomeDto = {
       romeLabel: "Boulangerie",
       appellationLabel: "Boulanger",
       romeCode: newRomeCode,
@@ -113,7 +117,7 @@ describe("Update Establishment aggregate from form data", () => {
     const nextAvailabilityDate = new Date();
     const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
-      .withAppellations([updatedAppelation])
+      .withAppellations([updatedAppellation])
       .withBusinessAddresses([
         {
           id: locationId,
@@ -122,6 +126,10 @@ describe("Update Establishment aggregate from form data", () => {
       ])
       .withBusinessContact(updatedContact)
       .withNextAvailabilityDate(nextAvailabilityDate)
+      .withSearchableBy({
+        jobSeekers: true,
+        students: false,
+      })
       .build();
 
     // Act : execute use-case with same siret
@@ -158,14 +166,15 @@ describe("Update Establishment aggregate from form data", () => {
               .withUpdatedAt(timeGateway.now())
               .withWebsite(updatedFormEstablishment.website)
               .withNextAvailabilityDate(nextAvailabilityDate)
+              .withSearchableBy(updatedFormEstablishment.searchableBy)
               .build(),
           )
           .withOffers([
             new OfferEntityBuilder()
-              .withRomeLabel(updatedAppelation.romeLabel)
-              .withRomeCode(updatedAppelation.romeCode)
-              .withAppellationCode(updatedAppelation.appellationCode)
-              .withAppellationLabel(updatedAppelation.appellationLabel)
+              .withRomeLabel(updatedAppellation.romeLabel)
+              .withRomeCode(updatedAppellation.romeCode)
+              .withAppellationCode(updatedAppellation.appellationCode)
+              .withAppellationLabel(updatedAppellation.appellationLabel)
               .withCreatedAt(timeGateway.now())
               .withScore(10)
               .build(),

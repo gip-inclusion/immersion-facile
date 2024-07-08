@@ -27,7 +27,7 @@ export const TEST_LOCATION: Location = {
   position: { lat: 43.8666, lon: 8.3333 },
 };
 
-const validContactEntityV2: ContactEntity = {
+export const validContactEntityV2: ContactEntity = {
   id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
   lastName: "Prost",
   firstName: "Alain",
