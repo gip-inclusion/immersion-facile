@@ -222,6 +222,9 @@ export const storedEventRowsToDomainEvent = (
           : []),
       ];
 
+      // reorder failures by subscriptionId
+      failures.sort((a, b) => a.subscriptionId.localeCompare(b.subscriptionId));
+
       const updatedPublication: EventPublication = {
         ...existingPublication,
         failures,
