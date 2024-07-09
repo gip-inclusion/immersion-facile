@@ -13,6 +13,7 @@ import {
   type Role,
   type TemplatedEmail,
   type TemplatedSms,
+  errorMessages,
   filterNotFalsy,
   frontRoutes,
   isEstablishmentTutorIsEstablishmentRepresentative,
@@ -39,10 +40,6 @@ import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/Shor
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import {
-  missingAgencyMessage,
-  missingConventionMessage,
-} from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
 type EmailWithRole = {
   email: string;
@@ -100,7 +97,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     const conventionRead =
       await uow.conventionQueries.getConventionById(conventionId);
     if (!conventionRead)
-      throw new NotFoundError(missingConventionMessage(conventionId));
+      throw new NotFoundError(
+        errorMessages.convention.notFound({ conventionId }),
+      );
 
     if (
       reminderKind === "FirstReminderForSignatories" ||
@@ -109,7 +108,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       return this.#onSignatoriesReminder(reminderKind, conventionRead, uow);
 
     const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
-    if (!agency) throw new NotFoundError(missingAgencyMessage(conventionRead));
+    if (!agency)
+      throw new NotFoundError(
+        errorMessages.agency.notFound({ agencyId: conventionRead.agencyId }),
+      );
 
     return this.#onAgencyReminder(reminderKind, conventionRead, agency, uow);
   }

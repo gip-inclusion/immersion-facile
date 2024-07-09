@@ -6,6 +6,7 @@ import {
   InclusionConnectedUserBuilder,
   currentJwtVersions,
   displayRouteName,
+  errorMessages,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -19,8 +20,6 @@ import {
 import { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
-import { establishmentNotFoundErrorMessage } from "../../../../domains/establishment/ports/EstablishmentAggregateRepository";
-import { formEstablishmentNotFoundErrorMessage } from "../../../../domains/establishment/ports/FormEstablishmentRepository";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 const backofficeAdminUser = new InclusionConnectedUserBuilder()
@@ -172,9 +171,9 @@ describe("Delete form establishment", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: establishmentNotFoundErrorMessage(
-          establishmentAggregate.establishment.siret,
-        ),
+        errors: errorMessages.establishment.notFound({
+          siret: establishmentAggregate.establishment.siret,
+        }),
       },
       status: 404,
     });
@@ -198,9 +197,9 @@ describe("Delete form establishment", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: formEstablishmentNotFoundErrorMessage(
-          establishmentAggregate.establishment.siret,
-        ),
+        errors: errorMessages.establishment.notFound({
+          siret: establishmentAggregate.establishment.siret,
+        }),
       },
       status: 404,
     });

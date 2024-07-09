@@ -8,12 +8,3 @@ export interface FormEstablishmentRepository {
   getBySiret: (siret: SiretDto) => Promise<FormEstablishmentDto | undefined>;
   getAll: () => Promise<FormEstablishmentDto[]>;
 }
-
-export const formEstablishementUpdateFailedErrorMessage = (
-  dto: FormEstablishmentDto,
-): string =>
-  `Cannot update form establishment DTO with siret ${dto.siret}, since it is not found.`;
-
-export const formEstablishmentNotFoundErrorMessage = (
-  siret: SiretDto,
-): string => `Form establishment with siret ${siret} not found.`;

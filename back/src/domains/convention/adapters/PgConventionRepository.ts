@@ -9,10 +9,14 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   InternshipKind,
+  errorMessages,
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
-import { ConflictError } from "../../../config/helpers/httpErrors";
+import {
+  ConflictError,
+  NotFoundError,
+} from "../../../config/helpers/httpErrors";
 import { KyselyDb, falsyToNull } from "../../../config/pg/kysely/kyselyUtils";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
@@ -92,7 +96,7 @@ export class PgConventionRepository implements ConventionRepository {
     const alreadyExistingConvention = await this.getById(convention.id);
     if (alreadyExistingConvention)
       throw new ConflictError(
-        `Convention with id ${convention.id} already exists`,
+        errorMessages.convention.conflict({ conventionId: convention.id }),
       );
 
     // prettier-ignore
@@ -247,7 +251,10 @@ export class PgConventionRepository implements ConventionRepository {
       .where("id", "=", id)
       .executeTakeFirst();
 
-    if (!result) throw new Error(`No convention with id '${id}'.`);
+    if (!result)
+      throw new NotFoundError(
+        errorMessages.convention.notFound({ conventionId: id }),
+      );
 
     return (
       result.establishment_tutor_id === result.establishment_representative_id

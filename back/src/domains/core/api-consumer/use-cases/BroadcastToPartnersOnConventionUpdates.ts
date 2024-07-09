@@ -3,6 +3,7 @@ import {
   ApiConsumer,
   ConventionReadDto,
   WithConventionDto,
+  errorMessages,
   isApiConsumerAllowed,
   pipeWithValue,
   withConventionSchema,
@@ -48,7 +49,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency) {
       throw new NotFoundError(
-        `Agency with Id ${convention.agencyId} not found`,
+        errorMessages.agency.notFound({ agencyId: convention.agencyId }),
       );
     }
     const {

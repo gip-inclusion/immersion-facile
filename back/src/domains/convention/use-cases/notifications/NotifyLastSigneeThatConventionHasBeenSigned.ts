@@ -1,29 +1,24 @@
 import {
   AgencyDto,
   ConventionDto,
-  ConventionId,
   Signatory,
   SignatoryRole,
   TemplatedEmail,
   WithConventionDto,
+  errorMessages,
   frontRoutes,
   withConventionSchema,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-
-export const missingConventionMessage = (conventionId: ConventionId) =>
-  `Missing convention ${conventionId} on convention repository.`;
-
-export const missingAgencyMessage = (convention: ConventionDto) =>
-  `Agency with id '${convention.agencyId}' not found.`;
-
-export const noSignatoryMessage = (convention: ConventionDto): string =>
-  `No signatories has signed the convention id ${convention.id}.`;
 
 export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;
@@ -53,12 +48,21 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     const savedConvention = await uow.conventionRepository.getById(
       convention.id,
     );
+
     if (!savedConvention)
-      throw new Error(missingConventionMessage(convention.id));
+      throw new NotFoundError(
+        errorMessages.convention.notFound({ conventionId: convention.id }),
+      );
+
     const [agency] = await uow.agencyRepository.getByIds([
       savedConvention.agencyId,
     ]);
-    if (!agency) throw new Error(missingAgencyMessage(savedConvention));
+
+    if (!agency)
+      throw new NotFoundError(
+        errorMessages.agency.notFound({ agencyId: savedConvention.agencyId }),
+      );
+
     return this.#onRepositoryConvention(uow, savedConvention, agency);
   }
 
@@ -133,6 +137,10 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       });
       return;
     }
-    throw new Error(noSignatoryMessage(convention));
+    throw new BadRequestError(
+      errorMessages.convention.noSignatoryHasSigned({
+        conventionId: convention.id,
+      }),
+    );
   }
 }

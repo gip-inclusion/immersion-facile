@@ -10,6 +10,7 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   WithAcquisition,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
   reasonableSchedule,
@@ -88,7 +89,9 @@ describe("PgConventionRepository", () => {
 
     await expectPromiseToFailWithError(
       conventionRepository.save(convention),
-      new ConflictError(`Convention with id ${convention.id} already exists`),
+      new ConflictError(
+        errorMessages.convention.conflict({ conventionId: convention.id }),
+      ),
     );
   });
 

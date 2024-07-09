@@ -4,6 +4,7 @@ import {
   InclusionConnectedUserBuilder,
   Role,
   createApiConsumerParamsFromApiConsumer,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -211,7 +212,9 @@ describe("SaveApiConsumer", () => {
           ),
           simpleUser,
         ),
-        new ForbiddenError("Insufficient privileges for this user"),
+        new ForbiddenError(
+          errorMessages.user.forbidden({ userId: simpleUser.id }),
+        ),
       );
 
       expectToEqual(uow.apiConsumerRepository.consumers, []);

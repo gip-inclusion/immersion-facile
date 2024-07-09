@@ -7,6 +7,7 @@ import {
   RenewMagicLinkRequestDto,
   Role,
   createConventionMagicLinkPayload,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
@@ -18,7 +19,6 @@ import {
 } from "../../../config/helpers/httpErrors";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
-import { someAgenciesMissingMessage } from "../../agency/ports/AgencyRepository";
 import { WithTriggeredBy } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../../core/jwt";
@@ -233,7 +233,9 @@ describe("RenewConventionMagicLink use case", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        new NotFoundError(someAgenciesMissingMessage([storedUnknownId])),
+        new NotFoundError(
+          errorMessages.agencies.notFound({ agencyIds: [storedUnknownId] }),
+        ),
       );
     });
 

@@ -3,19 +3,18 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   createConventionMagicLinkPayload,
+  errorMessages,
   expectObjectsToMatch,
   expectPromiseToFailWith,
   expectPromiseToFailWithError,
   validSignatoryRoles,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
-import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { conventionMissingMessage } from "../entities/Convention";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 import {
   acceptStatusTransitionTests,
@@ -191,7 +190,7 @@ describe("UpdateConventionStatus", () => {
 
       await conventionRepository.save(conventionBuilder);
 
-      await expectPromiseToFailWith(
+      await expectPromiseToFailWithError(
         updateConventionStatus.execute(
           {
             status: "DRAFT",
@@ -205,7 +204,9 @@ describe("UpdateConventionStatus", () => {
             emailHash: "osef",
           },
         ),
-        agencyMissingMessage(agency.id),
+        new NotFoundError(
+          errorMessages.agency.notFound({ agencyId: agency.id }),
+        ),
       );
     });
 
@@ -578,7 +579,11 @@ describe("UpdateConventionStatus", () => {
         updateConventionStatusUseCase,
         conventionRepository,
       }),
-      new NotFoundError(conventionMissingMessage(missingConventionId)),
+      new NotFoundError(
+        errorMessages.convention.notFound({
+          conventionId: missingConventionId,
+        }),
+      ),
     );
   });
 });

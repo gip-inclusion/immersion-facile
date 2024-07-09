@@ -1,6 +1,7 @@
 import {
   InclusionConnectedUserBuilder,
   SetFeatureFlagParam,
+  errorMessages,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
 } from "shared";
@@ -55,7 +56,9 @@ describe("SetFeatureFlag use case", () => {
   it("throws Forbidden if currentUser user is not admin", async () => {
     await expectPromiseToFailWithError(
       setFeatureFlag.execute(setEnableMaintenanceParams, icUserNotAdmin),
-      new ForbiddenError("Insufficient privileges for this user"),
+      new ForbiddenError(
+        errorMessages.user.forbidden({ userId: icUserNotAdmin.id }),
+      ),
     );
   });
 

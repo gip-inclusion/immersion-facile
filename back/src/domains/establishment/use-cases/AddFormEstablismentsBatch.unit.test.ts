@@ -5,6 +5,7 @@ import {
   GroupOptions,
   InclusionConnectedUserBuilder,
   defaultValidFormEstablishment,
+  errorMessages,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -118,7 +119,9 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   it("throws Forbidden if currentUser user is not admin", async () => {
     await expectPromiseToFailWithError(
       addFormEstablishmentBatch.execute(formEstablishmentBatch, icUserNotAdmin),
-      new ForbiddenError("Insufficient privileges for this user"),
+      new ForbiddenError(
+        errorMessages.user.forbidden({ userId: icUserNotAdmin.id }),
+      ),
     );
   });
 

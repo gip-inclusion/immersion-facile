@@ -11,6 +11,7 @@ import {
   allRoles,
   allSignatoryRoles,
   conventionStatuses,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
@@ -177,7 +178,10 @@ describe("Sign convention", () => {
               },
             ),
             new BadRequestError(
-              `Cannot go from status '${initialStatus}' to 'PARTIALLY_SIGNED'`,
+              errorMessages.convention.badStatusTransition({
+                currentStatus: initialStatus,
+                targetStatus: "PARTIALLY_SIGNED",
+              }),
             ),
           );
         },

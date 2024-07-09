@@ -15,6 +15,7 @@ import {
   allRoles,
   conventionStatuses,
   createConventionMagicLinkPayload,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
@@ -591,9 +592,11 @@ export const rejectStatusTransitionTests = ({
             role,
             initialStatus: someValidInitialStatus,
             expectedError: new ForbiddenError(
-              `Roles '${[role]}' are not allowed to go to status '${
-                updateStatusParams.status
-              }' for convention '${updateStatusParams.conventionId}'.`,
+              errorMessages.convention.badRoleStatusChange({
+                roles: [role],
+                status: updateStatusParams.status,
+                conventionId: updateStatusParams.conventionId,
+              }),
             ),
           });
         },
@@ -605,7 +608,7 @@ export const rejectStatusTransitionTests = ({
         notAllowedInclusionConnectedUsersToUpdate.map((userId) => ({ userId })),
       )("Rejected from userId '$userId'", ({ userId }) => {
         const user = makeUserIdMapInclusionConnectedUser[userId];
-        const getRoles = () => {
+        const getRoles = (): Role[] => {
           if (user.email === establishmentRepEmail)
             return ["establishment-representative"];
 
@@ -623,9 +626,11 @@ export const rejectStatusTransitionTests = ({
           userId,
           initialStatus: someValidInitialStatus,
           expectedError: new ForbiddenError(
-            `Roles '${getRoles()}' are not allowed to go to status '${
-              updateStatusParams.status
-            }' for convention '${updateStatusParams.conventionId}'.`,
+            errorMessages.convention.badRoleStatusChange({
+              roles: getRoles(),
+              status: updateStatusParams.status,
+              conventionId: updateStatusParams.conventionId,
+            }),
           ),
         });
       });
@@ -642,10 +647,16 @@ export const rejectStatusTransitionTests = ({
 
         const error = agencyHasTwoStepsAndValidatorTriesToValidate
           ? new ForbiddenError(
-              `Cannot go to status '${updateStatusParams.status}' for convention '${updateStatusParams.conventionId}'. Convention should be reviewed by counsellor`,
+              errorMessages.convention.twoStepsValidationBadStatus({
+                targetStatus: updateStatusParams.status,
+                conventionId: updateStatusParams.conventionId,
+              }),
             )
           : new BadRequestError(
-              `Cannot go from status '${status}' to '${updateStatusParams.status}'`,
+              errorMessages.convention.badStatusTransition({
+                currentStatus: status,
+                targetStatus: updateStatusParams.status,
+              }),
             );
         return testRejectsStatusUpdate({
           role: someValidRole,

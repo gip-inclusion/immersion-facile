@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
   UpdateAgencyStatusParamsWithoutId,
+  errorMessages,
   expectPromiseToFailWithError,
 } from "shared";
 import {
@@ -118,7 +119,9 @@ describe("Update agency status", () => {
           { id: existingAgency.id, status: "active" },
           { ...backofficeAdmin, isBackofficeAdmin: false },
         ),
-        new ForbiddenError("Insufficient privileges for this user"),
+        new ForbiddenError(
+          errorMessages.user.forbidden({ userId: backofficeAdmin.id }),
+        ),
       );
     });
 
@@ -129,7 +132,11 @@ describe("Update agency status", () => {
           { id: agencyId, status: "active" },
           backofficeAdmin,
         ),
-        new NotFoundError(`No agency found with id ${agencyId}`),
+        new NotFoundError(
+          errorMessages.agency.notFound({
+            agencyId,
+          }),
+        ),
       );
     });
   });

@@ -14,6 +14,7 @@ import {
   GetAgenciesFilter,
   PartialAgencyDto,
   agencySchema,
+  errorMessages,
   pipeWithValue,
 } from "shared";
 import { z } from "zod";
@@ -35,10 +36,7 @@ import {
   usersAgenciesRolesIncludeCounsellor,
   usersAgenciesRolesIncludeValidator,
 } from "../../core/authentication/inclusion-connect/adapters/agencyUsers.helpers";
-import {
-  AgencyRepository,
-  someAgenciesMissingMessage,
-} from "../ports/AgencyRepository";
+import { AgencyRepository } from "../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
 
@@ -201,7 +199,9 @@ export class PgAgencyRepository implements AgencyRepository {
     );
 
     if (missingIds.length)
-      throw new NotFoundError(someAgenciesMissingMessage(missingIds));
+      throw new NotFoundError(
+        errorMessages.agencies.notFound({ agencyIds: missingIds }),
+      );
 
     return this.#addEmailsToAgencies(agenciesWithoutEmails);
   }

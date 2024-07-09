@@ -4,6 +4,7 @@ import {
   FormEstablishmentDtoBuilder,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -22,7 +23,6 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { formEstablishementUpdateFailedErrorMessage } from "../ports/FormEstablishmentRepository";
 import { EditFormEstablishment } from "./EditFormEstablishment";
 
 const backofficeAdminUser = new InclusionConnectedUserBuilder()
@@ -122,7 +122,9 @@ describe("Edit Form Establishment", () => {
           establishmentPayload,
         ),
         new ConflictError(
-          formEstablishementUpdateFailedErrorMessage(updatedFormEstablishment),
+          errorMessages.establishment.conflictError({
+            siret: establishmentPayload.siret,
+          }),
         ),
       );
     });

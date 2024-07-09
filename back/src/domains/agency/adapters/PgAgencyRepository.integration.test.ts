@@ -5,6 +5,7 @@ import {
   GeoPositionDto,
   WithAcquisition,
   activeAgencyStatuses,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -14,7 +15,6 @@ import {
 } from "../../../config/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
 import {
   PgAgencyRepository,
   safirConflictErrorMessage,
@@ -162,7 +162,9 @@ describe("PgAgencyRepository", () => {
     it("throws when no agencies are found", async () => {
       await expectPromiseToFailWithError(
         agencyRepository.getByIds([agency1.id]),
-        new NotFoundError(someAgenciesMissingMessage([agency1.id])),
+        new NotFoundError(
+          errorMessages.agencies.notFound({ agencyIds: [agency1.id] }),
+        ),
       );
     });
   });

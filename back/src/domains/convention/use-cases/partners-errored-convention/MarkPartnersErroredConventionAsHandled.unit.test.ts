@@ -3,9 +3,12 @@ import {
   ConventionDtoBuilder,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
+  errorMessages,
   expectPromiseToFailWith,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
@@ -299,14 +302,14 @@ describe("mark partners errored convention as handled", () => {
   });
 
   it("Throw when no convention was found", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
         {
           conventionId,
         },
         icJwtDomainPayload,
       ),
-      `Convention with id '${conventionId}' missing.`,
+      new NotFoundError(errorMessages.convention.notFound({ conventionId })),
     );
   });
 
@@ -315,14 +318,12 @@ describe("mark partners errored convention as handled", () => {
 
     await conventionRepository.save(convention);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
-        {
-          conventionId,
-        },
+        { conventionId },
         icJwtDomainPayload,
       ),
-      `User '${userId}' not found on inclusion connected user repository.`,
+      new NotFoundError(errorMessages.user.notFound({ userId })),
     );
   });
 
@@ -342,7 +343,10 @@ describe("mark partners errored convention as handled", () => {
         },
         icJwtDomainPayload,
       ),
-      `User '${userId}' has no role on agency '${agency.id}'.`,
+      errorMessages.user.noRightsOnAgency({
+        agencyId: agency.id,
+        userId,
+      }),
     );
   });
 });

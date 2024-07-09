@@ -1,6 +1,7 @@
 import {
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
+  errorMessages,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
@@ -46,7 +47,9 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
     const agency = await uow.agencyRepository.getById(params.agencyId);
 
     if (!agency)
-      throw new NotFoundError(`No agency found with id: ${params.agencyId}`);
+      throw new NotFoundError(
+        errorMessages.agency.notFound({ agencyId: params.agencyId }),
+      );
 
     const updatedAgencyRights = icUser.agencyRights.filter(
       (agencyRight) => agencyRight.agency.id !== params.agencyId,

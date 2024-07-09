@@ -9,6 +9,7 @@ import {
   FindSimilarConventionsParams,
   SiretDto,
   WithConventionIdLegacy,
+  errorMessages,
   validatedConventionStatuses,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
@@ -159,7 +160,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
     if (!agency)
       throw new NotFoundError(
-        `Agency with id '${convention.agencyId}' not found.`,
+        errorMessages.agency.notFound({ agencyId: convention.agencyId }),
       );
 
     const referedAgency =

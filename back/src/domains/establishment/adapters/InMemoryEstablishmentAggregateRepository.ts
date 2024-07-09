@@ -8,6 +8,7 @@ import {
   SearchResultDto,
   SiretDto,
   conflictErrorSiret,
+  errorMessages,
   pathEq,
   replaceArrayElement,
 } from "shared";
@@ -23,7 +24,6 @@ import {
   SearchImmersionParams,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
-  establishmentNotFoundErrorMessage,
 } from "../ports/EstablishmentAggregateRepository";
 
 export const TEST_ROME_LABEL = "test_rome_label";
@@ -38,7 +38,7 @@ export class InMemoryEstablishmentAggregateRepository
       (formEstablishment) => formEstablishment.establishment.siret === siret,
     );
     if (formEstablishmentIndex === -1)
-      throw new NotFoundError(establishmentNotFoundErrorMessage(siret));
+      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
     this.#establishmentAggregates.splice(formEstablishmentIndex, 1);
   }
 

@@ -3,6 +3,7 @@ import {
   GroupOptions,
   InclusionConnectedUserBuilder,
   addressDtoToString,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -25,8 +26,6 @@ import {
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { ContactEntity } from "../entities/ContactEntity";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
-import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
-import { formEstablishmentNotFoundErrorMessage } from "../ports/FormEstablishmentRepository";
 import { DeleteEstablishment } from "./DeleteEstablishment";
 
 const backofficeAdminUser = new InclusionConnectedUserBuilder()
@@ -102,9 +101,9 @@ describe("Delete Establishment", () => {
           backofficeAdminUser,
         ),
         new NotFoundError(
-          establishmentNotFoundErrorMessage(
-            establishmentAggregate.establishment.siret,
-          ),
+          errorMessages.establishment.notFound({
+            siret: establishmentAggregate.establishment.siret,
+          }),
         ),
       );
     });
@@ -121,7 +120,9 @@ describe("Delete Establishment", () => {
           backofficeAdminUser,
         ),
         new NotFoundError(
-          formEstablishmentNotFoundErrorMessage(formEstablishment.siret),
+          errorMessages.establishment.notFound({
+            siret: formEstablishment.siret,
+          }),
         ),
       );
     });

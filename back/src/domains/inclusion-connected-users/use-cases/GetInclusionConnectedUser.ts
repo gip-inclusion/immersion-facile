@@ -8,6 +8,7 @@ import {
   WithDashboards,
   WithEstablismentsSiretAndName,
   agencyRoleIsNotToReview,
+  errorMessages,
 } from "shared";
 import { z } from "zod";
 import {
@@ -47,7 +48,8 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload?: InclusionConnectJwtPayload,
   ): Promise<InclusionConnectedUser> {
-    if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
+    if (!jwtPayload)
+      throw new ForbiddenError(errorMessages.user.noJwtProvided());
     const { userId } = jwtPayload;
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)

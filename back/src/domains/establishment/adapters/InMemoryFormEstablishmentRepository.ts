@@ -1,13 +1,9 @@
-import { FormEstablishmentDto, SiretDto, propEq } from "shared";
+import { FormEstablishmentDto, SiretDto, errorMessages, propEq } from "shared";
 import {
   ConflictError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import {
-  FormEstablishmentRepository,
-  formEstablishementUpdateFailedErrorMessage,
-  formEstablishmentNotFoundErrorMessage,
-} from "../ports/FormEstablishmentRepository";
+import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 
 export class InMemoryFormEstablishmentRepository
   implements FormEstablishmentRepository
@@ -28,7 +24,7 @@ export class InMemoryFormEstablishmentRepository
       (formEstablishment) => formEstablishment.siret === siret,
     );
     if (formEstablishmentIndex === -1)
-      throw new NotFoundError(formEstablishmentNotFoundErrorMessage(siret));
+      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
     this.#formEstablishments.splice(formEstablishmentIndex, 1);
   }
 
@@ -58,6 +54,8 @@ export class InMemoryFormEstablishmentRepository
     });
 
     if (!updated)
-      throw new ConflictError(formEstablishementUpdateFailedErrorMessage(dto));
+      throw new ConflictError(
+        errorMessages.establishment.conflictError({ siret: dto.siret }),
+      );
   }
 }

@@ -3,6 +3,7 @@ import {
   ConventionStatus,
   WithConventionIdLegacy,
   addConventionInputSchema,
+  errorMessages,
 } from "shared";
 import { ForbiddenError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -42,7 +43,9 @@ export class AddConvention extends TransactionalUseCase<
       convention.status !== "DRAFT" &&
       convention.status !== minimalValidStatus
     ) {
-      throw new ForbiddenError();
+      throw new ForbiddenError(
+        errorMessages.convention.forbiddenStatus({ status: convention.status }),
+      );
     }
 
     await rejectsSiretIfNotAnOpenCompany(this.#siretGateway, convention.siret);

@@ -9,6 +9,7 @@ import {
   Role,
   TemplatedEmail,
   conventionStatuses,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
@@ -42,10 +43,6 @@ import {
   forbiddenUnsupportedStatusMessage,
   toSignatoriesSummary,
 } from "./NotifyConventionReminder";
-import {
-  missingAgencyMessage,
-  missingConventionMessage,
-} from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
 describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   const establishmentRepresentativeWithoutMobilePhone: EstablishmentRepresentative =
@@ -100,7 +97,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           conventionId: convention.id,
           reminderKind: "FirstReminderForAgency",
         }),
-        new NotFoundError(missingConventionMessage(convention.id)),
+        new NotFoundError(
+          errorMessages.convention.notFound({ conventionId: convention.id }),
+        ),
       );
 
       //Assert
@@ -120,7 +119,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           conventionId: convention.id,
           reminderKind: "FirstReminderForAgency",
         }),
-        new NotFoundError(missingAgencyMessage(convention)),
+        new NotFoundError(
+          errorMessages.agency.notFound({ agencyId: convention.agencyId }),
+        ),
       );
 
       //Assert

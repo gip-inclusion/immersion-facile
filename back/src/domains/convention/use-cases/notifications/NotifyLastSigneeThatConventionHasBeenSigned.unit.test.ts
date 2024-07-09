@@ -2,9 +2,11 @@ import {
   AgencyDto,
   ConventionDto,
   ConventionDtoBuilder,
+  errorMessages,
   expectPromiseToFailWithError,
   frontRoutes,
 } from "shared";
+import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -18,11 +20,7 @@ import {
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import {
-  NotifyLastSigneeThatConventionHasBeenSigned,
-  missingConventionMessage,
-  noSignatoryMessage,
-} from "./NotifyLastSigneeThatConventionHasBeenSigned";
+import { NotifyLastSigneeThatConventionHasBeenSigned } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
 describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let conventionSignedByNoOne: ConventionDto;
@@ -145,7 +143,11 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
 
     await expectPromiseToFailWithError(
       notifyLastSignee.execute({ convention: conventionSignedByNoOne }),
-      new Error(noSignatoryMessage(conventionSignedByNoOne)),
+      new Error(
+        errorMessages.convention.noSignatoryHasSigned({
+          conventionId: conventionSignedByNoOne.id,
+        }),
+      ),
     );
 
     expectSavedNotificationsAndEvents({ emails: [] });
@@ -156,7 +158,11 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
 
     await expectPromiseToFailWithError(
       notifyLastSignee.execute({ convention: conventionSignedByNoOne }),
-      new Error(missingConventionMessage(conventionSignedByNoOne.id)),
+      new NotFoundError(
+        errorMessages.convention.notFound({
+          conventionId: conventionSignedByNoOne.id,
+        }),
+      ),
     );
 
     expectSavedNotificationsAndEvents({ emails: [] });

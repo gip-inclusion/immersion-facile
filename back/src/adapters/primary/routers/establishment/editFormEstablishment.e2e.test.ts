@@ -7,6 +7,7 @@ import {
   InclusionConnectedUserBuilder,
   createEstablishmentJwtPayload,
   currentJwtVersions,
+  errorMessages,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -238,10 +239,11 @@ describe("Edit form establishments", () => {
   });
 
   it("409 - Missing establishment form", async () => {
+    const establishment = FormEstablishmentDtoBuilder.valid()
+      .withSiret(TEST_OPEN_ESTABLISHMENT_2.siret)
+      .build();
     const response = await httpClient.updateFormEstablishment({
-      body: FormEstablishmentDtoBuilder.valid()
-        .withSiret(TEST_OPEN_ESTABLISHMENT_2.siret)
-        .build(),
+      body: establishment,
       headers: {
         authorization: generateEditEstablishmentJwt(
           createEstablishmentJwtPayload({
@@ -255,8 +257,9 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors:
-          "Cannot update form establishment DTO with siret 77561959600155, since it is not found.",
+        errors: errorMessages.establishment.conflictError({
+          siret: establishment.siret,
+        }),
       },
       status: 409,
     });

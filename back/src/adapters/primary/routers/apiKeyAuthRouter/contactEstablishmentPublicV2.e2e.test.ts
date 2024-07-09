@@ -1,4 +1,4 @@
-import { expectObjectsToMatch, expectToEqual } from "shared";
+import { errorMessages, expectObjectsToMatch, expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
@@ -87,7 +87,9 @@ describe("POST contact-establishment public V2 route", () => {
 
     expectToEqual(body, {
       status: 404,
-      message: `No establishment found with siret: ${contactEstablishment.siret}`,
+      message: errorMessages.establishment.notFound({
+        siret: contactEstablishment.siret,
+      }),
     });
     expectToEqual(status, 404);
   });
