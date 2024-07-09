@@ -33,15 +33,13 @@ import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
+
 import { v4 as uuidV4 } from "uuid";
 
 export const ApiConsumersSection = () => {
-  const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
-
   const isApiConsumerModalOpened = useIsModalOpen(apiConsumerModal);
-
+  const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
   const dispatch = useDispatch();
-
   const adminToken = useAdminToken();
   useEffect(() => {
     adminToken &&
