@@ -3,14 +3,16 @@ import { calculateDurationInSecondsFrom } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { OpacifiedLogger, createLogger } from "../utils/logger";
 
-export const handleEndOfScriptNotification = async <T>(
+export const handleEndOfScriptNotification = async <
+  T extends Record<string, unknown> | void,
+>(
   name: string,
   config: AppConfig,
   script: () => Promise<T>,
   handleResults: (results: T) => string,
   logger: OpacifiedLogger = createLogger(__filename),
 ) => {
-  const context = `${config.envType} - ${config.immersionFacileBaseUrl}\nScript [${name}]`;
+  const context = `${config.envType} - ${config.immersionFacileBaseUrl}`;
   const start = new Date();
   return script()
     .then((results) => {
@@ -23,6 +25,7 @@ export const handleEndOfScriptNotification = async <T>(
 
       const report = [
         reportTitle,
+        `Script [${name}]`,
         `Script duration : ${durationInSeconds} seconds`,
         "-> Report content :",
         reportContent,
