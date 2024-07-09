@@ -19,6 +19,20 @@ describe("Geosearch epic", () => {
     ({ store, dependencies } = createTestStore());
   });
 
+  it("should reset the value when the query has been emptied", () => {
+    store.dispatch(
+      geosearchSlice.actions.suggestionHasBeenSelected({
+        label: "Paris",
+        position: {
+          lat: 48.8566,
+          lon: 2.3522,
+        },
+      }),
+    );
+    store.dispatch(geosearchSlice.actions.queryWasEmptied());
+    expect(store.getState().geosearch.value).toBeNull();
+  });
+
   it("should update the searched query and reset the state", () => {
     const query = "foi";
     store.dispatch(geosearchSlice.actions.queryHasChanged(query));

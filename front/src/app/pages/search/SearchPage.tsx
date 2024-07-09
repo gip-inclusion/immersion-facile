@@ -53,9 +53,6 @@ export const SearchPage = ({
   const [searchMade, setSearchMade] = useState<SearchPageParams | null>(null);
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const innerSearchResultWrapper = useRef<HTMLDivElement>(null);
-  const [searchResultsHeight, setSearchResultsHeight] = useState<
-    number | undefined
-  >(innerSearchResultWrapper.current?.offsetHeight);
   const acquisitionParams = useGetAcquisitionParams();
   const initialValues: SearchPageParams = {
     place: "",
@@ -109,7 +106,6 @@ export const SearchPage = ({
   };
 
   const triggerSearch = (values: SearchPageParams) => {
-    setSearchResultsHeight(innerSearchResultWrapper.current?.offsetHeight);
     setSearchMade(values);
     requestSearch(filterFormValues(values));
   };
@@ -235,7 +231,7 @@ export const SearchPage = ({
             </div>
           </form>
         </PageHeader>
-        <div ref={searchResultsWrapper} style={{ height: searchResultsHeight }}>
+        <div ref={searchResultsWrapper}>
           {searchStatus === "ok" && searchMade !== null && (
             <div
               ref={innerSearchResultWrapper}
@@ -285,9 +281,10 @@ export const SearchPage = ({
                     className={cx(
                       fr.cx(
                         "fr-col-12",
-                        "fr-col-md-9",
+                        "fr-col-md-5",
                         "fr-grid-row",
                         "fr-grid-row--right",
+                        "fr-ml-auto",
                       ),
                       Styles.resultsSummary,
                     )}
@@ -320,7 +317,7 @@ export const SearchPage = ({
                   </div>
                 </div>
               </div>
-              <SearchListResults />
+              <SearchListResults showDistance={areValidGeoParams(searchMade)} />
             </div>
           )}
           {searchStatus === "extraFetch" ||
