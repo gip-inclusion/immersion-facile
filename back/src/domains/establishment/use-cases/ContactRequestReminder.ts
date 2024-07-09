@@ -22,8 +22,8 @@ const MAX_DISCUSSIONS = 5000;
 
 export const makeContactRequestReminder = createTransactionalUseCase<
   ContactRequestReminderMode,
-  number,
-  undefined,
+  { numberOfNotifications: number },
+  void,
   {
     domain: string;
     timeGateway: TimeGateway;
@@ -59,8 +59,7 @@ export const makeContactRequestReminder = createTransactionalUseCase<
         deps.saveNotificationAndRelatedEvent(uow, notification),
       ),
     );
-
-    return notifications.length;
+    return { numberOfNotifications: notifications.length };
   },
 );
 

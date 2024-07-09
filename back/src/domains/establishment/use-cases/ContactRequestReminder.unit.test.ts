@@ -106,8 +106,8 @@ describe("ContactRequestReminder", () => {
         "7days",
         undefined,
       );
-      expectToEqual(reminderQty3d, 0);
-      expectToEqual(reminderQty7d, 0);
+      expectToEqual(reminderQty3d, { numberOfNotifications: 0 });
+      expectToEqual(reminderQty7d, { numberOfNotifications: 0 });
       expectToEqual(uow.outboxRepository.events, []);
     });
   });
@@ -127,7 +127,7 @@ describe("ContactRequestReminder", () => {
         undefined,
       );
 
-      expectToEqual(reminderQty, 2);
+      expectToEqual(reminderQty, { numberOfNotifications: 2 });
       expectSavedNotificationsAndEvents({
         emails: [
           makeEstablishmentContactRequestReminder(
@@ -159,7 +159,7 @@ describe("ContactRequestReminder", () => {
         undefined,
       );
 
-      expectToEqual(reminderQty, 2);
+      expectToEqual(reminderQty, { numberOfNotifications: 2 });
       expectSavedNotificationsAndEvents({
         emails: [
           makeEstablishmentContactRequestReminder(
