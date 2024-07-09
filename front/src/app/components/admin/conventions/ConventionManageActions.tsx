@@ -31,6 +31,10 @@ import {
   statusTransitionConfigs,
   toDotNotation,
 } from "shared";
+import {
+  BroadcastAgainButton,
+  shouldShowBroadcast,
+} from "src/app/components/admin/conventions/BroadcastModal";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import {
   RemindSignatoriesButton,
@@ -259,6 +263,10 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
+        {shouldShowBroadcast({ userRoles: roles, convention }) && (
+          <BroadcastAgainButton convention={convention} />
+        )}
+
         {isAllowedTransition(convention, "CANCELLED", roles) && (
           <>
             <VerificationActionButton
@@ -446,6 +454,11 @@ export const RenewConventionForm = ({
     </FormProvider>
   );
 };
+
+// const showBroadcastButton = (convention: ConventionReadDto, roles: Role[]) => {
+//   const allowedRoles: Role[] = ["backOffice"];
+//   return roles.some((role) => allowedRoles.includes(role));
+// };
 
 const isAllowedTransition = (
   convention: ConventionReadDto,
