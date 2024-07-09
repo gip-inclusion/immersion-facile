@@ -16,6 +16,7 @@ import {
   createConventionMagicLinkPayload,
   currentJwtVersions,
   displayRouteName,
+  errorMessages,
   expectArraysToEqual,
   expectEmailOfType,
   expectHttpResponseToEqual,
@@ -30,7 +31,6 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { conventionMissingMessage } from "../../../../domains/convention/entities/Convention";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
   GenerateConventionJwt,
@@ -164,7 +164,9 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: `Convention with id ${convention.id} already exists`,
+          errors: errorMessages.convention.conflict({
+            conventionId: convention.id,
+          }),
         },
         status: 409,
       });
@@ -460,7 +462,9 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: `Convention with id ${unknownId} was not found`,
+          errors: errorMessages.convention.notFound({
+            conventionId: unknownId,
+          }),
         },
         status: 404,
       });
@@ -662,8 +666,11 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors:
-            "Roles 'establishment-representative' are not allowed to go to status 'ACCEPTED_BY_VALIDATOR' for convention 'a99eaca1-ee70-4c90-b3f4-668d492f7392'.",
+          errors: errorMessages.convention.badRoleStatusChange({
+            roles: ["establishment-representative"],
+            status: "ACCEPTED_BY_VALIDATOR",
+            conventionId: convention.id,
+          }),
         },
         status: 403,
       });
@@ -691,12 +698,14 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: conventionMissingMessage(unknownId),
+          errors: errorMessages.convention.notFound({
+            conventionId: unknownId,
+          }),
         },
         status: 404,
       });
     });
-  });
+  }); // tuka bonjour
 
   describe(`${displayRouteName(
     conventionMagicLinkRoutes.renewConvention,

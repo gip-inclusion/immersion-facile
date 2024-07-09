@@ -5,6 +5,7 @@ import {
   InclusionConnectDomainJwtPayload,
   UpdateConventionRequestDto,
   WithConventionIdLegacy,
+  errorMessages,
   updateConventionRequestSchema,
 } from "shared";
 import {
@@ -54,7 +55,7 @@ export class UpdateConvention extends TransactionalUseCase<
 
     if (!conventionFromRepo)
       throw new NotFoundError(
-        `Convention with id ${convention.id} was not found`,
+        errorMessages.convention.notFound({ conventionId: convention.id }),
       );
 
     if (conventionFromRepo.status !== "DRAFT") {

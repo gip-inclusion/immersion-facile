@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
+  errorMessages,
   expectPromiseToFailWithError,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -22,8 +23,6 @@ import {
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { conventionMissingMessage } from "../../entities/Convention";
-import { missingAgencyMessage } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 import {
   NO_JUSTIFICATION,
   NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification,
@@ -303,7 +302,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await expectPromiseToFailWithError(
         useCase.execute({ convention }),
-        new Error(conventionMissingMessage(convention.id)),
+        new Error(
+          errorMessages.convention.notFound({ conventionId: convention.id }),
+        ),
       );
 
       await expectSavedNotificationsAndEvents({});
@@ -318,7 +319,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await expectPromiseToFailWithError(
         useCase.execute({ convention }),
-        new Error(missingAgencyMessage(convention)),
+        new Error(
+          errorMessages.agency.notFound({ agencyId: convention.agencyId }),
+        ),
       );
 
       await expectSavedNotificationsAndEvents({});

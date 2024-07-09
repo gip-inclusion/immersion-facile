@@ -1,4 +1,4 @@
-import { ConventionId } from "shared";
+import { ConventionId, errorMessages } from "shared";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
@@ -122,7 +122,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
       await uow.conventionRepository.getById(conventionToSyncId);
     if (!convention)
       throw new NotFoundError(
-        `Convention with id ${conventionToSyncId} missing in conventionRepository.`,
+        errorMessages.convention.notFound({ conventionId: conventionToSyncId }),
       );
     return this.#broadcastToPeUsecase.execute({ convention });
   }

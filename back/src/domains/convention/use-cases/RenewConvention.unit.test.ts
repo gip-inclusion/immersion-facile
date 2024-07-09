@@ -11,6 +11,7 @@ import {
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -211,7 +212,9 @@ describe("RenewConvention", () => {
           }),
         ),
         new NotFoundError(
-          `Convention with id '${notSavedConvention.id}' not found`,
+          errorMessages.convention.notFound({
+            conventionId: notSavedConvention.id,
+          }),
         ),
       );
     });

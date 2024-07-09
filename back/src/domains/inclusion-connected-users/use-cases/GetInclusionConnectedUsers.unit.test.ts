@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUser,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -98,7 +99,9 @@ describe("GetInclusionConnectedUsers", () => {
         { agencyRole: "toReview" },
         notBackofficeAdminUser,
       ),
-      new ForbiddenError("Insufficient privileges for this user"),
+      new ForbiddenError(
+        errorMessages.user.forbidden({ userId: notBackofficeAdminUser.id }),
+      ),
     );
   });
 

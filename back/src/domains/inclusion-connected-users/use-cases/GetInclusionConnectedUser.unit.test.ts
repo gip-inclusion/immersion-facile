@@ -7,6 +7,7 @@ import {
   InclusionConnectedUserBuilder,
   User,
   allAgencyRoles,
+  errorMessages,
   expectPromiseToFailWith,
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
@@ -67,7 +68,7 @@ describe("GetUserAgencyDashboardUrl", () => {
   it("throws Forbidden if no jwt token provided", async () => {
     await expectPromiseToFailWith(
       getInclusionConnectedUser.execute(),
-      "No JWT token provided",
+      errorMessages.user.noJwtProvided(),
     );
   });
 

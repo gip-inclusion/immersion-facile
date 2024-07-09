@@ -2,6 +2,7 @@ import {
   AgencyRight,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
+  errorMessages,
   icUserRoleForAgencyParamsSchema,
   replaceElementWhere,
 } from "shared";
@@ -49,7 +50,10 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
 
     if (!agencyRightToUpdate)
       throw new NotFoundError(
-        `Agency with id ${params.agencyId} is not registered for user with id ${params.userId}`,
+        errorMessages.user.noRightsOnAgency({
+          agencyId: params.agencyId,
+          userId: params.userId,
+        }),
       );
 
     const updatedAgencyRight: AgencyRight = {

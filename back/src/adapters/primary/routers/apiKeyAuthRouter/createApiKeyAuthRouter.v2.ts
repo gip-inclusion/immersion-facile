@@ -7,6 +7,7 @@ import {
   SearchSortedBy,
   SiretDto,
   WithAcquisition,
+  errorMessages,
   eventToRightName,
   isApiConsumerAllowed,
   pipeWithValue,
@@ -255,7 +256,7 @@ const getFirstLocationIdOrThrow = async (
       );
 
     if (!aggregate)
-      throw new NotFoundError(`No establishment found with siret: ${siret}`);
+      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
 
     if (aggregate.establishment.locations[0]?.id) {
       return aggregate.establishment.locations[0].id;

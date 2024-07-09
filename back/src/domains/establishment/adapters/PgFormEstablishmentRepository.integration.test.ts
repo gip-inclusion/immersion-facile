@@ -3,6 +3,7 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   WithAcquisition,
+  errorMessages,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -13,10 +14,6 @@ import {
 } from "../../../config/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import {
-  formEstablishementUpdateFailedErrorMessage,
-  formEstablishmentNotFoundErrorMessage,
-} from "../ports/FormEstablishmentRepository";
 import { PgFormEstablishmentRepository } from "./PgFormEstablishmentRepository";
 
 describe("PgFormEstablishmentRepository", () => {
@@ -161,7 +158,9 @@ describe("PgFormEstablishmentRepository", () => {
       await expectPromiseToFailWithError(
         formEstablishmentRepository.update(formEstablishment),
         new ConflictError(
-          formEstablishementUpdateFailedErrorMessage(formEstablishment),
+          errorMessages.establishment.conflictError({
+            siret: formEstablishment.siret,
+          }),
         ),
       );
     });
@@ -180,7 +179,9 @@ describe("PgFormEstablishmentRepository", () => {
       await expectPromiseToFailWithError(
         formEstablishmentRepository.delete(formEstablishment.siret),
         new NotFoundError(
-          formEstablishmentNotFoundErrorMessage(formEstablishment.siret),
+          errorMessages.establishment.notFound({
+            siret: formEstablishment.siret,
+          }),
         ),
       );
     });

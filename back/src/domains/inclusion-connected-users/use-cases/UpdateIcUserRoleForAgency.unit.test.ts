@@ -4,6 +4,7 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
+  errorMessages,
   expectPromiseToFailWith,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -29,7 +30,7 @@ const backofficeAdminUser = new InclusionConnectedUserBuilder()
   .withIsAdmin(true)
   .build();
 
-const user = new InclusionConnectedUserBuilder()
+const notAdminUser = new InclusionConnectedUserBuilder()
   .withId("not-admin-id")
   .withIsAdmin(false)
   .build();
@@ -59,7 +60,7 @@ describe("GetInclusionConnectedUsers", () => {
 
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
-      user,
+      notAdminUser,
     ]);
     updateIcUserRoleForAgency = new UpdateIcUserRoleForAgency(
       uowPerformer,
@@ -72,7 +73,7 @@ describe("GetInclusionConnectedUsers", () => {
       updateIcUserRoleForAgency.execute({
         roles: ["counsellor"],
         agencyId: "agency-1",
-        userId: user.id,
+        userId: notAdminUser.id,
       }),
       new UnauthorizedError(),
     );
@@ -82,9 +83,11 @@ describe("GetInclusionConnectedUsers", () => {
     await expectPromiseToFailWithError(
       updateIcUserRoleForAgency.execute(
         { roles: ["counsellor"], agencyId: "agency-1", userId: "john-123" },
-        user,
+        notAdminUser,
       ),
-      new ForbiddenError("Insufficient privileges for this user"),
+      new ForbiddenError(
+        errorMessages.user.forbidden({ userId: notAdminUser.id }),
+      ),
     );
   });
 
@@ -92,7 +95,7 @@ describe("GetInclusionConnectedUsers", () => {
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
       {
-        ...user,
+        ...notAdminUser,
         agencyRights: [],
         dashboards: {
           agencies: {},
@@ -101,23 +104,27 @@ describe("GetInclusionConnectedUsers", () => {
       },
     ]);
 
+    const agencyId = "agency-1";
     await expectPromiseToFailWith(
       updateIcUserRoleForAgency.execute(
         {
           roles: ["counsellor"],
-          agencyId: "agency-1",
-          userId: user.id,
+          agencyId,
+          userId: notAdminUser.id,
         },
         backofficeAdminUser,
       ),
-      `Agency with id agency-1 is not registered for user with id ${user.id}`,
+      errorMessages.user.noRightsOnAgency({
+        agencyId,
+        userId: notAdminUser.id,
+      }),
     );
   });
 
   it("changes the role of a user for a given agency", async () => {
     const agency = new AgencyDtoBuilder().build();
     const icUser: InclusionConnectedUser = {
-      ...user,
+      ...notAdminUser,
       agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
       dashboards: {
         agencies: {},
@@ -135,25 +142,28 @@ describe("GetInclusionConnectedUsers", () => {
       {
         roles: [newRole],
         agencyId: agency.id,
-        userId: user.id,
+        userId: notAdminUser.id,
       },
       backofficeAdminUser,
     );
 
-    expectToEqual(await inclusionConnectedUserRepository.getById(user.id), {
-      ...user,
-      agencyRights: [{ agency, roles: [newRole], isNotifiedByEmail: false }],
-      dashboards: {
-        agencies: {},
-        establishments: {},
+    expectToEqual(
+      await inclusionConnectedUserRepository.getById(notAdminUser.id),
+      {
+        ...notAdminUser,
+        agencyRights: [{ agency, roles: [newRole], isNotifiedByEmail: false }],
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       },
-    });
+    );
   });
 
   it("should save IcUserAgencyRightChanged event when successful", async () => {
     const agency = new AgencyDtoBuilder().build();
     const icUser: InclusionConnectedUser = {
-      ...user,
+      ...notAdminUser,
       agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
       dashboards: {
         agencies: {},
@@ -167,7 +177,7 @@ describe("GetInclusionConnectedUsers", () => {
     ]);
     const newRole: AgencyRole = "validator";
     const icUserRoleForAgency: IcUserRoleForAgencyParams = {
-      userId: user.id,
+      userId: notAdminUser.id,
       agencyId: agency.id,
       roles: [newRole],
     };
@@ -196,7 +206,7 @@ describe("GetInclusionConnectedUsers", () => {
   it("can change to more than one role", async () => {
     const agency = new AgencyDtoBuilder().build();
     const icUser: InclusionConnectedUser = {
-      ...user,
+      ...notAdminUser,
       agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
       dashboards: {
         agencies: {},
@@ -212,7 +222,7 @@ describe("GetInclusionConnectedUsers", () => {
     const icUserRoleForAgency: IcUserRoleForAgencyParams = {
       roles: ["counsellor", "validator", "agencyOwner"],
       agencyId: agency.id,
-      userId: user.id,
+      userId: notAdminUser.id,
     };
 
     await updateIcUserRoleForAgency.execute(
@@ -220,16 +230,23 @@ describe("GetInclusionConnectedUsers", () => {
       backofficeAdminUser,
     );
 
-    expectToEqual(await inclusionConnectedUserRepository.getById(user.id), {
-      ...user,
-      agencyRights: [
-        { agency, roles: icUserRoleForAgency.roles, isNotifiedByEmail: false },
-      ],
-      dashboards: {
-        agencies: {},
-        establishments: {},
+    expectToEqual(
+      await inclusionConnectedUserRepository.getById(notAdminUser.id),
+      {
+        ...notAdminUser,
+        agencyRights: [
+          {
+            agency,
+            roles: icUserRoleForAgency.roles,
+            isNotifiedByEmail: false,
+          },
+        ],
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
       },
-    });
+    );
 
     expect(outboxRepo.events).toHaveLength(1);
 

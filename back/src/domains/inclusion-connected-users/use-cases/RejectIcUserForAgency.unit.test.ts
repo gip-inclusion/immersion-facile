@@ -3,11 +3,16 @@ import {
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   User,
+  errorMessages,
   expectPromiseToFailWith,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { UnauthorizedError } from "../../../config/helpers/httpErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} from "../../../config/helpers/httpErrors";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -88,7 +93,7 @@ describe("reject IcUser for agency", () => {
       currentUser,
     ]);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       rejectIcUserForAgencyUsecase.execute(
         {
           userId: "osef",
@@ -97,7 +102,9 @@ describe("reject IcUser for agency", () => {
         },
         currentUser,
       ),
-      "Insufficient privileges for this user",
+      new ForbiddenError(
+        errorMessages.user.forbidden({ userId: currentUser.id }),
+      ),
     );
   });
 
@@ -147,7 +154,7 @@ describe("reject IcUser for agency", () => {
       icUser,
     ]);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       rejectIcUserForAgencyUsecase.execute(
         {
           userId: icUser.id,
@@ -156,7 +163,9 @@ describe("reject IcUser for agency", () => {
         },
         backofficeAdminUser,
       ),
-      `No agency found with id: ${agency1.id}`,
+      new NotFoundError(
+        errorMessages.agency.notFound({ agencyId: agency1.id }),
+      ),
     );
   });
 

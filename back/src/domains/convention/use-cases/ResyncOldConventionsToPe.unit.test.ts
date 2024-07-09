@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
+  errorMessages,
   expectToEqual,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
@@ -332,7 +333,9 @@ describe("ResyncOldConventionsToPe use case", () => {
           id: conventionToSync1.id,
           status: "ERROR",
           processDate: timeGateway.now(),
-          reason: `Convention with id ${conventionToSync1.id} missing in conventionRepository.`,
+          reason: errorMessages.convention.notFound({
+            conventionId: conventionToSync1.id,
+          }),
         },
       ]);
       expectToEqual(peGateway.notifications, []);
@@ -341,7 +344,9 @@ describe("ResyncOldConventionsToPe use case", () => {
         skips: {},
         errors: {
           [conventionToSync1.id]: new NotFoundError(
-            `Convention with id ${conventionToSync1.id} missing in conventionRepository.`,
+            errorMessages.convention.notFound({
+              conventionId: conventionToSync1.id,
+            }),
           ),
         },
       });
@@ -365,7 +370,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           id: conventionToSync1.id,
           status: "ERROR",
           processDate: timeGateway.now(),
-          reason: `Agency with id ${agencyPE.id} missing in agencyRepository`,
+          reason: errorMessages.agency.notFound({ agencyId: agencyPE.id }),
         },
       ]);
       expectToEqual(peGateway.notifications, []);
@@ -374,7 +379,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         skips: {},
         errors: {
           [conventionToSync1.id]: new NotFoundError(
-            `Agency with id ${agencyPE.id} missing in agencyRepository`,
+            errorMessages.agency.notFound({ agencyId: agencyPE.id }),
           ),
         },
       });

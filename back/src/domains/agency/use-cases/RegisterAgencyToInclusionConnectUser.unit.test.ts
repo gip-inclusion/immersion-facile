@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   User,
+  errorMessages,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -19,7 +20,6 @@ import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryU
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
-import { someAgenciesMissingMessage } from "../ports/AgencyRepository";
 import { RegisterAgencyToInclusionConnectUser } from "./RegisterAgencyToInclusionConnectUser";
 
 const userId = "456";
@@ -64,14 +64,14 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
   it("fails if no Jwt Token provided", async () => {
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agencyId1]),
-      new ForbiddenError("No JWT token provided"),
+      new ForbiddenError(errorMessages.user.noJwtProvided()),
     );
   });
 
   it("fails if user does not exist", async () => {
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agencyId1], { userId }),
-      new NotFoundError(`User not found with id: ${userId}`),
+      new NotFoundError(errorMessages.user.notFound({ userId })),
     );
   });
 
@@ -79,7 +79,9 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     userRepository.users = [user];
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agencyId1], { userId }),
-      new NotFoundError(someAgenciesMissingMessage([agencyId1])),
+      new NotFoundError(
+        errorMessages.agencies.notFound({ agencyIds: [agencyId1] }),
+      ),
     );
   });
 
@@ -97,7 +99,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agency1.id], { userId }),
       new BadRequestError(
-        `This user (userId: ${userId}), already has agencies rights.`,
+        errorMessages.user.alreadyHaveAgencyRights({ userId }),
       ),
     );
   });

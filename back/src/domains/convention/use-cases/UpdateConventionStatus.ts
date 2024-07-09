@@ -11,6 +11,7 @@ import {
   UserId,
   WithConventionIdLegacy,
   backOfficeEmail,
+  errorMessages,
   getRequesterRole,
   reviewedConventionStatuses,
   stringToMd5,
@@ -21,7 +22,6 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import {
@@ -33,10 +33,7 @@ import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import {
-  conventionMissingMessage,
-  throwIfTransitionNotAllowed,
-} from "../entities/Convention";
+import { throwIfTransitionNotAllowed } from "../entities/Convention";
 
 const domainTopicByTargetStatusMap: Record<
   ConventionStatus,
@@ -79,12 +76,18 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       params.conventionId,
     );
     if (!conventionRead)
-      throw new NotFoundError(conventionMissingMessage(params.conventionId));
+      throw new NotFoundError(
+        errorMessages.convention.notFound({
+          conventionId: params.conventionId,
+        }),
+      );
 
     const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
 
     if (!agency)
-      throw new NotFoundError(agencyMissingMessage(conventionRead.agencyId));
+      throw new NotFoundError(
+        errorMessages.agency.notFound({ agencyId: conventionRead.agencyId }),
+      );
 
     const { user, roleInPayload } = await this.#getRoleInPayloadOrUser(
       uow,
@@ -149,7 +152,12 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     const updatedConvention: ConventionDto = conventionBuilder.build();
 
     const updatedId = await uow.conventionRepository.update(updatedConvention);
-    if (!updatedId) throw new NotFoundError(updatedId);
+    if (!updatedId)
+      throw new NotFoundError(
+        errorMessages.convention.notFound({
+          conventionId: updatedConvention.id,
+        }),
+      );
 
     const domainTopic = domainTopicByTargetStatusMap[params.status];
     if (domainTopic) {
@@ -214,7 +222,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     );
     if (!user)
       throw new NotFoundError(
-        `User '${payload.userId}' not found in inclusion connected user repository.`,
+        errorMessages.user.notFound({
+          userId: payload.userId,
+        }),
       );
 
     return {
@@ -239,7 +249,10 @@ export class UpdateConventionStatus extends TransactionalUseCase<
 
     if (!userAgencyRight && roles.length === 0) {
       throw new ForbiddenError(
-        `User '${user.id}' has no role on agency '${convention.agencyId}'.`,
+        errorMessages.user.noRightsOnAgency({
+          agencyId: convention.agencyId,
+          userId: user.id,
+        }),
       );
     }
 
@@ -254,16 +267,13 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     agencyId: AgencyId,
   ): Promise<string> {
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
-    if (!user)
-      throw new NotFoundError(
-        `User '${userId}' not found on inclusion connected user repository.`,
-      );
+    if (!user) throw new NotFoundError(errorMessages.user.notFound({ userId }));
     const userAgencyRights = user.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === agencyId,
     );
     if (!userAgencyRights)
       throw new ForbiddenError(
-        `User '${userId}' has no role on agency '${agencyId}'.`,
+        errorMessages.user.noRightsOnAgency({ agencyId, userId }),
       );
     return user.email;
   }
@@ -303,7 +313,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       const agencies = await uow.agencyRepository.getByIds([agencyId]);
       const agency = agencies.at(0);
       if (!agency)
-        throw new NotFoundError(`No agency found with id ${agencyId}`);
+        throw new NotFoundError(errorMessages.agency.notFound({ agencyId }));
 
       const agencyEmails = [
         ...agency.validatorEmails,

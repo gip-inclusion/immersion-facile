@@ -2,6 +2,7 @@ import {
   InclusionConnectedUser,
   SiretDto,
   addressDtoToString,
+  errorMessages,
   siretSchema,
 } from "shared";
 import { z } from "zod";
@@ -12,7 +13,6 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
-import { establishmentNotFoundErrorMessage } from "../ports/EstablishmentAggregateRepository";
 
 type DeleteEstablishmentPayload = {
   siret: SiretDto;
@@ -57,7 +57,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
         siret,
       );
     if (!establishmentAggregate)
-      throw new NotFoundError(establishmentNotFoundErrorMessage(siret));
+      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
 
     await Promise.all([
       uow.establishmentAggregateRepository.delete(siret),

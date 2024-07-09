@@ -2,6 +2,7 @@ import {
   AgencyId,
   InclusionConnectDomainJwtPayload,
   agencyIdsSchema,
+  errorMessages,
 } from "shared";
 import {
   BadRequestError,
@@ -36,32 +37,31 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     inclusionConnectedPayload: InclusionConnectDomainJwtPayload,
   ): Promise<void> {
     if (!inclusionConnectedPayload)
-      throw new ForbiddenError("No JWT token provided");
+      throw new ForbiddenError(errorMessages.user.noJwtProvided());
 
     const user = await uow.inclusionConnectedUserRepository.getById(
       inclusionConnectedPayload.userId,
     );
     if (!user)
       throw new NotFoundError(
-        `User not found with id: ${inclusionConnectedPayload.userId}`,
+        errorMessages.user.notFound({
+          userId: inclusionConnectedPayload.userId,
+        }),
       );
     if (user.agencyRights.length > 0) {
       throw new BadRequestError(
-        `This user (userId: ${user.id}), already has agencies rights.`,
+        errorMessages.user.alreadyHaveAgencyRights({
+          userId: user.id,
+        }),
       );
     }
 
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
     if (agencies.length !== agencyIds.length) {
-      const agenciesFoundMessage = agencies.length
-        ? `Found only : ${agencies.map((agency) => agency.id).join(", ")}.`
-        : "No agencies found.";
-
       throw new NotFoundError(
-        [
-          `Some agencies not found with ids : ${agencyIds.join(", ")}. `,
-          agenciesFoundMessage,
-        ].join(""),
+        errorMessages.agencies.notFound({
+          agencyIds: agencies.map((agency) => agency.id),
+        }),
       );
     }
 

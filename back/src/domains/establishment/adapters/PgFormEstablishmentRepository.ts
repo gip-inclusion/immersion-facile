@@ -4,6 +4,7 @@ import {
   FormEstablishmentDto,
   SiretDto,
   castError,
+  errorMessages,
   formEstablishmentSchema,
 } from "shared";
 import {
@@ -17,11 +18,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import {
-  FormEstablishmentRepository,
-  formEstablishementUpdateFailedErrorMessage,
-  formEstablishmentNotFoundErrorMessage,
-} from "../ports/FormEstablishmentRepository";
+import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 
 const logger = createLogger(__filename);
 export class PgFormEstablishmentRepository
@@ -83,7 +80,7 @@ export class PgFormEstablishmentRepository
       .execute();
     const deletedSiret = results.at(0)?.siret;
     if (deletedSiret !== siret)
-      throw new NotFoundError(formEstablishmentNotFoundErrorMessage(siret));
+      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
   }
 
   public async getAll(): Promise<FormEstablishmentDto[]> {
@@ -140,7 +137,9 @@ export class PgFormEstablishmentRepository
 
     if (result.at(0)?.siret !== formEstablishment.siret)
       throw new ConflictError(
-        formEstablishementUpdateFailedErrorMessage(formEstablishment),
+        errorMessages.establishment.conflictError({
+          siret: formEstablishment.siret,
+        }),
       );
   }
 

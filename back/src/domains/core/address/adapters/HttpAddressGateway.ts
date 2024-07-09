@@ -12,6 +12,7 @@ import {
   StreetNumberAndAddress,
   calculateDurationInSecondsFrom,
   castError,
+  errorMessages,
   filterNotFalsy,
   getDepartmentCodeFromDepartmentNameOrCity,
   lookupSearchResultsSchema,
@@ -19,6 +20,7 @@ import {
   lookupStreetAddressSpecialCharsRegex,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import { createLogger } from "../../../../utils/logger";
 import { AddressGateway } from "../ports/AddressGateway";
 import {
@@ -27,11 +29,6 @@ import {
   OpenCageDataSearchResultCollection,
 } from "./HttpAddressGateway.dto";
 import { AddressesRoutes } from "./HttpAddressGateway.routes";
-
-export const errorMessage = {
-  minimumCharErrorMessage: (minLength: number) =>
-    `Lookup street address require a minimum of ${minLength} char.`,
-};
 
 const logger = createLogger(__filename);
 
@@ -81,7 +78,9 @@ export class HttpAddressGateway implements AddressGateway {
     return this.#limiter
       .schedule(() => {
         if (query.length < queryMinLength)
-          throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
+          throw new BadRequestError(
+            errorMessages.address.queryToShort({ minLength: queryMinLength }),
+          );
 
         return this.httpClient.geosearch({
           headers: {
@@ -129,10 +128,10 @@ export class HttpAddressGateway implements AddressGateway {
           query.replace(lookupStreetAddressSpecialCharsRegex, "").length <
           lookupStreetAddressQueryMinLength
         )
-          throw new Error(
-            errorMessage.minimumCharErrorMessage(
-              lookupStreetAddressQueryMinLength,
-            ),
+          throw new BadRequestError(
+            errorMessages.address.queryToShort({
+              minLength: lookupStreetAddressQueryMinLength,
+            }),
           );
 
         return this.httpClient.geocoding({

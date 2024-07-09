@@ -1,5 +1,11 @@
 import { values } from "ramda";
-import { ConventionDto, ConventionId, ConventionReadDto, Email } from "shared";
+import {
+  ConventionDto,
+  ConventionId,
+  ConventionReadDto,
+  Email,
+  errorMessages,
+} from "shared";
 import { ConflictError } from "../../../config/helpers/httpErrors";
 import { ConventionRepository } from "../ports/ConventionRepository";
 
@@ -40,7 +46,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
   public async save(convention: ConventionDto): Promise<void> {
     if (this.#conventions[convention.id]) {
       throw new ConflictError(
-        `Convention with id ${convention.id} already exists`,
+        errorMessages.convention.conflict({ conventionId: convention.id }),
       );
     }
     this.#conventions[convention.id] = dropConventionReadFields(convention);

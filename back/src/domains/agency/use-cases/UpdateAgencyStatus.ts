@@ -2,6 +2,7 @@ import {
   InclusionConnectedUser,
   PartialAgencyDto,
   UpdateAgencyStatusParams,
+  errorMessages,
   updateAgencyStatusParamsSchema,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
@@ -39,7 +40,9 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
     );
     if (!existingAgency)
       throw new NotFoundError(
-        `No agency found with id ${updateAgencyStatusParams.id}`,
+        errorMessages.agency.notFound({
+          agencyId: updateAgencyStatusParams.id,
+        }),
       );
 
     const updatedAgencyParams: PartialAgencyDto = {

@@ -3,10 +3,10 @@ import {
   AgencyDto,
   ApiConsumer,
   ConventionDto,
-  ConventionId,
   ConventionReadDto,
   ConventionStatus,
   Role,
+  errorMessages,
   statusTransitionConfigs,
 } from "shared";
 import {
@@ -14,7 +14,6 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../config/helpers/httpErrors";
-import { agencyMissingMessage } from "../../agency/ports/AgencyRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfTransitionNotAllowed = ({
@@ -35,14 +34,19 @@ export const throwIfTransitionNotAllowed = ({
     })
   )
     throw new ForbiddenError(
-      `Roles '${roles.toString()}' are not allowed to go to status '${targetStatus}' for convention '${
-        conventionRead.id
-      }'.`,
+      errorMessages.convention.badRoleStatusChange({
+        roles,
+        status: targetStatus,
+        conventionId: conventionRead.id,
+      }),
     );
 
   if (!config.validInitialStatuses.includes(conventionRead.status))
     throw new BadRequestError(
-      `Cannot go from status '${conventionRead.status}' to '${targetStatus}'`,
+      errorMessages.convention.badStatusTransition({
+        currentStatus: conventionRead.status,
+        targetStatus,
+      }),
     );
 
   if (config.refine) {
@@ -70,10 +74,16 @@ export async function retrieveConventionWithAgency(
     conventionInPayload.id,
   );
   if (!convention)
-    throw new NotFoundError(conventionMissingMessage(conventionInPayload.id));
+    throw new NotFoundError(
+      errorMessages.convention.notFound({
+        conventionId: conventionInPayload.id,
+      }),
+    );
   const agency = await uow.agencyRepository.getById(convention.agencyId);
   if (!agency)
-    throw new NotFoundError(agencyMissingMessage(convention.agencyId));
+    throw new NotFoundError(
+      errorMessages.agency.notFound({ agencyId: convention.agencyId }),
+    );
   return { agency, convention };
 }
 
@@ -102,9 +112,6 @@ export const getAllConventionRecipientsEmail = (
 
   return recipientEmails;
 };
-
-export const conventionMissingMessage = (conventionId: ConventionId): string =>
-  `Convention with id '${conventionId}' missing.`;
 
 const isAgencyIdInConsumerScope = (
   conventionRead: ConventionReadDto,

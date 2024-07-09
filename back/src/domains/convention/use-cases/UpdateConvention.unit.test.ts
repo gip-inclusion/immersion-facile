@@ -5,6 +5,7 @@ import {
   EstablishmentTutor,
   InclusionConnectedUserBuilder,
   conventionStatuses,
+  errorMessages,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -131,7 +132,9 @@ describe("Update Convention", () => {
           { convention: validConvention },
           { userId: backofficeAdminUser.id },
         ),
-        new NotFoundError(`Convention with id ${id} was not found`),
+        new NotFoundError(
+          errorMessages.convention.notFound({ conventionId: id }),
+        ),
       );
     });
   });

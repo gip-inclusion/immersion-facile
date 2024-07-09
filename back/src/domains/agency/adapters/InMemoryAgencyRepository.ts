@@ -14,14 +14,12 @@ import {
   PartialAgencyDto,
   SiretDto,
   WithGeoPosition,
+  errorMessages,
   isTruthy,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
-import {
-  AgencyRepository,
-  someAgenciesMissingMessage,
-} from "../ports/AgencyRepository";
+import { AgencyRepository } from "../ports/AgencyRepository";
 
 const testAgencies: AgencyDto[] = [
   {
@@ -285,7 +283,9 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       },
     );
     if (result.missingIds.length)
-      throw new NotFoundError(someAgenciesMissingMessage(result.missingIds));
+      throw new NotFoundError(
+        errorMessages.agencies.notFound({ agencyIds: result.missingIds }),
+      );
     return result.agencies;
   }
 

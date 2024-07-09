@@ -2,6 +2,7 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   conventionStatuses,
+  errorMessages,
   expectPromiseToFailWithError,
 } from "shared";
 import {
@@ -122,7 +123,7 @@ describe("Add Convention", () => {
     await expectPromiseToFailWithError(
       addConvention.execute({ convention: validConvention }),
       new ConflictError(
-        `Convention with id ${validConvention.id} already exists`,
+        errorMessages.convention.conflict({ conventionId: validConvention.id }),
       ),
     );
   });
@@ -163,7 +164,9 @@ describe("Add Convention", () => {
               status,
             },
           }),
-          new ForbiddenError(),
+          new ForbiddenError(
+            errorMessages.convention.forbiddenStatus({ status }),
+          ),
         );
       }
     });

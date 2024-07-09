@@ -1,6 +1,7 @@
 import {
   ImmersionObjective,
   WithConventionDto,
+  errorMessages,
   withConventionSchema,
 } from "shared";
 import { NotFoundError } from "../../../../config/helpers/httpErrors";
@@ -44,7 +45,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
       throw new NotFoundError(
-        `Agency with id ${convention.agencyId} missing in agencyRepository`,
+        errorMessages.agency.notFound({ agencyId: convention.agencyId }),
       );
     if (agency.kind !== "pole-emploi")
       return this.options.resyncMode

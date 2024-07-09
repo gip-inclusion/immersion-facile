@@ -1,15 +1,16 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
+  errorMessages,
   expectObjectsToMatch,
   expectPromiseToFail,
-  expectPromiseToFailWith,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
   BadRequestError,
   ForbiddenError,
+  NotFoundError,
   UnauthorizedError,
 } from "../../../config/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
@@ -71,15 +72,15 @@ describe("Update agency", () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWithError(
       updateAgency.execute(agency, icUser),
-      new ForbiddenError("Insufficient privileges for this user"),
+      new ForbiddenError(errorMessages.user.forbidden({ userId: icUser.id })),
     );
   });
 
   it("Fails trying to update if no matching agency was found", async () => {
     const agency = new AgencyDtoBuilder().build();
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       updateAgency.execute(agency, backofficeAdmin),
-      `No agency found with id : ${agency.id}`,
+      new NotFoundError(errorMessages.agency.notFound({ agencyId: agency.id })),
     );
   });
 

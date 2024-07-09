@@ -1,6 +1,7 @@
 import {
   InclusionConnectDomainJwtPayload,
   MarkPartnersErroredConventionAsHandledRequest,
+  errorMessages,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
 import {
@@ -13,7 +14,6 @@ import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { conventionMissingMessage } from "../../entities/Convention";
 
 export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase<
   MarkPartnersErroredConventionAsHandledRequest,
@@ -43,21 +43,26 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
       params.conventionId,
     );
     if (!conventionToMarkAsHandled)
-      throw new NotFoundError(conventionMissingMessage(params.conventionId));
+      throw new NotFoundError(
+        errorMessages.convention.notFound({
+          conventionId: params.conventionId,
+        }),
+      );
 
     const currentUser =
       await uow.inclusionConnectedUserRepository.getById(userId);
     if (!currentUser)
-      throw new NotFoundError(
-        `User '${userId}' not found on inclusion connected user repository.`,
-      );
+      throw new NotFoundError(errorMessages.user.notFound({ userId }));
     const userAgencyRights = currentUser.agencyRights.find(
       (agencyRight) =>
         agencyRight.agency.id === conventionToMarkAsHandled.agencyId,
     );
     if (!userAgencyRights)
       throw new ForbiddenError(
-        `User '${userId}' has no role on agency '${conventionToMarkAsHandled.agencyId}'.`,
+        errorMessages.user.noRightsOnAgency({
+          userId,
+          agencyId: conventionToMarkAsHandled.agencyId,
+        }),
       );
 
     const conventionMarkAsHandledAt = this.timeGateway.now().toISOString();
