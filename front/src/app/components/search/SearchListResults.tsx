@@ -20,7 +20,11 @@ const initialPage = 0;
 const isResultPerPageOption = (value: string): value is ResultsPerPageOptions =>
   resultsPerPageOptions.includes(value as ResultsPerPageOptions);
 
-export const SearchListResults = () => {
+export const SearchListResults = ({
+  showDistance,
+}: {
+  showDistance: boolean;
+}) => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const [displayedResults, setDisplayedResults] =
     useState<SearchResultDto[]>(searchResults);
@@ -76,6 +80,7 @@ export const SearchListResults = () => {
               <SearchResult
                 key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
                 establishment={searchResult}
+                showDistance={showDistance}
                 onButtonClick={() => {
                   const appellations = searchResult.appellations;
                   const appellationCode = appellations?.length

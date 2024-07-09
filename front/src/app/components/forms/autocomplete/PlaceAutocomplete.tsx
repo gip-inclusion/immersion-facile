@@ -81,7 +81,7 @@ export const PlaceAutocomplete = ({
         options={searchSuggestions}
         value={selectedPlace}
         id={id}
-        getOptionLabel={(option) => option.label}
+        getOptionLabel={(option) => option.label ?? ""}
         onChange={(_, selectedPlace, reason) => {
           if (reason === "selectOption") {
             dispatch(
@@ -99,7 +99,10 @@ export const PlaceAutocomplete = ({
         onInputChange={(_, newInputValue, reason) => {
           setSearchTerm(newInputValue);
           if (reason === "input") {
-            if (newInputValue === "") onInputClear();
+            if (newInputValue === "") {
+              dispatch(geosearchSlice.actions.queryWasEmptied());
+              onInputClear();
+            }
             if (inputValue !== newInputValue) {
               dispatch(geosearchSlice.actions.queryHasChanged(newInputValue));
               setInputHasChanged(true);
