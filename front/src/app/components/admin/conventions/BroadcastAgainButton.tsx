@@ -1,15 +1,15 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import type { ConventionReadDto, Role } from "shared";
+import type { ApiConsumer, ConventionReadDto, Role } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 
 const useApiConsumers = () => {
   const dispatch = useDispatch();
@@ -28,28 +28,50 @@ const useApiConsumers = () => {
   return { apiConsumers };
 };
 
-const broadcastModal = createModal({
+const broadcastAgainButton = createModal({
   isOpenedByDefault: false,
   id: "im-broadcast-modal",
 });
+
+const isConventionInScope = (
+  apiConsumer: ApiConsumer,
+  convention: ConventionReadDto,
+) => {
+  if (
+    apiConsumer.rights.convention.scope.agencyKinds?.includes(
+      convention.agencyKind,
+    )
+  )
+    return true;
+
+  if (
+    apiConsumer.rights.convention.scope.agencyIds?.includes(convention.agencyId)
+  )
+    return true;
+
+  return false;
+};
 
 export const BroadcastAgainButton = ({
   convention,
 }: {
   convention: ConventionReadDto;
 }) => {
+  const dispatch = useDispatch();
   const { apiConsumers } = useApiConsumers();
 
-  const options = [
-    ...apiConsumers
-      .filter((c) => c.rights.convention.subscriptions.length !== 0)
-      .map(({ id, name }) => ({ label: name, value: id })),
+  const partners = [
+    ...apiConsumers.filter(
+      (apiConsumer) =>
+        apiConsumer.rights.convention.subscriptions.length !== 0 &&
+        isConventionInScope(apiConsumer, convention),
+    ),
     ...(convention.agencyKind === "pole-emploi"
-      ? [{ label: "France Travail", value: "france-travail" }]
+      ? [{ name: "France Travail", id: "france-travail" }]
       : []),
   ];
 
-  if (options.length === 0) return null;
+  if (partners.length === 0) return null;
 
   return (
     <>
@@ -57,30 +79,33 @@ export const BroadcastAgainButton = ({
         priority="secondary"
         className={fr.cx("fr-m-1w")}
         onClick={() => {
-          broadcastModal.open();
+          broadcastAgainButton.open();
         }}
       >
         Rediffuser au partenaire
       </Button>
       {createPortal(
-        <broadcastModal.Component title="Rediffuser au partenaire">
-          <Select
-            options={options}
-            label="À quel partenaire redifuser ?"
-            disabled={options.length === 1}
-            nativeSelectProps={{
-              ...(options.length === 1 ? { value: options[0].value } : {}),
-            }}
-          />
+        <broadcastAgainButton.Component title="Rediffuser au partenaire">
+          Vous allez rediffuser aux partenaires suivant :
+          <ul>
+            {partners.map(({ name, id }) => (
+              <li key={id}>{name}</li>
+            ))}
+          </ul>
           <Button
             onClick={() => {
-              console.log("TODO trigger broadcast again");
-              broadcastModal.close();
+              dispatch(
+                conventionSlice.actions.broadcastConventionToPartnerRequested({
+                  conventionId: convention.id,
+                  feedbackTopic: "broadcast-convention-again",
+                }),
+              );
+              broadcastAgainButton.close();
             }}
           >
             Rediffuser
           </Button>
-        </broadcastModal.Component>,
+        </broadcastAgainButton.Component>,
         document.body,
       )}
     </>

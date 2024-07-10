@@ -5,8 +5,9 @@ import {
 } from "@reduxjs/toolkit";
 import { keys } from "shared";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 
-const topics = ["api-consumer-global"] as const;
+const topics = ["api-consumer-global", "broadcast-convention-again"] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
 
@@ -61,6 +62,20 @@ export const feedbackMapping: Record<
       title: "Le consommateur d'API a bien été mis à jour.",
       message:
         "Le consommateur d'API a bien été mis à jour, il peut continuer à utiliser l'api",
+    },
+  },
+  "broadcast-convention-again": {
+    "create.success": {
+      action: conventionSlice.actions.broadcastConventionToPartnerSucceeded,
+      title: "La convention a bien été rediffusée.",
+      message:
+        "La convention a bien été rediffusée au partenaire. Vous pouvez vous rapprocher du partenaire pour le vérifier.",
+    },
+    "create.error": {
+      action: conventionSlice.actions.broadcastConventionToPartnerFailed,
+      title: "Problème rencontré lors de la rediffusion au partenaire.",
+      message:
+        "Une erreur est survenue. Veuillez consulter le tableau de bord.",
     },
   },
 };

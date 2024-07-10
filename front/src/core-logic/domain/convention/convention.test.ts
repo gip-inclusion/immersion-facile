@@ -14,6 +14,7 @@ import {
   expectToEqual,
 } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   TestDependencies,
   createTestStore,
@@ -877,6 +878,64 @@ describe("Convention slice", () => {
       expectConventionState({
         isLoading: false,
         feedback: { kind: "missingCounsellorValidationError" },
+      });
+    });
+  });
+
+  describe("Broadcast convention to partner", () => {
+    it("successfully trigger the broadcast", () => {
+      store.dispatch(
+        conventionSlice.actions.broadcastConventionToPartnerRequested({
+          conventionId: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+          feedbackTopic: "broadcast-convention-again",
+        }),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+
+      dependencies.conventionGateway.broadcastConventionAgainResult$.next(
+        undefined,
+      );
+
+      expectConventionState({
+        isLoading: false,
+      });
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "broadcast-convention-again": {
+          level: "success",
+          title: "La convention a bien été rediffusée.",
+          message:
+            "La convention a bien été rediffusée au partenaire. Vous pouvez vous rapprocher du partenaire pour le vérifier.",
+        },
+      });
+    });
+
+    it("fails when triggering the broadcast", () => {
+      store.dispatch(
+        conventionSlice.actions.broadcastConventionToPartnerRequested({
+          conventionId: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+          feedbackTopic: "broadcast-convention-again",
+        }),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+
+      dependencies.conventionGateway.broadcastConventionAgainResult$.error(
+        new Error("error occurred"),
+      );
+
+      expectConventionState({
+        isLoading: false,
+      });
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "broadcast-convention-again": {
+          level: "error",
+          title: "Problème rencontré lors de la rediffusion au partenaire.",
+          message:
+            "Une erreur est survenue. Veuillez consulter le tableau de bord.",
+        },
       });
     });
   });

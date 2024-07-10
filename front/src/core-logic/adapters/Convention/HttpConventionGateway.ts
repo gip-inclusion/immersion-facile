@@ -1,4 +1,4 @@
-import { Observable, from } from "rxjs";
+import { Observable, from, of } from "rxjs";
 import {
   AddConventionInput,
   ConventionDto,
@@ -14,6 +14,7 @@ import {
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
+  WithConventionId,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -29,6 +30,13 @@ export class HttpConventionGateway implements ConventionGateway {
     private readonly magicLinkHttpClient: HttpClient<ConventionMagicLinkRoutes>,
     private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionRoutes>,
   ) {}
+
+  public broadcastConventionAgain$(
+    _params: WithConventionId,
+    _jwt: InclusionConnectJwt,
+  ): Observable<void> {
+    return of(undefined);
+  }
 
   public createConvention$(params: AddConventionInput): Observable<void> {
     return from(

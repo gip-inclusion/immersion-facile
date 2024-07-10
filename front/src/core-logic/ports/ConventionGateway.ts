@@ -12,6 +12,7 @@ import {
   RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
+  WithConventionId,
 } from "shared";
 import { FetchConventionRequestedPayload } from "../domain/convention/convention.slice";
 
@@ -49,5 +50,9 @@ export interface ConventionGateway {
   renewConvention$(
     params: RenewConventionParams,
     jwt: ConventionSupportedJwt,
+  ): Observable<void>;
+  broadcastConventionAgain$(
+    params: WithConventionId,
+    jwt: InclusionConnectJwt,
   ): Observable<void>;
 }

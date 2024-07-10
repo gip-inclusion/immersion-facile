@@ -34,7 +34,7 @@ import {
 import {
   BroadcastAgainButton,
   shouldShowBroadcast,
-} from "src/app/components/admin/conventions/BroadcastModal";
+} from "src/app/components/admin/conventions/BroadcastAgainButton";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import {
   RemindSignatoriesButton,
@@ -263,10 +263,6 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {shouldShowBroadcast({ userRoles: roles, convention }) && (
-          <BroadcastAgainButton convention={convention} />
-        )}
-
         {isAllowedTransition(convention, "CANCELLED", roles) && (
           <>
             <VerificationActionButton
@@ -360,6 +356,10 @@ export const ConventionManageActions = ({
             </renewModal.Component>,
             document.body,
           )}
+
+        {shouldShowBroadcast({ userRoles: roles, convention }) && (
+          <BroadcastAgainButton convention={convention} />
+        )}
       </div>
     </div>
   );

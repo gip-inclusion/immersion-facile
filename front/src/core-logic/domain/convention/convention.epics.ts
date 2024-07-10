@@ -1,5 +1,6 @@
 import { concatMap, filter, map, switchMap } from "rxjs";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
+import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
@@ -171,6 +172,35 @@ const renewConventionEpic: ConventionEpic = (
     ),
   );
 
+const broadcastConventionAgainEpic: ConventionEpic = (
+  action$,
+  state$,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(conventionSlice.actions.broadcastConventionToPartnerRequested.match),
+    switchMap(({ payload }) =>
+      conventionGateway
+        .broadcastConventionAgain$(
+          { conventionId: payload.conventionId },
+          getAdminToken(state$.value),
+        )
+        .pipe(
+          map(() =>
+            conventionSlice.actions.broadcastConventionToPartnerSucceeded({
+              feedbackTopic: payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error: Error) =>
+            conventionSlice.actions.broadcastConventionToPartnerFailed({
+              errorMessage: error.message,
+              feedbackTopic: payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 export const conventionEpics = [
   saveConventionEpic,
   getConventionEpic,
@@ -181,4 +211,5 @@ export const conventionEpics = [
   getPreselectAgencyId,
   renewConventionEpic,
   getSimilarConventionsEpic,
+  broadcastConventionAgainEpic,
 ];
