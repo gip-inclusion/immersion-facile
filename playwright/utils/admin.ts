@@ -1,5 +1,12 @@
 import { Locator, Page, expect } from "@playwright/test";
-import { AdminTab, adminTabsList, frontRoutes } from "shared";
+import {
+  AdminTab,
+  AdminTabList,
+  EstablishmentDashboardTab,
+  EstablishmentDashboardTabList,
+  adminTabsList,
+  frontRoutes,
+} from "shared";
 import { loginWithInclusionConnect } from "./inclusionConnect";
 
 export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
@@ -14,7 +21,7 @@ export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
   await page.waitForTimeout(200); // wait for the submenu to close (its visibility makes hard to click on tabs)
   const tabLocator = await page
     .locator(".fr-tabs__list li")
-    .nth(getTabIndexByTabName(tabName))
+    .nth(getTabIndexByTabName(adminTabsList, tabName))
     .locator(".fr-tabs__tab");
   await expect(tabLocator).toBeVisible();
   await tabLocator.click({ force: true });
@@ -46,8 +53,11 @@ export const getMagicLinkInEmailWrapper = (
     .getByRole("link")
     .getAttribute("href");
 
-const getTabIndexByTabName = (tabName: AdminTab) => {
-  const index = adminTabsList.findIndex((tab) => tab === tabName);
+export const getTabIndexByTabName = (
+  tabList: AdminTabList | EstablishmentDashboardTabList,
+  tabName: AdminTab | EstablishmentDashboardTab,
+) => {
+  const index = tabList.findIndex((tab) => tab === tabName);
   if (index === -1) {
     throw new Error(`Tab ${tabName} not found in adminTabs`);
   }

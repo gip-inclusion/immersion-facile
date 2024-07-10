@@ -1,3 +1,4 @@
+import { frontRoutes } from "../routes/routes";
 import {
   DiscussionDto,
   DiscussionReadDto,
@@ -14,16 +15,20 @@ export const rejectDiscussionEmailParams = ({
   rejectionReason?: string;
 }) => ({
   subject: `L’entreprise ${discussion.businessName} ne souhaite pas donner suite à votre candidature à l’immersion`, // TODO check content
-  htmlContent: `Bonjour,
-
-Malheureusement, l’entreprise ${discussion.businessName} ne souhaite pas donner suite à votre candidature à l’immersion.
-Nous proposons aux entreprises de vous envoyer cette réponse rapide afin que vous soyez fixé sur l’issue de cette candidature et que vous puissiez postuler ailleurs. 
+  htmlContent: `Bonjour, 
+  
+Malheureusement, nous ne souhaitons pas donner suite à votre candidature à l’immersion.
 
 La raison du refus est : ${makeRejectionText(rejectionKind, rejectionReason)}
 
-N’hésitez pas à envoyer d’autre candidatures !
+N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr/${
+    frontRoutes.search
+  }">rechercher une immersion dans une autre entreprise</a> !
 
-Bonne journée, L’équipe immersion Facilitée`,
+Bonne journée, 
+${discussion.establishmentContact.firstName} ${
+    discussion.establishmentContact.lastName
+  }, représentant de l'entreprise ${discussion.businessName}`,
 });
 
 const makeRejectionText = (

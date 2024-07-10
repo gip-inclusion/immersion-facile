@@ -5,6 +5,7 @@ import {
   InclusionConnectedUserBuilder,
   RejectionKind,
   expectPromiseToFailWithError,
+  expectToEqual,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
@@ -40,6 +41,21 @@ const discussion = new DiscussionBuilder()
     email: authorizedUser.email,
   })
   .build();
+
+const emailParams = {
+  subject:
+    "L’entreprise My default business name ne souhaite pas donner suite à votre candidature à l’immersion",
+  htmlContent: `Bonjour, 
+  
+Malheureusement, nous ne souhaitons pas donner suite à votre candidature à l’immersion.
+
+La raison du refus est : l’entreprise estime ne pas être en capacité de vous aider dans votre projet professionnel.
+
+N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr/recherche">rechercher une immersion dans une autre entreprise</a> !
+
+Bonne journée, 
+estab lishment, représentant de l'entreprise My default business name`,
+};
 
 describe("RejectDiscussionAndSendNotification", () => {
   let rejectPotentialBeneficiaryOnDiscussion: RejectDiscussionAndSendNotification;
@@ -144,32 +160,29 @@ describe("RejectDiscussionAndSendNotification", () => {
     const updatedDiscussion = await uow.discussionRepository.getById(
       discussion.id,
     );
-
     expectUpdatedDiscussionToBeRejected({
       status: "REJECTED",
       rejectionKind: "UNABLE_TO_HELP",
       updatedDiscussion,
     });
 
+    expectToEqual(updatedDiscussion.exchanges, [
+      ...discussion.exchanges,
+      {
+        subject: emailParams.subject,
+        message: emailParams.htmlContent,
+        sender: "establishment",
+        recipient: "potentialBeneficiary",
+        sentAt: new CustomTimeGateway().now().toISOString(),
+      },
+    ]);
+
     expectSavedNotificationsAndEvents({
       emails: [
         {
           kind: "DISCUSSION_EXCHANGE",
           sender: immersionFacileNoReplyEmailSender,
-          params: {
-            subject:
-              "L’entreprise My default business name ne souhaite pas donner suite à votre candidature à l’immersion",
-            htmlContent: `Bonjour,
-
-Malheureusement, l’entreprise My default business name ne souhaite pas donner suite à votre candidature à l’immersion.
-Nous proposons aux entreprises de vous envoyer cette réponse rapide afin que vous soyez fixé sur l’issue de cette candidature et que vous puissiez postuler ailleurs. 
-
-La raison du refus est : l’entreprise estime ne pas être en capacité de vous aider dans votre projet professionnel.
-
-N’hésitez pas à envoyer d’autre candidatures !
-
-Bonne journée, L’équipe immersion Facilitée`,
-          },
+          params: emailParams,
           recipients: [`${discussion.id}_b@reply-domain`],
           replyTo: {
             email: `${discussion.id}_e@reply-domain`,

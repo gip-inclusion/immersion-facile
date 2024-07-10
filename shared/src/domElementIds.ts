@@ -644,8 +644,10 @@ export const domElementIds = {
         "im-manage-establishment__reject-application-button-open-modal",
       rejectApplicationJustificationKindInput:
         "im-manage-establishment__reject-application-justification-kind-input",
-      rejectApplicationJustificationTextInput:
+      rejectApplicationJustificationReasonInput:
         "im-manage-establishment__reject-application-justification-text-input",
+      rejectApplicationSubmitPreviewButton:
+        "im-manage-establishment__reject-application-submit-preview-button",
       rejectApplicationSubmitButton:
         "im-manage-establishment__reject-application-submit-button",
       rejectApplicationCancelButton:
@@ -656,6 +658,7 @@ export const domElementIds = {
     },
     manageDiscussion: {
       submitButton: "im-manage-establishment__manage-discussion-submit-button",
+      discussionIdInput: "im-manage-establishment__manage-discussion-id-input",
     },
   },
   searchDiagoriente: {},

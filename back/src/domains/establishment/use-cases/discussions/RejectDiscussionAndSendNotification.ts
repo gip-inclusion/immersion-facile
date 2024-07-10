@@ -1,4 +1,6 @@
 import {
+  DiscussionDto,
+  Exchange,
   InclusionConnectedUser,
   RejectionKind,
   createOpaqueEmail,
@@ -17,6 +19,7 @@ import {
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { addExchangeToDiscussion } from "../../helpers/discussion.helpers";
 
 export type RejectDiscussionAndSendNotification = ReturnType<
   typeof makeRejectDiscussionAndSendNotification
@@ -64,22 +67,36 @@ export const makeRejectDiscussionAndSendNotification =
           `User is not allowed to reject discussion ${discussionId}`,
         );
       }
-      await uow.discussionRepository.update({
+      const updatedDiscussion: DiscussionDto = {
         ...discussion,
         status: "REJECTED",
         ...makeRejection({ rejectionKind, rejectionReason }),
+      };
+
+      const emailParams = rejectDiscussionEmailParams({
+        discussion,
+        rejectionKind,
+        rejectionReason,
       });
+
+      const exchange: Exchange = {
+        subject: emailParams.subject,
+        message: emailParams.htmlContent,
+        sender: "establishment",
+        recipient: "potentialBeneficiary",
+        sentAt: deps.timeGateway.now().toISOString(),
+      };
+
+      await uow.discussionRepository.update(
+        addExchangeToDiscussion(updatedDiscussion, exchange),
+      );
 
       await deps.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "DISCUSSION_EXCHANGE",
           sender: immersionFacileNoReplyEmailSender,
-          params: rejectDiscussionEmailParams({
-            discussion,
-            rejectionKind,
-            rejectionReason,
-          }),
+          params: emailParams,
           recipients: [
             createOpaqueEmail(
               discussion.id,
