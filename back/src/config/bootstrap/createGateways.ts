@@ -63,6 +63,9 @@ import { InMemoryLaBonneBoiteGateway } from "../../domains/establishment/adapter
 import { createLbbRoutes } from "../../domains/establishment/adapters/la-bonne-boite/LaBonneBoite.routes";
 import { HttpPassEmploiGateway } from "../../domains/establishment/adapters/pass-emploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../domains/establishment/adapters/pass-emploi/InMemoryPassEmploiGateway";
+import { brevoContactRoutes } from "../../domains/marketing/adapters/establishmentMarketingGateway/BrevoContact.routes";
+import { BrevoEstablishmentMarketingGateway } from "../../domains/marketing/adapters/establishmentMarketingGateway/BrevoEstablishmentMarketingGateway";
+import { InMemoryEstablishmentMarketingGateway } from "../../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { createLogger } from "../../utils/logger";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
@@ -328,6 +331,15 @@ export const createGateways = async (
     peConnectGateway,
     poleEmploiGateway,
     timeGateway,
+    establishmentMarketingGateway:
+      config.establishmentMarketingGateway === "BREVO"
+        ? new BrevoEstablishmentMarketingGateway({
+            apiKey: config.apiKeyBrevo,
+            establishmentContactListId: config.brevoEstablishmentContactListId,
+            httpClient:
+              createAxiosHttpClientForExternalAPIs(brevoContactRoutes),
+          })
+        : new InMemoryEstablishmentMarketingGateway(),
     siret: getSiretGateway(config.siretGateway, config, timeGateway),
     shortLinkGenerator:
       config.shortLinkIdGeneratorGateway === "NANO_ID"

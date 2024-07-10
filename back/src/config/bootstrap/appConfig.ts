@@ -83,6 +83,19 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("BREVO_API_KEY");
   }
 
+  public get brevoEstablishmentContactListId(): number {
+    return parseInt(
+      this.#throwIfNotDefinedOrDefault("BREVO_ESTABLISHMENT_CONTACT_LIST_ID"),
+    );
+  }
+
+  public get establishmentMarketingGateway() {
+    return this.#throwIfNotInArray({
+      variableName: "ESTABLISHMENT_MARKETING_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "BREVO"],
+    });
+  }
+
   public get apiKeyOpenCageDataGeocoding() {
     return this.#throwIfNotDefinedOrDefault("API_KEY_OPEN_CAGE_DATA_GEOCODING");
   }
