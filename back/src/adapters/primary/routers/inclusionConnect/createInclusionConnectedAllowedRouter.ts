@@ -61,6 +61,19 @@ export const createInclusionConnectedAllowedRouter = (
       }),
   );
 
+  inclusionConnectedSharedRoutes.broadcastConventionAgain(
+    deps.adminAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw new UnauthorizedError();
+        await deps.useCases.broadcastConventionAgain.execute(
+          req.body,
+          currentUser,
+        );
+      }),
+  );
+
   inclusionConnectedSharedRoutes.getDiscussionByIdForEstablishment(
     inclusionConnectedMiddleware,
     (req, res) =>

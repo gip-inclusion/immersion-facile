@@ -51,6 +51,7 @@ export const createHttpDependencies = (): Dependencies => {
     conventionGateway: new HttpConventionGateway(
       createAxiosSharedClient(conventionMagicLinkRoutes, axiosOnSlashApi),
       createAxiosSharedClient(unauthenticatedConventionRoutes, axiosOnSlashApi),
+      createAxiosSharedClient(inclusionConnectedAllowedRoutes, axiosOnSlashApi),
     ),
     establishmentGateway: new HttpEstablishmentGateway(
       createAxiosSharedClient(establishmentRoutes, axiosOnSlashApi),

@@ -4,9 +4,11 @@ import {
   DiscussionBuilder,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   User,
   currentJwtVersions,
   displayRouteName,
+  expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
   inclusionConnectedAllowedRoutes,
@@ -15,6 +17,7 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { Gateways } from "../../../../config/bootstrap/createGateways";
+import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToPeServiceName } from "../../../../domains/core/saved-errors/ports/SavedErrorRepository";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
@@ -42,11 +45,17 @@ describe("InclusionConnectedAllowedRoutes", () => {
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: Gateways;
+  let eventCrawler: BasicEventCrawler;
 
   beforeEach(async () => {
     let request: SuperTest<Test>;
-    ({ request, generateInclusionConnectJwt, inMemoryUow, gateways } =
-      await buildTestApp());
+    ({
+      request,
+      generateInclusionConnectJwt,
+      inMemoryUow,
+      gateways,
+      eventCrawler,
+    } = await buildTestApp());
     httpClient = createSupertestSharedClient(
       inclusionConnectedAllowedRoutes,
       request,
@@ -362,6 +371,62 @@ describe("InclusionConnectedAllowedRoutes", () => {
           body: new DiscussionBuilder(discussion).buildRead(),
         });
       });
+    });
+  });
+
+  describe(`${displayRouteName(
+    inclusionConnectedAllowedRoutes.broadcastConventionAgain,
+  )}`, () => {
+    it("throws an error if user is not authenticated", async () => {
+      const response = await httpClient.broadcastConventionAgain({
+        headers: { authorization: "wrong-token" },
+        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: { error: "Provided token is invalid" },
+      });
+    });
+
+    it("save the event to Broadcast Convention again, than it event triggers calling partners", async () => {
+      const adminUser = new InclusionConnectedUserBuilder()
+        .withIsAdmin(true)
+        .build();
+
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        adminUser,
+      ]);
+
+      const token = generateInclusionConnectJwt({
+        userId: adminUser.id,
+        version: currentJwtVersions.inclusion,
+      });
+
+      const convention = new ConventionDtoBuilder().build();
+      inMemoryUow.conventionRepository.setConventions([convention]);
+
+      const response = await httpClient.broadcastConventionAgain({
+        headers: { authorization: token },
+        body: { conventionId: convention.id },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+
+      expectArraysToMatch(inMemoryUow.outboxRepository.events, [
+        { topic: "ConventionBroadcastRequested", status: "never-published" },
+      ]);
+
+      await eventCrawler.processNewEvents();
+
+      expectArraysToMatch(inMemoryUow.outboxRepository.events, [
+        { topic: "ConventionBroadcastRequested", status: "published" },
+      ]);
+
+      // TODO : when we store all partner responses, check that they have been called
     });
   });
 });

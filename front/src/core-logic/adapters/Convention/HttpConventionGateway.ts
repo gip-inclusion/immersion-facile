@@ -1,4 +1,4 @@
-import { Observable, from, of } from "rxjs";
+import { Observable, from } from "rxjs";
 import {
   AddConventionInput,
   ConventionDto,
@@ -10,6 +10,7 @@ import {
   DashboardUrlAndName,
   FindSimilarConventionsParams,
   InclusionConnectJwt,
+  InclusionConnectedAllowedRoutes,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
@@ -29,13 +30,26 @@ export class HttpConventionGateway implements ConventionGateway {
   constructor(
     private readonly magicLinkHttpClient: HttpClient<ConventionMagicLinkRoutes>,
     private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionRoutes>,
+    private readonly allowedInclusionConnectClient: HttpClient<InclusionConnectedAllowedRoutes>,
   ) {}
 
   public broadcastConventionAgain$(
-    _params: WithConventionId,
-    _jwt: InclusionConnectJwt,
+    params: WithConventionId,
+    jwt: InclusionConnectJwt,
   ): Observable<void> {
-    return of(undefined);
+    return from(
+      this.allowedInclusionConnectClient
+        .broadcastConventionAgain({
+          body: { conventionId: params.conventionId },
+          headers: { authorization: jwt },
+        })
+        .then((response) => {
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow);
+        }),
+    );
   }
 
   public createConvention$(params: AddConventionInput): Observable<void> {
