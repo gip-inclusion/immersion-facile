@@ -1,4 +1,4 @@
-import { expectPromiseToFailWithError } from "shared";
+import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import {
   BadRequestError,
   ForbiddenError,
@@ -9,10 +9,21 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
+import { fakeEstablishmentStatsResponse } from "../adapters/InMemoryStatisticQueries";
 import {
   GetEstablishmentStats,
   makeGetEstablishmentStats,
 } from "./GetEstablishmentStats";
+
+const apiConsumer = new ApiConsumerBuilder()
+  .withRights({
+    statistics: {
+      kinds: ["READ"],
+      scope: "no-scope",
+      subscriptions: [],
+    },
+  })
+  .build();
 
 describe("GetEstablishmentStats", () => {
   let getEstablishmentStats: GetEstablishmentStats;
@@ -46,16 +57,6 @@ describe("GetEstablishmentStats", () => {
   });
 
   it("throws BadRequest if perPage is greater than the max allowed", async () => {
-    const apiConsumer = new ApiConsumerBuilder()
-      .withRights({
-        statistics: {
-          kinds: ["READ"],
-          scope: "no-scope",
-          subscriptions: [],
-        },
-      })
-      .build();
-
     await expectPromiseToFailWithError(
       getEstablishmentStats.execute(
         {
@@ -82,5 +83,16 @@ describe("GetEstablishmentStats", () => {
         ),
       ),
     );
+  });
+
+  it("gets the content", async () => {
+    const result = await getEstablishmentStats.execute(
+      {
+        page: 1,
+        perPage: 1000,
+      },
+      apiConsumer,
+    );
+    expectToEqual(result, fakeEstablishmentStatsResponse);
   });
 });

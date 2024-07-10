@@ -88,7 +88,11 @@ const getUseCasesByTopics = (
     useCases.broadcastToPoleEmploiOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
-  ConventionDeprecated: [useCases.notifyAllActorsThatConventionIsDeprecated],
+  ConventionDeprecated: [
+    useCases.notifyAllActorsThatConventionIsDeprecated,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPartnersOnConventionUpdates,
+  ],
   ConventionReminderRequired: [useCases.notifyConventionReminder],
 
   // Establishment form related
