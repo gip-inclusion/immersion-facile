@@ -47,6 +47,10 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
 
   protected async _execute({ convention }: WithConventionDto, uow: UnitOfWork) {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
+    logger.info({
+      message: `Convention : ${convention.id} - Broadcasting to partners. Agency of kind : ${agency?.kind}`,
+    });
+
     if (!agency) {
       throw new NotFoundError(
         errorMessages.agency.notFound({ agencyId: convention.agencyId }),
@@ -73,16 +77,47 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
 
     const apiConsumers = pipeWithValue(
       await uow.apiConsumerRepository.getAll(),
-      filter<ApiConsumer>(
-        (apiConsumer) =>
+      filter<ApiConsumer>((apiConsumer) => {
+        if (
+          agency.kind === "mission-locale" &&
+          apiConsumer.name === "si-milo-production"
+        ) {
+          const values = {
+            apiConsumer: "si-milo-production",
+            isApiConsumerAllowed: isApiConsumerAllowed({
+              apiConsumer,
+              rightName: "convention",
+              consumerKind: "SUBSCRIPTION",
+            }),
+            isConventionInScope: isConventionInScope(
+              conventionRead,
+              apiConsumer,
+            ),
+            isConsumerSubscribedToConventionUpdated:
+              isConsumerSubscribedToConventionUpdated(apiConsumer),
+          };
+
+          logger.info({
+            message: `Convention : ${
+              convention.id
+            }  -  Filtering subscription of apiConsumer – ${JSON.stringify(
+              values,
+              null,
+              2,
+            )}`,
+          });
+        }
+
+        return (
           isApiConsumerAllowed({
             apiConsumer,
             rightName: "convention",
             consumerKind: "SUBSCRIPTION",
           }) &&
           isConventionInScope(conventionRead, apiConsumer) &&
-          isConsumerSubscribedToConventionUpdated(apiConsumer),
-      ),
+          isConsumerSubscribedToConventionUpdated(apiConsumer)
+        );
+      }),
     );
 
     await Promise.all(
@@ -92,6 +127,10 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
 
   #notifySubscriber(uow: UnitOfWork, conventionRead: ConventionReadDto) {
     return async (apiConsumer: ApiConsumer) => {
+      logger.info({
+        message: `Convention : ${conventionRead.id}  - Broadcasting to partners. Reached #notifySubscriber. ApiConsumer : ${apiConsumer.id}`,
+      });
+
       const conventionUpdatedCallbackParams =
         apiConsumer.rights.convention.subscriptions.find(
           (sub) => sub.subscribedEvent === "convention.updated",
