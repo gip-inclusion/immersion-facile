@@ -47,7 +47,7 @@ type DiscussionDtoBase = {
   exchanges: Exchange[];
   potentialBeneficiary: DiscussionPotentialBeneficiary;
   conventionId?: ConventionId;
-} & (DiscussionAccepted | DiscussionStatusWithRejection);
+} & DiscussionStatusWithRejection;
 
 export type DiscussionStatus = DiscussionDto["status"];
 export type RejectionKind = DiscussionRejected["rejectionKind"];

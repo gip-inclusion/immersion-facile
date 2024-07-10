@@ -29,10 +29,10 @@ import {
   rejectDiscussionEmailParams,
   toDisplayedDate,
 } from "shared";
-import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeebackEventCallback } from "src/app/hooks/feedback.hooks";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   getConventionInitialValuesFromUrl,
@@ -320,12 +320,14 @@ const RejectApplicationForm = ({
 }: {
   discussion: DiscussionReadDto;
 }): JSX.Element => {
-  const { register, watch, handleSubmit } = useForm<WithDiscussionRejection>({
-    resolver: zodResolver(discussionRejectionSchema),
-  });
+  const { register, watch, handleSubmit, formState } =
+    useForm<WithDiscussionRejection>({
+      resolver: zodResolver(discussionRejectionSchema),
+    });
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
+  const getFieldError = makeFieldError(formState);
   const dispatch = useDispatch();
   const watchedFormValues = watch();
   const [dataToSend, setDataToSend] =
@@ -407,9 +409,7 @@ const RejectApplicationForm = ({
       />
     </>
   ) : (
-    <form
-      onSubmit={handleSubmit(setDataToSend, (errors) => console.error(errors))}
-    >
+    <form onSubmit={handleSubmit(setDataToSend)}>
       <Select
         label="Pour quel motif souhaitez-vous refuser cette candidature ?"
         nativeSelectProps={{
@@ -418,11 +418,20 @@ const RejectApplicationForm = ({
           ...register("rejectionKind"),
         }}
         options={rejectionKindOptions}
+        {...getFieldError("rejectionKind")}
       />
       {watchedFormValues.rejectionKind === "OTHER" && (
-        <Input textArea label="Précisez" />
+        <Input
+          textArea
+          label="Précisez"
+          nativeTextAreaProps={{
+            id: domElementIds.establishmentDashboard.discussion
+              .rejectApplicationJustificationReasonInput,
+            ...register("rejectionReason"),
+          }}
+          {...getFieldError("rejectionReason")}
+        />
       )}
-      <Feedback topic="dashboard-discussion-rejection" />
       <ButtonsGroup
         buttons={[
           {
@@ -434,7 +443,7 @@ const RejectApplicationForm = ({
           },
           {
             id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationSubmitButton,
+              .rejectApplicationSubmitPreviewButton,
             priority: "primary",
             children: "Prévisualiser et envoyer",
           },

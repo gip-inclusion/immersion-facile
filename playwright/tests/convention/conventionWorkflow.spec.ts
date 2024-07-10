@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import test, { expect } from "@playwright/test";
-import { ConventionDto, domElementIds } from "shared";
+import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
   getMagicLinkInEmailWrapper,

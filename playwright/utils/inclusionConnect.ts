@@ -14,6 +14,7 @@ const buttonByRouteName: Record<
     navLink: string;
     username: string;
     password: string;
+    headerNavLink?: string;
   }
 > = {
   agencyDashboard: {
@@ -21,6 +22,7 @@ const buttonByRouteName: Record<
     navLink: domElementIds.header.navLinks.agency.dashboard,
     username: testConfig.inclusionConnect.username,
     password: testConfig.inclusionConnect.password,
+    headerNavLink: "fr-header-main-navigation-button-3",
   },
   establishmentDashboard: {
     loginButtonId:
@@ -28,6 +30,7 @@ const buttonByRouteName: Record<
     navLink: domElementIds.header.navLinks.establishment.dashboard,
     username: testConfig.inclusionConnect.username,
     password: testConfig.inclusionConnect.password,
+    headerNavLink: "fr-header-main-navigation-button-2",
   },
   admin: {
     loginButtonId: domElementIds.admin.login.inclusionConnectButton,
@@ -41,7 +44,7 @@ export const loginWithInclusionConnect = async (
   page: Page,
   routeName: "agencyDashboard" | "establishmentDashboard" | "admin",
 ) => {
-  const { loginButtonId, navLink, username, password } =
+  const { loginButtonId, navLink, username, password, headerNavLink } =
     buttonByRouteName[routeName];
 
   if (routeName === "admin") {
@@ -49,7 +52,7 @@ export const loginWithInclusionConnect = async (
     await expect(page.url()).toContain(frontRoutes[routeName]);
   } else {
     await page.goto("/");
-    await page.click("#fr-header-main-navigation-button-3");
+    await page.click(`#${headerNavLink}`);
     await page.click(`#${navLink}`);
     await expect(page.url()).toContain(frontRoutes[routeName]);
   }

@@ -12,8 +12,12 @@ import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1, zStringPossiblyEmpty } from "../zodUtils";
 import {
   Attachment,
+  DiscussionAccepted,
   DiscussionId,
+  DiscussionPending,
   DiscussionReadDto,
+  DiscussionRejected,
+  DiscussionStatusWithRejection,
   Exchange,
   ExchangeRole,
   WithDiscussionRejection,
@@ -49,20 +53,21 @@ export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
     }),
   ]);
 
-export const discutionRejectedSchema = z
+export const discussionRejectedSchema: z.Schema<DiscussionRejected> = z
   .object({
     status: z.literal("REJECTED"),
   })
   .and(discussionRejectionSchema);
 
-const discussionNotRejectedSchema = z.object({
+const discussionNotRejectedSchema: z.Schema<
+  DiscussionAccepted | DiscussionPending
+> = z.object({
   status: z.enum(["PENDING", "ACCEPTED"]),
 });
 
-const discussionStatusSchema = z.union([
-  discutionRejectedSchema,
-  discussionNotRejectedSchema,
-]);
+const discussionStatusSchema: z.Schema<DiscussionStatusWithRejection> = z.union(
+  [discussionRejectedSchema, discussionNotRejectedSchema],
+);
 
 export const discussionReadSchema: z.Schema<DiscussionReadDto> = z
   .object({

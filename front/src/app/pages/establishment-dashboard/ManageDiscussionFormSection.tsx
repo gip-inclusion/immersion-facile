@@ -34,7 +34,8 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
               label="Id de la mise en relation *"
               nativeInputProps={{
                 ...register("discussionId"),
-                id: "manageDiscussionForm-discussionId",
+                id: domElementIds.establishmentDashboard.manageDiscussion
+                  .discussionIdInput,
                 placeholder: "Id de la mise en relation",
                 onChange: (event) => {
                   setValue("discussionId", event.currentTarget.value.trim(), {
