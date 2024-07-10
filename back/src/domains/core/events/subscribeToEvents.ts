@@ -133,10 +133,16 @@ const getUseCasesByTopics = (
   ],
   IcUserAgencyRightChanged: [useCases.notifyIcUserAgencyRightChanged],
   IcUserAgencyRightRejected: [useCases.notifyIcUserAgencyRightRejected],
+
   //Api Consumer related:
   ApiConsumerSaved: [],
-  //partnersErroredConvention related
+
+  //partnersConvention related
   PartnerErroredConventionMarkedAsHandled: [],
+  ConventionBroadcastRequested: [
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToPartnersOnConventionUpdates,
+  ],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

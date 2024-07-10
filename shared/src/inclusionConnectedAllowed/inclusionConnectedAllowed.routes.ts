@@ -1,7 +1,10 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencyIdsSchema } from "../agency/agency.schema";
-import { markPartnersErroredConventionAsHandledRequestSchema } from "../convention/convention.schema";
+import {
+  markPartnersErroredConventionAsHandledRequestSchema,
+  withConventionIdSchema,
+} from "../convention/convention.schema";
 import { discussionReadSchema } from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
@@ -46,6 +49,19 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       404: legacyHttpErrorSchema,
       400: httpErrorSchema,
       403: legacyUnauthenticatedErrorSchema,
+    },
+  }),
+  broadcastConventionAgain: defineRoute({
+    url: "/inclusion-connected/broadcast-convention-again",
+    method: "post",
+    ...withAuthorizationHeaders,
+    requestBodySchema: withConventionIdSchema,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: legacyHttpErrorSchema,
+      403: legacyUnauthenticatedErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
   getInclusionConnectLogoutUrl: defineRoute({

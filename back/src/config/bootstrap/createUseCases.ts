@@ -29,6 +29,7 @@ import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/S
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
+import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../domains/convention/use-cases/notifications/NotifyActorThatConventionNeedsModifications";
@@ -614,6 +615,10 @@ export const createUseCases = (
     }),
     listActiveSubscriptions: makeListActiveSubscriptions({
       uowPerformer,
+    }),
+    broadcastConventionAgain: makeBroadcastConventionAgain({
+      uowPerformer,
+      deps: { createNewEvent },
     }),
     markDiscussionLinkedToConvention: makeMarkDiscussionLinkedToConvention({
       uowPerformer,
