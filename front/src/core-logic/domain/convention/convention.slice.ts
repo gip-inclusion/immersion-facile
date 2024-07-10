@@ -12,7 +12,9 @@ import {
   RenewConventionParams,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
+  WithConventionId,
 } from "shared";
+import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
 type ConventionValidationFeedbackKind =
@@ -288,5 +290,24 @@ export const conventionSlice = createSlice({
       state.similarConventionIds = payload;
     },
     getSimilarConventionsFailed: setFeedbackAsErrored,
+
+    broadcastConventionToPartnerRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<WithConventionId>,
+    ) => {
+      state.isLoading = true;
+    },
+    broadcastConventionToPartnerSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
+      state.isLoading = false;
+    },
+    broadcastConventionToPartnerFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isLoading = false;
+    },
   },
 });

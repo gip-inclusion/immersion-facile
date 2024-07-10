@@ -14,6 +14,7 @@ import {
   RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
+  WithConventionId,
   sleep,
 } from "shared";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
@@ -49,6 +50,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public updateConventionResult$ = new Subject<void>();
 
+  public broadcastConventionAgainResult$ = new Subject<void>();
+
   #agencies: { [id: string]: AgencyOption } = {};
 
   #conventions: { [id: string]: ConventionDto } = {
@@ -57,6 +60,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
   };
 
   constructor(private simulatedLatency?: number) {}
+
+  broadcastConventionAgain$(
+    _params: WithConventionId,
+    _jwt: InclusionConnectJwt,
+  ): Observable<void> {
+    return this.broadcastConventionAgainResult$;
+  }
 
   public createConvention$(_params: AddConventionInput): Observable<void> {
     this.addConventionCallCount++;
