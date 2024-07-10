@@ -211,6 +211,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
                 message: contactRequest.message,
                 recipient: "establishment",
                 sender: "potentialBeneficiary",
+                attachments: [],
               },
             ]
           : [],

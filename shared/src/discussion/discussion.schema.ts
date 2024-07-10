@@ -11,6 +11,7 @@ import { dateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1, zStringPossiblyEmpty } from "../zodUtils";
 import {
+  Attachment,
   DiscussionId,
   DiscussionReadDto,
   Exchange,
@@ -22,12 +23,18 @@ export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
 
 const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
+const attachementSchema: z.Schema<Attachment> = z.object({
+  name: z.string(),
+  link: z.string(),
+});
+
 const exchangeSchema: z.Schema<Exchange> = z.object({
   subject: zStringMinLength1,
   message: zStringMinLength1,
   sender: exchangeRoleSchema,
   recipient: exchangeRoleSchema,
   sentAt: dateStringSchema,
+  attachments: z.array(attachementSchema),
 });
 
 export const discussionReadSchema: z.Schema<DiscussionReadDto> = z.object({

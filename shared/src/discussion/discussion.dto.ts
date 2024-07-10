@@ -62,12 +62,18 @@ export type DiscussionReadDto = DiscussionDtoBase & {
   >;
 };
 
+export type Attachment = {
+  name: string;
+  link: string;
+};
+
 export type Exchange = {
   subject: string;
   message: string;
   sender: ExchangeRole;
   recipient: ExchangeRole;
   sentAt: DateString;
+  attachments: Attachment[];
 };
 
 const createdAt = new Date("2023-06-23T12:00:00.000").toISOString();
@@ -108,6 +114,7 @@ const defaultDiscussion: DiscussionDto = {
       sender: "potentialBeneficiary",
       message: "default message",
       recipient: "establishment",
+      attachments: [],
     },
   ],
 };

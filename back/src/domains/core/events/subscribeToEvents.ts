@@ -23,6 +23,7 @@ const getUseCasesByTopics = (
   useCases: UseCases,
 ): UseCaseSubscriptionsByTopics => ({
   NotificationAdded: [useCases.sendNotification],
+  ExchangeAddedToDiscussion: [useCases.sendExchangeToRecipient],
   NotificationBatchAdded: [useCases.sendNotificationsInBatch],
   // "Happy case" for immersion application.
   ConventionSubmittedByBeneficiary: [
