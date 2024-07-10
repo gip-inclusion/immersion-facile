@@ -5,17 +5,25 @@ import {
   PaginationQueryParams,
 } from "./pagination.dto";
 
+const pageQueryParamSchema = z.coerce.number().positive().min(1).int();
+const perPageQueryParamSchema = z.coerce
+  .number()
+  .positive()
+  .min(1)
+  .max(5_000)
+  .int();
+
 export const paginationQueryParamsSchema: z.Schema<PaginationQueryParams> =
   z.object({
-    page: z.number().positive().min(1).optional(),
-    perPage: z.number().min(1).max(5_000).optional(),
+    page: pageQueryParamSchema.optional(),
+    perPage: perPageQueryParamSchema.optional(),
   });
 
 export const paginationRequiredQueryParamsSchema: z.Schema<
   Required<PaginationQueryParams>
 > = z.object({
-  page: z.number().positive().min(1),
-  perPage: z.number().min(1).max(5_000),
+  page: pageQueryParamSchema,
+  perPage: perPageQueryParamSchema,
 });
 
 const paginationSchema: z.Schema<Pagination> = z.object({

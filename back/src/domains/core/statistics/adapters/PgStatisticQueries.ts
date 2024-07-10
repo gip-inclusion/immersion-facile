@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { DataWithPagination, PaginationQueryParams } from "shared";
 import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
@@ -6,6 +7,7 @@ import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
 
 export class PgStatisticQueries implements StatisticQueries {
   #transaction: KyselyDb;
+
   constructor(transaction: KyselyDb) {
     this.#transaction = transaction;
   }
@@ -16,13 +18,22 @@ export class PgStatisticQueries implements StatisticQueries {
   }: Required<PaginationQueryParams>): Promise<
     DataWithPagination<EstablishmentStat>
   > {
-    const { totalRecords } = (await this.#transaction
-      .selectFrom("conventions")
-      .groupBy("siret")
-      .select(({ fn }) => fn.count<string>("siret").over().as("totalRecords"))
+    const builder = this.#transaction
+      .selectFrom("conventions as c")
+      .fullJoin("establishments as e", "c.siret", "e.siret");
+
+    const { totalRecords } = (await builder
+      .groupBy((qb) => qb.fn.coalesce("c.siret", "e.siret"))
+      .select([
+        sql<number>`CAST
+        (count(coalesce (c.siret, e.siret)) over () AS INTEGER)`.as(
+          "totalRecords",
+        ),
+      ])
+      .limit(1)
       .executeTakeFirst()) ?? { totalRecords: 0 };
 
-    const totalPages = Math.ceil(Math.max(+totalRecords, 1) / perPage);
+    const totalPages = Math.ceil(Math.max(totalRecords, 1) / perPage);
 
     if (page > totalPages) {
       throw new BadRequestError(
@@ -30,15 +41,17 @@ export class PgStatisticQueries implements StatisticQueries {
       );
     }
 
-    const establishmentStats = await this.#transaction
-      .selectFrom("conventions as c")
-      .leftJoin("establishments as e", "c.siret", "e.siret")
+    const establishmentStats = await builder
       .groupBy(["c.siret", "c.business_name", "e.siret"])
       .orderBy("siret")
       .select((qb) => [
-        "c.siret as siret",
-        "c.business_name as name",
-        qb.fn.count<number>("c.siret").as("numberOfConventions"),
+        qb.fn.coalesce("c.siret", "e.siret").$castTo<string>().as("siret"),
+        qb.fn
+          .coalesce("e.name", "c.business_name")
+          .$castTo<string>()
+          .as("name"),
+        sql<number>`CAST
+            (count(c.siret) AS INTEGER)`.as("numberOfConventions"),
         qb
           .case()
           .when("e.siret", "is", null)
@@ -54,7 +67,7 @@ export class PgStatisticQueries implements StatisticQueries {
     return {
       data: establishmentStats,
       pagination: {
-        totalRecords: +totalRecords,
+        totalRecords,
         totalPages,
         numberPerPage: perPage,
         currentPage: page,

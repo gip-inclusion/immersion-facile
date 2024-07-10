@@ -103,6 +103,7 @@ export const paginatedEstablishmentStatsSchema = createPaginatedSchema(
   establishmentStatSchema,
 );
 
+export type PublicApiV2StatisticsRoutes = typeof publicApiV2StatisticsRoutes;
 export const publicApiV2StatisticsRoutes = defineRoutes({
   getEstablishmentStats: defineRoute({
     method: "get",

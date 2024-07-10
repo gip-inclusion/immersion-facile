@@ -73,6 +73,12 @@ describe("PgStatisticQueries", () => {
       const establishmentAggregate = new EstablishmentAggregateBuilder()
         .withEstablishmentSiret("33330000333300")
         .build();
+      const establishmentAggregateLinkedToNoConvention =
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("88880000888800")
+          .withLocationId("11111111-1111-4111-1111-111111111111")
+          .withContactId("11111111-1111-4111-1111-111111111111")
+          .build();
       const conventionSiret1A = new ConventionDtoBuilder()
         .withId(crypto.randomUUID())
         .withSiret("11110000111100")
@@ -91,6 +97,7 @@ describe("PgStatisticQueries", () => {
       const convention3 = new ConventionDtoBuilder()
         .withId(crypto.randomUUID())
         .withSiret(establishmentAggregate.establishment.siret)
+        .withBusinessName(establishmentAggregate.establishment.name)
         .withAgencyId(agency.id)
         .build();
 
@@ -98,6 +105,9 @@ describe("PgStatisticQueries", () => {
         await pgAgencyRepository.insert(agency);
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentAggregate,
+        );
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentAggregateLinkedToNoConvention,
         );
         await Promise.all([
           pgConventionRepository.save(conventionSiret1A),
@@ -133,18 +143,18 @@ describe("PgStatisticQueries", () => {
             {
               siret: conventionSiret1A.siret,
               name: conventionSiret1A.businessName,
-              numberOfConventions: "2" as unknown as number,
+              numberOfConventions: 2,
               isReferenced: false,
             },
             {
               siret: convention2.siret,
               name: convention2.businessName,
-              numberOfConventions: "1" as unknown as number,
+              numberOfConventions: 1,
               isReferenced: false,
             },
           ],
           pagination: {
-            totalRecords: 3,
+            totalRecords: 4,
             totalPages: 2,
             numberPerPage: 2,
             currentPage: 1,
@@ -161,12 +171,20 @@ describe("PgStatisticQueries", () => {
             {
               siret: convention3.siret,
               name: convention3.businessName,
-              numberOfConventions: "1" as unknown as number,
+              numberOfConventions: 1,
+              isReferenced: true,
+            },
+            {
+              siret:
+                establishmentAggregateLinkedToNoConvention.establishment.siret,
+              name: establishmentAggregateLinkedToNoConvention.establishment
+                .name,
+              numberOfConventions: 0,
               isReferenced: true,
             },
           ],
           pagination: {
-            totalRecords: 3,
+            totalRecords: 4,
             totalPages: 2,
             numberPerPage: 2,
             currentPage: 2,
