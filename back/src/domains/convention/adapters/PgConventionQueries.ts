@@ -15,10 +15,12 @@ import {
 } from "shared";
 import { validateAndParseZodSchema } from "../../../config/helpers/httpErrors";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import {
   AssessmentEmailKind,
   ConventionQueries,
+  ConventionSortByDate,
   GetConventionsByFiltersQueries,
 } from "../ports/ConventionQueries";
 import {
@@ -99,11 +101,27 @@ export class PgConventionQueries implements ConventionQueries {
 
   public async getConventionsByFilters(
     filters: GetConventionsByFiltersQueries,
+    sortByDate?: ConventionSortByDate,
   ): Promise<ConventionDto[]> {
+    const conventionsSortByDateToDatabaseConventionsOrderBy: Record<
+      ConventionSortByDate,
+      keyof Pick<Database["conventions"], "date_start" | "date_validation">
+    > = {
+      dateStart: "date_start",
+      dateValidation: "date_validation",
+    };
+
     return pipeWithValue(
       createConventionQueryBuilder(this.transaction),
       addFiltersToBuilder(filters),
-      (builder) => builder.orderBy("conventions.date_start", "desc").execute(),
+      (builder) =>
+        builder.orderBy(
+          sortByDate === undefined
+            ? "conventions.date_start"
+            : `conventions.${conventionsSortByDateToDatabaseConventionsOrderBy[sortByDate]}`,
+          "desc",
+        ),
+      (builder) => builder.execute(),
       andThen(validateConventionResults),
     );
   }

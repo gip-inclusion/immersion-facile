@@ -272,6 +272,30 @@ describe("Pg implementation of ConventionQueries", () => {
       .withAgencyId(agencyId)
       .build();
 
+    const firstValidatedConvention = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa03")
+      .withDateSubmission(new Date("2024-06-20").toISOString())
+      .withDateStart(new Date("2024-07-01").toISOString())
+      .withDateEnd(new Date("2024-07-02").toISOString())
+      .withSchedule(reasonableSchedule)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .validated()
+      .withDateValidation(new Date("2024-06-25").toISOString())
+      .withAgencyId(agencyId)
+      .build();
+
+    const secondValidatedConvention = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa04")
+      .withDateSubmission(new Date("2024-06-21").toISOString())
+      .withDateStart(new Date("2024-07-02").toISOString())
+      .withDateEnd(new Date("2024-07-03").toISOString())
+      .withSchedule(reasonableSchedule)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .validated()
+      .withDateValidation(new Date("2024-06-29").toISOString())
+      .withAgencyId(agencyId)
+      .build();
+
     beforeEach(async () => {
       await agencyRepo.insert(agency);
 
@@ -279,6 +303,8 @@ describe("Pg implementation of ConventionQueries", () => {
         [
           conventionCancelledAndDateStart20230327,
           conventionDraftAndDateStart20230330,
+          firstValidatedConvention,
+          secondValidatedConvention,
         ].map((params) => conventionRepository.save(params)),
       );
     });
@@ -322,6 +348,8 @@ describe("Pg implementation of ConventionQueries", () => {
 
       // Assert
       expectToEqual(resultAll, [
+        secondValidatedConvention,
+        firstValidatedConvention,
         conventionDraftAndDateStart20230330,
         conventionCancelledAndDateStart20230327,
       ]);
@@ -374,6 +402,25 @@ describe("Pg implementation of ConventionQueries", () => {
 
       // Assert
       expectToEqual(resultAll, []);
+    });
+
+    it(`getConventionsByFilters with:
+      - withStatuses ["ACCEPTED-BY-VALIDATOR"]
+      - sort by "date_validation"
+    > expect 2 convention retreived`, async () => {
+      // Act
+      const resultAll = await conventionQueries.getConventionsByFilters(
+        {
+          withStatuses: [firstValidatedConvention.status],
+        },
+        "dateValidation",
+      );
+
+      // Assert
+      expectToEqual(resultAll, [
+        secondValidatedConvention,
+        firstValidatedConvention,
+      ]);
     });
   });
 
