@@ -60,6 +60,7 @@ describe("ContactRequestReminder", () => {
           subject: "This is a contact request",
           message: "Beneficiary message",
           sentAt: date.toISOString(),
+          attachments: [],
         },
       ])
       .build(),

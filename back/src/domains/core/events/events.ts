@@ -17,6 +17,7 @@ import {
   WithConventionIdLegacy,
   WithDiscussionId,
   WithFormEstablishmentDto,
+  WithSiretDto,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentEntity";
@@ -110,10 +111,11 @@ export type DomainEvent =
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
   | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload & WithTriggeredBy>
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>
+  | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
 
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
-
+  
   // AGENCY RELATED
   | GenericEvent<"NewAgencyAdded", WithAgencyDto & WithTriggeredBy>
   | GenericEvent<"AgencyActivated", WithAgencyDto & WithTriggeredBy>

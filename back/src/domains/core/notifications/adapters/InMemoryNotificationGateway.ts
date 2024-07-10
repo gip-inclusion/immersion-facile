@@ -6,7 +6,9 @@ import { NotificationGateway } from "../ports/NotificationGateway";
 
 export const sendSmsErrorPhoneNumber = "0699999999";
 export class InMemoryNotificationGateway implements NotificationGateway {
-  public attachment: Buffer = Buffer.from("");
+  public attachmentsByLinks: Partial<Record<string, Buffer>> = {
+    default: Buffer.from(""),
+  };
 
   readonly #sentEmails: {
     templatedEmail: TemplatedEmail;
@@ -20,8 +22,10 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     private readonly numberOfEmailToKeep: number | null = null,
   ) {}
 
-  public async getAttachmentContent(_downloadToken: string): Promise<Buffer> {
-    return this.attachment;
+  public async getAttachmentContent(link: string): Promise<Buffer> {
+    const attachment = this.attachmentsByLinks[link];
+    if (!attachment) throw new Error(`No attachment found by link ${link}.`);
+    return attachment;
   }
 
   // For testing.

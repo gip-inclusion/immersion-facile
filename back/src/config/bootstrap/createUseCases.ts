@@ -105,9 +105,10 @@ import { RequestEditFormEstablishment } from "../../domains/establishment/use-ca
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../domains/establishment/use-cases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
-import { AddExchangeToDiscussionAndTransferEmail } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussionAndTransferEmail";
+import { AddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
 import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
+import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -171,13 +172,17 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
-      addExchangeToDiscussionAndSendEmail:
-        new AddExchangeToDiscussionAndTransferEmail(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-          config.immersionFacileDomain,
-          gateways.notification,
-        ),
+      addExchangeToDiscussion: new AddExchangeToDiscussion(
+        uowPerformer,
+        createNewEvent,
+        config.immersionFacileDomain,
+      ),
+      sendExchangeToRecipient: new SendExchangeToRecipient(
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
+        config.immersionFacileDomain,
+        gateways.notification,
+      ),
       getDiscussionByIdForEstablishment: new GetDiscussionByIdForEstablishment(
         uowPerformer,
       ),
