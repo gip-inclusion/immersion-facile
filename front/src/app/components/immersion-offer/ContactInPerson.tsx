@@ -3,7 +3,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   AppellationDto,
@@ -11,7 +11,7 @@ import {
   contactEstablishmentInPersonSchema,
   domElementIds,
 } from "shared";
-import { TranscientPreferencesModal } from "src/app/components/immersion-offer/TranscientPreferencesModal";
+import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
 import {
   transcientExpirationTimeInMinutes,
@@ -89,6 +89,8 @@ export const ContactInPerson = ({
 
   const getFieldError = makeFieldError(formState);
 
+  const formRef = useRef<HTMLFormElement>(null);
+
   const onFormValid = async (values: ContactEstablishmentInPersonDto) => {
     const errorKind =
       await outOfReduxDependencies.searchGateway.contactEstablishment(values);
@@ -101,8 +103,9 @@ export const ContactInPerson = ({
     <form
       onSubmit={handleSubmit(onFormValid)}
       id={"im-contact-form--in-person"}
+      ref={formRef}
     >
-      <TranscientPreferencesModal
+      <TranscientPreferencesDisplay
         scope="contact-establishment"
         onPreferencesChange={(accept) => {
           const newInitialValues = accept
@@ -113,6 +116,8 @@ export const ContactInPerson = ({
             : initialValues;
           reset(newInitialValues);
         }}
+        mode={"form-overlay"}
+        parentRef={formRef}
       />
       <>
         <p className={"fr-my-2w"}>

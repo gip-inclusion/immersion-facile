@@ -45,20 +45,24 @@ export const contactEstablishmentByMailFormSchema: z.Schema<ContactEstablishment
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
-    message: zTrimmedString,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema,
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
+    datePreferences: zTrimmedString,
+    hasWorkingExperience: z.boolean(),
+    experienceAdditionalInformation: zTrimmedString,
   });
 
 export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailDto> =
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
-    message: zTrimmedString,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
+    datePreferences: zTrimmedString,
+    hasWorkingExperience: z.boolean(),
+    experienceAdditionalInformation: zTrimmedString,
   });
 
 export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByPhoneDto> =
