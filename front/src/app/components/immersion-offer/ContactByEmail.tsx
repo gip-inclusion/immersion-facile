@@ -1,21 +1,22 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
-import CallOut from "@codegouvfr/react-dsfr/CallOut";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import Select from "@codegouvfr/react-dsfr/SelectNext";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
+import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AppellationDto,
   ContactEstablishmentByMailDto,
+  ImmersionObjective,
   OmitFromExistingKeys,
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
 } from "shared";
-import { TranscientPreferencesModal } from "src/app/components/immersion-offer/TranscientPreferencesModal";
+import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
 import {
   transcientExpirationTimeInMinutes,
@@ -38,17 +39,6 @@ type ContactByEmailProps = {
   onSubmitSuccess: () => void;
 };
 
-const motivationPlaceholder =
-  "***Rédigez ici votre email de motivation en suivant nos conseils.***";
-const initialMessage = `Bonjour, \n\n\
-J’ai trouvé votre entreprise sur le site https://immersion-facile.beta.gouv.fr\n\
-${motivationPlaceholder}
-  \n\
-Pourriez-vous me contacter par mail ou par téléphone pour me proposer un rendez-vous ? \n\
-Je pourrais alors vous expliquer directement mon projet. \n\
-  \n\
-En vous remerciant,`;
-
 export const inputsLabelsByKey: Record<
   keyof OmitFromExistingKeys<
     ContactEstablishmentByMailDto,
@@ -60,15 +50,17 @@ export const inputsLabelsByKey: Record<
   >,
   string
 > = {
-  immersionObjective:
-    "Objet de la période de mise en situation en milieu professionnel *",
+  immersionObjective: "But de l'immersion *",
   appellationCode: "Métier sur lequel porte la demande d'immersion *",
-  message: "Votre message à l’entreprise *",
+  datePreferences: "Dates d'immersion envisagées *",
   potentialBeneficiaryFirstName: "Prénom *",
   potentialBeneficiaryLastName: "Nom *",
   potentialBeneficiaryEmail: "Email *",
   potentialBeneficiaryPhone: "Téléphone *",
   potentialBeneficiaryResumeLink: "Page LinkedIn ou CV en ligne (optionnel)",
+  hasWorkingExperience: "Expérience professionnelle",
+  experienceAdditionalInformation:
+    "Détaillez en quelques lignes vos expériences et compétences *",
 };
 
 export const ContactByEmail = ({
@@ -77,15 +69,18 @@ export const ContactByEmail = ({
 }: ContactByEmailProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<typeof routes.searchResult>;
+
+  const [invalidEmailMessage, setInvalidEmailMessage] = useState<string | null>(
+    null,
+  );
+
   const {
     getTranscientDataForScope,
     setTranscientDataForScope,
     getPreferUseTranscientDataForScope,
   } = useTranscientDataFromStorage("contact-establishment", false);
 
-  const [invalidEmailMessage, setInvalidEmailMessage] = useState<string | null>(
-    null,
-  );
+  const formRef = useRef<HTMLFormElement>(null);
 
   const transcientDataForScope = getTranscientDataForScope();
   const preferUseTranscientData = getPreferUseTranscientDataForScope();
@@ -98,10 +93,11 @@ export const ContactByEmail = ({
         route.params.appellationCode,
       ),
       contactMode: "EMAIL",
+      datePreferences: "",
+      hasWorkingExperience: false,
       potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
       potentialBeneficiaryLastName: route.params.contactLastName ?? "",
       potentialBeneficiaryEmail: route.params.contactEmail ?? "",
-      message: route.params.contactMessage ?? initialMessage,
       immersionObjective: null,
       potentialBeneficiaryResumeLink: "",
       potentialBeneficiaryPhone: route.params.contactPhone ?? "",
@@ -110,6 +106,7 @@ export const ContactByEmail = ({
       ...(preferUseTranscientData && transcientDataForScope?.value
         ? { ...transcientDataForScope.value }
         : {}),
+      experienceAdditionalInformation: "",
     }),
     [
       appellations,
@@ -137,7 +134,11 @@ export const ContactByEmail = ({
     formState,
     formState: { isSubmitting },
     reset,
+    setValue,
+    watch,
   } = methods;
+
+  const hasWorkingExperienceValue = watch("hasWorkingExperience");
 
   const getFieldError = makeFieldError(formState);
 
@@ -146,73 +147,40 @@ export const ContactByEmail = ({
     const errorKind =
       await outOfReduxDependencies.searchGateway.contactEstablishment({
         ...values,
-        message: removeMotivationPlaceholder(values.message),
       });
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };
   return (
     <FormProvider {...methods}>
-      <TranscientPreferencesModal
-        scope="contact-establishment"
-        onPreferencesChange={(accept) => {
-          const newInitialValues = accept
-            ? {
-                ...initialValues,
-                ...transcientDataForScope?.value,
-              }
-            : initialValues;
-          reset(newInitialValues);
-        }}
-      />
-      <form onSubmit={handleSubmit(onFormValid)} id={"im-contact-form--email"}>
+      <form
+        onSubmit={handleSubmit(onFormValid)}
+        id={"im-contact-form--email"}
+        ref={formRef}
+      >
+        <TranscientPreferencesDisplay
+          scope="contact-establishment"
+          onPreferencesChange={(accept) => {
+            const newInitialValues = accept
+              ? {
+                  ...initialValues,
+                  ...transcientDataForScope?.value,
+                }
+              : initialValues;
+            reset(newInitialValues);
+          }}
+          mode="form-overlay"
+          parentRef={formRef}
+        />
         <>
           <p>
             Cette entreprise a choisi d'être contactée par mail. Veuillez
             compléter ce formulaire qui sera transmis à l'entreprise.
           </p>
-          <CallOut title="Besoin d'aide ?">
-            <a
-              href="https://immersion-facile.beta.gouv.fr/aide/article/choisir-lobjet-et-rediger-un-email-de-motivation-pour-decrocher-une-immersion-xytzii/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Nos conseils pour choisir l’objet et rédiger un bon email de
-              motivation.
-            </a>
-          </CallOut>
-          <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
-            Votre email de motivation
-          </h2>
-          <Select
-            label={inputsLabelsByKey.immersionObjective}
-            options={immersionObjectiveListOfOptions}
-            placeholder={"Sélectionnez un objet"}
-            nativeSelectProps={{
-              ...register("immersionObjective"),
-            }}
-            {...getFieldError("immersionObjective")}
-          />
-          <Select
-            disabled={appellations.length === 1}
-            label={inputsLabelsByKey.appellationCode}
-            options={appellationListOfOptions}
-            placeholder={"Sélectionnez un métier"}
-            nativeSelectProps={{
-              ...register("appellationCode"),
-            }}
-            {...getFieldError("appellationCode")}
-          />
-          <Input
-            label={inputsLabelsByKey.message}
-            textArea
-            nativeTextAreaProps={{
-              ...register("message"),
-              rows: 6,
-            }}
-            {...getFieldError("message")}
-          />
-          <h2 className={fr.cx("fr-h6")}>Vos informations</h2>
+          <h2 className={fr.cx("fr-h6")}>Vos informations de contact</h2>
+          <p className={fr.cx("fr-hint-text")}>
+            Pour permettre à l’entreprise de vous recontacter.
+          </p>
           <Input
             label={inputsLabelsByKey.potentialBeneficiaryFirstName}
             nativeInputProps={register("potentialBeneficiaryFirstName")}
@@ -245,6 +213,83 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("potentialBeneficiaryPhone")}
           />
+
+          <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>Votre immersion</h2>
+          <p className={fr.cx("fr-hint-text")}>
+            Donnez un maximum d’informations à l’entreprise pour qu’elle sache
+            si elle est en capacité de vous accueillir.
+          </p>
+          <Select
+            label={inputsLabelsByKey.immersionObjective}
+            options={immersionObjectiveListOfOptions}
+            placeholder={"But de l'immersion"}
+            nativeSelectProps={{
+              ...register("immersionObjective"),
+            }}
+            {...getFieldError("immersionObjective")}
+          />
+          <Select
+            disabled={appellations.length === 1}
+            label={inputsLabelsByKey.appellationCode}
+            options={appellationListOfOptions}
+            nativeSelectProps={{
+              ...register("appellationCode"),
+            }}
+            {...getFieldError("appellationCode")}
+          />
+          <Input
+            label={inputsLabelsByKey.datePreferences}
+            hintText={
+              "Exemple :  “du 1er au 10 juillet” ou “deux semaines en juin” ou “je suis flexible”"
+            }
+            nativeInputProps={{
+              ...register("datePreferences"),
+            }}
+            {...getFieldError("datePreferences")}
+          />
+
+          <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
+            Vos expériences et compétences
+          </h2>
+          <p className={fr.cx("fr-hint-text")}>
+            N’hésitez pas à détailler vos compétences, cela augmentera vos
+            chances de recevoir une réponse positive de l’entreprise.
+          </p>
+
+          <RadioButtons
+            options={[
+              {
+                label: "Je n'ai jamais travaillé",
+                nativeInputProps: {
+                  value: 0,
+                  checked: hasWorkingExperienceValue === false,
+                  onChange: () => {
+                    setValue("hasWorkingExperience", false);
+                  },
+                },
+              },
+              {
+                label:
+                  "J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat",
+                nativeInputProps: {
+                  value: 1,
+                  checked: hasWorkingExperienceValue === true,
+                  onChange: () => {
+                    setValue("hasWorkingExperience", true);
+                  },
+                },
+              },
+            ]}
+          />
+          <Input
+            label={inputsLabelsByKey.experienceAdditionalInformation}
+            hintText="Exemple : “travail en équipe”, “mise en rayon”, “babysitting”, etc."
+            nativeTextAreaProps={{
+              ...register("experienceAdditionalInformation"),
+            }}
+            {...getFieldError("experienceAdditionalInformation")}
+            textArea
+          />
           <Input
             label={inputsLabelsByKey.potentialBeneficiaryResumeLink}
             nativeInputProps={{
@@ -252,6 +297,7 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("potentialBeneficiaryResumeLink")}
           />
+
           <ButtonsGroup
             className={fr.cx()}
             alignment="right"
@@ -291,11 +337,15 @@ export const ContactByEmail = ({
   );
 };
 
-const immersionObjectiveListOfOptions = conventionObjectiveOptions.map(
-  (immersionObjective) => ({
+export const labelsForImmersionObjective: Record<ImmersionObjective, string> = {
+  "Confirmer un projet professionnel": "Je compte me former à ce métier",
+  "Découvrir un métier ou un secteur d'activité":
+    "J'en suis au premier stade de ma réorientation et je veux en savoir plus sur ce métier",
+  "Initier une démarche de recrutement": "Je suis à la recherche d'un emploi",
+};
+
+const immersionObjectiveListOfOptions: SelectProps.Option<ImmersionObjective>[] =
+  conventionObjectiveOptions.map((immersionObjective) => ({
     value: immersionObjective,
-    label: immersionObjective,
-  }),
-);
-const removeMotivationPlaceholder = (message: string) =>
-  message.replace(`\n${motivationPlaceholder}`, "");
+    label: labelsForImmersionObjective[immersionObjective],
+  }));

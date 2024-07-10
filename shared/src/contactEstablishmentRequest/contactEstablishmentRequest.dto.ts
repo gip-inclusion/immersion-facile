@@ -17,10 +17,12 @@ export type ContactInformations<T extends ContactMethod> = {
 } & WithAcquisition;
 
 export type ContactEstablishmentByMailDto = ContactInformations<"EMAIL"> & {
-  message: string;
   potentialBeneficiaryPhone: string;
   immersionObjective: ImmersionObjective | null;
   potentialBeneficiaryResumeLink?: string;
+  datePreferences: string;
+  hasWorkingExperience: boolean;
+  experienceAdditionalInformation: string;
 };
 
 export type ContactEstablishmentInPersonDto = ContactInformations<"IN_PERSON">;
