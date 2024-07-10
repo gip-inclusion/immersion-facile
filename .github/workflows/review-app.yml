@@ -3,9 +3,9 @@ name: "Review app"
 on:
   pull_request:
     types:
-      - opened,
-      - ready_for_review,
-      - review_requested,
+      - opened
+      - ready_for_review
+      - review_requested
       - synchronize
 concurrency:
   group: review-app-${{ github.event.number }}
