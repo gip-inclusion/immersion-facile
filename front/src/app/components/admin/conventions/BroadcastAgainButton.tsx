@@ -28,7 +28,7 @@ const useApiConsumers = () => {
   return { apiConsumers };
 };
 
-const broadcastAgainButton = createModal({
+const broadcastAgainModal = createModal({
   isOpenedByDefault: false,
   id: "im-broadcast-modal",
 });
@@ -37,19 +37,12 @@ const isConventionInScope = (
   apiConsumer: ApiConsumer,
   convention: ConventionReadDto,
 ) => {
-  if (
+  return (
     apiConsumer.rights.convention.scope.agencyKinds?.includes(
       convention.agencyKind,
-    )
-  )
-    return true;
-
-  if (
+    ) ||
     apiConsumer.rights.convention.scope.agencyIds?.includes(convention.agencyId)
-  )
-    return true;
-
-  return false;
+  );
 };
 
 export const BroadcastAgainButton = ({
@@ -79,13 +72,13 @@ export const BroadcastAgainButton = ({
         priority="secondary"
         className={fr.cx("fr-m-1w")}
         onClick={() => {
-          broadcastAgainButton.open();
+          broadcastAgainModal.open();
         }}
       >
         Rediffuser au partenaire
       </Button>
       {createPortal(
-        <broadcastAgainButton.Component title="Rediffuser au partenaire">
+        <broadcastAgainModal.Component title="Rediffuser au partenaire">
           Vous allez rediffuser aux partenaires suivant :
           <ul>
             {partners.map(({ name, id }) => (
@@ -100,12 +93,12 @@ export const BroadcastAgainButton = ({
                   feedbackTopic: "broadcast-convention-again",
                 }),
               );
-              broadcastAgainButton.close();
+              broadcastAgainModal.close();
             }}
           >
             Rediffuser
           </Button>
-        </broadcastAgainButton.Component>,
+        </broadcastAgainModal.Component>,
         document.body,
       )}
     </>
