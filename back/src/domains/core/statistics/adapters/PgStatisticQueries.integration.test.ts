@@ -39,6 +39,7 @@ describe("PgStatisticQueries", () => {
       db,
     );
     await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("establishments").execute();
   });
