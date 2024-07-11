@@ -75,6 +75,12 @@ describe("PgDiscussionRepository", () => {
           recipient: "establishment",
           sentAt: date.toISOString(),
           subject: "",
+          attachments: [
+            {
+              link: "magicTokenBrevo",
+              name: "monPdf.pdf",
+            },
+          ],
         },
       ])
       .withCreatedAt(date)
@@ -89,6 +95,7 @@ describe("PgDiscussionRepository", () => {
         sender: "establishment",
         sentAt: date.toISOString(),
         subject: "",
+        attachments: [],
       },
     ])
     .withCreatedAt(date)
@@ -336,10 +343,11 @@ describe("PgDiscussionRepository", () => {
             recipient: "potentialBeneficiary",
             sentAt: new Date("2023-11-11").toISOString(),
             sender: "establishment",
+            attachments: [],
           },
         ])
         .build();
-      const discussionOld = new DiscussionBuilder()
+      const discussionOldWithExchange = new DiscussionBuilder()
         .withSiret(siret)
         .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120103")
         .withCreatedAt(new Date("2022-11-11"))
@@ -350,21 +358,42 @@ describe("PgDiscussionRepository", () => {
             recipient: "potentialBeneficiary",
             sentAt: new Date("2022-11-11").toISOString(),
             sender: "establishment",
+            attachments: [
+              {
+                link: "dlskfjsdmlfsdmlfjsdmlfj",
+                name: "pj",
+              },
+            ],
           },
         ])
         .build();
 
       await Promise.all([
         pgDiscussionRepository.insert(discussion1),
-        pgDiscussionRepository.insert(discussionOld),
+        pgDiscussionRepository.insert(discussionOldWithExchange),
       ]);
 
       const numberOfUpdatedMessages =
         await pgDiscussionRepository.deleteOldMessages(since);
 
       expectToEqual(numberOfUpdatedMessages, 1);
-      await expectMessageToBeDeleted(discussion1, "mon nouveau message");
-      await expectMessageToBeDeleted(discussionOld, "Supprimé car trop ancien");
+
+      expectToEqual(
+        await pgDiscussionRepository.getById(discussion1.id),
+        discussion1,
+      );
+      expectToEqual(
+        await pgDiscussionRepository.getById(discussionOldWithExchange.id),
+        new DiscussionBuilder(discussionOldWithExchange)
+          .withExchanges([
+            {
+              ...discussionOldWithExchange.exchanges[0],
+              message: "Supprimé car trop ancien",
+              attachments: [],
+            },
+          ])
+          .build(),
+      );
     });
   });
 
@@ -413,24 +442,4 @@ describe("PgDiscussionRepository", () => {
       expect(numberOfDiscussions).toBe(2);
     });
   });
-
-  const expectMessageToBeDeleted = async (
-    discussion: DiscussionDto,
-    expectedMessage: string,
-  ) => {
-    expectToEqual(
-      await pgDiscussionRepository.getById(discussion.id),
-      new DiscussionBuilder(discussion)
-        .withExchanges([
-          {
-            subject: "mon nouveau sujet",
-            message: expectedMessage,
-            recipient: "potentialBeneficiary",
-            sentAt: discussion.exchanges[0].sentAt,
-            sender: "establishment",
-          },
-        ])
-        .build(),
-    );
-  };
 });
