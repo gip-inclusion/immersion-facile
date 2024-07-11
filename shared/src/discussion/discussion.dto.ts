@@ -26,6 +26,8 @@ export type DiscussionPotentialBeneficiary = {
   lastName: string;
   phone?: string;
   resumeLink?: string;
+  hasWorkingExperience?: boolean;
+  experienceAdditionalInformation?: string;
 };
 
 export type DiscussionEstablishmentContact = {

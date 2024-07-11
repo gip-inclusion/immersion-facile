@@ -15,6 +15,7 @@ import {
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
+  labelsForImmersionObjective,
 } from "shared";
 import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
@@ -335,13 +336,6 @@ export const ContactByEmail = ({
       </form>
     </FormProvider>
   );
-};
-
-export const labelsForImmersionObjective: Record<ImmersionObjective, string> = {
-  "Confirmer un projet professionnel": "Je compte me former à ce métier",
-  "Découvrir un métier ou un secteur d'activité":
-    "J'en suis au premier stade de ma réorientation et je veux en savoir plus sur ce métier",
-  "Initier une démarche de recrutement": "Je suis à la recherche d'un emploi",
 };
 
 const immersionObjectiveListOfOptions: SelectProps.Option<ImmersionObjective>[] =
