@@ -55,7 +55,7 @@ export const createTechnicalRouter = (
     }),
     async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.addExchangeToDiscussionAndSendEmail.execute(req.body),
+        deps.useCases.addExchangeToDiscussion.execute(req.body),
       ),
   );
 

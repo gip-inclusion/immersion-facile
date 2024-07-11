@@ -6,43 +6,36 @@ import {
   Exchange,
   ExchangeRole,
   brevoInboundBodySchema,
-  createOpaqueEmail,
   immersionFacileContactEmail,
-  immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
   BadRequestError,
   NotFoundError,
 } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";
+import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { addExchangeToDiscussion } from "../../helpers/discussion.helpers";
 
 const defaultSubject = "Sans objet";
 
-export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCase<BrevoInboundBody> {
+export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBody> {
   protected inputSchema = brevoInboundBodySchema;
 
   readonly #replyDomain: string;
 
-  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
-  readonly #notificationGateway: NotificationGateway;
+  readonly #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    createNewEvent: CreateNewEvent,
     domain: string,
-    notificationGateway: NotificationGateway,
   ) {
     super(uowPerformer);
     this.#replyDomain = `reply.${domain}`;
 
-    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#notificationGateway = notificationGateway;
+    this.#createNewEvent = createNewEvent;
   }
 
   protected async _execute(
@@ -97,63 +90,22 @@ export class AddExchangeToDiscussionAndTransferEmail extends TransactionalUseCas
       sentAt: new Date(item.SentAtDate).toISOString(),
       recipient: recipientKind,
       sender,
+      attachments: item.Attachments.map(({ Name, DownloadToken }) => ({
+        name: Name,
+        link: DownloadToken,
+      })),
     };
 
     await uow.discussionRepository.update(
       addExchangeToDiscussion(discussion, exchange),
     );
 
-    const [appellation] =
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-        discussion.appellationCode,
-      ]);
-
-    await this.#saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        kind: "DISCUSSION_EXCHANGE",
-        sender: immersionFacileNoReplyEmailSender,
-        params: {
-          subject: exchange.subject,
-          htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
-                  <br /><ul>
-                  <li>Candidat : ${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}</li>
-                  <li>Métier : ${appellation?.appellationLabel}</li>
-                  <li>Entreprise : ${discussion.businessName} - ${discussion.address.streetNumberAndAddress} ${discussion.address.postcode} ${discussion.address.city}</li>
-                  </ul><br /></div>
-            ${exchange.message}`,
-        },
-        recipients: [
-          recipientKind === "establishment"
-            ? discussion.establishmentContact.email
-            : discussion.potentialBeneficiary.email,
-        ],
-        cc:
-          recipientKind === "establishment"
-            ? discussion.establishmentContact.copyEmails
-            : [],
-        replyTo: {
-          email: createOpaqueEmail(discussion.id, sender, this.#replyDomain),
-          name:
-            sender === "establishment"
-              ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`
-              : `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
-        },
-        attachments: await Promise.all(
-          item.Attachments.map(async (attachment) => ({
-            name: attachment.Name,
-            content: (
-              await this.#notificationGateway.getAttachmentContent(
-                attachment.DownloadToken,
-              )
-            ).toString("base64"),
-          })),
-        ),
-      },
-      followedIds: {
-        establishmentSiret: discussion.siret,
-      },
-    });
+    await uow.outboxRepository.save(
+      this.#createNewEvent({
+        topic: "ExchangeAddedToDiscussion",
+        payload: { discussionId: discussion.id, siret: discussion.siret },
+      }),
+    );
   }
 }
 

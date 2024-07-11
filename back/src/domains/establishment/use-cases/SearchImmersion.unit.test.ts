@@ -101,6 +101,7 @@ const establishmentExchange: Exchange = {
   sender: "establishment",
   sentAt: new Date("2024-04-03").toISOString(),
   subject: "",
+  attachments: [],
 };
 const potentialBeneficiaryExchange: Exchange = {
   message: "",
@@ -108,6 +109,7 @@ const potentialBeneficiaryExchange: Exchange = {
   sender: "potentialBeneficiary",
   sentAt: new Date("2024-04-02").toISOString(),
   subject: "",
+  attachments: [],
 };
 
 describe("SearchImmersionUseCase", () => {

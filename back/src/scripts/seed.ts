@@ -257,6 +257,7 @@ const establishmentSeed = async (uow: UnitOfWork) => {
           sentAt: new Date("2024-02-02").toISOString(),
           subject: "Présentation",
           message: "Bonjour, je me présente!",
+          attachments: [],
         },
         {
           sender: "establishment",
@@ -264,6 +265,7 @@ const establishmentSeed = async (uow: UnitOfWork) => {
           sentAt: new Date("2024-02-03").toISOString(),
           subject: "Réponse entreprise",
           message: "Allez viens on est bien.",
+          attachments: [],
         },
       ])
       .build(),

@@ -42,6 +42,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .updateTable("exchanges")
       .set({
         message: "Supprimé car trop ancien",
+        attachments: sql`CAST(${JSON.stringify([])} AS JSONB)`,
       })
       .where("sent_at", "<=", endedSince)
       .executeTakeFirst();
@@ -182,6 +183,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
                   recipient: ref("recipient"),
                   sender: ref("sender"),
                   sentAt: ref("sent_at"),
+                  attachments: ref("attachments"),
                 }),
               ])
               .as("exchanges"),
@@ -312,6 +314,9 @@ export class PgDiscussionRepository implements DiscussionRepository {
           sender: exchange.sender,
           recipient: exchange.recipient,
           sent_at: exchange.sentAt,
+          attachments: sql`CAST(${JSON.stringify(
+            exchange.attachments,
+          )} AS JSONB)`,
         })),
       )
       .execute();

@@ -24,6 +24,7 @@ export const siretInfoErrors = [
 ] as const;
 
 export type SiretDto = Flavor<string, "SiretDto">;
+export type WithSiretDto = { siret: SiretDto };
 export type SiretEstablishmentDto = {
   siret: SiretDto;
   businessName: string;
