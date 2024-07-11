@@ -121,6 +121,7 @@ interface Exchanges {
   sent_at: Timestamp;
   subject: Generated<string>;
   id: Generated<number>;
+  attachments: Generated<Json>;
 }
 
 interface Groups {
