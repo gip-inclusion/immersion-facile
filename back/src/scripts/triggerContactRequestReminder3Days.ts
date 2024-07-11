@@ -28,7 +28,7 @@ const executeContactRequestReminder = () => {
     },
     uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
       .uowPerformer,
-  }).execute("3days", undefined);
+  }).execute("3days");
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
@@ -36,6 +36,7 @@ handleEndOfScriptNotification(
   "contactRequestReminderScript3Days",
   config,
   executeContactRequestReminder,
-  (notificationsQty) => `Total of reminders : ${notificationsQty}`,
+  ({ numberOfNotifications }) =>
+    `Total of reminders : ${numberOfNotifications}`,
   logger,
 );
