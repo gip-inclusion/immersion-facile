@@ -12,7 +12,7 @@ import type {
   EventPublication,
 } from "../events";
 import { EventBus } from "../ports/EventBus";
-import { InMemoryEventBus } from "./InMemoryEventBus";
+import { InMemoryEventBus, getLastPublication } from "./InMemoryEventBus";
 
 const domainEvt: DomainEvent = {
   id: "anId",
@@ -268,9 +268,8 @@ describe("InMemoryEventBus", () => {
     it("does the work on the last publications even if it is not ordered in event publication", async () => {
       // Prepare
       const publications: EventPublication[] = [
-        { publishedAt: new Date("2022-01-02").toISOString(), failures: [] },
         {
-          publishedAt: new Date("2022-01-01").toISOString(),
+          publishedAt: new Date("2021-01-01").toISOString(),
           failures: [
             {
               errorMessage: "Initially Failed",
@@ -278,6 +277,16 @@ describe("InMemoryEventBus", () => {
             },
           ],
         },
+        {
+          publishedAt: new Date("2022-01-02").toISOString(),
+          failures: [
+            {
+              errorMessage: "Newly Failed",
+              subscriptionId: failedSubscriptionId,
+            },
+          ],
+        },
+        { publishedAt: new Date("2022-01-01").toISOString(), failures: [] },
       ];
 
       const publishedEventWithNotOrderedPublications: DomainEvent = {
@@ -418,6 +427,42 @@ describe("InMemoryEventBus", () => {
           ],
         },
       ]);
+    });
+  });
+
+  describe("getLastPublication", () => {
+    it("get only the last publication", () => {
+      const failedSubscriptionId = "failedSubscription";
+      const eventToRePublish: DomainEvent = {
+        ...domainEvt,
+        wasQuarantined: false,
+        status: "failed-but-will-retry",
+        publications: [
+          {
+            publishedAt: new Date("2021-01-01").toISOString(),
+            failures: [
+              {
+                errorMessage: "Initially Failed",
+                subscriptionId: failedSubscriptionId,
+              },
+            ],
+          },
+          {
+            publishedAt: new Date("2022-01-02").toISOString(),
+            failures: [
+              {
+                errorMessage: "Newly Failed",
+                subscriptionId: failedSubscriptionId,
+              },
+            ],
+          },
+          { publishedAt: new Date("2022-01-01").toISOString(), failures: [] },
+        ],
+      };
+
+      const lastPublication = getLastPublication(eventToRePublish);
+
+      expect(lastPublication?.publishedAt).toBe("2022-01-02T00:00:00.000Z");
     });
   });
 });

@@ -228,7 +228,13 @@ const monitorErrorInCallback = (error: any, event: DomainEvent) => {
   });
 };
 
-const getLastPublication = (event: DomainEvent): EventPublication | undefined =>
+export const getLastPublication = (
+  event: DomainEvent,
+): EventPublication | undefined =>
   event.publications
-    .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
+    .sort((a, b) => {
+      if (a.publishedAt > b.publishedAt) return 1;
+      if (a.publishedAt < b.publishedAt) return -1;
+      return 0;
+    })
     .at(-1);
