@@ -455,11 +455,6 @@ export const RenewConventionForm = ({
   );
 };
 
-// const showBroadcastButton = (convention: ConventionReadDto, roles: Role[]) => {
-//   const allowedRoles: Role[] = ["backOffice"];
-//   return roles.some((role) => allowedRoles.includes(role));
-// };
-
 const isAllowedTransition = (
   convention: ConventionReadDto,
   targetStatus: ConventionStatus,
