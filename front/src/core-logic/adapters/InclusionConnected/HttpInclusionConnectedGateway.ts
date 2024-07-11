@@ -125,10 +125,7 @@ export class HttpInclusionConnectedGateway
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: 400 }, logBodyAndThrow)
-            .with({ status: 401 }, logBodyAndThrow)
-            .with({ status: 403 }, logBodyAndThrow)
-            .with({ status: 404 }, logBodyAndThrow)
+            .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
