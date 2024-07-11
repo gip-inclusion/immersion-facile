@@ -101,6 +101,7 @@ import { EditFormEstablishment } from "../../domains/establishment/use-cases/Edi
 import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
 import { InsertEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/InsertEstablishmentAggregateFromFormEstablishement";
+import { LegacyContactEstablishment } from "../../domains/establishment/use-cases/LegacyContactEstablishment";
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
 import { RequestEditFormEstablishment } from "../../domains/establishment/use-cases/RequestEditFormEstablishment";
@@ -369,6 +370,13 @@ export const createUseCases = (
         saveNotificationAndRelatedEvent,
       ),
       contactEstablishment: new ContactEstablishment(
+        uowPerformer,
+        createNewEvent,
+        uuidGenerator,
+        gateways.timeGateway,
+        config.minimumNumberOfDaysBetweenSimilarContactRequests,
+      ),
+      legacyContactEstablishment: new LegacyContactEstablishment(
         uowPerformer,
         createNewEvent,
         uuidGenerator,

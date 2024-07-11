@@ -1,8 +1,8 @@
 import {
   AppellationCode,
-  ContactEstablishmentRequestDto,
   ContactMethod,
   ImmersionObjective,
+  LegacyContactEstablishmentRequestDto,
   LocationId,
   SiretDto,
 } from "shared";
@@ -40,7 +40,7 @@ export const contactEstablishmentPublicV2ToDomain =
   (getLocationId: () => Promise<LocationId>) =>
   async (
     contactRequest: ContactEstablishmentPublicV2Dto,
-  ): Promise<ContactEstablishmentRequestDto> => ({
+  ): Promise<LegacyContactEstablishmentRequestDto> => ({
     ...contactRequest,
     locationId: await getLocationId(),
   });

@@ -145,7 +145,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
             getFirstLocationIdOrThrow(deps.uowPerformer, req.body.siret),
           ),
           andThen((contactRequest) =>
-            deps.useCases.contactEstablishment.execute(
+            deps.useCases.legacyContactEstablishment.execute(
               addAcquisitionParams(contactRequest, req.apiConsumer),
             ),
           ),

@@ -102,10 +102,20 @@ export const TranscientPreferencesDisplay = (
           {
             type: "button",
             priority: "secondary",
-            children: "Non",
+            children: "Pas cette fois",
             id: "transcient-preferences-modal-no",
             onClick: () => {
               savePreferences(false);
+            },
+          },
+          {
+            type: "button",
+            priority: "secondary",
+            children: "Non, ce n'est pas moi",
+            id: "transcient-preferences-modal-no",
+            onClick: () => {
+              savePreferences(false);
+              setTranscientDataForScope(null);
             },
           },
         ]}

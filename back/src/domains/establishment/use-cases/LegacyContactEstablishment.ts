@@ -1,17 +1,15 @@
 import subDays from "date-fns/subDays";
 import {
-  ContactEstablishmentByMailDto,
-  ContactEstablishmentRequestDto,
   DiscussionDto,
-  contactEstablishmentRequestSchema,
-  labelsForImmersionObjective,
+  LegacyContactEstablishmentRequestDto,
+  legacyContactEstablishmentRequestSchema,
 } from "shared";
 import {
   BadRequestError,
   ConflictError,
   ForbiddenError,
   NotFoundError,
-} from "shared";
+} from "../../../config/helpers/httpErrors";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -25,8 +23,8 @@ import {
   EstablishmentEntity,
 } from "../entities/EstablishmentEntity";
 
-export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
-  protected inputSchema = contactEstablishmentRequestSchema;
+export class LegacyContactEstablishment extends TransactionalUseCase<LegacyContactEstablishmentRequestDto> {
+  protected inputSchema = legacyContactEstablishmentRequestSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -53,7 +51,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   }
 
   public async _execute(
-    contactRequest: ContactEstablishmentRequestDto,
+    contactRequest: LegacyContactEstablishmentRequestDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const now = this.#timeGateway.now();
@@ -66,9 +64,15 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     if (!establishmentAggregate)
       throw new NotFoundError(`No establishment found with siret: ${siret}`);
 
-    if (contactMode !== establishmentAggregate.contact.contactMethod)
+    const establishmentContact = establishmentAggregate.contact;
+    if (!establishmentContact)
+      throw new NotFoundError(
+        `No contact found for establishment with siret: ${siret}`,
+      );
+
+    if (contactMode !== establishmentContact.contactMethod)
       throw new BadRequestError(
-        `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${establishmentAggregate.contact.contactMethod}`,
+        `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${establishmentContact.contactMethod}`,
       );
 
     if (
@@ -120,7 +124,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
     const discussion = this.#createDiscussion({
       contactRequest,
-      contact: establishmentAggregate.contact,
+      contact: establishmentContact,
       establishment: establishmentAggregate.establishment,
       now,
     });
@@ -138,9 +142,9 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       this.#createNewEvent({
         topic: "ContactRequestedByBeneficiary",
         payload: {
-          siret: discussion.siret,
+          ...contactRequest,
           discussionId: discussion.id,
-          triggeredBy: null,
+          triggeredBy: undefined,
         },
       }),
     );
@@ -152,7 +156,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     establishment,
     now,
   }: {
-    contactRequest: ContactEstablishmentRequestDto;
+    contactRequest: LegacyContactEstablishmentRequestDto;
     contact: ContactEntity;
     establishment: EstablishmentEntity;
     now: Date;
@@ -180,15 +184,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         firstName: contactRequest.potentialBeneficiaryFirstName,
         lastName: contactRequest.potentialBeneficiaryLastName,
         email: contactRequest.potentialBeneficiaryEmail,
-        ...(contactRequest.contactMode === "EMAIL"
-          ? { hasWorkingExperience: contactRequest.hasWorkingExperience }
-          : {}),
-        ...(contactRequest.contactMode === "EMAIL"
-          ? {
-              experienceAdditionalInformation:
-                contactRequest.experienceAdditionalInformation,
-            }
-          : {}),
         phone:
           contactRequest.contactMode === "EMAIL"
             ? contactRequest.potentialBeneficiaryPhone
@@ -213,20 +208,14 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
               {
                 subject: "Demande de contact initiée par le bénéficiaire",
                 sentAt: now.toISOString(),
-                message: formatContactRequestMessage({
-                  contact,
-                  establishment,
-                  contactRequest,
-                }),
+                message: contactRequest.message,
                 recipient: "establishment",
                 sender: "potentialBeneficiary",
-                attachments: [],
               },
             ]
           : [],
       acquisitionCampaign: contactRequest.acquisitionCampaign,
       acquisitionKeyword: contactRequest.acquisitionKeyword,
-      status: "PENDING",
     };
   }
 
@@ -238,7 +227,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   }: {
     uow: UnitOfWork;
     establishmentAggregate: EstablishmentAggregate;
-    contactRequest: ContactEstablishmentRequestDto;
+    contactRequest: LegacyContactEstablishmentRequestDto;
     now: Date;
   }) {
     const maxContactsPerWeekForEstablishment =
@@ -266,50 +255,3 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     }
   }
 }
-
-const formatContactRequestMessage = ({
-  establishment,
-  contact,
-  contactRequest,
-}: {
-  establishment: EstablishmentEntity;
-  contact: ContactEntity;
-  contactRequest: ContactEstablishmentByMailDto;
-}) => {
-  return `Bonjour ${contact.firstName} ${contact.lastName},
-
-Un candidat souhaite faire une immersion dans votre entreprise ${
-    establishment.name
-  } (TODO ADDRESS).
-
-Immersion souhaitée :
-
-    Métier : ${contactRequest.appellationCode} TODO APPELLATION LABEL.
-    Dates d’immersion envisagées : ${contactRequest.datePreferences}.
-    ${
-      contactRequest.immersionObjective
-        ? `But de l'immersion : ${
-            labelsForImmersionObjective[contactRequest.immersionObjective]
-          }.`
-        : ""
-    }
-    
-
-Profil du candidat :
-
-    Je n’ai jamais travaillé / J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat.
-    Expériences et compétences : "textarea".
-
-CTA : Écrire au candidat
-
-Ce candidat attend une réponse, vous pouvez :
-
-    répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton "Écrire au candidat" ci-dessus)
-
-    en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : POTENTIAL_BENEFICIARY_PHONE
-
-Vous pouvez préparer votre échange grâce à notre page d'aide.
-
-Bonne journée,
-L'équipe Immersion Facilitée`;
-};
