@@ -16,12 +16,14 @@ import {
   zUuidLike,
 } from "../zodUtils";
 import {
-  contactEstablishmentByPhoneSchema,
-  contactEstablishmentInPersonSchema,
   preferEmailContactSchema,
+  preferInPersonContactSchema,
+  preferPhoneContactSchema,
 } from "./contactEstablishmentRequest.schema";
 import {
   LegacyContactEstablishmentByMailDto,
+  LegacyContactEstablishmentByPhoneDto,
+  LegacyContactEstablishmentInPersonDto,
   LegacyContactEstablishmentRequestDto,
 } from "./legacyContactEstablishmentRequest.dto";
 
@@ -59,11 +61,23 @@ export const legacyContactEstablishmentByMailSchema: z.Schema<LegacyContactEstab
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
   });
 
+export const legacyContactEstablishmentByPhoneSchema: z.Schema<LegacyContactEstablishmentByPhoneDto> =
+  z.object({
+    ...commonFields,
+    contactMode: preferPhoneContactSchema,
+  });
+
+export const legacyContactEstablishmentInPersonSchema: z.Schema<LegacyContactEstablishmentInPersonDto> =
+  z.object({
+    ...commonFields,
+    contactMode: preferInPersonContactSchema,
+  });
+
 export const legacyContactEstablishmentRequestSchema: z.Schema<LegacyContactEstablishmentRequestDto> =
   z
     .union([
       legacyContactEstablishmentByMailSchema,
-      contactEstablishmentByPhoneSchema,
-      contactEstablishmentInPersonSchema,
+      legacyContactEstablishmentByPhoneSchema,
+      legacyContactEstablishmentInPersonSchema,
     ])
     .and(withAcquisitionSchema);

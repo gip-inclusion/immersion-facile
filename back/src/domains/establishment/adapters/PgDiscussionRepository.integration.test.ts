@@ -125,6 +125,19 @@ describe("PgDiscussionRepository", () => {
     .withStatus("ACCEPTED")
     .withCreatedAt(addDays(date, -4))
     .build();
+  const discussionWithPotentialBeneficiaryInformations = new DiscussionBuilder()
+    .withPotentialBeneficiary({
+      datePreferences: "my fake date preferences",
+      email: "fake-address@mail.com",
+      firstName: "John",
+      lastName: "Doe",
+      hasWorkingExperience: true,
+      experienceAdditionalInformation: "my fake experience",
+      phone: "0549000000",
+      resumeLink: "https://www.my-link.com",
+    })
+    .withCreatedAt(addDays(date, -1))
+    .build();
 
   describe("getDiscussions", () => {
     //TODO getDiscussions with lastAnsweredByCandidate parameter
@@ -151,6 +164,7 @@ describe("PgDiscussionRepository", () => {
           discussionWithoutExchanges,
           discussionWithRejectedStatusAndReason,
           discussionWithAcceptedStatus,
+          discussionWithPotentialBeneficiaryInformations,
         ],
       },
       {
@@ -193,6 +207,7 @@ describe("PgDiscussionRepository", () => {
             discussionWithoutExchanges,
             discussionWithRejectedStatusAndReason,
             discussionWithAcceptedStatus,
+            discussionWithPotentialBeneficiaryInformations,
           ].map((discussion) => pgDiscussionRepository.insert(discussion)),
         );
 

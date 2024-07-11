@@ -151,6 +151,7 @@ describe("ContactEstablishment", () => {
           siret: establishment.establishment.siret,
           discussionId,
           triggeredBy: null,
+          isLegacy: false,
         },
         status: "never-published",
         publications: [],
@@ -201,6 +202,7 @@ describe("ContactEstablishment", () => {
           siret,
           discussionId,
           triggeredBy: null,
+          isLegacy: false,
         },
         publications: [],
         status: "never-published",
@@ -250,6 +252,7 @@ describe("ContactEstablishment", () => {
           siret,
           discussionId,
           triggeredBy: null,
+          isLegacy: false,
         },
         publications: [],
         status: "never-published",
@@ -292,6 +295,9 @@ describe("ContactEstablishment", () => {
           email: validEmailRequest.potentialBeneficiaryEmail,
           phone: validEmailRequest.potentialBeneficiaryPhone,
           resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
+          experienceAdditionalInformation:
+            validEmailRequest.experienceAdditionalInformation,
+          hasWorkingExperience: validEmailRequest.hasWorkingExperience,
         },
         establishmentContact: {
           contactMethod: "EMAIL",
@@ -306,36 +312,28 @@ describe("ContactEstablishment", () => {
         immersionObjective: "Confirmer un projet professionnel",
         exchanges: [
           {
-            subject: "Demande de contact initiée par le bénéficiaire",
+            subject:
+              "potential_beneficiary_first_name potential_beneficiary_last_name vous contacte pour une demande d'immersion sur le métier de My appellation label",
             sentAt: connectionDateStr,
-            message: `Bonjour Alain Prost,
+            message: `<p>Bonjour Alain Prost,</p>
+                  
+  <table width="600">
+    <tr>
+      <td>
+        <p>Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (24 rue des bouchers 67000 Strasbourg).<br/><br/>Immersion souhaitée :<br/><br/>• Métier : My appellation label.<br/>• Dates d’immersion envisagées : fake date preferences.<br/>• But de l'immersion : Je compte me former à ce métier.<br/><br/>Profil du candidat :<br/><br/>• Expérience professionnelle : j’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat / .<br/>• Informations supplémentaires sur l'expérience du candidat : fake experience additional information.</p>
+      </td>
+    </tr>
+  </table>
 
-Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (TODO ADDRESS).
-
-Immersion souhaitée :
-
-    Métier : 12898 TODO APPELLATION LABEL.
-    Dates d’immersion envisagées : fake date preferences.
-    But de l'immersion : Je compte me former à ce métier.
-    
-
-Profil du candidat :
-
-    Je n’ai jamais travaillé / J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat.
-    Expériences et compétences : \"textarea\".
-
-CTA : Écrire au candidat
-
-Ce candidat attend une réponse, vous pouvez :
-
-    répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton \"Écrire au candidat\" ci-dessus)
-
-    en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : POTENTIAL_BENEFICIARY_PHONE
-
-Vous pouvez préparer votre échange grâce à notre page d'aide.
-
-Bonne journée,
-L'équipe Immersion Facilitée`,
+                  
+  <table width="600">
+    <tr>
+      <td>
+        <p>Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.<br/><br/>Bonne journée,<br/>L'équipe Immersion Facilitée</p>
+      </td>
+    </tr>
+  </table>
+`,
             recipient: "establishment",
             sender: "potentialBeneficiary",
             attachments: [],

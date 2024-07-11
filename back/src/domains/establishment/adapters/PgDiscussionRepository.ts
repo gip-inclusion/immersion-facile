@@ -184,6 +184,13 @@ export class PgDiscussionRepository implements DiscussionRepository {
               email: qb.ref("potential_beneficiary_email"),
               phone: qb.ref("potential_beneficiary_phone"),
               resumeLink: qb.ref("potential_beneficiary_resume_link"),
+              hasWorkingExperience: qb.ref(
+                "potential_beneficiary_has_working_experience",
+              ),
+              experienceAdditionalInformation: qb.ref(
+                "potential_beneficiary_experience_additional_information",
+              ),
+              datePreferences: qb.ref("potential_beneficiary_date_preferences"),
             }),
             establishmentContact: jsonBuildObject({
               contactMethod: sql<ContactMethod>`${qb.ref("contact_method")}`,
@@ -329,6 +336,10 @@ const discussionToPg = (
     potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
     potential_beneficiary_resume_link:
       discussion.potentialBeneficiary.resumeLink,
+    potential_beneficiary_experience_additional_information:
+      discussion.potentialBeneficiary.experienceAdditionalInformation,
+    potential_beneficiary_has_working_experience:
+      discussion.potentialBeneficiary.hasWorkingExperience,
     street_number_and_address: discussion.address.streetNumberAndAddress,
     siret: discussion.siret,
     contact_method: discussion.establishmentContact.contactMethod,

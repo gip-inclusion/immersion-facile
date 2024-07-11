@@ -291,6 +291,7 @@ export const SearchResultPage = () => {
                       ? "Contacter l'entreprise"
                       : "Nos conseils pour cette première prise de contact ! "}
                   </h2>
+
                   {match(currentSearchResult.contactMode)
                     .with("EMAIL", () => (
                       <ContactByEmail

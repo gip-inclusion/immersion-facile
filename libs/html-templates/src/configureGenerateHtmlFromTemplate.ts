@@ -13,7 +13,10 @@ import { ignoreTabs } from "./helpers/formatters";
 
 type Attachement = { url: string } | { name: string; content: string };
 
-export type GenerateHtmlOptions = { skipHead?: boolean };
+export type GenerateHtmlOptions = {
+  skipHead?: boolean;
+  showContentParts?: boolean;
+};
 
 const renderHTMLRow = (html: string | undefined) =>
   html && html !== ""
@@ -41,6 +44,16 @@ export const configureGenerateHtmlFromTemplate =
   ): {
     subject: string;
     htmlContent: string;
+    contentParts?: {
+      header: string | undefined;
+      greetings: string | undefined;
+      content: string | undefined;
+      buttons: string | undefined;
+      highlight: string | undefined;
+      subContent: string | undefined;
+      legals: string | undefined;
+      footer: string | undefined;
+    };
     tags?: string[];
     attachment?: Attachement[];
   } => {
@@ -67,7 +80,16 @@ export const configureGenerateHtmlFromTemplate =
         <p style="${replyHeaderStyle}">##- Veuillez répondre au-dessus de cette ligne -##</p>
         <p style="${replyHeaderStyle}">Cet email vous a été envoyé via le service Immersion Facilitée, vous pouvez répondre directement à cet email, il sera transmis à votre interlocuteur.</p>
         <p style="${replyHeaderStyle}">-----------------------------</p>`;
-
+    const contentParts = {
+      header: renderHeader(agencyLogoUrl, customParts.header),
+      greetings: renderGreetings(greetings),
+      content: renderContent(content),
+      buttons: renderButton(buttons),
+      highlight: renderHighlight(highlight),
+      subContent: renderContent(subContent),
+      legals: renderLegals(legals),
+      footer: renderFooter(customParts.footer),
+    };
     const htmlContent = bypassLayout
       ? ignoreTabs(`
         ${replyHeader}
@@ -79,18 +101,7 @@ export const configureGenerateHtmlFromTemplate =
         <html lang="fr">${options.skipHead ? "" : renderHead(subject)}
           <body>
             <table width="600" align="center" style="margin-top: 20px">
-              ${[
-                renderHeader(agencyLogoUrl, customParts.header),
-                renderGreetings(greetings),
-                renderContent(content),
-                renderButton(buttons),
-                renderHighlight(highlight),
-                renderContent(subContent),
-                renderLegals(legals),
-                renderFooter(customParts.footer),
-              ]
-                .map(renderHTMLRow)
-                .join("")}       
+              ${Object.values(contentParts).map(renderHTMLRow).join("")}       
             </table>
           </body>
         </html>
@@ -109,6 +120,7 @@ export const configureGenerateHtmlFromTemplate =
     return {
       subject,
       htmlContent: emailSupportedHtmlConcent,
+      ...(options.showContentParts ? { contentParts } : {}),
       ...(tags ? { tags } : {}),
       ...(attachmentUrls
         ? {

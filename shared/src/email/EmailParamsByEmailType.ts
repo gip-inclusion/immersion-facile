@@ -101,6 +101,22 @@ export type EmailParamsByEmailType = {
     contactFirstName: string;
     contactLastName: string;
     appellationLabel: string;
+    immersionObjective: ImmersionObjective | undefined;
+    replyToEmail: Email;
+    potentialBeneficiaryResumeLink?: string;
+    potentialBeneficiaryFirstName: string;
+    potentialBeneficiaryLastName: string;
+    potentialBeneficiaryPhone: string;
+    potentialBeneficiaryDatePreferences?: string;
+    potentialBeneficiaryHasWorkingExperience?: boolean;
+    potentialBeneficiaryExperienceAdditionalInformation?: string;
+  };
+  CONTACT_BY_EMAIL_REQUEST_LEGACY: {
+    businessName: string;
+    businessAddress: string;
+    contactFirstName: string;
+    contactLastName: string;
+    appellationLabel: string;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
     potentialBeneficiaryPhone: string;

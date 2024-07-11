@@ -39,7 +39,10 @@ import {
   makeValuesToWatchInUrl,
 } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
-import { convertHtmlToText } from "src/app/utils/html.utils";
+import {
+  addLineBreakOnNewLines,
+  convertHtmlToText,
+} from "src/app/utils/html.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { P, match } from "ts-pattern";
@@ -249,7 +252,11 @@ const DiscussionDetails = ({
           <hr className={fr.cx("fr-hr")} />
           <section>
             <h3>{subject}</h3>
-            <div>{convertHtmlToText(message)}</div>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: addLineBreakOnNewLines(convertHtmlToText(message)),
+              }}
+            />
           </section>
         </ExchangeMessage>
       ))}
