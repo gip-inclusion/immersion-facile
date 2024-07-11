@@ -2,9 +2,14 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useEffect, useState } from "react";
 import { FormOverlay } from "react-design-system";
-import { keys } from "shared";
+import {
+  isStringImmersionObjective,
+  keys,
+  labelsForImmersionObjective,
+} from "shared";
 import { inputsLabelsByKey } from "src/app/components/immersion-offer/ContactByEmail";
 import {
+  ContactTranscientData,
   TranscientData,
   useTranscientDataFromStorage,
 } from "src/app/components/immersion-offer/useTranscientDataFromStorage";
@@ -42,6 +47,7 @@ export const TranscientPreferencesDisplay = (
     getTranscientDataForScope,
     setPreferUseTranscientDataForScope,
     setTranscientDataForScope,
+    clearTranscientDataForScope,
   } = useTranscientDataFromStorage(scope);
   const transcientDataForScope = getTranscientDataForScope();
   const [displayIsVisible, setDisplayIsVisible] = useState(false);
@@ -78,14 +84,7 @@ export const TranscientPreferencesDisplay = (
         remplir ce formulaire :
       </p>
       {transcientDataForScope?.value && (
-        <ul>
-          {keys(transcientDataForScope.value).map((key) => (
-            <li key={key}>
-              {inputsLabelsByKey[key]}:{" "}
-              <strong>{transcientDataForScope?.value?.[key]}</strong>
-            </li>
-          ))}
-        </ul>
+        <ul>{renderTranscientKeyValues(transcientDataForScope.value)}</ul>
       )}
 
       <p>Voulez-vous utiliser ces données ?</p>
@@ -115,7 +114,7 @@ export const TranscientPreferencesDisplay = (
             id: "transcient-preferences-modal-no",
             onClick: () => {
               savePreferences(false);
-              setTranscientDataForScope(null);
+              clearTranscientDataForScope();
             },
           },
         ]}
@@ -131,4 +130,29 @@ export const TranscientPreferencesDisplay = (
       {jsxContent}
     </FormOverlay>
   );
+};
+
+const renderTranscientKeyValues = (data: ContactTranscientData) => {
+  return keys(data).map((key) => {
+    const label = inputsLabelsByKey[key];
+    const value = data[key];
+    return value ? (
+      <li key={key}>
+        {label}&nbsp;: <strong>{renderValue(key, value)}</strong>
+      </li>
+    ) : null;
+  });
+};
+
+const renderValue = (
+  key: keyof ContactTranscientData,
+  value: unknown,
+): React.ReactNode => {
+  if (typeof value === "boolean") {
+    return value ? "Oui" : "Non";
+  }
+  if (isStringImmersionObjective(value) && key === "immersionObjective") {
+    return labelsForImmersionObjective[value];
+  }
+  return <>{value}</>;
 };

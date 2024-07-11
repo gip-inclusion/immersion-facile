@@ -1,10 +1,10 @@
 import subDays from "date-fns/subDays";
+import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
-  ContactEstablishmentByMailDto,
   ContactEstablishmentRequestDto,
   DiscussionDto,
   contactEstablishmentRequestSchema,
-  labelsForImmersionObjective,
+  emailTemplatesByName,
 } from "shared";
 import {
   BadRequestError,
@@ -118,11 +118,12 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       // );
     }
 
-    const discussion = this.#createDiscussion({
+    const discussion = await this.#createDiscussion({
       contactRequest,
       contact: establishmentAggregate.contact,
       establishment: establishmentAggregate.establishment,
       now,
+      uow,
     });
 
     await uow.discussionRepository.insert(discussion);
@@ -141,22 +142,25 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
           siret: discussion.siret,
           discussionId: discussion.id,
           triggeredBy: null,
+          isLegacy: false,
         },
       }),
     );
   }
 
-  #createDiscussion({
+  async #createDiscussion({
     contactRequest,
     contact,
     establishment,
     now,
+    uow,
   }: {
     contactRequest: ContactEstablishmentRequestDto;
     contact: ContactEntity;
     establishment: EstablishmentEntity;
     now: Date;
-  }): DiscussionDto {
+    uow: UnitOfWork;
+  }): Promise<DiscussionDto> {
     const matchingAddress = establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
     );
@@ -165,6 +169,51 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         `Address with id ${contactRequest.locationId} not found for establishment with siret ${establishment.siret}`,
       );
     }
+
+    const appellationAndRomeDtos =
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
+        contactRequest.appellationCode,
+      ]);
+    const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
+
+    if (!appellationLabel)
+      throw new BadRequestError(
+        `No appellationLabel found for appellationCode: ${contactRequest.appellationCode}`,
+      );
+    const emailContent =
+      contactRequest.contactMode === "EMAIL"
+        ? configureGenerateHtmlFromTemplate(emailTemplatesByName, {
+            header: undefined,
+            footer: undefined,
+          })(
+            "CONTACT_BY_EMAIL_REQUEST",
+            {
+              appellationLabel,
+              businessName: establishment.customizedName ?? establishment.name,
+              contactFirstName: contact.firstName,
+              contactLastName: contact.lastName,
+              potentialBeneficiaryFirstName:
+                contactRequest.potentialBeneficiaryFirstName,
+              potentialBeneficiaryLastName:
+                contactRequest.potentialBeneficiaryLastName,
+              immersionObjective:
+                contactRequest.immersionObjective ?? undefined,
+              potentialBeneficiaryPhone:
+                contactRequest.potentialBeneficiaryPhone,
+              potentialBeneficiaryResumeLink:
+                contactRequest.potentialBeneficiaryResumeLink,
+              businessAddress: `${matchingAddress.address.streetNumberAndAddress} ${matchingAddress.address.postcode} ${matchingAddress.address.city}`,
+              replyToEmail: contactRequest.potentialBeneficiaryEmail,
+              potentialBeneficiaryDatePreferences:
+                contactRequest.datePreferences,
+              potentialBeneficiaryExperienceAdditionalInformation:
+                contactRequest.experienceAdditionalInformation,
+              potentialBeneficiaryHasWorkingExperience:
+                contactRequest.hasWorkingExperience,
+            },
+            { showContentParts: true },
+          )
+        : null;
     return {
       id: this.#uuidGenerator.new(),
       appellationCode: contactRequest.appellationCode,
@@ -208,16 +257,16 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         copyEmails: contact.copyEmails,
       },
       exchanges:
-        contactRequest.contactMode === "EMAIL"
+        contactRequest.contactMode === "EMAIL" &&
+        emailContent &&
+        emailContent.contentParts
           ? [
               {
-                subject: "Demande de contact initiée par le bénéficiaire",
+                subject: emailContent.subject,
                 sentAt: now.toISOString(),
-                message: formatContactRequestMessage({
-                  contact,
-                  establishment,
-                  contactRequest,
-                }),
+                message: `${emailContent.contentParts.greetings}
+                  ${emailContent.contentParts.content}
+                  ${emailContent.contentParts.subContent}`,
                 recipient: "establishment",
                 sender: "potentialBeneficiary",
                 attachments: [],
@@ -266,50 +315,3 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     }
   }
 }
-
-const formatContactRequestMessage = ({
-  establishment,
-  contact,
-  contactRequest,
-}: {
-  establishment: EstablishmentEntity;
-  contact: ContactEntity;
-  contactRequest: ContactEstablishmentByMailDto;
-}) => {
-  return `Bonjour ${contact.firstName} ${contact.lastName},
-
-Un candidat souhaite faire une immersion dans votre entreprise ${
-    establishment.name
-  } (TODO ADDRESS).
-
-Immersion souhaitée :
-
-    Métier : ${contactRequest.appellationCode} TODO APPELLATION LABEL.
-    Dates d’immersion envisagées : ${contactRequest.datePreferences}.
-    ${
-      contactRequest.immersionObjective
-        ? `But de l'immersion : ${
-            labelsForImmersionObjective[contactRequest.immersionObjective]
-          }.`
-        : ""
-    }
-    
-
-Profil du candidat :
-
-    Je n’ai jamais travaillé / J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat.
-    Expériences et compétences : "textarea".
-
-CTA : Écrire au candidat
-
-Ce candidat attend une réponse, vous pouvez :
-
-    répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton "Écrire au candidat" ci-dessus)
-
-    en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : POTENTIAL_BENEFICIARY_PHONE
-
-Vous pouvez préparer votre échange grâce à notre page d'aide.
-
-Bonne journée,
-L'équipe Immersion Facilitée`;
-};

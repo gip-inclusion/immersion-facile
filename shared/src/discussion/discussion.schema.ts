@@ -84,6 +84,9 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> = z
       resumeLink: zStringPossiblyEmpty,
       phone: phoneSchema.optional(),
       email: zStringPossiblyEmpty,
+      hasWorkingExperience: z.boolean().optional(),
+      experienceAdditionalInformation: zStringMinLength1.optional(),
+      datePreferences: zStringMinLength1.optional(),
     }),
     establishmentContact: z.object({
       firstName: zStringMinLength1,

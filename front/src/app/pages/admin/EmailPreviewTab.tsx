@@ -279,7 +279,7 @@ export const defaultEmailValueByEmailKind: {
     dateEnd: "DATE_END",
     justification: "JUSTIFICATION",
   },
-  CONTACT_BY_EMAIL_REQUEST: {
+  CONTACT_BY_EMAIL_REQUEST_LEGACY: {
     replyToEmail: "REPLY_TO_EMAIL",
     appellationLabel: "APPELLATION_LABEL",
     businessName: "BUSINESS_NAME",
@@ -292,6 +292,24 @@ export const defaultEmailValueByEmailKind: {
     potentialBeneficiaryPhone: "POTENTIAL_BENEFICIARY_PHONE",
     potentialBeneficiaryResumeLink: "POTENTIAL_BENEFICIARY_CV_OR_LINKEDIN",
     businessAddress: "BUSINESS_ADDRESS",
+  },
+  CONTACT_BY_EMAIL_REQUEST: {
+    replyToEmail: "REPLY_TO_EMAIL",
+    appellationLabel: "APPELLATION_LABEL",
+    businessName: "BUSINESS_NAME",
+    contactFirstName: "CONTACT_FIRST_NAME",
+    contactLastName: "CONTACT_LAST_NAME",
+    immersionObjective: "Découvrir un métier ou un secteur d'activité",
+    potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
+    potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
+    potentialBeneficiaryPhone: "POTENTIAL_BENEFICIARY_PHONE",
+    potentialBeneficiaryResumeLink: "POTENTIAL_BENEFICIARY_CV_OR_LINKEDIN",
+    businessAddress: "BUSINESS_ADDRESS",
+    potentialBeneficiaryDatePreferences:
+      "POTENTIAL_BENEFICIARY_DATE_PREFERENCES",
+    potentialBeneficiaryExperienceAdditionalInformation:
+      "POTENTIAL_BENEFICIARY_EXPERIENCE_ADDITIONAL_INFORMATION",
+    potentialBeneficiaryHasWorkingExperience: true,
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     businessName: "BUSINESS_NAME",

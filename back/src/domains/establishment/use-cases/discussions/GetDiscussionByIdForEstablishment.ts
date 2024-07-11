@@ -52,7 +52,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     ).at(0);
 
     if (!appellation)
-      throw new NotFoundError(`Missing appelation code '${appellationCode}'`);
+      throw new NotFoundError(`Missing appellation code '${appellationCode}'`);
 
     return {
       ...rest,
@@ -63,6 +63,11 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
         resumeLink: discussion.potentialBeneficiary.resumeLink,
         email: discussion.potentialBeneficiary.email,
         phone: discussion.potentialBeneficiary.phone,
+        hasWorkingExperience:
+          discussion.potentialBeneficiary.hasWorkingExperience,
+        experienceAdditionalInformation:
+          discussion.potentialBeneficiary.experienceAdditionalInformation,
+        datePreferences: discussion.potentialBeneficiary.datePreferences,
       },
       establishmentContact: {
         firstName: discussion.establishmentContact.firstName,

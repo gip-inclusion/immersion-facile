@@ -211,11 +211,13 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
                 message: contactRequest.message,
                 recipient: "establishment",
                 sender: "potentialBeneficiary",
+                attachments: [],
               },
             ]
           : [],
       acquisitionCampaign: contactRequest.acquisitionCampaign,
       acquisitionKeyword: contactRequest.acquisitionKeyword,
+      status: "PENDING",
     };
   }
 
