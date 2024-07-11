@@ -59,6 +59,7 @@ import {
 } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { v4 as uuidV4 } from "uuid";
+import { Feedback } from "../../feedback/Feedback";
 import { ScheduleSection } from "../../forms/convention/sections/schedule/ScheduleSection";
 
 export type JwtKindProps =
@@ -154,6 +155,7 @@ export const ConventionManageActions = ({
         submitFeedback={submitFeedback}
         signatories={convention.signatories}
       />
+      <Feedback topic="broadcast-convention-again" />
       <div
         style={{
           display: "flex",

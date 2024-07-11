@@ -93,7 +93,6 @@ export const BroadcastAgainButton = ({
                   feedbackTopic: "broadcast-convention-again",
                 }),
               );
-              broadcastAgainModal.close();
             }}
           >
             Rediffuser
