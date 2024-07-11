@@ -59,52 +59,52 @@ describe("DiagorienteAppellationsGateway", () => {
     const parallelCalls = 100;
     it.each([
       {
-        search: "Dév",
+        search: "faire du pain",
         results: [
           {
-            appellationLabel: "Nez",
-            appellationCode: "16989",
+            appellationLabel: "Ouvrier boulanger / Ouvrière boulangère",
+            appellationCode: "17407",
           },
           {
-            appellationLabel: "Dee-jay",
-            appellationCode: "13916",
+            appellationLabel: "Biscuitier / Biscuitière",
+            appellationCode: "11529",
           },
           {
-            appellationLabel: "Délaineur / Délaineuse",
-            appellationCode: "13923",
+            appellationLabel: "Boulanger / Boulangère",
+            appellationCode: "11573",
           },
           {
-            appellationLabel: "Déligneur / Déligneuse",
-            appellationCode: "13945",
+            appellationLabel: "Fourreur / Fourreuse",
+            appellationCode: "15157",
           },
           {
-            appellationLabel: "Déménageur / Déménageuse",
-            appellationCode: "13947",
+            appellationLabel: "Chef de rayon boulangerie",
+            appellationCode: "12278",
           },
         ],
       },
       {
-        search: "ux",
+        search: "ux design",
         results: [
           {
-            appellationLabel: "Mareyeur / Mareyeuse",
-            appellationCode: "16391",
+            appellationLabel: "UX - user experience designer",
+            appellationCode: "126549",
           },
           {
-            appellationLabel: "Élagueur / Élagueuse",
-            appellationCode: "14608",
+            appellationLabel: "UI - user interface designer",
+            appellationCode: "126550",
           },
           {
-            appellationLabel: "Scieur / Scieuse",
-            appellationCode: "19323",
+            appellationLabel: "Designer",
+            appellationCode: "13991",
           },
           {
-            appellationLabel: "Liégeur / Liégeuse",
-            appellationCode: "16185",
+            appellationLabel: "Web designer",
+            appellationCode: "20726",
           },
           {
-            appellationLabel: "Licier / Licière",
-            appellationCode: "16183",
+            appellationLabel: "Designer / Designeuse ergonome",
+            appellationCode: "13998",
           },
         ],
       },

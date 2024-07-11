@@ -46,7 +46,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
       logger.info({ message: "searchAppellations - call" });
       return this.httpClient
         .searchAppellations({
-          queryParams: { query, nb_results: maxResults * 2, tags: ["ROME4"] },
+          queryParams: { query, nb_results: maxResults * 10, tags: ["ROME4"] },
           headers: {
             Authorization: `Bearer ${tokenData.access_token}`,
           },
@@ -97,6 +97,7 @@ const diagorienteRawResponseToAppellationDto = (
     .filter(
       ({ data }) => appellationCodeSchema.safeParse(data.code_ogr).success,
     )
+    .sort((a, b) => (a.similarity <= b.similarity ? 1 : -1))
     .filter((_, index) => index <= maxResults - 1)
     .map(({ data }) => ({
       appellationLabel: data.titre,
