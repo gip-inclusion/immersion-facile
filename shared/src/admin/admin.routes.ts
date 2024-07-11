@@ -24,7 +24,7 @@ import { expressEmptyResponseBody } from "../zodUtils";
 import {
   icUserRoleForAgencyParamsSchema,
   rejectIcUserRoleForAgencyParamsSchema,
-  withAgencyRoleSchema,
+  withUserFiltersSchema,
 } from "./admin.schema";
 
 export type AdminRoutes = typeof adminRoutes;
@@ -76,7 +76,7 @@ export const adminRoutes = defineRoutes({
   getInclusionConnectedUsers: defineRoute({
     method: "get",
     url: "/admin/inclusion-connected/users",
-    queryParamsSchema: withAgencyRoleSchema,
+    queryParamsSchema: withUserFiltersSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(inclusionConnectedUserSchema),

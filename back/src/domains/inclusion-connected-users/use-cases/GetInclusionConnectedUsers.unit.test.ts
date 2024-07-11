@@ -105,7 +105,7 @@ describe("GetInclusionConnectedUsers", () => {
     );
   });
 
-  it("gets the users which have at least one agency with the given role", async () => {
+  it("gets the users by agencyRole which have at least one agency with the given role", async () => {
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       johnWithAgenciesToReview,
       paulWithAllAgenciesReviewed,
@@ -117,5 +117,22 @@ describe("GetInclusionConnectedUsers", () => {
     );
 
     expectToEqual(users, [johnWithAgenciesToReview]);
+  });
+
+  it("gets the users by agencyId which have at least one agency with the given role", async () => {
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      johnWithAgenciesToReview,
+      paulWithAllAgenciesReviewed,
+      backofficeAdminUser,
+    ]);
+    const users = await getInclusionConnectedUsers.execute(
+      { agencyId: agency1.id },
+      backofficeAdminUser,
+    );
+
+    expectToEqual(users, [
+      johnWithAgenciesToReview,
+      paulWithAllAgenciesReviewed,
+    ]);
   });
 });

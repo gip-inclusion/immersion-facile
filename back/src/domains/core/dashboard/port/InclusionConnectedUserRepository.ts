@@ -12,7 +12,7 @@ export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
 
 export interface InclusionConnectedUserRepository {
   getWithFilter(
-    filter: InclusionConnectedFilters,
+    filters: InclusionConnectedFilters,
   ): Promise<InclusionConnectedUser[]>;
   getById(userId: string): Promise<InclusionConnectedUser | undefined>;
   updateAgencyRights(params: {

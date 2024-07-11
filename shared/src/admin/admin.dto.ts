@@ -1,4 +1,8 @@
-import { ActiveOrRejectedStatus, AgencyId } from "../agency/agency.dto";
+import {
+  ActiveOrRejectedStatus,
+  AgencyId,
+  WithAgencyId,
+} from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
 import {
   AgencyRole,
@@ -23,6 +27,8 @@ export type RejectIcUserRoleForAgencyParams = OmitFromExistingKeys<
 export type WithAgencyRole = {
   agencyRole: AgencyRole;
 };
+
+export type WithUserFilters = WithAgencyId | WithAgencyRole;
 
 export type ManageConventionAdminForm = {
   conventionId: ConventionId;
