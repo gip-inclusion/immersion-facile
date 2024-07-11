@@ -12,7 +12,7 @@ import {
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
   RejectIcUserRoleForAgencyParams,
-  WithAgencyRole,
+  WithUserFilters,
 } from "./admin.dto";
 
 export const icUserRoleForAgencyParamsSchema: z.Schema<IcUserRoleForAgencyParams> =
@@ -29,9 +29,15 @@ export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleFor
     justification: zTrimmedString,
   });
 
-export const withAgencyRoleSchema: z.Schema<WithAgencyRole> = z.object({
-  agencyRole: agencyRoleSchema,
-});
+export const withUserFiltersSchema: z.Schema<WithUserFilters> = z
+  .object({
+    agencyRole: agencyRoleSchema,
+  })
+  .or(
+    z.object({
+      agencyId: agencyIdSchema,
+    }),
+  );
 
 export const manageConventionAdminFormSchema: z.Schema<ManageConventionAdminForm> =
   z.object({
