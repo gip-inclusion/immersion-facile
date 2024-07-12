@@ -52,4 +52,5 @@ export const icUsersAdminSelectors = {
   selectedUserId,
   agenciesNeedingReviewForSelectedUser,
   feedback: createSelector(icUsersAdminState, ({ feedback }) => feedback),
+  icUsersNeedingReviewSelector,
 };

@@ -75,6 +75,7 @@ export const zStringCanBeEmpty = z.string(requiredText);
 
 export const zStringPossiblyEmpty = zStringMinLength1
   .optional()
+  .or(z.null())
   .or(z.literal("")) as z.Schema<string>;
 
 export const zStringPossiblyEmptyWithMax = (max: number) =>

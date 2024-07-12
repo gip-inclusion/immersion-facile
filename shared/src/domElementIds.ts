@@ -547,6 +547,7 @@ export const domElementIds = {
       inclusionConnectButton: "im-login-form__inclusion-connect-button--admin",
     },
     agencyTab: {
+      agencyUsersTable: "im-agency-users-table",
       editAgencyForm: "im-form-edit-agency",
       activateAgencySelector: "agency-selector",
       editAgencyFormStatusSelector: "im-form-edit-agency__status-select",
