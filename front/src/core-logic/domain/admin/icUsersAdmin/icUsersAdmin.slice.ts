@@ -7,6 +7,7 @@ import {
   OmitFromExistingKeys,
   RejectIcUserRoleForAgencyParams,
   UserId,
+  WithUserFilters,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
@@ -57,7 +58,10 @@ export const icUsersAdminSlice = createSlice({
       if (state.feedback.kind === "errored")
         state.feedback = { kind: "usersToReviewFetchSuccess" };
     },
-    fetchInclusionConnectedUsersToReviewRequested: (state) => {
+    fetchInclusionConnectedUsersToReviewRequested: (
+      state,
+      _action: PayloadAction<WithUserFilters>,
+    ) => {
       state.isFetchingAgenciesNeedingReviewForIcUser = true;
     },
     fetchInclusionConnectedUsersToReviewFailed: (

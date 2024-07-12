@@ -7,6 +7,7 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
+  WithUserFilters,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import {
@@ -28,9 +29,10 @@ const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
       icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested
         .match,
     ),
-    switchMap((_action) =>
+    switchMap((action: PayloadAction<WithUserFilters>) =>
       adminGateway.getInclusionConnectedUsersToReview$(
         getAdminToken(state$.value),
+        action.payload,
       ),
     ),
     map(normalizeUsers),

@@ -23,7 +23,9 @@ export const RegisterUsersToAgencies = () => {
 
   useEffect(() => {
     dispatch(
-      icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
+      icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested({
+        agencyRole: "toReview",
+      }),
     );
   }, [dispatch]);
 

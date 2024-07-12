@@ -148,9 +148,38 @@ describe("Agency registration for authenticated users", () => {
   });
 
   describe("fetches inclusion connected users that have agencies to review", () => {
-    it("gets the users successfully", () => {
+    it("gets the users by agencyId successfully", () => {
       store.dispatch(
-        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
+        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
+          {
+            agencyId: agency2.id,
+          },
+        ),
+      );
+      expectIsFetchingIcUsersNeedingReviewToBe(true);
+
+      dependencies.adminGateway.getAgencyUsersToReviewResponse$.next([
+        {
+          ...authUser1,
+          agencyRights: [agency1Right, agency2Right],
+          dashboards: { agencies: {}, establishments: {} },
+        },
+      ]);
+      expectIsFetchingIcUsersNeedingReviewToBe(false);
+      expectToEqual(
+        icUsersAdminSelectors.icUsersNeedingReview(store.getState()),
+        [authUser1],
+      );
+      expectFeedbackToEqual({ kind: "usersToReviewFetchSuccess" });
+    });
+
+    it("gets the users by agencyRole successfully", () => {
+      store.dispatch(
+        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
+          {
+            agencyRole: "toReview",
+          },
+        ),
       );
       expectIsFetchingIcUsersNeedingReviewToBe(true);
 
@@ -176,7 +205,11 @@ describe("Agency registration for authenticated users", () => {
 
     it("stores error message when something goes wrong in fetching", () => {
       store.dispatch(
-        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
+        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
+          {
+            agencyRole: "toReview",
+          },
+        ),
       );
       const errorMessage = "Error fetching users to review";
       expectIsFetchingIcUsersNeedingReviewToBe(true);

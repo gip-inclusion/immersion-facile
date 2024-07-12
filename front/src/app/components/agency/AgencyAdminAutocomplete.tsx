@@ -9,6 +9,7 @@ import { AgencyId, AgencyOption, propEq } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { useStyles } from "tss-react/dsfr";
 
 export const useAgencyAdminAutocomplete = () => {
@@ -17,8 +18,16 @@ export const useAgencyAdminAutocomplete = () => {
   return {
     updateSearchTerm: (searchTerm: string) =>
       dispatch(agencyAdminSlice.actions.setAgencySearchQuery(searchTerm)),
-    selectOption: (agencyId: AgencyId) =>
-      dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId)),
+    selectOption: (agencyId: AgencyId) => {
+      dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId));
+      dispatch(
+        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
+          {
+            agencyId,
+          },
+        ),
+      );
+    },
   };
 };
 
