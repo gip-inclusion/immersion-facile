@@ -171,6 +171,7 @@ describe("RejectDiscussionAndSendNotification", () => {
       {
         subject: emailParams.subject,
         message: emailParams.htmlContent,
+        attachments: [],
         sender: "establishment",
         recipient: "potentialBeneficiary",
         sentAt: new CustomTimeGateway().now().toISOString(),
