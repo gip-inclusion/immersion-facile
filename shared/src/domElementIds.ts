@@ -552,6 +552,7 @@ export const domElementIds = {
       editAgencyFormStatusSelector: "im-form-edit-agency__status-select",
       editAgencyFormSafirCodeInput: "im-form-edit-agency__safir-code-input",
       editAgencyFormEditSubmitButton: "im-form-edit-agency__submit-button",
+      editAgencyUserTooltip: "im-edit-agency-tooltip",
       rejectAgencyModal: "im-reject-agency-modal",
       agencyToReviewInput: "im-agency-to-review__input",
       agencyToReviewButton: "im-agency-to-review__review-button",
