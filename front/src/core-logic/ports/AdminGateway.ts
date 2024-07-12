@@ -12,6 +12,7 @@ import {
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
+  WithUserFilters,
 } from "shared";
 
 export interface AdminGateway {
@@ -26,6 +27,7 @@ export interface AdminGateway {
   ) => Observable<DashboardUrlAndName>;
   getInclusionConnectedUsersToReview$: (
     token: InclusionConnectJwt,
+    filters: WithUserFilters,
   ) => Observable<InclusionConnectedUser[]>;
   updateFeatureFlags$: (
     params: SetFeatureFlagParam,

@@ -12,6 +12,7 @@ import {
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
+  WithUserFilters,
   createApiConsumerParamsFromApiConsumer,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -92,11 +93,12 @@ export class HttpAdminGateway implements AdminGateway {
 
   public getInclusionConnectedUsersToReview$(
     token: InclusionConnectJwt,
+    filters: WithUserFilters,
   ): Observable<InclusionConnectedUser[]> {
     return from(
       this.httpClient
         .getInclusionConnectedUsers({
-          queryParams: { agencyRole: "toReview" },
+          queryParams: filters,
           headers: { authorization: token },
         })
         .then((response) =>
