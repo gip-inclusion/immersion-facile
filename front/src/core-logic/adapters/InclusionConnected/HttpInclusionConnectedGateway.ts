@@ -16,7 +16,7 @@ import {
 } from "src/core-logic/adapters/otherwiseThrow";
 import { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 
 export class HttpInclusionConnectedGateway
   implements InclusionConnectedGateway
