@@ -1,3 +1,4 @@
+import { P, match } from "ts-pattern";
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto } from "../address/address.dto";
@@ -280,39 +281,77 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     rejectionKind?: RejectionKind,
     rejectionReason?: string,
   ) {
-    let discussion: DiscussionDto = {
-      ...this.discussion,
-      status: "PENDING",
-    };
-    if (status === "ACCEPTED") {
-      discussion = {
-        ...discussion,
-        status,
-      };
-    }
-    if (status === "REJECTED" && !rejectionKind) {
-      discussion = {
-        ...discussion,
-        status,
-        rejectionKind: "UNABLE_TO_HELP",
-      };
-    }
-    if (status === "REJECTED" && rejectionKind && rejectionKind !== "OTHER") {
-      discussion = {
-        ...discussion,
-        status,
-        rejectionKind,
-      };
-    }
-    if (status === "REJECTED" && rejectionKind && rejectionKind === "OTHER") {
-      discussion = {
-        ...discussion,
-        status,
-        rejectionKind,
-        rejectionReason: rejectionReason ?? "default rejection reason",
-      };
-    }
-    return new DiscussionBuilder(discussion);
+    let updatedDiscussion: DiscussionDto = this.discussion;
+
+    match({
+      status,
+      rejectionKind,
+      rejectionReason,
+    })
+      .with(
+        {
+          status: "PENDING",
+        },
+        ({ status }) => {
+          updatedDiscussion = {
+            ...updatedDiscussion,
+            status,
+          };
+        },
+      )
+      .with(
+        {
+          status: "ACCEPTED",
+        },
+        ({ status }) => {
+          updatedDiscussion = {
+            ...updatedDiscussion,
+            status,
+          };
+        },
+      )
+      .with(
+        {
+          status: "REJECTED",
+          rejectionKind: P.union("UNABLE_TO_HELP", "NO_TIME"),
+        },
+        ({ status, rejectionKind }) => {
+          updatedDiscussion = {
+            ...updatedDiscussion,
+            status,
+            rejectionKind,
+          };
+        },
+      )
+      .with(
+        {
+          status: "REJECTED",
+          rejectionKind: "OTHER",
+        },
+        ({ status, rejectionKind, rejectionReason }) => {
+          updatedDiscussion = {
+            ...updatedDiscussion,
+            status,
+            rejectionKind,
+            rejectionReason: rejectionReason ?? "default rejection reason",
+          };
+        },
+      )
+      .with(
+        {
+          status: "REJECTED",
+          rejectionKind: P.nullish,
+        },
+        ({ status }) => {
+          updatedDiscussion = {
+            ...updatedDiscussion,
+            status,
+            rejectionKind: "UNABLE_TO_HELP",
+          };
+        },
+      );
+
+    return new DiscussionBuilder(updatedDiscussion);
   }
 }
 
