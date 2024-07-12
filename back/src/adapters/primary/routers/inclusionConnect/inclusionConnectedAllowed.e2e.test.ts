@@ -374,7 +374,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     });
   });
   describe(`${displayRouteName(
-    inclusionConnectedAllowedRoutes.rejectDiscussion,
+    inclusionConnectedAllowedRoutes.updateDiscussionStatus,
   )}`, () => {
     it("400 - throws if discussion is already rejected", async () => {
       const user = new InclusionConnectedUserBuilder().build();
@@ -393,12 +393,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
         user,
       ]);
 
-      const response = await httpClient.rejectDiscussion({
+      const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
         urlParams: {
           discussionId: discussion.id,
         },
         body: {
+          status: "REJECTED",
           rejectionKind: "OTHER",
           rejectionReason: "No reason",
         },
@@ -416,12 +417,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       inMemoryUow.discussionRepository.discussions = [discussion];
 
-      const response = await httpClient.rejectDiscussion({
+      const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: "" },
         urlParams: {
           discussionId: discussion.id,
         },
         body: {
+          status: "REJECTED",
           rejectionKind: "OTHER",
           rejectionReason: "No reason",
         },
@@ -446,12 +448,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
         user,
       ]);
 
-      const response = await httpClient.rejectDiscussion({
+      const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
         urlParams: {
           discussionId: discussion.id,
         },
         body: {
+          status: "REJECTED",
           rejectionKind: "OTHER",
           rejectionReason: "No reason",
         },
@@ -479,12 +482,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
         user,
       ]);
 
-      const response = await httpClient.rejectDiscussion({
+      const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
         urlParams: {
           discussionId: discussion.id,
         },
         body: {
+          status: "REJECTED",
           rejectionKind: "OTHER",
           rejectionReason: "No reason",
         },

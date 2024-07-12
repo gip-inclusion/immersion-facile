@@ -903,6 +903,7 @@ describe("Convention slice", () => {
       });
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "broadcast-convention-again": {
+          on: "create",
           level: "success",
           title: "La convention a bien été rediffusée.",
           message:
@@ -931,6 +932,7 @@ describe("Convention slice", () => {
       });
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "broadcast-convention-again": {
+          on: "create",
           level: "error",
           title: "Problème rencontré lors de la rediffusion au partenaire.",
           message:

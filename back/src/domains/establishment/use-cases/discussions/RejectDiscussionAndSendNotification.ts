@@ -85,6 +85,7 @@ export const makeRejectDiscussionAndSendNotification =
         sender: "establishment",
         recipient: "potentialBeneficiary",
         sentAt: deps.timeGateway.now().toISOString(),
+        attachments: [],
       };
 
       await uow.discussionRepository.update(

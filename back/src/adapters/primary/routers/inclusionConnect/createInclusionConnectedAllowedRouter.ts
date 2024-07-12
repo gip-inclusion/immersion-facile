@@ -62,7 +62,7 @@ export const createInclusionConnectedAllowedRouter = (
   );
 
   inclusionConnectedSharedRoutes.broadcastConventionAgain(
-    deps.adminAuthMiddleware,
+    deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
