@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
+import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
@@ -21,6 +22,7 @@ export const EditAgency = () => {
         />
       </div>
       {agency && <EditAgencyForm agency={agency} />}
+      {agency && <AgencyUsers />}
     </>
   );
 };
