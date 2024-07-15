@@ -1486,7 +1486,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     it("returns false if no establishment from form with given siret exists", async () => {
       // Act and assert
       expect(
-        await pgEstablishmentAggregateRepository.hasEstablishmentWithSiret(
+        await pgEstablishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
           siret,
         ),
       ).toBe(false);
@@ -1500,7 +1500,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       // Act and assert
       expect(
-        await pgEstablishmentAggregateRepository.hasEstablishmentWithSiret(
+        await pgEstablishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
           siret,
         ),
       ).toBe(true);
@@ -1687,7 +1687,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       const siretNotInTable = "11111111111111";
 
       expect(
-        await pgEstablishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
+        await pgEstablishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
           siretNotInTable,
         ),
       ).toHaveLength(0);
@@ -1695,7 +1695,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
     it("returns a list with offers from offers as AppellationDto of given siret", async () => {
       const actualOffersAsAppelationDto =
-        await pgEstablishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
+        await pgEstablishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
           siretInTable,
         );
       expectArraysToEqualIgnoringOrder(actualOffersAsAppelationDto, [
@@ -1918,7 +1918,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       };
 
       const establishmentAggregates =
-        await pgEstablishmentAggregateRepository.getEstablishmentAggregates(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
           filters,
         );
 
@@ -1931,7 +1931,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       };
 
       const establishmentAggregates =
-        await pgEstablishmentAggregateRepository.getEstablishmentAggregates(
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
           filters,
         );
 

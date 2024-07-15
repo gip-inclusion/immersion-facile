@@ -27,57 +27,52 @@ export type SearchImmersionParams = {
 export type EstablishmentAggregateFilters = { contactEmail: string };
 
 export interface EstablishmentAggregateRepository {
+  //Establishment aggregate
   delete(siret: SiretDto): Promise<void>;
   insertEstablishmentAggregate(
     establishmentAggregate: EstablishmentAggregate,
   ): Promise<void>;
-
   updateEstablishmentAggregate(
     establishmentAggregate: EstablishmentAggregate,
     updatedAt: Date,
   ): Promise<void>;
-
-  markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
-    fromDate: Date,
-  ): Promise<number>;
-
+  getEstablishmentAggregateBySiret(
+    siret: string,
+  ): Promise<EstablishmentAggregate | undefined>;
+  getEstablishmentAggregatesByFilters({
+    contactEmail,
+  }: EstablishmentAggregateFilters): Promise<EstablishmentAggregate[]>;
+  hasEstablishmentAggregateWithSiret(siret: string): Promise<boolean>;
   updateEstablishmentsWithInseeData(
     inseeCheckDate: Date,
     params: UpdateEstablishmentsWithInseeDataParams,
   ): Promise<void>;
+  markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+    fromDate: Date,
+  ): Promise<number>;
 
-  hasEstablishmentWithSiret(siret: string): Promise<boolean>;
-
-  getEstablishmentAggregateBySiret(
-    siret: string,
-  ): Promise<EstablishmentAggregate | undefined>;
-
-  getEstablishmentAggregates({
-    contactEmail,
-  }: EstablishmentAggregateFilters): Promise<EstablishmentAggregate[]>;
-
-  getOffersAsAppellationDtoEstablishment(
+  //Offers
+  getOffersAsAppellationAndRomeDtosBySiret(
     siret: string,
   ): Promise<AppellationAndRomeDto[]>;
 
+  //SearchResult & SearchImmersionResults
   getSearchImmersionResultDtoBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
     locationId: LocationId,
   ): Promise<SearchResultDto | undefined>;
+  searchImmersionResults(
+    searchImmersionParams: SearchImmersionParams,
+  ): Promise<SearchImmersionResult[]>;
 
+  //Sirets
   getSiretsOfEstablishmentsWithRomeCode(rome: string): Promise<SiretDto[]>;
-
   getSiretOfEstablishmentsToSuggestUpdate(before: Date): Promise<SiretDto[]>;
-
   getSiretsOfEstablishmentsNotCheckedAtInseeSince(
     checkDate: Date,
     maxResults: number,
   ): Promise<SiretDto[]>;
-
-  searchImmersionResults(
-    searchImmersionParams: SearchImmersionParams,
-  ): Promise<SearchImmersionResult[]>;
 }
 
 export type ValuesToUpdateFromInseeApi = Partial<

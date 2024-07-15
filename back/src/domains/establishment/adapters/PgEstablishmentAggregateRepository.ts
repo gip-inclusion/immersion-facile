@@ -221,7 +221,7 @@ export class PgEstablishmentAggregateRepository
     );
   }
 
-  public async getEstablishmentAggregates({
+  public async getEstablishmentAggregatesByFilters({
     contactEmail,
   }: { contactEmail: string }): Promise<EstablishmentAggregate[]> {
     const aggregateWithStringDates = await executeKyselyRawSqlQuery(
@@ -338,7 +338,7 @@ export class PgEstablishmentAggregateRepository
     }));
   }
 
-  public async getOffersAsAppellationDtoEstablishment(
+  public async getOffersAsAppellationAndRomeDtosBySiret(
     siret: string,
   ): Promise<AppellationAndRomeDto[]> {
     const pgResult = await executeKyselyRawSqlQuery(
@@ -465,7 +465,9 @@ export class PgEstablishmentAggregateRepository
     return pgResult.rows.map((row) => row.siret);
   }
 
-  public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
+  public async hasEstablishmentAggregateWithSiret(
+    siret: string,
+  ): Promise<boolean> {
     const pgResult = await executeKyselyRawSqlQuery(
       this.transaction,
       "SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);",

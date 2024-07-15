@@ -59,7 +59,7 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async getEstablishmentAggregates({
+  public async getEstablishmentAggregatesByFilters({
     contactEmail,
   }: { contactEmail: string }): Promise<EstablishmentAggregate[]> {
     return this.#establishmentAggregates.filter(
@@ -68,7 +68,7 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async getOffersAsAppellationDtoEstablishment(
+  public async getOffersAsAppellationAndRomeDtosBySiret(
     siret: string,
   ): Promise<AppellationAndRomeDto[]> {
     return (
@@ -137,7 +137,9 @@ export class InMemoryEstablishmentAggregateRepository
       .map(path("establishment.siret"));
   }
 
-  public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
+  public async hasEstablishmentAggregateWithSiret(
+    siret: string,
+  ): Promise<boolean> {
     if (siret === conflictErrorSiret)
       throw new ConflictError(
         `Establishment with siret ${siret} already in db`,

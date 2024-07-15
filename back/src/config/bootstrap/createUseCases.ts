@@ -586,7 +586,9 @@ export const createUseCases = (
         }),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
         uowPerformer.perform((uow) =>
-          uow.establishmentAggregateRepository.hasEstablishmentWithSiret(siret),
+          uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
+            siret,
+          ),
         ),
       getImmersionFacileAgencyIdByKind: (_: void) =>
         uowPerformer.perform(async (uow) => {
