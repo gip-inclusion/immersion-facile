@@ -16,8 +16,8 @@ import {
 import { validateAndParseZodSchema } from "../../../config/helpers/httpErrors";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
-import { AssessmentEmailDomainTopic } from "../../core/events/events";
 import {
+  AssessmentEmailKind,
   ConventionQueries,
   GetConventionsByFiltersQueries,
 } from "../ports/ConventionQueries";
@@ -73,20 +73,17 @@ export class PgConventionQueries implements ConventionQueries {
 
   public async getAllConventionsForThoseEndingThatDidntGoThrough(
     dateEnd: Date,
-    sendingTopic: AssessmentEmailDomainTopic,
+    assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionDto[]> {
     const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.date_end", ">=", subHours(dateEnd, 24))
       .where("conventions.date_end", "<", dateEnd)
       .where("conventions.status", "in", validatedConventionStatuses)
-      .where(
-        "conventions.id",
-        "not in",
-        sql`(
-          SELECT (payload ->> 'id')::uuid
-          FROM outbox
-          WHERE topic = ${sendingTopic}
-        )`,
+      .where("conventions.id", "not in", (qb) =>
+        qb
+          .selectFrom("notifications_email")
+          .select("convention_id")
+          .where("email_kind", "=", assessmentEmailKind),
       )
       .orderBy("conventions.date_start", "desc")
       .execute();

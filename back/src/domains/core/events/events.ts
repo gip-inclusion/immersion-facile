@@ -4,7 +4,6 @@ import {
   ConventionId,
   DateString,
   EstablishmentJwtPayload,
-  ExtractFromExisting,
   Flavor,
   IcUserRoleForAgencyParams,
   RejectIcUserRoleForAgencyParams,
@@ -143,8 +142,3 @@ export type DomainEvent =
   | GenericEvent<"PartnerErroredConventionMarkedAsHandled", { conventionId: ConventionId; userId: UserId } & WithTriggeredBy>;
 
 export type DomainTopic = DomainEvent["topic"];
-
-export type AssessmentEmailDomainTopic = ExtractFromExisting<
-  DomainTopic,
-  "EmailWithLinkToCreateAssessmentSent" | "BeneficiaryAssessmentEmailSent"
->;

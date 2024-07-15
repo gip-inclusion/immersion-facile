@@ -4,10 +4,11 @@ import {
   ConventionReadDto,
   ConventionScope,
   ConventionStatus,
+  ExtractFromExisting,
   FindSimilarConventionsParams,
   SiretDto,
+  TemplatedEmail,
 } from "shared";
-import { AssessmentEmailDomainTopic } from "../../core/events/events";
 
 export type GetConventionsByFiltersQueries = {
   startDateGreater?: Date;
@@ -18,13 +19,19 @@ export type GetConventionsByFiltersQueries = {
   withSirets?: SiretDto[];
 };
 
+export type AssessmentEmailKind = ExtractFromExisting<
+  TemplatedEmail["kind"],
+  | "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
+  | "BENEFICIARY_ASSESSMENT_NOTIFICATION"
+>;
+
 export interface ConventionQueries {
   getConventionById: (
     id: ConventionId,
   ) => Promise<ConventionReadDto | undefined>;
   getAllConventionsForThoseEndingThatDidntGoThrough: (
     dateEnd: Date,
-    sendingTopic: AssessmentEmailDomainTopic,
+    assessmentEmailKind: AssessmentEmailKind,
   ) => Promise<ConventionDto[]>;
 
   getConventionsByFilters(

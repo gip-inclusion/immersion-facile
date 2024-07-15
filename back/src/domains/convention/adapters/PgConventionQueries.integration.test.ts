@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
-import { Pool, PoolClient } from "pg";
+import { sql } from "kysely";
+import { Pool } from "pg";
 import {
   AgencyDto,
   AgencyDtoBuilder,
@@ -11,6 +12,7 @@ import {
   ConventionReadDto,
   ConventionStatus,
   DATE_START,
+  Notification,
   SiretDto,
   defaultValidatorEmail,
   expectToEqual,
@@ -19,10 +21,7 @@ import {
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
-import { PgOutboxRepository } from "../../core/events/adapters/PgOutboxRepository";
-import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
-import { RealTimeGateway } from "../../core/time-gateway/adapters/RealTimeGateway";
-import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -33,7 +32,6 @@ const agencyIdB: AgencyId = "bbbbbbbb-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 
 describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
-  let client: PoolClient;
   let conventionQueries: PgConventionQueries;
   let agencyRepo: PgAgencyRepository;
   let conventionRepository: PgConventionRepository;
@@ -41,18 +39,17 @@ describe("Pg implementation of ConventionQueries", () => {
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    transaction = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM conventions");
-    await client.query(
-      "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
+    await transaction.deleteFrom("conventions").execute();
+    await sql`TRUNCATE TABLE convention_external_ids RESTART IDENTITY;`.execute(
+      transaction,
     );
-    await client.query("DELETE FROM agency_groups__agencies");
-    await client.query("DELETE FROM agency_groups");
-    await client.query("DELETE FROM agencies");
-    transaction = makeKyselyDb(pool);
+    await transaction.deleteFrom("agency_groups__agencies").execute();
+    await transaction.deleteFrom("agency_groups").execute();
+    await transaction.deleteFrom("agencies").execute();
 
     conventionQueries = new PgConventionQueries(transaction);
     agencyRepo = new PgAgencyRepository(transaction);
@@ -60,7 +57,6 @@ describe("Pg implementation of ConventionQueries", () => {
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
@@ -394,8 +390,9 @@ describe("Pg implementation of ConventionQueries", () => {
       "bbbb1111-1111-4111-1111-11111111bbbb";
 
     beforeEach(async () => {
-      await client.query("DELETE FROM agencies");
-      await client.query("DELETE FROM conventions");
+      await transaction.deleteFrom("agencies").execute();
+      await transaction.deleteFrom("conventions").execute();
+
       const agency = AgencyDtoBuilder.create().build();
       const conventionBuilderInitialMatching = new ConventionDtoBuilder()
         .withAgencyId(agency.id)
@@ -523,18 +520,19 @@ describe("Pg implementation of ConventionQueries", () => {
     beforeEach(async () => {
       const agencyRepository = new PgAgencyRepository(transaction);
       await agencyRepository.insert(agency);
-      await client.query("DELETE FROM outbox_failures");
-      await client.query("DELETE FROM outbox_publications");
-      await client.query("DELETE FROM outbox");
+      await transaction.deleteFrom("notifications_email_recipients").execute();
+      await transaction.deleteFrom("notifications_email_attachments").execute();
+      await transaction.deleteFrom("notifications_email").execute();
     });
 
     it("Gets all email params of validated immersions ending at given date that did not received any assessment link yet", async () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
       const conventionRepo = new PgConventionRepository(transaction);
-      const outboxRepo = new PgOutboxRepository(transaction);
+      const notificationRepo = new PgNotificationRepository(transaction);
       const dateStart = new Date("2022-05-10").toISOString();
       const dateEnd14 = new Date("2022-05-14").toISOString();
       const dateEnd15 = new Date("2022-05-15").toISOString();
+
       const validatedImmersionEndingThe14th = new ConventionDtoBuilder()
         .withId("aaaaac14-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .validated()
@@ -542,6 +540,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withDateEnd(dateEnd14)
         .withSchedule(reasonableSchedule)
         .build();
+
       const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
         new ConventionDtoBuilder()
           .withId("aaaaac15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
@@ -550,6 +549,7 @@ describe("Pg implementation of ConventionQueries", () => {
           .withDateEnd(dateEnd15)
           .withSchedule(reasonableSchedule)
           .build();
+
       const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .validated()
@@ -559,6 +559,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withEstablishmentTutorFirstName("Romain")
         .withEstablishmentTutorLastName("Grandjean")
         .build();
+
       const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("cccccc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .withDateStart("2022-05-10")
@@ -566,6 +567,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withSchedule(reasonableSchedule)
         .withStatus("IN_REVIEW")
         .build();
+
       await Promise.all(
         [
           validatedImmersionEndingThe14th,
@@ -575,23 +577,40 @@ describe("Pg implementation of ConventionQueries", () => {
         ].map((params) => conventionRepo.save(params)),
       );
 
-      const createNewEvent = makeCreateNewEvent({
-        timeGateway: new RealTimeGateway(),
-        uuidGenerator: new UuidV4Generator(),
-      });
-      const eventEmailSentToImmersion1 = createNewEvent({
-        topic: "EmailWithLinkToCreateAssessmentSent",
-        payload: {
-          id: validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.id,
+      const notification1: Notification = {
+        createdAt: new Date().toISOString(),
+        followedIds: {
+          conventionId:
+            validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.id,
+          establishmentSiret:
+            validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.siret,
+          agencyId:
+            validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.agencyId,
         },
-      });
-      await outboxRepo.save(eventEmailSentToImmersion1);
+        id: "77770000-0000-4777-7777-000077770000",
+        kind: "email",
+        templatedContent: {
+          kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+          params: {
+            internshipKind: "immersion",
+            assessmentCreationLink: "fake-link",
+            beneficiaryFirstName: "joe",
+            beneficiaryLastName: "joe",
+            conventionId:
+              validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.id,
+            establishmentTutorName: "tuteur du joe",
+            agencyLogoUrl: "https://super link",
+          },
+          recipients: ["joe-joe@gmail.com"],
+        },
+      };
+      await notificationRepo.saveBatch([notification1]);
 
       // Act
       const queryResults =
         await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
           new Date("2022-05-15T12:43:11"),
-          "EmailWithLinkToCreateAssessmentSent",
+          "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
         );
 
       // Assert
