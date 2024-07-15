@@ -266,6 +266,58 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
     });
 
+    it(`${displayRouteName(
+      inclusionConnectedAllowedRoutes.markPartnersErroredConventionAsHandled,
+    )} 403 when user has no rights on agency`, async () => {
+      const userId = "123456ab";
+      const userAgency = new AgencyDtoBuilder().withId("agency-id-1").build();
+      const conventionAgency = new AgencyDtoBuilder()
+        .withId("agency-id-2")
+        .build();
+      const conventionId = "11111111-1111-4111-1111-111111111111";
+      const user: InclusionConnectedUser = {
+        id: userId,
+        email: "joe@mail.com",
+        firstName: "Joe",
+        lastName: "Doe",
+        agencyRights: [
+          {
+            agency: userAgency,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        ],
+        dashboards: { agencies: {}, establishments: {} },
+        externalId: "joe-external-id",
+        createdAt: new Date().toISOString(),
+      };
+      const token = generateInclusionConnectJwt({
+        userId,
+        version: currentJwtVersions.inclusion,
+      });
+      const convention = new ConventionDtoBuilder()
+        .withId(conventionId)
+        .withAgencyId(conventionAgency.id)
+        .build();
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        user,
+      ]);
+      inMemoryUow.agencyRepository.setAgencies([userAgency, conventionAgency]);
+      inMemoryUow.conventionRepository.setConventions([convention]);
+
+      const response = await httpClient.markPartnersErroredConventionAsHandled({
+        headers: { authorization: token },
+        body: { conventionId: "11111111-1111-4111-1111-111111111111" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          errors: `L'utilisateur qui a l'identifiant "123456ab" n'a pas de droits sur l'agence "agency-id-2".`,
+        },
+        status: 403,
+      });
+    });
+
     it("mark partners errored convention as handled", async () => {
       const userId = "123456ab";
       const conventionId = "11111111-1111-4111-1111-111111111111";

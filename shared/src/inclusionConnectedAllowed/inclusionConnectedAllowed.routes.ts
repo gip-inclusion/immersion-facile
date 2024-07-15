@@ -51,7 +51,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       200: expressEmptyResponseBody,
       404: legacyHttpErrorSchema,
       400: httpErrorSchema,
-      403: legacyUnauthenticatedErrorSchema,
+      403: legacyHttpErrorSchema.or(legacyUnauthenticatedErrorSchema),
     },
   }),
   broadcastConventionAgain: defineRoute({

@@ -11,7 +11,8 @@ import { DiscussionState, discussionSlice } from "./discussion.slice";
 describe("Discussion slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
-  const discussionFetchError = new Error("Discussion fetch error.");
+  const discussionFetchErrorMessage = "Discussion fetch error from API.";
+  const discussionFetchError = new Error(discussionFetchErrorMessage);
   const defaultStartingDiscussionState: DiscussionState = {
     isLoading: false,
     discussion: null,
@@ -99,8 +100,7 @@ describe("Discussion slice", () => {
         on: "fetch",
         level: "error",
         title: "Problème lors de la récupération des discussions",
-        message:
-          "Une erreur est survenue lors de la récupération des discussions",
+        message: discussionFetchErrorMessage,
       },
     });
   });
@@ -202,7 +202,7 @@ describe("Discussion slice", () => {
           on: "update",
           level: "error",
           title: "Problème lors du rejet de la candidature",
-          message: "Une erreur est survenue lors du rejet de la candidature",
+          message: discussionFetchErrorMessage,
         },
       });
     });

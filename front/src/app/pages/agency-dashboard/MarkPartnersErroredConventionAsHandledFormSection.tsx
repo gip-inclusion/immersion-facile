@@ -14,6 +14,7 @@ import {
   domElementIds,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 
@@ -41,6 +42,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
       partnersErroredConventionSlice.actions.markAsHandledRequested({
         jwt,
         markAsHandledParams: { conventionId },
+        feedbackTopic: "mark-convention-as-handled",
       }),
     );
     erroredConventionHandledConfirmationModal.close();
@@ -120,6 +122,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
             document.body,
           )}
         </form>
+        <Feedback topic="mark-convention-as-handled" />
       </div>
     </section>
   );

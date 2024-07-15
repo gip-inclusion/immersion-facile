@@ -7,12 +7,14 @@ import { keys } from "shared";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
+import { partnersErroredConventionSlice } from "../partnersErroredConvention/partnersErroredConvention.slice";
 
 const topics = [
   "api-consumer-global",
   "dashboard-discussion",
   "dashboard-discussion-rejection",
   "broadcast-convention-again",
+  "mark-convention-as-handled",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -40,12 +42,14 @@ type ActionKind = "create" | "update" | "fetch" | "delete";
 
 export type ActionKindAndLevel = `${ActionKind}.${Feedback["level"]}`;
 
-type PayloadWithFeedbackTopic = { feedbackTopic: FeedbackTopic };
+type PayloadWithFeedbackTopic = {
+  feedbackTopic: FeedbackTopic;
+};
 
-// biome-ignore lint/complexity/noBannedTypes: need to use {}
-export type PayloadActionWithFeedbackTopic<P = {}> = PayloadAction<
-  P & PayloadWithFeedbackTopic
->;
+export type PayloadActionWithFeedbackTopic<
+  // biome-ignore lint/complexity/noBannedTypes: need to use {}
+  P extends Record<string, unknown> = {},
+> = PayloadAction<P & PayloadWithFeedbackTopic>;
 
 export const feedbackMapping: Record<
   FeedbackTopic,
@@ -111,6 +115,19 @@ export const feedbackMapping: Record<
         "Une erreur est survenue lors de la récupération des discussions",
     },
   },
+  "mark-convention-as-handled": {
+    "create.success": {
+      action: partnersErroredConventionSlice.actions.markAsHandledSucceeded,
+      title: "La convention a bien été marquée comme traitée.",
+      message: "La convention a bien été marquée comme traitée.",
+    },
+    "create.error": {
+      action: partnersErroredConventionSlice.actions.markAsHandledFailed,
+      title: "Problème rencontré.",
+      message:
+        "Problème rencontré lors du marquage de la convention comme traitée.",
+    },
+  },
 };
 
 export const feedbackSlice = createSlice({
@@ -161,7 +178,9 @@ export const feedbackSlice = createSlice({
                 state[action.payload.feedbackTopic] = {
                   on: actionKind,
                   level,
-                  message: feedbackForActionTopic.message,
+                  message:
+                    action.payload.errorMessage ??
+                    feedbackForActionTopic.message,
                   title: feedbackForActionTopic.title,
                 };
               },
