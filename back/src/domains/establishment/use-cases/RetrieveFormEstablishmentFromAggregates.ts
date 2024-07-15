@@ -67,7 +67,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   ) {
     return establishmentAggregateToFormEstablishement(
       establishmentAggregate,
-      await uow.establishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
+      await uow.establishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
         establishmentAggregate.establishment.siret,
       ),
     );

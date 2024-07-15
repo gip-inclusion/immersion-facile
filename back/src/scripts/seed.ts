@@ -277,7 +277,7 @@ const establishmentSeed = async (uow: UnitOfWork) => {
   Promise.all(
     [franceMerguez, decathlon].map(async (establishmentAggregate) => {
       const offersAsAppellationDto =
-        await uow.establishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
+        await uow.establishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
           establishmentAggregate.establishment.siret,
         );
       await uow.formEstablishmentRepository.create(
