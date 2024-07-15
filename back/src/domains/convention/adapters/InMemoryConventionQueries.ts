@@ -8,15 +8,14 @@ import {
   ConventionScope,
   FindSimilarConventionsParams,
   SiretDto,
-  WithConventionIdLegacy,
   errorMessages,
   validatedConventionStatuses,
 } from "shared";
 import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
-import { AssessmentEmailDomainTopic } from "../../core/events/events";
+import { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
+  AssessmentEmailKind,
   ConventionQueries,
   GetConventionsByFiltersQueries,
 } from "../ports/ConventionQueries";
@@ -26,7 +25,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
   constructor(
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly agencyRepository: InMemoryAgencyRepository,
-    private readonly outboxRepository?: InMemoryOutboxRepository,
+    private readonly notificationRepository: InMemoryNotificationRepository,
   ) {}
 
   public async findSimilarConventions(
@@ -54,12 +53,17 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public async getAllConventionsForThoseEndingThatDidntGoThrough(
     dateEnd: Date,
-    sendingTopic: AssessmentEmailDomainTopic,
+    assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionReadDto[]> {
-    const immersionIdsThatAlreadyGotAnEmail = this.outboxRepository
-      ? this.outboxRepository.events
-          .filter(propEq("topic", sendingTopic))
-          .map((event) => (event.payload as WithConventionIdLegacy).id)
+    const notifications = this.notificationRepository
+      ? await this.notificationRepository.getEmailsByFilters({
+          emailKind: assessmentEmailKind,
+        })
+      : [];
+    const immersionIdsThatAlreadyGotAnEmail = notifications
+      ? notifications.map(
+          (notification) => notification.followedIds.conventionId,
+        )
       : [];
     return this.conventionRepository.conventions
       .filter(

@@ -1,6 +1,9 @@
 import {
+  AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
+  Notification,
+  TemplatedEmail,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
@@ -10,8 +13,10 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
-import { makeTestDomainEvent } from "../../core/events/test.helpers";
-import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import {
+  SaveNotificationAndRelatedEvent,
+  makeSaveNotificationAndRelatedEvent,
+} from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -28,6 +33,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
   let sendEmailWithAssessmentCreationLink: SendEmailsWithAssessmentCreationLink;
   let timeGateway: CustomTimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -37,7 +43,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
     );
     timeGateway = new CustomTimeGateway();
     const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+    saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
       uuidGenerator,
       timeGateway,
     );
@@ -118,32 +124,61 @@ describe("SendEmailWithAssessmentCreationLink", () => {
 
   it("Does not send an email to immersions having already received one", async () => {
     // Arrange
+    const agency = new AgencyDtoBuilder().build();
     const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
       .withDateEnd("2021-05-14T10:00:00.000Z")
       .validated()
+      .withAgencyId(agency.id)
       .withId(id)
       .build();
-    await uow.conventionRepository.save(immersionApplicationEndingYesterday);
-    await uow.outboxRepository.save(
-      makeTestDomainEvent({
-        topic: "EmailWithLinkToCreateAssessmentSent",
-        payload: { id: immersionApplicationEndingYesterday.id },
-      }),
-    );
+    const signatories = immersionApplicationEndingYesterday.signatories;
 
-    timeGateway.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
+    const email: TemplatedEmail = {
+      kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+      params: {
+        internshipKind: "immersion",
+        assessmentCreationLink:
+          "http://fake-magic-link/bilan-immersion/immersion-ending-yesterday-id/establishment-tutor/2021-09-01T10:10:00.000Z/establishment@example.com",
+        beneficiaryFirstName: signatories.beneficiary.firstName,
+        beneficiaryLastName: signatories.beneficiary.lastName,
+        conventionId: immersionApplicationEndingYesterday.id,
+        establishmentTutorName: `${immersionApplicationEndingYesterday.establishmentTutor.firstName} ${immersionApplicationEndingYesterday.establishmentTutor.lastName}`,
+        agencyLogoUrl: undefined,
+      },
+      recipients: [signatories.establishmentRepresentative.email],
+      sender: {
+        email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+        name: "Immersion Facilitée",
+      },
+    };
+
+    const notification: Notification = {
+      createdAt: new Date().toISOString(),
+      followedIds: {
+        conventionId: immersionApplicationEndingYesterday.id,
+        agencyId: immersionApplicationEndingYesterday.agencyId,
+        establishmentSiret: immersionApplicationEndingYesterday.siret,
+      },
+      id: "first-notification-added-manually",
+      kind: "email",
+      templatedContent: email,
+    };
+
+    uow.agencyRepository.agencies = [agency];
+    uow.conventionRepository.setConventions([
+      immersionApplicationEndingYesterday,
+    ]);
+
+    uow.notificationRepository.notifications = [notification];
+
+    expectToEqual(uow.notificationRepository.notifications, [notification]);
+    expectToEqual(uow.outboxRepository.events, []);
 
     // Act
     await sendEmailWithAssessmentCreationLink.execute();
 
     // Assert
-    expectSavedNotificationsAndEvents({
-      emails: [],
-    });
-    expect(uow.outboxRepository.events).toHaveLength(1);
-    expectToEqual(
-      uow.outboxRepository.events[0].topic,
-      "EmailWithLinkToCreateAssessmentSent",
-    );
+    expectToEqual(uow.notificationRepository.notifications, [notification]);
+    expectToEqual(uow.outboxRepository.events, []);
   });
 });

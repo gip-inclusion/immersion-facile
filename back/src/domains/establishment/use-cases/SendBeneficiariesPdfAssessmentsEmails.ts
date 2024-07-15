@@ -52,7 +52,7 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
         tomorrow,
-        "BeneficiaryAssessmentEmailSent",
+        "BENEFICIARY_ASSESSMENT_NOTIFICATION",
       );
     const errors: Record<ConventionId, Error> = {};
     await Promise.all(

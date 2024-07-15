@@ -35,10 +35,11 @@ export const createInMemoryUow = () => {
   const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
   const agencyRepository = new InMemoryAgencyRepository();
   const conventionRepository = new InMemoryConventionRepository();
+  const notificationRepository = new InMemoryNotificationRepository();
   const conventionQueries = new InMemoryConventionQueries(
     conventionRepository,
     agencyRepository,
-    outboxRepository,
+    notificationRepository,
   );
   const userRepository = new InMemoryUserRepository();
   const shortLinkRepository = new InMemoryShortLinkRepository();
@@ -70,7 +71,7 @@ export const createInMemoryUow = () => {
       establishmentLeadRepository,
       conventionQueries,
     ),
-    notificationRepository: new InMemoryNotificationRepository(),
+    notificationRepository,
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,
     outboxQueries,
