@@ -16,7 +16,6 @@ import { routes } from "src/app/routes/routes";
 import { DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { partnersErroredConventionSelectors } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.selector";
 import { P, match } from "ts-pattern";
 import { Route } from "type-route";
 import { RegisterAgenciesForm } from "../../components/forms/register-agencies/RegisterAgenciesForm";
@@ -30,9 +29,6 @@ export const AgencyDashboardPage = ({
   // the Layout (Header, Footer...) is given by InclusionConnectedPrivateRoute (higher order component)
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const feedback = useAppSelector(inclusionConnectedSelectors.feedback);
-  const markErroredConventionAsHandledFeedback = useAppSelector(
-    partnersErroredConventionSelectors.feedback,
-  );
   const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
@@ -80,21 +76,9 @@ export const AgencyDashboardPage = ({
                   Guide de saisie des conventions
                 </Button>
                 {inclusionConnectedJwt ? (
-                  <>
-                    <MarkPartnersErroredConventionAsHandledFormSection
-                      jwt={inclusionConnectedJwt}
-                    />
-                    <SubmitFeedbackNotification
-                      submitFeedback={markErroredConventionAsHandledFeedback}
-                      messageByKind={{
-                        markedAsHandled: {
-                          title: "Succès",
-                          message:
-                            "La convention a bien été marquée comme traité.",
-                        },
-                      }}
-                    />
-                  </>
+                  <MarkPartnersErroredConventionAsHandledFormSection
+                    jwt={inclusionConnectedJwt}
+                  />
                 ) : (
                   <Alert
                     severity="error"

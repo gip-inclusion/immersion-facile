@@ -1,9 +1,10 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import {
   ConventionSupportedJwt,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
+import { PayloadActionWithFeedbackTopic } from "../feedback/feedback.slice";
 
 export type PartnersErroredConventionFeedbackKind = "markedAsHandled";
 
@@ -12,13 +13,11 @@ export type PartnersErroredConventionSubmitFeedback =
 
 export interface PartnersErroredConventionState {
   isLoading: boolean;
-  feedback: PartnersErroredConventionSubmitFeedback;
 }
 
 export const initialPartnersErroredConventionState: PartnersErroredConventionState =
   {
     isLoading: false,
-    feedback: { kind: "idle" },
   };
 
 type MarkPartnersErroredConventionAsHandledRequestPayload = {
@@ -32,20 +31,21 @@ export const partnersErroredConventionSlice = createSlice({
   reducers: {
     markAsHandledRequested: (
       state,
-      _action: PayloadAction<MarkPartnersErroredConventionAsHandledRequestPayload>,
+      _action: PayloadActionWithFeedbackTopic<MarkPartnersErroredConventionAsHandledRequestPayload>,
     ) => {
       state.isLoading = true;
     },
-    markAsHandledSucceeded: (state) => {
+    markAsHandledSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "markedAsHandled" };
     },
     markAsHandledFailed: (
       state: PartnersErroredConventionState,
-      action: PayloadAction<string>,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
     ) => {
       state.isLoading = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
   },
 });

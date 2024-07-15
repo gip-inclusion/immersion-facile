@@ -51,6 +51,7 @@ describe("Feedbacks", () => {
       expectFeedbackStoreByTopicToEqual({
         topic: "api-consumer-global",
         kindAndLevel: "create.error",
+        errorMessageFromApi: "fake error message",
       });
     });
     it("stores feedback with fetch level error from another slice", () => {
@@ -73,12 +74,18 @@ describe("Feedbacks", () => {
   const expectFeedbackStoreByTopicToEqual = ({
     topic,
     kindAndLevel,
-  }: { topic: FeedbackTopic; kindAndLevel: ActionKindAndLevel }) =>
+    errorMessageFromApi,
+  }: {
+    topic: FeedbackTopic;
+    kindAndLevel: ActionKindAndLevel;
+    errorMessageFromApi?: string;
+  }) =>
     expectToEqual(feedbacksSelectors.feedbacks(store.getState())[topic], {
       on: getLevelAndActionKindFromActionKindAndLevel(kindAndLevel).actionKind,
       level: getLevelAndActionKindFromActionKindAndLevel(kindAndLevel).level,
       title: feedbackMapping[topic][kindAndLevel]?.title,
-      // biome-ignore lint/style/noNonNullAssertion:
-      message: feedbackMapping[topic][kindAndLevel]!.message,
+      message:
+        // biome-ignore lint/style/noNonNullAssertion:
+        errorMessageFromApi ?? feedbackMapping[topic][kindAndLevel]!.message,
     });
 });

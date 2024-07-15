@@ -913,6 +913,7 @@ describe("Convention slice", () => {
     });
 
     it("fails when triggering the broadcast", () => {
+      const errorMessageFromApi = "error occurred from api";
       store.dispatch(
         conventionSlice.actions.broadcastConventionToPartnerRequested({
           conventionId: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
@@ -924,7 +925,7 @@ describe("Convention slice", () => {
       });
 
       dependencies.conventionGateway.broadcastConventionAgainResult$.error(
-        new Error("error occurred"),
+        new Error(errorMessageFromApi),
       );
 
       expectConventionState({
@@ -935,8 +936,7 @@ describe("Convention slice", () => {
           on: "create",
           level: "error",
           title: "Problème rencontré lors de la rediffusion au partenaire.",
-          message:
-            "Une erreur est survenue. Veuillez consulter le tableau de bord.",
+          message: errorMessageFromApi,
         },
       });
     });

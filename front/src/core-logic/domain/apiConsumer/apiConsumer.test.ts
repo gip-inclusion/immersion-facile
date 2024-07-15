@@ -166,8 +166,7 @@ describe("api consumer", () => {
           on: "create",
           level: "error",
           title: "Problème lors de la création du consommateur d'API",
-          message:
-            "Une erreur est survenue lors de la création du consommateur d'API",
+          message: errorMessage,
         },
       });
     });
