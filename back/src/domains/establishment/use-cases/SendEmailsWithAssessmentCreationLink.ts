@@ -61,7 +61,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
         yesterday,
-        "EmailWithLinkToCreateAssessmentSent",
+        "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
       );
 
     logger.info({

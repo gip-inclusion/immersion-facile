@@ -1,10 +1,16 @@
-import { ConventionDtoBuilder, ConventionId, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  ConventionId,
+  Notification,
+  TemplatedEmail,
+  expectToEqual,
+} from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
-import { makeTestDomainEvent } from "../../core/events/test.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -108,30 +114,56 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
   });
 
   it("Doesn't send an email to beneficiary that already received one", async () => {
+    const agency = new AgencyDtoBuilder().build();
     const conventionEndingTomorrow = new ConventionDtoBuilder()
       .withDateEnd("2023-11-22T10:00:00.000Z")
       .validated()
+      .withAgencyId(agency.id)
       .withId(id)
       .build();
-    await uow.conventionRepository.save(conventionEndingTomorrow);
-    await uow.outboxRepository.save(
-      makeTestDomainEvent({
-        topic: "BeneficiaryAssessmentEmailSent",
-        payload: { id: conventionEndingTomorrow.id },
-      }),
-    );
 
-    timeGateway.setNextDate(new Date("2021-05-21T08:00:00.000Z"));
+    const signatories = conventionEndingTomorrow.signatories;
+
+    const email: TemplatedEmail = {
+      kind: "BENEFICIARY_ASSESSMENT_NOTIFICATION",
+      params: {
+        internshipKind: "immersion",
+        beneficiaryFirstName: signatories.beneficiary.firstName,
+        beneficiaryLastName: signatories.beneficiary.lastName,
+        conventionId: conventionEndingTomorrow.id,
+        agencyAssessmentDocumentLink: undefined,
+        agencyValidatorEmail: "validator@gmail.com",
+        businessName: "my super company",
+      },
+      recipients: [signatories.beneficiary.email],
+      sender: {
+        email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+        name: "Immersion Facilitée",
+      },
+    };
+
+    const notification: Notification = {
+      createdAt: new Date().toISOString(),
+      followedIds: {
+        conventionId: conventionEndingTomorrow.id,
+        agencyId: conventionEndingTomorrow.agencyId,
+        establishmentSiret: conventionEndingTomorrow.siret,
+      },
+      id: "first-notification-added-manually",
+      kind: "email",
+      templatedContent: email,
+    };
+
+    uow.agencyRepository.agencies = [agency];
+    uow.conventionRepository.setConventions([conventionEndingTomorrow]);
+    uow.notificationRepository.notifications = [notification];
+
+    expectToEqual(uow.notificationRepository.notifications, [notification]);
+    expectToEqual(uow.outboxRepository.events, []);
 
     await sendBeneficiaryAssesmentEmail.execute();
 
-    expectSavedNotificationsAndEvents({
-      emails: [],
-    });
-
-    expectToEqual(
-      uow.outboxRepository.events[0].topic,
-      "BeneficiaryAssessmentEmailSent",
-    );
+    expectToEqual(uow.notificationRepository.notifications, [notification]);
+    expectToEqual(uow.outboxRepository.events, []);
   });
 });
