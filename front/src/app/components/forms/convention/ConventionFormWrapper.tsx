@@ -115,6 +115,7 @@ export const ConventionFormWrapper = ({
         .with(
           {
             formSuccessfullySubmitted: false,
+            shouldRedirectToError: false,
           },
           ({ showSummary }) =>
             showSummary ? (
@@ -124,7 +125,10 @@ export const ConventionFormWrapper = ({
             ),
         )
         .with(
-          { formSuccessfullySubmitted: true },
+          {
+            formSuccessfullySubmitted: true,
+            shouldRedirectToError: false,
+          },
           () =>
             fetchedConvention && (
               <SubmitConfirmationSection
