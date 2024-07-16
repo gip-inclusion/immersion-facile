@@ -9,7 +9,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError, ForbiddenError, UnauthorizedError } from "shared";
+import { BadRequestError, ForbiddenError } from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -58,7 +58,7 @@ describe("Update Convention", () => {
         updateConvention.execute({
           convention,
         }),
-        new UnauthorizedError(),
+        errors.user.unauthorized(),
       );
     });
 

@@ -8,7 +8,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { UnauthorizedError } from "shared";
 import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
@@ -193,7 +192,7 @@ describe("SaveApiConsumer", () => {
             authorizedUnJeuneUneSolutionApiConsumer,
           ),
         ),
-        new UnauthorizedError(),
+        errors.user.unauthorized(),
       );
 
       expectToEqual(uow.apiConsumerRepository.consumers, []);

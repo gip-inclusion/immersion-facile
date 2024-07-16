@@ -8,7 +8,7 @@ import {
   errors,
   updateConventionRequestSchema,
 } from "shared";
-import { BadRequestError, ForbiddenError, UnauthorizedError } from "shared";
+import { BadRequestError, ForbiddenError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -87,7 +87,7 @@ const throwIfNotAllowed = async (
   convention: ConventionDto,
   jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
 ) => {
-  if (!jwtPayload) throw new UnauthorizedError();
+  if (!jwtPayload) throw errors.user.unauthorized();
 
   if ("userId" in jwtPayload)
     return throwIfIcUserNotBackofficeAdmin(uow, jwtPayload);
@@ -100,5 +100,5 @@ const throwIfNotAllowed = async (
     return;
   }
 
-  throw new UnauthorizedError();
+  throw errors.user.unauthorized();
 };

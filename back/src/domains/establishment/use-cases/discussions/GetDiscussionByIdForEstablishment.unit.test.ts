@@ -1,10 +1,11 @@
 import {
   DiscussionBuilder,
   User,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -44,7 +45,7 @@ describe("GetDiscussionById use case", () => {
     it("cannot process if no jwt provided", async () => {
       await expectPromiseToFailWithError(
         getDiscussionById.execute(uuid()),
-        new UnauthorizedError(),
+        errors.user.unauthorized(),
       );
     });
 

@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { conventionMagicLinkRoutes } from "shared";
-import { UnauthorizedError } from "shared";
+import { conventionMagicLinkRoutes, errors } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { P, match } from "ts-pattern";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
@@ -41,7 +40,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     async (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!(req.payloads?.inclusion || req.payloads?.convention))
-          throw new UnauthorizedError();
+          throw errors.user.unauthorized();
         return deps.useCases.updateConvention.execute(
           req.body,
           req.payloads?.inclusion || req.payloads?.convention,
@@ -61,7 +60,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
             deps.useCases.updateConventionStatus.execute(req.body, inclusion),
           )
           .otherwise(() => {
-            throw new UnauthorizedError();
+            throw errors.user.unauthorized();
           }),
       ),
   );
@@ -70,7 +69,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req?.payloads?.convention) throw new UnauthorizedError();
+        if (!req?.payloads?.convention) throw errors.user.unauthorized();
         return deps.useCases.signConvention.execute(
           req.params,
           req.payloads.convention,
@@ -82,7 +81,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req?.payloads?.convention) throw new UnauthorizedError();
+        if (!req?.payloads?.convention) throw errors.user.unauthorized();
         return deps.useCases.getDashboard.execute({
           name: "conventionStatus",
           conventionId: req.payloads.convention.applicationId,

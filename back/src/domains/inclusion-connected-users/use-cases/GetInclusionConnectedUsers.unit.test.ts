@@ -5,7 +5,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { UnauthorizedError } from "shared";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
@@ -82,7 +81,7 @@ describe("GetInclusionConnectedUsers", () => {
   it("throws Unauthorized if no jwt token provided", async () => {
     await expectPromiseToFailWithError(
       getInclusionConnectedUsers.execute({ agencyRole: "toReview" }),
-      new UnauthorizedError(),
+      errors.user.unauthorized(),
     );
   });
 

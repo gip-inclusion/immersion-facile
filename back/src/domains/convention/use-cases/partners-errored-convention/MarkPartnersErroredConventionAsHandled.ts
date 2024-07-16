@@ -4,7 +4,6 @@ import {
   errors,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
-import { UnauthorizedError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -32,7 +31,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
     payload: InclusionConnectDomainJwtPayload,
   ): Promise<void> {
     if (!payload) {
-      throw new UnauthorizedError();
+      throw errors.user.unauthorized();
     }
     const { userId } = payload;
     const conventionToMarkAsHandled = await uow.conventionRepository.getById(

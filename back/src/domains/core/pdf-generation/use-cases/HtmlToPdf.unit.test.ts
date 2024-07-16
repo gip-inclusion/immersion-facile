@@ -1,9 +1,10 @@
 import {
   ConventionJwtPayload,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError, UnauthorizedError } from "shared";
+import { BadRequestError } from "shared";
 import { ZodError } from "zod";
 import { InMemoryPdfGeneratorGateway } from "../adapters/InMemoryPdfGeneratorGateway";
 import { HtmlToPdf } from "./HtmlToPdf";
@@ -52,7 +53,7 @@ describe("HtmlToPdf", () => {
   it("returns an error if no JWT is provided", async () => {
     await expectPromiseToFailWithError(
       htmlToPdf.execute(htmlContent),
-      new UnauthorizedError(),
+      errors.user.unauthorized(),
     );
   });
 });

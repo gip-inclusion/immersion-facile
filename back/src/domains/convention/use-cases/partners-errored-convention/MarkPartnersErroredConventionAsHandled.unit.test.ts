@@ -3,7 +3,6 @@ import {
   ConventionDtoBuilder,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
-  UnauthorizedError,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -302,7 +301,7 @@ describe("mark partners errored convention as handled", () => {
       markPartnersErroredConventionAsHandled.execute({
         conventionId,
       }),
-      new UnauthorizedError(),
+      errors.user.unauthorized(),
     );
   });
 
