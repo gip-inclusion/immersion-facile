@@ -10,7 +10,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { UnauthorizedError } from "shared";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
@@ -109,7 +108,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   it("throws Unauthorized if no currentUser is provided", async () => {
     await expectPromiseToFailWithError(
       addFormEstablishmentBatch.execute(formEstablishmentBatch),
-      new UnauthorizedError(),
+      errors.user.unauthorized(),
     );
   });
 

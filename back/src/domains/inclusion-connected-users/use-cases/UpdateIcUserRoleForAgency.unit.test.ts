@@ -8,7 +8,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { UnauthorizedError } from "shared";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
@@ -71,7 +70,7 @@ describe("GetInclusionConnectedUsers", () => {
         agencyId: "agency-1",
         userId: notAdminUser.id,
       }),
-      new UnauthorizedError(),
+      errors.user.unauthorized(),
     );
   });
 

@@ -9,12 +9,7 @@ import {
   errors,
   renewConventionParamsSchema,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "shared";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -41,7 +36,7 @@ export class RenewConvention extends TransactionalUseCase<
   ): Promise<void> {
     const allowedRoles: Role[] = ["validator", "counsellor", "backOffice"];
 
-    if (!jwtPayload) throw new UnauthorizedError();
+    if (!jwtPayload) throw errors.user.unauthorized();
 
     const conventionInRepo = await uow.conventionRepository.getById(
       renewed.from,

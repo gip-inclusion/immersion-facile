@@ -5,7 +5,6 @@ import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
 } from "shared";
-import { UnauthorizedError } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -46,7 +45,7 @@ describe("SetFeatureFlag use case", () => {
   it("throws Unauthorized if no currentUser is provided", async () => {
     await expectPromiseToFailWithError(
       setFeatureFlag.execute(setEnableMaintenanceParams),
-      new UnauthorizedError(),
+      errors.user.unauthorized(),
     );
   });
 

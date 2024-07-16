@@ -7,7 +7,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError, UnauthorizedError } from "shared";
+import { BadRequestError } from "shared";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -59,7 +59,7 @@ describe("Update agency", () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWithError(
       updateAgency.execute(agency),
-      new UnauthorizedError(),
+      errors.user.unauthorized(),
     );
   });
 

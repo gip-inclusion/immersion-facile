@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { inclusionConnectedAllowedRoutes } from "shared";
-import { UnauthorizedError } from "shared";
+import { errors, inclusionConnectedAllowedRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
@@ -53,7 +52,7 @@ export const createInclusionConnectedAllowedRouter = (
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const inclusion = req.payloads?.inclusion;
-        if (!inclusion) throw new UnauthorizedError();
+        if (!inclusion) throw errors.user.unauthorized();
         await deps.useCases.markPartnersErroredConventionAsHandled.execute(
           req.body,
           inclusion,
@@ -66,7 +65,7 @@ export const createInclusionConnectedAllowedRouter = (
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw new UnauthorizedError();
+        if (!currentUser) throw errors.user.unauthorized();
         await deps.useCases.broadcastConventionAgain.execute(
           req.body,
           currentUser,
@@ -89,7 +88,7 @@ export const createInclusionConnectedAllowedRouter = (
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req.payloads?.currentUser) throw new UnauthorizedError();
+        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
         return deps.useCases.rejectDiscussionAndSendNotification.execute(
           {
             discussionId: req.params.discussionId,

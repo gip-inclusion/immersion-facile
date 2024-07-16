@@ -5,7 +5,6 @@ import {
   errors,
   expectPromiseToFailWithError,
 } from "shared";
-import { UnauthorizedError } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -105,7 +104,7 @@ describe("Update agency status", () => {
           { id: existingAgency.id, status: "active" },
           undefined,
         ),
-        new UnauthorizedError(),
+        errors.user.unauthorized(),
       );
     });
 

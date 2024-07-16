@@ -15,12 +15,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "shared";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -180,7 +175,7 @@ describe("RenewConvention", () => {
     it("throws an error when no JWT payload", async () => {
       await expectPromiseToFailWithError(
         renewConvention.execute(renewConventionParams),
-        new UnauthorizedError(),
+        errors.user.unauthorized(),
       );
     });
 

@@ -7,7 +7,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { UnauthorizedError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -85,7 +84,7 @@ describe("Delete Establishment", () => {
         deleteEstablishment.execute({
           siret: establishmentAggregate.establishment.siret,
         }),
-        new UnauthorizedError(),
+        errors.user.unauthorized(),
       );
     });
 

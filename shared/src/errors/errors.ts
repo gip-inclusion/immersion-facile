@@ -11,6 +11,7 @@ import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
+  UnauthorizedError,
 } from "./httpErrors";
 
 export const errors = {
@@ -96,6 +97,7 @@ export const errors = {
       ),
   },
   user: {
+    unauthorized: () => new UnauthorizedError(),
     noJwtProvided: () =>
       new ForbiddenError("Aucun jeton d'authentification (JWT) fourni."),
     notFound: ({ userId }: { userId: UserId }) =>

@@ -14,7 +14,7 @@ import {
   isApiConsumerAllowed,
   pipeWithValue,
 } from "shared";
-import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/httpErrors";
@@ -201,7 +201,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
     deps.apiConsumerMiddleware,
     (req, res) =>
       sendHttpResponseForApiV2(req, res, async () => {
-        if (!req.apiConsumer) throw new UnauthorizedError();
+        if (!req.apiConsumer) throw errors.user.unauthorized();
 
         const page = req.query.page ?? defaultPageInPagination;
         const perPage = req.query.perPage ?? defaultPerPageInPagination;

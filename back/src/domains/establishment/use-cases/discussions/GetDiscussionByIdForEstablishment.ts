@@ -3,8 +3,9 @@ import {
   DiscussionReadDto,
   InclusionConnectDomainJwtPayload,
   discussionIdSchema,
+  errors,
 } from "shared";
-import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
@@ -19,7 +20,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload?: InclusionConnectDomainJwtPayload,
   ): Promise<DiscussionReadDto> {
-    if (!jwtPayload) throw new UnauthorizedError();
+    if (!jwtPayload) throw errors.user.unauthorized();
 
     const user = await uow.inclusionConnectedUserRepository.getById(
       jwtPayload.userId,

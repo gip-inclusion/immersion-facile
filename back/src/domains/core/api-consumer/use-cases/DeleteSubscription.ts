@@ -1,10 +1,11 @@
 import {
   ApiConsumer,
   SubscriptionEvent,
+  errors,
   findRightNameFromSubscriptionId,
   isApiConsumerAllowed,
 } from "shared";
-import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -21,7 +22,7 @@ export class DeleteSubscription extends TransactionalUseCase<
     uow: UnitOfWork,
     apiConsumer?: ApiConsumer,
   ): Promise<void> {
-    if (!apiConsumer) throw new UnauthorizedError();
+    if (!apiConsumer) throw errors.user.unauthorized();
 
     const subscribedRightName = findRightNameFromSubscriptionId(
       apiConsumer,
