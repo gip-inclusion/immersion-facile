@@ -1,11 +1,11 @@
-import { AgencyId } from "./agency/agency.dto";
+import { AgencyId } from "../agency/agency.dto";
 import type {
   ConventionId,
   ConventionStatus,
-} from "./convention/convention.dto";
-import { UserId } from "./inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { Role } from "./role/role.dto";
-import { SiretDto } from "./siret/siret";
+} from "../convention/convention.dto";
+import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import { Role } from "../role/role.dto";
+import { SiretDto } from "../siret/siret";
 
 export const errorMessages = {
   convention: {
