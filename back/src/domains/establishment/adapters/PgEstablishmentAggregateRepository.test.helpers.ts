@@ -1,11 +1,9 @@
-import { PoolClient } from "pg";
 import {
   AddressDto,
   FormEstablishmentSource,
   GeoPositionDto,
   NumberEmployeesRange,
 } from "shared";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { ContactEntity } from "../entities/ContactEntity";
 import {
   ContactEntityBuilder,
@@ -15,45 +13,6 @@ import {
   defaultLocation,
 } from "../helpers/EstablishmentBuilders";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
-
-export const getAllImmersionOfferRows = async (kyselyDb: KyselyDb) =>
-  kyselyDb
-    .selectFrom("immersion_offers")
-    .selectAll()
-    .execute()
-    .then((rows) =>
-      rows.map((row) => ({
-        rome_code: row.rome_code,
-        appellation_code: row.appellation_code,
-        siret: row.siret,
-        score: row.score,
-      })),
-    );
-
-export const insertImmersionOffer = async (
-  client: PoolClient,
-  props: {
-    romeCode: string;
-    siret: string;
-    appellationCode: string;
-    offerCreatedAt?: Date;
-  },
-): Promise<void> => {
-  const insertQuery = `INSERT INTO immersion_offers (
-      rome_code, siret, score, appellation_code, created_at
-      ) VALUES
-       ($1, $2, $3, $4, $5)`;
-  const defaultScore = 4;
-  const defaultOfferCreatedAt = new Date("2022-01-08");
-
-  await client.query(insertQuery, [
-    props.romeCode,
-    props.siret,
-    defaultScore,
-    props.appellationCode ?? null,
-    props.offerCreatedAt ?? defaultOfferCreatedAt,
-  ]);
-};
 
 export type PgEstablishmentRow = {
   siret: string;
@@ -69,22 +28,6 @@ export type PgEstablishmentRow = {
   max_contacts_per_week: number;
   last_insee_check_date?: Date;
 };
-
-export const getAllEstablishmentsRows = async (kyselyDb: KyselyDb) =>
-  kyselyDb.selectFrom("establishments").selectAll().execute();
-
-export const getEstablishmentsRowsBySiret = async (
-  kyselyDb: KyselyDb,
-  siret: string,
-) =>
-  kyselyDb
-    .selectFrom("establishments")
-    .selectAll()
-    .where("siret", "=", siret)
-    .executeTakeFirst();
-
-export const getAllImmersionContactsRows = async (kyselyDb: KyselyDb) =>
-  kyselyDb.selectFrom("establishments_contacts").selectAll().execute();
 
 export type InsertEstablishmentAggregateProps = {
   siret: string;

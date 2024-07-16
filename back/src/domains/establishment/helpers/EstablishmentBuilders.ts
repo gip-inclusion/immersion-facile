@@ -65,6 +65,14 @@ export class ContactEntityBuilder implements Builder<ContactEntity> {
   public withId(id: string) {
     return new ContactEntityBuilder({ ...this.entity, id });
   }
+
+  public withLastName(lastName: string) {
+    return new ContactEntityBuilder({ ...this.entity, lastName });
+  }
+
+  public withPhone(phone: string) {
+    return new ContactEntityBuilder({ ...this.entity, phone });
+  }
 }
 
 export const defaultNafCode = "7820Z";
