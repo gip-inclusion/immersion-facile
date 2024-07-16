@@ -1,10 +1,9 @@
 import {
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
-  errorMessages,
+  errors,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -41,15 +40,11 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
       params.userId,
     );
 
-    if (!icUser)
-      throw new NotFoundError(`No user found with id: ${params.userId}`);
+    if (!icUser) throw errors.user.notFound({ userId: params.userId });
 
     const agency = await uow.agencyRepository.getById(params.agencyId);
 
-    if (!agency)
-      throw new NotFoundError(
-        errorMessages.agency.notFound({ agencyId: params.agencyId }),
-      );
+    if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
 
     const updatedAgencyRights = icUser.agencyRights.filter(
       (agencyRight) => agencyRight.agency.id !== params.agencyId,

@@ -6,13 +6,6 @@ export const expectPromiseToFail = async (promise: Promise<unknown>) => {
   await expect(promise).rejects.toThrow();
 };
 
-export const expectPromiseToFailWith = async (
-  promise: Promise<unknown>,
-  errorMessage: string,
-) => {
-  await expect(promise).rejects.toThrowError(new Error(errorMessage));
-};
-
 export const expectPromiseToFailWithError = async <T extends Error>(
   promise: Promise<unknown>,
   expectedError: T,

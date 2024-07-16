@@ -5,11 +5,10 @@ import {
   SignatoryRole,
   TemplatedEmail,
   WithConventionDto,
-  errorMessages,
+  errors,
   frontRoutes,
   withConventionSchema,
 } from "shared";
-import { BadRequestError, NotFoundError } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -47,18 +46,16 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     );
 
     if (!savedConvention)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({ conventionId: convention.id }),
-      );
+      throw errors.convention.notFound({ conventionId: convention.id });
 
     const [agency] = await uow.agencyRepository.getByIds([
       savedConvention.agencyId,
     ]);
 
     if (!agency)
-      throw new NotFoundError(
-        errorMessages.agency.notFound({ agencyId: savedConvention.agencyId }),
-      );
+      throw errors.agency.notFound({
+        agencyId: savedConvention.agencyId,
+      });
 
     return this.#onRepositoryConvention(uow, savedConvention, agency);
   }
@@ -134,10 +131,8 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       });
       return;
     }
-    throw new BadRequestError(
-      errorMessages.convention.noSignatoryHasSigned({
-        conventionId: convention.id,
-      }),
-    );
+    throw errors.convention.noSignatoryHasSigned({
+      conventionId: convention.id,
+    });
   }
 }

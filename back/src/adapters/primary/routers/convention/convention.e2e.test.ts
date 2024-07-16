@@ -16,7 +16,7 @@ import {
   createConventionMagicLinkPayload,
   currentJwtVersions,
   displayRouteName,
-  errorMessages,
+  errors,
   expectArraysToEqual,
   expectEmailOfType,
   expectHttpResponseToEqual,
@@ -164,9 +164,9 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: errorMessages.convention.conflict({
+          errors: errors.convention.conflict({
             conventionId: convention.id,
-          }),
+          }).message,
         },
         status: 409,
       });
@@ -462,9 +462,9 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: errorMessages.convention.notFound({
+          errors: errors.convention.notFound({
             conventionId: unknownId,
-          }),
+          }).message,
         },
         status: 404,
       });
@@ -666,11 +666,11 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: errorMessages.convention.badRoleStatusChange({
+          errors: errors.convention.badRoleStatusChange({
             roles: ["establishment-representative"],
             status: "ACCEPTED_BY_VALIDATOR",
             conventionId: convention.id,
-          }),
+          }).message,
         },
         status: 403,
       });
@@ -698,9 +698,9 @@ describe("convention e2e", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: errorMessages.convention.notFound({
+          errors: errors.convention.notFound({
             conventionId: unknownId,
-          }),
+          }).message,
         },
         status: 404,
       });

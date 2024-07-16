@@ -1,11 +1,11 @@
 import {
+  BadRequestError,
   ConventionDtoBuilder,
   DiscussionBuilder,
   conventionStatuses,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
 } from "shared";
-import { BadRequestError, ConflictError, ForbiddenError } from "shared";
 import { DomainEvent } from "../../core/events/events";
 import {
   CreateNewEvent,
@@ -118,9 +118,7 @@ describe("Add Convention", () => {
 
     await expectPromiseToFailWithError(
       addConvention.execute({ convention: validConvention }),
-      new ConflictError(
-        errorMessages.convention.conflict({ conventionId: validConvention.id }),
-      ),
+      errors.convention.conflict({ conventionId: validConvention.id }),
     );
   });
 
@@ -160,9 +158,7 @@ describe("Add Convention", () => {
               status,
             },
           }),
-          new ForbiddenError(
-            errorMessages.convention.forbiddenStatus({ status }),
-          ),
+          errors.convention.forbiddenStatus({ status }),
         );
       }
     });

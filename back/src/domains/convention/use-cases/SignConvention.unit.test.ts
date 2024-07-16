@@ -11,12 +11,12 @@ import {
   allRoles,
   allSignatoryRoles,
   conventionStatuses,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -173,12 +173,10 @@ describe("Sign convention", () => {
                 emailHash: "toto",
               },
             ),
-            new BadRequestError(
-              errorMessages.convention.badStatusTransition({
-                currentStatus: initialStatus,
-                targetStatus: "PARTIALLY_SIGNED",
-              }),
-            ),
+            errors.convention.badStatusTransition({
+              currentStatus: initialStatus,
+              targetStatus: "PARTIALLY_SIGNED",
+            }),
           );
         },
       );

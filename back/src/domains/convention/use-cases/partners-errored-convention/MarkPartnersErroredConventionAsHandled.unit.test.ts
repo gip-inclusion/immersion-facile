@@ -3,12 +3,11 @@ import {
   ConventionDtoBuilder,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
-  errorMessages,
-  expectPromiseToFailWith,
+  UnauthorizedError,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "shared";
 import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
@@ -246,14 +245,17 @@ describe("mark partners errored convention as handled", () => {
       icUserWithAgencyRights,
     ]);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
         {
           conventionId,
         },
         icJwtDomainPayload,
       ),
-      `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId}'.`,
+      errors.broadcastFeedback.notFound({
+        conventionId,
+        serviceName: broadcastToPeServiceName,
+      }),
     );
   });
 
@@ -281,23 +283,26 @@ describe("mark partners errored convention as handled", () => {
       icUserWithAgencyRights,
     ]);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
         {
           conventionId,
         },
         icJwtDomainPayload,
       ),
-      `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId}'.`,
+      errors.broadcastFeedback.notFound({
+        serviceName: broadcastToPeServiceName,
+        conventionId,
+      }),
     );
   });
 
   it("Throw when no jwt were provided", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute({
         conventionId,
       }),
-      "Veuillez vous authentifier",
+      new UnauthorizedError(),
     );
   });
 
@@ -309,7 +314,7 @@ describe("mark partners errored convention as handled", () => {
         },
         icJwtDomainPayload,
       ),
-      new NotFoundError(errorMessages.convention.notFound({ conventionId })),
+      errors.convention.notFound({ conventionId }),
     );
   });
 
@@ -323,7 +328,7 @@ describe("mark partners errored convention as handled", () => {
         { conventionId },
         icJwtDomainPayload,
       ),
-      new NotFoundError(errorMessages.user.notFound({ userId })),
+      errors.user.notFound({ userId }),
     );
   });
 
@@ -336,14 +341,14 @@ describe("mark partners errored convention as handled", () => {
       icUserWithoutRight,
     ]);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
         {
           conventionId,
         },
         icJwtDomainPayload,
       ),
-      errorMessages.user.noRightsOnAgency({
+      errors.user.noRightsOnAgency({
         agencyId: agency.id,
         userId,
       }),

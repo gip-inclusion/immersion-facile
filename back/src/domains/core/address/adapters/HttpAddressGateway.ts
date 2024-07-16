@@ -12,14 +12,13 @@ import {
   StreetNumberAndAddress,
   calculateDurationInSecondsFrom,
   castError,
-  errorMessages,
+  errors,
   filterNotFalsy,
   getDepartmentCodeFromDepartmentNameOrCity,
   lookupSearchResultsSchema,
   lookupStreetAddressQueryMinLength,
   lookupStreetAddressSpecialCharsRegex,
 } from "shared";
-import { BadRequestError } from "shared";
 import { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
 import { AddressGateway } from "../ports/AddressGateway";
@@ -78,9 +77,9 @@ export class HttpAddressGateway implements AddressGateway {
     return this.#limiter
       .schedule(() => {
         if (query.length < queryMinLength)
-          throw new BadRequestError(
-            errorMessages.address.queryToShort({ minLength: queryMinLength }),
-          );
+          throw errors.address.queryToShort({
+            minLength: queryMinLength,
+          });
 
         return this.httpClient.geosearch({
           headers: {
@@ -128,11 +127,9 @@ export class HttpAddressGateway implements AddressGateway {
           query.replace(lookupStreetAddressSpecialCharsRegex, "").length <
           lookupStreetAddressQueryMinLength
         )
-          throw new BadRequestError(
-            errorMessages.address.queryToShort({
-              minLength: lookupStreetAddressQueryMinLength,
-            }),
-          );
+          throw errors.address.queryToShort({
+            minLength: lookupStreetAddressQueryMinLength,
+          });
 
         return this.httpClient.geocoding({
           queryParams: {

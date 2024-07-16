@@ -3,12 +3,11 @@ import {
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   User,
-  errorMessages,
-  expectPromiseToFailWith,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -98,9 +97,7 @@ describe("reject IcUser for agency", () => {
         },
         currentUser,
       ),
-      new ForbiddenError(
-        errorMessages.user.forbidden({ userId: currentUser.id }),
-      ),
+      errors.user.forbidden({ userId: currentUser.id }),
     );
   });
 
@@ -118,7 +115,7 @@ describe("reject IcUser for agency", () => {
       },
     };
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       rejectIcUserForAgencyUsecase.execute(
         {
           userId: icUser.id,
@@ -127,7 +124,7 @@ describe("reject IcUser for agency", () => {
         },
         backofficeAdminUser,
       ),
-      `No user found with id: ${icUser.id}`,
+      errors.user.notFound({ userId: icUser.id }),
     );
   });
 
@@ -159,9 +156,7 @@ describe("reject IcUser for agency", () => {
         },
         backofficeAdminUser,
       ),
-      new NotFoundError(
-        errorMessages.agency.notFound({ agencyId: agency1.id }),
-      ),
+      errors.agency.notFound({ agencyId: agency1.id }),
     );
   });
 

@@ -2,9 +2,8 @@ import {
   AgencyDto,
   InclusionConnectedUser,
   agencySchema,
-  errorMessages,
+  errors,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -35,11 +34,9 @@ export class UpdateAgency extends TransactionalUseCase<
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
     await uow.agencyRepository.update(agency).catch((error) => {
-      if (error.message === `Agency ${agency.id} does not exist`) {
-        throw new NotFoundError(
-          errorMessages.agency.notFound({ agencyId: agency.id }),
-        );
-      }
+      if (error.message === `Agency ${agency.id} does not exist`)
+        throw errors.agency.notFound({ agencyId: agency.id });
+
       throw error;
     });
 

@@ -9,13 +9,13 @@ import {
   Role,
   TemplatedEmail,
   conventionStatuses,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
+import { ForbiddenError } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
@@ -94,9 +94,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           conventionId: convention.id,
           reminderKind: "FirstReminderForAgency",
         }),
-        new NotFoundError(
-          errorMessages.convention.notFound({ conventionId: convention.id }),
-        ),
+        errors.convention.notFound({ conventionId: convention.id }),
       );
 
       //Assert
@@ -116,9 +114,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           conventionId: convention.id,
           reminderKind: "FirstReminderForAgency",
         }),
-        new NotFoundError(
-          errorMessages.agency.notFound({ agencyId: convention.agencyId }),
-        ),
+        errors.agency.notFound({ agencyId: convention.agencyId }),
       );
 
       //Assert

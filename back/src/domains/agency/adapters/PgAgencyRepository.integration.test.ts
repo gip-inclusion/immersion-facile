@@ -5,11 +5,11 @@ import {
   GeoPositionDto,
   WithAcquisition,
   activeAgencyStatuses,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ConflictError, NotFoundError } from "shared";
+import { ConflictError } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
@@ -159,9 +159,7 @@ describe("PgAgencyRepository", () => {
     it("throws when no agencies are found", async () => {
       await expectPromiseToFailWithError(
         agencyRepository.getByIds([agency1.id]),
-        new NotFoundError(
-          errorMessages.agencies.notFound({ agencyIds: [agency1.id] }),
-        ),
+        errors.agencies.notFound({ agencyIds: [agency1.id] }),
       );
     });
   });

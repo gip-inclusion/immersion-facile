@@ -6,7 +6,7 @@ import {
   InclusionConnectedUserBuilder,
   currentJwtVersions,
   displayRouteName,
-  errorMessages,
+  errors,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -171,9 +171,9 @@ describe("Delete form establishment", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: errorMessages.establishment.notFound({
+        errors: errors.establishment.notFound({
           siret: establishmentAggregate.establishment.siret,
-        }),
+        }).message,
       },
       status: 404,
     });
@@ -197,9 +197,9 @@ describe("Delete form establishment", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: errorMessages.establishment.notFound({
+        errors: errors.establishment.notFound({
           siret: establishmentAggregate.establishment.siret,
-        }),
+        }).message,
       },
       status: 404,
     });

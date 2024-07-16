@@ -2,7 +2,8 @@ import {
   AgencyDtoBuilder,
   InclusionConnectedUser,
   User,
-  expectPromiseToFailWith,
+  errors,
+  expectPromiseToFailWithError,
 } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -65,26 +66,28 @@ describe("Notify icUser agency right rejected", () => {
   });
 
   it("Throw when no agency were found", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       notifyIcUserAgencyRightRejected.execute({
         agencyId: agency.id,
         justification: "osef",
         userId: icUser.id,
       }),
-      `No agency were found with id: ${agency.id}`,
+      errors.agency.notFound({ agencyId: agency.id }),
     );
   });
 
   it("Throw when no icUser were found", async () => {
     uow.agencyRepository.setAgencies([agency]);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       notifyIcUserAgencyRightRejected.execute({
         agencyId: agency.id,
         justification: "osef",
         userId: icUser.id,
       }),
-      `No user were found with id: ${user.id}`,
+      errors.user.notFound({
+        userId: icUser.id,
+      }),
     );
   });
 

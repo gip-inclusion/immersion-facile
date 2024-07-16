@@ -116,7 +116,7 @@ export abstract class UseCase<
     } catch (e) {
       //TODO: Quelque chose ne va pas. Ici ça reviens à faire:
       // throw new BadRequestError(new BadRequestError(new ZodError(...)))
-      throw new BadRequestError(e);
+      throw new BadRequestError(e as any);
     }
     const result = await this._execute(validParams, jwtPayload);
     const durationInSeconds = calculateDurationInSecondsFrom(startDate);

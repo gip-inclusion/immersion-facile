@@ -5,12 +5,12 @@ import {
   GroupOptions,
   InclusionConnectedUserBuilder,
   defaultValidFormEstablishment,
-  errorMessages,
+  errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
@@ -116,9 +116,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   it("throws Forbidden if currentUser user is not admin", async () => {
     await expectPromiseToFailWithError(
       addFormEstablishmentBatch.execute(formEstablishmentBatch, icUserNotAdmin),
-      new ForbiddenError(
-        errorMessages.user.forbidden({ userId: icUserNotAdmin.id }),
-      ),
+      errors.user.forbidden({ userId: icUserNotAdmin.id }),
     );
   });
 

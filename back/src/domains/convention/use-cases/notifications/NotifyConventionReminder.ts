@@ -13,13 +13,13 @@ import {
   type Role,
   type TemplatedEmail,
   type TemplatedSms,
-  errorMessages,
+  errors,
   filterNotFalsy,
   frontRoutes,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
+import { ForbiddenError } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
@@ -93,10 +93,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   ) {
     const conventionRead =
       await uow.conventionQueries.getConventionById(conventionId);
-    if (!conventionRead)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({ conventionId }),
-      );
+    if (!conventionRead) throw errors.convention.notFound({ conventionId });
 
     if (
       reminderKind === "FirstReminderForSignatories" ||
@@ -106,9 +103,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
     if (!agency)
-      throw new NotFoundError(
-        errorMessages.agency.notFound({ agencyId: conventionRead.agencyId }),
-      );
+      throw errors.agency.notFound({
+        agencyId: conventionRead.agencyId,
+      });
 
     return this.#onAgencyReminder(reminderKind, conventionRead, agency, uow);
   }

@@ -3,10 +3,9 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  errorMessages,
+  errors,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -333,9 +332,9 @@ describe("ResyncOldConventionsToPe use case", () => {
           id: conventionToSync1.id,
           status: "ERROR",
           processDate: timeGateway.now(),
-          reason: errorMessages.convention.notFound({
+          reason: errors.convention.notFound({
             conventionId: conventionToSync1.id,
-          }),
+          }).message,
         },
       ]);
       expectToEqual(peGateway.notifications, []);
@@ -343,11 +342,9 @@ describe("ResyncOldConventionsToPe use case", () => {
         success: 0,
         skips: {},
         errors: {
-          [conventionToSync1.id]: new NotFoundError(
-            errorMessages.convention.notFound({
-              conventionId: conventionToSync1.id,
-            }),
-          ),
+          [conventionToSync1.id]: errors.convention.notFound({
+            conventionId: conventionToSync1.id,
+          }),
         },
       });
     });
@@ -370,7 +367,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           id: conventionToSync1.id,
           status: "ERROR",
           processDate: timeGateway.now(),
-          reason: errorMessages.agency.notFound({ agencyId: agencyPE.id }),
+          reason: errors.agency.notFound({ agencyId: agencyPE.id }).message,
         },
       ]);
       expectToEqual(peGateway.notifications, []);
@@ -378,9 +375,9 @@ describe("ResyncOldConventionsToPe use case", () => {
         success: 0,
         skips: {},
         errors: {
-          [conventionToSync1.id]: new NotFoundError(
-            errorMessages.agency.notFound({ agencyId: agencyPE.id }),
-          ),
+          [conventionToSync1.id]: errors.agency.notFound({
+            agencyId: agencyPE.id,
+          }),
         },
       });
     });

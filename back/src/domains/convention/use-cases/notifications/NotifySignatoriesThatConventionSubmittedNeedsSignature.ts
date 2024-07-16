@@ -6,7 +6,7 @@ import {
   Signatory,
   TemplatedEmail,
   WithConventionDto,
-  errorMessages,
+  errors,
   filterNotFalsy,
   frontRoutes,
   withConventionSchema,
@@ -68,9 +68,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
 
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
     if (!agency)
-      throw new Error(
-        errorMessages.agency.notFound({ agencyId: convention.agencyId }),
-      );
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
 
     for (const signatory of values(convention.signatories).filter(
       filterNotFalsy,

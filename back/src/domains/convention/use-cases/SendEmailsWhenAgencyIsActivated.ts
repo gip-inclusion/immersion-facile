@@ -1,9 +1,9 @@
 import {
   AgencyDto,
   agencySchema,
+  errors,
   getCounsellorsAndValidatorsEmailsDeduplicated,
 } from "shared";
-import { NotFoundError } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -59,9 +59,8 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
         agency.refersToAgencyId,
       );
       if (!agencyReferredTo)
-        throw new NotFoundError(
-          `No agency were found with id : ${agency.refersToAgencyId}`,
-        );
+        throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
+
       this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {

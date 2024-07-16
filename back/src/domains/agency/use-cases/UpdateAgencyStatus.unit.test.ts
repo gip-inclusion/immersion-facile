@@ -2,10 +2,10 @@ import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
   UpdateAgencyStatusParamsWithoutId,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
 } from "shared";
-import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -115,9 +115,7 @@ describe("Update agency status", () => {
           { id: existingAgency.id, status: "active" },
           { ...backofficeAdmin, isBackofficeAdmin: false },
         ),
-        new ForbiddenError(
-          errorMessages.user.forbidden({ userId: backofficeAdmin.id }),
-        ),
+        errors.user.forbidden({ userId: backofficeAdmin.id }),
       );
     });
 
@@ -128,11 +126,9 @@ describe("Update agency status", () => {
           { id: agencyId, status: "active" },
           backofficeAdmin,
         ),
-        new NotFoundError(
-          errorMessages.agency.notFound({
-            agencyId,
-          }),
-        ),
+        errors.agency.notFound({
+          agencyId,
+        }),
       );
     });
   });

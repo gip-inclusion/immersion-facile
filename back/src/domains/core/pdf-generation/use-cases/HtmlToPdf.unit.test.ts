@@ -43,8 +43,8 @@ describe("HtmlToPdf", () => {
               message: "Obligatoire",
               path: [],
             },
-          ]),
-        ),
+          ]) as any,
+        ) as any,
       ),
     );
   });

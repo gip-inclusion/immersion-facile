@@ -4,10 +4,10 @@ import {
   FormEstablishmentDto,
   SiretDto,
   castError,
-  errorMessages,
+  errors,
   formEstablishmentSchema,
 } from "shared";
-import { ConflictError, NotFoundError } from "shared";
+import { ConflictError } from "shared";
 import {
   KyselyDb,
   jsonBuildObject,
@@ -76,8 +76,7 @@ export class PgFormEstablishmentRepository
       .returning("siret")
       .execute();
     const deletedSiret = results.at(0)?.siret;
-    if (deletedSiret !== siret)
-      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
+    if (deletedSiret !== siret) throw errors.establishment.notFound({ siret });
   }
 
   public async getAll(): Promise<FormEstablishmentDto[]> {
@@ -133,11 +132,9 @@ export class PgFormEstablishmentRepository
       .execute();
 
     if (result.at(0)?.siret !== formEstablishment.siret)
-      throw new ConflictError(
-        errorMessages.establishment.conflictError({
-          siret: formEstablishment.siret,
-        }),
-      );
+      throw errors.establishment.conflictError({
+        siret: formEstablishment.siret,
+      });
   }
 
   #selectEstablishmentJsonBuildQueryBuilder() {

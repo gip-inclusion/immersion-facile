@@ -11,14 +11,14 @@ import {
   UserId,
   WithConventionIdLegacy,
   backOfficeEmail,
-  errorMessages,
+  errors,
   getRequesterRole,
   reviewedConventionStatuses,
   stringToMd5,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
+import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import {
@@ -73,18 +73,16 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       params.conventionId,
     );
     if (!conventionRead)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({
-          conventionId: params.conventionId,
-        }),
-      );
+      throw errors.convention.notFound({
+        conventionId: params.conventionId,
+      });
 
     const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
 
     if (!agency)
-      throw new NotFoundError(
-        errorMessages.agency.notFound({ agencyId: conventionRead.agencyId }),
-      );
+      throw errors.agency.notFound({
+        agencyId: conventionRead.agencyId,
+      });
 
     const { user, roleInPayload } = await this.#getRoleInPayloadOrUser(
       uow,
@@ -150,11 +148,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
 
     const updatedId = await uow.conventionRepository.update(updatedConvention);
     if (!updatedId)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({
-          conventionId: updatedConvention.id,
-        }),
-      );
+      throw errors.convention.notFound({
+        conventionId: updatedConvention.id,
+      });
 
     const domainTopic = domainTopicByTargetStatusMap[params.status];
     if (domainTopic) {
@@ -218,11 +214,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       payload.userId,
     );
     if (!user)
-      throw new NotFoundError(
-        errorMessages.user.notFound({
-          userId: payload.userId,
-        }),
-      );
+      throw errors.user.notFound({
+        userId: payload.userId,
+      });
 
     return {
       user,
@@ -245,12 +239,10 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     );
 
     if (!userAgencyRight && roles.length === 0) {
-      throw new ForbiddenError(
-        errorMessages.user.noRightsOnAgency({
-          agencyId: convention.agencyId,
-          userId: user.id,
-        }),
-      );
+      throw errors.user.noRightsOnAgency({
+        agencyId: convention.agencyId,
+        userId: user.id,
+      });
     }
 
     if (userAgencyRight) roles.push(...userAgencyRight.roles);
@@ -264,14 +256,13 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     agencyId: AgencyId,
   ): Promise<string> {
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
-    if (!user) throw new NotFoundError(errorMessages.user.notFound({ userId }));
+    if (!user) throw errors.user.notFound({ userId });
     const userAgencyRights = user.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === agencyId,
     );
     if (!userAgencyRights)
-      throw new ForbiddenError(
-        errorMessages.user.noRightsOnAgency({ agencyId, userId }),
-      );
+      throw errors.user.noRightsOnAgency({ agencyId, userId });
+
     return user.email;
   }
 
@@ -309,8 +300,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     ): Promise<Email> => {
       const agencies = await uow.agencyRepository.getByIds([agencyId]);
       const agency = agencies.at(0);
-      if (!agency)
-        throw new NotFoundError(errorMessages.agency.notFound({ agencyId }));
+      if (!agency) throw errors.agency.notFound({ agencyId });
 
       const agencyEmails = [
         ...agency.validatorEmails,

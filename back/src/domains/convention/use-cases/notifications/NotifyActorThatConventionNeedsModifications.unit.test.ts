@@ -6,7 +6,7 @@ import {
   Email,
   ModifierRole,
   Role,
-  expectPromiseToFailWith,
+  expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
 } from "shared";
@@ -244,14 +244,16 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
       const conventionWithoutBeneficiaryCurrentEmployer =
         new ConventionDtoBuilder().build();
 
-      await expectPromiseToFailWith(
+      await expectPromiseToFailWithError(
         usecase.execute({
           convention: conventionWithoutBeneficiaryCurrentEmployer,
           justification: "OSEF",
           requesterRole,
           modifierRole,
         }),
-        `No actor with role ${modifierRole} for convention ${conventionWithoutBeneficiaryCurrentEmployer.id}`,
+        new Error(
+          `No actor with role ${modifierRole} for convention ${conventionWithoutBeneficiaryCurrentEmployer.id}`,
+        ),
       );
     });
 
@@ -262,14 +264,16 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
       const conventionWithoutBeneficiaryRepresentative =
         new ConventionDtoBuilder().build();
 
-      await expectPromiseToFailWith(
+      await expectPromiseToFailWithError(
         usecase.execute({
           convention: conventionWithoutBeneficiaryRepresentative,
           justification: "OSEF",
           requesterRole,
           modifierRole,
         }),
-        `No actor with role ${modifierRole} for convention ${conventionWithoutBeneficiaryRepresentative.id}`,
+        new Error(
+          `No actor with role ${modifierRole} for convention ${conventionWithoutBeneficiaryRepresentative.id}`,
+        ),
       );
     });
   });

@@ -1,11 +1,11 @@
 import {
   InclusionConnectedUserBuilder,
   SetFeatureFlagParam,
-  errorMessages,
+  errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
 } from "shared";
-import { ForbiddenError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -53,9 +53,7 @@ describe("SetFeatureFlag use case", () => {
   it("throws Forbidden if currentUser user is not admin", async () => {
     await expectPromiseToFailWithError(
       setFeatureFlag.execute(setEnableMaintenanceParams, icUserNotAdmin),
-      new ForbiddenError(
-        errorMessages.user.forbidden({ userId: icUserNotAdmin.id }),
-      ),
+      errors.user.forbidden({ userId: icUserNotAdmin.id }),
     );
   });
 

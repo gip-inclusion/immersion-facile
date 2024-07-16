@@ -3,9 +3,8 @@ import {
   ConventionStatus,
   WithConventionIdLegacy,
   addConventionInputSchema,
-  errorMessages,
+  errors,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";
@@ -43,9 +42,9 @@ export class AddConvention extends TransactionalUseCase<
       convention.status !== "DRAFT" &&
       convention.status !== minimalValidStatus
     ) {
-      throw new ForbiddenError(
-        errorMessages.convention.forbiddenStatus({ status: convention.status }),
-      );
+      throw errors.convention.forbiddenStatus({
+        status: convention.status,
+      });
     }
 
     await rejectsSiretIfNotAnOpenCompany(this.#siretGateway, convention.siret);

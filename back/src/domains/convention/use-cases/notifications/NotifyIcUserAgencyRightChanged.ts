@@ -1,5 +1,6 @@
 import {
   IcUserRoleForAgencyParams,
+  errors,
   icUserRoleForAgencyParamsSchema,
 } from "shared";
 import { NotFoundError } from "shared";
@@ -38,8 +39,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
     const user = await uow.inclusionConnectedUserRepository.getById(
       params.userId,
     );
-    if (!user)
-      throw new NotFoundError(`User with id ${params.userId} not found`);
+    if (!user) throw errors.user.notFound({ userId: params.userId });
 
     if (!params.roles.includes("toReview"))
       await this.#saveNotificationAndRelatedEvent(uow, {

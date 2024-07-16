@@ -5,16 +5,11 @@ import {
   EstablishmentTutor,
   InclusionConnectedUserBuilder,
   conventionStatuses,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "shared";
+import { BadRequestError, ForbiddenError, UnauthorizedError } from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -132,9 +127,7 @@ describe("Update Convention", () => {
           { convention: validConvention },
           { userId: backofficeAdminUser.id },
         ),
-        new NotFoundError(
-          errorMessages.convention.notFound({ conventionId: id }),
-        ),
+        errors.convention.notFound({ conventionId: id }),
       );
     });
   });

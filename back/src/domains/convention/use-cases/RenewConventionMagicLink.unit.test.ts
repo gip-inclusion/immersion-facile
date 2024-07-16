@@ -7,7 +7,7 @@ import {
   RenewMagicLinkRequestDto,
   Role,
   createConventionMagicLinkPayload,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
@@ -230,9 +230,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        new NotFoundError(
-          errorMessages.agencies.notFound({ agencyIds: [storedUnknownId] }),
-        ),
+        errors.agencies.notFound({ agencyIds: [storedUnknownId] }),
       );
     });
 

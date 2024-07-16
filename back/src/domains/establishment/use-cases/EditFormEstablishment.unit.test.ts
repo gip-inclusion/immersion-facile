@@ -4,11 +4,11 @@ import {
   FormEstablishmentDtoBuilder,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ConflictError, ForbiddenError, NotFoundError } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -117,11 +117,9 @@ describe("Edit Form Establishment", () => {
           updatedFormEstablishment,
           establishmentPayload,
         ),
-        new ConflictError(
-          errorMessages.establishment.conflictError({
-            siret: establishmentPayload.siret,
-          }),
-        ),
+        errors.establishment.conflictError({
+          siret: establishmentPayload.siret,
+        }),
       );
     });
   });

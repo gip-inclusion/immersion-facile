@@ -8,7 +8,7 @@ import {
   SearchResultDto,
   SiretDto,
   conflictErrorSiret,
-  errorMessages,
+  errors,
   pathEq,
   replaceArrayElement,
 } from "shared";
@@ -35,7 +35,7 @@ export class InMemoryEstablishmentAggregateRepository
       (formEstablishment) => formEstablishment.establishment.siret === siret,
     );
     if (formEstablishmentIndex === -1)
-      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
+      throw errors.establishment.notFound({ siret });
     this.#establishmentAggregates.splice(formEstablishmentIndex, 1);
   }
 

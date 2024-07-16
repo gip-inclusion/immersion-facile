@@ -7,7 +7,7 @@ import {
   InclusionConnectedUserBuilder,
   createEstablishmentJwtPayload,
   currentJwtVersions,
-  errorMessages,
+  errors,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -257,9 +257,9 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: errorMessages.establishment.conflictError({
+        errors: errors.establishment.conflictError({
           siret: establishment.siret,
-        }),
+        }).message,
       },
       status: 409,
     });

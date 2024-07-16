@@ -1,4 +1,8 @@
-import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
+import {
+  WithFormEstablishmentDto,
+  errors,
+  withFormEstablishmentSchema,
+} from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
@@ -57,7 +61,9 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       );
 
     if (!initialEstablishmentAggregate)
-      throw new Error("Cannot update establishment that does not exist.");
+      throw errors.establishment.notFound({
+        siret: formEstablishment.siret,
+      });
 
     const establishmentAggregate = makeEstablishmentAggregate({
       uuidGenerator: this.#uuidGenerator,

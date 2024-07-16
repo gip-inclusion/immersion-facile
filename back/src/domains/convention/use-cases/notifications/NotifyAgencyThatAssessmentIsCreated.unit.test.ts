@@ -2,7 +2,8 @@ import {
   AgencyDtoBuilder,
   AssessmentDto,
   ConventionDtoBuilder,
-  expectPromiseToFailWith,
+  NotFoundError,
+  expectPromiseToFailWithError,
 } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -57,9 +58,11 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   });
 
   it("Throw when no convention were found", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       usecase.execute({ assessment }),
-      `Unable to send mail. No convention were found with id : ${assessment.conventionId}`,
+      new NotFoundError(
+        `Unable to send mail. No convention were found with id : ${assessment.conventionId}`,
+      ),
     );
 
     expectSavedNotificationsAndEvents({
@@ -70,9 +73,11 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   it("Throw when no agency were found", async () => {
     await uow.conventionRepository.save(convention);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       usecase.execute({ assessment }),
-      `Unable to send mail. No agency were found with id : ${convention.agencyId}`,
+      new NotFoundError(
+        `Unable to send mail. No agency were found with id : ${convention.agencyId}`,
+      ),
     );
 
     expectSavedNotificationsAndEvents({

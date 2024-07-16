@@ -1,5 +1,4 @@
-import { ConventionId, errorMessages } from "shared";
-import { NotFoundError } from "shared";
+import { ConventionId, errors } from "shared";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -121,9 +120,9 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
     const convention =
       await uow.conventionRepository.getById(conventionToSyncId);
     if (!convention)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({ conventionId: conventionToSyncId }),
-      );
+      throw errors.convention.notFound({
+        conventionId: conventionToSyncId,
+      });
     return this.#broadcastToPeUsecase.execute({ convention });
   }
 }

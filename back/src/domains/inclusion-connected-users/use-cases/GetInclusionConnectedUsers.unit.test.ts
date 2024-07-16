@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUser,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
@@ -96,9 +96,7 @@ describe("GetInclusionConnectedUsers", () => {
         { agencyRole: "toReview" },
         notBackofficeAdminUser,
       ),
-      new ForbiddenError(
-        errorMessages.user.forbidden({ userId: notBackofficeAdminUser.id }),
-      ),
+      errors.user.forbidden({ userId: notBackofficeAdminUser.id }),
     );
   });
 

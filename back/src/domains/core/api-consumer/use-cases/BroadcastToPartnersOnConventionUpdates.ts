@@ -3,12 +3,11 @@ import {
   ApiConsumer,
   ConventionReadDto,
   WithConventionDto,
-  errorMessages,
+  errors,
   isApiConsumerAllowed,
   pipeWithValue,
   withConventionSchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { isConventionInScope } from "../../../convention/entities/Convention";
 import { TransactionalUseCase } from "../../UseCase";
@@ -48,9 +47,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
   protected async _execute({ convention }: WithConventionDto, uow: UnitOfWork) {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency) {
-      throw new NotFoundError(
-        errorMessages.agency.notFound({ agencyId: convention.agencyId }),
-      );
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
     }
     const {
       acquisitionCampaign: _,

@@ -4,8 +4,9 @@ import {
   LocationId,
   SiretDto,
   addressDtoToString,
+  errors,
   expectObjectInArrayToMatch,
-  expectPromiseToFailWith,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
@@ -54,12 +55,15 @@ describe("Update Establishment aggregate from form data", () => {
   });
 
   it("Fails if establishment does not exists amongst establishments from form", async () => {
-    await expectPromiseToFailWith(
+    const establishment = FormEstablishmentDtoBuilder.valid().build();
+    await expectPromiseToFailWithError(
       updateEstablishmentAggregateFromFormUseCase.execute({
         formEstablishment: FormEstablishmentDtoBuilder.valid().build(),
         triggeredBy: null,
       }),
-      "Cannot update establishment that does not exist.",
+      errors.establishment.notFound({
+        siret: establishment.siret,
+      }),
     );
   });
 

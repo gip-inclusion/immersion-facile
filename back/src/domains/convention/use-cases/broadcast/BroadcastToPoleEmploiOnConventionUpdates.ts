@@ -1,10 +1,9 @@
 import {
   ImmersionObjective,
   WithConventionDto,
-  errorMessages,
+  errors,
   withConventionSchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/SavedErrorRepository";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -44,9 +43,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   ): Promise<void> {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
-      throw new NotFoundError(
-        errorMessages.agency.notFound({ agencyId: convention.agencyId }),
-      );
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
     if (agency.kind !== "pole-emploi")
       return this.options.resyncMode
         ? uow.conventionsToSyncRepository.save({

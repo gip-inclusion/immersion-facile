@@ -2,11 +2,10 @@ import {
   AgencyDto,
   ConventionDto,
   ConventionDtoBuilder,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   frontRoutes,
 } from "shared";
-import { NotFoundError } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -143,11 +142,9 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
 
     await expectPromiseToFailWithError(
       notifyLastSignee.execute({ convention: conventionSignedByNoOne }),
-      new Error(
-        errorMessages.convention.noSignatoryHasSigned({
-          conventionId: conventionSignedByNoOne.id,
-        }),
-      ),
+      errors.convention.noSignatoryHasSigned({
+        conventionId: conventionSignedByNoOne.id,
+      }),
     );
 
     expectSavedNotificationsAndEvents({ emails: [] });
@@ -158,11 +155,9 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
 
     await expectPromiseToFailWithError(
       notifyLastSignee.execute({ convention: conventionSignedByNoOne }),
-      new NotFoundError(
-        errorMessages.convention.notFound({
-          conventionId: conventionSignedByNoOne.id,
-        }),
-      ),
+      errors.convention.notFound({
+        conventionId: conventionSignedByNoOne.id,
+      }),
     );
 
     expectSavedNotificationsAndEvents({ emails: [] });

@@ -9,11 +9,10 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   InternshipKind,
-  errorMessages,
+  errors,
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
-import { ConflictError, NotFoundError } from "shared";
 import { KyselyDb, falsyToNull } from "../../../config/pg/kysely/kyselyUtils";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
@@ -92,9 +91,7 @@ export class PgConventionRepository implements ConventionRepository {
   public async save(convention: ConventionDto): Promise<void> {
     const alreadyExistingConvention = await this.getById(convention.id);
     if (alreadyExistingConvention)
-      throw new ConflictError(
-        errorMessages.convention.conflict({ conventionId: convention.id }),
-      );
+      throw errors.convention.conflict({ conventionId: convention.id });
 
     // prettier-ignore
     const {
@@ -248,10 +245,7 @@ export class PgConventionRepository implements ConventionRepository {
       .where("id", "=", id)
       .executeTakeFirst();
 
-    if (!result)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({ conventionId: id }),
-      );
+    if (!result) throw errors.convention.notFound({ conventionId: id });
 
     return (
       result.establishment_tutor_id === result.establishment_representative_id

@@ -1,6 +1,6 @@
 import {
   AppellationAndRomeDto,
-  errorMessages,
+  errors,
   expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
@@ -155,7 +155,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       });
 
     expectToEqual(body, {
-      message: errorMessages.establishment.notFound({ siret: siretNotInDB }),
+      message: errors.establishment.notFound({ siret: siretNotInDB }).message,
       status: 404,
     });
     expectToEqual(status, 404);

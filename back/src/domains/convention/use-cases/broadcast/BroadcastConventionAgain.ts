@@ -1,10 +1,9 @@
 import {
   InclusionConnectedUser,
   WithConventionId,
-  errorMessages,
+  errors,
   withConventionIdSchema,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 
@@ -23,19 +22,15 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
   },
   async ({ conventionId }, { uow, deps }, currentUser) => {
     if (!currentUser.isBackofficeAdmin)
-      throw new ForbiddenError(
-        errorMessages.user.forbidden({ userId: currentUser.id }),
-      );
+      throw errors.user.forbidden({ userId: currentUser.id });
 
     const convention =
       await uow.conventionQueries.getConventionById(conventionId);
 
     if (!convention)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({
-          conventionId,
-        }),
-      );
+      throw errors.convention.notFound({
+        conventionId,
+      });
 
     const broadcastConventionAgainEvent = deps.createNewEvent({
       topic: "ConventionBroadcastRequested",
