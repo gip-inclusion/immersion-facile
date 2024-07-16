@@ -2,7 +2,7 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -302,9 +302,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await expectPromiseToFailWithError(
         useCase.execute({ convention }),
-        new Error(
-          errorMessages.convention.notFound({ conventionId: convention.id }),
-        ),
+        errors.convention.notFound({ conventionId: convention.id }),
       );
 
       await expectSavedNotificationsAndEvents({});
@@ -319,9 +317,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
       await expectPromiseToFailWithError(
         useCase.execute({ convention }),
-        new Error(
-          errorMessages.agency.notFound({ agencyId: convention.agencyId }),
-        ),
+        errors.agency.notFound({ agencyId: convention.agencyId }),
       );
 
       await expectSavedNotificationsAndEvents({});

@@ -1,12 +1,11 @@
 import {
   AgencyDtoBuilder,
   User,
-  errorMessages,
+  errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
@@ -60,14 +59,14 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
   it("fails if no Jwt Token provided", async () => {
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agencyId1]),
-      new ForbiddenError(errorMessages.user.noJwtProvided()),
+      errors.user.noJwtProvided(),
     );
   });
 
   it("fails if user does not exist", async () => {
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agencyId1], { userId }),
-      new NotFoundError(errorMessages.user.notFound({ userId })),
+      errors.user.notFound({ userId }),
     );
   });
 
@@ -75,9 +74,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     userRepository.users = [user];
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agencyId1], { userId }),
-      new NotFoundError(
-        errorMessages.agencies.notFound({ agencyIds: [agencyId1] }),
-      ),
+      errors.agencies.notFound({ agencyIds: [agencyId1] }),
     );
   });
 
@@ -94,9 +91,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     ]);
     await expectPromiseToFailWithError(
       registerAgencyToInclusionConnectUser.execute([agency1.id], { userId }),
-      new BadRequestError(
-        errorMessages.user.alreadyHaveAgencyRights({ userId }),
-      ),
+      errors.user.alreadyHaveAgencyRights({ userId }),
     );
   });
 

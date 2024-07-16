@@ -43,7 +43,7 @@ export class FeatureDisabledError extends HttpError {
 export class NotFoundError extends HttpError {
   public httpCode = 404;
 
-  constructor(msg?: any) {
+  constructor(msg?: string) {
     super(msg);
     Object.setPrototypeOf(this, NotFoundError.prototype);
   }
@@ -52,7 +52,7 @@ export class NotFoundError extends HttpError {
 export class BadRequestError extends HttpError {
   public httpCode = 400;
 
-  constructor(msg?: any, issues?: string[]) {
+  constructor(msg?: string, issues?: string[]) {
     super(msg, issues);
     Object.setPrototypeOf(this, BadRequestError.prototype);
   }
@@ -61,7 +61,7 @@ export class BadRequestError extends HttpError {
 export class ConflictError extends HttpError {
   public httpCode = 409;
 
-  constructor(msg: any) {
+  constructor(msg: string) {
     super(msg);
     Object.setPrototypeOf(this, ConflictError.prototype);
   }
@@ -79,7 +79,7 @@ export class TooManyRequestApiError extends HttpError {
 export class UpgradeRequired extends HttpError {
   public httpCode = 426;
 
-  constructor(msg: any) {
+  constructor(msg: string) {
     super(msg);
     Object.setPrototypeOf(this, ConflictError.prototype);
   }

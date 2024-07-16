@@ -2,10 +2,9 @@ import {
   InclusionConnectedUser,
   SiretDto,
   addressDtoToString,
-  errorMessages,
+  errors,
   siretSchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -56,8 +55,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
-    if (!establishmentAggregate)
-      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
+    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
     await Promise.all([
       uow.establishmentAggregateRepository.delete(siret),

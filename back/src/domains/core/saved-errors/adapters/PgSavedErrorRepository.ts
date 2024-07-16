@@ -1,7 +1,6 @@
 import { isAxiosError } from "axios";
 import { sql } from "kysely";
-import { ConventionId } from "shared";
-import { NotFoundError } from "shared";
+import { ConventionId, errors } from "shared";
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import {
   SavedError,
@@ -24,9 +23,10 @@ export class PgSavedErrorRepository implements SavedErrorRepository {
       .executeTakeFirst();
 
     if (Number(result.numUpdatedRows) === 0)
-      throw new NotFoundError(
-        `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId}'.`,
-      );
+      throw errors.broadcastFeedback.notFound({
+        serviceName: broadcastToPeServiceName,
+        conventionId,
+      });
   }
 
   public async save(savedError: SavedError): Promise<void> {

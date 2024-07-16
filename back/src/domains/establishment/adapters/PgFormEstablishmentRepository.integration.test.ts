@@ -3,12 +3,11 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   WithAcquisition,
-  errorMessages,
+  errors,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ConflictError, NotFoundError } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgFormEstablishmentRepository } from "./PgFormEstablishmentRepository";
@@ -154,11 +153,9 @@ describe("PgFormEstablishmentRepository", () => {
     it("establishment does not exist", async () => {
       await expectPromiseToFailWithError(
         formEstablishmentRepository.update(formEstablishment),
-        new ConflictError(
-          errorMessages.establishment.conflictError({
-            siret: formEstablishment.siret,
-          }),
-        ),
+        errors.establishment.conflictError({
+          siret: formEstablishment.siret,
+        }),
       );
     });
   });
@@ -175,11 +172,9 @@ describe("PgFormEstablishmentRepository", () => {
     it("establishment not found", async () => {
       await expectPromiseToFailWithError(
         formEstablishmentRepository.delete(formEstablishment.siret),
-        new NotFoundError(
-          errorMessages.establishment.notFound({
-            siret: formEstablishment.siret,
-          }),
-        ),
+        errors.establishment.notFound({
+          siret: formEstablishment.siret,
+        }),
       );
     });
   });

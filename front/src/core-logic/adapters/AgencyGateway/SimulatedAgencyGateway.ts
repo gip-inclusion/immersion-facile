@@ -12,7 +12,7 @@ import {
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   WithAgencyId,
-  errorMessages,
+  errors,
   toAgencyPublicDisplayDto,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
@@ -117,7 +117,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
         ),
       );
     }
-    throw new Error(errorMessages.agency.notFound({ agencyId }));
+    throw errors.agency.notFound({ agencyId });
   }
 
   public getImmersionFacileAgencyId$(): Observable<AgencyId> {

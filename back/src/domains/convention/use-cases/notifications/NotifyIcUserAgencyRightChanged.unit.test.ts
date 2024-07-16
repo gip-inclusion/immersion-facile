@@ -2,7 +2,8 @@ import {
   AgencyDtoBuilder,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
-  expectPromiseToFailWith,
+  errors,
+  expectPromiseToFailWithError,
 } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -51,9 +52,11 @@ describe("SendEmailWhenAgencyIsActivated", () => {
   });
 
   it("throw error when no agency found", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       notifyIcUserAgencyRightChanged.execute(icUserRoleParams),
-      `Unable to send mail. No agency config found for ${icUserRoleParams.agencyId}`,
+      new Error(
+        `Unable to send mail. No agency config found for ${icUserRoleParams.agencyId}`,
+      ),
     );
 
     expectSavedNotificationsAndEvents({
@@ -68,9 +71,9 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       .build();
     uow.agencyRepository.setAgencies([agency]);
 
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       notifyIcUserAgencyRightChanged.execute(icUserRoleParams),
-      `User with id ${icUserRoleParams.userId} not found`,
+      errors.user.notFound({ userId: icUserRoleParams.userId }),
     );
 
     expectSavedNotificationsAndEvents({

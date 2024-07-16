@@ -14,10 +14,9 @@ import {
   PartialAgencyDto,
   SiretDto,
   WithGeoPosition,
-  errorMessages,
+  errors,
   isTruthy,
 } from "shared";
-import { NotFoundError } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { AgencyRepository } from "../ports/AgencyRepository";
 
@@ -283,9 +282,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       },
     );
     if (result.missingIds.length)
-      throw new NotFoundError(
-        errorMessages.agencies.notFound({ agencyIds: result.missingIds }),
-      );
+      throw errors.agencies.notFound({ agencyIds: result.missingIds });
     return result.agencies;
   }
 

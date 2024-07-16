@@ -8,9 +8,8 @@ import {
   WithDashboards,
   WithEstablismentsSiretAndName,
   agencyRoleIsNotToReview,
-  errorMessages,
+  errors,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
@@ -45,12 +44,10 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload?: InclusionConnectJwtPayload,
   ): Promise<InclusionConnectedUser> {
-    if (!jwtPayload)
-      throw new ForbiddenError(errorMessages.user.noJwtProvided());
+    if (!jwtPayload) throw errors.user.noJwtProvided();
     const { userId } = jwtPayload;
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
-    if (!user)
-      throw new NotFoundError(`No user found with provided ID : ${userId}`);
+    if (!user) throw errors.user.notFound({ userId });
     const establishments = await this.#withEstablishments(uow, user);
     return {
       ...user,

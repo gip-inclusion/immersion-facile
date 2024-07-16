@@ -1,11 +1,10 @@
 import {
   AgencyDtoBuilder,
   AgencyPublicDisplayDto,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -83,9 +82,7 @@ describe("GetAgencyPublicInfoById", () => {
     it("Should throw NotFoundError if agency does not exist", async () => {
       await expectPromiseToFailWithError(
         useCase.execute({ agencyId: agency.id }),
-        new NotFoundError(
-          errorMessages.agencies.notFound({ agencyIds: [agency.id] }),
-        ),
+        errors.agencies.notFound({ agencyIds: [agency.id] }),
       );
     });
 
@@ -93,9 +90,7 @@ describe("GetAgencyPublicInfoById", () => {
       uow.agencyRepository.setAgencies([agency]);
       await expectPromiseToFailWithError(
         useCase.execute({ agencyId: agency2.id }),
-        new NotFoundError(
-          errorMessages.agencies.notFound({ agencyIds: [agency2.id] }),
-        ),
+        errors.agencies.notFound({ agencyIds: [agency2.id] }),
       );
     });
   });

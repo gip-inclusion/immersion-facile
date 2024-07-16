@@ -4,9 +4,8 @@ import {
   ConventionId,
   ConventionReadDto,
   Email,
-  errorMessages,
+  errors,
 } from "shared";
-import { ConflictError } from "shared";
 import { ConventionRepository } from "../ports/ConventionRepository";
 
 export class InMemoryConventionRepository implements ConventionRepository {
@@ -44,11 +43,9 @@ export class InMemoryConventionRepository implements ConventionRepository {
   }
 
   public async save(convention: ConventionDto): Promise<void> {
-    if (this.#conventions[convention.id]) {
-      throw new ConflictError(
-        errorMessages.convention.conflict({ conventionId: convention.id }),
-      );
-    }
+    if (this.#conventions[convention.id])
+      throw errors.convention.conflict({ conventionId: convention.id });
+
     this.#conventions[convention.id] = dropConventionReadFields(convention);
   }
 

@@ -1,18 +1,13 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
-  errorMessages,
+  errors,
   expectObjectsToMatch,
   expectPromiseToFail,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "shared";
+import { BadRequestError, UnauthorizedError } from "shared";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -72,7 +67,7 @@ describe("Update agency", () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWithError(
       updateAgency.execute(agency, icUser),
-      new ForbiddenError(errorMessages.user.forbidden({ userId: icUser.id })),
+      errors.user.forbidden({ userId: icUser.id }),
     );
   });
 
@@ -80,7 +75,7 @@ describe("Update agency", () => {
     const agency = new AgencyDtoBuilder().build();
     await expectPromiseToFailWithError(
       updateAgency.execute(agency, backofficeAdmin),
-      new NotFoundError(errorMessages.agency.notFound({ agencyId: agency.id })),
+      errors.agency.notFound({ agencyId: agency.id }),
     );
   });
 

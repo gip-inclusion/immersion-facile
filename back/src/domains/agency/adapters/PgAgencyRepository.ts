@@ -14,10 +14,10 @@ import {
   GetAgenciesFilter,
   PartialAgencyDto,
   agencySchema,
-  errorMessages,
+  errors,
   pipeWithValue,
 } from "shared";
-import { ConflictError, NotFoundError } from "shared";
+import { ConflictError } from "shared";
 import { z } from "zod";
 import { validateAndParseZodSchema } from "../../../config/helpers/httpErrors";
 import {
@@ -196,9 +196,7 @@ export class PgAgencyRepository implements AgencyRepository {
     );
 
     if (missingIds.length)
-      throw new NotFoundError(
-        errorMessages.agencies.notFound({ agencyIds: missingIds }),
-      );
+      throw errors.agencies.notFound({ agencyIds: missingIds });
 
     return this.#addEmailsToAgencies(agenciesWithoutEmails);
   }

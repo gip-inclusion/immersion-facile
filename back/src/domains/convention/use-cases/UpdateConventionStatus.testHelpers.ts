@@ -15,12 +15,12 @@ import {
   allRoles,
   conventionStatuses,
   createConventionMagicLinkPayload,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { BadRequestError, ForbiddenError, UnauthorizedError } from "shared";
+import { BadRequestError, UnauthorizedError } from "shared";
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
@@ -587,13 +587,11 @@ export const rejectStatusTransitionTests = ({
             userId,
             role,
             initialStatus: someValidInitialStatus,
-            expectedError: new ForbiddenError(
-              errorMessages.convention.badRoleStatusChange({
-                roles: [role],
-                status: updateStatusParams.status,
-                conventionId: updateStatusParams.conventionId,
-              }),
-            ),
+            expectedError: errors.convention.badRoleStatusChange({
+              roles: [role],
+              status: updateStatusParams.status,
+              conventionId: updateStatusParams.conventionId,
+            }),
           });
         },
       );
@@ -621,13 +619,11 @@ export const rejectStatusTransitionTests = ({
         return testRejectsStatusUpdate({
           userId,
           initialStatus: someValidInitialStatus,
-          expectedError: new ForbiddenError(
-            errorMessages.convention.badRoleStatusChange({
-              roles: getRoles(),
-              status: updateStatusParams.status,
-              conventionId: updateStatusParams.conventionId,
-            }),
-          ),
+          expectedError: errors.convention.badRoleStatusChange({
+            roles: getRoles(),
+            status: updateStatusParams.status,
+            conventionId: updateStatusParams.conventionId,
+          }),
         });
       });
     }
@@ -642,18 +638,15 @@ export const rejectStatusTransitionTests = ({
           status === "IN_REVIEW";
 
         const error = agencyHasTwoStepsAndValidatorTriesToValidate
-          ? new ForbiddenError(
-              errorMessages.convention.twoStepsValidationBadStatus({
-                targetStatus: updateStatusParams.status,
-                conventionId: updateStatusParams.conventionId,
-              }),
-            )
-          : new BadRequestError(
-              errorMessages.convention.badStatusTransition({
-                currentStatus: status,
-                targetStatus: updateStatusParams.status,
-              }),
-            );
+          ? errors.convention.twoStepsValidationBadStatus({
+              targetStatus: updateStatusParams.status,
+              conventionId: updateStatusParams.conventionId,
+            })
+          : errors.convention.badStatusTransition({
+              currentStatus: status,
+              targetStatus: updateStatusParams.status,
+            });
+
         return testRejectsStatusUpdate({
           role: someValidRole,
           initialStatus: status,

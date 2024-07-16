@@ -5,11 +5,10 @@ import {
   GeoPositionDto,
   Location,
   LookupSearchResult,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AddressGateway } from "../ports/AddressGateway";
@@ -394,9 +393,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
     it("Should not support lookup address with only one char.", async () => {
       await expectPromiseToFailWithError(
         httpAddressGateway.lookupStreetAddress("R"),
-        new BadRequestError(
-          errorMessages.address.queryToShort({ minLength: 2 }),
-        ),
+        errors.address.queryToShort({ minLength: 2 }),
       );
     });
 
@@ -412,18 +409,14 @@ describe("HttpOpenCageDataAddressGateway", () => {
     it("Should not support lookup address with two chars including one special char.", async () => {
       await expectPromiseToFailWithError(
         httpAddressGateway.lookupStreetAddress("R,"),
-        new BadRequestError(
-          errorMessages.address.queryToShort({ minLength: 2 }),
-        ),
+        errors.address.queryToShort({ minLength: 2 }),
       );
     });
 
     it("Should not support lookup address with 3 chars matching the pattern '{digit} ,'", async () => {
       await expectPromiseToFailWithError(
         httpAddressGateway.lookupStreetAddress("4 ,"),
-        new BadRequestError(
-          errorMessages.address.queryToShort({ minLength: 2 }),
-        ),
+        errors.address.queryToShort({ minLength: 2 }),
       );
     });
 

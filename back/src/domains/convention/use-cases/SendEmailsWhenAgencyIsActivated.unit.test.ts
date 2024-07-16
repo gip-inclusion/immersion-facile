@@ -1,4 +1,4 @@
-import { AgencyDtoBuilder, expectPromiseToFailWith } from "shared";
+import { AgencyDtoBuilder, errors, expectPromiseToFailWithError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -84,9 +84,9 @@ describe("SendEmailWhenAgencyIsActivated", () => {
   });
 
   it("throw not found error if no agency were found with agency refers to id when agency refering to other activated", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       sendEmailsWhenAencyActivated.execute({ agency: agencyWithRefersTo }),
-      `No agency were found with id : ${agency.id}`,
+      errors.agency.notFound({ agencyId: agency.id }),
     );
   });
 

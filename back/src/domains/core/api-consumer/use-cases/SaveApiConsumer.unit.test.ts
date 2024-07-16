@@ -4,11 +4,11 @@ import {
   InclusionConnectedUserBuilder,
   Role,
   createApiConsumerParamsFromApiConsumer,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
@@ -209,9 +209,7 @@ describe("SaveApiConsumer", () => {
           ),
           simpleUser,
         ),
-        new ForbiddenError(
-          errorMessages.user.forbidden({ userId: simpleUser.id }),
-        ),
+        errors.user.forbidden({ userId: simpleUser.id }),
       );
 
       expectToEqual(uow.apiConsumerRepository.consumers, []);

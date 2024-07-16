@@ -6,7 +6,7 @@ import {
   RenewConventionParams,
   Role,
   clearSignaturesAndValidationDate,
-  errorMessages,
+  errors,
   renewConventionParamsSchema,
 } from "shared";
 import {
@@ -47,11 +47,9 @@ export class RenewConvention extends TransactionalUseCase<
       renewed.from,
     );
     if (!conventionInRepo)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({
-          conventionId: renewed.from,
-        }),
-      );
+      throw errors.convention.notFound({
+        conventionId: renewed.from,
+      });
 
     const roles = await this.#rolesByPayload(
       jwtPayload,

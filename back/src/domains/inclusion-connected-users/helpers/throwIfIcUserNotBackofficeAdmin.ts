@@ -2,7 +2,7 @@ import {
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
   UserId,
-  errorMessages,
+  errors,
 } from "shared";
 import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -29,6 +29,5 @@ export const getIcUserOrThrow = async (
 
 export const throwIfNotAdmin = (user: InclusionConnectedUser | undefined) => {
   if (!user) throw new UnauthorizedError();
-  if (!user.isBackofficeAdmin)
-    throw new ForbiddenError(errorMessages.user.forbidden({ userId: user.id }));
+  if (!user.isBackofficeAdmin) throw errors.user.forbidden({ userId: user.id });
 };

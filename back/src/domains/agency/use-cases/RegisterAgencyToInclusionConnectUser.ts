@@ -2,9 +2,8 @@ import {
   AgencyId,
   InclusionConnectDomainJwtPayload,
   agencyIdsSchema,
-  errorMessages,
+  errors,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -32,33 +31,26 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     uow: UnitOfWork,
     inclusionConnectedPayload: InclusionConnectDomainJwtPayload,
   ): Promise<void> {
-    if (!inclusionConnectedPayload)
-      throw new ForbiddenError(errorMessages.user.noJwtProvided());
+    if (!inclusionConnectedPayload) throw errors.user.noJwtProvided();
 
     const user = await uow.inclusionConnectedUserRepository.getById(
       inclusionConnectedPayload.userId,
     );
     if (!user)
-      throw new NotFoundError(
-        errorMessages.user.notFound({
-          userId: inclusionConnectedPayload.userId,
-        }),
-      );
+      throw errors.user.notFound({
+        userId: inclusionConnectedPayload.userId,
+      });
     if (user.agencyRights.length > 0) {
-      throw new BadRequestError(
-        errorMessages.user.alreadyHaveAgencyRights({
-          userId: user.id,
-        }),
-      );
+      throw errors.user.alreadyHaveAgencyRights({
+        userId: user.id,
+      });
     }
 
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
     if (agencies.length !== agencyIds.length) {
-      throw new NotFoundError(
-        errorMessages.agencies.notFound({
-          agencyIds: agencies.map((agency) => agency.id),
-        }),
-      );
+      throw errors.agencies.notFound({
+        agencyIds: agencies.map((agency) => agency.id),
+      });
     }
 
     const event = this.#createNewEvent({

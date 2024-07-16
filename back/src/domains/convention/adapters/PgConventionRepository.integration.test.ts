@@ -10,12 +10,11 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   WithAcquisition,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
-import { ConflictError } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
@@ -89,9 +88,7 @@ describe("PgConventionRepository", () => {
 
     await expectPromiseToFailWithError(
       conventionRepository.save(convention),
-      new ConflictError(
-        errorMessages.convention.conflict({ conventionId: convention.id }),
-      ),
+      errors.convention.conflict({ conventionId: convention.id }),
     );
   });
 

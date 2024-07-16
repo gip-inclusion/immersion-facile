@@ -9,7 +9,7 @@ import {
   WithAcquisition,
   defaultPageInPagination,
   defaultPerPageInPagination,
-  errorMessages,
+  errors,
   eventToRightName,
   isApiConsumerAllowed,
   pipeWithValue,
@@ -279,8 +279,7 @@ const getFirstLocationIdOrThrow = async (
         siret,
       );
 
-    if (!aggregate)
-      throw new NotFoundError(errorMessages.establishment.notFound({ siret }));
+    if (!aggregate) throw errors.establishment.notFound({ siret });
 
     if (aggregate.establishment.locations[0]?.id) {
       return aggregate.establishment.locations[0].id;

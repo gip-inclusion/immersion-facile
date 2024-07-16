@@ -6,10 +6,10 @@ import {
   ConventionReadDto,
   ConventionStatus,
   Role,
-  errorMessages,
+  errors,
   statusTransitionConfigs,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
+import { ForbiddenError } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfTransitionNotAllowed = ({
@@ -29,21 +29,17 @@ export const throwIfTransitionNotAllowed = ({
       rolesToValidate: roles,
     })
   )
-    throw new ForbiddenError(
-      errorMessages.convention.badRoleStatusChange({
-        roles,
-        status: targetStatus,
-        conventionId: conventionRead.id,
-      }),
-    );
+    throw errors.convention.badRoleStatusChange({
+      roles,
+      status: targetStatus,
+      conventionId: conventionRead.id,
+    });
 
   if (!config.validInitialStatuses.includes(conventionRead.status))
-    throw new BadRequestError(
-      errorMessages.convention.badStatusTransition({
-        currentStatus: conventionRead.status,
-        targetStatus,
-      }),
-    );
+    throw errors.convention.badStatusTransition({
+      currentStatus: conventionRead.status,
+      targetStatus,
+    });
 
   if (config.refine) {
     const { isError, errorMessage } = config.refine(conventionRead);
@@ -70,16 +66,11 @@ export async function retrieveConventionWithAgency(
     conventionInPayload.id,
   );
   if (!convention)
-    throw new NotFoundError(
-      errorMessages.convention.notFound({
-        conventionId: conventionInPayload.id,
-      }),
-    );
+    throw errors.convention.notFound({
+      conventionId: conventionInPayload.id,
+    });
   const agency = await uow.agencyRepository.getById(convention.agencyId);
-  if (!agency)
-    throw new NotFoundError(
-      errorMessages.agency.notFound({ agencyId: convention.agencyId }),
-    );
+  if (!agency) throw errors.agency.notFound({ agencyId: convention.agencyId });
   return { agency, convention };
 }
 

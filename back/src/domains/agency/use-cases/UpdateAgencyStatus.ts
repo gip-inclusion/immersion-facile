@@ -2,10 +2,9 @@ import {
   InclusionConnectedUser,
   PartialAgencyDto,
   UpdateAgencyStatusParams,
-  errorMessages,
+  errors,
   updateAgencyStatusParamsSchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -39,11 +38,9 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
       updateAgencyStatusParams.id,
     );
     if (!existingAgency)
-      throw new NotFoundError(
-        errorMessages.agency.notFound({
-          agencyId: updateAgencyStatusParams.id,
-        }),
-      );
+      throw errors.agency.notFound({
+        agencyId: updateAgencyStatusParams.id,
+      });
 
     const updatedAgencyParams: PartialAgencyDto = {
       id: updateAgencyStatusParams.id,

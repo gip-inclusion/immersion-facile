@@ -3,11 +3,11 @@ import {
   GroupOptions,
   InclusionConnectedUserBuilder,
   addressDtoToString,
-  errorMessages,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -97,11 +97,9 @@ describe("Delete Establishment", () => {
           },
           backofficeAdminUser,
         ),
-        new NotFoundError(
-          errorMessages.establishment.notFound({
-            siret: establishmentAggregate.establishment.siret,
-          }),
-        ),
+        errors.establishment.notFound({
+          siret: establishmentAggregate.establishment.siret,
+        }),
       );
     });
 
@@ -116,11 +114,9 @@ describe("Delete Establishment", () => {
           },
           backofficeAdminUser,
         ),
-        new NotFoundError(
-          errorMessages.establishment.notFound({
-            siret: formEstablishment.siret,
-          }),
-        ),
+        errors.establishment.notFound({
+          siret: formEstablishment.siret,
+        }),
       );
     });
   });

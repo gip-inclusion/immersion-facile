@@ -7,8 +7,8 @@ import {
   InclusionConnectedUserBuilder,
   User,
   allAgencyRoles,
-  errorMessages,
-  expectPromiseToFailWith,
+  errors,
+  expectPromiseToFailWithError,
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
@@ -59,16 +59,16 @@ describe("GetUserAgencyDashboardUrl", () => {
   });
 
   it("throws NotFoundError if the user is not found", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       getInclusionConnectedUser.execute(undefined, inclusionConnectJwtPayload),
-      `No user found with provided ID : ${userId}`,
+      errors.user.notFound({ userId }),
     );
   });
 
   it("throws Forbidden if no jwt token provided", async () => {
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       getInclusionConnectedUser.execute(),
-      errorMessages.user.noJwtProvided(),
+      errors.user.noJwtProvided(),
     );
   });
 

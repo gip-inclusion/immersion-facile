@@ -5,15 +5,10 @@ import {
   InclusionConnectDomainJwtPayload,
   UpdateConventionRequestDto,
   WithConventionIdLegacy,
-  errorMessages,
+  errors,
   updateConventionRequestSchema,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "shared";
+import { BadRequestError, ForbiddenError, UnauthorizedError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -54,9 +49,7 @@ export class UpdateConvention extends TransactionalUseCase<
     );
 
     if (!conventionFromRepo)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({ conventionId: convention.id }),
-      );
+      throw errors.convention.notFound({ conventionId: convention.id });
 
     if (conventionFromRepo.status !== "DRAFT") {
       throw new BadRequestError(

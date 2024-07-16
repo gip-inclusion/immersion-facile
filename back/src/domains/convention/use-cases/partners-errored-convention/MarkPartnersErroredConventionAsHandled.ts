@@ -1,10 +1,10 @@
 import {
   InclusionConnectDomainJwtPayload,
   MarkPartnersErroredConventionAsHandledRequest,
-  errorMessages,
+  errors,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
-import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -39,27 +39,22 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
       params.conventionId,
     );
     if (!conventionToMarkAsHandled)
-      throw new NotFoundError(
-        errorMessages.convention.notFound({
-          conventionId: params.conventionId,
-        }),
-      );
+      throw errors.convention.notFound({
+        conventionId: params.conventionId,
+      });
 
     const currentUser =
       await uow.inclusionConnectedUserRepository.getById(userId);
-    if (!currentUser)
-      throw new NotFoundError(errorMessages.user.notFound({ userId }));
+    if (!currentUser) throw errors.user.notFound({ userId });
     const userAgencyRights = currentUser.agencyRights.find(
       (agencyRight) =>
         agencyRight.agency.id === conventionToMarkAsHandled.agencyId,
     );
     if (!userAgencyRights)
-      throw new ForbiddenError(
-        errorMessages.user.noRightsOnAgency({
-          userId,
-          agencyId: conventionToMarkAsHandled.agencyId,
-        }),
-      );
+      throw errors.user.noRightsOnAgency({
+        userId,
+        agencyId: conventionToMarkAsHandled.agencyId,
+      });
 
     const conventionMarkAsHandledAt = this.timeGateway.now().toISOString();
 

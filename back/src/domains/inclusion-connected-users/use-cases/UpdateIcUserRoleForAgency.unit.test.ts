@@ -4,12 +4,11 @@ import {
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  errorMessages,
-  expectPromiseToFailWith,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, UnauthorizedError } from "shared";
+import { UnauthorizedError } from "shared";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
@@ -82,9 +81,7 @@ describe("GetInclusionConnectedUsers", () => {
         { roles: ["counsellor"], agencyId: "agency-1", userId: "john-123" },
         notAdminUser,
       ),
-      new ForbiddenError(
-        errorMessages.user.forbidden({ userId: notAdminUser.id }),
-      ),
+      errors.user.forbidden({ userId: notAdminUser.id }),
     );
   });
 
@@ -102,7 +99,7 @@ describe("GetInclusionConnectedUsers", () => {
     ]);
 
     const agencyId = "agency-1";
-    await expectPromiseToFailWith(
+    await expectPromiseToFailWithError(
       updateIcUserRoleForAgency.execute(
         {
           roles: ["counsellor"],
@@ -111,7 +108,7 @@ describe("GetInclusionConnectedUsers", () => {
         },
         backofficeAdminUser,
       ),
-      errorMessages.user.noRightsOnAgency({
+      errors.user.noRightsOnAgency({
         agencyId,
         userId: notAdminUser.id,
       }),

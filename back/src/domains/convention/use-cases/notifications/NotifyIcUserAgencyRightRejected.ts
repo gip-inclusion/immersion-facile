@@ -1,8 +1,8 @@
 import {
   RejectIcUserRoleForAgencyParams,
+  errors,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -30,17 +30,13 @@ export class NotifyIcUserAgencyRightRejected extends TransactionalUseCase<
   ): Promise<void> {
     const agency = await uow.agencyRepository.getById(params.agencyId);
 
-    if (!agency)
-      throw new NotFoundError(
-        `No agency were found with id: ${params.agencyId}`,
-      );
+    if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
 
     const user = await uow.inclusionConnectedUserRepository.getById(
       params.userId,
     );
 
-    if (!user)
-      throw new NotFoundError(`No user were found with id: ${params.userId}`);
+    if (!user) throw errors.user.notFound({ userId: params.userId });
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",

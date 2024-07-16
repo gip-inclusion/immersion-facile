@@ -4,11 +4,10 @@ import {
   ConventionReadDto,
   InclusionConnectedUserBuilder,
   defaultValidatorEmail,
-  errorMessages,
+  errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -63,9 +62,7 @@ describe("BroadcastConventionAgain", () => {
 
     await expectPromiseToFailWithError(
       broadcastConventionAgain.execute({ conventionId }, notAdminUser),
-      new ForbiddenError(
-        errorMessages.user.forbidden({ userId: notAdminUser.id }),
-      ),
+      errors.user.forbidden({ userId: notAdminUser.id }),
     );
   });
 
@@ -76,11 +73,9 @@ describe("BroadcastConventionAgain", () => {
         { conventionId: notFoundConventionId },
         adminUser,
       ),
-      new NotFoundError(
-        errorMessages.convention.notFound({
-          conventionId: notFoundConventionId,
-        }),
-      ),
+      errors.convention.notFound({
+        conventionId: notFoundConventionId,
+      }),
     );
   });
 
