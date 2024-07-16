@@ -38,6 +38,10 @@ import {
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
 import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
+import {
+  establishmentByFilters,
+  withEstablishmentLocationsSubQuery,
+} from "./PgEstablishmentRepository.sql";
 
 const logger = createLogger(__filename);
 
@@ -45,6 +49,18 @@ export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
   constructor(private transaction: KyselyDb) {}
+
+  public async getAllEstablishmentAggregates(): Promise<
+    EstablishmentAggregate[]
+  > {
+    const aggregateWithStringDates = await executeKyselyRawSqlQuery(
+      this.transaction,
+      establishmentByFilters("all"),
+    );
+    return aggregateWithStringDates.rows.map(({ aggregate }) =>
+      makeEstablishmentAggregateFromDb(aggregate),
+    );
+  }
 
   public async createImmersionOffersToEstablishments(
     offersWithSiret: OfferWithSiret[],
@@ -98,127 +114,14 @@ export class PgEstablishmentAggregateRepository
   public async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
-    const aggregateWithStringDates = (
+    const aggregate = (
       await executeKyselyRawSqlQuery(
         this.transaction,
-        `WITH unique_establishments_contacts AS (
-          SELECT 
-            DISTINCT ON (siret) siret, 
-            uuid 
-          FROM 
-            establishments_contacts
-        ), 
-        filtered_immersion_offers AS (
-          SELECT 
-            siret, 
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
-                'romeCode', rome_code, 
-                'romeLabel', libelle_rome,
-                'score', score, 
-                'appellationCode', appellation_code::text, 
-                'appellationLabel', pad.libelle_appellation_long::text,
-                'createdAt', 
-                to_char(
-                  created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                )
-              )
-              ORDER BY appellation_code
-            ) as immersionOffers 
-          FROM 
-            immersion_offers
-          LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_offers.appellation_code
-          LEFT JOIN public_romes_data AS prd ON prd.code_rome = immersion_offers.rome_code
-          WHERE 
-            siret = $1 
-          GROUP BY 
-            siret
-        ),
-        ${withEstablishmentAggregateSubQuery}
-         SELECT 
-          JSON_STRIP_NULLS(
-            JSON_BUILD_OBJECT(
-              'establishment', JSON_BUILD_OBJECT(
-                'acquisitionCampaign', e.acquisition_campaign,
-                'acquisitionKeyword' , e.acquisition_keyword,
-                'siret', e.siret, 
-                'name', e.name, 
-                'customizedName', e.customized_name, 
-                'website', e.website, 
-                'additionalInformation', e.additional_information,
-                'locations', ela.locations,  
-                'sourceProvider', e.source_provider,  
-                'nafDto', JSON_BUILD_OBJECT(
-                  'code', e.naf_code, 
-                  'nomenclature', e.naf_nomenclature
-                ), 
-                'numberEmployeesRange', e.number_employees, 
-                'updatedAt', to_char(
-                  e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                ), 
-                'createdAt', to_char(
-                  e.created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                ), 
-                'lastInseeCheckDate', to_char(
-                  e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                ), 
-                'isOpen', e.is_open, 
-                'isSearchable', e.is_searchable, 
-                'isCommited', e.is_commited,
-                'fitForDisabledWorkers', e.fit_for_disabled_workers,
-                'maxContactsPerWeek', e.max_contacts_per_week,
-                'nextAvailabilityDate', date_to_iso(e.next_availability_date),
-                'searchableBy', JSON_BUILD_OBJECT(
-                  'jobSeekers', e.searchable_by_job_seekers,
-                  'students', e.searchable_by_students
-                )
-              ), 
-              'immersionOffers', io.immersionOffers, 
-              'contact', JSON_BUILD_OBJECT(
-                'id', ec.uuid, 'firstName', ec.firstname, 
-                'lastName', ec.lastname, 'job', ec.job, 
-                'contactMethod', ec.contact_mode, 
-                'phone', ec.phone, 'email', ec.email, 
-                'copyEmails', ec.copy_emails
-              )
-            )
-          ) AS aggregate 
-        FROM 
-          filtered_immersion_offers AS io 
-          LEFT JOIN establishments AS e ON e.siret = io.siret 
-          LEFT JOIN unique_establishments_contacts AS uec ON e.siret = uec.siret 
-          LEFT JOIN establishments_contacts AS ec ON uec.uuid = ec.uuid
-          LEFT JOIN establishment_locations_agg AS ela ON e.siret = ela.establishment_siret
-        `,
+        establishmentByFilters("siret"),
         [siret],
       )
     ).rows[0]?.aggregate;
-    // Convert date fields from string to Date
-    return (
-      aggregateWithStringDates && {
-        establishment: {
-          ...aggregateWithStringDates.establishment,
-          updatedAt: aggregateWithStringDates.establishment.updatedAt
-            ? new Date(aggregateWithStringDates.establishment.updatedAt)
-            : undefined,
-          createdAt: new Date(aggregateWithStringDates.establishment.createdAt),
-          lastInseeCheckDate: aggregateWithStringDates.establishment
-            .lastInseeCheckDate
-            ? new Date(
-                aggregateWithStringDates.establishment.lastInseeCheckDate,
-              )
-            : undefined,
-          voluntaryToImmersion: true,
-        },
-        offers: aggregateWithStringDates.immersionOffers.map(
-          (immersionOfferWithStringDate: any) => ({
-            ...immersionOfferWithStringDate,
-            createdAt: new Date(immersionOfferWithStringDate.createdAt),
-          }),
-        ),
-        contact: aggregateWithStringDates.contact,
-      }
-    );
+    return aggregate && makeEstablishmentAggregateFromDb(aggregate);
   }
 
   public async getEstablishmentAggregatesByFilters({
@@ -226,137 +129,55 @@ export class PgEstablishmentAggregateRepository
   }: { contactEmail: string }): Promise<EstablishmentAggregate[]> {
     const aggregateWithStringDates = await executeKyselyRawSqlQuery(
       this.transaction,
-      `WITH unique_establishments_contacts AS (
-          SELECT 
-            DISTINCT ON (siret) siret, 
-            uuid 
-          FROM 
-            establishments_contacts
-          WHERE establishments_contacts.email = $1
-        ), 
-        filtered_immersion_offers AS (
-          SELECT
-            immersion_offers.siret as siret, 
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
-                'romeCode', rome_code, 
-                'romeLabel', libelle_rome,
-                'score', score, 
-                'appellationCode', appellation_code::text, 
-                'appellationLabel', pad.libelle_appellation_long::text,
-                'createdAt', 
-                to_char(
-                  created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                )
-              )
-              ORDER BY appellation_code
-            ) as immersionOffers 
-          FROM 
-            immersion_offers
-          LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_offers.appellation_code
-          LEFT JOIN public_romes_data AS prd ON prd.code_rome = immersion_offers.rome_code
-          RIGHT JOIN unique_establishments_contacts as uec ON uec.siret = immersion_offers.siret
-          GROUP BY
-              immersion_offers.siret
-        ),
-        ${withEstablishmentAggregateSubQuery}
-         SELECT 
-          JSON_STRIP_NULLS(
-            JSON_BUILD_OBJECT(
-              'establishment', JSON_BUILD_OBJECT(
-                'siret', e.siret, 
-                'name', e.name, 
-                'customizedName', e.customized_name, 
-                'website', e.website, 
-                'additionalInformation', e.additional_information,
-                'locations', ela.locations,  
-                'sourceProvider', e.source_provider,  
-                'nafDto', JSON_BUILD_OBJECT(
-                  'code', e.naf_code, 
-                  'nomenclature', e.naf_nomenclature
-                ), 
-                'numberEmployeesRange', e.number_employees, 
-                'updatedAt', to_char(
-                  e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                ), 
-                'createdAt', to_char(
-                  e.created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                ), 
-                'lastInseeCheckDate', to_char(
-                  e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-                ), 
-                'isOpen', e.is_open, 
-                'isSearchable', e.is_searchable, 
-                'isCommited', e.is_commited,
-                'fitForDisabledWorkers', e.fit_for_disabled_workers,
-                'maxContactsPerWeek', e.max_contacts_per_week,
-                'nextAvailabilityDate', date_to_iso(e.next_availability_date),
-                'searchableBy', JSON_BUILD_OBJECT(
-                  'jobSeekers', e.searchable_by_job_seekers,
-                  'students', e.searchable_by_students
-                )
-              ), 
-              'immersionOffers', io.immersionOffers, 
-              'contact', JSON_BUILD_OBJECT(
-                'id', ec.uuid, 'firstName', ec.firstname, 
-                'lastName', ec.lastname, 'job', ec.job, 
-                'contactMethod', ec.contact_mode, 
-                'phone', ec.phone, 'email', ec.email, 
-                'copyEmails', ec.copy_emails
-              )
-            )
-          ) AS aggregate 
-        FROM 
-          filtered_immersion_offers AS io 
-          LEFT JOIN establishments AS e ON e.siret = io.siret 
-          LEFT JOIN unique_establishments_contacts AS uec ON e.siret = uec.siret 
-          LEFT JOIN establishments_contacts AS ec ON uec.uuid = ec.uuid
-          LEFT JOIN establishment_locations_agg AS ela ON e.siret = ela.establishment_siret
-        `,
+      establishmentByFilters("contactEmail"),
       [contactEmail],
     );
-    const results = aggregateWithStringDates.rows;
-    return results.map(({ aggregate }) => ({
-      establishment: {
-        ...aggregate.establishment,
-        updatedAt: aggregate.establishment.updatedAt
-          ? new Date(aggregate.establishment.updatedAt)
-          : undefined,
-        createdAt: new Date(aggregate.establishment.createdAt),
-        lastInseeCheckDate: aggregate.establishment.lastInseeCheckDate
-          ? new Date(aggregate.establishment.lastInseeCheckDate)
-          : undefined,
-        voluntaryToImmersion: true,
-      },
-      offers: aggregate.immersionOffers.map(
-        (immersionOfferWithStringDate: any) => ({
-          ...immersionOfferWithStringDate,
-          createdAt: new Date(immersionOfferWithStringDate.createdAt),
-        }),
-      ),
-      contact: aggregate.contact,
-    }));
+    return aggregateWithStringDates.rows.map(({ aggregate }) =>
+      makeEstablishmentAggregateFromDb(aggregate),
+    );
   }
 
   public async getOffersAsAppellationAndRomeDtosBySiret(
     siret: string,
   ): Promise<AppellationAndRomeDto[]> {
-    const pgResult = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `SELECT io.*, libelle_rome, libelle_appellation_long, ogr_appellation
-       FROM immersion_offers io
-       JOIN public_romes_data prd ON prd.code_rome = io.rome_code 
-       LEFT JOIN public_appellations_data pad on io.appellation_code = pad.ogr_appellation
-       WHERE siret = $1;`,
-      [siret],
+    const results = await this.transaction
+      .selectFrom("immersion_offers as io")
+      .fullJoin("public_romes_data as prd", "prd.code_rome", "io.rome_code")
+      .leftJoin(
+        "public_appellations_data as pad",
+        "pad.ogr_appellation",
+        "io.appellation_code",
+      )
+      .select([
+        "prd.code_rome",
+        "prd.libelle_rome",
+        "pad.libelle_appellation_long",
+        "pad.ogr_appellation",
+      ])
+      .where("io.siret", "=", siret)
+      .execute();
+
+    return results.map(
+      ({
+        code_rome,
+        libelle_rome,
+        libelle_appellation_long,
+        ogr_appellation,
+      }) => {
+        if (!code_rome) throw new Error("code_rome is null");
+        if (!libelle_rome) throw new Error("libelle_rome is null");
+        if (!libelle_appellation_long)
+          throw new Error("libelle_appellation_long is null");
+        if (!ogr_appellation) throw new Error("ogr_appellation is null");
+        const dto: AppellationAndRomeDto = {
+          romeCode: code_rome,
+          appellationCode: ogr_appellation.toString(),
+          romeLabel: libelle_rome,
+          appellationLabel: libelle_appellation_long, // libelle_appellation_long should not be undefined
+        };
+        return dto;
+      },
     );
-    return pgResult.rows.map((row: any) => ({
-      romeCode: row.rome_code,
-      appellationCode:
-        optional(row.ogr_appellation) && row.ogr_appellation.toString(),
-      romeLabel: row.libelle_rome,
-      appellationLabel: row.libelle_appellation_long, // libelle_appellation_long should not be undefined
-    }));
   }
 
   public async getSearchImmersionResultDtoBySearchQuery(
@@ -406,29 +227,36 @@ export class PgEstablishmentAggregateRepository
   public async getSiretOfEstablishmentsToSuggestUpdate(
     before: Date,
   ): Promise<SiretDto[]> {
-    const response = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `SELECT DISTINCT e.siret 
-       FROM establishments e
-       WHERE e.update_date < $1 
-       AND NOT EXISTS (
-          SELECT 1 
-          FROM outbox o
-          WHERE o.topic='FormEstablishmentEditLinkSent' 
-          AND o.occurred_at > $1
-          AND o.payload ->> 'siret' = e.siret
-       )
-       AND NOT EXISTS (
-          SELECT 1 
-          FROM notifications_email n
-          WHERE n.email_kind='SUGGEST_EDIT_FORM_ESTABLISHMENT' 
-          AND n.created_at > $1
-          AND n.establishment_siret = e.siret
-       )`,
-      [before],
-    );
+    const result = await this.transaction
+      .selectFrom("establishments")
+      .select("establishments.siret")
+      .distinct()
+      .where("establishments.update_date", "<", before)
+      .where(({ not, exists, selectFrom }) =>
+        not(
+          exists(
+            selectFrom("outbox as o")
+              .select(sql`1`.as("_"))
+              .where("o.topic", "=", "FormEstablishmentEditLinkSent")
+              .whereRef(sql`o.payload ->> 'siret'`, "=", "establishments.siret")
+              .where("o.occurred_at", ">", before),
+          ),
+        ),
+      )
+      .where(({ not, exists, selectFrom }) =>
+        not(
+          exists(
+            selectFrom("notifications_email as n")
+              .select(sql`1`.as("__"))
+              .where("n.email_kind", "=", "SUGGEST_EDIT_FORM_ESTABLISHMENT")
+              .whereRef("n.establishment_siret", "=", "establishments.siret")
+              .where("n.created_at", ">", before),
+          ),
+        ),
+      )
+      .execute();
 
-    return response.rows.map(({ siret }) => siret);
+    return result.map(({ siret }) => siret);
   }
 
   public async getSiretsOfEstablishmentsNotCheckedAtInseeSince(
@@ -440,40 +268,47 @@ export class PgEstablishmentAggregateRepository
         "Querying getSiretsOfEstablishmentsNotCheckedAtInseeSince, maxResults must be <= 1000",
       );
 
-    const result = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-        SELECT siret
-        FROM establishments
-        WHERE last_insee_check_date IS NULL OR last_insee_check_date < $1
-        LIMIT $2
-    `,
-      [checkDate.toISOString(), maxResults],
-    );
+    const results = await this.transaction
+      .selectFrom("establishments")
+      .select("siret")
+      .where((eb) =>
+        eb.or([
+          eb("last_insee_check_date", "is", null),
+          eb("last_insee_check_date", "<", checkDate),
+        ]),
+      )
+      .limit(maxResults)
+      .execute();
 
-    return result.rows.map(({ siret }) => siret);
+    return results.map(({ siret }) => siret);
   }
 
   public async getSiretsOfEstablishmentsWithRomeCode(
     rome: string,
   ): Promise<string[]> {
-    const pgResult = await executeKyselyRawSqlQuery(
-      this.transaction,
-      "SELECT siret FROM immersion_offers WHERE rome_code = $1",
-      [rome],
-    );
-    return pgResult.rows.map((row) => row.siret);
+    const results = await this.transaction
+      .selectFrom("immersion_offers")
+      .select("siret")
+      .where("rome_code", "=", rome)
+      .execute();
+
+    return results.map((row) => row.siret);
   }
 
   public async hasEstablishmentAggregateWithSiret(
     siret: string,
   ): Promise<boolean> {
-    const pgResult = await executeKyselyRawSqlQuery(
-      this.transaction,
-      "SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);",
-      [siret],
-    );
-    return pgResult.rows[0].exists;
+    const result = await this.transaction
+      .selectNoFrom(({ exists, selectFrom }) =>
+        exists(
+          selectFrom("establishments")
+            .where("siret", "=", siret)
+            .select("siret"),
+        ).as("exist"),
+      )
+      .executeTakeFirst();
+
+    return result !== undefined ? Boolean(result.exist) : false;
   }
 
   public async insertEstablishmentAggregate(aggregate: EstablishmentAggregate) {
@@ -491,29 +326,30 @@ export class PgEstablishmentAggregateRepository
   public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
     since: Date,
   ): Promise<number> {
-    const querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek = `
-      SELECT e.siret
-      FROM establishments e
-      LEFT JOIN discussions d ON e.siret = d.siret
-      WHERE is_searchable = false
-        AND max_contacts_per_week > 0
-        AND d.created_at > $1
-      GROUP BY e.siret HAVING COUNT(*) >= e.max_contacts_per_week
-      `;
+    const result = await this.transaction
+      .updateTable("establishments")
+      .set({ is_searchable: true })
+      .where("is_searchable", "=", false)
+      .where("max_contacts_per_week", ">", 0)
+      .where("siret", "not in", (eb) =>
+        eb
+          .selectFrom("establishments")
+          .select("siret")
+          .leftJoin("discussions", "establishments.siret", "discussions.siret")
+          .where("is_searchable", "=", false)
+          .where("max_contacts_per_week", ">", 0)
+          .where("discussions.created_at", ">", since)
+          .groupBy("establishments.siret")
+          .havingRef(
+            (eb) => eb.fn.countAll(),
+            ">=",
+            "establishments.max_contacts_per_week",
+          ),
+      )
+      .returning("siret")
+      .execute();
 
-    const result = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-        UPDATE establishments
-        SET is_searchable = true 
-        WHERE is_searchable = false
-          AND max_contacts_per_week > 0
-          AND siret NOT IN (${querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek})
-        `,
-      [since],
-    );
-
-    return Number(result.numAffectedRows);
+    return result.length;
   }
 
   public async searchImmersionResults({
@@ -577,7 +413,7 @@ export class PgEstablishmentAggregateRepository
   public async updateEstablishmentAggregate(
     updatedAggregate: EstablishmentAggregate,
     updatedAt: Date,
-  ) {
+  ): Promise<void> {
     const existingAggregate = await this.getEstablishmentAggregateBySiret(
       updatedAggregate.establishment.siret,
     );
@@ -688,7 +524,7 @@ export class PgEstablishmentAggregateRepository
 
     await this.transaction
       .insertInto("establishments_locations")
-      .values(
+      .values((eb) =>
         establishment.locations.map(({ address, id, position }) => ({
           id,
           establishment_siret: establishment.siret,
@@ -698,7 +534,9 @@ export class PgEstablishmentAggregateRepository
           street_number_and_address: address.streetNumberAndAddress,
           lat: position.lat,
           lon: position.lon,
-          position: sql`ST_MakePoint(${position.lon}, ${position.lat})`,
+          position: eb.fn("ST_MakePoint", [
+            sql`${position.lon}, ${position.lat}`,
+          ]),
         })),
       )
       .execute();
@@ -967,6 +805,7 @@ const makeOrderByStatement = (searchMade: SearchMade): string => {
   };
   return sortQueryBySortedByValue[searchMade.sortedBy];
 };
+
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m
   shouldSetDistance = false,
@@ -979,7 +818,7 @@ WITH
   match_immersion_offer AS (
     ${selectedOffersSubQuery}
   ),
-  ${withEstablishmentAggregateSubQuery}
+  establishment_locations_agg AS (${withEstablishmentLocationsSubQuery})
   SELECT 
   row_number,
   JSON_STRIP_NULLS(
@@ -1043,31 +882,17 @@ const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
   return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
 };
 
-const buildAppellationsArray = `(JSON_AGG(JSON_BUILD_OBJECT(
-              'appellationCode', ogr_appellation::text,
-              'appellationLabel', libelle_appellation_long,
-              'score', io.score
-            ) ORDER BY ogr_appellation)) AS appellations`;
-
-const withEstablishmentAggregateSubQuery = `
-establishment_locations_agg AS (
-  SELECT
-    establishment_siret,
-    JSON_AGG(
-      JSON_BUILD_OBJECT(
-        'id', id,
-        'position', JSON_BUILD_OBJECT('lon', lon, 'lat', lat),
-        'address', JSON_BUILD_OBJECT(
-            'streetNumberAndAddress', street_number_and_address,
-            'postcode', post_code,
-            'city', city,
-            'departmentCode', department_code
-        )
-      )
-    ) AS locations
-  FROM establishments_locations
-  GROUP BY establishment_siret 
-)`;
+const buildAppellationsArray = `
+(
+  JSON_AGG (
+    JSON_BUILD_OBJECT(
+      'appellationCode', ogr_appellation::text,
+      'appellationLabel', libelle_appellation_long,
+      'score', io.score
+    ) 
+  ORDER BY ogr_appellation
+  )
+) AS appellations`;
 
 const makeSelectedOffersSubQuery = ({
   withGeoParams,
@@ -1159,3 +984,29 @@ const makeSelectedOffersSubQuery = ({
 
   return format(query, romeCodes);
 };
+
+const makeEstablishmentAggregateFromDb = (
+  aggregate: any,
+): EstablishmentAggregate => ({
+  establishment: {
+    ...aggregate.establishment,
+    updatedAt: aggregate.establishment.updatedAt
+      ? new Date(aggregate.establishment.updatedAt)
+      : undefined,
+    createdAt: new Date(aggregate.establishment.createdAt),
+    lastInseeCheckDate: aggregate.establishment.lastInseeCheckDate
+      ? new Date(aggregate.establishment.lastInseeCheckDate)
+      : undefined,
+    voluntaryToImmersion: true,
+  },
+  offers: aggregate.immersionOffers.map(
+    (immersionOfferWithStringDate: any) => ({
+      ...immersionOfferWithStringDate,
+      createdAt: new Date(immersionOfferWithStringDate.createdAt),
+    }),
+  ),
+  contact:
+    aggregate.contact && keys(aggregate.contact).length > 0
+      ? aggregate.contact
+      : undefined,
+});

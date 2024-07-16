@@ -1,3 +1,4 @@
+import { Builder } from "../Builder";
 import {
   GeoPositionDto,
   WithGeoPosition,
@@ -157,3 +158,34 @@ export const getDepartmentCodeFromDepartmentNameOrCity: Record<
   "Métropole de Lyon": "69",
   "Auvergne-Rhône-Alpes": "69",
 };
+
+export class LocationBuilder implements Builder<Location> {
+  constructor(
+    private readonly dto: Location = {
+      address: {
+        city: "Cergy",
+        departmentCode: "95",
+        postcode: "95000",
+        streetNumberAndAddress: "5 Avenue Jean Bart",
+      },
+      id: "a352bd48-b0ed-4e02-a664-02725fab8ad3",
+      position: { lat: 49.0317438, lon: 2.0606685 },
+    },
+  ) {
+    this.#dto = dto;
+  }
+
+  public withPosition(position: GeoPositionDto) {
+    return new LocationBuilder({ ...this.#dto, position });
+  }
+
+  public withId(id: LocationId) {
+    return new LocationBuilder({ ...this.#dto, id });
+  }
+
+  public build(): Location {
+    return this.#dto;
+  }
+
+  #dto: Location;
+}
