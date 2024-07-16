@@ -577,7 +577,7 @@ describe("Pg implementation of ConventionQueries", () => {
         ].map((params) => conventionRepo.save(params)),
       );
 
-      const notification1: Notification = {
+      const notification: Notification = {
         createdAt: new Date().toISOString(),
         followedIds: {
           conventionId:
@@ -604,7 +604,7 @@ describe("Pg implementation of ConventionQueries", () => {
           recipients: ["joe-joe@gmail.com"],
         },
       };
-      await notificationRepo.saveBatch([notification1]);
+      await notificationRepo.saveBatch([notification]);
 
       // Act
       const queryResults =
