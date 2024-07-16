@@ -4,11 +4,7 @@ import {
   errorMessages,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

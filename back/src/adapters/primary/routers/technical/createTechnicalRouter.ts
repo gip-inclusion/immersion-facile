@@ -3,12 +3,9 @@ import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import { TallyForm, technicalRoutes, uploadFileRoute } from "shared";
+import { BadRequestError, ForbiddenError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
-import {
-  BadRequestError,
-  ForbiddenError,
-} from "../../../../config/helpers/httpErrors";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
 import { UploadFileInput } from "../../../../domains/core/file-storage/useCases/UploadFile";

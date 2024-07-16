@@ -1,5 +1,5 @@
 import { AgencyDto, ConventionDto, Role } from "shared";
-import { BadRequestError } from "../config/helpers/httpErrors";
+import { BadRequestError } from "shared";
 
 const hasNoMagicLink = (role: Role) =>
   `Le rôle "${role}" n'a pas de liens magiques.`;

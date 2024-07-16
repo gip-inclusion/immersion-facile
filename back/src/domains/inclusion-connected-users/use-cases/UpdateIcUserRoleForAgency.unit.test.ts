@@ -9,10 +9,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  ForbiddenError,
-  UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, UnauthorizedError } from "shared";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {

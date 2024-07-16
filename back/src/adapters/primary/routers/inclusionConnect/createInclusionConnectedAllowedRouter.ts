@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { inclusionConnectedAllowedRoutes } from "shared";
+import { UnauthorizedError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
-import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { createLegacyInclusionConnectedMiddleware } from "./createLegacyInclusionConnectedMiddleware";
 

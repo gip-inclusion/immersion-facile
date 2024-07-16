@@ -9,11 +9,8 @@ import {
   frontRoutes,
   withConventionSchema,
 } from "shared";
+import { BadRequestError, NotFoundError } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

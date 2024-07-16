@@ -4,10 +4,7 @@ import {
   defaultValidFormEstablishment,
   expectPromiseToFailWithError,
 } from "shared";
-import {
-  BadRequestError,
-  ConflictError,
-} from "../../../config/helpers/httpErrors";
+import { BadRequestError, ConflictError } from "shared";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemoryRomeRepository } from "../../core/rome/adapters/InMemoryRomeRepository";

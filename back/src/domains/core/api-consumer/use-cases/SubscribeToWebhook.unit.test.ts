@@ -3,7 +3,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError } from "../../../../config/helpers/httpErrors";
+import { ForbiddenError } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {

@@ -5,7 +5,7 @@ import {
   immersionFacileNoReplyEmailSender,
   withDiscussionSchemaId,
 } from "shared";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";

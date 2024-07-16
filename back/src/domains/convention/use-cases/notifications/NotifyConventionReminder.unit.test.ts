@@ -15,11 +15,8 @@ import {
   frontRoutes,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {

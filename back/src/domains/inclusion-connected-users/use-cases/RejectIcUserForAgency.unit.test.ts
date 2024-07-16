@@ -8,11 +8,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";

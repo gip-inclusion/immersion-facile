@@ -1,9 +1,5 @@
 import { AssessmentDto, ConventionJwtPayload, assessmentSchema } from "shared";
-import {
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ConflictError, ForbiddenError, NotFoundError } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

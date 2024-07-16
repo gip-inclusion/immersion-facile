@@ -7,10 +7,7 @@ import {
   errorMessages,
   formEstablishmentSchema,
 } from "shared";
-import {
-  ConflictError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ConflictError, NotFoundError } from "shared";
 import {
   KyselyDb,
   jsonBuildObject,

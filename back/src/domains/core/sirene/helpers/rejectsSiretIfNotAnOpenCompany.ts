@@ -1,4 +1,4 @@
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { BadRequestError } from "shared";
 import { SiretGateway } from "../ports/SirenGateway";
 import { getSiretEstablishmentFromApi } from "./getSirenEstablishmentFromApi";
 

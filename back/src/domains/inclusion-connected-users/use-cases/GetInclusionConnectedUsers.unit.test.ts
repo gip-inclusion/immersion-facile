@@ -5,10 +5,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  ForbiddenError,
-  UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, UnauthorizedError } from "shared";
 import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";

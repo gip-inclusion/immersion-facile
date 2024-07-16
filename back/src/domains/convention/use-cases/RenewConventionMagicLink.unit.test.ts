@@ -12,11 +12,8 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
+import { BadRequestError, NotFoundError } from "shared";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { WithTriggeredBy } from "../../core/events/events";

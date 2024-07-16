@@ -10,11 +10,8 @@ import {
   agencyRoleIsNotToReview,
   errorMessages,
 } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { z } from "zod";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";

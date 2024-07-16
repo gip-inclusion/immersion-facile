@@ -4,7 +4,7 @@ import {
   agencySchema,
   errorMessages,
 } from "shared";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

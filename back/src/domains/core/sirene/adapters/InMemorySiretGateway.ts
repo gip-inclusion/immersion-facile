@@ -6,10 +6,7 @@ import {
   SiretEstablishmentDto,
   tooManySirenRequestsSiret,
 } from "shared";
-import {
-  TooManyRequestApiError,
-  UnavailableApiError,
-} from "../../../../config/helpers/httpErrors";
+import { TooManyRequestApiError, UnavailableApiError } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { SiretGateway } from "../ports/SirenGateway";
 

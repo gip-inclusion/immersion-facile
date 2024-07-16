@@ -4,7 +4,7 @@ import {
   PaginationQueryParams,
   paginationRequiredQueryParamsSchema,
 } from "shared";
-import { ForbiddenError } from "../../../../config/helpers/httpErrors";
+import { ForbiddenError } from "shared";
 import { createTransactionalUseCase } from "../../UseCase";
 
 export type EstablishmentStat = {

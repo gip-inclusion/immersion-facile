@@ -13,7 +13,7 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+} from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";

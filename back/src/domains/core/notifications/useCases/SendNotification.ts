@@ -1,6 +1,6 @@
 import { exhaustiveCheck } from "shared";
+import { NotFoundError } from "shared";
 import { z } from "zod";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";

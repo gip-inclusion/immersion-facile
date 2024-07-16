@@ -19,8 +19,8 @@ import {
   lookupStreetAddressQueryMinLength,
   lookupStreetAddressSpecialCharsRegex,
 } from "shared";
+import { BadRequestError } from "shared";
 import { HttpClient } from "shared-routes";
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import { createLogger } from "../../../../utils/logger";
 import { AddressGateway } from "../ports/AddressGateway";
 import {

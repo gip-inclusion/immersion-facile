@@ -8,7 +8,7 @@ import {
   pipeWithValue,
   withConventionSchema,
 } from "shared";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { isConventionInScope } from "../../../convention/entities/Convention";
 import { TransactionalUseCase } from "../../UseCase";

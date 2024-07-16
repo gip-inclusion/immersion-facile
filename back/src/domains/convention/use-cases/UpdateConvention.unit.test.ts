@@ -14,7 +14,7 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+} from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,

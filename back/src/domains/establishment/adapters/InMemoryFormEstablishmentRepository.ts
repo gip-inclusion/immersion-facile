@@ -1,8 +1,5 @@
 import { FormEstablishmentDto, SiretDto, errorMessages, propEq } from "shared";
-import {
-  ConflictError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ConflictError, NotFoundError } from "shared";
 import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 
 export class InMemoryFormEstablishmentRepository

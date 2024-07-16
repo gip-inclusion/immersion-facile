@@ -10,12 +10,8 @@ import {
   makeRejection,
   rejectDiscussionEmailParams,
 } from "shared";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { z } from "zod";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

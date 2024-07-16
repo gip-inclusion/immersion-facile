@@ -4,11 +4,7 @@ import {
   UserId,
   errorMessages,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfIcUserNotBackofficeAdmin = async (

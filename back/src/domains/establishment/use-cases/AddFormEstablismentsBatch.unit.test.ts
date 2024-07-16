@@ -10,10 +10,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  ForbiddenError,
-  UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, UnauthorizedError } from "shared";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {

@@ -7,11 +7,7 @@ import {
   addressDtoToString,
   siretSchema,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";

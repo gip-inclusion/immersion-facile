@@ -14,9 +14,9 @@ import {
   isUrlValid,
   withConventionSchema,
 } from "shared";
+import { NotFoundError } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";

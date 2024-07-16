@@ -3,11 +3,8 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { BadRequestError, UnauthorizedError } from "shared";
 import { ZodError } from "zod";
-import {
-  BadRequestError,
-  UnauthorizedError,
-} from "../../../../config/helpers/httpErrors";
 import { InMemoryPdfGeneratorGateway } from "../adapters/InMemoryPdfGeneratorGateway";
 import { HtmlToPdf } from "./HtmlToPdf";
 

@@ -13,10 +13,7 @@ import {
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
-import {
-  ConflictError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ConflictError, NotFoundError } from "shared";
 import { KyselyDb, falsyToNull } from "../../../config/pg/kysely/kyselyUtils";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";

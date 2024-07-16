@@ -9,9 +9,9 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { BadRequestError } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import { AddressGateway } from "../ports/AddressGateway";
 import { HttpAddressGateway } from "./HttpAddressGateway";
 import { addressesExternalRoutes } from "./HttpAddressGateway.routes";

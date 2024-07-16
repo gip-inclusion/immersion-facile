@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { NotFoundError } from "shared";
 import { makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
-import { NotFoundError } from "../helpers/httpErrors";
 
 export const makeInclusionConnectAuthMiddleware = (
   jwtPublicKey: string,

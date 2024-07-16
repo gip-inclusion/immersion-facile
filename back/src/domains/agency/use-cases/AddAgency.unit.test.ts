@@ -7,10 +7,7 @@ import {
   expectToEqual,
   invalidAgencySiretMessage,
 } from "shared";
-import {
-  ConflictError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ConflictError, NotFoundError } from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,

@@ -11,10 +11,7 @@ import {
   SiretDto,
   castError,
 } from "shared";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { BadRequestError, NotFoundError } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,

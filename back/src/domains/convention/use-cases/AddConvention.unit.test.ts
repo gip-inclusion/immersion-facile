@@ -5,11 +5,7 @@ import {
   errorMessages,
   expectPromiseToFailWithError,
 } from "shared";
-import {
-  BadRequestError,
-  ConflictError,
-  ForbiddenError,
-} from "../../../config/helpers/httpErrors";
+import { BadRequestError, ConflictError, ForbiddenError } from "shared";
 import { DomainEvent } from "../../core/events/events";
 import {
   CreateNewEvent,

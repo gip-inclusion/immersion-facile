@@ -3,7 +3,7 @@ import {
   InclusionConnectedUser,
   formEstablishmentSchema,
 } from "shared";
-import { ConflictError } from "../../../config/helpers/httpErrors";
+import { ConflictError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";

@@ -2,7 +2,7 @@ import {
   RejectIcUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";

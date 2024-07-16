@@ -8,7 +8,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,

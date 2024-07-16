@@ -7,10 +7,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  NotFoundError,
-  UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+import { NotFoundError, UnauthorizedError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,

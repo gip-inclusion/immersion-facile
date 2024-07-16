@@ -6,10 +6,7 @@ import {
   expectPromiseToFailWithError,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
+import { BadRequestError, NotFoundError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,

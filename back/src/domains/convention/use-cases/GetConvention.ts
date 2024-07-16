@@ -11,10 +11,7 @@ import {
   stringToMd5,
   withConventionIdSchema,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError } from "shared";
 import { conventionEmailsByRole } from "../../../utils/convention";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { InclusionConnectedUserRepository } from "../../core/dashboard/port/InclusionConnectedUserRepository";

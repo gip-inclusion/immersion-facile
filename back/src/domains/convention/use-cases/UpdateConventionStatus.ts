@@ -18,10 +18,7 @@ import {
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import {

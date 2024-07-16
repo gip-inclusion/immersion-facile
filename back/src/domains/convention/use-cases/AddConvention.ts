@@ -5,7 +5,7 @@ import {
   addConventionInputSchema,
   errorMessages,
 } from "shared";
-import { ForbiddenError } from "../../../config/helpers/httpErrors";
+import { ForbiddenError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";

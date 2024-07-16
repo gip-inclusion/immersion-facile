@@ -11,7 +11,7 @@ import {
   errorMessages,
   validatedConventionStatuses,
 } from "shared";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
 import {

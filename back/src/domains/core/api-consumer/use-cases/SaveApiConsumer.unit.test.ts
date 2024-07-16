@@ -8,10 +8,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  ForbiddenError,
-  UnauthorizedError,
-} from "../../../../config/helpers/httpErrors";
+import { ForbiddenError, UnauthorizedError } from "shared";
 import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";

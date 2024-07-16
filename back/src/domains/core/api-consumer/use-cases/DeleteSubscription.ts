@@ -4,12 +4,8 @@ import {
   findRightNameFromSubscriptionId,
   isApiConsumerAllowed,
 } from "shared";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
 import { z } from "zod";
-import {
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
