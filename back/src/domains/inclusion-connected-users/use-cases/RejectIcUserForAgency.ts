@@ -4,7 +4,7 @@ import {
   errorMessages,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";

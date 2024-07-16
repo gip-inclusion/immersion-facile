@@ -20,7 +20,7 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+} from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";

@@ -3,10 +3,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  NotFoundError,
-  TooManyRequestApiError,
-} from "../../../../config/helpers/httpErrors";
+import { NotFoundError, TooManyRequestApiError } from "shared";
 import { InMemorySiretGateway } from "../adapters/InMemorySiretGateway";
 import { GetSiret } from "./GetSiret";
 

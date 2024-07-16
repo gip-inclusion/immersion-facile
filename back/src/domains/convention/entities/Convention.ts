@@ -9,11 +9,7 @@ import {
   errorMessages,
   statusTransitionConfigs,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfTransitionNotAllowed = ({

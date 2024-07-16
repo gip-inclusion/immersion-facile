@@ -6,7 +6,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {

@@ -4,10 +4,7 @@ import {
   errorMessages,
   withConventionIdSchema,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 

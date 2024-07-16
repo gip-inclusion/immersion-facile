@@ -12,10 +12,7 @@ import {
   pathEq,
   replaceArrayElement,
 } from "shared";
-import {
-  ConflictError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ConflictError, NotFoundError } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";

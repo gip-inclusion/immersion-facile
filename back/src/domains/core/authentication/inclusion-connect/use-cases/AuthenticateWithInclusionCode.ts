@@ -8,7 +8,7 @@ import {
   frontRoutes,
   queryParamsAsString,
 } from "shared";
-import { ForbiddenError } from "../../../../../config/helpers/httpErrors";
+import { ForbiddenError } from "shared";
 import { notifyDiscord } from "../../../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../../UseCase";
 import { CreateNewEvent } from "../../../events/ports/EventBus";

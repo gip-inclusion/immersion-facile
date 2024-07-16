@@ -6,8 +6,8 @@ import {
   expectToEqual,
   immersionFacileNoReplyEmailSender,
 } from "shared";
+import { NotFoundError } from "shared";
 import { v4 as uuid } from "uuid";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,

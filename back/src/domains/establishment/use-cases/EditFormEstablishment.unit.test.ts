@@ -8,11 +8,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ConflictError, ForbiddenError, NotFoundError } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";

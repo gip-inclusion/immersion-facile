@@ -3,7 +3,7 @@ import {
   expectPromiseToFailWithError,
   getTallyFormValueOf,
 } from "shared";
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { BadRequestError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,

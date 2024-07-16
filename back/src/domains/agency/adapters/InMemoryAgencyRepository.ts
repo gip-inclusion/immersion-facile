@@ -17,7 +17,7 @@ import {
   errorMessages,
   isTruthy,
 } from "shared";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { AgencyRepository } from "../ports/AgencyRepository";
 

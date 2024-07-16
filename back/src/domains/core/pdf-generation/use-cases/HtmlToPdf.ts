@@ -3,7 +3,7 @@ import {
   ConventionRelatedJwtPayload,
   zStringMinLength1,
 } from "shared";
-import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
+import { UnauthorizedError } from "shared";
 import { UseCase } from "../../UseCase";
 import { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 

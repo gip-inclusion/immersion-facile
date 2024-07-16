@@ -16,11 +16,7 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";

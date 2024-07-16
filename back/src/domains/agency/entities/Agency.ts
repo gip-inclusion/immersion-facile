@@ -1,5 +1,5 @@
 import { AgencyDto } from "shared";
-import { ConflictError } from "../../../config/helpers/httpErrors";
+import { ConflictError } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwConflictErrorOnSimilarAgencyFound = async ({

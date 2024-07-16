@@ -12,7 +12,7 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+} from "shared";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";

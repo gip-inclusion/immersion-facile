@@ -14,7 +14,7 @@ import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
-} from "../../../config/helpers/httpErrors";
+} from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";

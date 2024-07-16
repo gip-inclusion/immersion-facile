@@ -3,8 +3,8 @@ import {
   agencySchema,
   getCounsellorsAndValidatorsEmailsDeduplicated,
 } from "shared";
+import { NotFoundError } from "shared";
 import { z } from "zod";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

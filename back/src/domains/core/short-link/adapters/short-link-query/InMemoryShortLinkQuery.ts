@@ -1,5 +1,5 @@
 import { AbsoluteUrl } from "shared";
-import { NotFoundError } from "../../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { shortLinkNotFoundMessage } from "../../ShortLink";
 import { ShortLinkId, ShortLinkQuery } from "../../ports/ShortLinkQuery";
 

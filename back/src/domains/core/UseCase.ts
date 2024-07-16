@@ -5,11 +5,9 @@ import {
   calculateDurationInSecondsFrom,
   castError,
 } from "shared";
+import { BadRequestError } from "shared";
 import { z } from "zod";
-import {
-  BadRequestError,
-  validateAndParseZodSchema,
-} from "../../config/helpers/httpErrors";
+import { validateAndParseZodSchema } from "../../config/helpers/httpErrors";
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";

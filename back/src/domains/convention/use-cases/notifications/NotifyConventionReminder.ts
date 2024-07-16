@@ -19,12 +19,9 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
 } from "shared";
+import { ForbiddenError, NotFoundError } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   ConventionReminderPayload,

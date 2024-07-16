@@ -4,10 +4,7 @@ import {
   WithConventionId,
   withConventionIdSchema,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { isConventionInScope } from "../entities/Convention";

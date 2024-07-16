@@ -5,8 +5,8 @@ import {
   errorMessages,
   siretSchema,
 } from "shared";
+import { NotFoundError } from "shared";
 import { z } from "zod";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";

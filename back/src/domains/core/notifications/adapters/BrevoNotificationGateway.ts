@@ -14,8 +14,8 @@ import {
   emailTemplatesByName,
   smsTemplatesByName,
 } from "shared";
+import { BadRequestError } from "shared";
 import { HttpClient } from "shared-routes";
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
 import { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import {
   counterSendTransactEmailError,

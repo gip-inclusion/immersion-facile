@@ -1,10 +1,10 @@
 import * as Sentry from "@sentry/node";
 import { isAxiosError } from "axios";
 import { Request, Response } from "express";
+import { HttpError } from "shared";
 import { ZodError } from "zod";
 import { LoggerParamsWithMessage, createLogger } from "../../utils/logger";
 import { notifyObjectDiscord } from "../../utils/notifyDiscord";
-import { HttpError } from "./httpErrors";
 
 const logger = createLogger(__filename);
 

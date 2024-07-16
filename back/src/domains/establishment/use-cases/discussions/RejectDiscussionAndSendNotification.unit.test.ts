@@ -8,11 +8,7 @@ import {
   expectToEqual,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,

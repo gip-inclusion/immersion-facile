@@ -6,6 +6,7 @@ import {
   FindSimilarConventionsResponseDto,
   SiretDto,
 } from "shared";
+import { NotFoundError } from "shared";
 import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
@@ -120,7 +121,6 @@ import { LinkFranceTravailUsersToTheirAgencies } from "../../domains/inclusion-c
 import { RejectIcUserForAgency } from "../../domains/inclusion-connected-users/use-cases/RejectIcUserForAgency";
 import { UpdateIcUserRoleForAgency } from "../../domains/inclusion-connected-users/use-cases/UpdateIcUserRoleForAgency";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
-import { NotFoundError } from "../helpers/httpErrors";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import {

@@ -14,14 +14,10 @@ import {
   isApiConsumerAllowed,
   pipeWithValue,
 } from "shared";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
-import {
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-  validateAndParseZodSchemaV2,
-} from "../../../../config/helpers/httpErrors";
+import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/httpErrors";
 import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";
 import { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { createLogger } from "../../../../utils/logger";

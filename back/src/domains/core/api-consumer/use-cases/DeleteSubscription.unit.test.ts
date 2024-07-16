@@ -1,8 +1,5 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,

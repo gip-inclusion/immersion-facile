@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { conventionMagicLinkRoutes } from "shared";
+import { UnauthorizedError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { P, match } from "ts-pattern";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
-import { UnauthorizedError } from "../../../../config/helpers/httpErrors";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 
 export const createMagicLinkRouter = (deps: AppDependencies) => {

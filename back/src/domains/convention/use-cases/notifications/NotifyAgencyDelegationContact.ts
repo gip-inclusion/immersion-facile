@@ -4,7 +4,7 @@ import {
   getTallyFormValueOf,
   tallyFormSchema,
 } from "shared";
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { BadRequestError } from "shared";
 import { DelegationContactRepository } from "../../../agency/ports/DelegationContactRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";

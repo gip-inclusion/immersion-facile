@@ -12,10 +12,7 @@ import {
   signConventionDtoWithRole,
   withConventionIdSchema,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DomainTopic } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";

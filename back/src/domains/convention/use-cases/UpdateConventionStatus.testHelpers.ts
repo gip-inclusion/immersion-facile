@@ -20,11 +20,7 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  UnauthorizedError,
-} from "../../../config/helpers/httpErrors";
+import { BadRequestError, ForbiddenError, UnauthorizedError } from "shared";
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";

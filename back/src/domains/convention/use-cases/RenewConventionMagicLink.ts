@@ -10,14 +10,10 @@ import {
   renewMagicLinkRequestSchema,
   stringToMd5,
 } from "shared";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
 import { conventionEmailsByRoleForMagicLinkRenewal } from "../../../utils/convention";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";

@@ -12,11 +12,8 @@ import {
   propEq,
   queryParamsAsString,
 } from "shared";
+import { TooManyRequestApiError, UnavailableApiError } from "shared";
 import { AxiosConfig } from "../../../../config/bootstrap/appConfig";
-import {
-  TooManyRequestApiError,
-  UnavailableApiError,
-} from "../../../../config/helpers/httpErrors";
 import {
   createAxiosInstance,
   isRetryableError,

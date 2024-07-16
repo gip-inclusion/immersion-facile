@@ -1,6 +1,6 @@
 import { sql } from "kysely";
 import { DataWithPagination, PaginationQueryParams } from "shared";
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { BadRequestError } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { StatisticQueries } from "../ports/StatisticQueries";
 import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";

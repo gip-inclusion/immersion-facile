@@ -1,5 +1,5 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import { ConflictError } from "../../../../config/helpers/httpErrors";
+import { ConflictError } from "shared";
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";

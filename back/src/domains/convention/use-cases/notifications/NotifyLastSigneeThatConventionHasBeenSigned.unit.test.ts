@@ -6,7 +6,7 @@ import {
   expectPromiseToFailWithError,
   frontRoutes,
 } from "shared";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,

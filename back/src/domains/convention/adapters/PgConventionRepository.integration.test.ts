@@ -15,7 +15,7 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
-import { ConflictError } from "../../../config/helpers/httpErrors";
+import { ConflictError } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";

@@ -1,5 +1,5 @@
 import { AddConventionInput, addConventionInputSchema } from "shared";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 
 export type MarkDiscussionLinkedToConvention = ReturnType<

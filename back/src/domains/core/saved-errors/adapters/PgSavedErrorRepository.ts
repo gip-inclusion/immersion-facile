@@ -1,7 +1,7 @@
 import { isAxiosError } from "axios";
 import { sql } from "kysely";
 import { ConventionId } from "shared";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import {
   SavedError,

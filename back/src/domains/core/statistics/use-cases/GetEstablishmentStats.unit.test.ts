@@ -1,8 +1,5 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-} from "../../../../config/helpers/httpErrors";
+import { BadRequestError, ForbiddenError } from "shared";
 import { ApiConsumerBuilder } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {

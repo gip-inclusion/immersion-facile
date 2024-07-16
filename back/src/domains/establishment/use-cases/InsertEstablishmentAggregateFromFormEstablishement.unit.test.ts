@@ -9,7 +9,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ConflictError } from "../../../config/helpers/httpErrors";
+import { ConflictError } from "shared";
 import {
   InMemoryAddressGateway,
   avenueChampsElyseesDto,

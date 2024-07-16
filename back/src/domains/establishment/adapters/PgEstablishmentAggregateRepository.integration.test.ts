@@ -12,11 +12,8 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { BadRequestError, NotFoundError } from "shared";
 import { v4 as uuid } from "uuid";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {

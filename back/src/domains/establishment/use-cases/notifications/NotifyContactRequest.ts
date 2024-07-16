@@ -6,10 +6,7 @@ import {
   createOpaqueEmail,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../../config/helpers/httpErrors";
+import { BadRequestError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";

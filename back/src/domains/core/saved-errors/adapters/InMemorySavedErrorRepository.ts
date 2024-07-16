@@ -1,5 +1,5 @@
 import { ConventionId } from "shared";
-import { NotFoundError } from "../../../../config/helpers/httpErrors";
+import { NotFoundError } from "shared";
 import {
   SavedError,
   SavedErrorRepository,

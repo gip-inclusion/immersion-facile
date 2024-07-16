@@ -10,10 +10,7 @@ import {
   expectToEqual,
   stringToMd5,
 } from "shared";
-import {
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { ForbiddenError, NotFoundError } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,

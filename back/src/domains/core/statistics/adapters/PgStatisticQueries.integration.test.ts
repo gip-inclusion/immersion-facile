@@ -6,7 +6,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError } from "../../../../config/helpers/httpErrors";
+import { BadRequestError } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,

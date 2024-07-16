@@ -6,7 +6,7 @@ import {
   Email,
   errorMessages,
 } from "shared";
-import { ConflictError } from "../../../config/helpers/httpErrors";
+import { ConflictError } from "shared";
 import { ConventionRepository } from "../ports/ConventionRepository";
 
 export class InMemoryConventionRepository implements ConventionRepository {

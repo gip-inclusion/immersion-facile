@@ -4,11 +4,7 @@ import {
   agencyIdsSchema,
   errorMessages,
 } from "shared";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../config/helpers/httpErrors";
+import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

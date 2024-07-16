@@ -1,12 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { Page, expect } from "@playwright/test";
 import { addBusinessDays, format } from "date-fns";
-import {
-  AgencyId,
-  domElementIds,
-  frontRoutes,
-  technicalRoutes,
-} from "shared";
+import { AgencyId, domElementIds, frontRoutes, technicalRoutes } from "shared";
 import { getRandomizedData } from "./data";
 import {
   expectElementToBeVisible,
