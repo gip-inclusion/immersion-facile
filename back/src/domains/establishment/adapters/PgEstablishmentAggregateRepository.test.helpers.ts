@@ -2,9 +2,13 @@ import {
   AddressDto,
   FormEstablishmentSource,
   GeoPositionDto,
+  Location,
   NumberEmployeesRange,
+  SearchResultDto,
 } from "shared";
 import { ContactEntity } from "../entities/ContactEntity";
+import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+import { OfferEntity } from "../entities/OfferEntity";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -122,4 +126,63 @@ export const insertEstablishmentAggregate = async (
   await establishmentAggregateRepository.insertEstablishmentAggregate(
     aggregate,
   );
+};
+
+export const makeExpectedSearchResult = ({
+  establishement,
+  withOffers,
+  withLocationAndDistance,
+}: {
+  establishement: EstablishmentAggregate;
+  withOffers: OfferEntity[];
+  withLocationAndDistance: Location & { distance: number };
+}): SearchResultDto => {
+  const firstOffer = withOffers.at(0);
+  if (!firstOffer)
+    throw new Error(
+      "At least one offer is required to make an expected SearchResult",
+    );
+  return {
+    additionalInformation: establishement.establishment.additionalInformation,
+    address: withLocationAndDistance.address,
+    appellations: withOffers.map(
+      ({ appellationCode, appellationLabel, score }) => ({
+        appellationCode,
+        appellationLabel,
+        score,
+      }),
+    ),
+    contactMode: establishement.contact?.contactMethod,
+    customizedName: establishement.establishment.customizedName,
+    distance_m: withLocationAndDistance.distance,
+    fitForDisabledWorkers: establishement.establishment.fitForDisabledWorkers,
+    locationId: withLocationAndDistance.id,
+    naf: establishement.establishment.nafDto.code,
+    nafLabel: "Activités des agences de travail temporaire",
+    name: establishement.establishment.name,
+    numberOfEmployeeRange: establishement.establishment.numberEmployeesRange,
+    position: withLocationAndDistance.position,
+    rome: firstOffer.romeCode,
+    romeLabel: firstOffer.romeLabel,
+    siret: establishement.establishment.siret,
+    voluntaryToImmersion: establishement.establishment.voluntaryToImmersion,
+    website: establishement.establishment.website,
+    isSearchable: true, // <<<<< Donnée renvoyée actuellement ?!
+  } as SearchResultDto; // d'où le as
+};
+
+export const sortSearchResultsByDistanceAndRomeAndSiret = (
+  a: SearchResultDto,
+  b: SearchResultDto,
+): number => {
+  if (a.distance_m && b.distance_m) {
+    if (a.distance_m > b.distance_m) return 1;
+    if (a.distance_m < b.distance_m) return -1;
+  }
+  if (a.rome > b.rome) return 1;
+  if (a.rome < b.rome) return -1;
+
+  if (a.siret > b.siret) return 1;
+  if (a.siret < b.siret) return -1;
+  return 0;
 };
