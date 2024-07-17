@@ -144,97 +144,6 @@ describe("mark partners errored convention as handled", () => {
     ]);
   });
 
-  it("only mark as handled the errored conventions that have the corresponding service name", async () => {
-    const conventionRepository = uow.conventionRepository;
-    const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
-    const savedErrorsRepository = uow.errorRepository;
-
-    const savedErrorConvention1: SavedError = {
-      serviceName: broadcastToPeServiceName,
-      consumerId: "my-consumer-id",
-      consumerName: "My consumer name",
-      params: {
-        conventionId,
-        httpStatus: 404,
-      },
-      subscriberErrorFeedback: {
-        message: "Ops, something is bad",
-      },
-      occurredAt: timeGateway.now(),
-      handledByAgency: false,
-    };
-
-    const savedErrorConvention2: SavedError = {
-      serviceName: broadcastToPeServiceName,
-      consumerId: "my-consumer-id",
-      consumerName: "My consumer name",
-      params: {
-        conventionId,
-        httpStatus: 404,
-      },
-      subscriberErrorFeedback: { message: "Ops, something is bad AGAIN" },
-      occurredAt: timeGateway.now(),
-      handledByAgency: false,
-    };
-
-    const savedErrorConvention3: SavedError = {
-      serviceName: "Yolo.serviceName",
-      consumerId: "my-consumer-id",
-      consumerName: "My consumer name",
-      params: {
-        conventionId,
-        httpStatus: 404,
-      },
-      subscriberErrorFeedback: {
-        message: "yolo",
-      },
-      occurredAt: timeGateway.now(),
-      handledByAgency: false,
-    };
-
-    await conventionRepository.save(convention);
-    await savedErrorsRepository.save(savedErrorConvention1);
-    await savedErrorsRepository.save(savedErrorConvention2);
-    await savedErrorsRepository.save(savedErrorConvention3);
-
-    await inclusionConnectRepository.setInclusionConnectedUsers([
-      icUserWithAgencyRights,
-    ]);
-
-    await markPartnersErroredConventionAsHandled.execute(
-      {
-        conventionId,
-      },
-      icJwtDomainPayload,
-    );
-
-    expectToEqual(savedErrorsRepository.savedErrors, [
-      {
-        ...savedErrorConvention1,
-        handledByAgency: true,
-      },
-      {
-        ...savedErrorConvention2,
-        handledByAgency: true,
-      },
-      { ...savedErrorConvention3 },
-    ]);
-
-    expectToEqual(outboxRepo.events, [
-      createNewEvent({
-        topic: "PartnerErroredConventionMarkedAsHandled",
-        payload: {
-          conventionId,
-          userId,
-          triggeredBy: {
-            kind: "inclusion-connected",
-            userId: icJwtDomainPayload.userId,
-          },
-        },
-      }),
-    ]);
-  });
-
   it("Throw when convention is not errored", async () => {
     const conventionRepository = uow.conventionRepository;
     const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
@@ -253,7 +162,6 @@ describe("mark partners errored convention as handled", () => {
       ),
       errors.broadcastFeedback.notFound({
         conventionId,
-        serviceName: broadcastToPeServiceName,
       }),
     );
   });
@@ -290,7 +198,6 @@ describe("mark partners errored convention as handled", () => {
         icJwtDomainPayload,
       ),
       errors.broadcastFeedback.notFound({
-        serviceName: broadcastToPeServiceName,
         conventionId,
       }),
     );
