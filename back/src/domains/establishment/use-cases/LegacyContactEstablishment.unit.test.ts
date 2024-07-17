@@ -300,8 +300,10 @@ describe("ContactEstablishment", () => {
             message: validEmailRequest.message,
             recipient: "establishment",
             sender: "potentialBeneficiary",
+            attachments: [],
           },
         ],
+        status: "PENDING",
       },
     ]);
   });
@@ -359,8 +361,10 @@ describe("ContactEstablishment", () => {
             recipient: "establishment",
             sender: "potentialBeneficiary",
             sentAt: discussionToOldDate,
+            attachments: [],
           },
         ],
+        status: "PENDING",
       },
       {
         id: "discussion1",
@@ -393,9 +397,11 @@ describe("ContactEstablishment", () => {
             recipient: "establishment",
             sender: "potentialBeneficiary",
             sentAt: discussion1Date,
+            attachments: [],
           },
         ],
         immersionObjective: "Confirmer un projet professionnel",
+        status: "PENDING",
       },
     ];
 
