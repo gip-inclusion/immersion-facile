@@ -157,7 +157,7 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          errors: `Error: ${new ZodError([
+          errors: new ZodError([
             {
               code: "invalid_union",
               unionErrors: [
@@ -223,7 +223,7 @@ describe("Admin router", () => {
               path: [],
               message: "Invalid input",
             },
-          ]).toString()}`,
+          ]).toString(),
         },
       });
     });

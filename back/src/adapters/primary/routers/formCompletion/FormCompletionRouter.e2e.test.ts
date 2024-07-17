@@ -77,8 +77,18 @@ describe("formCompletion Routes", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          errors:
-            'Error: [\n  {\n    "validation": "regex",\n    "code": "invalid_string",\n    "message": "SIRET doit être composé de 14 chiffres",\n    "path": [\n      "siret"\n    ]\n  }\n]',
+          errors: JSON.stringify(
+            [
+              {
+                validation: "regex",
+                code: "invalid_string",
+                message: "SIRET doit être composé de 14 chiffres",
+                path: ["siret"],
+              },
+            ],
+            null,
+            2,
+          ),
         },
       });
     });

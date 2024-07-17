@@ -1,3 +1,5 @@
+import { ZodError } from "zod";
+
 export abstract class HttpError extends Error {
   public abstract httpCode: number;
 
@@ -52,7 +54,7 @@ export class NotFoundError extends HttpError {
 export class BadRequestError extends HttpError {
   public httpCode = 400;
 
-  constructor(msg?: string, issues?: string[]) {
+  constructor(msg?: string | ZodError, issues?: string[]) {
     super(msg, issues);
     Object.setPrototypeOf(this, BadRequestError.prototype);
   }

@@ -13,7 +13,7 @@ import {
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
-import { validateAndParseZodSchema } from "../../../config/helpers/httpErrors";
+import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";

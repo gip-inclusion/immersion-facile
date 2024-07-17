@@ -1,6 +1,11 @@
 import { equals } from "ramda";
-import { ConventionDto, SiretDto, WithSiretDto, withSiretSchema } from "shared";
-import { NotFoundError } from "../../../config/helpers/httpErrors";
+import {
+  ConventionDto,
+  NotFoundError,
+  SiretDto,
+  WithSiretDto,
+  withSiretSchema,
+} from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

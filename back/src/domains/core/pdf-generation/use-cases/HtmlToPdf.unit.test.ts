@@ -33,19 +33,17 @@ describe("HtmlToPdf", () => {
     await expectPromiseToFailWithError(
       htmlToPdf.execute("", jwtPayload),
       new BadRequestError(
-        new BadRequestError(
-          new ZodError([
-            {
-              code: "too_small",
-              minimum: 1,
-              type: "string",
-              inclusive: true,
-              exact: false,
-              message: "Obligatoire",
-              path: [],
-            },
-          ]) as any,
-        ) as any,
+        new ZodError([
+          {
+            code: "too_small",
+            minimum: 1,
+            type: "string",
+            inclusive: true,
+            exact: false,
+            message: "Obligatoire",
+            path: [],
+          },
+        ]),
       ),
     );
   });
