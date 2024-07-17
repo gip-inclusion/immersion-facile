@@ -340,6 +340,8 @@ const discussionToPg = (
       discussion.potentialBeneficiary.experienceAdditionalInformation,
     potential_beneficiary_has_working_experience:
       discussion.potentialBeneficiary.hasWorkingExperience,
+    potential_beneficiary_date_preferences:
+      discussion.potentialBeneficiary.datePreferences,
     street_number_and_address: discussion.address.streetNumberAndAddress,
     siret: discussion.siret,
     contact_method: discussion.establishmentContact.contactMethod,

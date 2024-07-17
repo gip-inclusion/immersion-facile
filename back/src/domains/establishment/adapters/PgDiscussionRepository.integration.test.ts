@@ -61,7 +61,7 @@ describe("PgDiscussionRepository", () => {
 
   const date = new Date("2023-07-07");
 
-  const discussionWithLastExchangeByPotentialBeneficiary =
+  const discussionWithLastExchangeByPotentialBeneficiary1 =
     new DiscussionBuilder()
       .withId(uuid())
       .withSiret("00000000000001")
@@ -85,7 +85,7 @@ describe("PgDiscussionRepository", () => {
       ])
       .withCreatedAt(date)
       .build();
-  const discussionWithLastExchangeByEstablishment = new DiscussionBuilder()
+  const discussionWithLastExchangeByEstablishment2 = new DiscussionBuilder()
     .withId(uuid())
     .withSiret("00000000000003")
     .withExchanges([
@@ -100,7 +100,7 @@ describe("PgDiscussionRepository", () => {
     ])
     .withCreatedAt(addDays(date, -1))
     .build();
-  const discussionWithoutExchanges = new DiscussionBuilder()
+  const discussionWithoutExchanges3 = new DiscussionBuilder()
     .withId(uuid())
     .withSiret("00000000000002")
     .withExchanges([])
@@ -108,7 +108,7 @@ describe("PgDiscussionRepository", () => {
     .withCreatedAt(addDays(date, -2))
     .build();
 
-  const discussionWithRejectedStatusAndReason = new DiscussionBuilder()
+  const discussionWithRejectedStatusAndReason4 = new DiscussionBuilder()
     .withId(uuid())
     .withSiret("00000000000004")
     .withExchanges([])
@@ -117,7 +117,7 @@ describe("PgDiscussionRepository", () => {
     .withCreatedAt(addDays(date, -3))
     .build();
 
-  const discussionWithAcceptedStatus = new DiscussionBuilder()
+  const discussionWithAcceptedStatus5 = new DiscussionBuilder()
     .withId(uuid())
     .withSiret("00000000000005")
     .withExchanges([])
@@ -125,19 +125,20 @@ describe("PgDiscussionRepository", () => {
     .withStatus("ACCEPTED")
     .withCreatedAt(addDays(date, -4))
     .build();
-  const discussionWithPotentialBeneficiaryInformations = new DiscussionBuilder()
-    .withPotentialBeneficiary({
-      datePreferences: "my fake date preferences",
-      email: "fake-address@mail.com",
-      firstName: "John",
-      lastName: "Doe",
-      hasWorkingExperience: true,
-      experienceAdditionalInformation: "my fake experience",
-      phone: "0549000000",
-      resumeLink: "https://www.my-link.com",
-    })
-    .withCreatedAt(addDays(date, -1))
-    .build();
+  const discussionWithPotentialBeneficiaryInformations6 =
+    new DiscussionBuilder()
+      .withPotentialBeneficiary({
+        datePreferences: "my fake date preferences",
+        email: "fake-address@mail.com",
+        firstName: "John",
+        lastName: "Doe",
+        hasWorkingExperience: true,
+        experienceAdditionalInformation: "my fake experience",
+        phone: "0549000000",
+        resumeLink: "https://www.my-link.com",
+      })
+      .withCreatedAt(addDays(date, -5))
+      .build();
 
   describe("getDiscussions", () => {
     //TODO getDiscussions with lastAnsweredByCandidate parameter
@@ -145,11 +146,11 @@ describe("PgDiscussionRepository", () => {
       {
         params: {
           filters: {
-            sirets: [discussionWithLastExchangeByPotentialBeneficiary.siret],
+            sirets: [discussionWithLastExchangeByPotentialBeneficiary1.siret],
           },
           limit: 5,
         },
-        result: [discussionWithLastExchangeByPotentialBeneficiary],
+        result: [discussionWithLastExchangeByPotentialBeneficiary1],
       },
       {
         params: {
@@ -159,12 +160,10 @@ describe("PgDiscussionRepository", () => {
           limit: 5,
         },
         result: [
-          discussionWithLastExchangeByPotentialBeneficiary,
-          discussionWithLastExchangeByEstablishment,
-          discussionWithoutExchanges,
-          discussionWithRejectedStatusAndReason,
-          discussionWithAcceptedStatus,
-          discussionWithPotentialBeneficiaryInformations,
+          discussionWithLastExchangeByPotentialBeneficiary1,
+          discussionWithLastExchangeByEstablishment2,
+          discussionWithoutExchanges3,
+          discussionWithRejectedStatusAndReason4,
         ],
       },
       {
@@ -177,12 +176,12 @@ describe("PgDiscussionRepository", () => {
           },
           limit: 5,
         },
-        result: [discussionWithLastExchangeByPotentialBeneficiary],
+        result: [discussionWithLastExchangeByPotentialBeneficiary1],
       },
       {
         params: {
           filters: {
-            sirets: [discussionWithoutExchanges.siret],
+            sirets: [discussionWithoutExchanges3.siret],
             lastAnsweredByCandidate: {
               from: addDays(date, -1),
               to: date,
@@ -202,12 +201,12 @@ describe("PgDiscussionRepository", () => {
       async ({ params, result }) => {
         await Promise.all(
           [
-            discussionWithLastExchangeByPotentialBeneficiary,
-            discussionWithLastExchangeByEstablishment,
-            discussionWithoutExchanges,
-            discussionWithRejectedStatusAndReason,
-            discussionWithAcceptedStatus,
-            discussionWithPotentialBeneficiaryInformations,
+            discussionWithLastExchangeByPotentialBeneficiary1,
+            discussionWithLastExchangeByEstablishment2,
+            discussionWithoutExchanges3,
+            discussionWithRejectedStatusAndReason4,
+            discussionWithAcceptedStatus5,
+            discussionWithPotentialBeneficiaryInformations6,
           ].map((discussion) => pgDiscussionRepository.insert(discussion)),
         );
 
@@ -227,100 +226,100 @@ describe("PgDiscussionRepository", () => {
   describe("hasDiscussionMatching", () => {
     it.each([
       {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
-          siret: discussionWithLastExchangeByPotentialBeneficiary.siret,
+          siret: discussionWithLastExchangeByPotentialBeneficiary1.siret,
         },
         result: true,
       },
       {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
-          siret: discussionWithoutExchanges.siret,
+          siret: discussionWithoutExchanges3.siret,
         },
         result: false,
       },
       {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
           appellationCode:
-            discussionWithLastExchangeByPotentialBeneficiary.appellationCode,
+            discussionWithLastExchangeByPotentialBeneficiary1.appellationCode,
         },
         result: true,
       },
       {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
           potentialBeneficiaryEmail:
-            discussionWithLastExchangeByPotentialBeneficiary
+            discussionWithLastExchangeByPotentialBeneficiary1
               .potentialBeneficiary.email,
         },
         result: true,
       },
       {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
           since: new Date(
-            discussionWithLastExchangeByPotentialBeneficiary.createdAt,
+            discussionWithLastExchangeByPotentialBeneficiary1.createdAt,
           ),
         },
         result: true,
       },
       {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
           establishmentRepresentativeEmail:
-            discussionWithLastExchangeByPotentialBeneficiary.establishmentContact.email.toUpperCase(),
+            discussionWithLastExchangeByPotentialBeneficiary1.establishmentContact.email.toUpperCase(),
         },
         result: true,
       },
       {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
-          siret: discussionWithLastExchangeByPotentialBeneficiary.siret,
+          siret: discussionWithLastExchangeByPotentialBeneficiary1.siret,
           appellationCode:
-            discussionWithLastExchangeByPotentialBeneficiary.appellationCode,
+            discussionWithLastExchangeByPotentialBeneficiary1.appellationCode,
           potentialBeneficiaryEmail:
-            discussionWithLastExchangeByPotentialBeneficiary
+            discussionWithLastExchangeByPotentialBeneficiary1
               .potentialBeneficiary.email,
           since: date,
         },
         result: true,
       },
       {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary,
+        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
-          siret: discussionWithLastExchangeByPotentialBeneficiary.siret,
+          siret: discussionWithLastExchangeByPotentialBeneficiary1.siret,
           appellationCode:
-            discussionWithLastExchangeByPotentialBeneficiary.appellationCode,
+            discussionWithLastExchangeByPotentialBeneficiary1.appellationCode,
           potentialBeneficiaryEmail:
-            discussionWithLastExchangeByPotentialBeneficiary
+            discussionWithLastExchangeByPotentialBeneficiary1
               .potentialBeneficiary.email,
           since: addDays(date, 1),
         },
         result: false,
       },
       {
-        discussionInRepo: discussionWithoutExchanges,
+        discussionInRepo: discussionWithoutExchanges3,
         params: {
-          siret: discussionWithoutExchanges.siret,
-          appellationCode: discussionWithoutExchanges.appellationCode,
+          siret: discussionWithoutExchanges3.siret,
+          appellationCode: discussionWithoutExchanges3.appellationCode,
           potentialBeneficiaryEmail:
-            discussionWithoutExchanges.potentialBeneficiary.email,
-          since: new Date(discussionWithoutExchanges.createdAt),
+            discussionWithoutExchanges3.potentialBeneficiary.email,
+          since: new Date(discussionWithoutExchanges3.createdAt),
         },
         result: true,
       },
       {
-        discussionInRepo: discussionWithoutExchanges,
+        discussionInRepo: discussionWithoutExchanges3,
         params: {
-          siret: discussionWithLastExchangeByPotentialBeneficiary.siret,
+          siret: discussionWithLastExchangeByPotentialBeneficiary1.siret,
           appellationCode:
-            discussionWithLastExchangeByPotentialBeneficiary.appellationCode,
+            discussionWithLastExchangeByPotentialBeneficiary1.appellationCode,
           potentialBeneficiaryEmail:
-            discussionWithLastExchangeByPotentialBeneficiary
+            discussionWithLastExchangeByPotentialBeneficiary1
               .potentialBeneficiary.email,
-          since: addDays(new Date(discussionWithoutExchanges.createdAt), 1),
+          since: addDays(new Date(discussionWithoutExchanges3.createdAt), 1),
         },
         result: false,
       },
