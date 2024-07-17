@@ -1,4 +1,3 @@
-import { fromZonedTime } from "date-fns-tz";
 import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
@@ -400,9 +399,8 @@ function conventionToConventionNotification(
     telephone: convention.signatories.beneficiary.phone,
     prenom: convention.signatories.beneficiary.firstName,
     nom: convention.signatories.beneficiary.lastName,
-    dateNaissance: fromZonedTime(
-      `${convention.signatories.beneficiary.birthdate}T00:00:00`,
-      "Europe/Paris",
+    dateNaissance: new Date(
+      convention.signatories.beneficiary.birthdate,
     ).toISOString(),
     dateDemande: new Date(convention.dateSubmission).toISOString(),
     dateDebut: new Date(convention.dateStart).toISOString(),
