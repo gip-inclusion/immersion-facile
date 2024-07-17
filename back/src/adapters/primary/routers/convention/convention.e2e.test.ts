@@ -550,7 +550,7 @@ describe("convention e2e", () => {
             dateDebut: "2021-01-06T00:00:00.000Z",
             dateDemande: "2021-01-04T00:00:00.000Z",
             dateFin: "2021-01-15T00:00:00.000Z",
-            dateNaissance: "2002-10-05T14:48:00.000Z",
+            dateNaissance: "2002-10-04T22:00:00.000Z",
             descriptionPreventionSanitaire: "fourniture de gel",
             dureeImmersion: 70,
             email: "beneficiary@email.fr",
