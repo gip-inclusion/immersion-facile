@@ -154,6 +154,7 @@ describe("Broadcasts events to pole-emploi", () => {
         romeCode: "A1111",
         romeLabel: "some Rome",
       })
+      .withBeneficiaryBirthdate("2000-10-05")
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
       .withDateStart("2021-05-12")
@@ -174,6 +175,7 @@ describe("Broadcasts events to pole-emploi", () => {
       dureeImmersion: 21,
       dateDebut: "2021-05-12T00:00:00.000Z",
       dateFin: "2021-05-14T00:30:00.000Z",
+      dateNaissance: "2000-10-05T00:00:00.000Z",
       statut: "DEMANDE_VALIDÉE",
       codeAppellation: "011111",
     });
