@@ -325,7 +325,6 @@ export class PgAgencyRepository implements AgencyRepository {
       await this.transaction
         .deleteFrom("users__agencies")
         .where(usersAgenciesRolesIncludeValidator)
-        .where("is_notified_by_email", "=", true)
         .where("agency_id", "=", agency.id)
         .execute();
 
@@ -408,7 +407,6 @@ export class PgAgencyRepository implements AgencyRepository {
   ): Promise<AgencyDto> {
     const userRows = await getUsersWithAgencyRole(this.transaction, {
       agencyIds: [agencyWithoutEmail.id],
-      isNotifiedByEmail: true,
     });
 
     return addEmailsToAgency(userRows)(agencyWithoutEmail);
@@ -420,7 +418,6 @@ export class PgAgencyRepository implements AgencyRepository {
     if (!agenciesWithoutEmails.length) return [];
     const userRows = await getUsersWithAgencyRole(this.transaction, {
       agencyIds: agenciesWithoutEmails.map(({ id }) => id),
-      isNotifiedByEmail: true,
     });
 
     return agenciesWithoutEmails.map(addEmailsToAgency(userRows));

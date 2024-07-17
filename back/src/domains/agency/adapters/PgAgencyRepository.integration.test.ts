@@ -3,6 +3,7 @@ import {
   AgencyDto,
   AgencyDtoBuilder,
   GeoPositionDto,
+  User,
   WithAcquisition,
   activeAgencyStatuses,
   errorMessages,
@@ -15,10 +16,21 @@ import {
 } from "../../../config/helpers/httpErrors";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { PgInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgInclusionConnectedUserRepository";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import {
   PgAgencyRepository,
   safirConflictErrorMessage,
 } from "./PgAgencyRepository";
+
+const icUser: User = {
+  id: "add5c20e-6dd2-45af-affe-927358005251",
+  email: "icuser@email.fr",
+  firstName: "John",
+  lastName: "Doe",
+  externalId: "my-external-id",
+  createdAt: "2024-07-01",
+};
 
 const agency1builder = AgencyDtoBuilder.create(
   "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
@@ -77,6 +89,8 @@ const agencyWithRefersTo = agency2builder
 describe("PgAgencyRepository", () => {
   let pool: Pool;
   let agencyRepository: PgAgencyRepository;
+  let userRepository: PgUserRepository;
+  let inclusionConnectedUserRepository: PgInclusionConnectedUserRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
@@ -98,6 +112,10 @@ describe("PgAgencyRepository", () => {
     await db.deleteFrom("users").execute();
 
     agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
+    userRepository = new PgUserRepository(makeKyselyDb(pool));
+    inclusionConnectedUserRepository = new PgInclusionConnectedUserRepository(
+      makeKyselyDb(pool),
+    );
   });
 
   describe("getById", () => {
@@ -122,14 +140,45 @@ describe("PgAgencyRepository", () => {
       );
       expectToEqual(retrievedAgency, agencyWithRefersTo);
     });
+
+    it("returns existing agency, with all its validators (those inclusion connected + those that are not)", async () => {
+      await userRepository.save(icUser);
+      await agencyRepository.insert(agency1);
+      inclusionConnectedUserRepository.updateAgencyRights({
+        userId: icUser.id,
+        agencyRights: [
+          { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+        ],
+      });
+
+      const retrievedAgency = await agencyRepository.getById(agency1.id);
+
+      expectToEqual(retrievedAgency, {
+        ...agency1,
+        validatorEmails: [icUser.email, ...agency1.validatorEmails],
+      });
+    });
   });
 
   describe("getByIds", () => {
-    it("returns existing agency", async () => {
+    it("returns existing agency with all its validators", async () => {
+      await userRepository.save(icUser);
       await agencyRepository.insert(agency1);
+      inclusionConnectedUserRepository.updateAgencyRights({
+        userId: icUser.id,
+        agencyRights: [
+          { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+        ],
+      });
 
       const agencies = await agencyRepository.getByIds([agency1.id]);
-      expectToEqual(agencies, [agency1]);
+
+      expectToEqual(agencies, [
+        {
+          ...agency1,
+          validatorEmails: [icUser.email, ...agency1.validatorEmails],
+        },
+      ]);
     });
 
     it("returns all agencies matching ids", async () => {
@@ -175,11 +224,22 @@ describe("PgAgencyRepository", () => {
       expect(retrievedAgency).toBeUndefined();
     });
 
-    it("returns existing agency", async () => {
+    it("returns existing agency with all its validators", async () => {
+      await userRepository.save(icUser);
       await agencyRepository.insert(agency1);
+      await inclusionConnectedUserRepository.updateAgencyRights({
+        userId: icUser.id,
+        agencyRights: [
+          { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+        ],
+      });
 
       const retrievedAgency = await agencyRepository.getBySafir(safirCode);
-      expectToEqual(retrievedAgency, agency1);
+
+      expectToEqual(retrievedAgency, {
+        ...agency1,
+        validatorEmails: [icUser.email, ...agency1.validatorEmails],
+      });
     });
 
     it("throw conflict error on multiple agencies with same safir code", async () => {
@@ -249,19 +309,29 @@ describe("PgAgencyRepository", () => {
     });
 
     it("returns all agencies filtered on statuses", async () => {
+      await userRepository.save(icUser);
       await Promise.all([
         agencyRepository.insert(agency1PE),
         agencyRepository.insert(agency2MissionLocale),
         agencyRepository.insert(agencyAddedFromPeReferenciel),
         agencyRepository.insert(inactiveAgency),
       ]);
+      await inclusionConnectedUserRepository.updateAgencyRights({
+        userId: icUser.id,
+        agencyRights: [
+          { agency: agency1PE, roles: ["validator"], isNotifiedByEmail: false },
+        ],
+      });
 
       const agencies = await agencyRepository.getAgencies({
         filters: { status: activeAgencyStatuses },
       });
       expect(sortById(agencies)).toEqual([
         agency2MissionLocale,
-        agency1PE,
+        {
+          ...agency1PE,
+          validatorEmails: [icUser.email, ...agency1PE.validatorEmails],
+        },
         agencyAddedFromPeReferenciel,
       ]);
     });
@@ -390,8 +460,15 @@ describe("PgAgencyRepository", () => {
 
   describe("getAgenciesRelatedToAgency", () => {
     it("found related agencies", async () => {
+      await userRepository.save(icUser);
       await agencyRepository.insert(agency1);
       await agencyRepository.insert(agencyWithRefersTo);
+      await inclusionConnectedUserRepository.updateAgencyRights({
+        userId: icUser.id,
+        agencyRights: [
+          { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+        ],
+      });
 
       expectToEqual(
         await agencyRepository.getAgenciesRelatedToAgency(agency1.id),
@@ -683,6 +760,60 @@ describe("PgAgencyRepository", () => {
         ...agency1,
         status: "rejected",
         rejectionJustification: "justification du rejet",
+      });
+    });
+
+    describe("validatorEmails", () => {
+      it("deletes link with icUser", async () => {
+        await userRepository.save(icUser);
+        await agencyRepository.insert(agency1);
+        await inclusionConnectedUserRepository.updateAgencyRights({
+          userId: icUser.id,
+          agencyRights: [
+            { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+          ],
+        });
+        expect(await agencyRepository.getAgencies({})).toHaveLength(1);
+        expect(
+          (await agencyRepository.getAgencies({})).at(0)?.validatorEmails,
+        ).toEqual([icUser.email, ...agency1.validatorEmails]);
+
+        await agencyRepository.update({
+          id: agency1.id,
+          validatorEmails: ["new-validator@email.fr"],
+          status: "rejected",
+          rejectionJustification: "justification du rejet",
+        });
+
+        expect(
+          (await agencyRepository.getAgencies({})).at(0)?.validatorEmails,
+        ).toEqual(["new-validator@email.fr"]);
+      });
+
+      it("keep link with icUser", async () => {
+        await userRepository.save(icUser);
+        await agencyRepository.insert(agency1);
+        await inclusionConnectedUserRepository.updateAgencyRights({
+          userId: icUser.id,
+          agencyRights: [
+            { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+          ],
+        });
+        expect(await agencyRepository.getAgencies({})).toHaveLength(1);
+        expect(
+          (await agencyRepository.getAgencies({})).at(0)?.validatorEmails,
+        ).toEqual([icUser.email, ...agency1.validatorEmails]);
+
+        await agencyRepository.update({
+          id: agency1.id,
+          validatorEmails: [icUser.email],
+          status: "rejected",
+          rejectionJustification: "justification du rejet",
+        });
+
+        expect(
+          (await agencyRepository.getAgencies({})).at(0)?.validatorEmails,
+        ).toEqual([icUser.email]);
       });
     });
   });
