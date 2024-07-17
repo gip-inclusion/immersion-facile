@@ -144,7 +144,15 @@ export class HttpInclusionConnectedGateway
         match(response)
           .with({ status: 200 }, () => undefined)
           .with({ status: 400 }, logBodyAndThrow)
-          .with({ status: 403 }, logBodyAndThrow)
+          .with({ status: 403 }, (response) => {
+            if ("errors" in response.body)
+              throw new Error(response.body.errors);
+
+            if ("error" in response.body) throw new Error(response.body.error);
+
+            const _unreachable: never = response.body;
+            logBodyAndThrow(response);
+          })
           .with({ status: 404 }, () => {
             throw new Error(
               "L'erreur sur la convention que vous cherchez à traiter n'existe pas, peut-être est-elle déjà marquée comme traitée. Rechargez la page pour mettre à jour le tableau.",
