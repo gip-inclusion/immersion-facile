@@ -124,4 +124,5 @@ LEFT JOIN establishments AS e ON e.siret = io.siret
 LEFT JOIN unique_establishments_contacts AS uec ON e.siret = uec.siret 
 LEFT JOIN establishments_contacts AS ec ON uec.uuid = ec.uuid
 LEFT JOIN establishment_locations_agg AS ela ON e.siret = ela.establishment_siret
+ORDER BY e.siret
 `;
