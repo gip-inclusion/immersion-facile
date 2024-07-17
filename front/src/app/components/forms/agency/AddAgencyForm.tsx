@@ -410,7 +410,7 @@ const hasDelegationOptions: RadioButtonsProps["options"] = [
       value: 1,
     },
     hintText:
-      "J'ai une délégation délivrée par France Travail, Mission Locale ou Cap Emploi",
+      "J'ai une délégation délivrée par un prescripteur de plein droit (France Travail, Mission Locale, Conseil départemental, Cap emploi...)",
   },
   {
     illustration: <img src={errorSvg} alt="" />,
