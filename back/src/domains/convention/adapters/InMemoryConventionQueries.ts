@@ -17,8 +17,8 @@ import { InMemoryNotificationRepository } from "../../core/notifications/adapter
 import {
   AssessmentEmailKind,
   ConventionQueries,
-  ConventionSortByDate,
-  GetConventionsByFiltersQueries,
+  GetConventionsFilters,
+  GetConventionsParams,
 } from "../ports/ConventionQueries";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
@@ -89,19 +89,17 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
   public getConventionsByFiltersCalled = 0;
 
-  public async getConventionsByFilters(
-    filters: GetConventionsByFiltersQueries,
-    sortByDate?: ConventionSortByDate,
+  public async getConventions(
+    params: GetConventionsParams,
   ): Promise<ConventionDto[]> {
     this.getConventionsByFiltersCalled++;
     const conventions = this.conventionRepository.conventions
-      .filter(makeApplyFiltersToConventions(filters))
+      .filter(makeApplyFiltersToConventions(params.filters))
       .map((convention) => this.#addAgencyDataToConvention(convention));
 
     return conventions.sort((previous, current) => {
-      const sort = sortByDate ?? "dateStart";
-      const previousDate = previous[sort];
-      const currentDate = current[sort];
+      const previousDate = previous[params.sortBy];
+      const currentDate = current[params.sortBy];
 
       if (!previousDate) return 1;
       if (!currentDate) return -1;
@@ -113,7 +111,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
   public async getConventionsByScope(params: {
     scope: ConventionScope;
     limit: number;
-    filters: GetConventionsByFiltersQueries;
+    filters: GetConventionsFilters;
   }): Promise<ConventionReadDto[]> {
     return this.conventionRepository.conventions
       .filter((convention) => {
@@ -212,7 +210,7 @@ const makeApplyFiltersToConventions =
     dateSubmissionEqual,
     dateSubmissionSince,
     withSirets,
-  }: GetConventionsByFiltersQueries) =>
+  }: GetConventionsFilters) =>
   (convention: ConventionDto) =>
     (
       [

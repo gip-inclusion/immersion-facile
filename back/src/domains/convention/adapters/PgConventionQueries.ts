@@ -20,8 +20,9 @@ import { createLogger } from "../../../utils/logger";
 import {
   AssessmentEmailKind,
   ConventionQueries,
-  ConventionSortByDate,
-  GetConventionsByFiltersQueries,
+  GetConventionsFilters,
+  GetConventionsParams,
+  GetConventionsSortBy,
 } from "../ports/ConventionQueries";
 import {
   createConventionQueryBuilder,
@@ -99,12 +100,12 @@ export class PgConventionQueries implements ConventionQueries {
     return getReadConventionById(this.transaction, id);
   }
 
-  public async getConventionsByFilters(
-    filters: GetConventionsByFiltersQueries,
-    sortByDate?: ConventionSortByDate,
-  ): Promise<ConventionDto[]> {
+  public async getConventions({
+    filters,
+    sortBy,
+  }: GetConventionsParams): Promise<ConventionDto[]> {
     const conventionsSortByDateToDatabaseConventionsOrderBy: Record<
-      ConventionSortByDate,
+      GetConventionsSortBy,
       keyof Pick<Database["conventions"], "date_start" | "date_validation">
     > = {
       dateStart: "date_start",
@@ -115,13 +116,12 @@ export class PgConventionQueries implements ConventionQueries {
       createConventionQueryBuilder(this.transaction),
       addFiltersToBuilder(filters),
       (builder) =>
-        builder.orderBy(
-          sortByDate === undefined
-            ? "conventions.date_start"
-            : `conventions.${conventionsSortByDateToDatabaseConventionsOrderBy[sortByDate]}`,
-          "desc",
-        ),
-      (builder) => builder.execute(),
+        builder
+          .orderBy(
+            `conventions.${conventionsSortByDateToDatabaseConventionsOrderBy[sortBy]}`,
+            "desc",
+          )
+          .execute(),
       andThen(validateConventionResults),
     );
   }
@@ -129,7 +129,7 @@ export class PgConventionQueries implements ConventionQueries {
   public async getConventionsByScope(params: {
     scope: ConventionScope;
     limit: number;
-    filters: GetConventionsByFiltersQueries;
+    filters: GetConventionsFilters;
   }): Promise<ConventionReadDto[]> {
     if (
       (params.scope.agencyIds && params.scope.agencyIds.length === 0) ||
@@ -192,7 +192,7 @@ const addFiltersToBuilder =
     dateSubmissionEqual,
     dateSubmissionSince,
     withSirets,
-  }: GetConventionsByFiltersQueries) =>
+  }: GetConventionsFilters) =>
   (builder: ConventionReadQueryBuilder) => {
     const addWithStatusFilterIfNeeded: AddToBuilder = (b) =>
       withStatuses && withStatuses.length > 0

@@ -39,14 +39,13 @@ export const makeUpdateMarketingEstablishmentContactList =
           siret,
         );
 
-      const validatedConventions =
-        await uow.conventionQueries.getConventionsByFilters(
-          {
-            withSirets: [siret],
-            withStatuses: ["ACCEPTED_BY_VALIDATOR"],
-          },
-          "dateValidation",
-        );
+      const validatedConventions = await uow.conventionQueries.getConventions({
+        filters: {
+          withSirets: [siret],
+          withStatuses: ["ACCEPTED_BY_VALIDATOR"],
+        },
+        sortBy: "dateValidation",
+      });
 
       return establishment
         ? onEstablishment(
