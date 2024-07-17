@@ -67,19 +67,28 @@ export class ConventionsReminder extends TransactionalUseCase<
       conventionsForAgencyReminders,
       conventionsForFirstSignatoryReminder,
     ] = await Promise.all([
-      uow.conventionQueries.getConventionsByFilters({
-        startDateGreater: now,
-        startDateLessOrEqual: addBusinessDays(now, TWO_DAYS),
-        withStatuses: signatoryStatuses,
+      uow.conventionQueries.getConventions({
+        filters: {
+          startDateGreater: now,
+          startDateLessOrEqual: addBusinessDays(now, TWO_DAYS),
+          withStatuses: signatoryStatuses,
+        },
+        sortBy: "dateStart",
       }),
-      uow.conventionQueries.getConventionsByFilters({
-        startDateGreater: now,
-        startDateLessOrEqual: addBusinessDays(now, THREE_DAYS),
-        withStatuses: agencyStatuses,
+      uow.conventionQueries.getConventions({
+        filters: {
+          startDateGreater: now,
+          startDateLessOrEqual: addBusinessDays(now, THREE_DAYS),
+          withStatuses: agencyStatuses,
+        },
+        sortBy: "dateStart",
       }),
-      uow.conventionQueries.getConventionsByFilters({
-        dateSubmissionEqual: subDays(now, TWO_DAYS),
-        withStatuses: [...signatoryStatuses],
+      uow.conventionQueries.getConventions({
+        filters: {
+          dateSubmissionEqual: subDays(now, TWO_DAYS),
+          withStatuses: [...signatoryStatuses],
+        },
+        sortBy: "dateStart",
       }),
     ]);
 

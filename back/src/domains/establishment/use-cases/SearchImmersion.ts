@@ -150,10 +150,13 @@ export class SearchImmersion extends TransactionalUseCase<
               },
               limit: MAX_DISCUSSIONS,
             }),
-            uow.conventionQueries.getConventionsByFilters({
-              withSirets: sirets,
-              withStatuses: ["ACCEPTED_BY_VALIDATOR"],
-              dateSubmissionSince: oneYearAgo,
+            uow.conventionQueries.getConventions({
+              filters: {
+                withSirets: sirets,
+                withStatuses: ["ACCEPTED_BY_VALIDATOR"],
+                dateSubmissionSince: oneYearAgo,
+              },
+              sortBy: "dateStart",
             }),
           ])
         : [[], []];

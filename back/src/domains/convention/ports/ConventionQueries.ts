@@ -10,7 +10,7 @@ import {
   TemplatedEmail,
 } from "shared";
 
-export type GetConventionsByFiltersQueries = {
+export type GetConventionsFilters = {
   startDateGreater?: Date;
   startDateLessOrEqual?: Date;
   dateSubmissionEqual?: Date;
@@ -25,31 +25,33 @@ export type AssessmentEmailKind = ExtractFromExisting<
   | "BENEFICIARY_ASSESSMENT_NOTIFICATION"
 >;
 
-export type ConventionSortByDate = keyof Pick<
+export type GetConventionsSortBy = keyof Pick<
   ConventionDto,
   "dateValidation" | "dateStart"
 >;
+
+export type GetConventionsParams = {
+  filters: GetConventionsFilters;
+  sortBy: GetConventionsSortBy;
+};
 
 export interface ConventionQueries {
   getConventionById: (
     id: ConventionId,
   ) => Promise<ConventionReadDto | undefined>;
+  findSimilarConventions(
+    params: FindSimilarConventionsParams,
+  ): Promise<ConventionId[]>;
+
+  // TODO: a voir si on veut pas à terme unifier en une seule query les 3 queries si dessous
+  getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;
   getAllConventionsForThoseEndingThatDidntGoThrough: (
     dateEnd: Date,
     assessmentEmailKind: AssessmentEmailKind,
   ) => Promise<ConventionDto[]>;
-
-  getConventionsByFilters(
-    filters: GetConventionsByFiltersQueries,
-    sortByDate?: ConventionSortByDate,
-  ): Promise<ConventionDto[]>;
-
   getConventionsByScope(params: {
     scope: ConventionScope;
     limit: number;
-    filters: GetConventionsByFiltersQueries;
+    filters: GetConventionsFilters;
   }): Promise<ConventionReadDto[]>;
-  findSimilarConventions(
-    params: FindSimilarConventionsParams,
-  ): Promise<ConventionId[]>;
 }

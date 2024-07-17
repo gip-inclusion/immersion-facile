@@ -1,6 +1,6 @@
 import { ConventionStatus, conventionStatuses } from "shared";
 import { z } from "zod";
-import { GetConventionsByFiltersQueries } from "../../../../../../domains/convention/ports/ConventionQueries";
+import { GetConventionsFilters } from "../../../../../../domains/convention/ports/ConventionQueries";
 
 export type GetConventionsByFiltersQueryParamsV2 = {
   startDateGreater?: Date;
@@ -16,4 +16,4 @@ export const getConventionsByFiltersQueryParamsV2Schema = z.object({
 
 export const getConventionsByFiltersV2ToDomain = (
   paramsV2: GetConventionsByFiltersQueryParamsV2,
-): GetConventionsByFiltersQueries => paramsV2;
+): GetConventionsFilters => paramsV2;

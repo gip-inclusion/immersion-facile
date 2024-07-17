@@ -3,12 +3,12 @@ import { z } from "zod";
 import { ForbiddenError } from "../../../config/helpers/httpErrors";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { GetConventionsByFiltersQueries } from "../ports/ConventionQueries";
+import { GetConventionsFilters } from "../ports/ConventionQueries";
 
 const MAX_CONVENTIONS_RETURNED = 100;
 
 export class GetConventionsForApiConsumer extends TransactionalUseCase<
-  GetConventionsByFiltersQueries,
+  GetConventionsFilters,
   ConventionReadDto[],
   ApiConsumer
 > {
@@ -19,7 +19,7 @@ export class GetConventionsForApiConsumer extends TransactionalUseCase<
   });
 
   protected async _execute(
-    filters: GetConventionsByFiltersQueries,
+    filters: GetConventionsFilters,
     uow: UnitOfWork,
     apiConsumer?: ApiConsumer,
   ): Promise<ConventionReadDto[]> {
