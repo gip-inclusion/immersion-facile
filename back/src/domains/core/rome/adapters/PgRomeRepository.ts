@@ -148,11 +148,13 @@ const convertRowToAppellationDto = (
 const toTsQuery = (query: string): string => query.split(/\s+/).join(" & ");
 
 const prepareQueryParams = (query: string): [string, string] => {
-  const queryWords = query.split(/\s+/);
-  const lastWord = removeAccentAndParentheses(
+  const queryWords = removeInvalidInitialOrFinalCharaters(query)
+    .trim()
+    .split(/\s+/);
+  const lastWord = removeAccentAndSpecialCharacters(
     queryWords[queryWords.length - 1],
   );
-  const queryBeginning = removeAccentAndParentheses(
+  const queryBeginning = removeAccentAndSpecialCharacters(
     queryWords.length === 1
       ? queryWords.join(" ")
       : queryWords.slice(0, queryWords.length - 1).join(" "),
@@ -161,5 +163,23 @@ const prepareQueryParams = (query: string): [string, string] => {
   return [queryBeginning, lastWord];
 };
 
-const removeAccentAndParentheses = (str: string) =>
-  removeDiacritics(str).replace(/[()]/g, "");
+const removeAccentAndSpecialCharacters = (str: string) =>
+  removeDiacritics(str).replace(/[():]/g, "").replace(/[\&]/g, " ").trim();
+
+const removeInvalidInitialCharacters = (str: string): string => {
+  const firstCharacter = str.charAt(0);
+  if (["'"].includes(firstCharacter))
+    return removeInvalidInitialCharacters(str.slice(1));
+  return str;
+};
+
+const removeInvalidFinalCharacters = (str: string): string => {
+  const lastCharacter = str.charAt(str.length - 1);
+  if (["'"].includes(lastCharacter))
+    return removeInvalidFinalCharacters(str.slice(0, str.length - 1));
+  return str;
+};
+
+const removeInvalidInitialOrFinalCharaters = (str: string): string => {
+  return removeInvalidInitialCharacters(removeInvalidFinalCharacters(str));
+};
