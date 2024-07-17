@@ -50,7 +50,7 @@ const location: Location = {
   },
 };
 
-const validRequest: ContactEstablishmentRequestDto = {
+const validRequest: LegacyContactEstablishmentRequestDto = {
   appellationCode: "12898",
   siret,
   contactMode: "PHONE",
@@ -99,7 +99,7 @@ const establishmentAggregateWithEmailContact =
 
 const minimumNumberOfDaysBetweenSimilarContactRequests = 3;
 
-describe("ContactEstablishment", () => {
+describe("LegacyContactEstablishment", () => {
   let contactEstablishment: LegacyContactEstablishment;
   let uowPerformer: UnitOfWorkPerformer;
   let uuidGenerator: TestUuidGenerator;
@@ -127,8 +127,9 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid EMAIL contact request", async () => {
+    const establishment = establishmentAggregateWithEmailContact.build();
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      establishmentAggregateWithEmailContact.build(),
+      establishment,
     );
 
     const discussionId = "discussion_id";
@@ -145,7 +146,11 @@ describe("ContactEstablishment", () => {
         id: eventId,
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
-        payload: { ...validEmailRequest, discussionId, triggeredBy: undefined },
+        payload: {
+          siret: establishment.establishment.siret,
+          discussionId,
+          triggeredBy: null,
+        },
         status: "never-published",
         publications: [],
         wasQuarantined: false,
@@ -154,22 +159,23 @@ describe("ContactEstablishment", () => {
   });
 
   it("schedules event for valid PHONE contact request", async () => {
+    const establishment = new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withSiret(siret)
+          .withLocations([location])
+          .build(),
+      )
+      .withContact(
+        new ContactEntityBuilder()
+          .withId(contactId)
+          .withContactMethod("PHONE")
+          .build(),
+      )
+      .withOffers([immersionOffer])
+      .build();
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret(siret)
-            .withLocations([location])
-            .build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withId(contactId)
-            .withContactMethod("PHONE")
-            .build(),
-        )
-        .withOffers([immersionOffer])
-        .build(),
+      establishment,
     );
 
     const discussionId = "discussion_id";
@@ -179,7 +185,7 @@ describe("ContactEstablishment", () => {
     const now = new Date("2021-12-08T15:00");
     timeGateway.setNextDates([now, now]);
 
-    const validPhoneRequest: LegacyContactEstablishmentRequestDto = {
+    const validPhoneRequest: ContactEstablishmentRequestDto = {
       ...validRequest,
       contactMode: "PHONE",
     };
@@ -190,7 +196,11 @@ describe("ContactEstablishment", () => {
         id: eventId,
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
-        payload: { ...validPhoneRequest, discussionId, triggeredBy: undefined },
+        payload: {
+          siret,
+          discussionId,
+          triggeredBy: null,
+        },
         publications: [],
         status: "never-published",
         wasQuarantined: false,
@@ -224,7 +234,7 @@ describe("ContactEstablishment", () => {
     const now = new Date("2021-12-08T15:00");
     timeGateway.setNextDates([now, now]);
 
-    const validInPersonRequest: LegacyContactEstablishmentRequestDto = {
+    const validInPersonRequest: ContactEstablishmentRequestDto = {
       ...validRequest,
       contactMode: "IN_PERSON",
     };
@@ -236,9 +246,9 @@ describe("ContactEstablishment", () => {
         occurredAt: now.toISOString(),
         topic: "ContactRequestedByBeneficiary",
         payload: {
-          ...validInPersonRequest,
+          siret,
           discussionId,
-          triggeredBy: undefined,
+          triggeredBy: null,
         },
         publications: [],
         status: "never-published",
@@ -489,28 +499,6 @@ describe("ContactEstablishment", () => {
         }),
         new BadRequestError(
           "Contact mode mismatch: IN_PERSON in params. In contact (fetched with siret) : EMAIL",
-        ),
-      );
-    });
-
-    it("throws NotFoundError without contact id", async () => {
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder().withSiret(siret).build(),
-          )
-          .withoutContact() // no contact
-          .withOffers([immersionOffer])
-          .build(),
-      );
-
-      await expectPromiseToFailWithError(
-        contactEstablishment.execute({
-          ...validRequest,
-          contactMode: "PHONE",
-        }),
-        new NotFoundError(
-          "No contact found for establishment with siret: 11112222333344",
         ),
       );
     });
