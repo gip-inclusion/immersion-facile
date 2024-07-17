@@ -11,6 +11,7 @@ import {
 import { createLogger } from "../../../../utils/logger";
 import { isConventionInScope } from "../../../convention/entities/Convention";
 import { TransactionalUseCase } from "../../UseCase";
+import { broadcastToPartnersServiceName } from "../../saved-errors/ports/SavedErrorRepository";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
@@ -128,7 +129,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
             conventionStatus: response.conventionStatus,
             httpStatus: response.status,
           },
-          serviceName: "BroadcastToPartnersOnConventionUpdates",
+          serviceName: broadcastToPartnersServiceName,
         });
 
         return;

@@ -128,14 +128,12 @@ export const errors = {
   // },
   broadcastFeedback: {
     notFound: ({
-      serviceName,
       conventionId,
     }: {
-      serviceName: string;
       conventionId: ConventionId;
     }) =>
       new NotFoundError(
-        `There's no ${serviceName} unhandled errors for convention id '${conventionId}'.`,
+        `There's no unhandled errors for convention id '${conventionId}'.`,
       ),
   },
 };

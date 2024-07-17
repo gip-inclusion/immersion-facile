@@ -5,7 +5,6 @@ import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import {
   SavedError,
   SavedErrorRepository,
-  broadcastToPeServiceName,
 } from "../ports/SavedErrorRepository";
 
 export class PgSavedErrorRepository implements SavedErrorRepository {
@@ -18,13 +17,11 @@ export class PgSavedErrorRepository implements SavedErrorRepository {
       .updateTable("saved_errors")
       .set({ handled_by_agency: true })
       .where(sql`(params ->> 'conventionId')`, "=", conventionId)
-      .where("service_name", "=", broadcastToPeServiceName)
       .where("handled_by_agency", "=", false)
       .executeTakeFirst();
 
     if (Number(result.numUpdatedRows) === 0)
       throw errors.broadcastFeedback.notFound({
-        serviceName: broadcastToPeServiceName,
         conventionId,
       });
   }

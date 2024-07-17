@@ -3,7 +3,6 @@ import { NotFoundError } from "shared";
 import {
   SavedError,
   SavedErrorRepository,
-  broadcastToPeServiceName,
 } from "../ports/SavedErrorRepository";
 
 export class InMemorySavedErrorRepository implements SavedErrorRepository {
@@ -20,7 +19,7 @@ export class InMemorySavedErrorRepository implements SavedErrorRepository {
 
     if (!hasConventionErrorToMarkAsHandled)
       throw new NotFoundError(
-        `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId}'.`,
+        `There's no unhandled errors for convention id '${conventionId}'.`,
       );
 
     this.#savedErrors = this.#savedErrors.map((savedError) => {
@@ -47,5 +46,4 @@ const isUnhandledSavedErrorForConvention = (
   savedError.params &&
   "conventionId" in savedError.params &&
   savedError.params.conventionId === conventionId &&
-  savedError.serviceName === broadcastToPeServiceName &&
   savedError.handledByAgency === false;
