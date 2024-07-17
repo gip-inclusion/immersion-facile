@@ -161,7 +161,7 @@ export const getDepartmentCodeFromDepartmentNameOrCity: Record<
 
 export class LocationBuilder implements Builder<Location> {
   constructor(
-    private readonly dto: Location = {
+    dto: Location = {
       address: {
         city: "Cergy",
         departmentCode: "95",
