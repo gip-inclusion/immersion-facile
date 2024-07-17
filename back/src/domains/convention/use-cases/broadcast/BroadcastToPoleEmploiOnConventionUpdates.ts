@@ -72,7 +72,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       prenom: beneficiary.firstName,
       nom: beneficiary.lastName,
       dateNaissance: new Date(
-        convention.signatories.beneficiary.birthdate,
+        `${convention.signatories.beneficiary.birthdate}T00:00:00`,
       ).toISOString(),
       dateDemande: new Date(convention.dateSubmission).toISOString(),
       dateDebut: new Date(convention.dateStart).toISOString(),
