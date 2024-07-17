@@ -1,3 +1,4 @@
+import { fromZonedTime } from "date-fns-tz";
 import {
   ImmersionObjective,
   WithConventionDto,
@@ -71,8 +72,9 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       telephone: beneficiary.phone,
       prenom: beneficiary.firstName,
       nom: beneficiary.lastName,
-      dateNaissance: new Date(
+      dateNaissance: fromZonedTime(
         `${convention.signatories.beneficiary.birthdate}T00:00:00`,
+        "Europe/Paris",
       ).toISOString(),
       dateDemande: new Date(convention.dateSubmission).toISOString(),
       dateDebut: new Date(convention.dateStart).toISOString(),
