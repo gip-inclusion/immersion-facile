@@ -1,13 +1,13 @@
 import { SiretDto } from "shared";
 import {
-  DeletedEstablishementDto,
+  DeletedEstablishmentDto,
   DeletedEstablishmentRepository,
 } from "../ports/DeletedEstablishmentRepository";
 
 export class InMemoryDeletedEstablishmentRepository
   implements DeletedEstablishmentRepository
 {
-  #deletedEstablishments: DeletedEstablishementDto[] = [];
+  #deletedEstablishments: DeletedEstablishmentDto[] = [];
 
   public async areSiretsDeleted(
     siretsToCheck: SiretDto[],
@@ -27,12 +27,12 @@ export class InMemoryDeletedEstablishmentRepository
     return this.#deletedEstablishments;
   }
 
-  public set deletedEstablishments(deletedEstablishments: DeletedEstablishementDto[]) {
+  public set deletedEstablishments(deletedEstablishments: DeletedEstablishmentDto[]) {
     this.#deletedEstablishments = deletedEstablishments;
   }
 
   public async save(
-    deletedEstablishment: DeletedEstablishementDto,
+    deletedEstablishment: DeletedEstablishmentDto,
   ): Promise<void> {
     this.#deletedEstablishments.push(deletedEstablishment);
   }

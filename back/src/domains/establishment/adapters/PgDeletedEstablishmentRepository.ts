@@ -1,7 +1,7 @@
 import { SiretDto } from "shared";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import {
-  DeletedEstablishementDto,
+  DeletedEstablishmentDto,
   DeletedEstablishmentRepository,
 } from "../ports/DeletedEstablishmentRepository";
 
@@ -36,7 +36,7 @@ export class PgDeletedEstablishmentRepository
   }
 
   public async save(
-    deleteEstablishment: DeletedEstablishementDto,
+    deleteEstablishment: DeletedEstablishmentDto,
   ): Promise<void> {
     await this.#transaction
       .insertInto("establishments_deleted")

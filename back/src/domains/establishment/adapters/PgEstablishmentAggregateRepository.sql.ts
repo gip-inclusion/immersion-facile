@@ -60,7 +60,7 @@ FROM establishments_locations
 GROUP BY establishment_siret
 `;
 
-const selectAggragate = `
+const selectJsonAggregate = `
 SELECT 
   JSON_STRIP_NULLS(
     JSON_BUILD_OBJECT(
@@ -118,7 +118,7 @@ WITH
   unique_establishments_contacts AS (${uniqueEstablishmentContacts(mode)}), 
   filtered_immersion_offers AS (${filteredImmersionOffertSubQuery(mode)}),
   establishment_locations_agg AS (${withEstablishmentLocationsSubQuery})
-${selectAggragate}
+${selectJsonAggregate}
 FROM filtered_immersion_offers AS io 
 LEFT JOIN establishments AS e ON e.siret = io.siret 
 LEFT JOIN unique_establishments_contacts AS uec ON e.siret = uec.siret 
