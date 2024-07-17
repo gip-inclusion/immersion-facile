@@ -41,7 +41,7 @@ import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
 import {
   establishmentByFilters,
   withEstablishmentLocationsSubQuery,
-} from "./PgEstablishmentRepository.sql";
+} from "./PgEstablishmentAggregateRepository.sql";
 
 const logger = createLogger(__filename);
 

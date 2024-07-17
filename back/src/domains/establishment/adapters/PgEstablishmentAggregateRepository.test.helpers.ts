@@ -129,11 +129,11 @@ export const insertEstablishmentAggregate = async (
 };
 
 export const makeExpectedSearchResult = ({
-  establishement,
+  establishment,
   withOffers,
   withLocationAndDistance,
 }: {
-  establishement: EstablishmentAggregate;
+  establishment: EstablishmentAggregate;
   withOffers: OfferEntity[];
   withLocationAndDistance: Location & { distance: number };
 }): SearchResultDto => {
@@ -143,7 +143,7 @@ export const makeExpectedSearchResult = ({
       "At least one offer is required to make an expected SearchResult",
     );
   return {
-    additionalInformation: establishement.establishment.additionalInformation,
+    additionalInformation: establishment.establishment.additionalInformation,
     address: withLocationAndDistance.address,
     appellations: withOffers.map(
       ({ appellationCode, appellationLabel, score }) => ({
@@ -152,26 +152,26 @@ export const makeExpectedSearchResult = ({
         score,
       }),
     ),
-    contactMode: establishement.contact?.contactMethod,
-    customizedName: establishement.establishment.customizedName,
+    contactMode: establishment.contact?.contactMethod,
+    customizedName: establishment.establishment.customizedName,
     distance_m: withLocationAndDistance.distance,
-    fitForDisabledWorkers: establishement.establishment.fitForDisabledWorkers,
+    fitForDisabledWorkers: establishment.establishment.fitForDisabledWorkers,
     locationId: withLocationAndDistance.id,
-    naf: establishement.establishment.nafDto.code,
+    naf: establishment.establishment.nafDto.code,
     nafLabel: "Activités des agences de travail temporaire",
-    name: establishement.establishment.name,
-    numberOfEmployeeRange: establishement.establishment.numberEmployeesRange,
+    name: establishment.establishment.name,
+    numberOfEmployeeRange: establishment.establishment.numberEmployeesRange,
     position: withLocationAndDistance.position,
     rome: firstOffer.romeCode,
     romeLabel: firstOffer.romeLabel,
-    siret: establishement.establishment.siret,
-    voluntaryToImmersion: establishement.establishment.voluntaryToImmersion,
-    website: establishement.establishment.website,
+    siret: establishment.establishment.siret,
+    voluntaryToImmersion: establishment.establishment.voluntaryToImmersion,
+    website: establishment.establishment.website,
     isSearchable: true, // <<<<< Donnée renvoyée actuellement ?!
   } as SearchResultDto; // d'où le as
 };
 
-export const sortSearchResultsByDistanceAndRomeAndSiret = (
+export const sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults = (
   a: SearchResultDto,
   b: SearchResultDto,
 ): number => {

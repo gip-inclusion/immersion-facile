@@ -3,7 +3,7 @@ import { expectToEqual } from "shared";
 import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
-import { DeletedEstablishementDto } from "../ports/DeletedEstablishmentRepository";
+import { DeletedEstablishmentDto } from "../ports/DeletedEstablishmentRepository";
 import { PgDeletedEstablishmentRepository } from "./PgDeletedEstablishmentRepository";
 
 describe("PgDeletedEstablishmentRepository", () => {
@@ -30,7 +30,7 @@ describe("PgDeletedEstablishmentRepository", () => {
 
   it("save", async () => {
     const establishment = new EstablishmentAggregateBuilder().build();
-    const deletedEstablishment: DeletedEstablishementDto = {
+    const deletedEstablishment: DeletedEstablishmentDto = {
       siret: establishment.establishment.siret,
       createdAt: new Date(),
       deletedAt: new Date(),
@@ -66,7 +66,7 @@ describe("PgDeletedEstablishmentRepository", () => {
       },
     );
 
-    const deletedEstablishmentBis: DeletedEstablishementDto = {
+    const deletedEstablishmentBis: DeletedEstablishmentDto = {
       siret: establishment.establishment.siret,
       createdAt: new Date(),
       deletedAt: new Date(),
