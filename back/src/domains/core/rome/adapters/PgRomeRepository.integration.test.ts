@@ -129,7 +129,7 @@ describe("Postgres implementation of Rome Gateway", () => {
 
     it("Correctly handles search queries with several words and should be accent insensitive", async () => {
       expectToEqual(
-        await pgRomeRepository.searchAppellation("pret-a-porter enfant"),
+        await pgRomeRepository.searchAppellation("prêt-a-porter enfant"),
         [
           {
             appellationCode: "20614",
@@ -139,6 +139,81 @@ describe("Postgres implementation of Rome Gateway", () => {
           },
         ],
       );
+    });
+
+    it("should handle correctly special characters", async () => {
+      expectToEqual(await pgRomeRepository.searchAppellation("produit d'ass"), [
+        {
+          appellationCode: "12338",
+          appellationLabel: "Chef de segment produits d'assurances",
+          romeCode: "C1101",
+          romeLabel: "Conception - développement produits d'assurances",
+        },
+        {
+          appellationCode: "12823",
+          appellationLabel:
+            "Concepteur développeur / Conceptrice développeuse de produits d'assurances",
+          romeCode: "C1101",
+          romeLabel: "Conception - développement produits d'assurances",
+        },
+      ]);
+
+      expectToEqual(
+        await pgRomeRepository.searchAppellation("musicothérap:eute"),
+        [
+          {
+            appellationCode: "16942",
+            appellationLabel: "Musicothérapeute",
+            romeCode: "K1104",
+            romeLabel: "Psychologie",
+          },
+        ],
+      );
+
+      expectToEqual(
+        await pgRomeRepository.searchAppellation("'musicothérapeute"),
+        [
+          {
+            appellationCode: "16942",
+            appellationLabel: "Musicothérapeute",
+            romeCode: "K1104",
+            romeLabel: "Psychologie",
+          },
+        ],
+      );
+
+      expectToEqual(
+        await pgRomeRepository.searchAppellation("''''musicothérapeute"),
+        [
+          {
+            appellationCode: "16942",
+            appellationLabel: "Musicothérapeute",
+            romeCode: "K1104",
+            romeLabel: "Psychologie",
+          },
+        ],
+      );
+
+      expectToEqual(
+        await pgRomeRepository.searchAppellation("musicothérapeute''''"),
+        [
+          {
+            appellationCode: "16942",
+            appellationLabel: "Musicothérapeute",
+            romeCode: "K1104",
+            romeLabel: "Psychologie",
+          },
+        ],
+      );
+
+      expectToEqual(await pgRomeRepository.searchAppellation("musicoth&"), [
+        {
+          appellationCode: "16942",
+          appellationLabel: "Musicothérapeute",
+          romeCode: "K1104",
+          romeLabel: "Psychologie",
+        },
+      ]);
     });
   });
 });
