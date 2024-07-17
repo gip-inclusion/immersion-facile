@@ -96,6 +96,7 @@ jobs:
       NODE_ENV: test
       DATABASE_URL: postgresql://immersion:password@localhost:5432/immersion-db
       NOTIFICATION_GATEWAY: IN_MEMORY
+      ESTABLISHMENT_MARKETING_GATEWAY: IN_MEMORY
       ADDRESS_API_GATEWAY: OPEN_CAGE_DATA
       IC_USERNAME: ${{ secrets.IC_USERNAME }}
       IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
