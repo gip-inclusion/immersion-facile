@@ -17,8 +17,8 @@ import {
 import { ForbiddenError, NotFoundError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
-import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/httpErrors";
 import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";
+import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/validateAndParseZodSchema";
 import { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { createLogger } from "../../../../utils/logger";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";

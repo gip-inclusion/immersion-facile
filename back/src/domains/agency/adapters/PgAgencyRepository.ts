@@ -19,7 +19,7 @@ import {
 } from "shared";
 import { ConflictError } from "shared";
 import { z } from "zod";
-import { validateAndParseZodSchema } from "../../../config/helpers/httpErrors";
+import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
 import {
   KyselyDb,
   cast,

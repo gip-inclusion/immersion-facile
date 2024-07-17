@@ -13,7 +13,7 @@ export const validateAndParseZodSchema = <T>(
     schemaParsingInput,
     message: `ValidateAndParseZodSchema failed - ${inputSchema.constructor.name}`,
   });
-  throw new BadRequestError(result.error as any);
+  throw new BadRequestError(result.error);
 };
 
 export const validateAndParseZodSchemaV2 = <T>(

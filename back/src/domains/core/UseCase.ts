@@ -5,9 +5,8 @@ import {
   calculateDurationInSecondsFrom,
   castError,
 } from "shared";
-import { BadRequestError } from "shared";
 import { z } from "zod";
-import { validateAndParseZodSchema } from "../../config/helpers/httpErrors";
+import { validateAndParseZodSchema } from "../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";
@@ -106,18 +105,13 @@ export abstract class UseCase<
   ): Promise<Output> {
     const startDate = new Date();
     const useCaseName = this.constructor.name;
-    let validParams: Input;
-    try {
-      validParams = validateAndParseZodSchema(
-        this.inputSchema,
-        params,
-        logger as Logger,
-      );
-    } catch (e) {
-      //TODO: Quelque chose ne va pas. Ici ça reviens à faire:
-      // throw new BadRequestError(new BadRequestError(new ZodError(...)))
-      throw new BadRequestError(e as any);
-    }
+
+    const validParams = validateAndParseZodSchema(
+      this.inputSchema,
+      params,
+      logger as Logger,
+    );
+
     const result = await this._execute(validParams, jwtPayload);
     const durationInSeconds = calculateDurationInSecondsFrom(startDate);
     logger.info({

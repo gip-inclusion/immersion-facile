@@ -21,9 +21,7 @@ export const handleHttpJsonResponseError = (
 ): Response<any, Record<string, any>> => {
   Sentry.captureException(error);
   return error instanceof HttpError
-    ? res
-        .status(error.httpCode)
-        .json({ errors: toValidJSONObjectOrString(error) })
+    ? res.status(error.httpCode).json({ errors: error.message })
     : onNotHttpError(error, req, res);
 };
 
@@ -35,7 +33,7 @@ export const handleHttpJsonResponseErrorForApiV2 = (
   error instanceof HttpError
     ? res.status(error.httpCode).json({
         ...(error.issues ? { issues: error.issues } : {}),
-        message: toValidJSONObjectOrString(error),
+        message: error.message,
         status: error.httpCode,
       })
     : onNotHttpError(error, req, res);
@@ -87,7 +85,7 @@ const onNotHttpError = (error: any, req: Request, res: Response) => {
         });
   }
 
-  return res.status(500).json({ errors: toValidJSONObjectOrString(error) });
+  return res.status(500).json({ errors: error.message });
 };
 
 const logErrorAndNotifyDiscord = (
@@ -107,14 +105,4 @@ const logErrorAndNotifyDiscord = (
 
   logger.error(params);
   notifyObjectDiscord(params);
-};
-
-const toValidJSONObjectOrString = (
-  error: any,
-): string | { [key: string]: string } => {
-  try {
-    return JSON.parse(error.message);
-  } catch (_) {
-    return error.message;
-  }
 };
