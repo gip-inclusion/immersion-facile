@@ -20,7 +20,7 @@ import {
   OfferEntityBuilder,
 } from "../domains/establishment/helpers/EstablishmentBuilders";
 import { establishmentAggregateToFormEstablishement } from "../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
-import { getRandomAgencyId, insertAgencySeed, seedUsers } from "./seed.helpers";
+import { seedHelpers } from "./seed.helpers";
 
 /* eslint-disable no-console */
 const seed = async () => {
@@ -72,7 +72,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom IcUser")
     .withLastName("Nom IcUser")
-    .withId(seedUsers.icUsers[0].id)
+    .withId(seedHelpers.seedUsers.icUsers[0].id)
     .withExternalId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
     .build();
 
@@ -82,7 +82,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom Admin")
     .withLastName("Nom Admin")
-    .withId(seedUsers.admins[0].id)
+    .withId(seedHelpers.seedUsers.admins[0].id)
     .withExternalId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
     .build();
 
@@ -138,15 +138,15 @@ const agencySeed = async (uow: UnitOfWork) => {
 
   const insertQueries = [...Array(agenciesCountByKind).keys()].flatMap(() => {
     return [
-      insertAgencySeed({ uow, kind: "pole-emploi" }),
-      insertAgencySeed({ uow, kind: "cci" }),
-      insertAgencySeed({ uow, kind: "mission-locale" }),
-      insertAgencySeed({ uow, kind: "cap-emploi" }),
-      insertAgencySeed({ uow, kind: "conseil-departemental" }),
-      insertAgencySeed({ uow, kind: "prepa-apprentissage" }),
-      insertAgencySeed({ uow, kind: "structure-IAE" }),
-      insertAgencySeed({ uow, kind: "autre" }),
-      insertAgencySeed({ uow, kind: "operateur-cep" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "pole-emploi" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "cci" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "mission-locale" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "cap-emploi" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "conseil-departemental" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "prepa-apprentissage" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "structure-IAE" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "autre" }),
+      seedHelpers.insertAgencySeed({ uow, kind: "operateur-cep" }),
     ];
   });
 
@@ -304,7 +304,7 @@ const conventionSeed = async (uow: UnitOfWork) => {
     .withDateStart(new Date("2023-03-27").toISOString())
     .withDateEnd(new Date("2023-03-28").toISOString())
     .withStatus("READY_TO_SIGN")
-    .withAgencyId(getRandomAgencyId({ kind: "pole-emploi" }))
+    .withAgencyId(seedHelpers.getRandomAgencyId({ kind: "pole-emploi" }))
     .withSchedule(reasonableSchedule)
     .build();
 
@@ -316,7 +316,7 @@ const conventionSeed = async (uow: UnitOfWork) => {
     .withDateStart(new Date("2023-05-01").toISOString())
     .withDateEnd(new Date("2023-05-03").toISOString())
     .withStatus("READY_TO_SIGN")
-    .withAgencyId(getRandomAgencyId({ kind: "cci" }))
+    .withAgencyId(seedHelpers.getRandomAgencyId({ kind: "cci" }))
     .withSchedule(reasonableSchedule)
     .build();
 

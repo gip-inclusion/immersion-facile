@@ -27,18 +27,15 @@ let agencyIds: Record<AgencyKind, AgencyId[]> = {
   "operateur-cep": [],
 };
 
-export const getRandomAddress = (): AddressDto =>
+const getRandomAddress = (): AddressDto =>
   seedAddresses[Math.floor(Math.random() * seedAddresses.length)];
 
-export const getRandomAgencyId = ({ kind }: { kind: AgencyKind }) => {
+const getRandomAgencyId = ({ kind }: { kind: AgencyKind }) => {
   const ids = agencyIds[kind];
   return ids[Math.floor(Math.random() * ids.length)];
 };
 
-export const seedUsers: Record<
-  "admins" | "icUsers" | "notIcUsers",
-  SeedUser[]
-> = {
+const seedUsers: Record<"admins" | "icUsers" | "notIcUsers", SeedUser[]> = {
   admins: [
     {
       id: new UuidV4Generator().new(),
@@ -68,7 +65,7 @@ const getRandomNotIcUserEmail = (): string => {
   return emails[Math.floor(Math.random() * emails.length)];
 };
 
-export const insertAgencySeed = async ({
+const insertAgencySeed = async ({
   uow,
   kind,
 }: { uow: UnitOfWork; kind: AgencyKind }): Promise<void> => {
@@ -92,4 +89,10 @@ export const insertAgencySeed = async ({
     ...agencyIds,
     [kind]: [...agencyIds[kind], agencyId],
   };
+};
+
+export const seedHelpers = {
+  seedUsers,
+  getRandomAgencyId,
+  insertAgencySeed,
 };
