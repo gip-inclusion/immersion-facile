@@ -1,3 +1,4 @@
+import { Kysely } from "kysely";
 import {
   ConventionDtoBuilder,
   DiscussionBuilder,
@@ -11,6 +12,7 @@ import {
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createAppDependencies } from "../config/bootstrap/createAppDependencies";
 import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { Database } from "../config/pg/kysely/model/database";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
@@ -33,8 +35,25 @@ const seed = async () => {
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("Reset Db start");
-  await client.query("DELETE FROM feature_flags");
 
+  await resetDb(db);
+
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("Reset Db end");
+
+  await inclusionConnectUserSeed(db);
+  await deps.uowPerformer.perform(async (uow) => {
+    await featureFlagsSeed(uow);
+    await agencySeed(uow);
+    await establishmentSeed(uow);
+    await conventionSeed(uow);
+  });
+
+  client.release();
+  await pool.end();
+};
+
+const resetDb = async (db: Kysely<Database>) => {
   await db.deleteFrom("users_ongoing_oauths").execute();
   await db.deleteFrom("users__agencies").execute();
   await db.deleteFrom("users").execute();
@@ -48,24 +67,12 @@ const seed = async () => {
   await db.deleteFrom("establishments").execute();
   await db.deleteFrom("groups").execute();
   await db.deleteFrom("feature_flags").execute();
-
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("Reset Db end");
-
-  await inclusionConnectUserSeed(db);
-
-  await deps.uowPerformer.perform(async (uow) => {
-    await featureFlagsSeed(uow);
-    await agencySeed(uow);
-    await establishmentSeed(uow);
-    await conventionSeed(uow);
-  });
-
-  client.release();
-  await pool.end();
 };
 
 const inclusionConnectUserSeed = async (db: KyselyDb) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("seeding inclusion connected users...");
+
   const icUser = new InclusionConnectedUserBuilder()
     .withIsAdmin(false)
     .withCreatedAt(new Date("2024-04-29"))
@@ -106,6 +113,9 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
       user_id: adminUser.id,
     })
     .execute();
+
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("done");
 };
 
 const featureFlagsSeed = async (uow: UnitOfWork) => {
