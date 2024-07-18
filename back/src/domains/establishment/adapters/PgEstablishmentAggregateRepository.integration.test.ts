@@ -1007,29 +1007,18 @@ describe("PgEstablishmentAggregateRepository", () => {
           );
         });
         it("should throw if only one of the geo params is provided (lat/lon/distanceKm)", async () => {
-          const establishmentAggregate = new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret("78000403200029")
-            .withContactId("11111111-1111-4444-1111-111111110001")
-            .withOffers([cuvisteOffer, artisteCirqueOffer])
-            .withLocations([bassompierreSaintesLocation, veauxLocation])
-            .build();
-
-          // Prepare
-          await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-            establishmentAggregate,
-          );
-
-          // Act
-          const searchResults: SearchResultDto[] =
-            await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: {
-                sortedBy: "date",
-              },
-            });
-          const readableResults = searchResults.map(toReadableSearchResult);
-
           // Assert
-          expect(readableResults).toHaveLength(4);
+          await expectPromiseToFailWithError(
+            pgEstablishmentAggregateRepository.searchImmersionResults({
+              searchMade: {
+                sortedBy: "distance",
+                lat: 45,
+              },
+            }),
+            new BadRequestError(
+              "Cannot search by distance with invalid geo params",
+            ),
+          );
         });
         it("should throw if all geo params value is 0 and sorted by distance", async () => {
           // Assert
@@ -1040,6 +1029,23 @@ describe("PgEstablishmentAggregateRepository", () => {
                 lat: 0,
                 lon: 0,
                 distanceKm: 0,
+              },
+            }),
+            new BadRequestError(
+              "Cannot search by distance with invalid geo params",
+            ),
+          );
+        });
+
+        it("should throw if all geo params value is 0 but distanceKm > 0 and sorted by distance", async () => {
+          // Assert
+          await expectPromiseToFailWithError(
+            pgEstablishmentAggregateRepository.searchImmersionResults({
+              searchMade: {
+                sortedBy: "distance",
+                lat: 0,
+                lon: 0,
+                distanceKm: 10,
               },
             }),
             new BadRequestError(
