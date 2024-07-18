@@ -88,6 +88,7 @@ export const icUsersAdminSlice = createSlice({
       state,
       _action: PayloadAction<WithUserFilters>,
     ) => {
+      state.icAgencyUsers = icUsersAdminInitialState.icAgencyUsers;
       state.isFetchingAgencyUsers = true;
     },
     fetchAgencyUsersFailed: (state, action: PayloadAction<string>) => {
