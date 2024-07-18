@@ -149,6 +149,10 @@ describe("Agency registration for authenticated users", () => {
 
   describe("fetches inclusion connected users that have agencies to review", () => {
     it("gets the users by agencyId successfully", () => {
+      expectToEqual(
+        icUsersAdminSelectors.icUsersNeedingReview(store.getState()),
+        [],
+      );
       store.dispatch(
         icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
           {
@@ -174,6 +178,10 @@ describe("Agency registration for authenticated users", () => {
     });
 
     it("gets the users by agencyRole successfully", () => {
+      expectToEqual(
+        icUsersAdminSelectors.icUsersNeedingReview(store.getState()),
+        [],
+      );
       store.dispatch(
         icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
           {
@@ -217,6 +225,53 @@ describe("Agency registration for authenticated users", () => {
         new Error(errorMessage),
       );
       expectIsFetchingIcUsersNeedingReviewToBe(false);
+      expectFeedbackToEqual({ kind: "errored", errorMessage });
+    });
+  });
+
+  describe("fetches agency users", () => {
+    it("gets the users by agencyId successfully", () => {
+      const agencyUser: NormalizedIcUserById[keyof NormalizedIcUserById] = {
+        ...authUser1,
+        agencyRights: {
+          [agency1Right.agency.id]: agency1Right,
+          [agency2Right.agency.id]: agency2Right,
+        },
+        dashboards: { agencies: {}, establishments: {} },
+      };
+      store.dispatch(
+        icUsersAdminSlice.actions.fetchAgencyUsersRequested({
+          agencyId: agency2.id,
+        }),
+      );
+      expectIsFetchingAgencyUsersToBe(true);
+
+      dependencies.adminGateway.getAgencyUsersToReviewResponse$.next([
+        {
+          ...authUser1,
+          agencyRights: [agency1Right, agency2Right],
+          dashboards: { agencies: {}, establishments: {} },
+        },
+      ]);
+      expectIsFetchingAgencyUsersToBe(false);
+      expectToEqual(icUsersAdminSelectors.agencyUsers(store.getState()), {
+        [agencyUser.id]: agencyUser,
+      });
+      expectFeedbackToEqual({ kind: "agencyUsersFetchSuccess" });
+    });
+
+    it("stores error message when something goes wrong in fetching", () => {
+      store.dispatch(
+        icUsersAdminSlice.actions.fetchAgencyUsersRequested({
+          agencyId: "any-id",
+        }),
+      );
+      const errorMessage = "Error fetching users";
+      expectIsFetchingAgencyUsersToBe(true);
+      dependencies.adminGateway.getAgencyUsersToReviewResponse$.error(
+        new Error(errorMessage),
+      );
+      expectIsFetchingAgencyUsersToBe(false);
       expectFeedbackToEqual({ kind: "errored", errorMessage });
     });
   });
@@ -351,6 +406,12 @@ describe("Agency registration for authenticated users", () => {
     expect(
       store.getState().admin.inclusionConnectedUsersAdmin
         .isFetchingAgenciesNeedingReviewForIcUser,
+    ).toBe(expected);
+  };
+
+  const expectIsFetchingAgencyUsersToBe = (expected: boolean) => {
+    expect(
+      store.getState().admin.inclusionConnectedUsersAdmin.isFetchingAgencyUsers,
     ).toBe(expected);
   };
 

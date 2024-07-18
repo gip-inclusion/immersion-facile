@@ -26,23 +26,28 @@ export type NormalizedIcUserById = Record<
 type IcUsersAdminFeedbackKind =
   | "usersToReviewFetchSuccess"
   | "agencyRegisterToUserSuccess"
-  | "agencyRejectionForUserSuccess";
+  | "agencyRejectionForUserSuccess"
+  | "agencyUsersFetchSuccess";
 
 export type IcUsersAdminFeedback = SubmitFeedBack<IcUsersAdminFeedbackKind>;
 
 export type IcUsersAdminState = {
   icUsersNeedingReview: NormalizedIcUserById;
+  icAgencyUsers: NormalizedIcUserById;
   selectedUserId: UserId | null;
   isUpdatingIcUserAgency: boolean;
   isFetchingAgenciesNeedingReviewForIcUser: boolean;
+  isFetchingAgencyUsers: boolean;
   feedback: IcUsersAdminFeedback;
 };
 
 export const icUsersAdminInitialState: IcUsersAdminState = {
   icUsersNeedingReview: {},
+  icAgencyUsers: {},
   selectedUserId: null,
   isUpdatingIcUserAgency: false,
   isFetchingAgenciesNeedingReviewForIcUser: false,
+  isFetchingAgencyUsers: false,
   feedback: { kind: "idle" },
 };
 
@@ -78,6 +83,24 @@ export const icUsersAdminSlice = createSlice({
       state.isFetchingAgenciesNeedingReviewForIcUser = false;
       state.icUsersNeedingReview = action.payload;
       state.feedback.kind = "usersToReviewFetchSuccess";
+    },
+    fetchAgencyUsersRequested: (
+      state,
+      _action: PayloadAction<WithUserFilters>,
+    ) => {
+      state.isFetchingAgencyUsers = true;
+    },
+    fetchAgencyUsersFailed: (state, action: PayloadAction<string>) => {
+      state.isFetchingAgencyUsers = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+    fetchAgencyUsersSucceeded: (
+      state,
+      action: PayloadAction<NormalizedIcUserById>,
+    ) => {
+      state.isFetchingAgencyUsers = false;
+      state.icAgencyUsers = action.payload;
+      state.feedback.kind = "agencyUsersFetchSuccess";
     },
     registerAgencyWithRoleToUserRequested: (
       state,
