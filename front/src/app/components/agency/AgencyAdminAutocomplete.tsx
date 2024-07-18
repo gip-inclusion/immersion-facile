@@ -21,11 +21,9 @@ export const useAgencyAdminAutocomplete = () => {
     selectOption: (agencyId: AgencyId) => {
       dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId));
       dispatch(
-        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
-          {
-            agencyId,
-          },
-        ),
+        icUsersAdminSlice.actions.fetchAgencyUsersRequested({
+          agencyId,
+        }),
       );
     },
   };

@@ -46,6 +46,24 @@ const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
     ),
   );
 
+const fetchInclusionConnectedUsersWithAgencyIdEpic: AppEpic<
+  IcUsersAdminAction
+> = (action$, state$, { adminGateway }) =>
+  action$.pipe(
+    filter(icUsersAdminSlice.actions.fetchAgencyUsersRequested.match),
+    switchMap((action: PayloadAction<WithUserFilters>) =>
+      adminGateway.getInclusionConnectedUsersToReview$(
+        getAdminToken(state$.value),
+        action.payload,
+      ),
+    ),
+    map(normalizeUsers),
+    map(icUsersAdminSlice.actions.fetchAgencyUsersSucceeded),
+    catchEpicError((error) =>
+      icUsersAdminSlice.actions.fetchAgencyUsersFailed(error?.message),
+    ),
+  );
+
 const registerAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
   action$,
   state$,
@@ -122,4 +140,5 @@ export const icUsersAdminEpics = [
   fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic,
   registerAgencyToUserEpic,
   rejectAgencyToUserEpic,
+  fetchInclusionConnectedUsersWithAgencyIdEpic,
 ];

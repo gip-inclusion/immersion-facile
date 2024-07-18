@@ -16,6 +16,11 @@ const icUsersNeedingReviewSelector = createSelector(
   ({ icUsersNeedingReview }) => icUsersNeedingReview,
 );
 
+const agencyUsers = createSelector(
+  icUsersAdminState,
+  ({ icAgencyUsers }) => icAgencyUsers,
+);
+
 const agenciesNeedingReviewForSelectedUser = createSelector(
   icUsersNeedingReviewSelector,
   selectedUserId,
@@ -52,5 +57,5 @@ export const icUsersAdminSelectors = {
   selectedUserId,
   agenciesNeedingReviewForSelectedUser,
   feedback: createSelector(icUsersAdminState, ({ feedback }) => feedback),
-  icUsersNeedingReviewSelector,
+  agencyUsers,
 };

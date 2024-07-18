@@ -10,9 +10,7 @@ import { AgencyAdminAutocomplete } from "./AgencyAdminAutocomplete";
 
 export const EditAgency = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
-  const agencyUsers = useAppSelector(
-    icUsersAdminSelectors.icUsersNeedingReviewSelector,
-  );
+  const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
 
   return (
     <>
