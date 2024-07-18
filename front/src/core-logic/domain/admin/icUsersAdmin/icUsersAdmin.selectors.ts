@@ -18,7 +18,7 @@ const icUsersNeedingReviewSelector = createSelector(
 
 const agencyUsers = createSelector(
   icUsersAdminState,
-  ({ icAgencyUsers }) => icAgencyUsers,
+  ({ agencyUsers }) => agencyUsers,
 );
 
 const agenciesNeedingReviewForSelectedUser = createSelector(
