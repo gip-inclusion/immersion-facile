@@ -20,7 +20,7 @@ import {
   OfferEntityBuilder,
 } from "../domains/establishment/helpers/EstablishmentBuilders";
 import { establishmentAggregateToFormEstablishement } from "../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
-import { getRandomAgencyId, insertAgencySeed } from "./seed.helpers";
+import { getRandomAgencyId, insertAgencySeed, seedUsers } from "./seed.helpers";
 
 /* eslint-disable no-console */
 const seed = async () => {
@@ -36,6 +36,7 @@ const seed = async () => {
   await client.query("DELETE FROM feature_flags");
 
   await db.deleteFrom("users_ongoing_oauths").execute();
+  await db.deleteFrom("users__agencies").execute();
   await db.deleteFrom("users").execute();
   await db.deleteFrom("conventions").execute();
   await db.deleteFrom("agency_groups__agencies").execute();
@@ -71,7 +72,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom IcUser")
     .withLastName("Nom IcUser")
-    .withId(new UuidV4Generator().new())
+    .withId(seedUsers.icUsers[0].id)
     .withExternalId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
     .build();
 
@@ -81,7 +82,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom Admin")
     .withLastName("Nom Admin")
-    .withId(new UuidV4Generator().new())
+    .withId(seedUsers.admins[0].id)
     .withExternalId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
     .build();
 
