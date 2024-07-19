@@ -30,7 +30,7 @@ import {
   ImmersionContactInEstablishmentId,
   SiretAdditionFailure,
   WithFormEstablishmentDto,
-} from "./FormEstablishment.dto";
+} from "./formEstablishment.dto";
 
 // prettier-ignore
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =

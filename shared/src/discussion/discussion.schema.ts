@@ -4,7 +4,7 @@ import {
   conventionIdSchema,
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
-import { contactMethodSchema } from "../formEstablishment/FormEstablishment.schema";
+import { contactMethodSchema } from "../formEstablishment/formEstablishment.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { dateStringSchema } from "../schedule/Schedule.schema";

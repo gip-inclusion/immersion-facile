@@ -48,9 +48,8 @@ describe("Edit Form Establishment", () => {
   const existingFormEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(formSiret)
     .build();
-  const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
+  const updatedFormEstablishment = FormEstablishmentDtoBuilder.fullyUpdated()
     .withSiret(formSiret)
-    .withBusinessName("Edited Business Name")
     .build();
 
   beforeEach(() => {

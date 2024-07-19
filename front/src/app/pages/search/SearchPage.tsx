@@ -180,6 +180,9 @@ export const SearchPage = ({
                   setValue("latitude", lookupSearchResult.position.lat);
                   setValue("longitude", lookupSearchResult.position.lon);
                   setValue("place", lookupSearchResult.label);
+                  if (!formValues.distanceKm) {
+                    setValue("distanceKm", 10);
+                  }
                 }}
                 id={domElementIds.search.placeAutocompleteInput}
                 onInputClear={() => {

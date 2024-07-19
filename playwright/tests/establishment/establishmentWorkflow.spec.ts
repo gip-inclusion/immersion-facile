@@ -1,15 +1,51 @@
 import { faker } from "@faker-js/faker/locale/fr";
 import { Page, expect, test } from "@playwright/test";
-import { domElementIds, frontRoutes } from "shared";
+import { addMonths } from "date-fns";
+import {
+  FormEstablishmentDto,
+  domElementIds,
+  frontRoutes,
+  toDisplayedDate,
+} from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { fillAutocomplete, phoneRegexp } from "../../utils/utils";
 
+test.describe.configure({ mode: "serial" });
 const providedSiret = "41433740200039";
 
-test.describe.configure({ mode: "serial" });
-
 test.describe("Establishment creation and modification workflow", () => {
+  const updatedInformations = {
+    businessNameCustomized: faker.company.name(),
+    additionalInformation: faker.lorem.sentence(),
+    maxContactsPerWeek: faker.number.int({ min: 1, max: 10 }),
+    businessContact: {
+      job: faker.person.jobType(),
+      phone: faker.helpers.fromRegExp(phoneRegexp),
+      email: "recette+updated-establishment@immersion-facile.beta.gouv.fr",
+      contactMethod: "PHONE",
+      firstName: faker.person.firstName(),
+      lastName: faker.person.lastName(),
+      copyEmails: [
+        "recette+copy-updated-establishment@immersion-facile.beta.gouv.fr",
+      ],
+    },
+    searchableBy: {
+      students: false,
+      jobSeekers: true,
+    },
+    nextAvailabilityDate: addMonths(new Date(), 1).toISOString(),
+    appellations: [],
+    businessAddresses: [
+      {
+        id: "fake-id",
+        rawAddress: "6 rue de la chaîne 86000 Poitiers",
+      },
+    ],
+    website: faker.internet.domainName(),
+    fitForDisabledWorkers: true,
+    isEngagedEnterprise: true,
+  } satisfies Partial<FormEstablishmentDto>;
   test("creates a new establishment", async ({ page }) => {
     await page.goto("/");
     await page.click(`#${domElementIds.home.heroHeader.establishment}`);
@@ -29,7 +65,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
     await goToNextStep(page, 1, "create");
     await page
-      .locator(`[for="${domElementIds.establishment.create.searchableBy}-1"]`)
+      .locator(`[for="${domElementIds.establishment.create.searchableBy}-2"]`) // searchable by students
       .click();
 
     await goToNextStep(page, 2, "create");
@@ -109,6 +145,7 @@ test.describe("Establishment creation and modification workflow", () => {
   });
 
   test("modifies an existing establishment", async ({ page }) => {
+    // Get edit link
     await page.goto("/");
     await page.click(`#${domElementIds.home.heroHeader.establishment}`);
     await page.click(
@@ -138,28 +175,56 @@ test.describe("Establishment creation and modification workflow", () => {
     await emailWrapper.click();
     await emailWrapper.getByRole("link", { name: "Lien vers la page" }).click();
 
+    // Edit establishment
     await page
       .locator(`#${domElementIds.establishment.edit.startFormButton}`)
       .click();
-    await page.locator(".fr-radio-rich").getByText("Oui").click();
+    await page.locator(".fr-radio-rich").getByText("Non").click();
+    await page
+      .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
+      .fill(updatedInformations.nextAvailabilityDate.split("T")[0]);
+    await page.fill(
+      `#${domElementIds.establishment.edit.maxContactsPerWeek}`,
+      updatedInformations.maxContactsPerWeek.toString(),
+    );
 
     await goToNextStep(page, 1, "edit");
     await page
-      .locator(`[for="${domElementIds.establishment.edit.searchableBy}-2"]`)
+      .locator(
+        `[for="${domElementIds.establishment.edit.searchableBy}-1"]`, // job seekers
+      )
       .click();
     await goToNextStep(page, 2, "edit");
     await page.fill(
-      `#${domElementIds.establishment.edit.businessContact.job}`,
-      faker.person.jobType(),
+      `#${domElementIds.establishment.edit.businessContact.firstName}`,
+      updatedInformations.businessContact.firstName,
     );
+
+    await page.fill(
+      `#${domElementIds.establishment.edit.businessContact.lastName}`,
+      updatedInformations.businessContact.lastName,
+    );
+
+    await page.fill(
+      `#${domElementIds.establishment.edit.businessContact.job}`,
+      updatedInformations.businessContact.job,
+    );
+
     await page.fill(
       `#${domElementIds.establishment.edit.businessContact.phone}`,
-      faker.helpers.fromRegExp(phoneRegexp),
+      updatedInformations.businessContact.phone,
     );
+
     await page.fill(
       `#${domElementIds.establishment.edit.businessContact.email}`,
-      "recette+establishment-edit@immersion-facile.beta.gouv.fr",
+      updatedInformations.businessContact.email,
     );
+
+    await page
+      .locator(
+        `[for='${domElementIds.establishment.edit.businessContact.contactMethod}-1']`,
+      )
+      .click();
 
     await goToNextStep(page, 3, "edit");
 
@@ -169,25 +234,234 @@ test.describe("Establishment creation and modification workflow", () => {
     await expect(
       page.locator(`#${domElementIds.establishment.edit.siret} input`),
     ).toHaveValue(providedSiret);
+
+    await page.fill(
+      `#${domElementIds.establishment.edit.businessNameCustomized}`,
+      updatedInformations.businessNameCustomized,
+    );
+
+    await page.click(
+      `[for=${domElementIds.establishment.edit.isEngagedEnterprise}-${
+        updatedInformations.isEngagedEnterprise ? "1" : "0"
+      }]`,
+    );
+
+    await page.click(
+      `[for=${domElementIds.establishment.edit.fitForDisabledWorkers}-${
+        updatedInformations.fitForDisabledWorkers ? "1" : "0"
+      }]`,
+    );
+
+    await page.fill(
+      `#${domElementIds.establishment.edit.additionalInformation}`,
+      updatedInformations.additionalInformation,
+    );
+
+    await page.fill(
+      `#${domElementIds.establishment.edit.website}`,
+      updatedInformations.website,
+    );
+
+    await page.click(
+      `#${domElementIds.establishment.edit.businessAddresses}-delete-option-button-0`,
+    );
+    await page.click(
+      `#${domElementIds.establishment.edit.businessAddresses}-delete-option-button-0`,
+    ); // twice, to remove the second address
+
+    await page.fill(
+      `#${domElementIds.establishment.edit.appellations} .fr-input`,
+      "buchero",
+    );
+    await page
+      .locator(
+        `#${domElementIds.establishment.edit.appellations} .MuiAutocomplete-option`,
+      )
+      .first()
+      .click();
+
+    await fillAutocomplete({
+      page,
+      locator: `#${domElementIds.establishment.edit.businessAddresses}-0`,
+      value: updatedInformations.businessAddresses[0].rawAddress,
+    });
     await page.click(`#${domElementIds.establishment.edit.submitFormButton}`);
     await expect(page.locator(".fr-alert--success")).toBeVisible();
+    await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
 
-  test("searches for an establishment", async ({ page }) => {
+  test("check that establishment has been updated", async ({ page }) => {
+    // Check if the establishment has been updated
+    await goToAdminTab(page, "establishments");
+    await page.fill(
+      `#${domElementIds.admin.manageEstablishment.siretInput}`,
+      providedSiret,
+    );
+    await page.click(
+      `#${domElementIds.admin.manageEstablishment.searchButton}`,
+    );
+    await page.waitForTimeout(500); // waiting for fetch and render
+    await expect(
+      await page
+        .locator(
+          `#${domElementIds.establishment.admin.maxContactsPerWeekValue}`,
+        )
+        .textContent(),
+    ).toBe(updatedInformations.maxContactsPerWeek.toString());
+
+    await expect(
+      await page
+        .locator(
+          `#${domElementIds.establishment.admin.nextAvailabilityDateValue}`,
+        )
+        .textContent(),
+    ).toBe(
+      toDisplayedDate({
+        date: new Date(updatedInformations.nextAvailabilityDate),
+      }),
+    );
+
+    await expect(
+      await page
+        .locator(`#${domElementIds.establishment.admin.businessNameCustomized}`)
+        .inputValue(),
+    ).toBe(updatedInformations.businessNameCustomized);
+
+    await expect(
+      await page.locator(
+        `#${domElementIds.establishment.admin.searchableBy}-1`,
+      ),
+    ).toBeChecked();
+
+    await expect(
+      await page
+        .locator(
+          `#${domElementIds.establishment.admin.businessContact.firstName}`,
+        )
+        .inputValue(),
+    ).toBe(updatedInformations.businessContact.firstName);
+
+    await expect(
+      await page
+        .locator(
+          `#${domElementIds.establishment.admin.businessContact.lastName}`,
+        )
+        .inputValue(),
+    ).toBe(updatedInformations.businessContact.lastName);
+
+    await expect(
+      await page
+        .locator(`#${domElementIds.establishment.admin.businessContact.job}`)
+        .inputValue(),
+    ).toBe(updatedInformations.businessContact.job);
+
+    await expect(
+      await page
+        .locator(`#${domElementIds.establishment.admin.businessContact.phone}`)
+        .inputValue(),
+    ).toContain(updatedInformations.businessContact.phone.substring(1));
+
+    await expect(
+      await page
+        .locator(`#${domElementIds.establishment.admin.businessContact.email}`)
+        .inputValue(),
+    ).toBe(updatedInformations.businessContact.email);
+
+    await expect(
+      await page.locator(
+        `#${domElementIds.establishment.admin.businessContact.contactMethod}-1`,
+      ),
+    ).toBeChecked();
+
+    await expect(
+      (
+        await page
+          .locator(`#${domElementIds.establishment.admin.businessAddresses}-0`)
+          .inputValue()
+      ).toLowerCase(),
+    ).toBe(updatedInformations.businessAddresses[0].rawAddress.toLowerCase());
+
+    await expect(
+      await page
+        .locator(`#${domElementIds.establishment.admin.appellations} input`)
+        .inputValue(),
+    ).toContain("Bûcheron");
+
+    await expect(
+      await page.locator(
+        `#${domElementIds.establishment.admin.fitForDisabledWorkers}-${
+          updatedInformations.fitForDisabledWorkers ? "1" : "0"
+        }`,
+      ),
+    ).toBeChecked();
+
+    await expect(
+      await page.locator(
+        `#${domElementIds.establishment.admin.isEngagedEnterprise}-${
+          updatedInformations.isEngagedEnterprise ? "1" : "0"
+        }`,
+      ),
+    ).toBeChecked();
+
+    await expect(
+      await page
+        .locator(`#${domElementIds.establishment.admin.website}`)
+        .inputValue(),
+    ).toBe(updatedInformations.website);
+
+    await expect(
+      await page
+        .locator(`#${domElementIds.establishment.admin.additionalInformation}`)
+        .inputValue(),
+    ).toBe(updatedInformations.additionalInformation);
+  });
+
+  test("searches for non available establishment", async ({ page }) => {
     await page.goto(frontRoutes.search);
     await page.fill(
       `#${domElementIds.search.placeAutocompleteInput}`,
-      "Tain l",
+      "Poitiers",
     );
     await page
-      .getByRole("option", { name: "Tain-l'Hermitage, Valence," })
+      .getByRole("option", {
+        name: "Poitiers, Nouvelle-Aquitaine, France",
+      })
+      .first()
       .click();
     await page.getByRole("button", { name: "Rechercher" }).click();
     const resultsSelector = `.im-search-result[data-establishment-siret="${providedSiret}"]`;
-    await page.waitForSelector(resultsSelector);
-    const results = await page.locator(resultsSelector);
-    await expect(await results.all()).toHaveLength(1);
-    await expect(results.first()).toBeVisible();
+    await expect(await page.locator(resultsSelector)).toHaveCount(0);
+  });
+
+  test("make the establishment available", async ({ page }) => {
+    await goToAdminTab(page, "establishments");
+    await page.fill(
+      `#${domElementIds.admin.manageEstablishment.siretInput}`,
+      providedSiret,
+    );
+    await page.click(
+      `#${domElementIds.admin.manageEstablishment.searchButton}`,
+    );
+    await page.locator(".fr-radio-rich").getByText("Oui").click();
+    await page.click(`#${domElementIds.establishment.admin.submitFormButton}`);
+    await expect(page.locator(".fr-alert--success")).toBeVisible();
+  });
+
+  test("searches for available establishment", async ({ page }) => {
+    await page.goto(frontRoutes.search);
+    await page.fill(
+      `#${domElementIds.search.placeAutocompleteInput}`,
+      "Poitiers",
+    );
+    await page
+      .getByRole("option", {
+        name: "Poitiers, Nouvelle-Aquitaine, France",
+      })
+      .first()
+      .click();
+    await page.getByRole("button", { name: "Rechercher" }).click();
+    const resultsSelector = `.im-search-result[data-establishment-siret="${providedSiret}"]`;
+    await expect(await page.locator(resultsSelector)).toHaveCount(1);
   });
 
   test("deletes an establishment", async ({ page }) => {
