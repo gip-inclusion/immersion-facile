@@ -960,27 +960,34 @@ const searchImmersionResultsQuery = (
           .limit(limit),
         (qb) => {
           if (sortedBy === "date")
-            return qb.orderBy(sql`MAX(offer.created_at)`, "desc");
+            return qb
+              .orderBy((eb) => eb.fn.max("offer.created_at"), "desc")
+              .orderBy((eb) => eb.fn("RANDOM", []));
+
           if (sortedBy === "score")
-            return qb.orderBy(sql`MAX(offer.score)`, "desc");
+            return qb
+              .orderBy((eb) => eb.fn.max("offer.score"), "desc")
+              .orderBy((eb) => eb.fn("RANDOM", []));
 
           const geoParams = filters?.geoParams;
           if (geoParams && hasSearchGeoParams(geoParams))
-            return qb.orderBy(
-              (eb) =>
-                eb.fn("ST_Distance", [
-                  "loc.position",
-                  eb.fn("ST_GeographyFromText", [
-                    sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+            return qb
+              .orderBy(
+                (eb) =>
+                  eb.fn("ST_Distance", [
+                    "loc.position",
+                    eb.fn("ST_GeographyFromText", [
+                      sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+                    ]),
                   ]),
-                ]),
-              "asc",
-            );
+                "asc",
+              )
+              .orderBy((eb) => eb.fn("RANDOM", []));
           throw new BadRequestError(
             "Cannot search by distance with invalid geo params",
           );
         },
-      ).orderBy(sql`RANDOM()`),
+      ),
     )
     .selectFrom("filtered_results as r")
     .innerJoin("establishments as e", "e.siret", "r.siret")
