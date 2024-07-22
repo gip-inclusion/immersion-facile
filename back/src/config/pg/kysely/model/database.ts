@@ -42,6 +42,7 @@ export interface Database {
   partners_pe_connect: PartnersPeConnect;
   public_appellations_data: PublicAppellationsData;
   public_romes_data: PublicRomesData;
+  public_naf_classes_2008: PublicNafClasses2008;
   saved_errors: SavedErrors;
   searches_made__appellation_code: SearchesMadeAppellationCode;
   searches_made: SearchesMade;
@@ -576,6 +577,17 @@ interface FeatureFlags {
   is_active: boolean;
   kind: Generated<string>;
   value: Json | null;
+}
+
+interface PublicNafClasses2008 {
+  class_id: string;
+  class_label: string;
+  group_id: string;
+  group_label: string;
+  division_id: string;
+  division_label: string;
+  section_id: string;
+  section_label: string;
 }
 
 interface EstablishmentsDeleted {

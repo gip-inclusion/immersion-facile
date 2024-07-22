@@ -936,8 +936,10 @@ describe("PgEstablishmentAggregateRepository", () => {
           });
 
         // Assert
-        expect(searchResult[0].siret).toEqual(establishmentSiret1);
-        expect(searchResult[1].siret).toEqual(establishmentSiret2);
+        expectToEqual(
+          searchResult.map(({ siret }) => siret),
+          [establishmentSiret1, establishmentSiret2],
+        );
       });
 
       it("provide next availability date on result if establishment entity have it", async () => {
