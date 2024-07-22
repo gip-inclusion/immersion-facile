@@ -43,7 +43,7 @@ export interface Database {
   public_appellations_data: PublicAppellationsData;
   public_romes_data: PublicRomesData;
   public_naf_classes_2008: PublicNafClasses2008;
-  saved_errors: SavedErrors;
+  broadcast_feedbacks: BroadcastFeedbacks;
   searches_made__appellation_code: SearchesMadeAppellationCode;
   searches_made: SearchesMade;
   users__agencies: UsersAgencies;
@@ -178,15 +178,16 @@ interface Agencies extends WithAcquisition {
   rejection_justification: string | null;
 }
 
-interface SavedErrors {
+export interface BroadcastFeedbacks {
   id: Generated<number>;
   consumer_id: string | null;
   consumer_name: string;
   service_name: string;
-  subscriber_error_feedback: Json;
-  params: Record<string, unknown> | null;
+  subscriber_error_feedback: Json | null;
+  request_params: Json;
   occurred_at: Timestamp;
   handled_by_agency: Generated<boolean>;
+  response: Json | null;
 }
 
 // prettier-ignore
