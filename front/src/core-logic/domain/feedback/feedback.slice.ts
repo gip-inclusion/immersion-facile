@@ -58,7 +58,7 @@ export const feedbackMapping: Record<
   "api-consumer-global": {
     "create.success": {
       action: apiConsumerSlice.actions.saveApiConsumerSucceeded,
-      title: "Le consommateur d'API a bien été créé.",
+      title: "Le consommateur d'API a bien été créé",
       message:
         "Le consommateur d'API a bien été créé, il peut commencer à utiliser l'api",
     },
@@ -70,7 +70,7 @@ export const feedbackMapping: Record<
     },
     "update.success": {
       action: apiConsumerSlice.actions.updateApiConsumerSucceeded,
-      title: "Le consommateur d'API a bien été mis à jour.",
+      title: "Le consommateur d'API a bien été mis à jour",
       message:
         "Le consommateur d'API a bien été mis à jour, il peut continuer à utiliser l'api",
     },
@@ -78,13 +78,13 @@ export const feedbackMapping: Record<
   "broadcast-convention-again": {
     "create.success": {
       action: conventionSlice.actions.broadcastConventionToPartnerSucceeded,
-      title: "La convention a bien été rediffusée.",
+      title: "La convention a bien été rediffusée",
       message:
         "La convention a bien été rediffusée au partenaire. Vous pouvez vous rapprocher du partenaire pour le vérifier.",
     },
     "create.error": {
       action: conventionSlice.actions.broadcastConventionToPartnerFailed,
-      title: "Problème rencontré lors de la rediffusion au partenaire.",
+      title: "Problème rencontré lors de la rediffusion au partenaire",
       message:
         "Une erreur est survenue. Veuillez consulter le tableau de bord.",
     },
@@ -105,7 +105,7 @@ export const feedbackMapping: Record<
   "dashboard-discussion": {
     "fetch.success": {
       action: discussionSlice.actions.fetchDiscussionSucceeded,
-      title: "Les discussions ont bien été récupérées.",
+      title: "Les discussions ont bien été récupérées",
       message: "Les discussions ont bien été récupérées",
     },
     "fetch.error": {
@@ -118,12 +118,12 @@ export const feedbackMapping: Record<
   "mark-convention-as-handled": {
     "create.success": {
       action: partnersErroredConventionSlice.actions.markAsHandledSucceeded,
-      title: "La convention a bien été marquée comme traitée.",
+      title: "La convention a bien été marquée comme traitée",
       message: "La convention a bien été marquée comme traitée.",
     },
     "create.error": {
       action: partnersErroredConventionSlice.actions.markAsHandledFailed,
-      title: "Problème rencontré.",
+      title: "Problème rencontré",
       message:
         "Problème rencontré lors du marquage de la convention comme traitée.",
     },

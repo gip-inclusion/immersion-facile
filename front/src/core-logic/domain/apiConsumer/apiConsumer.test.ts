@@ -107,7 +107,7 @@ describe("api consumer", () => {
         "api-consumer-global": {
           on: "create",
           level: "success",
-          title: "Le consommateur d'API a bien été créé.",
+          title: "Le consommateur d'API a bien été créé",
           message:
             "Le consommateur d'API a bien été créé, il peut commencer à utiliser l'api",
         },
@@ -136,7 +136,7 @@ describe("api consumer", () => {
         "api-consumer-global": {
           on: "update",
           level: "success",
-          title: "Le consommateur d'API a bien été mis à jour.",
+          title: "Le consommateur d'API a bien été mis à jour",
           message:
             "Le consommateur d'API a bien été mis à jour, il peut continuer à utiliser l'api",
         },
