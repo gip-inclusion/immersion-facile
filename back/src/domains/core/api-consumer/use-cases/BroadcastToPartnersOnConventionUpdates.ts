@@ -11,7 +11,8 @@ import {
 import { createLogger } from "../../../../utils/logger";
 import { isConventionInScope } from "../../../convention/entities/Convention";
 import { TransactionalUseCase } from "../../UseCase";
-import { broadcastToPartnersServiceName } from "../../saved-errors/ports/SavedErrorRepository";
+
+import { broadcastToPartnersServiceName } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
@@ -117,19 +118,21 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
       if (response.title === "Partner subscription errored") {
         logger.error({ subscriberResponse: response });
 
-        await uow.errorRepository.save({
+        await uow.broadcastFeedbacksRepository.save({
           consumerId: apiConsumer.id,
           consumerName: apiConsumer.name,
           handledByAgency: false,
           subscriberErrorFeedback: response.subscriberErrorFeedback,
           occurredAt: this.#timeGateway.now(),
-          params: {
+          requestParams: {
             callbackUrl: response.callbackUrl,
             conventionId: response.conventionId,
             conventionStatus: response.conventionStatus,
-            httpStatus: response.status,
           },
           serviceName: broadcastToPartnersServiceName,
+          ...(response.status
+            ? { response: { httpStatus: response.status } }
+            : {}),
         });
 
         return;

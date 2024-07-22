@@ -57,7 +57,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
 
     const conventionMarkAsHandledAt = this.timeGateway.now().toISOString();
 
-    await uow.errorRepository.markPartnersErroredConventionAsHandled(
+    await uow.broadcastFeedbacksRepository.markPartnersErroredConventionAsHandled(
       params.conventionId,
     );
 

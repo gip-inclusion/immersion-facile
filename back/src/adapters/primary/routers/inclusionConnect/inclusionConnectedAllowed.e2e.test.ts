@@ -19,7 +19,7 @@ import { SuperTest, Test } from "supertest";
 import { Gateways } from "../../../../config/bootstrap/createGateways";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
-import { broadcastToPeServiceName } from "../../../../domains/core/saved-errors/ports/SavedErrorRepository";
+import { broadcastToPeServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
@@ -343,12 +343,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
       ]);
       inMemoryUow.agencyRepository.setAgencies([agency]);
       inMemoryUow.conventionRepository.setConventions([convention]);
-      await inMemoryUow.errorRepository.save({
+      await inMemoryUow.broadcastFeedbacksRepository.save({
         serviceName: broadcastToPeServiceName,
         consumerName: "France Travail",
         consumerId: null,
         subscriberErrorFeedback: { message: "Some message" },
-        params: { conventionId, httpStatus: 500 },
+        requestParams: { conventionId },
+        response: { httpStatus: 500 },
         occurredAt: new Date("2023-10-26T12:00:00.000"),
         handledByAgency: false,
       });
@@ -362,19 +363,23 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: { conventionId: convention.id },
       });
       expectHttpResponseToEqual(response, { body: "", status: 200 });
-      expectToEqual(inMemoryUow.errorRepository.savedErrors, [
-        {
-          serviceName: broadcastToPeServiceName,
-          consumerName: "France Travail",
-          consumerId: null,
-          subscriberErrorFeedback: {
-            message: "Some message",
+      expectToEqual(
+        inMemoryUow.broadcastFeedbacksRepository.broadcastFeedbacks,
+        [
+          {
+            serviceName: broadcastToPeServiceName,
+            consumerName: "France Travail",
+            consumerId: null,
+            subscriberErrorFeedback: {
+              message: "Some message",
+            },
+            requestParams: { conventionId },
+            response: { httpStatus: 500 },
+            occurredAt: new Date("2023-10-26T12:00:00.000"),
+            handledByAgency: true,
           },
-          params: { conventionId, httpStatus: 500 },
-          occurredAt: new Date("2023-10-26T12:00:00.000"),
-          handledByAgency: true,
-        },
-      ]);
+        ],
+      );
     });
 
     describe(`${displayRouteName(

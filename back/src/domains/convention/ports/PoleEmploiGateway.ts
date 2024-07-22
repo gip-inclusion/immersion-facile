@@ -77,7 +77,7 @@ export type PoleEmploiBroadcastResponse =
 export const isBroadcastResponseOk = (
   response: PoleEmploiBroadcastResponse,
 ): response is PeBroadcastSuccessResponse =>
-  [200, 201].includes(response.status);
+  [200, 201, 204].includes(response.status);
 
 // https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
 export type PoleEmploiGetAccessTokenResponse = {

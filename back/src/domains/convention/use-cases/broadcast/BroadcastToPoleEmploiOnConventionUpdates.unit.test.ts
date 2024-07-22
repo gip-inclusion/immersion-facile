@@ -7,7 +7,7 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
-import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/SavedErrorRepository";
+import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
@@ -113,15 +113,15 @@ describe("Broadcasts events to pole-emploi", () => {
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
-    expectToEqual(uow.errorRepository.savedErrors, [
+    expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
       {
         consumerId: null,
         consumerName: "France Travail",
         serviceName: broadcastToPeServiceName,
-        params: {
+        requestParams: {
           conventionId: convention.id,
-          httpStatus: 404,
         },
+        response: { httpStatus: 404 },
         subscriberErrorFeedback: {
           message: "Ops, something is bad",
         },
