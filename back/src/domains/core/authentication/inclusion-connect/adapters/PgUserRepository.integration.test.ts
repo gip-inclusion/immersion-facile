@@ -24,9 +24,12 @@ describe("PgAuthenticatedUserRepository", () => {
   let db: KyselyDb;
   let pgUserRepository: PgUserRepository;
 
-  beforeEach(async () => {
+  beforeAll(() => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
+  });
+
+  beforeEach(async () => {
     pgUserRepository = new PgUserRepository(db);
 
     await db.deleteFrom("users_ongoing_oauths").execute();

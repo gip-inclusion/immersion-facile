@@ -1,3 +1,4 @@
+import { Pool } from "pg";
 import { expectObjectsToMatch } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
@@ -5,14 +6,22 @@ import { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
 import { PgNpsRepository } from "./PgNpsRepository";
 
 describe("PgNpsRepository", () => {
+  let pool: Pool;
   let pgNpsRepository: PgNpsRepository;
   let db: KyselyDb;
 
-  beforeEach(async () => {
-    const pool = getTestPgPool();
+  beforeAll(() => {
+    pool = getTestPgPool();
     db = makeKyselyDb(pool);
+  });
+
+  beforeEach(async () => {
     await db.deleteFrom("nps").execute();
     pgNpsRepository = new PgNpsRepository(db);
+  });
+
+  afterAll(async () => {
+    await pool.end();
   });
 
   it("saves an nps correctly", async () => {
