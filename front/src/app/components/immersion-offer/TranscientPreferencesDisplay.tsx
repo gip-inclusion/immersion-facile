@@ -111,7 +111,7 @@ export const TranscientPreferencesDisplay = (
             type: "button",
             priority: "secondary",
             children: "Non, ce n'est pas moi",
-            id: "transcient-preferences-modal-no",
+            id: "transcient-preferences-modal-clear",
             onClick: () => {
               savePreferences(false);
               clearTranscientDataForScope();
