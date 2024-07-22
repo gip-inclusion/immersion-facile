@@ -13,42 +13,68 @@ export const handleEndOfScriptNotification = async <
   logger: OpacifiedLogger = createLogger(__filename),
 ) => {
   const context = `${config.envType} - ${config.immersionFacileBaseUrl}`;
-  const start = new Date();
+
+  const contextParams: ScriptContextParams = {
+    context,
+    logger,
+    name,
+    start: new Date(),
+  };
   return script()
-    .then((results) => {
-      const durationInSeconds = calculateDurationInSecondsFrom(start);
-
-      const reportTitle = `✅Success at ${new Date().toISOString()} - ${context}`;
-      const reportContent = handleResults({ ...results, durationInSeconds });
-
-      logger.info({ message: reportTitle, reportContent, durationInSeconds });
-
-      const report = [
-        reportTitle,
-        `Script [${name}]`,
-        `Script duration : ${durationInSeconds} seconds`,
-        "-> Report content :",
-        reportContent,
-        "----------------------------------------",
-      ].join("\n");
-
-      return notifyDiscordPipelineReport(report).finally(() => process.exit(0));
-    })
-    .catch((error) => {
-      const durationInSeconds = calculateDurationInSecondsFrom(start);
-      const reportTitle = `❌Failure at ${new Date().toISOString()} - ${context}`;
-
-      logger.error({ error, durationInSeconds, message: reportTitle });
-      return notifyDiscordPipelineReport(
-        [
-          reportTitle,
-          `Duration : ${durationInSeconds} seconds`,
-          `Error message :${error.message}`,
-          "----------------------------------------",
-        ].join("\n"),
-      ).finally(() => process.exit(1));
-    });
+    .then(onScriptSuccess<T>({ ...contextParams, handleResults }))
+    .catch(onScriptError(contextParams));
 };
+
+type ScriptContextParams = {
+  start: Date;
+  context: string;
+  logger: OpacifiedLogger;
+  name: string;
+};
+
+const onScriptSuccess =
+  <T extends Record<string, unknown> | void>({
+    start,
+    context,
+    logger,
+    name,
+    handleResults,
+  }: ScriptContextParams & {
+    handleResults: (results: T) => string;
+  }) =>
+  (results: T): Promise<void> => {
+    const durationInSeconds = calculateDurationInSecondsFrom(start);
+    const reportTitle = `✅ Success at ${new Date().toISOString()} - ${context}`;
+    const reportContent = handleResults({ ...results, durationInSeconds });
+
+    logger.info({ message: reportTitle, reportContent, durationInSeconds });
+    const report = [
+      reportTitle,
+      `Script [${name}]`,
+      `Script duration : ${durationInSeconds} seconds`,
+      "-> Report content :",
+      reportContent,
+      "----------------------------------------",
+    ].join("\n");
+    return notifyDiscordPipelineReport(report).finally(() => process.exit(0));
+  };
+
+const onScriptError =
+  ({ start, context, logger, name }: ScriptContextParams) =>
+  (error: any): Promise<void> => {
+    const durationInSeconds = calculateDurationInSecondsFrom(start);
+    const reportTitle = `❌ Failure at ${new Date().toISOString()} - ${context}`;
+
+    logger.error({ error, durationInSeconds, message: reportTitle });
+    const report = [
+      reportTitle,
+      `Script [${name}]`,
+      `Script duration : ${durationInSeconds} seconds`,
+      `Error message :${error.message}`,
+      "----------------------------------------",
+    ].join("\n");
+    return notifyDiscordPipelineReport(report).finally(() => process.exit(1));
+  };
 
 const discordSizeLimit = 1950;
 const notifyDiscordPipelineReport = async (rawContent: string) => {
