@@ -1,8 +1,9 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   expectObjectsToMatch,
+  expectToEqual,
 } from "shared";
 import {
   KyselyDb,
@@ -18,10 +19,7 @@ import {
 } from "../dto/PeConnect.dto";
 import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
-import {
-  PgConventionPoleEmploiAdvisorRepository,
-  PgConventionPoleEmploiUserAdvisorDto,
-} from "./PgConventionPoleEmploiAdvisorRepository";
+import { PgConventionPoleEmploiAdvisorRepository } from "./PgConventionPoleEmploiAdvisorRepository";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
 const userPeExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
@@ -64,39 +62,37 @@ const poleEmploiUpdatedUserAdvisor: PeUserAndAdvisor = {
 
 describe("PgConventionPoleEmploiAdvisorRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
   let conventionPoleEmploiAdvisorRepository: PgConventionPoleEmploiAdvisorRepository;
-  let transaction: KyselyDb;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
-    transaction = makeKyselyDb(pool);
-    await client.query("DELETE FROM partners_pe_connect");
+    db = makeKyselyDb(pool);
+    await db.deleteFrom("partners_pe_connect").execute();
     // REVIEW I had to add this not to have an error
     // TODO Remove when https://git.beta.pole-emploi.fr/jburkard/immersion-facile/-/merge_requests/967 is merged ?
-    await client.query("DELETE FROM immersion_assessments");
-    await client.query("DELETE FROM conventions");
-    await client.query("DELETE FROM agencies");
-    const agencyRepository = new PgAgencyRepository(transaction);
+    await db.deleteFrom("immersion_assessments").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agencies").execute();
+    const agencyRepository = new PgAgencyRepository(db);
     await agencyRepository.insert(AgencyDtoBuilder.create().build());
-    const conventionRepository = new PgConventionRepository(transaction);
+    const conventionRepository = new PgConventionRepository(db);
     const conventionExternalIdRepository = new PgConventionExternalIdRepository(
-      transaction,
+      db,
     );
     await conventionRepository.save(convention);
     await conventionExternalIdRepository.save(convention.id);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM partners_pe_connect");
+    await db.deleteFrom("partners_pe_connect").execute();
     conventionPoleEmploiAdvisorRepository =
-      new PgConventionPoleEmploiAdvisorRepository(transaction);
+      new PgConventionPoleEmploiAdvisorRepository(db);
   });
 
   describe("openSlotForNextConvention", () => {
@@ -104,34 +100,40 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
       await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
         poleEmploiFirstUserAdvisor,
       );
-      const inDb = await client.query("SELECT * FROM partners_pe_connect");
-      expect(inDb.rows).toHaveLength(1);
-      expectObjectsToMatch(inDb.rows[0], {
-        user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
-        convention_id: "00000000-0000-0000-0000-000000000000",
-        firstname: placementAdvisor.firstName,
-        lastname: placementAdvisor.lastName,
-        email: placementAdvisor.email,
-        type: placementAdvisor.type,
-      });
+
+      expectToEqual(
+        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        [
+          {
+            user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
+            convention_id: "00000000-0000-0000-0000-000000000000",
+            firstname: placementAdvisor.firstName,
+            lastname: placementAdvisor.lastName,
+            email: placementAdvisor.email,
+            type: placementAdvisor.type,
+          },
+        ],
+      );
     });
 
     it("should open a slot with no advisor", async () => {
       await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
         poleEmploiFirstUserWithoutAdvisor,
       );
-      const inDb = await client.query<PgConventionPoleEmploiUserAdvisorDto>(
-        "SELECT * FROM partners_pe_connect",
+
+      expectToEqual(
+        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        [
+          {
+            user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
+            convention_id: "00000000-0000-0000-0000-000000000000",
+            firstname: null,
+            lastname: null,
+            email: null,
+            type: null,
+          },
+        ],
       );
-      expect(inDb.rows).toHaveLength(1);
-      expectObjectsToMatch(inDb.rows[0], {
-        user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
-        convention_id: "00000000-0000-0000-0000-000000000000",
-        firstname: null,
-        lastname: null,
-        email: null,
-        type: null,
-      });
     });
 
     it("should update the open slot if it already exist", async () => {
@@ -143,16 +145,19 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
         poleEmploiUpdatedUserAdvisor,
       );
 
-      const inDb = await client.query("SELECT * FROM partners_pe_connect");
-      expect(inDb.rows).toHaveLength(1);
-      expectObjectsToMatch(inDb.rows[0], {
-        user_pe_external_id: poleEmploiUpdatedUserAdvisor.user.peExternalId,
-        convention_id: "00000000-0000-0000-0000-000000000000",
-        firstname: capemploiAdvisor.firstName,
-        lastname: capemploiAdvisor.lastName,
-        email: capemploiAdvisor.email,
-        type: capemploiAdvisor.type,
-      });
+      expectToEqual(
+        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        [
+          {
+            user_pe_external_id: poleEmploiUpdatedUserAdvisor.user.peExternalId,
+            convention_id: "00000000-0000-0000-0000-000000000000",
+            firstname: capemploiAdvisor.firstName,
+            lastname: capemploiAdvisor.lastName,
+            email: capemploiAdvisor.email,
+            type: capemploiAdvisor.type,
+          },
+        ],
+      );
     });
   });
 
@@ -179,12 +184,19 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
         userPeExternalId,
       );
 
-      const inDb = await client.query("SELECT * FROM partners_pe_connect");
-      expect(inDb.rows).toHaveLength(1);
-      expectObjectsToMatch(inDb.rows[0], {
-        user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
-        convention_id: conventionId,
-      });
+      expectToEqual(
+        await db.selectFrom("partners_pe_connect").selectAll().execute(),
+        [
+          {
+            user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
+            convention_id: conventionId,
+            email: placementAdvisor.email,
+            firstname: placementAdvisor.firstName,
+            lastname: placementAdvisor.lastName,
+            type: placementAdvisor.type,
+          },
+        ],
+      );
     });
   });
 

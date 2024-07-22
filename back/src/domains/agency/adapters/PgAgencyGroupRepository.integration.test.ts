@@ -9,21 +9,27 @@ const agency = new AgencyDtoBuilder().build();
 
 describe("PgAgencyGroupRepository", () => {
   let pool: Pool;
-  let transaction: KyselyDb;
+  let db: KyselyDb;
   let pgAgencyGroupRepository: PgAgencyGroupRepository;
   let pgAgencyRepository: PgAgencyRepository;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     pool = getTestPgPool();
-    transaction = makeKyselyDb(pool);
+    db = makeKyselyDb(pool);
+  });
 
-    await transaction.deleteFrom("agency_groups__agencies").execute();
-    await transaction.deleteFrom("agency_groups").execute();
-    await transaction.deleteFrom("conventions").execute();
-    await transaction.deleteFrom("agencies").execute();
+  beforeEach(async () => {
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agencies").execute();
 
-    pgAgencyGroupRepository = new PgAgencyGroupRepository(transaction);
-    pgAgencyRepository = new PgAgencyRepository(transaction);
+    pgAgencyGroupRepository = new PgAgencyGroupRepository(db);
+    pgAgencyRepository = new PgAgencyRepository(db);
+  });
+
+  afterAll(async () => {
+    await pool.end();
   });
 
   describe("getByCodeSafir", () => {
@@ -66,7 +72,7 @@ describe("PgAgencyGroupRepository", () => {
 
     await pgAgencyRepository.insert(agency);
 
-    const [{ id: agencyGroupId }] = await transaction
+    const [{ id: agencyGroupId }] = await db
       .insertInto("agency_groups")
       .values({
         siret: agencyGroup.siret,
@@ -84,7 +90,7 @@ describe("PgAgencyGroupRepository", () => {
       .execute();
 
     if (agencyGroup.agencyIds.length > 0) {
-      await transaction
+      await db
         .insertInto("agency_groups__agencies")
         .values({
           agency_group_id: agencyGroupId,

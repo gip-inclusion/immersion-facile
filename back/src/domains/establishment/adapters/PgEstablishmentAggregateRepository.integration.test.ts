@@ -90,7 +90,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("returns 1 closest establishment with `maxResults` at 1", async () => {
           expectToEqual(
             await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: searchMadeWithoutRome,
+              searchMade: searchMadeDistanceWithoutRome,
               maxResults: 1,
             }),
             [
@@ -109,7 +109,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("returns 2 closest establishments with `maxResults` at 2", async () => {
           expectToEqual(
             await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: searchMadeWithoutRome,
+              searchMade: searchMadeDistanceWithoutRome,
               maxResults: 2,
             }),
             [
@@ -136,7 +136,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("returns 2 closest establishments with `maxResults` at 3 without too far establishment", async () => {
           expectArraysToMatch(
             await pgEstablishmentAggregateRepository.searchImmersionResults({
-              searchMade: searchMadeWithoutRome,
+              searchMade: searchMadeDistanceWithoutRome,
               maxResults: 3,
             }),
             [
@@ -186,7 +186,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             // Act & Assert
             expectToEqual(
               await pgEstablishmentAggregateRepository.searchImmersionResults({
-                searchMade: searchMadeWithoutRome,
+                searchMade: searchMadeDistanceWithoutRome,
               }),
               [
                 makeExpectedSearchResult({
@@ -2020,13 +2020,13 @@ const locationOfFarFromSearchedPosition = new LocationBuilder()
   .build();
 
 const notMatchingRome = "B1805";
-const searchMadeWithoutRome: SearchMade = {
+const searchMadeDistanceWithoutRome: SearchMade = {
   ...locationOfSearchPosition.position,
   distanceKm: 30,
   sortedBy: "distance",
 };
 const cartographeSearchMade: SearchMade = {
-  ...searchMadeWithoutRome,
+  ...searchMadeDistanceWithoutRome,
   appellationCodes: [cartographeImmersionOffer.appellationCode],
 };
 
