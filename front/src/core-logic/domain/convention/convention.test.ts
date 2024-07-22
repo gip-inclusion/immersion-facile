@@ -905,7 +905,7 @@ describe("Convention slice", () => {
         "broadcast-convention-again": {
           on: "create",
           level: "success",
-          title: "La convention a bien été rediffusée.",
+          title: "La convention a bien été rediffusée",
           message:
             "La convention a bien été rediffusée au partenaire. Vous pouvez vous rapprocher du partenaire pour le vérifier.",
         },
@@ -935,7 +935,7 @@ describe("Convention slice", () => {
         "broadcast-convention-again": {
           on: "create",
           level: "error",
-          title: "Problème rencontré lors de la rediffusion au partenaire.",
+          title: "Problème rencontré lors de la rediffusion au partenaire",
           message: errorMessageFromApi,
         },
       });

@@ -44,7 +44,7 @@ describe("Agency info in store", () => {
       "mark-convention-as-handled": {
         on: "create",
         level: "success",
-        title: "La convention a bien été marquée comme traitée.",
+        title: "La convention a bien été marquée comme traitée",
         message: "La convention a bien été marquée comme traitée.",
       },
     });
@@ -69,7 +69,7 @@ describe("Agency info in store", () => {
       "mark-convention-as-handled": {
         on: "create",
         level: "error",
-        title: "Problème rencontré.",
+        title: "Problème rencontré",
         message: errorMessage,
       },
     });
