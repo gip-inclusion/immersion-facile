@@ -266,6 +266,7 @@ export const ContactByEmail = ({
                   checked: hasWorkingExperienceValue === false,
                   onChange: () => {
                     setValue("hasWorkingExperience", false);
+                    setValue("experienceAdditionalInformation", "");
                   },
                 },
               },
@@ -282,15 +283,18 @@ export const ContactByEmail = ({
               },
             ]}
           />
-          <Input
-            label={inputsLabelsByKey.experienceAdditionalInformation}
-            hintText="Exemple : “travail en équipe”, “mise en rayon”, “babysitting”, etc."
-            nativeTextAreaProps={{
-              ...register("experienceAdditionalInformation"),
-            }}
-            {...getFieldError("experienceAdditionalInformation")}
-            textArea
-          />
+          {hasWorkingExperienceValue && (
+            <Input
+              label={inputsLabelsByKey.experienceAdditionalInformation}
+              hintText="Exemple : “travail en équipe”, “mise en rayon”, “babysitting”, etc."
+              nativeTextAreaProps={{
+                ...register("experienceAdditionalInformation"),
+              }}
+              {...getFieldError("experienceAdditionalInformation")}
+              textArea
+            />
+          )}
+
           <Input
             label={inputsLabelsByKey.potentialBeneficiaryResumeLink}
             nativeInputProps={{
