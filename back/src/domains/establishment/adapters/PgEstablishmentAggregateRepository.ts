@@ -1,20 +1,23 @@
 import { sql } from "kysely";
-import format from "pg-format";
 import { equals, keys, pick } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
+  EstablishmentSearchableByValue,
   LocationId,
   RomeCode,
   SearchResultDto,
   SearchSortedBy,
   SiretDto,
   castError,
+  pipeWithValue,
 } from "shared";
 import { BadRequestError, NotFoundError } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
+  jsonBuildObject,
+  jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { optional } from "../../../config/pg/pgUtils";
 import { createLogger } from "../../../utils/logger";
@@ -24,10 +27,7 @@ import {
   EstablishmentEntity,
 } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
-import {
-  SearchMade,
-  hasSearchMadeGeoParams,
-} from "../entities/SearchMadeEntity";
+import { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
@@ -41,6 +41,7 @@ import {
 } from "./PgEstablishmentAggregateRepository.sql";
 
 const logger = createLogger(__filename);
+const MAX_RESULTS_HARD_LIMIT = 100;
 
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
@@ -175,50 +176,6 @@ export class PgEstablishmentAggregateRepository
         return dto;
       },
     );
-  }
-
-  public async getSearchImmersionResultDtoBySearchQuery(
-    siret: SiretDto,
-    appellationCode: AppellationCode,
-    locationId: LocationId,
-  ): Promise<SearchResultDto | undefined> {
-    const subQuery = `
-      SELECT 
-        io.siret,
-        io.rome_code,
-        prd.libelle_rome as rome_label,
-        ${buildAppellationsArray},
-        null AS distance_m,
-        1 AS row_number,
-        loc.*,
-        loc.id AS location_id,
-        e.naf_code,
-        e.is_searchable,
-        date_to_iso(e.next_availability_date) as next_availability_date,
-        e.name,
-        e.website,
-        e.additional_information,
-        e.customized_name,
-        e.fit_for_disabled_workers,
-        e.number_employees
-      FROM immersion_offers AS io
-      LEFT JOIN establishments e ON io.siret = e.siret
-      LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
-      LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
-      LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
-      WHERE io.siret = $1 AND io.appellation_code = $2 AND loc.id = $3
-      GROUP BY (io.siret, io.rome_code, prd.libelle_rome, location_id, e.naf_code, e.is_searchable, e.next_availability_date, e.name, e.website,
-               e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees)`;
-
-    const immersionSearchResultDtos =
-      await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        subQuery,
-        [siret, appellationCode, locationId],
-      );
-    const immersionSearchResultDto = immersionSearchResultDtos.at(0);
-    if (!immersionSearchResultDto) return;
-    const { isSearchable: _, ...rest } = immersionSearchResultDto;
-    return rest;
   }
 
   public async getSiretOfEstablishmentsToSuggestUpdate(
@@ -356,55 +313,82 @@ export class PgEstablishmentAggregateRepository
     searchMade: SearchMade;
     maxResults?: number;
   }): Promise<SearchImmersionResult[]> {
-    const romeCodes =
-      searchMade.romeCode ??
-      (await this.#getRomeCodeFromAppellationCode(searchMade.appellationCodes));
-    const andSearchableByFilter = searchMade.establishmentSearchableBy
-      ? `AND (searchable_by_students IS ${
-          searchMade.establishmentSearchableBy === "students"
-        } OR searchable_by_job_seekers IS ${
-          searchMade.establishmentSearchableBy === "jobSeekers"
-        })`
-      : "";
-    const sortExpression = makeOrderByStatement(searchMade);
-    const selectedOffersSubQuery = makeSelectedOffersSubQuery({
-      withGeoParams: true,
-      romeCodes,
-      andSearchableByFilter,
-      buildAppellationsArray,
-      sortExpression,
-      searchMade,
+    const around =
+      "lat" in searchMade
+        ? pick(["lat", "lon", "distanceKm"], searchMade)
+        : undefined;
+
+    const results = await searchImmersionResultsQuery(this.transaction, {
+      limit:
+        maxResults && maxResults < MAX_RESULTS_HARD_LIMIT
+          ? maxResults
+          : MAX_RESULTS_HARD_LIMIT,
+      filters: {
+        geoParams: around,
+        searchableBy: searchMade.establishmentSearchableBy,
+        romeCodes: searchMade.romeCode
+          ? [searchMade.romeCode]
+          : await this.#getRomeCodeFromAppellationCodes(
+              searchMade.appellationCodes,
+            ),
+      },
+      sortedBy: searchMade.sortedBy ?? "date",
     });
 
-    const selectedOffersWithoutGeoParamsSubQuery = makeSelectedOffersSubQuery({
-      withGeoParams: false,
-      romeCodes,
-      andSearchableByFilter,
-      buildAppellationsArray,
-      sortExpression,
-      searchMade,
-    });
+    return results.map(
+      ({ search_immersion_result }): SearchImmersionResult => ({
+        ...(search_immersion_result as SearchImmersionResult),
+        nextAvailabilityDate: search_immersion_result.nextAvailabilityDate
+          ? new Date(search_immersion_result.nextAvailabilityDate).toISOString()
+          : undefined,
+        customizedName: search_immersion_result.customizedName ?? undefined,
+      }),
+    );
+  }
 
-    const geoParams = pick(["lat", "lon", "distanceKm"], searchMade);
-
-    const immersionSearchResultDtos = hasSearchGeoParams(geoParams)
-      ? await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-          selectedOffersSubQuery,
-          [
-            `POINT(${geoParams.lon} ${geoParams.lat})`,
-            geoParams.distanceKm * 1000, // Formats parameters $1, $2
-            maxResults,
-          ],
-        )
-      : await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-          selectedOffersWithoutGeoParamsSubQuery,
-          [maxResults],
-          false,
-        );
-    return immersionSearchResultDtos.map((dto) => ({
-      ...dto,
-      voluntaryToImmersion: true,
-    }));
+  public async getSearchImmersionResultDtoBySearchQuery(
+    siret: SiretDto,
+    appellationCode: AppellationCode,
+    locationId: LocationId,
+  ): Promise<SearchResultDto | undefined> {
+    const immersionSearchResultDtos =
+      await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
+        `SELECT 
+          io.siret,
+          io.rome_code,
+          prd.libelle_rome as rome_label,
+          (JSON_AGG (JSON_BUILD_OBJECT(
+            'appellationCode', ogr_appellation::text,
+            'appellationLabel', libelle_appellation_long,
+            'score', io.score
+          ) ORDER BY ogr_appellation)) AS appellations,
+          null AS distance_m,
+          1 AS row_number,
+          loc.*,
+          loc.id AS location_id,
+          e.naf_code,
+          e.is_searchable,
+          date_to_iso(e.next_availability_date) as next_availability_date,
+          e.name,
+          e.website,
+          e.additional_information,
+          e.customized_name,
+          e.fit_for_disabled_workers,
+          e.number_employees
+        FROM immersion_offers AS io
+        LEFT JOIN establishments e ON io.siret = e.siret
+        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
+        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+        LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
+        WHERE io.siret = $1 AND io.appellation_code = $2 AND loc.id = $3
+        GROUP BY (io.siret, io.rome_code, prd.libelle_rome, location_id, e.naf_code, e.is_searchable, e.next_availability_date, e.name, e.website,
+          e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees)`,
+        [siret, appellationCode, locationId],
+      );
+    const immersionSearchResultDto = immersionSearchResultDtos.at(0);
+    if (!immersionSearchResultDto) return;
+    const { isSearchable: _, ...rest } = immersionSearchResultDto;
+    return rest;
   }
 
   public async updateEstablishmentAggregate(
@@ -555,10 +539,50 @@ export class PgEstablishmentAggregateRepository
     // this method returns a list of SearchImmersionResultDto
     const pgResult = await executeKyselyRawSqlQuery(
       this.transaction,
-      makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        selectedOffersSubQuery,
-        shouldSetDistance,
+      `WITH 
+      unique_establishments_contacts AS ( 
+        SELECT DISTINCT ON (siret) siret, uuid 
+        FROM establishments_contacts
+      ), 
+      match_immersion_offer AS (
+        ${selectedOffersSubQuery}
       ),
+      establishment_locations_agg AS (
+        ${withEstablishmentLocationsSubQuery}
+      )
+      SELECT 
+        row_number,
+        JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
+          'rome', io.rome_code,
+          'siret', io.siret,
+          ${shouldSetDistance ? `'distance_m', io.distance_m,` : ""}
+          'isSearchable',io.is_searchable,
+          'nextAvailabilityDate', io.next_availability_date,
+          'name', io.name,
+          'website', io.website,
+          'additionalInformation', io.additional_information,
+          'customizedName', io.customized_name,
+          'fitForDisabledWorkers', io.fit_for_disabled_workers,
+          'romeLabel', io.rome_label,
+          'appellations',  io.appellations,
+          'naf', io.naf_code,
+          'nafLabel', public_naf_classes_2008.class_label,
+          'address', JSON_BUILD_OBJECT(
+            'streetNumberAndAddress', io.street_number_and_address,
+            'postcode', io.post_code,
+            'city', io.city,
+            'departmentCode', io.department_code
+            ),
+          'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat),
+          'locationId', io.location_id,
+          'contactMode', ec.contact_mode,
+          'numberOfEmployeeRange', io.number_employees
+        )) AS search_immersion_result
+      FROM match_immersion_offer AS io   
+      LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(io.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+      LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = io.siret
+      LEFT JOIN establishments_contacts AS ec ON ec.uuid = uec.uuid
+      ORDER BY row_number ASC, io.location_id ASC;`,
       selectedOffersSubQueryParams,
     );
 
@@ -646,7 +670,7 @@ export class PgEstablishmentAggregateRepository
       });
   }
 
-  async #getRomeCodeFromAppellationCode(
+  async #getRomeCodeFromAppellationCodes(
     appellationCodes: AppellationCode[] | undefined,
   ): Promise<RomeCode[] | undefined> {
     if (!appellationCodes) return;
@@ -784,74 +808,6 @@ export class PgEstablishmentAggregateRepository
   }
 }
 
-const makeOrderByStatement = (searchMade: SearchMade): string => {
-  if (!searchMade.sortedBy)
-    throw new BadRequestError("sortedBy must be defined");
-  if (
-    !hasSearchMadeGeoParams(searchMade) &&
-    searchMade.sortedBy === "distance"
-  ) {
-    throw new BadRequestError(
-      "Cannot search by distance with invalid geo params",
-    );
-  }
-  const sortQueryBySortedByValue: Record<SearchSortedBy, string> = {
-    distance: "ORDER BY distance_m ASC, RANDOM()",
-    date: "ORDER BY max_created_at DESC, RANDOM()",
-    score: "ORDER BY max_score DESC, RANDOM()",
-  };
-  return sortQueryBySortedByValue[searchMade.sortedBy];
-};
-
-const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
-  selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellations and distance_m
-  shouldSetDistance = false,
-) => `
-WITH 
-  unique_establishments_contacts AS ( 
-    SELECT DISTINCT ON (siret) siret, uuid 
-    FROM establishments_contacts
-  ), 
-  match_immersion_offer AS (
-    ${selectedOffersSubQuery}
-  ),
-  establishment_locations_agg AS (${withEstablishmentLocationsSubQuery})
-  SELECT 
-  row_number,
-  JSON_STRIP_NULLS(
-      JSON_BUILD_OBJECT(
-        'rome', io.rome_code,
-        'siret', io.siret,
-        ${shouldSetDistance ? `'distance_m', io.distance_m,` : ""}
-        'isSearchable',io.is_searchable,
-        'nextAvailabilityDate', io.next_availability_date,
-        'name', io.name,
-        'website', io.website,
-        'additionalInformation', io.additional_information,
-        'customizedName', io.customized_name,
-        'fitForDisabledWorkers', io.fit_for_disabled_workers,
-        'romeLabel', io.rome_label,
-        'appellations',  io.appellations,
-        'naf', io.naf_code,
-        'nafLabel', public_naf_classes_2008.class_label,
-        'address', JSON_BUILD_OBJECT(
-          'streetNumberAndAddress', io.street_number_and_address,
-          'postcode', io.post_code,
-          'city', io.city,
-          'departmentCode', io.department_code
-          ),
-        'position', JSON_BUILD_OBJECT('lon', io.lon, 'lat', io.lat),
-        'locationId', io.location_id,
-        'contactMode', ec.contact_mode,
-        'numberOfEmployeeRange', io.number_employees
-      )
-    ) AS search_immersion_result
-FROM match_immersion_offer AS io   
-LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(io.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = io.siret
-LEFT JOIN establishments_contacts AS ec ON ec.uuid = uec.uuid
-ORDER BY row_number ASC, io.location_id ASC; `;
-
 const offersEqual = (a: OfferEntity, b: OfferEntity) =>
   // Only compare romeCode and appellationCode
   a.appellationCode === b.appellationCode;
@@ -879,109 +835,6 @@ const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
   return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
 };
 
-const buildAppellationsArray = `
-(
-  JSON_AGG (
-    JSON_BUILD_OBJECT(
-      'appellationCode', ogr_appellation::text,
-      'appellationLabel', libelle_appellation_long,
-      'score', io.score
-    ) 
-  ORDER BY ogr_appellation
-  )
-) AS appellations`;
-
-const makeSelectedOffersSubQuery = ({
-  withGeoParams,
-  romeCodes,
-  andSearchableByFilter,
-  buildAppellationsArray,
-  sortExpression,
-  searchMade,
-}: {
-  withGeoParams: boolean;
-  romeCodes: string | RomeCode[] | undefined;
-  andSearchableByFilter: string;
-  buildAppellationsArray: string;
-  sortExpression: string;
-  searchMade: SearchMade;
-}) => {
-  const query = `
-    WITH
-    active_establishments_within_area AS (
-      SELECT
-          e.siret,
-          e.fit_for_disabled_workers,
-          date_to_iso(e.next_availability_date) as next_availability_date,
-          e.additional_information,
-          e.customized_name,
-          e.is_searchable,
-          e.naf_code,
-          e.name,
-          e.number_employees,
-          e.website,
-          loc.*
-      FROM establishments e
-      LEFT JOIN establishments_locations loc ON loc.establishment_siret = e.siret
-      WHERE is_open 
-      ${andSearchableByFilter}
-      ${
-        withGeoParams
-          ? "AND ST_DWithin(loc.position, ST_GeographyFromText($1), $2)"
-          : ""
-      }
-    ),
-    matching_offers AS (
-      SELECT 
-        aewa.siret, 
-        aewa.position,
-        aewa.lat,
-        aewa.lon,
-        aewa.city,
-        aewa.street_number_and_address,
-        aewa.department_code,
-        aewa.post_code,
-        aewa.id as location_id,
-        rome_code, 
-        prd.libelle_rome AS rome_label, 
-        ${
-          withGeoParams
-            ? "ST_Distance(aewa.position, ST_GeographyFromText($1)) AS distance_m,"
-            : ""
-        }
-        aewa.fit_for_disabled_workers,
-        aewa.next_availability_date,
-        aewa.additional_information,
-        aewa.customized_name,
-        aewa.is_searchable,
-        aewa.naf_code,
-        aewa.name,
-        aewa.number_employees,
-        aewa.website,
-        ${buildAppellationsArray},
-        ${searchMade.sortedBy === "score" ? "MAX(io.score) AS max_score," : ""}
-        MAX(created_at) AS max_created_at
-        
-      FROM active_establishments_within_area aewa 
-      LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
-      LEFT JOIN public_appellations_data pad ON io.appellation_code = pad.ogr_appellation
-      LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
-      ${romeCodes ? "WHERE rome_code in (%1$L)" : ""}
-      GROUP BY(aewa.siret, aewa.position, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome, aewa.lat, aewa.lon,
-          aewa.city, aewa.position, aewa.street_number_and_address, aewa.department_code, aewa.post_code, aewa.id,
-          aewa.next_availability_date, aewa.additional_information, aewa.customized_name, aewa.is_searchable, aewa.naf_code, aewa.name, aewa.number_employees, aewa.website)
-    )
-    SELECT *, 
-    (
-      ROW_NUMBER () OVER (${sortExpression})
-    )::integer AS row_number 
-    FROM matching_offers
-    ${sortExpression}
-    LIMIT ${withGeoParams ? "$3" : "$1"}`;
-
-  return format(query, romeCodes);
-};
-
 const makeEstablishmentAggregateFromDb = (
   aggregate: any,
 ): EstablishmentAggregate => ({
@@ -1007,3 +860,185 @@ const makeEstablishmentAggregateFromDb = (
       ? aggregate.contact
       : undefined,
 });
+
+const searchImmersionResultsQuery = (
+  transaction: KyselyDb,
+  {
+    filters,
+    sortedBy,
+    limit,
+  }: {
+    limit: number;
+    filters?: {
+      searchableBy?: EstablishmentSearchableByValue;
+      romeCodes?: RomeCode[];
+      geoParams?: GeoParams;
+    };
+    sortedBy: SearchSortedBy;
+  },
+) => {
+  return transaction
+    .with("filtered_results", (qb) =>
+      pipeWithValue(
+        qb
+          .selectFrom((qb) =>
+            pipeWithValue(
+              qb
+                .selectFrom("establishments")
+                .select("siret")
+                .where("is_open", "=", true),
+              (qb) => {
+                const searchableBy = filters?.searchableBy;
+                if (searchableBy === "jobSeekers")
+                  return qb.whereRef(
+                    "searchable_by_job_seekers",
+                    "is",
+                    sql`TRUE`,
+                  );
+                if (searchableBy === "students")
+                  return qb.whereRef("searchable_by_students", "is", sql`TRUE`);
+                return qb;
+              },
+            ).as("e"),
+          )
+          .innerJoin(
+            (eb) =>
+              pipeWithValue(
+                eb
+                  .selectFrom("establishments_locations")
+                  .select(["establishment_siret as siret", "id", "position"]),
+                (eb) => {
+                  const geoParams = filters?.geoParams;
+                  return geoParams
+                    ? eb.where(({ fn }) =>
+                        fn("ST_DWithin", [
+                          "position",
+                          fn("ST_GeographyFromText", [
+                            sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+                          ]),
+                          sql`${(1000 * geoParams.distanceKm).toString()}`,
+                        ]),
+                      )
+                    : eb;
+                },
+              ).as("loc"),
+            (join) => join.onRef("loc.siret", "=", "e.siret"),
+          )
+          .innerJoin(
+            (eb) =>
+              pipeWithValue(
+                eb
+                  .selectFrom("immersion_offers")
+                  .select([
+                    "siret",
+                    "rome_code",
+                    "created_at",
+                    "appellation_code",
+                    "score",
+                  ]),
+                (eb) =>
+                  filters?.romeCodes
+                    ? eb.where("rome_code", "in", filters.romeCodes)
+                    : eb,
+              ).as("offer"),
+            (join) => join.onRef("offer.siret", "=", "e.siret"),
+          )
+          .innerJoin(
+            "public_appellations_data as a",
+            "a.ogr_appellation",
+            "offer.appellation_code",
+          )
+          .select([
+            "e.siret",
+            "loc.id as loc_id",
+            "offer.rome_code as code_rome",
+            sql`JSON_AGG( JSON_BUILD_OBJECT( 'appellationCode', a.ogr_appellation::text, 'appellationLabel', a.libelle_appellation_long, 'score', offer.score ) ORDER BY a.ogr_appellation)`.as(
+              "appelations",
+            ),
+          ])
+          .groupBy(["e.siret", "offer.rome_code", "loc.position", "loc.id"])
+          .limit(limit),
+        (qb) => {
+          if (sortedBy === "date")
+            return qb.orderBy(sql`MAX(offer.created_at)`, "desc");
+          if (sortedBy === "score")
+            return qb.orderBy(sql`MAX(offer.score)`, "desc");
+
+          const geoParams = filters?.geoParams;
+          if (geoParams && hasSearchGeoParams(geoParams))
+            return qb.orderBy(
+              (eb) =>
+                eb.fn("ST_Distance", [
+                  "loc.position",
+                  eb.fn("ST_GeographyFromText", [
+                    sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+                  ]),
+                ]),
+              "asc",
+            );
+          throw new BadRequestError(
+            "Cannot search by distance with invalid geo params",
+          );
+        },
+      ).orderBy(sql`RANDOM()`),
+    )
+    .selectFrom("filtered_results as r")
+    .innerJoin("establishments as e", "e.siret", "r.siret")
+    .innerJoin("establishments_contacts as c", "c.siret", "r.siret")
+    .innerJoin("establishments_locations as loc", "loc.id", "r.loc_id")
+    .innerJoin(
+      (eb) => eb.selectFrom("public_naf_classes_2008").selectAll().as("n"),
+      (join) =>
+        join.onRef(
+          "n.class_id",
+          "=",
+          sql`REGEXP_REPLACE(e.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2')`,
+        ),
+    )
+    .innerJoin("public_romes_data as ro", "ro.code_rome", "r.code_rome")
+    .select(({ ref, fn }) => {
+      const geoParams = filters?.geoParams;
+      const json = {
+        naf: ref("e.naf_code"),
+        siret: ref("e.siret"),
+        isSearchable: ref("e.is_searchable"),
+        nextAvailabilityDate: ref("e.next_availability_date"),
+        name: ref("e.name"),
+        website: ref("e.website"),
+        additionalInformation: ref("e.additional_information"),
+        customizedName: ref("e.customized_name"),
+        fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
+        numberOfEmployeeRange: ref("e.number_employees"),
+        nafLabel: ref("n.class_label"),
+        contactMode: ref("c.contact_mode"),
+        rome: ref("ro.code_rome"),
+        romeLabel: ref("ro.libelle_rome"),
+        address: jsonBuildObject({
+          streetNumberAndAddress: ref("loc.street_number_and_address"),
+          postcode: ref("loc.post_code"),
+          city: ref("loc.city"),
+          departmentCode: ref("loc.department_code"),
+        }),
+        position: jsonBuildObject({
+          lon: ref("loc.lon"),
+          lat: ref("loc.lat"),
+        }),
+        locationId: ref("loc.id"),
+        distance_m: geoParams
+          ? fn("ST_Distance", [
+              "loc.position",
+              fn("ST_GeographyFromText", [
+                sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+              ]),
+            ])
+          : sql`NULL`,
+        voluntaryToImmersion: sql`TRUE`,
+        appellations: ref("r.appelations"),
+      };
+
+      return jsonStripNulls(jsonBuildObject(json)).as(
+        "search_immersion_result",
+      );
+    })
+    .execute();
+};
