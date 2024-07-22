@@ -131,6 +131,47 @@ describe("Broadcasts events to pole-emploi", () => {
     ]);
   });
 
+  it("store the broadcast feetback success in a repo", async () => {
+    // Prepare
+    const { broadcastToPe, poleEmploiGateWay, peAgency, uow, timeGateway } =
+      await prepareUseCase();
+
+    // Act
+    const convention = new ConventionDtoBuilder()
+      .withAgencyId(peAgency.id)
+      .withoutFederatedIdentity()
+      .build();
+
+    poleEmploiGateWay.setNextResponse({
+      status: 200,
+    });
+    const now = new Date();
+    timeGateway.setNextDate(now);
+
+    await broadcastToPe.execute({ convention });
+
+    // Assert
+    expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
+      {
+        consumerId: null,
+        consumerName: "France Travail",
+        serviceName: broadcastToPeServiceName,
+        requestParams: {
+          conventionId: convention.id,
+          conventionStatus: convention.status,
+        },
+        response: {
+          httpStatus: 200,
+          body: {
+            status: 200,
+          },
+        },
+        occurredAt: now,
+        handledByAgency: false,
+      },
+    ]);
+  });
+
   it("Converts and sends conventions, with externalId and federated id", async () => {
     // Prepare
     const { broadcastToPe, poleEmploiGateWay, peAgency, uow } =

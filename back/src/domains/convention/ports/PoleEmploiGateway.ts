@@ -64,7 +64,7 @@ export type PoleEmploiConvention = {
   signatureEntreprise: boolean;
 };
 
-type PeBroadcastSuccessResponse = { status: 200 | 201 };
+type PeBroadcastSuccessResponse = { status: 200 | 201 | 204 };
 type PeBroadcastErrorResponse = {
   status: Exclude<number, 200 | 201>;
   subscriberErrorFeedback: SubscriberErrorFeedback;

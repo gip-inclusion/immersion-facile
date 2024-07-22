@@ -217,7 +217,56 @@ describe("Broadcast to partners on updated convention", () => {
         conventionStatus: errorResponse.conventionStatus,
       },
       ...(errorResponse.status
-        ? { response: { httpStatus: errorResponse.status } }
+        ? {
+            response: { httpStatus: errorResponse.status, body: errorResponse },
+          }
+        : {}),
+      serviceName: "BroadcastToPartnersOnConventionUpdates",
+    };
+
+    expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
+      expectedBroadcastFeedback,
+    ]);
+  });
+
+  it("save feedback success", async () => {
+    uow.agencyRepository.setAgencies([agency1]);
+    uow.conventionRepository.setConventions([convention1]);
+
+    uow.apiConsumerRepository.consumers = [apiConsumer1];
+
+    const now = new Date("2024-03-04T10:00:00Z");
+    timeGateway.setNextDate(now);
+
+    const successResponse: SubscriberResponse = {
+      title: "Partner subscription notified successfully",
+      callbackUrl: "http://fake.com",
+      conventionStatus: "ACCEPTED_BY_VALIDATOR",
+      conventionId: "lala",
+      status: 200,
+    };
+
+    subscribersGateway.simulatedResponse = successResponse;
+
+    await broadcastUpdatedConvention.execute({ convention: convention1 });
+
+    const expectedBroadcastFeedback: BroadcastFeedback = {
+      consumerId: apiConsumer1.id,
+      consumerName: apiConsumer1.name,
+      handledByAgency: false,
+      occurredAt: now,
+      requestParams: {
+        callbackUrl: successResponse.callbackUrl,
+        conventionId: successResponse.conventionId,
+        conventionStatus: successResponse.conventionStatus,
+      },
+      ...(successResponse.status
+        ? {
+            response: {
+              httpStatus: successResponse.status,
+              body: successResponse,
+            },
+          }
         : {}),
       serviceName: "BroadcastToPartnersOnConventionUpdates",
     };
