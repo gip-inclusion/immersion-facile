@@ -4,7 +4,7 @@ import {
   SubscriptionParams,
   expectToEqual,
 } from "shared";
-import { SavedError } from "../../saved-errors/ports/SavedErrorRepository";
+import { BroadcastFeedback } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -205,21 +205,25 @@ describe("Broadcast to partners on updated convention", () => {
 
     await broadcastUpdatedConvention.execute({ convention: convention1 });
 
-    const expectedSavedError: SavedError = {
+    const expectedBroadcastFeedback: BroadcastFeedback = {
       consumerId: apiConsumer1.id,
       consumerName: apiConsumer1.name,
       handledByAgency: false,
       subscriberErrorFeedback: errorResponse.subscriberErrorFeedback,
       occurredAt: now,
-      params: {
+      requestParams: {
         callbackUrl: errorResponse.callbackUrl,
         conventionId: errorResponse.conventionId,
         conventionStatus: errorResponse.conventionStatus,
-        httpStatus: errorResponse.status,
       },
+      ...(errorResponse.status
+        ? { response: { httpStatus: errorResponse.status } }
+        : {}),
       serviceName: "BroadcastToPartnersOnConventionUpdates",
     };
 
-    expectToEqual(uow.errorRepository.savedErrors, [expectedSavedError]);
+    expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
+      expectedBroadcastFeedback,
+    ]);
   });
 });

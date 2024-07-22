@@ -26,7 +26,7 @@ import { InMemoryOutboxRepository } from "../../events/adapters/InMemoryOutboxRe
 import { InMemoryFeatureFlagRepository } from "../../feature-flags/adapters/InMemoryFeatureFlagRepository";
 import { InMemoryNotificationRepository } from "../../notifications/adapters/InMemoryNotificationRepository";
 import { InMemoryRomeRepository } from "../../rome/adapters/InMemoryRomeRepository";
-import { InMemorySavedErrorRepository } from "../../saved-errors/adapters/InMemorySavedErrorRepository";
+import { InMemoryBroadcastFeedbacksRepository } from "../../saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
 import { InMemoryShortLinkRepository } from "../../short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
 import { InMemoryStatisticQueries } from "../../statistics/adapters/InMemoryStatisticQueries";
 import { UnitOfWork } from "../ports/UnitOfWork";
@@ -61,7 +61,7 @@ export const createInMemoryUow = () => {
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
     groupRepository: new InMemoryGroupRepository(),
-    errorRepository: new InMemorySavedErrorRepository(),
+    broadcastFeedbacksRepository: new InMemoryBroadcastFeedbacksRepository(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
     assessmentRepository: new InMemoryAssessmentRepository(),

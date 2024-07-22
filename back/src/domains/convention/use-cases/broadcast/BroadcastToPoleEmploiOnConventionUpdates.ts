@@ -5,7 +5,7 @@ import {
   withConventionSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/SavedErrorRepository";
+import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -110,12 +110,13 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       });
 
     if (!isBroadcastResponseOk(response)) {
-      await uow.errorRepository.save({
+      await uow.broadcastFeedbacksRepository.save({
         consumerId: null,
         consumerName: "France Travail",
         serviceName: broadcastToPeServiceName,
         subscriberErrorFeedback: response.subscriberErrorFeedback,
-        params: { conventionId: convention.id, httpStatus: response.status },
+        requestParams: { conventionId: convention.id },
+        response: { httpStatus: response.status },
         occurredAt: this.timeGateway.now(),
         handledByAgency: false,
       });

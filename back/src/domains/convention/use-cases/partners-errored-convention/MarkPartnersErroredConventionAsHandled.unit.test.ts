@@ -13,9 +13,9 @@ import {
   makeCreateNewEvent,
 } from "../../../core/events/ports/EventBus";
 import {
-  SavedError,
+  BroadcastFeedback,
   broadcastToPeServiceName,
-} from "../../../core/saved-errors/ports/SavedErrorRepository";
+} from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -93,23 +93,23 @@ describe("mark partners errored convention as handled", () => {
   it("Mark partner errored convention as handled", async () => {
     const conventionRepository = uow.conventionRepository;
     const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
-    const savedErrorsRepository = uow.errorRepository;
+    const broadcastFeedbacksRepository = uow.broadcastFeedbacksRepository;
 
-    const savedErrorConvention: SavedError = {
+    const savedErrorConvention: BroadcastFeedback = {
       serviceName: broadcastToPeServiceName,
       consumerName: "Yolo",
       consumerId: "yolo-id",
-      params: {
+      requestParams: {
         conventionId,
-        httpStatus: 404,
       },
+      response: { httpStatus: 404 },
       subscriberErrorFeedback: { message: "Ops, something is bad" },
       occurredAt: timeGateway.now(),
       handledByAgency: false,
     };
 
     await conventionRepository.save(convention);
-    await savedErrorsRepository.save(savedErrorConvention);
+    await broadcastFeedbacksRepository.save(savedErrorConvention);
 
     await inclusionConnectRepository.setInclusionConnectedUsers([
       icUserWithAgencyRights,
@@ -122,11 +122,102 @@ describe("mark partners errored convention as handled", () => {
       icJwtDomainPayload,
     );
 
-    expectToEqual(savedErrorsRepository.savedErrors, [
+    expectToEqual(broadcastFeedbacksRepository.broadcastFeedbacks, [
       {
         ...savedErrorConvention,
         handledByAgency: true,
       },
+    ]);
+
+    expectToEqual(outboxRepo.events, [
+      createNewEvent({
+        topic: "PartnerErroredConventionMarkedAsHandled",
+        payload: {
+          conventionId,
+          userId,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: icJwtDomainPayload.userId,
+          },
+        },
+      }),
+    ]);
+  });
+
+  it("only mark as handled the errored conventions that have the corresponding service name", async () => {
+    const conventionRepository = uow.conventionRepository;
+    const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
+    const broadcastFeedbacksRepository = uow.broadcastFeedbacksRepository;
+
+    const savedErrorConvention1: BroadcastFeedback = {
+      serviceName: broadcastToPeServiceName,
+      consumerId: "my-consumer-id",
+      consumerName: "My consumer name",
+      requestParams: {
+        conventionId,
+      },
+      response: { httpStatus: 404 },
+      subscriberErrorFeedback: {
+        message: "Ops, something is bad",
+      },
+      occurredAt: timeGateway.now(),
+      handledByAgency: false,
+    };
+
+    const savedErrorConvention2: BroadcastFeedback = {
+      serviceName: broadcastToPeServiceName,
+      consumerId: "my-consumer-id",
+      consumerName: "My consumer name",
+      requestParams: {
+        conventionId,
+      },
+      response: { httpStatus: 404 },
+      subscriberErrorFeedback: { message: "Ops, something is bad AGAIN" },
+      occurredAt: timeGateway.now(),
+      handledByAgency: false,
+    };
+
+    const savedErrorConvention3: BroadcastFeedback = {
+      serviceName: "Yolo.serviceName",
+      consumerId: "my-consumer-id",
+      consumerName: "My consumer name",
+      requestParams: {
+        conventionId,
+      },
+      response: { httpStatus: 404 },
+      subscriberErrorFeedback: {
+        message: "yolo",
+      },
+      occurredAt: timeGateway.now(),
+      handledByAgency: false,
+    };
+
+    await conventionRepository.save(convention);
+    await broadcastFeedbacksRepository.save(savedErrorConvention1);
+    await broadcastFeedbacksRepository.save(savedErrorConvention2);
+    await broadcastFeedbacksRepository.save(savedErrorConvention3);
+
+    await inclusionConnectRepository.setInclusionConnectedUsers([
+      icUserWithAgencyRights,
+    ]);
+
+    await markPartnersErroredConventionAsHandled.execute(
+      {
+        conventionId,
+      },
+      icJwtDomainPayload,
+    );
+
+    expectToEqual(broadcastFeedbacksRepository.broadcastFeedbacks, [
+      {
+        ...savedErrorConvention1,
+        handledByAgency: true,
+      },
+      {
+        ...savedErrorConvention2,
+        handledByAgency: true,
+      },
+      { ...savedErrorConvention3 },
     ]);
 
     expectToEqual(outboxRepo.events, [
@@ -169,23 +260,23 @@ describe("mark partners errored convention as handled", () => {
   it("Throw when convention is errored but already handled", async () => {
     const conventionRepository = uow.conventionRepository;
     const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
-    const savedErrorsRepository = uow.errorRepository;
+    const broadcastFeedbacksRepository = uow.broadcastFeedbacksRepository;
 
-    const savedHandledErrorConvention: SavedError = {
+    const savedHandledErrorConvention: BroadcastFeedback = {
       serviceName: broadcastToPeServiceName,
       consumerId: "my-consumer-id",
       consumerName: "My consumer name",
-      params: {
+      requestParams: {
         conventionId,
-        httpStatus: 404,
       },
+      response: { httpStatus: 404 },
       subscriberErrorFeedback: { message: "Ops, something is bad" },
       occurredAt: timeGateway.now(),
       handledByAgency: true,
     };
 
     await conventionRepository.save(convention);
-    await savedErrorsRepository.save(savedHandledErrorConvention);
+    await broadcastFeedbacksRepository.save(savedHandledErrorConvention);
     await inclusionConnectRepository.setInclusionConnectedUsers([
       icUserWithAgencyRights,
     ]);

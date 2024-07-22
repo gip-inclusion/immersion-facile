@@ -27,7 +27,7 @@ import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";
 import { PgNotificationRepository } from "../../notifications/adapters/PgNotificationRepository";
 import { PgRomeRepository } from "../../rome/adapters/PgRomeRepository";
-import { PgSavedErrorRepository } from "../../saved-errors/adapters/PgSavedErrorRepository";
+import { PgBroadcastFeedbacksRepository } from "../../saved-errors/adapters/PgBroadcastFeedbacksRepository";
 import { PgShortLinkRepository } from "../../short-link/adapters/short-link-repository/PgShortLinkRepository";
 import { PgStatisticQueries } from "../../statistics/adapters/PgStatisticQueries";
 import { UnitOfWork } from "../ports/UnitOfWork";
@@ -52,7 +52,9 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
       transaction,
     ),
     discussionRepository: new PgDiscussionRepository(transaction),
-    errorRepository: new PgSavedErrorRepository(transaction),
+    broadcastFeedbacksRepository: new PgBroadcastFeedbacksRepository(
+      transaction,
+    ),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       transaction,
     ),

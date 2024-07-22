@@ -26,7 +26,7 @@ import { OutboxRepository } from "../../events/ports/OutboxRepository";
 import { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";
 import { NotificationRepository } from "../../notifications/ports/NotificationRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
-import { SavedErrorRepository } from "../../saved-errors/ports/SavedErrorRepository";
+import { BroadcastFeedbacksRepository } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import { ShortLinkQuery } from "../../short-link/ports/ShortLinkQuery";
 import { ShortLinkRepository } from "../../short-link/ports/ShortLinkRepository";
 import { StatisticQueries } from "../../statistics/ports/StatisticQueries";
@@ -44,7 +44,7 @@ export type UnitOfWork = {
   delegationContactRepository: DelegationContactRepository;
   deletedEstablishmentRepository: DeletedEstablishmentRepository;
   discussionRepository: DiscussionRepository;
-  errorRepository: SavedErrorRepository;
+  broadcastFeedbacksRepository: BroadcastFeedbacksRepository;
   establishmentAggregateRepository: EstablishmentAggregateRepository;
   establishmentLeadQueries: EstablishmentLeadQueries;
   establishmentLeadRepository: EstablishmentLeadRepository;
