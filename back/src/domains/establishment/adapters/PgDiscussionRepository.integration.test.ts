@@ -164,6 +164,7 @@ describe("PgDiscussionRepository", () => {
           discussionWithLastExchangeByEstablishment2,
           discussionWithoutExchanges3,
           discussionWithRejectedStatusAndReason4,
+          discussionWithAcceptedStatus5,
         ],
       },
       {
