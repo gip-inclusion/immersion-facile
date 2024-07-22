@@ -1,5 +1,5 @@
 import { AddressDto, LocationId } from "../address/address.dto";
-import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import { ContactMethod } from "../formEstablishment/FormEstablishments.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import {
   AppellationDto,

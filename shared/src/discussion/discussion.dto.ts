@@ -3,7 +3,7 @@ import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto } from "../address/address.dto";
 import { ConventionId, ImmersionObjective } from "../convention/convention.dto";
-import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import { ContactMethod } from "../formEstablishment/FormEstablishments.dto";
 import {
   AppellationAndRomeDto,
   AppellationCode,
