@@ -9,7 +9,7 @@ import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
-} from "../../../config/helpers/httpErrors";
+} from "shared";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
