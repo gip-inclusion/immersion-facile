@@ -131,12 +131,28 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
           },
           serviceName: broadcastToPartnersServiceName,
           ...(response.status
-            ? { response: { httpStatus: response.status } }
+            ? { response: { httpStatus: response.status, body: response } }
             : {}),
         });
 
         return;
       }
+
+      await uow.broadcastFeedbacksRepository.save({
+        consumerId: apiConsumer.id,
+        consumerName: apiConsumer.name,
+        handledByAgency: false,
+        occurredAt: this.#timeGateway.now(),
+        requestParams: {
+          callbackUrl: response.callbackUrl,
+          conventionId: response.conventionId,
+          conventionStatus: response.conventionStatus,
+        },
+        ...(response.status
+          ? { response: { httpStatus: response.status, body: response } }
+          : {}),
+        serviceName: "BroadcastToPartnersOnConventionUpdates",
+      });
 
       logger.info({ subscriberResponse: response });
       return;
