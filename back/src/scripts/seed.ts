@@ -4,6 +4,7 @@ import {
   FeatureFlags,
   InclusionConnectedUserBuilder,
   conventionSchema,
+  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   reasonableSchedule,
@@ -123,6 +124,7 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
     enableMaintenance: makeTextFeatureFlag(false, {
       message: "Mon message de maintenance",
     }),
+    enableSearchByScore: makeBooleanFeatureFlag(false),
   };
 
   await uow.featureFlagRepository.insertAll(featureFlags);
