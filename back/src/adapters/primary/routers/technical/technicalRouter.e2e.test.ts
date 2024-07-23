@@ -17,10 +17,7 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import {
-  GenerateConventionJwt,
-  GenerateInclusionConnectJwt,
-} from "../../../../domains/core/jwt";
+import { GenerateConventionJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
@@ -104,7 +101,6 @@ const delegationContactTallyForm = {
 
 describe("technical router", () => {
   let generateConventionJwt: GenerateConventionJwt;
-  let _generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let httpClient: HttpClient<TechnicalRoutes>;
   let appConfig: AppConfig;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -234,7 +230,7 @@ describe("technical router", () => {
 
       expect(response.status).toBe(404);
       expectObjectsToMatch(response.body, {
-        errors: errors.shortLink.notFound({ shortLinkId: expectedShortLinkId })
+        message: errors.shortLink.notFound({ shortLinkId: expectedShortLinkId })
           .message,
       });
     });
@@ -312,7 +308,8 @@ describe("technical router", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: "Missmatch Tally signature",
+          message: "Missmatch Tally signature",
+          status: 403,
         },
         status: 403,
       });
@@ -353,7 +350,8 @@ describe("technical router", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: "Missmatch Tally signature",
+          message: "Missmatch Tally signature",
+          status: 403,
         },
         status: 403,
       });

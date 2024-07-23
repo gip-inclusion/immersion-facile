@@ -27,7 +27,6 @@ import {
 import { HttpClient } from "shared-routes";
 import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { ZodError } from "zod";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
@@ -159,73 +158,13 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          errors: new ZodError([
-            {
-              code: "invalid_union",
-              unionErrors: [
-                new ZodError([
-                  {
-                    code: "invalid_union",
-                    unionErrors: [
-                      new ZodError([
-                        {
-                          received: "unknown-dashboard",
-                          code: "invalid_enum_value",
-                          options: [
-                            "conventions",
-                            "events",
-                            "establishments",
-                            "agencies",
-                          ],
-                          path: ["name"],
-                          message:
-                            "Vous devez sélectionner une option parmi celles proposées",
-                        },
-                      ]),
-                      new ZodError([
-                        {
-                          received: "unknown-dashboard",
-                          code: "invalid_enum_value",
-                          options: ["agencyForAdmin"],
-                          path: ["name"],
-                          message:
-                            "Vous devez sélectionner une option parmi celles proposées",
-                        },
-                        {
-                          code: "invalid_type",
-                          expected: "string",
-                          received: "undefined",
-                          path: ["agencyId"],
-                          message: "Required",
-                        },
-                      ]),
-                    ],
-                    path: [],
-                    message: "Invalid input",
-                  },
-                ]),
-                new ZodError([
-                  {
-                    received: "unknown-dashboard",
-                    code: "invalid_enum_value",
-                    options: ["conventionStatus"],
-                    path: ["name"],
-                    message:
-                      "Vous devez sélectionner une option parmi celles proposées",
-                  },
-                  {
-                    code: "invalid_type",
-                    expected: "string",
-                    received: "undefined",
-                    path: ["conventionId"],
-                    message: "Required",
-                  },
-                ]),
-              ],
-              path: [],
-              message: "Invalid input",
-            },
-          ]).toString(),
+          status: 400,
+          message: "Schema validation failed. See issues for details.",
+          issues: [
+            "name : Vous devez sélectionner une option parmi celles proposées",
+            "agencyId : Required",
+            "conventionId : Required",
+          ],
         },
       });
     });
@@ -240,7 +179,8 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          errors:
+          status: 400,
+          message:
             "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
         },
       });
@@ -254,7 +194,7 @@ describe("Admin router", () => {
       });
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "You need to authenticate first" },
+        body: { status: 401, message: "Veuillez vous authentifier" },
       });
     });
 
@@ -266,7 +206,7 @@ describe("Admin router", () => {
       });
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "Provided token is invalid" },
+        body: { status: 401, message: "Provided token is invalid" },
       });
     });
   });
@@ -401,7 +341,7 @@ describe("Admin router", () => {
       });
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "Provided token is invalid" },
+        body: { status: 401, message: "Provided token is invalid" },
       });
     });
   });
@@ -427,7 +367,7 @@ describe("Admin router", () => {
       });
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "You need to authenticate first" },
+        body: { status: 401, message: "Veuillez vous authentifier" },
       });
     });
   });
@@ -499,7 +439,7 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "You need to authenticate first" },
+        body: { status: 401, message: "Veuillez vous authentifier" },
       });
     });
 
@@ -532,7 +472,8 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 404,
         body: {
-          errors: errors.user.notFound({ userId: inclusionConnectedUser.id })
+          status: 404,
+          message: errors.user.notFound({ userId: inclusionConnectedUser.id })
             .message,
         },
       });
@@ -606,7 +547,7 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "You need to authenticate first" },
+        body: { status: 401, message: "Veuillez vous authentifier" },
       });
     });
   });
@@ -697,7 +638,7 @@ describe("Admin router", () => {
 
       expectResponseAndReturnJwt(response, {
         status: 401,
-        body: { error: "You need to authenticate first" },
+        body: { message: "Veuillez vous authentifier", status: 401 },
       });
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
     });
@@ -712,7 +653,7 @@ describe("Admin router", () => {
 
       expectResponseAndReturnJwt(response, {
         status: 401,
-        body: { error: "Provided token is invalid" },
+        body: { status: 401, message: "Provided token is invalid" },
       });
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
     });
@@ -738,7 +679,7 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "You need to authenticate first" },
+        body: { status: 401, message: "Veuillez vous authentifier" },
       });
     });
 
@@ -752,7 +693,7 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "Provided token is invalid" },
+        body: { status: 401, message: "Provided token is invalid" },
       });
     });
   });

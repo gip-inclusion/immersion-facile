@@ -1,10 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { contactEstablishmentRequestSchema } from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
 import { groupWithResultsSchema } from "../group/group.schema";
-import {
-  httpErrorSchema,
-  legacyHttpErrorSchema,
-} from "../httpClient/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { searchResultQuerySchema } from "../siretAndAppellation/SiretAndAppellation.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import { searchParamsSchema } from "./SearchQueryParams.schema";
@@ -17,7 +14,7 @@ export const searchImmersionRoutes = defineRoutes({
     url: "/groups/:groupSlug",
     responses: {
       200: groupWithResultsSchema,
-      404: legacyHttpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   search: defineRoute({
@@ -26,7 +23,7 @@ export const searchImmersionRoutes = defineRoutes({
     queryParamsSchema: searchParamsSchema,
     responses: {
       200: searchResultsSchema,
-      400: httpErrorSchema.or(legacyHttpErrorSchema),
+      400: httpErrorSchema.or(httpErrorSchema),
     },
   }),
   contactEstablishment: defineRoute({
@@ -37,7 +34,7 @@ export const searchImmersionRoutes = defineRoutes({
       201: expressEmptyResponseBody,
       400: httpErrorSchema,
       404: httpErrorSchema,
-      409: legacyHttpErrorSchema,
+      409: httpErrorSchema,
     },
   }),
   getSearchResult: defineRoute({
@@ -47,7 +44,7 @@ export const searchImmersionRoutes = defineRoutes({
     responses: {
       200: searchResultSchema,
       400: httpErrorSchema,
-      404: legacyHttpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });

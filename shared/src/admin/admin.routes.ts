@@ -13,11 +13,7 @@ import {
   formEstablishmentBatchSchema,
 } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
-import {
-  httpErrorSchema,
-  legacyHttpErrorSchema,
-  legacyUnauthenticatedErrorSchema,
-} from "../httpClient/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
@@ -36,8 +32,8 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: dashboardUrlAndNameSchema,
-      400: legacyHttpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
     },
   }),
   addFormEstablishmentBatch: defineRoute({
@@ -48,7 +44,7 @@ export const adminRoutes = defineRoutes({
     responses: {
       200: establishmentBatchReportSchema,
       400: httpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
+      401: httpErrorSchema,
     },
   }),
   updateUserRoleForAgency: defineRoute({
@@ -58,9 +54,9 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       201: expressEmptyResponseBody,
-      400: legacyHttpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
-      404: legacyHttpErrorSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   rejectIcUserForAgency: defineRoute({
@@ -70,8 +66,8 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       201: expressEmptyResponseBody,
-      401: legacyUnauthenticatedErrorSchema,
-      404: legacyHttpErrorSchema,
+      401: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   getInclusionConnectedUsers: defineRoute({
@@ -81,7 +77,7 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(inclusionConnectedUserSchema),
-      401: legacyUnauthenticatedErrorSchema,
+      401: httpErrorSchema,
     },
   }),
   getLastNotifications: defineRoute({
@@ -97,7 +93,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: setFeatureFlagSchema,
     responses: {
       201: expressEmptyResponseBody,
-      401: legacyUnauthenticatedErrorSchema,
+      401: httpErrorSchema,
     },
   }),
   saveApiConsumer: defineRoute({
@@ -107,7 +103,7 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: apiConsumerJwtSchema.or(expressEmptyResponseBody),
-      401: legacyUnauthenticatedErrorSchema,
+      401: httpErrorSchema,
     },
   }),
   getAllApiConsumers: defineRoute({
@@ -116,7 +112,7 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(apiConsumerSchema),
-      401: legacyUnauthenticatedErrorSchema,
+      401: httpErrorSchema,
     },
   }),
 });

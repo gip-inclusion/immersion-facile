@@ -193,8 +193,14 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 201 }, () => undefined)
-            .with({ status: 400 }, (error) => {
-              throw new Error(error.body.errors);
+            .with({ status: 400 }, (_error) => {
+              const test = {
+                body: {
+                  message: "Mon message d'erreur.",
+                  issues: ["Truc : ne marche pas", "Bidule : non plus"],
+                },
+              };
+              throw new Error(badRequestResponseToString(test));
             })
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
@@ -202,3 +208,11 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 }
+
+const badRequestResponseToString = ({
+  body,
+}: { body: { message: string; issues?: string[] } }) => {
+  const { message, issues } = body;
+  if (!issues || issues.length === 0) return message;
+  return `${message} | Les problèmes sont : ${issues.join(", ")}`;
+};

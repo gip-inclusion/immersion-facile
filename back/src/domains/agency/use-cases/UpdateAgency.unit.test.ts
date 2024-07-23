@@ -107,26 +107,12 @@ describe("Update agency", () => {
       .withPosition(0, 0)
       .build();
 
-    const expectedErrorMessage = JSON.stringify(
-      [
-        {
-          code: "custom",
-          message: "0 est une latitude par défaut qui ne semble pas correcte",
-          path: ["position", "lat"],
-        },
-        {
-          code: "custom",
-          message: "0 est une longitude par défaut qui ne semble pas correcte",
-          path: ["position", "lon"],
-        },
-      ],
-      null,
-      2,
-    );
-
     await expectPromiseToFailWithError(
       updateAgency.execute(updatedAgency, backofficeAdmin),
-      new BadRequestError(expectedErrorMessage),
+      new BadRequestError("Schema validation failed. See issues for details.", [
+        "position.lat : 0 est une latitude par défaut qui ne semble pas correcte",
+        "position.lon : 0 est une longitude par défaut qui ne semble pas correcte",
+      ]),
     );
   });
 

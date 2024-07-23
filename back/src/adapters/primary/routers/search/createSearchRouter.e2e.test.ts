@@ -612,7 +612,8 @@ describe("search-immersion route", () => {
       expectHttpResponseToEqual(response, {
         status: 404,
         body: {
-          errors: errors.establishment.offerMissing({
+          status: 404,
+          message: errors.establishment.offerMissing({
             siret: requestedOffer.siret,
             appellationCode: requestedOffer.appellationCode,
             mode: "not found",
@@ -643,7 +644,8 @@ describe("search-immersion route", () => {
       expectHttpResponseToEqual(response, {
         status: 404,
         body: {
-          errors: errors.establishment.offerMissing({
+          status: 404,
+          message: errors.establishment.offerMissing({
             siret: requestedOffer.siret,
             appellationCode: requestedOffer.appellationCode,
             mode: "not found",

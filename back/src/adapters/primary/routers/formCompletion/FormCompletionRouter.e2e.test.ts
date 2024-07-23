@@ -78,18 +78,9 @@ describe("formCompletion Routes", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          errors: JSON.stringify(
-            [
-              {
-                validation: "regex",
-                code: "invalid_string",
-                message: "SIRET doit être composé de 14 chiffres",
-                path: ["siret"],
-              },
-            ],
-            null,
-            2,
-          ),
+          status: 400,
+          message: "Schema validation failed. See issues for details.",
+          issues: ["siret : SIRET doit être composé de 14 chiffres"],
         },
       });
     });
@@ -102,7 +93,8 @@ describe("formCompletion Routes", () => {
       expectHttpResponseToEqual(response, {
         status: 404,
         body: {
-          errors: errors.siretApi.notFound({ siret }).message,
+          status: 404,
+          message: errors.siretApi.notFound({ siret }).message,
         },
       });
     });
@@ -125,7 +117,8 @@ describe("formCompletion Routes", () => {
       expectHttpResponseToEqual(response, {
         status: 409,
         body: {
-          errors: errors.establishment.conflictError({
+          status: 409,
+          message: errors.establishment.conflictError({
             siret: establishmentAggregate.establishment.siret,
           }).message,
         },

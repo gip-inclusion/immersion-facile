@@ -6,10 +6,7 @@ import {
 } from "../email/validateEmail.schema";
 import { featureFlagsSchema } from "../featureFlag/featureFlags.schema";
 import { withAuthorizationHeaders } from "../headers";
-import {
-  httpErrorSchema,
-  legacyHttpErrorSchema,
-} from "../httpClient/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { brevoInboundBodySchema } from "../inboundEmailParsing/brevoInbound.schema";
 import {
   emptyObjectSchema,
@@ -44,7 +41,7 @@ export const technicalRoutes = defineRoutes({
     url: "/to/:shortLinkId",
     responses: {
       302: emptyObjectSchema,
-      404: legacyHttpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   featureFlags: defineRoute({
@@ -81,7 +78,7 @@ export const technicalRoutes = defineRoutes({
     headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
     responses: {
       201: expressEmptyResponseBody,
-      403: legacyHttpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
 
@@ -94,7 +91,7 @@ export const technicalRoutes = defineRoutes({
     headersSchema: z.object({ "tally-signature": z.string() }).passthrough(),
     responses: {
       201: expressEmptyResponseBody,
-      403: legacyHttpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
 });
