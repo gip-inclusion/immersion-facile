@@ -28,37 +28,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Get last migration file name
-        id: last-migration-file
-        run: |
-          last_migration_file=$(ls -v ./back/src/config/pg/migrations | tail -n 1)
-          echo "LAST_MIGRATION_FILE=$last_migration_file" >> "$GITHUB_OUTPUT"
-      - name: Get PR migration files
-        id: new-migration-files
-        run: |
-          git fetch origin main
-          git fetch origin ${GITHUB_HEAD_REF}
-          diff=$(git diff --name-only --diff-filter=A origin/main origin/${GITHUB_HEAD_REF})
-          if echo "$diff" | grep -q "/migrations/"; then
-            migration_files=$(echo "$diff" | grep "/migrations/")
-          else
-            migration_files=""
-            echo "No migration files found."
-          fi
-          echo "NEW_MIGRATION_FILES_IN_PR=$migration_files" >> "$GITHUB_OUTPUT"
-      - name: Verify if last migration file is new
-        env:
-          LAST_MIGRATION_FILE: ${{ steps.last-migration-file.outputs.LAST_MIGRATION_FILE }}
-          NEW_MIGRATION_FILES_IN_PR: ${{ steps.new-migration-files.outputs.NEW_MIGRATION_FILES_IN_PR }}
-        run: |
-          echo "LAST_MIGRATION_FILE: $LAST_MIGRATION_FILE"
-          echo "NEW_MIGRATION_FILES_IN_PR: $NEW_MIGRATION_FILES_IN_PR"
-          if [ -n "$NEW_MIGRATION_FILES_IN_PR" ] && ! echo "$NEW_MIGRATION_FILES_IN_PR" | grep -q "$LAST_MIGRATION_FILE"; then
-            echo "ERROR: there are migration conflicts."
-            exit 1
-          else
-            echo "There is no migration conflict in this PR."
-          fi
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9.4.0
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.15.0"
+          cache: "pnpm"
+      - run: |
+          pnpm back verify-migrations-order
 
   deploy-review-app:
     if: github.event.pull_request.draft == false && github.event.pull_request.state == 'open'
