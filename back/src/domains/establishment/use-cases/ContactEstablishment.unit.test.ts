@@ -298,6 +298,7 @@ describe("ContactEstablishment", () => {
           experienceAdditionalInformation:
             validEmailRequest.experienceAdditionalInformation,
           hasWorkingExperience: validEmailRequest.hasWorkingExperience,
+          datePreferences: validEmailRequest.datePreferences,
         },
         establishmentContact: {
           contactMethod: "EMAIL",
