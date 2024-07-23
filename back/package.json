@@ -46,7 +46,8 @@
     "trigger-update-establishments-from-sirene": "ts-node src/scripts/triggerUpdateEstablishmentsFromSireneApiScript.ts",
     "typecheck": "tsc --noEmit",
     "kysely-codegen": "kysely-codegen --dialect postgres",
-    "update-agencies-from-PE-referential": "ts-node src/scripts/updateAllPEAgenciesFromPeAgencyReferential.ts"
+    "update-agencies-from-PE-referential": "ts-node src/scripts/updateAllPEAgenciesFromPeAgencyReferential.ts",
+    "verify-migrations-order": "./src/scripts/verifyDatabaseMigrationsOrder.sh"
   },
   "keywords": [],
   "author": "",
