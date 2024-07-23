@@ -45,6 +45,7 @@ const seed = async () => {
   await deps.uowPerformer.perform(async (uow) => {
     await featureFlagsSeed(uow);
     await agencySeed(uow);
+    await icAgencyUsers(uow);
     await establishmentSeed(uow);
     await conventionSeed(uow);
   });
@@ -161,6 +162,30 @@ const agencySeed = async (uow: UnitOfWork) => {
   });
 
   await Promise.all(insertQueries);
+
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("done");
+};
+
+const icAgencyUsers = async (uow: UnitOfWork) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("seeding ic agency users...");
+
+  const agencies = new Set([
+    seedHelpers.getRandomAgencyId({ kind: "pole-emploi" }),
+    seedHelpers.getRandomAgencyId({ kind: "mission-locale" }),
+  ]);
+
+  await seedHelpers.linkAgenciesWithIcUser({
+    uow,
+    agencyIds: [...agencies, seedHelpers.getRandomAgencyId({ kind: "cci" })],
+    userId: seedHelpers.seedUsers.admins[0].id,
+  });
+  await seedHelpers.linkAgenciesWithIcUser({
+    uow,
+    agencyIds: [...agencies],
+    userId: seedHelpers.seedUsers.icUsers[0].id,
+  });
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");

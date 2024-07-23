@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   AgencyId,
   AgencyKind,
+  UserId,
   defaultValidatorEmail,
 } from "shared";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
@@ -65,6 +66,29 @@ const getRandomNotIcUserEmail = (): string => {
   return emails[Math.floor(Math.random() * emails.length)];
 };
 
+const linkAgenciesWithIcUser = async ({
+  userId,
+  agencyIds,
+  uow,
+}: { uow: UnitOfWork; agencyIds: AgencyId[]; userId: UserId }) => {
+  return Promise.all(
+    agencyIds.map(async (agencyId) => {
+      const agency = await uow.agencyRepository.getById(agencyId);
+      if (!agency) throw new Error(`agency with id ${agencyId} not found`);
+      return uow.inclusionConnectedUserRepository.updateAgencyRights({
+        userId,
+        agencyRights: [
+          {
+            agency,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        ],
+      });
+    }),
+  );
+};
+
 const insertAgencySeed = async ({
   uow,
   kind,
@@ -95,4 +119,5 @@ export const seedHelpers = {
   seedUsers,
   getRandomAgencyId,
   insertAgencySeed,
+  linkAgenciesWithIcUser,
 };
