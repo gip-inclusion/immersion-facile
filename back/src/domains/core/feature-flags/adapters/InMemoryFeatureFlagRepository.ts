@@ -1,6 +1,7 @@
 import {
   FeatureFlags,
   SetFeatureFlagParam,
+  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
@@ -18,6 +19,7 @@ const defaultFlags: FeatureFlags = {
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "Maintenance message",
   }),
+  enableSearchByScore: makeBooleanFeatureFlag(false),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {

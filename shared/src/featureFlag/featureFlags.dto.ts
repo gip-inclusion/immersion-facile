@@ -4,6 +4,7 @@ export type FeatureFlagName = (typeof featureFlagNames)[number];
 export const featureFlagNames = [
   "enableTemporaryOperation",
   "enableMaintenance",
+  "enableSearchByScore",
 ] as const;
 
 type FeatureFlagKind = (typeof featureFlagKinds)[number];
@@ -44,6 +45,7 @@ export type FeatureFlag =
 export type FeatureFlags = {
   enableMaintenance: FeatureFlagText;
   enableTemporaryOperation: FeatureFlagTextImageAndRedirect;
+  enableSearchByScore: FeatureFlagBoolean;
 };
 
 export type SetFeatureFlagParam = {

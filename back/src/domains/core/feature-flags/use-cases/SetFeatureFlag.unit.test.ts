@@ -23,6 +23,14 @@ const setEnableMaintenanceParams = {
   },
 } satisfies SetFeatureFlagParam;
 
+const setEnableSearchByScoreParams = {
+  flagName: "enableSearchByScore",
+  featureFlag: {
+    kind: "boolean",
+    isActive: true,
+  },
+} satisfies SetFeatureFlagParam;
+
 const icUserNotAdmin = new InclusionConnectedUserBuilder()
   .withIsAdmin(false)
   .build();
@@ -67,6 +75,41 @@ describe("SetFeatureFlag use case", () => {
     await setFeatureFlag.execute(setEnableMaintenanceParams, icUserAdmin);
     expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
       enableMaintenance: setEnableMaintenanceParams.featureFlag,
+    });
+  });
+
+  it("updates the feature flag", async () => {
+    await setFeatureFlag.execute(setEnableSearchByScoreParams, icUserAdmin);
+    expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
+      enableSearchByScore: setEnableSearchByScoreParams.featureFlag,
+    });
+
+    const updateEnableSearchByScoreParams = {
+      flagName: "enableSearchByScore",
+      featureFlag: {
+        kind: "boolean",
+        isActive: false,
+      },
+    } satisfies SetFeatureFlagParam;
+
+    await setFeatureFlag.execute(updateEnableSearchByScoreParams, icUserAdmin);
+    expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
+      enableSearchByScore: updateEnableSearchByScoreParams.featureFlag,
+    });
+
+    const reupdateEnableSearchByScoreParams = {
+      flagName: "enableSearchByScore",
+      featureFlag: {
+        kind: "boolean",
+        isActive: true,
+      },
+    } satisfies SetFeatureFlagParam;
+    await setFeatureFlag.execute(
+      reupdateEnableSearchByScoreParams,
+      icUserAdmin,
+    );
+    expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
+      enableSearchByScore: reupdateEnableSearchByScoreParams.featureFlag,
     });
   });
 });

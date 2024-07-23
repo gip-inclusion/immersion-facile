@@ -1,6 +1,7 @@
 import {
   FeatureFlags,
   expectToEqual,
+  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
@@ -27,6 +28,7 @@ const defaultFeatureFlags: FeatureFlags = {
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "",
   }),
+  enableSearchByScore: makeBooleanFeatureFlag(false),
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -41,6 +43,7 @@ const flagsFromApi: FeatureFlags = {
   enableMaintenance: makeTextFeatureFlag(true, {
     message: "My maintenance message",
   }),
+  enableSearchByScore: makeBooleanFeatureFlag(true),
 };
 
 describe("feature flag slice", () => {

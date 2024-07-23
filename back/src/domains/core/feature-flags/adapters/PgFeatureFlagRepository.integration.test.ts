@@ -2,6 +2,7 @@ import { Pool, PoolClient } from "pg";
 import {
   FeatureFlags,
   expectToEqual,
+  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
@@ -40,6 +41,7 @@ describe("PG getFeatureFlags", () => {
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
+      enableSearchByScore: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(expectedFeatureFlags);
@@ -58,10 +60,11 @@ describe("PG getFeatureFlags", () => {
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
+      enableSearchByScore: makeBooleanFeatureFlag(false),
     });
   });
 
-  it("inserts featureFlags than updates a Feature Flag to the given value", async () => {
+  it("inserts featureFlags then updates a Feature Flag to the given value", async () => {
     const initialFeatureFlags: FeatureFlags = {
       enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
         imageAlt: "Alt",
@@ -74,6 +77,7 @@ describe("PG getFeatureFlags", () => {
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
+      enableSearchByScore: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(initialFeatureFlags);
@@ -93,6 +97,11 @@ describe("PG getFeatureFlags", () => {
       }),
     });
 
+    await featureFlagRepository.update({
+      flagName: "enableSearchByScore",
+      featureFlag: makeBooleanFeatureFlag(true),
+    });
+
     const featureFlags = await featureFlagRepository.getAll();
     expectToEqual(featureFlags, {
       enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(true, {
@@ -106,6 +115,7 @@ describe("PG getFeatureFlags", () => {
       enableMaintenance: makeTextFeatureFlag(false, {
         message: "Maintenance message",
       }),
+      enableSearchByScore: makeBooleanFeatureFlag(true),
     });
   });
 });
