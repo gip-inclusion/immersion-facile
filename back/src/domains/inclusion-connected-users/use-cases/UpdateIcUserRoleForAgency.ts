@@ -6,7 +6,6 @@ import {
   icUserRoleForAgencyParamsSchema,
   replaceElementWhere,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -41,8 +40,7 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
     const userToUpdate = await uow.inclusionConnectedUserRepository.getById(
       params.userId,
     );
-    if (!userToUpdate)
-      throw new NotFoundError(`User with id ${params.userId} not found`);
+    if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
     const agencyRightToUpdate = userToUpdate.agencyRights.find(
       ({ agency }) => agency.id === params.agencyId,

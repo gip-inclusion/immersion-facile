@@ -5,9 +5,10 @@ import {
   addressDtoToString,
   contactEstablishmentEventPayloadSchema,
   createOpaqueEmail,
+  errors,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import { BadRequestError, NotFoundError } from "shared";
+
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -39,9 +40,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       payload.discussionId,
     );
     if (!discussion)
-      throw new NotFoundError(
-        `No discussion found with id: ${payload.discussionId}`,
-      );
+      throw errors.discussion.notFound({ discussionId: payload.discussionId });
 
     const followedIds = {
       establishmentSiret: discussion.siret,
@@ -58,9 +57,10 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
 
         if (!appellationLabel)
-          throw new BadRequestError(
-            `No appellationLabel found for appellationCode: ${discussion.appellationCode}`,
-          );
+          throw errors.discussion.missingAppellationLabel({
+            appellationCode: discussion.appellationCode,
+          });
+
         const cc = establishmentContact.copyEmails.filter(
           (email) => email !== establishmentContact.email,
         );

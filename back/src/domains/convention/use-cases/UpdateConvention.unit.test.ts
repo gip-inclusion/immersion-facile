@@ -72,7 +72,7 @@ describe("Update Convention", () => {
 
       await expectPromiseToFailWithError(
         updateConvention.execute({ convention }, { userId: icUser.id }),
-        new ForbiddenError(`User '${icUser.id}' is not a backOffice user`),
+        errors.user.notBackOfficeAdmin({ userId: icUser.id }),
       );
     });
 

@@ -15,6 +15,7 @@ import {
   createApiConsumerParamsFromApiConsumer,
   currentJwtVersions,
   displayRouteName,
+  errors,
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
@@ -524,7 +525,10 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 404,
-        body: { errors: "User with id my-user-id not found" },
+        body: {
+          errors: errors.user.notFound({ userId: inclusionConnectedUser.id })
+            .message,
+        },
       });
     });
   });

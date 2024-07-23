@@ -3,10 +3,10 @@ import {
   ContactMethod,
   DiscussionBuilder,
   addressDtoToString,
+  errors,
   expectPromiseToFailWithError,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import { BadRequestError, NotFoundError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -208,9 +208,9 @@ describe("NotifyContactRequest", () => {
 
       await expectPromiseToFailWithError(
         notifyContactRequest.execute(validInPersonPayload),
-        new NotFoundError(
-          `No discussion found with id: ${validInPersonPayload.discussionId}`,
-        ),
+        errors.discussion.notFound({
+          discussionId: validInPersonPayload.discussionId,
+        }),
       );
     });
 
@@ -225,9 +225,9 @@ describe("NotifyContactRequest", () => {
 
       await expectPromiseToFailWithError(
         notifyContactRequest.execute(validContactRequestByMail),
-        new BadRequestError(
-          `No appellationLabel found for appellationCode: ${discussion.appellationCode}`,
-        ),
+        errors.discussion.missingAppellationLabel({
+          appellationCode: discussion.appellationCode,
+        }),
       );
     });
   });

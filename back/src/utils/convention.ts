@@ -1,33 +1,31 @@
-import { AgencyDto, ConventionDto, Role } from "shared";
-import { BadRequestError } from "shared";
-
-const hasNoMagicLink = (role: Role) =>
-  `Le rôle "${role}" n'a pas de liens magiques.`;
+import { AgencyDto, ConventionDto, Role, errors } from "shared";
 
 export const conventionEmailsByRole = (
   convention: ConventionDto,
   agency: AgencyDto,
 ): Record<Role, string[] | Error> => ({
-  backOffice: new BadRequestError(hasNoMagicLink("backOffice")),
-  toReview: new BadRequestError(hasNoMagicLink("toReview")),
-  "agency-viewer": new BadRequestError(hasNoMagicLink("agency-viewer")),
+  backOffice: errors.convention.roleHasNoMagicLink({ role: "backOffice" }),
+  toReview: errors.convention.roleHasNoMagicLink({ role: "toReview" }),
+  "agency-viewer": errors.convention.roleHasNoMagicLink({
+    role: "agency-viewer",
+  }),
   beneficiary: [convention.signatories.beneficiary.email],
   "beneficiary-current-employer": convention.signatories
     .beneficiaryCurrentEmployer
     ? [convention.signatories.beneficiaryCurrentEmployer.email]
-    : new BadRequestError(
-        "There is no beneficiaryCurrentEmployer on convention.",
-      ),
+    : errors.convention.missingActor({
+        conventionId: convention.id,
+        role: "beneficiary-current-employer",
+      }),
   "beneficiary-representative": convention.signatories.beneficiaryRepresentative
     ? [convention.signatories.beneficiaryRepresentative.email]
-    : new BadRequestError(
-        "There is no beneficiaryRepresentative on convention.",
-      ),
+    : errors.convention.missingActor({
+        conventionId: convention.id,
+        role: "beneficiary-representative",
+      }),
   counsellor: agency.counsellorEmails,
   validator: agency.validatorEmails,
-  agencyOwner: new BadRequestError(
-    "Le responsable d'agence n'a pas de liens magiques.",
-  ),
+  agencyOwner: errors.convention.roleHasNoMagicLink({ role: "agencyOwner" }),
   "establishment-representative": [
     convention.signatories.establishmentRepresentative.email,
   ],
@@ -41,9 +39,9 @@ export const conventionEmailsByRoleForMagicLinkRenewal = (
 ): Record<Role, string[] | Error> => {
   return {
     ...conventionEmailsByRole(convention, agency),
-    backOffice: new BadRequestError("Le backoffice n'a pas de liens magiques."),
-    "establishment-tutor": new BadRequestError(
-      `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
-    ),
+    backOffice: errors.convention.roleHasNoMagicLink({ role: "backOffice" }),
+    "establishment-tutor": errors.convention.unsupportedRoleRenewMagicLink({
+      role,
+    }),
   };
 };

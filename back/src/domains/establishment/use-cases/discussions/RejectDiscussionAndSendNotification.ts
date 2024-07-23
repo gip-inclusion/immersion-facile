@@ -6,11 +6,11 @@ import {
   createOpaqueEmail,
   discussionIdSchema,
   discussionRejectionSchema,
+  errors,
   immersionFacileNoReplyEmailSender,
   makeRejection,
   rejectDiscussionEmailParams,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { z } from "zod";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -49,20 +49,14 @@ export const makeRejectDiscussionAndSendNotification =
       currentUser,
     ) => {
       const discussion = await uow.discussionRepository.getById(discussionId);
-      if (!discussion)
-        throw new NotFoundError(`No discussion found with id: ${discussionId}`);
+      if (!discussion) throw errors.discussion.notFound({ discussionId });
 
-      if (discussion.status === "REJECTED") {
-        throw new BadRequestError(
-          `Can't reject discussion ${discussionId} because it is already rejected`,
-        );
-      }
+      if (discussion.status === "REJECTED")
+        throw errors.discussion.alreadyRejected({ discussionId });
 
-      if (currentUser.email !== discussion.establishmentContact.email) {
-        throw new ForbiddenError(
-          `User is not allowed to reject discussion ${discussionId}`,
-        );
-      }
+      if (currentUser.email !== discussion.establishmentContact.email)
+        throw errors.discussion.rejectForbidden({ discussionId });
+
       const updatedDiscussion: DiscussionDto = {
         ...discussion,
         status: "REJECTED",

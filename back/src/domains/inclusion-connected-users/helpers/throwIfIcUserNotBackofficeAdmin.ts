@@ -4,7 +4,7 @@ import {
   UserId,
   errors,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
+
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfIcUserNotBackofficeAdmin = async (
@@ -13,9 +13,7 @@ export const throwIfIcUserNotBackofficeAdmin = async (
 ) => {
   const user = await getIcUserOrThrow(uow, jwtPayload.userId);
   if (!user.isBackofficeAdmin)
-    throw new ForbiddenError(
-      `User '${jwtPayload.userId}' is not a backOffice user`,
-    );
+    throw errors.user.notBackOfficeAdmin({ userId: jwtPayload.userId });
 };
 
 export const getIcUserOrThrow = async (
@@ -23,7 +21,7 @@ export const getIcUserOrThrow = async (
   userId: UserId,
 ): Promise<InclusionConnectedUser> => {
   const user = await uow.inclusionConnectedUserRepository.getById(userId);
-  if (!user) throw new NotFoundError(`User '${userId}' not found`);
+  if (!user) throw errors.user.notFound({ userId });
   return user;
 };
 

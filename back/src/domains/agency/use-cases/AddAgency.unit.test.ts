@@ -2,12 +2,12 @@ import {
   AgencyDto,
   AgencyDtoBuilder,
   CreateAgencyDto,
+  errors,
   expectPromiseToFail,
   expectPromiseToFailWithError,
   expectToEqual,
-  invalidAgencySiretMessage,
 } from "shared";
-import { ConflictError, NotFoundError } from "shared";
+import { ConflictError } from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -23,7 +23,6 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { referedAgencyMissingMessage } from "../ports/AgencyRepository";
 import { AddAgency } from "./AddAgency";
 
 describe("AddAgency use case", () => {
@@ -200,9 +199,7 @@ describe("AddAgency use case", () => {
 
       await expectPromiseToFailWithError(
         addAgency.execute(createAgencyWithRefersToParams),
-        new NotFoundError(
-          referedAgencyMissingMessage(createParisMissionLocaleParams.id),
-        ),
+        errors.agency.notFound({ agencyId: createParisMissionLocaleParams.id }),
       );
 
       expectToEqual(uow.agencyRepository.agencies, []);
@@ -238,7 +235,7 @@ describe("AddAgency use case", () => {
 
       await expectPromiseToFailWithError(
         addAgency.execute(newAgency),
-        new NotFoundError(invalidAgencySiretMessage),
+        errors.agency.invalidSiret({ siret: newAgency.agencySiret }),
       );
     });
   });

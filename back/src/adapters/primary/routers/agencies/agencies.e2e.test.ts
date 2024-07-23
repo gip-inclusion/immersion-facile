@@ -9,9 +9,9 @@ import {
   agencyRoutes,
   currentJwtVersions,
   displayRouteName,
+  errors,
   expectHttpResponseToEqual,
   expectToEqual,
-  invalidAgencySiretMessage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -258,7 +258,9 @@ describe("Agency routes", () => {
         expectHttpResponseToEqual(response, {
           status: 404,
           body: {
-            errors: invalidAgencySiretMessage,
+            errors: errors.agency.invalidSiret({
+              siret: missionLocaleWithBadSiret.agencySiret,
+            }).message,
           },
         });
 

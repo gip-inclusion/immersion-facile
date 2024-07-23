@@ -5,8 +5,8 @@ import {
   AgencyRight,
   InclusionConnectedUser,
   agencyRoleIsNotToReview,
+  errors,
 } from "shared";
-import { NotFoundError } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UserAuthenticatedPayload } from "../../core/events/events";
@@ -28,8 +28,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
     if (!codeSafir) return;
 
     const icUser = await uow.inclusionConnectedUserRepository.getById(userId);
-    if (!icUser)
-      throw new NotFoundError(`Inclusion Connect user '${userId}' not found.`);
+    if (!icUser) throw errors.user.notFound({ userId });
 
     if (isIcUserAlreadyHasValidRight(icUser, codeSafir)) return;
 

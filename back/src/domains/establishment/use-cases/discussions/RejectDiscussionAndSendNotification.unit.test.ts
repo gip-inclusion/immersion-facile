@@ -4,11 +4,11 @@ import {
   DiscussionStatus,
   InclusionConnectedUserBuilder,
   RejectionKind,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -89,7 +89,7 @@ describe("RejectDiscussionAndSendNotification", () => {
         },
         unauthorizedUser,
       ),
-      new NotFoundError(`No discussion found with id: ${discussion.id}`),
+      errors.discussion.notFound({ discussionId: discussion.id }),
     );
   });
 
@@ -104,9 +104,7 @@ describe("RejectDiscussionAndSendNotification", () => {
         },
         unauthorizedUser,
       ),
-      new ForbiddenError(
-        `User is not allowed to reject discussion ${discussion.id}`,
-      ),
+      errors.discussion.rejectForbidden({ discussionId: discussion.id }),
     );
   });
 
@@ -136,9 +134,9 @@ describe("RejectDiscussionAndSendNotification", () => {
         },
         authorizedUser,
       ),
-      new BadRequestError(
-        `Can't reject discussion ${rerejectedDiscussion.id} because it is already rejected`,
-      ),
+      errors.discussion.alreadyRejected({
+        discussionId: rerejectedDiscussion.id,
+      }),
     );
   });
 

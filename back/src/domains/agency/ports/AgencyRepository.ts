@@ -25,6 +25,3 @@ export interface AgencyRepository {
   insert(agency: AgencyDto): Promise<AgencyId | undefined>;
   update(partialAgency: PartialAgencyDto): Promise<void>;
 }
-
-export const referedAgencyMissingMessage = (refersToAgencyId: AgencyId) =>
-  `Refered agency with id '${refersToAgencyId}' missing on agency repository.`;

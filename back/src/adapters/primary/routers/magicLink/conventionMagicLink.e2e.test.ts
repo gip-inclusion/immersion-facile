@@ -12,6 +12,7 @@ import {
   ScheduleDtoBuilder,
   conventionMagicLinkRoutes,
   currentJwtVersions,
+  errors,
   expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
@@ -135,7 +136,9 @@ describe("Magic link router", () => {
 
         expectHttpResponseToEqual(response, {
           status: 403,
-          body: { errors: `User '${user.id}' is not a backOffice user` },
+          body: {
+            errors: errors.user.notBackOfficeAdmin({ userId: user.id }).message,
+          },
         });
       });
     });
