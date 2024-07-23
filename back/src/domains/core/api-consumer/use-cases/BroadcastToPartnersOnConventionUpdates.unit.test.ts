@@ -199,6 +199,7 @@ describe("Broadcast to partners on updated convention", () => {
       conventionId: "lala",
       status: 200,
       subscriberErrorFeedback: { message: "ca va très mal" },
+      body: { success: true },
     };
 
     subscribersGateway.simulatedResponse = errorResponse;
@@ -218,7 +219,10 @@ describe("Broadcast to partners on updated convention", () => {
       },
       ...(errorResponse.status
         ? {
-            response: { httpStatus: errorResponse.status, body: errorResponse },
+            response: {
+              httpStatus: errorResponse.status,
+              body: errorResponse.body,
+            },
           }
         : {}),
       serviceName: "BroadcastToPartnersOnConventionUpdates",
@@ -244,6 +248,7 @@ describe("Broadcast to partners on updated convention", () => {
       conventionStatus: "ACCEPTED_BY_VALIDATOR",
       conventionId: "lala",
       status: 200,
+      body: { success: true },
     };
 
     subscribersGateway.simulatedResponse = successResponse;
@@ -264,7 +269,7 @@ describe("Broadcast to partners on updated convention", () => {
         ? {
             response: {
               httpStatus: successResponse.status,
-              body: successResponse,
+              body: successResponse.body,
             },
           }
         : {}),

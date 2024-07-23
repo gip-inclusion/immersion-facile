@@ -330,7 +330,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
           conventionId1,
         ),
         new NotFoundError(
-          `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId1}'.`,
+          `There's no unhandled errors for convention id '${conventionId1}'.`,
         ),
       );
     });

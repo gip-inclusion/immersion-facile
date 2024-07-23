@@ -3,7 +3,6 @@ import { ConventionId, errors } from "shared";
 import {
   BroadcastFeedback,
   BroadcastFeedbacksRepository,
-  broadcastToPeServiceName,
 } from "../ports/BroadcastFeedbacksRepository";
 
 export class InMemoryBroadcastFeedbacksRepository
@@ -59,5 +58,4 @@ const isBroadcastFeedbackUnhandledErrorForConvention = (
   broadcastFeedback.requestParams &&
   "conventionId" in broadcastFeedback.requestParams &&
   broadcastFeedback.requestParams.conventionId === conventionId &&
-  broadcastFeedback.serviceName === broadcastToPeServiceName &&
   broadcastFeedback.handledByAgency === false;

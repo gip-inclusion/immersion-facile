@@ -36,6 +36,7 @@ export class HttpSubscribersGateway implements SubscribersGateway {
           status: response.status,
           conventionId: payload.convention.id,
           conventionStatus: payload.convention.status,
+          body: response.data,
         }),
       )
       .catch((err): SubscriberResponse => {
@@ -47,13 +48,14 @@ export class HttpSubscribersGateway implements SubscribersGateway {
           conventionId: payload.convention.id,
           conventionStatus: payload.convention.status,
           ...(axios.isAxiosError(error)
-            ? makeFeedbackFromError(error)
+            ? { ...makeFeedbackFromError(error), body: error.response?.data }
             : {
                 status: 500,
                 subscriberErrorFeedback: {
                   message: `Not an axios error: '${error.message}'`,
                   error,
                 },
+                body: undefined,
               }),
         };
       });

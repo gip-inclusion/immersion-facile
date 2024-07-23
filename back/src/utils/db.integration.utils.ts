@@ -136,7 +136,7 @@ export async function isDbEmpty(kyselyDb: KyselyDb) {
     [],
   );
   expectToEqual(
-    await kyselyDb.selectFrom("saved_errors").selectAll().execute(),
+    await kyselyDb.selectFrom("broadcast_feedbacks").selectAll().execute(),
     [],
   );
   expectToEqual(

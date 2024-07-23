@@ -64,10 +64,11 @@ export type PoleEmploiConvention = {
   signatureEntreprise: boolean;
 };
 
-type PeBroadcastSuccessResponse = { status: 200 | 201 | 204 };
+type PeBroadcastSuccessResponse = { status: 200 | 201 | 204; body: unknown };
 type PeBroadcastErrorResponse = {
   status: Exclude<number, 200 | 201>;
   subscriberErrorFeedback: SubscriberErrorFeedback;
+  body: unknown;
 };
 
 export type PoleEmploiBroadcastResponse =

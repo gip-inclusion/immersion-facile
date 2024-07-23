@@ -130,7 +130,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
           },
           serviceName: broadcastToPartnersServiceName,
           ...(response.status
-            ? { response: { httpStatus: response.status, body: response } }
+            ? { response: { httpStatus: response.status, body: response.body } }
             : {}),
         });
 
@@ -148,7 +148,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
           conventionStatus: response.conventionStatus,
         },
         ...(response.status
-          ? { response: { httpStatus: response.status, body: response } }
+          ? { response: { httpStatus: response.status, body: response.body } }
           : {}),
         serviceName: "BroadcastToPartnersOnConventionUpdates",
       });

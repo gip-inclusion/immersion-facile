@@ -109,19 +109,6 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
         processDate: this.timeGateway.now(),
       });
 
-    if (!isBroadcastResponseOk(response)) {
-      await uow.broadcastFeedbacksRepository.save({
-        consumerId: null,
-        consumerName: "France Travail",
-        serviceName: broadcastToPeServiceName,
-        subscriberErrorFeedback: response.subscriberErrorFeedback,
-        requestParams: { conventionId: convention.id },
-        response: { httpStatus: response.status },
-        occurredAt: this.timeGateway.now(),
-        handledByAgency: false,
-      });
-      return;
-    }
     await uow.broadcastFeedbacksRepository.save({
       consumerId: null,
       consumerName: "France Travail",
@@ -130,9 +117,12 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
         conventionId: convention.id,
         conventionStatus: convention.status,
       },
-      response: { httpStatus: response.status, body: response },
+      response: { httpStatus: response.status, body: response.body },
       occurredAt: this.timeGateway.now(),
       handledByAgency: false,
+      ...(!isBroadcastResponseOk(response)
+        ? { subscriberErrorFeedback: response.subscriberErrorFeedback }
+        : {}),
     });
   }
 }

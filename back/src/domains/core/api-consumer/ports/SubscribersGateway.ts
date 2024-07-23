@@ -18,6 +18,7 @@ type NotifyResponseCommon = {
   conventionId: ConventionId;
   conventionStatus: ConventionStatus;
   status: number | undefined;
+  body: unknown;
 };
 
 type NotifyResponseError = NotifyResponseCommon & {

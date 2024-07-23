@@ -19,6 +19,7 @@ export class InMemorySubscribersGateway implements SubscribersGateway {
     conventionStatus: "ACCEPTED_BY_VALIDATOR",
     conventionId: "lala",
     status: 200,
+    body: { success: true },
   };
 
   public get calls(): CallbackParams[] {

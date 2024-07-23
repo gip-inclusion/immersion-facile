@@ -35,6 +35,7 @@ describe("HttpPoleEmploiGateway", () => {
           message:
             "Identifiant National DE trouvé mais écart sur la date de naissance",
         },
+        body: {},
       },
     },
     {
@@ -50,6 +51,7 @@ describe("HttpPoleEmploiGateway", () => {
         subscriberErrorFeedback: {
           message: '"Identifiant National DE non trouvé"',
         },
+        body: {},
       },
     },
   ] satisfies TestCase[])(
@@ -90,7 +92,7 @@ describe("HttpPoleEmploiGateway", () => {
         dateNaissance: "1994-10-22T00:00:00",
         peConnectId: undefined,
       },
-      expected: { status: 200 }, // careful, if id is new, it will be 201
+      expected: { status: 200, body: { success: true } }, // careful, if id is new, it will be 201
     },
     {
       testMessage: "data is not known but there is a peConnectId",
@@ -102,6 +104,7 @@ describe("HttpPoleEmploiGateway", () => {
       },
       expected: {
         status: 200,
+        body: { success: true },
       },
     },
   ] satisfies TestCase[])(
