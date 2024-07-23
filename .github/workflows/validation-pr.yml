@@ -1,4 +1,4 @@
-name: "Review app"
+name: "Validation PR"
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validation:
+  fullcheck:
     uses: ./.github/workflows/fullcheck.yml
     secrets:
       API_KEY_OPEN_CAGE_DATA_GEOCODING: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOCODING }}
@@ -63,7 +63,7 @@ jobs:
   deploy-review-app:
     if: github.event.pull_request.draft == false && github.event.pull_request.state == 'open'
     uses: ./.github/workflows/review-app-deploy.yml
-    needs: validation
+    needs: fullcheck
     with:
       pull_request_id: ${{ github.event.number }}
       run_number: ${{ github.run_number }}
