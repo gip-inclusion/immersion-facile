@@ -877,7 +877,7 @@ const searchImmersionResultsQuery = (
     sortedBy: SearchSortedBy;
   },
 ) => {
-  return transaction
+  const query = transaction
     .with("filtered_results", (qb) =>
       pipeWithValue(
         qb
@@ -955,38 +955,14 @@ const searchImmersionResultsQuery = (
             sql`JSON_AGG( JSON_BUILD_OBJECT( 'appellationCode', a.ogr_appellation::text, 'appellationLabel', a.libelle_appellation_long, 'score', offer.score ) ORDER BY a.ogr_appellation)`.as(
               "appelations",
             ),
+            sql<number>`ROW_NUMBER() OVER (ORDER BY ${makeOrderByClauses(
+              sortedBy,
+              filters,
+            )})`.as("rank"),
           ])
           .groupBy(["e.siret", "offer.rome_code", "loc.position", "loc.id"])
-          .limit(limit),
-        (qb) => {
-          if (sortedBy === "date")
-            return qb
-              .orderBy((eb) => eb.fn.max("offer.created_at"), "desc")
-              .orderBy((eb) => eb.fn("RANDOM", []));
-
-          if (sortedBy === "score")
-            return qb
-              .orderBy((eb) => eb.fn.max("offer.score"), "desc")
-              .orderBy((eb) => eb.fn("RANDOM", []));
-
-          const geoParams = filters?.geoParams;
-          if (geoParams && hasSearchGeoParams(geoParams))
-            return qb
-              .orderBy(
-                (eb) =>
-                  eb.fn("ST_Distance", [
-                    "loc.position",
-                    eb.fn("ST_GeographyFromText", [
-                      sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
-                    ]),
-                  ]),
-                "asc",
-              )
-              .orderBy((eb) => eb.fn("RANDOM", []));
-          throw new BadRequestError(
-            "Cannot search by distance with invalid geo params",
-          );
-        },
+          .limit(limit)
+          .orderBy(makeOrderByClauses(sortedBy, filters)),
       ),
     )
     .selectFrom("filtered_results as r")
@@ -1005,47 +981,69 @@ const searchImmersionResultsQuery = (
     .innerJoin("public_romes_data as ro", "ro.code_rome", "r.code_rome")
     .select(({ ref, fn }) => {
       const geoParams = filters?.geoParams;
-      const json = {
-        naf: ref("e.naf_code"),
-        siret: ref("e.siret"),
-        isSearchable: ref("e.is_searchable"),
-        nextAvailabilityDate: ref("e.next_availability_date"),
-        name: ref("e.name"),
-        website: ref("e.website"),
-        additionalInformation: ref("e.additional_information"),
-        customizedName: ref("e.customized_name"),
-        fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
-        numberOfEmployeeRange: ref("e.number_employees"),
-        nafLabel: ref("n.class_label"),
-        contactMode: ref("c.contact_mode"),
-        rome: ref("ro.code_rome"),
-        romeLabel: ref("ro.libelle_rome"),
-        address: jsonBuildObject({
-          streetNumberAndAddress: ref("loc.street_number_and_address"),
-          postcode: ref("loc.post_code"),
-          city: ref("loc.city"),
-          departmentCode: ref("loc.department_code"),
-        }),
-        position: jsonBuildObject({
-          lon: ref("loc.lon"),
-          lat: ref("loc.lat"),
-        }),
-        locationId: ref("loc.id"),
-        distance_m: geoParams
-          ? fn("ST_Distance", [
-              "loc.position",
-              fn("ST_GeographyFromText", [
-                sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
-              ]),
-            ])
-          : sql`NULL`,
-        voluntaryToImmersion: sql`TRUE`,
-        appellations: ref("r.appelations"),
-      };
 
-      return jsonStripNulls(jsonBuildObject(json)).as(
-        "search_immersion_result",
-      );
+      return jsonStripNulls(
+        jsonBuildObject({
+          naf: ref("e.naf_code"),
+          siret: ref("e.siret"),
+          isSearchable: ref("e.is_searchable"),
+          nextAvailabilityDate: ref("e.next_availability_date"),
+          name: ref("e.name"),
+          website: ref("e.website"),
+          additionalInformation: ref("e.additional_information"),
+          customizedName: ref("e.customized_name"),
+          fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
+          numberOfEmployeeRange: ref("e.number_employees"),
+          nafLabel: ref("n.class_label"),
+          contactMode: ref("c.contact_mode"),
+          rome: ref("ro.code_rome"),
+          romeLabel: ref("ro.libelle_rome"),
+          address: jsonBuildObject({
+            streetNumberAndAddress: ref("loc.street_number_and_address"),
+            postcode: ref("loc.post_code"),
+            city: ref("loc.city"),
+            departmentCode: ref("loc.department_code"),
+          }),
+          position: jsonBuildObject({
+            lon: ref("loc.lon"),
+            lat: ref("loc.lat"),
+          }),
+          locationId: ref("loc.id"),
+          ...(geoParams
+            ? {
+                distance_m: fn("ST_Distance", [
+                  ref("loc.position"),
+                  fn("ST_GeographyFromText", [
+                    sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
+                  ]),
+                ]),
+              }
+            : {}),
+          voluntaryToImmersion: sql`TRUE`,
+          appellations: ref("r.appelations"),
+        }),
+      ).as("search_immersion_result");
     })
-    .execute();
+    .orderBy("r.rank");
+
+  return query.execute();
+};
+
+const makeOrderByClauses = (
+  sortedBy: SearchSortedBy,
+  filters?: {
+    searchableBy?: EstablishmentSearchableByValue;
+    romeCodes?: RomeCode[];
+    geoParams?: GeoParams;
+  },
+) => {
+  if (sortedBy === "date") return sql`MAX(offer.created_at) DESC, RANDOM()`;
+  if (sortedBy === "score") return sql`MAX(offer.score) DESC, RANDOM()`;
+  const geoParams = filters?.geoParams;
+  if (geoParams && hasSearchGeoParams(geoParams))
+    return sql`ST_Distance(loc.position,ST_GeographyFromText(${sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`})) ASC, RANDOM()`;
+
+  throw new BadRequestError(
+    "Cannot search by distance with invalid geo params",
+  );
 };
