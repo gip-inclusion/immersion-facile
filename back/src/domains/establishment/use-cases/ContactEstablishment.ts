@@ -238,6 +238,11 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
                 contactRequest.experienceAdditionalInformation,
             }
           : {}),
+        ...(contactRequest.contactMode === "EMAIL"
+          ? {
+              datePreferences: contactRequest.datePreferences,
+            }
+          : {}),
         phone:
           contactRequest.contactMode === "EMAIL"
             ? contactRequest.potentialBeneficiaryPhone
