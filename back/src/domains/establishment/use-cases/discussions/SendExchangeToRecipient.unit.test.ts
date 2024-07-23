@@ -2,11 +2,11 @@ import { addHours } from "date-fns";
 import {
   DiscussionBuilder,
   Exchange,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import { NotFoundError } from "shared";
 import { v4 as uuid } from "uuid";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -193,7 +193,7 @@ describe("SendExchangeToRecipient", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute({ discussionId }),
-        new NotFoundError(`Discussion ${discussionId} not found`),
+        errors.discussion.notFound({ discussionId }),
       );
     });
 
@@ -208,9 +208,9 @@ describe("SendExchangeToRecipient", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute({ discussionId: discussion.id }),
-        new NotFoundError(
-          `Code appelation '${discussion.appellationCode}' non trouvé`,
-        ),
+        errors.discussion.missingAppellationLabel({
+          appellationCode: discussion.appellationCode,
+        }),
       );
     });
 

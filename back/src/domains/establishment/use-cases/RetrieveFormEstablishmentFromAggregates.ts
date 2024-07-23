@@ -5,9 +5,9 @@ import {
   InclusionConnectJwtPayload,
   SiretDto,
   addressDtoToString,
+  errors,
   siretSchema,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
@@ -24,7 +24,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     uow: UnitOfWork,
     jwtPayload?: EstablishmentJwtPayload | InclusionConnectJwtPayload,
   ) {
-    if (!jwtPayload) throw new ForbiddenError();
+    if (!jwtPayload) throw errors.user.noJwtProvided();
     const isValidEstablishmentJwtPayload =
       "siret" in jwtPayload && siret === jwtPayload.siret;
 
@@ -33,8 +33,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         siret,
       );
 
-    if (!establishmentAggregate)
-      throw new NotFoundError(`No establishment found with siret ${siret}.`);
+    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
     if (isValidEstablishmentJwtPayload)
       return this.#onValidJwt(uow, establishmentAggregate);
@@ -45,7 +44,8 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         jwtPayload.userId,
       );
       if (!currentUser)
-        throw new NotFoundError(`No user found with id ${jwtPayload.userId}`);
+        throw errors.user.notFound({ userId: jwtPayload.userId });
+
       if (
         currentUser.establishments?.some(
           ({ siret }) => siret === establishmentAggregate.establishment.siret,
@@ -54,7 +54,8 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       )
         return this.#onValidJwt(uow, establishmentAggregate);
     }
-    throw new ForbiddenError("User not allowed to access this establishment.");
+
+    throw errors.user.unauthorized();
   }
 
   async #onValidJwt(
@@ -73,9 +74,8 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
 export const establishmentAggregateToFormEstablishement = (
   establishmentAggregate: EstablishmentAggregate,
   appellations: AppellationAndRomeDto[],
-): FormEstablishmentDto => {
-  if (!establishmentAggregate.contact) throw new BadRequestError("No contact ");
-  return {
+): FormEstablishmentDto =>
+  ({
     siret: establishmentAggregate.establishment.siret,
     source: "immersion-facile",
     website: establishmentAggregate.establishment.website,
@@ -99,5 +99,4 @@ export const establishmentAggregateToFormEstablishement = (
     nextAvailabilityDate:
       establishmentAggregate.establishment.nextAvailabilityDate,
     searchableBy: establishmentAggregate.establishment.searchableBy,
-  } satisfies FormEstablishmentDto;
-};
+  }) satisfies FormEstablishmentDto;

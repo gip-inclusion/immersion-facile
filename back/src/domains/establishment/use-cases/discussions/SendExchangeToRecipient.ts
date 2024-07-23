@@ -2,10 +2,10 @@ import {
   Exchange,
   WithDiscussionId,
   createOpaqueEmail,
+  errors,
   immersionFacileNoReplyEmailSender,
   withDiscussionSchemaId,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";
@@ -39,8 +39,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussion
     uow: UnitOfWork,
   ): Promise<void> {
     const discussion = await uow.discussionRepository.getById(discussionId);
-    if (!discussion)
-      throw new NotFoundError(`Discussion ${discussionId} not found`);
+    if (!discussion) throw errors.discussion.notFound({ discussionId });
 
     const lastExchange = discussion.exchanges.reduce<Exchange | undefined>(
       (acc, current) => (acc && acc.sentAt >= current.sentAt ? acc : current),
@@ -57,9 +56,9 @@ export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussion
     ).at(0);
 
     if (!appellation)
-      throw new NotFoundError(
-        `Code appelation '${discussion.appellationCode}' non trouvé`,
-      );
+      throw errors.discussion.missingAppellationLabel({
+        appellationCode: discussion.appellationCode,
+      });
 
     const attachments = await Promise.all(
       lastExchange.attachments.map(async ({ name, link }) => ({

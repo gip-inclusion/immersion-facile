@@ -3,8 +3,10 @@ import type {
   ConventionId,
   ConventionStatus,
 } from "../convention/convention.dto";
+import { DiscussionId } from "../discussion/discussion.dto";
 import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { Role } from "../role/role.dto";
+import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import {
   BadRequestError,
@@ -42,6 +44,8 @@ export const errors = {
           ", ",
         )}" ne peuvent pas appliquer le statut "${status}" pour la convention avec l'identifiant ${conventionId}.`,
       ),
+    roleHasNoMagicLink: ({ role }: { role: Role }) =>
+      new BadRequestError(`Le rôle "${role}" n'a pas de liens magiques.`),
     badStatusTransition: ({
       currentStatus,
       targetStatus,
@@ -59,6 +63,15 @@ export const errors = {
     noSignatoryHasSigned: ({ conventionId }: { conventionId: ConventionId }) =>
       new BadRequestError(
         `Aucun des signataires n'a signé la convention avec l'identifiant ${conventionId}.`,
+      ),
+    missingActor: ({
+      conventionId,
+      role,
+    }: { conventionId: ConventionId; role: Role }) =>
+      new BadRequestError(`There is no ${role} on convention ${conventionId}.`),
+    unsupportedRoleRenewMagicLink: ({ role }: { role: Role }) =>
+      new BadRequestError(
+        `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
       ),
   },
   establishment: {
@@ -95,6 +108,10 @@ export const errors = {
       new NotFoundError(
         `Aucune agence trouvée avec l'identifiant : ${agencyId}.`,
       ),
+    invalidSiret: ({ siret }: { siret: SiretDto }) =>
+      new NotFoundError(
+        `Le SIRET que vous avez saisi (${siret}) n'est pas valide et votre organisme n'a pas été enregistré. Merci de corriger le SIRET et de soumettre à nouveau le formulaire.`,
+      ),
   },
   user: {
     unauthorized: () => new UnauthorizedError(),
@@ -119,6 +136,8 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur qui a l'identifiant "${userId}" n'a pas de droits sur l'agence "${agencyId}".`,
       ),
+    notBackOfficeAdmin: ({ userId }: { userId: UserId }) =>
+      new ForbiddenError(`User '${userId}' is not a backoffice admin.`),
   },
   // location: {
   //   notFound: ({ siret }: { siret: SiretDto }) =>
@@ -134,6 +153,30 @@ export const errors = {
     }) =>
       new NotFoundError(
         `There's no unhandled errors for convention id '${conventionId}'.`,
+      ),
+  },
+  establishmentMarketing: {
+    notFound: ({ siret }: { siret: string }) =>
+      new NotFoundError(
+        `Establishment marketing contact with siret '${siret}' not found.`,
+      ),
+  },
+  discussion: {
+    notFound: ({ discussionId }: { discussionId: DiscussionId }) =>
+      new NotFoundError(`No discussion with id '${discussionId}' not found.`),
+    missingAppellationLabel: ({
+      appellationCode,
+    }: { appellationCode: AppellationCode }) =>
+      new BadRequestError(
+        `No appellationLabel found for appellationCode: ${appellationCode}`,
+      ),
+    rejectForbidden: ({ discussionId }: { discussionId: DiscussionId }) =>
+      new ForbiddenError(
+        `User is not allowed to reject discussion ${discussionId}`,
+      ),
+    alreadyRejected: ({ discussionId }: { discussionId: DiscussionId }) =>
+      new BadRequestError(
+        `Can't reject discussion ${discussionId} because it is already rejected`,
       ),
   },
 };

@@ -1,9 +1,9 @@
 import { equals } from "ramda";
 import {
   ConventionDto,
-  NotFoundError,
   SiretDto,
   WithSiretDto,
+  errors,
   withSiretSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
@@ -248,9 +248,8 @@ const deleteMarketingContactEntity = async (
   const establishmentMarketingContactEntity =
     await uow.establishmentMarketingRepository.getBySiret(siret);
   if (!establishmentMarketingContactEntity)
-    throw new NotFoundError(
-      `Could not delete establishment marketing contact with siret ${siret}.`,
-    );
+    throw errors.establishmentMarketing.notFound({ siret });
+
   await uow.establishmentMarketingRepository.delete(siret);
   await establishmentMarketingGateway.delete(
     establishmentMarketingContactEntity.contactEmail,

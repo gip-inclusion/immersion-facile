@@ -250,7 +250,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        new BadRequestError("Le backoffice n'a pas de liens magiques."),
+        errors.convention.roleHasNoMagicLink({ role: "backOffice" }),
       );
     });
 

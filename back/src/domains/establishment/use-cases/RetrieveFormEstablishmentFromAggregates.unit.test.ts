@@ -4,10 +4,10 @@ import {
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   addressDtoToString,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -52,14 +52,14 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   it("throws an error if there is no jwt", async () => {
     await expectPromiseToFailWithError(
       useCase.execute(establishmentJwtPayload.siret),
-      new ForbiddenError("Accès refusé"),
+      errors.user.noJwtProvided(),
     );
   });
 
   it("throws an error if there is no establishment with this siret", async () => {
     await expectPromiseToFailWithError(
       useCase.execute(establishmentJwtPayload.siret, establishmentJwtPayload),
-      new NotFoundError("No establishment found with siret 12345678901234."),
+      errors.establishment.notFound({ siret: establishmentJwtPayload.siret }),
     );
   });
 

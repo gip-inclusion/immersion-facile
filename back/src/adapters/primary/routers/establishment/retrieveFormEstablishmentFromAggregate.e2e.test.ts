@@ -7,6 +7,7 @@ import {
   createEstablishmentJwtPayload,
   currentJwtVersions,
   displayRouteName,
+  errors,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expiredMagicLinkErrorMessage,
@@ -209,7 +210,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: "No establishment found with siret 12345678901234.",
+        errors: errors.establishment.notFound({
+          siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+        }).message,
       },
       status: 404,
     });
@@ -282,7 +285,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: "No establishment found with siret 12345678901234.",
+        errors: errors.establishment.notFound({
+          siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+        }).message,
       },
       status: 404,
     });
