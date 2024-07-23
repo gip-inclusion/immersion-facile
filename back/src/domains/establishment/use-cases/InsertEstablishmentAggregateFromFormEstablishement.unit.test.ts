@@ -6,10 +6,10 @@ import {
   NumberEmployeesRange,
   SiretEstablishmentDto,
   WithAcquisition,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ConflictError } from "shared";
 import {
   InMemoryAddressGateway,
   avenueChampsElyseesDto,
@@ -253,7 +253,7 @@ describe("Insert Establishment aggregate from form data", () => {
 
     await expectPromiseToFailWithError(
       useCase.execute({ formEstablishment }),
-      new ConflictError(`Establishment with siret ${siret} already exists`),
+      errors.establishment.conflictError({ siret }),
     );
 
     expectToEqual(

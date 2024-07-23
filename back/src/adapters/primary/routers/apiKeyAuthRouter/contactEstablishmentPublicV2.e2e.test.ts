@@ -204,7 +204,10 @@ describe("POST contact-establishment public V2 route", () => {
 
     expectToEqual(body, {
       status: 400,
-      message: `Establishment with siret '${contactEstablishment.siret}' doesn't have an immersion offer with appellation code '${contactEstablishment.appellationCode}'.`,
+      message: errors.establishment.immersionOfferBadRequest({
+        siret: contactEstablishment.siret,
+        appellationCode: contactEstablishment.appellationCode,
+      }).message,
     });
     expectToEqual(status, 400);
   });

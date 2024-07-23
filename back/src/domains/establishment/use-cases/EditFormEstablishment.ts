@@ -3,9 +3,9 @@ import {
   FormEstablishmentDto,
   InclusionConnectDomainJwtPayload,
   InclusionConnectedUser,
+  errors,
   formEstablishmentSchema,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -33,10 +33,10 @@ export class EditFormEstablishment extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload?: EstablishmentDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<void> {
-    if (!jwtPayload) throw new ForbiddenError("No JWT payload provided");
+    if (!jwtPayload) throw errors.user.noJwtProvided();
 
     if ("siret" in jwtPayload && jwtPayload.siret !== formEstablishment.siret)
-      throw new ForbiddenError("Siret mismatch in JWT payload and form");
+      throw errors.establishment.siretMismatch();
 
     const user = await this.#getUserIfExistAndAllowed(
       uow,
@@ -75,10 +75,7 @@ export class EditFormEstablishment extends TransactionalUseCase<
       const user = await uow.inclusionConnectedUserRepository.getById(
         jwtPayload.userId,
       );
-      if (!user)
-        throw new NotFoundError(
-          `User with id '${jwtPayload.userId}' not found`,
-        );
+      if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 
       throwIfIcUserNotAllowed(user, formEstablishment);
       return user;
@@ -92,5 +89,5 @@ const throwIfIcUserNotAllowed = (
 ) => {
   if (user.isBackofficeAdmin) return;
   if (user.email === formEstablishment.businessContact.email) return;
-  throw new ForbiddenError();
+  throw errors.user.forbidden({ userId: user.id });
 };

@@ -1,5 +1,8 @@
-import { WithFormEstablishmentDto, withFormEstablishmentSchema } from "shared";
-import { ConflictError } from "shared";
+import {
+  WithFormEstablishmentDto,
+  errors,
+  withFormEstablishmentSchema,
+} from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
@@ -52,11 +55,10 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         formEstablishment.siret,
       );
 
-    if (establishment) {
-      throw new ConflictError(
-        `Establishment with siret ${formEstablishment.siret} already exists`,
-      );
-    }
+    if (establishment)
+      throw errors.establishment.conflictError({
+        siret: formEstablishment.siret,
+      });
 
     const establishmentAggregate = await makeEstablishmentAggregate({
       uuidGenerator: this.uuidGenerator,

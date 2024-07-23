@@ -7,6 +7,7 @@ import type {
 import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import { GroupSlug } from "../group/group.dto";
 import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { Role } from "../role/role.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -82,6 +83,8 @@ export const errors = {
       new NotFoundError(
         `Aucune entreprise trouvée avec le siret : ${siret}. Êtes-vous sûr d'avoir bien tapé votre siret ?`,
       ),
+    siretMismatch: () =>
+      new ForbiddenError("Siret mismatch in JWT payload and form"),
     conflictError: ({ siret }: { siret: SiretDto }) =>
       new ConflictError(
         `Une entreprise avec le siret ${siret} existe déjà dans notre annuaire.`,
@@ -111,7 +114,17 @@ export const errors = {
       new BadRequestError(
         `Contact mode mismatch: ${contactMethods.inParams} in params. In contact (fetched with siret ${siret}) : ${contactMethods.inRepo}`,
       ),
-    missingImmersionOffer: ({
+    immersionOfferNotFound: ({
+      siret,
+      appellationCode,
+    }: {
+      siret: SiretDto;
+      appellationCode: AppellationCode;
+    }) =>
+      new NotFoundError(
+        `Establishment with siret '${siret}' doesn't have an immersion offer with appellation code '${appellationCode}'.`,
+      ),
+    immersionOfferBadRequest: ({
       siret,
       appellationCode,
     }: {
@@ -250,5 +263,9 @@ export const errors = {
       new BadRequestError(
         `Email does not have the right format kind : ${kind}`,
       ),
+  },
+  establishmentGroup: {
+    missingBySlug: ({ groupSlug }: { groupSlug: GroupSlug }) =>
+      new NotFoundError(`Group with slug ${groupSlug} not found`),
   },
 };

@@ -8,7 +8,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -74,7 +73,7 @@ describe("Edit Form Establishment", () => {
         editFormEstablishment.execute(updatedFormEstablishment, {
           siret: "bad-siret",
         } as EstablishmentJwtPayload),
-        new ForbiddenError("Siret mismatch in JWT payload and form"),
+        errors.establishment.siretMismatch(),
       );
     });
 
@@ -84,9 +83,7 @@ describe("Edit Form Establishment", () => {
           updatedFormEstablishment,
           inclusionConnectJwtPayload,
         ),
-        new NotFoundError(
-          `User with id '${inclusionConnectJwtPayload.userId}' not found`,
-        ),
+        errors.user.notFound({ userId: inclusionConnectJwtPayload.userId }),
       );
     });
 
@@ -99,14 +96,14 @@ describe("Edit Form Establishment", () => {
           updatedFormEstablishment,
           inclusionConnectJwtPayload,
         ),
-        new ForbiddenError(),
+        errors.user.forbidden({ userId: inclusionConnectedUser.id }),
       );
     });
 
     it("Forbidden error without jwt payload", async () => {
       await expectPromiseToFailWithError(
         editFormEstablishment.execute(updatedFormEstablishment),
-        new ForbiddenError("No JWT payload provided"),
+        errors.user.noJwtProvided(),
       );
     });
 
