@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { Select } from "@codegouvfr/react-dsfr/SelectNext";
+import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -11,7 +11,7 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
-import { LatLonDistance, domElementIds, isStringEmpty } from "shared";
+import { LatLonDistance, SearchSortedBy, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -37,6 +37,25 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
     value: distance,
   }),
 );
+
+const sortOptionsWithoutDistance = [
+  {
+    label: "Trier par date de publication",
+    value: "date" as const,
+  },
+  {
+    label: "Trier par proximité",
+    value: "distance" as const,
+  },
+];
+
+const sortOptions = [
+  ...sortOptionsWithoutDistance,
+  {
+    label: "Trier par pertinence",
+    value: "score" as const,
+  },
+];
 
 export const SearchPage = ({
   route,
@@ -250,35 +269,12 @@ export const SearchPage = ({
                   )}
                 >
                   <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                    {areValidGeoParams(searchMade) && (
-                      <Select
-                        label=""
-                        options={[
-                          {
-                            value: "date" as const,
-                            label: "Trier par date de publication",
-                          },
-                          {
-                            value: "distance" as const,
-                            label: "Trier par proximité",
-                          },
-                        ]}
-                        nativeSelectProps={{
-                          value: searchMade.sortedBy,
-                          onChange: (event) => {
-                            const value = isStringEmpty(
-                              event.currentTarget.value,
-                            )
-                              ? "date"
-                              : event.currentTarget.value;
-                            triggerSearch({
-                              ...searchMade,
-                              sortedBy: value,
-                            });
-                          },
-                        }}
-                      />
-                    )}
+                    <SearchSortedBySelect
+                      options={
+                        lat && lon ? sortOptions : sortOptionsWithoutDistance
+                      }
+                      triggerSearch={triggerSearch}
+                    />
                   </div>
                   <div
                     className={cx(
@@ -372,4 +368,37 @@ const canSubmitSearch = (values: SearchPageParams) => {
     distanceKm: values.distanceKm,
   };
   return areValidGeoParams(geoParams) || areEmptyGeoParams(geoParams);
+};
+
+const SearchSortedBySelect = ({
+  options,
+  triggerSearch,
+}: {
+  options: SelectProps.Option<SearchSortedBy>[];
+  triggerSearch: (values: SearchPageParams) => void;
+}) => {
+  const { register, watch, setValue } = useForm();
+  const sortedByValue = watch("sortedBy");
+  const sortedBy = sortedByValue ?? "date";
+
+  return (
+    <Select
+      label="Trier par"
+      placeholder="Trier par"
+      options={options}
+      nativeSelectProps={{
+        ...register("sortedBy"),
+        id: domElementIds.search.sortFilter,
+        value: sortedBy,
+        onChange: (event) => {
+          const value = event.currentTarget.value;
+          setValue("sortedBy", value);
+          triggerSearch({
+            ...watch(),
+            sortedBy: value,
+          });
+        },
+      }}
+    />
+  );
 };
