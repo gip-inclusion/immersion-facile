@@ -1190,7 +1190,20 @@ L'équipe d'Immersion Facilitée`,
               )}.\n`
             : ""
         }  
-        Merci à vous !`,
+        Merci à vous !
+
+        Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs</strong> pour être accompagné par notre équipe.
+
+        Au programme :
+          • Comment établir une convention d'immersion
+          • Découvrir le tableau de bord
+        `,
+        buttons: [
+          {
+            label: "Je m'inscris au webinaire",
+            url: "https://app.livestorm.co/itou/decouvrir-immersion-facilitee?s=0aae9824-c7e1-4aba-996a-46bc5f1d4488",
+          },
+        ],
         agencyLogoUrl,
         subContent: defaultSignature("immersion"),
         attachmentUrls: [

@@ -191,7 +191,33 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       <br/>
       <br/>Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: AGENCY_NAME.
       <br/>
-      <br/>Merci à vous !</p>
+      <br/>Merci à vous !
+      <br/>
+      <br/>Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs</strong> pour être accompagné par notre équipe.
+      <br/>
+      <br/>Au programme :
+      <br/>• Comment établir une convention d'immersion
+      <br/>• Découvrir le tableau de bord</p>
+      </td>
+      </tr>
+      </table>
+      </td>
+      </tr>
+      <tr>
+      <td>
+      <table>
+      <tr>
+      <td 
+      align=\"center\" 
+      width=\"600\"
+      style=\"padding: 20px; padding-top: 10px; padding-bottom: 30px;\"
+      >
+      <a
+      style=\"text-decoration: none; display: inline-block; padding: 10px 20px; text-align: center; background-color: #000091; color: #fff;\"
+      href=\"https://app.livestorm.co/itou/decouvrir-immersion-facilitee?s=0aae9824-c7e1-4aba-996a-46bc5f1d4488\"
+      >
+      Je m'inscris au webinaire
+      </a>
       </td>
       </tr>
       </table>
