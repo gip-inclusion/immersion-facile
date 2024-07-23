@@ -2,10 +2,10 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   DiscussionDto,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "shared";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -49,7 +49,7 @@ describe("MarkDiscussionLinkedToConvention", () => {
         convention,
         discussionId: discussion.id,
       }),
-      new NotFoundError(`No discussion found with id: ${discussion.id}`),
+      errors.discussion.notFound({ discussionId: discussion.id }),
     );
   });
 

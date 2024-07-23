@@ -5,7 +5,6 @@ import {
   discussionIdSchema,
   errors,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
@@ -26,22 +25,17 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
       jwtPayload.userId,
     );
 
-    if (!user)
-      throw new NotFoundError(
-        `Inclusion Connected user with id ${jwtPayload.userId} not found`,
-      );
+    if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 
     const discussion = await uow.discussionRepository.getById(discussionId);
 
-    if (!discussion)
-      throw new NotFoundError(
-        `Could not find discussion with id ${discussionId}`,
-      );
+    if (!discussion) throw errors.discussion.notFound({ discussionId });
 
     if (discussion.establishmentContact.email !== user.email)
-      throw new ForbiddenError(
-        `You are not allowed to access discussion with id ${discussionId}`,
-      );
+      throw errors.discussion.accessForbidden({
+        discussionId,
+        userId: jwtPayload.userId,
+      });
 
     const { appellationCode, ...rest } = discussion;
 
@@ -52,7 +46,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     ).at(0);
 
     if (!appellation)
-      throw new NotFoundError(`Missing appellation code '${appellationCode}'`);
+      throw errors.discussion.missingAppellationLabel({ appellationCode });
 
     return {
       ...rest,

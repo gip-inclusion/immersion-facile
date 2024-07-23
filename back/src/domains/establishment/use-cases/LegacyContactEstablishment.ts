@@ -2,13 +2,8 @@ import subDays from "date-fns/subDays";
 import {
   DiscussionDto,
   LegacyContactEstablishmentRequestDto,
+  errors,
   legacyContactEstablishmentRequestSchema,
-} from "shared";
-import {
-  BadRequestError,
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
 } from "shared";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -61,22 +56,23 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
-    if (!establishmentAggregate)
-      throw new NotFoundError(`No establishment found with siret: ${siret}`);
+    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
     if (contactMode !== establishmentAggregate.contact.contactMethod)
-      throw new BadRequestError(
-        `Contact mode mismatch: ${contactMode} in params. In contact (fetched with siret) : ${establishmentAggregate.contact.contactMethod}`,
-      );
+      throw errors.establishment.contactRequestContactModeMismatch({
+        siret,
+        contactMethods: {
+          inParams: contactMode,
+          inRepo: establishmentAggregate.contact.contactMethod,
+        },
+      });
 
     if (
       establishmentAggregate.establishment.nextAvailabilityDate &&
       new Date(establishmentAggregate.establishment.nextAvailabilityDate) >
         this.#timeGateway.now()
     )
-      throw new ForbiddenError(
-        `The establishment ${establishmentAggregate.establishment.siret} is not available.`,
-      );
+      throw errors.establishment.forbiddenUnavailable({ siret });
 
     const similarDiscussionAlreadyExits =
       await uow.discussionRepository.hasDiscussionMatching({
@@ -91,12 +87,12 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       });
 
     if (similarDiscussionAlreadyExits)
-      throw new ConflictError(
-        [
-          `A contact request already exists for siret ${contactRequest.siret} and appellation ${contactRequest.appellationCode}, and this potential beneficiary email.`,
-          `Minimum ${this.#minimumNumberOfDaysBetweenSimilarContactRequests} days between two similar contact requests.`,
-        ].join("\n"),
-      );
+      throw errors.establishment.contactRequestConflict({
+        appellationCode: contactRequest.appellationCode,
+        minimumNumberOfDaysBetweenSimilarContactRequests:
+          this.#minimumNumberOfDaysBetweenSimilarContactRequests,
+        siret,
+      });
 
     const appellationLabel = establishmentAggregate.offers.find(
       (offer) => offer.appellationCode === contactRequest.appellationCode,
@@ -104,9 +100,10 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
 
     if (!appellationLabel) {
       notifyAndThrowErrorDiscord(
-        new BadRequestError(
-          `Establishment with siret '${contactRequest.siret}' doesn't have an immersion offer with appellation code '${contactRequest.appellationCode}'.`,
-        ),
+        errors.establishment.missingImmersionOffer({
+          appellationCode: contactRequest.appellationCode,
+          siret,
+        }),
       );
 
       // we keep discord notification for now, but we will remove it when the bug is confirmed and fixed
@@ -159,9 +156,10 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       (address) => address.id === contactRequest.locationId,
     );
     if (!matchingAddress) {
-      throw new NotFoundError(
-        `Address with id ${contactRequest.locationId} not found for establishment with siret ${establishment.siret}`,
-      );
+      throw errors.establishment.missingLocation({
+        locationId: contactRequest.locationId,
+        siret: contactRequest.siret,
+      });
     }
     return {
       id: this.#uuidGenerator.new(),

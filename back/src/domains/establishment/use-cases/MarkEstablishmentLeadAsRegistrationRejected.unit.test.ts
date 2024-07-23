@@ -3,10 +3,10 @@ import {
   ConventionDtoBuilder,
   ConventionJwtPayload,
   createConventionMagicLinkPayload,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -44,7 +44,7 @@ describe("MarkEstablishmentLeadAsRegistrationRejected", () => {
   it("throw not found error when convention not found", async () => {
     await expectPromiseToFailWithError(
       usecase.execute(undefined, conventionJwt),
-      new NotFoundError(`No convention were found with id ${convention.id}`),
+      errors.convention.notFound({ conventionId: convention.id }),
     );
   });
 
@@ -53,9 +53,7 @@ describe("MarkEstablishmentLeadAsRegistrationRejected", () => {
 
     await expectPromiseToFailWithError(
       usecase.execute(undefined, conventionJwt),
-      new NotFoundError(
-        `No establishment lead were found with siret ${convention.siret}`,
-      ),
+      errors.establishmentLead.notFound({ siret: convention.siret }),
     );
   });
 

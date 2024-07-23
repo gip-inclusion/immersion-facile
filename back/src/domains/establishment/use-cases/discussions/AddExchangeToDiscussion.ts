@@ -6,9 +6,9 @@ import {
   Exchange,
   ExchangeRole,
   brevoInboundBodySchema,
+  errors,
   immersionFacileContactEmail,
 } from "shared";
-import { BadRequestError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -52,16 +52,14 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBo
       return recipent.Address?.match(regex);
     });
     if (!recipient)
-      throw new BadRequestError(
-        `Email does not have the right format email to : ${email.To.map(
-          (recipient) => recipient.Address,
-        ).join(", ")}`,
-      );
+      throw errors.discussion.badEmailFormat({
+        email: email.To.map((recipient) => recipient.Address).join(", "),
+      });
+
     const [id, rawKind] = recipient.Address.split("@")[0].split("_");
     if (!["e", "b"].includes(rawKind))
-      throw new BadRequestError(
-        `Email does not have the right format kind : ${rawKind}`,
-      );
+      throw errors.discussion.badRecipientKindFormat({ kind: rawKind });
+
     const kind = rawKind === "e" ? "establishment" : "potentialBeneficiary";
     return [id, kind];
   }
@@ -73,8 +71,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBo
     const [discussionId, recipientKind] =
       this.#getDiscussionParamsFromEmail(item);
     const discussion = await uow.discussionRepository.getById(discussionId);
-    if (!discussion)
-      throw new NotFoundError(`Discussion ${discussionId} not found`);
+    if (!discussion) throw errors.discussion.notFound({ discussionId });
 
     const sender =
       recipientKind === "establishment"

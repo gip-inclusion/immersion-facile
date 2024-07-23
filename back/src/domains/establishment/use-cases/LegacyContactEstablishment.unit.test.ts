@@ -6,16 +6,12 @@ import {
   DiscussionBuilder,
   LegacyContactEstablishmentRequestDto,
   Location,
+  errors,
   expectArraysToEqual,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import {
-  BadRequestError,
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from "shared";
+
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -467,29 +463,29 @@ describe("LegacyContactEstablishment", () => {
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute(validEmailRequest),
-        new ConflictError(
-          [
-            `A contact request already exists for siret ${validEmailRequest.siret} and appellation ${validEmailRequest.appellationCode}, and this potential beneficiary email.`,
-            `Minimum ${minimumNumberOfDaysBetweenSimilarContactRequests} days between two similar contact requests.`,
-          ].join("\n"),
-        ),
+        errors.establishment.contactRequestConflict({
+          siret: validEmailRequest.siret,
+          appellationCode: validEmailRequest.appellationCode,
+          minimumNumberOfDaysBetweenSimilarContactRequests,
+        }),
       );
     });
 
     it("throws BadRequestError for contact mode mismatch", async () => {
+      const establishment = new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder().withSiret(siret).build(),
+        )
+        .withContact(
+          new ContactEntityBuilder()
+            .withId("wrong_contact_id")
+            .withContactMethod("EMAIL")
+            .build(),
+        )
+        .withOffers([immersionOffer])
+        .build();
       await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder().withSiret(siret).build(),
-          )
-          .withContact(
-            new ContactEntityBuilder()
-              .withId("wrong_contact_id")
-              .withContactMethod("EMAIL")
-              .build(),
-          )
-          .withOffers([immersionOffer])
-          .build(),
+        establishment,
       );
 
       await expectPromiseToFailWithError(
@@ -497,9 +493,13 @@ describe("LegacyContactEstablishment", () => {
           ...validRequest,
           contactMode: "IN_PERSON",
         }),
-        new BadRequestError(
-          "Contact mode mismatch: IN_PERSON in params. In contact (fetched with siret) : EMAIL",
-        ),
+        errors.establishment.contactRequestContactModeMismatch({
+          siret: establishment.establishment.siret,
+          contactMethods: {
+            inParams: "IN_PERSON",
+            inRepo: establishment.contact.contactMethod,
+          },
+        }),
       );
     });
 
@@ -509,7 +509,7 @@ describe("LegacyContactEstablishment", () => {
           ...validRequest,
           contactMode: "PHONE",
         }),
-        new NotFoundError("No establishment found with siret: 11112222333344"),
+        errors.establishment.notFound({ siret: validRequest.siret }),
       );
     });
 
@@ -536,9 +536,10 @@ describe("LegacyContactEstablishment", () => {
           ...validRequest,
           contactMode: "PHONE",
         }),
-        new BadRequestError(
-          `Establishment with siret '${validRequest.siret}' doesn't have an immersion offer with appellation code '${validRequest.appellationCode}'.`,
-        ),
+        errors.establishment.missingImmersionOffer({
+          siret: validRequest.siret,
+          appellationCode: validEmailRequest.appellationCode,
+        }),
       );
     });
 
@@ -557,9 +558,9 @@ describe("LegacyContactEstablishment", () => {
         contactEstablishment.execute({
           ...validEmailRequest,
         }),
-        new ForbiddenError(
-          `The establishment ${establishmentAggregate.establishment.siret} is not available.`,
-        ),
+        errors.establishment.forbiddenUnavailable({
+          siret: validEmailRequest.siret,
+        }),
       );
     });
   });

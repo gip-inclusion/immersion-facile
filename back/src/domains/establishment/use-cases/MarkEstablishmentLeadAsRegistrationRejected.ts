@@ -1,5 +1,4 @@
-import { ConventionJwtPayload } from "shared";
-import { NotFoundError } from "shared";
+import { ConventionJwtPayload, errors } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -31,18 +30,16 @@ export class MarkEstablishmentLeadAsRegistrationRejected extends TransactionalUs
     );
 
     if (!convention)
-      throw new NotFoundError(
-        `No convention were found with id ${jwtPayload.applicationId}`,
-      );
+      throw errors.convention.notFound({
+        conventionId: jwtPayload.applicationId,
+      });
 
     const establishmentLead = await uow.establishmentLeadRepository.getBySiret(
       convention.siret,
     );
 
     if (!establishmentLead)
-      throw new NotFoundError(
-        `No establishment lead were found with siret ${convention.siret}`,
-      );
+      throw errors.establishmentLead.notFound({ siret: convention.siret });
 
     if (establishmentLead.lastEventKind === "registration-refused") return;
 

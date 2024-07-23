@@ -1,9 +1,12 @@
+import { LocationId } from "../address/address.dto";
 import { AgencyId } from "../agency/agency.dto";
 import type {
   ConventionId,
   ConventionStatus,
 } from "../convention/convention.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
+import { Email } from "../email/email.dto";
+import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { Role } from "../role/role.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -83,6 +86,60 @@ export const errors = {
       new ConflictError(
         `Une entreprise avec le siret ${siret} existe déjà dans notre annuaire.`,
       ),
+    contactRequestConflict: ({
+      siret,
+      appellationCode,
+      minimumNumberOfDaysBetweenSimilarContactRequests,
+    }: {
+      siret: SiretDto;
+      appellationCode: AppellationCode;
+      minimumNumberOfDaysBetweenSimilarContactRequests: number;
+    }) =>
+      new ConflictError(
+        [
+          `A contact request already exists for siret ${siret} and appellation ${appellationCode}, and this potential beneficiary email.`,
+          `Minimum ${minimumNumberOfDaysBetweenSimilarContactRequests} days between two similar contact requests.`,
+        ].join("\n"),
+      ),
+    contactRequestContactModeMismatch: ({
+      siret,
+      contactMethods,
+    }: {
+      siret: SiretDto;
+      contactMethods: { inParams: ContactMethod; inRepo: ContactMethod };
+    }) =>
+      new BadRequestError(
+        `Contact mode mismatch: ${contactMethods.inParams} in params. In contact (fetched with siret ${siret}) : ${contactMethods.inRepo}`,
+      ),
+    missingImmersionOffer: ({
+      siret,
+      appellationCode,
+    }: {
+      siret: SiretDto;
+      appellationCode: AppellationCode;
+    }) =>
+      new BadRequestError(
+        `Establishment with siret '${siret}' doesn't have an immersion offer with appellation code '${appellationCode}'.`,
+      ),
+    missingLocation: ({
+      siret,
+      locationId,
+    }: {
+      siret: SiretDto;
+      locationId: LocationId;
+    }) =>
+      new NotFoundError(
+        `Address with id ${locationId} not found for establishment with siret ${siret}`,
+      ),
+    forbiddenUnavailable: ({
+      siret,
+    }: {
+      siret: SiretDto;
+    }) => new ForbiddenError(`The establishment ${siret} is not available.`),
+  },
+  establishmentLead: {
+    notFound: ({ siret }: { siret: SiretDto }) =>
+      new NotFoundError(`No establishment lead were found with siret ${siret}`),
   },
   address: {
     queryToShort: ({ minLength }: { minLength: number }) =>
@@ -177,6 +234,21 @@ export const errors = {
     alreadyRejected: ({ discussionId }: { discussionId: DiscussionId }) =>
       new BadRequestError(
         `Can't reject discussion ${discussionId} because it is already rejected`,
+      ),
+    accessForbidden: ({
+      discussionId,
+      userId,
+    }: { discussionId: DiscussionId; userId: UserId }) =>
+      new ForbiddenError(
+        `User '${userId}' is not allowed to access discussion with id ${discussionId}`,
+      ),
+    badEmailFormat: ({ email }: { email: Email }) =>
+      new BadRequestError(
+        `Email does not have the right format email to : ${email}`,
+      ),
+    badRecipientKindFormat: ({ kind }: { kind: string }) =>
+      new BadRequestError(
+        `Email does not have the right format kind : ${kind}`,
       ),
   },
 };
