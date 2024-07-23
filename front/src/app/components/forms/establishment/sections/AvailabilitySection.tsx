@@ -89,8 +89,9 @@ export const AvailabilitySection = ({
 
       {availableForImmersion === false && (
         <Input
-          {...formContents.nextAvailabilityDate}
+          label={formContents.nextAvailabilityDate.label}
           nativeInputProps={{
+            id: formContents.nextAvailabilityDate.id,
             defaultValue: currentValueFormatted,
             onBlur: (event) => {
               setValue(
@@ -132,20 +133,37 @@ export const AvailabilitySection = ({
         <div>
           <Alert
             severity="info"
+            title="Actuellement"
             description={
               <p>
-                Mise en relation max/semaine : {getValues().maxContactsPerWeek}{" "}
+                Mise en relation max/semaine :{" "}
+                <span
+                  id={domElementIds.establishment.admin.maxContactsPerWeekValue}
+                >
+                  {getValues().maxContactsPerWeek}
+                </span>{" "}
                 <br />
                 Prochaine disponibilité :{" "}
-                {currentNextAvailabilityDate
-                  ? `à partir du ${toDisplayedDate({
-                      date: new Date(currentNextAvailabilityDate),
-                    })}`
-                  : "tout le temps"}
+                {currentNextAvailabilityDate ? (
+                  <>
+                    à partir du{" "}
+                    <span
+                      id={
+                        domElementIds.establishment.admin
+                          .nextAvailabilityDateValue
+                      }
+                    >
+                      {toDisplayedDate({
+                        date: new Date(currentNextAvailabilityDate),
+                      })}
+                    </span>
+                  </>
+                ) : (
+                  "tout le temps"
+                )}
               </p>
             }
             small={true}
-            title="Actuellement"
           />
         </div>
       )}

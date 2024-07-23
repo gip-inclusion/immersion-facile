@@ -102,33 +102,10 @@ describe("PgFormEstablishmentRepository", () => {
         formEstablishment,
       ]);
 
-      const updatedFormEstablishment: FormEstablishmentDto = {
-        ...formEstablishment,
-        businessName: "newName",
-        fitForDisabledWorkers: true,
-        additionalInformation: "toto",
-        naf: {
-          code: "32132",
-          nomenclature: "yolo",
-        },
-        businessNameCustomized: "billy",
-        isEngagedEnterprise: true,
-        website: "http://web.site",
-        nextAvailabilityDate: new Date().toISOString(),
-        searchableBy: {
-          jobSeekers: true,
-          students: false,
-        },
-        maxContactsPerWeek: 5,
-        appellations: [
-          {
-            romeCode: "D1103",
-            appellationCode: "33333",
-            romeLabel: "Boucherie",
-            appellationLabel: "Boucher / Bouchère",
-          },
-        ],
-      };
+      const updatedFormEstablishment: FormEstablishmentDto =
+        FormEstablishmentDtoBuilder.fullyUpdated()
+          .withSiret(formEstablishment.siret)
+          .build();
       await formEstablishmentRepository.update(updatedFormEstablishment);
       expectToEqual(await formEstablishmentRepository.getAll(), [
         updatedFormEstablishment,

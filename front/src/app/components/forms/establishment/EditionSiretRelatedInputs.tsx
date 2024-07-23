@@ -26,15 +26,17 @@ export const EditionSiretRelatedInputs = ({
         }}
       />
       <Input
-        {...formContents.businessName}
+        label={formContents.businessName.label}
         nativeInputProps={{
+          id: formContents.businessName.id,
           ...register("businessName"),
           readOnly: true,
         }}
       />
       <Input
-        {...formContents.businessNameCustomized}
+        label={formContents.businessNameCustomized.label}
         nativeInputProps={{
+          id: formContents.businessNameCustomized.id,
           ...register("businessNameCustomized"),
         }}
       />

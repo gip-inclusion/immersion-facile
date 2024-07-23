@@ -56,7 +56,7 @@ export const MultipleAddressInput = ({
               iconId="fr-icon-delete-bin-line"
               title="Suppression"
               disabled={disabled}
-              id="im-multiple-address-input__delete-option-button"
+              id={`${id}-delete-option-button-${index}`}
               onClick={() => {
                 onAddressDeleted(index);
               }}
