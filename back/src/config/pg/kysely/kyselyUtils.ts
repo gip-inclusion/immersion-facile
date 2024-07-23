@@ -55,6 +55,7 @@ export const makeKyselyDb = (pool: Pool): Kysely<Database> => {
           error: {
             error: "message" in error ? error.message : error,
             query: event.query.sql,
+            params: event.query.parameters,
           },
         };
         notifyObjectDiscord(params);
