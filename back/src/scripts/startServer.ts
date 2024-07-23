@@ -57,6 +57,7 @@ createApp(appConfig).then(
   },
   (error: any) => {
     logger.error({ message: `Server start failed, ${error.message}`, error });
+    console.error(error);
     process.exit(1);
   },
 );
