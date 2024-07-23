@@ -39,22 +39,21 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
       "Assurez le succès de votre projet professionnel en découvrant un métier en conditions réelles. Passez quelques jours en entreprise pour vérifier que ce métier vous plaît et vous convient. Profitez-en pour découvrir éventuellement votre futur employeur !",
   },
   establishment: {
-    title:
-      "Rencontrer des candidats motivés ? C’est possible avec l'immersion professionnelle !",
+    title: "Recrutez plus facilement avec l'immersion professionnelle",
     displayName: "Entreprise",
     illustration: heroHeaderEstablishmentIllustration,
     icon: "fr-icon-building-line",
     subtitle:
-      "Contribuez au succès de reconversions professionnelles en ouvrant vos entreprises. Permettez à des profils motivés de découvrir le métier de leur choix, en conditions réelles auprès des professionnels en activité et identifiez ceux qui pourraient venir renforcer votre équipe.",
+      "Faites découvrir vos métiers et votre entreprise à de potentiels candidats. Vous avez déjà des candidatures ? Testez un candidat en conditions réelles avant la signature du contrat.",
   },
   agency: {
     title:
-      "L'immersion professionnelle, la meilleure façon de faire émerger de nouveaux talents",
+      "Signez et gérez facilement vos conventions d'immersion professionnelle",
     displayName: "Prescripteur",
     illustration: heroHeaderAgencyIllustration,
     icon: "fr-icon-map-pin-user-line",
     subtitle:
-      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
+      "Avec Immersion Facilitée, fini la paperasse et les aller-retours pour faire signer vos conventions. Suivez facilement celles en cours.",
   },
 };
 
@@ -118,7 +117,7 @@ export const heroHeaderNavCards: (
     ],
     establishment: [
       {
-        title: "Proposer une immersion ou modifier mon entreprise",
+        title: "Proposer des immersions ou les modifier",
         icon: "fr-icon-award-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.addEstablishmentForm,
@@ -236,44 +235,46 @@ export const sectionStatsData: Record<UserType, Stat[]> = {
   ],
   establishment: [
     {
-      badgeLabel: "Découverte",
+      badgeLabel: "Féxible",
       value: "1",
-      subtitle: "jour, 1 semaine ou 1 mois en entreprise",
+      subtitle: "jour, 1 semaine ou 1 mois",
       description:
-        "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
+        "Accueillez un potentiel candidat dans votre entreprise pendant une courte durée afin de lui faire découvrir le métier de votre choix",
     },
     {
-      badgeLabel: "Simplicité",
-      value: "100%",
-      subtitle: "démarche dématérialisée",
+      badgeLabel: "Simple",
+      value: "0",
+      subtitle: "euro",
+      description:
+        "Vous n'avez pas à rémunérer le candidat ou à prendre une assurance, tout est géré par son organisme prescripteur (France Travail, Cap Emploi, Mission Locale, etc.) ",
     },
     {
-      badgeLabel: "Opportunité",
-      value: "95%",
-      subtitle: "",
+      badgeLabel: "Rapide",
+      value: "0",
+      subtitle: "papier",
       description:
-        "des entreprises qui bénéficient du dispositif le recommandent, selon une étude publiée en mars 2021 par France Travail (anciennement Pôle emploi).",
+        "Tout se passe en ligne, ici : dépôt de votre offre, réception des candidatures (si nécessaire) puis signature de la convention dématérialisée",
     },
   ],
   agency: [
     {
-      badgeLabel: "Découverte",
-      value: "1",
-      subtitle: "jour, 1 semaine ou 1 mois en entreprise",
+      badgeLabel: "Rapide",
+      value: "2",
+      subtitle: "jours seulement",
       description:
-        "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
+        "90% des demandes de conventions sont validées et transmises en moins de 48h",
     },
     {
-      badgeLabel: "Simplicité",
+      badgeLabel: "Simple",
       value: "100%",
       subtitle: "démarche dématérialisée",
     },
     {
       badgeLabel: "Opportunité",
-      value: "7",
-      subtitle: "demandeurs d’emploi sur 10",
+      value: "9",
+      subtitle: "entreprises sur 10",
       description:
-        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude France Travail (anciennement Pôle emploi) en 2021.",
+        "90% des entreprises sont satisfaites à l'issu d'une immersion",
     },
   ],
 };
@@ -334,10 +335,11 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       url: "https://immersion-facile.beta.gouv.fr/aide/article/ma-structure-peut-elle-accueillir-des-immersions-professionnelles-1ccin58/",
     },
     {
-      title: "Quelles sont les obligations à respecter pour une immersion ?",
+      title:
+        "Vous avez encore des questions ? Participez à notre prochain webinaire",
       description:
-        "Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...",
-      url: "https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
+        "Régulèrement, nous organisons des webinaire en ligne pour vous présenter l'immersions professionnelles, notre plateforme, et répondre à vos questions. Cliquez-ici pour vous inscrire à la prochaine séssions",
+      url: "https://app.livestorm.co/itou/webinaire-proposer-des-immersions-pour-attirez-les-talents-1?type=detailed&utm_source=home-entreprise-if",
     },
   ],
   agency: [
@@ -349,9 +351,10 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       url: "https://immersion-facile.beta.gouv.fr/aide/article/puis-je-faire-une-demande-de-convention-avec-une-entreprise-non-inscrite-sur-le-site-f9z742/",
     },
     {
-      title: "Quelles sont les étapes de signature de la convention ?",
-      description: `Etape 1 : Signature du bénéficiaire et de l'entreprise. Le bénéficiaire et L'entreprise reçoivent un email appelé "Immersion Facilitée : Confirmez une demande d'immersion" ...`,
-      url: "https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-etapes-de-signature-de-la-convention-17hf59q/",
+      title: "Qui peut prescrire une immersion?",
+      description:
+        "Les prescripteurs de droits commun (France Travail, Missions Locales, Cap emploi, Conseil Départemental, CEP, SIAE sauf ETTI et prépa apprentissage) et tous les professionnels de l'accompagnement qui peuvent avoir une délégation auprès des prescripteurs de droit commun.",
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-prescrire-une-immersion-6frnyn/?bust=1722505187338",
     },
     {
       title:
