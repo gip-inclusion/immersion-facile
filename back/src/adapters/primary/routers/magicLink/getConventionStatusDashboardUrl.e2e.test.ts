@@ -53,7 +53,8 @@ describe("getConventionStatusDashboardUrl", () => {
     expectHttpResponseToEqual(response, {
       status: 401,
       body: {
-        error: "forbidden: unauthenticated",
+        status: 401,
+        message: "forbidden: unauthenticated",
       },
     });
   });

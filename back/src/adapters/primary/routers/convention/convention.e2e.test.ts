@@ -163,12 +163,13 @@ describe("convention e2e", () => {
       });
 
       expectHttpResponseToEqual(response, {
+        status: 409,
         body: {
-          errors: errors.convention.conflict({
+          status: 409,
+          message: errors.convention.conflict({
             conventionId: convention.id,
           }).message,
         },
-        status: 409,
       });
     });
   });
@@ -389,11 +390,12 @@ describe("convention e2e", () => {
       });
 
       expectHttpResponseToEqual(response, {
+        status: 404,
         body: {
-          errors:
+          status: 404,
+          message:
             "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
         },
-        status: 404,
       });
     });
   });
@@ -461,12 +463,13 @@ describe("convention e2e", () => {
       });
 
       expectHttpResponseToEqual(response, {
+        status: 404,
         body: {
-          errors: errors.convention.notFound({
+          status: 404,
+          message: errors.convention.notFound({
             conventionId: unknownId,
           }).message,
         },
-        status: 404,
       });
     });
   });
@@ -665,14 +668,15 @@ describe("convention e2e", () => {
       });
 
       expectHttpResponseToEqual(response, {
+        status: 403,
         body: {
-          errors: errors.convention.badRoleStatusChange({
+          status: 403,
+          message: errors.convention.badRoleStatusChange({
             roles: ["establishment-representative"],
             status: "ACCEPTED_BY_VALIDATOR",
             conventionId: convention.id,
           }).message,
         },
-        status: 403,
       });
     });
 
@@ -697,12 +701,13 @@ describe("convention e2e", () => {
       });
 
       expectHttpResponseToEqual(response, {
+        status: 404,
         body: {
-          errors: errors.convention.notFound({
+          status: 404,
+          message: errors.convention.notFound({
             conventionId: unknownId,
           }).message,
         },
-        status: 404,
       });
     });
   }); // tuka bonjour

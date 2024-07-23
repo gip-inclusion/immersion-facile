@@ -71,8 +71,8 @@ describe("POST /add-form-establishment-batch", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { error: "Provided token is invalid" },
       status: 401,
+      body: { status: 401, message: "Provided token is invalid" },
     });
   });
 

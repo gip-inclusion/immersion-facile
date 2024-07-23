@@ -209,12 +209,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     });
 
     expectHttpResponseToEqual(response, {
+      status: 404,
       body: {
-        errors: errors.establishment.notFound({
+        status: 404,
+        message: errors.establishment.notFound({
           siret: TEST_OPEN_ESTABLISHMENT_1.siret,
         }).message,
       },
-      status: 404,
     });
   });
 
@@ -232,10 +233,11 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     });
 
     expectHttpResponseToEqual(response, {
-      body: {
-        error: "Provided token is invalid",
-      },
       status: 401,
+      body: {
+        status: 401,
+        message: "Provided token is invalid",
+      },
     });
   });
 
@@ -284,12 +286,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     });
 
     expectHttpResponseToEqual(response, {
+      status: 404,
       body: {
-        errors: errors.establishment.notFound({
+        status: 404,
+        message: errors.establishment.notFound({
           siret: TEST_OPEN_ESTABLISHMENT_1.siret,
         }).message,
       },
-      status: 404,
     });
   });
 });

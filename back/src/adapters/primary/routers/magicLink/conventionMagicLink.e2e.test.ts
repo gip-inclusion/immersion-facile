@@ -137,7 +137,9 @@ describe("Magic link router", () => {
         expectHttpResponseToEqual(response, {
           status: 403,
           body: {
-            errors: errors.user.notBackOfficeAdmin({ userId: user.id }).message,
+            status: 403,
+            message: errors.user.notBackOfficeAdmin({ userId: user.id })
+              .message,
           },
         });
       });
@@ -437,7 +439,9 @@ describe("Magic link router", () => {
         });
 
       expectToEqual(response.body, {
-        errors: "This convention cannot be renewed, as it has status : 'DRAFT'",
+        status: 400,
+        message:
+          "This convention cannot be renewed, as it has status : 'DRAFT'",
       });
       expectToEqual(response.status, 400);
     });
@@ -454,7 +458,8 @@ describe("Magic link router", () => {
         });
 
       expectToEqual(response.body, {
-        errors: "The role 'beneficiary' is not allowed to renew convention",
+        status: 403,
+        message: "The role 'beneficiary' is not allowed to renew convention",
       });
       expectToEqual(response.status, 403);
     });
@@ -530,7 +535,8 @@ describe("Magic link router", () => {
 
       expectToEqual(response.status, 403);
       expectToEqual(response.body, {
-        errors: `User '${icUser.id}' is not the establishment representative for convention '${convention.id}'`,
+        status: 403,
+        message: `User '${icUser.id}' is not the establishment representative for convention '${convention.id}'`,
       });
     });
   });

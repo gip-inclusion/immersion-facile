@@ -62,7 +62,7 @@ const responseError = (
   message: string,
   status = 403,
 ): Response<any, Record<string, any>> =>
-  res.status(status).json({ error: `forbidden: ${message}` });
+  res.status(status).json({ status, message: `forbidden: ${message}` });
 
 export const makeMagicLinkAuthMiddleware = (
   config: AppConfig,
@@ -118,7 +118,8 @@ const sendAuthenticationError = (res: Response, error: Error) => {
   logger.error({ error, message: "authentication failed" });
   res.status(401);
   return res.json({
-    error: "Provided token is invalid",
+    status: 401,
+    message: "Provided token is invalid",
   });
 };
 

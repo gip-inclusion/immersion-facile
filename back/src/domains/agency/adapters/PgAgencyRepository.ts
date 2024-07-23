@@ -19,7 +19,7 @@ import {
 } from "shared";
 import { ConflictError } from "shared";
 import { z } from "zod";
-import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import {
   KyselyDb,
   cast,
@@ -158,7 +158,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
     const agencies = await this.#addEmailsToAgencies(agenciesWithoutEmails);
 
-    return validateAndParseZodSchema(z.array(agencySchema), agencies, logger);
+    return validateAndParseZodSchemaV2(z.array(agencySchema), agencies, logger);
   }
 
   public async getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]> {

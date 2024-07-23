@@ -58,8 +58,7 @@ export class HttpInclusionConnectedGateway
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: 400 }, logBodyAndThrow)
-            .with({ status: 403 }, logBodyAndThrow)
+            .with({ status: P.union(400, 401) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -144,14 +143,8 @@ export class HttpInclusionConnectedGateway
         match(response)
           .with({ status: 200 }, () => undefined)
           .with({ status: 400 }, logBodyAndThrow)
-          .with({ status: 403 }, (response) => {
-            if ("errors" in response.body)
-              throw new Error(response.body.errors);
-
-            if ("error" in response.body) throw new Error(response.body.error);
-
-            const _unreachable: never = response.body;
-            logBodyAndThrow(response);
+          .with({ status: P.union(401, 403) }, (response) => {
+            throw new Error(response.body.message);
           })
           .with({ status: 404 }, () => {
             throw new Error(

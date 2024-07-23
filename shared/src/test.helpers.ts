@@ -1,6 +1,7 @@
 import { partition } from "ramda";
 import type { HttpResponse, UnknownSharedRoute } from "shared-routes";
 import { EmailType, TemplatedEmail } from "./email/email";
+import { BadRequestError } from "./errors/httpErrors";
 
 export const expectPromiseToFail = async (promise: Promise<unknown>) => {
   await expect(promise).rejects.toThrow();
@@ -12,6 +13,24 @@ export const expectPromiseToFailWithError = async <T extends Error>(
 ) => {
   await expect(promise).rejects.toThrowError(expectedError);
   await expect(promise).rejects.toBeInstanceOf(expectedError.constructor);
+  if (expectedError instanceof BadRequestError) {
+    await expectPromiseToFailWithBadRequestError(promise, expectedError);
+  }
+};
+
+const expectPromiseToFailWithBadRequestError = async (
+  promise: Promise<unknown>,
+  expectedError: BadRequestError,
+) => {
+  try {
+    await promise;
+    expect("not reach").toBe("Promise resolve, expected to reject");
+  } catch (e: any) {
+    expect(e instanceof BadRequestError).toBe(true);
+    if (!(e instanceof BadRequestError)) throw new Error("Not a bad request");
+    expect(e.message).toBe(expectedError.message);
+    expect(e.issues).toEqual(expectedError.issues);
+  }
 };
 
 export const expectArraysToMatch = <T>(actual: T[], expected: Partial<T>[]) => {

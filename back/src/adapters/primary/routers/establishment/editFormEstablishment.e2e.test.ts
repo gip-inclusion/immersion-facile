@@ -196,8 +196,8 @@ describe("Edit form establishments", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { error: "Provided token is invalid" },
       status: 401,
+      body: { status: 401, message: "Provided token is invalid" },
     });
   });
 
@@ -210,7 +210,7 @@ describe("Edit form establishments", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { error: "Provided token is invalid" },
+      body: { status: 401, message: "Provided token is invalid" },
       status: 401,
     });
   });
@@ -257,7 +257,8 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: errors.establishment.conflictError({
+        status: 409,
+        message: errors.establishment.conflictError({
           siret: establishment.siret,
         }).message,
       },

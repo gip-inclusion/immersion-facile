@@ -1,4 +1,3 @@
-import { ZodError } from "zod";
 import { LocationId } from "../address/address.dto";
 import { AgencyId } from "../agency/agency.dto";
 import {
@@ -365,8 +364,11 @@ export const errors = {
       new NotFoundError(`subscription ${id} not found`),
   },
   inputs: {
-    badSchema: ({ zodError }: { zodError: ZodError }) =>
-      new BadRequestError(zodError.toString()),
+    badSchema: ({ flattenErrors }: { flattenErrors: string[] }) =>
+      new BadRequestError(
+        "Schema validation failed. See issues for details.",
+        flattenErrors,
+      ),
   },
   siretApi: {
     notFound: ({ siret }: { siret: SiretDto }) =>

@@ -258,7 +258,8 @@ describe("Agency routes", () => {
         expectHttpResponseToEqual(response, {
           status: 404,
           body: {
-            errors: errors.agency.invalidSiret({
+            status: 404,
+            message: errors.agency.invalidSiret({
               siret: missionLocaleWithBadSiret.agencySiret,
             }).message,
           },
@@ -281,7 +282,7 @@ describe("Agency routes", () => {
 
         expectHttpResponseToEqual(response, {
           status: 401,
-          body: { error: "You need to authenticate first" },
+          body: { status: 401, message: "Veuillez vous authentifier" },
         });
       });
 
@@ -359,7 +360,7 @@ describe("Agency routes", () => {
 
         expectHttpResponseToEqual(response, {
           status: 401,
-          body: { error: "Provided token is invalid" },
+          body: { status: 401, message: "Provided token is invalid" },
         });
       });
 

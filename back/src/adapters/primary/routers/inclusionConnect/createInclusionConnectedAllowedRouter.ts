@@ -3,7 +3,6 @@ import { errors, inclusionConnectedAllowedRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
-import { createLegacyInclusionConnectedMiddleware } from "./createLegacyInclusionConnectedMiddleware";
 
 export const createInclusionConnectedAllowedRouter = (
   deps: AppDependencies,
@@ -15,12 +14,8 @@ export const createInclusionConnectedAllowedRouter = (
     inclusionConnectedRouter,
   );
 
-  const inclusionConnectedMiddleware = createLegacyInclusionConnectedMiddleware(
-    deps.config.jwtPublicKey,
-  );
-
   inclusionConnectedSharedRoutes.getInclusionConnectedUser(
-    inclusionConnectedMiddleware,
+    deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.getInclusionConnectedUser.execute(
@@ -31,7 +26,7 @@ export const createInclusionConnectedAllowedRouter = (
   );
 
   inclusionConnectedSharedRoutes.registerAgenciesToUser(
-    inclusionConnectedMiddleware,
+    deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.registerAgencyToInclusionConnectUser.execute(
@@ -48,7 +43,7 @@ export const createInclusionConnectedAllowedRouter = (
   );
 
   inclusionConnectedSharedRoutes.markPartnersErroredConventionAsHandled(
-    inclusionConnectedMiddleware,
+    deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const inclusion = req.payloads?.inclusion;
@@ -74,7 +69,7 @@ export const createInclusionConnectedAllowedRouter = (
   );
 
   inclusionConnectedSharedRoutes.getDiscussionByIdForEstablishment(
-    inclusionConnectedMiddleware,
+    deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getDiscussionByIdForEstablishment.execute(

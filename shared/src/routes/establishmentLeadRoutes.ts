@@ -1,11 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { renewMagicLinkResponseSchema } from "../convention/convention.schema";
 import { withAuthorizationHeaders } from "../headers";
-import {
-  httpErrorSchema,
-  legacyHttpErrorSchema,
-  legacyUnauthenticatedErrorSchema,
-} from "../httpClient/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBodyOrEmptyObject } from "../zodUtils";
 
 export type EstablishmentLeadRoutes = typeof establishmentLeadRoutes;
@@ -17,9 +13,9 @@ export const establishmentLeadRoutes = defineRoutes({
     responses: {
       204: expressEmptyResponseBodyOrEmptyObject,
       400: httpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
+      401: httpErrorSchema,
       403: renewMagicLinkResponseSchema,
-      404: legacyHttpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });

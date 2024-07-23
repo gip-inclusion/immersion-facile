@@ -150,7 +150,7 @@ export class HttpConventionGateway implements ConventionGateway {
             })
             .with({ status: 404 }, () => undefined)
             .with({ status: 403 }, ({ body }) => {
-              throw new Error("message" in body ? body.message : body.errors);
+              throw new Error(body.message);
             })
 
             .otherwise(otherwiseThrow),

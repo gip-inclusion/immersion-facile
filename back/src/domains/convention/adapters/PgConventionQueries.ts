@@ -14,7 +14,7 @@ import {
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
-import { validateAndParseZodSchema } from "../../../config/helpers/validateAndParseZodSchema";
+import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
@@ -177,7 +177,7 @@ export class PgConventionQueries implements ConventionQueries {
       if (!agencyFields)
         throw new Error(`Agency ${pgResult.dto.agencyId} not found`);
 
-      return validateAndParseZodSchema(
+      return validateAndParseZodSchemaV2(
         conventionReadSchema,
         {
           ...pgResult.dto,
@@ -248,7 +248,7 @@ export const validateConventionResults = (
   pgResults: { dto: unknown }[],
 ): ConventionDto[] =>
   pgResults.map((pgResult) =>
-    validateAndParseZodSchema(conventionSchema, pgResult.dto, logger),
+    validateAndParseZodSchemaV2(conventionSchema, pgResult.dto, logger),
   );
 
 type AddToBuilder = (

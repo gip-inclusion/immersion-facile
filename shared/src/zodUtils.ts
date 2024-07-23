@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { ZodError, ZodIssue, z } from "zod";
 import { timeHHmmRegExp } from "./utils/date";
 
 // Change default error map behavior to provide context
@@ -151,3 +151,29 @@ export const zSchemaForType =
     arg;
 
 export const zAnyObj = z.object({}).passthrough();
+
+export const flattenZodErrors = (
+  error: ZodError<any>,
+  path: (string | number)[] = [],
+): string[] => {
+  const result = error.errors.reduce<string[]>((acc, issue: ZodIssue) => {
+    const currentPath = [...path, ...(issue.path || [])];
+
+    if (issue.code === "invalid_union" && issue.unionErrors) {
+      const unionMessages = issue.unionErrors.reduce<string[]>(
+        (unionMsgs: string[], unionError: ZodError<any>) => {
+          return unionMsgs.concat(flattenZodErrors(unionError, currentPath));
+        },
+        [],
+      );
+      return [...acc, ...unionMessages];
+    }
+
+    const key = currentPath.join(".");
+    const message = issue.message;
+    const flatMessage = key ? `${key} : ${message}` : message;
+    return [...acc, flatMessage];
+  }, []);
+
+  return Array.from(new Set(result));
+};

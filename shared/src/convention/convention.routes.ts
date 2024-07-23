@@ -3,11 +3,7 @@ import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { assessmentSchema } from "../assessment/assessment.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
-import {
-  httpErrorSchema,
-  legacyHttpErrorSchema,
-  legacyUnauthenticatedErrorSchema,
-} from "../httpClient/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import { addConventionInputSchema } from "./addConventionInput";
 import {
@@ -32,8 +28,8 @@ export const conventionMagicLinkRoutes = defineRoutes({
     responses: {
       201: expressEmptyResponseBody,
       400: httpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
-      403: legacyHttpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   getConvention: defineRoute({
@@ -43,8 +39,8 @@ export const conventionMagicLinkRoutes = defineRoutes({
     responses: {
       200: conventionReadSchema,
       400: httpErrorSchema,
-      403: renewMagicLinkResponseSchema.or(legacyHttpErrorSchema),
-      404: legacyHttpErrorSchema,
+      403: renewMagicLinkResponseSchema.or(httpErrorSchema),
+      404: httpErrorSchema,
     },
   }),
   getConventionStatusDashboard: defineRoute({
@@ -53,7 +49,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: dashboardUrlAndNameSchema,
-      401: legacyUnauthenticatedErrorSchema,
+      401: httpErrorSchema,
     },
   }),
   signConvention: defineRoute({
@@ -70,9 +66,9 @@ export const conventionMagicLinkRoutes = defineRoutes({
     responses: {
       200: withConventionIdLegacySchema,
       400: httpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
-      403: legacyHttpErrorSchema,
-      404: legacyHttpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   updateConventionStatus: defineRoute({
@@ -83,8 +79,8 @@ export const conventionMagicLinkRoutes = defineRoutes({
     responses: {
       200: withConventionIdLegacySchema,
       400: httpErrorSchema,
-      403: legacyHttpErrorSchema,
-      404: legacyHttpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   renewConvention: defineRoute({
@@ -109,7 +105,7 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     responses: {
       200: withConventionIdLegacySchema,
       400: httpErrorSchema,
-      409: legacyHttpErrorSchema,
+      409: httpErrorSchema,
     },
   }),
   shareConvention: defineRoute({

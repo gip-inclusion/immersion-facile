@@ -133,20 +133,20 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
     it(`${displayRouteName(
       inclusionConnectedAllowedRoutes.getInclusionConnectedUser,
-    )} 403 with bad token`, async () => {
+    )} 401 with bad token`, async () => {
       const response = await httpClient.getInclusionConnectedUser({
         headers: { authorization: "wrong-token" },
       });
 
       expectHttpResponseToEqual(response, {
-        body: { error: "jwt malformed" },
-        status: 403,
+        body: { message: "Provided token is invalid", status: 401 },
+        status: 401,
       });
     });
 
     it(`${displayRouteName(
       inclusionConnectedAllowedRoutes.getInclusionConnectedUser,
-    )} 403 with expired token`, async () => {
+    )} 401 with expired token`, async () => {
       const userId = "123";
       const token = generateInclusionConnectJwt(
         { userId, version: currentJwtVersions.inclusion },
@@ -158,8 +158,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        body: { error: "jwt expired" },
-        status: 403,
+        body: { message: "Token is expired", status: 401 },
+        status: 401,
       });
     });
   });
@@ -238,20 +238,20 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
     it(`${displayRouteName(
       inclusionConnectedAllowedRoutes.markPartnersErroredConventionAsHandled,
-    )} 403 with bad token`, async () => {
+    )} 401 with bad token`, async () => {
       const response = await httpClient.markPartnersErroredConventionAsHandled({
         headers: { authorization: "wrong-token" },
         body: { conventionId: "11111111-1111-4111-1111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
-        body: { error: "jwt malformed" },
-        status: 403,
+        body: { message: "Provided token is invalid", status: 401 },
+        status: 401,
       });
     });
 
     it(`${displayRouteName(
       inclusionConnectedAllowedRoutes.markPartnersErroredConventionAsHandled,
-    )} 403 with expired token`, async () => {
+    )} 401 with expired token`, async () => {
       const userId = "123";
       const token = generateInclusionConnectJwt(
         { userId, version: currentJwtVersions.inclusion },
@@ -262,8 +262,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: { conventionId: "11111111-1111-4111-1111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
-        body: { error: "jwt expired" },
-        status: 403,
+        body: { message: "Token is expired", status: 401 },
+        status: 401,
       });
     });
 
@@ -313,7 +313,11 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: `L'utilisateur qui a l'identifiant "123456ab" n'a pas de droits sur l'agence "agency-id-2".`,
+          status: 403,
+          message: errors.user.noRightsOnAgency({
+            userId: "123456ab",
+            agencyId: "agency-id-2",
+          }).message,
         },
         status: 403,
       });
@@ -466,9 +470,10 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          errors: errors.discussion.alreadyRejected({
+          message: errors.discussion.alreadyRejected({
             discussionId: discussion.id,
           }).message,
+          status: 400,
         },
       });
     });
@@ -492,7 +497,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectHttpResponseToEqual(response, {
         status: 401,
         body: {
-          error: "You need to authenticate first",
+          message: "Veuillez vous authentifier",
+          status: 401,
         },
       });
     });
@@ -522,10 +528,11 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectHttpResponseToEqual(response, {
         status: 403,
         body: {
-          errors: errors.discussion.rejectForbidden({
+          message: errors.discussion.rejectForbidden({
             discussionId: discussion.id,
             userId: user.id,
           }).message,
+          status: 403,
         },
       });
     });
@@ -573,7 +580,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "Provided token is invalid" },
+        body: { message: "Provided token is invalid", status: 401 },
       });
     });
 

@@ -97,7 +97,7 @@ describe("Assessment routes", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { error: "Provided token is invalid" },
+        body: { status: 401, message: "Provided token is invalid" },
       });
     });
 
@@ -139,7 +139,8 @@ describe("Assessment routes", () => {
       expectHttpResponseToEqual(response, {
         status: 403,
         body: {
-          errors:
+          status: 403,
+          message:
             "Convention provided in DTO is not the same as application linked to it",
         },
       });

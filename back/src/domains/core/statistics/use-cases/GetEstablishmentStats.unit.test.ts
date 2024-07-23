@@ -1,5 +1,4 @@
 import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
-import { ZodError } from "zod";
 import { ApiConsumerBuilder } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -61,17 +60,7 @@ describe("GetEstablishmentStats", () => {
         apiConsumer,
       ),
       errors.inputs.badSchema({
-        zodError: new ZodError([
-          {
-            code: "too_big",
-            maximum: 5000,
-            type: "number",
-            inclusive: true,
-            exact: false,
-            message: "Number must be less than or equal to 5000",
-            path: ["perPage"],
-          },
-        ]),
+        flattenErrors: ["perPage : Number must be less than or equal to 5000"],
       }),
     );
   });

@@ -1,6 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { legacyHttpErrorSchema } from "../httpClient/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { appellationSearchResponseSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import {
   getSiretInfoSchema,
@@ -20,11 +20,11 @@ export const formCompletionRoutes = defineRoutes({
     url: "/siret/:siret",
     responses: {
       200: getSiretInfoSchema,
-      400: legacyHttpErrorSchema,
-      404: legacyHttpErrorSchema,
-      409: legacyHttpErrorSchema,
-      429: legacyHttpErrorSchema,
-      503: legacyHttpErrorSchema,
+      400: httpErrorSchema,
+      404: httpErrorSchema,
+      409: httpErrorSchema,
+      429: httpErrorSchema,
+      503: httpErrorSchema,
     },
   }),
   getSiretInfoIfNotAlreadySaved: defineRoute({
@@ -32,11 +32,11 @@ export const formCompletionRoutes = defineRoutes({
     url: "/siret-if-not-saved/:siret",
     responses: {
       200: getSiretInfoSchema,
-      400: legacyHttpErrorSchema,
-      404: legacyHttpErrorSchema,
-      409: legacyHttpErrorSchema,
-      429: legacyHttpErrorSchema,
-      503: legacyHttpErrorSchema,
+      400: httpErrorSchema,
+      404: httpErrorSchema,
+      409: httpErrorSchema,
+      429: httpErrorSchema,
+      503: httpErrorSchema,
     },
   }),
   appellation: defineRoute({

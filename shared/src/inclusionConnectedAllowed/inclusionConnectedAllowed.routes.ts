@@ -10,11 +10,7 @@ import {
   discussionRejectedSchema,
 } from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
-import {
-  httpErrorSchema,
-  legacyHttpErrorSchema,
-  legacyUnauthenticatedErrorSchema,
-} from "../httpClient/httpErrors.schema";
+import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import { inclusionConnectedUserSchema } from "./inclusionConnectedAllowed.schema";
 
@@ -29,7 +25,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     responses: {
       200: inclusionConnectedUserSchema,
       400: httpErrorSchema,
-      403: legacyUnauthenticatedErrorSchema,
+      401: httpErrorSchema,
     },
   }),
   registerAgenciesToUser: defineRoute({
@@ -39,7 +35,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     requestBodySchema: agencyIdsSchema,
     responses: {
       200: expressEmptyResponseBody,
-      400: httpErrorSchema.or(legacyHttpErrorSchema),
+      400: httpErrorSchema.or(httpErrorSchema),
     },
   }),
   markPartnersErroredConventionAsHandled: defineRoute({
@@ -49,9 +45,10 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     requestBodySchema: markPartnersErroredConventionAsHandledRequestSchema,
     responses: {
       200: expressEmptyResponseBody,
-      404: legacyHttpErrorSchema,
       400: httpErrorSchema,
-      403: legacyHttpErrorSchema.or(legacyUnauthenticatedErrorSchema),
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   broadcastConventionAgain: defineRoute({
@@ -62,9 +59,9 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
-      401: legacyHttpErrorSchema,
-      403: legacyUnauthenticatedErrorSchema,
-      404: legacyHttpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   getInclusionConnectLogoutUrl: defineRoute({
@@ -80,9 +77,9 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: discussionReadSchema,
-      401: legacyHttpErrorSchema,
-      403: legacyHttpErrorSchema,
-      404: legacyHttpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
   updateDiscussionStatus: defineRoute({
@@ -93,9 +90,9 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
-      403: legacyUnauthenticatedErrorSchema,
-      404: legacyHttpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });

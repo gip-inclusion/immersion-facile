@@ -114,7 +114,7 @@ describe("Unregister establishment lead", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        body: { error: "Provided token is invalid" },
+        body: { status: 401, message: "Provided token is invalid" },
         status: 401,
       });
     });
@@ -164,7 +164,8 @@ describe("Unregister establishment lead", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: errors.convention.notFound({ conventionId: id }).message,
+          status: 404,
+          message: errors.convention.notFound({ conventionId: id }).message,
         },
         status: 404,
       });

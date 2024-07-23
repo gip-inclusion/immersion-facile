@@ -72,8 +72,7 @@ const handleSiretResponses = (
   match(response)
     .with({ status: 200 }, ({ body }) => body)
     .with({ status: 400 }, ({ body, status }) => {
-      // eslint-disable-next-line no-console
-      console.error(body.errors);
+      console.error(body.message);
       return errorMessageByCode[status];
     })
     .with(

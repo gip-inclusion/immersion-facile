@@ -129,7 +129,7 @@ describe("Delete form establishment", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { error: "Token is expired" },
+      body: { message: "Token is expired", status: 401 },
       status: 401,
     });
   });
@@ -151,7 +151,8 @@ describe("Delete form establishment", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: "Accès refusé",
+        message: "Veuillez vous authentifier",
+        status: 401,
       },
       status: 401,
     });
@@ -171,7 +172,8 @@ describe("Delete form establishment", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: errors.establishment.notFound({
+        status: 404,
+        message: errors.establishment.notFound({
           siret: establishmentAggregate.establishment.siret,
         }).message,
       },
@@ -197,7 +199,8 @@ describe("Delete form establishment", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        errors: errors.establishment.notFound({
+        status: 404,
+        message: errors.establishment.notFound({
           siret: establishmentAggregate.establishment.siret,
         }).message,
       },
