@@ -1,5 +1,5 @@
 import { WithAcquisition } from "../acquisition.dto";
-import { EstablishmentSearchableByValue } from "../formEstablishment/FormEstablishments.dto";
+import { EstablishmentSearchableByValue } from "../formEstablishment/formEstablishment.dto";
 import {
   AppellationCode,
   RomeCode,

@@ -9,11 +9,11 @@ import {
   FormEstablishmentAddress,
   FormEstablishmentDto,
   FormEstablishmentSource,
-} from "./FormEstablishments.dto";
+} from "./formEstablishment.dto";
 import {
   defaultMaxContactsPerWeek,
   noContactPerWeek,
-} from "./FormEstablishments.schema";
+} from "./formEstablishment.schema";
 
 export const defaultFormEstablishmentAddress = {
   id: "364efc5a-db4f-452c-8d20-95c6a23f21fe",

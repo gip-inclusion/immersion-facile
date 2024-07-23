@@ -1,6 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { renewMagicLinkResponseSchema } from "../convention/convention.schema";
-import { formEstablishmentSchema } from "../formEstablishment/FormEstablishments.schema";
+import { formEstablishmentSchema } from "../formEstablishment/formEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,

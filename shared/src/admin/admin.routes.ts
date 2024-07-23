@@ -11,7 +11,7 @@ import { setFeatureFlagSchema } from "../featureFlag/featureFlags.schema";
 import {
   establishmentBatchReportSchema,
   formEstablishmentBatchSchema,
-} from "../formEstablishment/FormEstablishments.schema";
+} from "../formEstablishment/formEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import {
   httpErrorSchema,

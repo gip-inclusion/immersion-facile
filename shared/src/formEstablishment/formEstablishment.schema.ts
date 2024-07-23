@@ -30,7 +30,7 @@ import {
   ImmersionContactInEstablishmentId,
   SiretAdditionFailure,
   WithFormEstablishmentDto,
-} from "./FormEstablishments.dto";
+} from "./formEstablishment.dto";
 
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =
   zTrimmedString;
