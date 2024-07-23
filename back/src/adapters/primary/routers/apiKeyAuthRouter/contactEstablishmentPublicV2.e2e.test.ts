@@ -130,26 +130,27 @@ describe("POST contact-establishment public V2 route", () => {
 
   it("rejects invalid requests with mismatching contact Mode with error code 400", async () => {
     const testEstablishmentContactMethod = "PHONE";
+    const establishment = new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withSiret(contactEstablishment.siret)
+          .withLocations([TEST_LOCATION])
+          .withNumberOfEmployeeRange("10-19")
+          .build(),
+      )
+      .withContact(
+        new ContactEntityBuilder()
+          .withContactMethod(testEstablishmentContactMethod)
+          .build(),
+      )
+      .withOffers([
+        new OfferEntityBuilder()
+          .withAppellationCode(contactEstablishment.appellationCode)
+          .build(),
+      ])
+      .build();
     inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret(contactEstablishment.siret)
-            .withLocations([TEST_LOCATION])
-            .withNumberOfEmployeeRange("10-19")
-            .build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withContactMethod(testEstablishmentContactMethod)
-            .build(),
-        )
-        .withOffers([
-          new OfferEntityBuilder()
-            .withAppellationCode(contactEstablishment.appellationCode)
-            .build(),
-        ])
-        .build(),
+      establishment,
     ];
 
     const { body, status } = await sharedRequest.contactEstablishment({
@@ -161,7 +162,13 @@ describe("POST contact-establishment public V2 route", () => {
 
     expectToEqual(body, {
       status: 400,
-      message: `Contact mode mismatch: ${contactEstablishment.contactMode} in params. In contact (fetched with siret) : ${testEstablishmentContactMethod}`,
+      message: errors.establishment.contactRequestContactModeMismatch({
+        contactMethods: {
+          inParams: contactEstablishment.contactMode,
+          inRepo: establishment.contact.contactMethod,
+        },
+        siret: contactEstablishment.siret,
+      }).message,
     });
     expectToEqual(status, 400);
   });

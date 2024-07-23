@@ -5,7 +5,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -53,20 +52,18 @@ describe("GetDiscussionById use case", () => {
       const userId = "user-404";
       await expectPromiseToFailWithError(
         getDiscussionById.execute(uuid(), { userId }),
-        new NotFoundError(
-          `Inclusion Connected user with id ${userId} not found`,
-        ),
+        errors.user.notFound({ userId }),
       );
     });
 
     it("throws NotFound when discussion cannot be found", async () => {
-      const someId = uuid();
+      const discussionId = uuid();
       uow.userRepository.users = [user];
       await expectPromiseToFailWithError(
-        getDiscussionById.execute(someId, {
+        getDiscussionById.execute(discussionId, {
           userId: user.id,
         }),
-        new NotFoundError(`Could not find discussion with id ${someId}`),
+        errors.discussion.notFound({ discussionId }),
       );
     });
 
@@ -77,9 +74,10 @@ describe("GetDiscussionById use case", () => {
         getDiscussionById.execute(discussion.id, {
           userId: user.id,
         }),
-        new ForbiddenError(
-          `You are not allowed to access discussion with id ${discussion.id}`,
-        ),
+        errors.discussion.accessForbidden({
+          discussionId: discussion.id,
+          userId: user.id,
+        }),
       );
     });
   });

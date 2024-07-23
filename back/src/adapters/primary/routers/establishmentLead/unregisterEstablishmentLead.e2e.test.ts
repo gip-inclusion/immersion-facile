@@ -5,6 +5,7 @@ import {
   EstablishmentLeadRoutes,
   createConventionMagicLinkPayload,
   displayRouteName,
+  errors,
   establishmentLeadRoutes,
   expectHttpResponseToEqual,
   expiredMagicLinkErrorMessage,
@@ -147,11 +148,12 @@ describe("Unregister establishment lead", () => {
     it(`${displayRouteName(
       establishmentLeadRoutes.unregisterEstablishmentLead,
     )} 404 - Convention not found`, async () => {
+      const id = "no-convention";
       const response = await httpClient.unregisterEstablishmentLead({
         headers: {
           authorization: generateConventionJwt(
             createConventionMagicLinkPayload({
-              id: "no-convention",
+              id,
               role: "establishment-representative",
               email: "",
               now: new Date(),
@@ -162,7 +164,7 @@ describe("Unregister establishment lead", () => {
 
       expectHttpResponseToEqual(response, {
         body: {
-          errors: "No convention were found with id no-convention",
+          errors: errors.convention.notFound({ conventionId: id }).message,
         },
         status: 404,
       });

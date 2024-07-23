@@ -1,5 +1,4 @@
-import { AddConventionInput, addConventionInputSchema } from "shared";
-import { NotFoundError } from "shared";
+import { AddConventionInput, addConventionInputSchema, errors } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 
 export type MarkDiscussionLinkedToConvention = ReturnType<
@@ -14,8 +13,7 @@ export const makeMarkDiscussionLinkedToConvention =
     async ({ discussionId, convention }, { uow }) => {
       if (!discussionId) return;
       const discussion = await uow.discussionRepository.getById(discussionId);
-      if (!discussion)
-        throw new NotFoundError(`No discussion found with id: ${discussionId}`);
+      if (!discussion) throw errors.discussion.notFound({ discussionId });
       await uow.discussionRepository.update({
         ...discussion,
         conventionId: convention.id,

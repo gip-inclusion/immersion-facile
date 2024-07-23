@@ -1,11 +1,11 @@
 import {
   BrevoInboundBody,
   DiscussionBuilder,
+  errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError, NotFoundError } from "shared";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -197,15 +197,10 @@ describe("AddExchangeToDiscussion", () => {
 
   describe("wrong paths", () => {
     it("throws an error if the email does not have the right format", async () => {
+      const email = "gerard@reply-dev.immersion-facile.beta.gouv.fr";
       await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute(
-          createBrevoResponse([
-            "gerard@reply-dev.immersion-facile.beta.gouv.fr",
-          ]),
-        ),
-        new BadRequestError(
-          "Email does not have the right format email to : gerard@reply-dev.immersion-facile.beta.gouv.fr",
-        ),
+        addExchangeToDiscussion.execute(createBrevoResponse([email])),
+        errors.discussion.badEmailFormat({ email }),
       );
     });
 
@@ -214,7 +209,7 @@ describe("AddExchangeToDiscussion", () => {
         addExchangeToDiscussion.execute(
           createBrevoResponse([`iozeuroiu897654654_bob@${replyDomain}`]),
         ),
-        new BadRequestError("Email does not have the right format kind : bob"),
+        errors.discussion.badRecipientKindFormat({ kind: "bob" }),
       );
     });
 
@@ -225,7 +220,7 @@ describe("AddExchangeToDiscussion", () => {
       ]);
       await expectPromiseToFailWithError(
         addExchangeToDiscussion.execute(brevoResponse),
-        new NotFoundError(`Discussion ${discussionId} not found`),
+        errors.discussion.notFound({ discussionId }),
       );
     });
   });
