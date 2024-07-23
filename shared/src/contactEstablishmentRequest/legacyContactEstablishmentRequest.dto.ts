@@ -1,7 +1,7 @@
 import { WithAcquisition } from "../acquisition.dto";
 import { LocationId } from "../address/address.dto";
 import { ImmersionObjective } from "../convention/convention.dto";
-import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import { ContactMethod } from "../formEstablishment/formEstablishment.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 
