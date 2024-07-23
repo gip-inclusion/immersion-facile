@@ -2,9 +2,9 @@ import {
   ApiConsumer,
   SearchResultDto,
   SearchResultQuery,
+  errors,
   searchResultQuerySchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -27,11 +27,12 @@ export class GetSearchResultBySearchQuery extends TransactionalUseCase<
         appellationCode,
         locationId,
       );
-    if (!searchImmersionResultDto) {
-      throw new NotFoundError(
-        `No offer found for siret ${siret} and appellation code ${appellationCode}`,
-      );
-    }
+    if (!searchImmersionResultDto)
+      throw errors.establishment.immersionOfferNotFound({
+        appellationCode,
+        siret,
+      });
+
     return searchImmersionResultDto;
   }
 }

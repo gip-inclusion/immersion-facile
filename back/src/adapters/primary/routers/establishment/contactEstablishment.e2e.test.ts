@@ -1,6 +1,7 @@
 import {
   ContactEstablishmentRequestDto,
   SearchRoutes,
+  errors,
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -113,18 +114,20 @@ describe(`${searchImmersionRoutes.contactEstablishment.method} ${searchImmersion
   });
 
   it("fails with 404 for unknown siret", async () => {
+    const siret = "40400040000404";
     const response = await sharedRequest.contactEstablishment({
       body: {
         ...validRequest,
-        siret: "40400040000404",
+        siret: siret,
       },
     });
 
     expectToEqual(response.status, 404);
     expectToEqual(
       JSON.stringify(response.body),
-      '{"errors":"No establishment found with siret: 40400040000404"}',
+      `{"errors":"${errors.establishment.notFound({ siret }).message}"}`,
     );
+
     // TODO exeptToEqual when errors are handled correctly
     // expectToEqual(response.body, {
     //   errors: "No establishment found with siret: 40400040000404",

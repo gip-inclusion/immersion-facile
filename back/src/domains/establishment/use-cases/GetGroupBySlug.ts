@@ -1,5 +1,9 @@
-import { GroupWithResults, WithGroupSlug, withGroupSlugSchema } from "shared";
-import { NotFoundError } from "shared";
+import {
+  GroupWithResults,
+  WithGroupSlug,
+  errors,
+  withGroupSlugSchema,
+} from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -17,7 +21,7 @@ export class GetOffersByGroupSlug extends TransactionalUseCase<
       await uow.groupRepository.getGroupWithSearchResultsBySlug(groupSlug);
 
     if (!groupWithResults)
-      throw new NotFoundError(`Group with slug ${groupSlug} not found`);
+      throw errors.establishmentGroup.missingBySlug({ groupSlug });
 
     return groupWithResults;
   }

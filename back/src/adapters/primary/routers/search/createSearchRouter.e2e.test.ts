@@ -4,6 +4,7 @@ import {
   SearchResultDto,
   SearchRoutes,
   SiretDto,
+  errors,
   expectHttpResponseToEqual,
   searchImmersionRoutes,
 } from "shared";
@@ -611,7 +612,10 @@ describe("search-immersion route", () => {
       expectHttpResponseToEqual(response, {
         status: 404,
         body: {
-          errors: `No offer found for siret ${requestedOffer.siret} and appellation code ${requestedOffer.appellationCode}`,
+          errors: errors.establishment.immersionOfferNotFound({
+            siret: requestedOffer.siret,
+            appellationCode: requestedOffer.appellationCode,
+          }).message,
         },
       });
     });
@@ -638,7 +642,10 @@ describe("search-immersion route", () => {
       expectHttpResponseToEqual(response, {
         status: 404,
         body: {
-          errors: `No offer found for siret ${requestedOffer.siret} and appellation code ${requestedOffer.appellationCode}`,
+          errors: errors.establishment.immersionOfferNotFound({
+            siret: requestedOffer.siret,
+            appellationCode: requestedOffer.appellationCode,
+          }).message,
         },
       });
     });

@@ -536,7 +536,7 @@ describe("LegacyContactEstablishment", () => {
           ...validRequest,
           contactMode: "PHONE",
         }),
-        errors.establishment.missingImmersionOffer({
+        errors.establishment.immersionOfferBadRequest({
           siret: validRequest.siret,
           appellationCode: validEmailRequest.appellationCode,
         }),
