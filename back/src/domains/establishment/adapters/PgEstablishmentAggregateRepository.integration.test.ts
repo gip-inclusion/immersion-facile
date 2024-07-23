@@ -1,9 +1,11 @@
 import { Pool } from "pg";
 import {
+  BadRequestError,
   Email,
   GeoPositionDto,
   Location,
   LocationBuilder,
+  NotFoundError,
   RomeCode,
   SearchResultDto,
   WithAcquisition,
@@ -12,7 +14,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError, NotFoundError } from "shared";
 import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
