@@ -133,7 +133,7 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
 const agencySeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding agencies...");
-  const agenciesCountByKind = 50;
+  const agenciesCountByKind = 5;
 
   const insertQueries = [...Array(agenciesCountByKind).keys()].flatMap(() => {
     return [
