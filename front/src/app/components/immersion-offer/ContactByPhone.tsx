@@ -3,7 +3,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   AppellationDto,
@@ -11,7 +11,7 @@ import {
   contactEstablishmentByPhoneSchema,
   domElementIds,
 } from "shared";
-import { TranscientPreferencesModal } from "src/app/components/immersion-offer/TranscientPreferencesModal";
+import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
 import {
   transcientExpirationTimeInMinutes,
@@ -79,6 +79,8 @@ export const ContactByPhone = ({
     defaultValues: initialValues,
   });
 
+  const formRef = useRef(null);
+
   const {
     register,
     handleSubmit,
@@ -98,8 +100,12 @@ export const ContactByPhone = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormValid)} id={"im-contact-form--phone"}>
-      <TranscientPreferencesModal
+    <form
+      onSubmit={handleSubmit(onFormValid)}
+      id={"im-contact-form--phone"}
+      ref={formRef}
+    >
+      <TranscientPreferencesDisplay
         scope="contact-establishment"
         onPreferencesChange={(accept) => {
           const newInitialValues = accept
@@ -110,6 +116,8 @@ export const ContactByPhone = ({
             : initialValues;
           reset(newInitialValues);
         }}
+        mode={"form-overlay"}
+        parentRef={formRef}
       />
       <>
         <p className={"fr-my-2w"}>

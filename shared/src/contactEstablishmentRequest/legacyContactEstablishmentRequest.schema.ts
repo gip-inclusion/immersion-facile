@@ -16,12 +16,16 @@ import {
   zUuidLike,
 } from "../zodUtils";
 import {
-  ContactEstablishmentByMailDto,
-  ContactEstablishmentByPhoneDto,
-  ContactEstablishmentEventPayload,
-  ContactEstablishmentInPersonDto,
-  ContactEstablishmentRequestDto,
-} from "./contactEstablishmentRequest.dto";
+  preferEmailContactSchema,
+  preferInPersonContactSchema,
+  preferPhoneContactSchema,
+} from "./contactEstablishmentRequest.schema";
+import {
+  LegacyContactEstablishmentByMailDto,
+  LegacyContactEstablishmentByPhoneDto,
+  LegacyContactEstablishmentInPersonDto,
+  LegacyContactEstablishmentRequestDto,
+} from "./legacyContactEstablishmentRequest.dto";
 
 const commonFields = {
   appellationCode: appellationCodeSchema,
@@ -32,59 +36,48 @@ const commonFields = {
   locationId: zUuidLike,
 };
 
-export const preferEmailContactSchema = z.literal("EMAIL");
-export const preferPhoneContactSchema = z.literal("PHONE");
-export const preferInPersonContactSchema = z.literal("IN_PERSON");
-
 const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
   [...conventionObjectiveOptions],
   localization.invalidImmersionObjective,
 );
 
-export const contactEstablishmentByMailFormSchema: z.Schema<ContactEstablishmentByMailDto> =
+export const legacyContactEstablishmentByMailFormSchema: z.Schema<LegacyContactEstablishmentByMailDto> =
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
+    message: zTrimmedString,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema,
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
-    datePreferences: zTrimmedString,
-    hasWorkingExperience: z.boolean(),
-    experienceAdditionalInformation: zTrimmedString,
   });
 
-export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailDto> =
+export const legacyContactEstablishmentByMailSchema: z.Schema<LegacyContactEstablishmentByMailDto> =
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
+    message: zTrimmedString,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
-    datePreferences: zTrimmedString,
-    hasWorkingExperience: z.boolean(),
-    experienceAdditionalInformation: zTrimmedString,
   });
 
-export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByPhoneDto> =
+export const legacyContactEstablishmentByPhoneSchema: z.Schema<LegacyContactEstablishmentByPhoneDto> =
   z.object({
     ...commonFields,
     contactMode: preferPhoneContactSchema,
   });
 
-export const contactEstablishmentInPersonSchema: z.Schema<ContactEstablishmentInPersonDto> =
+export const legacyContactEstablishmentInPersonSchema: z.Schema<LegacyContactEstablishmentInPersonDto> =
   z.object({
     ...commonFields,
     contactMode: preferInPersonContactSchema,
   });
 
-export const contactEstablishmentRequestSchema: z.Schema<ContactEstablishmentRequestDto> =
+export const legacyContactEstablishmentRequestSchema: z.Schema<LegacyContactEstablishmentRequestDto> =
   z
     .union([
-      contactEstablishmentByMailSchema,
-      contactEstablishmentByPhoneSchema,
-      contactEstablishmentInPersonSchema,
+      legacyContactEstablishmentByMailSchema,
+      legacyContactEstablishmentByPhoneSchema,
+      legacyContactEstablishmentInPersonSchema,
     ])
     .and(withAcquisitionSchema);
-
-export const contactEstablishmentEventPayloadSchema: z.Schema<ContactEstablishmentEventPayload> =
-  z.object({ discussionId: z.string(), siret: siretSchema });

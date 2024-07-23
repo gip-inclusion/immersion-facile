@@ -1,3 +1,4 @@
+import { keys } from "ramda";
 import { WithAcquisition } from "../acquisition.dto";
 import { Postcode } from "../address/address.dto";
 import { AgencyId, AgencyKind } from "../agency/agency.dto";
@@ -379,3 +380,15 @@ export type FindSimilarConventionsParams = {
 export type FindSimilarConventionsResponseDto = {
   similarConventionIds: ConventionId[];
 };
+
+export const labelsForImmersionObjective: Record<ImmersionObjective, string> = {
+  "Confirmer un projet professionnel": "Je compte me former à ce métier",
+  "Découvrir un métier ou un secteur d'activité":
+    "J'en suis au premier stade de ma réorientation et je veux en savoir plus sur ce métier",
+  "Initier une démarche de recrutement": "Je suis à la recherche d'un emploi",
+};
+
+export const isStringImmersionObjective = (
+  objective: string | unknown,
+): objective is ImmersionObjective =>
+  keys(labelsForImmersionObjective).includes(objective as ImmersionObjective);

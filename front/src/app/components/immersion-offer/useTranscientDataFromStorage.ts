@@ -6,9 +6,9 @@ const transcientDataStorageKey = "IfTranscientData";
 const preferUseTranscientDataStorageKey = "IfPreferUseTranscientData";
 
 const unrelevantDataKeysForContactScope: (keyof ContactEstablishmentByMailDto)[] =
-  ["locationId", "message", "appellationCode", "contactMode", "siret"] as const;
+  ["locationId", "appellationCode", "contactMode", "siret"] as const;
 
-type ContactTranscientData = OmitFromExistingKeys<
+export type ContactTranscientData = OmitFromExistingKeys<
   ContactEstablishmentByMailDto,
   (typeof unrelevantDataKeysForContactScope)[number]
 >;
@@ -18,7 +18,7 @@ type TranscientDataItem<T> = {
   expireAt: number;
 };
 
-export const transcientExpirationTimeInMinutes = 10;
+export const transcientExpirationTimeInMinutes = 0;
 
 export type TranscientData = {
   "contact-establishment": TranscientDataItem<ContactTranscientData>;
@@ -101,6 +101,12 @@ export const useTranscientDataFromStorage = (
     setTranscientData(updatedData);
     localStorage.setItem(transcientDataStorageKey, JSON.stringify(updatedData));
   };
+
+  const clearTranscientDataForScope = () => {
+    setTranscientData(null);
+    localStorage.removeItem(transcientDataStorageKey);
+  };
+
   const getTranscientDataForScope =
     (): TranscientDataItem<ContactTranscientData> | null => {
       const data = transcientData?.[scope] ?? null;
@@ -127,5 +133,6 @@ export const useTranscientDataFromStorage = (
     setTranscientData,
     getTranscientDataForScope,
     setTranscientDataForScope,
+    clearTranscientDataForScope,
   };
 };

@@ -1,5 +1,9 @@
 import { EmailButtonProps, createTemplatesByName } from "html-templates";
-import { ConventionId, InternshipKind } from "../convention/convention.dto";
+import {
+  ConventionId,
+  InternshipKind,
+  labelsForImmersionObjective,
+} from "../convention/convention.dto";
 import { frontRoutes } from "../routes/routes";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
@@ -1429,10 +1433,78 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       tags: ["mise en relation mail"],
       createEmailVariables: ({
         appellationLabel,
+        contactFirstName,
+        contactLastName,
+        potentialBeneficiaryFirstName,
+        potentialBeneficiaryLastName,
+        potentialBeneficiaryPhone,
+        businessAddress,
+        immersionObjective,
+        businessName,
+        potentialBeneficiaryResumeLink,
+        potentialBeneficiaryDatePreferences,
+        potentialBeneficiaryExperienceAdditionalInformation,
+        potentialBeneficiaryHasWorkingExperience,
+        replyToEmail,
+      }) => ({
+        subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
+        greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
+        content: `Un candidat souhaite faire une immersion dans votre entreprise ${businessName} (${businessAddress}).
+
+Immersion souhaitée :
+
+    • Métier : ${appellationLabel}.
+    • Dates d’immersion envisagées : ${potentialBeneficiaryDatePreferences}.
+    • ${
+      immersionObjective
+        ? `But de l'immersion : ${labelsForImmersionObjective[immersionObjective]}.`
+        : ""
+    }
+
+Profil du candidat :
+
+    • Expérience professionnelle : ${
+      potentialBeneficiaryHasWorkingExperience
+        ? "j’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat"
+        : "je n’ai jamais travaillé"
+    } / .
+    ${
+      potentialBeneficiaryExperienceAdditionalInformation
+        ? `• Informations supplémentaires sur l'expérience du candidat : ${potentialBeneficiaryExperienceAdditionalInformation}.`
+        : ""
+    }
+    ${
+      potentialBeneficiaryResumeLink
+        ? `• CV du candidat : ${potentialBeneficiaryResumeLink}.`
+        : ""
+    }`,
+        buttons: [
+          {
+            label: "Écrire au candidat",
+            url: `mailto:${replyToEmail}`,
+          },
+        ],
+        highlight: {
+          content: `
+          Ce candidat attend une réponse, vous pouvez :
+
+          - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton "Écrire au candidat" ci-dessus)
+
+          - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
+        },
+        subContent: `Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
+        ${defaultSignature("immersion")}`,
+      }),
+    },
+    CONTACT_BY_EMAIL_REQUEST_LEGACY: {
+      niceName: "Établissement - Mise en relation par mail",
+      tags: ["mise en relation mail"],
+      createEmailVariables: ({
+        appellationLabel,
         businessName,
         contactFirstName,
         contactLastName,
-        immersionObjective: immersionObject,
+        immersionObjective,
         message,
         potentialBeneficiaryFirstName,
         potentialBeneficiaryLastName,
@@ -1445,7 +1517,9 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
         content: `
         Un candidat souhaite faire une immersion ${
-          immersionObject ? `pour "${immersionObject?.toLowerCase()}"` : ""
+          immersionObjective
+            ? `pour "${immersionObjective?.toLowerCase()}"`
+            : ""
         } sur le métier de <strong>${appellationLabel}</strong> dans votre entreprise ${businessName} (${businessAddress}).
 
         Voici son message:

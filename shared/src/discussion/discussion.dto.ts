@@ -26,6 +26,9 @@ export type DiscussionPotentialBeneficiary = {
   lastName: string;
   phone?: string;
   resumeLink?: string;
+  hasWorkingExperience?: boolean;
+  experienceAdditionalInformation?: string;
+  datePreferences?: string;
 };
 
 export type DiscussionEstablishmentContact = {
@@ -131,6 +134,9 @@ const defaultDiscussion: DiscussionDto = {
     email: "ali-baba@gmail.com",
     phone: "+33654533456",
     resumeLink: undefined,
+    hasWorkingExperience: true,
+    experienceAdditionalInformation: "my super experience",
+    datePreferences: "my fake date preferences",
   },
   establishmentContact: {
     contactMethod: "EMAIL",
@@ -179,6 +185,11 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
         resumeLink: this.discussion.potentialBeneficiary.resumeLink,
         email: this.discussion.potentialBeneficiary.email,
         phone: this.discussion.potentialBeneficiary.phone,
+        hasWorkingExperience:
+          this.discussion.potentialBeneficiary.hasWorkingExperience,
+        experienceAdditionalInformation:
+          this.discussion.potentialBeneficiary.experienceAdditionalInformation,
+        datePreferences: this.discussion.potentialBeneficiary.datePreferences,
       },
       establishmentContact: {
         firstName: this.discussion.establishmentContact.firstName,

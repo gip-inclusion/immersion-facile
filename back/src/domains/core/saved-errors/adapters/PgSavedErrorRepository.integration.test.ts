@@ -13,6 +13,7 @@ import { Database } from "../../../../config/pg/kysely/model/database";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import {
   SavedError,
+  broadcastToPartnersServiceName,
   broadcastToPeServiceName,
 } from "../ports/SavedErrorRepository";
 import { PgSavedErrorRepository } from "./PgSavedErrorRepository";
@@ -125,10 +126,10 @@ describe("PgSavedErrorRepository", () => {
   describe("markPartnersErroredConventionAsHandled", () => {
     const conventionId1 = "d07af28e-9c7b-4845-91ee-71020860faa8";
 
-    it(`mark errored convention as handle when convention exist and service name is '${broadcastToPeServiceName}'`, async () => {
+    it("mark errored convention as handle when convention exist", async () => {
       const conventionId2 = "someId";
       const savedError1 = await makeSavedError(
-        broadcastToPeServiceName,
+        broadcastToPartnersServiceName,
         conventionId1,
         "response-error",
       );
@@ -179,7 +180,7 @@ describe("PgSavedErrorRepository", () => {
         [
           { ...savedError1, handledByAgency: true },
           { ...savedError2, handledByAgency: true },
-          savedError3,
+          { ...savedError3, handledByAgency: true },
           savedError4,
         ].map(({ subscriberErrorFeedback, ...rest }) => ({
           ...rest,
@@ -195,7 +196,7 @@ describe("PgSavedErrorRepository", () => {
       await expectPromiseToFailWithError(
         pgErrorRepository.markPartnersErroredConventionAsHandled(conventionId1),
         new NotFoundError(
-          `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId1}'.`,
+          `There's no unhandled errors for convention id '${conventionId1}'.`,
         ),
       );
     });
@@ -212,7 +213,7 @@ describe("PgSavedErrorRepository", () => {
       await expectPromiseToFailWithError(
         pgErrorRepository.markPartnersErroredConventionAsHandled(conventionId1),
         new NotFoundError(
-          `There's no ${broadcastToPeServiceName} unhandled errors for convention id '${conventionId1}'.`,
+          `There's no unhandled errors for convention id '${conventionId1}'.`,
         ),
       );
     });

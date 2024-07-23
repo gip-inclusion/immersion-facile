@@ -10,6 +10,8 @@ export type SavedError = {
   occurredAt: Date;
   handledByAgency: boolean;
 };
+export const broadcastToPartnersServiceName =
+  "BroadcastToPartnersOnConventionUpdates";
 export const broadcastToPeServiceName =
   "PoleEmploiGateway.notifyOnConventionUpdated";
 

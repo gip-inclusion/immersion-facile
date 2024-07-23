@@ -1,6 +1,7 @@
 import { ascend, prop, sort } from "ramda";
 import {
   ContactEstablishmentEventPayload,
+  TemplatedEmail,
   addressDtoToString,
   contactEstablishmentEventPayloadSchema,
   createOpaqueEmail,
@@ -69,35 +70,50 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           "potentialBeneficiary",
           this.#replyDomain,
         );
-
-        await this.#saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "CONTACT_BY_EMAIL_REQUEST",
-            recipients: [establishmentContact.email],
-            sender: immersionFacileNoReplyEmailSender,
-            replyTo: {
-              email: opaqueEmail,
-              name: `${potentialBeneficiary.firstName} ${potentialBeneficiary.lastName} - via Immersion Facilitée`,
-            },
-            cc,
+        let templatedContent: TemplatedEmail = {
+          kind: "CONTACT_BY_EMAIL_REQUEST",
+          recipients: [establishmentContact.email],
+          sender: immersionFacileNoReplyEmailSender,
+          replyTo: {
+            email: opaqueEmail,
+            name: `${potentialBeneficiary.firstName} ${potentialBeneficiary.lastName} - via Immersion Facilitée`,
+          },
+          cc,
+          params: {
+            replyToEmail: opaqueEmail,
+            businessName: discussion.businessName,
+            contactFirstName: establishmentContact.firstName,
+            contactLastName: establishmentContact.lastName,
+            appellationLabel,
+            potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
+            potentialBeneficiaryLastName: potentialBeneficiary.lastName,
+            immersionObjective: discussion.immersionObjective ?? undefined,
+            potentialBeneficiaryPhone:
+              potentialBeneficiary.phone ?? "pas de téléphone fourni",
+            potentialBeneficiaryResumeLink: potentialBeneficiary.resumeLink,
+            businessAddress: addressDtoToString(discussion.address),
+            potentialBeneficiaryDatePreferences:
+              discussion.potentialBeneficiary.datePreferences,
+            potentialBeneficiaryExperienceAdditionalInformation:
+              discussion.potentialBeneficiary.experienceAdditionalInformation,
+            potentialBeneficiaryHasWorkingExperience:
+              discussion.potentialBeneficiary.hasWorkingExperience,
+          },
+        };
+        if (payload.isLegacy) {
+          templatedContent = {
+            ...templatedContent,
+            kind: "CONTACT_BY_EMAIL_REQUEST_LEGACY",
             params: {
-              replyToEmail: opaqueEmail,
-              businessName: discussion.businessName,
-              contactFirstName: establishmentContact.firstName,
-              contactLastName: establishmentContact.lastName,
-              appellationLabel,
-              potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
-              potentialBeneficiaryLastName: potentialBeneficiary.lastName,
-              immersionObjective: discussion.immersionObjective ?? undefined,
-              potentialBeneficiaryPhone:
-                potentialBeneficiary.phone ?? "pas de téléphone fourni",
-              potentialBeneficiaryResumeLink: potentialBeneficiary.resumeLink,
+              ...templatedContent.params,
               message: sort(ascend(prop("sentAt")), discussion.exchanges)[0]
                 .message,
-              businessAddress: addressDtoToString(discussion.address),
             },
-          },
+          };
+        }
+        await this.#saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent,
           followedIds,
         });
 

@@ -4,6 +4,7 @@ import {
   AppellationAndRomeDto,
   ContactEstablishmentRequestDto,
   DiscussionBuilder,
+  LegacyContactEstablishmentRequestDto,
   Location,
   expectArraysToEqual,
   expectPromiseToFailWithError,
@@ -30,7 +31,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { ContactEstablishment } from "./ContactEstablishment";
+import { LegacyContactEstablishment } from "./LegacyContactEstablishment";
 
 const siret = "11112222333344";
 const contactId = "theContactId";
@@ -49,7 +50,7 @@ const location: Location = {
   },
 };
 
-const validRequest: ContactEstablishmentRequestDto = {
+const validRequest: LegacyContactEstablishmentRequestDto = {
   appellationCode: "12898",
   siret,
   contactMode: "PHONE",
@@ -72,12 +73,10 @@ const immersionOffer = new OfferEntityBuilder()
   .withAppellationLabel(appellationAndRome.appellationLabel)
   .build();
 
-const validEmailRequest: ContactEstablishmentRequestDto = {
+const validEmailRequest: LegacyContactEstablishmentRequestDto = {
   ...validRequest,
   contactMode: "EMAIL",
-  datePreferences: "fake date preferences",
-  hasWorkingExperience: true,
-  experienceAdditionalInformation: "fake experience additional information",
+  message: "message_to_send",
   immersionObjective: "Confirmer un projet professionnel",
   potentialBeneficiaryPhone: "+33654783402",
 };
@@ -100,8 +99,8 @@ const establishmentAggregateWithEmailContact =
 
 const minimumNumberOfDaysBetweenSimilarContactRequests = 3;
 
-describe("ContactEstablishment", () => {
-  let contactEstablishment: ContactEstablishment;
+describe("LegacyContactEstablishment", () => {
+  let contactEstablishment: LegacyContactEstablishment;
   let uowPerformer: UnitOfWorkPerformer;
   let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
@@ -118,7 +117,7 @@ describe("ContactEstablishment", () => {
       uuidGenerator,
     });
 
-    contactEstablishment = new ContactEstablishment(
+    contactEstablishment = new LegacyContactEstablishment(
       uowPerformer,
       createNewEvent,
       uuidGenerator,
@@ -151,7 +150,6 @@ describe("ContactEstablishment", () => {
           siret: establishment.establishment.siret,
           discussionId,
           triggeredBy: null,
-          isLegacy: false,
         },
         status: "never-published",
         publications: [],
@@ -202,7 +200,6 @@ describe("ContactEstablishment", () => {
           siret,
           discussionId,
           triggeredBy: null,
-          isLegacy: false,
         },
         publications: [],
         status: "never-published",
@@ -252,7 +249,6 @@ describe("ContactEstablishment", () => {
           siret,
           discussionId,
           triggeredBy: null,
-          isLegacy: false,
         },
         publications: [],
         status: "never-published",
@@ -295,9 +291,6 @@ describe("ContactEstablishment", () => {
           email: validEmailRequest.potentialBeneficiaryEmail,
           phone: validEmailRequest.potentialBeneficiaryPhone,
           resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
-          experienceAdditionalInformation:
-            validEmailRequest.experienceAdditionalInformation,
-          hasWorkingExperience: validEmailRequest.hasWorkingExperience,
         },
         establishmentContact: {
           contactMethod: "EMAIL",
@@ -312,28 +305,9 @@ describe("ContactEstablishment", () => {
         immersionObjective: "Confirmer un projet professionnel",
         exchanges: [
           {
-            subject:
-              "potential_beneficiary_first_name potential_beneficiary_last_name vous contacte pour une demande d'immersion sur le métier de My appellation label",
+            subject: "Demande de contact initiée par le bénéficiaire",
             sentAt: connectionDateStr,
-            message: `<p>Bonjour Alain Prost,</p>
-                  
-  <table width="600">
-    <tr>
-      <td>
-        <p>Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (24 rue des bouchers 67000 Strasbourg).<br/><br/>Immersion souhaitée :<br/><br/>• Métier : My appellation label.<br/>• Dates d’immersion envisagées : fake date preferences.<br/>• But de l'immersion : Je compte me former à ce métier.<br/><br/>Profil du candidat :<br/><br/>• Expérience professionnelle : j’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat / .<br/>• Informations supplémentaires sur l'expérience du candidat : fake experience additional information.</p>
-      </td>
-    </tr>
-  </table>
-
-                  
-  <table width="600">
-    <tr>
-      <td>
-        <p>Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.<br/><br/>Bonne journée,<br/>L'équipe Immersion Facilitée</p>
-      </td>
-    </tr>
-  </table>
-`,
+            message: validEmailRequest.message,
             recipient: "establishment",
             sender: "potentialBeneficiary",
             attachments: [],
@@ -442,19 +416,17 @@ describe("ContactEstablishment", () => {
     ];
 
     uuidGenerator.setNextUuid("discussion2");
-    const secondContactRequestDto: ContactEstablishmentRequestDto = {
+    const secondContactRequestDto: LegacyContactEstablishmentRequestDto = {
       appellationCode: appellationAndRome.appellationCode,
       siret,
       potentialBeneficiaryFirstName: "Bob",
       potentialBeneficiaryLastName: "Marley",
       potentialBeneficiaryEmail: "bob.marley@email.com",
       contactMode: "EMAIL",
+      message: "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
       immersionObjective: "Confirmer un projet professionnel",
       potentialBeneficiaryPhone: "+33654783402",
       locationId: establishment.locations[0].id,
-      datePreferences: "fake date preferences",
-      hasWorkingExperience: true,
-      experienceAdditionalInformation: "fake experience additional information",
     };
     await contactEstablishment.execute(secondContactRequestDto);
 

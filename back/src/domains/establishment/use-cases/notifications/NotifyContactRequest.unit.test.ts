@@ -114,6 +114,12 @@ describe("NotifyContactRequest", () => {
               contactFirstName: establishmentContact.firstName,
               contactLastName: establishmentContact.lastName,
               appellationLabel: TEST_APPELLATION_LABEL,
+              potentialBeneficiaryDatePreferences:
+                discussion.potentialBeneficiary.datePreferences,
+              potentialBeneficiaryExperienceAdditionalInformation:
+                discussion.potentialBeneficiary.experienceAdditionalInformation,
+              potentialBeneficiaryHasWorkingExperience:
+                discussion.potentialBeneficiary.hasWorkingExperience,
               potentialBeneficiaryFirstName:
                 discussion.potentialBeneficiary.firstName,
               potentialBeneficiaryLastName:
@@ -124,7 +130,6 @@ describe("NotifyContactRequest", () => {
                 "pas de téléphone fourni",
               potentialBeneficiaryResumeLink:
                 discussion.potentialBeneficiary.resumeLink,
-              message: discussion.exchanges[0].message,
               businessAddress: addressDtoToString(discussion.address),
             },
             cc: establishmentContact.copyEmails,

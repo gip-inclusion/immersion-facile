@@ -1,10 +1,8 @@
 import subDays from "date-fns/subDays";
-import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
-  ContactEstablishmentRequestDto,
   DiscussionDto,
-  contactEstablishmentRequestSchema,
-  emailTemplatesByName,
+  LegacyContactEstablishmentRequestDto,
+  legacyContactEstablishmentRequestSchema,
 } from "shared";
 import {
   BadRequestError,
@@ -25,8 +23,8 @@ import {
   EstablishmentEntity,
 } from "../entities/EstablishmentEntity";
 
-export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
-  protected inputSchema = contactEstablishmentRequestSchema;
+export class LegacyContactEstablishment extends TransactionalUseCase<LegacyContactEstablishmentRequestDto> {
+  protected inputSchema = legacyContactEstablishmentRequestSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -53,7 +51,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   }
 
   public async _execute(
-    contactRequest: ContactEstablishmentRequestDto,
+    contactRequest: LegacyContactEstablishmentRequestDto,
     uow: UnitOfWork,
   ): Promise<void> {
     const now = this.#timeGateway.now();
@@ -118,12 +116,11 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       // );
     }
 
-    const discussion = await this.#createDiscussion({
+    const discussion = this.#createDiscussion({
       contactRequest,
       contact: establishmentAggregate.contact,
       establishment: establishmentAggregate.establishment,
       now,
-      uow,
     });
 
     await uow.discussionRepository.insert(discussion);
@@ -142,25 +139,22 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
           siret: discussion.siret,
           discussionId: discussion.id,
           triggeredBy: null,
-          isLegacy: false,
         },
       }),
     );
   }
 
-  async #createDiscussion({
+  #createDiscussion({
     contactRequest,
     contact,
     establishment,
     now,
-    uow,
   }: {
-    contactRequest: ContactEstablishmentRequestDto;
+    contactRequest: LegacyContactEstablishmentRequestDto;
     contact: ContactEntity;
     establishment: EstablishmentEntity;
     now: Date;
-    uow: UnitOfWork;
-  }): Promise<DiscussionDto> {
+  }): DiscussionDto {
     const matchingAddress = establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
     );
@@ -169,51 +163,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         `Address with id ${contactRequest.locationId} not found for establishment with siret ${establishment.siret}`,
       );
     }
-
-    const appellationAndRomeDtos =
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-        contactRequest.appellationCode,
-      ]);
-    const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
-
-    if (!appellationLabel)
-      throw new BadRequestError(
-        `No appellationLabel found for appellationCode: ${contactRequest.appellationCode}`,
-      );
-    const emailContent =
-      contactRequest.contactMode === "EMAIL"
-        ? configureGenerateHtmlFromTemplate(emailTemplatesByName, {
-            header: undefined,
-            footer: undefined,
-          })(
-            "CONTACT_BY_EMAIL_REQUEST",
-            {
-              appellationLabel,
-              businessName: establishment.customizedName ?? establishment.name,
-              contactFirstName: contact.firstName,
-              contactLastName: contact.lastName,
-              potentialBeneficiaryFirstName:
-                contactRequest.potentialBeneficiaryFirstName,
-              potentialBeneficiaryLastName:
-                contactRequest.potentialBeneficiaryLastName,
-              immersionObjective:
-                contactRequest.immersionObjective ?? undefined,
-              potentialBeneficiaryPhone:
-                contactRequest.potentialBeneficiaryPhone,
-              potentialBeneficiaryResumeLink:
-                contactRequest.potentialBeneficiaryResumeLink,
-              businessAddress: `${matchingAddress.address.streetNumberAndAddress} ${matchingAddress.address.postcode} ${matchingAddress.address.city}`,
-              replyToEmail: contactRequest.potentialBeneficiaryEmail,
-              potentialBeneficiaryDatePreferences:
-                contactRequest.datePreferences,
-              potentialBeneficiaryExperienceAdditionalInformation:
-                contactRequest.experienceAdditionalInformation,
-              potentialBeneficiaryHasWorkingExperience:
-                contactRequest.hasWorkingExperience,
-            },
-            { showContentParts: true },
-          )
-        : null;
     return {
       id: this.#uuidGenerator.new(),
       appellationCode: contactRequest.appellationCode,
@@ -229,15 +178,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         firstName: contactRequest.potentialBeneficiaryFirstName,
         lastName: contactRequest.potentialBeneficiaryLastName,
         email: contactRequest.potentialBeneficiaryEmail,
-        ...(contactRequest.contactMode === "EMAIL"
-          ? { hasWorkingExperience: contactRequest.hasWorkingExperience }
-          : {}),
-        ...(contactRequest.contactMode === "EMAIL"
-          ? {
-              experienceAdditionalInformation:
-                contactRequest.experienceAdditionalInformation,
-            }
-          : {}),
         phone:
           contactRequest.contactMode === "EMAIL"
             ? contactRequest.potentialBeneficiaryPhone
@@ -257,16 +197,12 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         copyEmails: contact.copyEmails,
       },
       exchanges:
-        contactRequest.contactMode === "EMAIL" &&
-        emailContent &&
-        emailContent.contentParts
+        contactRequest.contactMode === "EMAIL"
           ? [
               {
-                subject: emailContent.subject,
+                subject: "Demande de contact initiée par le bénéficiaire",
                 sentAt: now.toISOString(),
-                message: `${emailContent.contentParts.greetings}
-                  ${emailContent.contentParts.content}
-                  ${emailContent.contentParts.subContent}`,
+                message: contactRequest.message,
                 recipient: "establishment",
                 sender: "potentialBeneficiary",
                 attachments: [],
@@ -287,7 +223,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   }: {
     uow: UnitOfWork;
     establishmentAggregate: EstablishmentAggregate;
-    contactRequest: ContactEstablishmentRequestDto;
+    contactRequest: LegacyContactEstablishmentRequestDto;
     now: Date;
   }) {
     const maxContactsPerWeekForEstablishment =

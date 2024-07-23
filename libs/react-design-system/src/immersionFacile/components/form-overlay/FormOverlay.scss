@@ -1,0 +1,13 @@
+.im-form-overlay {
+  position: absolute;
+  backdrop-filter: blur(5px);
+  background-color: rgba(255, 255, 255, 0.7);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+.im-form-overlay-parent {
+  position: relative;
+}
