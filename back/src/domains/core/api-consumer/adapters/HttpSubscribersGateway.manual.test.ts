@@ -58,6 +58,7 @@ describe("HttpSubscribersGateway", () => {
       callbackUrl,
       status: 201,
       title: "Partner subscription notified successfully",
+      body: { success: true },
     });
   });
 
@@ -81,6 +82,7 @@ describe("HttpSubscribersGateway", () => {
         message: "timeout of 0ms exceeded",
         error: new Error("timeout of 0ms exceeded"),
       },
+      body: undefined,
     });
   });
 
@@ -106,6 +108,7 @@ describe("HttpSubscribersGateway", () => {
         message: "Custom server error",
         error: new Error("Request failed with status code 500"),
       },
+      body: undefined,
     });
   });
 
@@ -129,6 +132,7 @@ describe("HttpSubscribersGateway", () => {
         message: "Custom server error",
         error: new Error("Request failed with status code 500"),
       },
+      body: undefined,
     });
   });
 
@@ -152,6 +156,7 @@ describe("HttpSubscribersGateway", () => {
         message: "Pas d'informations mais des données techniques disponibles",
         error: new Error("Request failed with status code 500"),
       },
+      body: undefined,
     });
   });
 
@@ -175,6 +180,7 @@ describe("HttpSubscribersGateway", () => {
         message: "Pas d'informations mais des données techniques disponibles",
         error: new Error("Request failed with status code 500"),
       },
+      body: undefined,
     });
   });
 });

@@ -105,6 +105,7 @@ describe("Broadcasts events to pole-emploi", () => {
     poleEmploiGateWay.setNextResponse({
       status: 404,
       subscriberErrorFeedback: { message: "Ops, something is bad" },
+      body: "not found",
     });
     const now = new Date();
     timeGateway.setNextDate(now);
@@ -120,8 +121,9 @@ describe("Broadcasts events to pole-emploi", () => {
         serviceName: broadcastToPeServiceName,
         requestParams: {
           conventionId: convention.id,
+          conventionStatus: convention.status,
         },
-        response: { httpStatus: 404 },
+        response: { httpStatus: 404, body: "not found" },
         subscriberErrorFeedback: {
           message: "Ops, something is bad",
         },
@@ -144,6 +146,7 @@ describe("Broadcasts events to pole-emploi", () => {
 
     poleEmploiGateWay.setNextResponse({
       status: 200,
+      body: { success: true },
     });
     const now = new Date();
     timeGateway.setNextDate(now);
@@ -163,7 +166,7 @@ describe("Broadcasts events to pole-emploi", () => {
         response: {
           httpStatus: 200,
           body: {
-            status: 200,
+            success: true,
           },
         },
         occurredAt: now,

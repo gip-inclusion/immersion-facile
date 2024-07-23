@@ -6,7 +6,10 @@ import {
 } from "../../ports/PoleEmploiGateway";
 
 export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
-  #nextResponse: PoleEmploiBroadcastResponse = { status: 200 };
+  #nextResponse: PoleEmploiBroadcastResponse = {
+    status: 200,
+    body: { succes: true },
+  };
 
   constructor(public notifications: PoleEmploiConvention[] = []) {}
 

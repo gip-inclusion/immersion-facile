@@ -134,6 +134,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     if (this.#isDev) {
       return {
         status: 200,
+        body: { success: true },
       };
     }
 
@@ -149,9 +150,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           },
         });
 
-        if ([200, 201].includes(response.status))
+        if ([200, 201, 204].includes(response.status))
           return {
             status: response.status,
+            body: response.body,
           };
 
         throw new Error(
@@ -185,6 +187,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
               message: `Not an axios error: ${error.message}`,
               error,
             },
+            body: undefined,
           };
         }
 
@@ -211,6 +214,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
               message: error.message,
               error,
             },
+            body: undefined,
           };
         }
 
@@ -234,6 +238,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
               message,
               error,
             },
+            body: error.response.data,
           };
         }
 
@@ -256,6 +261,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
             error,
             message,
           },
+          body: error.response.data,
         };
       });
   }
