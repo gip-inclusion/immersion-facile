@@ -2,6 +2,7 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
   FeatureFlag,
+  FeatureFlagBoolean,
   FeatureFlagText,
   FeatureFlagTextImageAndRedirect,
   FeatureFlags,
@@ -13,6 +14,12 @@ export const featureFlagTextValueSchema: z.Schema<FeatureFlagText["value"]> =
   z.object({
     message: z.string(),
   });
+
+const featureFlagBooleanSchema: z.Schema<FeatureFlagBoolean> = z.object({
+  isActive: z.boolean(),
+  kind: z.literal("boolean"),
+});
+
 const featureFlagTextSchema: z.Schema<FeatureFlagText> = z.object({
   isActive: z.boolean(),
   kind: z.literal("text"),
@@ -38,7 +45,9 @@ const featureFlagTextImageAndRedirectSchema: z.Schema<FeatureFlagTextImageAndRed
   });
 
 export const featureFlagSchema: z.Schema<FeatureFlag> =
-  featureFlagTextImageAndRedirectSchema.or(featureFlagTextSchema);
+  featureFlagTextImageAndRedirectSchema
+    .or(featureFlagTextSchema)
+    .or(featureFlagBooleanSchema);
 
 export const setFeatureFlagSchema: z.Schema<SetFeatureFlagParam> = z.object({
   flagName: z.enum(featureFlagNames),
@@ -48,4 +57,5 @@ export const setFeatureFlagSchema: z.Schema<SetFeatureFlagParam> = z.object({
 export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enableTemporaryOperation: featureFlagTextImageAndRedirectSchema,
   enableMaintenance: featureFlagTextSchema,
+  enableSearchByScore: featureFlagBooleanSchema,
 });

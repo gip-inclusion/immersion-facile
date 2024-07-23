@@ -1,5 +1,6 @@
 import {
   FeatureFlags,
+  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
@@ -16,6 +17,7 @@ const defaultFlagsInFront: FeatureFlags = {
   enableMaintenance: makeTextFeatureFlag(false, {
     message: "My maintenance message",
   }),
+  enableSearchByScore: makeBooleanFeatureFlag(false),
 };
 
 export const makeStubFeatureFlags = (

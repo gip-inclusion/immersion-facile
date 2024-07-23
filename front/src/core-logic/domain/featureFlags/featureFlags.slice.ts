@@ -2,6 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   FeatureFlags,
   SetFeatureFlagParam,
+  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
 } from "shared";
@@ -20,6 +21,7 @@ const initialState: FeatureFlagsState = {
     title: "",
   }),
   enableMaintenance: makeTextFeatureFlag(false, { message: "" }),
+  enableSearchByScore: makeBooleanFeatureFlag(false),
   isLoading: true,
 };
 

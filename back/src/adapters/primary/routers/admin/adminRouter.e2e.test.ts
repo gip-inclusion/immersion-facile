@@ -18,6 +18,7 @@ import {
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
+  makeBooleanFeatureFlag,
   makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   technicalRoutes,
@@ -350,6 +351,35 @@ describe("Admin router", () => {
         makeTextFeatureFlag(true, {
           message: "Updated Maintenance message",
         }),
+      );
+    });
+
+    it("201 - sets the feature flag to given value if token is valid with boolean value", async () => {
+      const initialFeatureFlags = await getFeatureFlags();
+      expectToEqual(
+        initialFeatureFlags.enableSearchByScore,
+        makeBooleanFeatureFlag(false),
+      );
+
+      const updateParams: SetFeatureFlagParam = {
+        flagName: "enableSearchByScore",
+        featureFlag: makeBooleanFeatureFlag(true),
+      };
+
+      const response = await sharedRequest.updateFeatureFlags({
+        body: updateParams,
+        headers: { authorization: token },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 201,
+        body: "",
+      });
+
+      const updatedFeatureFlags = await getFeatureFlags();
+      expectToEqual(
+        updatedFeatureFlags.enableSearchByScore,
+        makeBooleanFeatureFlag(true),
       );
     });
 

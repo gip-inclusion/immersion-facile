@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
@@ -9,6 +10,7 @@ import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  FeatureFlagBoolean,
   FeatureFlagName,
   FeatureFlagText,
   FeatureFlagTextImageAndRedirect,
@@ -82,6 +84,12 @@ export const FeatureFlagsSection = () => {
                       />
                     ),
                   )
+                  .with({ kind: "boolean" }, (featureFlagBoolean) => (
+                    <FeatureFlagBooleanForm
+                      featureFlag={featureFlagBoolean}
+                      featureFlagName={featureFlagName}
+                    />
+                  ))
                   .exhaustive()}
               </div>
             ))}
@@ -117,6 +125,10 @@ const labelsByFeatureFlag: Record<
   enableMaintenance: {
     title: "Maintenance",
     enableLabel: "Activer le mode maintenance",
+  },
+  enableSearchByScore: {
+    title: "Recherche par pertinence",
+    enableLabel: "Activer la recherche par pertinence (scoring)",
   },
 };
 
@@ -163,6 +175,80 @@ const FeatureFlagTextForm = ({
           ...formFields.message,
           ...register("message"),
         }}
+      />
+      <ErrorNotifications
+        labels={getFormErrors()}
+        errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+        visible={
+          formState.submitCount !== 0 &&
+          Object.values(formState.errors).length > 0
+        }
+      />
+      <Button size="small">Mettre à jour cette option</Button>
+    </form>
+  );
+};
+
+const FeatureFlagBooleanForm = ({
+  featureFlag,
+  featureFlagName,
+}: {
+  featureFlag: FeatureFlagBoolean;
+  featureFlagName: FeatureFlagName;
+}) => {
+  const dispatch = useDispatch();
+
+  const { handleSubmit, formState, setValue } = useForm<{
+    isActive: FeatureFlagBoolean["isActive"];
+  }>({
+    defaultValues: {
+      isActive: featureFlag.isActive,
+    },
+    mode: "onTouched",
+    resolver: zodResolver(featureFlagTextValueSchema),
+  });
+
+  const { getFormErrors } = getFormContents(formTextFieldsLabels);
+
+  const onFormSubmit = ({
+    isActive,
+  }: { isActive: FeatureFlagBoolean["isActive"] }) => {
+    dispatch(
+      featureFlagsSlice.actions.setFeatureFlagRequested({
+        flagName: featureFlagName,
+        featureFlag: {
+          ...featureFlag,
+          isActive,
+        },
+      }),
+    );
+  };
+
+  return (
+    <form className={fr.cx("fr-ml-9w")} onSubmit={handleSubmit(onFormSubmit)}>
+      <RadioButtons
+        legend="Activer cette option ?"
+        options={[
+          {
+            label: "Oui",
+            nativeInputProps: {
+              checked: formState.isDirty && formState.dirtyFields.isActive,
+              onChange: () => {
+                setValue("isActive", true);
+              },
+            },
+          },
+          {
+            label: "Non",
+            nativeInputProps: {
+              checked:
+                formState.isDirty && formState.dirtyFields.isActive === false,
+              onChange: () => {
+                setValue("isActive", false);
+              },
+            },
+          },
+        ]}
       />
       <ErrorNotifications
         labels={getFormErrors()}
