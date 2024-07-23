@@ -480,6 +480,10 @@ export const domElementIds = {
         "im-form-manage-establishment-admin__edit-establishment-button",
       nextAvailabilityDateInput:
         "im-form-manage-establishment-admin__next-availability-date",
+      maxContactsPerWeekValue:
+        "im-form-manage-establishment-admin__max-contact-per-week-value",
+      nextAvailabilityDateValue:
+        "im-form-manage-establishment-admin__current-next-availablity-date-value",
     },
   },
 

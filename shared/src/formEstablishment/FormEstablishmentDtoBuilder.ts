@@ -68,6 +68,57 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
   acquisitionCampaign: undefined,
 };
 
+export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
+  source: "immersion-facile",
+  businessAddresses: [
+    {
+      id: "fbd6096d-b514-4d54-a16e-46c89f75d83c",
+      rawAddress: "1 rue de la paix, 75001 Paris",
+    },
+    {
+      id: "fbd6096d-b514-4d54-a16e-46c89f75d83d",
+      rawAddress: "2 rue de la paix, 93000 Bobigny",
+    },
+  ],
+  businessContact: {
+    email: "my-updated-email@test.com",
+    contactMethod: "PHONE",
+    firstName: "Jean-Luc",
+    lastName: "Deloin",
+    copyEmails: ["updated-copy-email@test.com"],
+    job: "new job",
+    phone: "+33612345679",
+  },
+  naf: { code: "B", nomenclature: "nomenclature code B" },
+  businessName: "Edited Business Name",
+  siret: "01234567890123",
+  website: "https://updated.website.com",
+  additionalInformation: "This is an updated information",
+  appellations: [
+    {
+      romeCode: "A1234",
+      appellationCode: "11234",
+      romeLabel: "Label rome 1",
+      appellationLabel: "Appellation 1",
+    },
+    {
+      romeCode: "B1234",
+      appellationCode: "21234",
+      romeLabel: "Label rome 2",
+      appellationLabel: "Appellation 2",
+    },
+  ],
+  maxContactsPerWeek: defaultMaxContactsPerWeek - 5,
+  searchableBy: {
+    jobSeekers: false,
+    students: true,
+  },
+  businessNameCustomized: "Updated Business Name",
+  fitForDisabledWorkers: false,
+  isEngagedEnterprise: false,
+  nextAvailabilityDate: new Date("2025-02-01").toISOString(),
+};
+
 const emptyFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddresses: [
@@ -115,6 +166,10 @@ export class FormEstablishmentDtoBuilder
 
   public static allEmptyFields() {
     return new FormEstablishmentDtoBuilder(emptyFormEstablishment);
+  }
+
+  public static fullyUpdated() {
+    return new FormEstablishmentDtoBuilder(fullyUpdatedFormEstablishment);
   }
 
   public build() {
