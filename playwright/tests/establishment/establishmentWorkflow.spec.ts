@@ -145,7 +145,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
     await goToNextStep(page, 1, "edit");
     await page
-      .locator(`[for="${domElementIds.establishment.edit.searchableBy}-2"]`)
+      .locator(`[for="${domElementIds.establishment.edit.searchableBy}-0"]`)
       .click();
     await goToNextStep(page, 2, "edit");
     await page.fill(
