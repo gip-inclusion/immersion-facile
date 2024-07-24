@@ -21,6 +21,7 @@ import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
 import { routes } from "src/app/routes/routes";
+import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchPageParams,
@@ -37,25 +38,6 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
     value: distance,
   }),
 );
-
-const sortOptionsWithoutDistance = [
-  {
-    label: "Trier par date de publication",
-    value: "date" as const,
-  },
-  {
-    label: "Trier par proximité",
-    value: "distance" as const,
-  },
-];
-
-const sortOptions = [
-  ...sortOptionsWithoutDistance,
-  {
-    label: "Trier par pertinence",
-    value: "score" as const,
-  },
-];
 
 export const SearchPage = ({
   route,
@@ -269,12 +251,7 @@ export const SearchPage = ({
                   )}
                 >
                   <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                    <SearchSortedBySelect
-                      options={
-                        lat && lon ? sortOptions : sortOptionsWithoutDistance
-                      }
-                      triggerSearch={triggerSearch}
-                    />
+                    <SearchSortedBySelect triggerSearch={triggerSearch} />
                   </div>
                   <div
                     className={cx(
@@ -370,22 +347,52 @@ const canSubmitSearch = (values: SearchPageParams) => {
   return areValidGeoParams(geoParams) || areEmptyGeoParams(geoParams);
 };
 
+const getSortedByOptions = (
+  hasGeoParams: boolean,
+  hasScoreEnabled: boolean,
+): SelectProps.Option<SearchSortedBy>[] => [
+  {
+    label: "Trier par date de publication",
+    value: "date" as const,
+  },
+  ...(hasScoreEnabled
+    ? [
+        {
+          label: "Trier par pertinence",
+          value: "score" as const,
+        },
+      ]
+    : []),
+  ...(hasGeoParams
+    ? [
+        {
+          label: "Trier par proximité",
+          value: "distance" as const,
+        },
+      ]
+    : []),
+];
+
 const SearchSortedBySelect = ({
-  options,
   triggerSearch,
 }: {
-  options: SelectProps.Option<SearchSortedBy>[];
   triggerSearch: (values: SearchPageParams) => void;
 }) => {
   const { register, watch, setValue } = useForm();
   const sortedByValue = watch("sortedBy");
   const sortedBy = sortedByValue ?? "date";
-
+  const { enableSearchByScore } = useAppSelector(
+    featureFlagSelectors.featureFlagState,
+  );
+  const filteredOptions = getSortedByOptions(
+    areValidGeoParams(watch()),
+    enableSearchByScore.isActive,
+  );
   return (
     <Select
-      label="Trier par"
+      label="Trier les résultats"
       placeholder="Trier par"
-      options={options}
+      options={filteredOptions}
       nativeSelectProps={{
         ...register("sortedBy"),
         id: domElementIds.search.sortFilter,
@@ -393,8 +400,18 @@ const SearchSortedBySelect = ({
         onChange: (event) => {
           const value = event.currentTarget.value;
           setValue("sortedBy", value);
+          const formValues = watch();
+          if (value === "distance") {
+            if (areValidGeoParams(formValues)) {
+              triggerSearch({
+                ...formValues,
+                sortedBy: value,
+              });
+            }
+            return;
+          }
           triggerSearch({
-            ...watch(),
+            ...formValues,
             sortedBy: value,
           });
         },
