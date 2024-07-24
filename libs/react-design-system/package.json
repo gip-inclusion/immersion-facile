@@ -12,15 +12,14 @@
     "build-storybook": "storybook build",
     "lint": "pnpm -w lintconfig:glob ./libs/react-design-system/src",
     "make-styles": "scss-to-ts update",
-    "postinstall": "copy-dsfr-to-public",
-    "predev": "only-include-used-icons",
-    "prebuild": "only-include-used-icons"
+    "predev": "react-dsfr update-icons",
+    "prebuild": "react-dsfr update-icons"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.20.12",
-    "@codegouvfr/react-dsfr": "^1.9.8",
+    "@codegouvfr/react-dsfr": "^1.10.11",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.8.0",
