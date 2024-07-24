@@ -288,7 +288,7 @@ export class PgEstablishmentAggregateRepository
       .where("siret", "not in", (eb) =>
         eb
           .selectFrom("establishments")
-          .select("siret")
+          .select("establishments.siret")
           .leftJoin("discussions", "establishments.siret", "discussions.siret")
           .where("is_searchable", "=", false)
           .where("max_contacts_per_week", ">", 0)

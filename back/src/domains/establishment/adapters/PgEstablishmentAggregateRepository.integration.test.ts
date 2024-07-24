@@ -1,6 +1,8 @@
+import { addMilliseconds, subDays } from "date-fns";
 import { Pool } from "pg";
 import {
   BadRequestError,
+  DiscussionBuilder,
   Email,
   GeoPositionDto,
   Location,
@@ -31,6 +33,7 @@ import {
   OfferEntityBuilder,
   defaultLocation,
 } from "../helpers/EstablishmentBuilders";
+import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
   insertEstablishmentAggregate,
@@ -42,6 +45,7 @@ describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let kyselyDb: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
+  let pgDiscussionRepository: PgDiscussionRepository;
 
   beforeAll(() => {
     pool = getTestPgPool();
@@ -58,6 +62,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       kyselyDb,
     );
+    pgDiscussionRepository = new PgDiscussionRepository(kyselyDb);
   });
 
   afterAll(async () => {
@@ -1887,6 +1892,179 @@ describe("PgEstablishmentAggregateRepository", () => {
         ),
         [establishmentWithEmail1, establishmentWithEmail2],
       );
+    });
+  });
+
+  describe("markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek", () => {
+    const since = subDays(new Date(), 7);
+
+    const establishmentNotSearchable = new EstablishmentAggregateBuilder()
+      .withIsSearchable(false)
+      .build();
+
+    const establishmentIsNotSearchableAndMaxContactPerWeek0 =
+      new EstablishmentAggregateBuilder(establishmentNotSearchable)
+        .withMaxContactsPerWeek(0)
+        .build();
+
+    const establishmentIsNotSearchableAndMaxContactPerWeek1 =
+      new EstablishmentAggregateBuilder(establishmentNotSearchable)
+        .withMaxContactsPerWeek(1)
+        .build();
+
+    const establishmentIsNotSearchableAndMaxContactPerWeek2 =
+      new EstablishmentAggregateBuilder(establishmentNotSearchable)
+        .withMaxContactsPerWeek(2)
+        .build();
+
+    const discussionAfterSinceDate = new DiscussionBuilder()
+      .withSiret(
+        establishmentIsNotSearchableAndMaxContactPerWeek2.establishment.siret,
+      )
+      .withId(uuid())
+      .withCreatedAt(addMilliseconds(since, 1))
+      .build();
+
+    const discussionAtSinceDate = new DiscussionBuilder()
+      .withSiret(
+        establishmentIsNotSearchableAndMaxContactPerWeek2.establishment.siret,
+      )
+      .withId(uuid())
+      .withCreatedAt(since)
+      .build();
+
+    describe("update", () => {
+      it(`update is searchable for establishments that: 
+          - are not searchable
+          - have maxContactPerWeek at 2
+          - have 1 discussion since date`, async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentIsNotSearchableAndMaxContactPerWeek2,
+        );
+        await pgDiscussionRepository.insert(discussionAfterSinceDate);
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+          since,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          [
+            new EstablishmentAggregateBuilder(
+              establishmentIsNotSearchableAndMaxContactPerWeek2,
+            )
+              .withIsSearchable(true)
+              .build(),
+          ],
+        );
+      });
+
+      it(`update is searchable for establishments that: 
+          - are not searchable
+          - have maxContactPerWeek at 2
+          - have no discussion`, async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentIsNotSearchableAndMaxContactPerWeek2,
+        );
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+          since,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          [
+            new EstablishmentAggregateBuilder(
+              establishmentIsNotSearchableAndMaxContactPerWeek2,
+            )
+              .withIsSearchable(true)
+              .build(),
+          ],
+        );
+      });
+      it(`update is searchable for establishments that: 
+          - are not searchable
+          - have maxContactPerWeek at 1
+          - have 1 discussion before date`, async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentIsNotSearchableAndMaxContactPerWeek1,
+        );
+
+        await pgDiscussionRepository.insert(discussionAtSinceDate);
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+          since,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          [
+            new EstablishmentAggregateBuilder(
+              establishmentIsNotSearchableAndMaxContactPerWeek1,
+            )
+              .withIsSearchable(true)
+              .build(),
+          ],
+        );
+      });
+    });
+
+    describe("do not update", () => {
+      it(`do not update is searchable for establishments that: 
+          - are not searchable
+          - have maxContactPerWeek at 0
+          - have 0 discussion`, async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentIsNotSearchableAndMaxContactPerWeek0,
+        );
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+          since,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          [establishmentIsNotSearchableAndMaxContactPerWeek0],
+        );
+      });
+
+      it(`do not update is searchable for establishments that: 
+          - are not searchable
+          - have maxContactPerWeek at 0
+          - have 1 discussion since date`, async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentIsNotSearchableAndMaxContactPerWeek0,
+        );
+        await pgDiscussionRepository.insert(discussionAfterSinceDate);
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+          since,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          [establishmentIsNotSearchableAndMaxContactPerWeek0],
+        );
+      });
+
+      it(`do not update is searchable for establishments that: 
+          - are not searchable
+          - have maxContactPerWeek at 1
+          - have 1 discussion since date`, async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentIsNotSearchableAndMaxContactPerWeek1,
+        );
+        await pgDiscussionRepository.insert(discussionAfterSinceDate);
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+          since,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          [establishmentIsNotSearchableAndMaxContactPerWeek1],
+        );
+      });
     });
   });
 });
