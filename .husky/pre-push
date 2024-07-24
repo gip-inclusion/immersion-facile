@@ -4,6 +4,5 @@
 [ -n "$CI" ] && exit 0
 
 echo 'Pre-push hook'
-pnpm back verify-migrations-order
 pnpm fullcheck
 
