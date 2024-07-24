@@ -2,20 +2,22 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { values } from "ramda";
+import React from "react";
 import { Tooltip } from "react-design-system";
 import { AgencyId, AgencyRole, domElementIds } from "shared";
 import { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { ManageUserModal } from "./ManageUserModal";
 
 type AgencyUsersProperties = {
   agencyId: AgencyId;
   agencyUsers: NormalizedIcUserById;
 };
 
-const agencyRoleToDisplay: Record<AgencyRole, string> = {
+export const agencyRoleToDisplay: Record<AgencyRole, string> = {
   toReview: "A valider",
   validator: "Validateur",
-  agencyOwner: "Responsable d'agence",
   counsellor: "Pré-validateur",
+  agencyOwner: "Responsable d'agence",
   "agency-viewer": "Lecteur",
 };
 
@@ -61,7 +63,14 @@ export const AgencyUsers = ({
       ? "Reçoit les notifications"
       : "Ne reçoit pas les notifications";
 
-    return [formattedUserInfo, formattedContactMode, formattedUserRights];
+    const manageUser = <ManageUserModal agencyUser={agencyUser} />;
+
+    return [
+      formattedUserInfo,
+      formattedContactMode,
+      formattedUserRights,
+      manageUser,
+    ];
   });
 
   return (
@@ -79,7 +88,12 @@ export const AgencyUsers = ({
       </div>
       <Table
         id={domElementIds.admin.agencyTab.agencyUsersTable}
-        headers={["Utilisateurs", "Préférence de communication", "Rôles"]}
+        headers={[
+          "Utilisateurs",
+          "Préférence de communication",
+          "Rôles",
+          "Actions",
+        ]}
         data={tableData}
         fixed
       />
