@@ -55,9 +55,12 @@ export const SearchPage = ({
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const innerSearchResultWrapper = useRef<HTMLDivElement>(null);
   const acquisitionParams = useGetAcquisitionParams();
+  const { enableSearchByScore } = useAppSelector(
+    featureFlagSelectors.featureFlagState,
+  );
   const initialValues: SearchPageParams = {
     place: "",
-    sortedBy: "date",
+    sortedBy: enableSearchByScore ? "score" : "date",
     appellations: undefined,
     distanceKm: undefined,
     latitude: undefined,
@@ -391,14 +394,16 @@ const SearchSortedBySelect = ({
   return (
     <Select
       label="Trier les résultats"
-      placeholder="Trier par"
       options={filteredOptions}
       nativeSelectProps={{
         ...register("sortedBy"),
         id: domElementIds.search.sortFilter,
         value: sortedBy,
         onChange: (event) => {
-          const value = event.currentTarget.value;
+          const value =
+            (event.currentTarget.value as SearchSortedBy | "") === ""
+              ? "date"
+              : event.currentTarget.value; // fixing temp bug in SelectNext react-dsfr
           setValue("sortedBy", value);
           const formValues = watch();
           if (value === "distance") {
