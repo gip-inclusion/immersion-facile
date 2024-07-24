@@ -204,9 +204,10 @@ describe("POST contact-establishment public V2 route", () => {
 
     expectToEqual(body, {
       status: 400,
-      message: errors.establishment.immersionOfferBadRequest({
+      message: errors.establishment.offerMissing({
         siret: contactEstablishment.siret,
         appellationCode: contactEstablishment.appellationCode,
+        mode: "bad request",
       }).message,
     });
     expectToEqual(status, 400);

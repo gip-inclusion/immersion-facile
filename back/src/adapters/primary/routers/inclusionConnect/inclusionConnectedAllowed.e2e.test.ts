@@ -8,6 +8,7 @@ import {
   User,
   currentJwtVersions,
   displayRouteName,
+  errors,
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -465,7 +466,9 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          errors: `Can't reject discussion ${discussion.id} because it is already rejected`,
+          errors: errors.discussion.alreadyRejected({
+            discussionId: discussion.id,
+          }).message,
         },
       });
     });
@@ -519,7 +522,10 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectHttpResponseToEqual(response, {
         status: 403,
         body: {
-          errors: `User is not allowed to reject discussion ${discussion.id}`,
+          errors: errors.discussion.rejectForbidden({
+            discussionId: discussion.id,
+            userId: user.id,
+          }).message,
         },
       });
     });

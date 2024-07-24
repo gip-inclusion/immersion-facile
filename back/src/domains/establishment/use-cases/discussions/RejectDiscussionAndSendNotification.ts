@@ -55,7 +55,10 @@ export const makeRejectDiscussionAndSendNotification =
         throw errors.discussion.alreadyRejected({ discussionId });
 
       if (currentUser.email !== discussion.establishmentContact.email)
-        throw errors.discussion.rejectForbidden({ discussionId });
+        throw errors.discussion.rejectForbidden({
+          discussionId,
+          userId: currentUser.id,
+        });
 
       const updatedDiscussion: DiscussionDto = {
         ...discussion,
