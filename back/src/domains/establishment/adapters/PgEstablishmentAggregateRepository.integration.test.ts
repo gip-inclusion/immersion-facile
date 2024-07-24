@@ -75,6 +75,40 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       });
 
+      it("no location but keys provided in params - case occured from usecase without location", async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentWithOfferA1101_AtPosition,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.searchImmersionResults({
+            searchMade: {
+              lat: undefined,
+              lon: undefined,
+              distanceKm: undefined,
+              sortedBy: "date",
+              voluntaryToImmersion: true,
+              place: undefined,
+              appellationCodes: undefined,
+              romeCode: undefined,
+              establishmentSearchableBy: "jobSeekers",
+              acquisitionCampaign: undefined,
+              acquisitionKeyword: undefined,
+            },
+          }),
+          [
+            makeExpectedSearchResult({
+              establishment: establishmentWithOfferA1101_AtPosition,
+              withOffers: [offer_A1101_11987],
+              withLocationAndDistance: {
+                ...locationOfSearchPosition,
+                distance: undefined,
+              },
+            }),
+          ],
+        );
+      });
+
       describe("with `maxResults` parameter", () => {
         beforeEach(async () => {
           await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(

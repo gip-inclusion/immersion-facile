@@ -877,6 +877,9 @@ const searchImmersionResultsQuery = (
     sortedBy: SearchSortedBy;
   },
 ) => {
+  const geoParams = filters?.geoParams;
+  const searchableBy = filters?.searchableBy;
+
   const query = transaction
     .with("filtered_results", (qb) =>
       pipeWithValue(
@@ -888,7 +891,6 @@ const searchImmersionResultsQuery = (
                 .select("siret")
                 .where("is_open", "=", true),
               (qb) => {
-                const searchableBy = filters?.searchableBy;
                 if (searchableBy === "jobSeekers")
                   return qb.whereRef(
                     "searchable_by_job_seekers",
@@ -907,9 +909,8 @@ const searchImmersionResultsQuery = (
                 eb
                   .selectFrom("establishments_locations")
                   .select(["establishment_siret as siret", "id", "position"]),
-                (eb) => {
-                  const geoParams = filters?.geoParams;
-                  return geoParams
+                (eb) =>
+                  geoParams && hasSearchGeoParams(geoParams)
                     ? eb.where(({ fn }) =>
                         fn("ST_DWithin", [
                           "position",
@@ -919,8 +920,7 @@ const searchImmersionResultsQuery = (
                           sql`${(1000 * geoParams.distanceKm).toString()}`,
                         ]),
                       )
-                    : eb;
-                },
+                    : eb,
               ).as("loc"),
             (join) => join.onRef("loc.siret", "=", "e.siret"),
           )
@@ -979,10 +979,8 @@ const searchImmersionResultsQuery = (
         ),
     )
     .innerJoin("public_romes_data as ro", "ro.code_rome", "r.code_rome")
-    .select(({ ref, fn }) => {
-      const geoParams = filters?.geoParams;
-
-      return jsonStripNulls(
+    .select(({ ref, fn }) =>
+      jsonStripNulls(
         jsonBuildObject({
           naf: ref("e.naf_code"),
           siret: ref("e.siret"),
@@ -1009,7 +1007,7 @@ const searchImmersionResultsQuery = (
             lat: ref("loc.lat"),
           }),
           locationId: ref("loc.id"),
-          ...(geoParams
+          ...(geoParams && hasSearchGeoParams(geoParams)
             ? {
                 distance_m: fn("ST_Distance", [
                   ref("loc.position"),
@@ -1022,8 +1020,8 @@ const searchImmersionResultsQuery = (
           voluntaryToImmersion: sql`TRUE`,
           appellations: ref("r.appelations"),
         }),
-      ).as("search_immersion_result");
-    })
+      ).as("search_immersion_result"),
+    )
     .orderBy("r.rank");
 
   return query.execute();
