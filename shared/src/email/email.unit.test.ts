@@ -62,5 +62,18 @@ describe("email schemas validation", () => {
         expect(() => emailPossiblyEmptySchema.parse(email)).toThrow();
       },
     );
+
+    it("can check if email is valid without throwing", () => {
+      const failureIsSuccess = emailSchema.safeParse("yolo").success;
+      const successIsSuccess = emailSchema.safeParse("yolo@mail.com").success;
+
+      expect({
+        failureIsSuccess,
+        successIsSuccess,
+      }).toEqual({
+        failureIsSuccess: false,
+        successIsSuccess: true,
+      });
+    });
   });
 });

@@ -10,6 +10,7 @@ import {
   BeneficiaryRepresentative,
   ConventionReadDto,
   InternshipKind,
+  emailSchema,
   isBeneficiaryStudent,
   levelsOfEducation,
 } from "shared";
@@ -170,7 +171,10 @@ export const BeneficiaryFormSection = ({
       <EmailValidationInput
         hintText={formContents["signatories.beneficiary.email"].hintText}
         label={formContents["signatories.beneficiary.email"].label}
-        disabled={userFieldsAreFilled}
+        disabled={
+          userFieldsAreFilled &&
+          emailSchema.safeParse(connectedUser.email).success
+        }
         nativeInputProps={{
           ...formContents["signatories.beneficiary.email"],
           ...register("signatories.beneficiary.email"),
