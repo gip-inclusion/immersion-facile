@@ -12,8 +12,8 @@ import {
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
 import { useStyles } from "tss-react/dsfr";
 
-import ovoidSprite from "/dsfr/artwork/background/ovoid.svg";
-import technicalErrorSprite from "/dsfr/artwork/pictograms/system/technical-error.svg";
+import ovoidSprite from "@codegouvfr/react-dsfr/dsfr/artwork/background/ovoid.svg";
+import technicalErrorSprite from "@codegouvfr/react-dsfr/dsfr/artwork/pictograms/system/technical-error.svg";
 
 type ErrorPageContentProps = {
   type?: ManagedErrorKind;
