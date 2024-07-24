@@ -84,7 +84,9 @@ export const errors = {
         `Aucune entreprise trouvée avec le siret : ${siret}. Êtes-vous sûr d'avoir bien tapé votre siret ?`,
       ),
     siretMismatch: () =>
-      new ForbiddenError("Siret mismatch in JWT payload and form"),
+      new ForbiddenError(
+        "Il y a un problème de cohérance de Siret entre les données techniques (JWT et formulaire).",
+      ),
     conflictError: ({ siret }: { siret: SiretDto }) =>
       new ConflictError(
         `Une entreprise avec le siret ${siret} existe déjà dans notre annuaire.`,
@@ -100,8 +102,8 @@ export const errors = {
     }) =>
       new ConflictError(
         [
-          `A contact request already exists for siret ${siret} and appellation ${appellationCode}, and this potential beneficiary email.`,
-          `Minimum ${minimumNumberOfDaysBetweenSimilarContactRequests} days between two similar contact requests.`,
+          `Une demande de mise en contact existe déjà pour l'entreprise '${siret}', le code métier '${appellationCode}' et l'émail du candidat.`,
+          `Un minimum de ${minimumNumberOfDaysBetweenSimilarContactRequests} jours entre deux demande de mise en contact sont permises.`,
         ].join("\n"),
       ),
     contactRequestContactModeMismatch: ({
@@ -112,28 +114,24 @@ export const errors = {
       contactMethods: { inParams: ContactMethod; inRepo: ContactMethod };
     }) =>
       new BadRequestError(
-        `Contact mode mismatch: ${contactMethods.inParams} in params. In contact (fetched with siret ${siret}) : ${contactMethods.inRepo}`,
+        `Incohérance sur le mode de mise en contact. '${contactMethods.inParams}' dans les params. '${contactMethods.inRepo}' dans le contact d'entreprise '${siret}'.`,
       ),
-    immersionOfferNotFound: ({
+    offerMissing: ({
       siret,
       appellationCode,
+      mode,
     }: {
       siret: SiretDto;
       appellationCode: AppellationCode;
+      mode: "not found" | "bad request";
     }) =>
-      new NotFoundError(
-        `Establishment with siret '${siret}' doesn't have an immersion offer with appellation code '${appellationCode}'.`,
-      ),
-    immersionOfferBadRequest: ({
-      siret,
-      appellationCode,
-    }: {
-      siret: SiretDto;
-      appellationCode: AppellationCode;
-    }) =>
-      new BadRequestError(
-        `Establishment with siret '${siret}' doesn't have an immersion offer with appellation code '${appellationCode}'.`,
-      ),
+      mode === "bad request"
+        ? new BadRequestError(
+            `L'entreprise '${siret}' n'a pas d'offre d'immersion avec le code appellation '${appellationCode}'.`,
+          )
+        : new NotFoundError(
+            `L'entreprise '${siret}' n'a pas d'offre d'immersion avec le code appellation '${appellationCode}'.`,
+          ),
     missingLocation: ({
       siret,
       locationId,
@@ -142,17 +140,28 @@ export const errors = {
       locationId: LocationId;
     }) =>
       new NotFoundError(
-        `Address with id ${locationId} not found for establishment with siret ${siret}`,
+        `L'addresse '${locationId}' n'existe pas pour l'entreprise '${siret}'.`,
       ),
     forbiddenUnavailable: ({
       siret,
     }: {
       siret: SiretDto;
-    }) => new ForbiddenError(`The establishment ${siret} is not available.`),
+    }) =>
+      new ForbiddenError(
+        `L'entreprise ${siret} n'est pas disponible pour des immersions.`,
+      ),
   },
   establishmentLead: {
     notFound: ({ siret }: { siret: SiretDto }) =>
-      new NotFoundError(`No establishment lead were found with siret ${siret}`),
+      new NotFoundError(
+        `Les informations de lead d'entreprise avec le siret '${siret}' ne sont pas trouvés.`,
+      ),
+  },
+  establishmentMarketing: {
+    notFound: ({ siret }: { siret: string }) =>
+      new NotFoundError(
+        `Les informations de marketing d'entreprise avec le siret '${siret}' ne sont pas trouvés.`,
+      ),
   },
   address: {
     queryToShort: ({ minLength }: { minLength: number }) =>
@@ -207,7 +216,9 @@ export const errors = {
         `L'utilisateur qui a l'identifiant "${userId}" n'a pas de droits sur l'agence "${agencyId}".`,
       ),
     notBackOfficeAdmin: ({ userId }: { userId: UserId }) =>
-      new ForbiddenError(`User '${userId}' is not a backoffice admin.`),
+      new ForbiddenError(
+        `L'utilisateur '${userId}' n'est pas administrateur Immersion Facilitée.`,
+      ),
   },
   // location: {
   //   notFound: ({ siret }: { siret: SiretDto }) =>
@@ -222,50 +233,41 @@ export const errors = {
       conventionId: ConventionId;
     }) =>
       new NotFoundError(
-        `There's no unhandled errors for convention id '${conventionId}'.`,
-      ),
-  },
-  establishmentMarketing: {
-    notFound: ({ siret }: { siret: string }) =>
-      new NotFoundError(
-        `Establishment marketing contact with siret '${siret}' not found.`,
+        `Il n'y a pas d'erreur non géré de transfert de convention pour la convention '${conventionId}'.`,
       ),
   },
   discussion: {
     notFound: ({ discussionId }: { discussionId: DiscussionId }) =>
-      new NotFoundError(`No discussion with id '${discussionId}' not found.`),
+      new NotFoundError(`La discussion '${discussionId}' n'est pas trouvée.`),
     missingAppellationLabel: ({
       appellationCode,
     }: { appellationCode: AppellationCode }) =>
       new BadRequestError(
-        `No appellationLabel found for appellationCode: ${appellationCode}`,
+        `Pas de label trouvé pour le code appélation métier '${appellationCode}'.`,
       ),
-    rejectForbidden: ({ discussionId }: { discussionId: DiscussionId }) =>
+    rejectForbidden: ({
+      discussionId,
+      userId,
+    }: { discussionId: DiscussionId; userId: UserId }) =>
       new ForbiddenError(
-        `User is not allowed to reject discussion ${discussionId}`,
+        `L'utilisateur '${userId}' n'a pas le droit de rejeter la discussion '${discussionId}'.`,
       ),
     alreadyRejected: ({ discussionId }: { discussionId: DiscussionId }) =>
-      new BadRequestError(
-        `Can't reject discussion ${discussionId} because it is already rejected`,
-      ),
+      new BadRequestError(`La discussion '${discussionId}' est déjà rejetée.`),
     accessForbidden: ({
       discussionId,
       userId,
     }: { discussionId: DiscussionId; userId: UserId }) =>
       new ForbiddenError(
-        `User '${userId}' is not allowed to access discussion with id ${discussionId}`,
+        `L'utilisateur '${userId}' n'a pas accès à la discussion '${discussionId}'.`,
       ),
     badEmailFormat: ({ email }: { email: Email }) =>
-      new BadRequestError(
-        `Email does not have the right format email to : ${email}`,
-      ),
+      new BadRequestError(`L'émail n'a pas le bon format '${email}'.`),
     badRecipientKindFormat: ({ kind }: { kind: string }) =>
-      new BadRequestError(
-        `Email does not have the right format kind : ${kind}`,
-      ),
+      new BadRequestError(`L'émail n'a pas le bon type '${kind}'.`),
   },
   establishmentGroup: {
     missingBySlug: ({ groupSlug }: { groupSlug: GroupSlug }) =>
-      new NotFoundError(`Group with slug ${groupSlug} not found`),
+      new NotFoundError(`Aucun group avec le terme ${groupSlug} trouvé.`),
   },
 };

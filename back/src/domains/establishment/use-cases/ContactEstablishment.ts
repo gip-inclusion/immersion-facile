@@ -102,9 +102,10 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
     if (!appellationLabel) {
       notifyAndThrowErrorDiscord(
-        errors.establishment.immersionOfferBadRequest({
+        errors.establishment.offerMissing({
           siret,
           appellationCode: contactRequest.appellationCode,
+          mode: "bad request",
         }),
       );
 

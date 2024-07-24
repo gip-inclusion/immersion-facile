@@ -28,9 +28,10 @@ export class GetSearchResultBySearchQuery extends TransactionalUseCase<
         locationId,
       );
     if (!searchImmersionResultDto)
-      throw errors.establishment.immersionOfferNotFound({
+      throw errors.establishment.offerMissing({
         appellationCode,
         siret,
+        mode: "not found",
       });
 
     return searchImmersionResultDto;

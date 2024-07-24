@@ -104,7 +104,10 @@ describe("RejectDiscussionAndSendNotification", () => {
         },
         unauthorizedUser,
       ),
-      errors.discussion.rejectForbidden({ discussionId: discussion.id }),
+      errors.discussion.rejectForbidden({
+        discussionId: discussion.id,
+        userId: unauthorizedUser.id,
+      }),
     );
   });
 

@@ -100,9 +100,10 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
 
     if (!appellationLabel) {
       notifyAndThrowErrorDiscord(
-        errors.establishment.immersionOfferBadRequest({
+        errors.establishment.offerMissing({
           appellationCode: contactRequest.appellationCode,
           siret,
+          mode: "bad request",
         }),
       );
 

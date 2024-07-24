@@ -3,13 +3,11 @@ import { Kysely } from "kysely/dist/cjs/kysely";
 import { Pool } from "pg";
 import {
   ConventionId,
-  NotFoundError,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-
 import {
   cast,
   jsonBuildObject,
@@ -329,9 +327,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
         pgBroadcastFeedbacksRepository.markPartnersErroredConventionAsHandled(
           conventionId1,
         ),
-        new NotFoundError(
-          `There's no unhandled errors for convention id '${conventionId1}'.`,
-        ),
+        errors.broadcastFeedback.notFound({ conventionId: conventionId1 }),
       );
     });
   });

@@ -565,9 +565,10 @@ describe("ContactEstablishment", () => {
           ...validRequest,
           contactMode: "PHONE",
         }),
-        errors.establishment.immersionOfferBadRequest({
+        errors.establishment.offerMissing({
           appellationCode: validRequest.appellationCode,
           siret: validRequest.siret,
+          mode: "bad request",
         }),
       );
     });

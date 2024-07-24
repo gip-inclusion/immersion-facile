@@ -536,9 +536,10 @@ describe("LegacyContactEstablishment", () => {
           ...validRequest,
           contactMode: "PHONE",
         }),
-        errors.establishment.immersionOfferBadRequest({
+        errors.establishment.offerMissing({
           siret: validRequest.siret,
           appellationCode: validEmailRequest.appellationCode,
+          mode: "bad request",
         }),
       );
     });
