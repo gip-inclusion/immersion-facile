@@ -400,10 +400,7 @@ const SearchSortedBySelect = ({
         id: domElementIds.search.sortFilter,
         value: sortedBy,
         onChange: (event) => {
-          const value =
-            (event.currentTarget.value as SearchSortedBy | "") === ""
-              ? "date"
-              : event.currentTarget.value; // fixing temp bug in SelectNext react-dsfr
+          const value = event.currentTarget.value;
           setValue("sortedBy", value);
           const formValues = watch();
           if (value === "distance") {
