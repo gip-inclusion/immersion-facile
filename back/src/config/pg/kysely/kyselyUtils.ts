@@ -60,6 +60,12 @@ export const makeKyselyDb = (pool: Pool): Kysely<Database> => {
         };
         notifyObjectDiscord(params);
         logger.error(params);
+      } else if (event.queryDurationMillis > 1_000) {
+        logger.warn({
+          message: "SQL QUERY TOO LONG",
+          durationInSeconds: event.queryDurationMillis / 1000,
+          error: { query: event.query.sql },
+        });
       }
     },
   });
