@@ -62,7 +62,7 @@ export const SearchPage = ({
     place: "",
     sortedBy: enableSearchByScore ? "score" : "date",
     appellations: undefined,
-    distanceKm: undefined,
+    distanceKm: "" as any, // to show the placeholder, its value must be a string
     latitude: undefined,
     longitude: undefined,
     ...acquisitionParams,
@@ -203,7 +203,6 @@ export const SearchPage = ({
             <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
               <Select
                 label="Distance maximum"
-                placeholder="Distance"
                 options={radiusOptions}
                 disabled={!lat || !lon}
                 nativeSelectProps={{
