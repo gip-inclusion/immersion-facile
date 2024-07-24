@@ -143,15 +143,15 @@ describe("PgDiscussionRepository", () => {
   describe("getDiscussions", () => {
     //TODO getDiscussions with lastAnsweredByCandidate parameter
     it.each([
-      // {
-      //   params: {
-      //     filters: {
-      //       sirets: [discussionWithLastExchangeByPotentialBeneficiary1.siret],
-      //     },
-      //     limit: 5,
-      //   },
-      //   result: [discussionWithLastExchangeByPotentialBeneficiary1],
-      // },
+      {
+        params: {
+          filters: {
+            sirets: [discussionWithLastExchangeByPotentialBeneficiary1.siret],
+          },
+          limit: 5,
+        },
+        result: [discussionWithLastExchangeByPotentialBeneficiary1],
+      },
       {
         params: {
           filters: {
@@ -167,31 +167,31 @@ describe("PgDiscussionRepository", () => {
           discussionWithAcceptedStatus5,
         ],
       },
-      // {
-      //   params: {
-      //     filters: {
-      //       lastAnsweredByCandidate: {
-      //         from: addDays(date, -1),
-      //         to: date,
-      //       },
-      //     },
-      //     limit: 5,
-      //   },
-      //   result: [discussionWithLastExchangeByPotentialBeneficiary1],
-      // },
-      // {
-      //   params: {
-      //     filters: {
-      //       sirets: [discussionWithoutExchanges3.siret],
-      //       lastAnsweredByCandidate: {
-      //         from: addDays(date, -1),
-      //         to: date,
-      //       },
-      //     },
-      //     limit: 5,
-      //   },
-      //   result: [],
-      // },
+      {
+        params: {
+          filters: {
+            lastAnsweredByCandidate: {
+              from: addDays(date, -1),
+              to: date,
+            },
+          },
+          limit: 5,
+        },
+        result: [discussionWithLastExchangeByPotentialBeneficiary1],
+      },
+      {
+        params: {
+          filters: {
+            sirets: [discussionWithoutExchanges3.siret],
+            lastAnsweredByCandidate: {
+              from: addDays(date, -1),
+              to: date,
+            },
+          },
+          limit: 5,
+        },
+        result: [],
+      },
     ] satisfies {
       params: GetDiscussionsParams;
       result: DiscussionDto[] | Error;
