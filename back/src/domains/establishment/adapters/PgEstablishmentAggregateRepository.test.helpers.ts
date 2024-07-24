@@ -135,7 +135,7 @@ export const makeExpectedSearchResult = ({
 }: {
   establishment: EstablishmentAggregate;
   withOffers: OfferEntity[];
-  withLocationAndDistance: Location & { distance: number };
+  withLocationAndDistance: Location & { distance?: number };
 }): SearchResultDto => {
   const firstOffer = withOffers.at(0);
   if (!firstOffer)
