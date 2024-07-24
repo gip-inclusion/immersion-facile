@@ -57,7 +57,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
     discussionId: DiscussionId,
   ): Promise<DiscussionDto | undefined> {
     const pgResult = await this.#makeDiscussionQueryBuilder()
-      .where("discussions.id", "=", discussionId)
+      .where("d.id", "=", discussionId)
       .executeTakeFirst();
 
     return pgResult
@@ -71,28 +71,28 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }: GetDiscussionsParams): Promise<DiscussionDto[]> {
     const results = await pipeWithValue(
       this.#makeDiscussionQueryBuilder(),
+      (b) => (createdSince ? b.where("d.created_at", ">=", createdSince) : b),
       (b) =>
-        createdSince
-          ? b.where("discussions.created_at", ">=", createdSince)
-          : b,
-      (b) =>
-        sirets && sirets?.length > 0
-          ? b.where("discussions.siret", "in", sirets)
-          : b,
+        sirets && sirets?.length > 0 ? b.where("d.siret", "in", sirets) : b,
       (b) =>
         lastAnsweredByCandidate
-          ? b
-              .where("last_exchanges.sender", "=", "potentialBeneficiary")
-              .where((eb) =>
-                eb.between(
-                  "last_exchanges.sent_at",
-                  lastAnsweredByCandidate.from,
-                  lastAnsweredByCandidate.to,
-                ),
-              )
+          ? b.where("d.id", "in", (qb) =>
+              qb
+                .selectFrom("exchanges")
+                .select("discussion_id")
+                .where("sender", "=", "potentialBeneficiary")
+                .where(
+                  qb.between(
+                    "e.sent_at",
+                    lastAnsweredByCandidate.from,
+                    lastAnsweredByCandidate.to,
+                  ),
+                )
+                .whereRef("d.id", "=", "exchanges.discussion_id"),
+            )
           : b,
     )
-      .orderBy("discussions.created_at", "desc")
+      .orderBy("d.created_at", "desc")
       .limit(limit)
       .execute();
 
@@ -120,103 +120,70 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
   #makeDiscussionQueryBuilder() {
     return this.transaction
-      .with("last_exchanges", (db) =>
-        db
-          .selectFrom(({ selectFrom }) =>
-            selectFrom("exchanges")
-              .select(({ fn }) => [
-                "discussion_id",
-                "sent_at",
-                "sender",
-                fn
-                  .agg<number>("rank")
-                  .over((ob) =>
-                    ob.partitionBy("discussion_id").orderBy("sent_at", "desc"),
-                  )
-                  .as("rn"),
-              ])
-              .as("sub"),
-          )
-          .select(["discussion_id", "sent_at", "sender"])
-          .where("rn", "=", 1),
-      )
-      .with("exchanges_by_id", (db) =>
-        db
-          .selectFrom("exchanges")
-          .groupBy("discussion_id")
-          .select(({ ref, fn }) => [
-            "discussion_id",
-            fn
-              .agg<Exchange[]>("array_agg", [
-                jsonBuildObject({
-                  subject: ref("subject"),
-                  message: ref("message"),
-                  recipient: ref("recipient"),
-                  sender: ref("sender"),
-                  sentAt: ref("sent_at"),
-                  attachments: ref("attachments"),
-                }),
-              ])
-              .as("exchanges"),
-          ]),
-      )
-      .selectFrom("discussions")
-      .leftJoin("exchanges_by_id", "discussion_id", "id")
-      .leftJoin(
-        "last_exchanges",
-        "last_exchanges.discussion_id",
-        "discussions.id",
-      )
-      .select((qb) => [
+      .selectFrom("discussions as d")
+      .leftJoin("exchanges as e", "d.id", "e.discussion_id")
+      .groupBy(["d.id", "d.created_at", "d.siret"])
+      .select(({ ref, fn }) =>
         jsonStripNulls(
           jsonBuildObject({
-            id: qb.ref("id"),
-            createdAt: qb.ref("created_at"),
-            siret: qb.ref("siret"),
-            businessName: qb.ref("business_name"),
-            appellationCode: sql<string>`CAST(${qb.ref(
+            id: ref("d.id"),
+            createdAt: ref("d.created_at"),
+            siret: ref("d.siret"),
+            businessName: ref("d.business_name"),
+            appellationCode: sql<string>`CAST(${ref(
               "appellation_code",
             )} AS text)`,
-            immersionObjective: qb.ref("immersion_objective"),
+            immersionObjective: ref("d.immersion_objective"),
             potentialBeneficiary: jsonBuildObject({
-              firstName: qb.ref("potential_beneficiary_first_name"),
-              lastName: qb.ref("potential_beneficiary_last_name"),
-              email: qb.ref("potential_beneficiary_email"),
-              phone: qb.ref("potential_beneficiary_phone"),
-              resumeLink: qb.ref("potential_beneficiary_resume_link"),
-              hasWorkingExperience: qb.ref(
+              firstName: ref("d.potential_beneficiary_first_name"),
+              lastName: ref("d.potential_beneficiary_last_name"),
+              email: ref("d.potential_beneficiary_email"),
+              phone: ref("d.potential_beneficiary_phone"),
+              resumeLink: ref("d.potential_beneficiary_resume_link"),
+              hasWorkingExperience: ref(
                 "potential_beneficiary_has_working_experience",
               ),
-              experienceAdditionalInformation: qb.ref(
+              experienceAdditionalInformation: ref(
                 "potential_beneficiary_experience_additional_information",
               ),
-              datePreferences: qb.ref("potential_beneficiary_date_preferences"),
+              datePreferences: ref("d.potential_beneficiary_date_preferences"),
             }),
             establishmentContact: jsonBuildObject({
-              contactMethod: sql<ContactMethod>`${qb.ref("contact_method")}`,
-              firstName: qb.ref("establishment_contact_first_name"),
-              lastName: qb.ref("establishment_contact_last_name"),
-              email: qb.ref("establishment_contact_email"),
-              phone: qb.ref("establishment_contact_phone"),
-              job: qb.ref("establishment_contact_job"),
-              copyEmails: sql<string[]>`${qb.ref(
+              contactMethod: sql<ContactMethod>`${ref("d.contact_method")}`,
+              firstName: ref("d.establishment_contact_first_name"),
+              lastName: ref("d.establishment_contact_last_name"),
+              email: ref("d.establishment_contact_email"),
+              phone: ref("d.establishment_contact_phone"),
+              job: ref("d.establishment_contact_job"),
+              copyEmails: sql<string[]>`${ref(
                 "establishment_contact_copy_emails",
               )}`,
             }),
             address: jsonBuildObject({
-              streetNumberAndAddress: qb.ref("street_number_and_address"),
-              postcode: qb.ref("postcode"),
-              departmentCode: qb.ref("department_code"),
-              city: qb.ref("city"),
+              streetNumberAndAddress: ref("d.street_number_and_address"),
+              postcode: ref("d.postcode"),
+              departmentCode: ref("d.department_code"),
+              city: ref("d.city"),
             }),
-            exchanges: qb.ref("exchanges"),
-            conventionId: qb.ref("convention_id"),
-            status: sql<DiscussionStatus>`${qb.ref("status")}`,
-            rejectionKind: sql<RejectionKind>`${qb.ref("rejection_kind")}`,
-            rejectionReason: qb.ref("rejection_reason"),
+            exchanges: fn
+              .jsonAgg(
+                jsonBuildObject({
+                  subject: ref("e.subject"),
+                  message: ref("e.message"),
+                  recipient: ref("e.recipient"),
+                  sender: ref("e.sender"),
+                  sentAt: ref("e.sent_at"),
+                  attachments: ref("e.attachments"),
+                }).$castTo<Exchange>(),
+              )
+              .filterWhere("e.id", "is not", null),
+            conventionId: ref("d.convention_id"),
+            status: sql<DiscussionStatus>`${ref("d.status")}`,
+            rejectionKind: sql<RejectionKind>`${ref("d.rejection_kind")}`,
+            rejectionReason: ref("d.rejection_reason"),
           }),
         ).as("discussion"),
-      ]);
+      );
   }
 
   public async hasDiscussionMatching({
