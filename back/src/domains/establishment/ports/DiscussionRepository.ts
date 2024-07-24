@@ -18,6 +18,7 @@ export type HasDiscussionMatchingParams = {
 
 export type GetDiscussionsParams = {
   filters: {
+    discussionId?: DiscussionId;
     sirets?: SiretDto[];
     createdSince?: Date;
     lastAnsweredByCandidate?: { from: Date; to: Date };

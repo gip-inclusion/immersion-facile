@@ -34,7 +34,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .set({
         attachment: sql`jsonb_set(attachment::jsonb, '{content}', '"deleted-content"')`,
       })
-      .where(sql`attachment::jsonb ->> 'content' != 'deleted-content'`)
+      .where(sql<boolean>`attachment::jsonb ->> 'content' != 'deleted-content'`)
       .executeTakeFirst();
 
     return Number(response.numUpdatedRows);
@@ -96,7 +96,7 @@ export class PgNotificationRepository implements NotificationRepository {
     );
 
     return getEmailsNotificationBuilder(this.transaction)
-      .where("e.created_at", ">", sql`NOW() - INTERVAL '2 day'`)
+      .where("e.created_at", ">", sql<Date>`NOW() - INTERVAL '2 day'`)
       .where("e.id", "in", subQuery)
       .orderBy("e.created_at", "desc")
       .execute()
@@ -105,7 +105,7 @@ export class PgNotificationRepository implements NotificationRepository {
 
   public async getLastNotifications(): Promise<NotificationsByKind> {
     return getSmsNotificationBuilder(this.transaction)
-      .where("created_at", ">", sql`NOW() - INTERVAL '2 day'`)
+      .where("created_at", ">", sql<Date>`NOW() - INTERVAL '2 day'`)
       .limit(this.maxRetrievedNotifications)
       .execute()
       .then(async (rows) => ({
