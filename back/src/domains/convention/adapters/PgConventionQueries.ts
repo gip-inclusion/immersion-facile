@@ -1,4 +1,4 @@
-import { addDays, subDays, subHours } from "date-fns";
+import { addDays, subDays } from "date-fns";
 import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
@@ -75,12 +75,15 @@ export class PgConventionQueries implements ConventionQueries {
   }
 
   public async getAllConventionsForThoseEndingThatDidntGoThrough(
-    dateEnd: Date,
+    dateEnd: {
+      from: Date;
+      to: Date;
+    },
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionDto[]> {
     const pgResults = await createConventionQueryBuilder(this.transaction)
-      .where("conventions.date_end", ">=", subHours(dateEnd, 24))
-      .where("conventions.date_end", "<", dateEnd)
+      .where("conventions.date_end", ">=", dateEnd.from)
+      .where("conventions.date_end", "<", dateEnd.to)
       .where("conventions.status", "in", validatedConventionStatuses)
       .where("conventions.id", "not in", (qb) =>
         qb

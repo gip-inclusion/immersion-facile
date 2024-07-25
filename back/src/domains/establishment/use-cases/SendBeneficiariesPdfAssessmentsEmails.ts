@@ -51,7 +51,10 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
     const tomorrow = addDays(now, 1);
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-        tomorrow,
+        {
+          from: tomorrow,
+          to: addDays(tomorrow, 1),
+        },
         "BENEFICIARY_ASSESSMENT_NOTIFICATION",
       );
     const errors: Record<ConventionId, Error> = {};

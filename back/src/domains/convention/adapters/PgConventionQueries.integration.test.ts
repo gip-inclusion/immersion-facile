@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { addDays, subHours } from "date-fns";
 import { sql } from "kysely";
 import { Pool } from "pg";
 import {
@@ -672,9 +672,13 @@ describe("Pg implementation of ConventionQueries", () => {
       await notificationRepo.saveBatch([notification]);
 
       // Act
+      const date = new Date("2022-05-15T12:43:11");
       const queryResults =
         await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-          new Date("2022-05-15T12:43:11"),
+          {
+            from: subHours(date, 24),
+            to: date,
+          },
           "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
         );
 

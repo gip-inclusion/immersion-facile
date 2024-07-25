@@ -60,7 +60,10 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     const yesterday = subDays(now, 1);
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-        yesterday,
+        {
+          from: yesterday,
+          to: now,
+        },
         "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
       );
 
