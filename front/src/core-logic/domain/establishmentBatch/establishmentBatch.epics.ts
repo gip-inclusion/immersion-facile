@@ -4,13 +4,13 @@ import {
   FormEstablishmentDto,
   FormEstablishmentSource,
   csvBooleanToBoolean,
-  defaultMaxContactsPerWeek,
+  defaultMaxContactsPerMonth,
   establishmentAppellationsFromCSVToDto,
   establishmentCSVRowSchema,
   establishmentCopyEmailsFromCSVToDto,
   formEstablishmentSchema,
   isCSVCellEmptyString,
-  noContactPerWeek,
+  noContactPerMonth,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -113,7 +113,7 @@ export const candidateEstablishmentMapper = (
       isEngagedEnterprise: csvBooleanToBoolean(
         establishmentRow.isEngagedEnterprise,
       ),
-      maxContactsPerWeek: calculateMaxContactsPerWeek(
+      maxContactsPerMonth: calculateMaxContactsPerMonth(
         establishmentRow.isSearchable,
       ),
       searchableBy: {
@@ -133,11 +133,11 @@ export const candidateEstablishmentMapper = (
   return { formEstablishment: mappedEstablishment, zodErrors: errors };
 };
 
-const calculateMaxContactsPerWeek = (isSearchable?: CSVBoolean) => {
-  if (isSearchable === undefined) return defaultMaxContactsPerWeek;
+const calculateMaxContactsPerMonth = (isSearchable?: CSVBoolean) => {
+  if (isSearchable === undefined) return defaultMaxContactsPerMonth;
   return csvBooleanToBoolean(isSearchable)
-    ? defaultMaxContactsPerWeek
-    : noContactPerWeek;
+    ? defaultMaxContactsPerMonth
+    : noContactPerMonth;
 };
 
 export const establishmentBatchEpics = [

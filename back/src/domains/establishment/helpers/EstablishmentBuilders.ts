@@ -9,7 +9,7 @@ import {
   NumberEmployeesRange,
   RomeCode,
   WithAcquisition,
-  defaultMaxContactsPerWeek,
+  defaultMaxContactsPerMonth,
 } from "shared";
 import { avenueChampsElyseesDto } from "../../core/address/adapters/InMemoryAddressGateway";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -99,7 +99,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   updatedAt: new Date("2022-01-05T12:00:00.000"),
   isOpen: true,
   isSearchable: true,
-  maxContactsPerWeek: defaultMaxContactsPerWeek,
+  maxContactsPerMonth: defaultMaxContactsPerMonth,
   searchableBy: {
     jobSeekers: true,
     students: true,
@@ -181,10 +181,10 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, locations });
   }
 
-  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
+  public withMaxContactsPerMonth(maxContactsPerMonth: number) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      maxContactsPerWeek,
+      maxContactsPerMonth,
     });
   }
 
@@ -421,13 +421,13 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
+  public withMaxContactsPerMonth(maxContactsPerMonth: number) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(
         this.aggregate.establishment,
       )
-        .withMaxContactsPerWeek(maxContactsPerWeek)
+        .withMaxContactsPerMonth(maxContactsPerMonth)
         .build(),
     });
   }

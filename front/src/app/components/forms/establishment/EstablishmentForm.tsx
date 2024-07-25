@@ -128,7 +128,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     defaultValues: {
       ...initialFormEstablishment,
       ...acquisitionParams,
-      maxContactsPerWeek: undefined,
+      maxContactsPerMonth: undefined,
     },
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
@@ -241,10 +241,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     reset({
       ...initialFormEstablishment,
       ...acquisitionParams,
-      maxContactsPerWeek:
+      maxContactsPerMonth:
         mode === "create"
           ? undefined
-          : initialFormEstablishment.maxContactsPerWeek,
+          : initialFormEstablishment.maxContactsPerMonth,
     });
   }, [initialFormEstablishment, acquisitionParams, reset, mode]);
 

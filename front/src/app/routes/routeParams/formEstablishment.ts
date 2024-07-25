@@ -4,7 +4,7 @@ import {
   Email,
   FormEstablishmentDto,
   FormEstablishmentSource,
-  defaultMaxContactsPerWeek,
+  defaultMaxContactsPerMonth,
 } from "shared";
 import { AcquisitionParams } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
@@ -44,7 +44,7 @@ export const formEstablishmentParamsInUrl = {
   ),
   isEngagedEnterprise: param.query.optional.boolean,
   fitForDisabledWorkers: param.query.optional.boolean,
-  maxContactsPerWeek: param.query.optional.number,
+  maxContactsPerMonth: param.query.optional.number,
   nafCode: param.query.optional.string,
   nafNomenclature: param.query.optional.string,
   bcLastName: param.query.optional.string,
@@ -78,7 +78,7 @@ export const formEstablishmentQueryParamsToFormEstablishmentDto = (
     })) ?? [],
   isEngagedEnterprise: Boolean(params.isEngagedEnterprise),
   fitForDisabledWorkers: Boolean(params.fitForDisabledWorkers),
-  maxContactsPerWeek: params.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
+  maxContactsPerMonth: params.maxContactsPerMonth ?? defaultMaxContactsPerMonth,
   naf: {
     code: params.nafCode ?? "",
     nomenclature: params.nafNomenclature ?? "",
@@ -113,8 +113,8 @@ export const formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams =
       bAddresses: params.businessAddresses.map(({ rawAddress }) => rawAddress),
       isEngagedEnterprise: params.isEngagedEnterprise,
       fitForDisabledWorkers: params.fitForDisabledWorkers,
-      maxContactsPerWeek:
-        params.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
+      maxContactsPerMonth:
+        params.maxContactsPerMonth ?? defaultMaxContactsPerMonth,
       nafCode: params.naf?.code ?? "",
       nafNomenclature: params.naf?.nomenclature ?? "",
       bcLastName: params.businessContact.lastName,
@@ -159,7 +159,7 @@ export const createInitialFormValues = (
         },
       ],
       isEngagedEnterprise: true,
-      maxContactsPerWeek: defaultMaxContactsPerWeek,
+      maxContactsPerMonth: defaultMaxContactsPerMonth,
       appellations: [
         {
           appellationCode: "11573",

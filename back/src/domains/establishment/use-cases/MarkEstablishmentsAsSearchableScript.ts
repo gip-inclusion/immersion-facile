@@ -4,6 +4,8 @@ import { UseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
+const normalizedMonthInDays = 28;
+
 export class MarkEstablishmentsAsSearchableScript extends UseCase<
   void,
   number
@@ -25,8 +27,8 @@ export class MarkEstablishmentsAsSearchableScript extends UseCase<
   }
 
   protected async _execute(): Promise<number> {
-    const since = subDays(this.#timeGateway.now(), 7);
-    return this.#establishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+    const since = subDays(this.#timeGateway.now(), normalizedMonthInDays);
+    return this.#establishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
       since,
     );
   }

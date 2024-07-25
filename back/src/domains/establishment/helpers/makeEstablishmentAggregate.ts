@@ -1,4 +1,4 @@
-import { FormEstablishmentDto, Location, noContactPerWeek } from "shared";
+import { FormEstablishmentDto, Location, noContactPerMonth } from "shared";
 import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
@@ -29,8 +29,8 @@ export const makeEstablishmentAggregate = ({
     fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
     isCommited: formEstablishment.isEngagedEnterprise,
     isOpen: true,
-    isSearchable: formEstablishment.maxContactsPerWeek > noContactPerWeek,
-    maxContactsPerWeek: formEstablishment.maxContactsPerWeek,
+    isSearchable: formEstablishment.maxContactsPerMonth > noContactPerMonth,
+    maxContactsPerMonth: formEstablishment.maxContactsPerMonth,
     ...nafAndNumberOfEmployee,
     name: formEstablishment.businessName,
     siret: formEstablishment.siret,

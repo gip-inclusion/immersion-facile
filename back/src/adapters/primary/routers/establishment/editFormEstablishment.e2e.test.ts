@@ -88,7 +88,7 @@ describe("Edit form establishments", () => {
   it("200 - Updates establishment with new data", async () => {
     const updatedFormEstablishment: FormEstablishmentDto = {
       ...formEstablishment,
-      maxContactsPerWeek: 5,
+      maxContactsPerMonth: 20,
       searchableBy: {
         jobSeekers: false,
         students: true,

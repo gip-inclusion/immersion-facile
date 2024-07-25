@@ -173,7 +173,7 @@ const onEstablishment = async (
     departmentCode: firstLocation.address.departmentCode,
     hasIcAccount,
     isRegistered: true,
-    maxContactsPerWeek: establishment.establishment.maxContactsPerWeek,
+    maxContactsPerMonth: establishment.establishment.maxContactsPerMonth,
     nafCode: establishment.establishment.nafDto.code,
     numberOfDiscussionsAnswered,
     numberOfDiscussionsReceived: discussions.length,

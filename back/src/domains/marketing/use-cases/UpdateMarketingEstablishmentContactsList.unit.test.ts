@@ -90,7 +90,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
       hasIcAccount: false,
       isCommited: establishment.establishment.isCommited,
       isRegistered: true,
-      maxContactsPerWeek: establishment.establishment.maxContactsPerWeek,
+      maxContactsPerMonth: establishment.establishment.maxContactsPerMonth,
       nafCode: establishment.establishment.nafDto.code,
       nextAvailabilityDate:
         establishment.establishment.nextAvailabilityDate &&
@@ -163,7 +163,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           departmentCode: "974",
           hasIcAccount: true,
           isRegistered: true,
-          maxContactsPerWeek: 99999,
+          maxContactsPerMonth: 99999,
           nafCode: "789",
           numberOfDiscussionsAnswered: 657486,
           numberOfDiscussionsReceived: 121234256,
@@ -448,7 +448,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           departmentCode: "974",
           hasIcAccount: true,
           isRegistered: true,
-          maxContactsPerWeek: 99999,
+          maxContactsPerMonth: 99999,
           nafCode: "789",
           numberOfDiscussionsAnswered: 657486,
           numberOfDiscussionsReceived: 121234256,

@@ -36,8 +36,8 @@ import {
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =
   zTrimmedString;
 
-export const defaultMaxContactsPerWeek = 10;
-export const noContactPerWeek = 0;
+export const defaultMaxContactsPerMonth = 40;
+export const noContactPerMonth = 0;
 
 const validContactMethods: NotEmptyArray<ContactMethod> = [
   "EMAIL",
@@ -98,7 +98,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
       .array(appellationDtoSchema)
       .min(1, localization.atLeastOneJob),
     businessContact: businessContactSchema,
-    maxContactsPerWeek: z
+    maxContactsPerMonth: z
       .number({
         invalid_type_error:
           "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",

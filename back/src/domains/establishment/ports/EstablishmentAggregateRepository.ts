@@ -47,7 +47,7 @@ export interface EstablishmentAggregateRepository {
     inseeCheckDate: Date,
     params: UpdateEstablishmentsWithInseeDataParams,
   ): Promise<void>;
-  markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+  markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
     fromDate: Date,
   ): Promise<number>;
 

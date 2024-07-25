@@ -37,7 +37,7 @@ export class PgFormEstablishmentRepository
         fit_for_disabled_workers:
           formEstablishment.fitForDisabledWorkers ?? null,
         is_engaged_enterprise: formEstablishment.isEngagedEnterprise,
-        max_contacts_per_week: formEstablishment.maxContactsPerWeek,
+        max_contacts_per_month: formEstablishment.maxContactsPerMonth,
         naf: formEstablishment.naf
           ? JSON.stringify(formEstablishment.naf)
           : null,
@@ -114,7 +114,7 @@ export class PgFormEstablishmentRepository
         fit_for_disabled_workers:
           formEstablishment.fitForDisabledWorkers ?? null,
         is_engaged_enterprise: formEstablishment.isEngagedEnterprise ?? null,
-        max_contacts_per_week: formEstablishment.maxContactsPerWeek,
+        max_contacts_per_month: formEstablishment.maxContactsPerMonth,
         naf: formEstablishment.naf
           ? JSON.stringify(formEstablishment.naf)
           : null,
@@ -149,7 +149,7 @@ export class PgFormEstablishmentRepository
           businessNameCustomized: db.ref("business_name_customized"),
           fitForDisabledWorkers: db.ref("fit_for_disabled_workers"),
           isEngagedEnterprise: db.ref("is_engaged_enterprise"),
-          maxContactsPerWeek: db.ref("max_contacts_per_week"),
+          maxContactsPerMonth: db.ref("max_contacts_per_month"),
           naf: db.ref("naf"),
           siret: db.ref("siret"),
           source: db.ref("source"),

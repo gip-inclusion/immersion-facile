@@ -18,7 +18,7 @@ test.describe("Establishment creation and modification workflow", () => {
   const updatedInformations = {
     businessNameCustomized: faker.company.name(),
     additionalInformation: faker.lorem.sentence(),
-    maxContactsPerWeek: faker.number.int({ min: 1, max: 10 }),
+    maxContactsPerMonth: faker.number.int({ min: 1, max: 10 }),
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
@@ -184,8 +184,8 @@ test.describe("Establishment creation and modification workflow", () => {
       .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
       .fill(updatedInformations.nextAvailabilityDate.split("T")[0]);
     await page.fill(
-      `#${domElementIds.establishment.edit.maxContactsPerWeek}`,
-      updatedInformations.maxContactsPerWeek.toString(),
+      `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
+      updatedInformations.maxContactsPerMonth.toString(),
     );
 
     await goToNextStep(page, 1, "edit");
@@ -304,10 +304,10 @@ test.describe("Establishment creation and modification workflow", () => {
     await expect(
       await page
         .locator(
-          `#${domElementIds.establishment.admin.maxContactsPerWeekValue}`,
+          `#${domElementIds.establishment.admin.maxContactsPerMonthValue}`,
         )
         .textContent(),
-    ).toBe(updatedInformations.maxContactsPerWeek.toString());
+    ).toBe(updatedInformations.maxContactsPerMonth.toString());
 
     await expect(
       await page

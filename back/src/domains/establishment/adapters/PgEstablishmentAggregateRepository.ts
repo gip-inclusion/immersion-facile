@@ -277,27 +277,27 @@ export class PgEstablishmentAggregateRepository
     );
   }
 
-  public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+  public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
     since: Date,
   ): Promise<number> {
     const result = await this.transaction
       .updateTable("establishments")
       .set({ is_searchable: true })
       .where("is_searchable", "=", false)
-      .where("max_contacts_per_week", ">", 0)
+      .where("max_contacts_per_month", ">", 0)
       .where("siret", "not in", (eb) =>
         eb
           .selectFrom("establishments")
           .select("establishments.siret")
           .leftJoin("discussions", "establishments.siret", "discussions.siret")
           .where("is_searchable", "=", false)
-          .where("max_contacts_per_week", ">", 0)
+          .where("max_contacts_per_month", ">", 0)
           .where("discussions.created_at", ">", since)
           .groupBy("establishments.siret")
           .havingRef(
             (eb) => eb.fn.countAll(),
             ">=",
-            "establishments.max_contacts_per_week",
+            "establishments.max_contacts_per_month",
           ),
       )
       .returning("siret")
@@ -482,7 +482,7 @@ export class PgEstablishmentAggregateRepository
         is_open: establishment.isOpen,
         is_searchable: establishment.isSearchable,
         last_insee_check_date: establishment.lastInseeCheckDate ?? null,
-        max_contacts_per_week: establishment.maxContactsPerWeek,
+        max_contacts_per_month: establishment.maxContactsPerMonth,
         naf_code: establishment.nafDto.code,
         naf_nomenclature: establishment.nafDto.nomenclature,
         name: establishment.name,
@@ -625,7 +625,7 @@ export class PgEstablishmentAggregateRepository
         is_searchable: aggregate.establishment.isSearchable,
         is_commited: aggregate.establishment.isCommited,
         fit_for_disabled_workers: aggregate.establishment.fitForDisabledWorkers,
-        max_contacts_per_week: aggregate.establishment.maxContactsPerWeek,
+        max_contacts_per_month: aggregate.establishment.maxContactsPerMonth,
         last_insee_check_date: aggregate.establishment.lastInseeCheckDate,
         created_at: aggregate.establishment.createdAt,
         next_availability_date: aggregate.establishment.nextAvailabilityDate,

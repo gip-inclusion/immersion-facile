@@ -62,7 +62,7 @@ export type FormEstablishmentDto = {
   businessNameCustomized?: string;
   fitForDisabledWorkers?: boolean;
   isEngagedEnterprise?: boolean;
-  maxContactsPerWeek: number;
+  maxContactsPerMonth: number;
   naf?: NafDto; // { code: string, nomenclature: string }
   nextAvailabilityDate?: DateTimeIsoString;
   siret: SiretDto; // 14 characters string

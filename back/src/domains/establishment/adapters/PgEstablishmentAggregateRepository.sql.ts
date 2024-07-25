@@ -92,7 +92,7 @@ SELECT
         'isSearchable', e.is_searchable, 
         'isCommited', e.is_commited,
         'fitForDisabledWorkers', e.fit_for_disabled_workers,
-        'maxContactsPerWeek', e.max_contacts_per_week,
+        'maxContactsPerMonth', e.max_contacts_per_month,
         'nextAvailabilityDate', date_to_iso(e.next_availability_date),
         'searchableBy', JSON_BUILD_OBJECT(
           'jobSeekers', e.searchable_by_job_seekers,

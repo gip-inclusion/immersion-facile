@@ -15,7 +15,7 @@ type FormEstablishmentField = Partial<
       "id" | "naf" | "businessContact" | "source" | "isSearchable"
     >
   | `businessContact.${keyof BusinessContactDto}`
-  | "maxContactPerWeekWhenAvailable"
+  | "maxContactsPerMonthWhenAvailable"
 >;
 
 export type FormEstablishmentFieldsLabels = FormFieldsObjectForContent<
@@ -114,19 +114,19 @@ export const formEstablishmentFieldsLabels = (
     placeholder:
       "Ex : ma biographie d’entreprise (valeurs, écosystème, projections), mon potentiel d’embauche ou toute autre information essentielle pour l’accueil du bénéficiaire au sein de mon établissement (optionnel)",
   },
-  maxContactsPerWeek: {
+  maxContactsPerMonth: {
     label:
-      "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
+      "Au maximum, combien de mises en relation souhaitez-vous recevoir par mois ?",
     hintText:
-      "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
-    id: domElementIds.establishment[mode].maxContactsPerWeek,
+      "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes ce mois, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'au mois prochain.",
+    id: domElementIds.establishment[mode].maxContactsPerMonth,
   },
-  maxContactPerWeekWhenAvailable: {
+  maxContactsPerMonthWhenAvailable: {
     label:
-      "Quand vous serez à nouveau disponible, combien de mises en relation par semaine souhaiteriez-vous recevoir ?",
+      "Quand vous serez à nouveau disponible, combien de mises en relation par mois souhaiteriez-vous recevoir ?",
     hintText:
-      "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
-    id: domElementIds.establishment[mode].maxContactsPerWeekWhenAvailable,
+      "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes ce mois, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'au mois suivant.",
+    id: domElementIds.establishment[mode].maxContactsPerMonthWhenAvailable,
   },
   nextAvailabilityDate: {
     label: "Quand serez-vous à nouveau disponible ?",

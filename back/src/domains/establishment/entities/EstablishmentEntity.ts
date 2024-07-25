@@ -24,7 +24,7 @@ export type EstablishmentEntity = {
   isSearchable: boolean;
   lastInseeCheckDate?: Date;
   locations: Location[];
-  maxContactsPerWeek: number;
+  maxContactsPerMonth: number;
   nafDto: NafDto;
   name: string;
   nextAvailabilityDate?: DateTimeIsoString;

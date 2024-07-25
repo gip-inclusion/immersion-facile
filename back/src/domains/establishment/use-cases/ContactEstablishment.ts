@@ -294,16 +294,18 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     contactRequest: ContactEstablishmentRequestDto;
     now: Date;
   }) {
-    const maxContactsPerWeekForEstablishment =
-      establishmentAggregate.establishment.maxContactsPerWeek;
+    const maxContactsPerMonthForEstablishment =
+      establishmentAggregate.establishment.maxContactsPerMonth;
 
-    const numberOfDiscussionsOfPast7Days =
+    const numberOfDiscussionsOfPast24Days =
       await uow.discussionRepository.countDiscussionsForSiretSince(
         contactRequest.siret,
-        subDays(now, 7),
+        subDays(now, 24),
       );
 
-    if (maxContactsPerWeekForEstablishment <= numberOfDiscussionsOfPast7Days) {
+    if (
+      maxContactsPerMonthForEstablishment <= numberOfDiscussionsOfPast24Days
+    ) {
       const updatedEstablishment = {
         ...establishmentAggregate,
         establishment: {
