@@ -14,6 +14,7 @@ import {
   IcUsersAdminFeedback,
   IcUsersAdminState,
   NormalizedIcUserById,
+  NormalizedInclusionConnectedUser,
   icUsersAdminInitialState,
   icUsersAdminSlice,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -22,6 +23,7 @@ import {
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
+import { feedbacksSelectors } from "../../feedback/feedback.selectors";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
@@ -396,10 +398,7 @@ describe("Agency registration for authenticated users", () => {
   });
 
   const expectIsUpdatingUserAgencyToBe = (expected: boolean) => {
-    expect(
-      store.getState().admin.inclusionConnectedUsersAdmin
-        .isUpdatingIcUserAgency,
-    ).toBe(expected);
+    expect(icUsersAdminSelectors.isUpdating(store.getState())).toBe(expected);
   };
 
   const expectIsFetchingIcUsersNeedingReviewToBe = (expected: boolean) => {
@@ -427,4 +426,70 @@ describe("Agency registration for authenticated users", () => {
       ...params,
     });
   };
+  describe("Update users on agency", () => {
+    it("should update user successfully", () => {
+      const prefilledAdminState = adminPreloadedState({
+        inclusionConnectedUsersAdmin: {
+          ...icUsersAdminInitialState,
+          agencyUsers: testUserSet,
+        },
+      });
+      ({ store, dependencies } = createTestStore({
+        admin: prefilledAdminState,
+      }));
+      const originalUser = testUserSet[user1Id];
+      const updatedUser: NormalizedInclusionConnectedUser = {
+        ...originalUser,
+        agencyRights: {
+          ...originalUser.agencyRights,
+          [agency2.id]: {
+            ...originalUser.agencyRights[agency2.id],
+            roles: ["agencyOwner", "validator"],
+          },
+        },
+      };
+
+      expectToEqual(
+        store.getState().admin.inclusionConnectedUsersAdmin,
+        prefilledAdminState.inclusionConnectedUsersAdmin,
+      );
+
+      store.dispatch(
+        icUsersAdminSlice.actions.updateUserOnAgencyRequested({
+          userId: originalUser.id,
+          agencyId: agency2.id,
+          roles: updatedUser.agencyRights[agency2.id].roles,
+          feedbackTopic: "update-agency-user",
+        }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(true);
+
+      dependencies.adminGateway.updateAgencyRoleForUserResponse$.next(
+        undefined,
+      );
+
+      const expected: NormalizedIcUserById = {
+        ...icUsersAdminSelectors.agencyUsers(store.getState()),
+        [originalUser.id]: updatedUser,
+      };
+
+      expectIsUpdatingUserAgencyToBe(false);
+
+      expectToEqual(
+        icUsersAdminSelectors.agencyUsers(store.getState()),
+        expected,
+      );
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["update-agency-user"],
+        {
+          level: "success",
+          message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+          on: "update",
+          title: "L'utilisateur a été mis à jour",
+        },
+      );
+    });
+  });
 });

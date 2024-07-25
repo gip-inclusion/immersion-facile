@@ -7,6 +7,7 @@ import { keys } from "shared";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
+import { icUsersAdminSlice } from "../admin/icUsersAdmin/icUsersAdmin.slice";
 import { partnersErroredConventionSlice } from "../partnersErroredConvention/partnersErroredConvention.slice";
 
 const topics = [
@@ -15,6 +16,7 @@ const topics = [
   "dashboard-discussion-rejection",
   "broadcast-convention-again",
   "mark-convention-as-handled",
+  "update-agency-user",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -126,6 +128,19 @@ export const feedbackMapping: Record<
       title: "Problème rencontré",
       message:
         "Problème rencontré lors du marquage de la convention comme traitée.",
+    },
+  },
+  "update-agency-user": {
+    "update.success": {
+      action: icUsersAdminSlice.actions.updateUserOnAgencySucceeded,
+      title: "L'utilisateur a été mis à jour",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "update.error": {
+      action: icUsersAdminSlice.actions.updateUserOnAgencyFailed,
+      title: "Problème lors de la mise à jour de l'utilisateur",
+      message:
+        "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
   },
 };
