@@ -53,7 +53,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
   }
 
   public async getAllConventionsForThoseEndingThatDidntGoThrough(
-    dateEnd: Date,
+    dateEnd: {
+      from: Date;
+      to: Date;
+    },
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionReadDto[]> {
     const notifications = this.notificationRepository
@@ -69,7 +72,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
     return this.conventionRepository.conventions
       .filter(
         (convention) =>
-          new Date(convention.dateEnd).getDate() === dateEnd.getDate() &&
+          new Date(convention.dateEnd).getDate() >= dateEnd.from.getDate() &&
+          new Date(convention.dateEnd).getDate() < dateEnd.to.getDate() &&
           validatedConventionStatuses.includes(convention.status) &&
           !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
       )
