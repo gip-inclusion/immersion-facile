@@ -1,7 +1,11 @@
 import { decodeJwtWithoutSignatureCheck, queryParamsAsString } from "shared";
 import { HttpClient } from "shared-routes";
+import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../../../utils/logger";
-import { InclusionConnectIdTokenPayload } from "../../entities/InclusionConnectIdTokenPayload";
+import {
+  InclusionConnectIdTokenPayload,
+  inclusionConnectIdTokenPayloadSchema,
+} from "../../entities/InclusionConnectIdTokenPayload";
 import {
   GetAccessTokenParams,
   GetAccessTokenResult,
@@ -38,10 +42,13 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
       .then(({ body }) => ({
         accessToken: body.access_token,
         expire: body.expires_in,
-        icIdTokenPayload:
+        icIdTokenPayload: validateAndParseZodSchemaV2(
+          inclusionConnectIdTokenPayloadSchema,
           decodeJwtWithoutSignatureCheck<InclusionConnectIdTokenPayload>(
             body.id_token,
           ),
+          logger,
+        ),
       }))
       .catch((error) => {
         logger.error({

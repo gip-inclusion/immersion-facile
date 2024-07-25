@@ -1,4 +1,4 @@
-import { zStringMinLength1, zTrimmedString } from "shared";
+import { emailSchema, zStringMinLength1, zTrimmedString } from "shared";
 import { z } from "zod";
 import { BearerToken } from "../../dto/BearerToken";
 import {
@@ -15,10 +15,7 @@ import {
 
 export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
   z.object({
-    email: z
-      .string()
-      .email("L'addresse email France Travail doit être remplie valide")
-      .optional(),
+    email: emailSchema.optional(),
     family_name: zTrimmedString,
     gender: z.enum(["male", "female"]),
     given_name: zTrimmedString,
@@ -43,7 +40,7 @@ const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
     nom: zTrimmedString,
     prenom: zTrimmedString,
     civilite: z.enum(["1", "2"]),
-    mail: z.string().email("L'addresse email du conseillé doit être valide"),
+    mail: emailSchema,
     type: peAdvisorKindSchema,
   });
 
