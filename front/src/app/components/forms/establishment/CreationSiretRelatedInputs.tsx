@@ -11,7 +11,7 @@ import {
   FormEstablishmentDto,
   NumberEmployeesRange,
   addressDtoToString,
-  defaultMaxContactsPerWeek,
+  defaultMaxContactsPerMonth,
   domElementIds,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
@@ -27,22 +27,22 @@ import { establishmentSlice } from "src/core-logic/domain/establishmentPath/esta
 
 const maxContactPerWeekByNumberEmployees: Record<NumberEmployeesRange, number> =
   {
-    "": defaultMaxContactsPerWeek,
-    "0": 1,
-    "1-2": 1,
-    "3-5": 1,
-    "6-9": 1,
-    "10-19": 2,
-    "20-49": 2,
-    "50-99": 5,
-    "100-199": 10,
-    "200-249": 20,
-    "250-499": 20,
-    "500-999": 20,
-    "1000-1999": 20,
-    "2000-4999": 20,
-    "5000-9999": 20,
-    "+10000": 20,
+    "": defaultMaxContactsPerMonth,
+    "0": 4,
+    "1-2": 4,
+    "3-5": 4,
+    "6-9": 4,
+    "10-19": 8,
+    "20-49": 8,
+    "50-99": 20,
+    "100-199": 40,
+    "200-249": 80,
+    "250-499": 80,
+    "500-999": 80,
+    "1000-1999": 80,
+    "2000-4999": 80,
+    "5000-9999": 80,
+    "+10000": 80,
   };
 
 export const CreationSiretRelatedInputs = () => {
@@ -89,12 +89,12 @@ export const CreationSiretRelatedInputs = () => {
     );
     setValue("naf", establishmentInfos ? establishmentInfos.nafDto : undefined);
     setValue(
-      "maxContactsPerWeek",
+      "maxContactsPerMonth",
       establishmentInfos
         ? maxContactPerWeekByNumberEmployees[
             establishmentInfos.numberEmployeesRange
           ]
-        : defaultMaxContactsPerWeek,
+        : defaultMaxContactsPerMonth,
     );
   }, [establishmentInfos]);
 

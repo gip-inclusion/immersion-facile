@@ -370,9 +370,10 @@ export const domElementIds = {
       website: "im-form-create-establishment__website",
       additionalInformation:
         "im-form-create-establishment__additional-information",
-      maxContactsPerWeek: "im-form-create-establishment__max-contact-per-week",
-      maxContactsPerWeekWhenAvailable:
-        "im-form-create-establishment__max-contact-per-week-when-available",
+      maxContactsPerMonth:
+        "im-form-create-establishment__max-contacts-per-month",
+      maxContactsPerMonthWhenAvailable:
+        "im-form-create-establishment__max-contacts-per-month-when-available",
       errorSiretAlreadyExistButton:
         "im-form-create-establishment__edit-establishment-button",
       startFormButton: "im-form-create-establishment__start-button",
@@ -411,9 +412,9 @@ export const domElementIds = {
       website: "im-form-edit-establishment__website",
       additionalInformation:
         "im-form-edit-establishment__additional-information",
-      maxContactsPerWeek: "im-form-edit-establishment__max-contact-per-week",
-      maxContactsPerWeekWhenAvailable:
-        "im-form-edit-establishment__max-contact-per-week-when-available",
+      maxContactsPerMonth: "im-form-edit-establishment__max-contacts-per-month",
+      maxContactsPerMonthWhenAvailable:
+        "im-form-edit-establishment__max-contacts-per-month-when-available",
       addAppellationButton:
         "im-form-edit-establishment__add-appellation-button",
       addAddressButton: "im-form-edit-establishment__add-address-button",
@@ -470,18 +471,18 @@ export const domElementIds = {
       website: "im-form-manage-establishment-admin__website",
       additionalInformation:
         "im-form-manage-establishment-admin__additional-information",
-      maxContactsPerWeek:
-        "im-form-manage-establishment-admin__max-contact-per-week",
-      maxContactsPerWeekWhenAvailable:
-        "im-form-manage-establishment-admin__max-contact-per-week-when-available",
+      maxContactsPerMonth:
+        "im-form-manage-establishment-admin__max-contacts-per-month",
+      maxContactsPerMonthWhenAvailable:
+        "im-form-manage-establishment-admin__max-contacts-per-month-when-available",
       addAddressButton:
         "im-form-manage-establishment-admin__add-address-button",
       errorSiretAlreadyExistButton:
         "im-form-manage-establishment-admin__edit-establishment-button",
       nextAvailabilityDateInput:
         "im-form-manage-establishment-admin__next-availability-date",
-      maxContactsPerWeekValue:
-        "im-form-manage-establishment-admin__max-contact-per-week-value",
+      maxContactsPerMonthValue:
+        "im-form-manage-establishment-admin__max-contacts-per-month-value",
       nextAvailabilityDateValue:
         "im-form-manage-establishment-admin__current-next-availablity-date-value",
     },

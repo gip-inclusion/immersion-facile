@@ -18,21 +18,6 @@ import {
 } from "../helpers/EstablishmentBuilders";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
-export type PgEstablishmentRow = {
-  siret: string;
-  name: string | null;
-  customized_name?: string | null;
-  number_employees: string | null;
-  naf_code: string;
-  naf_nomenclature: string;
-  update_date?: Date;
-  is_open: boolean;
-  is_commited?: boolean | null;
-  fit_for_disabled_workers: boolean | null;
-  max_contacts_per_week: number;
-  last_insee_check_date?: Date;
-};
-
 export type InsertEstablishmentAggregateProps = {
   siret: string;
   romeAndAppellationCodes?: { romeCode: string; appellationCode: string }[];

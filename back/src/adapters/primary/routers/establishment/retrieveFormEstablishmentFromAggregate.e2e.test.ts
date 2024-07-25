@@ -130,8 +130,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             romeLabel: establishmentAggregate.offers[0].romeLabel,
           },
         ],
-        maxContactsPerWeek:
-          establishmentAggregate.establishment.maxContactsPerWeek,
+        maxContactsPerMonth:
+          establishmentAggregate.establishment.maxContactsPerMonth,
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         businessContact: establishmentAggregate.contact!,
         searchableBy: {
@@ -184,8 +184,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             romeLabel: establishmentAggregate.offers[0].romeLabel,
           },
         ],
-        maxContactsPerWeek:
-          establishmentAggregate.establishment.maxContactsPerWeek,
+        maxContactsPerMonth:
+          establishmentAggregate.establishment.maxContactsPerMonth,
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         businessContact: establishmentAggregate.contact!,
         searchableBy: establishmentAggregate.establishment.searchableBy,

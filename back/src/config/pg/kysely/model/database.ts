@@ -285,7 +285,7 @@ interface PgFormEstablishments extends WithAcquisition {
   created_at: Generated<Timestamp | null>;
   fit_for_disabled_workers: Generated<boolean | null>;
   is_engaged_enterprise: boolean | null;
-  max_contacts_per_week: number;
+  max_contacts_per_month: number;
   naf: Json | null;
   professions: Json;
   siret: string;
@@ -368,7 +368,7 @@ interface Establishments extends WithAcquisition {
   is_searchable: Generated<boolean>;
   last_insee_check_date: Timestamp | null;
   legacy_address: string | null;
-  max_contacts_per_week: number;
+  max_contacts_per_month: number;
   naf_code: string | null;
   naf_nomenclature: string | null;
   name: string | null;

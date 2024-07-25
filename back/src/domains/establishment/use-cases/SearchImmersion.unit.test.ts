@@ -927,7 +927,7 @@ describe("SearchImmersionUseCase", () => {
     const establishmentWithNextAvailabilityDate =
       new EstablishmentAggregateBuilder(establishment)
         .withEstablishmentNextAvailabilityDate(addDays(now, 1))
-        .withMaxContactsPerWeek(10)
+        .withMaxContactsPerMonth(10)
         .withIsSearchable(true)
         .build();
 

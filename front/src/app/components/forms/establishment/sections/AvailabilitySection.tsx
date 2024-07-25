@@ -45,7 +45,7 @@ export const AvailabilitySection = ({
 
   const shouldShowErrorOnAvailableForImmersion =
     availableForImmersion === undefined &&
-    (getFieldError("maxContactsPerWeek") ||
+    (getFieldError("maxContactsPerMonth") ||
       getFieldError("nextAvailabilityDate"));
 
   const currentNextAvailabilityDate = getValues("nextAvailabilityDate");
@@ -70,7 +70,7 @@ export const AvailabilitySection = ({
             onChange: () => {
               const isAvailable = option.nativeInputProps.value === 1;
               clearErrors("nextAvailabilityDate");
-              clearErrors("maxContactsPerWeek");
+              clearErrors("maxContactsPerMonth");
               setAvailableForImmersion(isAvailable);
               if (isAvailable) {
                 setValue("nextAvailabilityDate", undefined);
@@ -114,19 +114,19 @@ export const AvailabilitySection = ({
           <Input
             label={
               availableForImmersion
-                ? formContents.maxContactsPerWeek.label
-                : formContents.maxContactPerWeekWhenAvailable.label
+                ? formContents.maxContactsPerMonth.label
+                : formContents.maxContactsPerMonthWhenAvailable.label
             }
             nativeInputProps={{
-              ...formContents.maxContactsPerWeek,
-              ...register("maxContactsPerWeek", {
+              ...formContents.maxContactsPerMonth,
+              ...register("maxContactsPerMonth", {
                 valueAsNumber: true,
               }),
               type: "number",
               min: 1,
               pattern: "\\d*",
             }}
-            {...getFieldError("maxContactsPerWeek")}
+            {...getFieldError("maxContactsPerMonth")}
           />
         )}
       {mode === "admin" && availableForImmersion === undefined && (
@@ -138,9 +138,11 @@ export const AvailabilitySection = ({
               <p>
                 Mise en relation max/semaine :{" "}
                 <span
-                  id={domElementIds.establishment.admin.maxContactsPerWeekValue}
+                  id={
+                    domElementIds.establishment.admin.maxContactsPerMonthValue
+                  }
                 >
-                  {getValues().maxContactsPerWeek}
+                  {getValues().maxContactsPerMonth}
                 </span>{" "}
                 <br />
                 Prochaine disponibilité :{" "}
@@ -205,7 +207,7 @@ export const AvailabilitySection = ({
                 onStepChange(
                   2,
                   mode === "edit"
-                    ? ["maxContactsPerWeek", "nextAvailabilityDate"]
+                    ? ["maxContactsPerMonth", "nextAvailabilityDate"]
                     : ["nextAvailabilityDate"],
                 ),
               type: "button",

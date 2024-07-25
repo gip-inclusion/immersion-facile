@@ -117,7 +117,7 @@ describe("PgFormEstablishmentRepository", () => {
         businessAddresses: formEstablishment.businessAddresses,
         businessContact: formEstablishment.businessContact,
         businessName: formEstablishment.businessName,
-        maxContactsPerWeek: formEstablishment.maxContactsPerWeek,
+        maxContactsPerMonth: formEstablishment.maxContactsPerMonth,
         source: formEstablishment.source,
         searchableBy: formEstablishment.searchableBy,
       };

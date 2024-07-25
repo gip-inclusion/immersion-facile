@@ -95,7 +95,8 @@ export const establishmentAggregateToFormEstablishement = (
     naf: establishmentAggregate.establishment?.nafDto,
     appellations,
     businessContact: establishmentAggregate.contact,
-    maxContactsPerWeek: establishmentAggregate.establishment.maxContactsPerWeek,
+    maxContactsPerMonth:
+      establishmentAggregate.establishment.maxContactsPerMonth,
     nextAvailabilityDate:
       establishmentAggregate.establishment.nextAvailabilityDate,
     searchableBy: establishmentAggregate.establishment.searchableBy,

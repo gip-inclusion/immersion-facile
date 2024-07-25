@@ -11,8 +11,8 @@ import {
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
 import {
-  defaultMaxContactsPerWeek,
-  noContactPerWeek,
+  defaultMaxContactsPerMonth,
+  noContactPerMonth,
 } from "./FormEstablishment.schema";
 
 export const defaultFormEstablishmentAddress = {
@@ -59,7 +59,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
       appellationLabel: "Boucher / Bouchère",
     },
   ],
-  maxContactsPerWeek: defaultMaxContactsPerWeek,
+  maxContactsPerMonth: defaultMaxContactsPerMonth,
   searchableBy: {
     jobSeekers: true,
     students: true,
@@ -108,7 +108,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
       appellationLabel: "Appellation 2",
     },
   ],
-  maxContactsPerWeek: defaultMaxContactsPerWeek - 5,
+  maxContactsPerMonth: defaultMaxContactsPerMonth - 5,
   searchableBy: {
     jobSeekers: false,
     students: true,
@@ -142,7 +142,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   appellations: [],
   website: "",
   additionalInformation: "",
-  maxContactsPerWeek: defaultMaxContactsPerWeek,
+  maxContactsPerMonth: defaultMaxContactsPerMonth,
   searchableBy: {
     jobSeekers: true,
     students: false,
@@ -213,10 +213,10 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
+  public withMaxContactsPerWeek(maxContactsPerMonth: number) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
-      maxContactsPerWeek,
+      maxContactsPerMonth: maxContactsPerMonth,
     });
   }
 
@@ -269,7 +269,8 @@ const formEstablishmentToEstablishmentCsvRow = (
     .map((appellation) => appellation.appellationCode)
     .join(","),
   isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
-  isSearchable: establishment.maxContactsPerWeek > noContactPerWeek ? "1" : "0",
+  isSearchable:
+    establishment.maxContactsPerMonth > noContactPerMonth ? "1" : "0",
   fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
   searchableByStudents: establishment.searchableBy.students ? "1" : "0",
   searchableByJobSeekers: establishment.searchableBy.jobSeekers ? "1" : "0",

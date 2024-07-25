@@ -121,7 +121,7 @@ const makeEstablishmentMarketingGatewayDto = (
   ...(mode === "full"
     ? {
         isRegistered: true,
-        maxContactsPerWeek: 100,
+        maxContactsPerMonth: 100,
         nafCode: "A0178",
         numberOfDiscussionsAnswered: 100,
         numberOfDiscussionsReceived: 100,

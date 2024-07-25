@@ -153,7 +153,7 @@ export class InMemoryEstablishmentAggregateRepository
     ];
   }
 
-  public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(): Promise<number> {
+  public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(): Promise<number> {
     // not implemented because this method is used only in a script,
     // and the use case consists only in a PG query
     throw new Error("NOT implemented");

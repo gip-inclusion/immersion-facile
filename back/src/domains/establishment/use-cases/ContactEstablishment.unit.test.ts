@@ -344,7 +344,7 @@ describe("ContactEstablishment", () => {
     // préparation
     const establishmentAggregate = establishmentAggregateWithEmailContact
       .withIsSearchable(true)
-      .withMaxContactsPerWeek(2)
+      .withMaxContactsPerMonth(2)
       .withOffers([immersionOffer])
       .build();
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
@@ -576,7 +576,7 @@ describe("ContactEstablishment", () => {
     it("throws ForbidenError when establishment is not currently available", async () => {
       const establishmentAggregate = establishmentAggregateWithEmailContact
         .withIsSearchable(true)
-        .withMaxContactsPerWeek(2)
+        .withMaxContactsPerMonth(2)
         .withEstablishmentNextAvailabilityDate(addHours(timeGateway.now(), 1))
         .withOffers([immersionOffer])
         .build();

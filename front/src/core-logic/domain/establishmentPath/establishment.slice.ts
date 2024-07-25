@@ -4,7 +4,7 @@ import {
   FormEstablishmentDto,
   InclusionConnectJwt,
   SiretDto,
-  defaultMaxContactsPerWeek,
+  defaultMaxContactsPerMonth,
 } from "shared";
 import { emptyAppellationAndRome } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback"; // type EstablishmentUiStatus =
@@ -56,7 +56,7 @@ export const defaultFormEstablishmentValue = (
   },
   website: "",
   additionalInformation: "",
-  maxContactsPerWeek: defaultMaxContactsPerWeek,
+  maxContactsPerMonth: defaultMaxContactsPerMonth,
   naf: undefined,
   isEngagedEnterprise: undefined,
   fitForDisabledWorkers: undefined,

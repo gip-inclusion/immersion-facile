@@ -113,7 +113,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       businessContact: contact,
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
-      maxContactsPerWeek: establishment.maxContactsPerWeek,
+      maxContactsPerMonth: establishment.maxContactsPerMonth,
       searchableBy: {
         jobSeekers: true,
         students: false,
@@ -172,7 +172,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       businessContact: contact,
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
-      maxContactsPerWeek: establishment.maxContactsPerWeek,
+      maxContactsPerMonth: establishment.maxContactsPerMonth,
       searchableBy: {
         jobSeekers: true,
         students: true,
@@ -243,7 +243,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       businessContact: contact,
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
-      maxContactsPerWeek: establishment.maxContactsPerWeek,
+      maxContactsPerMonth: establishment.maxContactsPerMonth,
       searchableBy: {
         jobSeekers: true,
         students: true,

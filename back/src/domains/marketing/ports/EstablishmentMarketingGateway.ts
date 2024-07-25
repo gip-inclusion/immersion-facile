@@ -35,7 +35,7 @@ export type SpecificRegistered = {
   departmentCode: DepartmentCode; //ENT_CODE_DEPARTEMENT
   isCommited?: boolean; //ENT_LES_ENTREPRISES_SENGAGENT
   isRegistered: true; //ENT_REFERENCE_SITE
-  maxContactsPerWeek: number; //ENT_MAX_CONTACT_PER_WEEK
+  maxContactsPerMonth: number; //ENT_MAX_CONTACTS_PER_MONTH
   nafCode: string; //ENT_CODE_NAF
   nextAvailabilityDate?: Date; //ENT_DATE_DISPO
   numberOfDiscussionsAnswered: number; //ENT_NOMBRE_REPONSES_MER

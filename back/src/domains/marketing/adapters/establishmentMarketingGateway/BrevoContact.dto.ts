@@ -23,7 +23,7 @@ export type CreateContactAttributes = Partial<{
   ENT_DATE_VALIDATION_DERNIERE_CONVENTION: DateString | BrevoDeleteAttribute;
   ENT_EFFECTIF: string | BrevoDeleteAttribute;
   ENT_LES_ENTREPRISES_SENGAGENT: boolean | BrevoDeleteAttribute;
-  ENT_MAX_CONTACT_PER_WEEK: number | BrevoDeleteAttribute;
+  ENT_MAX_CONTACTS_PER_MONTH: number | BrevoDeleteAttribute;
   ENT_NB_CONVENTION: number | BrevoDeleteAttribute;
   ENT_NOMBRE_MER_RECUES: number | BrevoDeleteAttribute;
   ENT_NOMBRE_REPONSES_MER: number | BrevoDeleteAttribute;
@@ -58,7 +58,7 @@ export type GetContactInfoAttributes = Partial<{
   ENT_DATE_VALIDATION_DERNIERE_CONVENTION: DateString;
   ENT_EFFECTIF: string;
   ENT_LES_ENTREPRISES_SENGAGENT: boolean;
-  ENT_MAX_CONTACT_PER_WEEK: number;
+  ENT_MAX_CONTACTS_PER_MONTH: number;
   ENT_NB_CONVENTION: number;
   ENT_NOMBRE_MER_RECUES: number;
   ENT_NOMBRE_REPONSES_MER: number;

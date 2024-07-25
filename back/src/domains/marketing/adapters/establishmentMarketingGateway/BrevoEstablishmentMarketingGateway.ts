@@ -79,8 +79,8 @@ export class BrevoEstablishmentMarketingGateway
           dto.isRegistered && dto.isCommited !== undefined
             ? dto.isCommited
             : "",
-        ENT_MAX_CONTACT_PER_WEEK: dto.isRegistered
-          ? dto.maxContactsPerWeek
+        ENT_MAX_CONTACTS_PER_MONTH: dto.isRegistered
+          ? dto.maxContactsPerMonth
           : "",
         ENT_NOMBRE_MER_RECUES: dto.isRegistered
           ? dto.numberOfDiscussionsReceived
@@ -130,7 +130,7 @@ export class BrevoEstablishmentMarketingGateway
             ENT_CODE_NAF: "",
             ENT_DATE_DISPO: "",
             ENT_LES_ENTREPRISES_SENGAGENT: "",
-            ENT_MAX_CONTACT_PER_WEEK: "",
+            ENT_MAX_CONTACTS_PER_MONTH: "",
             ENT_NOMBRE_MER_RECUES: "",
             ENT_NOMBRE_REPONSES_MER: "",
             ENT_ROMES: "",
@@ -242,7 +242,7 @@ export class BrevoEstablishmentMarketingGateway
               isRegistered,
               departmentCode: attributes.ENT_CODE_DEPARTEMENT ?? "",
               isCommited: attributes.ENT_LES_ENTREPRISES_SENGAGENT ?? false,
-              maxContactsPerWeek: attributes.ENT_MAX_CONTACT_PER_WEEK ?? -1,
+              maxContactsPerMonth: attributes.ENT_MAX_CONTACTS_PER_MONTH ?? -1,
               nafCode: attributes.ENT_CODE_NAF ?? "",
               ...(attributes.ENT_DATE_DISPO !== undefined
                 ? {
