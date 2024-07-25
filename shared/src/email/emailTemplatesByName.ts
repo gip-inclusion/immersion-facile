@@ -1192,7 +1192,9 @@ L'équipe d'Immersion Facilitée`,
         }  
         Merci à vous !
 
-        Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs</strong> pour être accompagné par notre équipe.
+        Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs${
+          rest.refersToOtherAgency ? ` et aux structures d'accompagnement` : ""
+        }</strong> pour être accompagné par notre équipe.
 
         Au programme :
           • Comment établir une convention d'immersion
