@@ -38,6 +38,7 @@ export const AgencyDashboardPage = ({
     dashboards: {
       agencies: { agencyDashboardUrl, erroredConventionsDashboardUrl },
     },
+    agencyRights,
   }: InclusionConnectedUser): DashboardTab[] => [
     ...(agencyDashboardUrl
       ? [
@@ -61,20 +62,24 @@ export const AgencyDashboardPage = ({
     ...(erroredConventionsDashboardUrl
       ? [
           {
-            tabId: "conventions-en-erreur",
-            label: "Conventions en erreur",
+            tabId: "conventions-synchronisees",
+            label: "Conventions synchronisées",
             content: (
               <>
-                <Button
-                  priority="secondary"
-                  linkProps={{
-                    href: "https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.pole-emploi.fr/documents/Immersion_facilitee/GUIDE_SAISIE_DES_CONVENTIONS.pptx",
-                    target: "_blank",
-                    rel: "noreferrer",
-                  }}
-                >
-                  Guide de saisie des conventions
-                </Button>
+                {agencyRights.some(
+                  (agencyRight) => agencyRight.agency.kind === "pole-emploi",
+                ) && (
+                  <Button
+                    priority="secondary"
+                    linkProps={{
+                      href: "https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.pole-emploi.fr/documents/Immersion_facilitee/GUIDE_SAISIE_DES_CONVENTIONS.pptx",
+                      target: "_blank",
+                      rel: "noreferrer",
+                    }}
+                  >
+                    Guide de saisie des conventions
+                  </Button>
+                )}
                 {inclusionConnectedJwt ? (
                   <MarkPartnersErroredConventionAsHandledFormSection
                     jwt={inclusionConnectedJwt}
@@ -86,7 +91,6 @@ export const AgencyDashboardPage = ({
                     description="Cette page est reservée aux utilisateurs connectés avec Inclusion Connect, et dont l'agence est responsable de cette convention."
                   />
                 )}
-
                 <MetabaseView
                   title="Tableau de bord agence"
                   url={erroredConventionsDashboardUrl}
