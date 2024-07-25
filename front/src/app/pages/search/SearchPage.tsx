@@ -344,7 +344,7 @@ const canSubmitSearch = (values: SearchPageParams) => {
   const geoParams = {
     latitude: values.latitude,
     longitude: values.longitude,
-    distanceKm: values.distanceKm,
+    distanceKm: values.distanceKm ? values.distanceKm : undefined,
   };
   return areValidGeoParams(geoParams) || areEmptyGeoParams(geoParams);
 };
