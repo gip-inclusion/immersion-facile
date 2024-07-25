@@ -19,6 +19,7 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+import { PayloadActionWithFeedbackTopic } from "../../feedback/feedback.slice";
 
 type IcUsersAdminAction = ActionOfSlice<typeof icUsersAdminSlice>;
 const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
@@ -116,6 +117,33 @@ const rejectAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
     ),
   );
 
+const updateUserOnAgencyEpic: AppEpic<IcUsersAdminAction> = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(icUsersAdminSlice.actions.updateUserOnAgencyRequested.match),
+    switchMap(
+      (action: PayloadActionWithFeedbackTopic<IcUserRoleForAgencyParams>) =>
+        adminGateway
+          .updateUserRoleForAgency$(action.payload, getAdminToken(state$.value))
+          .pipe(
+            map(() =>
+              icUsersAdminSlice.actions.updateUserOnAgencySucceeded(
+                action.payload,
+              ),
+            ),
+            catchEpicError((error) =>
+              icUsersAdminSlice.actions.updateUserOnAgencyFailed({
+                errorMessage: error.message,
+                feedbackTopic: action.payload.feedbackTopic,
+              }),
+            ),
+          ),
+    ),
+  );
+
 const normalizeUsers = (
   users: InclusionConnectedUser[],
 ): NormalizedIcUserById =>
@@ -141,4 +169,5 @@ export const icUsersAdminEpics = [
   registerAgencyToUserEpic,
   rejectAgencyToUserEpic,
   fetchInclusionConnectedUsersWithAgencyIdEpic,
+  updateUserOnAgencyEpic,
 ];

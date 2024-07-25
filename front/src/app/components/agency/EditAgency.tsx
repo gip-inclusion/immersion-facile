@@ -4,13 +4,11 @@ import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
-import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
 import { AgencyAdminAutocomplete } from "./AgencyAdminAutocomplete";
 
 export const EditAgency = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
-  const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
 
   return (
     <>
@@ -24,7 +22,7 @@ export const EditAgency = () => {
         />
       </div>
       {agency && <EditAgencyForm agency={agency} />}
-      {agency && <AgencyUsers agencyId={agency.id} agencyUsers={agencyUsers} />}
+      {agency && <AgencyUsers agencyId={agency.id} />}
     </>
   );
 };

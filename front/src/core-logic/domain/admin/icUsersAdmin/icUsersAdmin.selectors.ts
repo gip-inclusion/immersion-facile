@@ -21,6 +21,11 @@ const agencyUsers = createSelector(
   ({ agencyUsers }) => agencyUsers,
 );
 
+const isUpdating = createSelector(
+  icUsersAdminState,
+  ({ isUpdatingIcUserAgency }) => isUpdatingIcUserAgency,
+);
+
 const agenciesNeedingReviewForSelectedUser = createSelector(
   icUsersNeedingReviewSelector,
   selectedUserId,
@@ -58,4 +63,5 @@ export const icUsersAdminSelectors = {
   agenciesNeedingReviewForSelectedUser,
   feedback: createSelector(icUsersAdminState, ({ feedback }) => feedback),
   agencyUsers,
+  isUpdating,
 };

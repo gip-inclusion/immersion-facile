@@ -10,8 +10,9 @@ import {
   WithUserFilters,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
+import { PayloadActionWithFeedbackTopic } from "../../feedback/feedback.slice";
 
-type NormalizedInclusionConnectedUser = OmitFromExistingKeys<
+export type NormalizedInclusionConnectedUser = OmitFromExistingKeys<
   InclusionConnectedUser,
   "agencyRights"
 > & {
@@ -159,6 +160,29 @@ export const icUsersAdminSlice = createSlice({
     ) => {
       state.isUpdatingIcUserAgency = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+
+    updateUserOnAgencyRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<IcUserRoleForAgencyParams>,
+    ) => {
+      state.isUpdatingIcUserAgency = true;
+    },
+
+    updateUserOnAgencySucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<IcUserRoleForAgencyParams>,
+    ) => {
+      state.isUpdatingIcUserAgency = false;
+      const { userId, agencyId, roles: newRoles } = action.payload;
+      state.agencyUsers[userId].agencyRights[agencyId].roles = newRoles;
+    },
+
+    updateUserOnAgencyFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isUpdatingIcUserAgency = false;
     },
   },
 });

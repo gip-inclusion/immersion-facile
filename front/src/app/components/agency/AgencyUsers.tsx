@@ -1,30 +1,49 @@
-import { fr } from "@codegouvfr/react-dsfr";
+import { FrClassName, fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { values } from "ramda";
 import React from "react";
 import { Tooltip } from "react-design-system";
 import { AgencyId, AgencyRole, domElementIds } from "shared";
-import { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { ManageUserModal } from "./ManageUserModal";
 
 type AgencyUsersProperties = {
   agencyId: AgencyId;
-  agencyUsers: NormalizedIcUserById;
 };
 
-export const agencyRoleToDisplay: Record<AgencyRole, string> = {
-  toReview: "A valider",
-  validator: "Validateur",
-  counsellor: "Pré-validateur",
-  agencyOwner: "Responsable d'agence",
-  "agency-viewer": "Lecteur",
+type AgencyRoleClasses = {
+  label: string;
+  className: FrClassName;
 };
 
-export const AgencyUsers = ({
-  agencyId,
-  agencyUsers,
-}: AgencyUsersProperties) => {
+export const agencyRoleToDisplay: Record<AgencyRole, AgencyRoleClasses> = {
+  toReview: {
+    label: "A valider",
+    className: "fr-badge--yellow-tournesol",
+  },
+  validator: {
+    label: "Validateur",
+    className: "fr-badge--purple-glycine",
+  },
+  counsellor: {
+    label: "Pré-validateur",
+    className: "fr-badge--brown-caramel",
+  },
+  agencyOwner: {
+    label: "Responsable d'agence",
+    className: "fr-badge--green-emeraude",
+  },
+  "agency-viewer": {
+    label: "Lecteur",
+    className: "fr-badge--beige-gris-galet",
+  },
+};
+
+export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
+  const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
+
   const tableData = values(agencyUsers).map((agencyUser) => {
     const hasFirstNameOrLastName = agencyUser.firstName || agencyUsers.lastName;
     const formattedUserInfo = (
@@ -44,16 +63,9 @@ export const AgencyUsers = ({
     );
     const formattedUserRights = agencyUser.agencyRights[agencyId].roles.map(
       (role) => {
-        if (role === "toReview") {
-          return (
-            <Badge severity="new" small>
-              {agencyRoleToDisplay[role]}
-            </Badge>
-          );
-        }
         return (
-          <Badge small className={"fr-badge--purple-glycine"}>
-            {agencyRoleToDisplay[role]}
+          <Badge small className={agencyRoleToDisplay[role].className}>
+            {agencyRoleToDisplay[role].label}
           </Badge>
         );
       },
@@ -63,13 +75,16 @@ export const AgencyUsers = ({
       ? "Reçoit les notifications"
       : "Ne reçoit pas les notifications";
 
-    const manageUser = <ManageUserModal agencyUser={agencyUser} />;
-
     return [
       formattedUserInfo,
       formattedContactMode,
       formattedUserRights,
-      manageUser,
+      <ManageUserModal
+        userEmail={agencyUser.email}
+        userRole={agencyUser.agencyRights[agencyId].roles}
+        userId={agencyUser.id}
+        agencyId={agencyId}
+      />,
     ];
   });
 
