@@ -1,4 +1,4 @@
-import { addDays, subHours } from "date-fns";
+import { addDays, addHours } from "date-fns";
 import { sql } from "kysely";
 import { Pool } from "pg";
 import {
@@ -676,8 +676,8 @@ describe("Pg implementation of ConventionQueries", () => {
       const queryResults =
         await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
           {
-            from: subHours(date, 24),
-            to: date,
+            from: date,
+            to: addHours(date, 24),
           },
           "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
         );

@@ -82,8 +82,16 @@ export class PgConventionQueries implements ConventionQueries {
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionDto[]> {
     const pgResults = await createConventionQueryBuilder(this.transaction)
-      .where("conventions.date_end", ">=", dateEnd.from)
-      .where("conventions.date_end", "<", dateEnd.to)
+      .where(
+        sql`DATE(conventions.date_end)`,
+        ">=",
+        dateEnd.from.toISOString().split("T")[0],
+      )
+      .where(
+        sql`DATE(conventions.date_end)`,
+        "<",
+        dateEnd.to.toISOString().split("T")[0],
+      )
       .where("conventions.status", "in", validatedConventionStatuses)
       .where("conventions.id", "not in", (qb) =>
         qb
