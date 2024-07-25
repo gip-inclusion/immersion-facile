@@ -1,7 +1,7 @@
 export const agencyDashboardTabsList = [
   "onboarding",
   "dashboard",
-  "conventions-en-erreur",
+  "conventions-synchronisees",
 ] as const;
 
 export type AgencyDashboardTab = (typeof agencyDashboardTabsList)[number];
