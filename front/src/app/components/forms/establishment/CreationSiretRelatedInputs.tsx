@@ -180,7 +180,9 @@ export const CreationSiretRelatedInputs = () => {
         hintText={formContents.businessNameCustomized.hintText}
         nativeInputProps={{
           ...formContents.businessNameCustomized,
-          ...register("businessNameCustomized"),
+          ...register("businessNameCustomized", {
+            setValueAs: (value) => (value ? value : undefined),
+          }),
           readOnly: isFetchingSiret,
         }}
         {...getFieldError("businessNameCustomized")}

@@ -73,9 +73,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
     source: formEstablishmentSourceSchema,
     siret: siretSchema,
     businessName: zTrimmedString,
-    businessNameCustomized: z
-      .string()
-      .transform((s) => s.trim())
+    businessNameCustomized: zStringMinLength1
       .refine(
         (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),
         "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",

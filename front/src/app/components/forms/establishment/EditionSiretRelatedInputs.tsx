@@ -1,9 +1,13 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
+import { FormEstablishmentDto } from "shared";
 import { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
-import { getFormContents } from "src/app/hooks/formContents.hooks";
+import {
+  getFormContents,
+  makeFieldError,
+} from "src/app/hooks/formContents.hooks";
 
 export const EditionSiretRelatedInputs = ({
   mode,
@@ -15,6 +19,10 @@ export const EditionSiretRelatedInputs = ({
   );
   const formContents = getFormFields();
   const { register } = useFormContext();
+
+  const getFieldError = makeFieldError(
+    useFormContext<FormEstablishmentDto>().formState,
+  );
 
   return (
     <>
@@ -37,8 +45,11 @@ export const EditionSiretRelatedInputs = ({
         label={formContents.businessNameCustomized.label}
         nativeInputProps={{
           id: formContents.businessNameCustomized.id,
-          ...register("businessNameCustomized"),
+          ...register("businessNameCustomized", {
+            setValueAs: (value) => (value ? value : undefined),
+          }),
         }}
+        {...getFieldError("businessNameCustomized")}
       />
     </>
   );
