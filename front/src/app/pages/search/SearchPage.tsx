@@ -253,7 +253,10 @@ export const SearchPage = ({
                   )}
                 >
                   <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                    <SearchSortedBySelect triggerSearch={triggerSearch} />
+                    <SearchSortedBySelect
+                      searchValues={formValues}
+                      triggerSearch={triggerSearch}
+                    />
                   </div>
                   <div
                     className={cx(
@@ -377,17 +380,17 @@ const getSortedByOptions = (
 
 const SearchSortedBySelect = ({
   triggerSearch,
+  searchValues,
 }: {
+  searchValues: SearchPageParams;
   triggerSearch: (values: SearchPageParams) => void;
 }) => {
-  const { register, watch, setValue } = useForm();
-  const sortedByValue = watch("sortedBy");
-  const sortedBy = sortedByValue ?? "date";
+  const sortedBy = searchValues.sortedBy ?? "date";
   const { enableSearchByScore } = useAppSelector(
     featureFlagSelectors.featureFlagState,
   );
   const filteredOptions = getSortedByOptions(
-    areValidGeoParams(watch()),
+    areValidGeoParams(searchValues),
     enableSearchByScore.isActive,
   );
   return (
@@ -395,24 +398,21 @@ const SearchSortedBySelect = ({
       label="Trier les résultats"
       options={filteredOptions}
       nativeSelectProps={{
-        ...register("sortedBy"),
         id: domElementIds.search.sortFilter,
         value: sortedBy,
         onChange: (event) => {
           const value = event.currentTarget.value;
-          setValue("sortedBy", value);
-          const formValues = watch();
           if (value === "distance") {
-            if (areValidGeoParams(formValues)) {
+            if (areValidGeoParams(searchValues)) {
               triggerSearch({
-                ...formValues,
+                ...searchValues,
                 sortedBy: value,
               });
             }
             return;
           }
           triggerSearch({
-            ...formValues,
+            ...searchValues,
             sortedBy: value,
           });
         },
