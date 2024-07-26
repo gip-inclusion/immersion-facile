@@ -265,6 +265,10 @@ export const errors = {
       new BadRequestError(`L'émail n'a pas le bon format '${email}'.`),
     badRecipientKindFormat: ({ kind }: { kind: string }) =>
       new BadRequestError(`L'émail n'a pas le bon type '${kind}'.`),
+    hasDiscussionMissingParams: () =>
+      new BadRequestError(
+        "Aucun critère n'a été fourni pour vérifier l'existence d'une mise en relation.",
+      ),
   },
   establishmentGroup: {
     missingBySlug: ({ groupSlug }: { groupSlug: GroupSlug }) =>

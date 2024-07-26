@@ -5,6 +5,7 @@ import {
   DiscussionBuilder,
   DiscussionDto,
   WithAcquisition,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -66,7 +67,7 @@ describe("PgDiscussionRepository", () => {
       .withId(uuid())
       .withSiret("00000000000001")
       .withEstablishmentContact({
-        email: "TEST@email.com",
+        email: "test@email.com",
       })
       .withExchanges([
         {
@@ -270,7 +271,8 @@ describe("PgDiscussionRepository", () => {
         discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
         params: {
           establishmentRepresentativeEmail:
-            discussionWithLastExchangeByPotentialBeneficiary1.establishmentContact.email.toUpperCase(),
+            discussionWithLastExchangeByPotentialBeneficiary1
+              .establishmentContact.email,
         },
         result: true,
       },
@@ -340,6 +342,13 @@ describe("PgDiscussionRepository", () => {
         );
       },
     );
+
+    it("throws when no params provided", () => {
+      expectPromiseToFailWithError(
+        pgDiscussionRepository.hasDiscussionMatching({}),
+        errors.discussion.hasDiscussionMissingParams(),
+      );
+    });
   });
 
   describe("insert/update/getById", () => {
