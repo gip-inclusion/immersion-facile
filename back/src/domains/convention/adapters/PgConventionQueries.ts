@@ -7,6 +7,7 @@ import {
   ConventionReadDto,
   ConventionScope,
   ConventionStatus,
+  DateRange,
   FindSimilarConventionsParams,
   conventionReadSchema,
   conventionSchema,
@@ -75,10 +76,7 @@ export class PgConventionQueries implements ConventionQueries {
   }
 
   public async getAllConventionsForThoseEndingThatDidntGoThrough(
-    dateEnd: {
-      from: Date;
-      to: Date;
-    },
+    dateEnd: DateRange,
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionDto[]> {
     const pgResults = await createConventionQueryBuilder(this.transaction)
