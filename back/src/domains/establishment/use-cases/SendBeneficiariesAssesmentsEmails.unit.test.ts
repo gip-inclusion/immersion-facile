@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -45,7 +46,6 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
     sendBeneficiaryAssesmentEmail = new SendBeneficiariesPdfAssessmentsEmails(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
-      timeGateway,
       makeCreateNewEvent({
         timeGateway,
         uuidGenerator: new UuidV4Generator(),
@@ -76,7 +76,12 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
     const now = new Date("2023-11-21T08:00:00.000Z");
     timeGateway.setNextDates([now, now]);
 
-    await sendBeneficiaryAssesmentEmail.execute();
+    await sendBeneficiaryAssesmentEmail.execute({
+      conventionEndDate: {
+        from: addDays(now, 1),
+        to: addDays(now, 2),
+      },
+    });
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -161,7 +166,13 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
     expectToEqual(uow.notificationRepository.notifications, [notification]);
     expectToEqual(uow.outboxRepository.events, []);
 
-    await sendBeneficiaryAssesmentEmail.execute();
+    const now = timeGateway.now();
+    await sendBeneficiaryAssesmentEmail.execute({
+      conventionEndDate: {
+        from: addDays(now, 1),
+        to: addDays(now, 2),
+      },
+    });
 
     expectToEqual(uow.notificationRepository.notifications, [notification]);
     expectToEqual(uow.outboxRepository.events, []);
