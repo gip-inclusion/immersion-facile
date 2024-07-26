@@ -553,6 +553,9 @@ export const domElementIds = {
     },
     agencyTab: {
       agencyUsersTable: "im-agency-users-table",
+      editAgencyAutocompleteInput: "im-form-edit-agency__agency-autocomplete",
+      editAgencyUserRoleButton:
+        "im-form-edit-agency__users-table__modify-button",
       editAgencyForm: "im-form-edit-agency",
       activateAgencySelector: "agency-selector",
       editAgencyFormStatusSelector: "im-form-edit-agency__status-select",
