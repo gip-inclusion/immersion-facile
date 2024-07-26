@@ -154,7 +154,7 @@ export const domElementIds = {
     resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
     appellationAutocomplete: "im-search-page__appellation-autocomplete",
     distanceSelect: "im-search-page__distance-dropdown",
-    sortFilter: "radio-inline-legend",
+    sortFilter: "im-search-page__sort-filter-select",
     searchSubmitButton: "im-search__submit-search",
     searchSortOptionBase: "im-search__search-sort-option-",
     lbbSearchResultButton: "im-search-result__lbb-contact-button",
