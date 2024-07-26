@@ -32,12 +32,16 @@ import { Route } from "type-route";
 import "./SearchPage.scss";
 import Styles from "./SearchPage.styles";
 
-const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
-  (distance) => ({
+const radiusOptions = [
+  {
+    value: undefined as any, // dirty fix to show the placeholder,
+    label: "Sélectionner une distance",
+  },
+  ...["1", "2", "5", "10", "20", "50", "100"].map((distance) => ({
     label: `${distance} km`,
     value: distance,
-  }),
-);
+  })),
+];
 
 export const SearchPage = ({
   route,
@@ -62,7 +66,7 @@ export const SearchPage = ({
     place: "",
     sortedBy: enableSearchByScore ? "score" : "date",
     appellations: undefined,
-    distanceKm: "" as any, // to show the placeholder, its value must be a string
+    distanceKm: undefined,
     latitude: undefined,
     longitude: undefined,
     ...acquisitionParams,
@@ -347,7 +351,7 @@ const canSubmitSearch = (values: SearchPageParams) => {
   const geoParams = {
     latitude: values.latitude,
     longitude: values.longitude,
-    distanceKm: values.distanceKm ? values.distanceKm : undefined,
+    distanceKm: values.distanceKm,
   };
   return areValidGeoParams(geoParams) || areEmptyGeoParams(geoParams);
 };

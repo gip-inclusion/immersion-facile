@@ -50,7 +50,7 @@ export const contactEstablishmentByMailFormSchema: z.Schema<ContactEstablishment
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
     datePreferences: zTrimmedString,
     hasWorkingExperience: z.boolean(),
-    experienceAdditionalInformation: zTrimmedString,
+    experienceAdditionalInformation: zTrimmedString.optional(),
   });
 
 export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailDto> =
@@ -62,7 +62,7 @@ export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMa
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
     datePreferences: zTrimmedString,
     hasWorkingExperience: z.boolean(),
-    experienceAdditionalInformation: zTrimmedString,
+    experienceAdditionalInformation: zTrimmedString.optional(),
   });
 
 export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByPhoneDto> =
