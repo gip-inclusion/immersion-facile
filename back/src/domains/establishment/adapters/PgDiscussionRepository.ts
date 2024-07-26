@@ -1,5 +1,6 @@
 import type { InsertObject } from "kysely";
 import { sql } from "kysely";
+import { keys } from "ramda";
 import {
   ContactMethod,
   DiscussionDto,
@@ -9,6 +10,7 @@ import {
   Exchange,
   RejectionKind,
   SiretDto,
+  errors,
   pipeWithValue,
 } from "shared";
 import {
@@ -186,48 +188,54 @@ export class PgDiscussionRepository implements DiscussionRepository {
       );
   }
 
-  public async hasDiscussionMatching({
-    siret,
-    appellationCode,
-    potentialBeneficiaryEmail,
-    since,
-    establishmentRepresentativeEmail,
-  }: Partial<HasDiscussionMatchingParams>): Promise<boolean> {
+  public async hasDiscussionMatching(
+    params: Partial<HasDiscussionMatchingParams>,
+  ): Promise<boolean> {
+    if (keys(params).length === 0)
+      throw errors.discussion.hasDiscussionMissingParams();
     const result = await this.transaction
-      .selectFrom("discussions")
-      .select(({ exists, selectFrom, lit, fn }) => [
+      .selectNoFrom(({ exists, selectFrom, lit }) => [
         exists(
           pipeWithValue(
             selectFrom("discussions").select(lit(1).as("one")),
-            (builder) => (siret ? builder.where("siret", "=", siret) : builder),
             (builder) =>
-              appellationCode
-                ? builder.where("appellation_code", "=", +appellationCode)
+              params.siret
+                ? builder.where("siret", "=", params.siret)
                 : builder,
             (builder) =>
-              since ? builder.where("created_at", ">=", since) : builder,
-            (builder) =>
-              potentialBeneficiaryEmail
+              params.appellationCode
                 ? builder.where(
-                    fn("lower", ["potential_beneficiary_email"]),
+                    "appellation_code",
                     "=",
-                    potentialBeneficiaryEmail.toLowerCase(),
+                    +params.appellationCode,
                   )
                 : builder,
             (builder) =>
-              establishmentRepresentativeEmail
+              params.since
+                ? builder.where("created_at", ">=", params.since)
+                : builder,
+            (builder) =>
+              params.potentialBeneficiaryEmail
                 ? builder.where(
-                    fn("lower", ["establishment_contact_email"]),
+                    "potential_beneficiary_email",
                     "=",
-                    establishmentRepresentativeEmail.toLowerCase(),
+                    params.potentialBeneficiaryEmail,
+                  )
+                : builder,
+            (builder) =>
+              params.establishmentRepresentativeEmail
+                ? builder.where(
+                    "establishment_contact_email",
+                    "=",
+                    params.establishmentRepresentativeEmail,
                   )
                 : builder,
           ),
         ).as("exists"),
       ])
-      .execute();
+      .executeTakeFirst();
 
-    return !!result.at(0)?.exists;
+    return !!result?.exists;
   }
 
   public async insert(discussion: DiscussionDto) {
