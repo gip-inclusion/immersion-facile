@@ -1,3 +1,4 @@
+import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -85,7 +86,12 @@ describe("SendEmailWithAssessmentCreationLink", () => {
     timeGateway.setNextDates([now, now]);
 
     // Act
-    await sendEmailWithAssessmentCreationLink.execute();
+    await sendEmailWithAssessmentCreationLink.execute({
+      conventionEndDate: {
+        from: subDays(now, 1),
+        to: now,
+      },
+    });
 
     // Assert
     expectSavedNotificationsAndEvents({
@@ -175,7 +181,13 @@ describe("SendEmailWithAssessmentCreationLink", () => {
     expectToEqual(uow.outboxRepository.events, []);
 
     // Act
-    await sendEmailWithAssessmentCreationLink.execute();
+    const now = timeGateway.now();
+    await sendEmailWithAssessmentCreationLink.execute({
+      conventionEndDate: {
+        from: subDays(timeGateway.now(), 1),
+        to: now,
+      },
+    });
 
     // Assert
     expectToEqual(uow.notificationRepository.notifications, [notification]);

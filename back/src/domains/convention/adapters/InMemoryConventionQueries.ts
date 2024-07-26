@@ -6,6 +6,7 @@ import {
   ConventionId,
   ConventionReadDto,
   ConventionScope,
+  DateRange,
   FindSimilarConventionsParams,
   SiretDto,
   errors,
@@ -53,10 +54,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
   }
 
   public async getAllConventionsForThoseEndingThatDidntGoThrough(
-    dateEnd: {
-      from: Date;
-      to: Date;
-    },
+    dateEnd: DateRange,
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionReadDto[]> {
     const notifications = this.notificationRepository

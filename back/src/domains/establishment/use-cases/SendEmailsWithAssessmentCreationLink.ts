@@ -1,7 +1,7 @@
-import { subDays } from "date-fns";
 import {
   ConventionDto,
   ConventionId,
+  DateRange,
   castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
@@ -24,10 +24,17 @@ type SendEmailsWithAssessmentCreationLinkOutput = {
 };
 
 export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
-  void,
+  {
+    conventionEndDate: DateRange;
+  },
   SendEmailsWithAssessmentCreationLinkOutput
 > {
-  protected inputSchema = z.void();
+  protected inputSchema = z.object({
+    conventionEndDate: z.object({
+      from: z.date(),
+      to: z.date(),
+    }),
+  });
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -53,17 +60,15 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
   }
 
   protected async _execute(
-    _: void,
+    params: {
+      conventionEndDate: DateRange;
+    },
     uow: UnitOfWork,
   ): Promise<SendEmailsWithAssessmentCreationLinkOutput> {
     const now = this.#timeGateway.now();
-    const yesterday = subDays(now, 1);
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-        {
-          from: yesterday,
-          to: now,
-        },
+        params.conventionEndDate,
         "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
       );
 

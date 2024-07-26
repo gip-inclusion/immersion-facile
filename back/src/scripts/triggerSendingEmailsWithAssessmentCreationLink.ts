@@ -1,3 +1,4 @@
+import subDays from "date-fns/subDays";
 import { Pool } from "pg";
 import { keys } from "ramda";
 import { AppConfig } from "../config/bootstrap/appConfig";
@@ -49,7 +50,13 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
       }),
     );
 
-  return sendEmailsWithAssessmentCreationLink.execute();
+  const now = timeGateway.now();
+  return sendEmailsWithAssessmentCreationLink.execute({
+    conventionEndDate: {
+      from: subDays(now, 1),
+      to: now,
+    },
+  });
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */

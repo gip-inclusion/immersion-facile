@@ -12,3 +12,8 @@ export interface AssessmentDto {
 export type WithAssessmentDto = {
   assessment: AssessmentDto;
 };
+
+export type DateRange = {
+  from: Date;
+  to: Date;
+};
