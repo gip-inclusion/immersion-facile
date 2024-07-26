@@ -1,4 +1,5 @@
-import { zToBoolean, zToNumber } from "./zodUtils";
+import { ZodError } from "zod";
+import { zToBoolean, zToNumber, zTrimmedString } from "./zodUtils";
 
 describe("zToBolean schema validation", () => {
   it.each([
@@ -31,5 +32,45 @@ describe("zToNumber schema validation", () => {
 
   it.each(["0,1", "not a number"])("boolean '%s' to be invalid", (boolean) => {
     expect(() => zToNumber.parse(boolean)).toThrow();
+  });
+});
+
+describe("zStringMinLengh1 schema validation", () => {
+  it.each([
+    { input: "beaujolais", expected: "beaujolais" },
+    {
+      input: "test-123",
+      expected: "test-123",
+    },
+    {
+      input: " test-123 ",
+      expected: "test-123",
+    },
+    {
+      input: "   ",
+      expected: new ZodError([
+        {
+          code: "too_small",
+          minimum: 1,
+          type: "string",
+          inclusive: true,
+          exact: false,
+          message: "Obligatoire",
+          path: [],
+        },
+        {
+          code: "custom",
+          message: "Obligatoire",
+          path: [],
+        },
+      ]),
+    },
+  ] satisfies {
+    input: string;
+    expected: ZodError | string;
+  }[])("parsing '$input' expect $expected", ({ input, expected }) => {
+    typeof expected !== "string"
+      ? expect(() => zTrimmedString.parse(input)).toThrow(expected)
+      : expect(zTrimmedString.parse(input)).toBe(expected);
   });
 });

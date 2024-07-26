@@ -1549,6 +1549,16 @@ describe("PgEstablishmentAggregateRepository", () => {
         },
         {
           originalEstablishment: new EstablishmentAggregateBuilder()
+            .withEstablishmentCustomizedName("TOTO")
+            .build(),
+          updatedEstablishment: new EstablishmentAggregateBuilder()
+            .withEstablishmentCustomizedName(undefined)
+            .withEstablishmentUpdatedAt(updatedAt)
+            .build(),
+          title: "removes customized name",
+        },
+        {
+          originalEstablishment: new EstablishmentAggregateBuilder()
             .withContact(
               new ContactEntityBuilder().withContactMethod("EMAIL").build(),
             )
