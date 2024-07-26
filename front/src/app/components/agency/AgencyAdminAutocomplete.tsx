@@ -5,7 +5,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { prop } from "ramda";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { AgencyId, AgencyOption, propEq } from "shared";
+import { AgencyId, AgencyOption, domElementIds, propEq } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
@@ -71,6 +71,7 @@ export const AgencyAdminAutocomplete = ({
         disablePortal
         filterOptions={(x) => x}
         options={agencyOptions.map(prop("id"))}
+        id={domElementIds.admin.agencyTab.editAgencyAutocompleteInput}
         value={agency ? agency.id : ""}
         noOptionsText={
           agencySearchText
