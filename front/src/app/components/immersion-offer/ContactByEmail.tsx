@@ -107,7 +107,7 @@ export const ContactByEmail = ({
       ...(preferUseTranscientData && transcientDataForScope?.value
         ? { ...transcientDataForScope.value }
         : {}),
-      experienceAdditionalInformation: "",
+      experienceAdditionalInformation: undefined,
     }),
     [
       appellations,
@@ -155,7 +155,7 @@ export const ContactByEmail = ({
   return (
     <FormProvider {...methods}>
       <form
-        onSubmit={handleSubmit(onFormValid)}
+        onSubmit={handleSubmit(onFormValid, console.error)}
         id={"im-contact-form--email"}
         ref={formRef}
       >
@@ -266,7 +266,7 @@ export const ContactByEmail = ({
                   checked: hasWorkingExperienceValue === false,
                   onChange: () => {
                     setValue("hasWorkingExperience", false);
-                    setValue("experienceAdditionalInformation", "");
+                    setValue("experienceAdditionalInformation", undefined);
                   },
                 },
               },

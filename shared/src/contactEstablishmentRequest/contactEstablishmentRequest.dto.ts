@@ -22,7 +22,7 @@ export type ContactEstablishmentByMailDto = ContactInformations<"EMAIL"> & {
   potentialBeneficiaryResumeLink?: string;
   datePreferences: string;
   hasWorkingExperience: boolean;
-  experienceAdditionalInformation: string;
+  experienceAdditionalInformation?: string;
 };
 
 export type ContactEstablishmentInPersonDto = ContactInformations<"IN_PERSON">;
