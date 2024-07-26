@@ -40,6 +40,8 @@ test.describe("Search", () => {
   });
 });
 
+test.skip("checks that share URL have the correct params values", async () => {});
+
 const expectSearchToHaveResults = async (page: Page) => {
   const searchResultsSelector = ".im-search-result";
   await page.waitForSelector(searchResultsSelector);

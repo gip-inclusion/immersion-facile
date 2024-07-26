@@ -256,6 +256,9 @@ export const SearchPage = ({
                     <SearchSortedBySelect
                       searchValues={formValues}
                       triggerSearch={triggerSearch}
+                      setSortedBy={(sortedBy: SearchSortedBy) =>
+                        setValue("sortedBy", sortedBy)
+                      }
                     />
                   </div>
                   <div
@@ -381,11 +384,13 @@ const getSortedByOptions = (
 const SearchSortedBySelect = ({
   triggerSearch,
   searchValues,
+  setSortedBy,
 }: {
   searchValues: SearchPageParams;
   triggerSearch: (values: SearchPageParams) => void;
+  setSortedBy: (sortedBy: SearchSortedBy) => void;
 }) => {
-  const sortedBy = searchValues.sortedBy ?? "date";
+  const { sortedBy } = searchValues;
   const { enableSearchByScore } = useAppSelector(
     featureFlagSelectors.featureFlagState,
   );
@@ -402,6 +407,7 @@ const SearchSortedBySelect = ({
         value: sortedBy,
         onChange: (event) => {
           const value = event.currentTarget.value;
+          setSortedBy(value);
           if (value === "distance") {
             if (areValidGeoParams(searchValues)) {
               triggerSearch({
