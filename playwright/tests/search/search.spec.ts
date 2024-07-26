@@ -2,6 +2,7 @@ import test, { expect, Page } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
 import { fillAutocomplete } from "../../utils/utils";
 
+test.describe.configure({ mode: "serial" });
 test.describe("Search", () => {
   test("can access and search with empty fields", async ({ page }) => {
     await page.goto("/");
