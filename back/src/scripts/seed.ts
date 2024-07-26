@@ -124,7 +124,7 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
     enableMaintenance: makeTextFeatureFlag(false, {
       message: "Mon message de maintenance",
     }),
-    enableSearchByScore: makeBooleanFeatureFlag(false),
+    enableSearchByScore: makeBooleanFeatureFlag(true),
   };
 
   await uow.featureFlagRepository.insertAll(featureFlags);
