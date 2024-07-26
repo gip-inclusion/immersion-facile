@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { Pool } from "pg";
 import { keys } from "ramda";
 import { AppConfig } from "../config/bootstrap/appConfig";
@@ -35,14 +36,19 @@ const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
     new SendBeneficiariesPdfAssessmentsEmails(
       uowPerformer,
       saveNotificationAndRelatedEvent,
-      timeGateway,
       makeCreateNewEvent({
         timeGateway,
         uuidGenerator: new UuidV4Generator(),
       }),
     );
 
-  return sendBeneficiariesPdfAssesmentsEmails.execute();
+  const now = timeGateway.now();
+  return sendBeneficiariesPdfAssesmentsEmails.execute({
+    conventionEndDate: {
+      from: addDays(now, 1),
+      to: addDays(now, 2),
+    },
+  });
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */

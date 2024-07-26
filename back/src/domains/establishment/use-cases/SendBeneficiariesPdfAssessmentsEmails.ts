@@ -1,7 +1,7 @@
-import { addDays } from "date-fns";
 import {
   ConventionDto,
   ConventionId,
+  DateRange,
   castError,
   immersionFacileNoReplyEmailSender,
 } from "shared";
@@ -9,7 +9,6 @@ import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
@@ -19,42 +18,42 @@ type SendBeneficiaryAssessmentEmailsOutput = {
 };
 
 export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
-  void,
+  {
+    conventionEndDate: DateRange;
+  },
   SendBeneficiaryAssessmentEmailsOutput
 > {
-  protected inputSchema = z.void();
+  protected inputSchema = z.object({
+    conventionEndDate: z.object({
+      from: z.date(),
+      to: z.date(),
+    }),
+  });
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   readonly #createNewEvent: CreateNewEvent;
 
-  readonly #timeGateway: TimeGateway;
-
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    timeGateway: TimeGateway,
     createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
 
     this.#createNewEvent = createNewEvent;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
-    _: void,
+    params: {
+      conventionEndDate: DateRange;
+    },
     uow: UnitOfWork,
   ): Promise<SendBeneficiaryAssessmentEmailsOutput> {
-    const now = this.#timeGateway.now();
-    const tomorrow = addDays(now, 1);
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-        {
-          from: tomorrow,
-          to: addDays(tomorrow, 1),
-        },
+        params.conventionEndDate,
         "BENEFICIARY_ASSESSMENT_NOTIFICATION",
       );
     const errors: Record<ConventionId, Error> = {};
