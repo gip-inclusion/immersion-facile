@@ -32,16 +32,12 @@ import { Route } from "type-route";
 import "./SearchPage.scss";
 import Styles from "./SearchPage.styles";
 
-const radiusOptions = [
-  {
-    value: undefined as any, // dirty fix to show the placeholder,
-    label: "Sélectionner une distance",
-  },
-  ...["1", "2", "5", "10", "20", "50", "100"].map((distance) => ({
+const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
+  (distance) => ({
     label: `${distance} km`,
     value: distance,
-  })),
-];
+  }),
+);
 
 export const SearchPage = ({
   route,
@@ -216,7 +212,7 @@ export const SearchPage = ({
                       ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
                       : undefined,
                   id: domElementIds.search.distanceSelect,
-                  value: `${distanceKm}`,
+                  value: `${distanceKm === undefined ? "" : distanceKm}`,
                   onChange: (event) => {
                     const value = parseInt(event.currentTarget.value);
                     setValue("distanceKm", value);
