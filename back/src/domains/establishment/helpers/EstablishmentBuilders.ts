@@ -322,6 +322,17 @@ export class EstablishmentAggregateBuilder
     });
   }
 
+  withEstablishmentOpen(isOpen: boolean) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withIsOpen(isOpen)
+        .build(),
+    });
+  }
+
   public withEstablishmentSiret(siret: string) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
