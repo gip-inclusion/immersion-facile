@@ -71,7 +71,6 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
     return {
       label: agencyRoleToDisplay[roleKey].label,
       nativeInputProps: {
-        // id: roleKey,
         name: roleKey,
         value: roleKey,
         checked: selectedUserData?.roles.includes(roleKey),
