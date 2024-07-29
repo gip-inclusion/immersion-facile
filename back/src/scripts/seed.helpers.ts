@@ -48,3 +48,34 @@ export const insertAgencySeed = async ({
     [kind]: [...agencyIds[kind], agencyId],
   };
 };
+
+export const insertAgencies = async ({ uow }: { uow: UnitOfWork }) => {
+  const peAgency = new AgencyDtoBuilder()
+    .withId("40400c99-9c0b-bbbb-bb6d-6bb9bd300404")
+    .withName("PE")
+    .withQuestionnaireUrl("https://questionnaire.seed")
+    .withSignature("PE agency signature")
+    .withKind("pole-emploi")
+    .withStatus("active")
+    .withAddress(seedAddresses[0])
+    .build();
+
+  const missionLocaleAgency = new AgencyDtoBuilder()
+    .withId("40400c99-9c0b-bbbb-bb6d-6bb9bd300505")
+    .withName("Mission Locale")
+    .withQuestionnaireUrl("https://questionnaire.seed")
+    .withSignature("mission locale agency signature")
+    .withKind("mission-locale")
+    .withStatus("active")
+    .withAddress(seedAddresses[1])
+    .build();
+
+  await uow.agencyRepository.insert(peAgency);
+  await uow.agencyRepository.insert(missionLocaleAgency);
+
+  agencyIds = {
+    ...agencyIds,
+    "pole-emploi": [...agencyIds["pole-emploi"], peAgency.id],
+    "mission-locale": [...agencyIds["mission-locale"], missionLocaleAgency.id],
+  };
+};
