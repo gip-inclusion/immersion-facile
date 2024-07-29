@@ -5,6 +5,7 @@ import {
   castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
+  withDateRangeSchema,
 } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
@@ -25,15 +26,12 @@ type SendEmailsWithAssessmentCreationLinkOutput = {
 
 export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
   {
-    conventionEndDate: DateRange;
+    conventionEndDate?: DateRange;
   },
   SendEmailsWithAssessmentCreationLinkOutput
 > {
   protected inputSchema = z.object({
-    conventionEndDate: z.object({
-      from: z.date(),
-      to: z.date(),
-    }),
+    conventionEndDate: withDateRangeSchema.optional(),
   });
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;

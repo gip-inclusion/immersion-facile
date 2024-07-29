@@ -1,6 +1,7 @@
 import subDays from "date-fns/subDays";
 import { Pool } from "pg";
 import { keys } from "ramda";
+import { DateRange } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
@@ -29,6 +30,22 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
     connectionString: dbUrl,
   });
   const timeGateway = new RealTimeGateway();
+  const now = timeGateway.now();
+  const yesterday: DateRange = getDateRangeFromScriptParams({
+    scriptParams: process.argv,
+  }) ?? {
+    from: subDays(now, 1),
+    to: now,
+  };
+
+  if (yesterday.to > now) {
+    const message =
+      "Attention, vous êtes sur le point d'envoyer des bilans concernant des immersions qui ne sont pas encore terminées.";
+    logger.error({
+      message,
+    });
+    throw new Error(message);
+  }
 
   const { uowPerformer } = createUowPerformer(config, () => pool);
 
@@ -55,16 +72,8 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
       }),
     );
 
-  const now = timeGateway.now();
   return sendEmailsWithAssessmentCreationLink.execute({
-    conventionEndDate: getDateRangeFromScriptParams({
-      timeGateway,
-      logger,
-      scriptParams: process.argv,
-    }) ?? {
-      from: subDays(now, 1),
-      to: now,
-    },
+    conventionEndDate: yesterday,
   });
 };
 

@@ -4,6 +4,7 @@ import {
   DateRange,
   castError,
   immersionFacileNoReplyEmailSender,
+  withDateRangeSchema,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -19,15 +20,12 @@ type SendBeneficiaryAssessmentEmailsOutput = {
 
 export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
   {
-    conventionEndDate: DateRange;
+    conventionEndDate?: DateRange;
   },
   SendBeneficiaryAssessmentEmailsOutput
 > {
   protected inputSchema = z.object({
-    conventionEndDate: z.object({
-      from: z.date(),
-      to: z.date(),
-    }),
+    conventionEndDate: withDateRangeSchema.optional(),
   });
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
