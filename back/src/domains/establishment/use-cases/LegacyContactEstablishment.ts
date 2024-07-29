@@ -4,6 +4,7 @@ import {
   LegacyContactEstablishmentRequestDto,
   errors,
   legacyContactEstablishmentRequestSchema,
+  normalizedMonthInDays,
 } from "shared";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -228,13 +229,13 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
     const maxContactsPerWeekForEstablishment =
       establishmentAggregate.establishment.maxContactsPerMonth;
 
-    const numberOfDiscussionsOfPast24Days =
+    const numberOfDiscussionsOfPastMonth =
       await uow.discussionRepository.countDiscussionsForSiretSince(
         contactRequest.siret,
-        subDays(now, 24),
+        subDays(now, normalizedMonthInDays),
       );
 
-    if (maxContactsPerWeekForEstablishment <= numberOfDiscussionsOfPast24Days) {
+    if (maxContactsPerWeekForEstablishment <= numberOfDiscussionsOfPastMonth) {
       const updatedEstablishment = {
         ...establishmentAggregate,
         establishment: {
