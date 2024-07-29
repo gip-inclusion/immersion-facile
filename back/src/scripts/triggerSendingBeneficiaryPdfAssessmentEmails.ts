@@ -48,15 +48,23 @@ const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
     );
 
   const now = timeGateway.now();
+  const tomorrow = getDateRangeFromScriptParams({
+    scriptParams: process.argv,
+  }) ?? {
+    from: addDays(now, 1),
+    to: addDays(now, 2),
+  };
+
+  if (tomorrow.to > addDays(now, 2)) {
+    const message =
+      "Attention, vous êtes sur le point d'envoyer des bilans concernant des immersions qui ne sont pas encore terminées.";
+    logger.error({
+      message,
+    });
+    throw new Error(message);
+  }
   return sendBeneficiariesPdfAssesmentsEmails.execute({
-    conventionEndDate: getDateRangeFromScriptParams({
-      timeGateway,
-      logger,
-      scriptParams: process.argv,
-    }) ?? {
-      from: addDays(now, 1),
-      to: addDays(now, 2),
-    },
+    conventionEndDate: tomorrow,
   });
 };
 
