@@ -30,7 +30,6 @@ import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-  defaultLocation,
 } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -1130,63 +1129,29 @@ describe("PgEstablishmentAggregateRepository", () => {
     });
 
     describe("getOffersAsAppelationDtoForFormEstablishment", () => {
-      const siretInTable = "12345678901234";
-      const establishment = new EstablishmentEntityBuilder()
-        .withSiret(siretInTable)
-        .withLocations([defaultLocation])
-        .build();
-      const contact = new ContactEntityBuilder()
-        .withEmail("toto@gmail.com")
-        .build();
-
-      const offers = [
-        new OfferEntityBuilder()
-          .withRomeCode("A1101")
-          .withRomeLabel("Conduite d'engins agricoles et forestiers")
-          .withAppellationCode("11987")
-          .withAppellationLabel("Chauffeur / Chauffeuse de machines agricoles")
-          .build(),
-        new OfferEntityBuilder()
-          .withRomeCode("A1101")
-          .withRomeLabel("Conduite d'engins agricoles et forestiers")
-          .withAppellationCode("12862")
-          .withAppellationLabel("Conducteur / Conductrice d'abatteuses")
-          .build(),
-      ];
-
       beforeEach(async () => {
-        const aggregate = new EstablishmentAggregateBuilder()
-          .withEstablishment(establishment)
-          .withContact(contact)
-          .withOffers(offers)
-          .withSearchableBy({
-            students: true,
-            jobSeekers: false,
-          })
-          .build();
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-          aggregate,
+          establishmentWithOfferA1101_AtPosition,
         );
       });
 
       it("returns an empty list if no establishment found with this siret", async () => {
         const siretNotInTable = "11111111111111";
 
-        expect(
+        expectToEqual(
           await pgEstablishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
             siretNotInTable,
           ),
-        ).toHaveLength(0);
+          [],
+        );
       });
 
       it("returns a list with offers from offers as AppellationDto of given siret", async () => {
-        const actualOffersAsAppelationDto =
-          await pgEstablishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
-            siretInTable,
-          );
         expectArraysToEqualIgnoringOrder(
-          actualOffersAsAppelationDto,
-          offers.map((offer) => ({
+          await pgEstablishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
+            establishmentWithOfferA1101_AtPosition.establishment.siret,
+          ),
+          establishmentWithOfferA1101_AtPosition.offers.map((offer) => ({
             appellationCode: offer.appellationCode,
             appellationLabel: offer.appellationLabel,
             romeCode: offer.romeCode,
