@@ -12,6 +12,11 @@ import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGen
 import { SendEmailsWithAssessmentCreationLink } from "../domains/establishment/use-cases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { getDateRangeFromScriptParams } from "./utils";
+
+/**
+ *  we can pass date params to this script like this: pnpm back trigger-sending-emails-with-assessment-creation-link 2024-07-01 2024-01-24
+ */
 
 const logger = createLogger(__filename);
 
@@ -52,7 +57,11 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
 
   const now = timeGateway.now();
   return sendEmailsWithAssessmentCreationLink.execute({
-    conventionEndDate: {
+    conventionEndDate: getDateRangeFromScriptParams({
+      timeGateway,
+      logger,
+      scriptParams: process.argv,
+    }) ?? {
       from: subDays(now, 1),
       to: now,
     },
