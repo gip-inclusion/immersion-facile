@@ -33,7 +33,7 @@ type AgencyRoleClasses = {
 
 export const agencyRoleToDisplay: Record<AgencyRole, AgencyRoleClasses> = {
   toReview: {
-    label: "A valider",
+    label: "À valider",
     className: "fr-badge--yellow-tournesol",
   },
   validator: {

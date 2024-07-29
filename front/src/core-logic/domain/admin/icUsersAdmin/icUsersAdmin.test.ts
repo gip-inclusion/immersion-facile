@@ -464,23 +464,19 @@ describe("Agency registration for authenticated users", () => {
       );
 
       expectIsUpdatingUserAgencyToBe(true);
-
       dependencies.adminGateway.updateAgencyRoleForUserResponse$.next(
         undefined,
       );
-
       const expected: NormalizedIcUserById = {
         ...icUsersAdminSelectors.agencyUsers(store.getState()),
         [originalUser.id]: updatedUser,
       };
-
       expectIsUpdatingUserAgencyToBe(false);
 
       expectToEqual(
         icUsersAdminSelectors.agencyUsers(store.getState()),
         expected,
       );
-
       expectToEqual(
         feedbacksSelectors.feedbacks(store.getState())["update-agency-user"],
         {
@@ -488,6 +484,51 @@ describe("Agency registration for authenticated users", () => {
           message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
           on: "update",
           title: "L'utilisateur a été mis à jour",
+        },
+      );
+    });
+    it("should return an error if update went wrong", () => {
+      const prefilledAdminState = adminPreloadedState({
+        inclusionConnectedUsersAdmin: {
+          ...icUsersAdminInitialState,
+          agencyUsers: testUserSet,
+        },
+      });
+      ({ store, dependencies } = createTestStore({
+        admin: prefilledAdminState,
+      }));
+      const originalUser = testUserSet[user1Id];
+      const errorMessage =
+        "Une erreur est survenue lors de la mise à jour de l'utilisateur";
+
+      expectToEqual(
+        store.getState().admin.inclusionConnectedUsersAdmin,
+        prefilledAdminState.inclusionConnectedUsersAdmin,
+      );
+
+      store.dispatch(
+        icUsersAdminSlice.actions.updateUserOnAgencyRequested({
+          userId: originalUser.id,
+          agencyId: agency2.id,
+          roles: originalUser.agencyRights[agency2.id].roles,
+          feedbackTopic: "update-agency-user",
+        }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(true);
+      dependencies.adminGateway.updateAgencyRoleForUserResponse$.error(
+        new Error(errorMessage),
+      );
+      expectIsUpdatingUserAgencyToBe(false);
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["update-agency-user"],
+        {
+          level: "error",
+          message:
+            "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+          on: "update",
+          title: "Problème lors de la mise à jour de l'utilisateur",
         },
       );
     });
