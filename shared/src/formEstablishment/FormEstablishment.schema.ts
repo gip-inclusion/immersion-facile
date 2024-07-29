@@ -36,7 +36,7 @@ import {
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =
   zTrimmedString;
 
-export const defaultMaxContactsPerMonth = 40;
+export const defaultMaxContactsPerMonth = 12;
 export const noContactPerMonth = 0;
 
 const validContactMethods: NotEmptyArray<ContactMethod> = [

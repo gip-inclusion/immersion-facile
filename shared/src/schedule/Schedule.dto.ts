@@ -1,6 +1,8 @@
 import { NotEmptyArray } from "../utils";
 import { DateString, DateTimeIsoString } from "../utils/date";
 
+export const normalizedMonthInDays = 28;
+
 export type Weekday =
   | "lundi"
   | "mardi"

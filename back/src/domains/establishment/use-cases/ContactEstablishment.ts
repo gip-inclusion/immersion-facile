@@ -6,6 +6,7 @@ import {
   contactEstablishmentRequestSchema,
   emailTemplatesByName,
   errors,
+  normalizedMonthInDays,
 } from "shared";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -297,15 +298,13 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     const maxContactsPerMonthForEstablishment =
       establishmentAggregate.establishment.maxContactsPerMonth;
 
-    const numberOfDiscussionsOfPast24Days =
+    const numberOfDiscussionsOfPastMonth =
       await uow.discussionRepository.countDiscussionsForSiretSince(
         contactRequest.siret,
-        subDays(now, 24),
+        subDays(now, normalizedMonthInDays),
       );
 
-    if (
-      maxContactsPerMonthForEstablishment <= numberOfDiscussionsOfPast24Days
-    ) {
+    if (maxContactsPerMonthForEstablishment <= numberOfDiscussionsOfPastMonth) {
       const updatedEstablishment = {
         ...establishmentAggregate,
         establishment: {
