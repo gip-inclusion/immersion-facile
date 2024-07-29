@@ -30,7 +30,6 @@
     "test:manual": "jest --runInBand --watchAll --testRegex=.manual.test.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
     "test": "NODE_OPTIONS='--max_old_space_size=4096' jest --testRegex='^((?!(integration|manual)).)*.test.ts$'",
-    "transform-past-form-establishments-into-searchable-data": "ts-node src/scripts/transformPastFormEstablishmentsIntoSearchableData.ts",
     "trigger-convention-reminder": "ts-node src/scripts/triggerConventionReminder.ts",
     "trigger-contact-request-reminder-3d": "ts-node src/scripts/triggerContactRequestReminder3Days.ts",
     "trigger-contact-request-reminder-7d": "ts-node src/scripts/triggerContactRequestReminder7Days.ts",
