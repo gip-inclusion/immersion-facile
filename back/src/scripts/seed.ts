@@ -21,7 +21,11 @@ import {
   OfferEntityBuilder,
 } from "../domains/establishment/helpers/EstablishmentBuilders";
 import { establishmentAggregateToFormEstablishement } from "../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
-import { getRandomAgencyId, insertAgencySeed } from "./seed.helpers";
+import {
+  getRandomAgencyId,
+  insertAgencies,
+  insertAgencySeed,
+} from "./seed.helpers";
 
 /* eslint-disable no-console */
 const seed = async () => {
@@ -135,7 +139,7 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
 const agencySeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding agencies...");
-  const agenciesCountByKind = 50;
+  const agenciesCountByKind = 10;
 
   const insertQueries = [...Array(agenciesCountByKind).keys()].flatMap(() => {
     return [
@@ -151,7 +155,7 @@ const agencySeed = async (uow: UnitOfWork) => {
     ];
   });
 
-  await Promise.all(insertQueries);
+  await Promise.all([...insertQueries, insertAgencies({ uow })]);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
