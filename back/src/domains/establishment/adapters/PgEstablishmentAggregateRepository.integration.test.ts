@@ -1138,16 +1138,22 @@ describe("PgEstablishmentAggregateRepository", () => {
       const contact = new ContactEntityBuilder()
         .withEmail("toto@gmail.com")
         .build();
+
       const offers = [
         new OfferEntityBuilder()
-          .withRomeCode("A1101") // Code only, no appellation
+          .withRomeCode("A1101")
+          .withRomeLabel("Conduite d'engins agricoles et forestiers")
           .withAppellationCode("11987")
+          .withAppellationLabel("Chauffeur / Chauffeuse de machines agricoles")
           .build(),
         new OfferEntityBuilder()
           .withRomeCode("A1101")
+          .withRomeLabel("Conduite d'engins agricoles et forestiers")
           .withAppellationCode("12862")
+          .withAppellationLabel("Conducteur / Conductrice d'abatteuses")
           .build(),
       ];
+
       beforeEach(async () => {
         const aggregate = new EstablishmentAggregateBuilder()
           .withEstablishment(establishment)
@@ -1178,168 +1184,125 @@ describe("PgEstablishmentAggregateRepository", () => {
           await pgEstablishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
             siretInTable,
           );
-        expectArraysToEqualIgnoringOrder(actualOffersAsAppelationDto, [
-          {
-            romeCode: offers[0].romeCode,
-            romeLabel: "Conduite d'engins agricoles et forestiers",
-            appellationCode: offers[0].appellationCode?.toString(),
-            appellationLabel: "Chauffeur / Chauffeuse de machines agricoles",
-          },
-          {
-            romeCode: offers[1].romeCode,
-            romeLabel: "Conduite d'engins agricoles et forestiers",
-            appellationCode: offers[1].appellationCode?.toString(),
-            appellationLabel: "Conducteur / Conductrice d'abatteuses",
-          },
-        ]);
+        expectArraysToEqualIgnoringOrder(
+          actualOffersAsAppelationDto,
+          offers.map((offer) => ({
+            appellationCode: offer.appellationCode,
+            appellationLabel: offer.appellationLabel,
+            romeCode: offer.romeCode,
+            romeLabel: offer.romeLabel,
+          })),
+        );
       });
     });
 
     describe("getSearchImmersionResultDtoBySearchQuery", () => {
-      it("Returns undefined when no matching establishment or appellation code", async () => {
-        const siretNotInTable = "11111111111111";
-
-        expect(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
-            siretNotInTable,
-            "14012",
-            "55555555-5555-4444-5555-555555555555",
-          ),
-        ).toBeUndefined();
+      beforeEach(async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentWithOfferA1101_AtPosition,
+        );
       });
 
-      it("Returns undefined SearchImmersionResultDto for given siret, appellationCode and wrong location id", async () => {
-        // Prepare
-        const siret = "12345678901234";
-        const boulangerRome = "D1102";
-        const extraLocation: Location = {
-          address: rueJacquardDto,
-          position: { lon: 2, lat: 48 },
-          id: "55555555-5555-4444-5555-555555555555",
-        };
-        const wrongLocationId = "55555555-5555-4444-5555-555555555666";
+      it("undefined when missing offer by siret", async () => {
+        const missingSiret = "11111111111111";
 
-        const establishment = new EstablishmentEntityBuilder()
-          .withSiret(siret)
-          .withCustomizedName("La boulangerie de Lucie")
-          .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
-          .withLocations([defaultLocation, extraLocation])
-          .withSearchableBy({
-            students: false,
-            jobSeekers: false,
-          })
-          .build();
-        const boulangerOffer1 = new OfferEntityBuilder()
-          .withRomeCode(boulangerRome)
-          .withAppellationCode("10868") // Aide-boulanger / Aide-boulangère
-          .build();
-        const boulangerOffer2 = new OfferEntityBuilder()
-          .withRomeCode(boulangerRome)
-          .withAppellationCode("12006") // Chef boulanger / boulangère
-          .build();
-        const otherOffer = new OfferEntityBuilder()
-          .withRomeCode("H2102")
-          .build();
-        const contact = new ContactEntityBuilder()
-          .withGeneratedContactId()
-          .build();
-
-        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-          new EstablishmentAggregateBuilder()
-            .withEstablishment(establishment)
-            .withOffers([boulangerOffer1, boulangerOffer2, otherOffer])
-            .withContact(contact)
-            .build(),
-        );
-
-        // Act
-        const actualSearchResultDto =
+        expectToEqual(
           await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
-            siret,
-            "12006",
-            wrongLocationId,
-          );
-        // Assert
-        expectToEqual(actualSearchResultDto, undefined);
+            missingSiret,
+            establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
+            establishmentWithOfferA1101_AtPosition.establishment.locations[0]
+              .id,
+          ),
+          undefined,
+        );
+      });
+
+      it("undefined when missing location id", async () => {
+        const missingLocationId = "55555555-5555-4444-5555-555555555666";
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+            establishmentWithOfferA1101_AtPosition.establishment.siret,
+            establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
+            missingLocationId,
+          ),
+          undefined,
+        );
+      });
+
+      it("undefined when missing offer appelation code", async () => {
+        const missingAppelationCode = artisteCirqueOffer.appellationCode;
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+            establishmentWithOfferA1101_AtPosition.establishment.siret,
+            missingAppelationCode,
+            establishmentWithOfferA1101_AtPosition.establishment.locations[0]
+              .id,
+          ),
+          undefined,
+        );
       });
 
       it("Returns reconstructed SearchImmersionResultDto for given siret, appellationCode and location id", async () => {
-        // Prepare
-        const siret = "12345678901234";
-        const boulangerRome = "D1102";
-        const extraLocation: Location = {
-          address: rueJacquardDto,
-          position: { lon: 2, lat: 48 },
-          id: "55555555-5555-4444-5555-555555555555",
-        };
-
-        const establishment = new EstablishmentEntityBuilder()
-          .withSiret(siret)
-          .withCustomizedName("La boulangerie de Lucie")
-          .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
-          .withLocations([defaultLocation, extraLocation])
-          .withSearchableBy({
-            students: false,
-            jobSeekers: false,
-          })
-          .build();
-        const boulangerOffer1 = new OfferEntityBuilder()
-          .withRomeCode(boulangerRome)
-          .withAppellationCode("10868") // Aide-boulanger / Aide-boulangère
-          .build();
-        const boulangerOffer2 = new OfferEntityBuilder()
-          .withRomeCode(boulangerRome)
-          .withAppellationCode("12006") // Chef boulanger / boulangère
-          .build();
-        const otherOffer = new OfferEntityBuilder()
-          .withRomeCode("H2102")
-          .build();
-        const contact = new ContactEntityBuilder()
-          .withGeneratedContactId()
-          .build();
-
-        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-          new EstablishmentAggregateBuilder()
-            .withEstablishment(establishment)
-            .withOffers([boulangerOffer1, boulangerOffer2, otherOffer])
-            .withContact(contact)
-            .build(),
-        );
-
-        // Act
-        const actualSearchResultDto =
+        expectToEqual(
           await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
-            siret,
-            "12006",
-            "55555555-5555-4444-5555-555555555555",
-          );
-        // Assert
-        expectToEqual(actualSearchResultDto, {
-          rome: boulangerRome,
-          romeLabel: "Boulangerie - viennoiserie",
-          appellations: [
-            {
-              appellationLabel: "Chef boulanger / boulangère",
-              appellationCode: "12006",
-              score: 4.5,
-            },
-          ],
-          naf: establishment.nafDto.code,
-          nafLabel: "Fabrication de pain et de pâtisserie fraîche",
-          siret,
-          name: establishment.name,
-          customizedName: establishment.customizedName,
-          website: establishment.website,
-          additionalInformation: establishment.additionalInformation,
-          voluntaryToImmersion: establishment.voluntaryToImmersion,
-          fitForDisabledWorkers: establishment.fitForDisabledWorkers,
-          position: extraLocation.position,
-          address: extraLocation.address,
-          numberOfEmployeeRange: establishment.numberEmployeesRange,
-          contactMode: contact.contactMethod,
-          distance_m: undefined,
-          locationId: extraLocation.id,
-        });
+            establishmentWithOfferA1101_AtPosition.establishment.siret,
+            establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
+            establishmentWithOfferA1101_AtPosition.establishment.locations[0]
+              .id,
+          ),
+          {
+            rome: establishmentWithOfferA1101_AtPosition.offers[0].romeCode,
+            romeLabel:
+              establishmentWithOfferA1101_AtPosition.offers[0].romeLabel,
+            appellations: [
+              {
+                appellationLabel:
+                  establishmentWithOfferA1101_AtPosition.offers[0]
+                    .appellationLabel,
+                appellationCode:
+                  establishmentWithOfferA1101_AtPosition.offers[0]
+                    .appellationCode,
+                score: establishmentWithOfferA1101_AtPosition.offers[0].score,
+              },
+            ],
+            naf: establishmentWithOfferA1101_AtPosition.establishment.nafDto
+              .code,
+            nafLabel: "Activités des agences de travail temporaire",
+            siret: establishmentWithOfferA1101_AtPosition.establishment.siret,
+            name: establishmentWithOfferA1101_AtPosition.establishment.name,
+            customizedName:
+              establishmentWithOfferA1101_AtPosition.establishment
+                .customizedName,
+            website:
+              establishmentWithOfferA1101_AtPosition.establishment.website,
+            additionalInformation:
+              establishmentWithOfferA1101_AtPosition.establishment
+                .additionalInformation,
+            voluntaryToImmersion:
+              establishmentWithOfferA1101_AtPosition.establishment
+                .voluntaryToImmersion,
+            fitForDisabledWorkers:
+              establishmentWithOfferA1101_AtPosition.establishment
+                .fitForDisabledWorkers,
+            numberOfEmployeeRange:
+              establishmentWithOfferA1101_AtPosition.establishment
+                .numberEmployeesRange,
+            contactMode:
+              establishmentWithOfferA1101_AtPosition.contact.contactMethod,
+            distance_m: undefined,
+            address:
+              establishmentWithOfferA1101_AtPosition.establishment.locations[0]
+                .address,
+            position:
+              establishmentWithOfferA1101_AtPosition.establishment.locations[0]
+                .position,
+            locationId:
+              establishmentWithOfferA1101_AtPosition.establishment.locations[0]
+                .id,
+          },
+        );
       });
     });
   });
