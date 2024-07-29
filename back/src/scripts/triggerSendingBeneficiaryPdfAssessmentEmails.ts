@@ -10,6 +10,11 @@ import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGen
 import { SendBeneficiariesPdfAssessmentsEmails } from "../domains/establishment/use-cases/SendBeneficiariesPdfAssessmentsEmails";
 import { createLogger } from "../utils/logger";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { getDateRangeFromScriptParams } from "./utils";
+
+/**
+ *  we can pass date params to this script like this: pnpm back trigger-sending-beneficiary-assessment-emails 2024-07-01 2024-01-24
+ */
 
 const logger = createLogger(__filename);
 
@@ -44,7 +49,11 @@ const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
 
   const now = timeGateway.now();
   return sendBeneficiariesPdfAssesmentsEmails.execute({
-    conventionEndDate: {
+    conventionEndDate: getDateRangeFromScriptParams({
+      timeGateway,
+      logger,
+      scriptParams: process.argv,
+    }) ?? {
       from: addDays(now, 1),
       to: addDays(now, 2),
     },
