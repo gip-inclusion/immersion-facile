@@ -52,12 +52,32 @@ export const insertAgencySeed = async ({
 export const insertAgencies = async ({ uow }: { uow: UnitOfWork }) => {
   const peAgency = new AgencyDtoBuilder()
     .withId("40400c99-9c0b-bbbb-bb6d-6bb9bd300404")
-    .withName("PE")
+    .withName("PE Paris")
     .withQuestionnaireUrl("https://questionnaire.seed")
     .withSignature("PE agency signature")
     .withKind("pole-emploi")
     .withStatus("active")
     .withAddress(seedAddresses[0])
+    .build();
+
+  const capEmploiAgency = new AgencyDtoBuilder()
+    .withId("40400c99-9c0b-bbbb-bb6d-6bb9bd300606")
+    .withName("Cap emploi Paris")
+    .withQuestionnaireUrl("https://questionnaire.seed")
+    .withSignature("mission locale agency signature")
+    .withKind("cap-emploi")
+    .withStatus("active")
+    .withAddress(seedAddresses[1])
+    .build();
+
+  const cciAgency = new AgencyDtoBuilder()
+    .withId("40400c99-9c0b-bbbb-bb6d-6bb9bd300707")
+    .withName("CCI Paris")
+    .withQuestionnaireUrl("https://questionnaire.seed")
+    .withSignature("mission locale agency signature")
+    .withKind("cci")
+    .withStatus("active")
+    .withAddress(seedAddresses[2])
     .build();
 
   const missionLocaleAgency = new AgencyDtoBuilder()
@@ -67,10 +87,12 @@ export const insertAgencies = async ({ uow }: { uow: UnitOfWork }) => {
     .withSignature("mission locale agency signature")
     .withKind("mission-locale")
     .withStatus("active")
-    .withAddress(seedAddresses[1])
+    .withAddress(seedAddresses[3])
     .build();
 
   await uow.agencyRepository.insert(peAgency);
+  await uow.agencyRepository.insert(cciAgency);
+  await uow.agencyRepository.insert(capEmploiAgency);
   await uow.agencyRepository.insert(missionLocaleAgency);
 
   agencyIds = {

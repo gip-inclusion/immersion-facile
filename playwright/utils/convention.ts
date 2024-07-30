@@ -36,7 +36,7 @@ export const submitBasicConventionForm = async (
     "75",
   );
   const firstAgencyInDropdown = await page.locator(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId} > option:nth-child(2)`,
+    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId} > option:nth-child(1)`,
   );
   const agencyId: AgencyId | null =
     await firstAgencyInDropdown.getAttribute("value");
