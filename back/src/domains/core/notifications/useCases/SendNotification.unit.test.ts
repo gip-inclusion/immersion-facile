@@ -1,7 +1,7 @@
 import {
-  NotFoundError,
   TemplatedEmail,
   TemplatedSms,
+  errors,
   expectPromiseToFailWithError,
 } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -34,9 +34,7 @@ describe("SendNotification UseCase", () => {
       const kind = "email";
       await expectPromiseToFailWithError(
         sendNotification.execute({ id, kind }),
-        new NotFoundError(
-          `Notification with id ${id} and kind ${kind} not found`,
-        ),
+        errors.notification.notFound({ id, kind }),
       );
     });
 

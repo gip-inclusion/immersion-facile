@@ -5,10 +5,10 @@ import {
   User,
   authenticateWithInclusionCodeSchema,
   currentJwtVersions,
+  errors,
   frontRoutes,
   queryParamsAsString,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { notifyDiscord } from "../../../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../../UseCase";
 import { CreateNewEvent } from "../../../events/ports/EventBus";
@@ -76,9 +76,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     );
     if (existingOngoingOAuth)
       return this.#onOngoingOAuth(params, uow, existingOngoingOAuth);
-    throw new ForbiddenError(
-      `No ongoing OAuth with provided state : ${params.state}`,
-    );
+    throw errors.inclusionConnect.missingOAuth({ state: params.state });
   }
 
   async #onOngoingOAuth(
@@ -96,7 +94,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       });
 
     if (icIdTokenPayload.nonce !== existingOngoingOAuth.nonce)
-      throw new ForbiddenError("Nonce mismatch");
+      throw errors.inclusionConnect.nonceMismatch();
 
     const existingInclusionConnectedUser =
       await uow.userRepository.findByExternalId(icIdTokenPayload.sub);

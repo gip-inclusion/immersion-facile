@@ -6,6 +6,7 @@ import {
   Email,
   ModifierRole,
   Role,
+  ShortLinkId,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
@@ -21,7 +22,6 @@ import { ConventionRequiresModificationPayload } from "../../../core/events/even
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
-import { ShortLinkId } from "../../../core/short-link/ports/ShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";

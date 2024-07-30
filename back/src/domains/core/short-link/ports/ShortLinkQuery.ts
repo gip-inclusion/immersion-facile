@@ -1,6 +1,4 @@
-import { AbsoluteUrl, Flavor } from "shared";
-
-export type ShortLinkId = Flavor<string, "ShortLinkId">;
+import { AbsoluteUrl, ShortLinkId } from "shared";
 
 export interface ShortLinkQuery {
   getById(id: ShortLinkId): Promise<AbsoluteUrl>;

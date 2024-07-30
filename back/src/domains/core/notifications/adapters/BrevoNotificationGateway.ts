@@ -12,9 +12,9 @@ import {
   type TemplatedEmail,
   type TemplatedSms,
   emailTemplatesByName,
+  errors,
   smsTemplatesByName,
 } from "shared";
-import { BadRequestError } from "shared";
 import { HttpClient } from "shared-routes";
 import { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import {
@@ -95,7 +95,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
         notificationId,
         message: "No recipient for provided email",
       });
-      throw new BadRequestError("No recipient for provided email");
+      throw errors.notification.missingRecipient();
     }
     const cc = this.#filterAllowListAndConvertToRecipients(email.cc);
 

@@ -48,6 +48,7 @@ export * from "./email/validateEmail.dto";
 export * from "./email/validateEmail.schema";
 export * from "./envHelpers";
 export * from "./errors/managedErrors";
+export * from "./shortLink/shortLink.dto";
 export * from "./errors/httpErrors";
 export * from "./errors/errors";
 export * from "./featureFlag/featureFlags.dto";

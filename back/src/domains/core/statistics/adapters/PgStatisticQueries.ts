@@ -1,6 +1,5 @@
 import { sql } from "kysely";
-import { DataWithPagination, PaginationQueryParams } from "shared";
-import { BadRequestError } from "shared";
+import { DataWithPagination, PaginationQueryParams, errors } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { StatisticQueries } from "../ports/StatisticQueries";
 import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
@@ -36,9 +35,7 @@ export class PgStatisticQueries implements StatisticQueries {
     const totalPages = Math.ceil(Math.max(totalRecords, 1) / perPage);
 
     if (page > totalPages) {
-      throw new BadRequestError(
-        `Page number is more than the total number of pages (required page: ${page} > total pages: ${totalPages}, with ${perPage} results / page)`,
-      );
+      throw errors.establishment.badPagination({ page, totalPages, perPage });
     }
 
     const establishmentStats = await builder

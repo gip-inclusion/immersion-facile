@@ -1,13 +1,14 @@
 import {
   AbsoluteUrl,
+  AuthenticateWithInclusionCodeConnectParams,
   User,
   allowedStartInclusionConnectLoginPages,
+  errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -236,13 +237,14 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
   describe("wrong paths", () => {
     it("rejects the connection if no state match the provided one in DB", async () => {
+      const params: AuthenticateWithInclusionCodeConnectParams = {
+        code: "my-inclusion-code",
+        state: "my-state",
+        page: "agencyDashboard",
+      };
       await expectPromiseToFailWithError(
-        authenticateWithInclusionCode.execute({
-          code: "my-inclusion-code",
-          state: "my-state",
-          page: "agencyDashboard",
-        }),
-        new ForbiddenError("No ongoing OAuth with provided state : my-state"),
+        authenticateWithInclusionCode.execute(params),
+        errors.inclusionConnect.missingOAuth({ state: params.state }),
       );
     });
 
@@ -269,7 +271,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           state: "my-state",
           page: "agencyDashboard",
         }),
-        new ForbiddenError("Nonce mismatch"),
+        errors.inclusionConnect.nonceMismatch(),
       );
     });
   });

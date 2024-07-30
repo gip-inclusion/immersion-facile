@@ -1,5 +1,4 @@
-import { exhaustiveCheck } from "shared";
-import { NotFoundError } from "shared";
+import { errors, exhaustiveCheck } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -35,11 +34,7 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
       kind,
     );
 
-    if (!notification) {
-      throw new NotFoundError(
-        `Notification with id ${id} and kind ${kind} not found`,
-      );
-    }
+    if (!notification) throw errors.notification.notFound({ id, kind });
 
     switch (notification.kind) {
       case "email":

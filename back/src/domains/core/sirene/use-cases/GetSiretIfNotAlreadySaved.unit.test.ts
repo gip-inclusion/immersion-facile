@@ -1,5 +1,4 @@
-import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import { ConflictError } from "shared";
+import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
 import { InMemoryEstablishmentAggregateRepository } from "../../../establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -41,9 +40,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
       getSiretIfNotAlreadySaved.execute({
         siret: siretAlreadyInDb,
       }),
-      new ConflictError(
-        "Establishment with siret 11112222000033 already in db",
-      ),
+      errors.establishment.conflictError({ siret: siretAlreadyInDb }),
     );
   });
 

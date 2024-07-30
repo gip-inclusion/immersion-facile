@@ -1,6 +1,5 @@
 import { ignoreTabs } from "html-templates";
-import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import { BadRequestError } from "shared";
+import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
 import { HttpClient } from "shared-routes";
 import { makeEmailAllowListPredicate } from "../../../../config/bootstrap/appConfig";
 import { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
@@ -63,7 +62,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
 
       await expectPromiseToFailWithError(
         triggerSendEmail(),
-        new BadRequestError("No recipient for provided email"),
+        errors.notification.missingRecipient(),
       );
     });
 

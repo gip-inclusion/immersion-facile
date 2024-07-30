@@ -4,6 +4,7 @@ import {
   ApiConsumerId,
   FindSimilarConventionsParams,
   FindSimilarConventionsResponseDto,
+  ShortLinkId,
   SiretDto,
 } from "shared";
 import { NotFoundError } from "shared";
@@ -84,7 +85,6 @@ import { SendNotificationInBatch } from "../../domains/core/notifications/useCas
 import { HtmlToPdf } from "../../domains/core/pdf-generation/use-cases/HtmlToPdf";
 import { AppellationSearch } from "../../domains/core/rome/use-cases/AppellationSearch";
 import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
-import { ShortLinkId } from "../../domains/core/short-link/ports/ShortLinkQuery";
 import { GetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
 import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cases/GetEstablishmentStats";

@@ -1,6 +1,7 @@
 import {
   FormCompletionRoutes,
   displayRouteName,
+  errors,
   expectHttpResponseToEqual,
   formCompletionRoutes,
 } from "shared";
@@ -101,7 +102,7 @@ describe("formCompletion Routes", () => {
       expectHttpResponseToEqual(response, {
         status: 404,
         body: {
-          errors: `Did not find establishment with siret : ${siret} in siret API`,
+          errors: errors.siretApi.notFound({ siret }).message,
         },
       });
     });
@@ -124,7 +125,9 @@ describe("formCompletion Routes", () => {
       expectHttpResponseToEqual(response, {
         status: 409,
         body: {
-          errors: `Establishment with siret ${establishmentAggregate.establishment.siret} already in db`,
+          errors: errors.establishment.conflictError({
+            siret: establishmentAggregate.establishment.siret,
+          }).message,
         },
       });
     });

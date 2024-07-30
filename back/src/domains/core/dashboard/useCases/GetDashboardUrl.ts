@@ -2,9 +2,9 @@ import {
   AbsoluteUrl,
   DashboardUrlAndName,
   GetDashboardParams,
+  errors,
   getDashboardParams,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { UseCase } from "../../UseCase";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { DashboardGateway } from "../port/DashboardGateway";
@@ -50,9 +50,7 @@ export class GetDashboardUrl extends UseCase<
       );
 
     if (params.name === "establishmentRepresentativeConventions")
-      throw new ForbiddenError(
-        "establishmentRepresentativeConventions is not available for GetDashboardUrl",
-      );
+      throw errors.dashboard.establishmentConventionForbidden();
 
     return this.#dashboardGateway.getDashboardUrl(
       params.name,

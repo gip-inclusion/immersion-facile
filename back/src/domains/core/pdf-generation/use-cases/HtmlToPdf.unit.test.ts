@@ -4,7 +4,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError } from "shared";
 import { ZodError } from "zod";
 import { InMemoryPdfGeneratorGateway } from "../adapters/InMemoryPdfGeneratorGateway";
 import { HtmlToPdf } from "./HtmlToPdf";
@@ -32,8 +31,8 @@ describe("HtmlToPdf", () => {
   it("returns an error if the html content is empty", async () => {
     await expectPromiseToFailWithError(
       htmlToPdf.execute("", jwtPayload),
-      new BadRequestError(
-        new ZodError([
+      errors.inputs.badSchema({
+        zodError: new ZodError([
           {
             code: "too_small",
             minimum: 1,
@@ -44,7 +43,7 @@ describe("HtmlToPdf", () => {
             path: [],
           },
         ]),
-      ),
+      }),
     );
   });
 

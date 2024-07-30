@@ -8,11 +8,11 @@ import {
   SiretDto,
   SiretEstablishmentDto,
   castError,
+  errors,
   filterNotFalsy,
   propEq,
   queryParamsAsString,
 } from "shared";
-import { TooManyRequestApiError, UnavailableApiError } from "shared";
 import { AxiosConfig } from "../../../../config/bootstrap/appConfig";
 import {
   createAxiosInstance,
@@ -102,8 +102,8 @@ export class InseeSiretGateway implements SiretGateway {
           error: castError(error),
         });
         if (error?.initialError?.status === 429)
-          throw new TooManyRequestApiError(serviceName);
-        throw new UnavailableApiError(serviceName);
+          throw errors.siretApi.tooManyRequests({ serviceName });
+        throw errors.siretApi.unavailable({ serviceName });
       });
   }
 

@@ -1,20 +1,17 @@
 import {
   AbsoluteUrl,
   CreateConventionMagicLinkPayloadProperties,
+  ShortLinkId,
 } from "shared";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { UnitOfWork } from "../unit-of-work/ports/UnitOfWork";
 import { ShortLinkIdGeneratorGateway } from "./ports/ShortLinkIdGeneratorGateway";
-import { ShortLinkId } from "./ports/ShortLinkQuery";
 
 export const makeShortLinkUrl = (
   config: AppConfig,
   shortLinkId: ShortLinkId,
 ): AbsoluteUrl => `${config.immersionFacileBaseUrl}/api/to/${shortLinkId}`;
-
-export const shortLinkNotFoundMessage = (shortLinkId: ShortLinkId): string =>
-  `Short link '${shortLinkId}' not found.`;
 
 type MakeMagicLinkAndProvidesShortLinkProperties = {
   conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties;

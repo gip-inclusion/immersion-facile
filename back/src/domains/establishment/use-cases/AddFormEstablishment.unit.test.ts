@@ -168,7 +168,7 @@ describe("Add FormEstablishment", () => {
 
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
-        new Error("Le service Sirene API n'est pas disponible"),
+        errors.siretApi.unavailable({ serviceName: "Sirene API" }),
       );
     });
   });

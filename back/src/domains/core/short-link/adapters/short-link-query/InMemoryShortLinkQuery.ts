@@ -1,7 +1,5 @@
-import { AbsoluteUrl } from "shared";
-import { NotFoundError } from "shared";
-import { shortLinkNotFoundMessage } from "../../ShortLink";
-import { ShortLinkId, ShortLinkQuery } from "../../ports/ShortLinkQuery";
+import { AbsoluteUrl, ShortLinkId, errors } from "shared";
+import { ShortLinkQuery } from "../../ports/ShortLinkQuery";
 
 export class InMemoryShortLinkQuery implements ShortLinkQuery {
   protected shortLinks: Partial<Record<ShortLinkId, AbsoluteUrl>> = {};
@@ -9,7 +7,7 @@ export class InMemoryShortLinkQuery implements ShortLinkQuery {
   public async getById(shortLinkId: ShortLinkId): Promise<AbsoluteUrl> {
     const longLink = this.shortLinks[shortLinkId];
     if (longLink) return longLink;
-    throw new NotFoundError(shortLinkNotFoundMessage(shortLinkId));
+    throw errors.shortLink.notFound({ shortLinkId });
   }
 
   public getShortLinks(): Partial<Record<ShortLinkId, AbsoluteUrl>> {
