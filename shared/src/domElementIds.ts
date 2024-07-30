@@ -552,10 +552,13 @@ export const domElementIds = {
       inclusionConnectButton: "im-login-form__inclusion-connect-button--admin",
     },
     agencyTab: {
-      agencyUsersTable: "im-agency-users-table",
+      editAgencyUsersTable: "im-form-edit-agency__users-table",
       editAgencyAutocompleteInput: "im-form-edit-agency__agency-autocomplete",
-      editAgencyUserRoleButton:
-        "im-form-edit-agency__users-table__modify-button",
+      editAgencyManageUserModal: "im-form-edit-agency__manage-user-modal",
+      editAgencyUserRoleButton: "im-form-edit-agency__users-table-edit-button",
+      editAgencyUserRoleSubmitButton:
+        "im-form-edit-agency__users-submit-button",
+      editAgencyManageUserCheckbox: "im-form-edit-agency__manage-user-checkbox",
       editAgencyForm: "im-form-edit-agency",
       activateAgencySelector: "agency-selector",
       editAgencyFormStatusSelector: "im-form-edit-agency__status-select",

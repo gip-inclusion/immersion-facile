@@ -398,7 +398,9 @@ describe("Agency registration for authenticated users", () => {
   });
 
   const expectIsUpdatingUserAgencyToBe = (expected: boolean) => {
-    expect(icUsersAdminSelectors.isUpdating(store.getState())).toBe(expected);
+    expect(icUsersAdminSelectors.isUpdatingIcUserAgency(store.getState())).toBe(
+      expected,
+    );
   };
 
   const expectIsFetchingIcUsersNeedingReviewToBe = (expected: boolean) => {

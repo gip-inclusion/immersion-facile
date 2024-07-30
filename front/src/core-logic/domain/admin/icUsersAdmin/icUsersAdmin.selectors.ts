@@ -21,7 +21,7 @@ const agencyUsers = createSelector(
   ({ agencyUsers }) => agencyUsers,
 );
 
-const isUpdating = createSelector(
+const isUpdatingIcUserAgency = createSelector(
   icUsersAdminState,
   ({ isUpdatingIcUserAgency }) => isUpdatingIcUserAgency,
 );
@@ -63,5 +63,5 @@ export const icUsersAdminSelectors = {
   agenciesNeedingReviewForSelectedUser,
   feedback: createSelector(icUsersAdminState, ({ feedback }) => feedback),
   agencyUsers,
-  isUpdating,
+  isUpdatingIcUserAgency,
 };
