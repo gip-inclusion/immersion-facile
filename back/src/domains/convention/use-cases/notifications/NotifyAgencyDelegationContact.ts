@@ -1,10 +1,10 @@
 import {
   TallyForm,
   TemplatedEmail,
+  errors,
   getTallyFormValueOf,
   tallyFormSchema,
 } from "shared";
-import { BadRequestError } from "shared";
 import { DelegationContactRepository } from "../../../agency/ports/DelegationContactRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -50,8 +50,7 @@ export class NotifyAgencyDelegationContact extends TransactionalUseCase<TallyFor
     const delegationEmail =
       await delegationContactRepository.getEmailByProvince(province);
 
-    if (!delegationEmail)
-      throw new BadRequestError(`Province ${province} not found`);
+    if (!delegationEmail) throw errors.delegation.missingEmail({ province });
 
     return {
       kind: "AGENCY_DELEGATION_CONTACT_INFORMATION",
@@ -75,6 +74,6 @@ export class NotifyAgencyDelegationContact extends TransactionalUseCase<TallyFor
 
 const getTallyFormValueOrThrow = (tallyForm: TallyForm, label: string) => {
   const value = getTallyFormValueOf(tallyForm, label);
-  if (!value) throw new BadRequestError(`No value found for label "${label}"`);
+  if (!value) throw errors.delegation.missingLabel({ label });
   return value;
 };

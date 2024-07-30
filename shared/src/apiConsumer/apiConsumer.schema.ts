@@ -10,6 +10,7 @@ import { localization, zStringMinLength1 } from "../zodUtils";
 import {
   ApiConsumer,
   ApiConsumerContact,
+  ApiConsumerSubscriptionId,
   CallbackHeaders,
   CreateWebhookSubscription,
   WebhookSubscription,
@@ -128,3 +129,6 @@ export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
   createdAt: zStringMinLength1.regex(dateRegExp),
   rights: apiConsumerRightsSchema,
 });
+
+export const apiConsumerSubscriptionIdSchema: z.Schema<ApiConsumerSubscriptionId> =
+  z.string();

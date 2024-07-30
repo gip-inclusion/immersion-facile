@@ -2,7 +2,7 @@ import {
   AgencyDtoBuilder,
   AssessmentDto,
   ConventionDtoBuilder,
-  NotFoundError,
+  errors,
   expectPromiseToFailWithError,
 } from "shared";
 import {
@@ -60,9 +60,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   it("Throw when no convention were found", async () => {
     await expectPromiseToFailWithError(
       usecase.execute({ assessment }),
-      new NotFoundError(
-        `Unable to send mail. No convention were found with id : ${assessment.conventionId}`,
-      ),
+      errors.convention.notFound({ conventionId: assessment.conventionId }),
     );
 
     expectSavedNotificationsAndEvents({
@@ -75,9 +73,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
     await expectPromiseToFailWithError(
       usecase.execute({ assessment }),
-      new NotFoundError(
-        `Unable to send mail. No agency were found with id : ${convention.agencyId}`,
-      ),
+      errors.agency.notFound({ agencyId: convention.agencyId }),
     );
 
     expectSavedNotificationsAndEvents({

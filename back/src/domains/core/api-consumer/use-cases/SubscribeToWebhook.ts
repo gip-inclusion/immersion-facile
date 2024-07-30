@@ -3,9 +3,9 @@ import {
   CreateWebhookSubscription,
   WebhookSubscription,
   createWebhookSubscriptionSchema,
+  errors,
   eventToRightName,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { TransactionalUseCase } from "../../UseCase";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -32,7 +32,7 @@ export class SubscribeToWebhook extends TransactionalUseCase<
     uow: UnitOfWork,
     payload: ApiConsumer,
   ) {
-    if (!payload) throw new ForbiddenError("No JWT payload provided");
+    if (!payload) throw errors.user.noJwtProvided();
 
     const rightName = eventToRightName(webhookSubscription.subscribedEvent);
 

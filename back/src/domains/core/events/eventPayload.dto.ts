@@ -2,6 +2,7 @@ import {
   AgencyModifierRole,
   ConventionDto,
   ConventionId,
+  ReminderKind,
   Role,
   SignatoryRole,
 } from "shared";
@@ -26,15 +27,6 @@ export type SignatoryRequestModificationPayload =
 export type ConventionRequiresModificationPayload =
   | AgencyActorRequestModificationPayload
   | SignatoryRequestModificationPayload;
-
-export const reminderKinds = [
-  "FirstReminderForSignatories",
-  "LastReminderForSignatories",
-  "FirstReminderForAgency",
-  "LastReminderForAgency",
-] as const;
-
-export type ReminderKind = (typeof reminderKinds)[number];
 
 export type ConventionReminderPayload = {
   reminderKind: ReminderKind;

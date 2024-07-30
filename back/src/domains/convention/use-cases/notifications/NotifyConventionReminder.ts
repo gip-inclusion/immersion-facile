@@ -10,6 +10,7 @@ import {
   type ExtractFromExisting,
   type GenericActor,
   type Phone,
+  ReminderKind,
   type Role,
   type TemplatedEmail,
   type TemplatedSms,
@@ -19,14 +20,10 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import {
-  ConventionReminderPayload,
-  ReminderKind,
-} from "../../../core/events/eventPayload.dto";
+import { ConventionReminderPayload } from "../../../core/events/eventPayload.dto";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
 import {
   NotificationContentAndFollowedIds,
@@ -160,9 +157,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     if (conventionRead.status !== "IN_REVIEW")
-      throw new ForbiddenError(
-        forbiddenUnsupportedStatusMessage(conventionRead, reminderKind),
-      );
+      throw errors.convention.forbiddenReminder({
+        convention: conventionRead,
+        kind: reminderKind,
+      });
 
     await this.#saveNotificationsBatchAndRelatedEvent(
       uow,
@@ -201,9 +199,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(conventionRead.status))
-      throw new ForbiddenError(
-        forbiddenUnsupportedStatusMessage(conventionRead, kind),
-      );
+      throw errors.convention.forbiddenReminder({
+        convention: conventionRead,
+        kind,
+      });
 
     const signatories = Object.values(conventionRead.signatories);
 
@@ -347,12 +346,6 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     };
   }
 }
-
-export const forbiddenUnsupportedStatusMessage = (
-  convention: ConventionDto,
-  kind: ReminderKind,
-): string =>
-  `Convention with id: '${convention.id}' and status: '${convention.status}' is not supported for reminder ${kind}.`;
 
 export const toSignatoriesSummary = ({
   signatories,

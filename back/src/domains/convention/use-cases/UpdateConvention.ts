@@ -8,7 +8,6 @@ import {
   errors,
   updateConventionRequestSchema,
 } from "shared";
-import { BadRequestError, ForbiddenError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -40,9 +39,7 @@ export class UpdateConvention extends TransactionalUseCase<
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
     if (convention.status !== minimalValidStatus)
-      throw new ForbiddenError(
-        `Convention ${convention.id} with modifications should have status ${minimalValidStatus}`,
-      );
+      throw errors.convention.updateBadStatusInParams({ id: convention.id });
 
     const conventionFromRepo = await uow.conventionRepository.getById(
       convention.id,
@@ -51,11 +48,10 @@ export class UpdateConvention extends TransactionalUseCase<
     if (!conventionFromRepo)
       throw errors.convention.notFound({ conventionId: convention.id });
 
-    if (conventionFromRepo.status !== "DRAFT") {
-      throw new BadRequestError(
-        `Convention ${conventionFromRepo.id} cannot be modified as it has status ${conventionFromRepo.status}`,
-      );
-    }
+    if (conventionFromRepo.status !== "DRAFT")
+      throw errors.convention.updateBadStatusInRepo({
+        id: conventionFromRepo.id,
+      });
 
     const triggeredBy: TriggeredBy =
       "userId" in jwtPayload
@@ -94,9 +90,7 @@ const throwIfNotAllowed = async (
 
   if ("applicationId" in jwtPayload) {
     if (jwtPayload.applicationId !== convention.id)
-      throw new ForbiddenError(
-        `User is not allowed to update convention ${convention.id}`,
-      );
+      throw errors.convention.updateForbidden({ id: convention.id });
     return;
   }
 

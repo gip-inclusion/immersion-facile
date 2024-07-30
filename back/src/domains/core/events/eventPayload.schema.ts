@@ -3,6 +3,7 @@ import {
   allRoles,
   allSignatoryRoles,
   conventionSchema,
+  reminderKinds,
   zTrimmedString,
 } from "shared";
 import { z } from "zod";
@@ -11,7 +12,6 @@ import {
   ConventionReminderPayload,
   ConventionRequiresModificationPayload,
   SignatoryRequestModificationPayload,
-  reminderKinds,
 } from "./eventPayload.dto";
 
 const agencyActorRequestConventionModificationPayloadSchema: z.Schema<AgencyActorRequestModificationPayload> =

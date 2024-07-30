@@ -3,11 +3,11 @@ import {
   ConventionDto,
   ConventionId,
   ConventionStatus,
+  ReminderKind,
   castError,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { ReminderKind } from "../../core/events/eventPayload.dto";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
