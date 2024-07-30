@@ -2,6 +2,24 @@ import { AddressDto } from "shared";
 
 export const seedAddresses: AddressDto[] = [
   {
+    city: "Paris",
+    departmentCode: "75",
+    postcode: "75001",
+    streetNumberAndAddress: "1 rue de Rivoli",
+  },
+  {
+    city: "Paris",
+    postcode: "75018",
+    streetNumberAndAddress: "189 Rue d'Aubervilliers",
+    departmentCode: "75",
+  },
+  {
+    city: "Paris",
+    postcode: "75012",
+    streetNumberAndAddress: "Rue Abel",
+    departmentCode: "75",
+  },
+  {
     city: "Bourg-en-Bresse",
     postcode: "01000",
     streetNumberAndAddress: "323 Avenue de Parme",
@@ -1021,24 +1039,6 @@ export const seedAddresses: AddressDto[] = [
     postcode: "74940",
     streetNumberAndAddress: "Route de Thônes",
     departmentCode: "74",
-  },
-  {
-    city: "Paris",
-    departmentCode: "75",
-    postcode: "75001",
-    streetNumberAndAddress: "1 rue de Rivoli",
-  },
-  {
-    city: "Paris",
-    postcode: "75018",
-    streetNumberAndAddress: "189 Rue d'Aubervilliers",
-    departmentCode: "75",
-  },
-  {
-    city: "Paris",
-    postcode: "75012",
-    streetNumberAndAddress: "Rue Abel",
-    departmentCode: "75",
   },
   {
     city: "Paris",
