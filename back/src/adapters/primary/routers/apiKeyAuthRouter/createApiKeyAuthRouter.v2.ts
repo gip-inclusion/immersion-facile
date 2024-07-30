@@ -14,7 +14,7 @@ import {
   isApiConsumerAllowed,
   pipeWithValue,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
+// import { ForbiddenError, NotFoundError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";
@@ -70,7 +70,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
             consumerKind: "READ",
           })
         )
-          throw new ForbiddenError();
+          throw errors.apiConsumer.forbidden();
         return pipeWithValue(
           req.query,
           (searchImmersionRequest) => {
@@ -104,7 +104,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
             consumerKind: "READ",
           })
         )
-          throw new ForbiddenError();
+          throw errors.apiConsumer.forbidden();
 
         const locationId = await getFirstLocationIdOrThrow(
           deps.uowPerformer,
@@ -134,7 +134,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
             consumerKind: "READ",
           })
         )
-          throw new ForbiddenError();
+          throw errors.apiConsumer.forbidden();
         return pipeWithValue(
           validateAndParseZodSchemaV2(
             contactEstablishmentPublicV2Schema,
@@ -161,9 +161,9 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
           rightName: "convention",
           consumerKind: "READ",
         })
-      ) {
-        throw new ForbiddenError();
-      }
+      )
+        throw errors.apiConsumer.forbidden();
+
       return pipeWithValue(
         await deps.useCases.getConventionForApiConsumer.execute(
           {
@@ -184,9 +184,9 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
           rightName: "convention",
           consumerKind: "READ",
         })
-      ) {
-        throw new ForbiddenError();
-      }
+      )
+        throw errors.apiConsumer.forbidden();
+
       return pipeWithValue(
         await deps.useCases.getConventionsForApiConsumer.execute(
           getConventionsByFiltersV2ToDomain(req.query),
@@ -227,9 +227,9 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
           rightName: rightNeeded,
           consumerKind: "SUBSCRIPTION",
         })
-      ) {
-        throw new ForbiddenError();
-      }
+      )
+        throw errors.apiConsumer.forbidden();
+
       await deps.useCases.subscribeToWebhook.execute(req.body, req.apiConsumer);
     }),
   );
@@ -245,9 +245,9 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
             keys(apiConsumer.rights).filter((rightName) =>
               apiConsumer.rights[rightName].kinds.includes("SUBSCRIPTION"),
             ).length === 0)
-        ) {
-          throw new ForbiddenError();
-        }
+        )
+          throw errors.apiConsumer.forbidden();
+
         return deps.useCases.listActiveSubscriptions.execute(
           undefined,
           apiConsumer,
@@ -281,13 +281,12 @@ const getFirstLocationIdOrThrow = async (
 
     if (!aggregate) throw errors.establishment.notFound({ siret });
 
-    if (aggregate.establishment.locations[0]?.id) {
-      return aggregate.establishment.locations[0].id;
+    const firstLocationId = aggregate.establishment.locations.at(0)?.id;
+    if (firstLocationId) {
+      return firstLocationId;
     }
 
-    throw new NotFoundError(
-      `No location found for establishment with siret: ${siret}`,
-    );
+    throw errors.establishment.noLocation({ siret });
   });
 };
 

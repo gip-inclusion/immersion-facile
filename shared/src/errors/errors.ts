@@ -1,6 +1,8 @@
+import { ZodError } from "zod";
 import { LocationId } from "../address/address.dto";
 import { AgencyId } from "../agency/agency.dto";
 import type {
+  ConventionDto,
   ConventionId,
   ConventionStatus,
 } from "../convention/convention.dto";
@@ -22,9 +24,13 @@ import {
 
 export const errors = {
   convention: {
+    notValidated: ({ convention }: { convention: ConventionDto }) =>
+      new BadRequestError(
+        `La convention '${convention.id}' n'est pas validée. Son status est '${convention.status}'.`,
+      ),
     notFound: ({ conventionId }: { conventionId: ConventionId }) =>
       new NotFoundError(
-        `Aucune convention trouvée avec l'identifiant : ${conventionId}. Êtes-vous sûr d'avoir bien tapé votre identifiant de convention ?`,
+        `Aucune convention trouvée avec l'identifiant '${conventionId}'. Êtes-vous sûr d'avoir bien tapé votre identifiant de convention ?`,
       ),
     conflict: ({ conventionId }: { conventionId: ConventionId }) =>
       new ConflictError(
@@ -79,6 +85,24 @@ export const errors = {
       ),
   },
   establishment: {
+    invalidGeoParams: () =>
+      new BadRequestError("Les paramètres géographiques ne sont pas valides."),
+    outOfMaxLimit: ({ kind, maxLimit }: { kind: string; maxLimit: number }) =>
+      new BadRequestError(
+        `La requête '${kind}' n'autorise pas une limite de '${maxLimit}'.`,
+      ),
+    missingAggregate: ({ siret }: { siret: SiretDto }) =>
+      new NotFoundError(
+        `L'établissement avec le siret '${siret}' n'existe pas dans le stockage des établissements.`,
+      ),
+    pgCreateConflict: ({ siret, error }: { siret: SiretDto; error: Error }) =>
+      new ConflictError(
+        `Il n'est pas possible de créer l'établissement avec le siret '${siret}'. Erreur: '${error}'.`,
+      ),
+    missingOrClosed: ({ siret }: { siret: SiretDto }) =>
+      new BadRequestError(
+        `Ce SIRET (${siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.aaaaaaaaaaaaa`,
+      ),
     notFound: ({ siret }: { siret: SiretDto }) =>
       new NotFoundError(
         `Aucune entreprise trouvée avec le siret : ${siret}. Êtes-vous sûr d'avoir bien tapé votre siret ?`,
@@ -142,6 +166,8 @@ export const errors = {
       new NotFoundError(
         `L'addresse '${locationId}' n'existe pas pour l'entreprise '${siret}'.`,
       ),
+    noLocation: ({ siret }: { siret: SiretDto }) =>
+      new NotFoundError(`L'établissement '${siret}' n'a pas de localisations.`),
     forbiddenUnavailable: ({
       siret,
     }: {
@@ -273,5 +299,16 @@ export const errors = {
   establishmentGroup: {
     missingBySlug: ({ groupSlug }: { groupSlug: GroupSlug }) =>
       new NotFoundError(`Aucun group avec le terme ${groupSlug} trouvé.`),
+  },
+  apiConsumer: {
+    forbidden: () => new ForbiddenError(),
+    notEnoughPrivilege: () =>
+      new ForbiddenError(
+        "Vous n'avez pas le droit d'accès à cette route. Contactez le support Immersion Facilitée si vous voulez plus de privilèges.",
+      ),
+  },
+  inputs: {
+    badSchema: ({ zodError }: { zodError: ZodError }) =>
+      new BadRequestError(zodError.toString()),
   },
 };

@@ -1,5 +1,4 @@
 import { FormEstablishmentDto, SiretDto, errors, propEq } from "shared";
-import { ConflictError } from "shared";
 import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 
 export class InMemoryFormEstablishmentRepository
@@ -8,10 +7,8 @@ export class InMemoryFormEstablishmentRepository
   #formEstablishments: FormEstablishmentDto[] = [];
 
   public async create(dto: FormEstablishmentDto): Promise<void> {
-    if (await this.getBySiret(dto.siret)) {
-      const message = `Immersion DTO with siret ${dto.siret} is already in the list`;
-      throw new ConflictError(message);
-    }
+    if (await this.getBySiret(dto.siret))
+      throw errors.establishment.conflictError({ siret: dto.siret });
 
     this.#formEstablishments.push(dto);
   }

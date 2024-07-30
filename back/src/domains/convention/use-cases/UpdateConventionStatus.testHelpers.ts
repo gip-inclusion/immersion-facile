@@ -2,6 +2,7 @@ import { values } from "ramda";
 import {
   AgencyDtoBuilder,
   AgencyRole,
+  BadRequestError,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -11,6 +12,7 @@ import {
   ExcludeFromExisting,
   InclusionConnectedUser,
   Role,
+  UnauthorizedError,
   UpdateConventionStatusRequestDto,
   allRoles,
   conventionStatuses,
@@ -20,7 +22,6 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { BadRequestError, UnauthorizedError } from "shared";
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";

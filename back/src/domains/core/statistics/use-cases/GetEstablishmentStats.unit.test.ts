@@ -1,5 +1,5 @@
-import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import { BadRequestError, ForbiddenError } from "shared";
+import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
+import { ZodError } from "zod";
 import { ApiConsumerBuilder } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -47,9 +47,7 @@ describe("GetEstablishmentStats", () => {
         },
         apiConsumerWithoutReadRight,
       ),
-      new ForbiddenError(
-        "You don't have sufficient rights to access this route. Contact support if you want more privileges.",
-      ),
+      errors.apiConsumer.notEnoughPrivilege(),
     );
   });
 
@@ -62,23 +60,19 @@ describe("GetEstablishmentStats", () => {
         },
         apiConsumer,
       ),
-      new BadRequestError(
-        JSON.stringify(
-          [
-            {
-              code: "too_big",
-              maximum: 5000,
-              type: "number",
-              inclusive: true,
-              exact: false,
-              message: "Number must be less than or equal to 5000",
-              path: ["perPage"],
-            },
-          ],
-          null,
-          2,
-        ),
-      ),
+      errors.inputs.badSchema({
+        zodError: new ZodError([
+          {
+            code: "too_big",
+            maximum: 5000,
+            type: "number",
+            inclusive: true,
+            exact: false,
+            message: "Number must be less than or equal to 5000",
+            path: ["perPage"],
+          },
+        ]),
+      }),
     );
   });
 

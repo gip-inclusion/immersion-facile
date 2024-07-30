@@ -2,9 +2,9 @@ import {
   ApiConsumer,
   DataWithPagination,
   PaginationQueryParams,
+  errors,
   paginationRequiredQueryParamsSchema,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { createTransactionalUseCase } from "../../UseCase";
 
 export type EstablishmentStat = {
@@ -28,9 +28,7 @@ export const makeGetEstablishmentStats = createTransactionalUseCase<
   },
   async (paginationParams, { uow }, apiConsumer) => {
     if (!apiConsumer.rights.statistics.kinds.includes("READ"))
-      throw new ForbiddenError(
-        "You don't have sufficient rights to access this route. Contact support if you want more privileges.",
-      );
+      throw errors.apiConsumer.notEnoughPrivilege();
     return uow.statisticQueries.getEstablishmentStats(paginationParams);
   },
 );

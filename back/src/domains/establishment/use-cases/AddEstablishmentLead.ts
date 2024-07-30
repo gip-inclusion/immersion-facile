@@ -1,5 +1,4 @@
-import { WithConventionDto, withConventionSchema } from "shared";
-import { BadRequestError } from "shared";
+import { WithConventionDto, errors, withConventionSchema } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -22,9 +21,7 @@ export class AddEstablishmentLead extends TransactionalUseCase<WithConventionDto
     uow: UnitOfWork,
   ): Promise<void> {
     if (convention.status !== "ACCEPTED_BY_VALIDATOR")
-      throw new BadRequestError(
-        `La convention ${convention.id} n'est pas validée. Son status est : ${convention.status}`,
-      );
+      throw errors.convention.notValidated({ convention });
 
     const alreadyExistingLead =
       await uow.establishmentLeadRepository.getBySiret(convention.siret);

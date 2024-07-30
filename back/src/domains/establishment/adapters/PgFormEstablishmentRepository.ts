@@ -7,7 +7,6 @@ import {
   errors,
   formEstablishmentSchema,
 } from "shared";
-import { ConflictError } from "shared";
 import {
   KyselyDb,
   jsonBuildObject,
@@ -63,9 +62,11 @@ export class PgFormEstablishmentRepository
           _message: `Cannot create form establishment with siret ${formEstablishment.siret}`,
           ...castedError,
         });
-        throw new ConflictError(
-          `Cannot create form establishment with siret ${formEstablishment.siret}. Error: ${castedError} `,
-        );
+
+        throw errors.establishment.pgCreateConflict({
+          siret: formEstablishment.siret,
+          error: castedError,
+        });
       });
   }
 
