@@ -125,7 +125,7 @@ jobs:
       SIRENE_REPOSITORY: ANNUAIRE_DES_ENTREPRISES
       SIRENE_ENDPOINT: https://api.insee.fr/entreprises/sirene/V3
       SIRENE_BEARER_TOKEN: ${{ secrets.SIRENE_BEARER_TOKEN }}
-      EVENT_CRAWLER_PERIOD_MS: 1000
+      EVENT_CRAWLER_PERIOD_MS: 600
     services:
       postgres:
         image: postgis/postgis:13-master
