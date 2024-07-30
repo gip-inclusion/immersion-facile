@@ -3,9 +3,11 @@ import {
   AbsoluteUrl,
   BrevoInboundBody,
   DiscussionBuilder,
+  ShortLinkId,
   TechnicalRoutes,
   ValidateEmailStatus,
   displayRouteName,
+  errors,
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
@@ -19,8 +21,6 @@ import {
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
-import { shortLinkNotFoundMessage } from "../../../../domains/core/short-link/ShortLink";
-import { ShortLinkId } from "../../../../domains/core/short-link/ports/ShortLinkQuery";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
@@ -234,7 +234,8 @@ describe("technical router", () => {
 
       expect(response.status).toBe(404);
       expectObjectsToMatch(response.body, {
-        errors: shortLinkNotFoundMessage(expectedShortLinkId),
+        errors: errors.shortLink.notFound({ shortLinkId: expectedShortLinkId })
+          .message,
       });
     });
   });

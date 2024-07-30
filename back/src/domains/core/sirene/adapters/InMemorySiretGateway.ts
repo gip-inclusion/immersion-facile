@@ -4,9 +4,9 @@ import {
   NumberEmployeesRange,
   SiretDto,
   SiretEstablishmentDto,
+  errors,
   tooManySirenRequestsSiret,
 } from "shared";
-import { TooManyRequestApiError, UnavailableApiError } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { SiretGateway } from "../ports/SirenGateway";
 
@@ -111,8 +111,8 @@ export class InMemorySiretGateway implements SiretGateway {
       const serviceName = "Sirene API";
       logger.error({ error, message: `Error fetching siret ${siret}` });
       if (error?.initialError?.status === 429)
-        throw new TooManyRequestApiError(serviceName);
-      throw new UnavailableApiError(serviceName);
+        throw errors.siretApi.tooManyRequests({ serviceName });
+      throw errors.siretApi.unavailable({ serviceName });
     }
   }
 

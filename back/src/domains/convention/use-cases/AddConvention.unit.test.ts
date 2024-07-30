@@ -203,7 +203,7 @@ describe("Add Convention", () => {
 
       await expectPromiseToFailWithError(
         addConvention.execute({ convention: validConvention }),
-        new Error("Le service Sirene API n'est pas disponible"),
+        errors.siretApi.unavailable({ serviceName: "Sirene API" }),
       );
     });
   });

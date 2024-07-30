@@ -1,5 +1,5 @@
-import { GetSiretRequestDto, SiretEstablishmentDto } from "shared";
-import { NotFoundError } from "shared";
+import { GetSiretRequestDto, SiretEstablishmentDto, errors } from "shared";
+
 import { SiretGateway } from "../ports/SirenGateway";
 
 export const getSiretEstablishmentFromApi = async (
@@ -11,11 +11,7 @@ export const getSiretEstablishmentFromApi = async (
     includeClosedEstablishments,
   );
 
-  if (!siretEstablishment) {
-    throw new NotFoundError(
-      `Did not find establishment with siret : ${siret} in siret API`,
-    );
-  }
+  if (!siretEstablishment) throw errors.siretApi.notFound({ siret });
 
   return siretEstablishment;
 };

@@ -3,10 +3,10 @@ import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
@@ -125,11 +125,11 @@ describe("PgStatisticQueries", () => {
         };
         await expectPromiseToFailWithError(
           pgStatisticQueries.getEstablishmentStats(queryParams),
-          new BadRequestError(
-            `Page number is more than the total number of pages (required page: ${
-              queryParams.page
-            } > total pages: ${2}, with ${queryParams.perPage} results / page)`,
-          ),
+          errors.establishment.badPagination({
+            page: queryParams.page,
+            perPage: queryParams.perPage,
+            totalPages: 2,
+          }),
         );
       });
 

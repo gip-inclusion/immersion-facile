@@ -1,5 +1,4 @@
-import { AbsoluteUrl } from "shared";
-import { ShortLinkId } from "../../ports/ShortLinkQuery";
+import { AbsoluteUrl, ShortLinkId } from "shared";
 import { ShortLinkRepository } from "../../ports/ShortLinkRepository";
 import { InMemoryShortLinkQuery } from "../short-link-query/InMemoryShortLinkQuery";
 

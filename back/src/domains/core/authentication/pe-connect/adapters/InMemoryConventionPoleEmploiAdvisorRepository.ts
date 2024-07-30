@@ -1,5 +1,4 @@
-import { ConventionId, PeExternalId } from "shared";
-import { NotFoundError } from "shared";
+import { ConventionId, PeExternalId, errors } from "shared";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
@@ -72,9 +71,7 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
         .filter(matchPeExternalId(peExternalId))
         .find(isOpenEntity);
     if (entity) return entity;
-    throw new NotFoundError(
-      "There is no open France Travail advisor entity linked to this OAuth peExternalId",
-    );
+    throw errors.convention.missingFTAdvisor({ ftExternalId: peExternalId });
   }
 
   #upsertWithClosedConvention = (

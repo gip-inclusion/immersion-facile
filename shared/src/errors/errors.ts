@@ -8,22 +8,39 @@ import type {
 } from "../convention/convention.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
+import { PeExternalId } from "../federatedIdentities/federatedIdentity.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { GroupSlug } from "../group/group.dto";
 import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import { NotificationKind } from "../notifications/notifications.dto";
 import { Role } from "../role/role.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { ShortLinkId } from "../shortLink/shortLink.dto";
 import { SiretDto } from "../siret/siret";
 import {
   BadRequestError,
   ConflictError,
   ForbiddenError,
   NotFoundError,
+  TooManyRequestApiError,
   UnauthorizedError,
+  UnavailableApiError,
 } from "./httpErrors";
 
 export const errors = {
+  inclusionConnect: {
+    missingOAuth: ({ state }: { state: string }) =>
+      new ForbiddenError(
+        `Il n'y a pas d'OAuth en cours avec l'état '${state}'.`,
+      ),
+    nonceMismatch: () =>
+      new ForbiddenError("Il y a un décalage sur le 'Nonce'."),
+  },
   convention: {
+    missingFTAdvisor: ({ ftExternalId }: { ftExternalId: PeExternalId }) =>
+      new NotFoundError(
+        `Il n'y a pas de conseiller France Travail attaché à l'identifiant OAuth ftExternalId '${ftExternalId}'.`,
+      ),
     notValidated: ({ convention }: { convention: ConventionDto }) =>
       new BadRequestError(
         `La convention '${convention.id}' n'est pas validée. Son status est '${convention.status}'.`,
@@ -85,6 +102,14 @@ export const errors = {
       ),
   },
   establishment: {
+    badPagination: ({
+      page,
+      perPage,
+      totalPages,
+    }: { page: number; totalPages: number; perPage: number }) =>
+      new BadRequestError(
+        `Le numéro de la page est plus grand que le nombre total de pages (page demandée: ${page} > pages totales: ${totalPages}, avec ${perPage} résultats / page).`,
+      ),
     invalidGeoParams: () =>
       new BadRequestError("Les paramètres géographiques ne sont pas valides."),
     outOfMaxLimit: ({ kind, maxLimit }: { kind: string; maxLimit: number }) =>
@@ -246,12 +271,6 @@ export const errors = {
         `L'utilisateur '${userId}' n'est pas administrateur Immersion Facilitée.`,
       ),
   },
-  // location: {
-  //   notFound: ({ siret }: { siret: SiretDto }) =>
-  //     new NotFoundError(
-  //       `Aucun emplacement trouvé pour l'entreprise avec le siret : ${siret}`,
-  //     ),
-  // },
   broadcastFeedback: {
     notFound: ({
       conventionId,
@@ -310,5 +329,33 @@ export const errors = {
   inputs: {
     badSchema: ({ zodError }: { zodError: ZodError }) =>
       new BadRequestError(zodError.toString()),
+  },
+  siretApi: {
+    notFound: ({ siret }: { siret: SiretDto }) =>
+      new NotFoundError(
+        `L'établissement avec le siret '${siret}' n'est pas trouvé dans l'API SIRET.`,
+      ),
+    tooManyRequests: ({ serviceName }: { serviceName: string }) =>
+      new TooManyRequestApiError(serviceName),
+    unavailable: ({ serviceName }: { serviceName: string }) =>
+      new UnavailableApiError(serviceName),
+  },
+  shortLink: {
+    notFound: ({ shortLinkId }: { shortLinkId: ShortLinkId }) =>
+      new NotFoundError(`Le lien court '${shortLinkId}' n'existe pas.`),
+  },
+  notification: {
+    notFound: ({ id, kind }: { id: string; kind: NotificationKind }) =>
+      new NotFoundError(
+        `La notification avec l'identifiant '${id}' et le type '${kind}' n'existe pas.`,
+      ),
+    missingRecipient: () =>
+      new BadRequestError("Il n'y a pas de destinataire fourni pour l'email."),
+  },
+  dashboard: {
+    establishmentConventionForbidden: () =>
+      new ForbiddenError(
+        "'establishmentRepresentativeConventions' n'est pas disponible pour 'GetDashboardUrl'",
+      ),
   },
 };

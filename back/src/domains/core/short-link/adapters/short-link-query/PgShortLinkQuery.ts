@@ -1,10 +1,10 @@
-import { AbsoluteUrl, castError } from "shared";
+import { AbsoluteUrl, ShortLinkId, castError } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../../utils/logger";
-import { ShortLinkId, ShortLinkQuery } from "../../ports/ShortLinkQuery";
+import { ShortLinkQuery } from "../../ports/ShortLinkQuery";
 import {
   PgShortLinkRepositoryDto,
   pgGetShortLinkByIdResultsSchema,

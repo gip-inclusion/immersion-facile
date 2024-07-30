@@ -6,6 +6,7 @@ import {
   Notification,
   NotificationId,
   NotificationKind,
+  ShortLinkId,
   Signatory,
   SmsNotification,
   TemplatedEmail,
@@ -15,7 +16,6 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
-import { ShortLinkId } from "../../short-link/ports/ShortLinkQuery";
 import {
   EmailNotificationFilters,
   NotificationRepository,

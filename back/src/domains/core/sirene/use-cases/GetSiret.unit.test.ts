@@ -1,9 +1,9 @@
 import {
   SiretEstablishmentDto,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { NotFoundError, TooManyRequestApiError } from "shared";
 import { InMemorySiretGateway } from "../adapters/InMemorySiretGateway";
 import { GetSiret } from "./GetSiret";
 
@@ -52,11 +52,10 @@ describe("GetSiret", () => {
   });
 
   it("throws NotFoundError where siret not found", async () => {
+    const siret = "40440440440400";
     await expectPromiseToFailWithError(
-      getSiret.execute({ siret: "40440440440400" }),
-      new NotFoundError(
-        "Did not find establishment with siret : 40440440440400 in siret API",
-      ),
+      getSiret.execute({ siret }),
+      errors.siretApi.notFound({ siret }),
     );
   });
 
@@ -70,7 +69,7 @@ describe("GetSiret", () => {
     });
     await expectPromiseToFailWithError(
       getSiret.execute({ siret: "42942942942900" }),
-      new TooManyRequestApiError("Sirene API"),
+      errors.siretApi.tooManyRequests({ serviceName: "Sirene API" }),
     );
   });
 });

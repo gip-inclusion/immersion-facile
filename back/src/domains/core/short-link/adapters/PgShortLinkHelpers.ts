@@ -1,7 +1,6 @@
 import { QueryConfig } from "pg";
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, ShortLinkId } from "shared";
 import { z } from "zod";
-import { ShortLinkId } from "../ports/ShortLinkQuery";
 
 export type PgShortLinkRepositoryDto = {
   short_link_id: string;
