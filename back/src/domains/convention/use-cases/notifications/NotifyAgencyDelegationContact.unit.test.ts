@@ -1,9 +1,9 @@
 import {
   TallyForm,
+  errors,
   expectPromiseToFailWithError,
   getTallyFormValueOf,
 } from "shared";
-import { BadRequestError } from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -44,9 +44,10 @@ describe("NotifyAgencyDelegationContact", () => {
   it("fail if tallyForm does not contain requested label", async () => {
     await expectPromiseToFailWithError(
       usecase.execute(wrongTallyForm),
-      new BadRequestError(
-        'No value found for label "Région de la structure qui souhaite une convention de délégation"',
-      ),
+      errors.delegation.missingLabel({
+        label:
+          "Région de la structure qui souhaite une convention de délégation",
+      }),
     );
   });
 

@@ -1,6 +1,7 @@
 import {
   ApiConsumer,
   WebhookSubscription,
+  errors,
   expectHttpResponseToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -298,7 +299,8 @@ describe("Webhook routes", () => {
       expectHttpResponseToEqual(response, {
         status: 403,
         body: {
-          message: `You do not have the "SUBSCRIPTION" kind associated to the "convention" right`,
+          message: errors.apiConsumer.missingRights({ rightName: "convention" })
+            .message,
           status: 403,
         },
       });

@@ -3,7 +3,6 @@ import {
   errors,
   icUserRoleForAgencyParamsSchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -30,11 +29,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     const agency = await uow.agencyRepository.getById(params.agencyId);
-    if (!agency) {
-      throw new NotFoundError(
-        `Unable to send mail. No agency config found for ${params.agencyId}`,
-      );
-    }
+    if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
 
     const user = await uow.inclusionConnectedUserRepository.getById(
       params.userId,

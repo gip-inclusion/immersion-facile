@@ -6,6 +6,7 @@ import {
   ConventionDtoBuilder,
   EstablishmentRepresentative,
   GenericActor,
+  ReminderKind,
   Role,
   TemplatedEmail,
   conventionStatuses,
@@ -15,7 +16,6 @@ import {
   frontRoutes,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
@@ -23,7 +23,6 @@ import {
   ExpectSavedNotificationsBatchAndEvent,
   makeExpectSavedNotificationsBatchAndEvent,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { ReminderKind } from "../../../core/events/eventPayload.dto";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -37,7 +36,6 @@ import {
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   NotifyConventionReminder,
-  forbiddenUnsupportedStatusMessage,
   toSignatoriesSummary,
 } from "./NotifyConventionReminder";
 
@@ -232,17 +230,15 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
-        const type: ReminderKind = "FirstReminderForAgency";
+        const kind: ReminderKind = "FirstReminderForAgency";
 
         //Act & Assert
         await expectPromiseToFailWithError(
           useCase.execute({
             conventionId: convention.id,
-            reminderKind: type,
+            reminderKind: kind,
           }),
-          new ForbiddenError(
-            forbiddenUnsupportedStatusMessage(convention, type),
-          ),
+          errors.convention.forbiddenReminder({ convention, kind }),
         );
         expectSavedNotificationsBatchAndEvent({
           emails: [],
@@ -351,16 +347,14 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
 
-        const type: ReminderKind = "FirstReminderForAgency";
+        const kind: ReminderKind = "FirstReminderForAgency";
         //Act
         await expectPromiseToFailWithError(
           useCase.execute({
             conventionId: convention.id,
-            reminderKind: type,
+            reminderKind: kind,
           }),
-          new ForbiddenError(
-            forbiddenUnsupportedStatusMessage(convention, type),
-          ),
+          errors.convention.forbiddenReminder({ convention, kind }),
         );
 
         //Assert
@@ -648,9 +642,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             conventionId: convention.id,
             reminderKind: kind,
           }),
-          new ForbiddenError(
-            forbiddenUnsupportedStatusMessage(convention, kind),
-          ),
+          errors.convention.forbiddenReminder({ convention, kind }),
         );
         expectSavedNotificationsBatchAndEvent({ emails: [] });
       });
@@ -658,7 +650,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   });
 
   describe("LastReminderForSignatories", () => {
-    const type: ReminderKind = "LastReminderForSignatories";
+    const kind: ReminderKind = "LastReminderForSignatories";
 
     it.each(authorizedSignatoryStatuses)(
       `Send email 'LastReminderForSignatories' to signatories when status is '%s'.
@@ -690,7 +682,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         //Act
         await useCase.execute({
           conventionId: convention.id,
-          reminderKind: type,
+          reminderKind: kind,
         });
 
         //Assert
@@ -758,7 +750,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         //Act
         await useCase.execute({
           conventionId: convention.id,
-          reminderKind: type,
+          reminderKind: kind,
         });
 
         //Assert
@@ -809,7 +801,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
               recipientPhone: `33${convention.signatories.establishmentRepresentative.phone.substring(
                 1,
               )}`,
-              kind: type,
+              kind,
               params: {
                 shortLink: makeShortLinkUrl(config, shortLinkIds[2]),
               },
@@ -834,11 +826,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         await expectPromiseToFailWithError(
           useCase.execute({
             conventionId: convention.id,
-            reminderKind: type,
+            reminderKind: kind,
           }),
-          new ForbiddenError(
-            forbiddenUnsupportedStatusMessage(convention, type),
-          ),
+          errors.convention.forbiddenReminder({ convention, kind }),
         );
         expectSavedNotificationsBatchAndEvent({});
       });

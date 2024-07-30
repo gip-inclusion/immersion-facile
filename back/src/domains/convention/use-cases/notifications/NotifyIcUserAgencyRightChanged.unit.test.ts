@@ -54,9 +54,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
   it("throw error when no agency found", async () => {
     await expectPromiseToFailWithError(
       notifyIcUserAgencyRightChanged.execute(icUserRoleParams),
-      new Error(
-        `Unable to send mail. No agency config found for ${icUserRoleParams.agencyId}`,
-      ),
+      errors.agency.notFound({ agencyId: icUserRoleParams.agencyId }),
     );
 
     expectSavedNotificationsAndEvents({

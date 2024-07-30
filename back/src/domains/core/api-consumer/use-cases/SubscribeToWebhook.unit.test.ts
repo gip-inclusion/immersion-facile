@@ -1,9 +1,9 @@
 import {
   SubscriptionParams,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -39,7 +39,7 @@ describe("SubscribeToWebhook", () => {
         callbackUrl: "https://www.lol.com",
         subscribedEvent: "convention.updated",
       }),
-      new ForbiddenError("No JWT payload provided"),
+      errors.user.noJwtProvided(),
     );
   });
 

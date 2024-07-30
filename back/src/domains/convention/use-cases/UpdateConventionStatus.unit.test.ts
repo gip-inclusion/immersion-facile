@@ -2,7 +2,6 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
-  NotFoundError,
   createConventionMagicLinkPayload,
   errors,
   expectObjectsToMatch,
@@ -254,9 +253,7 @@ describe("UpdateConventionStatus", () => {
             emailHash: "osef",
           },
         ),
-        new NotFoundError(
-          `Mail not found for agency with id: ${agency.id} on agency repository.`,
-        ),
+        errors.agency.emailNotFound({ agencyId: agency.id }),
       );
     });
   });

@@ -102,9 +102,9 @@ export type CallbackHeaders = Partial<
 >;
 
 export const eventToRightName = (
-  event: SubscriptionEvent,
+  event: SubscriptionEventId,
 ): ApiConsumerRightName => {
-  const strategy: Record<SubscriptionEvent, ApiConsumerRightName> = {
+  const strategy: Record<SubscriptionEventId, ApiConsumerRightName> = {
     "convention.updated": "convention",
   };
   return strategy[event];
@@ -115,9 +115,9 @@ export type ApiConsumerSubscriptionId = Flavor<
   "ApiConsumerSubscriptionId"
 >;
 
-export type SubscriptionEvent = SubscriptionName<"convention", "updated">;
+export type SubscriptionEventId = SubscriptionName<"convention", "updated">;
 export type CreateWebhookSubscription = SubscriptionParams & {
-  subscribedEvent: SubscriptionEvent;
+  subscribedEvent: SubscriptionEventId;
 };
 
 export type WebhookSubscription = CreateWebhookSubscription & {

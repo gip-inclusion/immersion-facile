@@ -392,3 +392,12 @@ export const isStringImmersionObjective = (
   objective: string | unknown,
 ): objective is ImmersionObjective =>
   keys(labelsForImmersionObjective).includes(objective as ImmersionObjective);
+
+export const reminderKinds = [
+  "FirstReminderForSignatories",
+  "LastReminderForSignatories",
+  "FirstReminderForAgency",
+  "LastReminderForAgency",
+] as const;
+
+export type ReminderKind = (typeof reminderKinds)[number];

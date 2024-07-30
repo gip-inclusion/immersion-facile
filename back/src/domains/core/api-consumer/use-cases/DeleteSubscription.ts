@@ -1,24 +1,23 @@
 import {
   ApiConsumer,
-  SubscriptionEvent,
+  ApiConsumerSubscriptionId,
+  apiConsumerSubscriptionIdSchema,
   errors,
   findRightNameFromSubscriptionId,
   isApiConsumerAllowed,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
-import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export class DeleteSubscription extends TransactionalUseCase<
-  string,
+  ApiConsumerSubscriptionId,
   void,
   ApiConsumer
 > {
-  protected inputSchema = z.string();
+  protected inputSchema = apiConsumerSubscriptionIdSchema;
 
   protected async _execute(
-    subscriptionId: SubscriptionEvent,
+    subscriptionId: ApiConsumerSubscriptionId,
     uow: UnitOfWork,
     apiConsumer?: ApiConsumer,
   ): Promise<void> {
@@ -30,7 +29,7 @@ export class DeleteSubscription extends TransactionalUseCase<
     );
 
     if (!subscribedRightName)
-      throw new NotFoundError(`subscription ${subscriptionId} not found`);
+      throw errors.apiConsumer.missing({ id: subscriptionId });
 
     if (
       !isApiConsumerAllowed({
@@ -38,11 +37,10 @@ export class DeleteSubscription extends TransactionalUseCase<
         rightName: subscribedRightName,
         consumerKind: "SUBSCRIPTION",
       })
-    ) {
-      throw new ForbiddenError(
-        `You do not have the "SUBSCRIPTION" kind associated to the "${subscribedRightName}" right`,
-      );
-    }
+    )
+      throw errors.apiConsumer.missingRights({
+        rightName: subscribedRightName,
+      });
 
     const updatedSubscriptions = apiConsumer.rights[
       subscribedRightName

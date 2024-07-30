@@ -18,7 +18,6 @@ import {
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
 } from "shared";
-import { NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import {
@@ -311,10 +310,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         (agencyEmail) => stringToMd5(agencyEmail) === emailHash,
       );
 
-      if (!email)
-        throw new NotFoundError(
-          `Mail not found for agency with id: ${agencyId} on agency repository.`,
-        );
+      if (!email) throw errors.agency.emailNotFound({ agencyId });
 
       return email;
     };

@@ -9,7 +9,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError, ForbiddenError } from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -76,7 +75,7 @@ describe("Update Convention", () => {
       );
     });
 
-    it("throws if no convention id does not match the one in jwt payload", () => {
+    it("throws if no convention id does not match the one in jwt payload", async () => {
       const convention = new ConventionDtoBuilder().build();
       const jwtPayload: ConventionDomainPayload = {
         applicationId: "another-convention-id",
@@ -84,11 +83,9 @@ describe("Update Convention", () => {
         emailHash: "yolo",
       };
 
-      expectPromiseToFailWithError(
+      await expectPromiseToFailWithError(
         updateConvention.execute({ convention }, jwtPayload),
-        new ForbiddenError(
-          `User is not allowed to update convention ${convention.id}`,
-        ),
+        errors.convention.updateForbidden({ id: convention.id }),
       );
     });
   });
@@ -158,9 +155,7 @@ describe("Update Convention", () => {
             emailHash: "123",
           },
         ),
-        new BadRequestError(
-          `Convention ${storedConvention.id} cannot be modified as it has status PARTIALLY_SIGNED`,
-        ),
+        errors.convention.updateBadStatusInRepo({ id: storedConvention.id }),
       );
     });
   });
@@ -278,9 +273,7 @@ describe("Update Convention", () => {
             { convention },
             { userId: backofficeAdminUser.id },
           ),
-          new ForbiddenError(
-            `Convention ${convention.id} with modifications should have status READY_TO_SIGN`,
-          ),
+          errors.convention.updateBadStatusInParams({ id: convention.id }),
         );
       }
     });
@@ -328,9 +321,7 @@ describe("Update Convention", () => {
           { convention: draftConvention },
           { userId: backofficeAdminUser.id },
         ),
-        new ForbiddenError(
-          `Convention ${id} with modifications should have status READY_TO_SIGN`,
-        ),
+        errors.convention.updateBadStatusInParams({ id }),
       );
     });
   });

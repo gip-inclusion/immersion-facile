@@ -3,10 +3,10 @@ import {
   ConventionDto,
   Role,
   WithConventionDto,
+  errors,
   frontRoutes,
   withConventionSchema,
 } from "shared";
-import { NotFoundError } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
@@ -55,11 +55,8 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
-    if (!agency) {
-      throw new NotFoundError(
-        `Unable to send mail. No agency config found for ${convention.agencyId}`,
-      );
-    }
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
 
     const conventionAdvisorEntity =
       await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(

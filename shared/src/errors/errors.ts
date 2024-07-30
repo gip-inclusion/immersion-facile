@@ -1,10 +1,15 @@
 import { ZodError } from "zod";
 import { LocationId } from "../address/address.dto";
 import { AgencyId } from "../agency/agency.dto";
+import {
+  ApiConsumerRightName,
+  ApiConsumerSubscriptionId,
+} from "../apiConsumer/ApiConsumer";
 import type {
   ConventionDto,
   ConventionId,
   ConventionStatus,
+  ReminderKind,
 } from "../convention/convention.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
@@ -37,6 +42,18 @@ export const errors = {
       new ForbiddenError("Il y a un décalage sur le 'Nonce'."),
   },
   convention: {
+    updateBadStatusInParams: ({ id }: { id: ConventionId }) =>
+      new ForbiddenError(
+        `Convention ${id} with modifications should have status READY_TO_SIGNaaaaa`,
+      ),
+    updateBadStatusInRepo: ({ id }: { id: ConventionId }) =>
+      new BadRequestError(
+        `Convention ${id} cannot be modified as it has status PARTIALLY_SIGNEDaaaaaa`,
+      ),
+    updateForbidden: ({ id }: { id: ConventionId }) =>
+      new ForbiddenError(
+        `User is not allowed to update convention ${id}aaaaaaaaaa`,
+      ),
     missingFTAdvisor: ({ ftExternalId }: { ftExternalId: PeExternalId }) =>
       new NotFoundError(
         `Il n'y a pas de conseiller France Travail attaché à l'identifiant OAuth ftExternalId '${ftExternalId}'.`,
@@ -99,6 +116,13 @@ export const errors = {
     unsupportedRoleRenewMagicLink: ({ role }: { role: Role }) =>
       new BadRequestError(
         `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
+      ),
+    forbiddenReminder: ({
+      convention,
+      kind,
+    }: { convention: ConventionDto; kind: ReminderKind }) =>
+      new ForbiddenError(
+        `Convention with id: '${convention.id}' and status: '${convention.status}' is not supported for reminder ${kind}.aaaaaaa`,
       ),
   },
   establishment: {
@@ -242,6 +266,10 @@ export const errors = {
       new NotFoundError(
         `Le SIRET que vous avez saisi (${siret}) n'est pas valide et votre organisme n'a pas été enregistré. Merci de corriger le SIRET et de soumettre à nouveau le formulaire.`,
       ),
+    emailNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
+      new NotFoundError(
+        `Mail not found for agency with id: ${agencyId} on agency repository.aaaaaaaaa`,
+      ),
   },
   user: {
     unauthorized: () => new UnauthorizedError(),
@@ -325,6 +353,12 @@ export const errors = {
       new ForbiddenError(
         "Vous n'avez pas le droit d'accès à cette route. Contactez le support Immersion Facilitée si vous voulez plus de privilèges.",
       ),
+    missingRights: ({ rightName }: { rightName: ApiConsumerRightName }) =>
+      new ForbiddenError(
+        `You do not have the "SUBSCRIPTION" kind associated to the "${rightName}" rightaaaaaaa`,
+      ),
+    missing: ({ id }: { id: ApiConsumerSubscriptionId }) =>
+      new NotFoundError(`subscription ${id} not found`),
   },
   inputs: {
     badSchema: ({ zodError }: { zodError: ZodError }) =>
@@ -357,5 +391,11 @@ export const errors = {
       new ForbiddenError(
         "'establishmentRepresentativeConventions' n'est pas disponible pour 'GetDashboardUrl'",
       ),
+  },
+  delegation: {
+    missingLabel: ({ label }: { label: ShortLinkId }) =>
+      new BadRequestError(`No value found for label "${label}".aaaaaa`),
+    missingEmail: ({ province }: { province: ShortLinkId }) =>
+      new BadRequestError(`Province ${province} not foundaaaaaaaaaa`),
   },
 };

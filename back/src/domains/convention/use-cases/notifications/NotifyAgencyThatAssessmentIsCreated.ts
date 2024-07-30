@@ -1,5 +1,4 @@
-import { WithAssessmentDto, withAssessmentSchema } from "shared";
-import { NotFoundError } from "shared";
+import { WithAssessmentDto, errors, withAssessmentSchema } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -26,15 +25,13 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
       assessment.conventionId,
     );
     if (!convention)
-      throw new NotFoundError(
-        `Unable to send mail. No convention were found with id : ${assessment.conventionId}`,
-      );
+      throw errors.convention.notFound({
+        conventionId: assessment.conventionId,
+      });
 
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
-      throw new NotFoundError(
-        `Unable to send mail. No agency were found with id : ${convention.agencyId}`,
-      );
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",

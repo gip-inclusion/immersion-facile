@@ -1,5 +1,9 @@
-import { expectPromiseToFailWithError, expectToEqual } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
+import {
+  ApiConsumerSubscriptionId,
+  errors,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -43,9 +47,7 @@ describe("DeleteSubscription", () => {
 
     await expectPromiseToFailWithError(
       deleteSubscription.execute(subscriptionId, apiConsumer),
-      new ForbiddenError(
-        `You do not have the "SUBSCRIPTION" kind associated to the "convention" right`,
-      ),
+      errors.apiConsumer.missingRights({ rightName: "convention" }),
     );
   });
 
@@ -79,7 +81,7 @@ describe("DeleteSubscription", () => {
 
   it("throws 404 when subscription not found", async () => {
     const now = new Date("2023-09-22");
-    const subscriptionId = "unexisting-id";
+    const subscriptionId: ApiConsumerSubscriptionId = "unexisting-id";
     const apiConsumer = new ApiConsumerBuilder()
       .withConventionRight({
         kinds: ["SUBSCRIPTION"],
@@ -99,7 +101,7 @@ describe("DeleteSubscription", () => {
 
     await expectPromiseToFailWithError(
       deleteSubscription.execute(subscriptionId, apiConsumer),
-      new NotFoundError(`subscription ${subscriptionId} not found`),
+      errors.apiConsumer.missing({ id: subscriptionId }),
     );
   });
 });

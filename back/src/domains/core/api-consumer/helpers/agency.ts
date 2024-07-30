@@ -1,5 +1,4 @@
-import { AgencyId, AgencyRefersToInConvention } from "shared";
-import { NotFoundError } from "shared";
+import { AgencyId, AgencyRefersToInConvention, errors } from "shared";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export const getReferedAgency = async (
@@ -8,7 +7,5 @@ export const getReferedAgency = async (
 ): Promise<AgencyRefersToInConvention> => {
   const referedAgency = await uow.agencyRepository.getById(agencyId);
   if (referedAgency) return { id: referedAgency.id, name: referedAgency.name };
-  throw new NotFoundError(
-    `Refered agency ${agencyId} missing on agency repository.`,
-  );
+  throw errors.agency.notFound({ agencyId });
 };
