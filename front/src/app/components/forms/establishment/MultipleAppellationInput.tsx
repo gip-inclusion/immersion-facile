@@ -1,8 +1,14 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
-import { AppellationAndRomeDto, emptyAppellationAndRome } from "shared";
+import {
+  AppellationAndRomeDto,
+  AppellationCode,
+  AppellationLabel,
+  emptyAppellationAndRome,
+} from "shared";
 import { useStyles } from "tss-react/dsfr";
+import { v4 as uuidV4 } from "uuid";
 import { AppellationAutocomplete } from "../autocomplete/AppellationAutocomplete";
 
 type MultipleAppellationInputProps = {
@@ -16,6 +22,14 @@ type MultipleAppellationInputProps = {
   disabled?: boolean;
 };
 
+const getAppellationKey = (
+  appellationCode: AppellationCode,
+  appellationLabel: AppellationLabel,
+) => {
+  if (appellationCode === "" && appellationLabel === "") return uuidV4();
+  return `${appellationCode}-${appellationLabel}`;
+};
+
 export const MultipleAppellationInput = ({
   name,
   label,
@@ -27,7 +41,6 @@ export const MultipleAppellationInput = ({
   disabled = false,
 }: MultipleAppellationInputProps) => {
   const { cx } = useStyles();
-
   return (
     <div
       className={cx(fr.cx("fr-input-group"), "im-appellation-autocomplete")}
@@ -39,9 +52,9 @@ export const MultipleAppellationInput = ({
           ({ appellationCode, appellationLabel }, index) => (
             <div
               className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
-              key={`${appellationCode}-${appellationLabel}`}
+              key={getAppellationKey(appellationCode, appellationLabel)}
             >
-              <div className={fr.cx("fr-col", "fr-mt-2w")}>
+              <div className={fr.cx("fr-col", !!index && "fr-mt-2w")}>
                 <AppellationAutocomplete
                   disabled={disabled}
                   label={"Rechercher un métier *"}

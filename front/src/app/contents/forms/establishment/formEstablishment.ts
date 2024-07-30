@@ -9,14 +9,15 @@ import { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";
 
-type FormEstablishmentField = Partial<
+type FormEstablishmentFieldKeys =
   | Exclude<
       keyof FormEstablishmentDto,
       "id" | "naf" | "businessContact" | "source" | "isSearchable"
     >
   | `businessContact.${keyof BusinessContactDto}`
-  | "maxContactsPerMonthWhenAvailable"
->;
+  | "maxContactsPerMonthWhenAvailable";
+
+type FormEstablishmentField = Partial<FormEstablishmentFieldKeys>;
 
 export type FormEstablishmentFieldsLabels = FormFieldsObjectForContent<
   Record<FormEstablishmentField, FormFieldAttributesForContent>
@@ -46,7 +47,7 @@ export const formEstablishmentFieldsLabels = (
     placeholder: "Ex : Nom de mon enseigne (optionnel)",
   },
   businessAddresses: {
-    label: "Vérifiez l'adresse de votre établissement",
+    label: "Les lieux où vous proposez une immersion",
     required: true,
     id: domElementIds.establishment[mode].businessAddresses,
     placeholder: "Ex : 26 rue du labrador, 37000 Tours",
@@ -98,8 +99,9 @@ export const formEstablishmentFieldsLabels = (
     id: domElementIds.establishment[mode].fitForDisabledWorkers,
   },
   appellations: {
-    label: "",
+    label: "Les métiers que vous proposez à l'immersion",
     id: domElementIds.establishment[mode].appellations,
+    required: true,
   },
   website: {
     label: "URL vers votre site internet",

@@ -37,13 +37,13 @@ export const appellationDtoSchema: z.Schema<AppellationAndRomeDto> = z.object({
 const matchRangeSchema: z.Schema<MatchRangeDto> = z.object({
   startIndexInclusive: z
     .number({
-      required_error: "Début d'interval obligatoire",
+      required_error: "Début d'intervalle obligatoire",
     })
     .min(0)
     .int(),
   endIndexExclusive: z
     .number({
-      required_error: "Fin d'interval obligatoire",
+      required_error: "Fin d'intervalle obligatoire",
     })
     .min(0)
     .int(),

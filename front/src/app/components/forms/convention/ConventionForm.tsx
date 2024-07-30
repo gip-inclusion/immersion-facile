@@ -35,7 +35,6 @@ import {
   isPeConnectIdentity,
   keys,
   notJobSeeker,
-  toDotNotation,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
@@ -53,7 +52,7 @@ import {
 } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
-  formErrorsToFlatErrors,
+  displayReadableError,
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
 
@@ -519,7 +518,7 @@ export const ConventionForm = ({
                   />
                   <ErrorNotifications
                     labels={getFormErrors()}
-                    errors={toDotNotation(formErrorsToFlatErrors(errors))}
+                    errors={displayReadableError(errors)}
                     visible={
                       submitCount !== 0 && Object.values(errors).length > 0
                     }

@@ -17,7 +17,6 @@ import {
   DepartmentCode,
   createAgencySchema,
   domElementIds,
-  toDotNotation,
 } from "shared";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
@@ -33,7 +32,7 @@ import {
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import {
-  formErrorsToFlatErrors,
+  displayReadableError,
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -290,9 +289,7 @@ const AgencyForm = ({
 
                 <ErrorNotifications
                   labels={getFormErrors()}
-                  errors={toDotNotation(
-                    formErrorsToFlatErrors(formState.errors),
-                  )}
+                  errors={displayReadableError(formState.errors)}
                   visible={
                     formState.submitCount !== 0 &&
                     Object.values(formState.errors).length > 0

@@ -7,6 +7,7 @@ import { useStyles } from "tss-react/dsfr";
 type MultipleAddressInputProps = {
   name: string;
   label?: string;
+  hintText?: string;
   currentAddresses: FormEstablishmentAddress[];
   onAddressAdded: (address: AddressDto, index: number) => void;
   onAddressDeleted: (index: number) => void;
@@ -24,6 +25,7 @@ export const MultipleAddressInput = ({
   error,
   id,
   disabled = false,
+  hintText,
 }: MultipleAddressInputProps) => {
   const { cx } = useStyles();
 
@@ -34,6 +36,7 @@ export const MultipleAddressInput = ({
     >
       <>
         {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
+        {hintText && <p className={fr.cx("fr-hint-text")}>{hintText}</p>}
         {currentAddresses.map((address, index) => (
           <div
             className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}

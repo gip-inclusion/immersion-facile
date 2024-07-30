@@ -1,5 +1,5 @@
 import { type FieldValues, type FormState, get } from "react-hook-form";
-import { DotNestedKeys } from "shared";
+import { DotNestedKeys, keys, toDotNotation } from "shared";
 import {
   FormFieldAttributes,
   FormFieldAttributesForContent,
@@ -100,3 +100,27 @@ export const formErrorsToFlatErrors = (
   }
   return errorObj;
 };
+
+const replaceArrayPath = (flatErrorsObject: Record<string, any>) => {
+  return keys(flatErrorsObject).reduce((acc, dotNestedKey) => {
+    const keySplitted = dotNestedKey.split(".");
+    if (keySplitted.length > 1) {
+      const domain = keySplitted.at(0);
+      const entryIndex = keySplitted.at(1);
+      const path = `${domain}.${entryIndex}`;
+      return {
+        ...acc,
+        [path]: flatErrorsObject[dotNestedKey],
+      };
+    }
+    return {
+      ...acc,
+      [dotNestedKey]: flatErrorsObject[dotNestedKey],
+    };
+  }, {});
+};
+
+export const displayReadableError = (
+  errors: Record<string, any>,
+): Record<string, any> =>
+  replaceArrayPath(toDotNotation(formErrorsToFlatErrors(errors)));

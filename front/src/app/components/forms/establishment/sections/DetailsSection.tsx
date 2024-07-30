@@ -17,7 +17,6 @@ import {
   domElementIds,
   emptyAppellationAndRome,
   removeAtIndex,
-  toDotNotation,
 } from "shared";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
@@ -25,7 +24,7 @@ import { MultipleAddressInput } from "src/app/components/forms/establishment/Mul
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
-  formErrorsToFlatErrors,
+  displayReadableError,
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
@@ -195,9 +194,6 @@ export const DetailsSection = ({
         {...getFieldError("additionalInformation")}
       />
 
-      <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-        Les métiers que vous proposez à l'immersion :
-      </h2>
       <MultipleAppellationInput
         {...formContents.appellations}
         onAppellationAdd={(appellation, index) => {
@@ -216,18 +212,14 @@ export const DetailsSection = ({
         currentAppellations={formValues.appellations}
         error={errors?.appellations?.message}
       />
-      <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-        Les lieux où vous proposez une immersion :
-      </h2>
-      <p className={fr.cx("fr-hint-text")}>
-        Par défaut, vous apparaîtrez dans les résultats de recherche liés à
+      <MultipleAddressInput
+        name="businessAddress"
+        label={formContents.businessAddresses.label}
+        hintText={`Par défaut, vous apparaîtrez dans les résultats de recherche liés à
         l’adresse de votre établissement. Vous pouvez ajouter d’autres adresses
         si vous proposez des immersions ailleurs. Par exemple : votre société
         est située à Dijon (adresse liée à votre SIRET) mais vous proposez une
-        immersion dans votre antenne de Nantes.
-      </p>
-      <MultipleAddressInput
-        name="businessAddress"
+        immersion dans votre antenne de Nantes.`}
         currentAddresses={formValues.businessAddresses}
         onAddressAdded={(address, index) => {
           const currentAddresses = formValues.businessAddresses;
@@ -258,7 +250,7 @@ export const DetailsSection = ({
       )}
       <ErrorNotifications
         labels={formErrors}
-        errors={toDotNotation(formErrorsToFlatErrors(errors))}
+        errors={displayReadableError(errors)}
         visible={submitCount !== 0 && Object.values(errors).length > 0}
       />
       {feedback.kind === "submitErrored" && (

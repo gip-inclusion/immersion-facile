@@ -6,13 +6,8 @@ import React from "react";
 import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import {
-  AgencyOption,
-  agencyIdAndNameSchema,
-  domElementIds,
-  toDotNotation,
-} from "shared";
-import { formErrorsToFlatErrors } from "src/app/hooks/formContents.hooks";
+import { AgencyOption, agencyIdAndNameSchema, domElementIds } from "shared";
+import { displayReadableError } from "src/app/hooks/formContents.hooks";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { z } from "zod";
 import { MultipleAgencyInput } from "./MultipleAgencyInput";
@@ -68,7 +63,7 @@ export const RegisterAgenciesForm = () => {
           }}
         />
         <ErrorNotifications
-          errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+          errors={displayReadableError(formState.errors)}
           visible={keys(formState.errors).length > 0}
         />
         <div className={fr.cx("fr-mt-2w")}>
