@@ -9,23 +9,37 @@ test.describe("Manage users in admin", () => {
     await fillAutocomplete({
       page,
       locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,
-      value: "Agence cap-emploi Paris",
+      value: "PE Paris",
     });
     await expect(
-      page.locator(`#${domElementIds.admin.agencyTab.agencyUsersTable}`),
+      page.locator(`#${domElementIds.admin.agencyTab.editAgencyUsersTable}`),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Modifier" }).click();
-    await expect(page.locator("#im-manage-user-modal")).toBeVisible();
+    await page
+      .locator(
+        `[id^=${domElementIds.admin.agencyTab.editAgencyUserRoleButton}]`,
+      )
+      .first()
+      .click();
     await expect(
-      page.locator("#admin-agency-user-table-modal-checkbox"),
+      page.locator(
+        `#${domElementIds.admin.agencyTab.editAgencyManageUserModal}`,
+      ),
     ).toBeVisible();
     await page
-      .locator('label[for="admin-agency-user-table-modal-checkbox-3"]')
+      .locator(
+        `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-3"]`,
+      )
       .click();
     await page
-      .locator('label[for="admin-agency-user-table-modal-checkbox-4"]')
+      .locator(
+        `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-4"]`,
+      )
       .click();
-    await page.getByRole("button", { name: "Valider" }).click();
+    await page
+      .locator(
+        `#${domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}`,
+      )
+      .click();
     await expect(page.locator(".fr-alert--success").first()).toBeVisible();
   });
 });

@@ -19,7 +19,6 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { PayloadActionWithFeedbackTopic } from "../../feedback/feedback.slice";
 
 type IcUsersAdminAction = ActionOfSlice<typeof icUsersAdminSlice>;
 const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
@@ -124,23 +123,22 @@ const updateUserOnAgencyEpic: AppEpic<IcUsersAdminAction> = (
 ) =>
   action$.pipe(
     filter(icUsersAdminSlice.actions.updateUserOnAgencyRequested.match),
-    switchMap(
-      (action: PayloadActionWithFeedbackTopic<IcUserRoleForAgencyParams>) =>
-        adminGateway
-          .updateUserRoleForAgency$(action.payload, getAdminToken(state$.value))
-          .pipe(
-            map(() =>
-              icUsersAdminSlice.actions.updateUserOnAgencySucceeded(
-                action.payload,
-              ),
-            ),
-            catchEpicError((error) =>
-              icUsersAdminSlice.actions.updateUserOnAgencyFailed({
-                errorMessage: error.message,
-                feedbackTopic: action.payload.feedbackTopic,
-              }),
+    switchMap((action) =>
+      adminGateway
+        .updateUserRoleForAgency$(action.payload, getAdminToken(state$.value))
+        .pipe(
+          map(() =>
+            icUsersAdminSlice.actions.updateUserOnAgencySucceeded(
+              action.payload,
             ),
           ),
+          catchEpicError((error) =>
+            icUsersAdminSlice.actions.updateUserOnAgencyFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
     ),
   );
 

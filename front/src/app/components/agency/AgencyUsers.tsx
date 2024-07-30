@@ -26,12 +26,15 @@ type AgencyUsersProperties = {
   agencyId: AgencyId;
 };
 
-type AgencyRoleClasses = {
+type AgencyDisplayedRoleAndClass = {
   label: string;
   className: FrClassName;
 };
 
-export const agencyRoleToDisplay: Record<AgencyRole, AgencyRoleClasses> = {
+export const agencyRoleToDisplay: Record<
+  AgencyRole,
+  AgencyDisplayedRoleAndClass
+> = {
   toReview: {
     label: "À valider",
     className: "fr-badge--yellow-tournesol",
@@ -56,7 +59,7 @@ export const agencyRoleToDisplay: Record<AgencyRole, AgencyRoleClasses> = {
 
 const manageUserModal = createModal({
   isOpenedByDefault: false,
-  id: "im-manage-user-modal",
+  id: domElementIds.admin.agencyTab.editAgencyManageUserModal,
 });
 
 export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
@@ -104,7 +107,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
       <Feedback topic="update-agency-user" />
 
       <Table
-        id={domElementIds.admin.agencyTab.agencyUsersTable}
+        id={domElementIds.admin.agencyTab.editAgencyUsersTable}
         headers={[
           "Utilisateurs",
           "Préférence de communication",
@@ -167,13 +170,15 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
               </div>
 
               <Checkbox
-                id="admin-agency-user-table-modal-checkbox"
-                orientation="horizontal"
+                id={domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}
                 legend="Rôles :"
                 options={checkboxOptions}
               />
 
               <Button
+                id={
+                  domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton
+                }
                 className={fr.cx("fr-mt-2w")}
                 onClick={() => {
                   dispatch(
