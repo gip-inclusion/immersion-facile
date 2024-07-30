@@ -18,7 +18,10 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.BASE_URL || "http://localhost:3000",
-    screenshot: "only-on-failure",
+    screenshot: {
+      mode: "only-on-failure",
+      fullPage: true,
+    },
     storageState: "./data/storageState.json" /* Accept cookies by default */,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
