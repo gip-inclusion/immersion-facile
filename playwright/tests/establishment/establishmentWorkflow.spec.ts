@@ -59,6 +59,7 @@ test.describe("Establishment creation and modification workflow", () => {
     const addEstablishmentButton = page.locator(
       `#${domElementIds.establishment.create.startFormButton}`,
     );
+    await addEstablishmentButton.waitFor({ timeout: 3_000 });
     await addEstablishmentButton.click();
 
     await page.locator(".fr-radio-rich").getByText("Oui").click();
@@ -176,9 +177,11 @@ test.describe("Establishment creation and modification workflow", () => {
     await emailWrapper.getByRole("link", { name: "Lien vers la page" }).click();
 
     // Edit establishment
-    await page
-      .locator(`#${domElementIds.establishment.edit.startFormButton}`)
-      .click();
+    const startFormButtonLocator = page.locator(
+      `#${domElementIds.establishment.edit.startFormButton}`,
+    );
+    await startFormButtonLocator.waitFor({ timeout: 3_000 });
+    await startFormButtonLocator.click();
     await page.locator(".fr-radio-rich").getByText("Non").click();
     await page
       .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
