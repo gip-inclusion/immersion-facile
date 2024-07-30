@@ -168,3 +168,9 @@ jobs:
       - name: Run playwright tests
         run: |
           pnpm playwright test:ci-v2
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results
+          path: ./playwright/test-results/
+          retention-days: 30
