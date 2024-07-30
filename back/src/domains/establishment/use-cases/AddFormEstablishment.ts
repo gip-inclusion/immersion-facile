@@ -1,9 +1,9 @@
 import {
   FormEstablishmentDto,
   InclusionConnectedUser,
+  errors,
   formEstablishmentSchema,
 } from "shared";
-import { ConflictError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -42,11 +42,9 @@ export class AddFormEstablishment extends TransactionalUseCase<
     const existingFormEstablishment =
       await uow.formEstablishmentRepository.getBySiret(dto.siret);
 
-    if (existingFormEstablishment) {
-      throw new ConflictError(
-        `Establishment with siret ${dto.siret} already exists`,
-      );
-    }
+    if (existingFormEstablishment)
+      throw errors.establishment.conflictError({ siret: dto.siret });
+
     await rejectsSiretIfNotAnOpenCompany(this.#siretGateway, dto.siret);
 
     const appellations =

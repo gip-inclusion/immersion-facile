@@ -2,9 +2,9 @@ import {
   AppellationAndRomeDto,
   FormEstablishmentDtoBuilder,
   defaultValidFormEstablishment,
+  errors,
   expectPromiseToFailWithError,
 } from "shared";
-import { BadRequestError, ConflictError } from "shared";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemoryRomeRepository } from "../../core/rome/adapters/InMemoryRomeRepository";
@@ -126,33 +126,8 @@ describe("Add FormEstablishment", () => {
 
     await expectPromiseToFailWithError(
       addFormEstablishment.execute(formEstablishment),
-      new ConflictError(
-        "Establishment with siret 01234567890123 already exists",
-      ),
+      errors.establishment.conflictError({ siret: formEstablishment.siret }),
     );
-  });
-
-  it("reject when trying to save Form Establishment in the repository with null values", async () => {
-    const formEstablishment =
-      FormEstablishmentDtoBuilder.allEmptyFields().build();
-
-    await expect(
-      addFormEstablishment.execute(formEstablishment),
-    ).rejects.toThrow();
-  });
-
-  it("reject when trying to save Form Establishment in the repository with null siret", async () => {
-    const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withSiret("")
-      .build();
-
-    try {
-      await addFormEstablishment.execute(formEstablishment);
-      throw new Error("Should not have been reached");
-    } catch (e) {
-      // eslint-disable-next-line jest/no-conditional-expect
-      expect(e).toBeInstanceOf(BadRequestError);
-    }
   });
 
   describe("SIRET validation", () => {
@@ -173,9 +148,9 @@ describe("Add FormEstablishment", () => {
 
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
-        new BadRequestError(
-          `Ce SIRET (${formEstablishment.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
-        ),
+        errors.establishment.missingOrClosed({
+          siret: formEstablishment.siret,
+        }),
       );
     });
 

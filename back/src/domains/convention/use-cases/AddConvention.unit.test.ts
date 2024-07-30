@@ -1,5 +1,4 @@
 import {
-  BadRequestError,
   ConventionDtoBuilder,
   DiscussionBuilder,
   conventionStatuses,
@@ -184,9 +183,7 @@ describe("Add Convention", () => {
 
       await expectPromiseToFailWithError(
         addConvention.execute({ convention: validConvention }),
-        new BadRequestError(
-          `Ce SIRET (${validConvention.siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
-        ),
+        errors.establishment.missingOrClosed({ siret: validConvention.siret }),
       );
     });
 

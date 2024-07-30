@@ -157,8 +157,9 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       numberOfSuccess: 1,
       failures: [
         {
-          errorMessage:
-            "Establishment with siret 12345678901234 already exists",
+          errorMessage: errors.establishment.conflictError({
+            siret: existingFormEstablishment.siret,
+          }).message,
           siret: existingFormEstablishment.siret,
         },
       ],
@@ -242,8 +243,9 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       failures: [
         {
           siret: formEstablishmentBatch.formEstablishments[0].siret,
-          errorMessage:
-            "Establishment with siret 12345678901234 already exists",
+          errorMessage: errors.establishment.conflictError({
+            siret: formEstablishmentBatch.formEstablishments[0].siret,
+          }).message,
         },
       ],
     });

@@ -1,16 +1,15 @@
 import { addMilliseconds, subDays } from "date-fns";
 import { Pool } from "pg";
 import {
-  BadRequestError,
   DiscussionBuilder,
   Email,
   GeoPositionDto,
   Location,
   LocationBuilder,
-  NotFoundError,
   RomeCode,
   SearchResultDto,
   WithAcquisition,
+  errors,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
   expectPromiseToFailWithError,
@@ -1054,9 +1053,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 sortedBy: "distance",
               },
             }),
-            new BadRequestError(
-              "Cannot search by distance with invalid geo params",
-            ),
+            errors.establishment.invalidGeoParams(),
           );
         });
         it("should throw if only one of the geo params is provided (lat/lon/distanceKm)", async () => {
@@ -1068,9 +1065,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 lat: 45,
               },
             }),
-            new BadRequestError(
-              "Cannot search by distance with invalid geo params",
-            ),
+            errors.establishment.invalidGeoParams(),
           );
         });
         it("should throw if all geo params value is 0 and sorted by distance", async () => {
@@ -1084,9 +1079,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 distanceKm: 0,
               },
             }),
-            new BadRequestError(
-              "Cannot search by distance with invalid geo params",
-            ),
+            errors.establishment.invalidGeoParams(),
           );
         });
 
@@ -1101,9 +1094,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 distanceKm: 10,
               },
             }),
-            new BadRequestError(
-              "Cannot search by distance with invalid geo params",
-            ),
+            errors.establishment.invalidGeoParams(),
           );
         });
 
@@ -1118,9 +1109,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 distanceKm: 10,
               },
             }),
-            new BadRequestError(
-              "Cannot search by distance with invalid geo params",
-            ),
+            errors.establishment.invalidGeoParams(),
           );
         });
         it("should throw if one of the geo params value is 0", async () => {
@@ -1134,9 +1123,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 distanceKm: 10,
               },
             }),
-            new BadRequestError(
-              "Cannot search by distance with invalid geo params",
-            ),
+            errors.establishment.invalidGeoParams(),
           );
         });
       });
@@ -1746,9 +1733,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       await expectPromiseToFailWithError(
         pgEstablishmentAggregateRepository.delete(siretNotInTable),
-        new NotFoundError(
-          `Establishment with siret ${siretNotInTable} missing on Establishment Aggregate Repository.`,
-        ),
+        errors.establishment.missingAggregate({ siret: siretNotInTable }),
       );
     });
 

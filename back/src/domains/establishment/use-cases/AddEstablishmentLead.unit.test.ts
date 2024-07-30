@@ -2,10 +2,10 @@ import subDays from "date-fns/subDays";
 import {
   ConventionDto,
   ConventionDtoBuilder,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -42,9 +42,7 @@ describe("Add EstablishmentLead", () => {
 
     await expectPromiseToFailWithError(
       addEstablishmentLead.execute({ convention }),
-      new BadRequestError(
-        `La convention ${convention.id} n'est pas validée. Son status est : ${convention.status}`,
-      ),
+      errors.convention.notValidated({ convention }),
     );
   });
 

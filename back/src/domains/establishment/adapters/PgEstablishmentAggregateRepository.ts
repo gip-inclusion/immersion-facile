@@ -10,9 +10,9 @@ import {
   SearchSortedBy,
   SiretDto,
   castError,
+  errors,
   pipeWithValue,
 } from "shared";
-import { BadRequestError, NotFoundError } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
@@ -93,9 +93,7 @@ export class PgEstablishmentAggregateRepository
       .execute()
       .then((result) => {
         if (result.length !== 1)
-          throw new NotFoundError(
-            `Establishment with siret ${siret} missing on Establishment Aggregate Repository.`,
-          );
+          throw errors.establishment.missingAggregate({ siret });
         logger.info({
           message: `Deleted establishment successfully. Siret was : ${siret}`,
         });
@@ -217,10 +215,12 @@ export class PgEstablishmentAggregateRepository
     checkDate: Date,
     maxResults: number,
   ): Promise<SiretDto[]> {
-    if (maxResults > 1000)
-      throw new BadRequestError(
-        "Querying getSiretsOfEstablishmentsNotCheckedAtInseeSince, maxResults must be <= 1000",
-      );
+    const maxLimit = 1000;
+    if (maxResults > maxLimit)
+      throw errors.establishment.outOfMaxLimit({
+        kind: "getSiretsOfEstablishmentsNotCheckedAtInseeSince",
+        maxLimit,
+      });
 
     const results = await this.transaction
       .selectFrom("establishments")
@@ -399,9 +399,10 @@ export class PgEstablishmentAggregateRepository
       updatedAggregate.establishment.siret,
     );
     if (!existingAggregate)
-      throw new NotFoundError(
-        `We do not have an establishment with siret ${updatedAggregate.establishment.siret} to update`,
-      );
+      throw errors.establishment.missingAggregate({
+        siret: updatedAggregate.establishment.siret,
+      });
+
     // Remove offers that don't exist anymore and create those that did not exist before
     await this.#updateImmersionOffersFromAggregates(
       existingAggregate,
@@ -1041,7 +1042,5 @@ const makeOrderByClauses = (
   if (geoParams && hasSearchGeoParams(geoParams))
     return sql`ST_Distance(loc.position,ST_GeographyFromText(${sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`})) ASC, RANDOM()`;
 
-  throw new BadRequestError(
-    "Cannot search by distance with invalid geo params",
-  );
+  throw errors.establishment.invalidGeoParams();
 };

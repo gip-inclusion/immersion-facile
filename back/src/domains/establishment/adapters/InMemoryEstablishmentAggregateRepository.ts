@@ -12,7 +12,6 @@ import {
   pathEq,
   replaceArrayElement,
 } from "shared";
-import { ConflictError, NotFoundError } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";
@@ -138,9 +137,7 @@ export class InMemoryEstablishmentAggregateRepository
     siret: string,
   ): Promise<boolean> {
     if (siret === conflictErrorSiret)
-      throw new ConflictError(
-        `Establishment with siret ${siret} already in db`,
-      );
+      throw errors.establishment.conflictError({ siret });
     return !!this.#establishmentAggregates.find(
       (aggregate) => aggregate.establishment.siret === siret,
     );
@@ -204,9 +201,9 @@ export class InMemoryEstablishmentAggregateRepository
       pathEq("establishment.siret", aggregate.establishment.siret),
     );
     if (aggregateIndex === -1)
-      throw new NotFoundError(
-        `We do not have an establishment with siret ${aggregate.establishment.siret} to update`,
-      );
+      throw errors.establishment.notFound({
+        siret: aggregate.establishment.siret,
+      });
     this.#establishmentAggregates = replaceArrayElement(
       this.#establishmentAggregates,
       aggregateIndex,
