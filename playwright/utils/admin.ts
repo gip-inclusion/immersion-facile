@@ -37,7 +37,9 @@ export const openEmailInAdmin = async (
   const emailSection = page
     .locator(`.fr-accordion:has-text("${emailType}")`)
     .nth(elementIndex);
-  await emailSection.locator(".fr-accordion__btn").click();
+  const locator = emailSection.locator(".fr-accordion__btn");
+  await locator.waitFor({ timeout: 3_000 });
+  await locator.click();
   return emailSection;
 };
 

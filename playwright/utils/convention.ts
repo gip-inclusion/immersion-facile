@@ -36,11 +36,11 @@ export const submitBasicConventionForm = async (
     "75",
   );
   const firstAgencyInDropdown = await page.locator(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId} > option:nth-child(1)`,
+    `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId} > option:nth-child(2)`,
   );
   const agencyId: AgencyId | null =
     await firstAgencyInDropdown.getAttribute("value");
-  expect(agencyId).not.toBeNull();
+  expect(agencyId).not.toBeFalsy();
   if (!agencyId) return;
   await page.selectOption(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
