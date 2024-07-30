@@ -48,14 +48,16 @@ const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
     );
 
   const now = timeGateway.now();
-  const tomorrow = getDateRangeFromScriptParams({
-    scriptParams: process.argv,
-  }) ?? {
+  const tomorrow = {
     from: addDays(now, 1),
     to: addDays(now, 2),
   };
+  const conventionEndDate =
+    getDateRangeFromScriptParams({
+      scriptParams: process.argv,
+    }) ?? tomorrow;
 
-  if (tomorrow.to > addDays(now, 2)) {
+  if (conventionEndDate.to > addDays(now, 2)) {
     const message =
       "Attention, vous êtes sur le point d'envoyer des bilans concernant des immersions qui ne sont pas encore terminées.";
     logger.error({
@@ -64,7 +66,7 @@ const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
     throw new Error(message);
   }
   return sendBeneficiariesPdfAssesmentsEmails.execute({
-    conventionEndDate: tomorrow,
+    conventionEndDate,
   });
 };
 
