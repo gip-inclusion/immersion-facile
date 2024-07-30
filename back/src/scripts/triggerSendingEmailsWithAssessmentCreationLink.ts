@@ -31,14 +31,16 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   });
   const timeGateway = new RealTimeGateway();
   const now = timeGateway.now();
-  const yesterday: DateRange = getDateRangeFromScriptParams({
-    scriptParams: process.argv,
-  }) ?? {
+  const yesterday = {
     from: subDays(now, 1),
     to: now,
   };
+  const conventionEndDate: DateRange =
+    getDateRangeFromScriptParams({
+      scriptParams: process.argv,
+    }) ?? yesterday;
 
-  if (yesterday.to > now) {
+  if (conventionEndDate.to > now) {
     const message =
       "Attention, vous êtes sur le point d'envoyer des bilans concernant des immersions qui ne sont pas encore terminées.";
     logger.error({
@@ -73,7 +75,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
     );
 
   return sendEmailsWithAssessmentCreationLink.execute({
-    conventionEndDate: yesterday,
+    conventionEndDate,
   });
 };
 
