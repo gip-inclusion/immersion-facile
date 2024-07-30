@@ -189,14 +189,14 @@ export const CreationSiretRelatedInputs = () => {
       />
       <AddressAutocomplete
         initialSearchTerm={establishmentInfos?.businessAddress}
-        {...formContents.businessAddresses}
+        label={"Vérifiez l'adresse de votre établissement *"}
+        id={domElementIds.establishment.create.addressAutocomplete}
         setFormValue={({ address }) =>
           setValue("businessAddresses.0", {
             id: uuidV4(),
             rawAddress: addressDtoToString(address),
           })
         }
-        id={domElementIds.establishment.create.addressAutocomplete}
         disabled={isFetchingSiret}
       />
     </>

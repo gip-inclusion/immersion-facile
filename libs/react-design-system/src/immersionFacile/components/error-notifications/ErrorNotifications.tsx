@@ -11,6 +11,18 @@ export type ErrorNotificationsProps = {
   visible: boolean;
 };
 
+const getErrorLabel = (
+  field: string,
+  labels?: Record<string, string | undefined>,
+) => {
+  if (!labels) return field;
+  if (field.includes(".")) {
+    const [domain, entryIndex] = field.split(".");
+    return `${labels[domain]} (${parseInt(entryIndex) + 1})`;
+  }
+  return labels[field];
+};
+
 const ErrorMessage = ({
   error,
   field,
@@ -19,17 +31,19 @@ const ErrorMessage = ({
   error: string | object;
   field: string;
   labels?: Record<string, string | undefined>;
-}) => (
-  <>
-    <strong className={`${componentName}__error-label`}>
-      {labels?.[field] ? labels[field] : field}
-    </strong>{" "}
-    :{" "}
-    <span className={`${componentName}__error-message`}>
-      {typeof error === "string" ? error : "Obligatoire"}
-    </span>
-  </>
-);
+}) => {
+  return (
+    <>
+      <strong className={`${componentName}__error-label`}>
+        {getErrorLabel(field, labels)}
+      </strong>{" "}
+      :{" "}
+      <span className={`${componentName}__error-message`}>
+        {typeof error === "string" ? error : "Obligatoire"}
+      </span>
+    </>
+  );
+};
 
 export const ErrorNotifications = ({
   errors,

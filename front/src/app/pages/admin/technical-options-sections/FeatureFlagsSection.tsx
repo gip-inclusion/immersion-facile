@@ -15,14 +15,13 @@ import {
   FeatureFlagTextWithSeverity,
   featureFlagTextImageAndRedirectValueSchema,
   featureFlagTextWithSeverityValueSchema,
-  toDotNotation,
 } from "shared";
 import {
   formTextImageAndRedirectFieldsLabels,
   formTextWithOptionsFieldsLabels,
 } from "src/app/contents/forms/admin/technicalOptions";
 import {
-  formErrorsToFlatErrors,
+  displayReadableError,
   getFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -182,7 +181,7 @@ const FeatureFlagTextWithSeverityForm = ({
 
       <ErrorNotifications
         labels={getFormErrors()}
-        errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+        errors={displayReadableError(formState.errors)}
         visible={
           formState.submitCount !== 0 &&
           Object.values(formState.errors).length > 0
@@ -274,7 +273,7 @@ const FeatureFlagTextImageAndRedirectForm = ({
       />
       <ErrorNotifications
         labels={getFormErrors()}
-        errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+        errors={displayReadableError(formState.errors)}
         visible={
           formState.submitCount !== 0 &&
           Object.values(formState.errors).length > 0

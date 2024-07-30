@@ -13,7 +13,6 @@ import {
   allAgencyStatuses,
   domElementIds,
   editAgencySchema,
-  toDotNotation,
 } from "shared";
 import {
   AgencyFormCommonFields,
@@ -21,7 +20,7 @@ import {
 } from "src/app/components/forms/agency/AgencyFormCommonFields";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
-  formErrorsToFlatErrors,
+  displayReadableError,
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
@@ -103,7 +102,7 @@ export const EditAgencyForm = ({
         </div>
         <ErrorNotifications
           labels={getFormErrors()}
-          errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+          errors={displayReadableError(formState.errors)}
           visible={
             formState.submitCount !== 0 &&
             Object.values(formState.errors).length > 0

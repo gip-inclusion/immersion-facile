@@ -29,7 +29,6 @@ import {
   reasonableSchedule,
   renewConventionParamsSchema,
   statusTransitionConfigs,
-  toDotNotation,
 } from "shared";
 import {
   BroadcastAgainButton,
@@ -45,7 +44,7 @@ import { VerificationActionButton } from "src/app/components/forms/convention/Ve
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
-  formErrorsToFlatErrors,
+  displayReadableError,
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
@@ -446,7 +445,7 @@ export const RenewConventionForm = ({
         />
         <ErrorNotifications
           labels={getFormErrors()}
-          errors={toDotNotation(formErrorsToFlatErrors(errors))}
+          errors={displayReadableError(errors)}
           visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
         <Button id={domElementIds.manageConvention.submitRenewModalButton}>

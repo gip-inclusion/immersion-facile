@@ -17,7 +17,7 @@ z.setErrorMap((issue, ctx) => {
   if (issue.code === "invalid_string" && issue.validation === "email")
     return {
       message: `${localization.invalidEmailFormat} - email fourni : ${
-        ctx.data ?? "vide"
+        ctx.data && ctx.data !== "" ? ctx.data : "vide"
       }`,
     };
 
@@ -56,6 +56,7 @@ export const localization = {
   required: "Obligatoire",
   signatoriesDistinctEmails:
     "Les emails des signataires doivent être différents.",
+  invalidAppellations: "Les métiers renseignés sont invalides.",
 };
 
 export const requiredText = {
