@@ -45,3 +45,9 @@ jobs:
         run: pnpm install
       - name: Playwright run
         run: pnpm playwright test:ci
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: test-results
+          path: ./playwright/test-results/
+          retention-days: 30
