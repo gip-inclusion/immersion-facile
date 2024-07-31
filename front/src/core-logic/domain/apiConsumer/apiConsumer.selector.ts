@@ -15,8 +15,14 @@ const lastCreatedToken = createSelector(
   (state) => state.lastCreatedToken,
 );
 
+const apiConsumerNames = createSelector(
+  apiConsumerState,
+  ({ apiConsumerNames }) => apiConsumerNames,
+);
+
 export const apiConsumerSelectors = {
   isLoading,
   apiConsumers,
+  apiConsumerNames,
   lastCreatedToken,
 };

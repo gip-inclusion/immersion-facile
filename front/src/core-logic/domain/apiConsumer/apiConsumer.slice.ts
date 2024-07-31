@@ -1,23 +1,61 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { ApiConsumer, ApiConsumerJwt, InclusionConnectJwt } from "shared";
+import {
+  ApiConsumer,
+  ApiConsumerJwt,
+  ApiConsumerName,
+  InclusionConnectJwt,
+  WithConventionId,
+} from "shared";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 type ApiConsumerState = {
   isLoading: boolean;
   apiConsumers: ApiConsumer[];
   lastCreatedToken: ApiConsumerJwt | null;
+  apiConsumerNames: ApiConsumerName[];
 };
 
 export const apiConsumerInitialState: ApiConsumerState = {
   isLoading: false,
   apiConsumers: [],
   lastCreatedToken: null,
+  apiConsumerNames: [],
 };
 
 export const apiConsumerSlice = createSlice({
   name: "apiConsumer",
   initialState: apiConsumerInitialState,
   reducers: {
+    fetchApiConsumerNamesRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<
+        WithConventionId & { jwt: InclusionConnectJwt }
+      >,
+    ) => {
+      state.isLoading = true;
+    },
+
+    fetchApiConsumerNamesSucceeded: (
+      state,
+      {
+        payload,
+      }: PayloadActionWithFeedbackTopic<{
+        apiConsumerNames: ApiConsumerName[];
+      }>,
+    ) => {
+      state.isLoading = false;
+      state.apiConsumerNames = payload.apiConsumerNames;
+    },
+
+    fetchApiConsumerNamesFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isLoading = false;
+    },
+    clearFetchedApiConsumerNames: (state) => {
+      state.apiConsumerNames = apiConsumerInitialState.apiConsumerNames;
+    },
     retrieveApiConsumersRequested: (
       state,
       _action: PayloadAction<InclusionConnectJwt>,

@@ -17,6 +17,7 @@ const topics = [
   "broadcast-convention-again",
   "partner-conventions",
   "agency-user",
+  "api-consumer-names",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -128,6 +129,14 @@ export const feedbackMapping: Record<
       title: "Problème rencontré",
       message:
         "Problème rencontré lors du marquage de la convention comme traitée.",
+    },
+  },
+  "api-consumer-names": {
+    "create.error": {
+      action: apiConsumerSlice.actions.fetchApiConsumerNamesFailed,
+      title: "Problème rencontré",
+      message:
+        "Une erreur est survenue lors de la récupération de la liste des partenaires à qui rediffuser la convention",
     },
   },
   "agency-user": {

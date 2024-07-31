@@ -1,4 +1,4 @@
-import { ApiConsumer, expectToEqual } from "shared";
+import { ApiConsumer, ConventionDtoBuilder, expectToEqual } from "shared";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
@@ -79,6 +79,76 @@ describe("api consumer", () => {
       );
 
       expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+    });
+  });
+
+  describe("Get Api consumer names", () => {
+    it("get Api consumer names by convention", () => {
+      const convention = new ConventionDtoBuilder().build();
+      expectInitialStateUnchanged();
+      store.dispatch(
+        apiConsumerSlice.actions.fetchApiConsumerNamesRequested({
+          conventionId: convention.id,
+          jwt: "my-jwt",
+          feedbackTopic: "api-consumer-names",
+        }),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+      dependencies.conventionGateway.getApiConsumersByconventionResult$.next([
+        "France Travail",
+      ]);
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(apiConsumerSelectors.apiConsumerNames(store.getState()), [
+        "France Travail",
+      ]);
+    });
+
+    it("stores error if failure during fetch", () => {
+      const convention = new ConventionDtoBuilder().build();
+      expectInitialStateUnchanged();
+      store.dispatch(
+        apiConsumerSlice.actions.fetchApiConsumerNamesRequested({
+          conventionId: convention.id,
+          jwt: "my-jwt",
+          feedbackTopic: "api-consumer-names",
+        }),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+      dependencies.conventionGateway.getApiConsumersByconventionResult$.error(
+        new Error("my-error-message"),
+      );
+      expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "api-consumer-names": {
+          on: "create",
+          level: "error",
+          title: "Problème rencontré",
+          message: "my-error-message",
+        },
+      });
+    });
+
+    it("Clear fetched convention", () => {
+      ({ store } = createTestStore({
+        admin: {
+          ...createTestStore().store.getState().admin,
+          apiConsumer: {
+            apiConsumerNames: ["France Travail"],
+            apiConsumers: [],
+            isLoading: false,
+            lastCreatedToken: null,
+          },
+        },
+      }));
+      expectToEqual(apiConsumerSelectors.apiConsumerNames(store.getState()), [
+        "France Travail",
+      ]);
+      store.dispatch(apiConsumerSlice.actions.clearFetchedApiConsumerNames());
+      expectToEqual(
+        apiConsumerSelectors.apiConsumerNames(store.getState()),
+        [],
+      );
     });
   });
 
