@@ -1,5 +1,6 @@
 import { Observable } from "rxjs";
 import {
+  ApiConsumerName,
   ConventionDto,
   ConventionId,
   ConventionJwt,
@@ -28,6 +29,12 @@ export interface ConventionGateway {
     convention: ConventionDto;
     discussionId?: DiscussionId;
   }): Observable<void>;
+  getApiConsumersByconvention$(
+    params: {
+      conventionId: ConventionId;
+    },
+    jwt: string,
+  ): Observable<ApiConsumerName[]>;
   getSimilarConventions$(
     findSimilarConventionsParams: FindSimilarConventionsParams,
   ): Observable<ConventionId[]>;
