@@ -56,12 +56,24 @@ export const ConventionManageContent = ({
 
   const dispatch = useDispatch();
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    (jwtParams.kind === "inclusionConnect" ||
+      jwtParams.kind === "backoffice") &&
+      convention &&
+      dispatch(
+        conventionSlice.actions.getApiConsumerNamesByConventionRequested({
+          conventionId: convention.id,
+          jwt: jwtParams.jwt,
+          feedbackTopic: "get-api-consumer-names-by-convention",
+        }),
+      );
+  }, [jwtParams.kind, jwtParams.jwt, convention, dispatch]);
+
+  useEffect(() => {
+    return () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
-    },
-    [dispatch],
-  );
+    };
+  }, [dispatch]);
 
   if (fetchConventionError) {
     if (!fetchConventionError.includes(expiredMagicLinkErrorMessage)) {
