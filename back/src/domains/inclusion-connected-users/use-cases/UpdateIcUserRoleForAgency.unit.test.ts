@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  AgencyRight,
   AgencyRole,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
@@ -255,6 +256,36 @@ describe("GetInclusionConnectedUsers", () => {
           },
         },
       }),
+    );
+  });
+  it("cannot remove the last validator of an agency", async () => {
+    const agency = new AgencyDtoBuilder().build();
+    const agencyRight: AgencyRight = {
+      agency,
+      roles: ["validator"],
+      isNotifiedByEmail: false,
+    };
+
+    const icUser: InclusionConnectedUser = {
+      ...notAdminUser,
+      agencyRights: [agencyRight],
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
+    };
+
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+      icUser,
+    ]);
+
+    await expectPromiseToFailWithError(
+      updateIcUserRoleForAgency.execute(
+        { agencyId: agency.id, roles: ["counsellor"], userId: icUser.id },
+        backofficeAdminUser,
+      ),
+      errors.agency.notEnoughValidators({ agencyId: agency.id }),
     );
   });
 });

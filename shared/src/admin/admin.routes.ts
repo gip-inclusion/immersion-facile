@@ -58,6 +58,7 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       201: expressEmptyResponseBody,
+      400: legacyHttpErrorSchema,
       401: legacyUnauthenticatedErrorSchema,
       404: legacyHttpErrorSchema,
     },
