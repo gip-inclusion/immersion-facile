@@ -1,5 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
+import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
 import { assessmentSchema } from "../assessment/assessment.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
@@ -32,6 +33,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
       403: httpErrorSchema,
     },
   }),
+
   getConvention: defineRoute({
     url: "/auth/demandes-immersion/:conventionId",
     method: "get",
@@ -126,6 +128,24 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     queryParamsSchema: findSimilarConventionsParamsSchema,
     responses: {
       200: findSimilarConventionsResponseSchema,
+    },
+  }),
+});
+
+export type AuthenticatedConventionRoutes =
+  typeof authenticatedConventionRoutes;
+
+export const authenticatedConventionRoutes = defineRoutes({
+  getApiConsumersByConvention: defineRoute({
+    method: "get",
+    url: "/conventions/:conventionId/api-consumers",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: apiConsumerReadSchema,
+      400: httpErrorSchema,
+      401: legacyUnauthenticatedErrorSchema,
+      403: legacyUnauthenticatedErrorSchema,
+      404: legacyHttpErrorSchema,
     },
   }),
 });

@@ -10,6 +10,7 @@ import { localization, zStringMinLength1 } from "../zodUtils";
 import {
   ApiConsumer,
   ApiConsumerContact,
+  ApiConsumerName,
   ApiConsumerSubscriptionId,
   CallbackHeaders,
   CreateWebhookSubscription,
@@ -132,3 +133,7 @@ export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
 
 export const apiConsumerSubscriptionIdSchema: z.Schema<ApiConsumerSubscriptionId> =
   z.string();
+
+export const apiConsumerReadSchema: z.Schema<ApiConsumerName[]> = z.array(
+  zStringMinLength1.max(255),
+);
