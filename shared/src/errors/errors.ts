@@ -270,6 +270,10 @@ export const errors = {
       new NotFoundError(
         `Mail not found for agency with id: ${agencyId} on agency repository.aaaaaaaaa`,
       ),
+    notEnoughValidators: ({ agencyId }: { agencyId: AgencyId }) =>
+      new BadRequestError(
+        `L'agence ${agencyId} doit avoir au moins un validateur.`,
+      ),
   },
   user: {
     unauthorized: () => new UnauthorizedError(),

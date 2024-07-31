@@ -449,9 +449,15 @@ describe("Admin router", () => {
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };
+      const validatorInAgency = new InclusionConnectedUserBuilder()
+        .withAgencyRights([
+          { roles: ["validator"], agency, isNotifiedByEmail: true },
+        ])
+        .build();
 
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
+        validatorInAgency,
         backofficeAdminUser,
       ]);
 

@@ -52,6 +52,24 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
         userId: params.userId,
       });
 
+    if (!params.roles.includes("validator")) {
+      const agencyUsers =
+        await uow.inclusionConnectedUserRepository.getWithFilter({
+          agencyId: params.agencyId,
+        });
+
+      const agencyHasOtherValidator = agencyUsers.some(
+        (agencyUser) =>
+          agencyUser.id !== params.userId &&
+          agencyUser.agencyRights.some((right) =>
+            right.roles.includes("validator"),
+          ),
+      );
+
+      if (!agencyHasOtherValidator)
+        throw errors.agency.notEnoughValidators({ agencyId: params.agencyId });
+    }
+
     const updatedAgencyRight: AgencyRight = {
       ...agencyRightToUpdate,
       roles: params.roles,

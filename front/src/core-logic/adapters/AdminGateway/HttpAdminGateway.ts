@@ -193,6 +193,9 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 201 }, () => undefined)
+            .with({ status: 400 }, (error) => {
+              throw new Error(error.body.errors);
+            })
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
