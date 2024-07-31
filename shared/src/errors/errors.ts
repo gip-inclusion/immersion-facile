@@ -355,7 +355,7 @@ export const errors = {
       ),
     missingRights: ({ rightName }: { rightName: ApiConsumerRightName }) =>
       new ForbiddenError(
-        `You do not have the "SUBSCRIPTION" kind associated to the "${rightName}" rightaaaaaaa`,
+        `You do not have the "SUBSCRIPTION" kind associated to the "${rightName}" right.`,
       ),
     missing: ({ id }: { id: ApiConsumerSubscriptionId }) =>
       new NotFoundError(`subscription ${id} not found`),

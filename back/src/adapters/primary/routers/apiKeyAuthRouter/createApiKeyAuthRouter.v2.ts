@@ -14,7 +14,6 @@ import {
   isApiConsumerAllowed,
   pipeWithValue,
 } from "shared";
-// import { ForbiddenError, NotFoundError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";

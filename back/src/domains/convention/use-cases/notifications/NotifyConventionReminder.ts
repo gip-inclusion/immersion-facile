@@ -10,7 +10,7 @@ import {
   type ExtractFromExisting,
   type GenericActor,
   type Phone,
-  ReminderKind,
+  type ReminderKind,
   type Role,
   type TemplatedEmail,
   type TemplatedSms,
