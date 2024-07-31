@@ -101,24 +101,19 @@ export const formErrorsToFlatErrors = (
   return errorObj;
 };
 
-const replaceArrayPath = (flatErrorsObject: Record<string, any>) => {
-  return keys(flatErrorsObject).reduce((acc, dotNestedKey) => {
-    const keySplitted = dotNestedKey.split(".");
-    if (keySplitted.length > 1) {
-      const domain = keySplitted.at(0);
-      const entryIndex = keySplitted.at(1);
-      const path = `${domain}.${entryIndex}`;
-      return {
-        ...acc,
-        [path]: flatErrorsObject[dotNestedKey],
-      };
-    }
+const replaceArrayPath = (flatErrorsObject: Record<string, any>) =>
+  keys(flatErrorsObject).reduce((acc, dotNestedKey) => {
+    const separator = ".";
+    const keySplitted = dotNestedKey.split(separator);
+    const key =
+      keySplitted.length > 1
+        ? keySplitted.slice(0, 2).join(separator)
+        : dotNestedKey;
     return {
       ...acc,
-      [dotNestedKey]: flatErrorsObject[dotNestedKey],
+      [key]: flatErrorsObject[dotNestedKey],
     };
   }, {});
-};
 
 export const displayReadableError = (
   errors: Record<string, any>,
