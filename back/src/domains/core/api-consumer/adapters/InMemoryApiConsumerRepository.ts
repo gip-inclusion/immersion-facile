@@ -1,6 +1,12 @@
 import { addYears, subYears } from "date-fns";
 import { values } from "ramda";
-import { ApiConsumer, ApiConsumerId, ApiConsumerRights, Builder } from "shared";
+import {
+  ApiConsumer,
+  ApiConsumerId,
+  ApiConsumerRights,
+  Builder,
+  Flavor,
+} from "shared";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { ApiConsumerRepository } from "../ports/ApiConsumerRepository";
 
@@ -208,6 +214,15 @@ export class ApiConsumerBuilder implements Builder<ApiConsumer> {
   ): ApiConsumerBuilder {
     return this.withRights({
       convention: conventionRight,
+    });
+  }
+
+  public withName(
+    apiConsumerName: Flavor<string, "ApiConsumerName">,
+  ): ApiConsumerBuilder {
+    return new ApiConsumerBuilder({
+      ...this.#dto,
+      name: apiConsumerName,
     });
   }
 
