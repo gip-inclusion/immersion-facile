@@ -1,49 +1,18 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import React, { useEffect } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
-import type { ApiConsumer, ConventionReadDto, Role } from "shared";
+import { ConventionReadDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
-import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-
-const useApiConsumers = () => {
-  const dispatch = useDispatch();
-  const apiConsumers = useAppSelector(apiConsumerSelectors.apiConsumers);
-  const inclusionConnectToken = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
-  useEffect(() => {
-    inclusionConnectToken &&
-      dispatch(
-        apiConsumerSlice.actions.retrieveApiConsumersRequested(
-          inclusionConnectToken,
-        ),
-      );
-  }, [inclusionConnectToken, dispatch]);
-  return { apiConsumers };
-};
 
 const broadcastAgainModal = createModal({
   isOpenedByDefault: false,
   id: "im-broadcast-modal",
 });
-
-const isConventionInScope = (
-  apiConsumer: ApiConsumer,
-  convention: ConventionReadDto,
-) => {
-  return (
-    apiConsumer.rights.convention.scope.agencyKinds?.includes(
-      convention.agencyKind,
-    ) ||
-    apiConsumer.rights.convention.scope.agencyIds?.includes(convention.agencyId)
-  );
-};
 
 export const BroadcastAgainButton = ({
   convention,
@@ -51,20 +20,10 @@ export const BroadcastAgainButton = ({
   convention: ConventionReadDto;
 }) => {
   const dispatch = useDispatch();
-  const { apiConsumers } = useApiConsumers();
 
-  const partners = [
-    ...apiConsumers.filter(
-      (apiConsumer) =>
-        apiConsumer.rights.convention.subscriptions.length !== 0 &&
-        isConventionInScope(apiConsumer, convention),
-    ),
-    ...(convention.agencyKind === "pole-emploi"
-      ? [{ name: "France Travail", id: "france-travail" }]
-      : []),
-  ];
+  const consumerNames = useAppSelector(conventionSelectors.apiConsumerNames);
 
-  if (partners.length === 0) return null;
+  if (consumerNames.length === 0) return null;
 
   return (
     <>
@@ -81,8 +40,8 @@ export const BroadcastAgainButton = ({
         <broadcastAgainModal.Component title="Rediffuser au partenaire">
           Vous allez rediffuser aux partenaires suivant :
           <ul>
-            {partners.map(({ name, id }) => (
-              <li key={id}>{name}</li>
+            {consumerNames.map((consumerName) => (
+              <li key={consumerName}>{consumerName}</li>
             ))}
           </ul>
           <Button
@@ -104,19 +63,9 @@ export const BroadcastAgainButton = ({
   );
 };
 
-type ShowModalParams = {
-  userRoles: Role[];
-  convention: ConventionReadDto;
-};
-
 export const shouldShowBroadcast = ({
-  userRoles,
   convention,
-}: ShowModalParams) => {
-  if (!userRoles.includes("backOffice")) return false;
-
-  // should check if agency has an API consumer which has subscriptions.
-  // This will have to be done, when the Button is made available for Agencies (and not only for IF admins)
+}: { convention: ConventionReadDto }) => {
   return (
     convention.agencyKind === "pole-emploi" ||
     convention.agencyKind === "mission-locale"

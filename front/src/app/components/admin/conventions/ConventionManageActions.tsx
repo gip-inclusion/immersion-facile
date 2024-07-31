@@ -358,7 +358,7 @@ export const ConventionManageActions = ({
             document.body,
           )}
 
-        {shouldShowBroadcast({ userRoles: roles, convention }) && (
+        {shouldShowBroadcast({ convention }) && (
           <BroadcastAgainButton convention={convention} />
         )}
       </div>
