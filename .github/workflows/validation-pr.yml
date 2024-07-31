@@ -42,7 +42,6 @@ jobs:
   deploy-review-app:
     if: github.event.pull_request.draft == false && github.event.pull_request.state == 'open'
     uses: ./.github/workflows/review-app-deploy.yml
-    needs: fullcheck
     with:
       pull_request_id: ${{ github.event.number }}
       run_number: ${{ github.run_number }}
