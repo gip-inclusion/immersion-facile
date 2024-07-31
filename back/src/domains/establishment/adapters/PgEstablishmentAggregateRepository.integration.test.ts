@@ -508,7 +508,6 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       });
 
-      // TODO : Je me questionne sur l'utilité de ce test alors qu'on a tout les autres ?
       it("returns one search DTO by establishment, with offers matching rome and geographical area", async () => {
         const establishmentAtRangeWithRome = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("00000000000001")
