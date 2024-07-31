@@ -9,6 +9,36 @@ import {
 type ApiConsumerAction = ActionOfSlice<typeof apiConsumerSlice>;
 type ApiConsumerEpic = AppEpic<ApiConsumerAction>;
 
+const getApiConsumerNamesByConventionEpic: ApiConsumerEpic = (
+  action$,
+  _state$,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(apiConsumerSlice.actions.fetchApiConsumerNamesRequested.match),
+    switchMap(({ payload }) =>
+      conventionGateway
+        .getApiConsumersByconvention$(
+          { conventionId: payload.conventionId },
+          payload.jwt,
+        )
+        .pipe(
+          map((apiConsumerNames) =>
+            apiConsumerSlice.actions.fetchApiConsumerNamesSucceeded({
+              apiConsumerNames,
+              feedbackTopic: payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error: Error) =>
+            apiConsumerSlice.actions.fetchApiConsumerNamesFailed({
+              errorMessage: error.message,
+              feedbackTopic: payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 const retrieveApiConsumersEpic: ApiConsumerEpic = (
   action$,
   _state$,
@@ -54,5 +84,6 @@ const createApiConsumerEpic: ApiConsumerEpic = (
 
 export const apiConsumerEpics = [
   retrieveApiConsumersEpic,
+  getApiConsumerNamesByConventionEpic,
   createApiConsumerEpic,
 ];

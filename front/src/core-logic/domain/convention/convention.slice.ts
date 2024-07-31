@@ -282,6 +282,7 @@ export const conventionSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
+
     getSimilarConventionsSucceeded: (
       state,
       { payload }: PayloadAction<ConventionId[]>,
