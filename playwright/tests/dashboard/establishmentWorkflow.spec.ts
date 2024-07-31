@@ -30,9 +30,12 @@ test.describe("Establishment dashboard workflow", () => {
         `#${domElementIds.establishmentDashboard.discussion.rejectApplicationSubmitButton}`,
       );
       const badgeLocator = await page.locator(
-        ".im-discussion-meta__item .fr-badge--error",
+        `#${domElementIds.establishmentDashboard.discussion.statusBadge}`,
       );
-      await expect(badgeLocator).toBeVisible();
+      await expect(badgeLocator).toBeVisible({
+        timeout: 10_000, // should wait for window to reload, it can take more than 5 seconds
+      });
+      await expect(badgeLocator).toHaveClass("fr-badge fr-badge--error");
       await expect(
         await page.locator(".im-exchange-message").all(),
       ).toHaveLength(3);
