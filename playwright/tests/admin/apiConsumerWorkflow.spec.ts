@@ -88,13 +88,15 @@ test.describe("Api Consumer Workflow", () => {
     page,
   }) => {
     await goToAdminTab(page, "technical-options");
-    const editApiConsumerButtonLocator = page.locator(
-      `[id^=${domElementIds.admin.technicalOptionsTab.editApiConsumerButton({
-        apiConsumerId: "",
-      })}]`,
-    );
-    await editApiConsumerButtonLocator.waitFor({ timeout: 3_000 });
-    await editApiConsumerButtonLocator.first().click();
+    const editApiConsumerButtonLocator = page
+      .locator(
+        `[id^=${domElementIds.admin.technicalOptionsTab.editApiConsumerButton({
+          apiConsumerId: "",
+        })}]`,
+      )
+      .first();
+    await expect(editApiConsumerButtonLocator).toBeVisible();
+    await editApiConsumerButtonLocator.click();
 
     await page
       .locator(

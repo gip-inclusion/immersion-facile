@@ -29,10 +29,9 @@ test.describe("Establishment dashboard workflow", () => {
       await page.click(
         `#${domElementIds.establishmentDashboard.discussion.rejectApplicationSubmitButton}`,
       );
-      const badgeLocator = page.locator(
+      const badgeLocator = await page.locator(
         ".im-discussion-meta__item .fr-badge--error",
       );
-      await badgeLocator.waitFor({ timeout: 10_000 });
       await expect(badgeLocator).toBeVisible();
       await expect(
         await page.locator(".im-exchange-message").all(),

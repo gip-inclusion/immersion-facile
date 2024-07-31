@@ -70,6 +70,50 @@ describe("notifications slice", () => {
       expectError("Something went wrong");
       expectIsLoadingToBe(false);
     });
+
+    it("should clear the notifications when the requested", () => {
+      store.dispatch(
+        notificationsSlice.actions.getLastNotificationsRequested(),
+      );
+      expectIsLoadingToBe(true);
+      const emails: EmailNotification[] = [
+        {
+          id: "123",
+          createdAt: "2022-07-10",
+          kind: "email",
+          followedIds: {},
+          templatedContent: {
+            kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+            recipients: ["bob@mail.com"],
+            params: {
+              editFrontUrl: "my-url",
+              businessAddresses: ["24 rue des boucher 67000 strasbourg"],
+              businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+            },
+          },
+        },
+      ];
+      const sms: SmsNotification[] = [
+        {
+          id: "456",
+          createdAt: "2022-07-10",
+          kind: "sms",
+          followedIds: {},
+          templatedContent: {
+            kind: "LastReminderForSignatories",
+            recipientPhone: "060011002200",
+            params: { shortLink: "http://my-url" },
+          },
+        },
+      ];
+      feedGatewayWithNotifications({ emails, sms });
+      expectNotifications({ emails, sms });
+      expectIsLoadingToBe(false);
+
+      store.dispatch(notificationsSlice.actions.clearNotificationsRequested());
+      expectIsLoadingToBe(false);
+      expectNotifications({ emails: [], sms: [] });
+    });
   });
 
   const expectIsLoadingToBe = (expected: boolean) => {

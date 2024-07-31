@@ -5,6 +5,7 @@ import {
   EstablishmentDashboardTab,
   EstablishmentDashboardTabList,
   adminTabsList,
+  domElementIds,
   frontRoutes,
 } from "shared";
 import { loginWithInclusionConnect } from "./inclusionConnect";
@@ -17,14 +18,17 @@ export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
     await loginWithInclusionConnect(page, "admin");
   }
   await expect(adminButton).toBeVisible();
-  await page.goto(frontRoutes.admin);
-  await page.waitForTimeout(200); // wait for the submenu to close (its visibility makes hard to click on tabs)
+  await adminButton.click();
+  await page
+    .locator(`#${domElementIds.header.navLinks.admin.backOffice}`)
+    .click();
+  await page.waitForTimeout(500); // wait for the submenu to close (its visibility makes hard to click on tabs)
   const tabLocator = await page
     .locator(".fr-tabs__list li")
     .nth(getTabIndexByTabName(adminTabsList, tabName))
     .locator(".fr-tabs__tab");
   await expect(tabLocator).toBeVisible();
-  await tabLocator.click({ force: true });
+  await tabLocator.click();
   expect(await page.url()).toContain(`${frontRoutes.admin}/${tabName}`);
 };
 
@@ -38,7 +42,7 @@ export const openEmailInAdmin = async (
     .locator(`.fr-accordion:has-text("${emailType}")`)
     .nth(elementIndex);
   const locator = emailSection.locator(".fr-accordion__btn");
-  await locator.waitFor({ timeout: 3_000 });
+  await expect(locator).toBeVisible();
   await locator.click();
   return emailSection;
 };
