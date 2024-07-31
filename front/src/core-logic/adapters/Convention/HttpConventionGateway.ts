@@ -1,6 +1,8 @@
 import { Observable, from } from "rxjs";
 import {
   AddConventionInput,
+  ApiConsumerName,
+  AuthenticatedConventionRoutes,
   ConventionDto,
   ConventionId,
   ConventionJwt,
@@ -31,6 +33,7 @@ export class HttpConventionGateway implements ConventionGateway {
   constructor(
     private readonly magicLinkHttpClient: HttpClient<ConventionMagicLinkRoutes>,
     private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionRoutes>,
+    private readonly authenticatedHttpClient: HttpClient<AuthenticatedConventionRoutes>,
     private readonly allowedInclusionConnectClient: HttpClient<InclusionConnectedAllowedRoutes>,
   ) {}
 
@@ -67,6 +70,25 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 409 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
+    );
+  }
+
+  public getApiConsumersByconvention$(
+    params: WithConventionId,
+    jwt: InclusionConnectJwt,
+  ): Observable<ApiConsumerName[]> {
+    return from(
+      this.authenticatedHttpClient
+        .getApiConsumersByConvention({
+          urlParams: { conventionId: params.conventionId },
+          headers: { authorization: jwt },
+        })
+        .then((response) => {
+          return match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow);
+        }),
     );
   }
 

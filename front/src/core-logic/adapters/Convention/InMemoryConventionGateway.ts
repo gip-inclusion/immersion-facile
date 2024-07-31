@@ -2,6 +2,7 @@ import { Observable, Subject, from } from "rxjs";
 import {
   AddConventionInput,
   AgencyOption,
+  ApiConsumerName,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -44,6 +45,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public conventionSignedResult$ = new Subject<void>();
 
+  public getApiConsumersByconventionResult$ = new Subject<ApiConsumerName[]>();
+
   public getSimilarConventionsResult$ = new Subject<ConventionId[]>();
 
   public updateConventionCallCount = 0;
@@ -71,6 +74,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public createConvention$(_params: AddConventionInput): Observable<void> {
     this.addConventionCallCount++;
     return this.addConventionResult$;
+  }
+
+  public getApiConsumersByconvention$(
+    _params: WithConventionId,
+    _jwt: InclusionConnectJwt,
+  ): Observable<ApiConsumerName[]> {
+    return this.getApiConsumersByconventionResult$;
   }
 
   public getConventionStatusDashboardUrl$(_jwt: string) {
