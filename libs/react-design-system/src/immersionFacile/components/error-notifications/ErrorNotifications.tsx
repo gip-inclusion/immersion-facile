@@ -17,7 +17,9 @@ const getErrorLabel = (
 ) => {
   if (!labels) return field;
   if (field.includes(".")) {
-    const [domain, entryIndex] = field.split(".");
+    const splittedField = field.split(".");
+    if (splittedField.length <= 1) return field;
+    const [domain, entryIndex] = splittedField;
     return `${labels[domain]} (${parseInt(entryIndex) + 1})`;
   }
   return labels[field];
