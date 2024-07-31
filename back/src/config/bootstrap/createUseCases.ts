@@ -19,6 +19,7 @@ import { AddConvention } from "../../domains/convention/use-cases/AddConvention"
 import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
+import { makeGetApiConsumersByconvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
@@ -632,6 +633,9 @@ export const createUseCases = (
     broadcastConventionAgain: makeBroadcastConventionAgain({
       uowPerformer,
       deps: { createNewEvent },
+    }),
+    getApiConsumersByConvention: makeGetApiConsumersByconvention({
+      uowPerformer,
     }),
     markDiscussionLinkedToConvention: makeMarkDiscussionLinkedToConvention({
       uowPerformer,
