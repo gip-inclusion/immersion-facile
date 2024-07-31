@@ -74,11 +74,13 @@ test.describe("Agency dashboard workflow", () => {
       .selectOption({
         index: 1,
       });
-    await page
+    const registerButton = await page
       .locator(
         `[id^=${domElementIds.admin.agencyTab.registerIcUserToAgencyButton}]`,
       )
-      .click();
+      .first();
+    await expect(registerButton).toBeVisible();
+    await registerButton.click();
     await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
 

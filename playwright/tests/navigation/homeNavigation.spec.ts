@@ -3,7 +3,6 @@ import { domElementIds, frontRoutes } from "shared";
 
 test.describe("Home user flow", () => {
   const userTypes = ["candidate", "establishment", "agency"] as const;
-
   userTypes.forEach((type) => {
     test(`Should change theme based on user type ${type}`, async ({ page }) => {
       await page.goto("/");

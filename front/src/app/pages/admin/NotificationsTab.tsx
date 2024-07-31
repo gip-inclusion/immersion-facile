@@ -4,6 +4,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { keys } from "ramda";
 import React, { ReactNode, useEffect, useState } from "react";
+import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   EmailNotification,
@@ -22,14 +23,18 @@ export const NotificationsTab = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(notificationsSlice.actions.getLastNotificationsRequested());
+    return () => {
+      dispatch(notificationsSlice.actions.clearNotificationsRequested());
+    };
   }, [dispatch]);
   const latestEmails = useAppSelector(adminSelectors.notifications.emails);
   const latestSms = useAppSelector(adminSelectors.notifications.sms);
   const errorMessage = useAppSelector(adminSelectors.notifications.error);
+  const isLoading = useAppSelector(adminSelectors.notifications.isLoading);
 
   const [notificationKindToShow, setNotificationKindToShow] =
     useState<NotificationKind>("email");
-
+  if (isLoading) return <Loader />;
   return (
     <div>
       <ToggleSwitch

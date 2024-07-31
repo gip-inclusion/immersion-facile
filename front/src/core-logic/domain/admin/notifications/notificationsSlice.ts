@@ -39,5 +39,11 @@ export const notificationsSlice = createSlice({
       state.error = action.payload;
       state.isLoading = false;
     },
+    clearNotificationsRequested: (state) => {
+      state.lastEmails = [];
+      state.lastSms = [];
+      state.error = null;
+      state.isLoading = false;
+    },
   },
 });

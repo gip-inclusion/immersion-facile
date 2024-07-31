@@ -180,7 +180,10 @@ test.describe("Establishment creation and modification workflow", () => {
     const startFormButtonLocator = page.locator(
       `#${domElementIds.establishment.edit.startFormButton}`,
     );
-    await startFormButtonLocator.waitFor({ timeout: 3_000 });
+
+    await expect(startFormButtonLocator).toBeVisible();
+    await expect(startFormButtonLocator).toBeEnabled();
+
     await startFormButtonLocator.click();
     await page.locator(".fr-radio-rich").getByText("Non").click();
     await page
@@ -303,7 +306,7 @@ test.describe("Establishment creation and modification workflow", () => {
     await page.click(
       `#${domElementIds.admin.manageEstablishment.searchButton}`,
     );
-    await page.waitForTimeout(500); // waiting for fetch and render
+    await page.waitForTimeout(1000); // waiting for fetch and render
     await expect(
       await page
         .locator(
