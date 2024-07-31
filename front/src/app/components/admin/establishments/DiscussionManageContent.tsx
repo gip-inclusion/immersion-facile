@@ -192,6 +192,7 @@ const DiscussionDetails = ({
         <DiscussionMeta
           children={[
             <p
+              id={domElementIds.establishmentDashboard.discussion.statusBadge}
               className={fr.cx("fr-badge", `fr-badge--${statusBadge.severity}`)}
             >
               {statusBadge.label}
