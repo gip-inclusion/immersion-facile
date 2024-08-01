@@ -20,7 +20,7 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
     name: "BroadcastConventionAgain",
     inputSchema: withConventionIdSchema,
   },
-  async ({ conventionId }, { uow, deps }, currentUser) => {
+  async ({ inputParams: { conventionId }, uow, deps, currentUser }) => {
     if (!currentUser.isBackofficeAdmin)
       throw errors.user.forbidden({ userId: currentUser.id });
 

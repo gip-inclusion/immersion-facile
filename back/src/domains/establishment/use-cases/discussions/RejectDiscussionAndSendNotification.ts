@@ -43,11 +43,12 @@ export const makeRejectDiscussionAndSendNotification =
         })
         .and(discussionRejectionSchema),
     },
-    async (
-      { discussionId, rejectionKind, rejectionReason },
-      { uow, deps },
+    async ({
+      inputParams: { discussionId, rejectionKind, rejectionReason },
+      uow,
+      deps,
       currentUser,
-    ) => {
+    }) => {
       const discussion = await uow.discussionRepository.getById(discussionId);
       if (!discussion) throw errors.discussion.notFound({ discussionId });
 

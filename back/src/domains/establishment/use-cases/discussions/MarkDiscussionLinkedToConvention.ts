@@ -10,7 +10,7 @@ export const makeMarkDiscussionLinkedToConvention =
       name: "MarkDiscussionLinkedToConvention",
       inputSchema: addConventionInputSchema,
     },
-    async ({ discussionId, convention }, { uow }) => {
+    async ({ inputParams: { discussionId, convention }, uow }) => {
       if (!discussionId) return;
       const discussion = await uow.discussionRepository.getById(discussionId);
       if (!discussion) throw errors.discussion.notFound({ discussionId });

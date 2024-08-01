@@ -31,7 +31,7 @@ export const makeContactRequestReminder = createTransactionalUseCase<
   }
 >(
   { name: "ContactRequestReminder", inputSchema: z.enum(["3days", "7days"]) },
-  async (mode, { uow, deps }, _) => {
+  async ({ inputParams: mode, uow, deps }) => {
     const now = deps.timeGateway.now();
     const discussions = await uow.discussionRepository.getDiscussions({
       filters: {

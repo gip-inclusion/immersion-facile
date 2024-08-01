@@ -18,7 +18,12 @@ export const makeCreateAssessment = createTransactionalUseCase<
   WithCreateNewEvent
 >(
   { name: "CreateAssessment", inputSchema: assessmentSchema },
-  async (dto, { uow, deps }, conventionJwtPayload) => {
+  async ({
+    inputParams: dto,
+    uow,
+    deps,
+    currentUser: conventionJwtPayload,
+  }) => {
     if (!conventionJwtPayload)
       throw new ForbiddenError("No magic link provided");
     throwForbiddenIfNotAllow(dto, conventionJwtPayload);

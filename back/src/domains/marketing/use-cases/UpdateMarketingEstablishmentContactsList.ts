@@ -35,10 +35,11 @@ export const makeUpdateMarketingEstablishmentContactList =
       inputSchema: withSiretSchema,
       name: "UpdateMarketingEstablishmentContactList",
     },
-    async (
-      { siret },
-      { deps: { establishmentMarketingGateway, timeGateway }, uow },
-    ): Promise<void> => {
+    async ({
+      inputParams: { siret },
+      deps: { establishmentMarketingGateway, timeGateway },
+      uow,
+    }): Promise<void> => {
       const establishment =
         await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
           siret,
