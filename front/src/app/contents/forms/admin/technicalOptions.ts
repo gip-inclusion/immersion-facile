@@ -76,7 +76,7 @@ export const formTextWithOptionsFieldsLabels: FeatureFlagTextWithOptionsFieldsLa
           value: "error",
         },
         {
-          label: "Succes",
+          label: "Succès",
           value: "success",
         },
         {
