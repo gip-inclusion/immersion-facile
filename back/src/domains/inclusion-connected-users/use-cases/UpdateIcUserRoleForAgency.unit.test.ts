@@ -258,15 +258,16 @@ describe("GetInclusionConnectedUsers", () => {
       }),
     );
   });
-  it("cannot remove the last validator of an agency", async () => {
+
+  it("cannot remove the last validator receiving notifications of an agency", async () => {
     const agency = new AgencyDtoBuilder().build();
     const agencyRight: AgencyRight = {
       agency,
       roles: ["validator"],
-      isNotifiedByEmail: false,
+      isNotifiedByEmail: true,
     };
 
-    const icUser: InclusionConnectedUser = {
+    const icUserReceivingNotif: InclusionConnectedUser = {
       ...notAdminUser,
       agencyRights: [agencyRight],
       dashboards: {
@@ -275,14 +276,29 @@ describe("GetInclusionConnectedUsers", () => {
       },
     };
 
+    const icUserWithoutNotif: InclusionConnectedUser = {
+      ...notAdminUser,
+      id: "not-receiving-notif-id",
+      agencyRights: [{ ...agencyRight, isNotifiedByEmail: false }],
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
+    };
+
     inclusionConnectedUserRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
-      icUser,
+      icUserReceivingNotif,
+      icUserWithoutNotif,
     ]);
 
     await expectPromiseToFailWithError(
       updateIcUserRoleForAgency.execute(
-        { agencyId: agency.id, roles: ["counsellor"], userId: icUser.id },
+        {
+          agencyId: agency.id,
+          roles: ["counsellor"],
+          userId: icUserReceivingNotif.id,
+        },
         backofficeAdminUser,
       ),
       errors.agency.notEnoughValidators({ agencyId: agency.id }),

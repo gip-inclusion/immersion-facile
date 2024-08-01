@@ -272,7 +272,7 @@ export const errors = {
       ),
     notEnoughValidators: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
-        `L'agence ${agencyId} doit avoir au moins un validateur.`,
+        `L'agence ${agencyId} doit avoir au moins un validateur recevant les emails.`,
       ),
   },
   user: {
