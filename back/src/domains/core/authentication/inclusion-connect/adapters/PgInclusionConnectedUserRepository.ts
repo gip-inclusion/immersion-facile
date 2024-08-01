@@ -1,9 +1,11 @@
+import { map, uniqBy } from "ramda";
 import {
   AgencyId,
   AgencyRight,
   AgencyRole,
   InclusionConnectedUser,
   UserId,
+  pipeWithValue,
 } from "shared";
 import {
   KyselyDb,
@@ -41,13 +43,10 @@ export class PgInclusionConnectedUserRepository
     userId,
     agencyRights,
   }: { userId: UserId; agencyRights: AgencyRight[] }): Promise<void> {
-    await executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-        DELETE FROM users__agencies WHERE user_id = $1
-        `,
-      [userId],
-    );
+    await this.transaction
+      .deleteFrom("users__agencies")
+      .where("user_id", "=", userId)
+      .executeTakeFirstOrThrow();
 
     if (agencyRights.length > 0)
       await this.transaction
@@ -153,15 +152,28 @@ export class PgInclusionConnectedUserRepository
 
     return response.rows.map(
       ({
-        inclusion_user: { isBackofficeAdmin, createdAt, agencyRights, ...rest },
+        inclusion_user: {
+          isBackofficeAdmin,
+          createdAt,
+          agencyRights,
+          establishments,
+          ...rest
+        },
       }): InclusionConnectedUser => ({
         ...rest,
-        agencyRights: agencyRights.map(
-          (agencyRight: AgencyRight): AgencyRight => ({
-            ...agencyRight,
-            agency: addEmailsToAgency(usersWithAgencyRole)(agencyRight.agency),
-          }),
+        agencyRights: pipeWithValue(
+          agencyRights as AgencyRight[],
+          uniqBy(({ agency }) => agency.id),
+          map(
+            (agencyRight: AgencyRight): AgencyRight => ({
+              ...agencyRight,
+              agency: addEmailsToAgency(usersWithAgencyRole)(
+                agencyRight.agency,
+              ),
+            }),
+          ),
         ),
+        establishments: uniqBy(({ siret }) => siret, establishments),
         createdAt: new Date(createdAt).toISOString(),
         dashboards: {
           agencies: {},
