@@ -111,10 +111,37 @@ describe("ContactRequestReminder", () => {
       expectToEqual(reminderQty7d, { numberOfNotifications: 0 });
       expectToEqual(uow.outboxRepository.events, []);
     });
+    it("no discussion with status other than PENDING", async () => {
+      uow.discussionRepository.discussions = [
+        new DiscussionBuilder(discussionWith3DaysSinceBeneficiairyExchange)
+          .withStatus("ACCEPTED")
+          .build(),
+        new DiscussionBuilder(discussionWith4DaysSinceBeneficiairyExchange)
+          .withStatus("REJECTED")
+          .build(),
+        new DiscussionBuilder(discussionWith7DaysSinceBeneficiairyExchange)
+          .withStatus("ACCEPTED")
+          .build(),
+        new DiscussionBuilder(discussionWith8DaysSinceBeneficiairyExchange)
+          .withStatus("REJECTED")
+          .build(),
+      ];
+      const reminderQty3d = await contactRequestReminder.execute(
+        "3days",
+        undefined,
+      );
+      const reminderQty7d = await contactRequestReminder.execute(
+        "7days",
+        undefined,
+      );
+      expectToEqual(reminderQty3d, { numberOfNotifications: 0 });
+      expectToEqual(reminderQty7d, { numberOfNotifications: 0 });
+      expectToEqual(uow.outboxRepository.events, []);
+    });
   });
 
   describe("right paths", () => {
-    it("when discussion with missing establishment response 3 days after ", async () => {
+    beforeEach(() => {
       uow.discussionRepository.discussions = [
         discussionWith2DaysSinceBeneficiairyExchange,
         discussionWith3DaysSinceBeneficiairyExchange,
@@ -123,6 +150,8 @@ describe("ContactRequestReminder", () => {
         discussionWith7DaysSinceBeneficiairyExchange,
         discussionWith8DaysSinceBeneficiairyExchange,
       ];
+    });
+    it("when discussion with missing establishment response 3 days after ", async () => {
       const reminderQty = await contactRequestReminder.execute(
         "3days",
         undefined,
@@ -146,15 +175,6 @@ describe("ContactRequestReminder", () => {
     });
 
     it("when discussion with missing establishment response 7 days after ", async () => {
-      uow.discussionRepository.discussions = [
-        discussionWith2DaysSinceBeneficiairyExchange,
-        discussionWith3DaysSinceBeneficiairyExchange,
-        discussionWith4DaysSinceBeneficiairyExchange,
-        discussionWith6DaysSinceBeneficiairyExchange,
-        discussionWith7DaysSinceBeneficiairyExchange,
-        discussionWith8DaysSinceBeneficiairyExchange,
-      ];
-
       const reminderQty = await contactRequestReminder.execute(
         "7days",
         undefined,
