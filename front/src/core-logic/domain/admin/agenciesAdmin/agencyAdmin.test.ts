@@ -1,7 +1,11 @@
 import {
   AgencyDto,
   AgencyDtoBuilder,
+  AgencyId,
   AgencyOption,
+  AgencyRight,
+  InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -22,6 +26,7 @@ import {
   AGENCY_NEEDING_REVIEW_2,
   PE_AGENCY_ACTIVE,
 } from "../../../adapters/AgencyGateway/SimulatedAgencyGateway";
+import { icUsersAdminSelectors } from "../icUsersAdmin/icUsersAdmin.selectors";
 
 describe("agencyAdmin", () => {
   let store: ReduxStore;
@@ -266,13 +271,33 @@ describe("agencyAdmin", () => {
       });
     });
 
-    it("send request to update agency and shows feedback", () => {
-      store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
+    it("send request to update agency and shows feedback, and refetch agency users", () => {
+      const updatedAgency: AgencyDto = {
+        ...agencyDto,
+        validatorEmails: ["a@b.com", "c@d.com"],
+      };
+      store.dispatch(
+        agencyAdminSlice.actions.updateAgencyRequested(updatedAgency),
+      );
 
       feedWithUpdateResponse();
       expectAgencyAdminStateToMatch({
         isUpdating: false,
         feedback: { kind: "agencyUpdated" },
+      });
+      const user = new InclusionConnectedUserBuilder().build();
+      feedWithIcUsers([user]);
+      expectToEqual(icUsersAdminSelectors.agencyUsers(store.getState()), {
+        [user.id]: {
+          ...user,
+          agencyRights: user.agencyRights.reduce(
+            (acc, agencyRight) => ({
+              ...acc,
+              [agencyRight.agency.id]: agencyRight,
+            }),
+            {} as Record<AgencyId, AgencyRight>,
+          ),
+        },
       });
     });
 
@@ -341,6 +366,10 @@ describe("agencyAdmin", () => {
 
   const feedWithUpdateError = (msg: string) => {
     dependencies.agencyGateway.updateAgencyResponse$.error(new Error(msg));
+  };
+
+  const feedWithIcUsers = (icUsers: InclusionConnectedUser[]) => {
+    dependencies.adminGateway.getAgencyUsersToReviewResponse$.next(icUsers);
   };
 
   const whenSearchTextIsProvided = (searchedText: string) => {

@@ -8,6 +8,8 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+import { type IcUsersAdminAction } from "../icUsersAdmin/icUsersAdmin.epics";
+import { icUsersAdminSlice } from "../icUsersAdmin/icUsersAdmin.slice";
 import { agencyAdminSlice } from "./agencyAdmin.slice";
 
 export type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
@@ -152,6 +154,16 @@ const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
     }),
   );
 
+const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
+  IcUsersAdminAction | AgencyAction
+> = (action$) =>
+  action$.pipe(
+    filter(icUsersAdminSlice.actions.updateUserOnAgencySucceeded.match),
+    map((action) =>
+      agencyAdminSlice.actions.setSelectedAgencyId(action.payload.agencyId),
+    ),
+  );
+
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
   agencyAdminGetNeedingReviewEpic,
@@ -160,4 +172,5 @@ export const agenciesAdminEpics = [
   updateAgencyEpic,
   updateAgencyNeedingReviewStatusEpic,
   agencyDoesNotNeedReviewAnymoreEpic,
+  fetchAgencyOnIcUserUpdatedEpic,
 ];
