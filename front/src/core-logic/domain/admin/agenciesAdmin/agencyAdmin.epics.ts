@@ -10,7 +10,7 @@ import {
 } from "src/core-logic/storeConfig/redux.helpers";
 import { agencyAdminSlice } from "./agencyAdmin.slice";
 
-type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
+export type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
 
 type AgencyEpic = AppEpic<AgencyAction | { type: "do-nothing" }>;
 

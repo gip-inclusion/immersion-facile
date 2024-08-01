@@ -29,7 +29,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 
 type EditAgencyFormProperties = {
   agency: AgencyDto;
@@ -70,11 +69,6 @@ export const EditAgencyForm = ({
         className={fr.cx("fr-my-4w")}
         onSubmit={handleSubmit((values) => {
           dispatch(agencyAdminSlice.actions.updateAgencyRequested(values));
-          dispatch(
-            icUsersAdminSlice.actions.fetchAgencyUsersRequested({
-              agencyId: agency.id,
-            }),
-          );
         })}
         id={domElementIds.admin.agencyTab.editAgencyForm}
         data-matomo-name={domElementIds.admin.agencyTab.editAgencyForm}
