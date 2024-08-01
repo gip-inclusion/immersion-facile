@@ -186,11 +186,12 @@ test.describe("Establishment creation and modification workflow", () => {
         .getByRole("link", { name: "Lien vers la page" })
         .click();
 
+      await page.waitForTimeout(4_000);
+
       // Edit establishment
       const startFormButtonLocator = await page.locator(
         `#${domElementIds.establishment.edit.startFormButton}`,
       );
-
       await expectLocatorToBeVisibleAndEnabled(startFormButtonLocator);
 
       await startFormButtonLocator.click();
