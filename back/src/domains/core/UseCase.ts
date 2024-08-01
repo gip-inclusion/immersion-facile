@@ -16,7 +16,7 @@ const logger = createLogger(__filename);
 type CreateTransactionalUseCase = <
   Input,
   Output = void,
-  UserIdentity = void,
+  CurrentUser = void,
   Dependencies = void,
 >(
   {
@@ -26,11 +26,12 @@ type CreateTransactionalUseCase = <
     name: string;
     inputSchema: z.ZodSchema<Input>;
   },
-  cb: (
-    params: Input,
-    { uow, deps }: { uow: UnitOfWork; deps: Dependencies },
-    userIdentity: UserIdentity,
-  ) => Promise<Output>,
+  cb: (params: {
+    inputParams: Input;
+    uow: UnitOfWork;
+    deps: Dependencies;
+    currentUser: CurrentUser;
+  }) => Promise<Output>,
 ) => (
   config: {
     uowPerformer: UnitOfWorkPerformer;
@@ -39,14 +40,14 @@ type CreateTransactionalUseCase = <
     : { deps: Dependencies }),
 ) => {
   useCaseName: string;
-  execute: (params: Input, userIdentity: UserIdentity) => Promise<Output>;
+  execute: (params: Input, currentUser: CurrentUser) => Promise<Output>;
 };
 
 export const createTransactionalUseCase: CreateTransactionalUseCase =
   ({ name, inputSchema }, cb) =>
   ({ uowPerformer, deps }) => ({
     useCaseName: name,
-    execute: async (inputParams, userIdentity) => {
+    execute: async (inputParams, currentUser) => {
       const startDate = new Date();
       const validParams = validateAndParseZodSchema(
         inputSchema,
@@ -56,7 +57,9 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
       const searchParams = getSearchParams(name, validParams);
 
       return uowPerformer
-        .perform((uow) => cb(validParams, { uow, deps }, userIdentity))
+        .perform((uow) =>
+          cb({ inputParams: validParams, uow, deps, currentUser }),
+        )
         .then((result) => {
           logger.info({
             useCaseName: name,

@@ -13,7 +13,7 @@ export const makeListActiveSubscriptions = createTransactionalUseCase<
   ApiConsumer
 >(
   { name: "ListActiveSubscriptions", inputSchema: z.void() },
-  (_, _uow, apiConsumer) => {
+  ({ currentUser: apiConsumer }) => {
     const subscriptions = keys(apiConsumer.rights).flatMap(
       (rightName) => apiConsumer.rights[rightName].subscriptions,
     );

@@ -26,7 +26,7 @@ export const makeGetEstablishmentStats = createTransactionalUseCase<
     name: "GetEstablishmentStats",
     inputSchema: paginationRequiredQueryParamsSchema,
   },
-  async (paginationParams, { uow }, apiConsumer) => {
+  async ({ inputParams: paginationParams, uow, currentUser: apiConsumer }) => {
     if (!apiConsumer.rights.statistics.kinds.includes("READ"))
       throw errors.apiConsumer.notEnoughPrivilege();
     return uow.statisticQueries.getEstablishmentStats(paginationParams);
