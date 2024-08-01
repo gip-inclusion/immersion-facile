@@ -2,6 +2,7 @@ import {
   AppellationCode,
   DiscussionDto,
   DiscussionId,
+  DiscussionStatus,
   Email,
   LocationId,
   SiretDto,
@@ -18,7 +19,7 @@ export type HasDiscussionMatchingParams = {
 
 export type GetDiscussionsParams = {
   filters: {
-    discussionId?: DiscussionId;
+    status?: DiscussionStatus;
     sirets?: SiretDto[];
     createdSince?: Date;
     lastAnsweredByCandidate?: { from: Date; to: Date };

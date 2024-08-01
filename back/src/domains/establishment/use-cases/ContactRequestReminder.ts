@@ -35,6 +35,7 @@ export const makeContactRequestReminder = createTransactionalUseCase<
     const now = deps.timeGateway.now();
     const discussions = await uow.discussionRepository.getDiscussions({
       filters: {
+        status: "PENDING",
         lastAnsweredByCandidate: {
           from: addDays(now, mode === "3days" ? -4 : -8),
           to: addDays(now, mode === "3days" ? -3 : -7),

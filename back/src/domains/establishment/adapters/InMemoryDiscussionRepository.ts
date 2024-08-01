@@ -27,6 +27,7 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
         filters.createdSince
           ? new Date(createdAt) >= filters.createdSince
           : true,
+      ({ status }) => (filters.status ? status === filters.status : true),
       ({ exchanges }) => {
         if (!filters.lastAnsweredByCandidate) return true;
         const mostRecentExchange = exchanges.reduce((a, b) =>
