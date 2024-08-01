@@ -1,7 +1,8 @@
+import { expectToEqual } from "../test.helpers";
 import {
   makeBooleanFeatureFlag,
-  makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
 } from "./featureFlags.dto";
 
 describe("feature flag utils tests", () => {
@@ -15,12 +16,16 @@ describe("feature flag utils tests", () => {
   });
 
   it("should return a text feature flag", () => {
-    const flag = makeTextFeatureFlag(true, { message: "Maintenance message" });
-    expect(flag).toEqual({
+    const flag = makeTextWithSeverityFeatureFlag(true, {
+      message: "Maintenance message",
+      severity: "warning",
+    });
+    expectToEqual(flag, {
       isActive: true,
-      kind: "text",
+      kind: "textWithSeverity",
       value: {
         message: "Maintenance message",
+        severity: "warning",
       },
     });
   });

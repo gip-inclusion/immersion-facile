@@ -15,10 +15,11 @@ import { SetFeatureFlag } from "./SetFeatureFlag";
 const setEnableMaintenanceParams = {
   flagName: "enableMaintenance",
   featureFlag: {
-    kind: "text",
+    kind: "textWithSeverity",
     isActive: true,
     value: {
       message: "Hola",
+      severity: "info",
     },
   },
 } satisfies SetFeatureFlagParam;
@@ -67,9 +68,9 @@ describe("SetFeatureFlag use case", () => {
   it("saves the feature flag", async () => {
     expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
       enableMaintenance: {
-        kind: "text",
+        kind: "textWithSeverity",
         isActive: false,
-        value: { message: "Maintenance message" },
+        value: { message: "Maintenance message", severity: "warning" },
       },
     });
     await setFeatureFlag.execute(setEnableMaintenanceParams, icUserAdmin);

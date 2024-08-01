@@ -2,8 +2,8 @@ import {
   FeatureFlags,
   expectToEqual,
   makeBooleanFeatureFlag,
-  makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
 } from "shared";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import {
@@ -25,8 +25,9 @@ const defaultFeatureFlags: FeatureFlags = {
     overtitle: "",
     title: "",
   }),
-  enableMaintenance: makeTextFeatureFlag(false, {
+  enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
     message: "",
+    severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
 };
@@ -40,8 +41,9 @@ const flagsFromApi: FeatureFlags = {
     overtitle: "",
     title: "",
   }),
-  enableMaintenance: makeTextFeatureFlag(true, {
+  enableMaintenance: makeTextWithSeverityFeatureFlag(true, {
     message: "My maintenance message",
+    severity: "error",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(true),
 };

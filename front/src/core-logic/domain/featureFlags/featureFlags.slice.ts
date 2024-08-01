@@ -3,8 +3,8 @@ import {
   FeatureFlags,
   SetFeatureFlagParam,
   makeBooleanFeatureFlag,
-  makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
 } from "shared";
 
 export type FeatureFlagsState = FeatureFlags & {
@@ -20,7 +20,10 @@ const initialState: FeatureFlagsState = {
     overtitle: "",
     title: "",
   }),
-  enableMaintenance: makeTextFeatureFlag(false, { message: "" }),
+  enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
+    message: "",
+    severity: "warning",
+  }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
   isLoading: true,
 };

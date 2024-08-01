@@ -1,8 +1,8 @@
 import {
   FeatureFlags,
   makeBooleanFeatureFlag,
-  makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
 } from "shared";
 
 const defaultFlagsInFront: FeatureFlags = {
@@ -14,8 +14,9 @@ const defaultFlagsInFront: FeatureFlags = {
     overtitle: "overtitle",
     title: "title",
   }),
-  enableMaintenance: makeTextFeatureFlag(false, {
+  enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
     message: "My maintenance message",
+    severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
 };

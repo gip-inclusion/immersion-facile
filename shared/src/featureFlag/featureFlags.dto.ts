@@ -1,6 +1,11 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 
+type FeatureFlagSeverity = (typeof featureFlagSeverities)[number];
+
+const featureFlagSeverities = ["warning", "error", "success", "info"] as const;
+
 export type FeatureFlagName = (typeof featureFlagNames)[number];
+
 export const featureFlagNames = [
   "enableTemporaryOperation",
   "enableMaintenance",
@@ -8,7 +13,12 @@ export const featureFlagNames = [
 ] as const;
 
 type FeatureFlagKind = (typeof featureFlagKinds)[number];
-const featureFlagKinds = ["boolean", "text", "textImageAndRedirect"] as const;
+
+const featureFlagKinds = [
+  "boolean",
+  "textImageAndRedirect",
+  "textWithSeverity",
+] as const;
 
 type GenericFeatureFlag<K extends FeatureFlagKind, V = void> = {
   kind: K;
@@ -16,34 +26,36 @@ type GenericFeatureFlag<K extends FeatureFlagKind, V = void> = {
 } & (V extends void ? object : { value: V });
 
 type WithFeatureFlagTextValue = { message: string };
-type WithImageUrl = { imageUrl: AbsoluteUrl };
-type WithImageAlt = { imageAlt: string };
-type WithRedirectUrl = { redirectUrl: AbsoluteUrl };
-type WithTitle = { title: string };
-type WithOvertitle = { overtitle: string };
 
-export type FeatureFlagText = GenericFeatureFlag<
-  "text",
-  WithFeatureFlagTextValue
+type WithImageAndRedirect = {
+  imageUrl: AbsoluteUrl;
+  imageAlt: string;
+  redirectUrl: AbsoluteUrl;
+  title: string;
+  overtitle: string;
+};
+type WithSeverityValue = {
+  severity: FeatureFlagSeverity;
+};
+
+export type FeatureFlagTextWithSeverity = GenericFeatureFlag<
+  "textWithSeverity",
+  WithFeatureFlagTextValue & WithSeverityValue
 >;
+
 export type FeatureFlagTextImageAndRedirect = GenericFeatureFlag<
   "textImageAndRedirect",
-  WithFeatureFlagTextValue &
-    WithImageUrl &
-    WithRedirectUrl &
-    WithImageAlt &
-    WithTitle &
-    WithOvertitle
+  WithFeatureFlagTextValue & WithImageAndRedirect
 >;
 export type FeatureFlagBoolean = GenericFeatureFlag<"boolean">;
 
 export type FeatureFlag =
   | FeatureFlagBoolean
-  | FeatureFlagText
-  | FeatureFlagTextImageAndRedirect;
+  | FeatureFlagTextImageAndRedirect
+  | FeatureFlagTextWithSeverity;
 
 export type FeatureFlags = {
-  enableMaintenance: FeatureFlagText;
+  enableMaintenance: FeatureFlagTextWithSeverity;
   enableTemporaryOperation: FeatureFlagTextImageAndRedirect;
   enableSearchByScore: FeatureFlagBoolean;
 };
@@ -57,8 +69,8 @@ const makeFeatureFlag =
   <K extends FeatureFlagKind>(kind: K) =>
   (
     isActive: boolean,
-    ...value: K extends "text"
-      ? [FeatureFlagText["value"]]
+    ...value: K extends "textWithSeverity"
+      ? [FeatureFlagTextWithSeverity["value"]]
       : K extends "textImageAndRedirect"
         ? [FeatureFlagTextImageAndRedirect["value"]]
         : []
@@ -73,10 +85,11 @@ const makeFeatureFlag =
   };
 
 export const makeBooleanFeatureFlag = makeFeatureFlag("boolean");
-export const makeTextFeatureFlag = makeFeatureFlag("text");
 export const makeTextImageAndRedirectFeatureFlag = makeFeatureFlag(
   "textImageAndRedirect",
 );
+export const makeTextWithSeverityFeatureFlag =
+  makeFeatureFlag("textWithSeverity");
 
 export const hasFeatureFlagValue = (
   flag: FeatureFlag | SetFeatureFlagParam["featureFlag"],

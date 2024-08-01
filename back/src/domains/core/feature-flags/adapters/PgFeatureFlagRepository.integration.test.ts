@@ -3,8 +3,8 @@ import {
   FeatureFlags,
   expectToEqual,
   makeBooleanFeatureFlag,
-  makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
 } from "shared";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
@@ -38,8 +38,9 @@ describe("PG getFeatureFlags", () => {
         overtitle: "",
         title: "",
       }),
-      enableMaintenance: makeTextFeatureFlag(false, {
+      enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
         message: "Maintenance message",
+        severity: "warning",
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
     };
@@ -57,8 +58,9 @@ describe("PG getFeatureFlags", () => {
         overtitle: "",
         title: "",
       }),
-      enableMaintenance: makeTextFeatureFlag(false, {
+      enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
         message: "Maintenance message",
+        severity: "warning",
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
     });
@@ -74,8 +76,9 @@ describe("PG getFeatureFlags", () => {
         overtitle: "overtitle",
         title: "title",
       }),
-      enableMaintenance: makeTextFeatureFlag(false, {
+      enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
         message: "Maintenance message",
+        severity: "error",
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
     };
@@ -112,8 +115,9 @@ describe("PG getFeatureFlags", () => {
         overtitle: "updatedOvertitle",
         title: "updatedTitle",
       }),
-      enableMaintenance: makeTextFeatureFlag(false, {
+      enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
         message: "Maintenance message",
+        severity: "error",
       }),
       enableSearchByScore: makeBooleanFeatureFlag(true),
     });

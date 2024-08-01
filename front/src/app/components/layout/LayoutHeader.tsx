@@ -275,6 +275,7 @@ export const LayoutHeader = () => {
               ? enableMaintenance.value.message
               : commonContent.maintenanceMessage
           }
+          level={enableMaintenance.value.severity}
         />
       )}
       <Header

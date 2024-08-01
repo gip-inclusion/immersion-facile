@@ -5,8 +5,8 @@ import {
   InclusionConnectedUserBuilder,
   conventionSchema,
   makeBooleanFeatureFlag,
-  makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
   reasonableSchedule,
 } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
@@ -125,8 +125,9 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
       title: "",
       overtitle: "",
     }),
-    enableMaintenance: makeTextFeatureFlag(false, {
+    enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
       message: "Mon message de maintenance",
+      severity: "warning",
     }),
     enableSearchByScore: makeBooleanFeatureFlag(true),
   };
