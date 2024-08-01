@@ -216,7 +216,7 @@ describe("PgDiscussionRepository", () => {
           );
         });
 
-        it("bug - discussion with lot of exchanges that had more reminders than expected on production", async () => {
+        it("filters discussions even if they have a lot of exchanges", async () => {
           const now = new Date("2024-08-01");
           const discussionWithLotOfExchanges = new DiscussionBuilder()
             .withId(uuid())
