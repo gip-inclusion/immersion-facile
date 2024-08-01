@@ -1,4 +1,4 @@
-import { Page, expect } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import { testConfig } from "../custom.config";
 
 export const phoneRegexp = new RegExp(/[0][1-9][0-9]{8}/);
@@ -68,4 +68,9 @@ export const logHttpResponse = ({
       );
     }
   });
+};
+
+export const expectLocatorToBeVisibleAndEnabled = async (locator: Locator) => {
+  await expect(locator).toBeVisible();
+  await expect(locator).toBeEnabled();
 };

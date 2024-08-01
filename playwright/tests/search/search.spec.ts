@@ -1,6 +1,9 @@
 import test, { expect, Page } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
-import { fillAutocomplete } from "../../utils/utils";
+import {
+  expectLocatorToBeVisibleAndEnabled,
+  fillAutocomplete,
+} from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 test.describe("Search", () => {
@@ -55,8 +58,7 @@ const expectSearchSubmitButtonToBeEnabled = async (page: Page) => {
   const searchSubmitButton = await page.locator(
     `#${domElementIds.search.searchSubmitButton}`,
   );
-  await expect(searchSubmitButton).toBeVisible();
-  await expect(searchSubmitButton).toBeEnabled();
+  await expectLocatorToBeVisibleAndEnabled(searchSubmitButton);
 };
 
 const expectSortFiltersToBe = async (page: Page, filters: string[]) => {

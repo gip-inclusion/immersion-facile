@@ -1,7 +1,7 @@
 import { Page, expect } from "@playwright/test";
 import { AgencyId, addressRoutes, domElementIds, frontRoutes } from "shared";
 import { goToAdminTab } from "./admin";
-import { fillAutocomplete } from "./utils";
+import { expectLocatorToBeVisibleAndEnabled, fillAutocomplete } from "./utils";
 
 export const fillAndSubmitBasicAgencyForm = async (
   page: Page,
@@ -70,11 +70,11 @@ export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
     .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
     .fill(agencyId);
 
-  await expect(
+  await expectLocatorToBeVisibleAndEnabled(
     await page.locator(
       `#${domElementIds.admin.agencyTab.agencyToReviewButton}`,
     ),
-  ).toBeEnabled();
+  );
 
   await page
     .locator(`#${domElementIds.admin.agencyTab.agencyToReviewButton}`)

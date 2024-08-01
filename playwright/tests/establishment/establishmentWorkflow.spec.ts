@@ -9,7 +9,11 @@ import {
 } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
-import { fillAutocomplete, phoneRegexp } from "../../utils/utils";
+import {
+  expectLocatorToBeVisibleAndEnabled,
+  fillAutocomplete,
+  phoneRegexp,
+} from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 const providedSiret = "41433740200039";
@@ -56,10 +60,12 @@ test.describe("Establishment creation and modification workflow", () => {
       `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
       providedSiret,
     );
-    const addEstablishmentButton = page.locator(
+    const addEstablishmentButton = await page.locator(
       `#${domElementIds.establishment.create.startFormButton}`,
     );
-    await addEstablishmentButton.waitFor({ timeout: 3_000 });
+
+    await expectLocatorToBeVisibleAndEnabled(addEstablishmentButton);
+
     await addEstablishmentButton.click();
 
     await page.locator(".fr-radio-rich").getByText("Oui").click();
@@ -157,11 +163,11 @@ test.describe("Establishment creation and modification workflow", () => {
       providedSiret,
     );
 
-    await expect(
-      page.locator(
+    await expectLocatorToBeVisibleAndEnabled(
+      await page.locator(
         `#${domElementIds.homeEstablishments.siretModal.editEstablishmentButton}`,
       ),
-    ).toBeEnabled();
+    );
 
     await page.click(
       `#${domElementIds.homeEstablishments.siretModal.editEstablishmentButton}`,
@@ -177,12 +183,11 @@ test.describe("Establishment creation and modification workflow", () => {
     await emailWrapper.getByRole("link", { name: "Lien vers la page" }).click();
 
     // Edit establishment
-    const startFormButtonLocator = page.locator(
+    const startFormButtonLocator = await page.locator(
       `#${domElementIds.establishment.edit.startFormButton}`,
     );
 
-    await expect(startFormButtonLocator).toBeVisible();
-    await expect(startFormButtonLocator).toBeEnabled();
+    await expectLocatorToBeVisibleAndEnabled(startFormButtonLocator);
 
     await startFormButtonLocator.click();
     await page.locator(".fr-radio-rich").getByText("Non").click();

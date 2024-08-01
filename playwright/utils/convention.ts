@@ -5,6 +5,7 @@ import { AgencyId, domElementIds, frontRoutes, technicalRoutes } from "shared";
 import { getRandomizedData } from "./data";
 import {
   expectElementToBeVisible,
+  expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
   phoneRegexp,
 } from "./utils";
@@ -174,17 +175,17 @@ export const signConvention = async (
       )
       .click();
   }
-  await expect(
-    page.locator(`#${domElementIds.conventionToSign.openSignModalButton}`),
-  ).toBeVisible();
-  await expect(
-    page.locator(`#${domElementIds.conventionToSign.openSignModalButton}`),
-  ).toBeEnabled();
+  await expectLocatorToBeVisibleAndEnabled(
+    await page.locator(
+      `#${domElementIds.conventionToSign.openSignModalButton}`,
+    ),
+  );
+
   await page.click(`#${domElementIds.conventionToSign.openSignModalButton}`);
 
-  await expect(
-    page.locator(`#${domElementIds.conventionToSign.submitButton}`),
-  ).toBeEnabled();
+  await expectLocatorToBeVisibleAndEnabled(
+    await page.locator(`#${domElementIds.conventionToSign.submitButton}`),
+  );
   await page.click(`#${domElementIds.conventionToSign.submitButton}`);
   await expect(page.locator(".fr-alert--success")).toBeVisible();
 };
