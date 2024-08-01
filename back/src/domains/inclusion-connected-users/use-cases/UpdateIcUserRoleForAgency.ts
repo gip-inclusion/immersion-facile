@@ -61,8 +61,9 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
       const agencyHasOtherValidator = agencyUsers.some(
         (agencyUser) =>
           agencyUser.id !== params.userId &&
-          agencyUser.agencyRights.some((right) =>
-            right.roles.includes("validator"),
+          agencyUser.agencyRights.some(
+            (right) =>
+              right.isNotifiedByEmail && right.roles.includes("validator"),
           ),
       );
 
