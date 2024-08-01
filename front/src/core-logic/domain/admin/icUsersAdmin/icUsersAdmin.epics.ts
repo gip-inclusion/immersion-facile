@@ -1,6 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { filter } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { map, switchMap, tap } from "rxjs/operators";
 import {
   AgencyId,
   AgencyRight,
@@ -10,7 +10,7 @@ import {
   WithUserFilters,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
-import { AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
+import { type AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
   NormalizedIcUserById,
@@ -22,12 +22,13 @@ import {
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
 
-type IcUsersAdminAction = ActionOfSlice<typeof icUsersAdminSlice>;
+export type IcUsersAdminAction = ActionOfSlice<typeof icUsersAdminSlice>;
 type IcUsersAdminActionEpic = AppEpic<IcUsersAdminAction>;
 
 const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: IcUsersAdminActionEpic =
   (action$, state$, { adminGateway }) =>
     action$.pipe(
+      tap(console.log),
       filter(
         icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested
           .match,

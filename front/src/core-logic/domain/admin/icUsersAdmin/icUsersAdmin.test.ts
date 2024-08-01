@@ -1,5 +1,6 @@
 import { values } from "ramda";
 import {
+  AgencyDto,
   AgencyDtoBuilder,
   AgencyId,
   AgencyRight,
@@ -24,6 +25,8 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { feedbacksSelectors } from "../../feedback/feedback.selectors";
+import { agencyAdminSelectors } from "../agenciesAdmin/agencyAdmin.selectors";
+import { agencyAdminInitialState } from "../agenciesAdmin/agencyAdmin.slice";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
@@ -397,37 +400,6 @@ describe("Agency registration for authenticated users", () => {
     });
   });
 
-  const expectIsUpdatingUserAgencyToBe = (expected: boolean) => {
-    expect(icUsersAdminSelectors.isUpdatingIcUserAgency(store.getState())).toBe(
-      expected,
-    );
-  };
-
-  const expectIsFetchingIcUsersNeedingReviewToBe = (expected: boolean) => {
-    expect(
-      store.getState().admin.inclusionConnectedUsersAdmin
-        .isFetchingAgenciesNeedingReviewForIcUser,
-    ).toBe(expected);
-  };
-
-  const expectIsFetchingAgencyUsersToBe = (expected: boolean) => {
-    expect(
-      store.getState().admin.inclusionConnectedUsersAdmin.isFetchingAgencyUsers,
-    ).toBe(expected);
-  };
-
-  const expectFeedbackToEqual = (expected: IcUsersAdminFeedback) => {
-    expectToEqual(icUsersAdminSelectors.feedback(store.getState()), expected);
-  };
-
-  const expectAgencyAdminStateToMatch = (
-    params: Partial<IcUsersAdminState>,
-  ) => {
-    expectToEqual(store.getState().admin.inclusionConnectedUsersAdmin, {
-      ...icUsersAdminInitialState,
-      ...params,
-    });
-  };
   describe("Update users on agency", () => {
     it("should update user successfully", () => {
       const prefilledAdminState = adminPreloadedState({
@@ -534,5 +506,81 @@ describe("Agency registration for authenticated users", () => {
         },
       );
     });
+    it("should refetch agency after user updates", () => {
+      const agency = new AgencyDtoBuilder()
+        .withId("1")
+        .withCounsellorEmails(["bob@mail.com"])
+        .withValidatorEmails(["validator@mail.com"])
+        .build();
+
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          agencyAdmin: {
+            ...agencyAdminInitialState,
+            agency,
+          },
+          inclusionConnectedUsersAdmin: {
+            ...icUsersAdminInitialState,
+            agencyUsers: testUserSet,
+          },
+        }),
+      }));
+
+      store.dispatch(
+        icUsersAdminSlice.actions.updateUserOnAgencyRequested({
+          userId: user2Id,
+          agencyId: agency3.id,
+          roles: ["validator"],
+          feedbackTopic: "update-agency-user",
+        }),
+      );
+      expectIsUpdatingUserAgencyToBe(true);
+      dependencies.adminGateway.updateAgencyRoleForUserResponse$.next(
+        undefined,
+      );
+
+      const expectedAgency: AgencyDto = {
+        ...agency,
+        validatorEmails: ["bob@mail.com", "validator@mail.com"],
+        counsellorEmails: [],
+      };
+      dependencies.agencyGateway.fetchedAgency$.next(expectedAgency);
+      expectToEqual(
+        agencyAdminSelectors.agency(store.getState()),
+        expectedAgency,
+      );
+    });
   });
+
+  const expectIsUpdatingUserAgencyToBe = (expected: boolean) => {
+    expect(icUsersAdminSelectors.isUpdatingIcUserAgency(store.getState())).toBe(
+      expected,
+    );
+  };
+
+  const expectIsFetchingIcUsersNeedingReviewToBe = (expected: boolean) => {
+    expect(
+      store.getState().admin.inclusionConnectedUsersAdmin
+        .isFetchingAgenciesNeedingReviewForIcUser,
+    ).toBe(expected);
+  };
+
+  const expectIsFetchingAgencyUsersToBe = (expected: boolean) => {
+    expect(
+      store.getState().admin.inclusionConnectedUsersAdmin.isFetchingAgencyUsers,
+    ).toBe(expected);
+  };
+
+  const expectFeedbackToEqual = (expected: IcUsersAdminFeedback) => {
+    expectToEqual(icUsersAdminSelectors.feedback(store.getState()), expected);
+  };
+
+  const expectAgencyAdminStateToMatch = (
+    params: Partial<IcUsersAdminState>,
+  ) => {
+    expectToEqual(store.getState().admin.inclusionConnectedUsersAdmin, {
+      ...icUsersAdminInitialState,
+      ...params,
+    });
+  };
 });
