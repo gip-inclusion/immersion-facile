@@ -1,10 +1,13 @@
 import { expect, test } from "@playwright/test";
 import { domElementIds } from "shared";
+import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { fillAutocomplete } from "../../utils/utils";
 
 test.describe("Manage users in admin", () => {
+  test.use({ storageState: testConfig.adminAuthFile });
   test("Can edit roles of a user", async ({ page }) => {
+    await page.goto("/");
     await goToAdminTab(page, "agencies");
     await fillAutocomplete({
       page,

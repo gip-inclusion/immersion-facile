@@ -8,15 +8,9 @@ import {
   domElementIds,
   frontRoutes,
 } from "shared";
-import { loginWithInclusionConnect } from "./inclusionConnect";
 
 export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
   const adminButton = await page.locator("#fr-header-main-navigation-button-4");
-  const isUserAdminConnected = await adminButton.isVisible();
-  if (!isUserAdminConnected) {
-    await expect(isUserAdminConnected).toBe(false);
-    await loginWithInclusionConnect(page, "admin");
-  }
   await expect(adminButton).toBeVisible();
   await adminButton.click();
   await page

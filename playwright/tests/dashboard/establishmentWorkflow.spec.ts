@@ -1,15 +1,20 @@
 import test, { expect, Page } from "@playwright/test";
 import { domElementIds } from "shared";
-import { goToEstablishmentDashboardTab } from "../../utils/dashboard";
-import { loginWithInclusionConnect } from "../../utils/inclusionConnect";
+import { testConfig } from "../../custom.config";
+import {
+  goToDashboard,
+  goToEstablishmentDashboardTab,
+} from "../../utils/dashboard";
 
 test.describe.configure({ mode: "serial" });
 
 test.describe("Establishment dashboard workflow", () => {
+  test.use({ storageState: testConfig.establishmentAuthFile });
   test.describe("Discussions", () => {
     test("should be able to reject candidate on a discussion", async ({
       page,
     }) => {
+      await page.goto("/");
       await goToDiscussion(page, "aaaaaaaa-9c0a-1aaa-aa6d-aaaaaaaaaaaa");
       await expect(
         await page.locator(".im-exchange-message").all(),
@@ -42,8 +47,7 @@ test.describe("Establishment dashboard workflow", () => {
 });
 
 const goToDiscussion = async (page: Page, discussionId: string) => {
-  await page.goto("/");
-  await loginWithInclusionConnect(page, "establishmentDashboard");
+  await goToDashboard(page, "establishment");
   await expect(page.locator(".fr-tabs__list")).toBeVisible();
   await goToEstablishmentDashboardTab(page, "discussions");
   await expect(

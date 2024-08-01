@@ -62,6 +62,7 @@ export const fillAndSubmitBasicAgencyForm = async (
 };
 
 export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
+  await page.goto("/");
   await goToAdminTab(page, "agencies");
   await page
     .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
