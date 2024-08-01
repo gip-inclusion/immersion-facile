@@ -1,4 +1,7 @@
-import { FeatureFlagText, FeatureFlagTextImageAndRedirect } from "shared";
+import {
+  FeatureFlagTextImageAndRedirect,
+  FeatureFlagTextWithSeverity,
+} from "shared";
 import { FormFieldAttributesForContent } from "src/app/contents/forms/types";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 
@@ -44,16 +47,42 @@ export const formTextImageAndRedirectFieldsLabels: FormTextImageAndRedirectField
     },
   };
 
-export type FormTextFieldsLabels = FormFieldsObjectForContent<
-  Record<Partial<keyof FeatureFlagText["value"]>, FormFieldAttributesForContent>
+export type FeatureFlagTextWithOptionsFieldsLabels = FormFieldsObjectForContent<
+  Record<
+    Partial<keyof FeatureFlagTextWithSeverity["value"]>,
+    FormFieldAttributesForContent
+  >
 >;
 
-export const formTextFieldsLabels: FormTextFieldsLabels = {
-  message: {
-    label: "Message (optionnel)",
-    id: "message",
-    hintText: "Si le message est vide, un message par défaut s'affichera",
-    placeholder:
-      "Désolé, nous rencontrons actuellement des difficultés techniques. Merci de réessayer plus tard.",
-  },
-};
+export const formTextWithOptionsFieldsLabels: FeatureFlagTextWithOptionsFieldsLabels =
+  {
+    message: {
+      label: "Message (optionnel)",
+      id: "message",
+      hintText: "Si le message est vide, un message par défaut s'affichera",
+      placeholder:
+        "Désolé, nous rencontrons actuellement des difficultés techniques. Merci de réessayer plus tard.",
+    },
+    severity: {
+      label: "Niveau d'alerte",
+      id: "maintenance-level",
+      options: [
+        {
+          label: "Attention",
+          value: "warning",
+        },
+        {
+          label: "Erreur",
+          value: "error",
+        },
+        {
+          label: "Succes",
+          value: "success",
+        },
+        {
+          label: "Info",
+          value: "info",
+        },
+      ],
+    },
+  };

@@ -20,8 +20,8 @@ import {
   expectObjectsToMatch,
   expectToEqual,
   makeBooleanFeatureFlag,
-  makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
   technicalRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -266,13 +266,17 @@ describe("Admin router", () => {
       const initialFeatureFlags = await getFeatureFlags();
       expectToEqual(
         initialFeatureFlags.enableMaintenance,
-        makeTextFeatureFlag(false, { message: "Maintenance message" }),
+        makeTextWithSeverityFeatureFlag(false, {
+          message: "Maintenance message",
+          severity: "warning",
+        }),
       );
 
       const params: SetFeatureFlagParam = {
         flagName: "enableMaintenance",
-        featureFlag: makeTextFeatureFlag(true, {
+        featureFlag: makeTextWithSeverityFeatureFlag(true, {
           message: "Updated Maintenance message",
+          severity: "success",
         }),
       };
 
@@ -289,8 +293,9 @@ describe("Admin router", () => {
       const updatedFeatureFlags = await getFeatureFlags();
       expectToEqual(
         updatedFeatureFlags.enableMaintenance,
-        makeTextFeatureFlag(true, {
+        makeTextWithSeverityFeatureFlag(true, {
           message: "Updated Maintenance message",
+          severity: "success",
         }),
       );
     });

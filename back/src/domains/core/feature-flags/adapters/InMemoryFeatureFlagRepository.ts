@@ -2,8 +2,8 @@ import {
   FeatureFlags,
   SetFeatureFlagParam,
   makeBooleanFeatureFlag,
-  makeTextFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
+  makeTextWithSeverityFeatureFlag,
 } from "shared";
 import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 
@@ -16,8 +16,9 @@ const defaultFlags: FeatureFlags = {
     overtitle: "overtitle",
     title: "title",
   }),
-  enableMaintenance: makeTextFeatureFlag(false, {
+  enableMaintenance: makeTextWithSeverityFeatureFlag(false, {
     message: "Maintenance message",
+    severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
 };

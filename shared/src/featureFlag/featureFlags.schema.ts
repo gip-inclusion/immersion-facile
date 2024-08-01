@@ -3,27 +3,16 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
   FeatureFlag,
   FeatureFlagBoolean,
-  FeatureFlagText,
   FeatureFlagTextImageAndRedirect,
+  FeatureFlagTextWithSeverity,
   FeatureFlags,
   SetFeatureFlagParam,
   featureFlagNames,
 } from "./featureFlags.dto";
 
-export const featureFlagTextValueSchema: z.Schema<FeatureFlagText["value"]> =
-  z.object({
-    message: z.string(),
-  });
-
 const featureFlagBooleanSchema: z.Schema<FeatureFlagBoolean> = z.object({
   isActive: z.boolean(),
   kind: z.literal("boolean"),
-});
-
-const featureFlagTextSchema: z.Schema<FeatureFlagText> = z.object({
-  isActive: z.boolean(),
-  kind: z.literal("text"),
-  value: featureFlagTextValueSchema,
 });
 
 export const featureFlagTextImageAndRedirectValueSchema: z.Schema<
@@ -37,6 +26,20 @@ export const featureFlagTextImageAndRedirectValueSchema: z.Schema<
   overtitle: z.string(),
 });
 
+export const featureFlagTextWithSeverityValueSchema: z.Schema<
+  FeatureFlagTextWithSeverity["value"]
+> = z.object({
+  message: z.string(),
+  severity: z.enum(["warning", "error", "success", "info"]),
+});
+
+const featureFlagTextWithSeveritySchema: z.Schema<FeatureFlagTextWithSeverity> =
+  z.object({
+    isActive: z.boolean(),
+    kind: z.literal("textWithSeverity"),
+    value: featureFlagTextWithSeverityValueSchema,
+  });
+
 const featureFlagTextImageAndRedirectSchema: z.Schema<FeatureFlagTextImageAndRedirect> =
   z.object({
     isActive: z.boolean(),
@@ -46,7 +49,7 @@ const featureFlagTextImageAndRedirectSchema: z.Schema<FeatureFlagTextImageAndRed
 
 export const featureFlagSchema: z.Schema<FeatureFlag> =
   featureFlagTextImageAndRedirectSchema
-    .or(featureFlagTextSchema)
+    .or(featureFlagTextWithSeveritySchema)
     .or(featureFlagBooleanSchema);
 
 export const setFeatureFlagSchema: z.Schema<SetFeatureFlagParam> = z.object({
@@ -56,6 +59,6 @@ export const setFeatureFlagSchema: z.Schema<SetFeatureFlagParam> = z.object({
 
 export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enableTemporaryOperation: featureFlagTextImageAndRedirectSchema,
-  enableMaintenance: featureFlagTextSchema,
+  enableMaintenance: featureFlagTextWithSeveritySchema,
   enableSearchByScore: featureFlagBooleanSchema,
 });

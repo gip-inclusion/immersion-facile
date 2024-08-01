@@ -10,7 +10,8 @@ const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
       [row.flag_name]: {
         isActive: row.is_active,
         kind: row.kind,
-        ...((row.kind === "text" || row.kind === "textImageAndRedirect") && {
+        ...((row.kind === "textWithSeverity" ||
+          row.kind === "textImageAndRedirect") && {
           value: row.value,
         }),
       },
