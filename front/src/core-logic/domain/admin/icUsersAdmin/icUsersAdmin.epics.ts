@@ -10,6 +10,8 @@ import {
   WithUserFilters,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
+import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
   NormalizedIcUserById,
   icUsersAdminSlice,
@@ -21,34 +23,37 @@ import {
 } from "src/core-logic/storeConfig/redux.helpers";
 
 type IcUsersAdminAction = ActionOfSlice<typeof icUsersAdminSlice>;
-const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
-  IcUsersAdminAction
-> = (action$, state$, { adminGateway }) =>
-  action$.pipe(
-    filter(
-      icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested
-        .match,
-    ),
-    switchMap((action: PayloadAction<WithUserFilters>) =>
-      adminGateway.getInclusionConnectedUsersToReview$(
-        getAdminToken(state$.value),
-        action.payload,
-      ),
-    ),
-    map(normalizeUsers),
-    map(
-      icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewSucceeded,
-    ),
-    catchEpicError((error) =>
-      icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewFailed(
-        error?.message,
-      ),
-    ),
-  );
+type IcUsersAdminActionEpic = AppEpic<IcUsersAdminAction>;
 
-const fetchInclusionConnectedUsersWithAgencyIdEpic: AppEpic<
-  IcUsersAdminAction
-> = (action$, state$, { adminGateway }) =>
+const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: IcUsersAdminActionEpic =
+  (action$, state$, { adminGateway }) =>
+    action$.pipe(
+      filter(
+        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested
+          .match,
+      ),
+      switchMap((action: PayloadAction<WithUserFilters>) =>
+        adminGateway.getInclusionConnectedUsersToReview$(
+          getAdminToken(state$.value),
+          action.payload,
+        ),
+      ),
+      map(normalizeUsers),
+      map(
+        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewSucceeded,
+      ),
+      catchEpicError((error) =>
+        icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewFailed(
+          error?.message,
+        ),
+      ),
+    );
+
+const fetchInclusionConnectedUsersWithAgencyIdEpic: IcUsersAdminActionEpic = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
   action$.pipe(
     filter(icUsersAdminSlice.actions.fetchAgencyUsersRequested.match),
     switchMap((action: PayloadAction<WithUserFilters>) =>
@@ -64,7 +69,7 @@ const fetchInclusionConnectedUsersWithAgencyIdEpic: AppEpic<
     ),
   );
 
-const registerAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
+const registerAgencyToUserEpic: IcUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -91,7 +96,7 @@ const registerAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
     ),
   );
 
-const rejectAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
+const rejectAgencyToUserEpic: IcUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -116,7 +121,7 @@ const rejectAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
     ),
   );
 
-const updateUserOnAgencyEpic: AppEpic<IcUsersAdminAction> = (
+const updateUserOnAgencyEpic: IcUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -139,6 +144,18 @@ const updateUserOnAgencyEpic: AppEpic<IcUsersAdminAction> = (
             }),
           ),
         ),
+    ),
+  );
+
+const fetchInclusionConnectedUserOnAgencyUpdateEpic: AppEpic<
+  IcUsersAdminAction | AgencyAction
+> = (action$) =>
+  action$.pipe(
+    filter(agencyAdminSlice.actions.updateAgencySucceeded.match),
+    map((action) =>
+      icUsersAdminSlice.actions.fetchAgencyUsersRequested({
+        agencyId: action.payload.id,
+      }),
     ),
   );
 
@@ -168,4 +185,5 @@ export const icUsersAdminEpics = [
   rejectAgencyToUserEpic,
   fetchInclusionConnectedUsersWithAgencyIdEpic,
   updateUserOnAgencyEpic,
+  fetchInclusionConnectedUserOnAgencyUpdateEpic,
 ];
