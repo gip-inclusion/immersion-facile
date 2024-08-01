@@ -29,9 +29,11 @@ export default defineConfig({
   timeout: 60_000,
   /* Configure projects for major browsers */
   projects: [
+    { name: "setup", testMatch: /auth\.setup\.ts/ },
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      dependencies: ["setup"],
     },
   ],
 });

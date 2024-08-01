@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { AgencyId } from "shared";
+import { testConfig } from "../../custom.config";
 import {
   fillAndSubmitBasicAgencyForm,
   rejectAgencyInAdmin,
@@ -21,9 +22,11 @@ test.describe("Agency workflow", () => {
     await fillAndSubmitBasicAgencyForm(page);
     await expect(page.locator(".fr-alert--error")).toBeVisible();
   });
-
-  test("Rejects an agency in backoffice", async ({ page }) => {
-    if (!agencyAddedId) throw new Error("agencyAddedId is null");
-    await rejectAgencyInAdmin(page, agencyAddedId);
+  test.describe("Agency rejection in admin", () => {
+    test.use({ storageState: testConfig.adminAuthFile });
+    test("Rejects an agency in backoffice", async ({ page }) => {
+      if (!agencyAddedId) throw new Error("agencyAddedId is null");
+      await rejectAgencyInAdmin(page, agencyAddedId);
+    });
   });
 });

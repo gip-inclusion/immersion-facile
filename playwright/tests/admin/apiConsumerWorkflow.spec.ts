@@ -1,9 +1,12 @@
 import { Page, expect, test } from "@playwright/test";
 import { domElementIds } from "shared";
+import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 
 test.describe("Api Consumer Workflow", () => {
+  test.use({ storageState: testConfig.adminAuthFile });
   test("Can add an api consumer", async ({ page }) => {
+    await page.goto("/");
     await goToAdminTab(page, "technical-options");
     await page
       .locator(
@@ -87,6 +90,7 @@ test.describe("Api Consumer Workflow", () => {
   test("Can edit an api consumer and check that modal returns to initial state", async ({
     page,
   }) => {
+    await page.goto("/");
     await goToAdminTab(page, "technical-options");
     const editApiConsumerButtonLocator = page
       .locator(

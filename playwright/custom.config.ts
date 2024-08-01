@@ -8,4 +8,7 @@ export const testConfig = {
     adminUsername: "admin+playwright@immersion-facile.beta.gouv.fr",
     adminPassword: process.env.IC_ADMIN_PASSWORD ?? "",
   },
+  adminAuthFile: ".auth/admin.json",
+  establishmentAuthFile: ".auth/establishment.json",
+  agencyAuthFile: ".auth/agency.json",
 };
