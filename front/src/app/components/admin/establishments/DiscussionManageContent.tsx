@@ -66,11 +66,20 @@ export const DiscussionManageContent = ({
     discussionId,
     inclusionConnectedJwt,
   );
+  const dispatch = useDispatch();
   useFeebackEventCallback(
     "dashboard-discussion-rejection",
     "update.success",
     () => {
-      window.location.reload();
+      if (inclusionConnectedJwt) {
+        dispatch(
+          discussionSlice.actions.fetchDiscussionRequested({
+            discussionId,
+            feedbackTopic: "dashboard-discussion",
+            jwt: inclusionConnectedJwt,
+          }),
+        );
+      }
     },
   );
   if (isLoading) return <Loader />;
