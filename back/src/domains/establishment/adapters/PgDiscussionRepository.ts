@@ -58,46 +58,22 @@ export class PgDiscussionRepository implements DiscussionRepository {
   public async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionDto | undefined> {
-    const pgResult = await this.#makeDiscussionQueryBuilder()
-      .where("d.id", "=", discussionId)
-      .executeTakeFirst();
-
+    const pgResult = await this.#makeDiscussionQueryBuilder(
+      {
+        filters: {},
+        limit: 1,
+      },
+      discussionId,
+    ).executeTakeFirst();
     return pgResult
       ? this.#makeDiscussionDtoFromPgDiscussion(pgResult.discussion)
       : undefined;
   }
 
-  public async getDiscussions({
-    filters: { createdSince, lastAnsweredByCandidate, sirets },
-    limit,
-  }: GetDiscussionsParams): Promise<DiscussionDto[]> {
-    const results = await pipeWithValue(
-      this.#makeDiscussionQueryBuilder(),
-      (b) => (createdSince ? b.where("d.created_at", ">=", createdSince) : b),
-      (b) =>
-        sirets && sirets?.length > 0 ? b.where("d.siret", "in", sirets) : b,
-      (b) =>
-        lastAnsweredByCandidate
-          ? b.where("d.id", "in", (qb) =>
-              qb
-                .selectFrom("exchanges")
-                .select("discussion_id")
-                .where("sender", "=", "potentialBeneficiary")
-                .where(
-                  qb.between(
-                    "e.sent_at",
-                    lastAnsweredByCandidate.from,
-                    lastAnsweredByCandidate.to,
-                  ),
-                )
-                .whereRef("d.id", "=", "exchanges.discussion_id"),
-            )
-          : b,
-    )
-      .orderBy("d.created_at", "desc")
-      .limit(limit)
-      .execute();
-
+  public async getDiscussions(
+    params: GetDiscussionsParams,
+  ): Promise<DiscussionDto[]> {
+    const results = await this.#makeDiscussionQueryBuilder(params).execute();
     return results.map(({ discussion }) =>
       this.#makeDiscussionDtoFromPgDiscussion(discussion),
     );
@@ -120,11 +96,62 @@ export class PgDiscussionRepository implements DiscussionRepository {
     );
   }
 
-  #makeDiscussionQueryBuilder() {
+  #makeDiscussionQueryBuilder(
+    {
+      filters: { createdSince, lastAnsweredByCandidate, sirets, status },
+      limit,
+    }: GetDiscussionsParams,
+    id?: DiscussionId,
+  ) {
     return this.transaction
       .selectFrom("discussions as d")
+      .innerJoin(
+        (qb) =>
+          pipeWithValue(
+            qb.selectFrom("discussions").select("discussions.id"),
+            (qb) => (status ? qb.where("discussions.status", "=", status) : qb),
+            (qb) => (id ? qb.where("discussions.id", "=", id) : qb),
+            (qb) =>
+              sirets && sirets?.length > 0
+                ? qb.where("discussions.siret", "in", sirets)
+                : qb,
+            (qb) =>
+              createdSince
+                ? qb.where("discussions.created_at", ">=", createdSince)
+                : qb,
+            (qb) =>
+              lastAnsweredByCandidate
+                ? qb.innerJoin(
+                    (qb) =>
+                      qb
+                        .selectFrom("exchanges")
+                        .select("discussion_id")
+                        .where("sender", "=", "potentialBeneficiary")
+                        .where((qb) =>
+                          qb.between(
+                            qb.ref("sent_at"),
+                            lastAnsweredByCandidate.from,
+                            lastAnsweredByCandidate.to,
+                          ),
+                        )
+                        .as("filtered_exchanges"),
+                    (join) =>
+                      join.onRef(
+                        "discussions.id",
+                        "=",
+                        "filtered_exchanges.discussion_id",
+                      ),
+                  )
+                : qb,
+          )
+            .limit(limit)
+            .as("filtered_discussions"),
+        (join) => join.onRef("d.id", "=", "filtered_discussions.id"),
+      )
       .leftJoin("exchanges as e", "d.id", "e.discussion_id")
       .groupBy(["d.id", "d.created_at", "d.siret"])
+      .orderBy("d.created_at", "desc")
+      .orderBy("d.siret", "asc")
       .select(({ ref, fn }) =>
         jsonStripNulls(
           jsonBuildObject({

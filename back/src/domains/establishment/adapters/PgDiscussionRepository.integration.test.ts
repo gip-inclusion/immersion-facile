@@ -1,9 +1,10 @@
-import { addDays } from "date-fns";
+import { addDays, subDays } from "date-fns";
 import { Pool } from "pg";
 import {
   AppellationAndRomeDto,
   DiscussionBuilder,
   DiscussionDto,
+  Exchange,
   WithAcquisition,
   errors,
   expectPromiseToFailWithError,
@@ -16,10 +17,7 @@ import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import {
-  GetDiscussionsParams,
-  HasDiscussionMatchingParams,
-} from "../ports/DiscussionRepository";
+import { HasDiscussionMatchingParams } from "../ports/DiscussionRepository";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
@@ -34,6 +32,99 @@ const offer = new OfferEntityBuilder()
   .withRomeCode(styliste.romeCode)
   .withAppellationCode(styliste.appellationCode)
   .withAppellationLabel(styliste.appellationLabel)
+  .build();
+
+const date = new Date("2023-07-07");
+
+const discussionWithLastExchangeByPotentialBeneficiary1 =
+  new DiscussionBuilder()
+    .withId(uuid())
+    .withSiret("00000000000001")
+    .withEstablishmentContact({
+      email: "test@email.com",
+    })
+    .withExchanges([
+      {
+        message: "",
+        sender: "potentialBeneficiary",
+        recipient: "establishment",
+        sentAt: date.toISOString(),
+        subject: "exchange with potentialBeneficiary 1",
+        attachments: [
+          {
+            link: "magicTokenBrevo",
+            name: "monPdf.pdf",
+          },
+        ],
+      },
+    ])
+    .withCreatedAt(date)
+    .build();
+const discussionRejectedWithLastExchangeByPotentialBeneficiary =
+  new DiscussionBuilder(discussionWithLastExchangeByPotentialBeneficiary1)
+    .withId(uuid())
+    .withSiret("00000000000010")
+    .withStatus("REJECTED")
+    .build();
+const discussionAcceptedWithLastExchangeByPotentialBeneficiary =
+  new DiscussionBuilder(discussionWithLastExchangeByPotentialBeneficiary1)
+    .withId(uuid())
+    .withSiret("00000000000011")
+    .withStatus("ACCEPTED")
+    .build();
+const discussionWithLastExchangeByEstablishment2 = new DiscussionBuilder()
+  .withId(uuid())
+  .withSiret("00000000000003")
+  .withExchanges([
+    {
+      message: "",
+      recipient: "potentialBeneficiary",
+      sender: "establishment",
+      sentAt: date.toISOString(),
+      subject: "exchange with establishment 2",
+      attachments: [],
+    },
+  ])
+  .withCreatedAt(addDays(date, -1))
+  .build();
+const discussionWithoutExchanges3 = new DiscussionBuilder()
+  .withId(uuid())
+  .withSiret("00000000000002")
+  .withExchanges([])
+  .withConventionId("some-convention-id")
+  .withCreatedAt(addDays(date, -2))
+  .build();
+
+const discussionWithRejectedStatusAndReason4 = new DiscussionBuilder()
+  .withId(uuid())
+  .withSiret("00000000000004")
+  .withExchanges([])
+  .withConventionId("some-other-convention-id")
+  .withStatus("REJECTED", "OTHER", "my custom reason")
+  .withCreatedAt(addDays(date, -3))
+  .build();
+
+const discussionWithAcceptedStatus5 = new DiscussionBuilder()
+  .withId(uuid())
+  .withSiret("00000000000005")
+  .withExchanges([])
+  .withConventionId("another-convention-id")
+  .withStatus("ACCEPTED")
+  .withCreatedAt(addDays(date, -4))
+  .build();
+
+const discussionWithPotentialBeneficiaryInformations6 = new DiscussionBuilder()
+  .withPotentialBeneficiary({
+    datePreferences: "my fake date preferences",
+    email: "fake-address@mail.com",
+    firstName: "John",
+    lastName: "Doe",
+    hasWorkingExperience: true,
+    experienceAdditionalInformation: "my fake experience",
+    phone: "0549000000",
+    resumeLink: "https://www.my-link.com",
+  })
+  .withCreatedAt(addDays(date, -5))
   .build();
 
 describe("PgDiscussionRepository", () => {
@@ -60,169 +151,202 @@ describe("PgDiscussionRepository", () => {
     await pool.end();
   });
 
-  const date = new Date("2023-07-07");
-
-  const discussionWithLastExchangeByPotentialBeneficiary1 =
-    new DiscussionBuilder()
-      .withId(uuid())
-      .withSiret("00000000000001")
-      .withEstablishmentContact({
-        email: "test@email.com",
-      })
-      .withExchanges([
-        {
-          message: "",
-          sender: "potentialBeneficiary",
-          recipient: "establishment",
-          sentAt: date.toISOString(),
-          subject: "exchange with potentialBeneficiary 1",
-          attachments: [
-            {
-              link: "magicTokenBrevo",
-              name: "monPdf.pdf",
-            },
-          ],
-        },
-      ])
-      .withCreatedAt(date)
-      .build();
-  const discussionWithLastExchangeByEstablishment2 = new DiscussionBuilder()
-    .withId(uuid())
-    .withSiret("00000000000003")
-    .withExchanges([
-      {
-        message: "",
-        recipient: "potentialBeneficiary",
-        sender: "establishment",
-        sentAt: date.toISOString(),
-        subject: "exchange with establishment 2",
-        attachments: [],
-      },
-    ])
-    .withCreatedAt(addDays(date, -1))
-    .build();
-  const discussionWithoutExchanges3 = new DiscussionBuilder()
-    .withId(uuid())
-    .withSiret("00000000000002")
-    .withExchanges([])
-    .withConventionId("some-convention-id")
-    .withCreatedAt(addDays(date, -2))
-    .build();
-
-  const discussionWithRejectedStatusAndReason4 = new DiscussionBuilder()
-    .withId(uuid())
-    .withSiret("00000000000004")
-    .withExchanges([])
-    .withConventionId("some-other-convention-id")
-    .withStatus("REJECTED", "OTHER", "my custom reason")
-    .withCreatedAt(addDays(date, -3))
-    .build();
-
-  const discussionWithAcceptedStatus5 = new DiscussionBuilder()
-    .withId(uuid())
-    .withSiret("00000000000005")
-    .withExchanges([])
-    .withConventionId("another-convention-id")
-    .withStatus("ACCEPTED")
-    .withCreatedAt(addDays(date, -4))
-    .build();
-  const discussionWithPotentialBeneficiaryInformations6 =
-    new DiscussionBuilder()
-      .withPotentialBeneficiary({
-        datePreferences: "my fake date preferences",
-        email: "fake-address@mail.com",
-        firstName: "John",
-        lastName: "Doe",
-        hasWorkingExperience: true,
-        experienceAdditionalInformation: "my fake experience",
-        phone: "0549000000",
-        resumeLink: "https://www.my-link.com",
-      })
-      .withCreatedAt(addDays(date, -5))
-      .build();
-
   describe("getDiscussions", () => {
     //TODO getDiscussions with lastAnsweredByCandidate parameter
-    it.each([
-      {
-        params: {
-          filters: {
-            sirets: [discussionWithLastExchangeByPotentialBeneficiary1.siret],
-          },
-          limit: 5,
-        },
-        result: [discussionWithLastExchangeByPotentialBeneficiary1],
-      },
-      {
-        params: {
-          filters: {
-            createdSince: addDays(date, -4),
-          },
-          limit: 5,
-        },
-        result: [
+    beforeEach(async () => {
+      await Promise.all(
+        [
           discussionWithLastExchangeByPotentialBeneficiary1,
           discussionWithLastExchangeByEstablishment2,
           discussionWithoutExchanges3,
           discussionWithRejectedStatusAndReason4,
           discussionWithAcceptedStatus5,
-        ],
-      },
-      {
-        params: {
-          filters: {
-            lastAnsweredByCandidate: {
-              from: addDays(date, -1),
-              to: date,
+          discussionWithPotentialBeneficiaryInformations6,
+          discussionRejectedWithLastExchangeByPotentialBeneficiary,
+          discussionAcceptedWithLastExchangeByPotentialBeneficiary,
+        ].map((discussion) => pgDiscussionRepository.insert(discussion)),
+      );
+    });
+    describe("unit filter param", () => {
+      it("siret filter param", async () => {
+        expectToEqual(
+          await pgDiscussionRepository.getDiscussions({
+            filters: {
+              sirets: [discussionWithLastExchangeByPotentialBeneficiary1.siret],
             },
-          },
-          limit: 5,
-        },
-        result: [discussionWithLastExchangeByPotentialBeneficiary1],
-      },
-      {
-        params: {
-          filters: {
-            sirets: [discussionWithoutExchanges3.siret],
-            lastAnsweredByCandidate: {
-              from: addDays(date, -1),
-              to: date,
+            limit: 5,
+          }),
+          [discussionWithLastExchangeByPotentialBeneficiary1],
+        );
+      });
+      it("createdSince filter param", async () => {
+        expectToEqual(
+          await pgDiscussionRepository.getDiscussions({
+            filters: {
+              createdSince: addDays(date, -4),
             },
-          },
-          limit: 5,
-        },
-        result: [],
-      },
-    ] satisfies {
-      params: GetDiscussionsParams;
-      result: DiscussionDto[] | Error;
-    }[])(
-      `getDiscussions return $result.length discussion with params:
-        $params
-        `,
-      async ({ params, result }) => {
-        await Promise.all(
+            limit: 10,
+          }),
           [
             discussionWithLastExchangeByPotentialBeneficiary1,
+            discussionRejectedWithLastExchangeByPotentialBeneficiary,
+            discussionAcceptedWithLastExchangeByPotentialBeneficiary,
             discussionWithLastExchangeByEstablishment2,
             discussionWithoutExchanges3,
             discussionWithRejectedStatusAndReason4,
             discussionWithAcceptedStatus5,
-            discussionWithPotentialBeneficiaryInformations6,
-          ].map((discussion) => pgDiscussionRepository.insert(discussion)),
+          ],
         );
+      });
 
-        result instanceof Error
-          ? expectPromiseToFailWithError(
-              pgDiscussionRepository.getDiscussions(params),
-              result,
+      describe("lastAnsweredByCandidate filter param", () => {
+        it("simple scenario", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                status: "PENDING",
+                lastAnsweredByCandidate: {
+                  from: addDays(date, -1),
+                  to: date,
+                },
+              },
+              limit: 5,
+            }),
+            [discussionWithLastExchangeByPotentialBeneficiary1],
+          );
+        });
+
+        it("bug - discussion with lot of exchanges that had more reminders than expected on production", async () => {
+          const now = new Date("2024-08-01");
+          const discussionWithLotOfExchanges = new DiscussionBuilder()
+            .withId(uuid())
+            .withExchanges(
+              (
+                [
+                  {
+                    sender: "potentialBeneficiary",
+                    recipient: "establishment",
+                    sentAt: new Date("2024-07-20 19:45:34").toISOString(),
+                  },
+                  {
+                    sender: "establishment",
+                    recipient: "potentialBeneficiary",
+                    sentAt: new Date("2024-07-22 08:02:54").toISOString(),
+                  },
+                  {
+                    sender: "potentialBeneficiary",
+                    recipient: "establishment",
+                    sentAt: new Date("2024-07-22 12:35:16").toISOString(),
+                  },
+                  {
+                    sender: "potentialBeneficiary",
+                    recipient: "establishment",
+                    sentAt: new Date("2024-07-23 18:48:35").toISOString(),
+                  },
+                  {
+                    sender: "establishment",
+                    recipient: "potentialBeneficiary",
+                    sentAt: new Date("2024-07-24 07:17:59").toISOString(),
+                  },
+                  {
+                    sender: "establishment",
+                    recipient: "potentialBeneficiary",
+                    sentAt: new Date("2024-07-24 08:39:28").toISOString(),
+                  },
+                  {
+                    sender: "potentialBeneficiary",
+                    recipient: "establishment",
+                    sentAt: new Date("2024-07-25 12:04:29").toISOString(),
+                  },
+                  {
+                    sender: "potentialBeneficiary",
+                    recipient: "establishment",
+                    sentAt: new Date("2024-07-25 12:12:20").toISOString(),
+                  },
+                  {
+                    sender: "potentialBeneficiary",
+                    recipient: "establishment",
+                    sentAt: new Date("2024-07-25 17:49:05").toISOString(),
+                  },
+                  {
+                    sender: "potentialBeneficiary",
+                    recipient: "establishment",
+                    sentAt: new Date("2024-07-29 08:03:20").toISOString(),
+                  },
+                  {
+                    sender: "establishment",
+                    recipient: "potentialBeneficiary",
+                    sentAt: new Date("2024-07-29 08:47:52").toISOString(),
+                  },
+                ] satisfies Pick<Exchange, "sender" | "recipient" | "sentAt">[]
+              ).map((rest) => ({
+                ...rest,
+                message: "",
+                subject: "",
+                attachments: [],
+              })),
             )
-          : expectToEqual(
-              await pgDiscussionRepository.getDiscussions(params),
-              result,
-            );
-      },
-    );
+            .build();
+
+          await pgDiscussionRepository.insert(discussionWithLotOfExchanges);
+
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                lastAnsweredByCandidate: {
+                  from: subDays(now, 4),
+                  to: subDays(now, 3),
+                },
+              },
+              limit: 5,
+            }),
+            [],
+          );
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                lastAnsweredByCandidate: {
+                  from: subDays(now, 8),
+                  to: subDays(now, 7),
+                },
+              },
+              limit: 5,
+            }),
+            [],
+          );
+        });
+      });
+    });
+    describe("combo filters", () => {
+      it("no result if siret excluded from filter", async () => {
+        expectToEqual(
+          await pgDiscussionRepository.getDiscussions({
+            filters: {
+              status: "PENDING",
+              lastAnsweredByCandidate: {
+                from: addDays(date, -1),
+                to: date,
+              },
+            },
+            limit: 5,
+          }),
+          [discussionWithLastExchangeByPotentialBeneficiary1],
+        );
+        expectToEqual(
+          await pgDiscussionRepository.getDiscussions({
+            filters: {
+              sirets: [discussionWithoutExchanges3.siret],
+              lastAnsweredByCandidate: {
+                from: addDays(date, -1),
+                to: date,
+              },
+            },
+            limit: 5,
+          }),
+          [],
+        );
+      });
+    });
   });
 
   describe("hasDiscussionMatching", () => {
@@ -497,7 +621,7 @@ describe("PgDiscussionRepository", () => {
           .build(),
       );
 
-      const discussion1 = new DiscussionBuilder()
+      const discussionWithRecentExchange = new DiscussionBuilder()
         .withSiret(siret)
         .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120104")
         .withCreatedAt(new Date("2023-11-11"))
@@ -512,7 +636,8 @@ describe("PgDiscussionRepository", () => {
           },
         ])
         .build();
-      const discussionOldWithExchange = new DiscussionBuilder()
+
+      const discussionWithOldExchange = new DiscussionBuilder()
         .withSiret(siret)
         .withId("bcbbbd2c-6f02-11ec-90d6-0242ac120103")
         .withCreatedAt(new Date("2022-11-11"))
@@ -534,8 +659,8 @@ describe("PgDiscussionRepository", () => {
         .build();
 
       await Promise.all([
-        pgDiscussionRepository.insert(discussion1),
-        pgDiscussionRepository.insert(discussionOldWithExchange),
+        pgDiscussionRepository.insert(discussionWithRecentExchange),
+        pgDiscussionRepository.insert(discussionWithOldExchange),
       ]);
 
       const numberOfUpdatedMessages =
@@ -544,15 +669,16 @@ describe("PgDiscussionRepository", () => {
       expectToEqual(numberOfUpdatedMessages, 1);
 
       expectToEqual(
-        await pgDiscussionRepository.getById(discussion1.id),
-        discussion1,
+        await pgDiscussionRepository.getById(discussionWithRecentExchange.id),
+        discussionWithRecentExchange,
       );
+
       expectToEqual(
-        await pgDiscussionRepository.getById(discussionOldWithExchange.id),
-        new DiscussionBuilder(discussionOldWithExchange)
+        await pgDiscussionRepository.getById(discussionWithOldExchange.id),
+        new DiscussionBuilder(discussionWithOldExchange)
           .withExchanges([
             {
-              ...discussionOldWithExchange.exchanges[0],
+              ...discussionWithOldExchange.exchanges[0],
               message: "Supprimé car trop ancien",
               attachments: [],
             },
