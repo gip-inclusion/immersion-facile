@@ -62,6 +62,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
   getInclusionConnectLogoutUrl: defineRoute({

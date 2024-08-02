@@ -311,6 +311,15 @@ export const errors = {
       new NotFoundError(
         `Il n'y a pas d'erreur non géré de transfert de convention pour la convention '${conventionId}'.`,
       ),
+    tooManyRequests: (params: {
+      lastBroadcastDate: Date;
+      formattedWaitingTime: string;
+    }) =>
+      new TooManyRequestApiError(
+        `La convention a été synchronisée le ${params.lastBroadcastDate.toLocaleDateString(
+          "fr",
+        )}. Merci d'essayer à nouveau dans ${params.formattedWaitingTime}.`,
+      ),
   },
   discussion: {
     badSiretFilter: () =>

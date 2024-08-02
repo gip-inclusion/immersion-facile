@@ -632,7 +632,7 @@ export const createUseCases = (
     }),
     broadcastConventionAgain: makeBroadcastConventionAgain({
       uowPerformer,
-      deps: { createNewEvent },
+      deps: { createNewEvent, timeGateway: gateways.timeGateway },
     }),
     getApiConsumersByConvention: makeGetApiConsumersByconvention({
       uowPerformer,
