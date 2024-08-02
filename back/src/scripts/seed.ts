@@ -38,8 +38,8 @@ const seed = async () => {
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("Reset Db start");
-  await client.query("DELETE FROM feature_flags");
-
+  await db.deleteFrom("api_consumers_subscriptions").execute();
+  await db.deleteFrom("api_consumers").execute();
   await db.deleteFrom("users_ongoing_oauths").execute();
   await db.deleteFrom("users").execute();
   await db.deleteFrom("conventions").execute();
