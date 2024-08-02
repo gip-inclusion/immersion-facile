@@ -67,7 +67,7 @@ type FormStep = 1 | 2 | 3 | 4;
 
 const steps: Record<FormStep, Pick<StepperProps, "title" | "nextTitle">> = {
   1: {
-    title: "Planning",
+    title: "Visibilité",
     nextTitle: "Référent immersion",
   },
   2: {

@@ -9,7 +9,7 @@ export const EstablishmentCreationFormPage = () => (
       layout="default"
       pageHeader={
         <PageHeader
-          title="Référencer mon entreprise"
+          title="Proposer une immersion"
           centered
           theme="establishment"
         />

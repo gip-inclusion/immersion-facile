@@ -78,7 +78,6 @@ export const AvailabilitySection = ({
             },
           },
         }))}
-        orientation="horizontal"
         state={shouldShowErrorOnAvailableForImmersion ? "error" : "default"}
         stateRelatedMessage={
           shouldShowErrorOnAvailableForImmersion
