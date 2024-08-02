@@ -1,7 +1,7 @@
 import { RadioButtonsProps } from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
-import errorSvg from "../../../../assets/img/error.svg";
-import successSvg from "../../../../assets/img/success.svg";
+import eyeOffSvg from "../../../../assets/img/eye-off.svg";
+import eyeSvg from "../../../../assets/img/eye.svg";
 
 export const booleanSelectOptions: RadioButtonsProps["options"] = [
   {
@@ -20,15 +20,19 @@ export const booleanSelectOptions: RadioButtonsProps["options"] = [
 
 export const richBooleanSelectOptions: RadioButtonsProps["options"] = [
   {
-    illustration: <img src={errorSvg} alt="" />,
+    illustration: <img src={eyeOffSvg} alt="" />,
     label: "Non",
+    hintText:
+      "Vous ne serez pas visible par les candidats jusqu’à ce que vous soyez à nouveau disponible",
     nativeInputProps: {
       value: 0,
     },
   },
   {
-    illustration: <img src={successSvg} alt="" />,
+    illustration: <img src={eyeSvg} alt="" />,
     label: "Oui",
+    hintText:
+      "Vous serez visibles par les candidats jusqu’à ce que votre limite de mises en relations mensuelle soit atteinte",
     nativeInputProps: {
       value: 1,
     },
