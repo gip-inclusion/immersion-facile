@@ -1,3 +1,4 @@
+import { addHours, intervalToDuration, isBefore } from "date-fns";
 import {
   InclusionConnectedUser,
   WithConventionId,
@@ -5,9 +6,13 @@ import {
   userHasEnoughRightsOnConvention,
   withConventionIdSchema,
 } from "shared";
-import { userHasEnoughRightsOnConvention } from "../../../../utils/convention";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
+import { BroadcastFeedback } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+
+const BROADCAST_FEEDBACK_DEBOUNCE_HOUR = 4;
+
 export type BroadcastConventionAgain = ReturnType<
   typeof makeBroadcastConventionAgain
 >;
@@ -15,7 +20,7 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
   WithConventionId,
   void,
   InclusionConnectedUser,
-  { createNewEvent: CreateNewEvent }
+  { createNewEvent: CreateNewEvent; timeGateway: TimeGateway }
 >(
   {
     name: "BroadcastConventionAgain",
@@ -53,6 +58,14 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
     )
       throw errors.user.forbidden({ userId: currentUser.id });
 
+    throwErrorIfTooManyRequests({
+      lastBroadcastFeedback:
+        await uow.broadcastFeedbacksRepository.getLastBroadcastFeedback(
+          conventionId,
+        ),
+      now: deps.timeGateway.now(),
+    });
+
     const broadcastConventionAgainEvent = deps.createNewEvent({
       topic: "ConventionBroadcastRequested",
       payload: {
@@ -67,3 +80,38 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
     await uow.outboxRepository.save(broadcastConventionAgainEvent);
   },
 );
+
+const throwErrorIfTooManyRequests = (params: {
+  lastBroadcastFeedback: BroadcastFeedback | null;
+  now: Date;
+}) => {
+  if (!params.lastBroadcastFeedback) return;
+
+  const lastBroadcastDate = params.lastBroadcastFeedback.occurredAt;
+  const broadcastPossibleDate = addHours(
+    lastBroadcastDate,
+    BROADCAST_FEEDBACK_DEBOUNCE_HOUR,
+  );
+  const isEnoughTimeSinceLastBroadcast = isBefore(
+    broadcastPossibleDate,
+    params.now,
+  );
+
+  if (!isEnoughTimeSinceLastBroadcast) {
+    const { hours, minutes } = intervalToDuration({
+      start: params.now,
+      end: broadcastPossibleDate,
+    });
+    const formattedWaitingHour = hours && hours > 0 ? `${hours}h` : "";
+    const formattedWaitingMinutes = minutes && minutes > 0 ? `${minutes}m` : "";
+    const formattedWaitingTime =
+      formattedWaitingHour.length > 0
+        ? `${formattedWaitingHour} ${formattedWaitingMinutes}`
+        : `${formattedWaitingMinutes}`;
+
+    throw errors.broadcastFeedback.tooManyRequests({
+      lastBroadcastDate,
+      formattedWaitingTime: formattedWaitingTime || "1 minute",
+    });
+  }
+};

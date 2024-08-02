@@ -1,3 +1,5 @@
+import { addMinutes, subHours } from "date-fns";
+import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -9,7 +11,12 @@ import {
   expectPromiseToFailWithError,
 } from "shared";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
+import {
+  BroadcastFeedback,
+  broadcastToPeServiceName,
+} from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
+import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -43,12 +50,13 @@ const userWithEnoughRights = new InclusionConnectedUserBuilder()
 describe("BroadcastConventionAgain", () => {
   let broadcastConventionAgain: BroadcastConventionAgain;
   let uow: InMemoryUnitOfWork;
+  let timeGateway: TimeGateway;
 
   beforeEach(async () => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
     const uuidGenerator = new TestUuidGenerator();
-    const timeGateway = new CustomTimeGateway();
+    timeGateway = new CustomTimeGateway();
     const createNewEvent = makeCreateNewEvent({
       uuidGenerator,
       timeGateway,
@@ -57,6 +65,7 @@ describe("BroadcastConventionAgain", () => {
       uowPerformer,
       deps: {
         createNewEvent,
+        timeGateway: timeGateway,
       },
     });
     await uow.agencyRepository.insert(
@@ -88,33 +97,107 @@ describe("BroadcastConventionAgain", () => {
     );
   });
 
-  it.each([adminUser, userWithEnoughRights])(
-    "trigger ConventionBroadcastAgain event with the whole convention in payload",
-    async (user) => {
-      await broadcastConventionAgain.execute({ conventionId }, user);
+  describe("when there is no previous broadcast", () => {
+    it.each([adminUser, userWithEnoughRights])(
+      "trigger ConventionBroadcastAgain event with the whole convention in payload",
+      async (user) => {
+        await broadcastConventionAgain.execute({ conventionId }, user);
 
-      expect(uow.outboxRepository.events).toHaveLength(1);
-      const expectedConventionRead: ConventionReadDto = {
-        ...convention,
-        agencyId: agency.id,
-        agencyKind: agency.kind,
-        agencyName: agency.name,
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [defaultValidatorEmail],
-        agencySiret: agency.agencySiret,
-        agencyDepartment: agency.address.departmentCode,
-      };
+        expect(uow.outboxRepository.events).toHaveLength(1);
+        const expectedConventionRead: ConventionReadDto = {
+          ...convention,
+          agencyId: agency.id,
+          agencyKind: agency.kind,
+          agencyName: agency.name,
+          agencyCounsellorEmails: [],
+          agencyValidatorEmails: [defaultValidatorEmail],
+          agencySiret: agency.agencySiret,
+          agencyDepartment: agency.address.departmentCode,
+        };
 
-      expectArraysToMatch(uow.outboxRepository.events, [
-        {
-          topic: "ConventionBroadcastRequested",
-          status: "never-published",
-          payload: {
-            convention: expectedConventionRead,
-            triggeredBy: { kind: "inclusion-connected", userId: user.id },
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionBroadcastRequested",
+            status: "never-published",
+            payload: {
+              convention: expectedConventionRead,
+              triggeredBy: { kind: "inclusion-connected", userId: user.id },
+            },
           },
+        ]);
+      },
+    );
+  });
+
+  describe("when there is a previous broadcast", () => {
+    it.each([adminUser, userWithEnoughRights])(
+      "trigger ConventionBroadcastAgain event with the whole convention in payload",
+      async (user) => {
+        const lastBroadcastDate = subDays(timeGateway.now(), 1);
+        const lastBroadcastFeedback: BroadcastFeedback = {
+          serviceName: broadcastToPeServiceName,
+          consumerId: "my-consumer-id",
+          consumerName: "My consumer name",
+          requestParams: {
+            conventionId,
+          },
+          response: { httpStatus: 404 },
+          subscriberErrorFeedback: { message: "Ops, something is bad" },
+          occurredAt: lastBroadcastDate,
+          handledByAgency: true,
+        };
+        uow.broadcastFeedbacksRepository.save(lastBroadcastFeedback);
+
+        await broadcastConventionAgain.execute({ conventionId }, user);
+
+        expect(uow.outboxRepository.events).toHaveLength(1);
+        const expectedConventionRead: ConventionReadDto = {
+          ...convention,
+          agencyId: agency.id,
+          agencyKind: agency.kind,
+          agencyName: agency.name,
+          agencyCounsellorEmails: [],
+          agencyValidatorEmails: [defaultValidatorEmail],
+          agencySiret: agency.agencySiret,
+          agencyDepartment: agency.address.departmentCode,
+        };
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionBroadcastRequested",
+            status: "never-published",
+            payload: {
+              convention: expectedConventionRead,
+              triggeredBy: { kind: "inclusion-connected", userId: user.id },
+            },
+          },
+        ]);
+      },
+    );
+
+    it("throws tooManyRequest when user request broadcast again before 4h since last broadcast", async () => {
+      const lastBroadcastDate = subHours(addMinutes(timeGateway.now(), 12), 1);
+      const lastBroadcastFeedback: BroadcastFeedback = {
+        serviceName: broadcastToPeServiceName,
+        consumerId: "my-consumer-id",
+        consumerName: "My consumer name",
+        requestParams: {
+          conventionId,
         },
-      ]);
-    },
-  );
+        response: { httpStatus: 404 },
+        subscriberErrorFeedback: { message: "Ops, something is bad" },
+        occurredAt: lastBroadcastDate,
+        handledByAgency: true,
+      };
+      uow.broadcastFeedbacksRepository.save(lastBroadcastFeedback);
+
+      await expectPromiseToFailWithError(
+        broadcastConventionAgain.execute({ conventionId }, adminUser),
+        errors.broadcastFeedback.tooManyRequests({
+          lastBroadcastDate,
+          formattedWaitingTime: "3h 12m",
+        }),
+      );
+    });
+  });
 });

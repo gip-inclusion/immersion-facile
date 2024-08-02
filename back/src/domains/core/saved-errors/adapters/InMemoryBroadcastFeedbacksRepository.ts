@@ -46,6 +46,19 @@ export class InMemoryBroadcastFeedbacksRepository
     this.#broadcastFeedbacks.push(broadcastFeedback);
   }
 
+  public async getLastBroadcastFeedback(
+    conventionId: ConventionId,
+  ): Promise<BroadcastFeedback | null> {
+    return (
+      this.#broadcastFeedbacks
+        .filter(
+          (broadcast) => broadcast.requestParams.conventionId === conventionId,
+        )
+        .sort((a, b) => a.occurredAt.getTime() - b.occurredAt.getTime())
+        .at(-1) || null
+    );
+  }
+
   public get broadcastFeedbacks(): BroadcastFeedback[] {
     return this.#broadcastFeedbacks;
   }
