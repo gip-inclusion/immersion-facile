@@ -195,6 +195,28 @@ describe("api consumer", () => {
     expect(apiConsumerSelectors.lastCreatedToken(store.getState())).toBeNull();
   });
 
+  it("clears list of api consumers", () => {
+    expectInitialStateUnchanged();
+
+    store.dispatch(
+      apiConsumerSlice.actions.retrieveApiConsumersRequested("admin-jwt"),
+    );
+    expect(apiConsumerSelectors.isLoading(store.getState())).toBe(true);
+
+    dependencies.adminGateway.apiConsumers$.next([apiConsumer1]);
+
+    expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+
+    expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), [
+      apiConsumer1,
+    ]);
+
+    store.dispatch(apiConsumerSlice.actions.clearApiConsumersRequested());
+
+    expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);
+    expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), []);
+  });
+
   const expectInitialStateUnchanged = () => {
     expectToEqual(apiConsumerSelectors.apiConsumers(store.getState()), []);
     expect(apiConsumerSelectors.isLoading(store.getState())).toBe(false);

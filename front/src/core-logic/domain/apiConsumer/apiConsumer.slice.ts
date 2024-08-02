@@ -67,5 +67,9 @@ export const apiConsumerSlice = createSlice({
     clearLastCreatedToken: (state) => {
       state.lastCreatedToken = null;
     },
+    clearApiConsumersRequested: (state) => {
+      state.isLoading = false;
+      state.apiConsumers = [];
+    },
   },
 });

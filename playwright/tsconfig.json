@@ -21,6 +21,7 @@
     "tests/**/*.ts",
     "tests-manual/**/*.ts",
     "utils/*.ts",
-    "utils/**/*.ts"
-, "tests/auth.setup.ts"  ]
+    "utils/**/*.ts",
+    "tests/auth.setup.ts"
+  ]
 }

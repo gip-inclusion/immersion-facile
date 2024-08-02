@@ -1,4 +1,3 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
@@ -46,6 +45,9 @@ export const ApiConsumersSection = () => {
       dispatch(
         apiConsumerSlice.actions.retrieveApiConsumersRequested(adminToken),
       );
+    return () => {
+      dispatch(apiConsumerSlice.actions.clearApiConsumersRequested());
+    };
   }, [adminToken, dispatch]);
 
   useEffect(() => {
@@ -114,22 +116,18 @@ export const ApiConsumersSection = () => {
       >
         Ajouter un nouveau consommateur
       </Button>
-      <div className={fr.cx("fr-grid-row")}>
-        <div className={fr.cx("fr-col")}>
-          <Table
-            fixed
-            data={tableDataFromApiConsumers}
-            headers={[
-              "Id (Nom)",
-              "Description",
-              "Date d'expiration",
-              "Contact",
-              "Droits",
-              "Actions",
-            ]}
-          />
-        </div>
-      </div>
+      <Table
+        fixed
+        data={tableDataFromApiConsumers}
+        headers={[
+          "Id (Nom)",
+          "Description",
+          "Date d'expiration",
+          "Contact",
+          "Droits",
+          "Actions",
+        ]}
+      />
       {createPortal(
         <apiConsumerModal.Component
           title="Ajout consommateur api"
