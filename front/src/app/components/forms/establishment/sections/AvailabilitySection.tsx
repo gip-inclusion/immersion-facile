@@ -136,7 +136,7 @@ export const AvailabilitySection = ({
             title="Actuellement"
             description={
               <p>
-                Mise en relation max/semaine :{" "}
+                Mise en relation max/mois :{" "}
                 <span
                   id={
                     domElementIds.establishment.admin.maxContactsPerMonthValue
