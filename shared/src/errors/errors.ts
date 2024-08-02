@@ -313,6 +313,10 @@ export const errors = {
       ),
   },
   discussion: {
+    badSiretFilter: () =>
+      new BadRequestError(
+        "Le filtre par SIRET est fourni mais il n'y a pas de SIRET dans le filtre.",
+      ),
     notFound: ({ discussionId }: { discussionId: DiscussionId }) =>
       new NotFoundError(`La discussion '${discussionId}' n'est pas trouvée.`),
     missingAppellationLabel: ({
