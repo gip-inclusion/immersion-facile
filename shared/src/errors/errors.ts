@@ -380,7 +380,9 @@ export const errors = {
         `L'établissement avec le siret '${siret}' n'est pas trouvé dans l'API SIRET.`,
       ),
     tooManyRequests: ({ serviceName }: { serviceName: string }) =>
-      new TooManyRequestApiError(serviceName),
+      new TooManyRequestApiError(
+        `Le service ${serviceName} a subit trop de sollicitation`,
+      ),
     unavailable: ({ serviceName }: { serviceName: string }) =>
       new UnavailableApiError(serviceName),
   },

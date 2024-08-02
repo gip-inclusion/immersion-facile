@@ -72,8 +72,8 @@ export class ConflictError extends HttpError {
 export class TooManyRequestApiError extends HttpError {
   public httpCode = 429;
 
-  constructor(public serviceName: string) {
-    super(`Le service ${serviceName} a subit trop de solicitation`);
+  constructor(message: string) {
+    super(message);
     Object.setPrototypeOf(this, TooManyRequestApiError.prototype);
   }
 }
