@@ -7,6 +7,7 @@ import {
 } from "src/app/contents/error/textSetup";
 import {
   ErrorButton,
+  ErrorButtonProps,
   HTTPFrontErrorContents,
 } from "src/app/contents/error/types";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
@@ -52,27 +53,43 @@ export const ErrorPageContent = ({
           dangerouslySetInnerHTML={{ __html: content.description }}
         />
         <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
-          {content.buttons.map((button: ErrorButton, index) => (
-            <li key={`${button.kind}-${index}`}>
-              {button.onClick ? (
-                <button
-                  className={cx(fr.cx("fr-btn"), `fr-btn--${button.kind}`)}
-                  onClick={button.onClick}
-                  type="button"
-                >
-                  {button.label}
-                </button>
-              ) : (
-                <a
-                  className={cx(fr.cx("fr-btn"), `fr-btn--${button.kind}`)}
-                  href={button.href}
-                  target={button.target}
-                >
-                  {button.label}
-                </a>
-              )}
-            </li>
-          ))}
+          {content.buttons.map((button: ErrorButton, index) => {
+            const buttonProps: ErrorButtonProps =
+              typeof button === "function"
+                ? button({
+                    currentUrl: window.location.href,
+                    currentDate: new Date().toISOString(),
+                    error: content.description,
+                  })
+                : button;
+            return (
+              <li key={`${buttonProps.kind}-${index}`}>
+                {buttonProps.onClick ? (
+                  <button
+                    className={cx(
+                      fr.cx("fr-btn"),
+                      `fr-btn--${buttonProps.kind}`,
+                    )}
+                    onClick={buttonProps.onClick}
+                    type="button"
+                  >
+                    {buttonProps.label}
+                  </button>
+                ) : (
+                  <a
+                    className={cx(
+                      fr.cx("fr-btn"),
+                      `fr-btn--${buttonProps.kind}`,
+                    )}
+                    href={buttonProps.href}
+                    target={buttonProps.target}
+                  >
+                    {buttonProps.label}
+                  </a>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
       <div

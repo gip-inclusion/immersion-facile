@@ -6,7 +6,17 @@ export type HTTPFrontErrorContents = {
   buttons: ErrorButton[];
 };
 
-export type ErrorButton = {
+export type ErrorButton =
+  | ErrorButtonProps
+  | ((params: ContactErrorInformations) => ErrorButtonProps);
+
+export type ContactErrorInformations = {
+  currentUrl: string;
+  currentDate: string;
+  error: string;
+};
+
+export type ErrorButtonProps = {
   label: string;
   kind: "primary" | "secondary";
   href?: string;
