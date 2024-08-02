@@ -51,10 +51,6 @@ export default defineConfig({
         skipWaiting: true,
       },
       selfDestroying: true,
-      includeAssets: [
-        "/dsfr/favicon/favicon.ico",
-        "/dsfr/favicon/apple-touch-icon.png",
-      ],
       manifest,
     }),
 

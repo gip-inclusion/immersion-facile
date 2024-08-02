@@ -2,6 +2,7 @@ import { Page, expect, test } from "@playwright/test";
 import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
+import { expectLocatorToBeVisibleAndEnabled } from "../../utils/utils";
 
 test.describe("Api Consumer Workflow", () => {
   test.use({ storageState: testConfig.adminAuthFile });
@@ -86,6 +87,7 @@ test.describe("Api Consumer Workflow", () => {
         `#${domElementIds.admin.technicalOptionsTab.apiConsumerModal} .fr-alert--success`,
       ),
     ).toBeVisible();
+    await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
   test("Can edit an api consumer and check that modal returns to initial state", async ({
     page,
@@ -101,7 +103,7 @@ test.describe("Api Consumer Workflow", () => {
         })}]`,
       )
       .first();
-
+    await expectLocatorToBeVisibleAndEnabled(editApiConsumerButtonLocator);
     await editApiConsumerButtonLocator.click();
 
     await page
