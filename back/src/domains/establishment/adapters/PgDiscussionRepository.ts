@@ -98,7 +98,13 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
   #makeDiscussionQueryBuilder(
     {
-      filters: { createdSince, lastAnsweredByCandidate, sirets, status },
+      filters: {
+        createdSince,
+        answeredByEstablishment,
+        createdBetween,
+        sirets,
+        status,
+      },
       limit,
     }: GetDiscussionsParams,
     id?: DiscussionId,
@@ -111,37 +117,42 @@ export class PgDiscussionRepository implements DiscussionRepository {
             qb.selectFrom("discussions").select("discussions.id"),
             (qb) => (status ? qb.where("discussions.status", "=", status) : qb),
             (qb) => (id ? qb.where("discussions.id", "=", id) : qb),
-            (qb) =>
-              sirets && sirets?.length > 0
-                ? qb.where("discussions.siret", "in", sirets)
-                : qb,
+            (qb) => {
+              if (!sirets) return qb;
+              if (sirets.length === 0) throw errors.discussion.badSiretFilter();
+              return qb.where("discussions.siret", "in", sirets);
+            },
             (qb) =>
               createdSince
                 ? qb.where("discussions.created_at", ">=", createdSince)
                 : qb,
             (qb) =>
-              lastAnsweredByCandidate
-                ? qb.innerJoin(
-                    (qb) =>
-                      qb
-                        .selectFrom("exchanges")
-                        .select("discussion_id")
-                        .where("sender", "=", "potentialBeneficiary")
-                        .where((qb) =>
-                          qb.between(
-                            qb.ref("sent_at"),
-                            lastAnsweredByCandidate.from,
-                            lastAnsweredByCandidate.to,
-                          ),
-                        )
-                        .as("filtered_exchanges"),
-                    (join) =>
-                      join.onRef(
-                        "discussions.id",
-                        "=",
-                        "filtered_exchanges.discussion_id",
-                      ),
+              createdBetween
+                ? qb.where((qb) =>
+                    qb.between(
+                      qb.ref("discussions.created_at"),
+                      createdBetween.from,
+                      createdBetween.to,
+                    ),
                   )
+                : qb,
+            (qb) =>
+              answeredByEstablishment !== undefined
+                ? qb.where(({ not, exists, selectFrom, lit }) => {
+                    const existSubQuery = exists(
+                      selectFrom("exchanges")
+                        .select(lit(1).as("one"))
+                        .whereRef(
+                          "exchanges.discussion_id",
+                          "=",
+                          "discussions.id",
+                        )
+                        .where("exchanges.sender", "=", "establishment"),
+                    );
+                    return answeredByEstablishment
+                      ? existSubQuery
+                      : not(existSubQuery);
+                  })
                 : qb,
           )
             .limit(limit)

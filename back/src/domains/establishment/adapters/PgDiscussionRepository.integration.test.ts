@@ -1,4 +1,4 @@
-import { addDays, subDays } from "date-fns";
+import { addDays, addHours, subDays } from "date-fns";
 import { Pool } from "pg";
 import {
   AppellationAndRomeDto,
@@ -36,97 +36,6 @@ const offer = new OfferEntityBuilder()
 
 const date = new Date("2023-07-07");
 
-const discussionWithLastExchangeByPotentialBeneficiary1 =
-  new DiscussionBuilder()
-    .withId(uuid())
-    .withSiret("00000000000001")
-    .withEstablishmentContact({
-      email: "test@email.com",
-    })
-    .withExchanges([
-      {
-        message: "",
-        sender: "potentialBeneficiary",
-        recipient: "establishment",
-        sentAt: date.toISOString(),
-        subject: "exchange with potentialBeneficiary 1",
-        attachments: [
-          {
-            link: "magicTokenBrevo",
-            name: "monPdf.pdf",
-          },
-        ],
-      },
-    ])
-    .withCreatedAt(date)
-    .build();
-const discussionRejectedWithLastExchangeByPotentialBeneficiary =
-  new DiscussionBuilder(discussionWithLastExchangeByPotentialBeneficiary1)
-    .withId(uuid())
-    .withSiret("00000000000010")
-    .withStatus("REJECTED")
-    .build();
-const discussionAcceptedWithLastExchangeByPotentialBeneficiary =
-  new DiscussionBuilder(discussionWithLastExchangeByPotentialBeneficiary1)
-    .withId(uuid())
-    .withSiret("00000000000011")
-    .withStatus("ACCEPTED")
-    .build();
-const discussionWithLastExchangeByEstablishment2 = new DiscussionBuilder()
-  .withId(uuid())
-  .withSiret("00000000000003")
-  .withExchanges([
-    {
-      message: "",
-      recipient: "potentialBeneficiary",
-      sender: "establishment",
-      sentAt: date.toISOString(),
-      subject: "exchange with establishment 2",
-      attachments: [],
-    },
-  ])
-  .withCreatedAt(addDays(date, -1))
-  .build();
-const discussionWithoutExchanges3 = new DiscussionBuilder()
-  .withId(uuid())
-  .withSiret("00000000000002")
-  .withExchanges([])
-  .withConventionId("some-convention-id")
-  .withCreatedAt(addDays(date, -2))
-  .build();
-
-const discussionWithRejectedStatusAndReason4 = new DiscussionBuilder()
-  .withId(uuid())
-  .withSiret("00000000000004")
-  .withExchanges([])
-  .withConventionId("some-other-convention-id")
-  .withStatus("REJECTED", "OTHER", "my custom reason")
-  .withCreatedAt(addDays(date, -3))
-  .build();
-
-const discussionWithAcceptedStatus5 = new DiscussionBuilder()
-  .withId(uuid())
-  .withSiret("00000000000005")
-  .withExchanges([])
-  .withConventionId("another-convention-id")
-  .withStatus("ACCEPTED")
-  .withCreatedAt(addDays(date, -4))
-  .build();
-
-const discussionWithPotentialBeneficiaryInformations6 = new DiscussionBuilder()
-  .withPotentialBeneficiary({
-    datePreferences: "my fake date preferences",
-    email: "fake-address@mail.com",
-    firstName: "John",
-    lastName: "Doe",
-    hasWorkingExperience: true,
-    experienceAdditionalInformation: "my fake experience",
-    phone: "0549000000",
-    resumeLink: "https://www.my-link.com",
-  })
-  .withCreatedAt(addDays(date, -5))
-  .build();
-
 describe("PgDiscussionRepository", () => {
   let pool: Pool;
   let pgDiscussionRepository: PgDiscussionRepository;
@@ -152,204 +61,439 @@ describe("PgDiscussionRepository", () => {
   });
 
   describe("getDiscussions", () => {
-    //TODO getDiscussions with lastAnsweredByCandidate parameter
-    beforeEach(async () => {
-      await Promise.all(
-        [
-          discussionWithLastExchangeByPotentialBeneficiary1,
-          discussionWithLastExchangeByEstablishment2,
-          discussionWithoutExchanges3,
-          discussionWithRejectedStatusAndReason4,
-          discussionWithAcceptedStatus5,
-          discussionWithPotentialBeneficiaryInformations6,
-          discussionRejectedWithLastExchangeByPotentialBeneficiary,
-          discussionAcceptedWithLastExchangeByPotentialBeneficiary,
-        ].map((discussion) => pgDiscussionRepository.insert(discussion)),
-      );
-    });
     describe("unit filter param", () => {
-      it("siret filter param", async () => {
-        expectToEqual(
-          await pgDiscussionRepository.getDiscussions({
-            filters: {
-              sirets: [discussionWithLastExchangeByPotentialBeneficiary1.siret],
-            },
-            limit: 5,
-          }),
-          [discussionWithLastExchangeByPotentialBeneficiary1],
-        );
-      });
-      it("createdSince filter param", async () => {
-        expectToEqual(
-          await pgDiscussionRepository.getDiscussions({
-            filters: {
-              createdSince: addDays(date, -4),
-            },
-            limit: 10,
-          }),
-          [
-            discussionWithLastExchangeByPotentialBeneficiary1,
-            discussionRejectedWithLastExchangeByPotentialBeneficiary,
-            discussionAcceptedWithLastExchangeByPotentialBeneficiary,
-            discussionWithLastExchangeByEstablishment2,
-            discussionWithoutExchanges3,
-            discussionWithRejectedStatusAndReason4,
-            discussionWithAcceptedStatus5,
-          ],
-        );
-      });
+      describe("siret filter param", () => {
+        const discussionWithSiret1 = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-01-01"))
+          .withSiret("00000000000001")
+          .build();
+        const discussionWithSiret2 = new DiscussionBuilder(discussionWithSiret1)
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-01-02"))
+          .build();
+        const discussionWithoutSiret = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-01-03"))
+          .withSiret("00000000000002")
+          .build();
+        beforeEach(async () => {
+          await pgDiscussionRepository.insert(discussionWithSiret1);
+          await pgDiscussionRepository.insert(discussionWithSiret2);
+          await pgDiscussionRepository.insert(discussionWithoutSiret);
+        });
 
-      describe("lastAnsweredByCandidate filter param", () => {
-        it("simple scenario", async () => {
+        it("exclude discussion that do not have siret in filter", async () => {
           expectToEqual(
             await pgDiscussionRepository.getDiscussions({
               filters: {
-                status: "PENDING",
-                lastAnsweredByCandidate: {
-                  from: addDays(date, -1),
-                  to: date,
-                },
+                sirets: [discussionWithSiret1.siret],
               },
               limit: 5,
             }),
-            [discussionWithLastExchangeByPotentialBeneficiary1],
+            [discussionWithSiret2, discussionWithSiret1],
           );
         });
 
-        it("filters discussions even if they have a lot of exchanges", async () => {
-          const now = new Date("2024-08-01");
-          const discussionWithLotOfExchanges = new DiscussionBuilder()
-            .withId(uuid())
-            .withExchanges(
-              (
-                [
-                  {
-                    sender: "potentialBeneficiary",
-                    recipient: "establishment",
-                    sentAt: new Date("2024-07-20 19:45:34").toISOString(),
-                  },
-                  {
-                    sender: "establishment",
-                    recipient: "potentialBeneficiary",
-                    sentAt: new Date("2024-07-22 08:02:54").toISOString(),
-                  },
-                  {
-                    sender: "potentialBeneficiary",
-                    recipient: "establishment",
-                    sentAt: new Date("2024-07-22 12:35:16").toISOString(),
-                  },
-                  {
-                    sender: "potentialBeneficiary",
-                    recipient: "establishment",
-                    sentAt: new Date("2024-07-23 18:48:35").toISOString(),
-                  },
-                  {
-                    sender: "establishment",
-                    recipient: "potentialBeneficiary",
-                    sentAt: new Date("2024-07-24 07:17:59").toISOString(),
-                  },
-                  {
-                    sender: "establishment",
-                    recipient: "potentialBeneficiary",
-                    sentAt: new Date("2024-07-24 08:39:28").toISOString(),
-                  },
-                  {
-                    sender: "potentialBeneficiary",
-                    recipient: "establishment",
-                    sentAt: new Date("2024-07-25 12:04:29").toISOString(),
-                  },
-                  {
-                    sender: "potentialBeneficiary",
-                    recipient: "establishment",
-                    sentAt: new Date("2024-07-25 12:12:20").toISOString(),
-                  },
-                  {
-                    sender: "potentialBeneficiary",
-                    recipient: "establishment",
-                    sentAt: new Date("2024-07-25 17:49:05").toISOString(),
-                  },
-                  {
-                    sender: "potentialBeneficiary",
-                    recipient: "establishment",
-                    sentAt: new Date("2024-07-29 08:03:20").toISOString(),
-                  },
-                  {
-                    sender: "establishment",
-                    recipient: "potentialBeneficiary",
-                    sentAt: new Date("2024-07-29 08:47:52").toISOString(),
-                  },
-                ] satisfies Pick<Exchange, "sender" | "recipient" | "sentAt">[]
-              ).map((rest) => ({
-                ...rest,
-                message: "",
-                subject: "",
-                attachments: [],
-              })),
-            )
-            .build();
-
-          await pgDiscussionRepository.insert(discussionWithLotOfExchanges);
-
+        it("include all discussions that have sirets in filter", async () => {
           expectToEqual(
             await pgDiscussionRepository.getDiscussions({
               filters: {
-                lastAnsweredByCandidate: {
-                  from: subDays(now, 4),
-                  to: subDays(now, 3),
+                sirets: [
+                  discussionWithSiret1.siret,
+                  discussionWithoutSiret.siret,
+                ],
+              },
+              limit: 5,
+            }),
+            [
+              discussionWithoutSiret,
+              discussionWithSiret2,
+              discussionWithSiret1,
+            ],
+          );
+        });
+
+        it("exclude all discussions if siret in filter does not match any discussion siret", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                sirets: ["99999999999999"],
+              },
+              limit: 5,
+            }),
+            [],
+          );
+        });
+
+        it("throws if siret filter is provided but empty", async () => {
+          await expectPromiseToFailWithError(
+            pgDiscussionRepository.getDiscussions({
+              filters: {
+                sirets: [],
+              },
+              limit: 5,
+            }),
+            errors.discussion.badSiretFilter(),
+          );
+        });
+      });
+
+      describe("createdSince filter param", () => {
+        const discussionCreatedSince1 = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-01-01"))
+          .build();
+        const discussionCreatedSince2 = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-01-02"))
+          .build();
+        const discussionCreatedBefore = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2023-12-31"))
+          .build();
+
+        beforeEach(async () => {
+          await pgDiscussionRepository.insert(discussionCreatedSince1);
+          await pgDiscussionRepository.insert(discussionCreatedSince2);
+          await pgDiscussionRepository.insert(discussionCreatedBefore);
+        });
+
+        it("exclude discussions created before", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                createdSince: new Date(discussionCreatedSince1.createdAt),
+              },
+              limit: 10,
+            }),
+            [discussionCreatedSince2, discussionCreatedSince1],
+          );
+        });
+        it("include all discussions if created since date is the creation date of the oldest discussion", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                createdSince: new Date(discussionCreatedBefore.createdAt),
+              },
+              limit: 10,
+            }),
+            [
+              discussionCreatedSince2,
+              discussionCreatedSince1,
+              discussionCreatedBefore,
+            ],
+          );
+        });
+        it("exclude all discussions if created since date is after of the most recent discussion", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                createdSince: new Date("2024-01-03"),
+              },
+              limit: 10,
+            }),
+            [],
+          );
+        });
+      });
+
+      describe("createdBetween filter param", () => {
+        const discussionCreatedBefore = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-08-01 23:59:59"))
+          .build();
+        const discussionCreatedBetween1 = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-08-02 00:00:00"))
+          .build();
+        const discussionCreatedBetween2 = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-08-03 00:00:00"))
+          .build();
+        const discussionCreatedAfter = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-08-03 00:00:01"))
+          .build();
+
+        beforeEach(async () => {
+          await pgDiscussionRepository.insert(discussionCreatedBefore);
+          await pgDiscussionRepository.insert(discussionCreatedBetween1);
+          await pgDiscussionRepository.insert(discussionCreatedBetween2);
+          await pgDiscussionRepository.insert(discussionCreatedAfter);
+        });
+
+        it("include discussion with created at exactly of created between ranges", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                createdBetween: {
+                  from: new Date("2024-08-02 00:00:00"),
+                  to: new Date("2024-08-03 00:00:00"),
+                },
+              },
+              limit: 5,
+            }),
+            [discussionCreatedBetween2, discussionCreatedBetween1],
+          );
+        });
+        it("include discussion with created at very close of created between range", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                createdBetween: {
+                  from: new Date("2024-08-01 23:59:59:999"),
+                  to: new Date("2024-08-02 00:00:00:001"),
+                },
+              },
+              limit: 5,
+            }),
+            [discussionCreatedBetween1],
+          );
+        });
+        it("exclude all discussions with created between range out of discussions created at", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                createdBetween: {
+                  from: new Date("2024-08-03 00:00:01:001"),
+                  to: new Date("2024-08-04 00:00:00"),
                 },
               },
               limit: 5,
             }),
             [],
           );
+        });
+      });
+
+      describe("answeredByEstablishment filter param", () => {
+        const discussionNotAnsweredByEstablishment = new DiscussionBuilder()
+          .withId(uuid())
+          .withExchanges([
+            {
+              sender: "potentialBeneficiary",
+              recipient: "establishment",
+              message: "",
+              attachments: [],
+              sentAt: new Date().toISOString(),
+              subject: "",
+            },
+          ])
+          .build();
+        const discussionAnsweredByEstablishment = new DiscussionBuilder()
+          .withId(uuid())
+          .withExchanges([
+            {
+              sender: "establishment",
+              recipient: "potentialBeneficiary",
+              message: "",
+              attachments: [],
+              sentAt: new Date().toISOString(),
+              subject: "",
+            },
+          ])
+          .build();
+
+        beforeEach(async () => {
+          await pgDiscussionRepository.insert(
+            discussionAnsweredByEstablishment,
+          );
+          await pgDiscussionRepository.insert(
+            discussionNotAnsweredByEstablishment,
+          );
+        });
+
+        it("include only discussions answered by establishment", async () => {
           expectToEqual(
             await pgDiscussionRepository.getDiscussions({
               filters: {
-                lastAnsweredByCandidate: {
-                  from: subDays(now, 8),
-                  to: subDays(now, 7),
-                },
+                answeredByEstablishment: true,
               },
               limit: 5,
             }),
-            [],
+            [discussionAnsweredByEstablishment],
+          );
+        });
+
+        it("include only discussions not answered by establishment", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                answeredByEstablishment: false,
+              },
+              limit: 5,
+            }),
+            [discussionNotAnsweredByEstablishment],
           );
         });
       });
     });
     describe("combo filters", () => {
-      it("no result if siret excluded from filter", async () => {
-        expectToEqual(
-          await pgDiscussionRepository.getDiscussions({
-            filters: {
-              status: "PENDING",
-              lastAnsweredByCandidate: {
-                from: addDays(date, -1),
-                to: date,
-              },
+      it("exclude discussions that does not match filters", async () => {
+        type ReducedExchange = Pick<Exchange, "sender" | "recipient">;
+        const sendedByBeneficiary: ReducedExchange = {
+          sender: "potentialBeneficiary",
+          recipient: "establishment",
+        };
+        const sendedByEstablishment: ReducedExchange = {
+          sender: "establishment",
+          recipient: "potentialBeneficiary",
+        };
+
+        const date = new Date("2024-08-02 00:00:00");
+        const discussionToMatchWithLotOfExchanges = new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(date)
+          .withStatus("PENDING")
+          .withExchanges(
+            [
+              sendedByBeneficiary,
+              sendedByEstablishment,
+              sendedByBeneficiary,
+              sendedByBeneficiary,
+              sendedByEstablishment,
+              sendedByEstablishment,
+              sendedByBeneficiary,
+              sendedByBeneficiary,
+              sendedByBeneficiary,
+              sendedByBeneficiary,
+              sendedByEstablishment,
+            ].map((rest, index) => ({
+              ...rest,
+              message: "",
+              subject: "",
+              attachments: [],
+              sentAt: addHours(new Date(date), index).toISOString(),
+            })),
+          )
+          .build();
+        const discussionToMatchWithOneExchangeOfEach = new DiscussionBuilder(
+          discussionToMatchWithLotOfExchanges,
+        )
+          .withId(uuid())
+          .withExchanges(
+            [sendedByBeneficiary, sendedByEstablishment].map((rest, index) => ({
+              ...rest,
+              message: "",
+              subject: "",
+              attachments: [],
+              sentAt: addHours(new Date(date), index).toISOString(),
+            })),
+          )
+          .withCreatedAt(
+            addHours(
+              new Date(discussionToMatchWithLotOfExchanges.createdAt),
+              1,
+            ),
+          )
+          .build();
+        const discussionBadSiret = new DiscussionBuilder(
+          discussionToMatchWithLotOfExchanges,
+        )
+          .withId(uuid())
+          .withSiret("99999999999999")
+          .build();
+        const discussionCreatedAtBelowRange = new DiscussionBuilder(
+          discussionToMatchWithLotOfExchanges,
+        )
+          .withId(uuid())
+          .withCreatedAt(subDays(new Date(discussionBadSiret.createdAt), 1))
+          .build();
+        const discussionCreatedAfterRange = new DiscussionBuilder(
+          discussionToMatchWithLotOfExchanges,
+        )
+          .withId(uuid())
+          .withCreatedAt(addDays(new Date(discussionBadSiret.createdAt), 1))
+          .build();
+        const discussionNotAnsweredByEstablishment = new DiscussionBuilder(
+          discussionToMatchWithLotOfExchanges,
+        )
+          .withId(uuid())
+          .withExchanges([
+            {
+              attachments: [],
+              message: "",
+              subject: "",
+              sentAt: new Date().toISOString(),
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
             },
-            limit: 5,
-          }),
-          [discussionWithLastExchangeByPotentialBeneficiary1],
+          ])
+          .build();
+
+        await pgDiscussionRepository.insert(
+          discussionToMatchWithLotOfExchanges,
         );
+        await pgDiscussionRepository.insert(
+          discussionToMatchWithOneExchangeOfEach,
+        );
+        await pgDiscussionRepository.insert(discussionBadSiret);
+        await pgDiscussionRepository.insert(discussionCreatedAtBelowRange);
+        await pgDiscussionRepository.insert(discussionCreatedAfterRange);
+        await pgDiscussionRepository.insert(
+          discussionNotAnsweredByEstablishment,
+        );
+
         expectToEqual(
           await pgDiscussionRepository.getDiscussions({
             filters: {
-              sirets: [discussionWithoutExchanges3.siret],
-              lastAnsweredByCandidate: {
-                from: addDays(date, -1),
-                to: date,
+              answeredByEstablishment: true,
+              status: discussionToMatchWithLotOfExchanges.status,
+              createdBetween: {
+                from: new Date(discussionToMatchWithLotOfExchanges.createdAt),
+                to: new Date(discussionToMatchWithOneExchangeOfEach.createdAt),
               },
+              sirets: [discussionToMatchWithLotOfExchanges.siret],
+              createdSince: new Date(
+                discussionToMatchWithLotOfExchanges.createdAt,
+              ),
             },
             limit: 5,
           }),
-          [],
+          [
+            discussionToMatchWithOneExchangeOfEach,
+            discussionToMatchWithLotOfExchanges,
+          ],
         );
       });
     });
   });
 
   describe("hasDiscussionMatching", () => {
+    const discussionWithLastExchangeByPotentialBeneficiary1 =
+      new DiscussionBuilder()
+        .withId(uuid())
+        .withSiret("00000000000001")
+        .withEstablishmentContact({
+          email: "test@email.com",
+        })
+        .withExchanges([
+          {
+            message: "",
+            sender: "potentialBeneficiary",
+            recipient: "establishment",
+            sentAt: new Date("2023-07-07").toISOString(),
+            subject: "exchange with potentialBeneficiary 1",
+            attachments: [
+              {
+                link: "magicTokenBrevo",
+                name: "monPdf.pdf",
+              },
+            ],
+          },
+        ])
+        .withCreatedAt(new Date("2023-07-07"))
+        .build();
+
+    const discussionWithoutExchanges3 = new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret("00000000000002")
+      .withExchanges([])
+      .withConventionId("some-convention-id")
+      .withCreatedAt(new Date("2023-07-05"))
+      .build();
+
     it.each([
       {
         discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
