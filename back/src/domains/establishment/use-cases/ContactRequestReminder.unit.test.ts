@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { subDays } from "date-fns";
 import {
   DiscussionBuilder,
   DiscussionDto,
@@ -28,6 +28,7 @@ import {
 } from "./ContactRequestReminder";
 
 describe("ContactRequestReminder", () => {
+  let timeGateway: CustomTimeGateway;
   const now = new Date();
   const domain = "domain.fr";
   const [
@@ -38,12 +39,12 @@ describe("ContactRequestReminder", () => {
     discussionWith7DaysSinceBeneficiairyExchange,
     discussionWith8DaysSinceBeneficiairyExchange,
   ] = [
-    addDays(now, -2),
-    addDays(now, -3),
-    addDays(now, -4),
-    addDays(now, -6),
-    addDays(now, -7),
-    addDays(now, -8),
+    subDays(now, 2),
+    subDays(now, 3),
+    subDays(now, 4),
+    subDays(now, 6),
+    subDays(now, 7),
+    subDays(now, 8),
   ].map((date, index) =>
     new DiscussionBuilder()
       .withId(uuid())
@@ -63,6 +64,7 @@ describe("ContactRequestReminder", () => {
           attachments: [],
         },
       ])
+      .withCreatedAt(date)
       .build(),
   );
 
@@ -71,7 +73,7 @@ describe("ContactRequestReminder", () => {
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
-    const timeGateway = new CustomTimeGateway(now);
+    timeGateway = new CustomTimeGateway(now);
     const uuidGenerator = new TestUuidGenerator();
     uuidGenerator.setNextUuids(["1", "2"]);
 
@@ -111,6 +113,104 @@ describe("ContactRequestReminder", () => {
       expectToEqual(reminderQty7d, { numberOfNotifications: 0 });
       expectToEqual(uow.outboxRepository.events, []);
     });
+
+    it("no discussion when establishment already answered", async () => {
+      timeGateway.setNextDate(new Date("2024-08-08 10:15:00"));
+      uow.discussionRepository.discussions = [
+        new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-07-01 09:19:35"))
+          .withStatus("PENDING")
+          .withExchanges([
+            {
+              sender: "potentialBeneficiary",
+              recipient: "establishment",
+              sentAt: new Date("2024-07-01 09:19:35").toISOString(),
+              attachments: [],
+              message: "",
+              subject: "",
+            },
+            {
+              sender: "establishment",
+              recipient: "potentialBeneficiary",
+              sentAt: new Date("2024-07-23 15:34:15").toISOString(),
+              attachments: [],
+              message: "",
+              subject: "",
+            },
+            {
+              sender: "potentialBeneficiary",
+              recipient: "establishment",
+              sentAt: new Date("2024-07-25 09:25:17").toISOString(),
+              attachments: [],
+              message: "",
+              subject: "",
+            },
+            {
+              sender: "establishment",
+              recipient: "potentialBeneficiary",
+              sentAt: new Date("2024-07-31 08:55:47").toISOString(),
+              attachments: [],
+              message: "",
+              subject: "",
+            },
+          ])
+          .build(),
+        new DiscussionBuilder()
+          .withId(uuid())
+          .withCreatedAt(new Date("2024-07-26 06:48:59"))
+          .withStatus("PENDING")
+          .withExchanges([
+            {
+              sender: "potentialBeneficiary",
+              recipient: "establishment",
+              sentAt: new Date("2024-07-26 06:48:59").toISOString(),
+              attachments: [],
+              message: "",
+              subject: "",
+            },
+            {
+              sender: "establishment",
+              recipient: "potentialBeneficiary",
+              sentAt: new Date("2024-07-26 07:24:36").toISOString(),
+              attachments: [],
+              message: "",
+              subject: "",
+            },
+            {
+              sender: "establishment",
+              recipient: "potentialBeneficiary",
+              sentAt: new Date("2024-07-29 10:13:46").toISOString(),
+              attachments: [],
+              message: "",
+              subject: "",
+            },
+            {
+              sender: "potentialBeneficiary",
+              recipient: "establishment",
+              sentAt: new Date("2024-07-29 14:12:26").toISOString(),
+              attachments: [],
+              message: "",
+              subject: "",
+            },
+          ])
+          .build(),
+      ];
+      const reminderQty3d = await contactRequestReminder.execute(
+        "3days",
+        undefined,
+      );
+      const reminderQty7d = await contactRequestReminder.execute(
+        "7days",
+        undefined,
+      );
+
+      expectToEqual(uow.notificationRepository.notifications, []);
+      expectToEqual(uow.outboxRepository.events, []);
+      expectToEqual(reminderQty3d, { numberOfNotifications: 0 });
+      expectToEqual(reminderQty7d, { numberOfNotifications: 0 });
+    });
+
     it("no discussion with status other than PENDING", async () => {
       uow.discussionRepository.discussions = [
         new DiscussionBuilder(discussionWith3DaysSinceBeneficiairyExchange)
@@ -151,6 +251,7 @@ describe("ContactRequestReminder", () => {
         discussionWith8DaysSinceBeneficiairyExchange,
       ];
     });
+
     it("when discussion with missing establishment response 3 days after ", async () => {
       const reminderQty = await contactRequestReminder.execute(
         "3days",

@@ -28,19 +28,16 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
           ? new Date(createdAt) >= filters.createdSince
           : true,
       ({ status }) => (filters.status ? status === filters.status : true),
-      ({ exchanges }) => {
-        if (!filters.lastAnsweredByCandidate) return true;
-        const mostRecentExchange = exchanges.reduce((a, b) =>
-          a.sentAt > b.sentAt ? a : b,
-        );
-        const sendAt = new Date(mostRecentExchange.sentAt);
-
-        return (
-          mostRecentExchange.sender === "potentialBeneficiary" &&
-          sendAt >= filters.lastAnsweredByCandidate.from &&
-          sendAt <= filters.lastAnsweredByCandidate.to
-        );
-      },
+      ({ createdAt }) =>
+        filters.createdBetween
+          ? new Date(createdAt) >= filters.createdBetween.from &&
+            new Date(createdAt) <= filters.createdBetween.to
+          : true,
+      ({ exchanges }) =>
+        filters.answeredByEstablishment !== undefined
+          ? exchanges.filter((e) => e.sender === "establishment").length > 0 ===
+            filters.answeredByEstablishment
+          : true,
     ];
     const discussions = this.discussions
       .filter((discussion) =>
