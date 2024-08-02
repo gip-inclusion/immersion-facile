@@ -4,6 +4,8 @@ import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { expectLocatorToBeVisibleAndEnabled } from "../../utils/utils";
 
+test.describe.configure({ mode: "serial" });
+
 test.describe("Api Consumer Workflow", () => {
   test.use({ storageState: testConfig.adminAuthFile });
   test("Can add an api consumer", async ({ page }) => {
@@ -87,7 +89,6 @@ test.describe("Api Consumer Workflow", () => {
         `#${domElementIds.admin.technicalOptionsTab.apiConsumerModal} .fr-alert--success`,
       ),
     ).toBeVisible();
-    await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
   test("Can edit an api consumer and check that modal returns to initial state", async ({
     page,
