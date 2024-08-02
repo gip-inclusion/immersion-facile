@@ -21,13 +21,23 @@ import {
   makeBroadcastConventionAgain,
 } from "./BroadcastConventionAgain";
 
-const adminUser = new InclusionConnectedUserBuilder().withIsAdmin(true).build();
 const conventionId = "11111111-1111-4111-1111-111111111111";
 const agencyId = "11111111-1111-4111-2222-111111111122";
 const agency = new AgencyDtoBuilder().withId(agencyId).build();
 const convention = new ConventionDtoBuilder()
   .withId(conventionId)
   .withAgencyId(agencyId)
+  .build();
+const adminUser = new InclusionConnectedUserBuilder().withIsAdmin(true).build();
+const userWithEnoughRights = new InclusionConnectedUserBuilder()
+  .withIsAdmin(false)
+  .withAgencyRights([
+    {
+      agency: agency,
+      roles: ["validator", "counsellor"],
+      isNotifiedByEmail: true,
+    },
+  ])
   .build();
 
 describe("BroadcastConventionAgain", () => {
@@ -55,14 +65,13 @@ describe("BroadcastConventionAgain", () => {
     await uow.conventionRepository.save(convention);
   });
 
-  it("throws Forbidden if user is not IF admin", async () => {
-    const notAdminUser = new InclusionConnectedUserBuilder()
-      .withIsAdmin(false)
-      .build();
+  it("throws Forbidden if user doesn't have enough rights on convention", async () => {
+    const user = new InclusionConnectedUserBuilder().withIsAdmin(false).build();
+    uow.userRepository.users = [user];
 
     await expectPromiseToFailWithError(
-      broadcastConventionAgain.execute({ conventionId }, notAdminUser),
-      errors.user.forbidden({ userId: notAdminUser.id }),
+      broadcastConventionAgain.execute({ conventionId }, user),
+      errors.user.forbidden({ userId: user.id }),
     );
   });
 
@@ -79,30 +88,33 @@ describe("BroadcastConventionAgain", () => {
     );
   });
 
-  it("trigger ConventionBroadcastAgain event with the whole convention in payload", async () => {
-    await broadcastConventionAgain.execute({ conventionId }, adminUser);
+  it.each([adminUser, userWithEnoughRights])(
+    "trigger ConventionBroadcastAgain event with the whole convention in payload",
+    async (user) => {
+      await broadcastConventionAgain.execute({ conventionId }, user);
 
-    expect(uow.outboxRepository.events).toHaveLength(1);
-    const expectedConventionRead: ConventionReadDto = {
-      ...convention,
-      agencyId: agency.id,
-      agencyKind: agency.kind,
-      agencyName: agency.name,
-      agencyCounsellorEmails: [],
-      agencyValidatorEmails: [defaultValidatorEmail],
-      agencySiret: agency.agencySiret,
-      agencyDepartment: agency.address.departmentCode,
-    };
+      expect(uow.outboxRepository.events).toHaveLength(1);
+      const expectedConventionRead: ConventionReadDto = {
+        ...convention,
+        agencyId: agency.id,
+        agencyKind: agency.kind,
+        agencyName: agency.name,
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: [defaultValidatorEmail],
+        agencySiret: agency.agencySiret,
+        agencyDepartment: agency.address.departmentCode,
+      };
 
-    expectArraysToMatch(uow.outboxRepository.events, [
-      {
-        topic: "ConventionBroadcastRequested",
-        status: "never-published",
-        payload: {
-          convention: expectedConventionRead,
-          triggeredBy: { kind: "inclusion-connected", userId: adminUser.id },
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "ConventionBroadcastRequested",
+          status: "never-published",
+          payload: {
+            convention: expectedConventionRead,
+            triggeredBy: { kind: "inclusion-connected", userId: user.id },
+          },
         },
-      },
-    ]);
-  });
+      ]);
+    },
+  );
 });

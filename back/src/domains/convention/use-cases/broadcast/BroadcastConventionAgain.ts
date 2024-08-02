@@ -5,6 +5,7 @@ import {
   userHasEnoughRightsOnConvention,
   withConventionIdSchema,
 } from "shared";
+import { userHasEnoughRightsOnConvention } from "../../../../utils/convention";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 export type BroadcastConventionAgain = ReturnType<
@@ -21,9 +22,6 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
     inputSchema: withConventionIdSchema,
   },
   async ({ inputParams: { conventionId }, uow, deps, currentUser }) => {
-    if (!currentUser.isBackofficeAdmin)
-      throw errors.user.forbidden({ userId: currentUser.id });
-
     const convention =
       await uow.conventionQueries.getConventionById(conventionId);
 
@@ -46,6 +44,14 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
         ),
       now: deps.timeGateway.now(),
     });
+
+    if (
+      !userHasEnoughRightsOnConvention(currentUser, convention, [
+        "counsellor",
+        "validator",
+      ])
+    )
+      throw errors.user.forbidden({ userId: currentUser.id });
 
     const broadcastConventionAgainEvent = deps.createNewEvent({
       topic: "ConventionBroadcastRequested",
