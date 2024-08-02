@@ -36,7 +36,8 @@ export const makeContactRequestReminder = createTransactionalUseCase<
     const discussions = await uow.discussionRepository.getDiscussions({
       filters: {
         status: "PENDING",
-        lastAnsweredByCandidate: {
+        answeredByEstablishment: false,
+        createdBetween: {
           from: addDays(now, mode === "3days" ? -4 : -8),
           to: addDays(now, mode === "3days" ? -3 : -7),
         },

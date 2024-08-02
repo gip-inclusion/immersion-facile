@@ -1,5 +1,6 @@
 import {
   AppellationCode,
+  DateRange,
   DiscussionDto,
   DiscussionId,
   DiscussionStatus,
@@ -22,7 +23,8 @@ export type GetDiscussionsParams = {
     status?: DiscussionStatus;
     sirets?: SiretDto[];
     createdSince?: Date;
-    lastAnsweredByCandidate?: { from: Date; to: Date };
+    createdBetween?: DateRange;
+    answeredByEstablishment?: boolean;
   };
   limit: number;
 };
