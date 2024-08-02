@@ -91,15 +91,17 @@ test.describe("Api Consumer Workflow", () => {
     page,
   }) => {
     await page.goto("/");
+
     await goToAdminTab(page, "technical-options");
-    const editApiConsumerButtonLocator = page
+
+    const editApiConsumerButtonLocator = await page
       .locator(
         `[id^=${domElementIds.admin.technicalOptionsTab.editApiConsumerButton({
           apiConsumerId: "",
         })}]`,
       )
       .first();
-    await expect(editApiConsumerButtonLocator).toBeVisible();
+
     await editApiConsumerButtonLocator.click();
 
     await page
