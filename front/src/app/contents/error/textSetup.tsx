@@ -1,6 +1,10 @@
 import { ManagedErrorKind, immersionFacileContactEmail } from "shared";
 import { routes } from "src/app/routes/routes";
-import { ErrorButton, HTTPFrontErrorContents } from "./types";
+import {
+  ContactErrorInformations,
+  ErrorButtonProps,
+  HTTPFrontErrorContents,
+} from "./types";
 
 export const unexpectedErrorContent = (
   title: string,
@@ -151,24 +155,39 @@ export const contentsMapper = (
   },
 });
 
-const redirectToHomePageButtonContent: ErrorButton = {
+const redirectToHomePageButtonContent: ErrorButtonProps = {
   kind: "primary",
   label: "Page d'accueil",
   ...routes.home().link,
 };
 const redirectToConventionWithoutIdentityProvider = (
   onClick: () => void,
-): ErrorButton => ({
+): ErrorButtonProps => ({
   kind: "primary",
   label:
     "Vous pouvez quand même remplir votre demande de convention en indiquant l'agence France Travail à laquelle vous êtes rattaché ici.",
   onClick,
 });
-const contactUsButtonContent: ErrorButton = {
-  kind: "secondary",
-  label: "Contactez-nous",
-  href: `mailto:${immersionFacileContactEmail}`,
-  target: "_blank",
+const contactUsButtonContent = ({
+  currentUrl,
+  currentDate,
+  error,
+}: ContactErrorInformations): ErrorButtonProps => {
+  const emailBody = `%0D%0A________________________%0D%0A
+  %0D%0A
+  Veuillez répondre au dessus de cette ligne.%0D%0A%0D%0A
+  Les infos suivantes peuvent être utiles pour résoudre votre problème :%0D%0A%0D%0A
+  - URL de la page concernée : ${currentUrl}%0D%0A%0D%0A
+  - Date et heure de l'erreur : ${currentDate}%0D%0A%0D%0A
+  - Résumé de l'erreur :%0D%0A%0D%0A
+  ${error}
+  `;
+  return {
+    kind: "secondary",
+    label: "Contactez-nous",
+    href: `mailto:${immersionFacileContactEmail}?body=${emailBody}`,
+    target: "_blank",
+  };
 };
 const httpClientErrorKind = "Erreur Http Client";
 const peConnectErrorKind = "Erreur Pôle Emploi Connect";
