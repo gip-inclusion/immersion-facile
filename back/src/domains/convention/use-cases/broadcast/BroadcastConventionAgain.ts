@@ -2,11 +2,11 @@ import {
   InclusionConnectedUser,
   WithConventionId,
   errors,
+  userHasEnoughRightsOnConvention,
   withConventionIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
-
 export type BroadcastConventionAgain = ReturnType<
   typeof makeBroadcastConventionAgain
 >;
@@ -31,6 +31,21 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
       throw errors.convention.notFound({
         conventionId,
       });
+    if (
+      !userHasEnoughRightsOnConvention(currentUser, convention, [
+        "counsellor",
+        "validator",
+      ])
+    )
+      throw errors.user.forbidden({ userId: currentUser.id });
+
+    throwErrorIfTooManyRequests({
+      lastBroadcastFeedback:
+        await uow.broadcastFeedbacksRepository.getLastBroadcastFeedback(
+          conventionId,
+        ),
+      now: deps.timeGateway.now(),
+    });
 
     const broadcastConventionAgainEvent = deps.createNewEvent({
       topic: "ConventionBroadcastRequested",

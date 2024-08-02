@@ -5,6 +5,10 @@ import { AgencyId, AgencyKind } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import {
+  AgencyRole,
+  InclusionConnectedUser,
+} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import {
   ModifierRole,
   Role,
   SignatoryRole,
@@ -401,3 +405,14 @@ export const reminderKinds = [
 ] as const;
 
 export type ReminderKind = (typeof reminderKinds)[number];
+
+export const userHasEnoughRightsOnConvention = (
+  user: InclusionConnectedUser,
+  convention: ConventionDto,
+  allowedRoles: AgencyRole[],
+): boolean =>
+  user.agencyRights.some(
+    (agencyRight) =>
+      agencyRight.agency.id === convention.agencyId &&
+      agencyRight.roles.some((role) => allowedRoles.includes(role)),
+  ) || !!user.isBackofficeAdmin;
