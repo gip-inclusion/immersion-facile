@@ -20,14 +20,6 @@ export const templatedEmailSchema = z.object({
   params: z.any(),
 }) as z.Schema<TemplatedEmail>;
 
-const emailSentSchema = z.object({
-  templatedEmail: templatedEmailSchema,
-  sentAt: z.string(),
-  error: z.optional(z.string()),
-});
-
-export const emailsSentSchema = z.array(emailSentSchema);
-
 // Waiting zod release for bad email regex
 const temporaryEmailRegex =
   /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i;
