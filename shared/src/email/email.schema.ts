@@ -13,20 +13,12 @@ export const emailAttachmentSchema: z.Schema<EmailAttachment> = z
 
 const emailTypeSchema = z.string() as z.Schema<EmailType>;
 
-export const templatedEmailSchema = z.object({
-  kind: emailTypeSchema,
-  recipients: z.array(z.string()),
-  cc: z.array(z.string()).optional(),
-  params: z.any(),
-}) as z.Schema<TemplatedEmail>;
-
 // Waiting zod release for bad email regex
 const temporaryEmailRegex =
   /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i;
-
 export const emailSchema: z.Schema<Email> = z
   .string(requiredText)
-  .transform((arg) => toLowerCaseWithoutDiacritics(arg))
+  .transform((arg) => toLowerCaseWithoutDiacritics(arg.trim()))
   .pipe(
     //Temporary regex instead of email - waiting zod release
     z
@@ -34,6 +26,14 @@ export const emailSchema: z.Schema<Email> = z
       .regex(temporaryEmailRegex),
   );
 
+export const templatedEmailSchema = z.object({
+  kind: emailTypeSchema,
+  recipients: z.array(z.string().transform((arg) => arg.trim())),
+  cc: z.array(z.string().transform((arg) => arg.trim())).optional(),
+  params: z.any(),
+}) as z.Schema<TemplatedEmail>;
+
 export const emailPossiblyEmptySchema = emailSchema
+  .transform((s) => s.trim())
   .optional()
   .or(z.literal(""));
