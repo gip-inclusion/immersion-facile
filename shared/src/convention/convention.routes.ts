@@ -143,9 +143,9 @@ export const authenticatedConventionRoutes = defineRoutes({
     responses: {
       200: apiConsumerReadSchema,
       400: httpErrorSchema,
-      401: legacyUnauthenticatedErrorSchema,
-      403: legacyUnauthenticatedErrorSchema,
-      404: legacyHttpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });
