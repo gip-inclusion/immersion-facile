@@ -10,7 +10,7 @@
     "test:ci": "CI=true BASE_URL=https://dev.immersion-facile.beta.gouv.fr EVENT_CRAWLER_PERIOD_MS=1000 playwright test",
     "test:ci-v2": "CI=true playwright test",
     "show-report": "playwright show-report",
-    "install": "playwright install"
+    "install": "playwright install --with-deps chromium"
   },
   "keywords": [],
   "author": "",
