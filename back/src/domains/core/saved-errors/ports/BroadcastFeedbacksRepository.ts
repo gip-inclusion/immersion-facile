@@ -37,4 +37,7 @@ export const broadcastToPeServiceName =
 export interface BroadcastFeedbacksRepository {
   save: (broadcastFeedback: BroadcastFeedback) => Promise<void>;
   markPartnersErroredConventionAsHandled: (id: ConventionId) => Promise<void>;
+  getLastBroadcastFeedback: (
+    id: ConventionId,
+  ) => Promise<BroadcastFeedback | null>;
 }

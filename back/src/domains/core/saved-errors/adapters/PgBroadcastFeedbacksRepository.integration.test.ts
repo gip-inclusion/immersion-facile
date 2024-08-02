@@ -47,12 +47,12 @@ describe("PgBroadcastFeedbacksRepository", () => {
 
   it("saves an axios response error in the repository", async () => {
     const conventionId = "someId";
-    const broadcastFeedback = await makeBroadcastFeedback(
-      "error",
-      "osef",
+    const broadcastFeedback = await makeBroadcastFeedback({
       conventionId,
-      "response-error",
-    );
+      serviceName: "osef",
+      kind: "error",
+      errorMode: "response-error",
+    });
     await pgBroadcastFeedbacksRepository.save(broadcastFeedback);
 
     const response = await kyselyDb
@@ -87,11 +87,11 @@ describe("PgBroadcastFeedbacksRepository", () => {
 
   it("saves an axios response success in the repository", async () => {
     const conventionId = "someId";
-    const broadcastFeedback = await makeBroadcastFeedback(
-      "success",
-      "osef",
+    const broadcastFeedback = await makeBroadcastFeedback({
       conventionId,
-    );
+      serviceName: "osef",
+      kind: "success",
+    });
     await pgBroadcastFeedbacksRepository.save(broadcastFeedback);
 
     const response = await kyselyDb
@@ -121,12 +121,12 @@ describe("PgBroadcastFeedbacksRepository", () => {
 
   it("saves an axios timeout error in the repository", async () => {
     const conventionId = "someId";
-    const broadcastFeedback = await makeBroadcastFeedback(
-      "error",
-      "osef",
+    const broadcastFeedback = await makeBroadcastFeedback({
       conventionId,
-      "timeout",
-    );
+      serviceName: "osef",
+      kind: "error",
+      errorMode: "timeout",
+    });
     await pgBroadcastFeedbacksRepository.save(broadcastFeedback);
 
     const response = await kyselyDb
@@ -166,12 +166,12 @@ describe("PgBroadcastFeedbacksRepository", () => {
 
   it("saves a not axios error in the repository", async () => {
     const conventionId = "someId";
-    const broadcastFeedback = await makeBroadcastFeedback(
-      "error",
-      "osef",
+    const broadcastFeedback = await makeBroadcastFeedback({
       conventionId,
-      "not-axios-error",
-    );
+      serviceName: "osef",
+      kind: "error",
+      errorMode: "not-axios-error",
+    });
     await pgBroadcastFeedbacksRepository.save(broadcastFeedback);
 
     const response = await kyselyDb
@@ -209,30 +209,30 @@ describe("PgBroadcastFeedbacksRepository", () => {
 
     it("mark errored convention as handle when convention exist", async () => {
       const conventionId2 = "someId";
-      const broadcastFeedback1 = await makeBroadcastFeedback(
-        "error",
-        broadcastToPeServiceName,
-        conventionId1,
-        "response-error",
-      );
-      const broadcastFeedback2 = await makeBroadcastFeedback(
-        "error",
-        broadcastToPeServiceName,
-        conventionId1,
-        "response-error",
-      );
-      const broadcastFeedback3 = await makeBroadcastFeedback(
-        "error",
-        "osef",
-        conventionId1,
-        "response-error",
-      );
-      const broadcastFeedback4 = await makeBroadcastFeedback(
-        "error",
-        broadcastToPeServiceName,
-        conventionId2,
-        "response-error",
-      );
+      const broadcastFeedback1 = await makeBroadcastFeedback({
+        conventionId: conventionId1,
+        serviceName: broadcastToPeServiceName,
+        kind: "error",
+        errorMode: "response-error",
+      });
+      const broadcastFeedback2 = await makeBroadcastFeedback({
+        conventionId: conventionId1,
+        serviceName: broadcastToPeServiceName,
+        kind: "error",
+        errorMode: "response-error",
+      });
+      const broadcastFeedback3 = await makeBroadcastFeedback({
+        conventionId: conventionId1,
+        serviceName: "osef",
+        kind: "error",
+        errorMode: "response-error",
+      });
+      const broadcastFeedback4 = await makeBroadcastFeedback({
+        conventionId: conventionId2,
+        serviceName: broadcastToPeServiceName,
+        kind: "error",
+        errorMode: "response-error",
+      });
 
       await pgBroadcastFeedbacksRepository.save(broadcastFeedback1);
       await pgBroadcastFeedbacksRepository.save(broadcastFeedback2);
@@ -314,13 +314,13 @@ describe("PgBroadcastFeedbacksRepository", () => {
     });
 
     it("Throw when the saved error is already mark as handle", async () => {
-      const broadcastFeedback1 = await makeBroadcastFeedback(
-        "error",
-        broadcastToPeServiceName,
-        conventionId1,
-        "response-error",
-        true,
-      );
+      const broadcastFeedback1 = await makeBroadcastFeedback({
+        conventionId: conventionId1,
+        serviceName: broadcastToPeServiceName,
+        kind: "error",
+        errorMode: "response-error",
+        handledByAgency: true,
+      });
       await pgBroadcastFeedbacksRepository.save(broadcastFeedback1);
 
       await expectPromiseToFailWithError(
@@ -331,19 +331,71 @@ describe("PgBroadcastFeedbacksRepository", () => {
       );
     });
   });
+
+  describe("getLastBroadcastFeedback", () => {
+    it("retrieve nothing if there is not last broadcast feedback", async () => {
+      const conventionId = "d07af28e-9c7b-4845-91ee-71020860faa8";
+
+      const result =
+        await pgBroadcastFeedbacksRepository.getLastBroadcastFeedback(
+          conventionId,
+        );
+
+      expect(result).toBeNull();
+    });
+
+    it("retrieve a broadcast feedback", async () => {
+      const conventionId = "d07af28e-9c7b-4845-91ee-71020860faa8";
+
+      const firstBroadcast = await makeBroadcastFeedback({
+        conventionId,
+        serviceName: broadcastToPeServiceName,
+        kind: "error",
+        occurredAt: new Date("2024-07-01"),
+      });
+      const lastBroadcast = await makeBroadcastFeedback({
+        conventionId,
+        serviceName: broadcastToPeServiceName,
+        kind: "error",
+        occurredAt: new Date("2024-07-31"),
+      });
+      await pgBroadcastFeedbacksRepository.save(firstBroadcast);
+      await pgBroadcastFeedbacksRepository.save(lastBroadcast);
+
+      const result =
+        await pgBroadcastFeedbacksRepository.getLastBroadcastFeedback(
+          conventionId,
+        );
+
+      expectToEqual(result, {
+        ...lastBroadcast,
+        ...(result?.subscriberErrorFeedback
+          ? {
+              subscriberErrorFeedback: {
+                message: result.subscriberErrorFeedback.message,
+                error: JSON.parse(
+                  JSON.stringify(result.subscriberErrorFeedback.error),
+                ),
+              },
+            }
+          : {}),
+      });
+    });
+  });
 });
 
-const makeBroadcastFeedback = async (
-  kind: "error" | "success",
-  serviceName: string,
-  conventionId: ConventionId,
-  errorMode?: "timeout" | "response-error" | "not-axios-error",
-  handledByAgency?: boolean,
-): Promise<BroadcastFeedback> => {
-  if (kind === "error") {
+const makeBroadcastFeedback = async (params: {
+  kind: "error" | "success";
+  serviceName: string;
+  conventionId: ConventionId;
+  occurredAt?: Date;
+  errorMode?: "timeout" | "response-error" | "not-axios-error";
+  handledByAgency?: boolean;
+}): Promise<BroadcastFeedback> => {
+  if (params.kind === "error") {
     const error = await axios
       .get(
-        errorMode === "timeout"
+        params.errorMode === "timeout"
           ? "http://sdlmfhjsdflmsdhfmsldjfhsd.com"
           : "https://www.google.com/yolo?hl=fr&tab=ww",
       )
@@ -358,28 +410,28 @@ const makeBroadcastFeedback = async (
     return {
       consumerId: null,
       consumerName: "my-consumer",
-      serviceName,
+      serviceName: params.serviceName,
       subscriberErrorFeedback: {
         message: "Some message",
         error:
-          errorMode === "not-axios-error"
+          params.errorMode === "not-axios-error"
             ? new Error("Not axios error")
             : error,
       },
-      requestParams: { conventionId },
+      requestParams: { conventionId: params.conventionId },
       response: { httpStatus: 500 },
-      occurredAt: new Date(),
-      handledByAgency: handledByAgency ? handledByAgency : false,
+      occurredAt: params.occurredAt ? params.occurredAt : new Date(),
+      handledByAgency: params.handledByAgency ? params.handledByAgency : false,
     };
   }
 
   return {
     consumerId: null,
     consumerName: "my-consumer",
-    serviceName,
-    requestParams: { conventionId },
+    serviceName: params.serviceName,
+    requestParams: { conventionId: params.conventionId },
     response: { httpStatus: 200, body: { status: 200, title: "blabla" } },
-    occurredAt: new Date(),
-    handledByAgency: handledByAgency ? handledByAgency : false,
+    occurredAt: params.occurredAt ? params.occurredAt : new Date(),
+    handledByAgency: params.handledByAgency ? params.handledByAgency : false,
   };
 };
