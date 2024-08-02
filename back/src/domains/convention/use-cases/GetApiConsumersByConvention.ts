@@ -22,7 +22,7 @@ export const makeGetApiConsumersByconvention = createTransactionalUseCase<
     name: "GetApiConsumersByconvention",
     inputSchema: withConventionIdSchema,
   },
-  async ({ conventionId }, { uow }, currentUser) => {
+  async ({ uow, currentUser, inputParams: { conventionId } }) => {
     const convention = await uow.conventionRepository.getById(conventionId);
 
     if (!convention)
