@@ -2,10 +2,10 @@ import {
   AgencyDto,
   ApiConsumer,
   ApiConsumerName,
-  ConventionDto,
   InclusionConnectedUser,
   WithConventionId,
   errors,
+  userHasEnoughRightsOnConvention,
   withConventionIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
@@ -46,7 +46,13 @@ export const makeGetApiConsumersByconvention = createTransactionalUseCase<
         agencyId: convention.agencyId,
       });
 
-    if (!userHasEnoughRightsOnConvention(user, convention)) return [];
+    if (
+      !userHasEnoughRightsOnConvention(user, convention, [
+        "counsellor",
+        "validator",
+      ])
+    )
+      return [];
 
     const apiConsumers = await uow.apiConsumerRepository.getAll();
 
@@ -75,15 +81,3 @@ const isConventionInScope = (
     apiConsumer.rights.convention.scope.agencyIds?.includes(conventionAgency.id)
   );
 };
-
-const userHasEnoughRightsOnConvention = (
-  user: InclusionConnectedUser,
-  convention: ConventionDto,
-): boolean =>
-  user.agencyRights.some(
-    (agencyRight) =>
-      agencyRight.agency.id === convention.agencyId &&
-      agencyRight.roles.some(
-        (role) => role === "counsellor" || role === "validator",
-      ),
-  ) || !!user.isBackofficeAdmin;
