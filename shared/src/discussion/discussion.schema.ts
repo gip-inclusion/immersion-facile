@@ -7,7 +7,7 @@ import {
 import { contactMethodSchema } from "../formEstablishment/FormEstablishment.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { dateStringSchema } from "../schedule/Schedule.schema";
+import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1, zStringPossiblyEmpty } from "../zodUtils";
 import {
@@ -38,7 +38,7 @@ const exchangeSchema: z.Schema<Exchange> = z.object({
   message: zStringMinLength1,
   sender: exchangeRoleSchema,
   recipient: exchangeRoleSchema,
-  sentAt: dateStringSchema,
+  sentAt: makeDateStringSchema(),
   attachments: z.array(attachementSchema),
 });
 
@@ -72,7 +72,7 @@ const discussionStatusSchema: z.Schema<DiscussionStatusWithRejection> = z.union(
 export const discussionReadSchema: z.Schema<DiscussionReadDto> = z
   .object({
     id: discussionIdSchema,
-    createdAt: dateStringSchema,
+    createdAt: makeDateStringSchema(),
     siret: siretSchema,
     businessName: zStringMinLength1,
     appellation: appellationDtoSchema,

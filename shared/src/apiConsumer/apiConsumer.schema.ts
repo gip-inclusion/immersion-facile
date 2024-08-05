@@ -3,10 +3,16 @@ import { callbackUrlSchema } from "../AbsoluteUrl";
 import { agencyIdSchema, agencyKindSchema } from "../agency/agency.schema";
 import { emailSchema } from "../email/email.schema";
 import { phoneSchema } from "../phone.schema";
-import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
+import {
+  dateTimeIsoStringSchema,
+  makeDateStringSchema,
+} from "../schedule/Schedule.schema";
 import { ApiConsumerJwt } from "../tokens/jwt.dto";
-import { dateRegExp } from "../utils/date";
-import { localization, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  stringWithMaxLength255,
+  zStringMinLength1,
+} from "../zodUtils";
 import {
   ApiConsumer,
   ApiConsumerContact,
@@ -115,11 +121,11 @@ const apiConsumerRightsSchema: z.Schema<ApiConsumer["rights"]> = z.object({
 
 const commonApiConsumerShape = {
   id: z.string().uuid(localization.invalidUuid),
-  name: zStringMinLength1.max(255),
+  name: stringWithMaxLength255,
   contact: apiConsumerContactSchema,
   rights: writeApiConsumerRightsSchema,
   description: z.string().optional(),
-  expirationDate: zStringMinLength1.regex(dateRegExp),
+  expirationDate: makeDateStringSchema(),
 };
 
 export const writeApiConsumerSchema: z.Schema<WriteApiConsumerParams> =
@@ -127,7 +133,7 @@ export const writeApiConsumerSchema: z.Schema<WriteApiConsumerParams> =
 
 export const apiConsumerSchema: z.Schema<ApiConsumer> = z.object({
   ...commonApiConsumerShape,
-  createdAt: zStringMinLength1.regex(dateRegExp),
+  createdAt: makeDateStringSchema(),
   rights: apiConsumerRightsSchema,
 });
 

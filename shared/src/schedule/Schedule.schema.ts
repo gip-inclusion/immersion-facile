@@ -24,10 +24,13 @@ export const dateTimeIsoStringSchema: z.Schema<DateTimeIsoString> = z
   .string()
   .datetime();
 
-export const dateStringSchema: z.Schema<DateString> = zStringMinLength1.regex(
-  dateRegExp,
-  localization.invalidDate,
-);
+export const makeDateStringSchema: (
+  errorMessage?: string,
+) => z.Schema<DateString> = (errorMessage) =>
+  zStringMinLength1.refine(
+    (dateString) => dateString.match(dateRegExp),
+    errorMessage ?? localization.invalidDate,
+  );
 
 export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
   date: dateTimeIsoStringSchema,
