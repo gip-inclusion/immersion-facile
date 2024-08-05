@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
-import { DateString } from "shared";
+import { DateString, errorToString } from "shared";
 import {
   counterPublishedEventsError,
   counterPublishedEventsSuccess,
@@ -178,17 +178,18 @@ const makeExecuteSubscriptionMatchingSubscriptionId =
       await subscription(event);
     } catch (error: any) {
       monitorErrorInCallback(error, event);
+      const errorMessage = errorToString(error);
       if (throwOnPublishFailure) {
         throw new Error(
           [
             `Could not process event with id : ${event.id}.`,
             `Subscription ${subscriptionId} failed on topic ${event.topic}.`,
-            `Error was : ${error.message}`,
+            `Error was : ${errorMessage}`,
           ].join("\n"),
           { cause: error },
         );
       }
-      return { subscriptionId, errorMessage: error.message };
+      return { subscriptionId, errorMessage };
     }
   };
 
