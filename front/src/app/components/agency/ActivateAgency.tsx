@@ -13,7 +13,7 @@ import {
   UpdateAgencyStatusParams,
   domElementIds,
   withAgencyIdSchema,
-  zTrimmedString,
+  zStringMinLength1,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import "src/assets/admin.css";
@@ -43,7 +43,9 @@ const RejectAgencyModalContent = ({
     defaultValues: {
       rejectionJustification: undefined,
     },
-    resolver: zodResolver(z.object({ rejectionJustification: zTrimmedString })),
+    resolver: zodResolver(
+      z.object({ rejectionJustification: zStringMinLength1 }),
+    ),
   });
   const { register, handleSubmit, formState, getValues } = methods;
 

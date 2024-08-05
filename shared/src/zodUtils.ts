@@ -89,11 +89,6 @@ export const zStringPossiblyEmptyWithMax = (max: number) =>
     })
     .optional() as z.Schema<string>;
 
-//to remove because duplicate with zStringMinLength1
-export const zTrimmedString = zStringMinLength1
-  .transform((s) => s.trim())
-  .refine((s) => s.length > 0, localization.required);
-
 export const zTrimmedStringWithMax = (max: number) =>
   zStringMinLength1
     .max(max, localization.maxCharacters(max))

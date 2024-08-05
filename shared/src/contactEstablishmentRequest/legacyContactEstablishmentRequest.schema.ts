@@ -11,8 +11,8 @@ import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
   zEnumValidation,
+  zStringMinLength1,
   zStringPossiblyEmpty,
-  zTrimmedString,
   zUuidLike,
 } from "../zodUtils";
 import {
@@ -30,8 +30,8 @@ import {
 const commonFields = {
   appellationCode: appellationCodeSchema,
   siret: siretSchema,
-  potentialBeneficiaryFirstName: zTrimmedString,
-  potentialBeneficiaryLastName: zTrimmedString,
+  potentialBeneficiaryFirstName: zStringMinLength1,
+  potentialBeneficiaryLastName: zStringMinLength1,
   potentialBeneficiaryEmail: emailSchema,
   locationId: zUuidLike,
 };
@@ -41,21 +41,11 @@ const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
   localization.invalidImmersionObjective,
 );
 
-export const legacyContactEstablishmentByMailFormSchema: z.Schema<LegacyContactEstablishmentByMailDto> =
-  z.object({
-    ...commonFields,
-    contactMode: preferEmailContactSchema,
-    message: zTrimmedString,
-    potentialBeneficiaryPhone: phoneSchema,
-    immersionObjective: immersionObjectiveSchema,
-    potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
-  });
-
 export const legacyContactEstablishmentByMailSchema: z.Schema<LegacyContactEstablishmentByMailDto> =
   z.object({
     ...commonFields,
     contactMode: preferEmailContactSchema,
-    message: zTrimmedString,
+    message: zStringMinLength1,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,

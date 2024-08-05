@@ -2,7 +2,7 @@ import {
   AppellationAndRomeDto,
   AppellationMatchDto,
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
-  zTrimmedString,
+  zStringMinLength1,
 } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
@@ -20,7 +20,7 @@ type AppellationSearchInputParams = {
 };
 
 const appellationSearchInputParamsSchema = z.object({
-  searchText: zTrimmedString,
+  searchText: zStringMinLength1,
   fetchAppellationsFromNaturalLanguage: z.boolean(),
 });
 

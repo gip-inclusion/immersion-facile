@@ -6,11 +6,7 @@ import { emailSchema } from "../email/email.schema";
 import { establishmentsRoles } from "../role/role.dto";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import {
-  zStringMinLength1,
-  zStringPossiblyEmpty,
-  zTrimmedString,
-} from "../zodUtils";
+import { zStringMinLength1, zStringPossiblyEmpty } from "../zodUtils";
 import {
   AgencyRight,
   InclusionConnectedUser,
@@ -34,7 +30,7 @@ export const withDiscussionSchemaId: z.Schema<WithDiscussionId> = z.object({
   discussionId: discussionIdSchema,
 });
 
-export const userIdSchema: z.Schema<UserId> = zTrimmedString;
+export const userIdSchema: z.Schema<UserId> = zStringMinLength1;
 
 const withEstablishmentSiretAndName: z.Schema<WithEstablismentsSiretAndName> =
   z.object({

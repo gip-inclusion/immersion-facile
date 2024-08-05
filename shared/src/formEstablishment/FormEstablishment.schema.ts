@@ -15,7 +15,6 @@ import {
   zEnumValidation,
   zStringMinLength1,
   zStringPossiblyEmpty,
-  zTrimmedString,
   zUuidLike,
 } from "../zodUtils";
 import {
@@ -27,14 +26,9 @@ import {
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
-  ImmersionContactInEstablishmentId,
   SiretAdditionFailure,
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
-
-// prettier-ignore
-export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =
-  zTrimmedString;
 
 export const defaultMaxContactsPerMonth = 12;
 export const noContactPerMonth = 0;
@@ -50,9 +44,9 @@ export const contactMethodSchema = zEnumValidation(
 );
 
 export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
-  lastName: zTrimmedString,
-  firstName: zTrimmedString,
-  job: zTrimmedString,
+  lastName: zStringMinLength1,
+  firstName: zStringMinLength1,
+  job: zStringMinLength1,
   phone: phoneSchema,
   email: emailSchema,
   contactMethod: contactMethodSchema,
@@ -72,7 +66,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
   .object({
     source: formEstablishmentSourceSchema,
     siret: siretSchema,
-    businessName: zTrimmedString,
+    businessName: zStringMinLength1,
     businessNameCustomized: zStringMinLength1
       .refine(
         (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),
@@ -145,7 +139,7 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
   z.object({
     siret: siretSchema,
     businessNameCustomized: zStringPossiblyEmpty,
-    businessName: zTrimmedString,
+    businessName: zStringMinLength1,
     businessAddress: addressWithPostalCodeSchema,
     naf_code: zStringMinLength1,
     appellations_code: zStringMinLength1,

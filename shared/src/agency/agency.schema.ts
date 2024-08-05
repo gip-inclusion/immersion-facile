@@ -15,7 +15,6 @@ import {
   zEnumValidation,
   zSchemaForType,
   zStringMinLength1,
-  zTrimmedString,
 } from "../zodUtils";
 import {
   AgencyDto,
@@ -34,7 +33,7 @@ import {
   allAgencyStatuses,
 } from "./agency.dto";
 
-export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
+export const agencyIdSchema: z.ZodSchema<AgencyId> = zStringMinLength1;
 export const refersToAgencyIdSchema: z.ZodSchema<AgencyId> = z.string();
 export const agencyIdsSchema: z.Schema<AgencyId[]> = z
   .array(agencyIdSchema)
@@ -157,7 +156,7 @@ export const updateAgencyStatusParamsWithoutIdSchema: z.Schema<UpdateAgencyStatu
     .or(
       z.object({
         status: z.literal("rejected"),
-        rejectionJustification: zTrimmedString,
+        rejectionJustification: zStringMinLength1,
       }),
     );
 

@@ -1,4 +1,4 @@
-import { zTrimmedString } from "../zodUtils";
+import { zStringMinLength1 } from "../zodUtils";
 import { siretSchema } from "./siret.schema";
 
 describe("siretSchema", () => {
@@ -38,6 +38,6 @@ describe("siretSchema", () => {
   });
 
   it("trims the given input", () => {
-    expect(zTrimmedString.parse("yolo ")).toBe("yolo");
+    expect(zStringMinLength1.parse("yolo ")).toBe("yolo");
   });
 });

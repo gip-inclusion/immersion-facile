@@ -6,7 +6,7 @@ import {
   userIdSchema,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zTrimmedString } from "../zodUtils";
+import { zStringMinLength1 } from "../zodUtils";
 import {
   IcUserRoleForAgencyParams,
   ManageConventionAdminForm,
@@ -26,7 +26,7 @@ export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleFor
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,
-    justification: zTrimmedString,
+    justification: zStringMinLength1,
   });
 
 export const withUserFiltersSchema: z.Schema<WithUserFilters> = z
