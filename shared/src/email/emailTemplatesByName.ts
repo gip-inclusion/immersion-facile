@@ -34,6 +34,28 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
+    TEST_EMAIL: {
+      niceName: "Email de test Immersion Facilitée",
+      createEmailVariables: ({ input1, input2, url }) => ({
+        subject: "[Immersion Facilitée] Email transactionel de test",
+        greetings: "Bonjour,",
+        content: `
+          Cet email vous a été envoyé dans le cadre d'un test.
+
+          - Input1 : ${input1}
+          - Input2 : ${input2}
+        `,
+        buttons: [
+          {
+            label: "Bouton de test",
+            target: "_blank",
+            url,
+          },
+        ],
+        subContent: `A très vite sur Immersion Facilitée,
+L'équipe d'Immersion Facilitée`,
+      }),
+    },
     ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
       niceName: "Etablissement - Relance mise en relation",
       tags: ["relance_MER"],

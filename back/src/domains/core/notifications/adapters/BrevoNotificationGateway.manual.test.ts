@@ -16,7 +16,7 @@ describe("BrevoNotificationGateway manual", () => {
           axios,
         ),
         emailAllowListPredicate: () => true,
-        defaultSender: { email: "bob@fake.mail", name: "Bob" },
+        defaultSender: { email: "bob@fake.mail", name: "Immersion Facilitée" },
         blackListedEmailDomains: [],
       },
       config.apiKeyBrevo,
@@ -25,19 +25,16 @@ describe("BrevoNotificationGateway manual", () => {
 
   it("should send email correctly", async () => {
     await notificationGateway.sendEmail({
-      kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-      recipients: ["bbohec.pro@gmail.com"],
+      kind: "TEST_EMAIL",
+      recipients: ["____TO____"], // Modify for testing
+      sender: {
+        email: "____FROM_EMAIL____", // Modify for testing
+        name: "_____FROM_NAME____", // Modify for testing
+      },
       params: {
-        conventionId: "CONVENTION_ID",
-        internshipKind: "immersion",
-        conventionSignShortlink: "www.google.com",
-        conventionStatusLink: "www.google.com",
-        businessName: "Super Corp",
-        establishmentRepresentativeName: "Stéphane Le Rep",
-        establishmentTutorName: "Joe le tuteur",
-        beneficiaryName: "John Doe",
-        signatoryName: "John Doe",
-        agencyLogoUrl: "http://toto",
+        input1: "paramètre métier 1",
+        input2: "paramètre métier 2",
+        url: "https://immersion-facile.beta.gouv.fr/",
       },
     });
 
