@@ -207,14 +207,17 @@ export class PgDiscussionRepository implements DiscussionRepository {
             }),
             exchanges: fn
               .jsonAgg(
-                jsonBuildObject({
-                  subject: ref("e.subject"),
-                  message: ref("e.message"),
-                  recipient: ref("e.recipient"),
-                  sender: ref("e.sender"),
-                  sentAt: ref("e.sent_at"),
-                  attachments: ref("e.attachments"),
-                }).$castTo<Exchange>(),
+                sql`
+                  JSON_BUILD_OBJECT(
+                    'subject', e.subject,
+                    'message', e.message,
+                    'recipient', e.recipient,
+                    'sender', e.sender,
+                    'sentAt', e.sent_at,
+                    'attachments', e.attachments
+                  )
+                  ORDER BY e.sent_at
+                `.$castTo<Exchange>(),
               )
               .filterWhere("e.id", "is not", null),
             conventionId: ref("d.convention_id"),
