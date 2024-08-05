@@ -11,8 +11,8 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
-  logBodyAndThrow,
   otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { match } from "ts-pattern";
@@ -36,7 +36,7 @@ export class HttpTechnicalGateway implements TechnicalGateway {
       .then((response) =>
         match(response)
           .with({ status: 200 }, ({ body }) => body)
-          .with({ status: 400 }, logBodyAndThrow)
+          .with({ status: 400 }, throwBadRequestWithExplicitMessage)
           .otherwise(otherwiseThrow),
       );
   }

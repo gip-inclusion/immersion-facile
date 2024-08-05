@@ -12,6 +12,7 @@ import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import {
   ContactErrorKind,
@@ -32,11 +33,12 @@ export class HttpSearchGateway implements SearchGateway {
       .then((response) =>
         match(response)
           .with({ status: 201 }, () => undefined)
+          .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+          .with({ status: 404 }, logBodyAndThrow)
           .with(
             { status: 409 },
             (): ContactErrorKind => "alreadyContactedRecently",
           )
-          .with({ status: P.union(400, 404) }, logBodyAndThrow)
           .otherwise(otherwiseThrow),
       );
   }
@@ -69,7 +71,8 @@ export class HttpSearchGateway implements SearchGateway {
         .then((result) =>
           match(result)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: P.union(400, 404) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -89,7 +92,7 @@ export class HttpSearchGateway implements SearchGateway {
         .then((result) =>
           match(result)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: P.union(400) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .otherwise(otherwiseThrow),
         ),
     );

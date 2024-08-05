@@ -13,6 +13,7 @@ import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
@@ -58,7 +59,8 @@ export class HttpInclusionConnectedGateway
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: P.union(400, 401) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -98,7 +100,7 @@ export class HttpInclusionConnectedGateway
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: 400 }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -124,7 +126,8 @@ export class HttpInclusionConnectedGateway
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -142,7 +145,7 @@ export class HttpInclusionConnectedGateway
       .then((response) =>
         match(response)
           .with({ status: 200 }, () => undefined)
-          .with({ status: 400 }, logBodyAndThrow)
+          .with({ status: 400 }, throwBadRequestWithExplicitMessage)
           .with({ status: P.union(401, 403) }, (response) => {
             throw new Error(response.body.message);
           })
