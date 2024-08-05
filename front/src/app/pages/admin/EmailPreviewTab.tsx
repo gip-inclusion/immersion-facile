@@ -199,6 +199,11 @@ export const defaultEmailValueByEmailKind: {
     EmailTemplatesByName[K]["createEmailVariables"]
   >[0];
 } = {
+  TEST_EMAIL: {
+    input1: "input1",
+    input2: "input2",
+    url: "https://immersion-facile.beta.gouv.fr",
+  },
   AGENCY_WAS_REJECTED: {
     agencyName: "AGENCY_NAME",
     rejectionJustification: "REJECTION_JUSTIFICATION",

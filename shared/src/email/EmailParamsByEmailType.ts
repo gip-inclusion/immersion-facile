@@ -397,4 +397,9 @@ export type EmailParamsByEmailType = {
     magicLink: string;
     validatorName: string;
   };
+  TEST_EMAIL: {
+    input1: string;
+    input2: string;
+    url: AbsoluteUrl;
+  };
 };
