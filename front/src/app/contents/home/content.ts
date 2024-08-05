@@ -338,7 +338,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       title:
         "Vous avez encore des questions ? Participez à notre prochain webinaire",
       description:
-        "Régulièrement, nous organisons des webinaire en ligne pour vous présenter l'immersions professionnelles, notre plateforme, et répondre à vos questions. Cliquez-ici pour vous inscrire à la prochaine session",
+        "Régulièrement, nous organisons des webinaires en ligne pour vous présenter l'immersion professionnelle, notre plateforme, et répondre à vos questions. Cliquez-ici pour vous inscrire à la prochaine session",
       url: "https://app.livestorm.co/itou/webinaire-proposer-des-immersions-pour-attirez-les-talents-1?type=detailed&utm_source=home-entreprise-if",
     },
   ],
