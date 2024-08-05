@@ -7,8 +7,8 @@ import {
   phoneSchema,
   siretSchema,
   zEnumValidation,
+  zStringMinLength1,
   zStringPossiblyEmpty,
-  zTrimmedString,
   zUuidLike,
 } from "shared";
 import { z } from "zod";
@@ -17,8 +17,8 @@ import { ContactEstablishmentPublicV2Dto } from "./ContactEstablishmentPublicV2.
 const commonFields = {
   appellationCode: appellationCodeSchema,
   siret: siretSchema,
-  potentialBeneficiaryFirstName: zTrimmedString,
-  potentialBeneficiaryLastName: zTrimmedString,
+  potentialBeneficiaryFirstName: zStringMinLength1,
+  potentialBeneficiaryLastName: zStringMinLength1,
   potentialBeneficiaryEmail: emailSchema,
   locationId: zUuidLike.optional(),
 };
@@ -35,7 +35,7 @@ const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
 const contactEstablishmentByMailSchema = z.object({
   ...commonFields,
   contactMode: preferEmailContactSchema,
-  message: zTrimmedString,
+  message: zStringMinLength1,
   potentialBeneficiaryPhone: phoneSchema,
   immersionObjective: immersionObjectiveSchema.nullable(),
   potentialBeneficiaryResumeLink: zStringPossiblyEmpty,

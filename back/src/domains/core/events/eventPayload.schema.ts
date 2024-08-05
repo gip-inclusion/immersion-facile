@@ -4,7 +4,7 @@ import {
   allSignatoryRoles,
   conventionSchema,
   reminderKinds,
-  zTrimmedString,
+  zStringMinLength1,
 } from "shared";
 import { z } from "zod";
 import {
@@ -17,16 +17,16 @@ import {
 const agencyActorRequestConventionModificationPayloadSchema: z.Schema<AgencyActorRequestModificationPayload> =
   z.object({
     convention: conventionSchema,
-    justification: zTrimmedString,
+    justification: zStringMinLength1,
     requesterRole: z.enum(allRoles),
     modifierRole: z.enum(agencyModifierRoles),
-    agencyActorEmail: zTrimmedString,
+    agencyActorEmail: zStringMinLength1,
   });
 
 const signatoryRequestConventionModificationPayloadSchema: z.Schema<SignatoryRequestModificationPayload> =
   z.object({
     convention: conventionSchema,
-    justification: zTrimmedString,
+    justification: zStringMinLength1,
     requesterRole: z.enum(allRoles),
     modifierRole: z.enum(allSignatoryRoles),
   });

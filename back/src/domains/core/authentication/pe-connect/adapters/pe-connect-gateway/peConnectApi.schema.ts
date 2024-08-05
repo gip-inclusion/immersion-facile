@@ -1,4 +1,4 @@
-import { emailSchema, zStringMinLength1, zTrimmedString } from "shared";
+import { emailSchema, zStringMinLength1 } from "shared";
 import { z } from "zod";
 import { BearerToken } from "../../dto/BearerToken";
 import {
@@ -16,9 +16,9 @@ import {
 export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
   z.object({
     email: emailSchema.optional(),
-    family_name: zTrimmedString,
+    family_name: zStringMinLength1,
     gender: z.enum(["male", "female"]),
-    given_name: zTrimmedString,
+    given_name: zStringMinLength1,
     idIdentiteExterne: zStringMinLength1,
     sub: zStringMinLength1,
   });
@@ -37,8 +37,8 @@ const peAdvisorKindSchema: z.Schema<PeConnectAdvisorsKind> =
 
 const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
   z.object({
-    nom: zTrimmedString,
-    prenom: zTrimmedString,
+    nom: zStringMinLength1,
+    prenom: zStringMinLength1,
     civilite: z.enum(["1", "2"]),
     mail: emailSchema,
     type: peAdvisorKindSchema,

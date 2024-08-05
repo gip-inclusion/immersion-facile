@@ -39,7 +39,6 @@ import {
   zStringMinLength1,
   zStringPossiblyEmpty,
   zStringPossiblyEmptyWithMax,
-  zTrimmedString,
   zTrimmedStringWithMax,
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
@@ -54,7 +53,6 @@ import {
   CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
   ConventionCommon,
   ConventionDto,
-  ConventionExternalId,
   ConventionId,
   ConventionInternshipKindSpecific,
   ConventionReadDto,
@@ -106,8 +104,6 @@ const zTrimmedStringMax255 = zTrimmedStringWithMax(255);
 export const conventionIdSchema: z.ZodSchema<ConventionId> = z
   .string()
   .uuid(localization.invalidUuid);
-export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
-  zTrimmedString;
 
 const roleSchema = z.enum(allRoles);
 
@@ -156,7 +152,7 @@ const establishmentTutorSchema: z.Schema<EstablishmentTutor> =
   actorSchema.merge(
     z.object({
       role: z.literal("establishment-tutor"),
-      job: zTrimmedString,
+      job: zStringMinLength1,
     }),
   );
 
@@ -225,7 +221,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
       localization.invalidApprovalFormatDate,
     ).optional(),
     siret: siretSchema,
-    businessName: zTrimmedString,
+    businessName: zStringMinLength1,
     schedule: scheduleSchema,
     workConditions: z.string().optional(),
     businessAdvantages: z.string().optional(),
@@ -397,7 +393,7 @@ export const updateConventionRequestSchema: z.Schema<UpdateConventionRequestDto>
     convention: conventionSchema,
   });
 
-const justificationSchema = zTrimmedString;
+const justificationSchema = zStringMinLength1;
 
 export const updateConventionStatusWithoutJustificationSchema: z.Schema<UpdateConventionStatusWithoutJustification> =
   z.object({
@@ -411,6 +407,7 @@ export const updateConventionStatusWithJustificationWithoutModifierRoleSchema: z
     statusJustification: justificationSchema,
     conventionId: conventionIdSchema,
   });
+
 export const updateConventionStatusWithJustificationWithModifierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWithModifierRole> =
   z.object({
     status: z.enum(conventionStatusesWithJustificationWithModifierRole),

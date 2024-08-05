@@ -11,8 +11,8 @@ import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
   zEnumValidation,
+  zStringMinLength1,
   zStringPossiblyEmpty,
-  zTrimmedString,
   zUuidLike,
 } from "../zodUtils";
 import {
@@ -26,8 +26,8 @@ import {
 const commonFields = {
   appellationCode: appellationCodeSchema,
   siret: siretSchema,
-  potentialBeneficiaryFirstName: zTrimmedString,
-  potentialBeneficiaryLastName: zTrimmedString,
+  potentialBeneficiaryFirstName: zStringMinLength1,
+  potentialBeneficiaryLastName: zStringMinLength1,
   potentialBeneficiaryEmail: emailSchema,
   locationId: zUuidLike,
 };
@@ -48,9 +48,9 @@ export const contactEstablishmentByMailFormSchema: z.Schema<ContactEstablishment
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema,
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
-    datePreferences: zTrimmedString,
+    datePreferences: zStringMinLength1,
     hasWorkingExperience: z.boolean(),
-    experienceAdditionalInformation: zTrimmedString.optional(),
+    experienceAdditionalInformation: zStringMinLength1.optional(),
   });
 
 export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailDto> =
@@ -60,9 +60,9 @@ export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMa
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
     potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
-    datePreferences: zTrimmedString,
+    datePreferences: zStringMinLength1,
     hasWorkingExperience: z.boolean(),
-    experienceAdditionalInformation: zTrimmedString.optional(),
+    experienceAdditionalInformation: zStringMinLength1.optional(),
   });
 
 export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByPhoneDto> =

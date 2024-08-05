@@ -42,37 +42,6 @@ describe("zToNumber schema validation", () => {
   });
 });
 
-describe("zTrimmedString schema validation", () => {
-  it.each([
-    { input: "beaujolais", expected: "beaujolais" },
-    {
-      input: "test-123",
-      expected: "test-123",
-    },
-    {
-      input: " test-123 ",
-      expected: "test-123",
-    },
-    {
-      input: "   ",
-      expected: new ZodError([
-        {
-          code: "custom",
-          message: "Obligatoire",
-          path: [],
-        },
-      ]),
-    },
-  ] satisfies {
-    input: string;
-    expected: ZodError | string;
-  }[])("parsing '$input' expect $expected", ({ input, expected }) => {
-    typeof expected !== "string"
-      ? expect(() => zStringMinLength1.parse(input)).toThrow(expected)
-      : expect(zStringMinLength1.parse(input)).toBe(expected);
-  });
-});
-
 describe("zStringMinLength1 schema validation", () => {
   it.each([
     "//",

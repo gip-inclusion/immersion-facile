@@ -305,7 +305,6 @@ describe("conventionDtoSchema", () => {
 
     expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
       "Obligatoire",
-      "Obligatoire",
     ]);
   });
 
