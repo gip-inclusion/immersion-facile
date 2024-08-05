@@ -9,7 +9,11 @@ import {
 import { HttpClient } from "shared-routes";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { P, match } from "ts-pattern";
-import { otherwiseThrow } from "../otherwiseThrow";
+import {
+  logBodyAndThrow,
+  otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
+} from "../otherwiseThrow";
 
 export class HttpEstablishmentGateway implements EstablishmentGateway {
   constructor(private readonly httpClient: HttpClient<EstablishmentRoutes>) {}
@@ -98,9 +102,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             .with({ status: 201 }, () => {
               /* void */
             })
-            .with({ status: 400 }, ({ body }) => {
-              throw new Error(JSON.stringify(body));
-            })
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -123,9 +125,8 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             .with({ status: 200 }, () => {
               /* void */
             })
-            .with({ status: P.union(400, 401, 403, 409) }, ({ body }) => {
-              throw new Error(JSON.stringify(body));
-            })
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 409) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

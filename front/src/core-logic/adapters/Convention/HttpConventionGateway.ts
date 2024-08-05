@@ -21,6 +21,7 @@ import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
@@ -46,7 +47,8 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) => {
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow);
         }),
     );
@@ -61,7 +63,8 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: P.union(400, 409) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 409 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -113,9 +116,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: 400 }, (response) => {
-              throw new Error(response.body.message);
-            })
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -145,9 +146,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: 400 }, (response) => {
-              throw new Error(response.body.message);
-            })
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 404 }, () => undefined)
             .with({ status: 403 }, ({ body }) => {
               throw new Error(body.message);
@@ -205,7 +204,8 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: P.union(400, 404, 401, 403) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(404, 401, 403) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -224,7 +224,8 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: P.union(400, 403, 404) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

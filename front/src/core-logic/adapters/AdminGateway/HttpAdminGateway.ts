@@ -19,6 +19,7 @@ import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { P, match } from "ts-pattern";
@@ -41,7 +42,7 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: 400 }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
@@ -85,7 +86,8 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: P.union(400, 401) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -117,7 +119,7 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: 400 }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .otherwise(otherwiseThrow),
         ),
     );
@@ -193,26 +195,10 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 201 }, () => undefined)
-            .with({ status: 400 }, (_error) => {
-              const test = {
-                body: {
-                  message: "Mon message d'erreur.",
-                  issues: ["Truc : ne marche pas", "Bidule : non plus"],
-                },
-              };
-              throw new Error(badRequestResponseToString(test));
-            })
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
   }
 }
-
-const badRequestResponseToString = ({
-  body,
-}: { body: { message: string; issues?: string[] } }) => {
-  const { message, issues } = body;
-  if (!issues || issues.length === 0) return message;
-  return `${message} | Les problèmes sont : ${issues.join(", ")}`;
-};

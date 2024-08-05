@@ -6,7 +6,10 @@ import {
   LookupSearchResult,
 } from "shared";
 import { HttpClient } from "shared-routes";
-import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
+import {
+  otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
+} from "src/core-logic/adapters/otherwiseThrow";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 import { match } from "ts-pattern";
 
@@ -30,11 +33,7 @@ export class HttpAddressGateway implements AddressGateway {
 
     return match(response)
       .with({ status: 200 }, ({ body }) => body)
-      .with({ status: 400 }, ({ body }) => {
-        // eslint-disable-next-line no-console
-        console.error(body);
-        throw new Error(body.message);
-      })
+      .with({ status: 400 }, throwBadRequestWithExplicitMessage)
       .otherwise(otherwiseThrow);
   }
 

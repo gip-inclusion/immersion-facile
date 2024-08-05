@@ -4,6 +4,7 @@ import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import {
   AssessmentAndJwt,
@@ -29,7 +30,8 @@ export class HttpAssessmentGateway implements AssessmentGateway {
         .then((response) =>
           match(response)
             .with({ status: 201 }, () => undefined)
-            .with({ status: P.union(400, 401, 403) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

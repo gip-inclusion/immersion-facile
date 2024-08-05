@@ -63,7 +63,7 @@ export * from "./group/group.dto";
 export * from "./group/group.schema";
 export * from "./headers";
 export * from "./http/httpStatus";
-export { httpErrorSchema } from "./httpClient/httpErrors.schema";
+export * from "./httpClient/httpErrors.schema";
 export * from "./inboundEmailParsing/brevoInbound.dto";
 export * from "./inboundEmailParsing/brevoInbound.schema";
 export * from "./inboundEmailParsing/inboundEmailParsing.utils";

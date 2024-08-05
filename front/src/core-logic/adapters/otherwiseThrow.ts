@@ -1,3 +1,4 @@
+import { HttpErrorBody, messageAndIssuesToString } from "shared";
 import { HttpResponse } from "shared-routes";
 
 export const logBodyAndThrow = <R extends HttpResponse<number, unknown>>({
@@ -7,6 +8,18 @@ export const logBodyAndThrow = <R extends HttpResponse<number, unknown>>({
   // eslint-disable-next-line no-console
   console.error(stringifiedBody);
   throw new Error(stringifiedBody);
+};
+
+export const throwBadRequestWithExplicitMessage = <
+  R extends HttpResponse<400, HttpErrorBody>,
+>({
+  body,
+}: R): never => {
+  const errorMessage = messageAndIssuesToString({
+    message: body.message,
+    issues: body.issues,
+  });
+  throw new Error(errorMessage);
 };
 
 export const otherwiseThrow = (unhandledResponse: never): never => {
