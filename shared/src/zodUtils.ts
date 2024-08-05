@@ -73,24 +73,23 @@ export const zStringMinLength1 = z
   .string(requiredText)
   .trim()
   .min(1, localization.required);
-export const zStringCanBeEmpty = z.string(requiredText);
+
+export const zStringCanBeEmpty = z.string(requiredText).trim();
 
 export const zStringPossiblyEmpty = zStringMinLength1
-  .optional()
+  .or(zStringCanBeEmpty)
   .or(z.null())
-  .or(z.literal("")) as z.Schema<string>;
+  .or(z.literal(""))
+  .optional() as z.Schema<string>;
 
 export const zStringPossiblyEmptyWithMax = (max: number) =>
-  zStringMinLength1
-    .max(max, localization.maxCharacters(max))
-    .optional()
-    .or(z.literal("")) as z.Schema<string>;
+  zStringPossiblyEmpty
+    .refine((val) => val === null || val === undefined || val.length <= max, {
+      message: localization.maxCharacters(max),
+    })
+    .optional() as z.Schema<string>;
 
-export const stringWithMaxLength255 = zStringMinLength1.max(
-  255,
-  "Ne doit pas dépasser 255 caractères",
-);
-
+//to remove because duplicate with zStringMinLength1
 export const zTrimmedString = zStringMinLength1
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, localization.required);
@@ -98,8 +97,9 @@ export const zTrimmedString = zStringMinLength1
 export const zTrimmedStringWithMax = (max: number) =>
   zStringMinLength1
     .max(max, localization.maxCharacters(max))
-    .transform((s) => s.trim())
-    .refine((s) => s.length > 0, localization.required);
+    .transform((s) => s.trim());
+
+export const stringWithMaxLength255 = zTrimmedStringWithMax(255);
 
 export const zTimeString = z
   .string(requiredText)

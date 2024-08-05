@@ -3,10 +3,10 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { templatedEmailSchema } from "../email/email.schema";
 import { userIdSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
+import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
-import { dateRegExp } from "../utils/date";
-import { localization, zStringMinLength1 } from "../zodUtils";
+import { localization } from "../zodUtils";
 import {
   EmailNotification,
   FollowedIds,
@@ -29,7 +29,7 @@ const followedIdsSchema: z.Schema<FollowedIds> = z.object({
 
 const notificationCommonSchema: z.Schema<NotificationCommonFields> = z.object({
   id: notificationIdSchema,
-  createdAt: zStringMinLength1.regex(dateRegExp),
+  createdAt: makeDateStringSchema(),
   followedIds: followedIdsSchema,
 });
 

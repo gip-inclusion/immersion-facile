@@ -15,7 +15,10 @@ import {
   appellationDtoSchema,
 } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { DailyScheduleDto } from "../schedule/Schedule.dto";
-import { dateStringSchema, scheduleSchema } from "../schedule/Schedule.schema";
+import {
+  makeDateStringSchema,
+  scheduleSchema,
+} from "../schedule/Schedule.schema";
 import {
   calculateWeeklyHoursFromSchedule,
   isSundayInSchedule,
@@ -27,7 +30,7 @@ import {
 } from "../siret/siret.schema";
 import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
 import { OmitFromExistingKeys } from "../utils";
-import { DateString, dateRegExp } from "../utils/date";
+import { DateString } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
@@ -120,7 +123,7 @@ const actorSchema = z.object({
 
 const signatorySchema = actorSchema.merge(
   z.object({
-    signedAt: zStringMinLength1.regex(dateRegExp).optional(),
+    signedAt: makeDateStringSchema().optional(),
   }),
 );
 
@@ -133,7 +136,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
       emergencyContactEmail: emailPossiblyEmptySchema,
       federatedIdentity: peConnectIdentitySchema.optional(),
       financiaryHelp: zStringPossiblyEmpty,
-      birthdate: zStringMinLength1.regex(dateRegExp, localization.invalidDate),
+      birthdate: makeDateStringSchema(),
       isRqth: zBoolean.optional(),
     }),
   );
@@ -212,21 +215,15 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     status: z.enum(conventionStatuses),
     statusJustification: z.string().optional(),
     agencyId: agencyIdSchema,
-    dateSubmission: zStringMinLength1.regex(
-      dateRegExp,
-      localization.invalidDate,
-    ),
-    dateStart: zStringMinLength1.regex(
-      dateRegExp,
-      localization.invalidDateStart,
-    ),
-    dateEnd: zStringMinLength1.regex(dateRegExp, localization.invalidDateEnd),
-    dateValidation: zStringMinLength1
-      .regex(dateRegExp, localization.invalidValidationFormatDate)
-      .optional(),
-    dateApproval: zStringMinLength1
-      .regex(dateRegExp, localization.invalidApprovalFormatDate)
-      .optional(),
+    dateSubmission: makeDateStringSchema(),
+    dateStart: makeDateStringSchema(localization.invalidDateStart),
+    dateEnd: makeDateStringSchema(localization.invalidDateEnd),
+    dateValidation: makeDateStringSchema(
+      localization.invalidValidationFormatDate,
+    ).optional(),
+    dateApproval: makeDateStringSchema(
+      localization.invalidApprovalFormatDate,
+    ).optional(),
     siret: siretSchema,
     businessName: zTrimmedString,
     schedule: scheduleSchema,
@@ -451,8 +448,8 @@ export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatu
 export const renewConventionParamsSchema: z.Schema<RenewConventionParams> = z
   .object({
     id: conventionIdSchema,
-    dateStart: zStringMinLength1.regex(dateRegExp),
-    dateEnd: zStringMinLength1.regex(dateRegExp),
+    dateStart: makeDateStringSchema(),
+    dateEnd: makeDateStringSchema(),
     schedule: scheduleSchema,
     renewed: renewedSchema,
   })
@@ -615,8 +612,8 @@ export const findSimilarConventionsParamsSchema: z.Schema<FindSimilarConventions
   z.object({
     siret: siretSchema,
     codeAppellation: appellationCodeSchema,
-    dateStart: dateStringSchema,
-    beneficiaryBirthdate: dateStringSchema,
+    dateStart: makeDateStringSchema(),
+    beneficiaryBirthdate: makeDateStringSchema(),
     beneficiaryLastName: zStringMinLength1,
   });
 
