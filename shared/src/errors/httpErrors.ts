@@ -95,3 +95,21 @@ export class UnavailableApiError extends HttpError {
     Object.setPrototypeOf(this, UnavailableApiError.prototype);
   }
 }
+
+export const errorToString = (error: any): string => {
+  if (error instanceof BadRequestError)
+    return messageAndIssuesToString({
+      message: error.message,
+      issues: error.issues,
+    });
+  if (error instanceof Error) return error.message;
+  return JSON.stringify(error);
+};
+
+export const messageAndIssuesToString = ({
+  message,
+  issues,
+}: { message: string; issues?: string[] }) => {
+  if (!issues || issues.length === 0) return message;
+  return `${message} | Les problèmes sont : ${issues.join(", ")}`;
+};

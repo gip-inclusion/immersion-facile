@@ -1,4 +1,8 @@
-import { ConventionDtoBuilder, expectArraysToMatch } from "shared";
+import {
+  BadRequestError,
+  ConventionDtoBuilder,
+  expectArraysToMatch,
+} from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -136,7 +140,9 @@ describe("InMemoryEventBus", () => {
         "ConventionSubmittedByBeneficiary",
         "failingSubscription",
         async (_) => {
-          throw new Error("Failed");
+          throw new BadRequestError("Ops... failed", [
+            "Event : has some troubles",
+          ]);
         },
       );
 
@@ -161,7 +167,8 @@ describe("InMemoryEventBus", () => {
               failures: [
                 {
                   subscriptionId: "failingSubscription",
-                  errorMessage: "Failed",
+                  errorMessage:
+                    "Ops... failed | Les problèmes sont : Event : has some troubles",
                 },
               ],
             },
