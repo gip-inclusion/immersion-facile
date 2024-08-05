@@ -1,6 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { filter } from "rxjs";
-import { map, switchMap, tap } from "rxjs/operators";
+import { map, switchMap } from "rxjs/operators";
 import {
   AgencyId,
   AgencyRight,
@@ -28,7 +28,6 @@ type IcUsersAdminActionEpic = AppEpic<IcUsersAdminAction>;
 const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: IcUsersAdminActionEpic =
   (action$, state$, { adminGateway }) =>
     action$.pipe(
-      tap(console.log),
       filter(
         icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested
           .match,
