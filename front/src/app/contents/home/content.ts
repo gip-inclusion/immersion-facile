@@ -235,7 +235,7 @@ export const sectionStatsData: Record<UserType, Stat[]> = {
   ],
   establishment: [
     {
-      badgeLabel: "Féxible",
+      badgeLabel: "Flexible",
       value: "1",
       subtitle: "jour, 1 semaine ou 1 mois",
       description:
@@ -338,7 +338,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       title:
         "Vous avez encore des questions ? Participez à notre prochain webinaire",
       description:
-        "Régulèrement, nous organisons des webinaire en ligne pour vous présenter l'immersions professionnelles, notre plateforme, et répondre à vos questions. Cliquez-ici pour vous inscrire à la prochaine séssions",
+        "Régulièrement, nous organisons des webinaire en ligne pour vous présenter l'immersions professionnelles, notre plateforme, et répondre à vos questions. Cliquez-ici pour vous inscrire à la prochaine session",
       url: "https://app.livestorm.co/itou/webinaire-proposer-des-immersions-pour-attirez-les-talents-1?type=detailed&utm_source=home-entreprise-if",
     },
   ],
@@ -351,7 +351,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       url: "https://immersion-facile.beta.gouv.fr/aide/article/puis-je-faire-une-demande-de-convention-avec-une-entreprise-non-inscrite-sur-le-site-f9z742/",
     },
     {
-      title: "Qui peut prescrire une immersion?",
+      title: "Qui peut prescrire une immersion ?",
       description:
         "Les prescripteurs de droits commun (France Travail, Missions Locales, Cap emploi, Conseil Départemental, CEP, SIAE sauf ETTI et prépa apprentissage) et tous les professionnels de l'accompagnement qui peuvent avoir une délégation auprès des prescripteurs de droit commun.",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-prescrire-une-immersion-6frnyn/?bust=1722505187338",
