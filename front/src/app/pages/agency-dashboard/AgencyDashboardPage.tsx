@@ -66,23 +66,22 @@ export const AgencyDashboardPage = ({
             label: "Conventions synchronisées",
             content: (
               <>
-                {agencyRights.some(
-                  (agencyRight) => agencyRight.agency.kind === "pole-emploi",
-                ) && (
+                {isPeUser(agencyRights) && (
                   <Button
                     priority="secondary"
                     linkProps={{
-                      href: "https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.pole-emploi.fr/documents/Immersion_facilitee/GUIDE_SAISIE_DES_CONVENTIONS.pptx",
+                      href: "https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.francetravail.fr/documents/Immersion_facilitee/GUIDE_SAISIE_(de_gestion)_DES_CONVENTIONS_(en_erreur).pptx",
                       target: "_blank",
                       rel: "noreferrer",
                     }}
                   >
-                    Guide de saisie des conventions
+                    Guide de gestion des conventions en erreur
                   </Button>
                 )}
                 {inclusionConnectedJwt ? (
                   <MarkPartnersErroredConventionAsHandledFormSection
                     jwt={inclusionConnectedJwt}
+                    isPeUser={isPeUser(agencyRights)}
                   />
                 ) : (
                   <Alert
@@ -217,3 +216,6 @@ export const AgencyDashboardPage = ({
     </>
   );
 };
+
+const isPeUser = (agencyRights: AgencyRight[]) =>
+  agencyRights.some((agencyRight) => agencyRight.agency.kind === "pole-emploi");
