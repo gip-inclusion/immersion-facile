@@ -121,7 +121,7 @@ describe("api consumer", () => {
 
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "api-consumer-names": {
-          on: "create",
+          on: "fetch",
           level: "error",
           title: "Problème rencontré",
           message: "my-error-message",
