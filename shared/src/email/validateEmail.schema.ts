@@ -1,20 +1,19 @@
 import { z } from "zod";
 import { emailSchema } from "./email.schema";
 import {
+  ValidateEmailFeedback,
   ValidateEmailInput,
-  ValidateEmailStatus,
-  validateEmailReason,
+  validateEmailStatuses,
 } from "./validateEmail.dto";
 
 export const validateEmailInputSchema: z.Schema<ValidateEmailInput> = z.object({
   email: emailSchema,
 });
 
-export const validateEmailReasonSchema = z.enum(validateEmailReason);
+export const validateEmailReasonSchema = z.enum(validateEmailStatuses);
 
-export const validateEmailResponseSchema: z.Schema<ValidateEmailStatus> =
+export const validateEmailResponseSchema: z.Schema<ValidateEmailFeedback> =
   z.object({
-    isValid: z.boolean(),
+    status: z.enum(validateEmailStatuses),
     proposal: z.string().or(z.null()),
-    reason: validateEmailReasonSchema,
   });

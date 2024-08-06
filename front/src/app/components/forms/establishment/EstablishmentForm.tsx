@@ -116,9 +116,8 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const [availableForImmersion, setAvailableForImmersion] = useState<
     boolean | undefined
   >(undefined);
-  const [invalidEmailMessage, setInvalidEmailMessage] = useState<string | null>(
-    null,
-  );
+  const [invalidEmailMessage, setInvalidEmailMessage] =
+    useState<React.ReactNode | null>(null);
 
   const [currentStep, setCurrentStep] = useState<Step>(
     isEstablishmentAdmin || isEstablishmentDashboard ? null : 0,

@@ -14,7 +14,7 @@ export const BusinessContactSection = ({
   onStepChange: OnStepChange;
   currentStep: Step;
   mode: Mode;
-  setInvalidEmailMessage: Dispatch<SetStateAction<string | null>>;
+  setInvalidEmailMessage: Dispatch<SetStateAction<React.ReactNode | null>>;
 }) => {
   const isStepMode = currentStep !== null;
   return (

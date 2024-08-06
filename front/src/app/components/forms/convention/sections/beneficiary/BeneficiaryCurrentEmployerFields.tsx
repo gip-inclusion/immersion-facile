@@ -4,11 +4,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { ConventionDto, addressDtoToString } from "shared";
-import {
-  EmailValidationInput,
-  feedbackMessages,
-  validateEmailBlockReasons,
-} from "src/app/components/forms/commons/EmailValidationInput";
+import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
@@ -168,16 +164,15 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...register("signatories.beneficiaryCurrentEmployer.email"),
         }}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.email")}
-        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+        onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
           const { "Employeur actuel du bénéficiaire": _, ...rest } =
             emailValidationErrors;
 
           setEmailValidationErrors({
             ...rest,
-            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+            ...(state === "error"
               ? {
-                  "Employeur actuel du bénéficiaire":
-                    feedbackMessages(proposal)[reason],
+                  "Employeur actuel du bénéficiaire": stateRelatedMessage,
                 }
               : {}),
           });

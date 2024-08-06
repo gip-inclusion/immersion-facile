@@ -4,7 +4,7 @@ import {
   ConventionSupportedJwt,
   Email,
   FeatureFlags,
-  ValidateEmailStatus,
+  ValidateEmailFeedback,
 } from "shared";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
@@ -20,22 +20,19 @@ export class TestTechnicalGateway implements TechnicalGateway {
   ): Promise<string> => Promise.resolve("YWJjZA==");
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
-    const emailWithErrorStatus: ValidateEmailStatus = {
-      isValid: false,
-      proposal: "",
-      reason: "invalid_email",
+  public async getEmailStatus(email: Email): Promise<ValidateEmailFeedback> {
+    const emailWithErrorStatus: ValidateEmailFeedback = {
+      status: "invalid_email",
+      proposal: null,
     };
-    const emailWithTypoStatus: ValidateEmailStatus = {
-      isValid: false,
+    const emailWithTypoStatus: ValidateEmailFeedback = {
       proposal: "email-with-typo@gmail.com",
-      reason: "invalid_email",
+      status: "invalid_email",
     };
     if (email === "email-with-error@example.com") return emailWithErrorStatus;
     if (email === "email-with-typo@gamil.com") return emailWithTypoStatus;
     return {
-      isValid: true,
-      reason: "accepted_email",
+      status: "accepted_email",
       proposal: null,
     };
   }

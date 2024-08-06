@@ -1,4 +1,4 @@
-import { Flavor, ValidateEmailReason } from "shared";
+import { Flavor, ValidateEmailStatus } from "shared";
 
 export type EmailableApiKey = Flavor<string, "EmailableApiKey">;
 
@@ -21,7 +21,7 @@ export type EmailableEmailValidationStatus = {
   mailbox_full?: boolean | null;
   mx_record?: string | null;
   no_reply?: boolean | null;
-  reason?: ValidateEmailReason | null;
+  reason?: ValidateEmailStatus | null;
   role?: boolean | null;
   score?: number | null;
   smtp_provider?: string | null;

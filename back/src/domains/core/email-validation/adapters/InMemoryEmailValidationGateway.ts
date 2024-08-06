@@ -1,46 +1,41 @@
-import { ValidateEmailStatus } from "shared";
+import { ValidateEmailFeedback } from "shared";
 import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 
 export class InMemoryEmailValidationGateway implements EmailValidationGetaway {
-  #emailValidationStatus: ValidateEmailStatus | undefined;
+  #emailValidationStatus: ValidateEmailFeedback | undefined;
 
   // for test purposes only
   public setEmailValidationStatusResponse(
-    emailValidationStatus: ValidateEmailStatus,
+    emailValidationStatus: ValidateEmailFeedback,
   ) {
     this.#emailValidationStatus = emailValidationStatus;
   }
 
-  public async validateEmail(email: string): Promise<ValidateEmailStatus> {
+  public async validateEmail(email: string): Promise<ValidateEmailFeedback> {
     if (this.#emailValidationStatus) return this.#emailValidationStatus;
     if (email.includes("@donotexist"))
       return {
-        isValid: false,
-        reason: "invalid_domain",
+        status: "invalid_domain",
         proposal: null,
       };
     if (email.includes("donotexist@"))
       return {
-        isValid: false,
-        reason: "rejected_email",
+        status: "invalid_email",
         proposal: null,
       };
     if (email.includes("error@"))
       return {
-        isValid: false,
-        reason: "unexpected_error",
+        status: "unexpected_error",
         proposal: null,
       };
     if (email === "email-with-typo@gamil.com")
       return {
-        isValid: false,
-        reason: "rejected_email",
+        status: "rejected_email",
         proposal: "email-with-typo@gmail.com",
       };
     return {
-      isValid: true,
+      status: "accepted_email",
       proposal: null,
-      reason: "accepted_email",
     };
   }
 }

@@ -4,7 +4,7 @@ import {
   ConventionSupportedJwt,
   Email,
   FeatureFlags,
-  ValidateEmailStatus,
+  ValidateEmailFeedback,
   sleep,
 } from "shared";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
@@ -21,23 +21,20 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
 
   constructor(private simulatedLatencyMs: number | undefined = undefined) {}
 
-  public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
+  public async getEmailStatus(email: Email): Promise<ValidateEmailFeedback> {
     if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
-    const emailWithErrorStatus: ValidateEmailStatus = {
-      isValid: false,
-      proposal: "",
-      reason: "invalid_email",
-    };
-    const emailWithTypoStatus: ValidateEmailStatus = {
-      isValid: false,
-      proposal: "email-with-typo@gmail.com",
-      reason: "invalid_email",
-    };
-    if (email === "email-with-error@example.com") return emailWithErrorStatus;
-    if (email === "email-with-typo@gamil.com") return emailWithTypoStatus;
+    if (email === "email-with-error@example.com")
+      return {
+        status: "invalid_email",
+        proposal: null,
+      };
+    if (email === "email-with-typo@gamil.com")
+      return {
+        status: "invalid_email",
+        proposal: "email-with-typo@gmail.com",
+      };
     return {
-      isValid: true,
-      reason: "accepted_email",
+      status: "accepted_email",
       proposal: null,
     };
   }
