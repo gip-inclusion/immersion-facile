@@ -27,14 +27,14 @@ const markPartnersErroredConventionAsHandledEpic: PartnersErroredConventionEpic 
           .pipe(
             map(() =>
               partnersErroredConventionSlice.actions.markAsHandledSucceeded({
-                feedbackTopic: "mark-convention-as-handled",
+                feedbackTopic: "partner-conventions",
               }),
             ),
           ),
       ),
       catchEpicError((error: Error) =>
         partnersErroredConventionSlice.actions.markAsHandledFailed({
-          feedbackTopic: "mark-convention-as-handled",
+          feedbackTopic: "partner-conventions",
           errorMessage: error.message,
         }),
       ),

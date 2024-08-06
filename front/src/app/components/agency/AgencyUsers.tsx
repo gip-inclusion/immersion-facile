@@ -104,7 +104,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
           id={domElementIds.admin.agencyTab.editAgencyUserTooltip}
         />
       </div>
-      <Feedback topic="update-agency-user" />
+      <Feedback topic="agency-user" />
 
       <Table
         id={domElementIds.admin.agencyTab.editAgencyUsersTable}
@@ -184,7 +184,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
                   dispatch(
                     icUsersAdminSlice.actions.updateUserOnAgencyRequested({
                       ...selectedUserData,
-                      feedbackTopic: "update-agency-user",
+                      feedbackTopic: "agency-user",
                     }),
                   );
                   manageUserModal.close();
