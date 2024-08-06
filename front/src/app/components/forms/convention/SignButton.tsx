@@ -94,6 +94,16 @@ export const SignButton = ({
           ]}
         >
           <>
+            <p>
+              Les étudiants ne sont pas soumis aux périodes de vacances
+              scolaires mais ne doivent pas avoir de cours ou d’examen sur la
+              période de stage.{" "}
+              <strong>
+                En signant cette convention, le bénéficiaire atteste être libéré
+                de toutes obligations étudiantes pendant la période de stage (ni
+                cours, ni examen).
+              </strong>
+            </p>
             <strong className={fr.cx("fr-mb-8w")}>
               Je, soussigné {signatoryFullName} ({signatoryFunction}{" "}
               {internshipKind === "immersion"
