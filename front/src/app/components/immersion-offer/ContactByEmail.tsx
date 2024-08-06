@@ -29,11 +29,7 @@ import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { Route } from "type-route";
-import {
-  EmailValidationInput,
-  feedbackMessages,
-  validateEmailBlockReasons,
-} from "../forms/commons/EmailValidationInput";
+import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
   appellations: AppellationDto[];
@@ -71,9 +67,8 @@ export const ContactByEmail = ({
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
   const route = useRoute() as Route<typeof routes.searchResult>;
 
-  const [invalidEmailMessage, setInvalidEmailMessage] = useState<string | null>(
-    null,
-  );
+  const [invalidEmailMessage, setInvalidEmailMessage] =
+    useState<React.ReactNode | null>(null);
 
   const {
     getTranscientDataForScope,
@@ -198,11 +193,9 @@ export const ContactByEmail = ({
               ...register("potentialBeneficiaryEmail"),
             }}
             {...getFieldError("potentialBeneficiaryEmail")}
-            onEmailValidationFeedback={({ isValid, reason, proposal }) =>
+            onEmailValidationFeedback={({ state, stateRelatedMessage }) =>
               setInvalidEmailMessage(
-                !isValid && reason && validateEmailBlockReasons.includes(reason)
-                  ? feedbackMessages(proposal)[reason]
-                  : null,
+                state === "error" ? stateRelatedMessage : null,
               )
             }
           />

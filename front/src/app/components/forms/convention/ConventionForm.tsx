@@ -100,7 +100,7 @@ export type EmailValidationErrorsState = Partial<
     | "Tuteur de l'entreprise"
     | "Représentant légal du bénéficiaire"
     | "Employeur actuel du bénéficiaire",
-    string
+    React.ReactNode
   >
 >;
 export type SetEmailValidationErrorsState = Dispatch<

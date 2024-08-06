@@ -6,7 +6,7 @@ import {
   Email,
   FeatureFlags,
   TechnicalRoutes,
-  ValidateEmailStatus,
+  ValidateEmailFeedback,
   uploadFileRoute,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -26,7 +26,7 @@ export class HttpTechnicalGateway implements TechnicalGateway {
     private readonly axiosInstance: AxiosInstance,
   ) {}
 
-  public getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
+  public getEmailStatus(email: Email): Promise<ValidateEmailFeedback> {
     return this.httpClient
       .validateEmail({
         queryParams: {

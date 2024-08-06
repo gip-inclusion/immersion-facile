@@ -12,11 +12,7 @@ import {
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import {
-  EmailValidationInput,
-  feedbackMessages,
-  validateEmailBlockReasons,
-} from "../../../commons/EmailValidationInput";
+import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
 export const EstablishmentRepresentativeFields = ({
   setEmailValidationErrors,
@@ -67,16 +63,15 @@ export const EstablishmentRepresentativeFields = ({
           ...register("signatories.establishmentRepresentative.email"),
         }}
         disabled={isFetchingSiret}
-        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+        onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
           const { "Responsable d'entreprise": _, ...rest } =
             emailValidationErrors;
 
           setEmailValidationErrors({
             ...rest,
-            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+            ...(state === "error"
               ? {
-                  "Responsable d'entreprise":
-                    feedbackMessages(proposal)[reason],
+                  "Responsable d'entreprise": stateRelatedMessage,
                 }
               : {}),
           });

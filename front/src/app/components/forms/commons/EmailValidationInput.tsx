@@ -1,11 +1,11 @@
 import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { ValidateEmailReason, ValidateEmailStatus } from "shared";
+import { ValidateEmailFeedback, ValidateEmailStatus } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {
-  onEmailValidationFeedback?: (status: ValidateEmailStatus) => void;
+  onEmailValidationFeedback?: (feedback: StateRelated) => void;
 };
 
 type StateRelated = {
@@ -13,57 +13,12 @@ type StateRelated = {
   stateRelatedMessage: InputProps.Common["stateRelatedMessage"];
 };
 
-const defaultErrorMessage =
-  "L'adresse email ne semble pas valide. Si vous êtes sûr de ne pas avoir fait d'erreur, vous pouvez tout de même la proposer.";
 const emailSeemsValidMessage = "L'adresse email a l'air valide";
-const noVerifyMessage =
-  "Il y a un problème de connexion qui ne nous permet pas de vérifier votre email. Veuillez vous assurer de n'avoir pas fait une erreur.";
 
 // https://help.emailable.com/en-us/article/verification-results-all-possible-states-and-reasons-fjsjn2/
-export const feedbackMessages = (
-  proposal: string | null | undefined,
-): Record<ValidateEmailReason, string> => ({
-  accepted_email: emailSeemsValidMessage,
-  disposable_email: "L'adresse email semble être une adresse jetable",
-  low_deliverability: emailSeemsValidMessage,
-  low_quality: emailSeemsValidMessage,
-  invalid_domain:
-    "Le domaine de l'email proposé ( après @ ) n'est pas valide ou n'existe pas.",
-  invalid_email: "L'email n'est pas valide.",
-  rejected_email: `Cette adresse email n'existe pas ${
-    proposal ? `, avez-vous voulu taper : ${proposal} ?` : "."
-  }`,
-  invalid_smtp:
-    "Le système propriétaire de l'email fourni n'est pas disponible pour vérifier la validité de l'email",
-  unavailable_smtp:
-    "Le système propriétaire de l'email fourni n'est pas disponible pour vérifier la validité de l'email",
-  unexpected_error:
-    "L'email n'a pas pu être vérifié suite à une erreur inconnue, veuillez bien vérifier par vous même que l'email soit valide.",
-  no_connect: noVerifyMessage,
-  service_unavailable: noVerifyMessage,
-});
-
-export const validateEmailBlockReasons: ValidateEmailReason[] = [
-  "invalid_domain",
-  "invalid_email",
-  "rejected_email",
-];
-
-const getStateRelatedFromStatus = (
-  { isValid, proposal, reason }: ValidateEmailStatus,
-  { state, stateRelatedMessage }: StateRelated,
-): StateRelated =>
-  state === "error"
-    ? {
-        state,
-        stateRelatedMessage,
-      }
-    : {
-        state: isValid ? "success" : "error",
-        stateRelatedMessage: reason
-          ? feedbackMessages(proposal)[reason]
-          : defaultErrorMessage,
-      };
+export const makeStateRelated = (
+  feedback: ValidateEmailFeedback,
+): StateRelated => stateRelatedByValidationStatus(feedback)[feedback.status];
 
 export const EmailValidationInput = (props: EmailValidationInputProps) => {
   const [currentInputValue, setCurrentInputValue] = useState<string>("");
@@ -85,18 +40,19 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
       )
       .then((emailValidationStatus) => {
         if (emailValidationStatus) {
-          props.onEmailValidationFeedback?.(emailValidationStatus);
-          setStateRelated(
-            getStateRelatedFromStatus(emailValidationStatus, {
-              state: stateRelated.state,
-              stateRelatedMessage: stateRelated.stateRelatedMessage,
-            }),
-          );
+          const feedback = makeStateRelated(emailValidationStatus);
+          props.onEmailValidationFeedback?.(feedback);
+          setStateRelated(feedback);
         }
       })
       .catch((error) => {
-        //eslint-disable-next-line no-console
         console.error(error);
+        const feedback = makeStateRelated({
+          status: "unexpected_error",
+          proposal: null,
+        });
+        props.onEmailValidationFeedback?.(feedback);
+        setStateRelated(feedback);
       });
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,3 +77,85 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
     />
   );
 };
+
+const makeStateRelatedMessage = (
+  feedback: ValidateEmailFeedback,
+  message: string,
+): React.ReactNode =>
+  `${message}${
+    feedback.proposal ? `Avez-vous voulu taper '${feedback.proposal}' ?` : ""
+  }`;
+
+const stateRelatedByValidationStatus = (
+  feedback: ValidateEmailFeedback,
+): Record<ValidateEmailStatus, StateRelated> => ({
+  accepted_email: {
+    state: "success",
+    stateRelatedMessage: makeStateRelatedMessage(
+      feedback,
+      emailSeemsValidMessage,
+    ),
+  },
+  low_deliverability: {
+    state: "success",
+    stateRelatedMessage: makeStateRelatedMessage(
+      feedback,
+      emailSeemsValidMessage,
+    ),
+  },
+  low_quality: {
+    state: "success",
+    stateRelatedMessage: makeStateRelatedMessage(
+      feedback,
+      emailSeemsValidMessage,
+    ),
+  },
+  disposable_email: {
+    state: "error",
+    stateRelatedMessage: makeStateRelatedMessage(
+      feedback,
+      "L'adresse email semble être une adresse jetable",
+    ),
+  },
+  invalid_domain: {
+    state: "error",
+    stateRelatedMessage: makeStateRelatedMessage(
+      feedback,
+      "Le domaine de l'email proposé ( après @ ) n'est pas valide ou n'existe pas.",
+    ),
+  },
+  invalid_email: {
+    state: "error",
+    stateRelatedMessage: makeStateRelatedMessage(
+      feedback,
+      "L'email n'est pas valide.",
+    ),
+  },
+  rejected_email: {
+    state: "error",
+    stateRelatedMessage: makeStateRelatedMessage(
+      feedback,
+      "Cette adresse email n'existe pas.",
+    ),
+  },
+  invalid_smtp: {
+    state: "default",
+    stateRelatedMessage: makeStateRelatedMessage(feedback, ""),
+  },
+  unexpected_error: {
+    state: "default",
+    stateRelatedMessage: makeStateRelatedMessage(feedback, ""),
+  },
+  unavailable_smtp: {
+    state: "default",
+    stateRelatedMessage: makeStateRelatedMessage(feedback, ""),
+  },
+  no_connect: {
+    state: "default",
+    stateRelatedMessage: makeStateRelatedMessage(feedback, ""),
+  },
+  service_unavailable: {
+    state: "default",
+    stateRelatedMessage: makeStateRelatedMessage(feedback, ""),
+  },
+});

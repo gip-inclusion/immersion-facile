@@ -1,6 +1,6 @@
 import { Email } from "./email.dto";
 
-export const validateEmailReason = [
+export const validateEmailStatuses = [
   "accepted_email",
   "disposable_email",
   "invalid_domain",
@@ -15,12 +15,11 @@ export const validateEmailReason = [
   "service_unavailable",
 ] as const;
 
-export type ValidateEmailReason = (typeof validateEmailReason)[number];
+export type ValidateEmailStatus = (typeof validateEmailStatuses)[number];
 
-export type ValidateEmailStatus = {
-  isValid: boolean;
+export type ValidateEmailFeedback = {
+  status: ValidateEmailStatus;
   proposal: string | null;
-  reason: ValidateEmailReason | null;
 };
 
 export const validateMultipleEmailRegex =

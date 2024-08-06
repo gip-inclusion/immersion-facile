@@ -14,11 +14,7 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import {
-  EmailValidationInput,
-  feedbackMessages,
-  validateEmailBlockReasons,
-} from "../../../commons/EmailValidationInput";
+import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
 export const EstablishementTutorFields = ({
   setEmailValidationErrors,
@@ -86,15 +82,15 @@ export const EstablishementTutorFields = ({
           ...register("establishmentTutor.email"),
         }}
         {...getFieldError("establishmentTutor.email")}
-        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+        onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
           const { "Tuteur de l'entreprise": _, ...rest } =
             emailValidationErrors;
 
           setEmailValidationErrors({
             ...rest,
-            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+            ...(state === "error"
               ? {
-                  "Tuteur de l'entreprise": feedbackMessages(proposal)[reason],
+                  "Tuteur de l'entreprise": stateRelatedMessage,
                 }
               : {}),
           });

@@ -1,6 +1,6 @@
 import {
+  type ValidateEmailFeedback,
   ValidateEmailInput,
-  type ValidateEmailStatus,
   validateEmailInputSchema,
 } from "shared";
 import { UseCase } from "../../UseCase";
@@ -8,7 +8,7 @@ import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 
 export class ValidateEmail extends UseCase<
   ValidateEmailInput,
-  ValidateEmailStatus
+  ValidateEmailFeedback
 > {
   protected inputSchema = validateEmailInputSchema;
 
@@ -18,7 +18,7 @@ export class ValidateEmail extends UseCase<
 
   protected _execute({
     email,
-  }: ValidateEmailInput): Promise<ValidateEmailStatus> {
+  }: ValidateEmailInput): Promise<ValidateEmailFeedback> {
     return this.emailValidationGateway.validateEmail(email);
   }
 }

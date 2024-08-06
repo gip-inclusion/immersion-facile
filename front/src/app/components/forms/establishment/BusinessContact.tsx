@@ -13,11 +13,7 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
-import {
-  EmailValidationInput,
-  feedbackMessages,
-  validateEmailBlockReasons,
-} from "../commons/EmailValidationInput";
+import { EmailValidationInput } from "../commons/EmailValidationInput";
 import { Mode } from "./EstablishmentForm";
 
 const preferredContactMethodOptions = (
@@ -55,7 +51,7 @@ export const BusinessContact = ({
 }: {
   readOnly?: boolean;
   mode: Mode;
-  setInvalidEmailMessage: Dispatch<SetStateAction<string | null>>;
+  setInvalidEmailMessage: Dispatch<SetStateAction<React.ReactNode | null>>;
 }) => {
   const { getFormFields } = getFormContents(
     formEstablishmentFieldsLabels(mode),
@@ -120,12 +116,8 @@ export const BusinessContact = ({
         {...getFieldError(
           "businessContact.email" as DotNestedKeys<FormEstablishmentDto>,
         )} // seems we have an issue with our DotNestedKeys
-        onEmailValidationFeedback={({ isValid, reason, proposal }) =>
-          setInvalidEmailMessage(
-            !isValid && reason && validateEmailBlockReasons.includes(reason)
-              ? feedbackMessages(proposal)[reason]
-              : null,
-          )
+        onEmailValidationFeedback={({ state, stateRelatedMessage }) =>
+          setInvalidEmailMessage(state === "error" ? stateRelatedMessage : null)
         }
       />
       <MultipleEmailsInput

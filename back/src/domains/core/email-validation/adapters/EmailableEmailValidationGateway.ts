@@ -1,12 +1,9 @@
 import Bottleneck from "bottleneck";
-import { ValidateEmailStatus } from "shared";
+import { ValidateEmailFeedback } from "shared";
 import { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
 import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
-import {
-  EmailableApiKey,
-  EmailableEmailValidationStatus,
-} from "./EmailableEmailValidationGateway.dto";
+import { EmailableApiKey } from "./EmailableEmailValidationGateway.dto";
 import { EmailableValidationRoutes } from "./EmailableEmailValidationGateway.routes";
 
 const logger = createLogger(__filename);
@@ -25,7 +22,7 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
     private readonly emailableApiKey: EmailableApiKey,
   ) {}
 
-  public async validateEmail(email: string): Promise<ValidateEmailStatus> {
+  public async validateEmail(email: string): Promise<ValidateEmailFeedback> {
     return this.#limiter.schedule(() =>
       this.httpClient
         .validateEmail({
@@ -34,47 +31,20 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
             api_key: this.emailableApiKey,
           },
         })
-        .then(
-          ({ body: { state, reason, did_you_mean } }) =>
-            ({
-              isValid: this.#isEmailValid(state, reason),
-              reason: reason ?? null,
-              proposal: did_you_mean ?? null,
-            }) satisfies ValidateEmailStatus,
-        )
+        .then(({ body: { reason, did_you_mean } }) => ({
+          status: reason ?? "unexpected_error",
+          proposal: did_you_mean ?? null,
+        }))
         .catch((error) => {
           logger.error({
             error,
             message: "validateEmail => Error while calling emailable API ",
           });
           return {
-            isValid: false,
+            status: "service_unavailable",
             proposal: null,
-            reason: "service_unavailable",
-          } satisfies ValidateEmailStatus;
+          };
         }),
-    );
-  }
-
-  #isEmailValid(
-    state: EmailableEmailValidationStatus["state"],
-    reason: EmailableEmailValidationStatus["reason"],
-  ): boolean {
-    const unacceptableStates: EmailableEmailValidationStatus["state"][] = [
-      "undeliverable",
-    ];
-    const unacceptableReasons: EmailableEmailValidationStatus["reason"][] = [
-      "invalid_domain",
-      "invalid_email",
-      "invalid_smtp",
-      "rejected_email",
-      "unexpected_error",
-      "no_connect",
-    ];
-
-    return (
-      !unacceptableStates.includes(state) &&
-      !unacceptableReasons.includes(reason)
     );
   }
 }

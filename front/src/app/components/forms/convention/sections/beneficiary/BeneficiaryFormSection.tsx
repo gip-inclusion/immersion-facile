@@ -29,11 +29,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import {
-  EmailValidationInput,
-  feedbackMessages,
-  validateEmailBlockReasons,
-} from "../../../commons/EmailValidationInput";
+import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContactFields";
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";
@@ -181,14 +177,14 @@ export const BeneficiaryFormSection = ({
           ...(userFieldsAreFilled ? { value: connectedUser.email } : {}),
         }}
         {...getFieldError("signatories.beneficiary.email")}
-        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+        onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
           const { Bénéficiaire: _, ...rest } = emailValidationErrors;
 
           setEmailValidationErrors({
             ...rest,
-            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+            ...(state === "error"
               ? {
-                  Bénéficiaire: feedbackMessages(proposal)[reason],
+                  Bénéficiaire: stateRelatedMessage,
                 }
               : {}),
           });

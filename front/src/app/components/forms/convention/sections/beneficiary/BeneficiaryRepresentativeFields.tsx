@@ -12,11 +12,7 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
-import {
-  EmailValidationInput,
-  feedbackMessages,
-  validateEmailBlockReasons,
-} from "../../../commons/EmailValidationInput";
+import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
 type BeneficiaryRepresentativeFieldsProps = {
   disabled?: boolean;
@@ -118,16 +114,15 @@ export const BeneficiaryRepresentativeFields = ({
           ...register("signatories.beneficiaryRepresentative.email"),
         }}
         {...getFieldError("signatories.beneficiaryRepresentative.email")}
-        onEmailValidationFeedback={({ isValid, reason, proposal }) => {
+        onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
           const { "Représentant légal du bénéficiaire": _, ...rest } =
             emailValidationErrors;
 
           setEmailValidationErrors({
             ...rest,
-            ...(!isValid && reason && validateEmailBlockReasons.includes(reason)
+            ...(state === "error"
               ? {
-                  "Représentant légal du bénéficiaire":
-                    feedbackMessages(proposal)[reason],
+                  "Représentant légal du bénéficiaire": stateRelatedMessage,
                 }
               : {}),
           });

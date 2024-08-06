@@ -48,7 +48,7 @@ export const DetailsSection = ({
   mode: Mode;
   currentStep: Step;
   onStepChange: OnStepChange;
-  invalidEmailMessage: string | null;
+  invalidEmailMessage: React.ReactNode | null;
 }) => {
   const adminJwt = useAdminToken();
   const dispatch = useDispatch();

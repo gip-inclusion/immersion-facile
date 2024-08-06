@@ -1,6 +1,6 @@
 import {
+  ValidateEmailFeedback,
   ValidateEmailInput,
-  ValidateEmailStatus,
   expectPromiseToFail,
 } from "shared";
 import { InMemoryEmailValidationGateway } from "../adapters/InMemoryEmailValidationGateway";
@@ -16,10 +16,9 @@ describe("Email validation status", () => {
   });
 
   it("retrieve email validation status from queried email", async () => {
-    const expectedEmailValidationStatus: ValidateEmailStatus = {
-      isValid: true,
+    const expectedEmailValidationStatus: ValidateEmailFeedback = {
+      status: "invalid_smtp",
       proposal: null,
-      reason: "invalid_smtp",
     };
     emailValidationGateway.setEmailValidationStatusResponse(
       expectedEmailValidationStatus,

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ValidateEmailStatus, expectToEqual } from "shared";
+import { ValidateEmailFeedback, expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
@@ -19,30 +19,27 @@ describe("EmailableEmailValidationGateway", () => {
   describe("Emailable validateEmail", () => {
     const candidates: {
       candidateEmail: string;
-      expectedStatus: ValidateEmailStatus | Error;
+      expectedStatus: ValidateEmailFeedback | Error;
     }[] = [
       {
         candidateEmail: "enguerran.weiss@beta.gouv.fr",
         expectedStatus: {
-          isValid: true,
+          status: "accepted_email",
           proposal: null,
-          reason: "accepted_email",
         },
       },
       {
         candidateEmail: "enguerranweiss@beta.gouv.fr",
         expectedStatus: {
-          isValid: false,
+          status: "rejected_email",
           proposal: null,
-          reason: "rejected_email",
         },
       },
       {
         candidateEmail: "this-email-doesnt-exist@gamil.com",
         expectedStatus: {
-          isValid: false,
+          status: "rejected_email",
           proposal: "this-email-doesnt-exist@gmail.com",
-          reason: "rejected_email",
         },
       },
     ];

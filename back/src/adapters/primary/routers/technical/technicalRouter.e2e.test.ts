@@ -5,7 +5,7 @@ import {
   DiscussionBuilder,
   ShortLinkId,
   TechnicalRoutes,
-  ValidateEmailStatus,
+  ValidateEmailFeedback,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
@@ -238,10 +238,9 @@ describe("technical router", () => {
 
   describe("/validate-email", () => {
     const candidateEmail = "enguerran.weiss@beta.gouv.fr";
-    const expectedStatus: ValidateEmailStatus = {
-      isValid: true,
+    const expectedStatus: ValidateEmailFeedback = {
+      status: "accepted_email",
       proposal: null,
-      reason: "accepted_email",
     };
 
     it(`${displayRouteName(
