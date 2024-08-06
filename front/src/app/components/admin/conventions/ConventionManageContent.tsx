@@ -57,19 +57,6 @@ export const ConventionManageContent = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    (jwtParams.kind === "inclusionConnect" ||
-      jwtParams.kind === "backoffice") &&
-      convention &&
-      dispatch(
-        conventionSlice.actions.getApiConsumerNamesByConventionRequested({
-          conventionId: convention.id,
-          jwt: jwtParams.jwt,
-          feedbackTopic: "get-api-consumer-names-by-convention",
-        }),
-      );
-  }, [jwtParams.kind, jwtParams.jwt, convention, dispatch]);
-
-  useEffect(() => {
     return () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
     };
@@ -86,10 +73,11 @@ export const ConventionManageContent = ({
       })
       .replace();
   }
+
   if (isLoading) return <Loader />;
+  if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!roles.length)
     return <p>Vous n'êtes pas autorisé à accéder à cette convention</p>;
-  if (!convention) return <p>Pas de convention correspondante trouvée</p>;
 
   return (
     <>
