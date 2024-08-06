@@ -95,7 +95,17 @@ export class PgConventionQueries implements ConventionQueries {
         qb
           .selectFrom("notifications_email")
           .select("convention_id")
-          .where("email_kind", "=", assessmentEmailKind),
+          .where("email_kind", "=", assessmentEmailKind)
+          .where(
+            sql`DATE(created_at)`,
+            ">=",
+            subDays(dateEnd.from, 1).toISOString().split("T")[0],
+          )
+          .where(
+            sql`DATE(created_at)`,
+            "<=",
+            addDays(dateEnd.from, 1).toISOString().split("T")[0],
+          ),
       )
       .orderBy("conventions.date_start", "desc")
       .execute();
