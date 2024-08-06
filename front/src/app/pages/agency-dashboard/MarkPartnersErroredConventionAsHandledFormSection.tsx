@@ -26,8 +26,10 @@ const erroredConventionHandledConfirmationModal = createModal({
 
 export const MarkPartnersErroredConventionAsHandledFormSection = ({
   jwt,
+  isPeUser,
 }: {
   jwt: InclusionConnectJwt;
+  isPeUser: boolean;
 }) => {
   const methods = useForm<MarkPartnersErroredConventionAsHandledRequest>({
     resolver: zodResolver(markPartnersErroredConventionAsHandledRequestSchema),
@@ -107,17 +109,20 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
                 </form>
               </FormProvider>
 
-              <p>
-                Si nécessaire, vous pouvez retrouver les instructions détaillées
-                pour la saisie d'une convention en cliquant sur le lien suivant:{" "}
-                <a
-                  href="https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.pole-emploi.fr/documents/Immersion_facilitee/GUIDE_SAISIE_DES_CONVENTIONS.pptx"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Guide de saisie des conventions
-                </a>
-              </p>
+              {isPeUser && (
+                <p>
+                  Si nécessaire, vous pouvez retrouver les instructions
+                  détaillées pour la saisie d'une convention en cliquant sur le
+                  lien suivant:{" "}
+                  <a
+                    href="https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.francetravail.fr/documents/Immersion_facilitee/GUIDE_SAISIE_(de_gestion)_DES_CONVENTIONS_(en_erreur).pptx"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Guide de gestion des conventions en erreur
+                  </a>
+                </p>
+              )}
             </erroredConventionHandledConfirmationModal.Component>,
             document.body,
           )}
