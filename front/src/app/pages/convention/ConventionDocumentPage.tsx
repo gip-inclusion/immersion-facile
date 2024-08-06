@@ -508,9 +508,9 @@ export const ConventionDocumentPage = ({
               scolaires mais ne doivent pas avoir de cours ou d’examen sur la
               période de stage.{" "}
               <strong>
-                En signant cette convention, le bénéficiaire à attester être
+                En signant cette convention, le bénéficiaire a attesté être
                 libéré de toutes obligations étudiantes pendant la période de
-                stage(ni cours, ni examen).
+                stage(ni cours, ni examens).
               </strong>
             </p>
           )}
