@@ -1,4 +1,5 @@
 import { addDays, addHours } from "date-fns";
+import subDays from "date-fns/subDays";
 import { sql } from "kysely";
 import { Pool } from "pg";
 import {
@@ -643,7 +644,7 @@ describe("Pg implementation of ConventionQueries", () => {
       );
 
       const notification: Notification = {
-        createdAt: new Date().toISOString(),
+        createdAt: subDays(new Date(dateEnd15), 1).toISOString(),
         followedIds: {
           conventionId:
             validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.id,
