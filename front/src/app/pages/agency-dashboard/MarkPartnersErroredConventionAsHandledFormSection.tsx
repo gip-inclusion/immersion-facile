@@ -14,8 +14,10 @@ import {
   domElementIds,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
+import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 
 const erroredConventionHandledConfirmationModal = createModal({
@@ -49,6 +51,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
     );
     erroredConventionHandledConfirmationModal.close();
   };
+  const conventionIdRegistration = methods.register("conventionId");
   return (
     <section className={fr.cx("fr-mt-4w")}>
       <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>
@@ -60,7 +63,21 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
             <Input
               label="Id de la convention *"
               nativeInputProps={{
-                ...methods.register("conventionId"),
+                ...conventionIdRegistration,
+                onChange: (event) => {
+                  if (event.currentTarget.value.length >= 32) {
+                    dispatch(
+                      conventionSlice.actions.fetchConventionRequested({
+                        conventionId: event.currentTarget.value,
+                        jwt,
+                      }),
+                    );
+                  }
+                  if (event.currentTarget.value.length === 0) {
+                    dispatch(conventionSlice.actions.clearFetchedConvention());
+                  }
+                  conventionIdRegistration.onChange(event);
+                },
                 id: "MarkPartnersErroredConvention-conventionId",
                 placeholder: "Id de la convention",
               }}
@@ -77,6 +94,10 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
           >
             Marquer la convention comme traitée
           </Button>
+          <BroadcastAgainButton
+            conventionId={methods.getValues("conventionId")}
+            disabled={!methods.formState.isValid}
+          />
           {createPortal(
             <erroredConventionHandledConfirmationModal.Component title="Confirmation de saisie">
               <p>

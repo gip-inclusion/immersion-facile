@@ -29,11 +29,9 @@ import {
   reasonableSchedule,
   renewConventionParamsSchema,
   statusTransitionConfigs,
+  userHasEnoughRightsOnConvention,
 } from "shared";
-import {
-  BroadcastAgainButton,
-  shouldShowBroadcast,
-} from "src/app/components/admin/conventions/BroadcastAgainButton";
+import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import {
   RemindSignatoriesButton,
@@ -97,6 +95,7 @@ export const ConventionManageActions = ({
   const icUserRoles = useAppSelector(
     inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
+  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const feedback = useAppSelector(conventionSelectors.feedback);
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
     string | null
@@ -358,9 +357,11 @@ export const ConventionManageActions = ({
             document.body,
           )}
 
-        {shouldShowBroadcast({ convention }) && (
-          <BroadcastAgainButton convention={convention} />
-        )}
+        {currentUser &&
+          userHasEnoughRightsOnConvention(currentUser, convention, [
+            "counsellor",
+            "validator",
+          ]) && <BroadcastAgainButton conventionId={convention.id} />}
       </div>
     </div>
   );
