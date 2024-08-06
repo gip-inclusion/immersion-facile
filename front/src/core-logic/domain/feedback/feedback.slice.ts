@@ -132,7 +132,7 @@ export const feedbackMapping: Record<
     },
   },
   "api-consumer-names": {
-    "create.error": {
+    "fetch.error": {
       action: apiConsumerSlice.actions.fetchApiConsumerNamesFailed,
       title: "Problème rencontré",
       message:
