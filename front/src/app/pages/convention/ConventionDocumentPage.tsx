@@ -502,6 +502,19 @@ export const ConventionDocumentPage = ({
             , rappelées ci-après.
           </p>
 
+          {internshipKind === "mini-stage-cci" && (
+            <p>
+              Les étudiants ne sont pas soumis aux périodes de vacances
+              scolaires mais ne doivent pas avoir de cours ou d’examen sur la
+              période de stage.{" "}
+              <strong>
+                En signant cette convention, le bénéficiaire à attester être
+                libéré de toutes obligations étudiantes pendant la période de
+                stage(ni cours, ni examen).
+              </strong>
+            </p>
+          )}
+
           <h2 className={fr.cx("fr-h4")}>
             Toutes les parties ci-dessus ont signé cette convention par le moyen
             d'une signature électronique&nbsp;:
