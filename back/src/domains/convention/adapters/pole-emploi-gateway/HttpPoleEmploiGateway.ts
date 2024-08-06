@@ -124,7 +124,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   ): Promise<PoleEmploiBroadcastResponse> {
     logger.info({
       message: "PeBroadcast",
-      status: "total",
+      franceTravailGatewayStatus: "total",
       peConnect: {
         peId: poleEmploiConvention.id,
         originalId: poleEmploiConvention.originalId,
@@ -142,7 +142,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       .then((response): PoleEmploiBroadcastResponse => {
         logger.info({
           message: "PeBroadcast",
-          status: "success",
+          franceTravailGatewayStatus: "success",
           sharedRouteResponse: response,
           peConnect: {
             peId: poleEmploiConvention.id,
@@ -167,7 +167,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         if (!axios.isAxiosError(error)) {
           logger.error({
             message: "PeBroadcast - notAxiosError",
-            status: "error",
+            franceTravailGatewayStatus: "error",
             error,
             peConnect: {
               peId: poleEmploiConvention.id,
@@ -194,7 +194,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         if (!error.response) {
           logger.error({
             message: "PeBroadcast - noResponseInAxiosError",
-            status: "error",
+            franceTravailGatewayStatus: "error",
             error,
             peConnect: {
               peId: poleEmploiConvention.id,
@@ -225,7 +225,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         if (error.response.status === 404) {
           logger.error({
             message: `PeBroadcast - notFoundOrMismatch - ${message}`,
-            status: "error",
+            franceTravailGatewayStatus: "error",
             axiosResponse: error.response,
             peConnect: {
               peId: poleEmploiConvention.id,
@@ -244,7 +244,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
         const errorObject: LoggerParamsWithMessage = {
           message: "PeBroadcast",
-          status: "error",
+          franceTravailGatewayStatus: "error",
           error,
           axiosResponse: error.response,
           peConnect: {

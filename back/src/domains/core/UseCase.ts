@@ -63,15 +63,14 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
         .then((result) => {
           logger.info({
             useCaseName: name,
-            status: "success",
             durationInSeconds: calculateDurationInSecondsFrom(startDate),
+            logStatus: "ok",
           });
           return result;
         })
         .catch((error) => {
           logger.error({
             useCaseName: name,
-            status: "error",
             durationInSeconds: calculateDurationInSecondsFrom(startDate),
             searchParams,
             message: castError(error).message,
@@ -160,15 +159,14 @@ export abstract class TransactionalUseCase<
       .then((result) => {
         logger.info({
           useCaseName,
-          status: "success",
           durationInSeconds: calculateDurationInSecondsFrom(startDate),
+          logStatus: "ok",
         });
         return result;
       })
       .catch((error) => {
         logger.error({
           useCaseName,
-          status: "error",
           durationInSeconds: calculateDurationInSecondsFrom(startDate),
           searchParams,
           message: castError(error).message,

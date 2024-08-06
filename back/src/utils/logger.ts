@@ -24,6 +24,8 @@ import { SearchMadeEntity } from "../domains/establishment/entities/SearchMadeEn
 import { LaBonneBoiteRequestParams } from "../domains/establishment/ports/LaBonneBoiteGateway";
 import { NodeProcessReport } from "./nodeProcessReport";
 
+type LogStatus = "debug" | "info" | "ok" | "warn" | "error" | "alert";
+
 const level: LoggerOptions["level"] =
   process.env.LOG_LEVEL || process.env.NODE_ENV === "test" ? "fatal" : "info";
 
@@ -89,7 +91,9 @@ type LoggerParams = Partial<{
   searchLBB: LaBonneBoiteRequestParams;
   searchMade: SearchMadeEntity;
   searchParams: SearchQueryParamsDto | undefined;
-  status: "success" | "total" | "error" | AuthorisationStatus;
+  franceTravailGatewayStatus: "success" | "total" | "error";
+  logStatus: LogStatus;
+  authorisationStatus: AuthorisationStatus;
   subscriptionId: string;
   topic: DomainTopic;
   useCaseName: string;
@@ -106,6 +110,19 @@ export type OpacifiedLogger = {
   level: string;
 };
 
+type LogMethod = keyof OpacifiedLogger;
+
+const logMethodToLogStatus: Record<LogMethod, LogStatus> = {
+  info: "info",
+  warn: "warn",
+  error: "error",
+  fatal: "error",
+  debug: "debug",
+  silent: "debug",
+  trace: "debug",
+  level: "debug",
+};
+
 export type LoggerParamsWithMessage = LoggerParams & {
   message?: string;
 };
@@ -116,7 +133,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
   const logger = rootLogger.child({ name: path.basename(filename) });
 
   const makeLogFunction =
-    (method: keyof OpacifiedLogger): LoggerFunction =>
+    (method: LogMethod): LoggerFunction =>
     ({
       adapters,
       agencyId,
@@ -138,7 +155,9 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       schemaParsingInput,
       searchMade,
       searchLBB,
-      status,
+      logStatus,
+      authorisationStatus,
+      franceTravailGatewayStatus,
       subscriptionId,
       topic,
       useCaseName,
@@ -168,7 +187,9 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         schemaParsingInput,
         searchMade,
         searchLBB,
-        status,
+        status: logStatus ?? logMethodToLogStatus[method],
+        authorisationStatus,
+        franceTravailGatewayStatus,
         subscriptionId,
         topic,
         useCaseName,

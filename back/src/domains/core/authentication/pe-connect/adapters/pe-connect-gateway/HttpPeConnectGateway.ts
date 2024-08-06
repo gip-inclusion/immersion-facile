@@ -52,19 +52,19 @@ const makePeConnectLogger = (
   success: ({ message, ...rest }: LoggerParamsWithMessage) =>
     logger.info({
       ...rest,
-      status: "success",
+      franceTravailGatewayStatus: "success",
       message: `${counterApiKind} - ${counterType} - ${message}`,
     }),
   total: ({ message, ...rest }: LoggerParamsWithMessage) =>
     logger.info({
       ...rest,
-      status: "total",
+      franceTravailGatewayStatus: "total",
       message: `${counterApiKind} - ${counterType} - ${message}`,
     }),
   error: ({ message, ...rest }: LoggerParamsWithMessage) =>
     logger.error({
       ...rest,
-      status: "error",
+      franceTravailGatewayStatus: "error",
       message: `${counterApiKind} - ${counterType} - ${message}`,
     }),
 });
