@@ -52,7 +52,7 @@ const createIncTotalCountForRequest =
         path: route,
         body: "sanitized",
       },
-      status: authorisationStatus,
+      authorisationStatus,
       message: `apiKeyAuthMiddlewareRequestsTotal for ${consumerName}`,
     });
   };
