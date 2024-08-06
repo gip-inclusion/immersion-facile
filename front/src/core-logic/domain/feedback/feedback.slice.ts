@@ -15,8 +15,8 @@ const topics = [
   "dashboard-discussion",
   "dashboard-discussion-rejection",
   "broadcast-convention-again",
-  "mark-convention-as-handled",
-  "update-agency-user",
+  "partner-conventions",
+  "agency-user",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -117,20 +117,20 @@ export const feedbackMapping: Record<
         "Une erreur est survenue lors de la récupération des discussions",
     },
   },
-  "mark-convention-as-handled": {
-    "create.success": {
+  "partner-conventions": {
+    "update.success": {
       action: partnersErroredConventionSlice.actions.markAsHandledSucceeded,
       title: "La convention a bien été marquée comme traitée",
       message: "La convention a bien été marquée comme traitée.",
     },
-    "create.error": {
+    "update.error": {
       action: partnersErroredConventionSlice.actions.markAsHandledFailed,
       title: "Problème rencontré",
       message:
         "Problème rencontré lors du marquage de la convention comme traitée.",
     },
   },
-  "update-agency-user": {
+  "agency-user": {
     "update.success": {
       action: icUsersAdminSlice.actions.updateUserOnAgencySucceeded,
       title: "L'utilisateur a été mis à jour",

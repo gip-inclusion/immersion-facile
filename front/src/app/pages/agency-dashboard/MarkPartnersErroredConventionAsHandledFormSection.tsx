@@ -44,7 +44,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
       partnersErroredConventionSlice.actions.markAsHandledRequested({
         jwt,
         markAsHandledParams: { conventionId },
-        feedbackTopic: "mark-convention-as-handled",
+        feedbackTopic: "partner-conventions",
       }),
     );
     erroredConventionHandledConfirmationModal.close();
@@ -127,7 +127,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
             document.body,
           )}
         </form>
-        <Feedback topic="mark-convention-as-handled" />
+        <Feedback topic="partner-conventions" />
       </div>
     </section>
   );

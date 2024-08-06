@@ -433,7 +433,7 @@ describe("Agency registration for authenticated users", () => {
           userId: originalUser.id,
           agencyId: agency2.id,
           roles: updatedUser.agencyRights[agency2.id].roles,
-          feedbackTopic: "update-agency-user",
+          feedbackTopic: "agency-user",
         }),
       );
 
@@ -452,7 +452,7 @@ describe("Agency registration for authenticated users", () => {
         expected,
       );
       expectToEqual(
-        feedbacksSelectors.feedbacks(store.getState())["update-agency-user"],
+        feedbacksSelectors.feedbacks(store.getState())["agency-user"],
         {
           level: "success",
           message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
@@ -485,7 +485,7 @@ describe("Agency registration for authenticated users", () => {
           userId: originalUser.id,
           agencyId: agency2.id,
           roles: originalUser.agencyRights[agency2.id].roles,
-          feedbackTopic: "update-agency-user",
+          feedbackTopic: "agency-user",
         }),
       );
 
@@ -496,7 +496,7 @@ describe("Agency registration for authenticated users", () => {
       expectIsUpdatingUserAgencyToBe(false);
 
       expectToEqual(
-        feedbacksSelectors.feedbacks(store.getState())["update-agency-user"],
+        feedbacksSelectors.feedbacks(store.getState())["agency-user"],
         {
           level: "error",
           message:
@@ -531,7 +531,7 @@ describe("Agency registration for authenticated users", () => {
           userId: user2Id,
           agencyId: agency3.id,
           roles: ["validator"],
-          feedbackTopic: "update-agency-user",
+          feedbackTopic: "agency-user",
         }),
       );
       expectIsUpdatingUserAgencyToBe(true);

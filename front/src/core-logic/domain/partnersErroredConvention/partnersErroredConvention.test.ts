@@ -23,7 +23,7 @@ describe("Agency info in store", () => {
       partnersErroredConventionSlice.actions.markAsHandledRequested({
         jwt: "my-jwt",
         markAsHandledParams: { conventionId: fakeConventionId },
-        feedbackTopic: "mark-convention-as-handled",
+        feedbackTopic: "partner-conventions",
       }),
     );
     expectIsLoadingToBe(true);
@@ -34,15 +34,15 @@ describe("Agency info in store", () => {
       partnersErroredConventionSlice.actions.markAsHandledRequested({
         jwt: "my-jwt",
         markAsHandledParams: { conventionId: fakeConventionId },
-        feedbackTopic: "mark-convention-as-handled",
+        feedbackTopic: "partner-conventions",
       }),
     );
     dependencies.inclusionConnectedGateway.markPartnersErroredConventionAsHandledResult$.next();
 
     expectIsLoadingToBe(false);
     expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-      "mark-convention-as-handled": {
-        on: "create",
+      "partner-conventions": {
+        on: "update",
         level: "success",
         title: "La convention a bien été marquée comme traitée",
         message: "La convention a bien été marquée comme traitée.",
@@ -56,7 +56,7 @@ describe("Agency info in store", () => {
       partnersErroredConventionSlice.actions.markAsHandledRequested({
         jwt: "my-jwt",
         markAsHandledParams: { conventionId: fakeConventionId },
-        feedbackTopic: "mark-convention-as-handled",
+        feedbackTopic: "partner-conventions",
       }),
     );
 
@@ -66,8 +66,8 @@ describe("Agency info in store", () => {
 
     expectIsLoadingToBe(false);
     expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-      "mark-convention-as-handled": {
-        on: "create",
+      "partner-conventions": {
+        on: "update",
         level: "error",
         title: "Problème rencontré",
         message: errorMessage,
