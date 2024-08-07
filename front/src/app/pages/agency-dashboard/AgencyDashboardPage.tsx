@@ -115,7 +115,7 @@ export const AgencyDashboardPage = ({
                     </h3>
                     <p>
                       Action → Soit le mail utilisé chez Immersion Facilitée est
-                      différend de celui du dossier du Demandeur d'emploi. Dans
+                      différent de celui du dossier du Demandeur d'emploi. Dans
                       ce cas, modifier l'email dans le dossier du Demandeur
                       d'emploi avant validation et avec son accord. Action →
                       Soit le candidat n'est pas inscrit. Dans ce cas, procéder
