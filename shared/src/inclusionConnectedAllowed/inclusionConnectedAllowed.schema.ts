@@ -6,7 +6,7 @@ import { emailSchema } from "../email/email.schema";
 import { establishmentsRoles } from "../role/role.dto";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zStringMinLength1, zStringPossiblyEmpty } from "../zodUtils";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   AgencyRight,
   InclusionConnectedUser,
@@ -63,9 +63,9 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     email: emailSchema,
     createdAt: dateTimeIsoStringSchema,
     agencyRights: z.array(agencyRightSchema),
-    firstName: zStringPossiblyEmpty,
-    lastName: zStringPossiblyEmpty,
-    externalId: zStringPossiblyEmpty.or(z.null()),
+    firstName: zStringCanBeEmpty,
+    lastName: zStringCanBeEmpty,
+    externalId: zStringCanBeEmpty.or(z.null()),
     dashboards: dashboardsSchema,
     establishments: z.array(withEstablishmentSiretAndName).optional(),
     isBackofficeAdmin: z.boolean().optional(),

@@ -1,7 +1,7 @@
 import { ZodError } from "zod";
 import {
+  zStringCanBeEmpty,
   zStringMinLength1,
-  zStringPossiblyEmpty,
   zStringPossiblyEmptyWithMax,
   zToBoolean,
   zToNumber,
@@ -119,7 +119,7 @@ describe("zStringMinLength1 schema validation", () => {
   });
 });
 
-describe("zStringPossiblyEmpty schema validation", () => {
+describe("zStringCanBeEmpty schema validation", () => {
   it.each([
     {
       input: "",
@@ -146,7 +146,7 @@ describe("zStringPossiblyEmpty schema validation", () => {
       output: "",
     },
   ])(`accepts valid "%s"`, ({ input, output }) => {
-    expect(zStringPossiblyEmpty.parse(input)).toEqual(output);
+    expect(zStringCanBeEmpty.parse(input)).toEqual(output);
   });
 });
 

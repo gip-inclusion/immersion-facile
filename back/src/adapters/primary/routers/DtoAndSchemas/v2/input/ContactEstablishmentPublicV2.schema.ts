@@ -7,8 +7,8 @@ import {
   phoneSchema,
   siretSchema,
   zEnumValidation,
+  zStringCanBeEmpty,
   zStringMinLength1,
-  zStringPossiblyEmpty,
   zUuidLike,
 } from "shared";
 import { z } from "zod";
@@ -42,7 +42,7 @@ const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailPubli
     message: zStringMinLength1,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
-    potentialBeneficiaryResumeLink: zStringPossiblyEmpty.optional(),
+    potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
   });
 
 const contactEstablishmentByPhoneSchema = z.object({

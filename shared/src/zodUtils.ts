@@ -76,9 +76,6 @@ export const zStringMinLength1 = z
 
 export const zStringCanBeEmpty = z.string(requiredText).trim();
 
-export const zStringPossiblyEmpty: z.Schema<string> =
-  zStringMinLength1.or(zStringCanBeEmpty); // remplacer par zStringCanBeEmpty
-
 export const zStringPossiblyEmptyWithMax = (max: number): z.Schema<string> =>
   zStringCanBeEmpty.max(max, localization.maxCharacters(max));
 

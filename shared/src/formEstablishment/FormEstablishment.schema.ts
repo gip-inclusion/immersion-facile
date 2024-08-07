@@ -13,8 +13,8 @@ import {
   localization,
   zBoolean,
   zEnumValidation,
+  zStringCanBeEmpty,
   zStringMinLength1,
-  zStringPossiblyEmpty,
   zUuidLike,
 } from "../zodUtils";
 import {
@@ -73,8 +73,8 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
         "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
       )
       .optional(),
-    website: zStringPossiblyEmpty.optional(),
-    additionalInformation: zStringPossiblyEmpty.optional(),
+    website: zStringCanBeEmpty.optional(),
+    additionalInformation: zStringCanBeEmpty.optional(),
     businessAddresses: z
       .array(
         z.object({
@@ -138,7 +138,7 @@ const csvBooleanSchema: z.Schema<CSVBoolean> = z.enum(["1", "0", ""]);
 export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
   z.object({
     siret: siretSchema,
-    businessNameCustomized: zStringPossiblyEmpty,
+    businessNameCustomized: zStringCanBeEmpty,
     businessName: zStringMinLength1,
     businessAddress: addressWithPostalCodeSchema,
     naf_code: zStringMinLength1,
@@ -150,10 +150,10 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     businessContact_lastName: zStringMinLength1,
     businessContact_firstName: zStringMinLength1,
     businessContact_contactMethod: contactMethodSchema,
-    businessContact_copyEmails: zStringPossiblyEmpty,
+    businessContact_copyEmails: zStringCanBeEmpty,
     isSearchable: csvBooleanSchema,
-    website: zStringPossiblyEmpty,
-    additionalInformation: zStringPossiblyEmpty,
+    website: zStringCanBeEmpty,
+    additionalInformation: zStringCanBeEmpty,
     fitForDisabledWorkers: csvBooleanSchema,
     searchableByJobSeekers: csvBooleanSchema,
     searchableByStudents: csvBooleanSchema,

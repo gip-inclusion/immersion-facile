@@ -9,7 +9,7 @@ import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zStringMinLength1, zStringPossiblyEmpty } from "../zodUtils";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   Attachment,
   DiscussionAccepted,
@@ -81,9 +81,9 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> = z
     potentialBeneficiary: z.object({
       firstName: zStringMinLength1,
       lastName: zStringMinLength1,
-      resumeLink: zStringPossiblyEmpty.optional(),
+      resumeLink: zStringCanBeEmpty.optional(),
       phone: phoneSchema.optional(),
-      email: zStringPossiblyEmpty,
+      email: zStringCanBeEmpty,
       hasWorkingExperience: z.boolean().optional(),
       experienceAdditionalInformation: zStringMinLength1.optional(),
       datePreferences: zStringMinLength1.optional(),
