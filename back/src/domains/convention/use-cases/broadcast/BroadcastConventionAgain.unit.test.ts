@@ -195,7 +195,7 @@ describe("BroadcastConventionAgain", () => {
         broadcastConventionAgain.execute({ conventionId }, adminUser),
         errors.broadcastFeedback.tooManyRequests({
           lastBroadcastDate,
-          formattedWaitingTime: "3h 12m",
+          formattedWaitingTime: "3 heures 12 minutes",
         }),
       );
     });

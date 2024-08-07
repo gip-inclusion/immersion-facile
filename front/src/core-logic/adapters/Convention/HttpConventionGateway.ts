@@ -86,7 +86,8 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) => {
           return match(response)
             .with({ status: 200 }, ({ body }) => body)
-            .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow);
         }),
     );

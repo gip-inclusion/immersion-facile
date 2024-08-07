@@ -1,11 +1,16 @@
-import { ColumnType, Generated, JSONColumnType } from "kysely";
-import {
+import type { ColumnType, Generated, JSONColumnType } from "kysely";
+import type {
   AbsoluteUrl,
   ConventionId,
   DateTimeIsoString,
   DiscussionStatus,
   Email,
 } from "shared";
+import type { SubscriberErrorFeedback } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
+import type {
+  BroadcastFeedbackResponse,
+  ConventionBroadcastRequestParams,
+} from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
 
 export interface Database {
   actors: Actors;
@@ -183,11 +188,11 @@ export interface BroadcastFeedbacks {
   consumer_id: string | null;
   consumer_name: string;
   service_name: string;
-  subscriber_error_feedback: Json | null;
-  request_params: Json;
+  subscriber_error_feedback: JSONColumnType<SubscriberErrorFeedback> | null;
+  request_params: JSONColumnType<ConventionBroadcastRequestParams>;
   occurred_at: Timestamp;
   handled_by_agency: Generated<boolean>;
-  response: Json | null;
+  response: JSONColumnType<BroadcastFeedbackResponse> | null;
 }
 
 // prettier-ignore
