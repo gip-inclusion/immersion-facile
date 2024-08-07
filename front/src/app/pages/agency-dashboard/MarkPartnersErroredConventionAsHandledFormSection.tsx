@@ -65,15 +65,16 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
               nativeInputProps={{
                 ...conventionIdRegistration,
                 onChange: (event) => {
-                  if (event.currentTarget.value.length >= 32) {
+                  const conventionId = event.currentTarget.value;
+                  if (conventionId.length >= 32) {
                     dispatch(
                       conventionSlice.actions.fetchConventionRequested({
-                        conventionId: event.currentTarget.value,
+                        conventionId: conventionId,
                         jwt,
                       }),
                     );
                   }
-                  if (event.currentTarget.value.length === 0) {
+                  if (conventionId.length === 0) {
                     dispatch(conventionSlice.actions.clearFetchedConvention());
                   }
                   conventionIdRegistration.onChange(event);

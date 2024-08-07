@@ -30,7 +30,6 @@ describe("GetApiConsumersByConvention", () => {
 
     getApiConsumersByConvention = makeGetApiConsumersByconvention({
       uowPerformer,
-      deps: {},
     });
   });
 

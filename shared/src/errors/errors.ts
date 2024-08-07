@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { LocationId } from "../address/address.dto";
 import { AgencyId } from "../agency/agency.dto";
 import {
@@ -316,8 +317,9 @@ export const errors = {
       formattedWaitingTime: string;
     }) =>
       new TooManyRequestApiError(
-        `La convention a été synchronisée le ${params.lastBroadcastDate.toLocaleDateString(
-          "fr",
+        `La convention a été synchronisée le ${format(
+          params.lastBroadcastDate,
+          "dd/MM/yyyy 'à' hh'h'mm",
         )}. Merci d'essayer à nouveau dans ${params.formattedWaitingTime}.`,
       ),
   },

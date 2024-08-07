@@ -1,4 +1,10 @@
-import { addHours, intervalToDuration, isBefore } from "date-fns";
+import {
+  addHours,
+  formatDuration,
+  intervalToDuration,
+  isBefore,
+} from "date-fns";
+import fr from "date-fns/locale/fr";
 import {
   InclusionConnectedUser,
   WithConventionId,
@@ -50,22 +56,6 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
       now: deps.timeGateway.now(),
     });
 
-    if (
-      !userHasEnoughRightsOnConvention(currentUser, convention, [
-        "counsellor",
-        "validator",
-      ])
-    )
-      throw errors.user.forbidden({ userId: currentUser.id });
-
-    throwErrorIfTooManyRequests({
-      lastBroadcastFeedback:
-        await uow.broadcastFeedbacksRepository.getLastBroadcastFeedback(
-          conventionId,
-        ),
-      now: deps.timeGateway.now(),
-    });
-
     const broadcastConventionAgainEvent = deps.createNewEvent({
       topic: "ConventionBroadcastRequested",
       payload: {
@@ -98,20 +88,19 @@ const throwErrorIfTooManyRequests = (params: {
   );
 
   if (!isEnoughTimeSinceLastBroadcast) {
-    const { hours, minutes } = intervalToDuration({
+    const duration = intervalToDuration({
       start: params.now,
       end: broadcastPossibleDate,
     });
-    const formattedWaitingHour = hours && hours > 0 ? `${hours}h` : "";
-    const formattedWaitingMinutes = minutes && minutes > 0 ? `${minutes}m` : "";
-    const formattedWaitingTime =
-      formattedWaitingHour.length > 0
-        ? `${formattedWaitingHour} ${formattedWaitingMinutes}`
-        : `${formattedWaitingMinutes}`;
+
+    const formattedDuration = formatDuration(duration, {
+      format: ["hours", "minutes"],
+      locale: fr,
+    });
 
     throw errors.broadcastFeedback.tooManyRequests({
       lastBroadcastDate,
-      formattedWaitingTime: formattedWaitingTime || "1 minute",
+      formattedWaitingTime: formattedDuration,
     });
   }
 };

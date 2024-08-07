@@ -62,9 +62,7 @@ export const makeGetApiConsumersByconvention = createTransactionalUseCase<
         isConventionInScope(apiConsumer, agency),
     );
     return [
-      ...conventionApiConsurmers.map(
-        (conventionApiConsurmer) => conventionApiConsurmer.name,
-      ),
+      ...conventionApiConsurmers.map(({ name }) => name),
       ...(agency.kind === "pole-emploi" ? ["France Travail"] : []),
     ];
   },

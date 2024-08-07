@@ -56,11 +56,12 @@ export const ConventionManageContent = ({
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
-    };
-  }, [dispatch]);
+    },
+    [dispatch],
+  );
 
   if (fetchConventionError) {
     if (!fetchConventionError.includes(expiredMagicLinkErrorMessage)) {
