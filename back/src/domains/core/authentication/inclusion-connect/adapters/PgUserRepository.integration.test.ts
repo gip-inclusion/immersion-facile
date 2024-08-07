@@ -7,7 +7,9 @@ import {
   User,
   UserId,
   defaultValidatorEmail,
+  errors,
   expectArraysToEqualIgnoringOrder,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
@@ -511,13 +513,16 @@ describe("PgAuthenticatedUserRepository", () => {
   describe("delete", () => {
     it("deletes an existing user", async () => {
       await userRepository.save(user);
-      await userRepository.delete(user.id);
+      await userRepository.deleteById(user.id);
       const response = await userRepository.findByEmail(user.email);
       expectToEqual(response, undefined);
     });
 
     it("does not throw when user does not exist", async () => {
-      await userRepository.delete(userId);
+      await expectPromiseToFailWithError(
+        userRepository.deleteById(userId),
+        errors.user.notFound({ userId }),
+      );
     });
   });
 });

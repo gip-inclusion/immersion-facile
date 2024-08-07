@@ -185,12 +185,12 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       userWithSameEmail.id !== existingInclusionConnectedUser.id;
     if (conflictingUserFound) {
       const conflictingUser = userWithSameEmail;
-      this.#updateUserAgencyRights(
+      await this.#updateUserAgencyRights(
         conflictingUser,
         existingInclusionConnectedUser,
         uow,
       );
-      await uow.userRepository.delete(conflictingUser.id);
+      //await uow.userRepository.deleteById(conflictingUser.id);
       const user: User = {
         createdAt: existingInclusionConnectedUser.createdAt,
         externalId: existingInclusionConnectedUser.externalId,
@@ -241,7 +241,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       ),
       userId: userToKeepIcUser.id,
     });
-    await uow.inclusionConnectedUserRepository.delete(conflictingUser.id);
+    await uow.inclusionConnectedUserRepository.deleteById(conflictingUser.id);
   }
 
   #mergeAgencyRights(
