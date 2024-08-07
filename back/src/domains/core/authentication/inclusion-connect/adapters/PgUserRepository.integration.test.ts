@@ -512,16 +512,31 @@ describe("PgAuthenticatedUserRepository", () => {
   };
   describe("delete", () => {
     it("deletes an existing user", async () => {
-      await userRepository.save(user);
-      await userRepository.deleteById(user.id);
-      const response = await userRepository.findByEmail(user.email);
+      await insertUser(user1);
+      await agencyRepository.insert(agency1);
+      await insertAgencyRegistrationToUser({
+        userId: user1.id,
+        agencyId: agency1.id,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      });
+      await userRepository.deleteById(user1.id);
+      const response = await userRepository.getById(user1.id);
       expectToEqual(response, undefined);
+      expectToEqual(
+        await db
+          .selectFrom("users__agencies")
+          .selectAll()
+          .where("user_id", "=", user1.id)
+          .execute(),
+        [],
+      );
     });
 
     it("does not throw when user does not exist", async () => {
       await expectPromiseToFailWithError(
-        userRepository.deleteById(userId),
-        errors.user.notFound({ userId }),
+        userRepository.deleteById(user1.id),
+        errors.user.notFound({ userId: user1.id }),
       );
     });
   });
