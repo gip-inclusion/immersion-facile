@@ -24,4 +24,5 @@ export interface UserRepository {
     userId: UserId;
     agencyRights: AgencyRight[];
   }): Promise<void>;
+  delete(userId: UserId): Promise<void>;
 }

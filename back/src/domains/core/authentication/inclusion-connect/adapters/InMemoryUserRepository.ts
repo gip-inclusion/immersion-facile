@@ -1,6 +1,7 @@
-import { values } from "ramda";
+import { keys, values } from "ramda";
 import {
   AgencyRight,
+  ConflictError,
   Email,
   InclusionConnectedUser,
   User,
@@ -24,6 +25,34 @@ export class InMemoryUserRepository implements UserRepository {
 
   public async save(user: User): Promise<void> {
     this.#usersById[user.id] = user;
+    if (
+      values(this.#usersById).filter(({ email }) => email === user.email)
+        .length > 1
+    )
+      throw new ConflictError(
+        "Multiple users with same emails is not allowed.",
+      );
+    if (
+      values(this.#usersById).filter(
+        ({ externalId }) => externalId === user.externalId,
+      ).length > 1
+    )
+      throw new ConflictError(
+        "Multiple users with same externalIds is not allowed.",
+      );
+  }
+
+  public async delete(id: UserId): Promise<void> {
+    this.#usersById = keys(this.#usersById).reduce<Record<UserId, User>>(
+      (acc, userId) => {
+        if (userId === id) return acc;
+        return {
+          ...acc,
+          [userId]: this.#usersById[userId],
+        };
+      },
+      {},
+    );
   }
 
   // for test purpose

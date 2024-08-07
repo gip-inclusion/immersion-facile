@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { AbsoluteUrl, expectObjectsToMatch } from "shared";
 import {
   KyselyDb,
@@ -34,25 +34,21 @@ describe("AuthenticateWithInclusionCode use case", () => {
     email: "john.doe@inclusion.com",
   };
 
-  let client: PoolClient;
   let pool: Pool;
   let uow: UnitOfWork;
   let transaction: KyselyDb;
   let inclusionConnectGateway: InMemoryInclusionConnectGateway;
-  let uuidGenerator: UuidV4Generator;
   let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
-  let immersionRedirectUri: AbsoluteUrl;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
     transaction = makeKyselyDb(pool);
     uow = createPgUow(transaction);
-    uuidGenerator = new UuidV4Generator();
-    const timeGateway = new CustomTimeGateway();
+    const uuidGenerator = new UuidV4Generator();
+    const immersionRedirectUri: AbsoluteUrl =
+      "http://immersion-uri.com/my-redirection";
+
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
-    const immersionBaseUri: AbsoluteUrl = "http://immersion-uri.com";
-    immersionRedirectUri = `${immersionBaseUri}/my-redirection`;
     authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
       new PgUowPerformer(pool, createPgUow),
       makeCreateNewEvent({
@@ -70,12 +66,11 @@ describe("AuthenticateWithInclusionCode use case", () => {
         clientId,
         clientSecret,
       },
-      timeGateway,
+      new CustomTimeGateway(),
     );
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 

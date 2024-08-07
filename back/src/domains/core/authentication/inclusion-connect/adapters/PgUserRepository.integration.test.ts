@@ -508,6 +508,18 @@ describe("PgAuthenticatedUserRepository", () => {
       })
       .execute();
   };
+  describe("delete", () => {
+    it("deletes an existing user", async () => {
+      await userRepository.save(user);
+      await userRepository.delete(user.id);
+      const response = await userRepository.findByEmail(user.email);
+      expectToEqual(response, undefined);
+    });
+
+    it("does not throw when user does not exist", async () => {
+      await userRepository.delete(userId);
+    });
+  });
 });
 
 const user1: User = {

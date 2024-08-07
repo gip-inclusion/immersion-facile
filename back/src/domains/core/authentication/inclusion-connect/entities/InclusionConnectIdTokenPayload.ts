@@ -1,9 +1,9 @@
-import { Email, emailSchema } from "shared";
+import { Email, ExternalId, emailSchema } from "shared";
 import { z } from "zod";
 
 export type InclusionConnectIdTokenPayload = {
   nonce: string;
-  sub: string;
+  sub: ExternalId;
   given_name: string;
   family_name: string;
   email: Email;
