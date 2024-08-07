@@ -17,7 +17,7 @@ type ContactInformationPublicV2<T extends ContactMethod> = {
   locationId?: LocationId;
 };
 
-type ContactEstablishmentByMailPublicV2Dto =
+export type ContactEstablishmentByMailPublicV2Dto =
   ContactInformationPublicV2<"EMAIL"> & {
     message: string;
     potentialBeneficiaryPhone: string;

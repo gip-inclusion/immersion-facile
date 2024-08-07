@@ -12,7 +12,10 @@ import {
   zUuidLike,
 } from "shared";
 import { z } from "zod";
-import { ContactEstablishmentPublicV2Dto } from "./ContactEstablishmentPublicV2.dto";
+import {
+  ContactEstablishmentByMailPublicV2Dto,
+  ContactEstablishmentPublicV2Dto,
+} from "./ContactEstablishmentPublicV2.dto";
 
 const commonFields = {
   appellationCode: appellationCodeSchema,
@@ -32,14 +35,15 @@ const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
   localization.invalidImmersionObjective,
 );
 
-const contactEstablishmentByMailSchema = z.object({
-  ...commonFields,
-  contactMode: preferEmailContactSchema,
-  message: zStringMinLength1,
-  potentialBeneficiaryPhone: phoneSchema,
-  immersionObjective: immersionObjectiveSchema.nullable(),
-  potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
-});
+const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailPublicV2Dto> =
+  z.object({
+    ...commonFields,
+    contactMode: preferEmailContactSchema,
+    message: zStringMinLength1,
+    potentialBeneficiaryPhone: phoneSchema,
+    immersionObjective: immersionObjectiveSchema.nullable(),
+    potentialBeneficiaryResumeLink: zStringPossiblyEmpty.optional(),
+  });
 
 const contactEstablishmentByPhoneSchema = z.object({
   ...commonFields,

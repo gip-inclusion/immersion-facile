@@ -127,11 +127,11 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
   signatorySchema.merge(
     z.object({
       role: z.literal("beneficiary"),
-      emergencyContact: zStringPossiblyEmpty,
+      emergencyContact: zStringPossiblyEmpty.optional(),
       emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
       emergencyContactEmail: emailPossiblyEmptySchema,
       federatedIdentity: peConnectIdentitySchema.optional(),
-      financiaryHelp: zStringPossiblyEmpty,
+      financiaryHelp: zStringPossiblyEmpty.optional(),
       birthdate: makeDateStringSchema(),
       isRqth: zBoolean.optional(),
     }),
@@ -160,7 +160,6 @@ const establishmentRepresentativeSchema: z.Schema<EstablishmentRepresentative> =
   signatorySchema.merge(
     z.object({
       role: z.literal("establishment-representative"),
-      job: zStringPossiblyEmpty,
     }),
   );
 

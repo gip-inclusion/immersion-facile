@@ -122,10 +122,6 @@ describe("zStringMinLength1 schema validation", () => {
 describe("zStringPossiblyEmpty schema validation", () => {
   it.each([
     {
-      input: null,
-      output: null,
-    },
-    {
       input: "",
       output: "",
     },
@@ -155,17 +151,18 @@ describe("zStringPossiblyEmpty schema validation", () => {
 });
 
 describe("zStringPossiblyEmptyWithMax schema validation", () => {
-  it.each([null, "", " ", "//", " Non ", "\n"])(
-    `accepts valid "%s"`,
-    (text) => {
-      expect(() => zStringPossiblyEmptyWithMax(3).parse(text)).not.toThrow();
-    },
-  );
+  it.each(["", " ", "//", " Non ", "\n"])(`accepts valid "%s"`, (text) => {
+    expect(() => zStringPossiblyEmptyWithMax(3).parse(text)).not.toThrow();
+  });
 
   it("fails to validate schema", () => {
     const expectedError: ZodError = new ZodError([
       {
-        code: "custom",
+        code: "too_big",
+        maximum: 3,
+        type: "string",
+        inclusive: true,
+        exact: false,
         message: "Le maximum est de 3 caractères",
         path: [],
       },
