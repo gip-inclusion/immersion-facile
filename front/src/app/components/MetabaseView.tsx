@@ -48,9 +48,9 @@ export const MetabaseView = ({
   if (!url) return <p>Chargement du dashboard en cours...</p>;
   return (
     <div>
-      <h5 className={cx(fr.cx("fr-h5", "fr-mb-2w"), "flex")}>
+      <h2 className={cx(fr.cx("fr-h5", "fr-mb-2w"), "flex")}>
         {title} <TitleButton url={url} />
-      </h5>
+      </h2>
       {ENV.envType === "production" ||
       url === globalStatsUrl ||
       url === immersionStatsUrl ? (
