@@ -48,7 +48,7 @@ export const legacyContactEstablishmentByMailSchema: z.Schema<LegacyContactEstab
     message: zStringMinLength1,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
-    potentialBeneficiaryResumeLink: zStringPossiblyEmpty,
+    potentialBeneficiaryResumeLink: zStringPossiblyEmpty.optional(),
   });
 
 export const legacyContactEstablishmentByPhoneSchema: z.Schema<LegacyContactEstablishmentByPhoneDto> =

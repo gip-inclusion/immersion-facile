@@ -73,8 +73,8 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
         "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
       )
       .optional(),
-    website: zStringPossiblyEmpty,
-    additionalInformation: zStringPossiblyEmpty,
+    website: zStringPossiblyEmpty.optional(),
+    additionalInformation: zStringPossiblyEmpty.optional(),
     businessAddresses: z
       .array(
         z.object({
