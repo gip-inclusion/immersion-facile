@@ -1,5 +1,6 @@
 import {
   AbsoluteUrl,
+  AgencyRight,
   AuthenticateWithInclusionCodeConnectParams,
   AuthenticatedUserQueryParams,
   User,
@@ -99,9 +100,15 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     const existingInclusionConnectedUser =
       await uow.userRepository.findByExternalId(icIdTokenPayload.sub);
 
-    const existingUser =
-      existingInclusionConnectedUser ??
-      (await uow.userRepository.findByEmail(icIdTokenPayload.email));
+    const userWithSameEmail = await uow.userRepository.findByEmail(
+      icIdTokenPayload.email,
+    );
+
+    const existingUser = await this.#makeExistingUser(
+      existingInclusionConnectedUser,
+      userWithSameEmail,
+      uow,
+    );
 
     const newOrUpdatedAuthenticatedUser: User = {
       ...this.#makeAuthenticatedUser(
@@ -111,6 +118,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       ),
       ...(existingUser && {
         id: existingUser.id,
+        createdAt: existingUser.createdAt,
       }),
     };
 
@@ -164,6 +172,38 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     })}`;
   }
 
+  async #makeExistingUser(
+    existingInclusionConnectedUser: User | undefined,
+    userWithSameEmail: User | undefined,
+    uow: UnitOfWork,
+  ): Promise<User | undefined> {
+    const existingUser = existingInclusionConnectedUser ?? userWithSameEmail;
+    if (!existingUser) return undefined;
+    const conflictingUserFound =
+      userWithSameEmail &&
+      existingInclusionConnectedUser &&
+      userWithSameEmail.id !== existingInclusionConnectedUser.id;
+    if (conflictingUserFound) {
+      const conflictingUser = userWithSameEmail;
+      this.#updateUserAgencyRights(
+        conflictingUser,
+        existingInclusionConnectedUser,
+        uow,
+      );
+      await uow.userRepository.delete(conflictingUser.id);
+      const user: User = {
+        createdAt: existingInclusionConnectedUser.createdAt,
+        externalId: existingInclusionConnectedUser.externalId,
+        id: existingInclusionConnectedUser.id,
+        email: conflictingUser.email,
+        firstName: conflictingUser.firstName,
+        lastName: conflictingUser.lastName,
+      };
+      return user;
+    }
+    return existingUser;
+  }
+
   #makeAuthenticatedUser(
     userId: string,
     createdAt: Date,
@@ -177,5 +217,55 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       externalId: jwtPayload.sub,
       createdAt: createdAt.toISOString(),
     };
+  }
+
+  async #updateUserAgencyRights(
+    conflictingUser: User,
+    userToKeep: User,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const conflictingIcUser =
+      await uow.inclusionConnectedUserRepository.getById(conflictingUser.id);
+    const userToKeepIcUser = await uow.inclusionConnectedUserRepository.getById(
+      userToKeep.id,
+    );
+    if (!conflictingIcUser || !userToKeepIcUser) return;
+
+    const conflictingUserAgencyRights = conflictingIcUser.agencyRights;
+    const userToKeepAgencyRights = userToKeepIcUser.agencyRights;
+
+    await uow.inclusionConnectedUserRepository.updateAgencyRights({
+      agencyRights: this.#mergeAgencyRights(
+        conflictingUserAgencyRights,
+        userToKeepAgencyRights,
+      ),
+      userId: userToKeepIcUser.id,
+    });
+    await uow.inclusionConnectedUserRepository.delete(conflictingUser.id);
+  }
+
+  #mergeAgencyRights(
+    oldAgencyRights: AgencyRight[],
+    newAgencyRights: AgencyRight[],
+  ): AgencyRight[] {
+    return oldAgencyRights.reduce<AgencyRight[]>((acc, oldAgencyRight) => {
+      const newAgencyRight = newAgencyRights.find(
+        (newAgencyRight) =>
+          newAgencyRight.agency.id === oldAgencyRight.agency.id,
+      );
+      if (newAgencyRight) {
+        return [
+          ...acc,
+          {
+            ...newAgencyRight,
+            isNotifiedByEmail:
+              newAgencyRight.isNotifiedByEmail ||
+              oldAgencyRight.isNotifiedByEmail,
+            roles: [...newAgencyRight.roles, ...oldAgencyRight.roles],
+          },
+        ];
+      }
+      return [...acc, oldAgencyRight];
+    }, []);
   }
 }

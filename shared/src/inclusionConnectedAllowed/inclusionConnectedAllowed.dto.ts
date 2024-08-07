@@ -24,13 +24,14 @@ export type AgencyRight = {
 };
 
 export type UserId = Flavor<string, "UserId">;
+export type ExternalId = Flavor<string, "ExternalId">;
 
 export type User = {
   id: UserId;
   email: Email;
   firstName: string;
   lastName: string;
-  externalId: string | null;
+  externalId: ExternalId | null;
   createdAt: DateTimeIsoString;
 };
 

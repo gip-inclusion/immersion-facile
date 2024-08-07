@@ -1,5 +1,6 @@
 import {
   AbsoluteUrl,
+  AgencyDtoBuilder,
   AuthenticateWithInclusionCodeConnectParams,
   User,
   allowedStartInclusionConnectLoginPages,
@@ -9,6 +10,7 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -43,13 +45,12 @@ describe("AuthenticateWithInclusionCode use case", () => {
   let uow: InMemoryUnitOfWork;
   let inclusionConnectGateway: InMemoryInclusionConnectGateway;
   let uuidGenerator: TestUuidGenerator;
-  let timeGateway: CustomTimeGateway;
   let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
-    timeGateway = new CustomTimeGateway();
+    const timeGateway = new CustomTimeGateway();
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
     const immersionBaseUri: AbsoluteUrl = "http://immersion-uri.com";
     const immersionRedirectUri: AbsoluteUrl = `${immersionBaseUri}/my-redirection`;
@@ -211,6 +212,93 @@ describe("AuthenticateWithInclusionCode use case", () => {
             externalId: defaultExpectedIcIdTokenPayload.sub,
           },
         ]);
+      });
+
+      it("when user change its email on inclusion connect", async () => {
+        const externalId = uuid();
+
+        const initialUser: User = {
+          id: uuid(),
+          email: "initial@mail.com",
+          externalId,
+          firstName: "Billy",
+          lastName: "Idol",
+          createdAt: new Date().toISOString(),
+        };
+
+        const previousMigrationUserWithUpdatedEmail: User = {
+          id: uuid(),
+          email: "updated@mail.com",
+          externalId: null,
+          firstName: "",
+          lastName: "",
+          createdAt: new Date().toISOString(),
+        };
+
+        uow.userRepository.users = [
+          initialUser,
+          previousMigrationUserWithUpdatedEmail,
+        ];
+
+        const agency1 = new AgencyDtoBuilder().withId(uuid()).build();
+        const agency2 = new AgencyDtoBuilder().withId(uuid()).build();
+
+        uow.inclusionConnectedUserRepository.agencyRightsByUserId = {
+          [initialUser.id]: [
+            {
+              agency: agency1,
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+          ],
+          [previousMigrationUserWithUpdatedEmail.id]: [
+            {
+              agency: agency1,
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+            { agency: agency2, isNotifiedByEmail: true, roles: ["counsellor"] },
+          ],
+        };
+
+        const updatedUser: User = {
+          id: initialUser.id,
+          email: previousMigrationUserWithUpdatedEmail.email,
+          firstName: "Martine",
+          lastName: "Duflot",
+          externalId,
+          createdAt: initialUser.createdAt,
+        };
+
+        await authenticateWithInclusionCode.execute({
+          code: "my-inclusion-code",
+          state: makeSuccessfulAuthenticationConditions({
+            email: updatedUser.email,
+            family_name: updatedUser.lastName,
+            given_name: updatedUser.firstName,
+            sub: externalId,
+          }).initialOngoingOAuth.state,
+          page: "agencyDashboard",
+        });
+
+        expectObjectInArrayToMatch(uow.userRepository.users, [updatedUser]);
+        expectToEqual(
+          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
+          {
+            [initialUser.id]: [
+              {
+                agency: agency1,
+                isNotifiedByEmail: true,
+                roles: ["counsellor", "validator"],
+              },
+              {
+                agency: agency2,
+                isNotifiedByEmail: true,
+                roles: ["counsellor"],
+              },
+            ],
+          },
+        );
       });
     });
 
