@@ -245,6 +245,7 @@ const agencyOptionsInSelectorFromAgencyOptions = (
     .filter(
       ({ kind }) => kind !== "immersion-facile" && agencyKinds.includes(kind),
     )
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map(({ id, name }) => ({
       label: name,
       value: id,
