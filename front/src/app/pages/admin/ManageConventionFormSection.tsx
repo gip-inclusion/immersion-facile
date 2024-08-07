@@ -31,7 +31,7 @@ export const ManageConventionFormSection = ({
   const { isValid } = formState;
   return (
     <>
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>Piloter une convention</h5>
+      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>Piloter une convention</h2>
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ conventionId }) => {

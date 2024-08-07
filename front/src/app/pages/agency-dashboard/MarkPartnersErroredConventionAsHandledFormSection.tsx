@@ -51,9 +51,9 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
   };
   return (
     <section className={fr.cx("fr-mt-4w")}>
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
+      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>
         Marquer une convention comme traitée
-      </h5>
+      </h2>
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <div className={fr.cx("fr-grid-row")}>

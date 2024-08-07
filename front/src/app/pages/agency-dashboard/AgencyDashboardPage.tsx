@@ -94,6 +94,35 @@ export const AgencyDashboardPage = ({
                   title="Tableau de bord agence"
                   url={erroredConventionsDashboardUrl}
                 />
+                {isPeUser(agencyRights) && (
+                  <>
+                    <h2 className={fr.cx("fr-h5", "fr-mt-2w")}>
+                      Comment prévenir les erreurs :
+                    </h2>
+
+                    <h3 className={fr.cx("fr-h6")}>
+                      Identifiant National DE trouvé mais écart sur la date de
+                      naissance
+                    </h3>
+                    <p>
+                      Action → Modifier la date de naissance dans la demande
+                      pour correspondre à l'information présente dans le dossier
+                      du Demandeur d'emploi
+                    </p>
+
+                    <h3 className={fr.cx("fr-h6")}>
+                      Identifiant National DE non trouvé
+                    </h3>
+                    <p>
+                      Action → Soit le mail utilisé chez Immersion Facilitée est
+                      différend de celui du dossier du Demandeur d'emploi. Dans
+                      ce cas, modifier l'email dans le dossier du Demandeur
+                      d'emploi avant validation et avec son accord. Action →
+                      Soit le candidat n'est pas inscrit. Dans ce cas, procéder
+                      à l'inscription ou réinscription avant la validation .
+                    </p>
+                  </>
+                )}
               </>
             ),
           },
