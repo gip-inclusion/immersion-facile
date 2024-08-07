@@ -36,8 +36,8 @@ import {
   localization,
   zBoolean,
   zEnumValidation,
+  zStringCanBeEmpty,
   zStringMinLength1,
-  zStringPossiblyEmpty,
   zStringPossiblyEmptyWithMax,
   zTrimmedStringWithMax,
 } from "../zodUtils";
@@ -127,11 +127,11 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
   signatorySchema.merge(
     z.object({
       role: z.literal("beneficiary"),
-      emergencyContact: zStringPossiblyEmpty.optional(),
+      emergencyContact: zStringCanBeEmpty.optional(),
       emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
       emergencyContactEmail: emailPossiblyEmptySchema,
       federatedIdentity: peConnectIdentitySchema.optional(),
-      financiaryHelp: zStringPossiblyEmpty.optional(),
+      financiaryHelp: zStringCanBeEmpty.optional(),
       birthdate: makeDateStringSchema(),
       isRqth: zBoolean.optional(),
     }),
@@ -174,7 +174,7 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
   signatorySchema.merge(
     z.object({
       role: z.literal("beneficiary-current-employer"),
-      job: zStringPossiblyEmpty,
+      job: zStringCanBeEmpty,
       businessSiret: siretSchema,
       businessName: zTrimmedStringMax255,
       businessAddress: zStringMinLength1,

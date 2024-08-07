@@ -3,12 +3,7 @@ import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
-import {
-  zStringCanBeEmpty,
-  zStringMinLength1,
-  zStringPossiblyEmpty,
-  zUuidLike,
-} from "../zodUtils";
+import { zStringCanBeEmpty, zStringMinLength1, zUuidLike } from "../zodUtils";
 import { SearchResultDto } from "./SearchResult.dto";
 
 export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
@@ -30,8 +25,8 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
   contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"]).optional(),
   distance_m: z.number().optional(),
   numberOfEmployeeRange: z.string().optional(),
-  website: zStringPossiblyEmpty.optional(),
-  additionalInformation: zStringPossiblyEmpty.optional(),
+  website: zStringCanBeEmpty.optional(),
+  additionalInformation: zStringCanBeEmpty.optional(),
   fitForDisabledWorkers: z.boolean().optional(),
   urlOfPartner: z.string().optional(),
   appellations: z.array(

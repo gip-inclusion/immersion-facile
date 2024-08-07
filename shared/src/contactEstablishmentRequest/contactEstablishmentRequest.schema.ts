@@ -11,8 +11,8 @@ import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
   zEnumValidation,
+  zStringCanBeEmpty,
   zStringMinLength1,
-  zStringPossiblyEmpty,
   zUuidLike,
 } from "../zodUtils";
 import {
@@ -47,7 +47,7 @@ export const contactEstablishmentByMailFormSchema: z.Schema<ContactEstablishment
     contactMode: preferEmailContactSchema,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema,
-    potentialBeneficiaryResumeLink: zStringPossiblyEmpty.optional(),
+    potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
     datePreferences: zStringMinLength1,
     hasWorkingExperience: z.boolean(),
     experienceAdditionalInformation: zStringMinLength1.optional(),
@@ -59,7 +59,7 @@ export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMa
     contactMode: preferEmailContactSchema,
     potentialBeneficiaryPhone: phoneSchema,
     immersionObjective: immersionObjectiveSchema.nullable(),
-    potentialBeneficiaryResumeLink: zStringPossiblyEmpty.optional(),
+    potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
     datePreferences: zStringMinLength1,
     hasWorkingExperience: z.boolean(),
     experienceAdditionalInformation: zStringMinLength1.optional(),
