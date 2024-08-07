@@ -2,7 +2,6 @@ import { addDays, startOfToday } from "date-fns";
 import {
   AppellationAndRomeDto,
   AppellationCode,
-  AppellationDto,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -12,6 +11,7 @@ import {
   PeConnectIdentity,
   ScheduleDto,
   appellationCodeSchema,
+  errors,
   isBeneficiaryStudent,
   keys,
   mergeObjectsExceptFalsyValues,
@@ -23,6 +23,7 @@ import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/Conven
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
+import { searchParams } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { ValueSerializer, param } from "type-route";
@@ -225,26 +226,32 @@ export const makeValuesToWatchInUrl = (convention: ConventionPresentation) => {
   );
 };
 
+const parseStringToJsonOrThrow = <T>(
+  raw: string,
+  paramName: ConventionFormKeysInUrl | keyof typeof searchParams,
+): T => {
+  try {
+    return JSON.parse(raw);
+  } catch (_error) {
+    throw errors.routeParams.malformedJson({ paramName });
+  }
+};
+
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {
-  parse: (raw) => JSON.parse(raw),
+  parse: (raw) => parseStringToJsonOrThrow(raw, "schedule"),
   stringify: (schedule) => JSON.stringify(schedule),
 };
 
 export const appellationAndRomeDtoSerializer: ValueSerializer<AppellationAndRomeDto> =
   {
-    parse: (raw) => JSON.parse(raw),
+    parse: (raw) => parseStringToJsonOrThrow(raw, "immersionAppellation"),
     stringify: (appellationDto) => JSON.stringify(appellationDto),
   };
 
 export const appellationAndRomeDtoArraySerializer: ValueSerializer<
   AppellationAndRomeDto[]
 > = {
-  parse: (raw) => JSON.parse(raw),
-  stringify: (appellationDto) => JSON.stringify(appellationDto),
-};
-
-export const appellationDtoSerializer: ValueSerializer<AppellationDto> = {
-  parse: (raw) => JSON.parse(raw),
+  parse: (raw) => parseStringToJsonOrThrow(raw, "appellations"),
   stringify: (appellationDto) => JSON.stringify(appellationDto),
 };
 

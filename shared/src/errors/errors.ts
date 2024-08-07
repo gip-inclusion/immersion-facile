@@ -408,4 +408,10 @@ export const errors = {
     missingEmail: ({ province }: { province: ShortLinkId }) =>
       new BadRequestError(`Province ${province} not foundaaaaaaaaaa`),
   },
+  routeParams: {
+    malformedJson: ({ paramName }: { paramName: string }) =>
+      new BadRequestError(
+        `Il semble que le paramètre d'URL '${paramName}' est incorrect : vous n'avez probablement pas copié-collé le lien correctement.`,
+      ),
+  },
 };

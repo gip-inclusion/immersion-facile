@@ -168,7 +168,8 @@ const redirectToConventionWithoutIdentityProvider = (
     "Vous pouvez quand même remplir votre demande de convention en indiquant l'agence France Travail à laquelle vous êtes rattaché ici.",
   onClick,
 });
-const contactUsButtonContent = ({
+
+export const contactUsButtonContent = ({
   currentUrl,
   currentDate,
   error,
