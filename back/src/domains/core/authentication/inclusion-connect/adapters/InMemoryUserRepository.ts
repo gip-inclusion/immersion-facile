@@ -6,6 +6,7 @@ import {
   InclusionConnectedUser,
   User,
   UserId,
+  errors,
 } from "shared";
 import {
   InclusionConnectedFilters,
@@ -42,7 +43,11 @@ export class InMemoryUserRepository implements UserRepository {
       );
   }
 
-  public async delete(id: UserId): Promise<void> {
+  public async deleteById(id: UserId): Promise<void> {
+    const user = this.#usersById[id];
+    if (!user) {
+      throw errors.user.notFound({ userId: id });
+    }
     this.#usersById = keys(this.#usersById).reduce<Record<UserId, User>>(
       (acc, userId) => {
         if (userId === id) return acc;

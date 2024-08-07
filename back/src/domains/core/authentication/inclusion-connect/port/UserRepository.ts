@@ -13,6 +13,7 @@ export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
 };
 
 export interface UserRepository {
+  deleteById(id: UserId): Promise<void>;
   save(user: User): Promise<void>;
   findByExternalId(externalId: string): Promise<User | undefined>;
   findByEmail(email: Email): Promise<User | undefined>;
@@ -24,5 +25,4 @@ export interface UserRepository {
     userId: UserId;
     agencyRights: AgencyRight[];
   }): Promise<void>;
-  delete(userId: UserId): Promise<void>;
 }
