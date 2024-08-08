@@ -78,9 +78,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       .withId(john.id)
       .build();
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      adminUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([adminUser]);
 
     const result = await getInclusionConnectedUser.execute(undefined, {
       ...inclusionConnectJwtPayload,
@@ -102,7 +100,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     "returns the dashboard url when role is '%s'",
     async (agencyUserRole) => {
       const agency = new AgencyDtoBuilder().build();
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      uow.userRepository.setInclusionConnectedUsers([
         {
           ...john,
           agencyRights: [
@@ -153,7 +151,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         ],
         dashboards: { agencies: {}, establishments: {} },
       };
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      uow.userRepository.setInclusionConnectedUsers([
         storedInclusionConnectedUser,
       ]);
       const inclusionConnectedUser = await getInclusionConnectedUser.execute(
@@ -175,7 +173,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     const agency3 = agencyBuilder.withId("3333").build();
     const agency4 = agencyBuilder.withId("4444").build();
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    uow.userRepository.setInclusionConnectedUsers([
       {
         ...john,
         agencyRights: [
@@ -217,7 +215,7 @@ describe("GetUserAgencyDashboardUrl", () => {
   describe("establishment dashboards", () => {
     describe("convention", () => {
       it("retrieve dashboard when IC user is establishement rep in at least one convention", async () => {
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           {
             ...john,
             dashboards: { agencies: {}, establishments: {} },
@@ -248,7 +246,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("retrieve dashboard when IC user is establishement tutor in at least one convention", async () => {
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           {
             ...john,
             agencyRights: [],
@@ -279,7 +277,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("should retrieve dashboard when ic user is establishment representative and tutor for at least one convention", async () => {
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           {
             ...john,
             agencyRights: [],
@@ -311,7 +309,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("do not retrieve dashboard when IC user is not establishement tutor or respresentative in any conventions", async () => {
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           {
             ...john,
             agencyRights: [],
@@ -333,7 +331,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
     describe("discussions", () => {
       it("retrieve dashboard when IC user is establishment contact for at least one discussion", async () => {
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           {
             ...john,
             dashboards: { agencies: {}, establishments: {} },
@@ -364,7 +362,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("do not retrieve dashboard when IC user is not establishment contact in any discussion", async () => {
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           {
             ...john,
             agencyRights: [],
@@ -386,7 +384,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
     describe("establishments", () => {
       it("retrieve establishments when IC user is establishement rep in at least one establishment", async () => {
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           {
             ...john,
             dashboards: { agencies: {}, establishments: {} },
@@ -431,7 +429,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("do not retrieve  establishment  when IC user is not establishment representative in at least one establishment", async () => {
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           {
             ...john,
             agencyRights: [],

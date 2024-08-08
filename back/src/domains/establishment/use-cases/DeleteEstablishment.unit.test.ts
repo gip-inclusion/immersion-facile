@@ -69,9 +69,7 @@ describe("Delete Establishment", () => {
       timeGateway,
       makeSaveNotificationAndRelatedEvent(new TestUuidGenerator(), timeGateway),
     );
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,

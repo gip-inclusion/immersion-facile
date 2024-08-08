@@ -138,7 +138,7 @@ describe("Edit form establishments", () => {
       userId: backofficeAdminUser.id,
     };
 
-    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    inMemoryUow.userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
     ]);
 

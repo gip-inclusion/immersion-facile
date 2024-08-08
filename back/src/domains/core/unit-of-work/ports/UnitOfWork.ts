@@ -18,9 +18,8 @@ import { SearchMadeRepository } from "../../../establishment/ports/SearchMadeRep
 import { EstablishmentMarketingRepository } from "../../../marketing/ports/EstablishmentMarketingRepository";
 import { ApiConsumerRepository } from "../../api-consumer/ports/ApiConsumerRepository";
 import { OngoingOAuthRepository } from "../../authentication/inclusion-connect/port/OngoingOAuthRepositiory";
-import { UserRepository } from "../../authentication/inclusion-connect/port/UserRepositiory";
+import { UserRepository } from "../../authentication/inclusion-connect/port/UserRepository";
 import { ConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/port/ConventionPoleEmploiAdvisorRepository";
-import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { OutboxQueries } from "../../events/ports/OutboxQueries";
 import { OutboxRepository } from "../../events/ports/OutboxRepository";
 import { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";
@@ -52,7 +51,6 @@ export type UnitOfWork = {
   featureFlagRepository: FeatureFlagRepository;
   formEstablishmentRepository: FormEstablishmentRepository;
   groupRepository: GroupRepository;
-  inclusionConnectedUserRepository: InclusionConnectedUserRepository;
   notificationRepository: NotificationRepository;
   npsRepository: NpsRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;

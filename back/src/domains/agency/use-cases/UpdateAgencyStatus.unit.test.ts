@@ -33,9 +33,7 @@ describe("Update agency status", () => {
     timeGateway.setNextDate(nextDate);
     uuidGenerator.setNextUuid(nextUuid);
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdmin,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([backofficeAdmin]);
 
     const createNewEvent = makeCreateNewEvent({
       uuidGenerator,

@@ -43,9 +43,7 @@ describe("reject IcUser for agency", () => {
     uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ timeGateway, uuidGenerator });
     const uowPerformer = new InMemoryUowPerformer(uow);
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
     rejectIcUserForAgencyUsecase = new RejectIcUserForAgency(
       uowPerformer,
       createNewEvent,
@@ -83,9 +81,7 @@ describe("reject IcUser for agency", () => {
       isBackofficeAdmin: false,
     };
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      currentUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([currentUser]);
 
     await expectPromiseToFailWithError(
       rejectIcUserForAgencyUsecase.execute(
@@ -141,7 +137,7 @@ describe("reject IcUser for agency", () => {
       },
     };
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    uow.userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
       icUser,
     ]);
@@ -179,7 +175,7 @@ describe("reject IcUser for agency", () => {
 
     uow.agencyRepository.setAgencies([agency1, agency2]);
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    uow.userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
       icUser,
     ]);
@@ -193,7 +189,7 @@ describe("reject IcUser for agency", () => {
       backofficeAdminUser,
     );
 
-    expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
+    expectToEqual(uow.userRepository.agencyRightsByUserId, {
       [icUser.id]: [
         { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
       ],

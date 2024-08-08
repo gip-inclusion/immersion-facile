@@ -36,9 +36,7 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
 
-    const icUser = await uow.inclusionConnectedUserRepository.getById(
-      params.userId,
-    );
+    const icUser = await uow.userRepository.getById(params.userId);
 
     if (!icUser) throw errors.user.notFound({ userId: params.userId });
 
@@ -62,7 +60,7 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.updateAgencyRights({
+      uow.userRepository.updateAgencyRights({
         userId: icUser.id,
         agencyRights: updatedAgencyRights,
       }),

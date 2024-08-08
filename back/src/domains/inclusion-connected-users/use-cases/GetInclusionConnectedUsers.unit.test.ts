@@ -5,7 +5,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
+import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { GetInclusionConnectedUsers } from "./GetInclusionConnectedUsers";
@@ -69,11 +69,11 @@ const notBackofficeAdminUser: InclusionConnectedUser = {
 describe("GetInclusionConnectedUsers", () => {
   let getInclusionConnectedUsers: GetInclusionConnectedUsers;
   let uowPerformer: InMemoryUowPerformer;
-  let inclusionConnectedUserRepository: InMemoryInclusionConnectedUserRepository;
+  let userRepository: InMemoryUserRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    inclusionConnectedUserRepository = uow.inclusionConnectedUserRepository;
+    userRepository = uow.userRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
     getInclusionConnectedUsers = new GetInclusionConnectedUsers(uowPerformer);
   });
@@ -86,9 +86,7 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("throws Forbidden if token payload is not backoffice token", async () => {
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      notBackofficeAdminUser,
-    ]);
+    userRepository.setInclusionConnectedUsers([notBackofficeAdminUser]);
 
     await expectPromiseToFailWithError(
       getInclusionConnectedUsers.execute(
@@ -100,7 +98,7 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("gets the users by agencyRole which have at least one agency with the given role", async () => {
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    userRepository.setInclusionConnectedUsers([
       johnWithAgenciesToReview,
       paulWithAllAgenciesReviewed,
       backofficeAdminUser,
@@ -114,7 +112,7 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("gets the users by agencyId which have at least one agency with the given role", async () => {
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    userRepository.setInclusionConnectedUsers([
       johnWithAgenciesToReview,
       paulWithAllAgenciesReviewed,
       backofficeAdminUser,

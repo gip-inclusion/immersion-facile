@@ -66,7 +66,7 @@ describe("Magic link router", () => {
     );
     const initialConvention = conventionBuilder.build();
     inMemoryUow.conventionRepository.setConventions([initialConvention]);
-    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    inMemoryUow.userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
     ]);
   });
@@ -119,9 +119,7 @@ describe("Magic link router", () => {
           .withIsAdmin(false)
           .build();
 
-        inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
-          [user],
-        );
+        inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
 
         const userJwt = generateInclusionConnectJwt({
           userId: user.id,
@@ -356,7 +354,7 @@ describe("Magic link router", () => {
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      inMemoryUow.userRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
       ]);
       const renewedConventionStartDate = addDays(
@@ -482,9 +480,7 @@ describe("Magic link router", () => {
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        icUser,
-      ]);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([icUser]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await request
@@ -518,9 +514,7 @@ describe("Magic link router", () => {
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        icUser,
-      ]);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([icUser]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await request

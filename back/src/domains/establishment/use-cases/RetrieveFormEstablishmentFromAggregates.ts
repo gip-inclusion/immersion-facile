@@ -40,9 +40,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
 
     const isValidIcJwtPayload = "userId" in jwtPayload;
     if (isValidIcJwtPayload) {
-      const currentUser = await uow.inclusionConnectedUserRepository.getById(
-        jwtPayload.userId,
-      );
+      const currentUser = await uow.userRepository.getById(jwtPayload.userId);
       if (!currentUser)
         throw errors.user.notFound({ userId: jwtPayload.userId });
 

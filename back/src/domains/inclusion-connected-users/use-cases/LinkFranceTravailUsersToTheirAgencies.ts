@@ -27,7 +27,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
   ): Promise<void> {
     if (!codeSafir) return;
 
-    const icUser = await uow.inclusionConnectedUserRepository.getById(userId);
+    const icUser = await uow.userRepository.getById(userId);
     if (!icUser) throw errors.user.notFound({ userId });
 
     if (isIcUserAlreadyHasValidRight(icUser, codeSafir)) return;
@@ -35,7 +35,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
     const agency: AgencyDto | undefined =
       await uow.agencyRepository.getBySafir(codeSafir);
     if (agency) {
-      await uow.inclusionConnectedUserRepository.updateAgencyRights({
+      await uow.userRepository.updateAgencyRights({
         userId,
         agencyRights: [
           ...icUser.agencyRights.filter(
@@ -60,7 +60,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
           icUser.agencyRights,
         );
 
-      await uow.inclusionConnectedUserRepository.updateAgencyRights({
+      await uow.userRepository.updateAgencyRights({
         userId,
         agencyRights: [
           ...agencyRightsWithoutConflicts,

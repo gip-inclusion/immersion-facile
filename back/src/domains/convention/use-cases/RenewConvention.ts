@@ -92,8 +92,9 @@ export class RenewConvention extends TransactionalUseCase<
       return [jwtPayload.role];
     }
 
-    const inclusionConnectedUser =
-      await uow.inclusionConnectedUserRepository.getById(jwtPayload.userId);
+    const inclusionConnectedUser = await uow.userRepository.getById(
+      jwtPayload.userId,
+    );
     if (!inclusionConnectedUser)
       throw new NotFoundError(
         `Inclusion connected user '${jwtPayload.userId}' not found.`,

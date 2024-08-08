@@ -6,7 +6,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -39,13 +38,12 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
   let userRepository: InMemoryUserRepository;
   let agencyRepository: InMemoryAgencyRepository;
   let outboxRepository: InMemoryOutboxRepository;
-  let inclusionConnectedUserRepository: InMemoryInclusionConnectedUserRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     userRepository = uow.userRepository;
     agencyRepository = uow.agencyRepository;
-    inclusionConnectedUserRepository = uow.inclusionConnectedUserRepository;
+    userRepository = uow.userRepository;
     outboxRepository = uow.outboxRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
     const createNewEvent = makeCreateNewEvent({
@@ -80,7 +78,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
 
   it("fails if user already has agency rights", async () => {
     agencyRepository.setAgencies([agency1]);
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    userRepository.setInclusionConnectedUsers([
       {
         ...user,
         agencyRights: [
@@ -106,8 +104,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
         userId,
       });
 
-      const inclusionConnectedUser =
-        await inclusionConnectedUserRepository.getById(userId);
+      const inclusionConnectedUser = await userRepository.getById(userId);
 
       expectToEqual(inclusionConnectedUser, {
         ...user,
@@ -135,8 +132,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
         },
       );
 
-      const inclusionConnectedUser =
-        await inclusionConnectedUserRepository.getById(userId);
+      const inclusionConnectedUser = await userRepository.getById(userId);
 
       expectToEqual(inclusionConnectedUser, {
         ...user,

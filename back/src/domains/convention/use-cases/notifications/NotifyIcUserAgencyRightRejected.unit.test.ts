@@ -93,7 +93,7 @@ describe("Notify icUser agency right rejected", () => {
 
   it("Send an email to icUser to notify that registration to agency was rejected", async () => {
     uow.agencyRepository.setAgencies([agency]);
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+    uow.userRepository.setInclusionConnectedUsers([icUser]);
 
     await notifyIcUserAgencyRightRejected.execute({
       agencyId: agency.id,

@@ -54,9 +54,9 @@ describe("POST /add-form-establishment-batch", () => {
 
     ({ gateways } = testApp);
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
-    testApp.inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
-      [backofficeAdminUser],
-    );
+    testApp.inMemoryUow.userRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+    ]);
 
     gateways.timeGateway.defaultDate = new Date();
 

@@ -20,6 +20,6 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
     currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser[]> {
     throwIfNotAdmin(currentUser);
-    return uow.inclusionConnectedUserRepository.getWithFilter(filters);
+    return uow.userRepository.getWithFilter(filters);
   }
 }

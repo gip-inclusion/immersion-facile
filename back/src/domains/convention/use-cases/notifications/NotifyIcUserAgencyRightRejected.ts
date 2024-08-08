@@ -32,9 +32,7 @@ export class NotifyIcUserAgencyRightRejected extends TransactionalUseCase<
 
     if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
 
-    const user = await uow.inclusionConnectedUserRepository.getById(
-      params.userId,
-    );
+    const user = await uow.userRepository.getById(params.userId);
 
     if (!user) throw errors.user.notFound({ userId: params.userId });
 

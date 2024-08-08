@@ -209,9 +209,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     if ("role" in payload)
       return { roleInPayload: payload.role, user: undefined };
 
-    const user = await uow.inclusionConnectedUserRepository.getById(
-      payload.userId,
-    );
+    const user = await uow.userRepository.getById(payload.userId);
     if (!user)
       throw errors.user.notFound({
         userId: payload.userId,
@@ -254,7 +252,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     userId: UserId,
     agencyId: AgencyId,
   ): Promise<string> {
-    const user = await uow.inclusionConnectedUserRepository.getById(userId);
+    const user = await uow.userRepository.getById(userId);
     if (!user) throw errors.user.notFound({ userId });
     const userAgencyRights = user.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === agencyId,

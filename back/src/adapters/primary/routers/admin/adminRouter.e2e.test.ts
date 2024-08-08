@@ -85,7 +85,7 @@ describe("Admin router", () => {
 
     sharedRequest = createSupertestSharedClient(adminRoutes, request);
 
-    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    inMemoryUow.userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
     ]);
 
@@ -400,7 +400,7 @@ describe("Admin router", () => {
         ])
         .build();
 
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      inMemoryUow.userRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
         validatorInAgency,
         backofficeAdminUser,
@@ -422,14 +422,11 @@ describe("Admin router", () => {
         body: "",
       });
 
-      expectObjectsToMatch(
-        inMemoryUow.inclusionConnectedUserRepository.agencyRightsByUserId,
-        {
-          [inclusionConnectedUser.id]: [
-            { agency, roles: [updatedRole], isNotifiedByEmail: false },
-          ],
-        },
-      );
+      expectObjectsToMatch(inMemoryUow.userRepository.agencyRightsByUserId, {
+        [inclusionConnectedUser.id]: [
+          { agency, roles: [updatedRole], isNotifiedByEmail: false },
+        ],
+      });
     });
 
     it("401 - missing admin token", async () => {
@@ -504,7 +501,7 @@ describe("Admin router", () => {
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      inMemoryUow.userRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
         backofficeAdminUser,
       ]);
@@ -523,12 +520,9 @@ describe("Admin router", () => {
         body: "",
       });
 
-      expectObjectsToMatch(
-        inMemoryUow.inclusionConnectedUserRepository.agencyRightsByUserId,
-        {
-          [inclusionConnectedUser.id]: [],
-        },
-      );
+      expectObjectsToMatch(inMemoryUow.userRepository.agencyRightsByUserId, {
+        [inclusionConnectedUser.id]: [],
+      });
 
       await processEventsForEmailToBeSent(eventCrawler);
 
