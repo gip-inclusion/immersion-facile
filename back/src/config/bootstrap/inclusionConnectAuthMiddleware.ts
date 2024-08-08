@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { errors } from "shared";
+import { errors, inclusionConnectTokenExpiredMessage } from "shared";
 import { makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 
@@ -35,7 +35,7 @@ export const makeInclusionConnectAuthMiddleware = (
         status: unauthorizedError.status,
         message:
           "name" in error && error.name === "TokenExpiredError"
-            ? "Token is expired"
+            ? inclusionConnectTokenExpiredMessage
             : "Provided token is invalid",
       });
     }

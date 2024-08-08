@@ -51,3 +51,5 @@ export const agencyRoleIsNotToReview = (
   agencyRoles: AgencyRole[],
 ): agencyRoles is ExcludeFromExisting<AgencyRole, "toReview">[] =>
   !agencyRoles.includes("toReview");
+
+export const inclusionConnectTokenExpiredMessage = "Token is expired";

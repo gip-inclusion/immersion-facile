@@ -10,6 +10,7 @@ import {
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
+  inclusionConnectTokenExpiredMessage,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -127,7 +128,7 @@ describe("Delete form establishment", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { message: "Token is expired", status: 401 },
+      body: { message: inclusionConnectTokenExpiredMessage, status: 401 },
       status: 401,
     });
   });
