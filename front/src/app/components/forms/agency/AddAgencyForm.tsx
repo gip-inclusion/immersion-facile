@@ -177,7 +177,7 @@ const AgencyForm = ({
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
           departmentCode,
-          kind: "withoutRefersToAgency",
+          filterKind: "withoutRefersToAgency",
         }),
       ),
     [dispatch],

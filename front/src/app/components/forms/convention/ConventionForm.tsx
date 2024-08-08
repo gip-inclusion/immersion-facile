@@ -235,7 +235,7 @@ export const ConventionForm = ({
     (departmentCode: DepartmentCode) =>
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
-          kind: makeListAgencyOptionsKindFilter({
+          filterKind: makeListAgencyOptionsKindFilter({
             internshipKind: conventionValues.internshipKind,
             shouldListAll: false,
             federatedIdentity,

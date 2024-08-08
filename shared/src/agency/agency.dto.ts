@@ -124,7 +124,7 @@ export type GetAgenciesFilter = {
   nameIncludes?: string;
   position?: AgencyPositionFilter;
   departmentCode?: DepartmentCode;
-  kind?: AgencyKindFilter;
+  filterKind?: AgencyKindFilter;
   status?: AgencyStatus[];
   siret?: SiretDto;
 };
