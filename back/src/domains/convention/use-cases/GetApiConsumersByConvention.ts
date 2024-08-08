@@ -30,9 +30,7 @@ export const makeGetApiConsumersByconvention = createTransactionalUseCase<
         conventionId,
       });
 
-    const user = await uow.inclusionConnectedUserRepository.getById(
-      currentUser.id,
-    );
+    const user = await uow.userRepository.getById(currentUser.id);
 
     if (!user)
       throw errors.user.notFound({
