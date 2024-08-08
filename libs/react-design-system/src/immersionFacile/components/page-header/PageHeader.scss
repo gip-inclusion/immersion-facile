@@ -1,53 +1,7 @@
-$patternSizes: 80px, 160px, 130px;
 .im-page-header {
-  position: relative;
-  &__inner {
-    /*!*/
-  }
-  &--default {
-    background-color: var(--blue-france-sun-113-625);
-  }
-  &--candidate {
-    background-color: var(--green-archipel-sun-391-moon-716);
-  }
-  &--establishment {
-    background-color: var(--blue-cumulus-sun-368-moon-732);
-  }
-  &--agency {
-    background-color: var(--purple-glycine-sun-319-moon-630);
-  }
   &__title {
-    color: var(--grey-1000-100);
     &--centered {
       text-align: center;
-    }
-  }
-  &__patterns {
-    /*!*/
-  }
-  &__pattern {
-    background: var(--grey-1000-100);
-    border-radius: 50%;
-    opacity: 0.2;
-    filter: blur(20px);
-    position: absolute;
-    @for $i from 0 to length($patternSizes) {
-      &--#{$i} {
-        width: #{nth($patternSizes, $i + 1)};
-        height: #{nth($patternSizes, $i + 1)};
-      }
-    }
-    &--0 {
-      top: -100px;
-      right: 0;
-    }
-    &--1 {
-      top: 120px;
-      right: -150px;
-    }
-    &--2 {
-      bottom: -220px;
-      right: -50px;
     }
   }
 }

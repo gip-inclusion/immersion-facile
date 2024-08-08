@@ -12,6 +12,7 @@ import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
+import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionManageInclusionConnectedPage } from "src/app/pages/convention/ConventionManageInclusionConnectedPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
@@ -64,7 +65,6 @@ const getPageByRouteName: {
       inclusionConnectConnexionPageHeader={
         <PageHeader
           title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀"
-          theme="default"
           centered
         />
       }
@@ -80,7 +80,6 @@ const getPageByRouteName: {
         inclusionConnectConnexionPageHeader={
           <PageHeader
             title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀"
-            theme="default"
             centered
           />
         }
@@ -97,7 +96,6 @@ const getPageByRouteName: {
         inclusionConnectConnexionPageHeader={
           <PageHeader
             title="Retrouvez vos conventions en tant que prescripteur"
-            theme="agency"
             centered
           />
         }
@@ -110,6 +108,9 @@ const getPageByRouteName: {
   conventionCustomAgency: () => <ConventionCustomAgencyPage />,
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
+  conventionConfirmation: (route) => (
+    <ConventionConfirmationPage route={route} />
+  ),
   conventionImmersionForExternals: (route) => (
     <ConventionPageForExternals route={route} />
   ),
@@ -130,7 +131,6 @@ const getPageByRouteName: {
         inclusionConnectConnexionPageHeader={
           <PageHeader
             title="Retrouvez vos conventions en tant qu'entreprise"
-            theme="establishment"
             centered
           />
         }

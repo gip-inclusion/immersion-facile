@@ -7,53 +7,39 @@ export type PageHeaderProps = {
   title: string;
   className?: string;
   children?: React.ReactNode;
-  usePatterns?: boolean;
-  centered?: boolean;
-  theme?: "default" | "candidate" | "establishment" | "agency";
   classes?: Partial<Record<"root" | "inner" | "title", string>>;
+  centered?: boolean;
 };
 
 export const PageHeader = ({
   title,
   className,
   children,
-  usePatterns,
-  centered,
-  theme = "default",
   classes = {},
+  centered = false,
 }: PageHeaderProps) => {
   const { cx } = useStyles();
   return (
     <section
       className={cx(
-        fr.cx("fr-py-7w"),
-        Styles.root,
-        Styles[theme],
+        fr.cx("fr-pt-9w", "fr-pb-2w"),
         ` ${className ?? ""}`,
         classes.root,
       )}
       role="region"
       aria-label="En-tête de page"
     >
-      <div className={cx(fr.cx("fr-container"), Styles.inner, classes.inner)}>
+      <div className={cx(fr.cx("fr-container"), classes.inner)}>
         <h1
           className={cx(
-            Styles.title,
-            centered && Styles.titleCentered,
             children ? "" : "fr-my-auto",
+            centered && Styles.titleCentered,
             classes.title,
           )}
         >
           {title}
         </h1>
         {children}
-        {usePatterns && (
-          <div className={cx(Styles.patterns)}>
-            <div className={cx(Styles.pattern, Styles.pattern0)} />
-            <div className={cx(Styles.pattern, Styles.pattern1)} />
-            <div className={cx(Styles.pattern, Styles.pattern2)} />
-          </div>
-        )}
       </div>
     </section>
   );

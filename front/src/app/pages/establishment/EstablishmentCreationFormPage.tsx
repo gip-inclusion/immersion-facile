@@ -7,13 +7,7 @@ export const EstablishmentCreationFormPage = () => (
   <HeaderFooterLayout>
     <MainWrapper
       layout="default"
-      pageHeader={
-        <PageHeader
-          title="Proposer une immersion"
-          centered
-          theme="establishment"
-        />
-      }
+      pageHeader={<PageHeader title="Proposer une immersion" />}
     >
       <EstablishmentForm mode="create" />
     </MainWrapper>

@@ -102,6 +102,13 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.conventionImmersionRoute}-agence-immersion-facilitee`,
   ),
+  conventionConfirmation: defineRoute(
+    {
+      conventionId: param.path.string,
+    },
+    ({ conventionId }) =>
+      `/${frontRoutes.conventionImmersionRoute}/confirmation/${conventionId}`,
+  ),
   conventionDocument: defineRoute(
     {
       jwt: param.query.optional.string,

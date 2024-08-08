@@ -164,12 +164,7 @@ const ConventionSignPageContent = ({
           () => (
             <MainWrapper
               layout={"default"}
-              pageHeader={
-                <PageHeader
-                  title={t.intro.conventionSignTitle}
-                  theme="candidate"
-                />
-              }
+              pageHeader={<PageHeader title={t.intro.conventionSignTitle} />}
             >
               {convention && (
                 <>

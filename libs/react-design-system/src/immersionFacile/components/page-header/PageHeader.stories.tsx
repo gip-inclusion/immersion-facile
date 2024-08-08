@@ -29,24 +29,3 @@ export const Default: Story = {
     title: "Page title",
   },
 };
-
-export const Candidate: Story = {
-  args: {
-    title: "Page title",
-    theme: "candidate",
-  },
-};
-
-export const Establishment: Story = {
-  args: {
-    title: "Page title",
-    theme: "establishment",
-  },
-};
-
-export const Agency: Story = {
-  args: {
-    title: "Page title",
-    theme: "agency",
-  },
-};
