@@ -6,14 +6,8 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 export const AddAgencyPage = () => (
   <HeaderFooterLayout>
     <MainWrapper
-      layout="boxed"
-      pageHeader={
-        <PageHeader
-          title="Ajout d'organisme encadrant les PMSMP"
-          centered
-          theme="agency"
-        />
-      }
+      layout="default"
+      pageHeader={<PageHeader title="Ajout d'organisme encadrant les PMSMP" />}
     >
       <AddAgencyForm />
     </MainWrapper>

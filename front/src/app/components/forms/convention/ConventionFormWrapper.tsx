@@ -3,7 +3,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import React, { useEffect } from "react";
-import { Loader, SubmitConfirmationSection } from "react-design-system";
+import { Loader } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -16,7 +16,6 @@ import {
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { type ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
 import { type ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
@@ -92,13 +91,9 @@ export const ConventionFormWrapper = ({
     }
 
     return () => {
-      dispatch(conventionSlice.actions.clearFetchedConvention());
       dispatch(conventionSlice.actions.clearFeedbackTriggered());
     };
   }, [dispatch, mode, route.params.jwt]);
-
-  const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
-    useCopyButton();
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -129,15 +124,15 @@ export const ConventionFormWrapper = ({
             formSuccessfullySubmitted: true,
             shouldRedirectToError: false,
           },
-          () =>
-            fetchedConvention && (
-              <SubmitConfirmationSection
-                idToCopy={fetchedConvention.id}
-                copyButtonIsDisabled={copyButtonIsDisabled}
-                copyButtonLabel={copyButtonLabel}
-                onCopyButtonClick={onCopyButtonClick}
-              />
-            ),
+          () => {
+            fetchedConvention &&
+              routes
+                .conventionConfirmation({
+                  conventionId: fetchedConvention.id,
+                })
+                .push();
+            return null;
+          },
         )
         .with({ shouldRedirectToError: true }, () => (
           <>

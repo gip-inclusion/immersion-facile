@@ -7,13 +7,7 @@ export const EstablishmentEditionFormPage = () => (
   <HeaderFooterLayout>
     <MainWrapper
       layout="default"
-      pageHeader={
-        <PageHeader
-          title="Éditer une entreprise référencée"
-          centered
-          theme="establishment"
-        />
-      }
+      pageHeader={<PageHeader title="Éditer une entreprise référencée" />}
     >
       <EstablishmentForm mode="edit" />
     </MainWrapper>

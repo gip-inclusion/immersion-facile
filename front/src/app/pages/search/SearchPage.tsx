@@ -128,10 +128,7 @@ export const SearchPage = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
-        <PageHeader
-          title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
-          theme="candidate"
-        >
+        <PageHeader title="Je trouve une entreprise pour réaliser mon immersion professionnelle">
           <form
             onSubmit={handleSubmit((value) =>
               triggerSearch(filterFormValues(value)),

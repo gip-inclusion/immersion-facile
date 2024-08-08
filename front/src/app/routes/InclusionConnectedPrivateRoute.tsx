@@ -69,6 +69,7 @@ export const InclusionConnectedPrivateRoute = ({
         <MainWrapper
           layout="boxed"
           pageHeader={inclusionConnectConnexionPageHeader}
+          vSpacing={2}
         >
           <LoginForm
             sections={[
