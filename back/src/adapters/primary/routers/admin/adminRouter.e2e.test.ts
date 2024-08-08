@@ -380,8 +380,11 @@ describe("Admin router", () => {
   describe(`${displayRouteName(
     adminRoutes.updateUserRoleForAgency,
   )} Update user role for agency`, () => {
-    it("201 - Updates role of user form 'toReview' to 'counsellor' for given agency", async () => {
-      const agency = new AgencyDtoBuilder().build();
+    it("201 - Updates role of user from 'toReview' to 'counsellor' for given agency", async () => {
+      const agency = new AgencyDtoBuilder()
+        .withId("two-steps-validation-agency")
+        .withCounsellorEmails(["fake-email@gmail.com"])
+        .build();
       const inclusionConnectedUser: InclusionConnectedUser = {
         id: "my-user-id",
         email: "john@mail.com",
@@ -400,6 +403,7 @@ describe("Admin router", () => {
         ])
         .build();
 
+      inMemoryUow.agencyRepository.insert(agency);
       inMemoryUow.userRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
         validatorInAgency,
@@ -425,6 +429,60 @@ describe("Admin router", () => {
       expectObjectsToMatch(inMemoryUow.userRepository.agencyRightsByUserId, {
         [inclusionConnectedUser.id]: [
           { agency, roles: [updatedRole], isNotifiedByEmail: false },
+        ],
+      });
+    });
+
+    it("400 - when trying to Update role of user from 'toReview' to 'counsellor' for agency that have only one step validation", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const inclusionConnectedUser: InclusionConnectedUser = {
+        id: "my-user-id",
+        email: "john@mail.com",
+        firstName: "John",
+        lastName: "Doe",
+        agencyRights: [
+          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+        ],
+        dashboards: { agencies: {}, establishments: {} },
+        externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
+      };
+      const validatorInAgency = new InclusionConnectedUserBuilder()
+        .withAgencyRights([
+          { roles: ["validator"], agency, isNotifiedByEmail: true },
+        ])
+        .build();
+
+      inMemoryUow.agencyRepository.insert(agency);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([
+        inclusionConnectedUser,
+        validatorInAgency,
+        backofficeAdminUser,
+      ]);
+
+      const updatedRole: AgencyRole = "counsellor";
+
+      const response = await sharedRequest.updateUserRoleForAgency({
+        body: {
+          agencyId: agency.id,
+          userId: inclusionConnectedUser.id,
+          roles: [updatedRole],
+        },
+        headers: { authorization: token },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          message:
+            "Le role \"counsellor\" n'est pas autorisé pour l'agence \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\" car cette agence n'a qu'une seul étape de validation.",
+          status: 400,
+        },
+      });
+
+      expectObjectsToMatch(inMemoryUow.userRepository.agencyRightsByUserId, {
+        [inclusionConnectedUser.id]: [
+          { agency, roles: ["toReview"], isNotifiedByEmail: false },
         ],
       });
     });
