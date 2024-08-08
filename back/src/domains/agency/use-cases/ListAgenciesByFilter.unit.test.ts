@@ -69,24 +69,44 @@ const agencyWithSiret = new AgencyDtoBuilder()
   .withAgencySiret("11122233344455")
   .build();
 
+const agencyChambreAgriculture = new AgencyDtoBuilder()
+  .withId("7")
+  .withName("Agence chambre d'agriculture")
+  .withKind("chambre-agriculture")
+  .build();
+
+const agencyCma = new AgencyDtoBuilder()
+  .withId("8")
+  .withName("Agency CMA")
+  .withKind("cma")
+  .build();
+
+const allAgencies = [
+  otherAgencyInParis,
+  cciAgency1InCergy,
+  cciAgency2InParis,
+  peAgency1InParis,
+  peAgency2InParis,
+  otherAgencyWithRefersToInCergy,
+  agencyWithSiret,
+  agencyChambreAgriculture,
+  agencyCma,
+];
+
 describe("Query: List agencies by filter", () => {
-  const uow = createInMemoryUow();
-  const agencyRepository = uow.agencyRepository;
-  const useCase = new ListAgencyOptionsByFilter(new InMemoryUowPerformer(uow));
-  const allAgencies = [
-    otherAgencyInParis,
-    cciAgency1InCergy,
-    cciAgency2InParis,
-    peAgency1InParis,
-    peAgency2InParis,
-    otherAgencyWithRefersToInCergy,
-    agencyWithSiret,
-  ];
-  agencyRepository.setAgencies(allAgencies);
+  let listAgencyOptionsByFilter: ListAgencyOptionsByFilter;
+
+  beforeEach(() => {
+    const uow = createInMemoryUow();
+    listAgencyOptionsByFilter = new ListAgencyOptionsByFilter(
+      new InMemoryUowPerformer(uow),
+    );
+    uow.agencyRepository.setAgencies(allAgencies);
+  });
 
   describe("No filters", () => {
     it("List all agencies", async () => {
-      const result = await useCase.execute({}, undefined);
+      const result = await listAgencyOptionsByFilter.execute({}, undefined);
       expectToEqual(result, allAgencies.map(toAgencyOption));
     });
   });
@@ -94,32 +114,35 @@ describe("Query: List agencies by filter", () => {
   describe("With Agency kind filter", () => {
     it("List miniStageOnly agencies", async () => {
       expectToEqual(
-        await useCase.execute({ kind: "miniStageOnly" }, undefined),
-        [cciAgency1InCergy, cciAgency2InParis].map(toAgencyOption),
-      );
-    });
-
-    it("List immersionWithoutPe agencies", async () => {
-      expectToEqual(
-        await useCase.execute({ kind: "immersionWithoutPe" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { kind: "miniStageOnly" },
+          undefined,
+        ),
         [
-          otherAgencyInParis,
-          otherAgencyWithRefersToInCergy,
-          agencyWithSiret,
+          cciAgency1InCergy,
+          cciAgency2InParis,
+          agencyChambreAgriculture,
+          agencyCma,
         ].map(toAgencyOption),
       );
     });
 
     it("List immersionPeOnly agencies", async () => {
       expectToEqual(
-        await useCase.execute({ kind: "immersionPeOnly" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { kind: "immersionPeOnly" },
+          undefined,
+        ),
         [peAgency1InParis, peAgency2InParis].map(toAgencyOption),
       );
     });
 
     it("List miniStageExcluded agencies", async () => {
       expectToEqual(
-        await useCase.execute({ kind: "miniStageExcluded" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { kind: "miniStageExcluded" },
+          undefined,
+        ),
         [
           otherAgencyInParis,
           peAgency1InParis,
@@ -132,7 +155,10 @@ describe("Query: List agencies by filter", () => {
 
     it("List withoutRefersToAgency agencies", async () => {
       expectToEqual(
-        await useCase.execute({ kind: "withoutRefersToAgency" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { kind: "withoutRefersToAgency" },
+          undefined,
+        ),
         allAgencies
           .filter((agency) => agency.refersToAgencyId === null)
           .map(toAgencyOption),
@@ -141,7 +167,10 @@ describe("Query: List agencies by filter", () => {
 
     it("List agencies for given siret", async () => {
       expectToEqual(
-        await useCase.execute({ siret: "11122233344455" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { siret: "11122233344455" },
+          undefined,
+        ),
         [toAgencyOption(agencyWithSiret)],
       );
     });
@@ -150,14 +179,20 @@ describe("Query: List agencies by filter", () => {
   describe("With Agency department code filter", () => {
     it("List agencies with department code 95", async () => {
       expectToEqual(
-        await useCase.execute({ departmentCode: "95" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { departmentCode: "95" },
+          undefined,
+        ),
         [cciAgency1InCergy, otherAgencyWithRefersToInCergy].map(toAgencyOption),
       );
     });
 
     it("List agencies with department code 75", async () => {
       expectToEqual(
-        await useCase.execute({ departmentCode: "75" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { departmentCode: "75" },
+          undefined,
+        ),
         [
           otherAgencyInParis,
           cciAgency2InParis,
@@ -169,7 +204,10 @@ describe("Query: List agencies by filter", () => {
 
     it("List agencies with department code 78", async () => {
       expectToEqual(
-        await useCase.execute({ departmentCode: "78" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { departmentCode: "78" },
+          undefined,
+        ),
         [].map(toAgencyOption),
       );
     });
@@ -178,21 +216,32 @@ describe("Query: List agencies by filter", () => {
   describe("With Agency name", () => {
     it("List agencies with name 'PE'", async () => {
       expectToEqual(
-        await useCase.execute({ nameIncludes: "PE" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { nameIncludes: "PE" },
+          undefined,
+        ),
         [peAgency1InParis, peAgency2InParis].map(toAgencyOption),
       );
     });
 
     it("List agencies with name 'Agence'", async () => {
       expectToEqual(
-        await useCase.execute({ nameIncludes: "Agence" }, undefined),
-        allAgencies.map(toAgencyOption),
+        await listAgencyOptionsByFilter.execute(
+          { nameIncludes: "Agence" },
+          undefined,
+        ),
+        allAgencies
+          .filter((agency) => agency.id !== agencyCma.id)
+          .map(toAgencyOption),
       );
     });
 
     it("List agencies with name 'TOTO'", async () => {
       expectToEqual(
-        await useCase.execute({ nameIncludes: "TOTO" }, undefined),
+        await listAgencyOptionsByFilter.execute(
+          { nameIncludes: "TOTO" },
+          undefined,
+        ),
         [].map(toAgencyOption),
       );
     });

@@ -16,6 +16,7 @@ import {
   WithGeoPosition,
   errors,
   isTruthy,
+  miniStageAgencyKinds,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import { AgencyRepository } from "../ports/AgencyRepository";
@@ -319,7 +320,8 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 }
 
 const isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";
-const isAgencyCci = (agency: AgencyDto) => agency.kind === "cci";
+const isMiniStageAgency = (agency: AgencyDto) =>
+  miniStageAgencyKinds.includes(agency.kind);
 
 const sortByNearestFrom =
   (position: GeoPositionDto) =>
@@ -342,12 +344,13 @@ const agencyIsOfKind = (
   agencyKindFilter?: AgencyKindFilter,
 ): boolean => {
   if (agencyKindFilter === "immersionPeOnly") return isImmersionPeOnly(agency);
-  if (agencyKindFilter === "immersionWithoutPe")
-    return !isAgencyCci(agency) && !isImmersionPeOnly(agency);
-  if (agencyKindFilter === "miniStageOnly") return isAgencyCci(agency);
-  if (agencyKindFilter === "miniStageExcluded") return !isAgencyCci(agency);
+  if (agencyKindFilter === "miniStageOnly") return isMiniStageAgency(agency);
+  if (agencyKindFilter === "miniStageExcluded")
+    return !isMiniStageAgency(agency);
   if (agencyKindFilter === "withoutRefersToAgency")
     return !agency.refersToAgencyId;
+  const _exhaustiveCheck: undefined = agencyKindFilter;
+
   return true;
 };
 

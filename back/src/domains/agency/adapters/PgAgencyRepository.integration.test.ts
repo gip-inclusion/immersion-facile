@@ -227,15 +227,26 @@ describe("PgAgencyRepository", () => {
         .build(),
     ];
 
-    const agencyCciInParis = new AgencyDtoBuilder()
+    const agencyInParisBuilder = new AgencyDtoBuilder().withAddress({
+      departmentCode: "75",
+      city: "Paris",
+      postcode: "75001",
+      streetNumberAndAddress: "OSEF",
+    });
+
+    const agencyCciInParis = agencyInParisBuilder
       .withId("55555555-5555-5555-5555-555555555555")
       .withKind("cci")
-      .withAddress({
-        departmentCode: "75",
-        city: "Paris",
-        postcode: "75001",
-        streetNumberAndAddress: "OSEF",
-      })
+      .build();
+
+    const agencyChambreAgriculture = agencyInParisBuilder
+      .withId("77777777-7777-7777-7777-777777777777")
+      .withKind("chambre-agriculture")
+      .build();
+
+    const agencyCma = agencyInParisBuilder
+      .withId("88888888-8888-8888-8888-888888888888")
+      .withKind("cma")
       .build();
 
     it("returns empty list for empty table", async () => {
@@ -297,18 +308,26 @@ describe("PgAgencyRepository", () => {
       await Promise.all([
         agencyRepository.insert(agencyCciInParis),
         agencyRepository.insert(agency1PE),
+        agencyRepository.insert(agencyChambreAgriculture),
+        agencyRepository.insert(agencyCma),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
         filters: { kind: "miniStageOnly" },
       });
-      expect(sortById(agencies)).toEqual([agencyCciInParis]);
+      expect(sortById(agencies)).toEqual([
+        agencyCciInParis,
+        agencyChambreAgriculture,
+        agencyCma,
+      ]);
     });
 
     it("if agencyKindFilter = 'miniStageExcluded', returns agencies that are not kind cci", async () => {
       await Promise.all([
         agencyRepository.insert(agencyCciInParis),
         agencyRepository.insert(agency1PE),
+        agencyRepository.insert(agencyChambreAgriculture),
+        agencyRepository.insert(agencyCma),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
@@ -483,50 +502,6 @@ describe("PgAgencyRepository", () => {
 
       // Assert
       expect(agencies).toEqual([peNancyAgency]);
-    });
-
-    it("if agencyKindFilter is 'immersionWithoutPe', it returns all agencies except those from PE", async () => {
-      const peNancyAgency = agency1builder
-        .withName("Nancy PE agency")
-        .withKind("pole-emploi")
-        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
-        .withStatus("active")
-        .build();
-
-      const capEmploiNancyAgency = agency2builder
-        .withName("Nancy CAP EMPLOI agency")
-        .withKind("cap-emploi")
-        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
-        .withStatus("active")
-        .build();
-
-      const cciAgency = agency1builder
-        .withId("33333333-3333-3333-3333-333333333333")
-        .withName("Nancy CAP EMPLOI agency")
-        .withKind("cci")
-        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
-        .withStatus("active")
-        .build();
-
-      await Promise.all([
-        agencyRepository.insert(peNancyAgency),
-        agencyRepository.insert(capEmploiNancyAgency),
-        agencyRepository.insert(cciAgency),
-      ]);
-
-      // Act
-      const agencies = await agencyRepository.getAgencies({
-        filters: {
-          position: {
-            position: placeStanislasPosition,
-            distance_km: 100,
-          },
-          kind: "immersionWithoutPe",
-        },
-      });
-
-      // Assert
-      expect(agencies).toEqual([capEmploiNancyAgency]);
     });
   });
 
