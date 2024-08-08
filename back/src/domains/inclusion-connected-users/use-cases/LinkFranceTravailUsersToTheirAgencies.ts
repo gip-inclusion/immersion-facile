@@ -74,7 +74,11 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
             )
               return existingAgencyRight;
 
-            return { agency, roles: ["counsellor"], isNotifiedByEmail: false };
+            return {
+              agency,
+              roles: ["agency-viewer"],
+              isNotifiedByEmail: false,
+            };
           }),
         ],
       });

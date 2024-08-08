@@ -181,24 +181,24 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         [icUser.id]: [
           {
             agency: agency1InGroup,
-            roles: ["counsellor"],
+            roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
           {
             agency: agency2InGroup,
-            roles: ["counsellor"],
+            roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
           {
             agency: agency3InGroup,
-            roles: ["counsellor"],
+            roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
         ],
       });
     });
 
-    it("doesn't override an agency role exept if it's to review", async () => {
+    it("doesn't override an agency role except if it's to review", async () => {
       uow.agencyGroupRepository.agencyGroups = [agencyGroup];
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
@@ -237,12 +237,12 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
           },
           {
             agency: agency2InGroup,
-            roles: ["counsellor"],
+            roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
           {
             agency: agency3InGroup,
-            roles: ["counsellor"],
+            roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
         ],
