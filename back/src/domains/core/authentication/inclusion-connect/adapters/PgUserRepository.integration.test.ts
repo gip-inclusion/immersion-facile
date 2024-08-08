@@ -520,7 +520,7 @@ describe("PgAuthenticatedUserRepository", () => {
         roles: ["validator"],
         isNotifiedByEmail: false,
       });
-      await userRepository.deleteById(user1.id);
+      await userRepository.delete(user1.id);
       const response = await userRepository.getById(user1.id);
       expectToEqual(response, undefined);
       expectToEqual(
@@ -535,7 +535,7 @@ describe("PgAuthenticatedUserRepository", () => {
 
     it("does not throw when user does not exist", async () => {
       await expectPromiseToFailWithError(
-        userRepository.deleteById(user1.id),
+        userRepository.delete(user1.id),
         errors.user.notFound({ userId: user1.id }),
       );
     });

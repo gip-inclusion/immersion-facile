@@ -243,7 +243,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const agency1 = new AgencyDtoBuilder().withId(uuid()).build();
         const agency2 = new AgencyDtoBuilder().withId(uuid()).build();
 
-        uow.inclusionConnectedUserRepository.agencyRightsByUserId = {
+        uow.userRepository.agencyRightsByUserId = {
           [initialUser.id]: [
             {
               agency: agency1,
@@ -282,23 +282,20 @@ describe("AuthenticateWithInclusionCode use case", () => {
         });
 
         expectObjectInArrayToMatch(uow.userRepository.users, [updatedUser]);
-        expectToEqual(
-          uow.inclusionConnectedUserRepository.agencyRightsByUserId,
-          {
-            [initialUser.id]: [
-              {
-                agency: agency1,
-                isNotifiedByEmail: true,
-                roles: ["counsellor", "validator"],
-              },
-              {
-                agency: agency2,
-                isNotifiedByEmail: true,
-                roles: ["counsellor"],
-              },
-            ],
-          },
-        );
+        expectToEqual(uow.userRepository.agencyRightsByUserId, {
+          [initialUser.id]: [
+            {
+              agency: agency1,
+              isNotifiedByEmail: true,
+              roles: ["counsellor", "validator"],
+            },
+            {
+              agency: agency2,
+              isNotifiedByEmail: true,
+              roles: ["counsellor"],
+            },
+          ],
+        });
       });
     });
 
