@@ -17,6 +17,7 @@ import {
   domElementIds,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -64,6 +65,7 @@ const manageUserModal = createModal({
 
 export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
   const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
+  const agency = useAppSelector(agencyAdminSelectors.agency);
   const dispatch = useDispatch();
 
   const [selectedUserData, setSelectedUserData] = useState<
@@ -172,7 +174,13 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
               <Checkbox
                 id={domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}
                 legend="Rôles :"
-                options={checkboxOptions}
+                options={
+                  agency && agency.counsellorEmails.length > 0
+                    ? checkboxOptions
+                    : checkboxOptions.filter(
+                        (option) => option.label !== "Pré-validateur",
+                      )
+                }
               />
 
               <Button
