@@ -4,13 +4,11 @@ import {
   AgencyDto,
   AgencyId,
   AgencyKind,
-  AgencyKindFilter,
   AgencyOption,
   AgencyPositionFilter,
   AgencyStatus,
   DepartmentCode,
   GeoPositionDto,
-  GetAgenciesFilter as GetAgenciesFilters,
   PartialAgencyDto,
   SiretDto,
   WithGeoPosition,
@@ -19,7 +17,10 @@ import {
   miniStageAgencyKinds,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
-import { AgencyRepository } from "../ports/AgencyRepository";
+import {
+  AgencyRepository,
+  GetAgenciesFilters,
+} from "../ports/AgencyRepository";
 
 const testAgencies: AgencyDto[] = [
   {
@@ -242,10 +243,14 @@ export class InMemoryAgencyRepository implements AgencyRepository {
           ![
             agencyHasDepartmentCode(agency, filters?.departmentCode),
             agencyHasName(agency, filters?.nameIncludes),
-            agencyIsOfKind(agency, filters?.kind),
+            agencyIsOfKind(agency, filters?.kinds),
             agencyIsOfPosition(agency, filters?.position),
             agencyIsOfStatus(agency, filters?.status),
             agencyHasSiret(agency, filters?.siret),
+            agencyDoesNotReferToOtherAgency(
+              agency,
+              filters?.doesNotReferToOtherAgency,
+            ),
           ].includes(false),
       )
       .slice(0, limit);
@@ -319,8 +324,8 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }
 }
 
-const isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";
-const isMiniStageAgency = (agency: AgencyDto) =>
+const _isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";
+const _isMiniStageAgency = (agency: AgencyDto) =>
   miniStageAgencyKinds.includes(agency.kind);
 
 const sortByNearestFrom =
@@ -341,17 +346,19 @@ const sortByNearestFrom =
 
 const agencyIsOfKind = (
   agency: AgencyDto,
-  agencyKindFilter?: AgencyKindFilter,
+  agencyKinds?: AgencyKind[],
 ): boolean => {
-  if (agencyKindFilter === "immersionPeOnly") return isImmersionPeOnly(agency);
-  if (agencyKindFilter === "miniStageOnly") return isMiniStageAgency(agency);
-  if (agencyKindFilter === "miniStageExcluded")
-    return !isMiniStageAgency(agency);
-  if (agencyKindFilter === "withoutRefersToAgency")
-    return !agency.refersToAgencyId;
-  const _exhaustiveCheck: undefined = agencyKindFilter;
+  if (!agencyKinds) return true;
+  return agencyKinds.includes(agency.kind);
+  // if (agencyKindFilter === "immersionPeOnly") return isImmersionPeOnly(agency);
+  // if (agencyKindFilter === "miniStageOnly") return isMiniStageAgency(agency);
+  // if (agencyKindFilter === "miniStageExcluded")
+  //   return !isMiniStageAgency(agency);
+  // if (agencyKindFilter === "withoutRefersToAgency")
+  //   return !agency.refersToAgencyId;
+  // const _exhaustiveCheck: undefined = agencyKindFilter;
 
-  return true;
+  // return true;
 };
 
 const agencyIsOfStatus = (
@@ -378,6 +385,14 @@ const agencyHasName = (agency: AgencyDto, name?: string): boolean => {
 const agencyHasSiret = (agency: AgencyDto, siret?: SiretDto): boolean => {
   if (!siret) return true;
   return agency.agencySiret === siret;
+};
+
+const agencyDoesNotReferToOtherAgency = (
+  agency: AgencyDto,
+  shouldNotReferToOtherAgency?: true,
+): boolean => {
+  if (shouldNotReferToOtherAgency === undefined) return true;
+  return agency.refersToAgencyId === null;
 };
 
 const agencyIsOfPosition = (

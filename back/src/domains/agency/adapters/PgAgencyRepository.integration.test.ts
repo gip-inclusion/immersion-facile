@@ -8,6 +8,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  miniStageAgencyKinds,
 } from "shared";
 import { ConflictError } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
@@ -292,19 +293,7 @@ describe("PgAgencyRepository", () => {
       expect(sortById(agencies)).toEqual([agency2MissionLocale, agency1PE]);
     });
 
-    it("if agencyKindFilter = 'immersionPeOnly', returns only pe agencies", async () => {
-      await Promise.all([
-        agencyRepository.insert(agency1PE),
-        agencyRepository.insert(agency2MissionLocale),
-      ]);
-
-      const agencies = await agencyRepository.getAgencies({
-        filters: { kind: "immersionPeOnly" },
-      });
-      expect(sortById(agencies)).toEqual([agency1PE]);
-    });
-
-    it("if agencyKindFilter = 'miniStageOnly', returns only cci agencies", async () => {
+    it("return agencies matching the provided kinds", async () => {
       await Promise.all([
         agencyRepository.insert(agencyCciInParis),
         agencyRepository.insert(agency1PE),
@@ -312,38 +301,19 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(agencyCma),
       ]);
 
-      const agencies = await agencyRepository.getAgencies({
-        filters: { kind: "miniStageOnly" },
+      const agenciesMiniStage = await agencyRepository.getAgencies({
+        filters: { kinds: miniStageAgencyKinds },
       });
-      expect(sortById(agencies)).toEqual([
+      expect(sortById(agenciesMiniStage)).toEqual([
         agencyCciInParis,
         agencyChambreAgriculture,
         agencyCma,
       ]);
-    });
 
-    it("if agencyKindFilter = 'miniStageExcluded', returns agencies that are not kind cci", async () => {
-      await Promise.all([
-        agencyRepository.insert(agencyCciInParis),
-        agencyRepository.insert(agency1PE),
-        agencyRepository.insert(agencyChambreAgriculture),
-        agencyRepository.insert(agencyCma),
-      ]);
-
-      const agencies = await agencyRepository.getAgencies({
-        filters: { kind: "miniStageExcluded" },
+      const agenciesFt = await agencyRepository.getAgencies({
+        filters: { kinds: ["pole-emploi"] },
       });
-      expect(sortById(agencies)).toEqual([agency1PE]);
-    });
-
-    it("if agencyKindFilter = 'withoutRefersToAgency', returns agencies that have no refersToAgency", async () => {
-      await agencyRepository.insert(agency1);
-      await agencyRepository.insert(agencyWithRefersTo);
-
-      const agencies = await agencyRepository.getAgencies({
-        filters: { kind: "withoutRefersToAgency" },
-      });
-      expect(sortById(agencies)).toEqual([agency1]);
+      expect(agenciesFt).toEqual([agency1PE]);
     });
 
     it("returns all agencies filtered by name", async () => {
@@ -399,6 +369,16 @@ describe("PgAgencyRepository", () => {
         agencyCciInParis,
         agencyWithParisInCoveredDepartments,
       ]);
+    });
+    it("should not return refered agencies when the filter is provided", async () => {
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agencyWithRefersTo);
+
+      const agencies = await agencyRepository.getAgencies({
+        filters: { doesNotReferToOtherAgency: true },
+      });
+
+      expect(sortById(agencies)).toEqual([agency1]);
     });
   });
 
@@ -467,41 +447,6 @@ describe("PgAgencyRepository", () => {
 
       // Assert
       expect(agencies).toEqual([nancyAgency, epinalAgency]);
-    });
-
-    it("if agencyKindFilter is 'immersionPeOnly', it returns only agencies of pe kind", async () => {
-      const peNancyAgency = agency1builder
-        .withName("Nancy PE agency")
-        .withKind("pole-emploi")
-        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
-        .withStatus("active")
-        .build();
-
-      const capEmploiNancyAgency = agency2builder
-        .withName("Nancy CAP EMPLOI agency")
-        .withKind("cap-emploi")
-        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
-        .withStatus("active")
-        .build();
-
-      await Promise.all([
-        agencyRepository.insert(peNancyAgency),
-        agencyRepository.insert(capEmploiNancyAgency),
-      ]);
-
-      // Act
-      const agencies = await agencyRepository.getAgencies({
-        filters: {
-          position: {
-            position: placeStanislasPosition,
-            distance_km: 100,
-          },
-          kind: "immersionPeOnly",
-        },
-      });
-
-      // Assert
-      expect(agencies).toEqual([peNancyAgency]);
     });
   });
 

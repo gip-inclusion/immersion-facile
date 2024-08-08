@@ -67,7 +67,7 @@ export const listAgencyOptionsRequestSchema: z.ZodSchema<ListAgencyOptionsReques
   z.object({
     departmentCode: z.string().optional(),
     nameIncludes: z.string().optional(),
-    kind: z.enum(agencyKindFilters).optional(),
+    filterKind: z.enum(agencyKindFilters).optional(),
     siret: z.string().optional(),
   });
 

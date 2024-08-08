@@ -11,11 +11,9 @@ import {
   DepartmentCode,
   Email,
   GeoPositionDto,
-  GetAgenciesFilter,
   PartialAgencyDto,
   agencySchema,
   errors,
-  miniStageAgencyKinds,
   pipeWithValue,
 } from "shared";
 import { ConflictError } from "shared";
@@ -34,7 +32,10 @@ import {
   usersAgenciesRolesIncludeCounsellor,
   usersAgenciesRolesIncludeValidator,
 } from "../../core/authentication/inclusion-connect/adapters/agencyUsers.helpers";
-import { AgencyRepository } from "../ports/AgencyRepository";
+import {
+  AgencyRepository,
+  GetAgenciesFilters,
+} from "../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
 
@@ -69,11 +70,18 @@ export class PgAgencyRepository implements AgencyRepository {
     filters = {},
     limit,
   }: {
-    filters?: GetAgenciesFilter;
+    filters?: GetAgenciesFilters;
     limit?: number;
   }): Promise<AgencyDto[]> {
-    const { departmentCode, kind, nameIncludes, position, siret, status } =
-      filters;
+    const {
+      departmentCode,
+      kinds,
+      doesNotReferToOtherAgency,
+      nameIncludes,
+      position,
+      siret,
+      status,
+    } = filters;
     const results = await pipeWithValue(
       this.transaction
         .selectFrom("agencies")
@@ -84,19 +92,12 @@ export class PgAgencyRepository implements AgencyRepository {
           ? b.where("covered_departments", "@>", `["${departmentCode}"]`)
           : b,
       (b) => (nameIncludes ? b.where("name", "ilike", `%${nameIncludes}%`) : b),
-      (b) => {
-        if (kind === "immersionPeOnly")
-          return b.where("kind", "=", "pole-emploi");
-        if (kind === "miniStageOnly")
-          return b.where("kind", "in", miniStageAgencyKinds);
-        if (kind === "miniStageExcluded")
-          return b.where("kind", "not in", miniStageAgencyKinds);
-        if (kind === "withoutRefersToAgency")
-          return b.where("refers_to_agency_id", "is", null);
-        const _exhaustiveCheck: undefined = kind;
-        return b;
-      },
+      (b) => (kinds ? b.where("kind", "in", kinds) : b),
       (b) => (status ? b.where("status", "in", status) : b),
+      (b) =>
+        doesNotReferToOtherAgency
+          ? b.where("refers_to_agency_id", "is", null)
+          : b,
       (b) => (siret ? b.where("agency_siret", "=", siret) : b),
       (b) =>
         b.limit(

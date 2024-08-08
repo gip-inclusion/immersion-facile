@@ -115,7 +115,7 @@ describe("Query: List agencies by filter", () => {
     it("List miniStageOnly agencies", async () => {
       expectToEqual(
         await listAgencyOptionsByFilter.execute(
-          { kind: "miniStageOnly" },
+          { filterKind: "miniStageOnly" },
           undefined,
         ),
         [
@@ -130,7 +130,7 @@ describe("Query: List agencies by filter", () => {
     it("List immersionPeOnly agencies", async () => {
       expectToEqual(
         await listAgencyOptionsByFilter.execute(
-          { kind: "immersionPeOnly" },
+          { filterKind: "immersionPeOnly" },
           undefined,
         ),
         [peAgency1InParis, peAgency2InParis].map(toAgencyOption),
@@ -140,7 +140,7 @@ describe("Query: List agencies by filter", () => {
     it("List miniStageExcluded agencies", async () => {
       expectToEqual(
         await listAgencyOptionsByFilter.execute(
-          { kind: "miniStageExcluded" },
+          { filterKind: "miniStageExcluded" },
           undefined,
         ),
         [
@@ -156,7 +156,7 @@ describe("Query: List agencies by filter", () => {
     it("List withoutRefersToAgency agencies", async () => {
       expectToEqual(
         await listAgencyOptionsByFilter.execute(
-          { kind: "withoutRefersToAgency" },
+          { filterKind: "withoutRefersToAgency" },
           undefined,
         ),
         allAgencies

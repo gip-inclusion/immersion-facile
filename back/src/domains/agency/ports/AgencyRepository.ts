@@ -1,11 +1,24 @@
-import {
+import type {
   AddressDto,
   AgencyDto,
   AgencyId,
   AgencyKind,
-  GetAgenciesFilter,
+  AgencyPositionFilter,
+  AgencyStatus,
+  DepartmentCode,
   PartialAgencyDto,
+  SiretDto,
 } from "shared";
+
+export type GetAgenciesFilters = {
+  nameIncludes?: string;
+  position?: AgencyPositionFilter;
+  departmentCode?: DepartmentCode;
+  kinds?: AgencyKind[];
+  status?: AgencyStatus[];
+  siret?: SiretDto;
+  doesNotReferToOtherAgency?: true;
+};
 
 export interface AgencyRepository {
   alreadyHasActiveAgencyWithSameAddressAndKind(params: {
@@ -14,7 +27,7 @@ export interface AgencyRepository {
     idToIgnore: AgencyId;
   }): Promise<boolean>;
   getAgencies(props: {
-    filters?: GetAgenciesFilter;
+    filters?: GetAgenciesFilters;
     limit?: number;
   }): Promise<AgencyDto[]>;
   getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]>;
