@@ -15,6 +15,7 @@ import {
   PartialAgencyDto,
   agencySchema,
   errors,
+  miniStageAgencyKinds,
   pipeWithValue,
 } from "shared";
 import { ConflictError } from "shared";
@@ -86,14 +87,13 @@ export class PgAgencyRepository implements AgencyRepository {
       (b) => {
         if (kind === "immersionPeOnly")
           return b.where("kind", "=", "pole-emploi");
-        if (kind === "immersionWithoutPe")
-          return b
-            .where("kind", "!=", "pole-emploi")
-            .where("kind", "!=", "cci");
-        if (kind === "miniStageOnly") return b.where("kind", "=", "cci");
-        if (kind === "miniStageExcluded") return b.where("kind", "!=", "cci");
+        if (kind === "miniStageOnly")
+          return b.where("kind", "in", miniStageAgencyKinds);
+        if (kind === "miniStageExcluded")
+          return b.where("kind", "not in", miniStageAgencyKinds);
         if (kind === "withoutRefersToAgency")
           return b.where("refers_to_agency_id", "is", null);
+        const _exhaustiveCheck: undefined = kind;
         return b;
       },
       (b) => (status ? b.where("status", "in", status) : b),

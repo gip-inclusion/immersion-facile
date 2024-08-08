@@ -11,6 +11,8 @@ let agencyIds: Record<AgencyKind, AgencyId[]> = {
   "prepa-apprentissage": [],
   "structure-IAE": [],
   cci: [],
+  cma: [],
+  "chambre-agriculture": [],
   autre: [],
   "immersion-facile": [],
   "operateur-cep": [],

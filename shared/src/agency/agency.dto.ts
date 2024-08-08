@@ -53,6 +53,12 @@ export type WithAgencyId = {
   agencyId: AgencyId;
 };
 
+export const miniStageAgencyKinds: AgencyKind[] = [
+  "cci",
+  "cma",
+  "chambre-agriculture",
+];
+
 export type AgencyKind = (typeof agencyKindList)[number];
 
 export const agencyKindList = [
@@ -62,10 +68,12 @@ export const agencyKindList = [
   "conseil-departemental",
   "prepa-apprentissage",
   "structure-IAE",
-  "cci",
   "autre",
   "immersion-facile",
   "operateur-cep",
+  "cci",
+  "cma",
+  "chambre-agriculture",
 ] as const;
 
 export type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
@@ -76,9 +84,11 @@ export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   "cap-emploi": "Cap Emploi",
   "conseil-departemental": "Conseil Départemental",
   "prepa-apprentissage": "Prépa Apprentissage",
-  cci: "Chambres de Commerce et d'Industrie",
   "structure-IAE": "Structure IAE",
   "operateur-cep": "Opérateur du CEP",
+  cci: "Chambres de Commerce et d'Industrie",
+  cma: "Chambre des métiers de l'Artisanat",
+  "chambre-agriculture": "Chambre d'agriculture",
   autre: "Autre",
 };
 
@@ -98,7 +108,6 @@ export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 
 export const agencyKindFilters = [
   "immersionPeOnly",
-  "immersionWithoutPe",
   "miniStageOnly",
   "miniStageExcluded",
   "withoutRefersToAgency",
