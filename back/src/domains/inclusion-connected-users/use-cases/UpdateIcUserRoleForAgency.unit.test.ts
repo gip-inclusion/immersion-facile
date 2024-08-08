@@ -9,6 +9,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
@@ -37,6 +38,7 @@ describe("GetInclusionConnectedUsers", () => {
   let userRepository: InMemoryUserRepository;
   let timeGateway: CustomTimeGateway;
   let outboxRepo: InMemoryOutboxRepository;
+  let agencyRepository: InMemoryAgencyRepository;
   let createNewEvent: CreateNewEvent;
 
   beforeEach(() => {
@@ -52,6 +54,8 @@ describe("GetInclusionConnectedUsers", () => {
     });
 
     userRepository = uow.userRepository;
+
+    agencyRepository = uow.agencyRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
 
     userRepository.setInclusionConnectedUsers([
@@ -85,7 +89,7 @@ describe("GetInclusionConnectedUsers", () => {
     );
   });
 
-  it("throws not found if agency does not exist for user", async () => {
+  it("throws not found if agency does not exist", async () => {
     userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
       {
@@ -98,7 +102,8 @@ describe("GetInclusionConnectedUsers", () => {
       },
     ]);
 
-    const agencyId = "agency-1";
+    const agencyId = "Fake-Agency-Id";
+
     await expectPromiseToFailWithError(
       updateIcUserRoleForAgency.execute(
         {
@@ -108,8 +113,38 @@ describe("GetInclusionConnectedUsers", () => {
         },
         backofficeAdminUser,
       ),
-      errors.user.noRightsOnAgency({
+      errors.agency.notFound({
         agencyId,
+      }),
+    );
+  });
+
+  it("throws not found if agency does not exist for user", async () => {
+    const agency = new AgencyDtoBuilder().build();
+    agencyRepository.setAgencies([agency]);
+    userRepository.setInclusionConnectedUsers([
+      backofficeAdminUser,
+      {
+        ...notAdminUser,
+        agencyRights: [],
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
+      },
+    ]);
+
+    await expectPromiseToFailWithError(
+      updateIcUserRoleForAgency.execute(
+        {
+          roles: ["counsellor"],
+          agencyId: agency.id,
+          userId: notAdminUser.id,
+        },
+        backofficeAdminUser,
+      ),
+      errors.user.noRightsOnAgency({
+        agencyId: agency.id,
         userId: notAdminUser.id,
       }),
     );
@@ -117,6 +152,7 @@ describe("GetInclusionConnectedUsers", () => {
 
   it("changes the role of a user for a given agency", async () => {
     const agency = new AgencyDtoBuilder().build();
+    agencyRepository.setAgencies([agency]);
     const icUser: InclusionConnectedUser = {
       ...notAdminUser,
       agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
@@ -150,6 +186,7 @@ describe("GetInclusionConnectedUsers", () => {
 
   it("should save IcUserAgencyRightChanged event when successful", async () => {
     const agency = new AgencyDtoBuilder().build();
+    agencyRepository.setAgencies([agency]);
     const icUser: InclusionConnectedUser = {
       ...notAdminUser,
       agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
@@ -189,7 +226,10 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("can change to more than one role", async () => {
-    const agency = new AgencyDtoBuilder().build();
+    const agency = new AgencyDtoBuilder()
+      .withCounsellorEmails(["fake-email@gmail.com"])
+      .build();
+    agencyRepository.setAgencies([agency]);
     const icUser: InclusionConnectedUser = {
       ...notAdminUser,
       agencyRights: [{ agency, roles: ["toReview"], isNotifiedByEmail: false }],
@@ -245,7 +285,10 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("cannot remove the last validator receiving notifications of an agency", async () => {
-    const agency = new AgencyDtoBuilder().build();
+    const agency = new AgencyDtoBuilder()
+      .withCounsellorEmails(["fake-email@gmail.com"])
+      .build();
+    agencyRepository.setAgencies([agency]);
     const agencyRight: AgencyRight = {
       agency,
       roles: ["validator"],
@@ -287,6 +330,43 @@ describe("GetInclusionConnectedUsers", () => {
         backofficeAdminUser,
       ),
       errors.agency.notEnoughValidators({ agencyId: agency.id }),
+    );
+  });
+
+  it("Throw an error when trying to update user Role to counsellor when agency is only one step validation", async () => {
+    const oneStepValidationAgency = new AgencyDtoBuilder()
+      .withCounsellorEmails([])
+      .build();
+
+    agencyRepository.setAgencies([oneStepValidationAgency]);
+
+    const icUserWithRoleValidator = new InclusionConnectedUserBuilder()
+      .withId("not-admin-id")
+      .withIsAdmin(false)
+      .withAgencyRights([
+        {
+          agency: oneStepValidationAgency,
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+      ])
+      .build();
+
+    userRepository.setInclusionConnectedUsers([icUserWithRoleValidator]);
+
+    await expectPromiseToFailWithError(
+      updateIcUserRoleForAgency.execute(
+        {
+          agencyId: oneStepValidationAgency.id,
+          roles: ["counsellor"],
+          userId: icUserWithRoleValidator.id,
+        },
+        backofficeAdminUser,
+      ),
+      errors.agency.invalidRoleUpdateForOneStepValidationAgency({
+        agencyId: oneStepValidationAgency.id,
+        role: "counsellor",
+      }),
     );
   });
 });

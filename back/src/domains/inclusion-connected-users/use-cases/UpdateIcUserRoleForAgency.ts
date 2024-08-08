@@ -40,6 +40,10 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
     const userToUpdate = await uow.userRepository.getById(params.userId);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
+    const agency = await uow.agencyRepository.getById(params.agencyId);
+
+    if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
+
     const agencyRightToUpdate = userToUpdate.agencyRights.find(
       ({ agency }) => agency.id === params.agencyId,
     );
@@ -48,6 +52,15 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
       throw errors.user.noRightsOnAgency({
         agencyId: params.agencyId,
         userId: params.userId,
+      });
+
+    if (
+      agency.counsellorEmails.length === 0 &&
+      params.roles.includes("counsellor")
+    )
+      throw errors.agency.invalidRoleUpdateForOneStepValidationAgency({
+        agencyId: params.agencyId,
+        role: "counsellor",
       });
 
     if (!params.roles.includes("validator")) {
