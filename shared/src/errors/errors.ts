@@ -16,7 +16,10 @@ import { Email } from "../email/email.dto";
 import { PeExternalId } from "../federatedIdentities/federatedIdentity.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { GroupSlug } from "../group/group.dto";
-import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import {
+  AgencyRole,
+  UserId,
+} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { NotificationKind } from "../notifications/notifications.dto";
 import { Role } from "../role/role.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -273,6 +276,13 @@ export const errors = {
     notEnoughValidators: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
         `L'agence ${agencyId} doit avoir au moins un validateur recevant les emails.`,
+      ),
+    invalidRoleUpdateForOneStepValidationAgency: ({
+      agencyId,
+      role,
+    }: { agencyId: AgencyId; role: AgencyRole }) =>
+      new BadRequestError(
+        `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence n'a qu'une seul étape de validation.`,
       ),
   },
   user: {
