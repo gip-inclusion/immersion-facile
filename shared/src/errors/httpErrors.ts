@@ -1,5 +1,11 @@
 import { ZodError } from "zod";
 
+export type HttpErrorResponseBody = {
+  status: number;
+  message: string;
+  issues?: string[];
+};
+
 export abstract class HttpError extends Error {
   public abstract httpCode: number;
 
