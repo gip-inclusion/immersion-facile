@@ -55,9 +55,7 @@ describe("Edit Form Establishment", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
     editFormEstablishment = new EditFormEstablishment(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
@@ -88,9 +86,7 @@ describe("Edit Form Establishment", () => {
     });
 
     it("Forbidden error on InclusionConnectJwtPayload with ic user that doesn't have rights on establishment", async () => {
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        inclusionConnectedUser,
-      ]);
+      uow.userRepository.setInclusionConnectedUsers([inclusionConnectedUser]);
       await expectPromiseToFailWithError(
         editFormEstablishment.execute(
           updatedFormEstablishment,
@@ -163,9 +159,7 @@ describe("Edit Form Establishment", () => {
         existingFormEstablishment,
       ]);
 
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        backofficeAdminUser,
-      ]);
+      uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
 
       // Act
       await editFormEstablishment.execute(updatedFormEstablishment, {

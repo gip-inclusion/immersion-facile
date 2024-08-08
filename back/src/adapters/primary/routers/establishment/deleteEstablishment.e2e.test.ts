@@ -56,9 +56,7 @@ describe("Delete form establishment", () => {
     const request = testAppAndDeps.request;
     timeGateway = testAppAndDeps.gateways.timeGateway;
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
   });
 
   it(`${displayRouteName(

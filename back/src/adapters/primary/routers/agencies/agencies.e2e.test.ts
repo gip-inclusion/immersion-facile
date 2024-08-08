@@ -49,7 +49,7 @@ describe("Agency routes", () => {
     httpClient = createSupertestSharedClient(agencyRoutes, deps.request);
 
     inMemoryUow.agencyRepository.setAgencies([]);
-    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    inMemoryUow.userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
     ]);
 

@@ -274,9 +274,10 @@ describe("convention e2e", () => {
     it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
       "200 - succeeds with JWT %s",
       async (scenario) => {
-        inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
-          [inclusionConnectedUser, backofficeAdminUser],
-        );
+        inMemoryUow.userRepository.setInclusionConnectedUsers([
+          inclusionConnectedUser,
+          backofficeAdminUser,
+        ]);
 
         const jwt = match(scenario)
           .with("ConventionJwt", () =>
@@ -488,7 +489,7 @@ describe("convention e2e", () => {
       inMemoryUow.conventionExternalIdRepository.externalIdsByConventionId = {
         [inReviewConvention.id]: externalId,
       };
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      inMemoryUow.userRepository.setInclusionConnectedUsers([
         inclusionConnectedUser,
         backofficeAdminUser,
       ]);

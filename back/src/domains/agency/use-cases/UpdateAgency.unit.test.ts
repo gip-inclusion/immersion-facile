@@ -44,10 +44,7 @@ describe("Update agency", () => {
     agencyRepository = uow.agencyRepository;
     outboxRepository = uow.outboxRepository;
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdmin,
-      icUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([backofficeAdmin, icUser]);
 
     updateAgency = new UpdateAgency(
       new InMemoryUowPerformer(uow),

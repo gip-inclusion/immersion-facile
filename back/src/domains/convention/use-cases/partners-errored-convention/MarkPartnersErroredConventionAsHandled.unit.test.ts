@@ -92,7 +92,7 @@ describe("mark partners errored convention as handled", () => {
 
   it("Mark partner errored convention as handled", async () => {
     const conventionRepository = uow.conventionRepository;
-    const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
+    const userRepository = uow.userRepository;
     const broadcastFeedbacksRepository = uow.broadcastFeedbacksRepository;
 
     const savedErrorConvention: BroadcastFeedback = {
@@ -111,9 +111,7 @@ describe("mark partners errored convention as handled", () => {
     await conventionRepository.save(convention);
     await broadcastFeedbacksRepository.save(savedErrorConvention);
 
-    await inclusionConnectRepository.setInclusionConnectedUsers([
-      icUserWithAgencyRights,
-    ]);
+    await userRepository.setInclusionConnectedUsers([icUserWithAgencyRights]);
 
     await markPartnersErroredConventionAsHandled.execute(
       {
@@ -146,12 +144,10 @@ describe("mark partners errored convention as handled", () => {
 
   it("Throw when convention is not errored", async () => {
     const conventionRepository = uow.conventionRepository;
-    const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
+    const userRepository = uow.userRepository;
 
     await conventionRepository.save(convention);
-    await inclusionConnectRepository.setInclusionConnectedUsers([
-      icUserWithAgencyRights,
-    ]);
+    await userRepository.setInclusionConnectedUsers([icUserWithAgencyRights]);
 
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
@@ -168,7 +164,7 @@ describe("mark partners errored convention as handled", () => {
 
   it("Throw when convention is errored but already handled", async () => {
     const conventionRepository = uow.conventionRepository;
-    const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
+    const userRepository = uow.userRepository;
     const broadcastFeedbacksRepository = uow.broadcastFeedbacksRepository;
 
     const savedHandledErrorConvention: BroadcastFeedback = {
@@ -186,9 +182,7 @@ describe("mark partners errored convention as handled", () => {
 
     await conventionRepository.save(convention);
     await broadcastFeedbacksRepository.save(savedHandledErrorConvention);
-    await inclusionConnectRepository.setInclusionConnectedUsers([
-      icUserWithAgencyRights,
-    ]);
+    await userRepository.setInclusionConnectedUsers([icUserWithAgencyRights]);
 
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
@@ -240,12 +234,10 @@ describe("mark partners errored convention as handled", () => {
 
   it("Throw when user doesn't have right for agency", async () => {
     const conventionRepository = uow.conventionRepository;
-    const inclusionConnectRepository = uow.inclusionConnectedUserRepository;
+    const userRepository = uow.userRepository;
 
     await conventionRepository.save(convention);
-    await inclusionConnectRepository.setInclusionConnectedUsers([
-      icUserWithoutRight,
-    ]);
+    await userRepository.setInclusionConnectedUsers([icUserWithoutRight]);
 
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(

@@ -140,9 +140,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         .build(),
     );
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
     // Act
     const retrievedForm = await useCase.execute(
       siret,
@@ -211,7 +209,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       ],
     };
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    uow.userRepository.setInclusionConnectedUsers([
       userWithEstablishmentRights,
     ]);
 

@@ -36,9 +36,7 @@ describe("Update Convention", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
 
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
 
     createNewEvent = makeCreateNewEvent({
       timeGateway: new CustomTimeGateway(),
@@ -67,7 +65,7 @@ describe("Update Convention", () => {
         .withIsAdmin(false)
         .build();
 
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.setInclusionConnectedUsers([icUser]);
 
       await expectPromiseToFailWithError(
         updateConvention.execute({ convention }, { userId: icUser.id }),

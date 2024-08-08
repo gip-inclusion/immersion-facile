@@ -72,9 +72,7 @@ export class EditFormEstablishment extends TransactionalUseCase<
     formEstablishment: FormEstablishmentDto,
   ) {
     if ("userId" in jwtPayload) {
-      const user = await uow.inclusionConnectedUserRepository.getById(
-        jwtPayload.userId,
-      );
+      const user = await uow.userRepository.getById(jwtPayload.userId);
       if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 
       throwIfIcUserNotAllowed(user, formEstablishment);

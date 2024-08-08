@@ -54,7 +54,7 @@ describe("Get Convention", () => {
           externalId: "john-external-id",
           createdAt: new Date().toISOString(),
         };
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+        uow.userRepository.setInclusionConnectedUsers([user]);
         uow.agencyRepository.setAgencies([agency]);
         uow.conventionRepository.setConventions([convention]);
 
@@ -135,7 +135,7 @@ describe("Get Convention", () => {
             externalId: "john-external-id",
             createdAt: new Date().toISOString(),
           };
-          uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+          uow.userRepository.setInclusionConnectedUsers([
             inclusionConnectedUser,
           ]);
           const payload: ConventionJwtPayload = {
@@ -204,7 +204,7 @@ describe("Get Convention", () => {
           externalId: "john-external-id",
           createdAt: new Date().toISOString(),
         };
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+        uow.userRepository.setInclusionConnectedUsers([user]);
         const jwtPayload: InclusionConnectDomainJwtPayload = {
           userId: "my-user-id",
         };
@@ -235,7 +235,7 @@ describe("Get Convention", () => {
           externalId: "john-external-id",
           createdAt: new Date().toISOString(),
         };
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+        uow.userRepository.setInclusionConnectedUsers([user]);
 
         const jwtPayload: InclusionConnectDomainJwtPayload = {
           userId: user.id,
@@ -262,9 +262,7 @@ describe("Get Convention", () => {
           .withIsAdmin(true)
           .build();
 
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-          backofficeAdminUser,
-        ]);
+        uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
 
         const conventionResult = await getConvention.execute(
           { conventionId: convention.id },
@@ -348,9 +346,7 @@ describe("Get Convention", () => {
           externalId: "john-external-id",
           createdAt: new Date().toISOString(),
         };
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-          inclusionConnectedUser,
-        ]);
+        uow.userRepository.setInclusionConnectedUsers([inclusionConnectedUser]);
         const payload: ConventionJwtPayload = {
           role: "validator",
           emailHash: stringToMd5(inclusionConnectedUser.email),

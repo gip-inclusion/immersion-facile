@@ -175,7 +175,7 @@ describe("inclusion connection flow", () => {
 
       const user = await inMemoryUow.userRepository.findByExternalId(sub);
 
-      const icUser = await inMemoryUow.inclusionConnectedUserRepository.getById(
+      const icUser = await inMemoryUow.userRepository.getById(
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         user!.id,
       );

@@ -277,7 +277,7 @@ export const setupInitialState = ({
   ]);
   conventionRepository.setConventions(values(conventionsToTest));
   withIcUser &&
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers(
+    uow.userRepository.setInclusionConnectedUsers(
       values(makeUserIdMapInclusionConnectedUser),
     );
 

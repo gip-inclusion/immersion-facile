@@ -46,7 +46,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   ): Promise<InclusionConnectedUser> {
     if (!jwtPayload) throw errors.user.noJwtProvided();
     const { userId } = jwtPayload;
-    const user = await uow.inclusionConnectedUserRepository.getById(userId);
+    const user = await uow.userRepository.getById(userId);
     if (!user) throw errors.user.notFound({ userId });
     const establishments = await this.#withEstablishments(uow, user);
     return {

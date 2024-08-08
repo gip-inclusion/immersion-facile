@@ -110,9 +110,7 @@ export class SignConvention extends TransactionalUseCase<
   ): Promise<{ role: Role; icUser: InclusionConnectedUser | undefined }> {
     if ("role" in jwtPayload)
       return { role: jwtPayload.role, icUser: undefined };
-    const icUser = await uow.inclusionConnectedUserRepository.getById(
-      jwtPayload.userId,
-    );
+    const icUser = await uow.userRepository.getById(jwtPayload.userId);
     if (!icUser)
       throw new NotFoundError(`No user found with id '${jwtPayload.userId}'`);
 

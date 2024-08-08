@@ -62,10 +62,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       });
 
       expectToEqual(uow.userRepository.users, [defaultUser]);
-      expectToEqual(
-        uow.inclusionConnectedUserRepository.agencyRightsByUserId,
-        {},
-      );
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {});
     });
   });
 
@@ -77,7 +74,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: codeSafir,
       });
 
-      expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {
         [defaultUser.id]: [
           { agency, roles: ["validator"], isNotifiedByEmail: false },
         ],
@@ -96,7 +93,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         },
       };
 
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.setInclusionConnectedUsers([icUser]);
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
@@ -104,7 +101,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: codeSafir,
       });
 
-      expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {
         [icUser.id]: [
           { agency, roles: ["agencyOwner"], isNotifiedByEmail: false },
         ],
@@ -123,7 +120,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         },
       };
 
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.setInclusionConnectedUsers([icUser]);
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
@@ -131,7 +128,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: codeSafir,
       });
 
-      expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {
         [icUser.id]: [
           { agency, roles: ["validator"], isNotifiedByEmail: false },
         ],
@@ -145,10 +142,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: "not-existing-code-safir",
       });
 
-      expectToEqual(
-        uow.inclusionConnectedUserRepository.agencyRightsByUserId,
-        {},
-      );
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {});
     });
   });
   describe("when safir code matches agency group", () => {
@@ -175,7 +169,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         },
       };
 
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.setInclusionConnectedUsers([icUser]);
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: icUser.id,
@@ -183,7 +177,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: agencyGroupCodeSafir,
       });
 
-      expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {
         [icUser.id]: [
           {
             agency: agency1InGroup,
@@ -226,7 +220,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         },
       };
 
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.setInclusionConnectedUsers([icUser]);
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: icUser.id,
@@ -234,7 +228,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: agencyGroupCodeSafir,
       });
 
-      expectToEqual(uow.inclusionConnectedUserRepository.agencyRightsByUserId, {
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {
         [icUser.id]: [
           {
             agency: agency1InGroup,

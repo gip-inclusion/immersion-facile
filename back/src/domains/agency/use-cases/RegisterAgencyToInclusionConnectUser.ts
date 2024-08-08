@@ -33,7 +33,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
   ): Promise<void> {
     if (!inclusionConnectedPayload) throw errors.user.noJwtProvided();
 
-    const user = await uow.inclusionConnectedUserRepository.getById(
+    const user = await uow.userRepository.getById(
       inclusionConnectedPayload.userId,
     );
     if (!user)
@@ -66,7 +66,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.updateAgencyRights({
+      uow.userRepository.updateAgencyRights({
         userId: user.id,
         agencyRights: agencies.map((agency) => ({
           agency,

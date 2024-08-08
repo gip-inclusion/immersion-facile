@@ -1,7 +1,9 @@
 import {
   AgencyId,
   AgencyRight,
+  Email,
   InclusionConnectedUser,
+  User,
   UserId,
   WithAgencyRole,
 } from "shared";
@@ -10,7 +12,10 @@ export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
   agencyId?: AgencyId;
 };
 
-export interface InclusionConnectedUserRepository {
+export interface UserRepository {
+  save(user: User): Promise<void>;
+  findByExternalId(externalId: string): Promise<User | undefined>;
+  findByEmail(email: Email): Promise<User | undefined>;
   getWithFilter(
     filters: InclusionConnectedFilters,
   ): Promise<InclusionConnectedUser[]>;

@@ -42,8 +42,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
         conventionId: params.conventionId,
       });
 
-    const currentUser =
-      await uow.inclusionConnectedUserRepository.getById(userId);
+    const currentUser = await uow.userRepository.getById(userId);
     if (!currentUser) throw errors.user.notFound({ userId });
     const userAgencyRights = currentUser.agencyRights.find(
       (agencyRight) =>

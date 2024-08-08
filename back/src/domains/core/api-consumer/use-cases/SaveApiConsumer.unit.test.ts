@@ -40,7 +40,7 @@ describe("SaveApiConsumer", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    uow.userRepository.setInclusionConnectedUsers([
       backofficeAdmin,
       simpleUser,
     ]);

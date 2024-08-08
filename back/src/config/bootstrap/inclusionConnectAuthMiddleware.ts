@@ -22,7 +22,7 @@ export const makeInclusionConnectAuthMiddleware = (
         return res.status(unauthorizedError.status).json(unauthorizedError);
 
       const currentIcUser = await uowPerformer.perform((uow) =>
-        uow.inclusionConnectedUserRepository.getById(payload.userId),
+        uow.userRepository.getById(payload.userId),
       );
       if (!currentIcUser)
         throw errors.user.notFound({ userId: payload.userId });

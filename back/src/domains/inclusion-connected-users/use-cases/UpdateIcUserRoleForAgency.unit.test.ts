@@ -9,7 +9,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { InMemoryInclusionConnectedUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryInclusionConnectedUserRepository";
+import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
@@ -34,7 +34,7 @@ const notAdminUser = new InclusionConnectedUserBuilder()
 describe("GetInclusionConnectedUsers", () => {
   let updateIcUserRoleForAgency: UpdateIcUserRoleForAgency;
   let uowPerformer: InMemoryUowPerformer;
-  let inclusionConnectedUserRepository: InMemoryInclusionConnectedUserRepository;
+  let userRepository: InMemoryUserRepository;
   let timeGateway: CustomTimeGateway;
   let outboxRepo: InMemoryOutboxRepository;
   let createNewEvent: CreateNewEvent;
@@ -51,10 +51,10 @@ describe("GetInclusionConnectedUsers", () => {
       uuidGenerator: new TestUuidGenerator(),
     });
 
-    inclusionConnectedUserRepository = uow.inclusionConnectedUserRepository;
+    userRepository = uow.userRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
       notAdminUser,
     ]);
@@ -86,7 +86,7 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("throws not found if agency does not exist for user", async () => {
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
       {
         ...notAdminUser,
@@ -126,10 +126,7 @@ describe("GetInclusionConnectedUsers", () => {
       },
     };
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-      icUser,
-    ]);
+    userRepository.setInclusionConnectedUsers([backofficeAdminUser, icUser]);
     const newRole: AgencyRole = "validator";
 
     await updateIcUserRoleForAgency.execute(
@@ -141,17 +138,14 @@ describe("GetInclusionConnectedUsers", () => {
       backofficeAdminUser,
     );
 
-    expectToEqual(
-      await inclusionConnectedUserRepository.getById(notAdminUser.id),
-      {
-        ...notAdminUser,
-        agencyRights: [{ agency, roles: [newRole], isNotifiedByEmail: false }],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
+    expectToEqual(await userRepository.getById(notAdminUser.id), {
+      ...notAdminUser,
+      agencyRights: [{ agency, roles: [newRole], isNotifiedByEmail: false }],
+      dashboards: {
+        agencies: {},
+        establishments: {},
       },
-    );
+    });
   });
 
   it("should save IcUserAgencyRightChanged event when successful", async () => {
@@ -165,10 +159,7 @@ describe("GetInclusionConnectedUsers", () => {
       },
     };
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-      icUser,
-    ]);
+    userRepository.setInclusionConnectedUsers([backofficeAdminUser, icUser]);
     const newRole: AgencyRole = "validator";
     const icUserRoleForAgency: IcUserRoleForAgencyParams = {
       userId: notAdminUser.id,
@@ -208,10 +199,7 @@ describe("GetInclusionConnectedUsers", () => {
       },
     };
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-      icUser,
-    ]);
+    userRepository.setInclusionConnectedUsers([backofficeAdminUser, icUser]);
 
     const icUserRoleForAgency: IcUserRoleForAgencyParams = {
       roles: ["counsellor", "validator", "agencyOwner"],
@@ -224,23 +212,20 @@ describe("GetInclusionConnectedUsers", () => {
       backofficeAdminUser,
     );
 
-    expectToEqual(
-      await inclusionConnectedUserRepository.getById(notAdminUser.id),
-      {
-        ...notAdminUser,
-        agencyRights: [
-          {
-            agency,
-            roles: icUserRoleForAgency.roles,
-            isNotifiedByEmail: false,
-          },
-        ],
-        dashboards: {
-          agencies: {},
-          establishments: {},
+    expectToEqual(await userRepository.getById(notAdminUser.id), {
+      ...notAdminUser,
+      agencyRights: [
+        {
+          agency,
+          roles: icUserRoleForAgency.roles,
+          isNotifiedByEmail: false,
         },
+      ],
+      dashboards: {
+        agencies: {},
+        establishments: {},
       },
-    );
+    });
 
     expect(outboxRepo.events).toHaveLength(1);
 
@@ -286,7 +271,7 @@ describe("GetInclusionConnectedUsers", () => {
       },
     };
 
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
       icUserReceivingNotif,
       icUserWithoutNotif,

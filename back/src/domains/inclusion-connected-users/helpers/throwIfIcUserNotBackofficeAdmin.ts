@@ -20,7 +20,7 @@ export const getIcUserOrThrow = async (
   uow: UnitOfWork,
   userId: UserId,
 ): Promise<InclusionConnectedUser> => {
-  const user = await uow.inclusionConnectedUserRepository.getById(userId);
+  const user = await uow.userRepository.getById(userId);
   if (!user) throw errors.user.notFound({ userId });
   return user;
 };

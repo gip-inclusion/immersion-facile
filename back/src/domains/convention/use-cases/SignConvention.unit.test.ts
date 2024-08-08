@@ -133,9 +133,7 @@ describe("Sign convention", () => {
           externalId: "billy-external-id",
           createdAt: new Date().toISOString(),
         };
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-          icUser,
-        ]);
+        uow.userRepository.setInclusionConnectedUsers([icUser]);
         const signedAt = new Date("2022-01-01");
         timeGateway.setNextDate(signedAt);
 
@@ -246,9 +244,7 @@ describe("Sign convention", () => {
           externalId: "billy-external-id",
           createdAt: new Date().toISOString(),
         };
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-          icUser,
-        ]);
+        uow.userRepository.setInclusionConnectedUsers([icUser]);
         const signedAt = new Date("2022-01-01");
         timeGateway.setNextDate(signedAt);
 

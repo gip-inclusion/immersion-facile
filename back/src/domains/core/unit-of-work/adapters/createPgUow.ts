@@ -18,7 +18,6 @@ import { PgGroupRepository } from "../../../establishment/adapters/PgGroupReposi
 import { PgSearchMadeRepository } from "../../../establishment/adapters/PgSearchMadeRepository";
 import { PgEstablishmentMarketingRepository } from "../../../marketing/adapters/PgEstablishmentMarketingRepository";
 import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
-import { PgInclusionConnectedUserRepository } from "../../authentication/inclusion-connect/adapters/PgInclusionConnectedUserRepository";
 import { PgOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/PgOngoingOAuthRepository";
 import { PgUserRepository } from "../../authentication/inclusion-connect/adapters/PgUserRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/adapters/PgConventionPoleEmploiAdvisorRepository";
@@ -64,9 +63,6 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     featureFlagRepository: new PgFeatureFlagRepository(transaction),
     formEstablishmentRepository: new PgFormEstablishmentRepository(transaction),
     assessmentRepository: new PgAssessmentRepository(transaction),
-    inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
-      transaction,
-    ),
     npsRepository: new PgNpsRepository(transaction),
     notificationRepository: new PgNotificationRepository(transaction),
     ongoingOAuthRepository: new PgOngoingOAuthRepository(transaction),

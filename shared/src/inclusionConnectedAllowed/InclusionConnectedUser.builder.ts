@@ -6,7 +6,7 @@ import {
   UserId,
 } from "./inclusionConnectedAllowed.dto";
 
-const defaultInculsionConnectUser: InclusionConnectedUser = {
+const defaultInclusionConnectedUser: InclusionConnectedUser = {
   id: "default-inclusion-connect-user-id",
   email: "default.user@mail.com",
   firstName: "Default",
@@ -22,9 +22,9 @@ const defaultInculsionConnectUser: InclusionConnectedUser = {
 export class InclusionConnectedUserBuilder
   implements Builder<InclusionConnectedUser>
 {
-  #dto: InclusionConnectedUser = defaultInculsionConnectUser;
+  #dto: InclusionConnectedUser = defaultInclusionConnectedUser;
 
-  constructor(dto = defaultInculsionConnectUser) {
+  constructor(dto = defaultInclusionConnectedUser) {
     this.#dto = dto;
   }
 

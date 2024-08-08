@@ -1,10 +1,19 @@
 import { values } from "ramda";
-import { Email, User } from "shared";
-import { UserRepository } from "../port/UserRepositiory";
+import {
+  AgencyRight,
+  Email,
+  InclusionConnectedUser,
+  User,
+  UserId,
+} from "shared";
+import {
+  InclusionConnectedFilters,
+  UserRepository,
+} from "../port/UserRepository";
+
+type AgencyRightsByUserId = Record<UserId, AgencyRight[]>;
 
 export class InMemoryUserRepository implements UserRepository {
-  #usersById: Record<string, User> = {};
-
   public async findByExternalId(externalId: string): Promise<User | undefined> {
     return this.users.find((user) => user.externalId === externalId);
   }
@@ -31,4 +40,76 @@ export class InMemoryUserRepository implements UserRepository {
       {} as Record<string, User>,
     );
   }
+
+  public async getById(
+    userId: string,
+  ): Promise<InclusionConnectedUser | undefined> {
+    const foundUser = await this.users.find((user) => user.id === userId);
+    if (!foundUser) return;
+    return {
+      ...foundUser,
+      agencyRights: this.agencyRightsByUserId[userId] ?? [],
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
+    };
+  }
+
+  public async getWithFilter({
+    agencyRole,
+    agencyId,
+  }: InclusionConnectedFilters): Promise<InclusionConnectedUser[]> {
+    // TODO: gestion des filtres optionnels à améliorer
+    return this.users
+      .filter((user) =>
+        this.agencyRightsByUserId[user.id].some(({ roles, agency }) => {
+          if (agencyId) {
+            if (agency.id !== agencyId) return false;
+          }
+
+          if (agencyRole) {
+            if (!roles.includes(agencyRole)) return false;
+          }
+
+          return true;
+        }),
+      )
+      .map((user) => ({
+        ...user,
+        agencyRights: this.agencyRightsByUserId[user.id],
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
+      }));
+  }
+
+  public setInclusionConnectedUsers(
+    inclusionConnectedUsers: InclusionConnectedUser[],
+  ) {
+    this.users = inclusionConnectedUsers.map(
+      ({ agencyRights: _, ...user }) => user,
+    );
+    this.agencyRightsByUserId = inclusionConnectedUsers.reduce(
+      (acc, icUser) => ({
+        ...acc,
+        [icUser.id]: icUser.agencyRights,
+      }),
+      {} satisfies AgencyRightsByUserId,
+    );
+  }
+
+  public async updateAgencyRights({
+    userId,
+    agencyRights,
+  }: {
+    userId: UserId;
+    agencyRights: AgencyRight[];
+  }): Promise<void> {
+    this.agencyRightsByUserId[userId] = agencyRights;
+  }
+
+  public agencyRightsByUserId: AgencyRightsByUserId = {};
+  #usersById: Record<string, User> = {};
 }

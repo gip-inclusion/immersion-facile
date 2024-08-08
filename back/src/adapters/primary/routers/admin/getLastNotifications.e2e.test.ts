@@ -36,7 +36,7 @@ describe(`${adminRoutes.getLastNotifications.url} route`, () => {
       userId: backofficeAdminUser.id,
     };
 
-    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+    inMemoryUow.userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
     ]);
 

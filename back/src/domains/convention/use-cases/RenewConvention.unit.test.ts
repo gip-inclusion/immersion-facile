@@ -136,7 +136,7 @@ describe("RenewConvention", () => {
       async ({ payload }) => {
         uow.conventionRepository.setConventions([existingValidatedConvention]);
 
-        uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        uow.userRepository.setInclusionConnectedUsers([
           inclusionConnectedUser,
           backofficeAdmin,
         ]);
@@ -256,7 +256,7 @@ describe("RenewConvention", () => {
 
     it("throws an error when inclusion connect user has no rights on agency", async () => {
       uow.conventionRepository.setConventions([existingValidatedConvention]);
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      uow.userRepository.setInclusionConnectedUsers([
         { ...inclusionConnectedUser, agencyRights: [] },
       ]);
       await expectPromiseToFailWithError(
@@ -269,7 +269,7 @@ describe("RenewConvention", () => {
 
     it("throws an error when inclusion connect user has bad rights on agency", async () => {
       uow.conventionRepository.setConventions([existingValidatedConvention]);
-      uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      uow.userRepository.setInclusionConnectedUsers([
         {
           ...inclusionConnectedUser,
           agencyRights: [

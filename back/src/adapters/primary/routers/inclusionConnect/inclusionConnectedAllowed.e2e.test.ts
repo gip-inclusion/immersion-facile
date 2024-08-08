@@ -75,7 +75,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       inMemoryUow.conventionRepository.setConventions([convention]);
 
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      inMemoryUow.userRepository.setInclusionConnectedUsers([
         inclusionConnectedUserWithRights,
       ]);
 
@@ -168,7 +168,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     it(`${displayRouteName(
       inclusionConnectedAllowedRoutes.registerAgenciesToUser,
     )} 200 add an agency as registered to an Inclusion Connected user`, async () => {
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      inMemoryUow.userRepository.setInclusionConnectedUsers([
         inclusionConnectedUserWithoutRights,
       ]);
       inMemoryUow.agencyRepository.setAgencies([agency]);
@@ -187,15 +187,12 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: "",
         status: 200,
       });
-      expectToEqual(
-        await inMemoryUow.inclusionConnectedUserRepository.getById(userId),
-        {
-          ...inclusionConnectedUserWithRights,
-          agencyRights: [
-            { agency, roles: ["toReview"], isNotifiedByEmail: false },
-          ],
-        },
-      );
+      expectToEqual(await inMemoryUow.userRepository.getById(userId), {
+        ...inclusionConnectedUserWithRights,
+        agencyRights: [
+          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+        ],
+      });
     });
 
     it(`${displayRouteName(
@@ -300,9 +297,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         .withId(conventionId)
         .withAgencyId(conventionAgency.id)
         .build();
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        user,
-      ]);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
       inMemoryUow.agencyRepository.setAgencies([userAgency, conventionAgency]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
@@ -343,9 +338,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         .withId(conventionId)
         .withAgencyId(agency.id)
         .build();
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        user,
-      ]);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
       inMemoryUow.agencyRepository.setAgencies([agency]);
       inMemoryUow.conventionRepository.setConventions([convention]);
       await inMemoryUow.broadcastFeedbacksRepository.save({
@@ -451,9 +444,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         version: currentJwtVersions.inclusion,
       });
       inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        user,
-      ]);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
 
       const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
@@ -510,9 +501,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         version: currentJwtVersions.inclusion,
       });
       inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        user,
-      ]);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
 
       const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
@@ -548,9 +537,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         version: currentJwtVersions.inclusion,
       });
       inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        user,
-      ]);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
 
       const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
@@ -589,9 +576,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         .withIsAdmin(true)
         .build();
 
-      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        adminUser,
-      ]);
+      inMemoryUow.userRepository.setInclusionConnectedUsers([adminUser]);
 
       const token = generateInclusionConnectJwt({
         userId: adminUser.id,

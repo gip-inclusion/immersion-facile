@@ -21,9 +21,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
   ): Promise<DiscussionReadDto> {
     if (!jwtPayload) throw errors.user.unauthorized();
 
-    const user = await uow.inclusionConnectedUserRepository.getById(
-      jwtPayload.userId,
-    );
+    const user = await uow.userRepository.getById(jwtPayload.userId);
 
     if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 

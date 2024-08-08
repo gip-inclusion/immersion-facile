@@ -105,7 +105,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       externalId: "jean-external-id",
       createdAt: new Date().toISOString(),
     };
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+    uow.userRepository.setInclusionConnectedUsers([icUser]);
 
     await notifyIcUserAgencyRightChanged.execute(icUserRoleParams);
 
@@ -146,7 +146,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       externalId: "jean-external-id",
       createdAt: new Date().toISOString(),
     };
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+    uow.userRepository.setInclusionConnectedUsers([icUser]);
 
     await notifyIcUserAgencyRightChanged.execute({
       roles: ["toReview"],

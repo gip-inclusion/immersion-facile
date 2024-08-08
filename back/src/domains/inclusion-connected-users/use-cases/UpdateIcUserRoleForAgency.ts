@@ -37,9 +37,7 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    const userToUpdate = await uow.inclusionConnectedUserRepository.getById(
-      params.userId,
-    );
+    const userToUpdate = await uow.userRepository.getById(params.userId);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
     const agencyRightToUpdate = userToUpdate.agencyRights.find(
@@ -53,10 +51,9 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
       });
 
     if (!params.roles.includes("validator")) {
-      const agencyUsers =
-        await uow.inclusionConnectedUserRepository.getWithFilter({
-          agencyId: params.agencyId,
-        });
+      const agencyUsers = await uow.userRepository.getWithFilter({
+        agencyId: params.agencyId,
+      });
 
       const agencyHasOtherValidator = agencyUsers.some(
         (agencyUser) =>
@@ -94,7 +91,7 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.updateAgencyRights({
+      uow.userRepository.updateAgencyRights({
         userId: params.userId,
         agencyRights: newAgencyRights,
       }),
