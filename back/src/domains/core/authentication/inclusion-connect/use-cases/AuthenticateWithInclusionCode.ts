@@ -190,7 +190,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         existingInclusionConnectedUser,
         uow,
       );
-      //await uow.userRepository.deleteById(conflictingUser.id);
+      await uow.userRepository.delete(conflictingUser.id);
       const user: User = {
         createdAt: existingInclusionConnectedUser.createdAt,
         externalId: existingInclusionConnectedUser.externalId,
@@ -224,24 +224,22 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     userToKeep: User,
     uow: UnitOfWork,
   ): Promise<void> {
-    const conflictingIcUser =
-      await uow.inclusionConnectedUserRepository.getById(conflictingUser.id);
-    const userToKeepIcUser = await uow.inclusionConnectedUserRepository.getById(
-      userToKeep.id,
+    const conflictingIcUser = await uow.userRepository.getById(
+      conflictingUser.id,
     );
+    const userToKeepIcUser = await uow.userRepository.getById(userToKeep.id);
     if (!conflictingIcUser || !userToKeepIcUser) return;
 
     const conflictingUserAgencyRights = conflictingIcUser.agencyRights;
     const userToKeepAgencyRights = userToKeepIcUser.agencyRights;
 
-    await uow.inclusionConnectedUserRepository.updateAgencyRights({
+    await uow.userRepository.updateAgencyRights({
       agencyRights: this.#mergeAgencyRights(
         conflictingUserAgencyRights,
         userToKeepAgencyRights,
       ),
       userId: userToKeepIcUser.id,
     });
-    await uow.inclusionConnectedUserRepository.deleteById(conflictingUser.id);
   }
 
   #mergeAgencyRights(

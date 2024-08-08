@@ -312,6 +312,14 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur '${userId}' n'est pas administrateur Immersion Facilitée.`,
       ),
+    conflictByEmail: ({ userEmail }: { userEmail: Email }) =>
+      new ConflictError(
+        `L'utilisateur ayant le mail ${userEmail} existe déjà.`,
+      ),
+    conflictByExternalId: ({ externalId }: { externalId: string }) =>
+      new ConflictError(
+        `L'utilisateur ayant l'externalId ${externalId} existe déjà.`,
+      ),
   },
   broadcastFeedback: {
     notFound: ({

@@ -96,7 +96,7 @@ export class PgUserRepository implements UserRepository {
     return;
   }
 
-  public async deleteById(userId: UserId): Promise<void> {
+  public async delete(userId: UserId): Promise<void> {
     const response = await this.transaction
       .deleteFrom("users")
       .where("id", "=", userId)
