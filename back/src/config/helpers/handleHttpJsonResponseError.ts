@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/node";
 import { isAxiosError } from "axios";
 import { Request, Response } from "express";
-import { HttpError } from "shared";
+import { HttpError, HttpErrorResponseBody } from "shared";
 import { ZodError } from "zod";
 import { LoggerParamsWithMessage, createLogger } from "../../utils/logger";
 import { notifyObjectDiscord } from "../../utils/notifyDiscord";
@@ -33,7 +33,7 @@ export const handleHttpJsonResponseErrorForApiV2 = (
         ...(error.issues ? { issues: error.issues } : {}),
         message: error.message,
         status: error.httpCode,
-      })
+      } satisfies HttpErrorResponseBody)
     : onNotHttpError(error, req, res);
 };
 
@@ -84,7 +84,10 @@ const onNotHttpError = (error: any, req: Request, res: Response) => {
         });
   }
 
-  return res.status(500).json({ errors: error.message });
+  return res.status(500).json({
+    message: error.message,
+    status: 500,
+  } satisfies HttpErrorResponseBody);
 };
 
 const logErrorAndNotifyDiscord = (
