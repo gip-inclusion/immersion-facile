@@ -121,7 +121,7 @@ describe("GetApiConsumersByConvention", () => {
 
     uow.conventionRepository.setConventions([convention]);
     uow.agencyRepository.agencies = [agency];
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+    uow.userRepository.setInclusionConnectedUsers([user]);
 
     expectToEqual(
       await getApiConsumersByConvention.execute(
@@ -167,7 +167,7 @@ describe("GetApiConsumersByConvention", () => {
 
     uow.conventionRepository.setConventions([convention]);
     uow.agencyRepository.agencies = [agency];
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+    uow.userRepository.setInclusionConnectedUsers([user]);
     uow.apiConsumerRepository.consumers = [apiConsumer];
 
     expectToEqual(
@@ -208,7 +208,7 @@ describe("GetApiConsumersByConvention", () => {
 
     uow.conventionRepository.setConventions([convention]);
     uow.agencyRepository.agencies = [agency];
-    uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([user]);
+    uow.userRepository.setInclusionConnectedUsers([user]);
     uow.apiConsumerRepository.consumers = [apiConsumer];
 
     expectToEqual(
