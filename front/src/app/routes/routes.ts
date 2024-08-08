@@ -95,6 +95,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       `/agence-dashboard/${tab}`, //legacy route redirect to frontRoutes.agencyDashboard
     ],
   ),
+  beneficiaryDashboard: defineRoute(`/${frontRoutes.beneficiaryDashboard}`),
   conventionCustomAgency: defineRoute(
     {
       jwt: param.query.optional.string,

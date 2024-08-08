@@ -47,6 +47,7 @@ export const domElementIds = {
         home: buildHeaderNavLinkId("candidate-home"),
         search: buildHeaderNavLinkId("candidate-search"),
         formConvention: buildHeaderNavLinkId("candidate-form-convention"),
+        dashboard: buildHeaderNavLinkId("candidate-dashboard"),
       },
       establishment: {
         home: buildHeaderNavLinkId("establishment-home"),
@@ -65,6 +66,7 @@ export const domElementIds = {
         emails: buildHeaderNavLinkId("admin-emails"),
       },
       quickAccess: {
+        beneficiary: buildHeaderNavLinkId("quick-access-beneficiary"),
         establishment: buildHeaderNavLinkId("quick-access-establishment"),
         agency: buildHeaderNavLinkId("quick-access-agency"),
         myAccount: buildHeaderNavLinkId("quick-access-my-account"),
@@ -691,4 +693,5 @@ export const domElementIds = {
     dontKnowCategoryButton:
       "im-convention-form__initiate-dont-know-category-button",
   },
+  beneficiaryDashboard: {},
 } satisfies DomElementIds;

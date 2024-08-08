@@ -70,7 +70,7 @@ export const ButtonWithSubMenu = ({
         <ul className={cx(fr.cx("fr-menu__list"), Styles.list)}>
           {navItems.map((item) => (
             <li key={item.linkProps.id}>
-              <a className={fr.cx("fr-nav__link")} href={item.linkProps.href}>
+              <a className={fr.cx("fr-nav__link")} {...item.linkProps}>
                 {item.text}
               </a>
             </li>

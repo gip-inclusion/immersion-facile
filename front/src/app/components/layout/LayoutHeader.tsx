@@ -66,6 +66,14 @@ export const LayoutHeader = () => {
     <ButtonWithSubMenu
       navItems={[
         {
+          text: "Je suis un candidat",
+          isActive: false,
+          linkProps: {
+            ...routes.beneficiaryDashboard().link,
+            id: quickAccessIds.beneficiary,
+          },
+        },
+        {
           text: "Je suis une entreprise",
           isActive: false,
           linkProps: {
@@ -113,13 +121,16 @@ export const LayoutHeader = () => {
 
   const isCandidateRoute =
     currentRoute.name === routes.search().name ||
-    currentRoute.name === routes.homeCandidates().name;
+    currentRoute.name === routes.homeCandidates().name ||
+    currentRoute.name === routes.beneficiaryDashboard().name;
   const isEstablishmentRoute =
     currentRoute.name === routes.formEstablishment().name ||
-    currentRoute.name === routes.homeEstablishments().name;
+    currentRoute.name === routes.homeEstablishments().name ||
+    currentRoute.name === routes.establishmentDashboard().name;
   const isAgencyRoute =
     currentRoute.name === routes.addAgency().name ||
-    currentRoute.name === routes.homeAgencies().name;
+    currentRoute.name === routes.homeAgencies().name ||
+    currentRoute.name === routes.agencyDashboard().name;
   const links: MainNavigationProps.Item[] = [
     {
       text: "Accueil",
@@ -157,6 +168,14 @@ export const LayoutHeader = () => {
               skipFirstStep: true,
             }).link,
             id: candidateIds.formConvention,
+          },
+        },
+        {
+          text: "Mon espace",
+          isActive: currentRoute.name === routes.beneficiaryDashboard().name,
+          linkProps: {
+            ...routes.beneficiaryDashboard().link,
+            id: candidateIds.dashboard,
           },
         },
       ],
