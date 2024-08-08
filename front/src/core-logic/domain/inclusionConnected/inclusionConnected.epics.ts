@@ -1,4 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
+import { inclusionConnectTokenExpiredMessage } from "shared";
 import { AuthAction } from "src/core-logic/domain/auth/auth.epics";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
@@ -43,7 +44,7 @@ const getCurrentUserEpic: InclusionConnectedEpic = (
     ),
     map(inclusionConnectedSlice.actions.currentUserFetchSucceeded),
     catchEpicError((error) =>
-      error?.message.includes("jwt expired")
+      error?.message.includes(inclusionConnectTokenExpiredMessage)
         ? authSlice.actions.federatedIdentityDeletionTriggered({
             mode: "device-only",
           })

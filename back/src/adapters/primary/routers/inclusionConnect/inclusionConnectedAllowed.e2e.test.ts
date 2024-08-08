@@ -12,6 +12,7 @@ import {
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
+  inclusionConnectTokenExpiredMessage,
   inclusionConnectedAllowedRoutes,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -158,7 +159,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        body: { message: "Token is expired", status: 401 },
+        body: { message: inclusionConnectTokenExpiredMessage, status: 401 },
         status: 401,
       });
     });
@@ -259,7 +260,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: { conventionId: "11111111-1111-4111-1111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
-        body: { message: "Token is expired", status: 401 },
+        body: { message: inclusionConnectTokenExpiredMessage, status: 401 },
         status: 401,
       });
     });

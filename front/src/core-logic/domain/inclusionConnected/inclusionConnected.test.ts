@@ -6,6 +6,7 @@ import {
   WithAgencyIds,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
+  inclusionConnectTokenExpiredMessage,
 } from "shared";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -184,7 +185,7 @@ describe("InclusionConnected", () => {
       );
       expectIsLoadingToBe(true);
 
-      const errorMessage = "Something went wrong : jwt expired";
+      const errorMessage = `Something went wrong : ${inclusionConnectTokenExpiredMessage}`;
       dependencies.inclusionConnectedGateway.currentUser$.error(
         new Error(errorMessage),
       );
