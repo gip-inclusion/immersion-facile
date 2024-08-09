@@ -18,10 +18,7 @@ export const numberOfEmployeesRangeSchema: z.Schema<NumberEmployeesRange> =
   z.enum(numberEmployeesRanges);
 
 export const siretSchema: z.Schema<SiretDto> = zStringMinLength1
-  .refine(
-    (siret) => siret.match(siretRegex),
-    "SIRET doit être composé de 14 chiffres",
-  )
+  .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
   .transform(removeSpaces);
 
 export const withSiretSchema: z.Schema<WithSiretDto> = z.object({
