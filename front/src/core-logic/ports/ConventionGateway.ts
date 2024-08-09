@@ -29,7 +29,7 @@ export interface ConventionGateway {
     convention: ConventionDto;
     discussionId?: DiscussionId;
   }): Observable<void>;
-  getApiConsumersByconvention$(
+  getApiConsumersByConvention$(
     params: {
       conventionId: ConventionId;
     },

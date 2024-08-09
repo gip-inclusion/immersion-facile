@@ -76,7 +76,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.addConventionResult$;
   }
 
-  public getApiConsumersByconvention$(
+  public getApiConsumersByConvention$(
     _params: WithConventionId,
     _jwt: InclusionConnectJwt,
   ): Observable<ApiConsumerName[]> {

@@ -73,7 +73,7 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public getApiConsumersByconvention$(
+  public getApiConsumersByConvention$(
     params: WithConventionId,
     jwt: InclusionConnectJwt,
   ): Observable<ApiConsumerName[]> {

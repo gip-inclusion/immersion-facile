@@ -96,7 +96,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
             Marquer la convention comme traitée
           </Button>
           <BroadcastAgainButton
-            conventionId={methods.getValues("conventionId")}
+            conventionId={methods.watch("conventionId")}
             disabled={!methods.formState.isValid}
           />
           {createPortal(
