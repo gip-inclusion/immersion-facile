@@ -15,20 +15,20 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  GetApiConsumersByconvention,
-  makeGetApiConsumersByconvention,
+  GetApiConsumersByConvention,
+  makeGetApiConsumersByConvention,
 } from "./GetApiConsumersByConvention";
 
 describe("GetApiConsumersByConvention", () => {
   const uuidGenerator = new TestUuidGenerator();
-  let getApiConsumersByConvention: GetApiConsumersByconvention;
+  let getApiConsumersByConvention: GetApiConsumersByConvention;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
 
-    getApiConsumersByConvention = makeGetApiConsumersByconvention({
+    getApiConsumersByConvention = makeGetApiConsumersByConvention({
       uowPerformer,
     });
   });

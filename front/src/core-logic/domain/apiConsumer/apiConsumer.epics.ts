@@ -18,7 +18,7 @@ const getApiConsumerNamesByConventionEpic: ApiConsumerEpic = (
     filter(apiConsumerSlice.actions.fetchApiConsumerNamesRequested.match),
     switchMap(({ payload }) =>
       conventionGateway
-        .getApiConsumersByconvention$(
+        .getApiConsumersByConvention$(
           { conventionId: payload.conventionId },
           payload.jwt,
         )

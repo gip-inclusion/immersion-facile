@@ -10,16 +10,16 @@ import {
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 
-export type GetApiConsumersByconvention = ReturnType<
-  typeof makeGetApiConsumersByconvention
+export type GetApiConsumersByConvention = ReturnType<
+  typeof makeGetApiConsumersByConvention
 >;
-export const makeGetApiConsumersByconvention = createTransactionalUseCase<
+export const makeGetApiConsumersByConvention = createTransactionalUseCase<
   WithConventionId,
   ApiConsumerName[],
   InclusionConnectedUser
 >(
   {
-    name: "GetApiConsumersByconvention",
+    name: "GetApiConsumersByConvention",
     inputSchema: withConventionIdSchema,
   },
   async ({ uow, currentUser, inputParams: { conventionId } }) => {
