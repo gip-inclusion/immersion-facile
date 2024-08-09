@@ -80,9 +80,7 @@ export const zStringPossiblyEmptyWithMax = (max: number): z.Schema<string> =>
   zStringCanBeEmpty.max(max, localization.maxCharacters(max));
 
 export const zTrimmedStringWithMax = (max: number) =>
-  zStringMinLength1
-    .max(max, localization.maxCharacters(max))
-    .transform((s) => s.trim());
+  zStringMinLength1.max(max, localization.maxCharacters(max));
 
 export const stringWithMaxLength255 = zTrimmedStringWithMax(255);
 
