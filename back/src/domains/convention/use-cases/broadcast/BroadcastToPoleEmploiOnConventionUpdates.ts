@@ -1,9 +1,12 @@
 import {
+  AgencyDto,
+  ConventionDto,
   ImmersionObjective,
   WithConventionDto,
   errors,
   withConventionSchema,
 } from "shared";
+import { AgencyRepository } from "../../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -25,6 +28,24 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Initier une démarche de recrutement": 3,
 };
 
+const getLinkedAgencies = async (
+  agencyRepository: AgencyRepository,
+  convention: ConventionDto,
+): Promise<{ agency: AgencyDto; refersToAgency: AgencyDto | null }> => {
+  const agency = await agencyRepository.getById(convention.agencyId);
+  if (!agency) throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+  let refersToAgency = null;
+  if (agency.refersToAgencyId) {
+    refersToAgency = await agencyRepository.getById(agency.refersToAgencyId);
+
+    if (refersToAgency === undefined)
+      throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
+  }
+
+  return { agency, refersToAgency };
+};
+
 export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;
 
@@ -41,10 +62,15 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
-    if (!agency)
-      throw errors.agency.notFound({ agencyId: convention.agencyId });
-    if (agency.kind !== "pole-emploi")
+    const { agency, refersToAgency } = await getLinkedAgencies(
+      uow.agencyRepository,
+      convention,
+    );
+
+    if (
+      (agency.kind !== "pole-emploi" && !refersToAgency) ||
+      (refersToAgency && refersToAgency.kind !== "pole-emploi")
+    )
       return this.options.resyncMode
         ? uow.conventionsToSyncRepository.save({
             id: convention.id,

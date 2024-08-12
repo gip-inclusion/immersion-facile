@@ -42,7 +42,7 @@ const prepareUseCase = async () => {
 };
 
 describe("Broadcasts events to pole-emploi", () => {
-  it("Skips convention if not linked to an agency of kind pole-emploi", async () => {
+  it("Skips convention if not linked to an agency of kind pole-emploi nor agencyRefersTo of kind pole-emploi", async () => {
     // Prepare
     const { broadcastToPe, poleEmploiGateWay, uow } = await prepareUseCase();
 
@@ -238,5 +238,61 @@ describe("Broadcasts events to pole-emploi", () => {
       broadcastToPe.execute({ convention }),
       new Error("fake axios error"),
     );
+  });
+
+  it("broadcast to pole-emploi when convention is from an agency RefersTo", async () => {
+    // Prepare
+    const { broadcastToPe, poleEmploiGateWay, peAgency, uow } =
+      await prepareUseCase();
+    const agencyWithRefersTo = new AgencyDtoBuilder()
+      .withKind("autre")
+      .withRefersToAgencyId(peAgency.id)
+      .build();
+
+    await uow.agencyRepository.setAgencies([peAgency, agencyWithRefersTo]);
+
+    const immersionConventionId: ConventionId =
+      "00000000-0000-0000-0000-000000000000";
+
+    const externalId = "00000000001";
+    uow.conventionExternalIdRepository.externalIdsByConventionId = {
+      [immersionConventionId]: externalId,
+    };
+
+    // Act
+    const convention = new ConventionDtoBuilder()
+      .withId(immersionConventionId)
+      .withAgencyId(agencyWithRefersTo.id)
+      .withImmersionAppelation({
+        appellationCode: "11111",
+        appellationLabel: "some Appellation",
+        romeCode: "A1111",
+        romeLabel: "some Rome",
+      })
+      .withBeneficiaryBirthdate("2000-10-05")
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
+      .withDateStart("2021-05-12")
+      .withDateEnd("2021-05-14T00:30:00.000Z") //
+      .withSchedule(reasonableSchedule)
+      .withImmersionObjective("Initier une démarche de recrutement")
+      .build();
+
+    await broadcastToPe.execute({ convention });
+
+    // Assert
+    expect(poleEmploiGateWay.notifications).toHaveLength(1);
+    expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
+      id: externalId,
+      peConnectId: "some-id",
+      originalId: immersionConventionId,
+      objectifDeImmersion: 3,
+      dureeImmersion: 21,
+      dateDebut: "2021-05-12T00:00:00.000Z",
+      dateFin: "2021-05-14T00:30:00.000Z",
+      dateNaissance: "2000-10-05T00:00:00.000Z",
+      statut: "DEMANDE_VALIDÉE",
+      codeAppellation: "011111",
+    });
   });
 });
