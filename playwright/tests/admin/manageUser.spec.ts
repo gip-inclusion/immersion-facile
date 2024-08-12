@@ -35,11 +35,6 @@ test.describe("Manage users in admin", () => {
       .click();
     await page
       .locator(
-        `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-4"]`,
-      )
-      .click();
-    await page
-      .locator(
         `#${domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}`,
       )
       .click();
