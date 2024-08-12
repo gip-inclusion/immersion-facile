@@ -21,6 +21,7 @@ export interface Database {
   api_consumers: ApiConsumers;
   convention_external_ids: ConventionExternalIds;
   conventions: Conventions;
+  conventions_to_sync_with_pe: ConventionsToSyncWithPe;
   delegation_contacts: DelegationContacts;
   discussions: Discussions;
   establishment_lead_events: EstablishmentLeadEvents;
@@ -253,6 +254,13 @@ interface Conventions extends WithAcquisition {
   renewed_justification: string | null;
   date_approval: Timestamp | null;
   establishment_number_employees: NumberEmployeesRange | null;
+}
+
+interface ConventionsToSyncWithPe {
+  id: string;
+  status: string;
+  process_date: Timestamp | null;
+  reason: string | null;
 }
 
 interface Actors {

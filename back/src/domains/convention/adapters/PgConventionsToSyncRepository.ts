@@ -1,58 +1,9 @@
 import { ConventionId } from "shared";
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import {
   ConventionToSync,
   ConventionsToSyncRepository,
 } from "../ports/ConventionsToSyncRepository";
-
-export const conventionsToSyncTableName = "conventions_to_sync_with_pe";
-
-export class PgConventionsToSyncRepository
-  implements ConventionsToSyncRepository
-{
-  constructor(private transaction: KyselyDb) {}
-
-  public async getById(
-    id: ConventionId,
-  ): Promise<ConventionToSync | undefined> {
-    const pgConventionToSync = await selectConventionToSyncById(
-      this.transaction,
-      id,
-    );
-    return pgConventionToSync
-      ? pgResultToConventionToSync(pgConventionToSync)
-      : undefined;
-  }
-
-  public async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
-    const queryResult = await executeKyselyRawSqlQuery<PgConventionToSync>(
-      this.transaction,
-      `
-          SELECT id, status, process_date, reason
-          FROM ${conventionsToSyncTableName}
-          WHERE status = 'TO_PROCESS'
-             OR status = 'ERROR'
-              LIMIT $1
-      `,
-      [limit],
-    );
-    return queryResult.rows.map((pgConventionToSync) =>
-      pgResultToConventionToSync(pgConventionToSync),
-    );
-  }
-
-  public async save(conventionToSync: ConventionToSync): Promise<void> {
-    return (await isConventionToSyncAlreadyExists(
-      this.transaction,
-      conventionToSync.id,
-    ))
-      ? updateConventionToSync(this.transaction, conventionToSync)
-      : insertConventionToSync(this.transaction, conventionToSync);
-  }
-}
 
 type PgConventionToSync = {
   id: string;
@@ -71,88 +22,97 @@ const pgResultToConventionToSync = (
     reason: pgConventionToSync.reason ?? undefined,
   }) as ConventionToSync;
 
-const isConventionToSyncAlreadyExists = async (
-  transaction: KyselyDb,
-  conventionId: ConventionId,
-): Promise<boolean> => {
-  const rows = (
-    await executeKyselyRawSqlQuery(
-      transaction,
-      `SELECT EXISTS(SELECT 1
-                     FROM ${conventionsToSyncTableName}
-                     WHERE id = $1)`,
-      [conventionId],
-    )
-  ).rows;
-  const result = rows.at(0);
-  if (!result) return false;
-  return result.exists;
-};
+export class PgConventionsToSyncRepository
+  implements ConventionsToSyncRepository
+{
+  constructor(private transaction: KyselyDb) {}
 
-const updateConventionToSync = async (
-  transaction: KyselyDb,
-  conventionToSync: ConventionToSync,
-): Promise<void> => {
-  await executeKyselyRawSqlQuery(
-    transaction,
-    `
-        UPDATE ${conventionsToSyncTableName}
-        SET status       = $2,
-            process_date = $3,
-            reason       = $4
-        WHERE id = $1
-    `,
-    [
-      conventionToSync.id,
-      conventionToSync.status,
-      conventionToSync.status !== "TO_PROCESS"
-        ? conventionToSync.processDate
-        : null,
-      conventionToSync.status === "ERROR" || conventionToSync.status === "SKIP"
-        ? conventionToSync.reason
-        : null,
-    ],
-  );
-};
+  public async getById(
+    id: ConventionId,
+  ): Promise<ConventionToSync | undefined> {
+    const result = await this.transaction
+      .selectFrom("conventions_to_sync_with_pe")
+      .where("id", "=", id)
+      .select(["id", "status", "process_date", "reason"])
+      .executeTakeFirst();
 
-const insertConventionToSync = async (
-  transaction: KyselyDb,
-  conventionToSync: ConventionToSync,
-): Promise<void> => {
-  await executeKyselyRawSqlQuery(
-    transaction,
-    `
-        INSERT INTO ${conventionsToSyncTableName} (id,
-                                                   status,
-                                                   process_date,
-                                                   reason)
-        VALUES ($1, $2, $3, $4)
-    `,
-    [
-      conventionToSync.id,
-      conventionToSync.status,
-      conventionToSync.status !== "TO_PROCESS"
-        ? conventionToSync.processDate
-        : null,
-      conventionToSync.status === "ERROR" || conventionToSync.status === "SKIP"
-        ? conventionToSync.reason
-        : null,
-    ],
-  );
-};
+    return result && pgResultToConventionToSync(result);
+  }
 
-const selectConventionToSyncById = async (
-  transaction: KyselyDb,
-  conventionId: ConventionId,
-): Promise<PgConventionToSync | undefined> =>
-  (
-    await executeKyselyRawSqlQuery<PgConventionToSync>(
-      transaction,
-      `
-          SELECT id, status, process_date, reason
-          FROM ${conventionsToSyncTableName}
-          WHERE id = $1
-      `,
-      [conventionId],
-    )
-  ).rows.at(0);
+  public async getToProcessOrError(limit: number): Promise<ConventionToSync[]> {
+    const result = await this.transaction
+      .selectFrom("conventions_to_sync_with_pe")
+      .where("status", "in", ["TO_PROCESS", "ERROR"])
+      .select(["id", "status", "process_date", "reason"])
+      .limit(limit)
+      .execute();
+
+    return result.map((pgConventionToSync) =>
+      pgResultToConventionToSync(pgConventionToSync),
+    );
+  }
+
+  public async save(conventionToSync: ConventionToSync): Promise<void> {
+    return (await this.#isConventionToSyncAlreadyExists(conventionToSync.id))
+      ? this.#updateConventionToSync(conventionToSync)
+      : this.#insertConventionToSync(conventionToSync);
+  }
+
+  async #isConventionToSyncAlreadyExists(
+    conventionId: ConventionId,
+  ): Promise<boolean> {
+    const result = await this.transaction
+      .selectNoFrom(({ exists, selectFrom }) =>
+        exists(
+          selectFrom("conventions_to_sync_with_pe")
+            .where("id", "=", conventionId)
+            .select("id"),
+        ).as("exist"),
+      )
+      .executeTakeFirst();
+
+    return result !== undefined ? Boolean(result.exist) : false;
+  }
+
+  async #updateConventionToSync(
+    conventionToSync: ConventionToSync,
+  ): Promise<void> {
+    await this.transaction
+      .updateTable("conventions_to_sync_with_pe")
+      .set({
+        status: conventionToSync.status,
+        process_date:
+          conventionToSync.status !== "TO_PROCESS"
+            ? conventionToSync.processDate
+            : null,
+        reason:
+          conventionToSync.status === "ERROR" ||
+          conventionToSync.status === "SKIP"
+            ? conventionToSync.reason
+            : null,
+      })
+      .where("id", "=", conventionToSync.id)
+      .execute();
+  }
+
+  async #insertConventionToSync(
+    conventionToSync: ConventionToSync,
+  ): Promise<void> {
+    await this.transaction
+      .insertInto("conventions_to_sync_with_pe")
+      .values({
+        id: conventionToSync.id,
+        status: conventionToSync.status,
+        process_date:
+          conventionToSync.status !== "TO_PROCESS"
+            ? conventionToSync.processDate
+            : null,
+        reason:
+          conventionToSync.status === "ERROR" ||
+          conventionToSync.status === "SKIP"
+            ? conventionToSync.reason
+            : null,
+      })
+      .execute();
+  }
+}
