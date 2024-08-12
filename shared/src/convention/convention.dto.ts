@@ -277,6 +277,7 @@ export type EstablishmentTutor = GenericActor<"establishment-tutor"> & {
 export type AgencyRefersToInConvention = {
   id: AgencyId;
   name: string;
+  kind: AgencyKind;
 };
 
 export type ConventionAgencyFields = {

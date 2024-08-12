@@ -973,6 +973,7 @@ describe("Pg implementation of ConventionQueries", () => {
       agencyRefersTo: withRefersToAgency && {
         id: withRefersToAgency.id,
         name: withRefersToAgency.name,
+        kind: withRefersToAgency.kind,
       },
       agencyCounsellorEmails,
       agencyValidatorEmails,

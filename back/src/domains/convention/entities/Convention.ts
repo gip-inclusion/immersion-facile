@@ -106,7 +106,11 @@ const isAgencyIdInConsumerScope = (
 ): boolean => {
   const { scope } = apiConsumer.rights.convention;
   return scope.agencyIds
-    ? scope.agencyIds.includes(conventionRead.agencyId)
+    ? scope.agencyIds.includes(conventionRead.agencyId) ||
+        Boolean(
+          conventionRead.agencyRefersTo &&
+            scope.agencyIds.includes(conventionRead.agencyRefersTo.id),
+        )
     : false;
 };
 
@@ -116,7 +120,11 @@ const isAgencyKindInConsumerScope = (
 ): boolean => {
   const { scope } = apiConsumer.rights.convention;
   return scope.agencyKinds
-    ? scope.agencyKinds.includes(conventionRead.agencyKind)
+    ? scope.agencyKinds.includes(conventionRead.agencyKind) ||
+        Boolean(
+          conventionRead.agencyRefersTo &&
+            scope.agencyKinds.includes(conventionRead.agencyRefersTo.kind),
+        )
     : false;
 };
 
