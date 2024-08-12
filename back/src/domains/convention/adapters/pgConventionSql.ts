@@ -256,6 +256,7 @@ export const getConventionAgencyFieldsForAgencies = async (
               jsonBuildObject({
                 id: ref("agencies.refers_to_agency_id").$castTo<AgencyId>(),
                 name: ref("referred_agencies.name").$castTo<string>(),
+                kind: ref("referred_agencies.kind").$castTo<AgencyKind>(),
               }),
             )
             .else(null)

@@ -6,6 +6,11 @@ export const getReferedAgency = async (
   agencyId: AgencyId,
 ): Promise<AgencyRefersToInConvention> => {
   const referedAgency = await uow.agencyRepository.getById(agencyId);
-  if (referedAgency) return { id: referedAgency.id, name: referedAgency.name };
+  if (referedAgency)
+    return {
+      id: referedAgency.id,
+      name: referedAgency.name,
+      kind: referedAgency.kind,
+    };
   throw errors.agency.notFound({ agencyId });
 };

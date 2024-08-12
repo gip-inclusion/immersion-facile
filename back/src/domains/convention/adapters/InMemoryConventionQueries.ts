@@ -196,6 +196,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         ? {
             id: referedAgency.id,
             name: referedAgency.name,
+            kind: referedAgency.kind,
           }
         : undefined,
     };

@@ -280,4 +280,97 @@ describe("Broadcast to partners on updated convention", () => {
       expectedBroadcastFeedback,
     ]);
   });
+
+  it("broadcast updated convention to agency and agency refered to ", async () => {
+    const agencyWithRefersTo = new AgencyDtoBuilder()
+      .withId("agency-with-refers-to")
+      .withKind("autre")
+      .withRefersToAgencyId(agency1.id)
+      .build();
+
+    const conventionFromAgencyWithRefersTo = new ConventionDtoBuilder()
+      .withId("11111111-ee70-4c90-b3f4-668d492f7397")
+      .withAgencyId(agencyWithRefersTo.id)
+      .build();
+
+    const apiConsumerWithSubscriptionOnAgencyWithReferesTo =
+      new ApiConsumerBuilder()
+        .withId("my-api-consumer-with-subscription-on-agency-with-referes-to")
+        .withConventionRight({
+          kinds: ["SUBSCRIPTION"],
+          scope: { agencyIds: [agencyWithRefersTo.id] },
+          subscriptions: [
+            {
+              ...subscriptionParams,
+              subscribedEvent: "convention.updated",
+              createdAt: new Date().toISOString(),
+              id: "my-subscription-id",
+            },
+          ],
+        })
+        .build();
+
+    uow.agencyRepository.setAgencies([agency1, agencyWithRefersTo]);
+    uow.conventionRepository.setConventions([conventionFromAgencyWithRefersTo]);
+
+    uow.apiConsumerRepository.consumers = [
+      apiConsumer1,
+      apiConsumerWithSubscriptionOnAgencyWithReferesTo,
+      apiConsumerNotAllowedToBeNotified,
+      apiConsumerWithoutSubscription,
+    ];
+
+    await broadcastUpdatedConvention.execute({
+      convention: conventionFromAgencyWithRefersTo,
+    });
+
+    const expectedCallsAfterFirstExecute: CallbackParams[] = [
+      {
+        body: {
+          subscribedEvent: "convention.updated",
+          payload: {
+            convention: {
+              ...conventionFromAgencyWithRefersTo,
+              agencyName: agencyWithRefersTo.name,
+              agencyDepartment: agencyWithRefersTo.address.departmentCode,
+              agencyKind: agencyWithRefersTo.kind,
+              agencySiret: agencyWithRefersTo.agencySiret,
+              agencyCounsellorEmails: agencyWithRefersTo.counsellorEmails,
+              agencyValidatorEmails: agencyWithRefersTo.validatorEmails,
+              agencyRefersTo: {
+                id: agency1.id,
+                kind: agency1.kind,
+                name: agency1.name,
+              },
+            },
+          },
+        },
+        subscriptionParams,
+      },
+      {
+        body: {
+          subscribedEvent: "convention.updated",
+          payload: {
+            convention: {
+              ...conventionFromAgencyWithRefersTo,
+              agencyName: agencyWithRefersTo.name,
+              agencyDepartment: agencyWithRefersTo.address.departmentCode,
+              agencyKind: agencyWithRefersTo.kind,
+              agencySiret: agencyWithRefersTo.agencySiret,
+              agencyCounsellorEmails: agencyWithRefersTo.counsellorEmails,
+              agencyValidatorEmails: agencyWithRefersTo.validatorEmails,
+              agencyRefersTo: {
+                id: agency1.id,
+                kind: agency1.kind,
+                name: agency1.name,
+              },
+            },
+          },
+        },
+        subscriptionParams,
+      },
+    ];
+
+    expectToEqual(subscribersGateway.calls, expectedCallsAfterFirstExecute);
+  });
 });
