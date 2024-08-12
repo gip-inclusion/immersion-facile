@@ -54,10 +54,8 @@ describe("GetInclusionConnectedUsers", () => {
     });
 
     userRepository = uow.userRepository;
-
     agencyRepository = uow.agencyRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
-
     userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
       notAdminUser,
