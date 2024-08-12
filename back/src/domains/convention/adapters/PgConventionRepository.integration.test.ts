@@ -1,5 +1,5 @@
 import { addDays, subDays } from "date-fns";
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   BeneficiaryCurrentEmployer,
@@ -9,6 +9,7 @@ import {
   ConventionId,
   EstablishmentRepresentative,
   EstablishmentTutor,
+  PeConnectToken,
   WithAcquisition,
   errors,
   expectPromiseToFailWithError,
@@ -32,30 +33,26 @@ const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
 
 describe("PgConventionRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
   let conventionRepository: PgConventionRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
     db = makeKyselyDb(pool);
-    const agencyRepository = new PgAgencyRepository(db);
-    await agencyRepository.insert(AgencyDtoBuilder.create().build());
+    await new PgAgencyRepository(db).insert(AgencyDtoBuilder.create().build());
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM partners_pe_connect");
-    await client.query("DELETE FROM conventions");
-    await client.query("DELETE FROM actors");
-    await client.query(
-      "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
-    );
+    await db.deleteFrom("partners_pe_connect").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("actors").execute();
+    await db.deleteFrom("partners_pe_connect").execute();
+    await db.deleteFrom("convention_external_ids").execute();
+
     conventionRepository = new PgConventionRepository(db);
   });
 
@@ -266,10 +263,17 @@ describe("PgConventionRepository", () => {
       })
       .build();
 
-    await client.query(
-      `INSERT INTO partners_pe_connect(user_pe_external_id, convention_id, firstname, lastname, email, type)
-      VALUES('${userPeExternalId}', '${convention.id}', 'John', 'Doe', 'john@mail.com', 'PLACEMENT')`,
-    );
+    await db
+      .insertInto("partners_pe_connect")
+      .values({
+        user_pe_external_id: userPeExternalId,
+        convention_id: convention.id,
+        email: "john@mail.com",
+        firstname: "John",
+        lastname: "Doe",
+        type: "PLACEMENT",
+      })
+      .execute();
 
     await conventionRepository.save(convention);
 
@@ -313,10 +317,17 @@ describe("PgConventionRepository", () => {
       })
       .build();
 
-    await client.query(
-      `INSERT INTO partners_pe_connect(user_pe_external_id, convention_id, firstname, lastname, email, type)
-      VALUES('${userPeExternalId}', '${convention.id}', NULL, NULL, NULL, NULL)`,
-    );
+    await db
+      .insertInto("partners_pe_connect")
+      .values({
+        user_pe_external_id: userPeExternalId,
+        convention_id: convention.id,
+        email: null,
+        firstname: null,
+        lastname: null,
+        type: null,
+      })
+      .execute();
 
     await conventionRepository.save(convention);
 
@@ -350,17 +361,19 @@ describe("PgConventionRepository", () => {
         role: "establishment-representative",
       })
       .build();
-    const { rows } = await client.query(
-      `SELECT * FROM actors WHERE email = '${email}'`,
-    );
-    expect(rows).toHaveLength(0);
+
+    const getEmailBuilder = db
+      .selectFrom("actors")
+      .select("email")
+      .where("email", "=", email);
+
+    const results1 = await getEmailBuilder.execute();
+    expectToEqual(results1, []);
 
     await conventionRepository.save(convention);
 
-    const { rows: actors } = await client.query(
-      `SELECT * FROM actors WHERE email = '${email}'`,
-    );
-    expect(actors).toHaveLength(1);
+    const results2 = await getEmailBuilder.execute();
+    expectToEqual(results2, [{ email }]);
   });
 
   it("Updates the establisment representative", async () => {
@@ -478,7 +491,7 @@ describe("PgConventionRepository", () => {
       firstName: "Current",
       lastName: "Employer",
       email: "current.employer@mail.com",
-      phone: "8888888888",
+      phone: "+33111223344",
       role: "beneficiary-current-employer",
       businessName: "Entreprise .Inc",
       businessSiret: "01234567891234",
@@ -501,14 +514,18 @@ describe("PgConventionRepository", () => {
     await conventionRepository.save(
       conventionWithoutBeneficiaryCurrentEmployer,
     );
+
     await expectConventionHaveBeneficiaryCurrentEmployer(
+      conventionRepository,
       conventionId,
       undefined,
     );
 
     //SAVE CONVENTION WITH BENEFICIARY CURRENT EMPLOYER
     await conventionRepository.update(conventionWithBeneficiaryCurrentEmployer);
+
     await expectConventionHaveBeneficiaryCurrentEmployer(
+      conventionRepository,
       conventionId,
       beneficiaryCurrentEmployer,
     );
@@ -525,12 +542,15 @@ describe("PgConventionRepository", () => {
       role: "beneficiary-current-employer",
       businessAddress: "Rue des Bouchers 67065 Strasbourg",
     };
+
     await conventionRepository.update(
       new ConventionDtoBuilder(conventionWithBeneficiaryCurrentEmployer)
         .withBeneficiaryCurrentEmployer(newBeneficiaryCurrentEmployer)
         .build(),
     );
+
     await expectConventionHaveBeneficiaryCurrentEmployer(
+      conventionRepository,
       conventionId,
       newBeneficiaryCurrentEmployer,
     );
@@ -539,7 +559,9 @@ describe("PgConventionRepository", () => {
     await conventionRepository.update(
       conventionWithoutBeneficiaryCurrentEmployer,
     );
+
     await expectConventionHaveBeneficiaryCurrentEmployer(
+      conventionRepository,
       conventionId,
       undefined,
     );
@@ -593,7 +615,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Retrieves federated identity if exists", async () => {
-    const peConnectId = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+    const peConnectId: PeConnectToken = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = new ConventionDtoBuilder()
       .withFederatedIdentity({
         provider: "peConnect",
@@ -609,17 +631,24 @@ describe("PgConventionRepository", () => {
       })
       .build();
 
-    await client.query(
-      `INSERT INTO partners_pe_connect(user_pe_external_id, convention_id, firstname, lastname, email, type)
-    VALUES('${peConnectId}', '${convention.id}', 'John', 'Doe', 'john@mail.com', 'PLACEMENT')`,
+    await db
+      .insertInto("partners_pe_connect")
+      .values({
+        user_pe_external_id: peConnectId,
+        convention_id: convention.id,
+        email: "john@mail.com",
+        firstname: "John",
+        lastname: "Doe",
+        type: "PLACEMENT",
+      })
+      .execute();
+
+    await conventionRepository.save(convention);
+
+    expectToEqual(
+      await conventionRepository.getById(convention.id),
+      convention,
     );
-
-    const externalId = await conventionRepository.save(convention);
-
-    expect(await conventionRepository.getById(convention.id)).toEqual({
-      ...convention,
-      externalId,
-    });
   });
 
   it("Updates an already saved immersion", async () => {
@@ -876,86 +905,43 @@ describe("PgConventionRepository", () => {
     });
   });
 
-  const tutorIdAndRepIdFromConventionId = (conventionId: ConventionId) =>
-    client.query<{
-      establishment_tutor_id: number;
-      establishment_representative_id: number;
-    }>(
-      `SELECT establishment_tutor_id,establishment_representative_id  FROM conventions WHERE id = '${conventionId}'`,
-    );
-
-  const expectTutorAndRepToHaveSameId = async (conventionId: ConventionId) => {
-    const { rows } = await tutorIdAndRepIdFromConventionId(conventionId);
-    const { establishment_tutor_id, establishment_representative_id } = rows[0];
-    expect(establishment_representative_id).toBe(establishment_tutor_id);
-  };
-
   const expectConventionHaveBeneficiaryCurrentEmployer = async (
+    conventionRepository: PgConventionRepository,
     conventionId: ConventionId,
     expectedBeneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
   ) => {
-    const { rows } = await client.query<{
-      extra_fields: {
-        job: string | null;
-        businessSiret: string | null;
-        businessName: string | null;
-        businessAddress: string | null;
-      };
-      phone: string | null;
-      first_name: string | null;
-      last_name: string | null;
-      id: number;
-      signed_at: string | null;
-      role: string;
-      email: string | null;
-    }>(
-      `
-      SELECT actors.*
-      FROM actors 
-      LEFT JOIN conventions ON actors.id = conventions.beneficiary_current_employer_id 
-      WHERE conventions.id = '${conventionId}'
-      `,
-    );
-    const result = rows.at(0);
-    const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined =
-      result
-        ? {
-            firstName: result.first_name !== null ? result.first_name : "",
-            lastName: result.last_name !== null ? result.last_name : "",
-            role: "beneficiary-current-employer",
-            email: result.email !== null ? result.email : "",
-            phone: result.phone !== null ? result.phone : "",
-            businessName:
-              result.extra_fields.businessName !== null
-                ? result.extra_fields.businessName
-                : "",
-            businessAddress:
-              result.extra_fields.businessAddress !== null
-                ? result.extra_fields.businessAddress
-                : "",
-            businessSiret:
-              result.extra_fields.businessSiret !== null
-                ? result.extra_fields.businessSiret
-                : "",
-            job:
-              result.extra_fields.job !== null ? result.extra_fields.job : "",
-            signedAt: result.signed_at !== null ? result.signed_at : undefined,
-          }
-        : undefined;
+    const convention = await conventionRepository.getById(conventionId);
+    if (!convention) throw new Error("No result");
     expectToEqual(
-      beneficiaryCurrentEmployer,
+      convention.signatories.beneficiaryCurrentEmployer,
       expectedBeneficiaryCurrentEmployer,
+    );
+  };
+
+  const tutorIdAndRepIdFromConventionId = (conventionId: ConventionId) =>
+    db
+      .selectFrom("conventions")
+      .where("id", "=", conventionId)
+      .select(["establishment_tutor_id", "establishment_representative_id"])
+      .executeTakeFirst();
+
+  const expectTutorAndRepToHaveSameId = async (conventionId: ConventionId) => {
+    const result = await tutorIdAndRepIdFromConventionId(conventionId);
+    if (!result) throw new Error("No result");
+    expectToEqual(
+      result.establishment_representative_id,
+      result.establishment_tutor_id,
     );
   };
 
   const expectTutorAndRepToHaveDifferentIds = async (
     conventionId: ConventionId,
   ) => {
-    const { rows } = await tutorIdAndRepIdFromConventionId(conventionId);
-    const { establishment_tutor_id, establishment_representative_id } = rows[0];
-    expect(establishment_representative_id !== establishment_tutor_id).toBe(
-      true,
-    );
+    const result = await tutorIdAndRepIdFromConventionId(conventionId);
+    if (!result) throw new Error("No result");
+    expect(
+      result.establishment_representative_id !== result.establishment_tutor_id,
+    ).toBe(true);
   };
 
   const expectConventionInRepoToEqual = async (convention: ConventionDto) => {
