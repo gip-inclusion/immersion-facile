@@ -52,6 +52,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     responses: {
       200: dashboardUrlAndNameSchema,
       401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   signConvention: defineRoute({
