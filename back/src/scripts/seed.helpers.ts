@@ -16,6 +16,8 @@ let agencyIds: Record<AgencyKind, AgencyId[]> = {
   autre: [],
   "immersion-facile": [],
   "operateur-cep": [],
+  cma: [],
+  "chambre-agriculture": [],
 };
 
 export const getRandomAddress = (): AddressDto =>

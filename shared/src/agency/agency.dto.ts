@@ -61,7 +61,13 @@ export const miniStageAgencyKinds: AgencyKind[] = [
 
 export type AgencyKind = (typeof agencyKindList)[number];
 
-export const agencyKindList = [
+export const miniStageAgencyKinds = [
+  "cci",
+  "cma",
+  "chambre-agriculture",
+] as const;
+
+const immersionAgencyKindList = [
   "pole-emploi",
   "mission-locale",
   "cap-emploi",
@@ -74,6 +80,11 @@ export const agencyKindList = [
   "cci",
   "cma",
   "chambre-agriculture",
+] as const;
+
+export const agencyKindList = [
+  ...immersionAgencyKindList,
+  ...miniStageAgencyKinds,
 ] as const;
 
 export type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
@@ -90,6 +101,8 @@ export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   cma: "Chambre des métiers de l'Artisanat",
   "chambre-agriculture": "Chambre d'agriculture",
   autre: "Autre",
+  cma: "Chambre de Métiers Agricoles",
+  "chambre-agriculture": "Chambre d'Agriculture",
 };
 
 export const allAgencyKindsAllowedToAdd = keys(agencyKindToLabel);
