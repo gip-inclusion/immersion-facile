@@ -1,12 +1,14 @@
-import { Pool, PoolClient } from "pg";
+import { Kysely } from "kysely";
+import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  expectObjectsToMatch,
+  expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../config/pg/kysely/model/database";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
@@ -26,31 +28,29 @@ const assessment: AssessmentEntity = {
 
 describe("PgAssessmentRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: Kysely<Database>;
   let assessmentRepository: PgAssessmentRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
-    await client.query("DELETE FROM conventions");
-    await client.query("DELETE FROM agency_groups__agencies");
-    await client.query("DELETE FROM agency_groups");
-    await client.query("DELETE FROM agencies");
-    const transaction = makeKyselyDb(pool);
-    const agencyRepository = new PgAgencyRepository(transaction);
-    await agencyRepository.insert(AgencyDtoBuilder.create().build());
-    const conventionRepository = new PgConventionRepository(transaction);
-    await conventionRepository.save(convention);
+    db = makeKyselyDb(pool);
+
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("agencies").execute();
+
+    await new PgAgencyRepository(db).insert(AgencyDtoBuilder.create().build());
+    await new PgConventionRepository(db).save(convention);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM immersion_assessments");
-    assessmentRepository = new PgAssessmentRepository(makeKyselyDb(pool));
+    assessmentRepository = new PgAssessmentRepository(db);
+    await db.deleteFrom("immersion_assessments").execute();
   });
 
   describe("save", () => {
@@ -67,33 +67,41 @@ describe("PgAssessmentRepository", () => {
     });
 
     it("when all is good", async () => {
+      const allAssessmentsQueryBuilder = db
+        .selectFrom("immersion_assessments")
+        .selectAll();
+
+      expectToEqual(await allAssessmentsQueryBuilder.execute(), []);
+
       await assessmentRepository.save(assessment);
-      const inDb = await client.query("SELECT * FROM immersion_assessments");
-      expect(inDb.rows).toHaveLength(1);
-      expectObjectsToMatch(inDb.rows[0], {
-        status: assessment.status,
-        establishment_feedback: assessment.establishmentFeedback,
-        convention_id: assessment.conventionId,
-      });
+
+      expectArraysToMatch(await allAssessmentsQueryBuilder.execute(), [
+        {
+          status: assessment.status,
+          establishment_feedback: assessment.establishmentFeedback,
+          convention_id: assessment.conventionId,
+        },
+      ]);
     });
   });
 
   describe("getByConventionId", () => {
     it("returns undefined if no Convention where found", async () => {
-      const notFoundImmersion = await assessmentRepository.getByConventionId(
-        "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
+        ),
+        undefined,
       );
-
-      expect(notFoundImmersion).toBeUndefined();
     });
 
     it("returns assessment found", async () => {
       await assessmentRepository.save(assessment);
-      const assessmentInDb = await assessmentRepository.getByConventionId(
-        assessment.conventionId,
-      );
 
-      expectToEqual(assessmentInDb, assessment);
+      expectToEqual(
+        await assessmentRepository.getByConventionId(assessment.conventionId),
+        assessment,
+      );
     });
   });
 });
