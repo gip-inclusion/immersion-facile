@@ -174,16 +174,13 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
               emails: cast<Email[]>(eb.ref("c.contact_emails")),
               phone: eb.ref("c.contact_phone"),
             }),
-            subscriptions: sql<WebhookSubscription[]>`
-            JSON_AGG(
-              JSON_BUILD_OBJECT(
+            subscriptions: sql<WebhookSubscription[]>` JSON_AGG(JSON_BUILD_OBJECT(
                 'callbackUrl', s.callback_url,
                 'callbackHeaders', s.callback_headers,
                 'createdAt', date_to_iso(s.created_at),
                 'id', s.id,
                 'subscribedEvent', s.subscribed_event
-              )
-            ) FILTER (WHERE s.subscribed_event IS NOT NULL)`,
+            )) FILTER (WHERE s.subscribed_event IS NOT NULL)`,
           }),
         ).as("raw_api_consumer"),
       )
