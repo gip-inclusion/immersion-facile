@@ -36,25 +36,25 @@ describe("Pg implementation of ConventionQueries", () => {
   let conventionQueries: PgConventionQueries;
   let agencyRepo: PgAgencyRepository;
   let conventionRepository: PgConventionRepository;
-  let transaction: KyselyDb;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    transaction = makeKyselyDb(pool);
+    db = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
-    await transaction.deleteFrom("conventions").execute();
+    await db.deleteFrom("conventions").execute();
     await sql`TRUNCATE TABLE convention_external_ids RESTART IDENTITY;`.execute(
-      transaction,
+      db,
     );
-    await transaction.deleteFrom("agency_groups__agencies").execute();
-    await transaction.deleteFrom("agency_groups").execute();
-    await transaction.deleteFrom("agencies").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("agencies").execute();
 
-    conventionQueries = new PgConventionQueries(transaction);
-    agencyRepo = new PgAgencyRepository(transaction);
-    conventionRepository = new PgConventionRepository(transaction);
+    conventionQueries = new PgConventionQueries(db);
+    agencyRepo = new PgAgencyRepository(db);
+    conventionRepository = new PgConventionRepository(db);
   });
 
   afterAll(async () => {
@@ -456,8 +456,8 @@ describe("Pg implementation of ConventionQueries", () => {
       "bbbb1111-1111-4111-1111-11111111bbbb";
 
     beforeEach(async () => {
-      await transaction.deleteFrom("agencies").execute();
-      await transaction.deleteFrom("conventions").execute();
+      await db.deleteFrom("agencies").execute();
+      await db.deleteFrom("conventions").execute();
 
       const agency = AgencyDtoBuilder.create().build();
       const conventionBuilderInitialMatching = new ConventionDtoBuilder()
@@ -584,17 +584,16 @@ describe("Pg implementation of ConventionQueries", () => {
   describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
     const agency = AgencyDtoBuilder.create().build();
     beforeEach(async () => {
-      const agencyRepository = new PgAgencyRepository(transaction);
-      await agencyRepository.insert(agency);
-      await transaction.deleteFrom("notifications_email_recipients").execute();
-      await transaction.deleteFrom("notifications_email_attachments").execute();
-      await transaction.deleteFrom("notifications_email").execute();
+      await new PgAgencyRepository(db).insert(agency);
+      await db.deleteFrom("notifications_email_recipients").execute();
+      await db.deleteFrom("notifications_email_attachments").execute();
+      await db.deleteFrom("notifications_email").execute();
     });
 
     it("Gets all email params of validated immersions ending at given date that did not received any assessment link yet", async () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
-      const conventionRepo = new PgConventionRepository(transaction);
-      const notificationRepo = new PgNotificationRepository(transaction);
+      const conventionRepo = new PgConventionRepository(db);
+      const notificationRepo = new PgNotificationRepository(db);
       const dateStart = new Date("2022-05-10").toISOString();
       const dateEnd14 = new Date("2022-05-14").toISOString();
       const dateEnd15 = new Date("2022-05-15").toISOString();
