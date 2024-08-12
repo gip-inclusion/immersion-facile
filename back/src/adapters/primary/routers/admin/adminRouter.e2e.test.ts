@@ -474,8 +474,11 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 400,
         body: {
-          message:
-            "Le role \"counsellor\" n'est pas autorisé pour l'agence \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\" car cette agence n'a qu'une seul étape de validation.",
+          message: errors.agency.invalidRoleUpdateForOneStepValidationAgency({
+            agencyId: agency.id,
+            role: updatedRole,
+          }).message,
+
           status: 400,
         },
       });
