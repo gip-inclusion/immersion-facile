@@ -144,9 +144,10 @@ export const departmentNameToDepartmentCode: Record<
   Martinique: "972",
   Guyane: "973",
   "La Réunion": "974",
-  Mayotte: "976",
-  "Saint-Martin": "971",
   "Saint-Pierre-et-Miquelon": "975",
+  Mayotte: "976",
+  "Saint-Barthélemy": "977",
+  "Saint-Martin": "978",
 };
 
 export const getDepartmentCodeFromDepartmentNameOrCity: Record<
