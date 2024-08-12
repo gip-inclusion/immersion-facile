@@ -1,7 +1,9 @@
-import { Pool, PoolClient } from "pg";
+import { Kysely } from "kysely";
+import { Pool } from "pg";
 import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import { v4 as uuid } from "uuid";
 import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../config/pg/kysely/model/database";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
@@ -11,30 +13,26 @@ describe("PgConventionExternalIdRepository", () => {
   let pgConventionExternalIdRepository: PgConventionExternalIdRepository;
   let pgConventionRepository: PgConventionRepository;
   let pgAgencyRepository: PgAgencyRepository;
-  let client: PoolClient;
   let pool: Pool;
+  let db: Kysely<Database>;
 
   beforeAll(() => {
     pool = getTestPgPool();
+    db = makeKyselyDb(pool);
+    pgConventionRepository = new PgConventionRepository(db);
+    pgConventionExternalIdRepository = new PgConventionExternalIdRepository(db);
+    pgAgencyRepository = new PgAgencyRepository(db);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    client = await pool.connect();
-    const transaction = makeKyselyDb(pool);
-    pgConventionRepository = new PgConventionRepository(transaction);
-    pgConventionExternalIdRepository = new PgConventionExternalIdRepository(
-      transaction,
-    );
-    pgAgencyRepository = new PgAgencyRepository(transaction);
-    await transaction.deleteFrom("convention_external_ids").execute();
-    await transaction.deleteFrom("conventions").execute();
-    await transaction.deleteFrom("agency_groups__agencies").execute();
-    await transaction.deleteFrom("agencies").execute();
+    await db.deleteFrom("convention_external_ids").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agencies").execute();
   });
 
   describe("save", () => {
