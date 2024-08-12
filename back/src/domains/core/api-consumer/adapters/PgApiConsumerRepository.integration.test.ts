@@ -1,6 +1,8 @@
-import { Pool, PoolClient } from "pg";
+import { Kysely } from "kysely";
+import { Pool } from "pg";
 import { ApiConsumer, WebhookSubscription, expectToEqual } from "shared";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../../config/pg/kysely/model/database";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
@@ -41,22 +43,21 @@ const apiConsumer: ApiConsumer = {
 
 describe("PgApiConsumerRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: Kysely<Database>;
   let apiConsumerRepository: PgApiConsumerRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
+    apiConsumerRepository = new PgApiConsumerRepository(db);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM api_consumers");
-    apiConsumerRepository = new PgApiConsumerRepository(makeKyselyDb(pool));
+    await db.deleteFrom("api_consumers").execute();
   });
 
   it("save & getById", async () => {
