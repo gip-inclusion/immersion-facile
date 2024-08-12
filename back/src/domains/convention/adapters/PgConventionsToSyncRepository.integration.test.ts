@@ -1,12 +1,11 @@
-import { Pool, PoolClient } from "pg";
+import { Kysely } from "kysely";
+import { Pool } from "pg";
 import { expectToEqual } from "shared";
 import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../config/pg/kysely/model/database";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { ConventionToSync } from "../ports/ConventionsToSyncRepository";
-import {
-  PgConventionsToSyncRepository,
-  conventionsToSyncTableName,
-} from "./PgConventionsToSyncRepository";
+import { PgConventionsToSyncRepository } from "./PgConventionsToSyncRepository";
 
 describe("PgConventionsToSyncRepository", () => {
   const conventionsToSync: ConventionToSync[] = [
@@ -34,43 +33,41 @@ describe("PgConventionsToSyncRepository", () => {
   ];
 
   let pool: Pool;
-  let client: PoolClient;
+  let db: Kysely<Database>;
   let conventionsToSyncRepository: PgConventionsToSyncRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query(`DELETE
-                        FROM ${conventionsToSyncTableName}`);
-    conventionsToSyncRepository = new PgConventionsToSyncRepository(
-      makeKyselyDb(pool),
-    );
+    conventionsToSyncRepository = new PgConventionsToSyncRepository(db);
+    await db.deleteFrom("conventions_to_sync_with_pe").execute();
   });
 
-  it.each(conventionsToSync)(
-    `save and getById convention with status '$status'`,
-    async (conventionToSync) => {
-      expectToEqual(
-        await conventionsToSyncRepository.getById(conventionToSync.id),
-        undefined,
-      );
+  describe("save and getById convention", () => {
+    it.each(conventionsToSync)(
+      `with status '$status'`,
+      async (conventionToSync) => {
+        expectToEqual(
+          await conventionsToSyncRepository.getById(conventionToSync.id),
+          undefined,
+        );
 
-      await conventionsToSyncRepository.save(conventionToSync);
+        await conventionsToSyncRepository.save(conventionToSync);
 
-      const syncedConvention = await conventionsToSyncRepository.getById(
-        conventionToSync.id,
-      );
-      expectToEqual(syncedConvention, conventionToSync);
-    },
-  );
+        const syncedConvention = await conventionsToSyncRepository.getById(
+          conventionToSync.id,
+        );
+        expectToEqual(syncedConvention, conventionToSync);
+      },
+    );
+  });
 
   it("save updated conventionToSync", async () => {
     const initialConventionToSync: ConventionToSync = conventionsToSync[0];
