@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import {
   Group,
   GroupSlug,
@@ -7,7 +8,6 @@ import {
 } from "shared";
 import {
   KyselyDb,
-  executeKyselyRawSqlQuery,
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
@@ -42,61 +42,82 @@ export class PgGroupRepository implements GroupRepository {
       },
     };
 
-    const resultsResponse = await executeKyselyRawSqlQuery(
-      this.transaction,
-      `
-      SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
-        'rome', io.rome_code, 
-        'siret', e.siret, 
-        'distance_m', 0, 
-        'name', e.name, 
-        'website', e.website, 
-        'additionalInformation', e.additional_information, 
-        'customizedName', e.customized_name, 
-        'voluntaryToImmersion', true,
-        'fitForDisabledWorkers', e.fit_for_disabled_workers,
-        'position', JSON_BUILD_OBJECT('lon', loc.lon, 'lat', loc.lat), 
-        'romeLabel', r.libelle_rome,
-        'appellations',  JSON_AGG(
-          JSON_BUILD_OBJECT(
-            'appellationCode', ogr_appellation::text,
-            'appellationLabel', libelle_appellation_long,
-            'score', io.score
-          )
-          ORDER BY ogr_appellation
+    const results = await this.transaction
+      .selectFrom("groups__sirets as gs")
+      .leftJoin("groups as g", "g.slug", "gs.group_slug")
+      .leftJoin("establishments as e", "e.siret", "gs.siret")
+      .leftJoin("immersion_offers as io", "io.siret", "e.siret")
+      .leftJoin("establishments_contacts as ec", "ec.siret", "e.siret")
+      .leftJoin(
+        "public_appellations_data as ap",
+        "ap.ogr_appellation",
+        "io.appellation_code",
+      )
+      .leftJoin("public_romes_data as r", "r.code_rome", "ap.code_rome")
+      .leftJoin("public_naf_classes_2008 as naf", (join) =>
+        join.onRef(
+          "naf.class_id",
+          "=",
+          sql`REGEXP_REPLACE(e.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2')`,
         ),
-        'naf', e.naf_code,
-        'nafLabel', public_naf_classes_2008.class_label,
-        'address', JSON_BUILD_OBJECT(
-            'streetNumberAndAddress', loc.street_number_and_address, 
-            'postcode', loc.post_code,
-            'city', loc.city,
-            'departmentCode', loc.department_code
-         ),
-        'contactMode', ec.contact_mode,
-        'numberOfEmployeeRange', e.number_employees,
-        'locationId', loc.id
-      )) as search_result_dto
-      FROM "groups__sirets"
-      LEFT JOIN "groups" g ON g.slug = groups__sirets.group_slug
-      LEFT JOIN "establishments" e ON e.siret = groups__sirets.siret
-      LEFT JOIN "immersion_offers" io ON io.siret = e.siret
-      LEFT JOIN "establishments_contacts" AS ec ON ec.siret = e.siret
-      LEFT JOIN "public_appellations_data" ap ON ap.ogr_appellation = io.appellation_code
-      LEFT JOIN "public_romes_data" r ON io.rome_code = r.code_rome
-      LEFT JOIN "public_naf_classes_2008" ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
-      LEFT JOIN establishments_locations loc ON e.siret = loc.establishment_siret
-      WHERE groups__sirets.group_slug = $1 AND e.is_open AND e.is_searchable
-      GROUP BY(e.siret, io.rome_code, r.libelle_rome, public_naf_classes_2008.class_label, ec.contact_mode, loc.lon, loc.lat, loc.street_number_and_address, loc.post_code, loc.city, loc.department_code, loc.id)
-    `,
-      [slug],
-    );
-
-    const results = resultsResponse.rows.map((row) => row.search_result_dto);
+      )
+      .leftJoin(
+        "establishments_locations as loc",
+        "e.siret",
+        "loc.establishment_siret",
+      )
+      .where("gs.group_slug", "=", slug)
+      .where("e.is_open", "=", true)
+      .where("e.is_searchable", "=", true)
+      .groupBy([
+        "e.siret",
+        "io.rome_code",
+        "r.libelle_rome",
+        "naf.class_label",
+        "ec.contact_mode",
+        "loc.id",
+      ])
+      .select(({ ref }) =>
+        jsonStripNulls(
+          jsonBuildObject({
+            rome: ref("io.rome_code"),
+            siret: ref("e.siret"),
+            distance_m: sql`0`,
+            name: ref("e.name"),
+            website: ref("e.website"),
+            additionalInformation: ref("e.additional_information"),
+            customizedName: ref("e.customized_name"),
+            voluntaryToImmersion: sql`TRUE`,
+            fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
+            position: jsonBuildObject({
+              lon: ref("loc.lon"),
+              lat: ref("loc.lat"),
+            }),
+            romeLabel: ref("r.libelle_rome"),
+            appellations: sql`JSON_AGG(JSON_BUILD_OBJECT(
+              'appellationCode', ap.ogr_appellation::text,
+              'appellationLabel', ap.libelle_appellation_long,
+              'score', io.score
+            ) ORDER BY ap.ogr_appellation)`,
+            naf: ref("e.naf_code"),
+            nafLabel: ref("naf.class_label"),
+            address: jsonBuildObject({
+              streetNumberAndAddress: ref("loc.street_number_and_address"),
+              postcode: ref("loc.post_code"),
+              city: ref("loc.city"),
+              departmentCode: ref("loc.department_code"),
+            }),
+            contactMode: ref("ec.contact_mode"),
+            numberOfEmployeeRange: ref("e.number_employees"),
+            locationId: ref("loc.id"),
+          }),
+        ).as("search_result_dto"),
+      )
+      .execute();
 
     return groupWithResultsSchema.parse({
       group,
-      results,
+      results: results.map(({ search_result_dto }) => search_result_dto),
     });
   }
 
@@ -136,31 +157,36 @@ export class PgGroupRepository implements GroupRepository {
   public async save(group: GroupEntity): Promise<void> {
     const pgGroups = await this.transaction
       .selectFrom("groups")
-      .selectAll()
+      .select("groups.slug")
       .where("slug", "=", group.slug)
       .execute();
 
     const groupAlreadyExists = !!pgGroups.length;
 
-    if (groupAlreadyExists) {
-      await this.#clearExistingSiretsForGroup(group.slug);
-      await this.#insertGroupSirets(group);
-    } else {
-      await this.transaction
-        .insertInto("groups")
-        .values({
-          name: group.name,
-          slug: group.slug,
-          tint_color: group.options.tintColor,
-          hero_header_title: group.options.heroHeader.title,
-          hero_header_description: group.options.heroHeader.description,
-          hero_header_background_color:
-            group.options.heroHeader.backgroundColor,
-          hero_header_logo_url: group.options.heroHeader.logoUrl,
-        })
-        .execute();
-      await this.#insertGroupSirets(group);
-    }
+    return groupAlreadyExists
+      ? this.#onExistingGroup(group)
+      : this.#onMissingGroup(group);
+  }
+
+  async #onMissingGroup(group: GroupEntity): Promise<void> {
+    await this.transaction
+      .insertInto("groups")
+      .values({
+        name: group.name,
+        slug: group.slug,
+        tint_color: group.options.tintColor,
+        hero_header_title: group.options.heroHeader.title,
+        hero_header_description: group.options.heroHeader.description,
+        hero_header_background_color: group.options.heroHeader.backgroundColor,
+        hero_header_logo_url: group.options.heroHeader.logoUrl,
+      })
+      .execute();
+    await this.#insertGroupSirets(group);
+  }
+
+  async #onExistingGroup(group: GroupEntity): Promise<void> {
+    await this.#clearExistingSiretsForGroup(group.slug);
+    await this.#insertGroupSirets(group);
   }
 
   async #insertGroupSirets(group: GroupEntity) {
