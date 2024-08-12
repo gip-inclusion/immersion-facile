@@ -326,6 +326,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 
 const _isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";
 const _isMiniStageAgency = (agency: AgencyDto) =>
+  agency.kind !== "immersion-facile" &&
   miniStageAgencyKinds.includes(agency.kind);
 
 const sortByNearestFrom =
@@ -350,15 +351,6 @@ const agencyIsOfKind = (
 ): boolean => {
   if (!agencyKinds) return true;
   return agencyKinds.includes(agency.kind);
-  // if (agencyKindFilter === "immersionPeOnly") return isImmersionPeOnly(agency);
-  // if (agencyKindFilter === "miniStageOnly") return isMiniStageAgency(agency);
-  // if (agencyKindFilter === "miniStageExcluded")
-  //   return !isMiniStageAgency(agency);
-  // if (agencyKindFilter === "withoutRefersToAgency")
-  //   return !agency.refersToAgencyId;
-  // const _exhaustiveCheck: undefined = agencyKindFilter;
-
-  // return true;
 };
 
 const agencyIsOfStatus = (
