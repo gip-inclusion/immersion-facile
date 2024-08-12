@@ -13,8 +13,10 @@ import { useDispatch } from "react-redux";
 import {
   AgencyDto,
   AgencyKind,
+  AllowedAgencyKindToAdd,
   CreateAgencyDto,
   DepartmentCode,
+  allAgencyKindsAllowedToAdd,
   createAgencySchema,
   domElementIds,
 } from "shared";
@@ -159,7 +161,7 @@ const AgencyForm = ({
     defaultValues: formInitialValues,
   });
 
-  const { handleSubmit, formState, reset, register, watch } = methods;
+  const { handleSubmit, formState, reset, watch, setValue } = methods;
 
   const dispatch = useDispatch();
   const agencyOptions = useAppSelector(agenciesSelectors.options);
@@ -171,6 +173,12 @@ const AgencyForm = ({
   }, [reset, formInitialValues]);
   const [hasDelegation, setHasDelegation] = useState<boolean | null>(null);
   const selectedKind = watch("kind");
+  const sortedAgencyOptions = agencyListOfOptions.sort((a, b) => {
+    if (typeof a.label === "string" && typeof b.label === "string") {
+      return a.label.localeCompare(b.label);
+    }
+    return 0;
+  });
 
   const onDepartmentCodeChangedMemoized = useCallback(
     (departmentCode: DepartmentCode) =>
@@ -235,13 +243,14 @@ const AgencyForm = ({
         <Select
           label={formContents.kind.label}
           hint={formContents.kind.hintText}
-          options={agencyListOfOptions.sort((a, b) =>
-            a.label < b.label ? -1 : 0,
-          )}
+          options={sortedAgencyOptions}
           placeholder={formContents.kind.placeholder}
           nativeSelectProps={{
             ...formContents.kind,
-            ...register("kind"),
+            onChange: (event) => {
+              const { value } = event.currentTarget;
+              setValue("kind", value);
+            },
           }}
           state={selectedKind === "pole-emploi" ? "error" : "default"}
           stateRelatedMessage={
@@ -271,13 +280,49 @@ const AgencyForm = ({
         {match({ selectedKind, hasDelegation, refersToOtherAgency })
           .with(
             {
-              selectedKind: "autre",
-              hasDelegation: true,
+              selectedKind: "",
             },
-            { selectedKind: P.not("").and(P.not("autre")) },
+            () => null,
+          )
+          .with(
             {
               selectedKind: "autre",
-              hasDelegation: P.nullish,
+              hasDelegation: false,
+              refersToOtherAgency: false,
+            },
+            () => (
+              <Alert
+                severity="info"
+                title="Vous ne pouvez pas finaliser votre référencement sans convention de délégation"
+                description={
+                  <>
+                    Remplissez ce formulaire afin de recevoir par mail le
+                    contact du prescripteur de droit qui peut vous délivrer
+                    votre convention de délégation:{" "}
+                    <a
+                      href="https://tally.so/r/w7WM49"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      https://tally.so/r/w7WM49
+                    </a>
+                  </>
+                }
+              />
+            ),
+          )
+          .with(
+            {
+              selectedKind: P.when(isAgencyKindAllowedToAdd),
+            },
+            {
+              selectedKind: "autre",
+              hasDelegation: true,
+              refersToOtherAgency: false,
+            },
+            {
+              selectedKind: "autre",
+              hasDelegation: false,
               refersToOtherAgency: true,
             },
             () => (
@@ -317,45 +362,6 @@ const AgencyForm = ({
                 </div>
               </>
             ),
-          )
-          .with({ selectedKind: "autre", hasDelegation: false }, () => (
-            <Alert
-              severity="info"
-              title="Vous ne pouvez pas finaliser votre référencement sans convention de délégation"
-              description={
-                <>
-                  Remplissez ce formulaire afin de recevoir par mail le contact
-                  du prescripteur de droit qui peut vous délivrer votre
-                  convention de délégation:{" "}
-                  <a
-                    href="https://tally.so/r/w7WM49"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    https://tally.so/r/w7WM49
-                  </a>
-                </>
-              }
-            />
-          ))
-          .with(
-            {
-              selectedKind: "",
-              hasDelegation: null,
-            },
-            {
-              selectedKind: "",
-              hasDelegation: false,
-            },
-            {
-              selectedKind: "",
-              hasDelegation: true,
-            },
-            {
-              selectedKind: "autre",
-              hasDelegation: null,
-            },
-            () => undefined,
           )
           .exhaustive()}
       </form>
@@ -418,3 +424,8 @@ const hasDelegationOptions: RadioButtonsProps["options"] = [
     hintText: `Je dois en faire la demande auprès d'un prescipteur de plein droit`,
   },
 ];
+
+const isAgencyKindAllowedToAdd = (
+  kind: AllowedAgencyKindToAdd | "",
+): kind is AllowedAgencyKindToAdd =>
+  kind !== "" && allAgencyKindsAllowedToAdd.includes(kind);

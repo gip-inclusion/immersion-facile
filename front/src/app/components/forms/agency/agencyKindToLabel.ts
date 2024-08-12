@@ -1,8 +1,10 @@
+import { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import {
   AgencyKind,
   AllowedAgencyKindToAdd,
   agencyKindList,
   agencyKindToLabel,
+  allAgencyKindsAllowedToAdd,
 } from "shared";
 
 const allAgencyKindToLabel: Record<AgencyKind, string> = {
@@ -10,17 +12,14 @@ const allAgencyKindToLabel: Record<AgencyKind, string> = {
   "immersion-facile": "Immersion facilitée",
 };
 
-export const agencyListOfOptions = agencyKindList
-  .filter(
-    (agencyKind): agencyKind is AllowedAgencyKindToAdd =>
-      agencyKind !== "immersion-facile",
-  )
-  .map((agencyKind) => ({
+export const agencyListOfOptions: SelectProps.Option<AllowedAgencyKindToAdd>[] =
+  allAgencyKindsAllowedToAdd.map((agencyKind) => ({
     value: agencyKind,
     label: agencyKindToLabel[agencyKind],
   }));
 
-export const allAgencyListOfOptions = agencyKindList.map((agencyKind) => ({
-  value: agencyKind,
-  label: allAgencyKindToLabel[agencyKind],
-}));
+export const allAgencyListOfOptions: SelectProps.Option<AgencyKind>[] =
+  agencyKindList.map((agencyKind) => ({
+    value: agencyKind,
+    label: allAgencyKindToLabel[agencyKind],
+  }));
