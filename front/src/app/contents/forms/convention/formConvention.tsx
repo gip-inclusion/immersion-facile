@@ -176,7 +176,8 @@ const conventionSection = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Activités observées / pratiquées pendant l'immersion"
         : "Activités observées / pratiquées pendant le stage",
-    hintText: "Précisez les activités observées / pratiquées",
+    hintText:
+      "Précisez les éléments clefs de la période, son contexte, les tâches confiées, les objectifs assignés au bénéficiaire.",
     id: conventionSectionIds.immersionActivities,
     required: true,
     placeholder: "Ex : mise en rayon, accueil et aide à la clientèle",
