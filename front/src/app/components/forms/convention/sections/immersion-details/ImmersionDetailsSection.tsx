@@ -144,6 +144,16 @@ export const ImmersionDetailsSection = () => {
           ...register("workConditions"),
         }}
       />
+
+      {values.internshipKind === "mini-stage-cci" && (
+        <Alert
+          small
+          severity="info"
+          className={fr.cx("fr-mb-4w")}
+          title="Déplacements"
+          description="Les déplacements dans le cadre du stage ne sont pas interdits tant qu’ils se font en présence et sous la responsabilité du tuteur et pendant les horaires prévus à la convention."
+        />
+      )}
       <Input
         label={formContents.businessAdvantages.label}
         hintText={formContents.businessAdvantages.hintText}

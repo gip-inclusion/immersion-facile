@@ -424,11 +424,13 @@ export const ConventionDocumentPage = ({
             {toDisplayedDate({ date: new Date(convention.dateEnd) })}.
           </p>
           <div>
-            Les horaires{" "}
-            {internshipKind === "immersion"
-              ? "de l'immersion"
-              : "du mini-stage"}{" "}
-            seront : {formatSchedule(convention)}.
+            <strong>
+              Les horaires{" "}
+              {internshipKind === "immersion"
+                ? "de l'immersion"
+                : "du mini-stage"}{" "}
+              seront : {formatSchedule(convention)}.
+            </strong>
           </div>
           <h4 className={fr.cx("fr-h6")}>
             Conditions d'observation de l’activité
