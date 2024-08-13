@@ -82,7 +82,7 @@ export const BroadcastAgainButton = ({
         </broadcastAgainModal.Component>,
         document.body,
       )}
-      <Feedback topic="broadcast-convention-again" />
+      <Feedback topic="broadcast-convention-again" closable={true} />
     </>
   );
 };

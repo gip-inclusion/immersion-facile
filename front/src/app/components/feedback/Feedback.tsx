@@ -14,10 +14,11 @@ type FeedbackProps = {
     title?: string;
     message: string;
   }) => JSX.Element;
+  closable?: boolean;
   children?: React.ReactNode;
 };
 
-export const Feedback = ({ topic, render }: FeedbackProps) => {
+export const Feedback = ({ topic, render, closable }: FeedbackProps) => {
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
   const feedback = feedbacks[topic];
   if (!feedback) return null;
@@ -28,7 +29,16 @@ export const Feedback = ({ topic, render }: FeedbackProps) => {
       message: feedback.message,
     });
   }
-  return (
+
+  return closable === true ? (
+    <Alert
+      severity={feedback.level}
+      title={feedback.title}
+      description={feedback.message}
+      small
+      closable={closable}
+    />
+  ) : (
     <Alert
       severity={feedback.level}
       title={feedback.title}
