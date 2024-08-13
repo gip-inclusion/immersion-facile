@@ -1,6 +1,6 @@
-import { QueryConfig } from "pg";
 import { AbsoluteUrl, ShortLinkId } from "shared";
 import { z } from "zod";
+import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 
 export type PgShortLinkRepositoryDto = {
   short_link_id: string;
@@ -28,43 +28,29 @@ export const pgShortLinkRepositoryStructure = {
   },
 };
 
-export const insertShortLinkQuery = (
+export const insertShortLinkQuery = async (
+  db: KyselyDb,
   shortLinkId: ShortLinkId,
   url: AbsoluteUrl,
-): QueryConfig<
-  [PgShortLinkRepositoryDto["short_link_id"], PgShortLinkRepositoryDto["url"]]
-> => {
-  const columns = [
-    pgShortLinkRepositoryStructure.columnNames.shortLinkId,
-    pgShortLinkRepositoryStructure.columnNames.url,
-  ];
-  return {
-    text: `
-      INSERT INTO ${pgShortLinkRepositoryStructure.tableName} (${columns}) 
-      VALUES ($1, $2)
-    `,
-    values: [shortLinkId, url],
-  };
+): Promise<void> => {
+  await db
+    .insertInto("short_links")
+    .values({
+      short_link_id: shortLinkId,
+      url,
+    })
+    .execute();
 };
 
-export const getShortLinkByIdQuery = (
-  shortlinkId: ShortLinkId,
-): QueryConfig<[PgShortLinkRepositoryDto["short_link_id"]]> => ({
-  text: `
-    SELECT *
-    FROM ${pgShortLinkRepositoryStructure.tableName} 
-    WHERE ${pgShortLinkRepositoryStructure.columnNames.shortLinkId} = $1
-  `,
-  values: [shortlinkId],
-});
+export const getAllShortLinks = async (db: KyselyDb) =>
+  db.selectFrom("short_links").selectAll().execute();
 
-export const deleteShortLinkByIdQuery = (
+export const deleteShortLinkById = async (
+  transaction: KyselyDb,
   shortLinkId: ShortLinkId,
-): QueryConfig<[PgShortLinkRepositoryDto["short_link_id"]]> => ({
-  text: `
-    DELETE
-    FROM ${pgShortLinkRepositoryStructure.tableName}
-    WHERE ${pgShortLinkRepositoryStructure.columnNames.shortLinkId} = $1
-  `,
-  values: [shortLinkId],
-});
+): Promise<void> => {
+  await transaction
+    .deleteFrom("short_links")
+    .where("short_link_id", "=", shortLinkId)
+    .execute();
+};
