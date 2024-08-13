@@ -14,7 +14,6 @@ import {
   WithGeoPosition,
   errors,
   isTruthy,
-  miniStageAgencyKinds,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import {
@@ -323,11 +322,6 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
   }
 }
-
-const _isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";
-const _isMiniStageAgency = (agency: AgencyDto) =>
-  agency.kind !== "immersion-facile" &&
-  miniStageAgencyKinds.includes(agency.kind);
 
 const sortByNearestFrom =
   (position: GeoPositionDto) =>
