@@ -35,22 +35,22 @@ describe("AuthenticateWithInclusionCode use case", () => {
   };
 
   let pool: Pool;
+  let db: KyselyDb;
   let uow: UnitOfWork;
-  let transaction: KyselyDb;
   let inclusionConnectGateway: InMemoryInclusionConnectGateway;
   let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    transaction = makeKyselyDb(pool);
-    uow = createPgUow(transaction);
+    db = makeKyselyDb(pool);
+    uow = createPgUow(db);
     const uuidGenerator = new UuidV4Generator();
     const immersionRedirectUri: AbsoluteUrl =
       "http://immersion-uri.com/my-redirection";
 
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
     authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
-      new PgUowPerformer(pool, createPgUow),
+      new PgUowPerformer(db, createPgUow),
       makeCreateNewEvent({
         timeGateway: new CustomTimeGateway(),
         uuidGenerator,
@@ -75,8 +75,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
   });
 
   beforeEach(async () => {
-    await transaction.deleteFrom("users_ongoing_oauths").execute();
-    await transaction.deleteFrom("users").execute();
+    await db.deleteFrom("users_ongoing_oauths").execute();
+    await db.deleteFrom("users").execute();
   });
 
   describe("when user had never connected before", () => {
