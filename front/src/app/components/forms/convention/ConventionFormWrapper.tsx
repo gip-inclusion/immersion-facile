@@ -210,6 +210,14 @@ const ConventionSummarySection = () => {
           signatories={convention.signatories}
         />
       )}
+      {convention?.internshipKind === "mini-stage-cci" && (
+        <Alert
+          severity={"info"}
+          title="Validation"
+          description="Attention ! Vérifiez que tous les éléments sont bien intégrés et exacts.En cas de demande de modification après validation, tous les signataires devront signer à nouveau la convention."
+          small
+        />
+      )}
       {shouldShowDuplicateWarning && (
         <DuplicateConventionAlert similarConventionIds={similarConventionIds} />
       )}
