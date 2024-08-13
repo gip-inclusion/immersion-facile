@@ -56,11 +56,11 @@ export const BroadcastAgainButton = ({
         }}
         disabled={disabled || consumerNames.length === 0 || isLoading}
       >
-        Rediffuser au partenaire
+        Rediffuser dans votre SI ou système applicatif
       </Button>
       {createPortal(
-        <broadcastAgainModal.Component title="Rediffuser au partenaire">
-          Vous allez rediffuser aux partenaires suivant :
+        <broadcastAgainModal.Component title="Rediffuser dans votre SI ou système applicatif">
+          Vous allez rediffuser aux SI ou système applicatifs suivant :
           <ul>
             {consumerNames.map((consumerName) => (
               <li key={consumerName}>{consumerName}</li>
