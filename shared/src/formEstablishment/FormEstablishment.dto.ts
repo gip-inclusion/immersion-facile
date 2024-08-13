@@ -55,7 +55,7 @@ export type EstablishmentSearchableByValue = keyof EstablishmentSearchableBy;
 
 export type FormEstablishmentDto = {
   additionalInformation?: string;
-  appellations: AppellationAndRomeDto[]; // at least one
+  appellations: [AppellationAndRomeDto, ...AppellationAndRomeDto[]]; // at least one
   businessAddresses: FormEstablishmentAddress[];
   businessContact: BusinessContactDto;
   businessName: string;

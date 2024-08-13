@@ -368,7 +368,13 @@ export const seedSearchResults: SearchResultDto[] = [
     address: defaultAddress,
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
-    appellations: [],
+    appellations: [
+      {
+        appellationLabel: "Facteur / Factrice",
+        appellationCode: "15044",
+        score: 0,
+      },
+    ],
     nafLabel: "Accueil et Restauration",
     numberOfEmployeeRange: "11-49",
     website: "www.mega-corp.com/job",
@@ -389,7 +395,13 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "PHONE",
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
-    appellations: [],
+    appellations: [
+      {
+        appellationLabel: "Facteur / Factrice",
+        appellationCode: "15044",
+        score: 0,
+      },
+    ],
     nafLabel: "Accueil et Restauration",
     numberOfEmployeeRange: "200-1000",
     website: "www.coolitude-inc.com/job",
@@ -442,7 +454,13 @@ export const seedSearchResults: SearchResultDto[] = [
     address: defaultAddress,
     contactMode: undefined,
     romeLabel: "Giga métier",
-    appellations: [],
+    appellations: [
+      {
+        appellationLabel: "Facteur / Factrice",
+        appellationCode: "15044",
+        score: 0,
+      },
+    ],
     nafLabel: "",
     website: "https://www.example.com",
     locationId: "123",

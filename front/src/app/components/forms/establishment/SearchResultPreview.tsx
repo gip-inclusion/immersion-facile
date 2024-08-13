@@ -1,7 +1,16 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { FormEstablishmentDto, SearchResultDto } from "shared";
+import {
+  AppellationWithScoreDto,
+  FormEstablishmentDto,
+  SearchResultDto,
+} from "shared";
 import { useStyles } from "tss-react/dsfr";
 import { SearchResult } from "../../search/SearchResult";
+
+const isNonEmptyAppellations = (
+  appellations: AppellationWithScoreDto[],
+): appellations is [AppellationWithScoreDto, ...AppellationWithScoreDto[]] =>
+  appellations.length === 0;
 
 const establishmentToSearchResultPreview = ({
   appellations,
@@ -13,34 +22,45 @@ const establishmentToSearchResultPreview = ({
   website,
   fitForDisabledWorkers,
   additionalInformation,
-}: FormEstablishmentDto): SearchResultDto => ({
-  rome: appellations.length > 0 ? appellations[0].romeCode : "",
-  romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
-  appellations: appellations.map((appellation) => ({
-    ...appellation,
-    score: 0,
-  })),
-  nafLabel: "",
-  naf: naf?.code || "",
-  name: businessNameCustomized || businessName || "Mon entreprise",
-  // Fake data
-  voluntaryToImmersion: true,
-  position: {
-    lat: 0,
-    lon: 0,
-  },
-  address: {
-    streetNumberAndAddress: businessAddresses[0]?.rawAddress ?? "",
-    city: "",
-    departmentCode: "",
-    postcode: "",
-  },
-  siret,
-  website,
-  fitForDisabledWorkers,
-  additionalInformation,
-  locationId: "",
-});
+}: FormEstablishmentDto): SearchResultDto => {
+  const possiblyEmptyAppellations = appellations.map(
+    (appellation): AppellationWithScoreDto => ({
+      ...appellation,
+      score: 0,
+    }),
+  );
+  if (!isNonEmptyAppellations(possiblyEmptyAppellations)) {
+    throw
+  }
+  const test: SearchResultDto["appellations"] = isNonEmptyAppellations(
+    possiblyEmptyAppellations,
+  );
+  return {
+    rome: appellations.length > 0 ? appellations[0].romeCode : "",
+    romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
+    appellations: test,
+    nafLabel: "",
+    naf: naf?.code || "",
+    name: businessNameCustomized || businessName || "Mon entreprise",
+    // Fake data
+    voluntaryToImmersion: true,
+    position: {
+      lat: 0,
+      lon: 0,
+    },
+    address: {
+      streetNumberAndAddress: businessAddresses[0]?.rawAddress ?? "",
+      city: "",
+      departmentCode: "",
+      postcode: "",
+    },
+    siret,
+    website,
+    fitForDisabledWorkers,
+    additionalInformation,
+    locationId: "",
+  };
+};
 
 type SearchResultPreviewProps = {
   establishment: FormEstablishmentDto;
