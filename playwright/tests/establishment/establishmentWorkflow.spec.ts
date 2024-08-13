@@ -39,7 +39,6 @@ test.describe("Establishment creation and modification workflow", () => {
       jobSeekers: true,
     },
     nextAvailabilityDate: addMonths(new Date(), 1).toISOString(),
-    appellations: [],
     businessAddresses: [
       {
         id: "fake-id",

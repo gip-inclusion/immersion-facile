@@ -9,6 +9,7 @@ import {
   SiretDto,
   conflictErrorSiret,
   errors,
+  mapNonEmptyArray,
   pathEq,
   replaceArrayElement,
 } from "shared";
@@ -256,13 +257,16 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation
       customizedName: establishmentAgg.establishment.customizedName,
       rome: romeCode,
       romeLabel: TEST_ROME_LABEL,
-      appellations: establishmentAgg.offers
-        .filter((immersionOffer) => immersionOffer.romeCode === romeCode)
-        .map((immersionOffer) => ({
+      appellations: mapNonEmptyArray(
+        establishmentAgg.offers.filter(
+          (immersionOffer) => immersionOffer.romeCode === romeCode,
+        ),
+        (immersionOffer) => ({
           appellationLabel: immersionOffer.appellationLabel,
           appellationCode: immersionOffer.appellationCode,
           score: immersionOffer.score,
-        })),
+        }),
+      ),
       siret: establishmentAgg.establishment.siret,
       voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
       contactMode: establishmentAgg.contact?.contactMethod,
@@ -310,11 +314,14 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
   distance_m,
   romeLabel: TEST_ROME_LABEL,
   website: establishmentAggregate.establishment.website,
-  appellations: establishmentAggregate.offers
-    .filter((offer) => offer.romeCode === romeCode)
-    .map((offer) => ({
+  appellations: mapNonEmptyArray(
+    establishmentAggregate.offers.filter(
+      (offer) => offer.romeCode === romeCode,
+    ),
+    (offer) => ({
       appellationCode: offer.appellationCode,
       appellationLabel: offer.appellationLabel,
       score: customScore ?? offer.score,
-    })),
+    }),
+  ),
 });

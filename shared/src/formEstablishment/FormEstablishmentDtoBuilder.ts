@@ -139,7 +139,14 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   },
   businessName: "",
   siret: "",
-  appellations: [],
+  appellations: [
+    {
+      appellationCode: "",
+      appellationLabel: "",
+      romeCode: "",
+      romeLabel: "",
+    },
+  ],
   website: "",
   additionalInformation: "",
   maxContactsPerMonth: defaultMaxContactsPerMonth,
@@ -180,7 +187,9 @@ export class FormEstablishmentDtoBuilder
     return formEstablishmentToEstablishmentCsvRow(this.#dto);
   }
 
-  public withAppellations(appellations: AppellationAndRomeDto[]) {
+  public withAppellations(
+    appellations: [AppellationAndRomeDto, ...AppellationAndRomeDto[]],
+  ) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       appellations,

@@ -3,12 +3,14 @@ import {
   FormEstablishmentDtoBuilder,
   GeoPositionDto,
   NafDto,
+  NonEmptyArray,
   NumberEmployeesRange,
   SiretEstablishmentDto,
   WithAcquisition,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  mapNonEmptyArray,
 } from "shared";
 import {
   InMemoryAddressGateway,
@@ -104,7 +106,7 @@ describe("Insert Establishment aggregate from form data", () => {
       acquisitionKeyword: "yolo",
       acquisitionCampaign: "my campaign",
     } satisfies WithAcquisition;
-    const professions: AppellationAndRomeDto[] = [
+    const professions: NonEmptyArray<AppellationAndRomeDto> = [
       {
         romeCode: "A1101",
         appellationCode: "11717",
@@ -162,7 +164,7 @@ describe("Insert Establishment aggregate from form data", () => {
           )
           .withFitForDisabledWorkers(true)
           .withOffers(
-            professions.map((prof) =>
+            mapNonEmptyArray(professions, (prof) =>
               new OfferEntityBuilder({
                 ...prof,
                 createdAt: timeGateway.now(),

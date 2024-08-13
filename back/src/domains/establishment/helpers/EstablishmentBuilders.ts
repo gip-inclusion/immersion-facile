@@ -6,6 +6,7 @@ import {
   FormEstablishmentSource,
   Location,
   NafDto,
+  NonEmptyArray,
   NumberEmployeesRange,
   RomeCode,
   WithAcquisition,
@@ -443,7 +444,7 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withOffers(offers: OfferEntity[]) {
+  public withOffers(offers: NonEmptyArray<OfferEntity>) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       offers,

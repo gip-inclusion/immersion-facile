@@ -88,7 +88,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
     naf: nafSchema.optional(),
     appellations: z
       .array(appellationDtoSchema)
-      .min(1, localization.atLeastOneJob),
+      .nonempty(localization.atLeastOneJob),
     businessContact: businessContactSchema,
     maxContactsPerMonth: z
       .number({

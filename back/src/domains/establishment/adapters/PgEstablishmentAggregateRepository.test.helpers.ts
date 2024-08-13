@@ -1,4 +1,4 @@
-import { Location, SearchResultDto } from "shared";
+import { Location, SearchResultDto, mapNonEmptyArray } from "shared";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
 
@@ -19,7 +19,8 @@ export const makeExpectedSearchResult = ({
   return {
     additionalInformation: establishment.establishment.additionalInformation,
     address: withLocationAndDistance.address,
-    appellations: withOffers.map(
+    appellations: mapNonEmptyArray(
+      withOffers,
       ({ appellationCode, appellationLabel, score }) => ({
         appellationCode,
         appellationLabel,

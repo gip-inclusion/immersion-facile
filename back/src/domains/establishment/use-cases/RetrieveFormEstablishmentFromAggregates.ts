@@ -6,6 +6,7 @@ import {
   SiretDto,
   addressDtoToString,
   errors,
+  mapNonEmptyArray,
   siretSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -91,7 +92,7 @@ export const establishmentAggregateToFormEstablishement = (
     fitForDisabledWorkers:
       establishmentAggregate.establishment.fitForDisabledWorkers,
     naf: establishmentAggregate.establishment?.nafDto,
-    appellations,
+    appellations: mapNonEmptyArray(appellations, (appellation) => appellation),
     businessContact: establishmentAggregate.contact,
     maxContactsPerMonth:
       establishmentAggregate.establishment.maxContactsPerMonth,

@@ -6,13 +6,14 @@ import {
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
+import { NonEmptyArray } from "../utils";
 
 export type AppellationWithScoreDto = AppellationDto & { score: number };
 
 export type SearchResultDto = {
   rome: RomeCode;
   romeLabel: string;
-  appellations: [AppellationWithScoreDto, ...AppellationWithScoreDto[]];
+  appellations: NonEmptyArray<AppellationWithScoreDto>;
   naf: string;
   nafLabel: string;
   siret: SiretDto;

@@ -9,6 +9,7 @@ import {
   SearchSortedBy,
   SiretDto,
   castError,
+  mapNonEmptyArray,
   searchParamsSchema,
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
@@ -166,7 +167,7 @@ export class SearchImmersion extends TransactionalUseCase<
       .map(({ isSearchable: _, ...rest }) => rest)
       .map((result) => ({
         ...result,
-        appellations: result.appellations.map((appellation) => ({
+        appellations: mapNonEmptyArray(result.appellations, (appellation) => ({
           ...appellation,
           score:
             appellation.score +

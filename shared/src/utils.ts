@@ -170,6 +170,15 @@ type Primitive = string | boolean | number | undefined | null;
 export const arrayFromNumber = (n: number): number[] =>
   n > 0 ? Array.from(Array(n).keys()) : [];
 
+export type NonEmptyArray<T> = [T, ...T[]];
+
+export const mapNonEmptyArray = <Input extends Array<unknown>, Output>(
+  array: Input,
+  callback: (t: Input[number]) => Output,
+): NonEmptyArray<Output> => {
+  if (array.length === 0) throw new Error("Cannot map an empty array");
+  return array.map(callback) as NonEmptyArray<Output>;
+};
 export const isUrlValid = (url: string | undefined) => {
   if (!url) return false;
   try {

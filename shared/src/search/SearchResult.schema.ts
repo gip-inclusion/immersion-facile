@@ -3,7 +3,12 @@ import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zStringCanBeEmpty, zStringMinLength1, zUuidLike } from "../zodUtils";
+import {
+  localization,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+  zUuidLike,
+} from "../zodUtils";
 import { SearchResultDto } from "./SearchResult.dto";
 
 export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
@@ -29,13 +34,15 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
   additionalInformation: zStringCanBeEmpty.optional(),
   fitForDisabledWorkers: z.boolean().optional(),
   urlOfPartner: z.string().optional(),
-  appellations: z.array(
-    z.object({
-      appellationLabel: z.string(),
-      appellationCode: appellationCodeSchema,
-      score: z.number(),
-    }),
-  ),
+  appellations: z
+    .array(
+      z.object({
+        appellationLabel: z.string(),
+        appellationCode: appellationCodeSchema,
+        score: z.number(),
+      }),
+    )
+    .nonempty(localization.atLeastOneJob),
   // locationId: zUuidLike,
   locationId: zUuidLike.or(z.null()),
 });

@@ -4,6 +4,7 @@ import {
   FormEstablishmentSource,
   Location,
   NafDto,
+  NonEmptyArray,
   NumberEmployeesRange,
   SiretDto,
   WithAcquisition,
@@ -39,7 +40,7 @@ export type EstablishmentEntity = {
 
 export type EstablishmentAggregate = {
   establishment: EstablishmentEntity;
-  offers: OfferEntity[];
+  offers: NonEmptyArray<OfferEntity>;
   contact: ContactEntity;
 };
 

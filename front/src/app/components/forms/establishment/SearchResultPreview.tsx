@@ -1,16 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import {
-  AppellationWithScoreDto,
   FormEstablishmentDto,
   SearchResultDto,
+  mapNonEmptyArray,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 import { SearchResult } from "../../search/SearchResult";
-
-const isNonEmptyAppellations = (
-  appellations: AppellationWithScoreDto[],
-): appellations is [AppellationWithScoreDto, ...AppellationWithScoreDto[]] =>
-  appellations.length === 0;
 
 const establishmentToSearchResultPreview = ({
   appellations,
@@ -23,22 +18,13 @@ const establishmentToSearchResultPreview = ({
   fitForDisabledWorkers,
   additionalInformation,
 }: FormEstablishmentDto): SearchResultDto => {
-  const possiblyEmptyAppellations = appellations.map(
-    (appellation): AppellationWithScoreDto => ({
-      ...appellation,
-      score: 0,
-    }),
-  );
-  if (!isNonEmptyAppellations(possiblyEmptyAppellations)) {
-    throw
-  }
-  const test: SearchResultDto["appellations"] = isNonEmptyAppellations(
-    possiblyEmptyAppellations,
-  );
   return {
     rome: appellations.length > 0 ? appellations[0].romeCode : "",
     romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
-    appellations: test,
+    appellations: mapNonEmptyArray(appellations, (appellation) => ({
+      ...appellation,
+      score: 0,
+    })),
     nafLabel: "",
     naf: naf?.code || "",
     name: businessNameCustomized || businessName || "Mon entreprise",
