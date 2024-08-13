@@ -1,4 +1,4 @@
-import { addDays, addHours } from "date-fns";
+import { addDays, addHours, parseISO } from "date-fns";
 import subDays from "date-fns/subDays";
 import { sql } from "kysely";
 import { Pool } from "pg";
@@ -8,14 +8,18 @@ import {
   AgencyId,
   AgencyKind,
   AppellationCode,
+  ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
   ConventionStatus,
   DATE_START,
+  EmailNotification,
   Notification,
   SiretDto,
+  concatValidatorNames,
   defaultValidatorEmail,
+  expectArraysToEqualIgnoringOrder,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
@@ -23,6 +27,8 @@ import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
+import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
+import { ConventionRepository } from "../ports/ConventionRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -30,6 +36,80 @@ const conventionIdA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
 const conventionIdB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
 const agencyIdA: AgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 const agencyIdB: AgencyId = "bbbbbbbb-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+
+const createNotification = ({
+  id,
+  createdAt,
+  convention,
+  emailKind,
+}: {
+  id: string;
+  createdAt: Date;
+  convention: ConventionDto;
+  emailKind:
+    | "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
+    | "VALIDATED_CONVENTION_FINAL_CONFIRMATION";
+}): EmailNotification => {
+  return emailKind === "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
+    ? {
+        createdAt: createdAt.toISOString(),
+        followedIds: {
+          conventionId: convention.id,
+          establishmentSiret: convention.siret,
+          agencyId: convention.agencyId,
+        },
+        id,
+        kind: "email",
+        templatedContent: {
+          kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+          params: {
+            internshipKind: "immersion",
+            assessmentCreationLink: "fake-link",
+            beneficiaryFirstName: "joe",
+            beneficiaryLastName: "joe",
+            conventionId: convention.id,
+            establishmentTutorName: "tuteur du joe",
+            agencyLogoUrl: "https://super link",
+          },
+          recipients: ["joe-joe@gmail.com"],
+        },
+      }
+    : {
+        createdAt: createdAt.toISOString(),
+        followedIds: {
+          conventionId: convention.id,
+          establishmentSiret: convention.siret,
+          agencyId: convention.agencyId,
+        },
+        id,
+        kind: "email",
+        templatedContent: {
+          kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+          params: {
+            conventionId: convention.id,
+            internshipKind: convention.internshipKind,
+            beneficiaryFirstName: "prénom béneficiaire",
+            beneficiaryLastName: "nom béneficiaire",
+            beneficiaryBirthdate: "1995-05-05",
+            dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+            dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+            establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+            businessName: convention.businessName,
+            immersionAppellationLabel:
+              convention.immersionAppellation.appellationLabel,
+            emergencyContactInfos: "",
+            agencyLogoUrl: "https://super link",
+            agencyAssessmentDocumentLink: "https://super link",
+            agencyReferentEmail: "",
+            magicLink: "",
+            validatorName: convention.validators?.agencyValidator
+              ? concatValidatorNames(convention.validators?.agencyValidator)
+              : "",
+          },
+          recipients: ["joe-joe@gmail.com"],
+        },
+      };
+};
 
 describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
@@ -51,6 +131,8 @@ describe("Pg implementation of ConventionQueries", () => {
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agency_groups").execute();
     await db.deleteFrom("agencies").execute();
+    await db.deleteFrom("notifications_email_recipients").execute();
+    await db.deleteFrom("notifications_email").execute();
 
     conventionQueries = new PgConventionQueries(db);
     agencyRepo = new PgAgencyRepository(db);
@@ -583,94 +665,109 @@ describe("Pg implementation of ConventionQueries", () => {
 
   describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
     const agency = AgencyDtoBuilder.create().build();
-    beforeEach(async () => {
-      await new PgAgencyRepository(db).insert(agency);
-      await db.deleteFrom("notifications_email_recipients").execute();
-      await db.deleteFrom("notifications_email_attachments").execute();
-      await db.deleteFrom("notifications_email").execute();
-    });
+    const dateStart = new Date("2022-05-10").toISOString();
+    const dateEnd14 = new Date("2022-05-14").toISOString();
+    const dateEnd15 = new Date("2022-05-15").toISOString();
+    const validatedImmersionEndingThe14th = new ConventionDtoBuilder()
+      .withId("aaaaac14-9c0a-1aaa-aa6d-6aa9ad38aaaa")
+      .validated()
+      .withDateStart(dateStart)
+      .withDateEnd(dateEnd14)
+      .withSchedule(reasonableSchedule)
+      .build();
 
-    it("Gets all email params of validated immersions ending at given date that did not received any assessment link yet", async () => {
-      // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
-      const conventionRepo = new PgConventionRepository(db);
-      const notificationRepo = new PgNotificationRepository(db);
-      const dateStart = new Date("2022-05-10").toISOString();
-      const dateEnd14 = new Date("2022-05-14").toISOString();
-      const dateEnd15 = new Date("2022-05-15").toISOString();
-
-      const validatedImmersionEndingThe14th = new ConventionDtoBuilder()
-        .withId("aaaaac14-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-        .validated()
-        .withDateStart(dateStart)
-        .withDateEnd(dateEnd14)
-        .withSchedule(reasonableSchedule)
-        .build();
-
-      const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
-        new ConventionDtoBuilder()
-          .withId("aaaaac15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-          .validated()
-          .withDateStart(dateStart)
-          .withDateEnd(dateEnd15)
-          .withSchedule(reasonableSchedule)
-          .build();
-
-      const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
-        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
+    const validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail =
+      new ConventionDtoBuilder()
+        .withId("aaaaac15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .validated()
         .withDateStart(dateStart)
         .withDateEnd(dateEnd15)
         .withSchedule(reasonableSchedule)
-        .withEstablishmentTutorFirstName("Romain")
-        .withEstablishmentTutorLastName("Grandjean")
         .build();
 
-      const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
-        .withId("cccccc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-        .withDateStart("2022-05-10")
-        .withDateEnd("2022-05-15")
-        .withSchedule(reasonableSchedule)
-        .withStatus("IN_REVIEW")
-        .build();
+    const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
+      .validated()
+      .withDateStart(dateStart)
+      .withDateEnd(dateEnd15)
+      .withSchedule(reasonableSchedule)
+      .withEstablishmentTutorFirstName("Romain")
+      .withEstablishmentTutorLastName("Grandjean")
+      .build();
+
+    const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
+      .withId("cccccc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
+      .withDateStart(dateStart)
+      .withDateEnd(dateEnd15)
+      .withSchedule(reasonableSchedule)
+      .withStatus("IN_REVIEW")
+      .build();
+
+    const assessmentNotification: Notification = createNotification({
+      id: "77770000-0000-4777-7777-000077770000",
+      createdAt: subDays(new Date(dateEnd15), 1),
+      convention:
+        validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
+      emailKind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+    });
+    const conventionValidateEndingThe14thNotification: Notification =
+      createNotification({
+        id: "77770000-0000-4777-7777-000077770001",
+        createdAt: subDays(new Date(dateEnd14), 7),
+        convention: validatedImmersionEndingThe14th,
+        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      });
+    const conventionValidateEndingThe15thNotification: Notification =
+      createNotification({
+        id: "77770000-0000-4777-7777-000077770002",
+        createdAt: subDays(new Date(dateEnd15), 7),
+        convention:
+          validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
+        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      });
+    const conventionValidateEndingThe15thNotification2: Notification =
+      createNotification({
+        id: "77770000-0000-4777-7777-000077770003",
+        createdAt: subDays(new Date(dateEnd15), 7),
+        convention: validatedImmersionEndingThe15th,
+        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      });
+    const ongoingConventionValidateEndingThe15thNotification2: Notification =
+      createNotification({
+        id: "77770000-0000-4777-7777-000077770004",
+        createdAt: subDays(new Date(dateEnd15), 7),
+        convention: ongoingImmersionEndingThe15th,
+        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      });
+
+    let conventionRepo: ConventionRepository;
+    let notificationRepo: NotificationRepository;
+
+    beforeEach(async () => {
+      const agencyRepository = new PgAgencyRepository(db);
+      await agencyRepository.insert(agency);
+
+      conventionRepo = new PgConventionRepository(db);
+      notificationRepo = new PgNotificationRepository(db);
 
       await Promise.all(
         [
           validatedImmersionEndingThe14th,
-          validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail,
+          validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
           validatedImmersionEndingThe15th,
           ongoingImmersionEndingThe15th,
         ].map((params) => conventionRepo.save(params)),
       );
+      await notificationRepo.saveBatch([
+        assessmentNotification,
+        conventionValidateEndingThe14thNotification,
+        conventionValidateEndingThe15thNotification,
+        conventionValidateEndingThe15thNotification2,
+        ongoingConventionValidateEndingThe15thNotification2,
+      ]);
+    });
 
-      const notification: Notification = {
-        createdAt: subDays(new Date(dateEnd15), 1).toISOString(),
-        followedIds: {
-          conventionId:
-            validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.id,
-          establishmentSiret:
-            validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.siret,
-          agencyId:
-            validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.agencyId,
-        },
-        id: "77770000-0000-4777-7777-000077770000",
-        kind: "email",
-        templatedContent: {
-          kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
-          params: {
-            internshipKind: "immersion",
-            assessmentCreationLink: "fake-link",
-            beneficiaryFirstName: "joe",
-            beneficiaryLastName: "joe",
-            conventionId:
-              validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail.id,
-            establishmentTutorName: "tuteur du joe",
-            agencyLogoUrl: "https://super link",
-          },
-          recipients: ["joe-joe@gmail.com"],
-        },
-      };
-      await notificationRepo.saveBatch([notification]);
-
+    it("Gets all conventions of validated immersions ending at given date that did not receive any assessment link yet", async () => {
       // Act
       const date = new Date("2022-05-15T12:43:11");
       const queryResults =
@@ -684,6 +781,91 @@ describe("Pg implementation of ConventionQueries", () => {
 
       // Assert
       expectToEqual(queryResults, [validatedImmersionEndingThe15th]);
+    });
+
+    it("Gets all conventions of validated conventions that are already passed but has been ACCEPTED_BY_VALIDATOR at a later date", async () => {
+      const validationDate = new Date("2022-05-20T12:43:11");
+      const futureConvention = new ConventionDtoBuilder()
+        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad0")
+        .validated()
+        .withDateStart(addDays(validationDate, 2).toISOString())
+        .withDateEnd(addDays(validationDate, 4).toISOString())
+        .withSchedule(reasonableSchedule)
+        .withEstablishmentTutorFirstName("Romain")
+        .withEstablishmentTutorLastName("Grandjean")
+        .build();
+      const futureConventionNotification: Notification = createNotification({
+        id: "77770000-0000-4777-7773-000077770000",
+        createdAt: validationDate,
+        convention: futureConvention,
+        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      });
+      const pastConvention = new ConventionDtoBuilder()
+        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad5")
+        .validated()
+        .withDateStart(dateStart)
+        .withDateEnd(dateEnd15)
+        .withSchedule(reasonableSchedule)
+        .withEstablishmentTutorFirstName("Romain")
+        .withEstablishmentTutorLastName("Grandjean")
+        .build();
+      const pastConventionNotification: Notification = createNotification({
+        id: "77770000-0000-4777-7777-000077770005",
+        createdAt: validationDate,
+        convention: pastConvention,
+        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      });
+      await conventionRepo.save(pastConvention);
+      await conventionRepo.save(futureConvention);
+      await notificationRepo.save(pastConventionNotification);
+      await notificationRepo.save(futureConventionNotification);
+
+      const queryResults =
+        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
+          {
+            from: subDays(validationDate, 5),
+            to: addHours(validationDate, 24),
+          },
+          "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+        );
+
+      expectArraysToEqualIgnoringOrder(queryResults, [
+        validatedImmersionEndingThe15th,
+        pastConvention,
+      ]);
+    });
+
+    it("Gets all conventions of validated conventions that are already passed but has been ACCEPTED_BY_VALIDATOR today", async () => {
+      const today = new Date("2022-05-20T12:43:11");
+      const tomorrow = new Date("2022-05-21T12:43:11");
+      const pastConvention = new ConventionDtoBuilder()
+        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad5")
+        .validated()
+        .withDateStart(dateStart)
+        .withDateEnd(dateEnd15)
+        .withSchedule(reasonableSchedule)
+        .withEstablishmentTutorFirstName("Romain")
+        .withEstablishmentTutorLastName("Grandjean")
+        .build();
+      const pastConventionNotification: Notification = createNotification({
+        id: "77770000-0000-4777-7777-000077770005",
+        createdAt: today,
+        convention: pastConvention,
+        emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      });
+      await conventionRepo.save(pastConvention);
+      await notificationRepo.save(pastConventionNotification);
+
+      const queryResults =
+        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
+          {
+            from: tomorrow,
+            to: addHours(tomorrow, 24),
+          },
+          "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+        );
+
+      expectArraysToEqualIgnoringOrder(queryResults, [pastConvention]);
     });
   });
 
