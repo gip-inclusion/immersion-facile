@@ -3,22 +3,6 @@ import { FeatureFlags, SetFeatureFlagParam, hasFeatureFlagValue } from "shared";
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 
-const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
-  raw.reduce(
-    (acc, row) => ({
-      ...acc,
-      [row.flag_name]: {
-        isActive: row.is_active,
-        kind: row.kind,
-        ...((row.kind === "textWithSeverity" ||
-          row.kind === "textImageAndRedirect") && {
-          value: row.value,
-        }),
-      },
-    }),
-    {} as FeatureFlags,
-  );
-
 export class PgFeatureFlagRepository implements FeatureFlagRepository {
   constructor(private transaction: KyselyDb) {}
 
@@ -63,3 +47,19 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
       .execute();
   }
 }
+
+const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
+  raw.reduce(
+    (acc, row) => ({
+      ...acc,
+      [row.flag_name]: {
+        isActive: row.is_active,
+        kind: row.kind,
+        ...((row.kind === "textWithSeverity" ||
+          row.kind === "textImageAndRedirect") && {
+          value: row.value,
+        }),
+      },
+    }),
+    {} as FeatureFlags,
+  );
