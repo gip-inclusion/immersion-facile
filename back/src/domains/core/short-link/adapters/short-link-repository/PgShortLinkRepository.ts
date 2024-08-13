@@ -1,12 +1,8 @@
 import { AbsoluteUrl, ShortLinkId, castError } from "shared";
-import { executeKyselyRawSqlQuery } from "../../../../../config/pg/kysely/kyselyUtils";
+import { z } from "zod";
 import { createLogger } from "../../../../../utils/logger";
 import { ShortLinkRepository } from "../../ports/ShortLinkRepository";
-import {
-  PgShortLinkRepositoryDto,
-  pgShortLinkRepositorySchema,
-  pgShortLinkRepositoryStructure,
-} from "../PgShortLinkHelpers";
+import { pgShortLinkRepositorySchema } from "../PgShortLinkHelpers";
 import { PgShortLinkQuery } from "../short-link-query/PgShortLinkQuery";
 
 const logger = createLogger(__filename);
@@ -17,23 +13,19 @@ export class PgShortLinkRepository
 {
   public async save(shortLinkId: ShortLinkId, url: AbsoluteUrl): Promise<void> {
     logger.info({ message: `pgShortLinkRepositorySave ${shortLinkId}` });
-
-    const query = `INSERT INTO ${pgShortLinkRepositoryStructure.tableName}(${[
-      pgShortLinkRepositoryStructure.columnNames.shortLinkId,
-      pgShortLinkRepositoryStructure.columnNames.url,
-    ]}) VALUES($1, $2) RETURNING *`;
-
-    return executeKyselyRawSqlQuery<PgShortLinkRepositoryDto>(
-      this.transaction,
-      query,
-      [shortLinkId, url],
-    )
-      .then(({ rows }) => {
-        const result = rows.at(0);
-        if (!result)
-          throw new Error(`${shortLinkId} was not saved on repository.`);
-        const { short_link_id, created_at } =
-          pgShortLinkRepositorySchema.parse(result);
+    return this.transaction
+      .insertInto("short_links")
+      .values({
+        short_link_id: shortLinkId,
+        url,
+      })
+      .returningAll()
+      .execute()
+      .then((results) => {
+        const [{ short_link_id, created_at }] = z
+          .array(pgShortLinkRepositorySchema)
+          .length(1)
+          .parse(results);
         logger.info({
           message: `pgShortLinkRepositorySaveSuccess with short_link_id = ${short_link_id} and created_at = ${created_at}`,
         });

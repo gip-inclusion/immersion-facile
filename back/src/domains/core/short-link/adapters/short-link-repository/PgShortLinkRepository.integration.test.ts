@@ -1,21 +1,21 @@
-import { Pool, PoolClient } from "pg";
-import { AbsoluteUrl, ShortLinkId, expectPromiseToFailWithError } from "shared";
+import { Pool } from "pg";
+import {
+  AbsoluteUrl,
+  ShortLinkId,
+  expectArraysToMatch,
+  expectPromiseToFailWithError,
+} from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
-import {
-  PgShortLinkRepositoryDto,
-  deleteShortLinkByIdQuery,
-  getShortLinkByIdQuery,
-} from "../PgShortLinkHelpers";
+import { deleteShortLinkById, getAllShortLinks } from "../PgShortLinkHelpers";
 import { PgShortLinkRepository } from "./PgShortLinkRepository";
 
 describe("PgShortLinkRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
-  let transaction: KyselyDb;
+  let db: KyselyDb;
   let pgShortLinkRepository: PgShortLinkRepository;
 
   const testShortLinkId: ShortLinkId = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -24,32 +24,25 @@ describe("PgShortLinkRepository", () => {
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
-    transaction = makeKyselyDb(pool);
-    await client.query(deleteShortLinkByIdQuery(testShortLinkId));
-  });
-
-  beforeEach(() => {
-    pgShortLinkRepository = new PgShortLinkRepository(transaction);
+    db = makeKyselyDb(pool);
+    pgShortLinkRepository = new PgShortLinkRepository(db);
+    await db.deleteFrom("short_links").execute();
   });
 
   afterAll(async () => {
-    await client.query(deleteShortLinkByIdQuery(testShortLinkId));
-    client.release();
+    await deleteShortLinkById(db, testShortLinkId);
     await pool.end();
   });
 
   it("save", async () => {
     await pgShortLinkRepository.save(testShortLinkId, originalUrl);
 
-    const { rows } = await client.query<PgShortLinkRepositoryDto>(
-      getShortLinkByIdQuery(testShortLinkId),
-    );
-
-    expect(rows.length === 1).toBeTruthy();
-    const expectedResult = rows[0];
-    expect(expectedResult.short_link_id).toEqual(testShortLinkId);
-    expect(expectedResult.url).toEqual(originalUrl);
+    expectArraysToMatch(await getAllShortLinks(db), [
+      {
+        short_link_id: testShortLinkId,
+        url: originalUrl,
+      },
+    ]);
   });
 
   it("can't save: duplicate shortLinkId", async () => {

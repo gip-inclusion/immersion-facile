@@ -52,6 +52,7 @@ export interface Database {
   broadcast_feedbacks: BroadcastFeedbacks;
   searches_made__appellation_code: SearchesMadeAppellationCode;
   searches_made: SearchesMade;
+  short_links: ShortLinks;
   users__agencies: UsersAgencies;
   users_admins: UsersAdmins;
   users_ongoing_oauths: OngoingOauths;
@@ -615,6 +616,12 @@ interface ImmersionAssessments {
   establishment_feedback: string;
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
+}
+
+interface ShortLinks {
+  short_link_id: string;
+  url: string;
+  created_at: Generated<Timestamp>;
 }
 
 interface MarketingEstablishmentContacts {

@@ -1,17 +1,19 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import {
   AbsoluteUrl,
   ShortLinkId,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { makeKyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import {
-  deleteShortLinkByIdQuery,
+  deleteShortLinkById,
   insertShortLinkQuery,
 } from "../PgShortLinkHelpers";
-import { PgShortLinkRepository } from "../short-link-repository/PgShortLinkRepository";
 import {
   PgShortLinkQuery,
   shortLinkIdNotFoundErrorMessage,
@@ -19,7 +21,7 @@ import {
 
 describe("PgShortLinkQuery", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let pgShortLinkQuery: PgShortLinkQuery;
 
   const testShortLinkId: ShortLinkId = "000000000000000000000000000000000001";
@@ -28,22 +30,21 @@ describe("PgShortLinkQuery", () => {
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
+    pgShortLinkQuery = new PgShortLinkQuery(db);
   });
 
   beforeEach(async () => {
-    await client.query(deleteShortLinkByIdQuery(testShortLinkId));
-    pgShortLinkQuery = new PgShortLinkRepository(makeKyselyDb(pool));
+    await deleteShortLinkById(db, testShortLinkId);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   describe("getById", () => {
     it("success", async () => {
-      await client.query(insertShortLinkQuery(testShortLinkId, originalUrl));
+      await insertShortLinkQuery(db, testShortLinkId, originalUrl);
 
       expectToEqual(
         await pgShortLinkQuery.getById(testShortLinkId),
