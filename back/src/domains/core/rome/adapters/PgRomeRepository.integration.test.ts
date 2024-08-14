@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { expectToEqual } from "shared";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
@@ -6,24 +6,22 @@ import { PgRomeRepository } from "./PgRomeRepository";
 
 describe("Postgres implementation of Rome Gateway", () => {
   let pool: Pool;
-  let client: PoolClient;
   let pgRomeRepository: PgRomeRepository;
 
   beforeAll(async () => {
     //We do not empty the data because the table data is static as it public data
     pool = getTestPgPool();
-    client = await pool.connect();
     pgRomeRepository = new PgRomeRepository(makeKyselyDb(pool));
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   describe("appellationToCodeMetier", () => {
     it("Conversion of appellation to ROME works", async () => {
-      expect(await pgRomeRepository.appellationToCodeMetier("10868")).toBe(
+      expectToEqual(
+        await pgRomeRepository.appellationToCodeMetier("10868"),
         "D1102",
       );
     });
@@ -56,16 +54,34 @@ describe("Postgres implementation of Rome Gateway", () => {
 
   describe("searchRome", () => {
     it("Searches match in appellation and returns distinct rome", async () => {
-      expect(await pgRomeRepository.searchRome("boulangere")).toEqual([
+      expectToEqual(await pgRomeRepository.searchRome("boulangere"), [
         { romeCode: "D1102", romeLabel: "Boulangerie - viennoiserie" },
       ]);
     });
 
     it("Searches match in rome and returns distinct rome", async () => {
-      expect((await pgRomeRepository.searchRome("boulangerie"))[0]).toEqual({
-        romeCode: "D1102",
-        romeLabel: "Boulangerie - viennoiserie",
-      });
+      expectToEqual(await pgRomeRepository.searchRome("boulangerie"), [
+        {
+          romeCode: "D1102",
+          romeLabel: "Boulangerie - viennoiserie",
+        },
+        {
+          romeCode: "D1106",
+          romeLabel: "Vente en alimentation",
+        },
+        {
+          romeCode: "D1502",
+          romeLabel: "Management/gestion de rayon produits alimentaires",
+        },
+        {
+          romeCode: "D1507",
+          romeLabel: "Mise en rayon libre-service",
+        },
+        {
+          romeCode: "H2102",
+          romeLabel: "Conduite d'équipement de production alimentaire",
+        },
+      ]);
     });
 
     it("Correctly handles search queries with multiple words", async () => {
