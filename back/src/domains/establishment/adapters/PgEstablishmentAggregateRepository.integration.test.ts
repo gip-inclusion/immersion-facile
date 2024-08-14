@@ -877,31 +877,88 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       });
 
-      it("provide next availability date on result if establishment entity have it", async () => {
-        const aggregate = new EstablishmentAggregateBuilder()
+      it("provide next availability date and updated at and created at on result", async () => {
+        const aggregateWithOptionalValues = new EstablishmentAggregateBuilder()
+          .withLocations([
+            new LocationBuilder(portHubleChaniersLocation)
+              .withId(uuid())
+              .build(),
+          ])
+          .withOffers([
+            new OfferEntityBuilder()
+              .withCreatedAt(new Date("2023-12-02"))
+              .build(),
+          ])
           .withEstablishmentNextAvailabilityDate(new Date())
+          .withEstablishmentUpdatedAt(new Date())
           .build();
+        const aggregateWithoutOptionalValues =
+          new EstablishmentAggregateBuilder()
+            .withLocations([
+              new LocationBuilder(portHubleChaniersLocation)
+                .withId(uuid())
+                .build(),
+            ])
+            .withOffers([
+              new OfferEntityBuilder()
+                .withCreatedAt(new Date("2023-12-01"))
+                .build(),
+            ])
+            .withEstablishmentSiret("12341234123412")
+            .withContactId(uuid())
+            .withEstablishmentNextAvailabilityDate(undefined)
+            .withEstablishmentUpdatedAt(undefined)
+            .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-          aggregate,
+          aggregateWithOptionalValues,
+        );
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          aggregateWithoutOptionalValues,
         );
 
         const searchResults =
           await pgEstablishmentAggregateRepository.searchImmersionResults({
             searchMade: {
-              ...aggregate.establishment.locations[0].position,
-              appellationCodes: [aggregate.offers[0].appellationCode],
+              ...aggregateWithOptionalValues.establishment.locations[0]
+                .position,
+              appellationCodes: [
+                aggregateWithOptionalValues.offers[0].appellationCode,
+              ],
               distanceKm: 0,
               sortedBy: "date",
             },
             maxResults: 2,
           });
 
-        expectArraysToMatch(searchResults, [
-          {
-            nextAvailabilityDate: aggregate.establishment.nextAvailabilityDate,
-          },
-        ]);
+        expectToEqual(
+          searchResults.map(
+            ({ siret, nextAvailabilityDate, updatedAt, createdAt }) => ({
+              siret,
+              nextAvailabilityDate,
+              updatedAt,
+              createdAt,
+            }),
+          ),
+          [
+            {
+              siret: aggregateWithOptionalValues.establishment.siret,
+              nextAvailabilityDate:
+                aggregateWithOptionalValues.establishment.nextAvailabilityDate,
+              updatedAt:
+                aggregateWithOptionalValues.establishment.updatedAt?.toISOString(),
+              createdAt:
+                aggregateWithOptionalValues.establishment.createdAt.toISOString(),
+            },
+            {
+              siret: aggregateWithoutOptionalValues.establishment.siret,
+              nextAvailabilityDate: undefined,
+              updatedAt: undefined,
+              createdAt:
+                aggregateWithoutOptionalValues.establishment.createdAt.toISOString(),
+            },
+          ],
+        );
       });
       it("should return immersion offers even without lat/lon/distanceKm search", async () => {
         const establishmentAggregate = new EstablishmentAggregateBuilder()

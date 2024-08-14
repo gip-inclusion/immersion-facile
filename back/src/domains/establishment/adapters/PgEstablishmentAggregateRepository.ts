@@ -3,6 +3,7 @@ import { equals, keys, pick } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
+  DateTimeIsoString,
   EstablishmentSearchableByValue,
   LocationId,
   RomeCode,
@@ -1010,6 +1011,8 @@ const searchImmersionResultsQuery = (
             lat: ref("loc.lat"),
           }),
           locationId: ref("loc.id"),
+          updatedAt: sql<DateTimeIsoString>`date_to_iso(e.update_date)`,
+          createdAt: sql<DateTimeIsoString>`date_to_iso(e.created_at)`,
           ...(geoParams && hasSearchGeoParams(geoParams)
             ? {
                 distance_m: fn("ST_Distance", [
@@ -1038,11 +1041,11 @@ const makeOrderByClauses = (
     geoParams?: GeoParams;
   },
 ) => {
-  if (sortedBy === "date") return sql`MAX(offer.created_at) DESC, RANDOM()`;
-  if (sortedBy === "score") return sql`MAX(offer.score) DESC, RANDOM()`;
+  if (sortedBy === "date") return sql`MAX(offer.created_at) DESC`;
+  if (sortedBy === "score") return sql`MAX(offer.score) DESC`;
   const geoParams = filters?.geoParams;
   if (geoParams && hasSearchGeoParams(geoParams))
-    return sql`ST_Distance(loc.position,ST_GeographyFromText(${sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`})) ASC, RANDOM()`;
+    return sql`ST_Distance(loc.position,ST_GeographyFromText(${sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`})) ASC`;
 
   throw errors.establishment.invalidGeoParams();
 };

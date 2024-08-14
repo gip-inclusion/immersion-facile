@@ -66,6 +66,8 @@ const immersionOffer: SearchResultDto = {
   additionalInformation: "Ferme bio",
   urlOfPartner: "https://www.emploi-store.fr/portail/accueil",
   locationId,
+  updatedAt: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
 };
 
 describe("search epic", () => {

@@ -1,0 +1,19 @@
+.im-tag {
+  border: 1px solid var(--grey-0-1000);
+  &--rqth {
+    background-color: var(--grey-1000-100);
+  }
+  &--super-enterprise {
+    background-color: var(--yellow-tournesol-925-125);
+  }
+  &--lbb {
+    color: var(--text-label-purple-glycine);
+    background-color: var(--background-contrast-purple-glycine);
+    border: 1px solid var(--text-label-purple-glycine);
+  }
+  &--voluntaryToImmersion {
+    color: var(--text-label-blue-cumulus);
+    background-color: var(--background-contrast-blue-cumulus);
+    border: 1px solid var(--text-label-blue-cumulus);
+  }
+}

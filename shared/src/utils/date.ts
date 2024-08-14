@@ -1,10 +1,15 @@
 // Matches valid dates of the format 'yyyy-mm-dd'.
 import { addHours, format, isValid } from "date-fns";
+import { z } from "zod";
 import { Flavor } from "../typeFlavors";
 
 export type DateString = Flavor<string, "DateString">;
 
 export type DateTimeIsoString = Flavor<string, "DateTimeIsoString">;
+
+export const dateTimeIsoStringSchema: z.Schema<DateTimeIsoString> = z
+  .string()
+  .datetime();
 
 export const dateRegExp = /\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
 

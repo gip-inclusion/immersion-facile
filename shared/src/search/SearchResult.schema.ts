@@ -3,6 +3,7 @@ import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
+import { dateTimeIsoStringSchema } from "../utils/date";
 import { zStringCanBeEmpty, zStringMinLength1, zUuidLike } from "../zodUtils";
 import { SearchResultDto } from "./SearchResult.dto";
 
@@ -36,6 +37,8 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
       score: z.number(),
     }),
   ),
+  updatedAt: dateTimeIsoStringSchema.optional(),
+  createdAt: dateTimeIsoStringSchema,
   // locationId: zUuidLike,
   locationId: zUuidLike.or(z.null()),
 });

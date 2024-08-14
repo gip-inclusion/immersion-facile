@@ -1,18 +1,19 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
+import Card from "@codegouvfr/react-dsfr/Card";
+import { Tag } from "@codegouvfr/react-dsfr/Tag";
+import { formatDistance } from "date-fns";
+import { fr as frLocale } from "date-fns/locale";
 import { equals } from "ramda";
 import React, { memo } from "react";
+import { Gradient, Tag as ImTag } from "react-design-system";
 import {
+  DateTimeIsoString,
   SearchResultDto,
-  addressDtoToString,
   domElementIds,
   frenchEstablishmentKinds,
-  getMapsLink,
-  toAbsoluteUrl,
 } from "shared";
-import { useStyles } from "tss-react/dsfr";
+import { routes } from "src/app/routes/routes";
 import "./SearchResult.scss";
-import { SearchResultLabels } from "./SearchResultLabels";
 
 export type EnterpriseSearchResultProps = {
   establishment: SearchResultDto;
@@ -23,40 +24,43 @@ export type EnterpriseSearchResultProps = {
   layout?: "fr-col-lg-4" | "fr-col-md-6";
 };
 
-const componentName = "im-search-result";
+const getLastDate = (
+  createdAt?: DateTimeIsoString,
+  updatedAt?: DateTimeIsoString,
+): DateTimeIsoString | undefined => {
+  if (createdAt)
+    return formatDistance(new Date(updatedAt ?? createdAt), new Date(), {
+      addSuffix: true,
+      locale: frLocale,
+    });
+  return;
+};
 
 const SearchResultComponent = ({
   onButtonClick,
   establishment,
   preview,
   layout = "fr-col-lg-4",
-  showDistance = true,
 }: EnterpriseSearchResultProps) => {
-  const { cx } = useStyles();
-
   const {
     siret,
     name,
     customizedName,
-    distance_m,
     address,
-    contactMode,
-    numberOfEmployeeRange,
-    nafLabel,
     romeLabel,
     appellations,
     voluntaryToImmersion,
-    website,
     fitForDisabledWorkers,
-    additionalInformation,
-    urlOfPartner,
+    createdAt,
+    updatedAt,
+    locationId,
   } = establishment;
 
-  const distanceKm = ((distance_m ?? 0) * 0.001).toFixed(1);
   const isCustomizedNameValidToDisplay =
     customizedName &&
     customizedName.length > 0 &&
     !frenchEstablishmentKinds.includes(customizedName.toUpperCase().trim());
+
   const establishmentRawName = isCustomizedNameValidToDisplay
     ? customizedName
     : name;
@@ -64,125 +68,59 @@ const SearchResultComponent = ({
   const [establismentNameFirstLetter, ...establismentNameOtherLetters] =
     establishmentRawName;
 
-  const establismentName = [
+  const jobTitle =
+    appellations.length > 0 ? appellations[0].appellationLabel : romeLabel;
+
+  const establishmentName = [
     establismentNameFirstLetter.toLocaleUpperCase(),
     establismentNameOtherLetters.join("").toLocaleLowerCase(),
   ].join("");
 
+  const dateJobCreatedAt = getLastDate(createdAt, updatedAt);
+
   return (
     <div className={fr.cx("fr-col-12", "fr-col-md-6", layout)}>
-      <div
-        className={cx(fr.cx("fr-card"), componentName)}
-        data-establishment-siret={siret}
-      >
-        <div className={fr.cx("fr-card__body")}>
-          <div className={fr.cx("fr-card__content")}>
-            <h3
-              className={cx(
-                fr.cx("fr-card__title"),
-                `${componentName}-card__title`,
-              )}
-            >
-              {establismentName}
-            </h3>
-            <p className={fr.cx("fr-card__desc")}>
-              {" "}
-              {appellations.length > 0
-                ? appellations
-                    .map((appellation) => appellation.appellationLabel)
-                    .join(", ")
-                : romeLabel}
-            </p>
-            <ul className={fr.cx("fr-card__desc", "fr-text--xs")}>
-              {nafLabel && nafLabel !== "" && <li>{nafLabel}</li>}
-              {numberOfEmployeeRange && (
-                <li>
-                  {numberOfEmployeeRange}{" "}
-                  {numberOfEmployeeRange === "0" ? "salarié" : "salariés"}
-                </li>
-              )}
-              <li>
-                <a
-                  href={getMapsLink(establishment)}
-                  target="_blank"
-                  className={cx(`${componentName}__location-link`)}
-                  rel="noreferrer"
-                >
-                  {addressDtoToString(address).toLocaleLowerCase()}
-                </a>{" "}
-                {showDistance && (
-                  <span>
-                    <strong>
-                      {distanceKm}
-                      km
-                    </strong>{" "}
-                    de votre position
-                  </span>
-                )}
-              </li>
-              {urlOfPartner && (
-                <li>
-                  <a
-                    href={toAbsoluteUrl(urlOfPartner)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {/* eslint-disable-next-line no-irregular-whitespace */}
-                    Trouver le contact sur La Bonne Boite
-                  </a>
-                </li>
-              )}
-              {website && (
-                <li>
-                  <a
-                    href={toAbsoluteUrl(website)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Voir le site de l'entreprise
-                  </a>
-                </li>
-              )}
-              {additionalInformation && (
-                <li title={additionalInformation}>
-                  {additionalInformation.length > 100
-                    ? `${additionalInformation.substring(0, 100)}...`
-                    : additionalInformation}
-                </li>
-              )}
-            </ul>
-            <SearchResultLabels
-              voluntaryToImmersion={voluntaryToImmersion}
-              contactMode={contactMode}
-              fitForDisabledWorkers={fitForDisabledWorkers}
-            />
-          </div>
-          <div className={fr.cx("fr-card__footer")}>
-            <Button
-              size="small"
-              type="button"
-              nativeButtonProps={{
-                id: voluntaryToImmersion
-                  ? `${domElementIds.search.searchResultButton}-${establishment.siret}`
-                  : `${domElementIds.search.lbbSearchResultButton}-${establishment.siret}`,
-              }}
-              iconId="fr-icon-mail-fill"
-              disabled={preview}
-              onClick={
-                preview
-                  ? () => {
-                      //
-                    }
-                  : onButtonClick
-              }
-            >
-              {voluntaryToImmersion || contactMode !== undefined || preview
-                ? "Contacter l'entreprise"
-                : "Tentez votre chance"}
-            </Button>
-          </div>
-        </div>
-      </div>
+      <Card
+        title={jobTitle}
+        desc={establishmentName}
+        linkProps={{
+          ...routes.searchResult({
+            appellationCode: appellations[0].appellationCode,
+            siret,
+            ...(locationId ? { location: locationId } : {}),
+          }).link,
+          onClick: preview
+            ? () => {}
+            : (event) => {
+                event.preventDefault();
+                if (onButtonClick) {
+                  onButtonClick();
+                }
+              },
+        }}
+        id={
+          voluntaryToImmersion
+            ? `${domElementIds.search.searchResultButton}-${siret}`
+            : `${domElementIds.search.lbbSearchResultButton}-${siret}`
+        }
+        enlargeLink
+        titleAs="h2"
+        imageComponent={
+          <Gradient>
+            <div className={fr.cx("fr-p-1v")}>
+              {fitForDisabledWorkers && <ImTag theme="rqth" />}
+              {!voluntaryToImmersion && <ImTag theme="lbb" />}
+              {voluntaryToImmersion && <ImTag theme="voluntaryToImmersion" />}
+            </div>
+          </Gradient>
+        }
+        endDetail={dateJobCreatedAt}
+        start={
+          <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">
+            {address.city} ({address.departmentCode})
+          </Tag>
+        }
+      />
     </div>
   );
 };

@@ -30,4 +30,13 @@ export type SearchImmersionResultPublicV2 = {
 
 export const domainToSearchImmersionResultPublicV2 = (
   searchImmersionResult: SearchResultDto,
-): SearchImmersionResultPublicV2 => searchImmersionResult;
+): SearchImmersionResultPublicV2 => {
+  const {
+    createdAt: _createdAt,
+    updatedAt: _updatedAt,
+    fitForDisabledWorkers: _fitForDisabledWorkers,
+    customizedName: _customizedName,
+    ...searchImmersionResultPublicV2Data
+  } = searchImmersionResult;
+  return searchImmersionResultPublicV2Data;
+};

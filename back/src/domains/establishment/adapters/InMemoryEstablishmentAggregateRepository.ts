@@ -283,6 +283,8 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation
       isSearchable: establishmentAgg.establishment.isSearchable,
       nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
       locationId: establishmentAgg.establishment.locations[0].id,
+      updatedAt: establishmentAgg.establishment.updatedAt?.toISOString(),
+      createdAt: establishmentAgg.establishment.createdAt.toISOString(),
     };
   };
 
@@ -317,4 +319,6 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
       appellationLabel: offer.appellationLabel,
       score: customScore ?? offer.score,
     })),
+  updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
+  createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
 });

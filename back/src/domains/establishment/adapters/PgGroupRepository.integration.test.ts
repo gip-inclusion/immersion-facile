@@ -209,6 +209,8 @@ describe("PgEstablishmentGroupRepository", () => {
       voluntaryToImmersion: establishment.voluntaryToImmersion,
       website: establishment.website,
       locationId: location.id,
+      updatedAt: establishment.updatedAt?.toISOString(),
+      createdAt: establishment.createdAt.toISOString(),
     });
 
     expectToEqual(groupWithResults, {

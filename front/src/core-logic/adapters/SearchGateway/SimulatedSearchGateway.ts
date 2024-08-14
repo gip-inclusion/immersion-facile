@@ -58,6 +58,8 @@ export class SimulatedSearchGateway implements SearchGateway {
     additionalInformation: "Ferme bio",
     urlOfPartner: "https://www.emploi-store.fr/portail/accueil",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   };
 
   constructor(seedResults?: SearchResultDto[], simulatedLatency = 0) {

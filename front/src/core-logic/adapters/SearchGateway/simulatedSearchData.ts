@@ -40,6 +40,8 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     numberOfEmployeeRange: "2000-4999",
     contactMode: "PHONE",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "G1204",
@@ -71,6 +73,8 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "+10000",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "D1211",
@@ -102,6 +106,8 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "+10000",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "D1211",
@@ -133,6 +139,8 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "+10000",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "D1211",
@@ -164,6 +172,8 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "+10000",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "D1505",
@@ -195,6 +205,8 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "+10000",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "D1211",
@@ -227,6 +239,8 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     numberOfEmployeeRange: "+10000",
     contactMode: "PHONE",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "D1211",
@@ -259,6 +273,7 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "+10000",
     locationId: "123",
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "N1103",
@@ -305,6 +320,8 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
     },
     numberOfEmployeeRange: "2000-4999",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
 ];
 
@@ -356,6 +373,8 @@ export const seedSearchResults: SearchResultDto[] = [
       "Afin de transmettre le savoir faire vous serez encadré par une équipe professionnelle dirigée par un champion du monde de la pizza, afin de transmettre le savoir faire vous serez encadré par une équipe professionnelle dirigée par un champion du monde de la pizza",
     distance_m: 7984654,
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "A0001",
@@ -368,7 +387,13 @@ export const seedSearchResults: SearchResultDto[] = [
     address: defaultAddress,
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
-    appellations: [],
+    appellations: [
+      {
+        appellationLabel: "Développeur / Développeuse web",
+        appellationCode: "14156",
+        score: 0,
+      },
+    ],
     nafLabel: "Accueil et Restauration",
     numberOfEmployeeRange: "11-49",
     website: "www.mega-corp.com/job",
@@ -376,6 +401,7 @@ export const seedSearchResults: SearchResultDto[] = [
       "Un texte super long qui donne des tonnes d'informations complémentaires sur l'immersion, les métiers proposés, tout ça... ",
     distance_m: 7000,
     locationId: "123",
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "A0003",
@@ -389,7 +415,13 @@ export const seedSearchResults: SearchResultDto[] = [
     contactMode: "PHONE",
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
-    appellations: [],
+    appellations: [
+      {
+        appellationLabel: "Développeur / Développeuse web",
+        appellationCode: "14156",
+        score: 0,
+      },
+    ],
     nafLabel: "Accueil et Restauration",
     numberOfEmployeeRange: "200-1000",
     website: "www.coolitude-inc.com/job",
@@ -404,6 +436,8 @@ export const seedSearchResults: SearchResultDto[] = [
      L'entreprise cool avec une description sur plusieurs lignes.`,
     distance_m: 500,
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "A0002",
@@ -431,6 +465,8 @@ export const seedSearchResults: SearchResultDto[] = [
     nafLabel: "",
     distance_m: 100,
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     rome: "A0003",
@@ -442,10 +478,18 @@ export const seedSearchResults: SearchResultDto[] = [
     address: defaultAddress,
     contactMode: undefined,
     romeLabel: "Giga métier",
-    appellations: [],
+    appellations: [
+      {
+        appellationLabel: "Développeur / Développeuse web",
+        appellationCode: "14156",
+        score: 0,
+      },
+    ],
     nafLabel: "",
     website: "https://www.example.com",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -475,6 +519,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -505,6 +551,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "Test avec description courte",
     numberOfEmployeeRange: "20-49",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -535,6 +583,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -565,6 +615,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -594,6 +646,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "5610C",
@@ -624,6 +678,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -653,6 +709,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -683,6 +741,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -713,6 +773,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -742,6 +804,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -771,6 +835,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -801,6 +867,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -831,6 +899,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -861,6 +931,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
     locationId: null,
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -890,6 +962,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -919,6 +993,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "4724Z",
@@ -949,6 +1025,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -979,6 +1057,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1009,6 +1089,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1038,6 +1120,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1067,6 +1151,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1097,6 +1183,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1127,6 +1215,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1157,6 +1247,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1186,6 +1278,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1215,6 +1309,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1245,6 +1341,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1275,6 +1373,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1305,6 +1405,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1334,6 +1436,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1363,6 +1467,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "3-5",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1393,6 +1499,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1422,6 +1530,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1457,6 +1567,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1486,6 +1598,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1516,6 +1630,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1545,6 +1661,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "100-199",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1575,6 +1693,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1605,6 +1725,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "5610C",
@@ -1635,6 +1757,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1665,6 +1789,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1695,6 +1821,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1725,6 +1853,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1755,6 +1885,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1784,6 +1916,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1814,6 +1948,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1844,6 +1980,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1874,6 +2012,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1903,6 +2043,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "4724Z",
@@ -1933,6 +2075,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1962,6 +2106,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -1992,6 +2138,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -2022,6 +2170,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "4724Z",
@@ -2052,6 +2202,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -2082,6 +2234,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -2111,6 +2265,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -2140,6 +2296,7 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "1-2",
     locationId: "123",
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -2170,6 +2327,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "5610A",
@@ -2199,6 +2358,7 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "20-49",
     locationId: "123",
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "4724Z",
@@ -2230,6 +2390,7 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "6-9",
     locationId: "123",
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "1071C",
@@ -2259,6 +2420,8 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "10-19",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
   {
     naf: "6820B",
@@ -2289,5 +2452,7 @@ export const seedSearchResults: SearchResultDto[] = [
     additionalInformation: "",
     numberOfEmployeeRange: "",
     locationId: "123",
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   },
 ];

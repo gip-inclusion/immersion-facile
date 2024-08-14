@@ -91,12 +91,12 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   locations: [defaultLocation],
   customizedName: undefined,
   isCommited: undefined,
-  createdAt: new Date(),
+  createdAt: new Date("2024-08-08"),
   sourceProvider: "immersion-facile",
   voluntaryToImmersion: true,
   nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
-  updatedAt: new Date("2022-01-05T12:00:00.000"),
+  updatedAt: new Date("2024-08-10"),
   isOpen: true,
   isSearchable: true,
   maxContactsPerMonth: defaultMaxContactsPerMonth,
@@ -228,7 +228,7 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  public withUpdatedAt(updatedAt: Date) {
+  public withUpdatedAt(updatedAt?: Date) {
     return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
   }
 
@@ -311,7 +311,7 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withEstablishmentNextAvailabilityDate(date: Date) {
+  public withEstablishmentNextAvailabilityDate(date?: Date) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(
@@ -373,7 +373,7 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withEstablishmentUpdatedAt(updatedAt: Date) {
+  public withEstablishmentUpdatedAt(updatedAt?: Date) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(
