@@ -1,8 +1,6 @@
-import { Kysely } from "kysely";
 import { Pool } from "pg";
 import { expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../config/pg/kysely/model/database";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { ConventionToSync } from "../ports/ConventionsToSyncRepository";
 import { PgConventionsToSyncRepository } from "./PgConventionsToSyncRepository";
@@ -33,7 +31,7 @@ describe("PgConventionsToSyncRepository", () => {
   ];
 
   let pool: Pool;
-  let db: Kysely<Database>;
+  let db: KyselyDb;
   let conventionsToSyncRepository: PgConventionsToSyncRepository;
 
   beforeAll(async () => {

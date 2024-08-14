@@ -1,4 +1,3 @@
-import { Kysely } from "kysely";
 import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
@@ -7,8 +6,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../config/pg/kysely/model/database";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
@@ -28,7 +26,7 @@ const assessment: AssessmentEntity = {
 
 describe("PgAssessmentRepository", () => {
   let pool: Pool;
-  let db: Kysely<Database>;
+  let db: KyselyDb;
   let assessmentRepository: PgAssessmentRepository;
 
   beforeAll(async () => {

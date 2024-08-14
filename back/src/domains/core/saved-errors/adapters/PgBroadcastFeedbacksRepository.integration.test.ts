@@ -1,5 +1,4 @@
 import axios, { isAxiosError } from "axios";
-import { Kysely } from "kysely/dist/cjs/kysely";
 import { Pool } from "pg";
 import {
   ConventionId,
@@ -9,11 +8,11 @@ import {
   expectToEqual,
 } from "shared";
 import {
+  KyselyDb,
   cast,
   jsonBuildObject,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../../config/pg/kysely/model/database";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { SubscriberErrorFeedback } from "../../api-consumer/ports/SubscribersGateway";
 import {
@@ -27,7 +26,7 @@ import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository
 describe("PgBroadcastFeedbacksRepository", () => {
   let pool: Pool;
   let pgBroadcastFeedbacksRepository: PgBroadcastFeedbacksRepository;
-  let kyselyDb: Kysely<Database>;
+  let kyselyDb: KyselyDb;
 
   beforeAll(() => {
     pool = getTestPgPool();
