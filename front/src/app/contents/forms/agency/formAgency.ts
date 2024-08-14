@@ -1,4 +1,9 @@
-import { AddressDto, CreateAgencyDto, domElementIds } from "shared";
+import {
+  AddressDto,
+  CreateAgencyDto,
+  GeoPositionDto,
+  domElementIds,
+} from "shared";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";
 
@@ -8,6 +13,7 @@ export type FormAgencyFieldsLabels = FormFieldsObjectForContent<
       | keyof CreateAgencyDto
       | "stepsForValidation"
       | `address.${keyof AddressDto}`
+      | `position.${keyof GeoPositionDto}`
     >,
     FormFieldAttributesForContent
   >
@@ -53,6 +59,14 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   },
   position: {
     label: "Coordonnées géographiques de la structure",
+    id: domElementIds.addAgency.positionInput,
+  },
+  "position.lon": {
+    label: "Coordonnées géographiques de la structure - longitude",
+    id: domElementIds.addAgency.positionInput,
+  },
+  "position.lat": {
+    label: "Coordonnées géographiques de la structure - latitude",
     id: domElementIds.addAgency.positionInput,
   },
   logoUrl: {

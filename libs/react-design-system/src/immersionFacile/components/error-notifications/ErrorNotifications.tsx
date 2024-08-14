@@ -5,6 +5,9 @@ import { useStyles } from "tss-react/dsfr";
 
 const componentName = "im-notification-errors";
 
+const doesSplittedKeyContainsIndex = (key: string[]) =>
+  key.length > 1 && !Number.isNaN(Number(key[1]));
+
 export type ErrorNotificationsProps = {
   errors: Record<string, string>;
   labels?: Record<string, string | undefined>;
@@ -16,9 +19,8 @@ const getErrorLabel = (
   labels?: Record<string, string | undefined>,
 ) => {
   if (!labels) return field;
-  if (field.includes(".")) {
+  if (field.includes(".") && doesSplittedKeyContainsIndex(field.split("."))) {
     const splittedField = field.split(".");
-    if (splittedField.length <= 1) return field;
     const [domain, entryIndex] = splittedField;
     return `${labels[domain]} (${parseInt(entryIndex) + 1})`;
   }
