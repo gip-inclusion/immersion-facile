@@ -553,6 +553,7 @@ export const ConventionForm = ({
                   iconId="fr-icon-checkbox-circle-line"
                   iconPosition="left"
                   type="button"
+                  className={fr.cx("fr-hidden", "fr-unhidden-lg")}
                   nativeButtonProps={{
                     id: domElementIds.conventionImmersionRoute.submitFormButton,
                   }}
@@ -563,9 +564,7 @@ export const ConventionForm = ({
                       isValid,
                     });
                     return handleSubmit(onSubmit, (errors) => {
-                      // eslint-disable-next-line @typescript-eslint/no-floating-promises
                       validateSteps("doNotClear");
-                      // eslint-disable-next-line no-console
                       console.error(conventionValues, errors);
                     })(e);
                   }}
@@ -597,20 +596,16 @@ export const ConventionForm = ({
                 <ShareConventionLink />
                 <Button
                   type="submit"
-                  onClick={() => {
+                  onClick={(e) => {
                     // biome-ignore lint/suspicious/noConsoleLog: <explanation>
                     console.log("beforeHandleSubmit", {
                       errors,
                       isValid,
                     });
-                    return methods.handleSubmit((a) => {
-                      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-                      console.log("afterHandleSubmitSuccess", {
-                        errors,
-                        isValid,
-                      });
-                      onSubmit(a);
-                    });
+                    return handleSubmit(onSubmit, (errors) => {
+                      validateSteps("doNotClear");
+                      console.error(conventionValues, errors);
+                    })(e);
                   }}
                   id={
                     domElementIds.conventionImmersionRoute
