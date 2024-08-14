@@ -33,7 +33,6 @@ const seed = async () => {
   const deps = await createAppDependencies(config);
 
   const pool = deps.getPgPoolFn();
-  const client = await pool.connect();
   const db = makeKyselyDb(pool);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
@@ -65,7 +64,6 @@ const seed = async () => {
     await conventionSeed(uow);
   });
 
-  client.release();
   await pool.end();
 };
 
