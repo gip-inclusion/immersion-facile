@@ -1,16 +1,12 @@
+import { sql } from "kysely";
 import {
   AppellationAndRomeDto,
   AppellationCode,
-  RomeCode,
   RomeDto,
-  RomeLabel,
   castError,
   removeDiacritics,
 } from "shared";
-import {
-  KyselyDb,
-  executeKyselyRawSqlQuery,
-} from "../../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../utils/logger";
 import { RomeRepository } from "../ports/RomeRepository";
 
@@ -20,66 +16,119 @@ export class PgRomeRepository implements RomeRepository {
   constructor(private transaction: KyselyDb) {}
 
   public appellationToCodeMetier(
-    romeCodeAppellation: string,
+    romeCodeAppellation: AppellationCode,
   ): Promise<string | undefined> {
-    return executeKyselyRawSqlQuery(
-      this.transaction,
-      `SELECT code_rome
-        FROM public_appellations_data
-        WHERE ogr_appellation=$1`,
-      [romeCodeAppellation],
-    )
-      .then((res) => {
-        try {
-          return res.rows[0].code_rome;
-        } catch (_) {
-          logger.error({
-            message: `could not fetch rome code with given appellation ${romeCodeAppellation}`,
-            error: {
-              result: res,
-            },
-          });
-
-          return;
-        }
+    return this.transaction
+      .selectFrom("public_appellations_data")
+      .where("ogr_appellation", "=", parseInt(romeCodeAppellation))
+      .select("code_rome")
+      .execute()
+      .then((results) => {
+        const romeCode = results.at(0)?.code_rome;
+        if (romeCode) return romeCode;
+        logger.error({
+          message: `could not fetch rome code with given appellation ${romeCodeAppellation}, results: ${results}`,
+        });
+        return undefined;
       })
       .catch((e) => {
         logger.error(e);
-        return;
+        return undefined;
       });
   }
 
   public async getAppellationAndRomeDtosFromAppellationCodes(
     codes: AppellationCode[],
   ): Promise<AppellationAndRomeDto[]> {
-    const { rows } = await executeKyselyRawSqlQuery<AppelationRow>(
-      this.transaction,
-      `
-        SELECT ogr_appellation, libelle_appellation_long, appellations.code_rome, libelle_rome
-        FROM public_appellations_data AS appellations
-        JOIN public_romes_data AS romes ON  appellations.code_rome = romes.code_rome
-        WHERE appellations.ogr_appellation = ANY ($1)
-    `,
-      [codes],
-    );
-    return rows.map(convertRowToAppellationDto);
+    return this.transaction
+      .selectFrom("public_appellations_data as appelations")
+      .innerJoin(
+        "public_romes_data as romes",
+        "appelations.code_rome",
+        "romes.code_rome",
+      )
+      .where(
+        "appelations.ogr_appellation",
+        "in",
+        codes.map((code) => parseInt(code)),
+      )
+      .select([
+        "appelations.ogr_appellation",
+        "appelations.libelle_appellation_long",
+        "romes.libelle_rome",
+        "romes.code_rome",
+      ])
+      .execute()
+      .then((results) =>
+        results.map(
+          (result) =>
+            ({
+              appellationCode: result.ogr_appellation.toString(),
+              appellationLabel: result.libelle_appellation_long,
+              romeCode: result.code_rome,
+              romeLabel: result.libelle_rome,
+            }) satisfies AppellationAndRomeDto,
+        ),
+      );
   }
 
   public searchAppellation(query: string): Promise<AppellationAndRomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
-
-    return executeKyselyRawSqlQuery<AppelationRow>(
-      this.transaction,
-      `SELECT ogr_appellation, libelle_appellation_long, public_appellations_data.code_rome, libelle_rome
-        FROM public_appellations_data 
-        JOIN public_romes_data ON  public_appellations_data.code_rome = public_romes_data.code_rome
-        WHERE
-           (libelle_appellation_long_tsvector @@ to_tsquery('french',$1) AND libelle_appellation_long_without_special_char ILIKE $3)
-           OR (libelle_appellation_long_without_special_char ILIKE $2 AND libelle_appellation_long_without_special_char ILIKE $3)
-        LIMIT 80`,
-      [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
-    )
-      .then((res) => res.rows.map(convertRowToAppellationDto))
+    return this.transaction
+      .selectFrom("public_appellations_data")
+      .innerJoin(
+        "public_romes_data",
+        "public_appellations_data.code_rome",
+        "public_romes_data.code_rome",
+      )
+      .where((eb) =>
+        eb.or([
+          eb.and([
+            eb.eb("libelle_appellation_long_without_special_char", "@@", (eb) =>
+              eb.fn("to_tsquery", [
+                sql`'french'`,
+                sql`${toTsQuery(queryBeginning)}`,
+              ]),
+            ),
+            eb.eb(
+              "libelle_appellation_long_without_special_char",
+              "ilike",
+              `%${lastWord}%`,
+            ),
+          ]),
+          eb.and([
+            eb.eb(
+              "libelle_appellation_long_without_special_char",
+              "ilike",
+              `%${queryBeginning}%`,
+            ),
+            eb.eb(
+              "libelle_appellation_long_without_special_char",
+              "ilike",
+              `%${lastWord}%`,
+            ),
+          ]),
+        ]),
+      )
+      .select([
+        "public_appellations_data.ogr_appellation",
+        "public_appellations_data.libelle_appellation_long",
+        "public_romes_data.libelle_rome",
+        "public_romes_data.code_rome",
+      ])
+      .limit(80)
+      .execute()
+      .then((results) =>
+        results.map(
+          (result) =>
+            ({
+              appellationCode: result.ogr_appellation.toString(),
+              appellationLabel: result.libelle_appellation_long,
+              romeCode: result.code_rome,
+              romeLabel: result.libelle_rome,
+            }) satisfies AppellationAndRomeDto,
+        ),
+      )
       .catch((error) => {
         logger.error({
           error: { error: castError(error), query },
@@ -91,36 +140,64 @@ export class PgRomeRepository implements RomeRepository {
 
   public searchRome(query: string): Promise<RomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
-    return executeKyselyRawSqlQuery<{
-      code_rome: RomeCode;
-      libelle_rome: RomeLabel;
-    }>(
-      this.transaction,
-      `
-        WITH matching_rome AS(
-            WITH search_corpus AS (
-              SELECT code_rome, libelle_rome::text AS searchable_text, libelle_rome_tsvector AS ts_vector FROM public_romes_data
-              UNION
-              SELECT code_rome, libelle_appellation_long_without_special_char AS searchable_text, libelle_appellation_long_tsvector AS ts_vector FROM  public_appellations_data
-            )
-            SELECT DISTINCT code_rome
-            FROM search_corpus 
-            WHERE
-              (ts_vector @@ to_tsquery('french',$1) AND searchable_text ILIKE $3)
-              OR (searchable_text ILIKE $2 AND searchable_text ILIKE $3)
-            LIMIT 80
-            )
-        SELECT matching_rome.code_rome, libelle_rome
-        FROM matching_rome LEFT JOIN public_romes_data ON matching_rome.code_rome = public_romes_data.code_rome`,
-      [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
-    )
-      .then((res) =>
-        res.rows.map(
-          (row): RomeDto => ({
-            romeCode: row.code_rome,
-            romeLabel: row.libelle_rome,
-          }),
-        ),
+
+    return this.transaction
+      .with("search_corpus", (eb) =>
+        eb
+          .selectFrom("public_romes_data")
+          .select([
+            "public_romes_data.code_rome as code_rome",
+            "public_romes_data.libelle_rome as searchable_text",
+            "public_romes_data.libelle_rome_tsvector as ts_vector",
+          ])
+          .unionAll(
+            eb
+              .selectFrom("public_appellations_data")
+              .select([
+                "public_appellations_data.code_rome as code_rome",
+                "public_appellations_data.libelle_appellation_long_without_special_char as searchable_text",
+                "public_appellations_data.libelle_appellation_long_tsvector as ts_vector",
+              ]),
+          ),
+      )
+      .with("matching_rome", (eb) =>
+        eb
+
+          .selectFrom("search_corpus")
+          .where((eb) =>
+            eb.or([
+              eb.and([
+                eb.eb("ts_vector", "@@", (eb) =>
+                  eb.fn("to_tsquery", [
+                    sql`'french'`,
+                    sql`${toTsQuery(queryBeginning)}`,
+                  ]),
+                ),
+                eb.eb("searchable_text", "ilike", `%${lastWord}%`),
+              ]),
+              eb.and([
+                eb.eb("searchable_text", "ilike", `%${queryBeginning}%`),
+                eb.eb("searchable_text", "ilike", `%${lastWord}%`),
+              ]),
+            ]),
+          )
+          .select("code_rome")
+          .distinct()
+          .limit(80),
+      )
+      .selectFrom("matching_rome")
+      .innerJoin(
+        "public_romes_data",
+        "matching_rome.code_rome",
+        "public_romes_data.code_rome",
+      )
+      .select(["public_romes_data.code_rome", "public_romes_data.libelle_rome"])
+      .execute()
+      .then((results) =>
+        results.map((result) => ({
+          romeCode: result.code_rome,
+          romeLabel: result.libelle_rome,
+        })),
       )
       .catch((e) => {
         logger.error(e);
@@ -128,22 +205,6 @@ export class PgRomeRepository implements RomeRepository {
       });
   }
 }
-
-type AppelationRow = {
-  ogr_appellation: number;
-  code_rome: RomeCode;
-  libelle_appellation_long: string;
-  libelle_rome: string;
-};
-
-const convertRowToAppellationDto = (
-  row: AppelationRow,
-): AppellationAndRomeDto => ({
-  appellationCode: row.ogr_appellation.toString(),
-  romeCode: row.code_rome,
-  appellationLabel: row.libelle_appellation_long,
-  romeLabel: row.libelle_rome,
-});
 
 const toTsQuery = (query: string): string => query.split(/\s+/).join(" & ");
 
@@ -168,18 +229,17 @@ const removeAccentAndSpecialCharacters = (str: string) =>
 
 const removeInvalidInitialCharacters = (str: string): string => {
   const firstCharacter = str.charAt(0);
-  if (["'"].includes(firstCharacter))
-    return removeInvalidInitialCharacters(str.slice(1));
-  return str;
+  return ["'"].includes(firstCharacter)
+    ? removeInvalidInitialCharacters(str.slice(1))
+    : str;
 };
 
 const removeInvalidFinalCharacters = (str: string): string => {
   const lastCharacter = str.charAt(str.length - 1);
-  if (["'"].includes(lastCharacter))
-    return removeInvalidFinalCharacters(str.slice(0, str.length - 1));
-  return str;
+  return ["'"].includes(lastCharacter)
+    ? removeInvalidFinalCharacters(str.slice(0, str.length - 1))
+    : str;
 };
 
-const removeInvalidInitialOrFinalCharaters = (str: string): string => {
-  return removeInvalidInitialCharacters(removeInvalidFinalCharacters(str));
-};
+const removeInvalidInitialOrFinalCharaters = (str: string): string =>
+  removeInvalidInitialCharacters(removeInvalidFinalCharacters(str));
