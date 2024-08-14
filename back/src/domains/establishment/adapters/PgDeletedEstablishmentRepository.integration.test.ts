@@ -1,6 +1,6 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { DeletedEstablishmentDto } from "../ports/DeletedEstablishmentRepository";
@@ -8,23 +8,20 @@ import { PgDeletedEstablishmentRepository } from "./PgDeletedEstablishmentReposi
 
 describe("PgDeletedEstablishmentRepository", () => {
   let pgDeletedEstablishmentRepository: PgDeletedEstablishmentRepository;
-  let client: PoolClient;
   let pool: Pool;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
+    pgDeletedEstablishmentRepository = new PgDeletedEstablishmentRepository(db);
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM establishments_deleted");
-    pgDeletedEstablishmentRepository = new PgDeletedEstablishmentRepository(
-      makeKyselyDb(pool),
-    );
+    await db.deleteFrom("establishments_deleted").execute();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
@@ -36,14 +33,11 @@ describe("PgDeletedEstablishmentRepository", () => {
       deletedAt: new Date(),
     };
 
-    expectToEqual(
-      (await client.query(getAllDeletedEstablishmentQuery)).rows,
-      [],
-    );
+    expectToEqual(await getAllDeletedEstablishmentQuery(db), []);
 
     await pgDeletedEstablishmentRepository.save(deletedEstablishment);
 
-    expectToEqual((await client.query(getAllDeletedEstablishmentQuery)).rows, [
+    expectToEqual(await getAllDeletedEstablishmentQuery(db), [
       {
         siret: deletedEstablishment.siret,
         created_at: deletedEstablishment.createdAt,
@@ -74,7 +68,7 @@ describe("PgDeletedEstablishmentRepository", () => {
 
     await pgDeletedEstablishmentRepository.save(deletedEstablishmentBis);
 
-    expectToEqual((await client.query(getAllDeletedEstablishmentQuery)).rows, [
+    expectToEqual(await getAllDeletedEstablishmentQuery(db), [
       {
         siret: deletedEstablishment.siret,
         created_at: deletedEstablishment.createdAt,
@@ -98,7 +92,5 @@ describe("PgDeletedEstablishmentRepository", () => {
   });
 });
 
-const getAllDeletedEstablishmentQuery = `
-  SELECT *
-  FROM establishments_deleted
-`;
+const getAllDeletedEstablishmentQuery = (db: KyselyDb) =>
+  db.selectFrom("establishments_deleted").selectAll().execute();
