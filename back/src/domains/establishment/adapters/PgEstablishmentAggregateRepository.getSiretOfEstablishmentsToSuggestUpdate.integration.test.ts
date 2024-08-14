@@ -1,6 +1,6 @@
 import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { expectToEqual } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
@@ -11,7 +11,6 @@ import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRe
 
 describe("PgScriptsQueries", () => {
   let pool: Pool;
-  let client: PoolClient;
   let db: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
   let pgOutboxRepository: PgOutboxRepository;
@@ -19,19 +18,7 @@ describe("PgScriptsQueries", () => {
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
     db = makeKyselyDb(pool);
-  });
-
-  beforeEach(async () => {
-    await db.deleteFrom("establishments_contacts").execute();
-    await db.deleteFrom("establishments_locations").execute();
-    await db.deleteFrom("establishments").execute();
-    await client.query("DELETE FROM outbox_failures");
-    await client.query("DELETE FROM outbox_publications");
-    await client.query("DELETE FROM outbox");
-    await client.query("DELETE FROM notifications_email_recipients");
-    await client.query("DELETE FROM notifications_email");
     pgOutboxRepository = new PgOutboxRepository(db);
     pgNotificationRepository = new PgNotificationRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
@@ -39,8 +26,18 @@ describe("PgScriptsQueries", () => {
     );
   });
 
+  beforeEach(async () => {
+    await db.deleteFrom("establishments_contacts").execute();
+    await db.deleteFrom("establishments_locations").execute();
+    await db.deleteFrom("establishments").execute();
+    await db.deleteFrom("outbox_failures").execute();
+    await db.deleteFrom("outbox_publications").execute();
+    await db.deleteFrom("outbox").execute();
+    await db.deleteFrom("notifications_email_recipients").execute();
+    await db.deleteFrom("notifications_email").execute();
+  });
+
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
