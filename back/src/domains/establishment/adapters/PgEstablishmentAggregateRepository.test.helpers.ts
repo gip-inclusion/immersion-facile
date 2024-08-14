@@ -42,6 +42,8 @@ export const makeExpectedSearchResult = ({
     voluntaryToImmersion: establishment.establishment.voluntaryToImmersion,
     website: establishment.establishment.website,
     isSearchable: establishment.establishment.isSearchable, // <<<<< Donnée renvoyée actuellement alors que pas spécifié dans le DTO?!
+    updatedAt: establishment.establishment.updatedAt?.toISOString(),
+    createdAt: establishment.establishment.createdAt.toISOString(),
   } as SearchResultDto; // d'où le as
 };
 

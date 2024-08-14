@@ -40,6 +40,8 @@ const establishmentToSearchResultPreview = ({
   fitForDisabledWorkers,
   additionalInformation,
   locationId: "",
+  updatedAt: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
 });
 
 type SearchResultPreviewProps = {

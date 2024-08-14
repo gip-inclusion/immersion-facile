@@ -13,6 +13,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../../../../domains/establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../../domains/establishment/adapters/InMemoryGroupRepository";
+import { EstablishmentEntity } from "../../../../domains/establishment/entities/EstablishmentEntity";
 import { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
 import { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
 import {
@@ -29,11 +30,17 @@ const siret1 = "12345678901234";
 const siret2 = "11111111111111";
 const siret3 = "12341234123455";
 
+const defaultUpdatedAt = new Date("2024-08-10");
+
 const toSearchImmersionResults = (
-  params: { siret: SiretDto; offer: OfferEntity }[],
+  params: {
+    siret: SiretDto;
+    offer: OfferEntity;
+    establishment: EstablishmentEntity;
+  }[],
   withDistance: number | false,
 ): SearchResultDto[] =>
-  params.map(({ siret, offer }) => ({
+  params.map(({ siret, offer, establishment }) => ({
     naf: defaultNafCode,
     nafLabel: "NAFRev2",
     name: "Company inside repository",
@@ -56,6 +63,8 @@ const toSearchImmersionResults = (
     position: defaultLocation.position,
     locationId: defaultLocation.id,
     ...(withDistance !== false ? { distance_m: withDistance } : {}),
+    updatedAt: defaultUpdatedAt.toISOString(),
+    createdAt: establishment.createdAt.toISOString(),
   }));
 
 const offer1 = new OfferEntityBuilder()
@@ -67,6 +76,8 @@ const offer2 = new OfferEntityBuilder()
   .withRomeCode("A1203")
   .withAppellationCode("16067")
   .build();
+
+const establishment = new EstablishmentEntityBuilder().build();
 
 const immersionOffer = new OfferEntityBuilder().build();
 const establishmentAggregate1 = new EstablishmentAggregateBuilder()
@@ -281,8 +292,8 @@ describe("search-immersion route", () => {
           status: 200,
           body: toSearchImmersionResults(
             [
-              { siret: siret1, offer: offer1 },
-              { siret: siret2, offer: offer2 },
+              { siret: siret1, offer: offer1, establishment },
+              { siret: siret2, offer: offer2, establishment },
             ],
             0,
           ),
@@ -305,8 +316,8 @@ describe("search-immersion route", () => {
           status: 200,
           body: toSearchImmersionResults(
             [
-              { siret: siret1, offer: offer1 },
-              { siret: siret3, offer: offer1 },
+              { siret: siret1, offer: offer1, establishment },
+              { siret: siret3, offer: offer1, establishment },
             ],
             0,
           ),
@@ -328,9 +339,9 @@ describe("search-immersion route", () => {
           status: 200,
           body: toSearchImmersionResults(
             [
-              { siret: siret1, offer: offer1 },
-              { siret: siret2, offer: offer2 },
-              { siret: siret3, offer: offer1 },
+              { siret: siret1, offer: offer1, establishment },
+              { siret: siret2, offer: offer2, establishment },
+              { siret: siret3, offer: offer1, establishment },
             ],
             0,
           ),
@@ -448,9 +459,9 @@ describe("search-immersion route", () => {
           status: 200,
           body: toSearchImmersionResults(
             [
-              { siret: siret1, offer: offer1 },
-              { siret: siret2, offer: offer2 },
-              { siret: siret3, offer: offer1 },
+              { siret: siret1, offer: offer1, establishment },
+              { siret: siret2, offer: offer2, establishment },
+              { siret: siret3, offer: offer1, establishment },
             ],
             false,
           ),
@@ -468,8 +479,8 @@ describe("search-immersion route", () => {
           status: 200,
           body: toSearchImmersionResults(
             [
-              { siret: siret1, offer: offer1 },
-              { siret: siret3, offer: offer1 },
+              { siret: siret1, offer: offer1, establishment },
+              { siret: siret3, offer: offer1, establishment },
             ],
             false,
           ),
@@ -569,6 +580,8 @@ describe("search-immersion route", () => {
           voluntaryToImmersion: true,
           website: "",
           locationId: defaultLocation.id,
+          updatedAt: defaultUpdatedAt.toISOString(),
+          createdAt: new Date("2024-08-08").toISOString(),
         },
       });
     });

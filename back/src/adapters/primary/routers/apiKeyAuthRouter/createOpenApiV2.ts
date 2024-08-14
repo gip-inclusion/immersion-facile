@@ -2,7 +2,6 @@ import {
   ConventionDtoBuilder,
   ConventionReadDto,
   CreateWebhookSubscription,
-  SearchResultDto,
   conventionReadSchema,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
@@ -10,6 +9,7 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
 import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
+import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
   publicApiV2SearchEstablishmentRoutes,
@@ -50,7 +50,7 @@ const contactInPersonExample: ContactEstablishmentPublicV2Dto = {
   locationId: "123",
 };
 
-const searchImmersionResult: SearchResultDto = {
+const searchImmersionResult: SearchImmersionResultPublicV2 = {
   additionalInformation: "Some additional information",
   address: {
     departmentCode: "75",
@@ -74,9 +74,7 @@ const searchImmersionResult: SearchResultDto = {
     },
   ],
   contactMode: "EMAIL",
-  customizedName: "Ma super boite",
   distance_m: 1225,
-  fitForDisabledWorkers: false,
   naf: "123",
   nafLabel: "Fabrication de vêtements",
   name: "Raison sociale de ma super boite",

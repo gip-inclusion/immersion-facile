@@ -31,6 +31,8 @@ export const stubSearchResult: SearchResultDto = {
   contactMode: "EMAIL",
   numberOfEmployeeRange: "10-19",
   locationId: "123",
+  updatedAt: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
 };
 
 /* eslint-disable @typescript-eslint/require-await */

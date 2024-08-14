@@ -1,5 +1,6 @@
 import { sql } from "kysely";
 import {
+  DateTimeIsoString,
   Group,
   GroupSlug,
   GroupWithResults,
@@ -110,6 +111,8 @@ export class PgGroupRepository implements GroupRepository {
             contactMode: ref("ec.contact_mode"),
             numberOfEmployeeRange: ref("e.number_employees"),
             locationId: ref("loc.id"),
+            createdAt: sql<DateTimeIsoString>`date_to_iso(e.created_at)`,
+            updatedAt: sql<DateTimeIsoString>`date_to_iso(e.update_date)`,
           }),
         ).as("search_result_dto"),
       )

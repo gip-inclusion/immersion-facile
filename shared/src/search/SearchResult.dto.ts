@@ -6,6 +6,7 @@ import {
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
+import { DateTimeIsoString } from "../utils/date";
 
 export type AppellationWithScoreDto = AppellationDto & { score: number };
 
@@ -29,4 +30,6 @@ export type SearchResultDto = {
   website?: string;
   additionalInformation?: string;
   urlOfPartner?: string;
+  updatedAt?: DateTimeIsoString;
+  createdAt?: DateTimeIsoString;
 };
