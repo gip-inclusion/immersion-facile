@@ -101,14 +101,16 @@ export const formErrorsToFlatErrors = (
   return errorObj;
 };
 
+const doesSplittedKeyContainsIndex = (splittedKey: string[]) =>
+  splittedKey.length > 1 && !Number.isNaN(Number(splittedKey[1]));
+
 const replaceArrayPath = (flatErrorsObject: Record<string, any>) =>
   keys(flatErrorsObject).reduce((acc, dotNestedKey) => {
     const separator = ".";
     const keySplitted = dotNestedKey.split(separator);
-    const key =
-      keySplitted.length > 1
-        ? keySplitted.slice(0, 2).join(separator)
-        : dotNestedKey;
+    const key = doesSplittedKeyContainsIndex(keySplitted)
+      ? keySplitted.slice(0, 2).join(separator)
+      : dotNestedKey;
     return {
       ...acc,
       [key]: flatErrorsObject[dotNestedKey],
