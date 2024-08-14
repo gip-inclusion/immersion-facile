@@ -122,6 +122,10 @@ const labelsByFeatureFlag: Record<
     title: "Recherche par pertinence",
     enableLabel: "Activer la recherche par pertinence (scoring)",
   },
+  enableProConnect: {
+    enableLabel: "Activer le mode Pro Connect",
+    title: "Passer de Inclusion Connect à Pro Connect",
+  },
 };
 
 const FeatureFlagTextWithSeverityForm = ({

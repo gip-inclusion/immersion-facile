@@ -128,6 +128,7 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
       severity: "warning",
     }),
     enableSearchByScore: makeBooleanFeatureFlag(true),
+    enableProConnect: makeBooleanFeatureFlag(false),
   };
 
   await uow.featureFlagRepository.insertAll(featureFlags);

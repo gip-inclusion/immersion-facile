@@ -48,6 +48,7 @@ describe("PG getFeatureFlags", () => {
         severity: "warning",
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
+      enableProConnect: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(expectedFeatureFlags);
@@ -66,6 +67,7 @@ describe("PG getFeatureFlags", () => {
         severity: "warning",
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
+      enableProConnect: makeBooleanFeatureFlag(false),
     });
   });
 
@@ -84,6 +86,7 @@ describe("PG getFeatureFlags", () => {
         severity: "error",
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
+      enableProConnect: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(initialFeatureFlags);
@@ -121,6 +124,7 @@ describe("PG getFeatureFlags", () => {
         severity: "error",
       }),
       enableSearchByScore: makeBooleanFeatureFlag(true),
+      enableProConnect: makeBooleanFeatureFlag(false),
     });
   });
 });

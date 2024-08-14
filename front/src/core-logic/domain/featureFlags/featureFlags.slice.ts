@@ -25,6 +25,7 @@ const initialState: FeatureFlagsState = {
     severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
+  enableProConnect: makeBooleanFeatureFlag(false),
   isLoading: true,
 };
 
