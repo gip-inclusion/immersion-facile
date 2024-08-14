@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import {
   AppellationWithScoreDto,
   Group,
@@ -52,22 +52,20 @@ const laMieCalineGroup: GroupEntity = {
 
 describe("PgEstablishmentGroupRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let pgEstablishmentGroupRepository: PgGroupRepository;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
-  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
-  });
-
-  beforeEach(async () => {
     db = makeKyselyDb(pool);
     pgEstablishmentGroupRepository = new PgGroupRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       db,
     );
+  });
+
+  beforeEach(async () => {
     await db.deleteFrom("groups__sirets").execute();
     await db.deleteFrom("groups").execute();
     await db.deleteFrom("establishments_contacts").execute();
@@ -77,7 +75,6 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
