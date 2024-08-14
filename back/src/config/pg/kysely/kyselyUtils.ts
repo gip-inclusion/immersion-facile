@@ -37,12 +37,12 @@ export const jsonStripNulls = <T>(
   obj: RawBuilder<T>,
 ): RawBuilder<StripNullRecursive<T>> => sql`json_strip_nulls(${obj})`;
 export const executeKyselyRawSqlQuery = <T extends QueryResultRow>(
-  transaction: Kysely<Database>,
+  transaction: KyselyDb,
   sqlQuery: string,
   values?: any[],
 ) => transaction.executeQuery<T>(CompiledQuery.raw(sqlQuery, values));
 
-export const makeKyselyDb = (pool: Pool): Kysely<Database> => {
+export const makeKyselyDb = (pool: Pool): KyselyDb => {
   const logger = createLogger(__filename);
   return new Kysely<Database>({
     dialect: new PostgresDialect({ pool }),

@@ -1,8 +1,9 @@
-import { Kysely } from "kysely";
 import { Pool } from "pg";
 import { ApiConsumer, WebhookSubscription, expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../../config/pg/kysely/model/database";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
@@ -43,7 +44,7 @@ const apiConsumer: ApiConsumer = {
 
 describe("PgApiConsumerRepository", () => {
   let pool: Pool;
-  let db: Kysely<Database>;
+  let db: KyselyDb;
   let apiConsumerRepository: PgApiConsumerRepository;
 
   beforeAll(async () => {

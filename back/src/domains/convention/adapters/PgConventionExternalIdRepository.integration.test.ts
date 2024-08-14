@@ -1,9 +1,7 @@
-import { Kysely } from "kysely";
 import { Pool } from "pg";
 import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import { v4 as uuid } from "uuid";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../config/pg/kysely/model/database";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "./PgConventionExternalIdRepository";
@@ -14,7 +12,7 @@ describe("PgConventionExternalIdRepository", () => {
   let pgConventionRepository: PgConventionRepository;
   let pgAgencyRepository: PgAgencyRepository;
   let pool: Pool;
-  let db: Kysely<Database>;
+  let db: KyselyDb;
 
   beforeAll(() => {
     pool = getTestPgPool();
