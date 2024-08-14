@@ -61,4 +61,5 @@ export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enableTemporaryOperation: featureFlagTextImageAndRedirectSchema,
   enableMaintenance: featureFlagTextWithSeveritySchema,
   enableSearchByScore: featureFlagBooleanSchema,
+  enableProConnect: featureFlagBooleanSchema,
 });

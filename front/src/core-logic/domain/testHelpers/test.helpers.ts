@@ -19,6 +19,7 @@ const defaultFlagsInFront: FeatureFlags = {
     severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
+  enableProConnect: makeBooleanFeatureFlag(false),
 };
 
 export const makeStubFeatureFlags = (

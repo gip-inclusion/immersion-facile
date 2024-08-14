@@ -21,6 +21,7 @@ const defaultFlags: FeatureFlags = {
     severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
+  enableProConnect: makeBooleanFeatureFlag(false),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {

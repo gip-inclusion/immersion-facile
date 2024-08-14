@@ -30,6 +30,7 @@ const defaultFeatureFlags: FeatureFlags = {
     severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
+  enableProConnect: makeBooleanFeatureFlag(false),
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -46,6 +47,7 @@ const flagsFromApi: FeatureFlags = {
     severity: "error",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(true),
+  enableProConnect: makeBooleanFeatureFlag(true),
 };
 
 describe("feature flag slice", () => {
