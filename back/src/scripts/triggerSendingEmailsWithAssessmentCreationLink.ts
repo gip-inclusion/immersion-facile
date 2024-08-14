@@ -1,8 +1,8 @@
 import subDays from "date-fns/subDays";
-import { Pool } from "pg";
 import { keys } from "ramda";
 import { DateRange } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
@@ -25,10 +25,6 @@ const config = AppConfig.createFromEnv();
 const sendEmailsWithAssessmentCreationLinkScript = async () => {
   logger.info({ message: "Starting to send Emails with assessment link" });
 
-  const dbUrl = config.pgImmersionDbUrl;
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
   const timeGateway = new RealTimeGateway();
   const now = timeGateway.now();
   const yesterday = {
@@ -49,7 +45,10 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
     throw new Error(message);
   }
 
-  const { uowPerformer } = createUowPerformer(config, () => pool);
+  const { uowPerformer } = createUowPerformer(
+    config,
+    createGetPgPoolFn(config),
+  );
 
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,

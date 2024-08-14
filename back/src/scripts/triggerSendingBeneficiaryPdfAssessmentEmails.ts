@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
-import { Pool } from "pg";
 import { keys } from "ramda";
 import { AppConfig } from "../config/bootstrap/appConfig";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -22,13 +22,12 @@ const config = AppConfig.createFromEnv();
 const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
   logger.info({ message: "Starting to send Beneficiary assessment Emails" });
 
-  const dbUrl = config.pgImmersionDbUrl;
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
   const timeGateway = new RealTimeGateway();
 
-  const { uowPerformer } = createUowPerformer(config, () => pool);
+  const { uowPerformer } = createUowPerformer(
+    config,
+    createGetPgPoolFn(config),
+  );
 
   const uuidGenerator = new UuidV4Generator();
 

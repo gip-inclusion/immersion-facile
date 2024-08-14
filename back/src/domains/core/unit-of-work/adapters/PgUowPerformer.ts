@@ -1,11 +1,5 @@
-import { Kysely } from "kysely";
-import { Pool } from "pg";
 import { castError } from "shared";
-import {
-  KyselyDb,
-  makeKyselyDb,
-} from "../../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../../config/pg/kysely/model/database";
+import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../utils/logger";
 import { UnitOfWork } from "../ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
@@ -13,29 +7,27 @@ import { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
 const logger = createLogger(__filename);
 
 export class PgUowPerformer implements UnitOfWorkPerformer {
-  #db: Kysely<Database>;
-
   constructor(
-    pool: Pool,
+    private db: KyselyDb,
     private createPgUow: (transaction: KyselyDb) => UnitOfWork,
-  ) {
-    this.#db = makeKyselyDb(pool);
-  }
+  ) {}
 
   public perform<T>(cb: (uow: UnitOfWork) => Promise<T>): Promise<T> {
-    return this.#db
+    return this.db
       .transaction()
       .execute<T>((transaction) => cb(this.createPgUow(transaction)))
       .catch((error: any) => {
-        error instanceof Error
-          ? logger.error({
-              error,
-              message: `Error in transaction: ${error.message}`,
-            })
-          : logger.error({
-              error: castError(error),
-              message: "Unknown Error in transaction",
-            });
+        logger.error(
+          error instanceof Error
+            ? {
+                error,
+                message: `Error in transaction: ${error.message}`,
+              }
+            : {
+                error: castError(error),
+                message: "Unknown Error in transaction",
+              },
+        );
         throw error;
       });
   }

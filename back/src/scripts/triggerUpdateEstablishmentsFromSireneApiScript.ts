@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import {
   ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
@@ -44,7 +45,10 @@ const main = async () => {
     connectionString: dbUrl,
   });
 
-  const { uowPerformer } = createUowPerformer(config, () => pool);
+  const { uowPerformer } = createUowPerformer(
+    config,
+    createGetPgPoolFn(config),
+  );
 
   const updateEstablishmentsFromSirenAPI =
     new UpdateEstablishmentsFromSirenApiScript(

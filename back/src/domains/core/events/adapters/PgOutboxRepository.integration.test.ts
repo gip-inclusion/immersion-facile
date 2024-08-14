@@ -1,6 +1,14 @@
-import { Pool, PoolClient } from "pg";
-import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
-import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { CompiledQuery } from "kysely";
+import { Pool } from "pg";
+import {
+  ConventionDtoBuilder,
+  expectArraysToEqualIgnoringOrder,
+  expectToEqual,
+} from "shared";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
@@ -10,7 +18,7 @@ import { PgOutboxRepository, StoredEventRow } from "./PgOutboxRepository";
 
 describe("PgOutboxRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let outboxRepository: PgOutboxRepository;
   const uuidGenerator = new TestUuidGenerator();
   const timeGateway = new CustomTimeGateway();
@@ -24,38 +32,61 @@ describe("PgOutboxRepository", () => {
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM outbox_failures");
-    await client.query("DELETE FROM outbox_publications");
-    await client.query("DELETE FROM outbox");
+    db = makeKyselyDb(pool);
 
-    outboxRepository = new PgOutboxRepository(makeKyselyDb(pool));
+    await db.deleteFrom("outbox_failures").execute();
+    await db.deleteFrom("outbox_publications").execute();
+    await db.deleteFrom("outbox").execute();
+
+    outboxRepository = new PgOutboxRepository(db);
   });
 
   it("countAllEvents", async () => {
-    await client.query(
-      `INSERT INTO outbox(id, status, occurred_at, topic, payload) VALUES ('aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa', 'never-published','2021-11-15T08:30:00.000Z', 'PeConnectFederatedIdentityAssociated', '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}')`,
-    );
-    await client.query(
-      `INSERT INTO outbox(id, status, occurred_at, topic, payload) VALUES ('aaaaac99-9c0b-1aaa-aa6d-6bb9bd38cccc', 'never-published','2021-11-15T08:30:00.000Z', 'PeConnectFederatedIdentityAssociated', '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}')`,
-    );
-    await client.query(
-      `INSERT INTO outbox(id, status, occurred_at, topic, payload) VALUES ('aaaaac99-9c0b-1aaa-aa6d-6bb9bd38bbbb', 'in-process','2021-11-15T08:30:00.000Z', 'PeConnectFederatedIdentityAssociated', '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}')`,
-    );
+    const common = {
+      occurred_at: "2021-11-15T08:30:00.000Z",
+      topic: "PeConnectFederatedIdentityAssociated",
+      payload:
+        '{"exp": 1652054423, "iat": 1651881623, "siret": "my-siret", "version": 1}',
+    };
 
-    const total = await outboxRepository.countAllEvents({
-      status: "never-published",
-    });
+    await db
+      .insertInto("outbox")
+      .values({
+        id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
+        status: "never-published",
+        ...common,
+      })
+      .execute();
+    await db
+      .insertInto("outbox")
+      .values({
+        id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38cccc",
+        status: "never-published",
+        ...common,
+      })
+      .execute();
+    await db
+      .insertInto("outbox")
+      .values({
+        id: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38bbbb",
+        status: "in-process",
+        ...common,
+      })
+      .execute();
 
-    expect(total).toBe(2);
+    expectToEqual(
+      await outboxRepository.countAllEvents({
+        status: "never-published",
+      }),
+      2,
+    );
   });
 
   describe("save", () => {
@@ -265,19 +296,17 @@ describe("PgOutboxRepository", () => {
   };
 
   const getAllEventsStored = (): Promise<StoredEventRow[]> =>
-    client
-      .query(
-        `
-        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
-          published_at, subscription_id, error_message 
-        FROM outbox  
+    // TODO: kysely query builder hard to make here
+    db
+      .executeQuery<StoredEventRow>(
+        CompiledQuery.raw(`
+        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status, published_at, subscription_id, error_message
+        FROM outbox
         LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
         LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-      `,
+      `),
       )
       .then((result) => result.rows);
-
-  //         JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
 });
 
 const expectStoredRowsToMatchEvent = (
@@ -305,26 +334,24 @@ const expectStoredRowsToMatchEvent = (
   }
 
   const expectedRowsForEvent: StoredEventRow[] = publications.flatMap(
-    ({ publishedAt, failures }): StoredEventRow[] => {
-      if (!failures.length)
-        return [
-          {
-            ...commonStoredEventFields,
-            published_at: new Date(publishedAt),
-            subscription_id: null,
-            error_message: null,
-          },
-        ];
-
-      return failures.map(
-        (failure): StoredEventRow => ({
-          ...commonStoredEventFields,
-          published_at: new Date(publishedAt),
-          subscription_id: failure.subscriptionId,
-          error_message: failure.errorMessage,
-        }),
-      );
-    },
+    ({ publishedAt, failures }) =>
+      !failures.length
+        ? [
+            {
+              ...commonStoredEventFields,
+              published_at: new Date(publishedAt),
+              subscription_id: null,
+              error_message: null,
+            },
+          ]
+        : failures.map(
+            (failure): StoredEventRow => ({
+              ...commonStoredEventFields,
+              published_at: new Date(publishedAt),
+              subscription_id: failure.subscriptionId,
+              error_message: failure.errorMessage,
+            }),
+          ),
   );
   expectArraysToEqualIgnoringOrder(rows, expectedRowsForEvent);
 };
