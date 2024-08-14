@@ -1,8 +1,8 @@
 import { subDays } from "date-fns";
-import { Pool } from "pg";
 import { keys } from "ramda";
 import { SiretDto } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
@@ -23,12 +23,11 @@ const config = AppConfig.createFromEnv();
 
 const triggerEstablishmentLeadReminders = async () => {
   logger.info({ message: "Starting to send Emails to establishment leads" });
-  const dbUrl = config.pgImmersionDbUrl;
-  const pool = new Pool({
-    connectionString: dbUrl,
-  });
   const timeGateway = new RealTimeGateway();
-  const { uowPerformer } = createUowPerformer(config, () => pool);
+  const { uowPerformer } = createUowPerformer(
+    config,
+    createGetPgPoolFn(config),
+  );
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,
     3600 * 24 * 30,

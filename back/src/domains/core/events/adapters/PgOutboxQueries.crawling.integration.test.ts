@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { ConventionDto, ConventionDtoBuilder, expectToEqual } from "shared";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
@@ -164,7 +164,6 @@ describe("PgOutboxQueries for crawling purposes", () => {
   };
 
   let pool: Pool;
-  let client: PoolClient;
   let outboxQueries: PgOutboxQueries;
   const uuidGenerator = new TestUuidGenerator();
   const timeGateway = new CustomTimeGateway();
@@ -178,20 +177,20 @@ describe("PgOutboxQueries for crawling purposes", () => {
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM outbox_failures");
-    await client.query("DELETE FROM outbox_publications");
-    await client.query("DELETE FROM outbox");
+    const db = makeKyselyDb(pool);
 
-    outboxQueries = new PgOutboxQueries(makeKyselyDb(pool));
+    await db.deleteFrom("outbox_failures").execute();
+    await db.deleteFrom("outbox_publications").execute();
+    await db.deleteFrom("outbox").execute();
+
+    outboxQueries = new PgOutboxQueries(db);
 
     await createEvents(uuidGenerator, timeGateway, createNewEvent);
   });

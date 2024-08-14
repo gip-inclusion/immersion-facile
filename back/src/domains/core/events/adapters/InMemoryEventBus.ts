@@ -167,29 +167,20 @@ const makeExecuteSubscriptionMatchingSubscriptionId =
     throwOnPublishFailure: boolean,
   ) =>
   async (subscriptionId: SubscriptionId): Promise<void | EventFailure> => {
-    const subscription = subscriptionsForTopic[subscriptionId];
-    logger.info({
-      events: [event],
-      topic: event.topic,
-      message: `Sending an event for ${subscriptionId}`,
-    });
-
     try {
-      await subscription(event);
+      logger.info({
+        events: [event],
+        topic: event.topic,
+        message: `Sending an event for ${subscriptionId}`,
+      });
+      await subscriptionsForTopic[subscriptionId](event);
     } catch (error: any) {
-      monitorErrorInCallback(error, event);
-      const errorMessage = errorToString(error);
-      if (throwOnPublishFailure) {
-        throw new Error(
-          [
-            `Could not process event with id : ${event.id}.`,
-            `Subscription ${subscriptionId} failed on topic ${event.topic}.`,
-            `Error was : ${errorMessage}`,
-          ].join("\n"),
-          { cause: error },
-        );
-      }
-      return { subscriptionId, errorMessage };
+      return onSubscriptionError(
+        error,
+        event,
+        throwOnPublishFailure,
+        subscriptionId,
+      );
     }
   };
 
@@ -239,3 +230,23 @@ export const getLastPublication = (
       return 0;
     })
     .at(-1);
+function onSubscriptionError(
+  error: any,
+  event: DomainEvent,
+  throwOnPublishFailure: boolean,
+  subscriptionId: SubscriptionId,
+) {
+  monitorErrorInCallback(error, event);
+  const errorMessage = errorToString(error);
+  if (throwOnPublishFailure) {
+    throw new Error(
+      [
+        `Could not process event with id : ${event.id}.`,
+        `Subscription ${subscriptionId} failed on topic ${event.topic}.`,
+        `Error was : ${errorMessage}`,
+      ].join("\n"),
+      { cause: error },
+    );
+  }
+  return { subscriptionId, errorMessage };
+}

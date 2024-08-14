@@ -1,5 +1,5 @@
-import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { PoleEmploiGetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
@@ -32,10 +32,7 @@ const executeUsecase = async () => {
 
   const { uowPerformer } = createUowPerformer(
     config,
-    () =>
-      new Pool({
-        connectionString: config.pgImmersionDbUrl,
-      }),
+    createGetPgPoolFn(config),
   );
 
   const resyncOldConventionsToPeUsecase = new ResyncOldConventionsToPe(

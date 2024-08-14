@@ -1,11 +1,16 @@
-import { Pool, PoolClient } from "pg";
+import { CompiledQuery } from "kysely";
+import { Pool } from "pg";
 import { expectObjectsToMatch, expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createPgUow } from "../../unit-of-work/adapters/createPgUow";
 import type { DomainEvent, EventPublication } from "../events";
+import { EventBus } from "../ports/EventBus";
 import { InMemoryEventBus } from "./InMemoryEventBus";
 import {
   PgOutboxRepository,
@@ -35,33 +40,34 @@ const domainEvt: DomainEvent = {
 
 describe("when simulating that an event has failed to force re-run it only for one usecase", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
+  let timeGateway: CustomTimeGateway;
+  let eventBus: EventBus;
+  let outboxRepository: PgOutboxRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
+    timeGateway = new CustomTimeGateway();
+    eventBus = new InMemoryEventBus(
+      timeGateway,
+      new InMemoryUowPerformer(createPgUow(db)),
+    );
+    outboxRepository = new PgOutboxRepository(db);
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
+  });
+
+  beforeEach(async () => {
+    await db.deleteFrom("outbox_failures").execute();
+    await db.deleteFrom("outbox_publications").execute();
+    await db.deleteFrom("outbox").execute();
   });
 
   it("republishes only the subscription that has failed", async () => {
     // Arrange
-
-    const kyselyDb = makeKyselyDb(pool);
-
-    await client.query("DELETE FROM outbox_failures");
-    await client.query("DELETE FROM outbox_publications");
-    await client.query("DELETE FROM outbox");
-
-    const timeGateway = new CustomTimeGateway();
-    const eventBus = new InMemoryEventBus(
-      timeGateway,
-      new InMemoryUowPerformer(createPgUow(kyselyDb)),
-    );
-    const outboxRepository = new PgOutboxRepository(kyselyDb);
 
     const subscriptionId = "failedSubscription";
 
@@ -90,7 +96,7 @@ describe("when simulating that an event has failed to force re-run it only for o
 
     await outboxRepository.save(initialEvent);
     expectToEqual(
-      storedEventRowsToDomainEvent(await getAllEventsStored(client)),
+      storedEventRowsToDomainEvent(await getAllEventsStored(db)),
       initialEvent,
     );
 
@@ -102,7 +108,7 @@ describe("when simulating that an event has failed to force re-run it only for o
 
     // Assert
     expectObjectsToMatch(
-      storedEventRowsToDomainEvent(await getAllEventsStored(client)),
+      storedEventRowsToDomainEvent(await getAllEventsStored(db)),
       {
         status: "published",
         publications: [
@@ -115,15 +121,15 @@ describe("when simulating that an event has failed to force re-run it only for o
   });
 });
 
-const getAllEventsStored = (client: PoolClient): Promise<StoredEventRow[]> =>
-  client
-    .query(
-      `
+const getAllEventsStored = (db: KyselyDb): Promise<StoredEventRow[]> =>
+  db
+    .executeQuery(
+      CompiledQuery.raw(`
         SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status,
           published_at, subscription_id, error_message 
         FROM outbox  
         LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
         LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id
-      `,
+      `),
     )
-    .then((result) => result.rows);
+    .then((results) => results.rows as StoredEventRow[]);

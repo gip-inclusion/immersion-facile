@@ -1,5 +1,9 @@
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { FormEstablishmentDtoBuilder } from "shared";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
@@ -12,29 +16,29 @@ const someSiret = "12345678901234";
 
 describe("PgUowPerformer", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
+  let pgUowPerformer: PgUowPerformer;
+
   const uuidGenerator = new TestUuidGenerator();
   const createNewEvent = makeCreateNewEvent({
     uuidGenerator,
     timeGateway: new CustomTimeGateway(),
   });
-  let pgUowPerformer: PgUowPerformer;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
+    pgUowPerformer = new PgUowPerformer(db, createPgUow);
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM form_establishments");
-    await client.query("DELETE FROM outbox_failures");
-    await client.query("DELETE FROM outbox_publications");
-    await client.query("DELETE FROM outbox");
-    pgUowPerformer = new PgUowPerformer(pool, createPgUow);
+    await db.deleteFrom("form_establishments").execute();
+    await db.deleteFrom("outbox_failures").execute();
+    await db.deleteFrom("outbox_publications").execute();
+    await db.deleteFrom("outbox").execute();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
@@ -80,12 +84,12 @@ describe("PgUowPerformer", () => {
     formEstablishmentLength: number;
     outboxLength: number;
   }) => {
-    const { rows: formEstablishments } = await client.query(
-      "SELECT * FROM form_establishments",
-    );
-    expect(formEstablishments).toHaveLength(formEstablishmentLength);
+    expect(
+      await db.selectFrom("form_establishments").selectAll().execute(),
+    ).toHaveLength(formEstablishmentLength);
 
-    const { rows: outbox } = await client.query("SELECT * FROM outbox");
-    expect(outbox).toHaveLength(outboxLength);
+    expect(await db.selectFrom("outbox").selectAll().execute()).toHaveLength(
+      outboxLength,
+    );
   };
 });
