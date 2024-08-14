@@ -10,6 +10,7 @@ export const featureFlagNames = [
   "enableTemporaryOperation",
   "enableMaintenance",
   "enableSearchByScore",
+  "enableProConnect",
 ] as const;
 
 type FeatureFlagKind = (typeof featureFlagKinds)[number];
@@ -55,9 +56,11 @@ export type FeatureFlag =
   | FeatureFlagTextWithSeverity;
 
 export type FeatureFlags = {
+  // TODO: pas de controle sur les clés ici, on peut mettre ce qu'on veut
   enableMaintenance: FeatureFlagTextWithSeverity;
   enableTemporaryOperation: FeatureFlagTextImageAndRedirect;
   enableSearchByScore: FeatureFlagBoolean;
+  enableProConnect: FeatureFlagBoolean;
 };
 
 export type SetFeatureFlagParam = {
