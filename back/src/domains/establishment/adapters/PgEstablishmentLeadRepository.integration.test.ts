@@ -1,30 +1,27 @@
 import { subDays } from "date-fns";
-import { Pool, PoolClient } from "pg";
+import { Pool } from "pg";
 import { expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";
 
 describe("PgEstablishmentLeadRepository", () => {
   let pool: Pool;
-  let client: PoolClient;
+  let db: KyselyDb;
   let establishmentLeadRepository: PgEstablishmentLeadRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    client = await pool.connect();
+    db = makeKyselyDb(pool);
+    establishmentLeadRepository = new PgEstablishmentLeadRepository(db);
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM establishment_lead_events");
-    establishmentLeadRepository = new PgEstablishmentLeadRepository(
-      makeKyselyDb(pool),
-    );
+    await db.deleteFrom("establishment_lead_events").execute();
   });
 
   afterAll(async () => {
-    client.release();
     await pool.end();
   });
 
