@@ -11,7 +11,6 @@ import {
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
 } from "shared";
-import { InclusionConnectConfig } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
 import { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import { DomainTopic } from "../../domains/core/events/events";
 import { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
@@ -28,6 +27,17 @@ export type AccessTokenConfig = {
 export type AxiosConfig = {
   endpoint: string;
   bearerToken: string;
+};
+
+export type InclusionConnectConfig = {
+  clientId: string;
+  clientSecret: string;
+  immersionRedirectUri: {
+    afterLogin: AbsoluteUrl;
+    afterLogout: AbsoluteUrl;
+  };
+  inclusionConnectBaseUri: AbsoluteUrl;
+  scope: string;
 };
 
 // See "Working with AppConfig" in back/README.md for more details.
@@ -241,36 +251,27 @@ export class AppConfig {
   }
 
   public get inclusionConnectConfig(): InclusionConnectConfig {
-    return this.inclusionConnectGateway === "HTTPS"
-      ? {
-          clientId: this.#throwIfNotDefinedOrDefault(
-            "INCLUSION_CONNECT_CLIENT_ID",
-          ),
-          clientSecret: this.#throwIfNotDefinedOrDefault(
-            "INCLUSION_CONNECT_CLIENT_SECRET",
-          ),
-          immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
-          inclusionConnectBaseUri: this.#throwIfNotAbsoluteUrl(
-            "INCLUSION_CONNECT_BASE_URI",
-          ),
-          scope: "openid profile email",
-        }
-      : {
-          clientId: this.#throwIfNotDefinedOrDefault(
-            "INCLUSION_CONNECT_CLIENT_ID",
-            "fake id",
-          ),
-          clientSecret: this.#throwIfNotDefinedOrDefault(
-            "INCLUSION_CONNECT_CLIENT_SECRET",
-            "fake secret",
-          ),
-          immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
-          inclusionConnectBaseUri: this.#throwIfNotDefinedOrDefault(
-            "INCLUSION_CONNECT_BASE_URI",
-            "https://fake.url",
-          ) as AbsoluteUrl,
-          scope: "openid profile email",
-        };
+    return {
+      clientId: this.#throwIfNotDefinedOrDefault(
+        "INCLUSION_CONNECT_CLIENT_ID",
+        this.inclusionConnectGateway !== "HTTPS" ? "fake id" : undefined,
+      ),
+      clientSecret: this.#throwIfNotDefinedOrDefault(
+        "INCLUSION_CONNECT_CLIENT_SECRET",
+        this.inclusionConnectGateway !== "HTTPS" ? "fake secret" : undefined,
+      ),
+      immersionRedirectUri: {
+        afterLogin: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
+        afterLogout: this.immersionFacileBaseUrl,
+      },
+      inclusionConnectBaseUri: this.#throwIfNotAbsoluteUrl(
+        "INCLUSION_CONNECT_BASE_URI",
+        this.inclusionConnectGateway !== "HTTPS"
+          ? "https://fake.url"
+          : undefined,
+      ),
+      scope: "openid profile email",
+    };
   }
 
   // == Inclusion Connect gateway ==

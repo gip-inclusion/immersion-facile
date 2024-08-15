@@ -228,7 +228,7 @@ export const createUseCases = (
       initiateInclusionConnect: new InitiateInclusionConnect(
         uowPerformer,
         uuidGenerator,
-        config.inclusionConnectConfig,
+        gateways.inclusionConnectGateway,
       ),
       authenticateWithInclusionCode: new AuthenticateWithInclusionCode(
         uowPerformer,
@@ -237,14 +237,12 @@ export const createUseCases = (
         uuidGenerator,
         generateAuthenticatedUserToken,
         config.immersionFacileBaseUrl,
-        config.inclusionConnectConfig,
         gateways.timeGateway,
       ),
       linkFranceTravailUsersToTheirAgencies:
         new LinkFranceTravailUsersToTheirAgencies(uowPerformer),
       inclusionConnectLogout: new GetInclusionConnectLogoutUrl(
-        config.immersionFacileBaseUrl,
-        config.inclusionConnectConfig,
+        gateways.inclusionConnectGateway,
       ),
       bindConventionToFederatedIdentity: new BindConventionToFederatedIdentity(
         uowPerformer,

@@ -1,25 +1,25 @@
-import { expectToEqual } from "shared";
+import { expectToEqual, queryParamsAsString } from "shared";
+import {
+  InMemoryInclusionConnectGateway,
+  fakeInclusionConnectConfig,
+} from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
 import { GetInclusionConnectLogoutUrl } from "./GetInclusionConnectLogoutUrl";
-import { InclusionConnectConfig } from "./InitiateInclusionConnect";
 
 describe("GetInclusionConnectLogoutUrl", () => {
   it("returns the inclusion connect logout url from %s", async () => {
-    const baseUrl = "http://my-base-url.com";
-    const inclusionConnectConfig: InclusionConnectConfig = {
-      clientId: "my-client-id",
-      clientSecret: "my-client-secret",
-      immersionRedirectUri: baseUrl,
-      scope: "",
-      inclusionConnectBaseUri: "http://my-inclusion-connect-base-url.com",
-    };
     const getIcLogoutUrl = new GetInclusionConnectLogoutUrl(
-      baseUrl,
-      inclusionConnectConfig,
+      new InMemoryInclusionConnectGateway(fakeInclusionConnectConfig),
     );
 
     expectToEqual(
       await getIcLogoutUrl.execute(),
-      `${inclusionConnectConfig.inclusionConnectBaseUri}/logout/?client_id=${inclusionConnectConfig.clientId}&post_logout_redirect_uri=${baseUrl}`,
+      `${
+        fakeInclusionConnectConfig.inclusionConnectBaseUri
+      }/logout/?${queryParamsAsString({
+        postLogoutRedirectUrl:
+          fakeInclusionConnectConfig.immersionRedirectUri.afterLogout,
+        clientId: fakeInclusionConnectConfig.clientId,
+      })}`,
     );
   });
 });

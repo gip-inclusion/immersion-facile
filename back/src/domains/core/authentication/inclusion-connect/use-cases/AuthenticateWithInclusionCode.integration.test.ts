@@ -11,19 +11,16 @@ import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../unit-of-work/adapters/createPgUow";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryInclusionConnectGateway } from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
+import {
+  InMemoryInclusionConnectGateway,
+  fakeInclusionConnectConfig,
+} from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
-const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
 const correctToken = "my-correct-token";
-const clientId = "my-client-id";
-const clientSecret = "my-client-secret";
-const scope = "openid profile email";
-
-const inclusionConnectBaseUri: AbsoluteUrl =
-  "http://fake-inclusion-connect-uri.com";
+const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
 
 describe("AuthenticateWithInclusionCode use case", () => {
   const defaultExpectedIcIdTokenPayload: InclusionConnectIdTokenPayload = {
@@ -45,10 +42,9 @@ describe("AuthenticateWithInclusionCode use case", () => {
     db = makeKyselyDb(pool);
     uow = createPgUow(db);
     const uuidGenerator = new UuidV4Generator();
-    const immersionRedirectUri: AbsoluteUrl =
-      "http://immersion-uri.com/my-redirection";
-
-    inclusionConnectGateway = new InMemoryInclusionConnectGateway();
+    inclusionConnectGateway = new InMemoryInclusionConnectGateway(
+      fakeInclusionConnectConfig,
+    );
     authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
       new PgUowPerformer(db, createPgUow),
       makeCreateNewEvent({
@@ -59,13 +55,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
       uuidGenerator,
       () => correctToken,
       immersionBaseUrl,
-      {
-        immersionRedirectUri,
-        inclusionConnectBaseUri,
-        scope,
-        clientId,
-        clientSecret,
-      },
       new CustomTimeGateway(),
     );
   });
