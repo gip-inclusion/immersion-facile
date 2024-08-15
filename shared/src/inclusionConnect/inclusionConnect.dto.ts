@@ -1,3 +1,4 @@
+import { Flavor, InclusionConnectJwt } from "..";
 import { ConventionDto } from "../convention/convention.dto";
 import {
   AgencyRole,
@@ -8,9 +9,11 @@ import { EstablishmentRole, Role } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
 import { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
+export type InclusionConnectState = Flavor<string, "InclusionConnectState">;
+export type InclusionConnectCode = Flavor<string, "InclusionConnectCode">;
 export type AuthenticateWithInclusionCodeConnectParams = WithSourcePage & {
-  code: string;
-  state: string;
+  state: InclusionConnectState;
+  code: InclusionConnectCode;
 };
 
 export type AllowedStartInclusionConnectLoginSourcesKind =
@@ -21,7 +24,7 @@ export type WithSourcePage = {
 };
 
 export type AuthenticatedUserQueryParams = {
-  token: string;
+  token: InclusionConnectJwt;
 } & Pick<User, "email" | "firstName" | "lastName">;
 
 type InclusionConnectConventionManageAllowedRole =

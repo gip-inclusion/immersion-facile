@@ -1,19 +1,26 @@
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, WithSourcePage } from "shared";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
+import { InclusionConnectOAuthJwt } from "../entities/OngoingOAuth";
 
-export type GetAccessTokenParams = {
+export type GetAccessTokenParams = WithSourcePage & {
   code: string;
-  redirectUri: AbsoluteUrl;
 };
 
 export type GetAccessTokenResult = {
   icIdTokenPayload: InclusionConnectIdTokenPayload;
   expire: number;
-  accessToken: string;
+  accessToken: InclusionConnectOAuthJwt;
+};
+
+export type GetLoginUrlParams = WithSourcePage & {
+  nonce: string;
+  state: string;
 };
 
 export interface InclusionConnectGateway {
+  getLoginUrl(params: GetLoginUrlParams): Promise<AbsoluteUrl>;
   getAccessToken: (
     params: GetAccessTokenParams,
   ) => Promise<GetAccessTokenResult>;
+  getLogoutUrl(): Promise<AbsoluteUrl>;
 }

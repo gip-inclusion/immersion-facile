@@ -14,7 +14,7 @@ import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
 import { HttpInclusionConnectGateway } from "../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/HttpInclusionConnectGateway";
 import { InMemoryInclusionConnectGateway } from "../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
-import { makeInclusionConnectExternalRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/inclusionConnectExternalRoutes";
+import { makeInclusionConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/inclusionConnect.routes";
 import { InclusionConnectGateway } from "../../domains/core/authentication/inclusion-connect/port/InclusionConnectGateway";
 import { HttpPeConnectGateway } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/InMemoryPeConnectGateway";
@@ -178,13 +178,13 @@ export const createGateways = async (
     config.inclusionConnectGateway === "HTTPS"
       ? new HttpInclusionConnectGateway(
           createAxiosHttpClientForExternalAPIs(
-            makeInclusionConnectExternalRoutes(
+            makeInclusionConnectRoutes(
               config.inclusionConnectConfig.inclusionConnectBaseUri,
             ),
           ),
           config.inclusionConnectConfig,
         )
-      : new InMemoryInclusionConnectGateway();
+      : new InMemoryInclusionConnectGateway(config.inclusionConnectConfig);
 
   const createEmailValidationGateway = (config: AppConfig) =>
     ({

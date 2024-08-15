@@ -36,16 +36,20 @@ export const makeThrowIfNotDefinedOrDefault =
 
 export const makeThrowIfNotAbsoluteUrl =
   (processEnv: ProcessEnv) =>
-  <T extends string>(variableName: T): AbsoluteUrl => {
-    const value = processEnv[variableName];
+  <T extends string>(
+    variableName: T,
+    defaultValue?: AbsoluteUrl,
+  ): AbsoluteUrl => {
+    const value = processEnv[variableName] || defaultValue;
     if (!value) throw new Error(`Expected ${variableName} to be Defined`);
-    try {
-      return absoluteUrlSchema.parse(value);
-    } catch (_error) {
+
+    const parseResult = absoluteUrlSchema.safeParse(value);
+    if (!parseResult.success)
       throw new Error(
-        `Provided value ${value} for ${variableName} is not an absolute url.`,
+        `Provided value ${value} for ${variableName} is not an absolute url. ${parseResult.error}`,
       );
-    }
+
+    return parseResult.data;
   };
 
 export type OpenCageGeoSearchKey = `oc_gs_${string}`;

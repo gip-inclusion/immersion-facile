@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import { InclusionConnectState } from "shared";
 import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { optional } from "../../../../../config/pg/pgUtils";
 import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
@@ -17,7 +18,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   constructor(private transaction: KyselyDb) {}
 
   public async findByState(
-    state: string,
+    state: InclusionConnectState,
     provider: "inclusionConnect",
   ): Promise<OngoingOAuth | undefined> {
     const pgOngoingOAuth: PersistenceOngoingOAuth | undefined =

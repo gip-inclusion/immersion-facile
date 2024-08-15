@@ -7,14 +7,14 @@ import { z } from "zod";
 // id_token is a jwt that has a payload of kind : InclusionAccessTokenResponse
 // access_token could be used to call UserInfo endpoint
 
-type InclusionAccessTokenResponse = {
+type InclusionConnectAccessTokenResponse = {
   access_token: string;
   token_type: "Bearer";
   expires_in: number;
   id_token: string;
 };
 
-const inclusionAccessTokenResponseSchema: z.Schema<InclusionAccessTokenResponse> =
+const inclusionConnectAccessTokenResponseSchema: z.Schema<InclusionConnectAccessTokenResponse> =
   z.object({
     access_token: z.string(),
     token_type: z.enum(["Bearer"]),
@@ -31,21 +31,21 @@ export type InclusionConnectLogoutQueryParams = {
   post_logout_redirect_uri: AbsoluteUrl;
 };
 
-export type InclusionConnectExternalRoutes = ReturnType<
-  typeof makeInclusionConnectExternalRoutes
+export type InclusionConnectRoutes = ReturnType<
+  typeof makeInclusionConnectRoutes
 >;
 
-export const makeInclusionConnectExternalRoutes = (
+export const makeInclusionConnectRoutes = (
   inclusionConnectBaseUrl: AbsoluteUrl,
 ) =>
   defineRoutes({
     // url should be of form: "https://{hostname}/auth" then we add  /token | /logout,
     // documentation is here : https://github.com/gip-inclusion/inclusion-connect/blob/main/docs/inclusion_connect.md
-    inclusionConnectGetAccessToken: defineRoute({
+    getAccessToken: defineRoute({
       method: "post",
       url: `${inclusionConnectBaseUrl}/token/`,
       requestBodySchema: z.string(),
       headersSchema: withContentTypeUrlEncodedSchema.passthrough(),
-      responses: { 200: inclusionAccessTokenResponseSchema },
+      responses: { 200: inclusionConnectAccessTokenResponseSchema },
     }),
   });
