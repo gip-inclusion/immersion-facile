@@ -19,19 +19,16 @@ import {
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryInclusionConnectGateway } from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
+import {
+  InMemoryInclusionConnectGateway,
+  fakeInclusionConnectConfig,
+} from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
 const correctToken = "my-correct-token";
-const clientId = "my-client-id";
-const clientSecret = "my-client-secret";
-const scope = "openid profile email";
-
-const inclusionConnectBaseUri: AbsoluteUrl =
-  "http://fake-inclusion-connect-uri.com";
 
 const defaultExpectedIcIdTokenPayload: InclusionConnectIdTokenPayload = {
   nonce: "nounce",
@@ -51,9 +48,9 @@ describe("AuthenticateWithInclusionCode use case", () => {
     uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
     const timeGateway = new CustomTimeGateway();
-    inclusionConnectGateway = new InMemoryInclusionConnectGateway();
-    const immersionBaseUri: AbsoluteUrl = "http://immersion-uri.com";
-    const immersionRedirectUri: AbsoluteUrl = `${immersionBaseUri}/my-redirection`;
+    inclusionConnectGateway = new InMemoryInclusionConnectGateway(
+      fakeInclusionConnectConfig,
+    );
     authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
@@ -64,13 +61,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
       uuidGenerator,
       () => correctToken,
       immersionBaseUrl,
-      {
-        immersionRedirectUri,
-        inclusionConnectBaseUri,
-        scope,
-        clientId,
-        clientSecret,
-      },
       timeGateway,
     );
   });

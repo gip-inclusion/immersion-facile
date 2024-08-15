@@ -1,5 +1,11 @@
-import { decodeJwtWithoutSignatureCheck, queryParamsAsString } from "shared";
+import {
+  AbsoluteUrl,
+  WithSourcePage,
+  decodeJwtWithoutSignatureCheck,
+  queryParamsAsString,
+} from "shared";
 import { HttpClient } from "shared-routes";
+import { InclusionConnectConfig } from "../../../../../../config/bootstrap/appConfig";
 import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../../../utils/logger";
 import {
@@ -9,31 +15,70 @@ import {
 import {
   GetAccessTokenParams,
   GetAccessTokenResult,
+  GetLoginUrlParams,
   InclusionConnectGateway,
 } from "../../port/InclusionConnectGateway";
-import { InclusionConnectConfig } from "../../use-cases/InitiateInclusionConnect";
-import { InclusionConnectExternalRoutes } from "./inclusionConnectExternalRoutes";
+import {
+  InclusionConnectLogoutQueryParams,
+  InclusionConnectRoutes,
+} from "./inclusionConnect.routes";
 
 const logger = createLogger(__filename);
 
 export class HttpInclusionConnectGateway implements InclusionConnectGateway {
   constructor(
-    private httpClient: HttpClient<InclusionConnectExternalRoutes>,
+    private httpClientInclusionConnect: HttpClient<InclusionConnectRoutes>,
     private inclusionConnectConfig: InclusionConnectConfig,
   ) {}
 
+  public async getLoginUrl({
+    nonce,
+    page,
+    state,
+  }: GetLoginUrlParams): Promise<AbsoluteUrl> {
+    return `${this.makeInclusionConnectAuthorizeUri()}?${queryParamsAsString<InclusionConnectLoginUrlParams>(
+      {
+        client_id: this.inclusionConnectConfig.clientId,
+        nonce,
+        redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
+        response_type: "code",
+        scope: this.inclusionConnectConfig.scope,
+        state,
+      },
+    )}`;
+  }
+
+  private makeInclusionConnectAuthorizeUri(): AbsoluteUrl {
+    // the following is made in order to support both the old and the new InclusionConnect urls:
+    // Base Url was : https://connect.inclusion.beta.gouv.fr/realms/inclusion-connect/protocol/openid-connect
+    // OLD : "https://connect.inclusion.beta.gouv.fr/realms/inclusion-connect/protocol/openid-connect/auth"
+
+    // Base Url will be : https://connect.inclusion.beta.gouv.fr/auth
+    // NEW : "https://connect.inclusion.beta.gouv.fr/auth/authorize"
+    // or : "https://recette.connect.inclusion.beta.gouv.fr/auth/authorize"
+
+    const authorizeInPath =
+      this.inclusionConnectConfig.inclusionConnectBaseUri.includes(
+        "connect.inclusion.beta.gouv.fr/auth",
+      )
+        ? "authorize"
+        : "auth";
+
+    return `${this.inclusionConnectConfig.inclusionConnectBaseUri}/${authorizeInPath}`;
+  }
+
   public async getAccessToken({
     code,
-    redirectUri,
+    page,
   }: GetAccessTokenParams): Promise<GetAccessTokenResult> {
-    return this.httpClient
-      .inclusionConnectGetAccessToken({
+    return this.httpClientInclusionConnect
+      .getAccessToken({
         body: queryParamsAsString({
           code,
           client_id: this.inclusionConnectConfig.clientId,
           client_secret: this.inclusionConnectConfig.clientSecret,
           grant_type: "authorization_code",
-          redirect_uri: redirectUri,
+          redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
         }),
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -58,7 +103,33 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
         throw error;
       });
   }
+
+  public async getLogoutUrl(): Promise<AbsoluteUrl> {
+    return `${
+      this.inclusionConnectConfig.inclusionConnectBaseUri
+    }/logout/?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
+      client_id: this.inclusionConnectConfig.clientId,
+      post_logout_redirect_uri:
+        this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
+    })}`;
+  }
+
+  #makeRedirectAfterLoginUrl(params: WithSourcePage): AbsoluteUrl {
+    return `${
+      this.inclusionConnectConfig.immersionRedirectUri.afterLogin
+    }?${queryParamsAsString<WithSourcePage>(params)}`;
+  }
 }
+
+type InclusionConnectLoginUrlParams = {
+  response_type: "code";
+  client_id: string;
+  redirect_uri: AbsoluteUrl;
+  scope: string;
+  state: string;
+  nonce: string;
+  login_hint?: string;
+};
 
 // -> inclusionConnect button calls startInclusionConnectLogin (immersion)
 // -> redirects to inclusionConnect (inclusion)

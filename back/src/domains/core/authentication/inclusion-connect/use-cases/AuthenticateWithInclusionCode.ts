@@ -3,7 +3,9 @@ import {
   AgencyRight,
   AuthenticateWithInclusionCodeConnectParams,
   AuthenticatedUserQueryParams,
+  InclusionConnectCode,
   User,
+  WithSourcePage,
   authenticateWithInclusionCodeSchema,
   currentJwtVersions,
   errors,
@@ -20,9 +22,7 @@ import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerfo
 import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { makeInclusionConnectRedirectUri } from "../entities/inclusionConnectRedirectUrl";
 import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
-import { InclusionConnectConfig } from "./InitiateInclusionConnect";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
 
@@ -42,8 +42,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   readonly #immersionFacileBaseUrl: AbsoluteUrl;
 
-  readonly #inclusionConnectConfig: InclusionConnectConfig;
-
   readonly #timeGateway: TimeGateway;
 
   constructor(
@@ -53,45 +51,39 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     uuidGenerator: UuidGenerator,
     generateAuthenticatedUserJwt: GenerateInclusionConnectJwt,
     immersionFacileBaseUrl: AbsoluteUrl,
-    inclusionConnectConfig: InclusionConnectConfig,
     timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
-
     this.#createNewEvent = createNewEvent;
     this.#inclusionConnectGateway = inclusionConnectGateway;
     this.#uuidGenerator = uuidGenerator;
     this.#generateAuthenticatedUserJwt = generateAuthenticatedUserJwt;
     this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
-    this.#inclusionConnectConfig = inclusionConnectConfig;
     this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
-    params: AuthenticateWithInclusionCodeConnectParams,
+    { code, page, state }: AuthenticateWithInclusionCodeConnectParams,
     uow: UnitOfWork,
   ): Promise<ConnectedRedirectUrl> {
     const existingOngoingOAuth = await uow.ongoingOAuthRepository.findByState(
-      params.state,
+      state,
       "inclusionConnect",
     );
     if (existingOngoingOAuth)
-      return this.#onOngoingOAuth(params, uow, existingOngoingOAuth);
-    throw errors.inclusionConnect.missingOAuth({ state: params.state });
+      return this.#onOngoingOAuth({ code, page }, uow, existingOngoingOAuth);
+    throw errors.inclusionConnect.missingOAuth({ state });
   }
 
   async #onOngoingOAuth(
-    params: AuthenticateWithInclusionCodeConnectParams,
+    { code, page }: WithSourcePage & { code: InclusionConnectCode },
     uow: UnitOfWork,
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
     const { accessToken, expire, icIdTokenPayload } =
       await this.#inclusionConnectGateway.getAccessToken({
-        code: params.code,
-        redirectUri: makeInclusionConnectRedirectUri(
-          this.#inclusionConnectConfig,
-          { page: params.page },
-        ),
+        code,
+        page,
       });
 
     if (icIdTokenPayload.nonce !== existingOngoingOAuth.nonce)
@@ -163,7 +155,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     );
 
     return `${this.#immersionFacileBaseUrl}/${
-      frontRoutes[params.page]
+      frontRoutes[page]
     }?${queryParamsAsString<AuthenticatedUserQueryParams>({
       token,
       firstName: newOrUpdatedAuthenticatedUser.firstName,

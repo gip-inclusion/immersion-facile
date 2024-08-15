@@ -14,10 +14,12 @@ import {
   expectToEqual,
   inclusionConnectTokenExpiredMessage,
   inclusionConnectedAllowedRoutes,
+  queryParamsAsString,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { Gateways } from "../../../../config/bootstrap/createGateways";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
@@ -48,6 +50,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: Gateways;
   let eventCrawler: BasicEventCrawler;
+  let appConfig: AppConfig;
 
   beforeEach(async () => {
     let request: SuperTest<Test>;
@@ -57,6 +60,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inMemoryUow,
       gateways,
       eventCrawler,
+      appConfig,
     } = await buildTestApp());
     httpClient = createSupertestSharedClient(
       inclusionConnectedAllowedRoutes,
@@ -387,7 +391,12 @@ describe("InclusionConnectedAllowedRoutes", () => {
       it("returns a correct logout url with status 200", async () => {
         const response = await httpClient.getInclusionConnectLogoutUrl();
         expectHttpResponseToEqual(response, {
-          body: "https://fake-inclusion.com/logout/?client_id=inclusion-client-id&post_logout_redirect_uri=https://my-domain",
+          body: `${
+            appConfig.inclusionConnectConfig.inclusionConnectBaseUri
+          }/logout/?${queryParamsAsString({
+            postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
+            clientId: appConfig.inclusionConnectConfig.clientId,
+          })}`,
           status: 200,
         });
       });

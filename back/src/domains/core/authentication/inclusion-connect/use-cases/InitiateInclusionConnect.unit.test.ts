@@ -1,5 +1,4 @@
 import {
-  AbsoluteUrl,
   WithSourcePage,
   allowedStartInclusionConnectLoginPages,
   expectToEqual,
@@ -8,35 +7,24 @@ import {
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
+import {
+  InMemoryInclusionConnectGateway,
+  fakeInclusionConnectConfig,
+} from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
 import { InitiateInclusionConnect } from "./InitiateInclusionConnect";
-
-const clientId = "my-client-id";
-const clientSecret = "my-client-secret";
-const scope = "openid profile email";
-const state = "my-state";
-const nonce = "my-nonce";
-const responseType = "code" as const;
-const immersionBaseUri: AbsoluteUrl = "http://immersion-uri.com";
-const inclusionConnectBaseUri: AbsoluteUrl =
-  "http://fake-inclusion-connect-uri.com";
 
 describe("InitiateInclusionConnect usecase", () => {
   it.each(allowedStartInclusionConnectLoginPages)(
     "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
     async (page) => {
+      const state = "my-state";
+      const nonce = "my-nonce";
       const uow = createInMemoryUow();
       const uuidGenerator = new TestUuidGenerator();
-      const immersionRedirectUri: AbsoluteUrl = `${immersionBaseUri}/my-redirection`;
       const useCase = new InitiateInclusionConnect(
         new InMemoryUowPerformer(uow),
         uuidGenerator,
-        {
-          immersionRedirectUri,
-          inclusionConnectBaseUri,
-          scope,
-          clientId,
-          clientSecret,
-        },
+        new InMemoryInclusionConnectGateway(fakeInclusionConnectConfig),
       );
 
       uuidGenerator.setNextUuids([nonce, state]);
@@ -46,20 +34,19 @@ describe("InitiateInclusionConnect usecase", () => {
       };
       const redirectUrl = await useCase.execute(sourcePage);
 
-      expect(redirectUrl).toBe(
+      expectToEqual(
+        redirectUrl,
         encodeURI(
-          `${inclusionConnectBaseUri}/auth?${[
-            `client_id=${clientId}`,
-            `nonce=${nonce}`,
-            `redirect_uri=${immersionRedirectUri}?${queryParamsAsString<WithSourcePage>(
-              sourcePage,
-            )}`,
-            `response_type=${responseType}`,
-            `scope=${scope}`,
-            `state=${state}`,
-          ].join("&")}`,
+          `${
+            fakeInclusionConnectConfig.inclusionConnectBaseUri
+          }/login?${queryParamsAsString({
+            page,
+            nonce,
+            state,
+          })}`,
         ),
       );
+
       expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
         {
           nonce,

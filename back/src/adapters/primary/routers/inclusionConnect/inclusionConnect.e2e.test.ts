@@ -1,6 +1,6 @@
 import {
-  AbsoluteUrl,
   AgencyDtoBuilder,
+  AllowedStartInclusionConnectLoginSourcesKind,
   InclusionConnectImmersionRoutes,
   WithSourcePage,
   allowedStartInclusionConnectLoginPages,
@@ -15,6 +15,8 @@ import {
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { fakeInclusionConnectConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
@@ -22,35 +24,39 @@ import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("inclusion connection flow", () => {
-  const clientId = "my-client-id";
-  const clientSecret = "my-client-secret";
-  const scope = "openid profile email";
   const state = "my-state";
   const nonce = "nounce"; // matches the one in payload;
-  const domain = "immersion-uri.com";
-  const responseType = "code" as const;
-  const inclusionConnectBaseUri: AbsoluteUrl =
-    "http://fake-inclusion-connect-uri.com";
+  const immersionDomain = "immersion.fr";
 
   let httpClient: HttpClient<InclusionConnectImmersionRoutes>;
   let uuidGenerator: UuidGenerator;
   let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
   let inMemoryUow: InMemoryUnitOfWork;
+  let appConfig: AppConfig;
 
   describe("Right path", () => {
     beforeAll(async () => {
       let request: SuperTest<Test>;
-      ({ uuidGenerator, gateways, request, eventCrawler, inMemoryUow } =
-        await buildTestApp(
-          new AppConfigBuilder({
-            INCLUSION_CONNECT_GATEWAY: "IN_MEMORY",
-            INCLUSION_CONNECT_CLIENT_SECRET: clientSecret,
-            INCLUSION_CONNECT_CLIENT_ID: clientId,
-            INCLUSION_CONNECT_BASE_URI: inclusionConnectBaseUri,
-            DOMAIN: domain,
-          }).build(),
-        ));
+
+      ({
+        uuidGenerator,
+        gateways,
+        request,
+        eventCrawler,
+        inMemoryUow,
+        appConfig,
+      } = await buildTestApp(
+        new AppConfigBuilder({
+          INCLUSION_CONNECT_GATEWAY: "IN_MEMORY",
+          INCLUSION_CONNECT_CLIENT_SECRET:
+            fakeInclusionConnectConfig.clientSecret,
+          INCLUSION_CONNECT_CLIENT_ID: fakeInclusionConnectConfig.clientId,
+          INCLUSION_CONNECT_BASE_URI:
+            fakeInclusionConnectConfig.inclusionConnectBaseUri,
+          DOMAIN: immersionDomain,
+        }).build(),
+      ));
       httpClient = createSupertestSharedClient(
         inclusionConnectImmersionRoutes,
         request,
@@ -63,32 +69,32 @@ describe("inclusion connection flow", () => {
       const uuids = [nonce, state];
       uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
+      const page: AllowedStartInclusionConnectLoginSourcesKind =
+        "establishmentDashboard";
       const queryParams: WithSourcePage = {
-        page: "establishmentDashboard",
+        page,
       };
 
-      const response = await httpClient.startInclusionConnectLogin({
-        queryParams,
-      });
-
-      expectHttpResponseToEqual(response, {
-        body: {},
-        status: 302,
-        headers: {
-          location: encodeURI(
-            `${inclusionConnectBaseUri}/auth?${[
-              `client_id=${clientId}`,
-              `nonce=${nonce}`,
-              `redirect_uri=https://${domain}/api${
-                inclusionConnectImmersionRoutes.afterLoginRedirection.url
-              }?${queryParamsAsString<WithSourcePage>(queryParams)}`,
-              `response_type=${responseType}`,
-              `scope=${scope}`,
-              `state=${state}`,
-            ].join("&")}`,
-          ),
+      expectHttpResponseToEqual(
+        await httpClient.startInclusionConnectLogin({
+          queryParams,
+        }),
+        {
+          body: {},
+          status: 302,
+          headers: {
+            location: encodeURI(
+              `${
+                appConfig.inclusionConnectConfig.inclusionConnectBaseUri
+              }/login?${queryParamsAsString({
+                page,
+                nonce,
+                state,
+              })}`,
+            ),
+          },
         },
-      });
+      );
     });
 
     it.each(allowedStartInclusionConnectLoginPages)(
@@ -124,7 +130,7 @@ describe("inclusion connection flow", () => {
 
         if (response.status !== 302) throw new Error("Response must be 302");
         const locationHeader = response.headers.location as string;
-        const locationPrefix = `https://${domain}/${frontRoutes[page]}?token=`;
+        const locationPrefix = `${appConfig.immersionFacileBaseUrl}/${frontRoutes[page]}?token=`;
 
         expect(locationHeader).toContain(locationPrefix);
         expect(

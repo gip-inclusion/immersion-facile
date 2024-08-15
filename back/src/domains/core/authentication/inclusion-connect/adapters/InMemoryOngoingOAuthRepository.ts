@@ -1,3 +1,4 @@
+import { InclusionConnectState } from "shared";
 import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
@@ -5,7 +6,10 @@ export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   // for test purpose
   public ongoingOAuths: OngoingOAuth[] = [];
 
-  public async findByState(state: string, provider: IdentityProvider) {
+  public async findByState(
+    state: InclusionConnectState,
+    provider: IdentityProvider,
+  ) {
     return this.ongoingOAuths.find(
       (ongoingOAuth) =>
         ongoingOAuth.state === state && ongoingOAuth.provider === provider,
