@@ -393,7 +393,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         expectHttpResponseToEqual(response, {
           body: `${
             appConfig.inclusionConnectConfig.inclusionConnectBaseUri
-          }/logout/?${queryParamsAsString({
+          }/logout?${queryParamsAsString({
             postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
             clientId: appConfig.inclusionConnectConfig.clientId,
           })}`,
