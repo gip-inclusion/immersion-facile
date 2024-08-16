@@ -4,6 +4,7 @@ import {
   withUserFiltersSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
@@ -20,6 +21,9 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
     currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser[]> {
     throwIfNotAdmin(currentUser);
-    return uow.userRepository.getWithFilter(filters);
+    return uow.userRepository.getWithFilter(
+      filters,
+      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+    );
   }
 }

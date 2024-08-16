@@ -5,6 +5,7 @@ import {
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -36,7 +37,10 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
 
-    const icUser = await uow.userRepository.getById(params.userId);
+    const icUser = await uow.userRepository.getById(
+      params.userId,
+      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+    );
 
     if (!icUser) throw errors.user.notFound({ userId: params.userId });
 

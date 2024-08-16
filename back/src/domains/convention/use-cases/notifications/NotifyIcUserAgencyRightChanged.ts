@@ -1,5 +1,6 @@
 import { UserParamsForAgency, errors, userParamsForAgencySchema } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { oAuthModeByFeatureFlags } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -27,7 +28,10 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
     const agency = await uow.agencyRepository.getById(params.agencyId);
     if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
 
-    const user = await uow.userRepository.getById(params.userId);
+    const user = await uow.userRepository.getById(
+      params.userId,
+      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+    );
     if (!user) throw errors.user.notFound({ userId: params.userId });
 
     if (!params.roles.includes("toReview"))
