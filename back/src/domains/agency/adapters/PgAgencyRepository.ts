@@ -8,6 +8,7 @@ import {
   AgencyKind,
   AgencyRole,
   AgencyStatus,
+  ConflictError,
   DepartmentCode,
   Email,
   GeoPositionDto,
@@ -16,7 +17,6 @@ import {
   errors,
   pipeWithValue,
 } from "shared";
-import { ConflictError } from "shared";
 import { z } from "zod";
 import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import {
@@ -370,7 +370,6 @@ export class PgAgencyRepository implements AgencyRepository {
         email,
         first_name: "",
         last_name: "",
-        external_id: null,
       })
       .onConflict((oc) => oc.doNothing())
       .returning("id as userId")
