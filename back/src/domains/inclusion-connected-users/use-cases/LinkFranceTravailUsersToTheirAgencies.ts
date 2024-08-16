@@ -10,6 +10,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserAuthenticatedPayload } from "../../core/events/events";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -27,8 +28,10 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     if (!codeSafir) return;
-
-    const icUser = await uow.userRepository.getById(userId);
+    const icUser = await uow.userRepository.getById(
+      userId,
+      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+    );
     if (!icUser) throw errors.user.notFound({ userId });
 
     if (isIcUserAlreadyHasValidRight(icUser, codeSafir)) return;

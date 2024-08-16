@@ -107,6 +107,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         expectObjectsToMatch(
           await uow.userRepository.findByExternalId(
             defaultExpectedIcIdTokenPayload.sub,
+            mode,
           ),
           {
             id: expectedOngoingOauth?.userId,

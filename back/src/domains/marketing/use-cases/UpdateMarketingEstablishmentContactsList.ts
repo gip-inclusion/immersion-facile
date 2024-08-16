@@ -7,6 +7,7 @@ import {
   withSiretSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { EstablishmentAggregate } from "../../establishment/entities/EstablishmentEntity";
@@ -144,7 +145,10 @@ const onEstablishment = async (
     marketingContact,
   );
 
-  const user = await uow.userRepository.findByEmail(marketingContact.email);
+  const user = await uow.userRepository.findByEmail(
+    marketingContact.email,
+    oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+  );
 
   const hasIcAccount = !!user?.externalId;
 
