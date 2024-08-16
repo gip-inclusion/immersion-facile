@@ -1,12 +1,9 @@
 import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import {
-  InclusionConnectButton,
-  InclusionConnectButtonProps,
-} from "./InclusionConnectButton";
+import { OAuthButton, OAuthButtonProps } from "./OAuthButton";
 
-const Component = InclusionConnectButton;
+const Component = OAuthButton;
 type Story = StoryObj<typeof Component>;
-const argTypes: Partial<ArgTypes<InclusionConnectButtonProps>> | undefined = {};
+const argTypes: Partial<ArgTypes<OAuthButtonProps>> | undefined = {};
 
 const componentDescription = `
 \`\`\`tsx  

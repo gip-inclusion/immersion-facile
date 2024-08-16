@@ -2,10 +2,10 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import React, { useEffect } from "react";
 import {
-  InclusionConnectButton,
   Loader,
   LoginForm,
   MainWrapper,
+  OAuthButton,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -19,6 +19,7 @@ import { routes } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { Route } from "type-route";
 
@@ -46,6 +47,9 @@ export const InclusionConnectedPrivateRoute = ({
   );
   const isLoadingUser = useAppSelector(inclusionConnectedSelectors.isLoading);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
+  const { enableProConnect } = useAppSelector(
+    featureFlagSelectors.featureFlagState,
+  );
 
   useEffect(() => {
     const { token, email = "", firstName = "", lastName = "" } = route.params;
@@ -65,6 +69,10 @@ export const InclusionConnectedPrivateRoute = ({
     }
   }, [route.params, route.name, dispatch]);
 
+  const providerName = enableProConnect.isActive
+    ? "Pro Connect"
+    : "Inclusion Connect";
+
   if (!isInclusionConnected)
     return (
       <HeaderFooterLayout>
@@ -78,22 +86,26 @@ export const InclusionConnectedPrivateRoute = ({
               <LoginForm
                 sections={[
                   {
-                    title: "Se connecter avec Inclusion Connect",
-                    description:
-                      "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
+                    title: `Se connecter avec ${providerName}`,
+                description: `${providerName} est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.`,
                     authComponent: (
-                      <InclusionConnectButton
+                      <OAuthButton
                         id={
                           domElementIds[route.name].login.inclusionConnectButton
                         }
                         inclusionConnectEndpoint={`${
                           inclusionConnectImmersionRoutes
                             .startInclusionConnectLogin.url
-                        }?${queryParamsAsString(
-                          inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
-                            { page: route.name },
-                          ),
-                        )}`}
+                    }?${queryParamsAsString(
+                      inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
+                        { page: route.name },
+                      ),
+                    )}`}
+                    mode={
+                      enableProConnect.isActive
+                        ? "pro-connect"
+                        : "inclusion-connect"
+                        }
                       />
                     ),
                   },
