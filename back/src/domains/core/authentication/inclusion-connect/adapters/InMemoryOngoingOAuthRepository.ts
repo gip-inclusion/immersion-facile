@@ -1,13 +1,13 @@
-import { InclusionConnectState } from "shared";
-import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
+import { IdentityProvider, OAuthState } from "shared";
+import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
 export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   // for test purpose
   public ongoingOAuths: OngoingOAuth[] = [];
 
-  public async findByState(
-    state: InclusionConnectState,
+  public async findByStateAndProvider(
+    state: OAuthState,
     provider: IdentityProvider,
   ) {
     return this.ongoingOAuths.find(
@@ -17,9 +17,9 @@ export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   }
 
   public async save(newOngoingOAuth: OngoingOAuth): Promise<void> {
-    const existingOngoingOAuth = await this.findByState(
+    const existingOngoingOAuth = await this.findByStateAndProvider(
       newOngoingOAuth.state,
-      "inclusionConnect",
+      newOngoingOAuth.provider,
     );
 
     if (!existingOngoingOAuth) {

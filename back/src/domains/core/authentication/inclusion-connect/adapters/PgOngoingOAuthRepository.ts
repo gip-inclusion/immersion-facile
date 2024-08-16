@@ -1,8 +1,8 @@
 import { sql } from "kysely";
-import { InclusionConnectState } from "shared";
+import { IdentityProvider, OAuthState } from "shared";
 import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { optional } from "../../../../../config/pg/pgUtils";
-import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
+import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
 type PersistenceOngoingOAuth = {
@@ -17,9 +17,9 @@ type PersistenceOngoingOAuth = {
 export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async findByState(
-    state: InclusionConnectState,
-    provider: "inclusionConnect",
+  public async findByStateAndProvider(
+    state: OAuthState,
+    provider: IdentityProvider,
   ): Promise<OngoingOAuth | undefined> {
     const pgOngoingOAuth: PersistenceOngoingOAuth | undefined =
       await this.transaction
@@ -35,7 +35,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
     const { state, nonce, provider, userId, externalId, accessToken } =
       ongoingOAuth;
-    if (await this.findByState(state, provider)) {
+    if (await this.findByStateAndProvider(state, provider)) {
       await this.transaction
         .updateTable("users_ongoing_oauths")
         .set({

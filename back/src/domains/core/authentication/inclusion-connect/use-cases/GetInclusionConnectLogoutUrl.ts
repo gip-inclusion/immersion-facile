@@ -1,16 +1,26 @@
 import { AbsoluteUrl } from "shared";
 import { z } from "zod";
-import { UseCase } from "../../../UseCase";
-import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
+import { TransactionalUseCase } from "../../../UseCase";
+import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
+import { OAuthGateway, oAuthModeByFeatureFlags } from "../port/OAuthGateway";
 
-export class GetInclusionConnectLogoutUrl extends UseCase<void, AbsoluteUrl> {
+export class GetInclusionConnectLogoutUrl extends TransactionalUseCase<
+  void,
+  AbsoluteUrl
+> {
   protected inputSchema = z.void();
 
-  constructor(private inclusionConnectGateway: InclusionConnectGateway) {
-    super();
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private inclusionConnectGateway: OAuthGateway,
+  ) {
+    super(uowPerformer);
   }
 
-  public async _execute(): Promise<AbsoluteUrl> {
-    return this.inclusionConnectGateway.getLogoutUrl();
+  public async _execute(_: void, uow: UnitOfWork): Promise<AbsoluteUrl> {
+    return this.inclusionConnectGateway.getLogoutUrl(
+      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+    );
   }
 }

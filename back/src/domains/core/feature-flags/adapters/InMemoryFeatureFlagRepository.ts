@@ -7,7 +7,7 @@ import {
 } from "shared";
 import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 
-const defaultFlags: FeatureFlags = {
+export const defaultFlags: FeatureFlags = {
   enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
     imageAlt: "altImage",
     imageUrl: "https://imageUrl",

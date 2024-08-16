@@ -1,7 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { emptyObjectSchema } from "../zodUtils";
 import {
-  authenticateWithInclusionCodeSchema,
+  authenticateWithOAuthCodeSchema,
   withSourcePageSchema,
 } from "./inclusionConnect.schema";
 
@@ -21,7 +21,7 @@ export const inclusionConnectImmersionRoutes = defineRoutes({
   afterLoginRedirection: defineRoute({
     method: "get",
     url: "/inclusion-connect-after-login",
-    queryParamsSchema: authenticateWithInclusionCodeSchema,
+    queryParamsSchema: authenticateWithOAuthCodeSchema,
     responses: {
       302: emptyObjectSchema,
     },

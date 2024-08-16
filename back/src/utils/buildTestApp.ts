@@ -6,7 +6,7 @@ import { createApp } from "../config/bootstrap/server";
 import { InMemoryPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
 import { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import { InMemoryInclusionConnectGateway } from "../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
+import { InMemoryOAuthGateway } from "../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { InMemoryPeConnectGateway } from "../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/InMemoryPeConnectGateway";
 import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
@@ -39,7 +39,7 @@ export type InMemoryGateways = {
   laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
-  inclusionConnectGateway: InMemoryInclusionConnectGateway;
+  oAuthGateway: InMemoryOAuthGateway;
   documentGateway: NotImplementedDocumentGateway;
   dashboardGateway: StubDashboardGateway;
   addressApi: InMemoryAddressGateway;
