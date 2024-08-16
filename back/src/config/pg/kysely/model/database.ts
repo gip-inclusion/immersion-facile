@@ -359,7 +359,8 @@ interface Users {
   last_name: string;
   created_at: Generated<string>;
   updated_at: Generated<Timestamp>;
-  external_id: string | null;
+  external_id_inclusion_connect: string | null;
+  external_id_pro_connect: string | null;
 }
 
 interface OngoingOauths {
