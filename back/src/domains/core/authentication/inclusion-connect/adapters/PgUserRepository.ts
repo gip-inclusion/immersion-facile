@@ -16,6 +16,7 @@ import {
   KyselyDb,
   executeKyselyRawSqlQuery,
 } from "../../../../../config/pg/kysely/kyselyUtils";
+import { OAuthGatewayMode } from "../port/OAuthGateway";
 import {
   InclusionConnectedFilters,
   UserRepository,
@@ -37,28 +38,62 @@ type PersistenceAuthenticatedUser = {
 export class PgUserRepository implements UserRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async findByExternalId(externalId: string): Promise<User | undefined> {
+  public async findByExternalId(
+    externalId: string,
+    mode: OAuthGatewayMode,
+  ): Promise<User | undefined> {
     const response = await this.transaction
       .selectFrom("users")
-      .selectAll()
-      .where("external_id", "=", externalId)
+      .select([
+        "id",
+        "first_name",
+        "last_name",
+        "email",
+        "created_at",
+        mode === "InclusionConnect"
+          ? "external_id_inclusion_connect as external_id"
+          : "external_id_pro_connect as external_id",
+      ])
+      .where(
+        mode === "InclusionConnect"
+          ? "external_id_inclusion_connect"
+          : "external_id_pro_connect",
+        "=",
+        externalId,
+      )
       .executeTakeFirst();
     return toAuthenticatedUser(response);
   }
 
-  public async findByEmail(email: Email): Promise<User | undefined> {
-    const response = await this.transaction
-      .selectFrom("users")
-      .selectAll()
+  public async findByEmail(
+    email: Email,
+    mode: OAuthGatewayMode,
+  ): Promise<User | undefined> {
+    const response = await this.#getUserQueryBuilder(mode)
       .where("email", "ilike", email)
       .executeTakeFirst();
     return toAuthenticatedUser(response);
   }
 
-  public async save(user: User): Promise<void> {
+  #getUserQueryBuilder(mode: string) {
+    return this.transaction
+      .selectFrom("users")
+      .select([
+        "id",
+        "first_name",
+        "last_name",
+        "email",
+        "created_at",
+        mode === "InclusionConnect"
+          ? "external_id_inclusion_connect as external_id"
+          : "external_id_pro_connect as external_id",
+      ]);
+  }
+
+  public async save(user: User, mode: OAuthGatewayMode): Promise<void> {
     const { id, email, firstName, lastName, externalId, createdAt } = user;
 
-    const existingUser = await this.#findById(id);
+    const existingUser = await this.#findById(id, mode);
 
     if (!existingUser) {
       await this.transaction
@@ -68,7 +103,9 @@ export class PgUserRepository implements UserRepository {
           email,
           first_name: firstName,
           last_name: lastName,
-          external_id: externalId,
+          [mode === "InclusionConnect"
+            ? "external_id_inclusion_connect"
+            : "external_id_pro_connect"]: externalId,
           created_at: createdAt,
         })
         .execute();
@@ -89,7 +126,9 @@ export class PgUserRepository implements UserRepository {
         first_name: firstName,
         last_name: lastName,
         email,
-        external_id: externalId,
+        [mode === "InclusionConnect"
+          ? "external_id_inclusion_connect"
+          : "external_id_pro_connect"]: externalId,
         updated_at: sql`now()`,
       })
       .where("id", "=", id)
@@ -109,10 +148,11 @@ export class PgUserRepository implements UserRepository {
       });
   }
 
-  async #findById(userId: UserId) {
-    const response = await this.transaction
-      .selectFrom("users")
-      .selectAll()
+  async #findById(
+    userId: UserId,
+    mode: OAuthGatewayMode,
+  ): Promise<User | undefined> {
+    const response = await this.#getUserQueryBuilder(mode)
       .where("id", "=", userId)
       .executeTakeFirst();
     return toAuthenticatedUser(response);
@@ -120,8 +160,9 @@ export class PgUserRepository implements UserRepository {
 
   public async getById(
     userId: string,
+    mode: OAuthGatewayMode,
   ): Promise<InclusionConnectedUser | undefined> {
-    const icUsers = await this.#getInclusionConnectedUsers({ userId });
+    const icUsers = await this.#getInclusionConnectedUsers({ userId }, mode);
     return icUsers[0];
   }
 
@@ -129,8 +170,8 @@ export class PgUserRepository implements UserRepository {
     agencyRole,
     agencyId,
     email,
-  }: InclusionConnectedFilters): Promise<InclusionConnectedUser[]> {
-    return this.#getInclusionConnectedUsers({ agencyRole, agencyId, email });
+  }: InclusionConnectedFilters, mode: OAuthGatewayMode): Promise<InclusionConnectedUser[]> {
+    return this.#getInclusionConnectedUsers({ agencyRole, agencyId, email }, mode);
   }
 
   public async updateAgencyRights({
@@ -164,7 +205,7 @@ export class PgUserRepository implements UserRepository {
     agencyRole?: AgencyRole;
     agencyId?: AgencyId;
     email?: Email;
-  }): Promise<InclusionConnectedUser[]> {
+  }, mode: OAuthGatewayMode): Promise<InclusionConnectedUser[]> {
     const buildAgencyRight = `JSON_BUILD_OBJECT(
        'roles', users__agencies.roles,
        'isNotifiedByEmail', users__agencies.is_notified_by_email,
@@ -215,7 +256,11 @@ export class PgUserRepository implements UserRepository {
         'firstName', users.first_name,
         'lastName', users.last_name,
         'createdAt', users.created_at,
-        'externalId', users.external_id,
+        'externalId', users.${
+          mode === "InclusionConnect"
+            ? "external_id_inclusion_connect"
+            : "external_id_pro_connect"
+        },
         'agencyRights', COALESCE(${agencyRightsJsonAgg}, '[]'),
         'establishments', COALESCE(${establishmentsJsonAgg}, '[]'),
         'isBackofficeAdmin', BOOL_OR(users_admins.user_id IS NOT NULL)
