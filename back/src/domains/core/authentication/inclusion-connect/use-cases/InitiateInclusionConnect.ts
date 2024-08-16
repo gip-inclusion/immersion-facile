@@ -3,7 +3,7 @@ import { TransactionalUseCase } from "../../../UseCase";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
-import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
+import { OAuthGateway, oAuthModeByFeatureFlags } from "../port/OAuthGateway";
 
 export class InitiateInclusionConnect extends TransactionalUseCase<
   WithSourcePage,
@@ -14,7 +14,7 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private uuidGenerator: UuidGenerator,
-    private inclusionConnectGateway: InclusionConnectGateway,
+    private oAuthGateway: OAuthGateway,
   ) {
     super(uowPerformer);
   }
@@ -26,16 +26,23 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
     const nonce = this.uuidGenerator.new();
     const state = this.uuidGenerator.new();
 
+    const mode = oAuthModeByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
+    );
+
     await uow.ongoingOAuthRepository.save({
       nonce,
       state,
-      provider: "inclusionConnect",
+      provider: mode === "InclusionConnect" ? "inclusionConnect" : "proConnect",
     });
 
-    return this.inclusionConnectGateway.getLoginUrl({
-      ...params,
-      nonce,
-      state,
-    });
+    return this.oAuthGateway.getLoginUrl(
+      {
+        ...params,
+        nonce,
+        state,
+      },
+      mode,
+    );
   }
 }

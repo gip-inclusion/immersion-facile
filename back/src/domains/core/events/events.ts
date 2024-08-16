@@ -5,6 +5,7 @@ import {
   DateString,
   EstablishmentJwtPayload,
   Flavor,
+  IdentityProvider,
   RejectIcUserRoleForAgencyParams,
   Role,
   SiretDto,
@@ -24,7 +25,6 @@ import {
 import { z } from "zod";
 import { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentEntity";
-import { IdentityProvider } from "../authentication/inclusion-connect/entities/OngoingOAuth";
 import { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import {
   ConventionReminderPayload,

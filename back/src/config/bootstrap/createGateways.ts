@@ -12,10 +12,11 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import { HttpInclusionConnectGateway } from "../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/HttpInclusionConnectGateway";
-import { InMemoryInclusionConnectGateway } from "../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
-import { makeInclusionConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/inclusionConnect.routes";
-import { InclusionConnectGateway } from "../../domains/core/authentication/inclusion-connect/port/InclusionConnectGateway";
+import { HttpOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/HttpOAuthGateway";
+import { InMemoryOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
+import { makeInclusionConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/inclusionConnect.routes";
+import { makeProConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/proConnect.routes";
+import { OAuthGateway } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { HttpPeConnectGateway } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalRoutes } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
@@ -174,17 +175,22 @@ export const createGateways = async (
         )
       : new InMemoryPeConnectGateway();
 
-  const inclusionConnectGateway: InclusionConnectGateway =
+  const oAuthGateway: OAuthGateway =
     config.inclusionConnectGateway === "HTTPS"
-      ? new HttpInclusionConnectGateway(
+      ? new HttpOAuthGateway(
           createAxiosHttpClientForExternalAPIs(
             makeInclusionConnectRoutes(
               config.inclusionConnectConfig.inclusionConnectBaseUri,
             ),
           ),
+          createAxiosHttpClientForExternalAPIs(
+            makeProConnectRoutes(
+              config.inclusionConnectConfig.proConnectBaseUri,
+            ),
+          ),
           config.inclusionConnectConfig,
         )
-      : new InMemoryInclusionConnectGateway(config.inclusionConnectConfig);
+      : new InMemoryOAuthGateway(config.inclusionConnectConfig);
 
   const createEmailValidationGateway = (config: AppConfig) =>
     ({
@@ -304,7 +310,7 @@ export const createGateways = async (
     notification: createNotificationGateway(config, timeGateway),
     emailValidationGateway: createEmailValidationGateway(config),
 
-    inclusionConnectGateway,
+    oAuthGateway,
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(

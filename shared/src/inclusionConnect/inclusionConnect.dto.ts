@@ -9,11 +9,12 @@ import { SignatoryRole } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
 import { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
-export type InclusionConnectState = Flavor<string, "InclusionConnectState">;
-export type InclusionConnectCode = Flavor<string, "InclusionConnectCode">;
-export type AuthenticateWithInclusionCodeConnectParams = WithSourcePage & {
-  state: InclusionConnectState;
-  code: InclusionConnectCode;
+export type IdentityProvider = "inclusionConnect" | "proConnect";
+export type OAuthState = Flavor<string, "OAuthState">;
+export type OAuthCode = Flavor<string, "OAuthCode">;
+export type AuthenticateWithOAuthCodeParams = WithSourcePage & {
+  state: OAuthState;
+  code: OAuthCode;
 };
 
 export type AllowedStartInclusionConnectLoginSourcesKind =

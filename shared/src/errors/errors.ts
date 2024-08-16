@@ -17,6 +17,10 @@ import { PeExternalId } from "../federatedIdentities/federatedIdentity.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { GroupSlug } from "../group/group.dto";
 import {
+  IdentityProvider,
+  OAuthState,
+} from "../inclusionConnect/inclusionConnect.dto";
+import {
   AgencyRole,
   UserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
@@ -37,9 +41,12 @@ import {
 
 export const errors = {
   inclusionConnect: {
-    missingOAuth: ({ state }: { state: string }) =>
+    missingOAuth: ({
+      state,
+      identityProvider,
+    }: { state: OAuthState; identityProvider: IdentityProvider }) =>
       new ForbiddenError(
-        `Il n'y a pas d'OAuth en cours avec l'état '${state}'.`,
+        `Il n'y a pas d'OAuth en cours avec l'état '${state}' et le provider '${identityProvider}'.`,
       ),
     nonceMismatch: () =>
       new ForbiddenError("Il y a un décalage sur le 'Nonce'."),

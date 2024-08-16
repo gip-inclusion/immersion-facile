@@ -8,54 +8,64 @@ import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUow
 import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  InMemoryInclusionConnectGateway,
+  InMemoryOAuthGateway,
   fakeInclusionConnectConfig,
-} from "../adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
+} from "../adapters/oauth-gateway/InMemoryOAuthGateway";
+import { oAuthGatewayModes } from "../port/OAuthGateway";
 import { InitiateInclusionConnect } from "./InitiateInclusionConnect";
 
 describe("InitiateInclusionConnect usecase", () => {
-  it.each(allowedStartInclusionConnectLoginPages)(
-    "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
-    async (page) => {
-      const state = "my-state";
-      const nonce = "my-nonce";
-      const uow = createInMemoryUow();
-      const uuidGenerator = new TestUuidGenerator();
-      const useCase = new InitiateInclusionConnect(
-        new InMemoryUowPerformer(uow),
-        uuidGenerator,
-        new InMemoryInclusionConnectGateway(fakeInclusionConnectConfig),
-      );
+  describe.each(oAuthGatewayModes)("With OAuthGateway mode '%s'", (mode) => {
+    it.each(allowedStartInclusionConnectLoginPages)(
+      "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
+      async (page) => {
+        const state = "my-state";
+        const nonce = "my-nonce";
+        const uow = createInMemoryUow();
+        const uuidGenerator = new TestUuidGenerator();
+        const useCase = new InitiateInclusionConnect(
+          new InMemoryUowPerformer(uow),
+          uuidGenerator,
+          new InMemoryOAuthGateway(fakeInclusionConnectConfig),
+        );
+        uow.featureFlagRepository.update({
+          flagName: "enableProConnect",
+          featureFlag: { isActive: mode === "ProConnect", kind: "boolean" },
+        });
 
-      uuidGenerator.setNextUuids([nonce, state]);
+        uuidGenerator.setNextUuids([nonce, state]);
 
-      const sourcePage: WithSourcePage = {
-        page,
-      };
-      const redirectUrl = await useCase.execute(sourcePage);
+        const sourcePage: WithSourcePage = {
+          page,
+        };
+        const redirectUrl = await useCase.execute(sourcePage);
 
-      expectToEqual(
-        redirectUrl,
-        encodeURI(
-          `${
-            fakeInclusionConnectConfig.inclusionConnectBaseUri
-          }/login?${queryParamsAsString({
-            page,
+        expectToEqual(
+          redirectUrl,
+          encodeURI(
+            `${
+              mode === "InclusionConnect"
+                ? fakeInclusionConnectConfig.inclusionConnectBaseUri
+                : fakeInclusionConnectConfig.proConnectBaseUri
+            }/login?${queryParamsAsString({
+              page,
+              nonce,
+              state,
+            })}`,
+          ),
+        );
+
+        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+          {
             nonce,
             state,
-          })}`,
-        ),
-      );
-
-      expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-        {
-          nonce,
-          state,
-          provider: "inclusionConnect",
-          externalId: undefined,
-          accessToken: undefined,
-        },
-      ]);
-    },
-  );
+            provider:
+              mode === "InclusionConnect" ? "inclusionConnect" : "proConnect",
+            externalId: undefined,
+            accessToken: undefined,
+          },
+        ]);
+      },
+    );
+  });
 });

@@ -1,10 +1,10 @@
-import { InclusionConnectState } from "shared";
-import { IdentityProvider, OngoingOAuth } from "../entities/OngoingOAuth";
+import { IdentityProvider, OAuthState } from "shared";
+import { OngoingOAuth } from "../entities/OngoingOAuth";
 
 export interface OngoingOAuthRepository {
   save(onGoingOAuth: OngoingOAuth): Promise<void>;
-  findByState(
-    state: InclusionConnectState,
+  findByStateAndProvider(
+    state: OAuthState,
     provider: IdentityProvider,
   ): Promise<OngoingOAuth | undefined>;
 }
