@@ -5,50 +5,126 @@ import {
   queryParamsAsString,
 } from "shared";
 import { HttpClient } from "shared-routes";
-import { InclusionConnectConfig } from "../../../../../../config/bootstrap/appConfig";
+import { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../../../utils/logger";
 import {
-  InclusionConnectIdTokenPayload,
-  inclusionConnectIdTokenPayloadSchema,
-} from "../../entities/InclusionConnectIdTokenPayload";
+  OAuthIdTokenPayload,
+  oAuthIdTokenPayloadSchema,
+} from "../../entities/OAuthIdTokenPayload";
 import {
   GetAccessTokenParams,
   GetAccessTokenResult,
   GetLoginUrlParams,
-  InclusionConnectGateway,
-} from "../../port/InclusionConnectGateway";
+  OAuthGateway,
+  OAuthGatewayMode,
+} from "../../port/OAuthGateway";
 import {
   InclusionConnectLogoutQueryParams,
   InclusionConnectRoutes,
 } from "./inclusionConnect.routes";
+import { ProConnectRoutes } from "./proConnect.routes";
 
 const logger = createLogger(__filename);
 
-export class HttpInclusionConnectGateway implements InclusionConnectGateway {
-  constructor(
-    private httpClientInclusionConnect: HttpClient<InclusionConnectRoutes>,
-    private inclusionConnectConfig: InclusionConnectConfig,
-  ) {}
+export class HttpOAuthGateway implements OAuthGateway {
+  private httpClient: Record<
+    OAuthGatewayMode,
+    HttpClient<InclusionConnectRoutes> | HttpClient<ProConnectRoutes>
+  >;
 
-  public async getLoginUrl({
-    nonce,
-    page,
-    state,
-  }: GetLoginUrlParams): Promise<AbsoluteUrl> {
-    return `${this.makeInclusionConnectAuthorizeUri()}?${queryParamsAsString<InclusionConnectLoginUrlParams>(
-      {
-        client_id: this.inclusionConnectConfig.clientId,
-        nonce,
-        redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
-        response_type: "code",
-        scope: this.inclusionConnectConfig.scope,
-        state,
-      },
-    )}`;
+  constructor(
+    httpClientInclusionConnect: HttpClient<InclusionConnectRoutes>,
+    httpClientProConnect: HttpClient<ProConnectRoutes>,
+    private inclusionConnectConfig: OAuthConfig,
+  ) {
+    this.httpClient = {
+      InclusionConnect: httpClientInclusionConnect,
+      ProConnect: httpClientProConnect,
+    };
   }
 
-  private makeInclusionConnectAuthorizeUri(): AbsoluteUrl {
+  public async getLoginUrl(
+    { nonce, page, state }: GetLoginUrlParams,
+    mode: OAuthGatewayMode,
+  ): Promise<AbsoluteUrl> {
+    // On pourrait placer ces URL au niveau du ProConnect/InclusionConnect HTTP Client ?
+    const uriByMode: Record<OAuthGatewayMode, AbsoluteUrl> = {
+      InclusionConnect: this.#makeInclusionConnectAuthorizeUri(),
+      ProConnect: "http://", //TODO a définir
+    };
+
+    return `${
+      uriByMode[mode]
+    }?${queryParamsAsString<InclusionConnectLoginUrlParams>({
+      client_id: this.inclusionConnectConfig.clientId,
+      nonce,
+      redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
+      response_type: "code",
+      scope: this.inclusionConnectConfig.scope,
+      state,
+    })}`;
+  }
+
+  public async getAccessToken(
+    { code, page }: GetAccessTokenParams,
+    mode: OAuthGatewayMode,
+  ): Promise<GetAccessTokenResult> {
+    return this.httpClient[mode]
+      .getAccessToken({
+        body: queryParamsAsString({
+          code,
+          client_id: this.inclusionConnectConfig.clientId,
+          client_secret: this.inclusionConnectConfig.clientSecret,
+          grant_type: "authorization_code",
+          redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
+        }),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+      .then(
+        ({ body }): GetAccessTokenResult => ({
+          accessToken: body.access_token,
+          expire: body.expires_in,
+          oAuthIdTokenPayload: validateAndParseZodSchemaV2(
+            oAuthIdTokenPayloadSchema,
+            decodeJwtWithoutSignatureCheck<OAuthIdTokenPayload>(body.id_token),
+            logger,
+          ),
+        }),
+      )
+      .catch((error) => {
+        logger.error({
+          error,
+          message: "Error trying to get Access Token",
+        });
+        throw error;
+      });
+  }
+
+  public async getLogoutUrl(mode: OAuthGatewayMode): Promise<AbsoluteUrl> {
+    const uriByMode: Record<OAuthGatewayMode, AbsoluteUrl> = {
+      InclusionConnect: `${this.inclusionConnectConfig.inclusionConnectBaseUri}/logout/`,
+      ProConnect: "http://", // TODO
+    };
+
+    return `${
+      uriByMode[mode]
+    }?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
+      client_id: this.inclusionConnectConfig.clientId,
+      post_logout_redirect_uri:
+        this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
+    })}`;
+  }
+
+  #makeRedirectAfterLoginUrl(params: WithSourcePage): AbsoluteUrl {
+    return `${
+      this.inclusionConnectConfig.immersionRedirectUri.afterLogin
+    }?${queryParamsAsString<WithSourcePage>(params)}`;
+  }
+
+  #makeInclusionConnectAuthorizeUri(): AbsoluteUrl {
     // the following is made in order to support both the old and the new InclusionConnect urls:
     // Base Url was : https://connect.inclusion.beta.gouv.fr/realms/inclusion-connect/protocol/openid-connect
     // OLD : "https://connect.inclusion.beta.gouv.fr/realms/inclusion-connect/protocol/openid-connect/auth"
@@ -65,59 +141,6 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
         : "auth";
 
     return `${this.inclusionConnectConfig.inclusionConnectBaseUri}/${authorizeInPath}`;
-  }
-
-  public async getAccessToken({
-    code,
-    page,
-  }: GetAccessTokenParams): Promise<GetAccessTokenResult> {
-    return this.httpClientInclusionConnect
-      .getAccessToken({
-        body: queryParamsAsString({
-          code,
-          client_id: this.inclusionConnectConfig.clientId,
-          client_secret: this.inclusionConnectConfig.clientSecret,
-          grant_type: "authorization_code",
-          redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
-        }),
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      })
-      .then(({ body }) => ({
-        accessToken: body.access_token,
-        expire: body.expires_in,
-        icIdTokenPayload: validateAndParseZodSchemaV2(
-          inclusionConnectIdTokenPayloadSchema,
-          decodeJwtWithoutSignatureCheck<InclusionConnectIdTokenPayload>(
-            body.id_token,
-          ),
-          logger,
-        ),
-      }))
-      .catch((error) => {
-        logger.error({
-          error,
-          message: "Error trying to get Access Token",
-        });
-        throw error;
-      });
-  }
-
-  public async getLogoutUrl(): Promise<AbsoluteUrl> {
-    return `${
-      this.inclusionConnectConfig.inclusionConnectBaseUri
-    }/logout/?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
-      client_id: this.inclusionConnectConfig.clientId,
-      post_logout_redirect_uri:
-        this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
-    })}`;
-  }
-
-  #makeRedirectAfterLoginUrl(params: WithSourcePage): AbsoluteUrl {
-    return `${
-      this.inclusionConnectConfig.immersionRedirectUri.afterLogin
-    }?${queryParamsAsString<WithSourcePage>(params)}`;
   }
 }
 

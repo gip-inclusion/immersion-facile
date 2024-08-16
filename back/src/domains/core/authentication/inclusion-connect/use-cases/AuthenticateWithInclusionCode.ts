@@ -1,12 +1,13 @@
 import {
   AbsoluteUrl,
   AgencyRight,
-  AuthenticateWithInclusionCodeConnectParams,
+  AuthenticateWithOAuthCodeParams,
   AuthenticatedUserQueryParams,
-  InclusionConnectCode,
+  IdentityProvider,
+  OAuthCode,
   User,
   WithSourcePage,
-  authenticateWithInclusionCodeSchema,
+  authenticateWithOAuthCodeSchema,
   currentJwtVersions,
   errors,
   frontRoutes,
@@ -20,21 +21,25 @@ import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
-import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
+import { OAuthIdTokenPayload } from "../entities/OAuthIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
+import {
+  OAuthGateway,
+  OAuthGatewayMode,
+  oAuthModeByFeatureFlags,
+} from "../port/OAuthGateway";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
 
 export class AuthenticateWithInclusionCode extends TransactionalUseCase<
-  AuthenticateWithInclusionCodeConnectParams,
+  AuthenticateWithOAuthCodeParams,
   ConnectedRedirectUrl
 > {
-  protected inputSchema = authenticateWithInclusionCodeSchema;
+  protected inputSchema = authenticateWithOAuthCodeSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
-  readonly #inclusionConnectGateway: InclusionConnectGateway;
+  readonly #inclusionConnectGateway: OAuthGateway;
 
   readonly #uuidGenerator: UuidGenerator;
 
@@ -47,7 +52,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
-    inclusionConnectGateway: InclusionConnectGateway,
+    inclusionConnectGateway: OAuthGateway,
     uuidGenerator: UuidGenerator,
     generateAuthenticatedUserJwt: GenerateInclusionConnectJwt,
     immersionFacileBaseUrl: AbsoluteUrl,
@@ -63,37 +68,52 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   }
 
   protected async _execute(
-    { code, page, state }: AuthenticateWithInclusionCodeConnectParams,
+    { code, page, state }: AuthenticateWithOAuthCodeParams,
     uow: UnitOfWork,
   ): Promise<ConnectedRedirectUrl> {
-    const existingOngoingOAuth = await uow.ongoingOAuthRepository.findByState(
-      state,
-      "inclusionConnect",
+    const mode = oAuthModeByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
     );
+    const identityProvider: IdentityProvider =
+      mode === "InclusionConnect" ? "inclusionConnect" : "proConnect";
+    const existingOngoingOAuth =
+      await uow.ongoingOAuthRepository.findByStateAndProvider(
+        state,
+        identityProvider,
+      );
     if (existingOngoingOAuth)
-      return this.#onOngoingOAuth({ code, page }, uow, existingOngoingOAuth);
-    throw errors.inclusionConnect.missingOAuth({ state });
+      return this.#onOngoingOAuth(
+        uow,
+        mode,
+        { code, page },
+        existingOngoingOAuth,
+      );
+    throw errors.inclusionConnect.missingOAuth({ state, identityProvider });
   }
 
   async #onOngoingOAuth(
-    { code, page }: WithSourcePage & { code: InclusionConnectCode },
     uow: UnitOfWork,
+    mode: OAuthGatewayMode,
+    { code, page }: WithSourcePage & { code: OAuthCode },
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
-    const { accessToken, expire, icIdTokenPayload } =
-      await this.#inclusionConnectGateway.getAccessToken({
-        code,
-        page,
-      });
+    const { accessToken, expire, oAuthIdTokenPayload } =
+      await this.#inclusionConnectGateway.getAccessToken(
+        {
+          code,
+          page,
+        },
+        mode,
+      );
 
-    if (icIdTokenPayload.nonce !== existingOngoingOAuth.nonce)
+    if (oAuthIdTokenPayload.nonce !== existingOngoingOAuth.nonce)
       throw errors.inclusionConnect.nonceMismatch();
 
     const existingInclusionConnectedUser =
-      await uow.userRepository.findByExternalId(icIdTokenPayload.sub);
+      await uow.userRepository.findByExternalId(oAuthIdTokenPayload.sub);
 
     const userWithSameEmail = await uow.userRepository.findByEmail(
-      icIdTokenPayload.email,
+      oAuthIdTokenPayload.email,
     );
 
     const existingUser = await this.#makeExistingUser(
@@ -106,7 +126,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       ...this.#makeAuthenticatedUser(
         this.#uuidGenerator.new(),
         this.#timeGateway.now(),
-        icIdTokenPayload,
+        oAuthIdTokenPayload,
       ),
       ...(existingUser && {
         id: existingUser.id,
@@ -117,7 +137,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     const ongoingOAuth: OngoingOAuth = {
       ...existingOngoingOAuth,
       userId: newOrUpdatedAuthenticatedUser.id,
-      externalId: icIdTokenPayload.sub,
+      externalId: oAuthIdTokenPayload.sub,
       accessToken,
     };
 
@@ -137,7 +157,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         payload: {
           userId: newOrUpdatedAuthenticatedUser.id,
           provider: ongoingOAuth.provider,
-          codeSafir: icIdTokenPayload.structure_pe ?? null,
+          codeSafir: oAuthIdTokenPayload.structure_pe ?? null,
           triggeredBy: {
             kind: "inclusion-connected",
             userId: newOrUpdatedAuthenticatedUser.id,
@@ -199,7 +219,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   #makeAuthenticatedUser(
     userId: string,
     createdAt: Date,
-    jwtPayload: InclusionConnectIdTokenPayload,
+    jwtPayload: OAuthIdTokenPayload,
   ): User {
     return {
       id: userId,

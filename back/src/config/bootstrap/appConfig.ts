@@ -29,7 +29,7 @@ export type AxiosConfig = {
   bearerToken: string;
 };
 
-export type InclusionConnectConfig = {
+export type OAuthConfig = {
   clientId: string;
   clientSecret: string;
   immersionRedirectUri: {
@@ -37,6 +37,7 @@ export type InclusionConnectConfig = {
     afterLogout: AbsoluteUrl;
   };
   inclusionConnectBaseUri: AbsoluteUrl;
+  proConnectBaseUri: AbsoluteUrl;
   scope: string;
 };
 
@@ -250,7 +251,7 @@ export class AppConfig {
     );
   }
 
-  public get inclusionConnectConfig(): InclusionConnectConfig {
+  public get inclusionConnectConfig(): OAuthConfig {
     return {
       clientId: this.#throwIfNotDefinedOrDefault(
         "INCLUSION_CONNECT_CLIENT_ID",
@@ -267,7 +268,13 @@ export class AppConfig {
       inclusionConnectBaseUri: this.#throwIfNotAbsoluteUrl(
         "INCLUSION_CONNECT_BASE_URI",
         this.inclusionConnectGateway !== "HTTPS"
-          ? "https://fake.url"
+          ? "https://fake-inclusion-connect.url"
+          : undefined,
+      ),
+      proConnectBaseUri: this.#throwIfNotAbsoluteUrl(
+        "PRO_CONNECT_BASE_URI",
+        this.inclusionConnectGateway !== "HTTPS"
+          ? "https://fake-pro-connect.url"
           : undefined,
       ),
       scope: "openid profile email",

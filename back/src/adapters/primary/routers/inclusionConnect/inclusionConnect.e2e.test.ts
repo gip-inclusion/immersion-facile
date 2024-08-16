@@ -16,7 +16,7 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { fakeInclusionConnectConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/Inclusion-connect-gateway/InMemoryInclusionConnectGateway";
+import { fakeInclusionConnectConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
@@ -104,10 +104,10 @@ describe("inclusion connection flow", () => {
       async (page) => {
         const authCode = "inclusion-auth-code";
         const inclusionToken = "inclusion-token";
-        gateways.inclusionConnectGateway.setAccessTokenResponse({
+        gateways.oAuthGateway.setAccessTokenResponse({
           accessToken: inclusionToken,
           expire: 1,
-          icIdTokenPayload: {
+          oAuthIdTokenPayload: {
             email: "osef@gmail",
             family_name: "osef",
             given_name: "jean",
@@ -152,10 +152,10 @@ describe("inclusion connection flow", () => {
       const authCode = "inclusion-auth-code";
       const inclusionToken = "inclusion-token";
       const sub = "osef";
-      gateways.inclusionConnectGateway.setAccessTokenResponse({
+      gateways.oAuthGateway.setAccessTokenResponse({
         accessToken: inclusionToken,
         expire: 1,
-        icIdTokenPayload: {
+        oAuthIdTokenPayload: {
           email: "osef@gmail",
           family_name: "osef",
           given_name: "jean",

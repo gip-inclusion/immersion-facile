@@ -1,7 +1,7 @@
 import { Email, ExternalId, emailSchema } from "shared";
 import { z } from "zod";
 
-export type InclusionConnectIdTokenPayload = {
+export type OAuthIdTokenPayload = {
   nonce: string;
   sub: ExternalId;
   given_name: string;
@@ -10,7 +10,7 @@ export type InclusionConnectIdTokenPayload = {
   structure_pe?: string;
 };
 
-export const inclusionConnectIdTokenPayloadSchema: z.Schema<InclusionConnectIdTokenPayload> =
+export const oAuthIdTokenPayloadSchema: z.Schema<OAuthIdTokenPayload> =
   z.object({
     nonce: z.string(),
     sub: z.string(),
