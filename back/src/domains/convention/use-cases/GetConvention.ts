@@ -14,6 +14,10 @@ import {
 import { ForbiddenError, NotFoundError } from "shared";
 import { conventionEmailsByRole } from "../../../utils/convention";
 import { TransactionalUseCase } from "../../core/UseCase";
+import {
+  OAuthGatewayMode,
+  oAuthModeByFeatureFlags,
+} from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -44,12 +48,26 @@ export class GetConvention extends TransactionalUseCase<
       conventionId,
     );
 
+    const mode = oAuthModeByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
+    );
+
     if (isConventionDomainPayload) {
-      return this.#onConventionDomainPayload({ authPayload, uow, convention });
+      return this.#onConventionDomainPayload({
+        authPayload,
+        uow,
+        convention,
+        mode,
+      });
     }
 
     if (isInclusionConnectPayload) {
-      return this.#onInclusionConnectPayload({ authPayload, uow, convention });
+      return this.#onInclusionConnectPayload({
+        authPayload,
+        uow,
+        convention,
+        mode,
+      });
     }
 
     throw new ForbiddenError("Incorrect jwt");
@@ -59,10 +77,12 @@ export class GetConvention extends TransactionalUseCase<
     authPayload,
     convention,
     uow,
+    mode,
   }: {
     authPayload: ConventionDomainPayload;
     convention: ConventionReadDto;
     uow: UnitOfWork;
+    mode: OAuthGatewayMode;
   }): Promise<ConventionReadDto> {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency) {
@@ -73,6 +93,7 @@ export class GetConvention extends TransactionalUseCase<
       convention,
       agency,
       userRepository: uow.userRepository,
+      mode,
     });
     if (!matchingMd5Emails) {
       throw new ForbiddenError(
@@ -87,12 +108,14 @@ export class GetConvention extends TransactionalUseCase<
     authPayload,
     convention,
     uow,
+    mode,
   }: {
     authPayload: InclusionConnectJwtPayload;
     convention: ConventionReadDto;
     uow: UnitOfWork;
+    mode: OAuthGatewayMode;
   }): Promise<ConventionReadDto> {
-    const user = await uow.userRepository.getById(authPayload.userId);
+    const user = await uow.userRepository.getById(authPayload.userId, mode);
     if (!user)
       throw new NotFoundError(`No user found with id '${authPayload.userId}'`);
 
@@ -123,11 +146,13 @@ export class GetConvention extends TransactionalUseCase<
     convention,
     agency,
     userRepository,
+    mode,
   }: {
     authPayload: ConventionDomainPayload;
     convention: ConventionReadDto;
     agency: AgencyDto;
     userRepository: UserRepository;
+    mode: OAuthGatewayMode;
   }): Promise<boolean> {
     const emailsByRole = conventionEmailsByRole(convention, agency)[
       authPayload.role
@@ -141,6 +166,7 @@ export class GetConvention extends TransactionalUseCase<
         authPayload,
         agencyId: agency.id,
         userRepository,
+        mode,
       });
     const peAdvisorEmail =
       convention.signatories.beneficiary.federatedIdentity?.payload?.advisor
@@ -159,18 +185,23 @@ export class GetConvention extends TransactionalUseCase<
     authPayload,
     userRepository,
     agencyId,
+    mode,
   }: {
     authPayload: ConventionDomainPayload;
     userRepository: UserRepository;
     agencyId: AgencyId;
+    mode: OAuthGatewayMode;
   }) {
     if (authPayload.role !== "counsellor" && authPayload.role !== "validator")
       return false;
 
-    const users = await userRepository.getWithFilter({
-      agencyRole: authPayload.role,
-      agencyId,
-    });
+    const users = await userRepository.getWithFilter(
+      {
+        agencyRole: authPayload.role,
+        agencyId,
+      },
+      mode,
+    );
 
     return users.some(
       (user) => stringToMd5(user.email) === authPayload.emailHash,

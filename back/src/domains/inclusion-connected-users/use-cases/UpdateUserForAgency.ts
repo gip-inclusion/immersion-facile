@@ -19,17 +19,20 @@ import {
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import {OAuthGatewayMode, oAuthModeByFeatureFlags} from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 
 const rejectIfAgencyWontHaveValidatorsReceivingNotifications = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   agency: AgencyDto,
+  provider: OAuthGatewayMode,
 ) => {
   if (!params.roles.includes("validator") || !params.isNotifiedByEmail) {
     await throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(
       uow,
       agency,
       params.userId,
+      provider,
     );
   }
 };
@@ -53,12 +56,14 @@ const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   agency: AgencyDto,
+  provider: OAuthGatewayMode,
 ) => {
   if (!params.roles.includes("counsellor") || !params.isNotifiedByEmail) {
     await throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
       uow,
       agency,
       params.userId,
+      provider,
     );
   }
 };
@@ -67,6 +72,7 @@ const makeAgencyRights = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   userToUpdate: InclusionConnectedUser,
+  provider: OAuthGatewayMode,
 ) => {
   const agency = await uow.agencyRepository.getById(params.agencyId);
 
@@ -90,8 +96,9 @@ const makeAgencyRights = async (
     uow,
     params,
     agency,
+    provider,
   );
-  await rejectIfAgencyWithRefersToWontHaveCounsellors(uow, params, agency);
+  await rejectIfAgencyWithRefersToWontHaveCounsellors(uow, params, agency, provider);
 
   const updatedAgencyRight: AgencyRight = {
     ...agencyRightToUpdate,
@@ -151,10 +158,13 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    const userToUpdate = await uow.userRepository.getById(params.userId);
+    const mode = oAuthModeByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
+    );
+    const userToUpdate = await uow.userRepository.getById(params.userId, mode);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
-    const newAgencyRights = await makeAgencyRights(uow, params, userToUpdate);
+    const newAgencyRights = await makeAgencyRights(uow, params, userToUpdate, mode);
     rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 
     const event: DomainEvent = this.#createNewEvent({

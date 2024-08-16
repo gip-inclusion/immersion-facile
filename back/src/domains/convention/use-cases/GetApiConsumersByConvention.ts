@@ -9,6 +9,7 @@ import {
   withConventionIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 
 export type GetApiConsumersByConvention = ReturnType<
   typeof makeGetApiConsumersByConvention
@@ -30,7 +31,10 @@ export const makeGetApiConsumersByConvention = createTransactionalUseCase<
         conventionId,
       });
 
-    const user = await uow.userRepository.getById(currentUser.id);
+    const user = await uow.userRepository.getById(
+      currentUser.id,
+      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+    );
 
     if (!user)
       throw errors.user.notFound({

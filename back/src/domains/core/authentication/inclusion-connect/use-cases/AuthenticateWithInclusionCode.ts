@@ -110,16 +110,18 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       throw errors.inclusionConnect.nonceMismatch();
 
     const existingInclusionConnectedUser =
-      await uow.userRepository.findByExternalId(oAuthIdTokenPayload.sub);
+      await uow.userRepository.findByExternalId(oAuthIdTokenPayload.sub, mode);
 
     const userWithSameEmail = await uow.userRepository.findByEmail(
       oAuthIdTokenPayload.email,
+      mode,
     );
 
     const existingUser = await this.#makeExistingUser(
+      uow,
+      mode,
       existingInclusionConnectedUser,
       userWithSameEmail,
-      uow,
     );
 
     const newOrUpdatedAuthenticatedUser: User = {
@@ -148,7 +150,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       );
     }
 
-    await uow.userRepository.save(newOrUpdatedAuthenticatedUser);
+    await uow.userRepository.save(newOrUpdatedAuthenticatedUser, mode);
     await uow.ongoingOAuthRepository.save(ongoingOAuth);
 
     await uow.outboxRepository.save(
@@ -185,9 +187,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   }
 
   async #makeExistingUser(
+    uow: UnitOfWork,
+    mode: OAuthGatewayMode,
     existingInclusionConnectedUser: User | undefined,
     userWithSameEmail: User | undefined,
-    uow: UnitOfWork,
   ): Promise<User | undefined> {
     const existingUser = existingInclusionConnectedUser ?? userWithSameEmail;
     if (!existingUser) return undefined;
@@ -198,9 +201,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     if (conflictingUserFound) {
       const conflictingUser = userWithSameEmail;
       await this.#updateUserAgencyRights(
+        uow,
+        mode,
         conflictingUser,
         existingInclusionConnectedUser,
-        uow,
       );
       await uow.userRepository.delete(conflictingUser.id);
       const user: User = {
@@ -232,14 +236,19 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   }
 
   async #updateUserAgencyRights(
+    uow: UnitOfWork,
+    mode: OAuthGatewayMode,
     conflictingUser: User,
     userToKeep: User,
-    uow: UnitOfWork,
   ): Promise<void> {
     const conflictingIcUser = await uow.userRepository.getById(
       conflictingUser.id,
+      mode,
     );
-    const userToKeepIcUser = await uow.userRepository.getById(userToKeep.id);
+    const userToKeepIcUser = await uow.userRepository.getById(
+      userToKeep.id,
+      mode,
+    );
     if (!conflictingIcUser || !userToKeepIcUser) return;
 
     const conflictingUserAgencyRights = conflictingIcUser.agencyRights;
