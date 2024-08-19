@@ -67,7 +67,7 @@ export const BeneficiaryDashboardPage = () => {
             <ul>
               <li>
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/bilan-de-limmersion-s8xirh/"
+                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/le-bilan-de-limmersion-1q9asij/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
