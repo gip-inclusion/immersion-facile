@@ -354,7 +354,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       title: "Qui peut prescrire une immersion ?",
       description:
         "Les prescripteurs de droit commun (France Travail, Missions Locales, Cap emploi, Conseil Départemental, CEP, SIAE sauf ETTI et prépa apprentissage) et tous les professionnels de l'accompagnement qui peuvent avoir une délégation auprès des prescripteurs de droit commun.",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-prescrire-une-immersion-6frnyn/?bust=1722505187338",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/qui-peut-prescrire-une-immersion-6frnyn/?bust=1722505187338",
     },
     {
       title:

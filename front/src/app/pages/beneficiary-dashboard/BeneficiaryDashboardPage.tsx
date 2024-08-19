@@ -23,7 +23,7 @@ export const BeneficiaryDashboardPage = () => {
             <ul>
               <li>
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-recu-la-convention-validee-que-faire-1y3t9xw/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-recu-la-convention-validee-que-faire-1y3t9xw/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
@@ -33,7 +33,7 @@ export const BeneficiaryDashboardPage = () => {
               </li>
               <li>
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-signer-ma-convention-ou-envoyer-un-lien-de-signature-125bxxd/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/comment-signer-ma-convention-ou-envoyer-un-lien-de-signature-125bxxd/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
@@ -43,7 +43,7 @@ export const BeneficiaryDashboardPage = () => {
               </li>
               <li>
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-connaitre-letat-dune-demande-de-convention-1gbhxt4/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/comment-connaitre-letat-dune-demande-de-convention-1gbhxt4/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
@@ -53,7 +53,7 @@ export const BeneficiaryDashboardPage = () => {
               </li>
               <li>
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-etapes-de-signature-de-la-convention-17hf59q/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-etapes-de-signature-de-la-convention-17hf59q/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
@@ -67,7 +67,7 @@ export const BeneficiaryDashboardPage = () => {
             <ul>
               <li>
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/le-bilan-de-limmersion-1q9asij/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/le-bilan-de-limmersion-1q9asij/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
@@ -83,7 +83,7 @@ export const BeneficiaryDashboardPage = () => {
             <ul>
               <li>
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/category/guide-de-limmersion-v19aod/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/category/guide-de-limmersion-v19aod/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
@@ -104,7 +104,7 @@ export const BeneficiaryDashboardPage = () => {
               </li>
               <li>
                 <a
-                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
