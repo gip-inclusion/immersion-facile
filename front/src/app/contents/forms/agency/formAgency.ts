@@ -107,7 +107,8 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   questionnaireUrl: {
     id: domElementIds.addAgency.questionnaireUrlInput,
     label: "Lien vers le document de support du bilan de fin d’immersion ",
-    hintText: "Format attendu : https://mon-document.com/bilan ",
+    hintText:
+      "Format attendu : https://mon-document.com/bilan, assurez-vous que ce lien est accessible à tout le monde (pas de lien vers des intranets et espaces privés - sharepoint privé, drive privé)",
     placeholder:
       "Ex : https://docs.google.com/document/d/mon-document-pour-bilan",
   },
