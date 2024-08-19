@@ -35,13 +35,14 @@ const getLinkedAgencies = async (
   const agency = await agencyRepository.getById(convention.agencyId);
   if (!agency) throw errors.agency.notFound({ agencyId: convention.agencyId });
 
-  let refersToAgency = null;
-  if (agency.refersToAgencyId) {
-    refersToAgency = await agencyRepository.getById(agency.refersToAgencyId);
+  if (!agency.refersToAgencyId) return { agency, refersToAgency: null };
 
-    if (refersToAgency === undefined)
-      throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
-  }
+  const refersToAgency = await agencyRepository.getById(
+    agency.refersToAgencyId,
+  );
+
+  if (!refersToAgency)
+    throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
 
   return { agency, refersToAgency };
 };
@@ -68,7 +69,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     );
 
     if (
-      (agency.kind !== "pole-emploi" && !refersToAgency) ||
+      (!refersToAgency && agency.kind !== "pole-emploi") ||
       (refersToAgency && refersToAgency.kind !== "pole-emploi")
     )
       return this.options.resyncMode
