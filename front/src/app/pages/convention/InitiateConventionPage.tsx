@@ -94,7 +94,7 @@ export const InitiateConventionPage = () => {
             >
               <a
                 id={domElementIds.initiateConvention.dontKnowCategoryButton}
-                href="https://aide.immersion-facile.beta.gouv.fr/fr/category/guide-de-limmersion-v19aod/"
+                href="https://immersion-facile.beta.gouv.fr/aide/category/guide-de-limmersion-v19aod/"
                 className={fr.cx(
                   "fr-link",
                   "fr-icon-arrow-right-line",
@@ -145,7 +145,7 @@ export const InitiateConventionPage = () => {
                   alternateTitle="Je n'ai pas encore de structure d'accompagnement : je n'ai pas de conseiller en insertion professionnelle ou je ne suis pas accompagné par une structure d'insertion"
                   id={domElementIds.initiateConvention.noStructureButton}
                   link={{
-                    href: "https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/",
+                    href: "https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/",
                     target: "_blank",
                   }}
                   withBorder
