@@ -81,6 +81,11 @@ export class PgConventionQueries implements ConventionQueries {
   ): Promise<ConventionDto[]> {
     const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.status", "in", validatedConventionStatuses)
+      .where(
+        sql`conventions.date_end`,
+        "<",
+        dateEnd.to.toISOString().split("T")[0],
+      )
       .where(({ selectFrom, not, exists }) =>
         not(
           exists(
@@ -88,14 +93,14 @@ export class PgConventionQueries implements ConventionQueries {
               .select("notifications_email.convention_id")
               .where("notifications_email.email_kind", "=", assessmentEmailKind)
               .where(
-                sql`DATE(notifications_email.created_at)`,
+                sql`notifications_email.created_at`,
                 ">=",
                 subDays(dateEnd.from, 1).toISOString().split("T")[0],
               )
               .where(
-                sql`DATE(notifications_email.created_at)`,
+                sql`notifications_email.created_at`,
                 "<=",
-                addDays(dateEnd.to, 1).toISOString().split("T")[0],
+                addDays(dateEnd.to, 2).toISOString().split("T")[0],
               )
               .whereRef(
                 "conventions.id",
@@ -107,56 +112,44 @@ export class PgConventionQueries implements ConventionQueries {
       )
       .where((eb) =>
         eb.or([
-          eb.and([
-            eb(
-              sql`DATE(conventions.date_end)`,
-              ">=",
-              dateEnd.from.toISOString().split("T")[0],
-            ),
-            eb(
-              sql`DATE(conventions.date_end)`,
-              "<",
-              dateEnd.to.toISOString().split("T")[0],
-            ),
-          ]),
-          eb.and([
-            eb.exists(
-              eb
-                .selectFrom("notifications_email")
-                .select("notifications_email.convention_id")
-                .where(
-                  "notifications_email.email_kind",
-                  "=",
-                  "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-                )
-                .where(
-                  sql`DATE(notifications_email.created_at)`,
-                  ">=",
-                  subDays(dateEnd.from, 1).toISOString().split("T")[0],
-                )
-                .where(
-                  sql`DATE(notifications_email.created_at)`,
-                  "<=",
-                  dateEnd.to.toISOString().split("T")[0],
-                )
-                .whereRef(
-                  "conventions.id",
-                  "=",
-                  "notifications_email.convention_id",
-                ),
-            ),
-            eb(
-              sql`DATE(conventions.date_end)`,
-              "<=",
-              dateEnd.to.toISOString().split("T")[0],
-            ),
-          ]),
+          eb(
+            sql`conventions.date_end`,
+            ">=",
+            dateEnd.from.toISOString().split("T")[0],
+          ),
+          eb.exists(
+            eb
+              .selectFrom("notifications_email")
+              .select("notifications_email.convention_id")
+              .where(
+                "notifications_email.email_kind",
+                "=",
+                "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+              )
+              .where(
+                sql`notifications_email.created_at`,
+                ">=",
+                subDays(dateEnd.from, 1).toISOString().split("T")[0],
+              )
+              .where(
+                sql`notifications_email.created_at`,
+                "<=",
+                addDays(dateEnd.to, 1).toISOString().split("T")[0],
+              )
+              .whereRef(
+                "conventions.id",
+                "=",
+                "notifications_email.convention_id",
+              ),
+          ),
         ]),
       )
       .orderBy("conventions.date_start", "desc")
       .execute();
 
-    return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto));
+    return await pgResults.map((pgResult) =>
+      conventionSchema.parse(pgResult.dto),
+    );
   }
 
   public async getConventionById(

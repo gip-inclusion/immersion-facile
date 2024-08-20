@@ -35,10 +35,10 @@ export const createConventionQueryBuilder = (transaction: KyselyDb) => {
   const builder = transaction
     .selectFrom("conventions")
     .innerJoin("actors as b", "b.id", "conventions.beneficiary_id")
-    .leftJoin("actors as br", "br.id", "conventions.beneficiary_representative_id")
-    .leftJoin("actors as bce", "bce.id", "conventions.beneficiary_current_employer_id")
     .innerJoin("actors as er", "er.id", "conventions.establishment_representative_id")
     .innerJoin("actors as et", "et.id", "conventions.establishment_tutor_id")
+    .leftJoin("actors as br", "br.id", "conventions.beneficiary_representative_id")
+    .leftJoin("actors as bce", "bce.id", "conventions.beneficiary_current_employer_id")
     .leftJoin("partners_pe_connect as p", "p.convention_id", "conventions.id")
     .leftJoin("view_appellations_dto as vad", "vad.appellation_code", "conventions.immersion_appellation")
     .leftJoin("agencies", "agencies.id", "conventions.agency_id")
