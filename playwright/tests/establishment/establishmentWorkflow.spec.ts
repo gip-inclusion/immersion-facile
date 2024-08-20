@@ -495,7 +495,7 @@ test.describe("Establishment creation and modification workflow", () => {
       .first()
       .click();
     await page.getByRole("button", { name: "Rechercher" }).click();
-    const resultsSelector = `.im-search-result[data-establishment-siret="${providedSiret}"]`;
+    const resultsSelector = `#${domElementIds.search.searchResultButton}-${providedSiret}`;
     await expect(await page.locator(resultsSelector)).toHaveCount(1);
   });
 

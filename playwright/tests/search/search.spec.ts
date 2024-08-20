@@ -6,6 +6,7 @@ import {
 } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
+
 test.describe("Search", () => {
   test("can access and search with empty fields", async ({ page }) => {
     await page.goto("/");
@@ -47,7 +48,7 @@ test.describe("Search", () => {
 test.skip("checks that share URL have the correct params values", async () => {});
 
 const expectSearchToHaveResults = async (page: Page) => {
-  const searchResultsSelector = ".im-search-result";
+  const searchResultsSelector = `[id^=${domElementIds.search.searchResultButton}]`;
   await page.waitForSelector(searchResultsSelector);
   await expect(
     await page.locator(searchResultsSelector).count(),
