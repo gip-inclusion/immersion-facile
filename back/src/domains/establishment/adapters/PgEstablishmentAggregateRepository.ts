@@ -191,7 +191,8 @@ export class PgEstablishmentAggregateRepository
               .select(sql`1`.as("_"))
               .where("o.topic", "=", "FormEstablishmentEditLinkSent")
               .whereRef(sql`o.payload ->> 'siret'`, "=", "establishments.siret")
-              .where("o.occurred_at", ">", before),
+              .where("o.occurred_at", ">", before)
+              .limit(1),
           ),
         ),
       )
@@ -202,7 +203,8 @@ export class PgEstablishmentAggregateRepository
               .select(sql`1`.as("__"))
               .where("n.email_kind", "=", "SUGGEST_EDIT_FORM_ESTABLISHMENT")
               .whereRef("n.establishment_siret", "=", "establishments.siret")
-              .where("n.created_at", ">", before),
+              .where("n.created_at", ">", before)
+              .limit(1),
           ),
         ),
       )
