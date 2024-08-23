@@ -2,6 +2,7 @@ import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   AgencyId,
+  AgencyRight,
   AgencyRole,
   InclusionConnectedUser,
   User,
@@ -254,94 +255,143 @@ describe("PgAuthenticatedUserRepository", () => {
         ],
       });
     });
+  });
 
-    describe("addAgencyToUser", () => {
-      it("adds an element in users__agencies table", async () => {
-        await agencyRepository.insert(agency1);
-        await insertUser(user1);
-        const icUserToUpdate: InclusionConnectedUser = {
-          ...user1,
-          establishments: [],
-          agencyRights: [
-            {
-              roles: ["counsellor"],
-              agency: agency1,
-              isNotifiedByEmail: false,
+  describe("updateAgencyRights", () => {
+    it("updates an element in users__agencies table", async () => {
+      await agencyRepository.insert(agency1);
+      await insertUser(user1);
+      const agencyRights: AgencyRight[] = [
+        {
+          roles: ["counsellor"],
+          agency: agency1,
+          isNotifiedByEmail: false,
+        },
+      ];
+      await userRepository.updateAgencyRights({
+        userId: user1.id,
+        agencyRights: agencyRights,
+      });
+      expectToEqual(await userRepository.getById(user1.id), {
+        ...user1,
+        establishments: [],
+        agencyRights: agencyRights,
+        ...withEmptyDashboards,
+      });
+
+      await userRepository.updateAgencyRights({
+        userId: user1.id,
+        agencyRights: [
+          {
+            roles: ["validator"],
+            agency: agency1,
+            isNotifiedByEmail: true,
+          },
+        ],
+      });
+
+      expectToEqual(await userRepository.getById(user1.id), {
+        ...user1,
+        establishments: [],
+        agencyRights: [
+          {
+            roles: ["validator"],
+            agency: {
+              ...agency1,
+              validatorEmails: [...agency1.validatorEmails, user1.email],
             },
-          ],
-          ...withEmptyDashboards,
-        };
+            isNotifiedByEmail: true,
+          },
+        ],
+        ...withEmptyDashboards,
+      });
+    });
 
-        await userRepository.updateAgencyRights({
-          userId: icUserToUpdate.id,
-          agencyRights: icUserToUpdate.agencyRights,
-        });
+    it("adds an element in users__agencies table", async () => {
+      await agencyRepository.insert(agency1);
+      await insertUser(user1);
+      const icUserToUpdate: InclusionConnectedUser = {
+        ...user1,
+        establishments: [],
+        agencyRights: [
+          {
+            roles: ["counsellor"],
+            agency: agency1,
+            isNotifiedByEmail: false,
+          },
+        ],
+        ...withEmptyDashboards,
+      };
 
-        const savedIcUser = await userRepository.getById(user1.id);
-        expectToEqual(savedIcUser, icUserToUpdate);
+      await userRepository.updateAgencyRights({
+        userId: icUserToUpdate.id,
+        agencyRights: icUserToUpdate.agencyRights,
       });
 
-      it("Delete an element in users__agencies table when no agency rights are provided", async () => {
-        await agencyRepository.insert(agency1);
-        await insertUser(user1);
-        const icUserToSave: InclusionConnectedUser = {
-          ...user1,
-          establishments: [],
-          agencyRights: [],
-          ...withEmptyDashboards,
-        };
+      const savedIcUser = await userRepository.getById(user1.id);
+      expectToEqual(savedIcUser, icUserToUpdate);
+    });
 
-        await userRepository.updateAgencyRights({
-          userId: icUserToSave.id,
-          agencyRights: icUserToSave.agencyRights,
-        });
+    it("Delete an element in users__agencies table when no agency rights are provided", async () => {
+      await agencyRepository.insert(agency1);
+      await insertUser(user1);
+      const icUserToSave: InclusionConnectedUser = {
+        ...user1,
+        establishments: [],
+        agencyRights: [],
+        ...withEmptyDashboards,
+      };
 
-        const savedIcUser = await userRepository.getById(user1.id);
-        expectToEqual(savedIcUser, icUserToSave);
+      await userRepository.updateAgencyRights({
+        userId: icUserToSave.id,
+        agencyRights: icUserToSave.agencyRights,
       });
 
-      it("Delete just one element in users__agencies table when two agency rights are provided", async () => {
-        await agencyRepository.insert(agency1);
-        await agencyRepository.insert(agency2);
+      const savedIcUser = await userRepository.getById(user1.id);
+      expectToEqual(savedIcUser, icUserToSave);
+    });
 
-        await insertUser(user1);
+    it("Delete just one element in users__agencies table when two agency rights are provided", async () => {
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
 
-        const icUserToSave: InclusionConnectedUser = {
-          ...user1,
-          establishments: [],
-          agencyRights: [
-            { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
-            { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
-          ],
-          ...withEmptyDashboards,
-        };
+      await insertUser(user1);
 
-        await userRepository.updateAgencyRights({
-          userId: icUserToSave.id,
-          agencyRights: icUserToSave.agencyRights,
-        });
+      const icUserToSave: InclusionConnectedUser = {
+        ...user1,
+        establishments: [],
+        agencyRights: [
+          { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+          { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
+        ],
+        ...withEmptyDashboards,
+      };
 
-        const savedIcUser = await userRepository.getById(user1.id);
-
-        expectToEqual(savedIcUser, icUserToSave);
-
-        const updatedIcUserToSave: InclusionConnectedUser = {
-          ...user1,
-          establishments: [],
-          agencyRights: [
-            { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
-          ],
-          ...withEmptyDashboards,
-        };
-
-        await userRepository.updateAgencyRights({
-          userId: updatedIcUserToSave.id,
-          agencyRights: updatedIcUserToSave.agencyRights,
-        });
-
-        const updatedSavedIcUser = await userRepository.getById(user1.id);
-        expectToEqual(updatedSavedIcUser, updatedIcUserToSave);
+      await userRepository.updateAgencyRights({
+        userId: icUserToSave.id,
+        agencyRights: icUserToSave.agencyRights,
       });
+
+      const savedIcUser = await userRepository.getById(user1.id);
+
+      expectToEqual(savedIcUser, icUserToSave);
+
+      const updatedIcUserToSave: InclusionConnectedUser = {
+        ...user1,
+        establishments: [],
+        agencyRights: [
+          { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+        ],
+        ...withEmptyDashboards,
+      };
+
+      await userRepository.updateAgencyRights({
+        userId: updatedIcUserToSave.id,
+        agencyRights: updatedIcUserToSave.agencyRights,
+      });
+
+      const updatedSavedIcUser = await userRepository.getById(user1.id);
+      expectToEqual(updatedSavedIcUser, updatedIcUserToSave);
     });
   });
 
