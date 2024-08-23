@@ -417,6 +417,8 @@ describe("Admin router", () => {
           agencyId: agency.id,
           userId: inclusionConnectedUser.id,
           roles: [updatedRole],
+          isNotifiedByEmail: false,
+          email: inclusionConnectedUser.email,
         },
         headers: { authorization: token },
       });
@@ -467,6 +469,8 @@ describe("Admin router", () => {
           agencyId: agency.id,
           userId: inclusionConnectedUser.id,
           roles: [updatedRole],
+          isNotifiedByEmail: false,
+          email: inclusionConnectedUser.email,
         },
         headers: { authorization: token },
       });
@@ -496,6 +500,8 @@ describe("Admin router", () => {
           agencyId: "yo",
           userId: "yolo",
           roles: ["counsellor"],
+          isNotifiedByEmail: false,
+          email: "any@email.fr",
         },
         headers: { authorization: "" },
       });
@@ -528,6 +534,8 @@ describe("Admin router", () => {
           agencyId: agency.id,
           userId: inclusionConnectedUser.id,
           roles: [updatedRole],
+          isNotifiedByEmail: false,
+          email: inclusionConnectedUser.email,
         },
         headers: { authorization: token },
       });
