@@ -85,8 +85,12 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             url: `https://${domain}/${frontRoutes.establishmentDashboard}`,
           },
         ],
-        subContent: `A très vite sur Immersion Facilitée,
-L'équipe d'Immersion Facilitée`,
+        subContent: `
+        <strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.
+        Créer votre compte avec le même mail que celui avec lequel les candidats vous contactent.
+
+        A très vite sur Immersion Facilitée,
+        L'équipe d'Immersion Facilitée`,
       }),
     },
     SHARE_DRAFT_CONVENTION_BY_LINK: {
@@ -1504,7 +1508,7 @@ Profil du candidat :
       potentialBeneficiaryHasWorkingExperience
         ? "j’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat"
         : "je n’ai jamais travaillé"
-    } / .
+    }.
     ${
       potentialBeneficiaryExperienceAdditionalInformation
         ? `• Informations supplémentaires sur l'expérience du candidat : ${potentialBeneficiaryExperienceAdditionalInformation}.`
@@ -1525,7 +1529,7 @@ Profil du candidat :
           content: `
           Ce candidat attend une réponse, vous pouvez :
 
-          - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton "Écrire au candidat" ci-dessus)
+          - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton ci-dessus)
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
         },
