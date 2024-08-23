@@ -23,6 +23,8 @@ const icUserRoleParams: IcUserRoleForAgencyParams = {
   roles: ["counsellor"],
   agencyId: "agency-1",
   userId: "jbab-123",
+  isNotifiedByEmail: false,
+  email: "icUserRoleParams@email.fr",
 };
 
 describe("SendEmailWhenAgencyIsActivated", () => {
@@ -151,7 +153,9 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     await notifyIcUserAgencyRightChanged.execute({
       roles: ["toReview"],
       agencyId: "agency-1",
-      userId: "jbab-123",
+      userId: icUser.id,
+      isNotifiedByEmail: false,
+      email: icUser.email,
     });
 
     expectSavedNotificationsAndEvents({

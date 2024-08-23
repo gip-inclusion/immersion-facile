@@ -15,11 +15,13 @@ export type IcUserRoleForAgencyParams = {
   agencyId: AgencyId;
   roles: AgencyRole[];
   userId: UserId;
+  isNotifiedByEmail: boolean;
+  email: string;
 };
 
 export type RejectIcUserRoleForAgencyParams = OmitFromExistingKeys<
   IcUserRoleForAgencyParams,
-  "roles"
+  "roles" | "isNotifiedByEmail" | "email"
 > & {
   justification: string;
 };

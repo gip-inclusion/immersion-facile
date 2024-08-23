@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
+import { emailSchema } from "../email/email.schema";
 import {
   agencyRoleSchema,
   userIdSchema,
@@ -20,6 +21,8 @@ export const icUserRoleForAgencyParamsSchema: z.Schema<IcUserRoleForAgencyParams
     agencyId: agencyIdSchema,
     userId: userIdSchema,
     roles: z.array(agencyRoleSchema),
+    isNotifiedByEmail: z.boolean(),
+    email: emailSchema,
   });
 
 export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleForAgencyParams> =
