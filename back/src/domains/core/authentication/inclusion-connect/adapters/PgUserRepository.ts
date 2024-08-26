@@ -134,7 +134,10 @@ export class PgUserRepository implements UserRepository {
   public async updateAgencyRights({
     userId,
     agencyRights,
-  }: { userId: UserId; agencyRights: AgencyRight[] }): Promise<void> {
+  }: {
+    userId: UserId;
+    agencyRights: AgencyRight[];
+  }): Promise<void> {
     await this.transaction
       .deleteFrom("users__agencies")
       .where("user_id", "=", userId)
@@ -274,6 +277,17 @@ export class PgUserRepository implements UserRepository {
         ...(isBackofficeAdmin ? { isBackofficeAdmin: true } : {}),
       }),
     );
+  }
+
+  public async updateEmail(userId: string, email: string): Promise<void> {
+    await this.transaction
+      .updateTable("users")
+      .set({
+        email,
+        updated_at: sql`now()`,
+      })
+      .where("id", "=", userId)
+      .execute();
   }
 }
 

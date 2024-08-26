@@ -25,4 +25,5 @@ export interface UserRepository {
     userId: UserId;
     agencyRights: AgencyRight[];
   }): Promise<void>;
+  updateEmail(userId: string, email: string): Promise<void>;
 }

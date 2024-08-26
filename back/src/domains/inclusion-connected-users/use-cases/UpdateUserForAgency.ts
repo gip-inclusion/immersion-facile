@@ -1,13 +1,14 @@
 import {
   AgencyDto,
   AgencyRight,
-  UserUpdateParamsForAgency,
   InclusionConnectedUser,
+  UserUpdateParamsForAgency,
   errors,
-  userUpdateParamsForAgencySchema,
   replaceElementWhere,
+  userUpdateParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -124,6 +125,25 @@ const makeAgencyRights = async (
   return newAgencyRights;
 };
 
+const rejectEmailModificationIfInclusionConnectedUser = (
+  user: InclusionConnectedUser,
+  newEmail: string | null,
+) => {
+  if (!newEmail || !user.externalId) return;
+  if (user.email !== newEmail) {
+    throw errors.user.forbiddenToChangeEmailForUIcUser();
+  }
+};
+
+const updateIfUserEmailChanged = async (
+  user: InclusionConnectedUser,
+  newEmail: string | null,
+  userRepository: UserRepository,
+) => {
+  if (!newEmail || user.email === newEmail) return;
+  await userRepository.updateEmail(user.id, newEmail);
+};
+
 export class UpdateUserForAgency extends TransactionalUseCase<
   UserUpdateParamsForAgency,
   void,
@@ -152,6 +172,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
     const newAgencyRights = await makeAgencyRights(uow, params, userToUpdate);
+    rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 
     const event: DomainEvent = this.#createNewEvent({
       topic: "IcUserAgencyRightChanged",
@@ -169,6 +190,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
         userId: params.userId,
         agencyRights: newAgencyRights,
       }),
+      updateIfUserEmailChanged(userToUpdate, params.email, uow.userRepository),
       uow.outboxRepository.save(event),
     ]);
   }

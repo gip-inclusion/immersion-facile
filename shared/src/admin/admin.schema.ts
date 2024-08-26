@@ -22,7 +22,7 @@ export const userUpdateParamsForAgencySchema: z.Schema<UserUpdateParamsForAgency
     userId: userIdSchema,
     roles: z.array(agencyRoleSchema),
     isNotifiedByEmail: z.boolean(),
-    email: emailSchema,
+    email: emailSchema.or(z.null()),
   });
 
 export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleForAgencyParams> =

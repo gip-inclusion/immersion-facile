@@ -16,7 +16,7 @@ export type UserUpdateParamsForAgency = {
   roles: AgencyRole[];
   userId: UserId;
   isNotifiedByEmail: boolean;
-  email: string;
+  email: string | null;
 };
 
 export type RejectIcUserRoleForAgencyParams = OmitFromExistingKeys<

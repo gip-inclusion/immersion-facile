@@ -324,6 +324,10 @@ export const errors = {
       new ConflictError(
         `L'utilisateur ayant l'externalId ${externalId} existe déjà.`,
       ),
+    forbiddenToChangeEmailForUIcUser: () =>
+      new ForbiddenError(
+        "Il n'est pas possible de modifier un mail d'un utilisateur inclusion connecté.",
+      ),
   },
   broadcastFeedback: {
     notFound: ({

@@ -135,7 +135,7 @@ describe("PgAuthenticatedUserRepository", () => {
   describe("getById", () => {
     describe("when no agency is connected", () => {
       it("gets the Inclusion Connected User from its Id", async () => {
-        await insertUser(user1);
+        await insertUser(db, user1);
         await db
           .insertInto("users_admins")
           .values({ user_id: user1.id })
@@ -151,7 +151,7 @@ describe("PgAuthenticatedUserRepository", () => {
       });
 
       it("gets the inclusion connected User with admin right for admins", async () => {
-        await insertUser(user1);
+        await insertUser(db, user1);
         const inclusionConnectedUser = await userRepository.getById(user1.id);
         expectToEqual(inclusionConnectedUser, {
           ...user1,
@@ -166,17 +166,17 @@ describe("PgAuthenticatedUserRepository", () => {
       await Promise.all([
         await agencyRepository.insert(agency1),
         await agencyRepository.insert(agency2),
-        await insertUser(user1),
+        await insertUser(db, user1),
       ]);
 
       // create the link between the user and the agencies
-      await insertAgencyRegistrationToUser({
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user1.id,
         roles: ["toReview"],
         isNotifiedByEmail: false,
       });
-      await insertAgencyRegistrationToUser({
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency2.id,
         userId: user1.id,
         roles: ["validator"],
@@ -229,7 +229,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await establishmentRepository.insertEstablishmentAggregate(
         establishment2,
       );
-      await insertUser(user1);
+      await insertUser(db, user1);
       await db
         .insertInto("users_admins")
         .values({ user_id: user1.id })
@@ -260,7 +260,7 @@ describe("PgAuthenticatedUserRepository", () => {
   describe("updateAgencyRights", () => {
     it("updates an element in users__agencies table", async () => {
       await agencyRepository.insert(agency1);
-      await insertUser(user1);
+      await insertUser(db, user1);
       const agencyRights: AgencyRight[] = [
         {
           roles: ["counsellor"],
@@ -309,7 +309,7 @@ describe("PgAuthenticatedUserRepository", () => {
 
     it("adds an element in users__agencies table", async () => {
       await agencyRepository.insert(agency1);
-      await insertUser(user1);
+      await insertUser(db, user1);
       const icUserToUpdate: InclusionConnectedUser = {
         ...user1,
         establishments: [],
@@ -334,7 +334,7 @@ describe("PgAuthenticatedUserRepository", () => {
 
     it("Delete an element in users__agencies table when no agency rights are provided", async () => {
       await agencyRepository.insert(agency1);
-      await insertUser(user1);
+      await insertUser(db, user1);
       const icUserToSave: InclusionConnectedUser = {
         ...user1,
         establishments: [],
@@ -355,7 +355,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await agencyRepository.insert(agency1);
       await agencyRepository.insert(agency2);
 
-      await insertUser(user1);
+      await insertUser(db, user1);
 
       const icUserToSave: InclusionConnectedUser = {
         ...user1,
@@ -395,11 +395,45 @@ describe("PgAuthenticatedUserRepository", () => {
     });
   });
 
+  describe("update user", () => {
+    it("updates  users email in users table", async () => {
+      await agencyRepository.insert(agency1);
+      await insertUser(db, user1);
+      await insertAgencyRegistrationToUser(db, {
+        agencyId: agency1.id,
+        userId: user1.id,
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+      });
+      const updatedEmail = "new-email@email.fr";
+
+      await userRepository.updateEmail(user1.id, updatedEmail);
+
+      const agencyRights: AgencyRight[] = [
+        {
+          roles: ["counsellor"],
+          agency: agency1,
+          isNotifiedByEmail: false,
+        },
+      ];
+      expectToEqual(await userRepository.getById(user1.id), {
+        ...user1,
+        email: updatedEmail,
+        establishments: [],
+        agencyRights: agencyRights,
+        ...withEmptyDashboards,
+      });
+    });
+  });
+
   describe("getWithFilters", () => {
     it("returns empty array if no filters are given", async () => {
-      await Promise.all([agencyRepository.insert(agency1), insertUser(user1)]);
+      await Promise.all([
+        agencyRepository.insert(agency1),
+        insertUser(db, user1),
+      ]);
 
-      await insertAgencyRegistrationToUser({
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user1.id,
         roles: ["toReview"],
@@ -413,21 +447,21 @@ describe("PgAuthenticatedUserRepository", () => {
     it("fetches Inclusion Connected Users with status 'toReview'", async () => {
       await agencyRepository.insert(agency1);
       await agencyRepository.insert(agency2);
-      await insertUser(user1);
-      await insertUser(user2);
-      await insertAgencyRegistrationToUser({
+      await insertUser(db, user1);
+      await insertUser(db, user2);
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user1.id,
         roles: ["toReview"],
         isNotifiedByEmail: false,
       });
-      await insertAgencyRegistrationToUser({
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency2.id,
         userId: user1.id,
         roles: ["validator"],
         isNotifiedByEmail: false,
       });
-      await insertAgencyRegistrationToUser({
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency2.id,
         userId: user2.id,
         roles: ["toReview"],
@@ -462,21 +496,21 @@ describe("PgAuthenticatedUserRepository", () => {
     it("fetches inclusion connected users given its status 'validator' and agencyId", async () => {
       await agencyRepository.insert(agency1);
       await agencyRepository.insert(agency2);
-      await insertUser(user1);
-      await insertUser(user2);
-      await insertAgencyRegistrationToUser({
+      await insertUser(db, user1);
+      await insertUser(db, user2);
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user1.id,
         roles: ["validator"],
         isNotifiedByEmail: false,
       });
-      await insertAgencyRegistrationToUser({
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user2.id,
         roles: ["toReview"],
         isNotifiedByEmail: false,
       });
-      await insertAgencyRegistrationToUser({
+      await insertAgencyRegistrationToUser(db, {
         agencyId: agency2.id,
         userId: user1.id,
         roles: ["validator"],
@@ -518,53 +552,11 @@ describe("PgAuthenticatedUserRepository", () => {
     });
   });
 
-  const insertUser = async ({
-    id,
-    email,
-    firstName,
-    lastName,
-    externalId,
-    createdAt,
-  }: User) => {
-    await db
-      .insertInto("users")
-      .values({
-        id,
-        email,
-        first_name: firstName,
-        last_name: lastName,
-        external_id: externalId,
-        created_at: createdAt,
-      })
-      .execute();
-  };
-
-  const insertAgencyRegistrationToUser = async ({
-    userId,
-    agencyId,
-    roles,
-    isNotifiedByEmail,
-  }: {
-    userId: UserId;
-    agencyId: AgencyId;
-    roles: AgencyRole[];
-    isNotifiedByEmail: boolean;
-  }) => {
-    await db
-      .insertInto("users__agencies")
-      .values({
-        user_id: userId,
-        agency_id: agencyId,
-        roles: JSON.stringify(roles),
-        is_notified_by_email: isNotifiedByEmail,
-      })
-      .execute();
-  };
   describe("delete", () => {
     it("deletes an existing user", async () => {
-      await insertUser(user1);
+      await insertUser(db, user1);
       await agencyRepository.insert(agency1);
-      await insertAgencyRegistrationToUser({
+      await insertAgencyRegistrationToUser(db, {
         userId: user1.id,
         agencyId: agency1.id,
         roles: ["validator"],
@@ -637,3 +629,45 @@ const agency2 = new AgencyDtoBuilder()
   .withName("Agence 2")
   .withKind("cci")
   .build();
+
+const insertUser = async (
+  db: KyselyDb,
+  { id, email, firstName, lastName, externalId, createdAt }: User,
+) => {
+  await db
+    .insertInto("users")
+    .values({
+      id,
+      email,
+      first_name: firstName,
+      last_name: lastName,
+      external_id: externalId,
+      created_at: createdAt,
+    })
+    .execute();
+};
+
+const insertAgencyRegistrationToUser = async (
+  db: KyselyDb,
+  {
+    userId,
+    agencyId,
+    roles,
+    isNotifiedByEmail,
+  }: {
+    userId: UserId;
+    agencyId: AgencyId;
+    roles: AgencyRole[];
+    isNotifiedByEmail: boolean;
+  },
+) => {
+  await db
+    .insertInto("users__agencies")
+    .values({
+      user_id: userId,
+      agency_id: agencyId,
+      roles: JSON.stringify(roles),
+      is_notified_by_email: isNotifiedByEmail,
+    })
+    .execute();
+};
