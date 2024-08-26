@@ -5,7 +5,7 @@ import {
   DateString,
   EstablishmentJwtPayload,
   Flavor,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   RejectIcUserRoleForAgencyParams,
   Role,
   SiretDto,
@@ -155,7 +155,7 @@ export type DomainEvent =
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
   | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: UserId; agencyIds: AgencyId[] } & WithTriggeredBy>
-  | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams & WithTriggeredBy>
+  | GenericEvent<"IcUserAgencyRightChanged", UserUpdateParamsForAgency & WithTriggeredBy>
   | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams & WithTriggeredBy>
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string } & WithTriggeredBy>

@@ -6,7 +6,7 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
-  IcUserRoleForAgencyParams,
+  IcUserForAgencyParams,
   InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
@@ -42,7 +42,7 @@ export interface AdminGateway {
   ): Observable<NotificationsByKind>;
 
   updateUserRoleForAgency$(
-    params: IcUserRoleForAgencyParams,
+    params: IcUserForAgencyParams,
     token: InclusionConnectJwt,
   ): Observable<void>;
 

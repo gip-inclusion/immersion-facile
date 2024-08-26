@@ -8,7 +8,7 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
@@ -157,7 +157,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 
   public updateUserRoleForAgency$(
-    { agencyId }: IcUserRoleForAgencyParams,
+    { agencyId }: UserUpdateParamsForAgency,
     _token: string,
   ): Observable<void> {
     return agencyId === "non-existing-agency-id"

@@ -7,7 +7,7 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   InclusionConnectJwt,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
@@ -183,7 +183,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public updateUserRoleForAgency$(
-    params: IcUserRoleForAgencyParams,
+    params: UserUpdateParamsForAgency,
     token: string,
   ): Observable<void> {
     return from(

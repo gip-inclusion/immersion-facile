@@ -3,7 +3,7 @@ import {
   AgencyDtoBuilder,
   AgencyRight,
   AgencyRole,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   User,
@@ -22,7 +22,7 @@ import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGa
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UpdateIcUserRoleForAgency } from "./UpdateIcUserRoleForAgency";
+import { UpdateUserForAgency } from "./UpdateUserForAgency";
 
 const backofficeAdminUser = new InclusionConnectedUserBuilder()
   .withId("backoffice-admin-id")
@@ -35,7 +35,7 @@ const notAdminUser = new InclusionConnectedUserBuilder()
   .build();
 
 describe("GetInclusionConnectedUsers", () => {
-  let updateIcUserRoleForAgency: UpdateIcUserRoleForAgency;
+  let updateIcUserRoleForAgency: UpdateUserForAgency;
   let uowPerformer: InMemoryUowPerformer;
   let userRepository: InMemoryUserRepository;
   let timeGateway: CustomTimeGateway;
@@ -62,7 +62,7 @@ describe("GetInclusionConnectedUsers", () => {
       backofficeAdminUser,
       notAdminUser,
     ]);
-    updateIcUserRoleForAgency = new UpdateIcUserRoleForAgency(
+    updateIcUserRoleForAgency = new UpdateUserForAgency(
       uowPerformer,
       createNewEvent,
     );
@@ -237,7 +237,7 @@ describe("GetInclusionConnectedUsers", () => {
 
     userRepository.setInclusionConnectedUsers([backofficeAdminUser, icUser]);
     const newRole: AgencyRole = "validator";
-    const icUserRoleForAgency: IcUserRoleForAgencyParams = {
+    const icUserRoleForAgency: UserUpdateParamsForAgency = {
       userId: notAdminUser.id,
       agencyId: agency.id,
       roles: [newRole],
@@ -297,7 +297,7 @@ describe("GetInclusionConnectedUsers", () => {
       validator,
     ]);
 
-    const icUserRoleForAgency: IcUserRoleForAgencyParams = {
+    const icUserRoleForAgency: UserUpdateParamsForAgency = {
       roles: ["counsellor", "validator", "agencyOwner"],
       agencyId: agency.id,
       userId: notAdminUser.id,

@@ -4,7 +4,7 @@ import { map, switchMap } from "rxjs/operators";
 import {
   AgencyId,
   AgencyRight,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   WithUserFilters,
@@ -78,7 +78,7 @@ const registerAgencyToUserEpic: IcUsersAdminActionEpic = (
     filter(
       icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested.match,
     ),
-    switchMap((action: PayloadAction<IcUserRoleForAgencyParams>) =>
+    switchMap((action: PayloadAction<UserUpdateParamsForAgency>) =>
       adminGateway
         .updateUserRoleForAgency$(action.payload, getAdminToken(state$.value))
         .pipe(

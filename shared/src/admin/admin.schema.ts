@@ -9,14 +9,14 @@ import {
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1 } from "../zodUtils";
 import {
-  IcUserRoleForAgencyParams,
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
   RejectIcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   WithUserFilters,
 } from "./admin.dto";
 
-export const icUserRoleForAgencyParamsSchema: z.Schema<IcUserRoleForAgencyParams> =
+export const userUpdateParamsForAgencySchema: z.Schema<UserUpdateParamsForAgency> =
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,

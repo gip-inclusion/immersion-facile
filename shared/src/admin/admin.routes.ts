@@ -18,7 +18,7 @@ import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclu
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
-  icUserRoleForAgencyParamsSchema,
+  userUpdateParamsForAgencySchema,
   rejectIcUserRoleForAgencyParamsSchema,
   withUserFiltersSchema,
 } from "./admin.schema";
@@ -50,7 +50,7 @@ export const adminRoutes = defineRoutes({
   updateUserRoleForAgency: defineRoute({
     method: "patch",
     url: "/admin/inclusion-connected/users",
-    requestBodySchema: icUserRoleForAgencyParamsSchema,
+    requestBodySchema: userUpdateParamsForAgencySchema,
     ...withAuthorizationHeaders,
     responses: {
       201: expressEmptyResponseBody,
