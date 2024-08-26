@@ -4,6 +4,7 @@ import {
   WithAgencyId,
 } from "../agency/agency.dto";
 import { ConventionId } from "../convention/convention.dto";
+import { Email } from "../email/email.dto";
 import {
   AgencyRole,
   UserId,
@@ -16,7 +17,7 @@ export type UserUpdateParamsForAgency = {
   roles: AgencyRole[];
   userId: UserId;
   isNotifiedByEmail: boolean;
-  email: string | null;
+  email: Email | null;
 };
 
 export type RejectIcUserRoleForAgencyParams = OmitFromExistingKeys<

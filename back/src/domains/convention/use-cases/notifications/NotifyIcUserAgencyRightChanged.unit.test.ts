@@ -1,7 +1,7 @@
 import {
   AgencyDtoBuilder,
-  UserUpdateParamsForAgency,
   InclusionConnectedUser,
+  UserUpdateParamsForAgency,
   errors,
   expectPromiseToFailWithError,
 } from "shared";

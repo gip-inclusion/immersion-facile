@@ -1,25 +1,22 @@
 import { FrClassName, fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { values } from "ramda";
 import React, { useState } from "react";
-import { Tooltip, keys } from "react-design-system";
+import { Tooltip } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   AgencyId,
   AgencyRole,
-  Email,
   UserUpdateParamsForAgency,
   domElementIds,
 } from "shared";
+import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { Feedback } from "../feedback/Feedback";
 
@@ -65,34 +62,12 @@ const manageUserModal = createModal({
 
 export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
   const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
-  const agency = useAppSelector(agencyAdminSelectors.agency);
   const dispatch = useDispatch();
 
   const [selectedUserData, setSelectedUserData] = useState<
-    (UserUpdateParamsForAgency & { userEmail: Email }) | null
+    (UserUpdateParamsForAgency & { isIcUser: boolean }) | null
   >(null);
 
-  const checkboxOptions = keys(agencyRoleToDisplay).map((roleKey) => {
-    return {
-      label: agencyRoleToDisplay[roleKey].label,
-      nativeInputProps: {
-        name: roleKey,
-        value: roleKey,
-        checked: selectedUserData?.roles.includes(roleKey),
-        onChange: () => {
-          if (selectedUserData) {
-            const { roles } = selectedUserData;
-            setSelectedUserData({
-              ...selectedUserData,
-              roles: roles.includes(roleKey)
-                ? roles.filter((r) => r !== roleKey)
-                : [...roles, roleKey],
-            });
-          }
-        },
-      },
-    };
-  });
   return (
     <>
       <h5 className={fr.cx("fr-h5", "fr-mb-1v", "fr-mt-4w")}>Utilisateurs</h5>
@@ -148,13 +123,16 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
               id={`${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agencyId}-${index}`}
               onClick={() => {
                 dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-                manageUserModal.open();
                 setSelectedUserData({
                   agencyId,
                   userId: agencyUser.id,
                   roles: agencyUser.agencyRights[agencyId].roles,
-                  userEmail: agencyUser.email,
+                  email: agencyUser.email,
+                  isNotifiedByEmail:
+                    agencyUser.agencyRights[agencyId].isNotifiedByEmail,
+                  isIcUser: !!agencyUser.externalId,
                 });
+                manageUserModal.open();
               }}
             >
               Modifier
@@ -166,41 +144,10 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
       {createPortal(
         <manageUserModal.Component title="Modifier le rôle de l'utilisateur">
           {selectedUserData && (
-            <>
-              <div className={fr.cx("fr-mb-2w", "fr-mt-1v")}>
-                Utilisateur : {selectedUserData.userEmail}
-              </div>
-
-              <Checkbox
-                id={domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}
-                legend="Rôles :"
-                options={
-                  agency && agency.counsellorEmails.length > 0
-                    ? checkboxOptions
-                    : checkboxOptions.filter(
-                        (option) => option.label !== "Pré-validateur",
-                      )
-                }
-              />
-
-              <Button
-                id={
-                  domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton
-                }
-                className={fr.cx("fr-mt-2w")}
-                onClick={() => {
-                  dispatch(
-                    icUsersAdminSlice.actions.updateUserOnAgencyRequested({
-                      ...selectedUserData,
-                      feedbackTopic: "agency-user",
-                    }),
-                  );
-                  manageUserModal.close();
-                }}
-              >
-                Valider
-              </Button>
-            </>
+            <AgencyUserModificationForm
+              agencyUser={selectedUserData}
+              closeModal={() => manageUserModal.close}
+            />
           )}
         </manageUserModal.Component>,
         document.body,

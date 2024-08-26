@@ -2,11 +2,11 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   AgencyId,
   AgencyRight,
-  UserUpdateParamsForAgency,
   InclusionConnectedUser,
   OmitFromExistingKeys,
   RejectIcUserRoleForAgencyParams,
   UserId,
+  UserUpdateParamsForAgency,
   WithUserFilters,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
@@ -173,8 +173,18 @@ export const icUsersAdminSlice = createSlice({
       action: PayloadActionWithFeedbackTopic<UserUpdateParamsForAgency>,
     ) => {
       state.isUpdatingIcUserAgency = false;
-      const { userId, agencyId, roles: newRoles } = action.payload;
+      const {
+        userId,
+        agencyId,
+        roles: newRoles,
+        email,
+        isNotifiedByEmail,
+      } = action.payload;
       state.agencyUsers[userId].agencyRights[agencyId].roles = newRoles;
+      state.agencyUsers[userId].agencyRights[agencyId].isNotifiedByEmail =
+        isNotifiedByEmail;
+      state.agencyUsers[userId].email =
+        email ?? state.agencyUsers[userId].email;
     },
 
     updateUserOnAgencyFailed: (

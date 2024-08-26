@@ -4,9 +4,9 @@ import { map, switchMap } from "rxjs/operators";
 import {
   AgencyId,
   AgencyRight,
-  UserUpdateParamsForAgency,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   WithUserFilters,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";

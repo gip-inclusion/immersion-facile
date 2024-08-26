@@ -6,12 +6,12 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
-  IcUserForAgencyParams,
   InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
+  UserUpdateParamsForAgency,
   WithUserFilters,
 } from "shared";
 
@@ -42,7 +42,7 @@ export interface AdminGateway {
   ): Observable<NotificationsByKind>;
 
   updateUserRoleForAgency$(
-    params: IcUserForAgencyParams,
+    params: UserUpdateParamsForAgency,
     token: InclusionConnectJwt,
   ): Observable<void>;
 

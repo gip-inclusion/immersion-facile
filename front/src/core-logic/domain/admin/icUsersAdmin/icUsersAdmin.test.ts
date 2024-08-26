@@ -4,9 +4,9 @@ import {
   AgencyDtoBuilder,
   AgencyId,
   AgencyRight,
-  UserUpdateParamsForAgency,
   RejectIcUserRoleForAgencyParams,
   User,
+  UserUpdateParamsForAgency,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -297,6 +297,8 @@ describe("Agency registration for authenticated users", () => {
         agencyId: "agency-3",
         userId: user2Id,
         roles: ["validator"],
+        isNotifiedByEmail: false,
+        email: "email@email.fr",
       };
 
       expectToEqual(
@@ -330,6 +332,8 @@ describe("Agency registration for authenticated users", () => {
         agencyId: "agency-3",
         userId: "user-id",
         roles: ["validator"],
+        isNotifiedByEmail: false,
+        email: "email@email.fr",
       };
       const errorMessage = `Error registering user ${payload.userId} to agency ${payload.agencyId} with roles ${payload.roles}`;
 
@@ -414,11 +418,13 @@ describe("Agency registration for authenticated users", () => {
       const originalUser = testUserSet[user1Id];
       const updatedUser: NormalizedInclusionConnectedUser = {
         ...originalUser,
+        email: "updated-email@email.fr",
         agencyRights: {
           ...originalUser.agencyRights,
           [agency2.id]: {
             ...originalUser.agencyRights[agency2.id],
             roles: ["agencyOwner", "validator"],
+            isNotifiedByEmail: false,
           },
         },
       };
@@ -434,6 +440,8 @@ describe("Agency registration for authenticated users", () => {
           agencyId: agency2.id,
           roles: updatedUser.agencyRights[agency2.id].roles,
           feedbackTopic: "agency-user",
+          isNotifiedByEmail: false,
+          email: "updated-email@email.fr",
         }),
       );
 
@@ -486,6 +494,8 @@ describe("Agency registration for authenticated users", () => {
           agencyId: agency2.id,
           roles: originalUser.agencyRights[agency2.id].roles,
           feedbackTopic: "agency-user",
+          isNotifiedByEmail: false,
+          email: "email@email.fr",
         }),
       );
 
@@ -532,6 +542,8 @@ describe("Agency registration for authenticated users", () => {
           agencyId: agency3.id,
           roles: ["validator"],
           feedbackTopic: "agency-user",
+          isNotifiedByEmail: false,
+          email: "email@email.fr",
         }),
       );
       expectIsUpdatingUserAgencyToBe(true);
