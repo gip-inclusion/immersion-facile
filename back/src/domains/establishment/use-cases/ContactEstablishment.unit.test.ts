@@ -101,6 +101,7 @@ describe("ContactEstablishment", () => {
   let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
   let uow: InMemoryUnitOfWork;
+  const domain = "domain.fr";
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -119,6 +120,7 @@ describe("ContactEstablishment", () => {
       uuidGenerator,
       timeGateway,
       minimumNumberOfDaysBetweenSimilarContactRequests,
+      domain,
     );
   });
 
@@ -325,7 +327,7 @@ describe("ContactEstablishment", () => {
   <table width="600">
     <tr>
       <td>
-        <p>Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.<br/><br/>Bonne journée,<br/>L'équipe Immersion Facilitée</p>
+        <p><strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.<br/>Créer votre compte avec le même mail que celui avec lequel les candidats vous contactent.<br/><br/>Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.<br/><br/>Bonne journée,<br/>L'équipe Immersion Facilitée</p>
       </td>
     </tr>
   </table>

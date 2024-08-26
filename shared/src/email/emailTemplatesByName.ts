@@ -85,8 +85,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             url: `https://${domain}/${frontRoutes.establishmentDashboard}`,
           },
         ],
-        subContent: `
-        <strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.
+        subContent: `<strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.
         Créer votre compte avec le même mail que celui avec lequel les candidats vous contactent.
 
         A très vite sur Immersion Facilitée,
@@ -1486,7 +1485,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         potentialBeneficiaryDatePreferences,
         potentialBeneficiaryExperienceAdditionalInformation,
         potentialBeneficiaryHasWorkingExperience,
-        replyToEmail,
+        domain,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
@@ -1521,8 +1520,9 @@ Profil du candidat :
     }`,
         buttons: [
           {
-            label: "Écrire au candidat",
-            url: `mailto:${replyToEmail}`,
+            label: "Répondre au candidat via mon espace",
+            target: "_blank",
+            url: `https://${domain}/${frontRoutes.establishmentDashboard}/discussions?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
           },
         ],
         highlight: {
@@ -1533,7 +1533,10 @@ Profil du candidat :
 
           - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
         },
-        subContent: `Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
+        subContent: `<strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.
+        Créer votre compte avec le même mail que celui avec lequel les candidats vous contactent.
+        
+        Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
         ${defaultSignature("immersion")}`,
       }),
     },

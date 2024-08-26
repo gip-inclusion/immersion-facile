@@ -32,12 +32,15 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
   readonly #minimumNumberOfDaysBetweenSimilarContactRequests: number;
 
+  readonly #domain: string;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
     uuidGenerator: UuidGenerator,
     timeGateway: TimeGateway,
     minimumNumberOfDaysBetweenSimilarContactRequests: number,
+    domain: string,
   ) {
     super(uowPerformer);
 
@@ -46,6 +49,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     this.#minimumNumberOfDaysBetweenSimilarContactRequests =
       minimumNumberOfDaysBetweenSimilarContactRequests;
     this.#createNewEvent = createNewEvent;
+    this.#domain = domain;
   }
 
   public async _execute(
@@ -123,6 +127,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       establishment: establishmentAggregate.establishment,
       now,
       uow,
+      domain: this.#domain,
     });
 
     await uow.discussionRepository.insert(discussion);
@@ -153,12 +158,14 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     establishment,
     now,
     uow,
+    domain,
   }: {
     contactRequest: ContactEstablishmentRequestDto;
     contact: ContactEntity;
     establishment: EstablishmentEntity;
     now: Date;
     uow: UnitOfWork;
+    domain: string;
   }): Promise<DiscussionDto> {
     const matchingAddress = establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
@@ -210,6 +217,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
                 contactRequest.experienceAdditionalInformation,
               potentialBeneficiaryHasWorkingExperience:
                 contactRequest.hasWorkingExperience,
+              domain,
             },
             { showContentParts: true },
           )

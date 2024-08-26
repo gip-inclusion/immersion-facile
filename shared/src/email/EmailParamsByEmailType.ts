@@ -110,6 +110,7 @@ export type EmailParamsByEmailType = {
     potentialBeneficiaryDatePreferences?: string;
     potentialBeneficiaryHasWorkingExperience?: boolean;
     potentialBeneficiaryExperienceAdditionalInformation?: string;
+    domain: string;
   };
   CONTACT_BY_EMAIL_REQUEST_LEGACY: {
     businessName: string;

@@ -21,6 +21,8 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
+  readonly #domain: string;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -28,6 +30,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
   ) {
     super(uowPerformer);
     this.#replyDomain = `reply.${domain}`;
+    this.#domain = domain;
 
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
@@ -98,6 +101,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               discussion.potentialBeneficiary.experienceAdditionalInformation,
             potentialBeneficiaryHasWorkingExperience:
               discussion.potentialBeneficiary.hasWorkingExperience,
+            domain: this.#domain,
           },
         };
         if (payload.isLegacy) {

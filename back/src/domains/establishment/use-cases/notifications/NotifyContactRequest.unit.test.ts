@@ -34,6 +34,7 @@ describe("NotifyContactRequest", () => {
   let romeRepository: InMemoryRomeRepository;
   let notifyContactRequest: NotifyContactRequest;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  const domain = "reply.domain.com";
 
   beforeEach(() => {
     const uow = createInMemoryUow();
@@ -55,7 +56,7 @@ describe("NotifyContactRequest", () => {
     notifyContactRequest = new NotifyContactRequest(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
-      "reply.domain.com",
+      domain,
     );
   });
 
@@ -131,6 +132,7 @@ describe("NotifyContactRequest", () => {
               potentialBeneficiaryResumeLink:
                 discussion.potentialBeneficiary.resumeLink,
               businessAddress: addressDtoToString(discussion.address),
+              domain,
             },
             cc: establishmentContact.copyEmails,
           },
