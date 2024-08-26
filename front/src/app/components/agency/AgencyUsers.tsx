@@ -13,7 +13,7 @@ import {
   AgencyId,
   AgencyRole,
   Email,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   domElementIds,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -69,7 +69,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
   const dispatch = useDispatch();
 
   const [selectedUserData, setSelectedUserData] = useState<
-    (IcUserRoleForAgencyParams & { userEmail: Email }) | null
+    (UserUpdateParamsForAgency & { userEmail: Email }) | null
   >(null);
 
   const checkboxOptions = keys(agencyRoleToDisplay).map((roleKey) => {

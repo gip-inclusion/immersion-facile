@@ -5,7 +5,7 @@ import {
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
@@ -89,7 +89,7 @@ export class TestAdminGateway implements AdminGateway {
   }
 
   public updateUserRoleForAgency$(
-    _params: IcUserRoleForAgencyParams,
+    _params: UserUpdateParamsForAgency,
     _token: string,
   ): Observable<void> {
     return this.updateAgencyRoleForUserResponse$;

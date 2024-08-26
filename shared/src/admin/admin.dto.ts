@@ -11,7 +11,7 @@ import {
 import { SiretDto } from "../siret/siret";
 import { OmitFromExistingKeys } from "../utils";
 
-export type IcUserRoleForAgencyParams = {
+export type UserUpdateParamsForAgency = {
   agencyId: AgencyId;
   roles: AgencyRole[];
   userId: UserId;
@@ -20,7 +20,7 @@ export type IcUserRoleForAgencyParams = {
 };
 
 export type RejectIcUserRoleForAgencyParams = OmitFromExistingKeys<
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   "roles" | "isNotifiedByEmail" | "email"
 > & {
   justification: string;

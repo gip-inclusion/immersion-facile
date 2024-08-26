@@ -1,7 +1,7 @@
 import {
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   errors,
-  icUserRoleForAgencyParamsSchema,
+  userUpdateParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -9,10 +9,10 @@ import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   void
 > {
-  protected inputSchema = icUserRoleForAgencyParamsSchema;
+  protected inputSchema = userUpdateParamsForAgencySchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -25,7 +25,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: IcUserRoleForAgencyParams,
+    params: UserUpdateParamsForAgency,
     uow: UnitOfWork,
   ): Promise<void> {
     const agency = await uow.agencyRepository.getById(params.agencyId);

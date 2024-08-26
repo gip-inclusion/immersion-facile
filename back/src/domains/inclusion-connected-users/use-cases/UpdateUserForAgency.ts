@@ -1,10 +1,10 @@
 import {
   AgencyDto,
   AgencyRight,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   InclusionConnectedUser,
   errors,
-  icUserRoleForAgencyParamsSchema,
+  userUpdateParamsForAgencySchema,
   replaceElementWhere,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -16,7 +16,7 @@ import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 const rejectIfAgencyWontHaveValidators = async (
   uow: UnitOfWork,
-  params: IcUserRoleForAgencyParams,
+  params: UserUpdateParamsForAgency,
   agency: AgencyDto,
 ) => {
   if (
@@ -42,7 +42,7 @@ const rejectIfAgencyWontHaveValidators = async (
 };
 
 const rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails = async (
-  params: IcUserRoleForAgencyParams,
+  params: UserUpdateParamsForAgency,
   agency: AgencyDto,
 ) => {
   if (
@@ -58,7 +58,7 @@ const rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails = async (
 
 const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
   uow: UnitOfWork,
-  params: IcUserRoleForAgencyParams,
+  params: UserUpdateParamsForAgency,
   agency: AgencyDto,
 ) => {
   if (
@@ -85,7 +85,7 @@ const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
 
 const makeAgencyRights = async (
   uow: UnitOfWork,
-  params: IcUserRoleForAgencyParams,
+  params: UserUpdateParamsForAgency,
   userToUpdate: InclusionConnectedUser,
 ) => {
   const agency = await uow.agencyRepository.getById(params.agencyId);
@@ -124,12 +124,12 @@ const makeAgencyRights = async (
   return newAgencyRights;
 };
 
-export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
-  IcUserRoleForAgencyParams,
+export class UpdateUserForAgency extends TransactionalUseCase<
+  UserUpdateParamsForAgency,
   void,
   InclusionConnectedUser
 > {
-  protected inputSchema = icUserRoleForAgencyParamsSchema;
+  protected inputSchema = userUpdateParamsForAgencySchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -143,7 +143,7 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: IcUserRoleForAgencyParams,
+    params: UserUpdateParamsForAgency,
     uow: UnitOfWork,
     currentUser: InclusionConnectedUser,
   ): Promise<void> {

@@ -4,7 +4,7 @@ import {
   AgencyDtoBuilder,
   AgencyId,
   AgencyRight,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   RejectIcUserRoleForAgencyParams,
   User,
   expectToEqual,
@@ -293,7 +293,7 @@ describe("Agency registration for authenticated users", () => {
         }),
       }));
 
-      const payload: IcUserRoleForAgencyParams = {
+      const payload: UserUpdateParamsForAgency = {
         agencyId: "agency-3",
         userId: user2Id,
         roles: ["validator"],
@@ -326,7 +326,7 @@ describe("Agency registration for authenticated users", () => {
     });
 
     it("stores error message when something goes wrong in the update", () => {
-      const payload: IcUserRoleForAgencyParams = {
+      const payload: UserUpdateParamsForAgency = {
         agencyId: "agency-3",
         userId: "user-id",
         roles: ["validator"],

@@ -121,7 +121,7 @@ import { GetInclusionConnectedUser } from "../../domains/inclusion-connected-use
 import { GetInclusionConnectedUsers } from "../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUsers";
 import { LinkFranceTravailUsersToTheirAgencies } from "../../domains/inclusion-connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import { RejectIcUserForAgency } from "../../domains/inclusion-connected-users/use-cases/RejectIcUserForAgency";
-import { UpdateIcUserRoleForAgency } from "../../domains/inclusion-connected-users/use-cases/UpdateIcUserRoleForAgency";
+import { UpdateUserForAgency } from "../../domains/inclusion-connected-users/use-cases/UpdateUserForAgency";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
@@ -201,7 +201,7 @@ export const createUseCases = (
       ),
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
-      updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(
+      updateIcUserRoleForAgency: new UpdateUserForAgency(
         uowPerformer,
         createNewEvent,
       ),

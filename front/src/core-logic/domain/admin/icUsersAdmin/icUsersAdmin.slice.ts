@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   AgencyId,
   AgencyRight,
-  IcUserRoleForAgencyParams,
+  UserUpdateParamsForAgency,
   InclusionConnectedUser,
   OmitFromExistingKeys,
   RejectIcUserRoleForAgencyParams,
@@ -106,13 +106,13 @@ export const icUsersAdminSlice = createSlice({
     },
     registerAgencyWithRoleToUserRequested: (
       state,
-      _action: PayloadAction<IcUserRoleForAgencyParams>,
+      _action: PayloadAction<UserUpdateParamsForAgency>,
     ) => {
       state.isUpdatingIcUserAgency = true;
     },
     registerAgencyWithRoleToUserSucceeded: (
       state,
-      action: PayloadAction<IcUserRoleForAgencyParams>,
+      action: PayloadAction<UserUpdateParamsForAgency>,
     ) => {
       const { userId, agencyId, roles: newRoles } = action.payload;
       state.isUpdatingIcUserAgency = false;
@@ -163,14 +163,14 @@ export const icUsersAdminSlice = createSlice({
 
     updateUserOnAgencyRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<IcUserRoleForAgencyParams>,
+      _action: PayloadActionWithFeedbackTopic<UserUpdateParamsForAgency>,
     ) => {
       state.isUpdatingIcUserAgency = true;
     },
 
     updateUserOnAgencySucceeded: (
       state,
-      action: PayloadActionWithFeedbackTopic<IcUserRoleForAgencyParams>,
+      action: PayloadActionWithFeedbackTopic<UserUpdateParamsForAgency>,
     ) => {
       state.isUpdatingIcUserAgency = false;
       const { userId, agencyId, roles: newRoles } = action.payload;
