@@ -15,6 +15,9 @@ import {
 type AgencyRightsByUserId = Record<UserId, AgencyRight[]>;
 
 export class InMemoryUserRepository implements UserRepository {
+  public agencyRightsByUserId: AgencyRightsByUserId = {};
+  #usersById: Record<string, User> = {};
+
   public async findByExternalId(externalId: string): Promise<User | undefined> {
     return this.users.find((user) => user.externalId === externalId);
   }
@@ -131,6 +134,7 @@ export class InMemoryUserRepository implements UserRepository {
     this.agencyRightsByUserId[userId] = agencyRights;
   }
 
-  public agencyRightsByUserId: AgencyRightsByUserId = {};
-  #usersById: Record<string, User> = {};
+  public async updateEmail(userId: string, email: string): Promise<void> {
+    this.#usersById[userId].email = email;
+  }
 }
