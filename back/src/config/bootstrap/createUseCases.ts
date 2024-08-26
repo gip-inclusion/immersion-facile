@@ -376,6 +376,7 @@ export const createUseCases = (
         uuidGenerator,
         gateways.timeGateway,
         config.minimumNumberOfDaysBetweenSimilarContactRequests,
+        config.immersionFacileDomain,
       ),
       legacyContactEstablishment: new LegacyContactEstablishment(
         uowPerformer,

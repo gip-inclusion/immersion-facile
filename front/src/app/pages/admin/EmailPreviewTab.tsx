@@ -315,6 +315,7 @@ export const defaultEmailValueByEmailKind: {
     potentialBeneficiaryExperienceAdditionalInformation:
       "POTENTIAL_BENEFICIARY_EXPERIENCE_ADDITIONAL_INFORMATION",
     potentialBeneficiaryHasWorkingExperience: true,
+    domain: "immersion-facile.beta.gouv.fr",
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     businessName: "BUSINESS_NAME",
