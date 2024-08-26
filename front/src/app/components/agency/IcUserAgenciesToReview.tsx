@@ -63,6 +63,8 @@ function AgencyReviewForm({
         agencyId: agency.id,
         userId: selectedUserId,
         roles: [selectedRole],
+        isNotifiedByEmail: false,
+        email: null,
       }),
     );
   };
