@@ -18,8 +18,8 @@ import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclu
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
-  userUpdateParamsForAgencySchema,
   rejectIcUserRoleForAgencyParamsSchema,
+  userUpdateParamsForAgencySchema,
   withUserFiltersSchema,
 } from "./admin.schema";
 

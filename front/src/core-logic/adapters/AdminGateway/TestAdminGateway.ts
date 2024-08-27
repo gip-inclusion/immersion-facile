@@ -5,12 +5,12 @@ import {
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
-  UserUpdateParamsForAgency,
   InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
+  UserUpdateParamsForAgency,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
