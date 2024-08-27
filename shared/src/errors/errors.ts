@@ -288,6 +288,14 @@ export const errors = {
       new BadRequestError(
         `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence n'a qu'une seul étape de validation.`,
       ),
+
+    invalidRoleUpdateForAgencyWithRefersTo: ({
+      agencyId,
+      role,
+    }: { agencyId: AgencyId; role: AgencyRole }) =>
+      new BadRequestError(
+        `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
+      ),
   },
   user: {
     unauthorized: () => new UnauthorizedError(),
