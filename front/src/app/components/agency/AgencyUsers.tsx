@@ -146,7 +146,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
           {selectedUserData && (
             <AgencyUserModificationForm
               agencyUser={selectedUserData}
-              closeModal={() => manageUserModal.close}
+              closeModal={() => manageUserModal.close()}
             />
           )}
         </manageUserModal.Component>,

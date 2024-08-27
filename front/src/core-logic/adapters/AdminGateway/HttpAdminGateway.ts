@@ -7,11 +7,11 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
-  UserUpdateParamsForAgency,
   InclusionConnectJwt,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
+  UserUpdateParamsForAgency,
   WithUserFilters,
   createApiConsumerParamsFromApiConsumer,
 } from "shared";
