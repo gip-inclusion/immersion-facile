@@ -1,13 +1,13 @@
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
-import illustration from "../../../../public/assets/images/illustration-search-test.png";
 import Styles from "./Gradient.styles";
 
 type GradientProps = {
   children: React.ReactNode;
+  illustration: string;
 };
 
-export const Gradient = ({ children }: GradientProps) => {
+export const Gradient = ({ children, illustration }: GradientProps) => {
   const { cx } = useStyles();
   return (
     <div

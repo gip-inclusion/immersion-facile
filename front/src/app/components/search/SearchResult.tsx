@@ -13,6 +13,7 @@ import {
   frenchEstablishmentKinds,
 } from "shared";
 import { routes } from "src/app/routes/routes";
+import illustration from "src/assets/img/illustration-search-test.png";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {
@@ -106,7 +107,7 @@ const SearchResultComponent = ({
         enlargeLink
         titleAs="h2"
         imageComponent={
-          <Gradient>
+          <Gradient illustration={illustration}>
             <div className={fr.cx("fr-p-1v")}>
               {fitForDisabledWorkers && <ImTag theme="rqth" />}
               {!voluntaryToImmersion && <ImTag theme="lbb" />}
