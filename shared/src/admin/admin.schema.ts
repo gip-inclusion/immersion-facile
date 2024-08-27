@@ -12,6 +12,7 @@ import {
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
   RejectIcUserRoleForAgencyParams,
+  UserCreateParamsForAgency,
   UserUpdateParamsForAgency,
   WithUserFilters,
 } from "./admin.dto";
@@ -23,6 +24,15 @@ export const userUpdateParamsForAgencySchema: z.Schema<UserUpdateParamsForAgency
     roles: z.array(agencyRoleSchema),
     isNotifiedByEmail: z.boolean(),
     email: emailSchema.or(z.null()),
+  });
+
+export const userCreateParamsForAgencySchema: z.Schema<UserCreateParamsForAgency> =
+  z.object({
+    userId: userIdSchema,
+    agencyId: agencyIdSchema,
+    roles: z.array(agencyRoleSchema),
+    isNotifiedByEmail: z.boolean(),
+    email: emailSchema,
   });
 
 export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleForAgencyParams> =
