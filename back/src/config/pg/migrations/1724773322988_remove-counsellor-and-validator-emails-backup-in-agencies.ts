@@ -1,14 +1,16 @@
 import { MigrationBuilder } from "node-pg-migrate";
 
+const agencies = "agencies";
 const viewAgencies = "view_agencies";
 const viewAgenciesSibImport = "view_agency_email_for_sib_import";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
-  pgm.dropView("view_conventions");
-  pgm.dropView(viewAgencies);
-  pgm.dropView(viewAgenciesSibImport);
+  pgm.dropView("view_one_mail_per_agency_sib", { ifExists: true });
+  pgm.dropView("view_conventions", { ifExists: true });
+  pgm.dropView(viewAgencies, { ifExists: true });
+  pgm.dropView(viewAgenciesSibImport, { ifExists: true });
 
-  pgm.dropColumn("agencies", [
+  pgm.dropColumn(agencies, [
     "counsellor_emails_backup",
     "validator_emails_backup",
   ]);
@@ -49,4 +51,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   );
 }
 
-export async function down(_pgm: MigrationBuilder): Promise<void> {}
+export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.addColumns(agencies, {
+    counsellor_emails_backup: { type: "jsonb" },
+    validator_emails_backup: { type: "jsonb" },
+  });
+}
