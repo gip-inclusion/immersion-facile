@@ -568,6 +568,45 @@ describe("UpdateUserForAgency", () => {
       });
     });
 
+    it("Throw an error when trying to update user Role to counsellor when agency is only one step validation", async () => {
+      const oneStepValidationAgency = new AgencyDtoBuilder()
+        .withCounsellorEmails([])
+        .build();
+
+      agencyRepository.setAgencies([oneStepValidationAgency]);
+
+      const icUserWithRoleValidator = new InclusionConnectedUserBuilder()
+        .withId("not-admin-id")
+        .withIsAdmin(false)
+        .withAgencyRights([
+          {
+            agency: oneStepValidationAgency,
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+        ])
+        .build();
+
+      userRepository.setInclusionConnectedUsers([icUserWithRoleValidator]);
+
+      await expectPromiseToFailWithError(
+        updateIcUserRoleForAgency.execute(
+          {
+            agencyId: oneStepValidationAgency.id,
+            roles: ["counsellor"],
+            userId: icUserWithRoleValidator.id,
+            isNotifiedByEmail: true,
+            email: icUserWithRoleValidator.email,
+          },
+          backofficeAdminUser,
+        ),
+        errors.agency.invalidRoleUpdateForOneStepValidationAgency({
+          agencyId: oneStepValidationAgency.id,
+          role: "counsellor",
+        }),
+      );
+    });
+
     describe("cannot remove the last counsellor receiving notifications of an agency with refersTo", () => {
       let user: User;
       let agency: AgencyDto;
@@ -650,45 +689,6 @@ describe("UpdateUserForAgency", () => {
           }),
         );
       });
-    });
-
-    it("Throw an error when trying to update user Role to counsellor when agency is only one step validation", async () => {
-      const oneStepValidationAgency = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .build();
-
-      agencyRepository.setAgencies([oneStepValidationAgency]);
-
-      const icUserWithRoleValidator = new InclusionConnectedUserBuilder()
-        .withId("not-admin-id")
-        .withIsAdmin(false)
-        .withAgencyRights([
-          {
-            agency: oneStepValidationAgency,
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-        ])
-        .build();
-
-      userRepository.setInclusionConnectedUsers([icUserWithRoleValidator]);
-
-      await expectPromiseToFailWithError(
-        updateIcUserRoleForAgency.execute(
-          {
-            agencyId: oneStepValidationAgency.id,
-            roles: ["counsellor"],
-            userId: icUserWithRoleValidator.id,
-            isNotifiedByEmail: true,
-            email: icUserWithRoleValidator.email,
-          },
-          backofficeAdminUser,
-        ),
-        errors.agency.invalidRoleUpdateForOneStepValidationAgency({
-          agencyId: oneStepValidationAgency.id,
-          role: "counsellor",
-        }),
-      );
     });
   });
 });
