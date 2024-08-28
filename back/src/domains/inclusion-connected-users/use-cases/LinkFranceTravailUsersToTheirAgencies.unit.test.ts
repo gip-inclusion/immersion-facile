@@ -144,6 +144,39 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.userRepository.agencyRightsByUserId, {});
     });
+
+    it("don't add agency right to IC user if agency is closed or rejected", async () => {
+      const closedAgency = new AgencyDtoBuilder()
+        .withId("agency-id-3")
+        .withCodeSafir("agency-safir-4")
+        .withStatus("closed")
+        .build();
+
+      const rejectedAgency = new AgencyDtoBuilder()
+        .withId("agency-id-4")
+        .withCodeSafir("agency-safir-5")
+        .withStatus("rejected")
+        .build();
+      uow.agencyRepository.setAgencies([
+        ...agenciesInRepo,
+        closedAgency,
+        rejectedAgency,
+      ]);
+
+      await linkFranceTravailUsersToTheirAgencies.execute({
+        userId: "my-user-id",
+        provider: "inclusionConnect",
+        codeSafir: "agency-safir-4",
+      });
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {});
+
+      await linkFranceTravailUsersToTheirAgencies.execute({
+        userId: "my-user-id",
+        provider: "inclusionConnect",
+        codeSafir: "agency-safir-5",
+      });
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {});
+    });
   });
   describe("when safir code matches agency group", () => {
     const agencyGroup: AgencyGroup = {
@@ -246,6 +279,58 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
             isNotifiedByEmail: false,
           },
         ],
+      });
+    });
+
+    it("don't add agency right to IC user if agency is closed or rejected", async () => {
+      const closedAgency = new AgencyDtoBuilder()
+        .withId("agency-id-3")
+        .withCodeSafir("agency-safir-4")
+        .withStatus("closed")
+        .build();
+
+      const rejectedAgency = new AgencyDtoBuilder()
+        .withId("agency-id-4")
+        .withCodeSafir("agency-safir-5")
+        .withStatus("rejected")
+        .build();
+      uow.agencyRepository.setAgencies([
+        ...agenciesInRepo,
+        closedAgency,
+        rejectedAgency,
+      ]);
+      const agencyGroupWithClosedAndRejectedAgencies: AgencyGroup = {
+        siret: "12345678902345",
+        kind: "france-travail",
+        email: "agency-group-1-email@gmail.com",
+        codeSafir: agencyGroupCodeSafir,
+        departments: ["87", "23", "19"],
+        name: "DR du limousin",
+        scope: "direction-régionale",
+        agencyIds: [closedAgency.id, rejectedAgency.id],
+        ccEmails: ["fake-email1@gmail.com", "fake-email2@gmail.com"],
+      };
+      uow.agencyGroupRepository.agencyGroups = [
+        agencyGroupWithClosedAndRejectedAgencies,
+      ];
+      const icUser: InclusionConnectedUser = {
+        ...defaultUser,
+        agencyRights: [],
+        dashboards: {
+          agencies: {},
+          establishments: {},
+        },
+      };
+      uow.userRepository.setInclusionConnectedUsers([icUser]);
+
+      await linkFranceTravailUsersToTheirAgencies.execute({
+        userId: icUser.id,
+        provider: "inclusionConnect",
+        codeSafir: agencyGroupCodeSafir,
+      });
+
+      expectToEqual(uow.userRepository.agencyRightsByUserId, {
+        [icUser.id]: [],
       });
     });
   });
