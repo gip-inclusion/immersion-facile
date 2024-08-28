@@ -255,6 +255,67 @@ describe("PgAuthenticatedUserRepository", () => {
         ],
       });
     });
+
+    it("gets the icUser without the agency rights on agencies that are closed or rejected", async () => {
+      const rejectedAgency = new AgencyDtoBuilder()
+        .withValidatorEmails(["closed-agency-validator@email.fr"])
+        .withId("11111111-1111-4bbb-1111-111111111114")
+        .withStatus("rejected")
+        .withName("Agence rejected")
+        .build();
+
+      const closedAgency = new AgencyDtoBuilder()
+        .withValidatorEmails(["rejected-agency-validator@email.fr"])
+        .withId("11111111-1111-4bbb-1111-111111111115")
+        .withName("Agence closed")
+        .withStatus("closed")
+        .build();
+
+      await Promise.all([
+        await agencyRepository.insert(agency1),
+        await agencyRepository.insert(agency2),
+        await agencyRepository.insert(rejectedAgency),
+        await agencyRepository.insert(closedAgency),
+        await insertUser(db, user1),
+      ]);
+
+      // create the link between the user and the agencies
+      await insertAgencyRegistrationToUser(db, {
+        agencyId: agency1.id,
+        userId: user1.id,
+        roles: ["toReview"],
+        isNotifiedByEmail: false,
+      });
+      await insertAgencyRegistrationToUser(db, {
+        agencyId: agency2.id,
+        userId: user1.id,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      });
+      await insertAgencyRegistrationToUser(db, {
+        agencyId: closedAgency.id,
+        userId: user1.id,
+        roles: ["toReview"],
+        isNotifiedByEmail: false,
+      });
+      await insertAgencyRegistrationToUser(db, {
+        agencyId: rejectedAgency.id,
+        userId: user1.id,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      });
+
+      const inclusionConnectedUser = await userRepository.getById(user1.id);
+      expectToEqual(inclusionConnectedUser, {
+        ...user1,
+        establishments: [],
+        agencyRights: [
+          { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
+        ],
+        ...withEmptyDashboards,
+      });
+    });
   });
 
   describe("updateAgencyRights", () => {
