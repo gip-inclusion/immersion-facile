@@ -8,6 +8,7 @@ import {
   InclusionConnectedUser,
   User,
   UserId,
+  activeAgencyStatuses,
   errors,
   pipeWithValue,
 } from "shared";
@@ -190,8 +191,8 @@ export class PgUserRepository implements UserRepository {
           'status', agencies.status
         )
       )`;
-
-    const agencyRightsJsonAgg = `JSONB_AGG(${buildAgencyRight}) FILTER (WHERE agencies.id IS NOT NULL)`;
+    const inActiveAgencyStatuses = `('${activeAgencyStatuses.join("','")}')`;
+    const agencyRightsJsonAgg = `JSONB_AGG(${buildAgencyRight}) FILTER (WHERE agencies.id IS NOT NULL AND agencies.status in ${inActiveAgencyStatuses} )`;
 
     const establishmentsJsonAgg = `JSONB_AGG(
       JSON_BUILD_OBJECT(
