@@ -10,10 +10,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.dropView(viewAgencies, { ifExists: true });
   pgm.dropView(viewAgenciesSibImport, { ifExists: true });
 
-  pgm.dropColumn(agencies, [
-    "counsellor_emails_backup",
-    "validator_emails_backup",
-  ]);
+  pgm.dropColumn(
+    agencies,
+    ["counsellor_emails_backup", "validator_emails_backup"],
+    { ifExists: true },
+  );
 
   pgm.createView(
     viewAgencies,
