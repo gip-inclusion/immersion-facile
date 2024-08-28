@@ -4,6 +4,7 @@ import {
   AgencyGroup,
   AgencyRight,
   InclusionConnectedUser,
+  activeAgencyStatuses,
   agencyRoleIsNotToReview,
   errors,
 } from "shared";
@@ -34,7 +35,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
 
     const agency: AgencyDto | undefined =
       await uow.agencyRepository.getBySafir(codeSafir);
-    if (agency) {
+    if (agency && activeAgencyStatuses.includes(agency.status)) {
       await uow.userRepository.updateAgencyRights({
         userId,
         agencyRights: [
@@ -64,22 +65,24 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
         userId,
         agencyRights: [
           ...agencyRightsWithoutConflicts,
-          ...agencies.map((agency): AgencyRight => {
-            const existingAgencyRight = agencyRightsWithConflicts.find(
-              (agencyRight) => agencyRight.agency.id === agency.id,
-            );
-            if (
-              existingAgencyRight &&
-              agencyRoleIsNotToReview(existingAgencyRight.roles)
-            )
-              return existingAgencyRight;
+          ...agencies
+            .filter((agency) => activeAgencyStatuses.includes(agency.status))
+            .map((agency): AgencyRight => {
+              const existingAgencyRight = agencyRightsWithConflicts.find(
+                (agencyRight) => agencyRight.agency.id === agency.id,
+              );
+              if (
+                existingAgencyRight &&
+                agencyRoleIsNotToReview(existingAgencyRight.roles)
+              )
+                return existingAgencyRight;
 
-            return {
-              agency,
-              roles: ["agency-viewer"],
-              isNotifiedByEmail: false,
-            };
-          }),
+              return {
+                agency,
+                roles: ["agency-viewer"],
+                isNotifiedByEmail: false,
+              };
+            }),
         ],
       });
       return;
