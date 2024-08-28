@@ -37,4 +37,4 @@ export * from "./toastr";
 export * from "./tooltip";
 export * from "./exchange-message";
 export * from "./tag";
-export * from "./gradient";
+export * from "./search-result-illustration";
