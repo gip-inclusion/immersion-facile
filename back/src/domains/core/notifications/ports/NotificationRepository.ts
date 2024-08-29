@@ -26,8 +26,6 @@ export interface NotificationRepository {
     emails: EmailNotification[];
     sms: SmsNotification[];
   }>;
-  getEmailsByFilters: (
-    filters?: EmailNotificationFilters,
-  ) => Promise<EmailNotification[]>;
+  getEmailsByFilters: () => Promise<EmailNotification[]>;
   deleteAllEmailAttachements: () => Promise<number>;
 }

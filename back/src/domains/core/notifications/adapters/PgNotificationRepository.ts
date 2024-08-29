@@ -17,10 +17,7 @@ import {
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import {
-  EmailNotificationFilters,
-  NotificationRepository,
-} from "../ports/NotificationRepository";
+import { NotificationRepository } from "../ports/NotificationRepository";
 
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
@@ -73,25 +70,13 @@ export class PgNotificationRepository implements NotificationRepository {
       .then(map((row) => row.notif));
   }
 
-  public async getEmailsByFilters({
-    since,
-    emailKind,
-    email,
-  }: EmailNotificationFilters = {}): Promise<EmailNotification[]> {
+  public async getEmailsByFilters(): Promise<EmailNotification[]> {
     const subQuery = pipeWithValue(
       this.transaction
         .selectFrom("notifications_email as e")
         .select("id")
-        .innerJoin(
-          "notifications_email_recipients as r",
-          "e.id",
-          "r.notifications_email_id",
-        )
         .groupBy("e.id")
         .orderBy("e.created_at", "desc"),
-      (b) => (since ? b.where("e.created_at", ">=", since) : b),
-      (b) => (emailKind ? b.where("e.email_kind", "=", emailKind) : b),
-      (b) => (email ? b.where("r.email", "=", email) : b),
       (b) => b.limit(this.maxRetrievedNotifications),
     );
 
