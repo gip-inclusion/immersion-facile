@@ -224,7 +224,7 @@ describe("PgNotificationRepository", () => {
         smsNotification,
       ]);
 
-      const response = await pgNotificationRepository.getEmailsByFilters({});
+      const response = await pgNotificationRepository.getEmailsByFilters();
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
@@ -245,43 +245,12 @@ describe("PgNotificationRepository", () => {
       );
     });
 
-    it("works with no filters provided", async () => {
-      const response = await pgNotificationRepository.getEmailsByFilters({});
+    it("works", async () => {
+      const response = await pgNotificationRepository.getEmailsByFilters();
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
       );
-    });
-
-    it("works with 'emailKind' filter", async () => {
-      const response = await pgNotificationRepository.getEmailsByFilters({
-        emailKind: "EDIT_FORM_ESTABLISHMENT_LINK",
-      });
-      expectToEqual(response, [emailNotifications[1]]);
-    });
-
-    it("works with 'since' filter", async () => {
-      const responseForMostRecent =
-        await pgNotificationRepository.getEmailsByFilters({
-          since: new Date(emailNotifications[2].createdAt),
-        });
-      expectToEqual(responseForMostRecent, [emailNotifications[2]]);
-
-      const responseForOldest =
-        await pgNotificationRepository.getEmailsByFilters({
-          since: new Date(emailNotifications[1].createdAt),
-        });
-      expectToEqual(
-        responseForOldest,
-        emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
-      );
-    });
-
-    it("works with 'email' filter, and keeps all recipients", async () => {
-      const response = await pgNotificationRepository.getEmailsByFilters({
-        email: emailNotifications[2].templatedContent.recipients[0],
-      });
-      expectToEqual(response, [emailNotifications[2]]);
     });
   });
 
