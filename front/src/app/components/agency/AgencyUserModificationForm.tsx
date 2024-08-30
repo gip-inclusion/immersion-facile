@@ -73,6 +73,16 @@ export const AgencyUserModificationForm = ({
     };
   });
 
+  const checkboxOptionsWithFilter = () => {
+    if (agency && agency.counsellorEmails.length === 0)
+      return checkboxOptions.filter(
+        (option) => option.label !== "Pré-validateur",
+      );
+    if (agency && agency.refersToAgencyId !== null)
+      return checkboxOptions.filter((option) => option.label !== "Validateur");
+    return checkboxOptions;
+  };
+
   if (!agencyUser) return <></>;
 
   const [invalidEmailMessage, setInvalidEmailMessage] =
@@ -98,13 +108,7 @@ export const AgencyUserModificationForm = ({
           id={domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}
           legend="Rôles :"
           {...getFieldError("roles")}
-          options={
-            agency && agency.counsellorEmails.length > 0
-              ? checkboxOptions
-              : checkboxOptions.filter(
-                  (option) => option.label !== "Pré-validateur",
-                )
-          }
+          options={checkboxOptionsWithFilter()}
         />
 
         <ToggleSwitch
