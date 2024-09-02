@@ -13,10 +13,10 @@ import {
   frenchEstablishmentKinds,
 } from "shared";
 import { routes } from "src/app/routes/routes";
-import illustration1 from "src/assets/img/search-illustration-0.png";
-import illustration2 from "src/assets/img/search-illustration-1.png";
-import illustration3 from "src/assets/img/search-illustration-2.png";
-import illustration4 from "src/assets/img/search-illustration-3.png";
+import illustration1 from "src/assets/img/search-illustration-0.webp";
+import illustration2 from "src/assets/img/search-illustration-1.webp";
+import illustration3 from "src/assets/img/search-illustration-2.webp";
+import illustration4 from "src/assets/img/search-illustration-3.webp";
 import "./SearchResult.scss";
 
 const illustrations = [
