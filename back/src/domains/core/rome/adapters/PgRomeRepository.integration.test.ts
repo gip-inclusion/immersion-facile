@@ -230,6 +230,37 @@ describe("Postgres implementation of Rome Gateway", () => {
           romeLabel: "Psychologie",
         },
       ]);
+
+      expectToEqual(
+        await pgRomeRepository.searchAppellation(
+          "Directeur / Directrice 'entreprise ou de Service d'Aide par le Travail -ESAT-",
+        ),
+        [
+          {
+            appellationCode: "14354",
+            appellationLabel:
+              "Directeur / Directrice d'entreprise ou de Service d'Aide par le Travail -ESAT-",
+            romeCode: "K1403",
+            romeLabel:
+              "Management de structure de santé, sociale ou pénitentiaire",
+          },
+        ],
+      );
+      expectToEqual(
+        await pgRomeRepository.searchAppellation(
+          "Directeur / 'Directrice 'entreprise ou de Service d'Aide par le Travail -ESAT-' ",
+        ),
+        [
+          {
+            appellationCode: "14354",
+            appellationLabel:
+              "Directeur / Directrice d'entreprise ou de Service d'Aide par le Travail -ESAT-",
+            romeCode: "K1403",
+            romeLabel:
+              "Management de structure de santé, sociale ou pénitentiaire",
+          },
+        ],
+      );
     });
   });
 });
