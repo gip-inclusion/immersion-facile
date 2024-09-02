@@ -74,6 +74,7 @@ export class PgRomeRepository implements RomeRepository {
 
   public searchAppellation(query: string): Promise<AppellationAndRomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
+    const sanitizedQuery = toTsQuery(queryBeginning);
     return this.transaction
       .selectFrom("public_appellations_data")
       .innerJoin(
@@ -85,10 +86,7 @@ export class PgRomeRepository implements RomeRepository {
         eb.or([
           eb.and([
             eb.eb("libelle_appellation_long_without_special_char", "@@", (eb) =>
-              eb.fn("to_tsquery", [
-                sql`'french'`,
-                sql`${toTsQuery(queryBeginning)}`,
-              ]),
+              eb.fn("to_tsquery", [sql`'french'`, sql`${sanitizedQuery}`]),
             ),
             eb.eb(
               "libelle_appellation_long_without_special_char",
@@ -206,7 +204,14 @@ export class PgRomeRepository implements RomeRepository {
   }
 }
 
-const toTsQuery = (query: string): string => query.split(/\s+/).join(" & ");
+const toTsQuery = (input: string): string =>
+  input
+    .replace(/[\/-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/'(?=\s|$)|(?<=\s|^)'/g, "")
+    .trim()
+    .replace(/\s+/g, " & ");
 
 const prepareQueryParams = (query: string): [string, string] => {
   const queryWords = removeInvalidInitialOrFinalCharaters(query)
@@ -242,4 +247,4 @@ const removeInvalidFinalCharacters = (str: string): string => {
 };
 
 const removeInvalidInitialOrFinalCharaters = (str: string): string =>
-  removeInvalidInitialCharacters(removeInvalidFinalCharacters(str));
+  removeInvalidInitialCharacters(removeInvalidFinalCharacters(str.trim()));
