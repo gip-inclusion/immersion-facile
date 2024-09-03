@@ -75,7 +75,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(201), () =>
-        deps.useCases.updateIcUserRoleForAgency.execute(
+        deps.useCases.updateUserForAgency.execute(
           req.body,
           req.payloads?.currentUser,
         ),
@@ -86,7 +86,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(201), () =>
-        deps.useCases.updateIcUserRoleForAgency.execute(
+        deps.useCases.updateUserForAgency.execute(
           req.body,
           req.payloads?.currentUser,
         ),
