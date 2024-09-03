@@ -1,12 +1,18 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
+  UserCreateParamsForAgency,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
+import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -39,12 +45,15 @@ describe("CreateUserForAgency", () => {
   let agencyRepository: InMemoryAgencyRepository;
   let timeGateway: TimeGateway;
   let uuidGenerator: UuidGenerator;
+  let outboxRepository: InMemoryOutboxRepository;
+  let createNewEvent: CreateNewEvent;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
 
     userRepository = uow.userRepository;
     agencyRepository = uow.agencyRepository;
+    outboxRepository = uow.outboxRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
     userRepository.setInclusionConnectedUsers([
       backofficeAdminUser,
@@ -52,9 +61,13 @@ describe("CreateUserForAgency", () => {
     ]);
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
+    createNewEvent = makeCreateNewEvent({
+      uuidGenerator,
+      timeGateway,
+    });
     createUserForAgency = makeCreateUserForAgency({
       uowPerformer,
-      deps: { timeGateway, uuidGenerator },
+      deps: { timeGateway, createNewEvent },
     });
     agencyRepository.setAgencies([agency]);
   });
@@ -141,16 +154,15 @@ describe("CreateUserForAgency", () => {
     const newUserId = uuidGenerator.new();
     userRepository.users = [];
 
-    await createUserForAgency.execute(
-      {
-        userId: newUserId,
-        agencyId: agency.id,
-        roles: ["counsellor"],
-        isNotifiedByEmail: false,
-        email: "new-user@email.fr",
-      },
-      backofficeAdminUser,
-    );
+    const icUserForAgency: UserCreateParamsForAgency = {
+      userId: newUserId,
+      agencyId: agency.id,
+      roles: ["counsellor"],
+      isNotifiedByEmail: false,
+      email: "new-user@email.fr",
+    };
+
+    await createUserForAgency.execute(icUserForAgency, backofficeAdminUser);
 
     expect(userRepository.users.length).toBe(1);
     expectToEqual(await userRepository.getById(newUserId), {
@@ -168,6 +180,19 @@ describe("CreateUserForAgency", () => {
         establishments: {},
       },
     });
+
+    expectToEqual(outboxRepository.events, [
+      createNewEvent({
+        topic: "IcUserAgencyRightChanged",
+        payload: {
+          ...icUserForAgency,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: backofficeAdminUser.id,
+          },
+        },
+      }),
+    ]);
   });
 
   it("add agency rights to an existing user", async () => {
@@ -195,16 +220,15 @@ describe("CreateUserForAgency", () => {
       ],
     });
 
-    await createUserForAgency.execute(
-      {
-        userId,
-        agencyId: anotherAgency.id,
-        roles: ["counsellor"],
-        isNotifiedByEmail: false,
-        email: "user@email.fr",
-      },
-      backofficeAdminUser,
-    );
+    const icUserForAgency: UserCreateParamsForAgency = {
+      userId,
+      agencyId: anotherAgency.id,
+      roles: ["counsellor"],
+      isNotifiedByEmail: false,
+      email: "user@email.fr",
+    };
+
+    await createUserForAgency.execute(icUserForAgency, backofficeAdminUser);
 
     expectToEqual(await userRepository.getById(userId), {
       createdAt: timeGateway.now().toISOString(),
@@ -230,5 +254,17 @@ describe("CreateUserForAgency", () => {
         establishments: {},
       },
     });
+    expectToEqual(outboxRepository.events, [
+      createNewEvent({
+        topic: "IcUserAgencyRightChanged",
+        payload: {
+          ...icUserForAgency,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: backofficeAdminUser.id,
+          },
+        },
+      }),
+    ]);
   });
 });

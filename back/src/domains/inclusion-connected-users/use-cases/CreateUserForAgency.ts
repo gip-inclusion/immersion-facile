@@ -6,6 +6,8 @@ import {
   userCreateParamsForAgencySchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import { DomainEvent } from "../../core/events/events";
+import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
@@ -15,50 +17,61 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
   UserCreateParamsForAgency,
   void,
   InclusionConnectedUser,
-  { timeGateway: TimeGateway }
+  { timeGateway: TimeGateway; createNewEvent: CreateNewEvent }
 >(
   {
     name: "CreateUserForAgency",
     inputSchema: userCreateParamsForAgencySchema,
   },
-  async ({
-    inputParams: { agencyId, email, isNotifiedByEmail, roles, userId },
-    uow,
-    currentUser,
-    deps,
-  }) => {
+  async ({ inputParams, uow, currentUser, deps }) => {
     throwIfNotAdmin(currentUser);
-    const agency = await uow.agencyRepository.getById(agencyId);
-    if (!agency) throw errors.agency.notFound({ agencyId });
+    const agency = await uow.agencyRepository.getById(inputParams.agencyId);
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: inputParams.agencyId });
 
-    if (agency.refersToAgencyId && roles.includes("validator"))
+    if (agency.refersToAgencyId && inputParams.roles.includes("validator"))
       throw errors.agency.invalidRoleUpdateForAgencyWithRefersTo({
         agencyId: agency.id,
         role: "validator",
       });
 
-    const existingUser = await uow.userRepository.getById(userId);
+    const existingUser = await uow.userRepository.getById(inputParams.userId);
 
     if (!existingUser) {
       await uow.userRepository.save({
         createdAt: deps.timeGateway.now().toISOString(),
-        email,
+        email: inputParams.email,
         externalId: null,
         firstName: "",
-        id: userId,
+        id: inputParams.userId,
         lastName: "",
       });
     }
 
     const existingUserAgencyRights = existingUser?.agencyRights ?? [];
     const agencyRight: AgencyRight = {
-      roles,
-      isNotifiedByEmail: isNotifiedByEmail,
+      roles: inputParams.roles,
+      isNotifiedByEmail: inputParams.isNotifiedByEmail,
       agency,
     };
-    await uow.userRepository.updateAgencyRights({
-      userId: userId,
-      agencyRights: [...existingUserAgencyRights, agencyRight],
+
+    const event: DomainEvent = deps.createNewEvent({
+      topic: "IcUserAgencyRightChanged",
+      payload: {
+        ...inputParams,
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: currentUser.id,
+        },
+      },
     });
+
+    await Promise.all([
+      uow.userRepository.updateAgencyRights({
+        userId: inputParams.userId,
+        agencyRights: [...existingUserAgencyRights, agencyRight],
+      }),
+      uow.outboxRepository.save(event),
+    ]);
   },
 );

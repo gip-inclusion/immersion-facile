@@ -636,6 +636,7 @@ export const createUseCases = (
       uowPerformer,
       deps: {
         timeGateway: gateways.timeGateway,
+        createNewEvent,
       },
     }),
     broadcastConventionAgain: makeBroadcastConventionAgain({
