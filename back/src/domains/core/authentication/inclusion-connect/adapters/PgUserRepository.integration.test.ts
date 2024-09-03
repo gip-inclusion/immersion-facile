@@ -282,248 +282,248 @@ describe("PgAuthenticatedUserRepository", () => {
       });
 
       it("gets the icUser without the agency rights on agencies that are closed or rejected", async () => {
-      const rejectedAgency = new AgencyDtoBuilder()
-        .withValidatorEmails(["closed-agency-validator@email.fr"])
-        .withId("11111111-1111-4bbb-1111-111111111114")
-        .withStatus("rejected")
-        .withName("Agence rejected")
-        .build();
+        const rejectedAgency = new AgencyDtoBuilder()
+          .withValidatorEmails(["closed-agency-validator@email.fr"])
+          .withId("11111111-1111-4bbb-1111-111111111114")
+          .withStatus("rejected")
+          .withName("Agence rejected")
+          .build();
 
-      const closedAgency = new AgencyDtoBuilder()
-        .withValidatorEmails(["rejected-agency-validator@email.fr"])
-        .withId("11111111-1111-4bbb-1111-111111111115")
-        .withName("Agence closed")
-        .withStatus("closed")
-        .build();
+        const closedAgency = new AgencyDtoBuilder()
+          .withValidatorEmails(["rejected-agency-validator@email.fr"])
+          .withId("11111111-1111-4bbb-1111-111111111115")
+          .withName("Agence closed")
+          .withStatus("closed")
+          .build();
 
-      await Promise.all([
-        await agencyRepository.insert(agency1),
-        await agencyRepository.insert(agency2),
-        await agencyRepository.insert(rejectedAgency),
-        await agencyRepository.insert(closedAgency),
-        await insertUser(db, user1, mode),
-      ]);
+        await Promise.all([
+          await agencyRepository.insert(agency1),
+          await agencyRepository.insert(agency2),
+          await agencyRepository.insert(rejectedAgency),
+          await agencyRepository.insert(closedAgency),
+          await insertUser(db, user1, mode),
+        ]);
 
-      // create the link between the user and the agencies
-      await insertAgencyRegistrationToUser(db, {
-        agencyId: agency1.id,
-        userId: user1.id,
-        roles: ["to-review"],
-        isNotifiedByEmail: false,
-      });
-      await insertAgencyRegistrationToUser(db, {
-        agencyId: agency2.id,
-        userId: user1.id,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
-      });
-      await insertAgencyRegistrationToUser(db, {
-        agencyId: closedAgency.id,
-        userId: user1.id,
-        roles: ["to-review"],
-        isNotifiedByEmail: false,
-      });
-      await insertAgencyRegistrationToUser(db, {
-        agencyId: rejectedAgency.id,
-        userId: user1.id,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
-      });
+        // create the link between the user and the agencies
+        await insertAgencyRegistrationToUser(db, {
+          agencyId: agency1.id,
+          userId: user1.id,
+          roles: ["to-review"],
+          isNotifiedByEmail: false,
+        });
+        await insertAgencyRegistrationToUser(db, {
+          agencyId: agency2.id,
+          userId: user1.id,
+          roles: ["validator"],
+          isNotifiedByEmail: false,
+        });
+        await insertAgencyRegistrationToUser(db, {
+          agencyId: closedAgency.id,
+          userId: user1.id,
+          roles: ["to-review"],
+          isNotifiedByEmail: false,
+        });
+        await insertAgencyRegistrationToUser(db, {
+          agencyId: rejectedAgency.id,
+          userId: user1.id,
+          roles: ["validator"],
+          isNotifiedByEmail: false,
+        });
 
-      const inclusionConnectedUser = await userRepository.getById(user1.id, mode);
-      expectToEqual(inclusionConnectedUser, {
-        ...user1,
-        establishments: [],
-        agencyRights: [
-          { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
-          { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
-        ],
-        ...withEmptyDashboards,
+        const inclusionConnectedUser = await userRepository.getById(
+          user1.id,
+          mode,
+        );
+        expectToEqual(inclusionConnectedUser, {
+          ...user1,
+          establishments: [],
+          agencyRights: [
+            { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
+            { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
+          ],
+          ...withEmptyDashboards,
+        });
       });
     });
-  });
 
-  describe("updateAgencyRights", () => {
-    it("updates an element in users__agencies table", async () => {
-      await agencyRepository.insert(agency1);
-      await insertUser(db, user1, mode);
-      const agencyRights: AgencyRight[] = [
-        {
-          roles: ["counsellor"],
-          agency: agency1,
-          isNotifiedByEmail: false,
-        },
-      ];
-      await userRepository.updateAgencyRights({
-        userId: user1.id,
-        agencyRights: agencyRights,
-      });
-      expectToEqual(await userRepository.getById(user1.id, mode), {
-        ...user1,
-        establishments: [],
-        agencyRights: agencyRights,
-        ...withEmptyDashboards,
-      });
-
-      await userRepository.updateAgencyRights({
-        userId: user1.id,
-        agencyRights: [
+    describe("updateAgencyRights", () => {
+      it("updates an element in users__agencies table", async () => {
+        await agencyRepository.insert(agency1);
+        await insertUser(db, user1, mode);
+        const agencyRights: AgencyRight[] = [
           {
-            roles: ["validator"],
+            roles: ["counsellor"],
             agency: agency1,
-            isNotifiedByEmail: true,
+            isNotifiedByEmail: false,
           },
-        ],
-      });
+        ];
+        await userRepository.updateAgencyRights({
+          userId: user1.id,
+          agencyRights: agencyRights,
+        });
+        expectToEqual(await userRepository.getById(user1.id, mode), {
+          ...user1,
+          establishments: [],
+          agencyRights: agencyRights,
+          ...withEmptyDashboards,
+        });
 
-      expectToEqual(await userRepository.getById(user1.id, mode), {
-        ...user1,
-        establishments: [],
-        agencyRights: [
-          {
-            roles: ["validator"],
-            agency: {
-              ...agency1,
-              validatorEmails: [...agency1.validatorEmails, user1.email],
+        await userRepository.updateAgencyRights({
+          userId: user1.id,
+          agencyRights: [
+            {
+              roles: ["validator"],
+              agency: agency1,
+              isNotifiedByEmail: true,
             },
-            isNotifiedByEmail: true,
-          },
-        ],
-        ...withEmptyDashboards,
+          ],
+        });
+
+        expectToEqual(await userRepository.getById(user1.id, mode), {
+          ...user1,
+          establishments: [],
+          agencyRights: [
+            {
+              roles: ["validator"],
+              agency: {
+                ...agency1,
+                validatorEmails: [...agency1.validatorEmails, user1.email],
+              },
+              isNotifiedByEmail: true,
+            },
+          ],
+          ...withEmptyDashboards,
+        });
+      });
+      it("adds an element in users__agencies table", async () => {
+        await agencyRepository.insert(agency1);
+        await insertUser(db, user1, mode);
+        const icUserToUpdate: InclusionConnectedUser = {
+          ...user1,
+          establishments: [],
+          agencyRights: [
+            {
+              roles: ["counsellor"],
+              agency: agency1,
+              isNotifiedByEmail: false,
+            },
+          ],
+          ...withEmptyDashboards,
+        };
+
+        await userRepository.updateAgencyRights({
+          userId: icUserToUpdate.id,
+          agencyRights: icUserToUpdate.agencyRights,
+        });
+
+        const savedIcUser = await userRepository.getById(user1.id, mode);
+        expectToEqual(savedIcUser, icUserToUpdate);
+      });
+
+      it("Delete an element in users__agencies table when no agency rights are provided", async () => {
+        await agencyRepository.insert(agency1);
+        await insertUser(db, user1, mode);
+        const icUserToSave: InclusionConnectedUser = {
+          ...user1,
+          establishments: [],
+          agencyRights: [],
+          ...withEmptyDashboards,
+        };
+
+        await userRepository.updateAgencyRights({
+          userId: icUserToSave.id,
+          agencyRights: icUserToSave.agencyRights,
+        });
+
+        const savedIcUser = await userRepository.getById(user1.id, mode);
+        expectToEqual(savedIcUser, icUserToSave);
+      });
+
+      it("Delete just one element in users__agencies table when two agency rights are provided", async () => {
+        await agencyRepository.insert(agency1);
+        await agencyRepository.insert(agency2);
+
+        await insertUser(db, user1, mode);
+
+        const icUserToSave: InclusionConnectedUser = {
+          ...user1,
+          establishments: [],
+          agencyRights: [
+            {
+              agency: agency1,
+              roles: ["validator"],
+              isNotifiedByEmail: false,
+            },
+            {
+              agency: agency2,
+              roles: ["to-review"],
+              isNotifiedByEmail: false,
+            },
+          ],
+          ...withEmptyDashboards,
+        };
+
+        await userRepository.updateAgencyRights({
+          userId: icUserToSave.id,
+          agencyRights: icUserToSave.agencyRights,
+        });
+
+        const savedIcUser = await userRepository.getById(user1.id, mode);
+
+        expectToEqual(savedIcUser, icUserToSave);
+
+        const updatedIcUserToSave: InclusionConnectedUser = {
+          ...user1,
+          establishments: [],
+          agencyRights: [
+            {
+              agency: agency1,
+              roles: ["validator"],
+              isNotifiedByEmail: false,
+            },
+          ],
+          ...withEmptyDashboards,
+        };
+
+        await userRepository.updateAgencyRights({
+          userId: updatedIcUserToSave.id,
+          agencyRights: updatedIcUserToSave.agencyRights,
+        });
+
+        const updatedSavedIcUser = await userRepository.getById(user1.id, mode);
+        expectToEqual(updatedSavedIcUser, updatedIcUserToSave);
       });
     });
-        it("adds an element in users__agencies table", async () => {
-          await agencyRepository.insert(agency1);
-          await insertUser(db, user1, mode);
-          const icUserToUpdate: InclusionConnectedUser = {
-            ...user1,
-            establishments: [],
-            agencyRights: [
-              {
-                roles: ["counsellor"],
-                agency: agency1,
-                isNotifiedByEmail: false,
-              },
-            ],
-            ...withEmptyDashboards,
-          };
-
-          await userRepository.updateAgencyRights({
-            userId: icUserToUpdate.id,
-            agencyRights: icUserToUpdate.agencyRights,
-          });
-
-          const savedIcUser = await userRepository.getById(user1.id, mode);
-          expectToEqual(savedIcUser, icUserToUpdate);
-        });
-
-        it("Delete an element in users__agencies table when no agency rights are provided", async () => {
-          await agencyRepository.insert(agency1);
-          await insertUser(db, user1, mode);
-          const icUserToSave: InclusionConnectedUser = {
-            ...user1,
-            establishments: [],
-            agencyRights: [],
-            ...withEmptyDashboards,
-          };
-
-          await userRepository.updateAgencyRights({
-            userId: icUserToSave.id,
-            agencyRights: icUserToSave.agencyRights,
-          });
-
-          const savedIcUser = await userRepository.getById(user1.id, mode);
-          expectToEqual(savedIcUser, icUserToSave);
-        });
-
-        it("Delete just one element in users__agencies table when two agency rights are provided", async () => {
-          await agencyRepository.insert(agency1);
-          await agencyRepository.insert(agency2);
-
-          await insertUser(db, user1, mode);
-
-          const icUserToSave: InclusionConnectedUser = {
-            ...user1,
-            establishments: [],
-            agencyRights: [
-              {
-                agency: agency1,
-                roles: ["validator"],
-                isNotifiedByEmail: false,
-              },
-              {
-                agency: agency2,
-                roles: ["to-review"],
-                isNotifiedByEmail: false,
-              },
-            ],
-            ...withEmptyDashboards,
-          };
-
-          await userRepository.updateAgencyRights({
-            userId: icUserToSave.id,
-            agencyRights: icUserToSave.agencyRights,
-          });
-
-          const savedIcUser = await userRepository.getById(user1.id, mode);
-
-          expectToEqual(savedIcUser, icUserToSave);
-
-          const updatedIcUserToSave: InclusionConnectedUser = {
-            ...user1,
-            establishments: [],
-            agencyRights: [
-              {
-                agency: agency1,
-                roles: ["validator"],
-                isNotifiedByEmail: false,
-              },
-            ],
-            ...withEmptyDashboards,
-          };
-
-          await userRepository.updateAgencyRights({
-            userId: updatedIcUserToSave.id,
-            agencyRights: updatedIcUserToSave.agencyRights,
-          });
-
-          const updatedSavedIcUser = await userRepository.getById(
-            user1.id,
-            mode,
-          );
-          expectToEqual(updatedSavedIcUser, updatedIcUserToSave);
-        });
-      });
-  describe("update user", () => {
-    it("updates  users email in users table", async () => {
-      await agencyRepository.insert(agency1);
-      await insertUser(db, user1, mode);
-      await insertAgencyRegistrationToUser(db, {
-        agencyId: agency1.id,
-        userId: user1.id,
-        roles: ["counsellor"],
-        isNotifiedByEmail: false,
-      });
-      const updatedEmail = "new-email@email.fr";
-
-      await userRepository.updateEmail(user1.id, updatedEmail);
-
-      const agencyRights: AgencyRight[] = [
-        {
+    describe("update user", () => {
+      it("updates  users email in users table", async () => {
+        await agencyRepository.insert(agency1);
+        await insertUser(db, user1, mode);
+        await insertAgencyRegistrationToUser(db, {
+          agencyId: agency1.id,
+          userId: user1.id,
           roles: ["counsellor"],
-          agency: agency1,
           isNotifiedByEmail: false,
-        },
-      ];
-      expectToEqual(await userRepository.getById(user1.id, mode), {
-        ...user1,
-        email: updatedEmail,
-        establishments: [],
-        agencyRights: agencyRights,
-        ...withEmptyDashboards,
+        });
+        const updatedEmail = "new-email@email.fr";
+
+        await userRepository.updateEmail(user1.id, updatedEmail);
+
+        const agencyRights: AgencyRight[] = [
+          {
+            roles: ["counsellor"],
+            agency: agency1,
+            isNotifiedByEmail: false,
+          },
+        ];
+        expectToEqual(await userRepository.getById(user1.id, mode), {
+          ...user1,
+          email: updatedEmail,
+          establishments: [],
+          agencyRights: agencyRights,
+          ...withEmptyDashboards,
+        });
       });
     });
-  });
 
     describe("getWithFilters", () => {
       it("returns empty array if no filters are given", async () => {
@@ -701,28 +701,28 @@ describe("PgAuthenticatedUserRepository", () => {
     });
   });
 
-  describe("delete", () => {
-    it("deletes an existing user", async () => {
-      await insertUser(db, user1, mode);
-      await agencyRepository.insert(agency1);
-      await insertAgencyRegistrationToUser(db, {
-        userId: user1.id,
-        agencyId: agency1.id,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
+    describe("delete", () => {
+      it("deletes an existing user", async () => {
+        await insertUser(db, user1, mode);
+        await agencyRepository.insert(agency1);
+        await insertAgencyRegistrationToUser(db, {
+          userId: user1.id,
+          agencyId: agency1.id,
+          roles: ["validator"],
+          isNotifiedByEmail: false,
+        });
+        await userRepository.delete(user1.id);
+        const response = await userRepository.getById(user1.id, mode);
+        expectToEqual(response, undefined);
+        expectToEqual(
+          await db
+            .selectFrom("users__agencies")
+            .selectAll()
+            .where("user_id", "=", user1.id)
+            .execute(),
+          [],
+        );
       });
-      await userRepository.delete(user1.id);
-      const response = await userRepository.getById(user1.id, mode);
-      expectToEqual(response, undefined);
-      expectToEqual(
-        await db
-          .selectFrom("users__agencies")
-          .selectAll()
-          .where("user_id", "=", user1.id)
-          .execute(),
-        [],
-      );
-    });
 
       it("does not throw when user does not exist", async () => {
         await expectPromiseToFailWithError(
@@ -783,7 +783,7 @@ const agency2 = new AgencyDtoBuilder()
 const insertUser = async (
   db: KyselyDb,
   { id, email, firstName, lastName, externalId, createdAt }: User,
-  mode: OAuthGatewayMode
+  mode: OAuthGatewayMode,
 ) => {
   await db
     .insertInto("users")

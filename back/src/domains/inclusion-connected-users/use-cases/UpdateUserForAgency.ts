@@ -9,6 +9,10 @@ import {
   userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
+import {
+  OAuthGatewayMode,
+  oAuthModeByFeatureFlags,
+} from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -19,7 +23,6 @@ import {
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
-import {OAuthGatewayMode, oAuthModeByFeatureFlags} from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 
 const rejectIfAgencyWontHaveValidatorsReceivingNotifications = async (
   uow: UnitOfWork,
@@ -164,7 +167,12 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     const userToUpdate = await uow.userRepository.getById(params.userId, mode);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
-    const newAgencyRights = await makeAgencyRights(uow, params, userToUpdate, mode);
+    const newAgencyRights = await makeAgencyRights(
+      uow,
+      params,
+      userToUpdate,
+      mode,
+    );
     rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 
     const event: DomainEvent = this.#createNewEvent({
