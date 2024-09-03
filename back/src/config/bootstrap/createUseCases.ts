@@ -201,7 +201,7 @@ export const createUseCases = (
       ),
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
-      updateIcUserRoleForAgency: new UpdateUserForAgency(
+      updateUserForAgency: new UpdateUserForAgency(
         uowPerformer,
         createNewEvent,
       ),
