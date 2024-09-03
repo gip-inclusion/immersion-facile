@@ -7,7 +7,6 @@ import {
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
@@ -16,7 +15,7 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
   UserCreateParamsForAgency,
   void,
   InclusionConnectedUser,
-  { timeGateway: TimeGateway; uuidGenerator: UuidGenerator }
+  { timeGateway: TimeGateway }
 >(
   {
     name: "CreateUserForAgency",
