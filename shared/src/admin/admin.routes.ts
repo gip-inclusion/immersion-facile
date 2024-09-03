@@ -19,6 +19,7 @@ import { notificationsByKindSchema } from "../notifications/notifications.schema
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
   rejectIcUserRoleForAgencyParamsSchema,
+  userCreateParamsForAgencySchema,
   userUpdateParamsForAgencySchema,
   withUserFiltersSchema,
 } from "./admin.schema";
@@ -63,7 +64,7 @@ export const adminRoutes = defineRoutes({
   addUserForAgency: defineRoute({
     method: "post",
     url: "/admin/inclusion-connected/users",
-    requestBodySchema: userUpdateParamsForAgencySchema,
+    requestBodySchema: userCreateParamsForAgencySchema,
     ...withAuthorizationHeaders,
     responses: {
       201: expressEmptyResponseBody,

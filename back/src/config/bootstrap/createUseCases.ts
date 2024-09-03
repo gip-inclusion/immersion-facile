@@ -117,6 +117,7 @@ import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/d
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
+import { makeCreateUserForAgency } from "../../domains/inclusion-connected-users/use-cases/CreateUserForAgency";
 import { GetInclusionConnectedUser } from "../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUser";
 import { GetInclusionConnectedUsers } from "../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUsers";
 import { LinkFranceTravailUsersToTheirAgencies } from "../../domains/inclusion-connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
@@ -630,6 +631,12 @@ export const createUseCases = (
     }),
     listActiveSubscriptions: makeListActiveSubscriptions({
       uowPerformer,
+    }),
+    createUserForAgency: makeCreateUserForAgency({
+      uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+      },
     }),
     broadcastConventionAgain: makeBroadcastConventionAgain({
       uowPerformer,

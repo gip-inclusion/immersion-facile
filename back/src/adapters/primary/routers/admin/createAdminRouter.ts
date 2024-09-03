@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { GetDashboardParams, adminRoutes, agencyRoutes } from "shared";
+import { GetDashboardParams, adminRoutes, agencyRoutes, errors } from "shared";
 import { BadRequestError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
@@ -85,12 +85,11 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.addUserForAgency(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res.status(201), () =>
-        deps.useCases.updateUserForAgency.execute(
-          req.body,
-          req.payloads?.currentUser,
-        ),
-      ),
+      sendHttpResponse(req, res.status(201), async () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        await deps.useCases.createUserForAgency.execute(req.body, currentUser);
+      }),
   );
 
   sharedAdminRouter.rejectIcUserForAgency(
