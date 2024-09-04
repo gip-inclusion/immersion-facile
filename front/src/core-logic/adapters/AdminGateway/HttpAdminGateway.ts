@@ -49,6 +49,26 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
+  public createUserForAgency$(
+    params: UserParamsForAgency,
+    token: string,
+  ): Observable<InclusionConnectedUser> {
+    return from(
+      this.httpClient
+        .createUserForAgency({
+          body: params,
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
   public getAllApiConsumers$(
     adminToken: InclusionConnectJwt,
   ): Observable<ApiConsumer[]> {

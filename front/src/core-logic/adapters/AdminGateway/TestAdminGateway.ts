@@ -43,6 +43,8 @@ export class TestAdminGateway implements AdminGateway {
 
   public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
 
+  public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
+
   public updateFeatureFlags$ = (
     params: SetFeatureFlagParam,
     _adminToken: InclusionConnectJwt,
@@ -56,6 +58,13 @@ export class TestAdminGateway implements AdminGateway {
     _token: InclusionConnectJwt,
   ): Observable<EstablishmentBatchReport> {
     return this.establishmentBatchResponse$;
+  }
+
+  public createUserForAgency$(
+    _params: UserParamsForAgency,
+    _token: string,
+  ): Observable<InclusionConnectedUser> {
+    return this.createUserForAgencyResponse$;
   }
 
   public getDashboardUrl$(): Observable<DashboardUrlAndName> {

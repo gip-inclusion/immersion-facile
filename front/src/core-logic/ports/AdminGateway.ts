@@ -21,6 +21,11 @@ export interface AdminGateway {
     token: InclusionConnectJwt,
   ) => Observable<EstablishmentBatchReport>;
 
+  createUserForAgency$(
+    params: UserParamsForAgency,
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser>;
+
   getDashboardUrl$: (
     params: GetDashboardParams,
     token: InclusionConnectJwt,

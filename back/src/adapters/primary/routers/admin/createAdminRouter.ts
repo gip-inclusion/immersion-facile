@@ -82,13 +82,16 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
-  sharedAdminRouter.addUserForAgency(
+  sharedAdminRouter.createUserForAgency(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res.status(201), async () => {
+      sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
         if (!currentUser) throw errors.user.unauthorized();
-        await deps.useCases.createUserForAgency.execute(req.body, currentUser);
+        return await deps.useCases.createUserForAgency.execute(
+          req.body,
+          currentUser,
+        );
       }),
   );
 

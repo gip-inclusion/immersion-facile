@@ -69,6 +69,24 @@ export class SimulatedAdminGateway implements AdminGateway {
     });
   }
 
+  public createUserForAgency$(
+    { agencyId }: UserParamsForAgency,
+    _token: string,
+  ): Observable<InclusionConnectedUser> {
+    return agencyId === "non-existing-agency-id"
+      ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
+      : of({
+          id: "fake-user-id-2",
+          email: "remi@sanfamille.fr",
+          firstName: "Rémi",
+          lastName: "Sanfamille",
+          agencyRights: [],
+          dashboards: { agencies: {}, establishments: {} },
+          externalId: "fake-user-external-id-2",
+          createdAt: new Date().toISOString(),
+        });
+  }
+
   public getAllApiConsumers$(
     _adminToken: InclusionConnectJwt,
   ): Observable<ApiConsumer[]> {
