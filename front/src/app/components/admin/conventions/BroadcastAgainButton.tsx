@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import { ConventionId, zUuidLike } from "shared";
@@ -27,6 +27,9 @@ export const BroadcastAgainButton = ({
   const dispatch = useDispatch();
   const jwt = useAppSelector(authSelectors.inclusionConnectToken);
   const isLoading = useAppSelector(apiConsumerSelectors.isLoading);
+  const [isModalButtonDisabled, setIsModalButtonDisabled] = useState(
+    disabled ?? false,
+  );
 
   useEffect(() => {
     jwt &&
@@ -38,10 +41,11 @@ export const BroadcastAgainButton = ({
           feedbackTopic: "api-consumer-names",
         }),
       );
+    setIsModalButtonDisabled(disabled ?? false);
     return () => {
       dispatch(apiConsumerSlice.actions.clearFetchedApiConsumerNames());
     };
-  }, [jwt, conventionId, dispatch]);
+  }, [jwt, conventionId, dispatch, disabled]);
 
   const consumerNames = useAppSelector(apiConsumerSelectors.apiConsumerNames);
 
@@ -68,6 +72,7 @@ export const BroadcastAgainButton = ({
           </ul>
           <Button
             type="button"
+            disabled={isModalButtonDisabled}
             onClick={() => {
               dispatch(
                 conventionSlice.actions.broadcastConventionToPartnerRequested({
@@ -75,6 +80,8 @@ export const BroadcastAgainButton = ({
                   feedbackTopic: "broadcast-convention-again",
                 }),
               );
+              setIsModalButtonDisabled(true);
+              broadcastAgainModal.close();
             }}
           >
             Rediffuser
