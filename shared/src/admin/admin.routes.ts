@@ -60,13 +60,13 @@ export const adminRoutes = defineRoutes({
     },
   }),
 
-  addUserForAgency: defineRoute({
+  createUserForAgency: defineRoute({
     method: "post",
     url: "/admin/inclusion-connected/users",
     requestBodySchema: userParamsForAgencySchema,
     ...withAuthorizationHeaders,
     responses: {
-      201: expressEmptyResponseBody,
+      200: inclusionConnectedUserSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,

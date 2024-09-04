@@ -121,6 +121,58 @@ const rejectAgencyToUserEpic: IcUsersAdminActionEpic = (
     ),
   );
 
+const createUserOnAgencyEpic: IcUsersAdminActionEpic = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(icUsersAdminSlice.actions.createUserOnAgencyRequested.match),
+    switchMap((action) =>
+      adminGateway
+        .createUserForAgency$(action.payload, getAdminToken(state$.value))
+        .pipe(
+          map(
+            ({
+              id,
+              email,
+              firstName,
+              lastName,
+              createdAt,
+              dashboards,
+              externalId,
+              agencyRights,
+            }) =>
+              icUsersAdminSlice.actions.createUserOnAgencySucceeded({
+                icUser: {
+                  id,
+                  email,
+                  firstName,
+                  lastName,
+                  externalId,
+                  createdAt,
+                  dashboards,
+                  agencyRights: agencyRights.reduce(
+                    (agenciesAcc, agencyRight) => ({
+                      ...agenciesAcc,
+                      [agencyRight.agency.id]: agencyRight,
+                    }),
+                    {} as Record<AgencyId, AgencyRight>,
+                  ),
+                },
+                feedbackTopic: action.payload.feedbackTopic,
+              }),
+          ),
+          catchEpicError((error) =>
+            icUsersAdminSlice.actions.createUserOnAgencyFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 const updateUserOnAgencyEpic: IcUsersAdminActionEpic = (
   action$,
   state$,
@@ -186,4 +238,5 @@ export const icUsersAdminEpics = [
   fetchInclusionConnectedUsersWithAgencyIdEpic,
   updateUserOnAgencyEpic,
   fetchInclusionConnectedUserOnAgencyUpdateEpic,
+  createUserOnAgencyEpic,
 ];

@@ -162,6 +162,32 @@ export const icUsersAdminSlice = createSlice({
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
+    createUserOnAgencyRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
+    ) => {
+      state.isUpdatingIcUserAgency = true;
+    },
+
+    createUserOnAgencySucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        icUser: NormalizedInclusionConnectedUser;
+      }>,
+    ) => {
+      state.isUpdatingIcUserAgency = false;
+      const { id } = action.payload.icUser;
+
+      state.agencyUsers[id] = action.payload.icUser;
+    },
+
+    createUserOnAgencyFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isUpdatingIcUserAgency = false;
+    },
+
     updateUserOnAgencyRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,

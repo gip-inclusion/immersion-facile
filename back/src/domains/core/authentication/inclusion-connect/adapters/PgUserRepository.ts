@@ -128,8 +128,9 @@ export class PgUserRepository implements UserRepository {
   public async getWithFilter({
     agencyRole,
     agencyId,
+    email,
   }: InclusionConnectedFilters): Promise<InclusionConnectedUser[]> {
-    return this.#getInclusionConnectedUsers({ agencyRole, agencyId });
+    return this.#getInclusionConnectedUsers({ agencyRole, agencyId, email });
   }
 
   public async updateAgencyRights({
@@ -162,6 +163,7 @@ export class PgUserRepository implements UserRepository {
     userId?: UserId;
     agencyRole?: AgencyRole;
     agencyId?: AgencyId;
+    email?: Email;
   }): Promise<InclusionConnectedUser[]> {
     const buildAgencyRight = `JSON_BUILD_OBJECT(
        'roles', users__agencies.roles,
@@ -308,6 +310,7 @@ type Filters = {
   userId?: UserId;
   agencyRole?: AgencyRole;
   agencyId?: AgencyId;
+  email?: Email;
 };
 
 type WhereClause = {
@@ -316,7 +319,12 @@ type WhereClause = {
 };
 
 const getWhereClause = (filters: Filters): WhereClause => {
-  if (!filters.userId && !filters.agencyRole && !filters.agencyId) {
+  if (
+    !filters.userId &&
+    !filters.agencyRole &&
+    !filters.agencyId &&
+    !filters.email
+  ) {
     return { statement: "WHERE users.id IS NULL", values: [] };
   }
 
@@ -326,6 +334,11 @@ const getWhereClause = (filters: Filters): WhereClause => {
   if (filters.userId) {
     searchClause = `${searchClause} users.id = $1`;
     searchParams = [...searchParams, filters.userId];
+  }
+
+  if (filters.email) {
+    searchClause = `${searchClause} users.email = $${searchParams.length + 1}`;
+    searchParams = [...searchParams, filters.email];
   }
 
   if (filters.agencyRole) {

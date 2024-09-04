@@ -12,7 +12,10 @@ import {
   domElementIds,
   userParamsForAgencySchema,
 } from "shared";
-import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
+import {
+  UserFormMode,
+  agencyRoleToDisplay,
+} from "src/app/components/agency/AgencyUsers";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -22,9 +25,11 @@ import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUs
 export const AgencyUserModificationForm = ({
   agencyUser,
   closeModal,
+  mode,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
+  mode: UserFormMode;
 }) => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
   const dispatch = useDispatch();
@@ -41,13 +46,21 @@ export const AgencyUserModificationForm = ({
 
   const getFieldError = makeFieldError(formState);
 
-  const onValidSubmit = (values: UserParamsForAgency) => {
-    dispatch(
-      icUsersAdminSlice.actions.updateUserOnAgencyRequested({
-        ...values,
-        feedbackTopic: "agency-user",
-      }),
-    );
+  const onValidSubmit = () => {
+    mode === "add"
+      ? dispatch(
+          icUsersAdminSlice.actions.createUserOnAgencyRequested({
+            ...values,
+            feedbackTopic: "agency-user",
+          }),
+        )
+      : dispatch(
+          icUsersAdminSlice.actions.updateUserOnAgencyRequested({
+            ...values,
+            feedbackTopic: "agency-user",
+          }),
+        );
+
     closeModal();
   };
 

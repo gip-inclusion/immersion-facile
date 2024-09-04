@@ -4,9 +4,11 @@ import {
   AgencyDtoBuilder,
   AgencyId,
   AgencyRight,
+  InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   User,
   UserParamsForAgency,
+  errors,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -560,6 +562,126 @@ describe("Agency registration for authenticated users", () => {
       expectToEqual(
         agencyAdminSelectors.agency(store.getState()),
         expectedAgency,
+      );
+    });
+  });
+
+  describe("Create users on agency", () => {
+    it("should create user successfully", () => {
+      expectToEqual(
+        store.getState().admin.inclusionConnectedUsersAdmin,
+        icUsersAdminInitialState,
+      );
+
+      const userToCreate: NormalizedInclusionConnectedUser = {
+        id: "fake-id",
+        email: "fake-email@mail.com",
+        firstName: "fake-first-name",
+        lastName: "fake-last-name",
+        externalId: null,
+        createdAt: new Date().toISOString(),
+        agencyRights: {},
+        dashboards: { agencies: {}, establishments: {} },
+      };
+
+      store.dispatch(
+        icUsersAdminSlice.actions.createUserOnAgencyRequested({
+          userId: userToCreate.id,
+          agencyId: agency2.id,
+          roles: ["validator"],
+          isNotifiedByEmail: false,
+          email: userToCreate.email,
+          feedbackTopic: "agency-user",
+        }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(true);
+
+      const icUser: InclusionConnectedUser = {
+        ...userToCreate,
+        agencyRights: [
+          {
+            agency: agency2,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        ],
+      };
+      dependencies.adminGateway.createUserForAgencyResponse$.next(icUser);
+
+      expectIsUpdatingUserAgencyToBe(false);
+
+      expectToEqual(icUsersAdminSelectors.agencyUsers(store.getState()), {
+        [userToCreate.id]: {
+          ...icUser,
+          agencyRights: {
+            [agency2.id]: {
+              agency: agency2,
+              roles: ["validator"],
+              isNotifiedByEmail: false,
+            },
+          },
+        },
+      });
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["agency-user"],
+        {
+          level: "success",
+          message: "L'utilisateur a été créé et associé à cette agence.",
+          on: "create",
+          title: "L'utilisateur a été créé",
+        },
+      );
+    });
+
+    it("return an error if creation went wrong", () => {
+      expectToEqual(
+        store.getState().admin.inclusionConnectedUsersAdmin,
+        icUsersAdminInitialState,
+      );
+
+      const userToCreate: NormalizedInclusionConnectedUser = {
+        id: "fake-id",
+        email: "fake-email@mail.com",
+        firstName: "fake-first-name",
+        lastName: "fake-last-name",
+        externalId: null,
+        createdAt: new Date().toISOString(),
+        agencyRights: {},
+        dashboards: { agencies: {}, establishments: {} },
+      };
+
+      store.dispatch(
+        icUsersAdminSlice.actions.createUserOnAgencyRequested({
+          userId: userToCreate.id,
+          agencyId: agency2.id,
+          roles: ["validator"],
+          isNotifiedByEmail: false,
+          email: userToCreate.email,
+          feedbackTopic: "agency-user",
+        }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(true);
+
+      dependencies.adminGateway.createUserForAgencyResponse$.error(
+        errors.agency.notFound({ agencyId: agency2.id }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(false);
+
+      expectToEqual(
+        icUsersAdminSelectors.agencyUsers(store.getState()),
+        icUsersAdminInitialState.agencyUsers,
+      );
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["agency-user"],
+        {
+          level: "error",
+          message: errors.agency.notFound({ agencyId: agency2.id }).message,
+          on: "create",
+          title: "Problème lors de la création de l'utilisateur",
+        },
       );
     });
   });
