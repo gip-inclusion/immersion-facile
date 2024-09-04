@@ -554,7 +554,9 @@ export const domElementIds = {
       inclusionConnectButton: "im-login-form__inclusion-connect-button--admin",
     },
     agencyTab: {
-      editAgencyUsersTable: "im-form-edit-agency__users-table",
+      openManageUserModalButton:
+        "im-form-edit-agency__add-user-to-agency-button",
+      agencyUsersTable: "im-form-edit-agency__users-table",
       editAgencyAutocompleteInput: "im-form-edit-agency__agency-autocomplete",
       editAgencyManageUserModal: "im-form-edit-agency__manage-user-modal",
       editAgencyUserRoleButton: "im-form-edit-agency__users-table-edit-button",
@@ -566,8 +568,10 @@ export const domElementIds = {
       editAgencyFormStatusSelector: "im-form-edit-agency__status-select",
       editAgencyFormSafirCodeInput: "im-form-edit-agency__safir-code-input",
       editAgencyFormEditSubmitButton: "im-form-edit-agency__submit-button",
-      editAgencyUserEmail: "im-edit-agency-user-email",
-      editAgencyUserTooltip: "im-edit-agency-user-tooltip",
+      editAgencyUserEmail: "im-edit-agency-user__email",
+      editAgencyUserIsNotifiedByEmail:
+        "im-edit-agency-user__is-notified-by-email-toggle",
+      editAgencyUserTooltip: "im-edit-agency-user__tooltip",
       rejectAgencyModal: "im-reject-agency-modal",
       agencyToReviewInput: "im-agency-to-review__input",
       agencyToReviewButton: "im-agency-to-review__review-button",

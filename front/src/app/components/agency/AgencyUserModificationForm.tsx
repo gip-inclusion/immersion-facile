@@ -105,9 +105,11 @@ export const AgencyUserModificationForm = ({
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onValidSubmit)}>
         <EmailValidationInput
-          id={domElementIds.admin.agencyTab.editAgencyUserEmail}
           label="Email"
-          nativeInputProps={{ ...register("email") }}
+          nativeInputProps={{
+            ...register("email"),
+            id: domElementIds.admin.agencyTab.editAgencyUserEmail,
+          }}
           {...getFieldError("email")}
           disabled={agencyUser.isIcUser}
           onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
@@ -125,6 +127,7 @@ export const AgencyUserModificationForm = ({
         />
 
         <ToggleSwitch
+          id={domElementIds.admin.agencyTab.editAgencyUserIsNotifiedByEmail}
           label="Recevoir les notifications par email"
           checked={values.isNotifiedByEmail}
           onChange={() =>
