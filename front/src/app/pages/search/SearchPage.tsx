@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
-import React, { useEffect, useRef, useState } from "react";
+import React, { ElementRef, useEffect, useRef, useState } from "react";
 import {
   Loader,
   MainWrapper,
@@ -52,8 +52,8 @@ export const SearchPage = ({
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const requestSearch = useSearchUseCase(route);
   const [searchMade, setSearchMade] = useState<SearchPageParams | null>(null);
-  const searchResultsWrapper = useRef<HTMLDivElement>(null);
-  const innerSearchResultWrapper = useRef<HTMLDivElement>(null);
+  const searchResultsWrapper = useRef<ElementRef<"div">>(null);
+  const innerSearchResultWrapper = useRef<ElementRef<"div">>(null);
   const acquisitionParams = useGetAcquisitionParams();
   const { enableSearchByScore } = useAppSelector(
     featureFlagSelectors.featureFlagState,

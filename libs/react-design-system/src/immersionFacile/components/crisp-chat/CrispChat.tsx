@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { ElementRef, useEffect, useRef } from "react";
 
 type CrispChatProperties = {
   crispWebsiteId: string;
@@ -10,7 +10,7 @@ export const CrispChat = ({
   crispWebsiteId,
   userConsent,
 }: CrispChatProperties) => {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<ElementRef<"div">>(null);
   const appendCrispChatScript = () => {
     (window as any).$crisp = [];
     (window as any).CRISP_WEBSITE_ID = crispWebsiteId;

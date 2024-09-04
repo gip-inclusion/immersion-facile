@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { ElementRef, useLayoutEffect, useRef, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ButtonWithSubMenu.styles";
 
@@ -17,7 +17,7 @@ export const ButtonWithSubMenu = ({
   const buttonId = id ?? "button-with-submenu";
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { cx } = useStyles();
-  const toggleButtonRef = useRef<HTMLButtonElement>(null);
+  const toggleButtonRef = useRef<ElementRef<"button">>(null);
   useLayoutEffect(() => {
     document.body.addEventListener("click", (event) => {
       if (
