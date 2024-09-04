@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import React, { useEffect, useRef, useState } from "react";
+import React, { ElementRef, useEffect, useRef, useState } from "react";
 import { Loader, MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -59,7 +59,7 @@ export const SearchResultPage = () => {
   );
   const feedback = useAppSelector(searchSelectors.feedback);
   const isLoading = useAppSelector(searchSelectors.isLoading);
-  const formContactRef = useRef<HTMLDivElement | null>(null);
+  const formContactRef = useRef<ElementRef<"div">>(null);
   const [shouldShowError, setShouldShowError] = useState<boolean>(false);
   const dispatch = useDispatch();
   const [showConfirmationMessage, setShowConfirmationMessage] = useState<

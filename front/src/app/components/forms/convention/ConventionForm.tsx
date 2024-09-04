@@ -5,6 +5,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React, {
   Dispatch,
+  ElementRef,
   SetStateAction,
   useCallback,
   useEffect,
@@ -210,7 +211,7 @@ export const ConventionForm = ({
     );
   };
 
-  const accordionsRef = useRef<Array<HTMLDivElement | null>>([]);
+  const accordionsRef = useRef<Array<ElementRef<"div">>>([]);
 
   const [stepsStatus, setStepsStatus] = useState<Record<
     number,

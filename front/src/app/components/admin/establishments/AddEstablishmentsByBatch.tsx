@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Papa from "papaparse";
 import { keys, values } from "ramda";
-import React, { useEffect, useRef, useState } from "react";
+import React, { ElementRef, useEffect, useRef, useState } from "react";
 import { Loader } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -75,7 +75,7 @@ export const AddEstablishmentsByBatch = () => {
   const [csvRowsParsed, setCsvRowsParsed] = useState<unknown[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const tableElement = useRef<HTMLTableElement | null>(null);
+  const tableElement = useRef<ElementRef<"table">>(null);
 
   useEffect(() => {
     const onFullscreenChange = () =>

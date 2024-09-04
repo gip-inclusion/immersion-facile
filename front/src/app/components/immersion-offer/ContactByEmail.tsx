@@ -5,7 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useMemo, useRef, useState } from "react";
+import React, { ElementRef, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   AppellationDto,
@@ -76,7 +76,7 @@ export const ContactByEmail = ({
     getPreferUseTranscientDataForScope,
   } = useTranscientDataFromStorage("contact-establishment", false);
 
-  const formRef = useRef<HTMLFormElement>(null);
+  const formRef = useRef<ElementRef<"form">>(null);
 
   const transcientDataForScope = getTranscientDataForScope();
   const preferUseTranscientData = getPreferUseTranscientDataForScope();
