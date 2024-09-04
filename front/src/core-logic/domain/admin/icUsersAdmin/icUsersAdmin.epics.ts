@@ -6,7 +6,7 @@ import {
   AgencyRight,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   WithUserFilters,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
@@ -78,7 +78,7 @@ const registerAgencyToUserEpic: IcUsersAdminActionEpic = (
     filter(
       icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested.match,
     ),
-    switchMap((action: PayloadAction<UserUpdateParamsForAgency>) =>
+    switchMap((action: PayloadAction<UserParamsForAgency>) =>
       adminGateway
         .updateUserRoleForAgency$(action.payload, getAdminToken(state$.value))
         .pipe(

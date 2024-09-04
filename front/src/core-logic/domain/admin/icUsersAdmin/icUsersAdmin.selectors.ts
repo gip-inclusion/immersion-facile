@@ -6,9 +6,9 @@ import { RootState } from "src/core-logic/storeConfig/store";
 const icUsersAdminState = ({ admin }: RootState) =>
   admin.inclusionConnectedUsersAdmin;
 
-const selectedUserId = createSelector(
+const selectedUser = createSelector(
   icUsersAdminState,
-  ({ selectedUserId }) => selectedUserId,
+  ({ selectedUser }) => selectedUser,
 );
 
 const icUsersNeedingReviewSelector = createSelector(
@@ -28,10 +28,10 @@ const isUpdatingIcUserAgency = createSelector(
 
 const agenciesNeedingReviewForSelectedUser = createSelector(
   icUsersNeedingReviewSelector,
-  selectedUserId,
-  (usersNeedingReview, selectedUserId) => {
-    if (!selectedUserId) return [];
-    const inclusionConnectedUser = usersNeedingReview[selectedUserId];
+  selectedUser,
+  (usersNeedingReview, selectedUser) => {
+    if (!selectedUser) return [];
+    const inclusionConnectedUser = usersNeedingReview[selectedUser.id];
     if (!inclusionConnectedUser) return [];
     return values(inclusionConnectedUser.agencyRights).filter(({ roles }) =>
       roles.includes("toReview"),
@@ -59,7 +59,7 @@ const icUsersNeedingReview = createSelector(
 
 export const icUsersAdminSelectors = {
   icUsersNeedingReview,
-  selectedUserId,
+  selectedUser,
   agenciesNeedingReviewForSelectedUser,
   feedback: createSelector(icUsersAdminState, ({ feedback }) => feedback),
   agencyUsers,

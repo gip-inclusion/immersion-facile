@@ -3,7 +3,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { UserId, domElementIds } from "shared";
+import { User, domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -18,7 +18,7 @@ export const RegisterUsersToAgencies = () => {
   const agenciesNeedingReviewForUser = useAppSelector(
     icUsersAdminSelectors.agenciesNeedingReviewForSelectedUser,
   );
-  const selectedUserId = useAppSelector(icUsersAdminSelectors.selectedUserId);
+  const selectedUser = useAppSelector(icUsersAdminSelectors.selectedUser);
   const feedback = useAppSelector(icUsersAdminSelectors.feedback);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const RegisterUsersToAgencies = () => {
 
   useEffect(() => {
     if (agenciesNeedingReviewForUser.length === 0) {
-      dispatch(icUsersAdminSlice.actions.inclusionConnectedUserSelected(""));
+      dispatch(icUsersAdminSlice.actions.inclusionConnectedUserSelected(null));
     }
   }, [agenciesNeedingReviewForUser, dispatch]);
 
@@ -55,18 +55,20 @@ export const RegisterUsersToAgencies = () => {
             placeholder="Sélectionner un utilisateur"
             nativeSelectProps={{
               defaultValue: "",
-              value: selectedUserId || "",
+              value: selectedUser?.id || "",
               id: domElementIds.admin.agencyTab.selectIcUserToReview,
               onChange: (event) => {
                 dispatch(
                   icUsersAdminSlice.actions.inclusionConnectedUserSelected(
-                    event.currentTarget.value as UserId,
+                    icUsersNeedingReview.find(
+                      (icUser) => icUser.id === event.currentTarget.value,
+                    ) as User,
                   ),
                 );
               },
             }}
           />
-          {match({ agenciesNeedingReviewForUser, feedback, selectedUserId })
+          {match({ agenciesNeedingReviewForUser, feedback, selectedUser })
             .with(
               {
                 agenciesNeedingReviewForUser: P.when(
@@ -79,12 +81,12 @@ export const RegisterUsersToAgencies = () => {
                     feedback.kind === "usersToReviewFetchSuccess" ||
                     feedback.kind === "agencyRejectionForUserSuccess",
                 ),
-                selectedUserId: P.not(P.nullish),
+                selectedUser: P.not(P.nullish),
               },
-              ({ selectedUserId }) => (
+              ({ selectedUser }) => (
                 <IcUserAgenciesToReview
                   agenciesNeedingReviewForUser={agenciesNeedingReviewForUser}
-                  selectedUserId={selectedUserId}
+                  selectedUser={selectedUser}
                 />
               ),
             )

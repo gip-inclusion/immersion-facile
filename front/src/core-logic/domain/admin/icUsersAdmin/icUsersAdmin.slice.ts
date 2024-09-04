@@ -5,8 +5,9 @@ import {
   InclusionConnectedUser,
   OmitFromExistingKeys,
   RejectIcUserRoleForAgencyParams,
+  User,
   UserId,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   WithUserFilters,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
@@ -35,7 +36,7 @@ export type IcUsersAdminFeedback = SubmitFeedBack<IcUsersAdminFeedbackKind>;
 export type IcUsersAdminState = {
   icUsersNeedingReview: NormalizedIcUserById;
   agencyUsers: NormalizedIcUserById;
-  selectedUserId: UserId | null;
+  selectedUser: User | null;
   isUpdatingIcUserAgency: boolean;
   isFetchingAgenciesNeedingReviewForIcUser: boolean;
   isFetchingAgencyUsers: boolean;
@@ -45,7 +46,7 @@ export type IcUsersAdminState = {
 export const icUsersAdminInitialState: IcUsersAdminState = {
   icUsersNeedingReview: {},
   agencyUsers: {},
-  selectedUserId: null,
+  selectedUser: null,
   isUpdatingIcUserAgency: false,
   isFetchingAgenciesNeedingReviewForIcUser: false,
   isFetchingAgencyUsers: false,
@@ -58,9 +59,9 @@ export const icUsersAdminSlice = createSlice({
   reducers: {
     inclusionConnectedUserSelected: (
       state,
-      action: PayloadAction<UserId | null>,
+      action: PayloadAction<User | null>,
     ) => {
-      state.selectedUserId = action.payload;
+      state.selectedUser = action.payload;
       if (state.feedback.kind === "errored")
         state.feedback = { kind: "usersToReviewFetchSuccess" };
     },
@@ -106,13 +107,13 @@ export const icUsersAdminSlice = createSlice({
     },
     registerAgencyWithRoleToUserRequested: (
       state,
-      _action: PayloadAction<UserUpdateParamsForAgency>,
+      _action: PayloadAction<UserParamsForAgency>,
     ) => {
       state.isUpdatingIcUserAgency = true;
     },
     registerAgencyWithRoleToUserSucceeded: (
       state,
-      action: PayloadAction<UserUpdateParamsForAgency>,
+      action: PayloadAction<UserParamsForAgency>,
     ) => {
       const { userId, agencyId, roles: newRoles } = action.payload;
       state.isUpdatingIcUserAgency = false;
@@ -163,14 +164,14 @@ export const icUsersAdminSlice = createSlice({
 
     updateUserOnAgencyRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<UserUpdateParamsForAgency>,
+      _action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
     ) => {
       state.isUpdatingIcUserAgency = true;
     },
 
     updateUserOnAgencySucceeded: (
       state,
-      action: PayloadActionWithFeedbackTopic<UserUpdateParamsForAgency>,
+      action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
     ) => {
       state.isUpdatingIcUserAgency = false;
       const {

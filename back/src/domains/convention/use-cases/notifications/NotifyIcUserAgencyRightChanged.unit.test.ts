@@ -1,7 +1,7 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUser,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   errors,
   expectPromiseToFailWithError,
 } from "shared";
@@ -19,7 +19,7 @@ import {
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyIcUserAgencyRightChanged } from "./NotifyIcUserAgencyRightChanged";
 
-const icUserRoleParams: UserUpdateParamsForAgency = {
+const icUserRoleParams: UserParamsForAgency = {
   roles: ["counsellor"],
   agencyId: "agency-1",
   userId: "jbab-123",

@@ -1,11 +1,12 @@
 import {
   AgencyDto,
   AgencyRight,
+  Email,
   InclusionConnectedUser,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   errors,
   replaceElementWhere,
-  userUpdateParamsForAgencySchema,
+  userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
@@ -17,7 +18,7 @@ import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 const rejectIfAgencyWontHaveValidators = async (
   uow: UnitOfWork,
-  params: UserUpdateParamsForAgency,
+  params: UserParamsForAgency,
   agency: AgencyDto,
 ) => {
   if (
@@ -43,7 +44,7 @@ const rejectIfAgencyWontHaveValidators = async (
 };
 
 const rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails = async (
-  params: UserUpdateParamsForAgency,
+  params: UserParamsForAgency,
   agency: AgencyDto,
 ) => {
   if (
@@ -59,7 +60,7 @@ const rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails = async (
 
 const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
   uow: UnitOfWork,
-  params: UserUpdateParamsForAgency,
+  params: UserParamsForAgency,
   agency: AgencyDto,
 ) => {
   if (
@@ -86,7 +87,7 @@ const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
 
 const makeAgencyRights = async (
   uow: UnitOfWork,
-  params: UserUpdateParamsForAgency,
+  params: UserParamsForAgency,
   userToUpdate: InclusionConnectedUser,
 ) => {
   const agency = await uow.agencyRepository.getById(params.agencyId);
@@ -127,7 +128,7 @@ const makeAgencyRights = async (
 
 const rejectEmailModificationIfInclusionConnectedUser = (
   user: InclusionConnectedUser,
-  newEmail: string | null,
+  newEmail: Email,
 ) => {
   if (!newEmail || !user.externalId) return;
   if (user.email !== newEmail) {
@@ -137,19 +138,19 @@ const rejectEmailModificationIfInclusionConnectedUser = (
 
 const updateIfUserEmailChanged = async (
   user: InclusionConnectedUser,
-  newEmail: string | null,
+  newEmail: Email,
   userRepository: UserRepository,
 ) => {
-  if (!newEmail || user.email === newEmail) return;
+  if (user.email === newEmail || user.externalId) return;
   await userRepository.updateEmail(user.id, newEmail);
 };
 
 export class UpdateUserForAgency extends TransactionalUseCase<
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   void,
   InclusionConnectedUser
 > {
-  protected inputSchema = userUpdateParamsForAgencySchema;
+  protected inputSchema = userParamsForAgencySchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -163,7 +164,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: UserUpdateParamsForAgency,
+    params: UserParamsForAgency,
     uow: UnitOfWork,
     currentUser: InclusionConnectedUser,
   ): Promise<void> {

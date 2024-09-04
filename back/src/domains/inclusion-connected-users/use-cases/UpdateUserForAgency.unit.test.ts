@@ -6,7 +6,7 @@ import {
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   User,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -204,33 +204,6 @@ describe("UpdateUserForAgency", () => {
       );
     });
 
-    it("does not modify email if not requested", async () => {
-      const icUser: InclusionConnectedUser = {
-        ...notAdminUser,
-        externalId: null,
-        agencyRights: [agencyRight],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
-      };
-      userRepository.setInclusionConnectedUsers([icUser]);
-
-      await updateIcUserRoleForAgency.execute(
-        {
-          agencyId: agency.id,
-          roles: ["validator"],
-          userId: icUser.id,
-          isNotifiedByEmail: true,
-          email: null,
-        },
-        backofficeAdminUser,
-      );
-
-      const updatedUser = await userRepository.getById(icUser.id);
-      expectToEqual(updatedUser?.email, icUser.email);
-    });
-
     it("does not modify email if it hasn't changed", async () => {
       const icUser: InclusionConnectedUser = {
         ...notAdminUser,
@@ -322,7 +295,7 @@ describe("UpdateUserForAgency", () => {
         validator,
       ]);
 
-      const icUserRoleForAgency: UserUpdateParamsForAgency = {
+      const icUserRoleForAgency: UserParamsForAgency = {
         roles: ["counsellor", "validator", "agencyOwner"],
         agencyId: agency.id,
         userId: notAdminUser.id,
@@ -383,7 +356,7 @@ describe("UpdateUserForAgency", () => {
 
       userRepository.setInclusionConnectedUsers([backofficeAdminUser, icUser]);
       const newRole: AgencyRole = "validator";
-      const icUserRoleForAgency: UserUpdateParamsForAgency = {
+      const icUserRoleForAgency: UserParamsForAgency = {
         userId: notAdminUser.id,
         agencyId: agency.id,
         roles: [newRole],

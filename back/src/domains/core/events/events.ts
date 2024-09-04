@@ -9,7 +9,7 @@ import {
   Role,
   SiretDto,
   UserId,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   WithAgencyDto,
   WithAssessmentDto,
   WithConventionDto,
@@ -155,7 +155,7 @@ export type DomainEvent =
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
   | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: UserId; agencyIds: AgencyId[] } & WithTriggeredBy>
-  | GenericEvent<"IcUserAgencyRightChanged", UserUpdateParamsForAgency & WithTriggeredBy>
+  | GenericEvent<"IcUserAgencyRightChanged", UserParamsForAgency & WithTriggeredBy>
   | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams & WithTriggeredBy>
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string } & WithTriggeredBy>
