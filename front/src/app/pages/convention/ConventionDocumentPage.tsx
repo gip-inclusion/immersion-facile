@@ -139,8 +139,10 @@ export const ConventionDocumentPage = ({
   const replaceContentsUrlWithAbsoluteUrl = (htmlContent: string): string =>
     htmlContent
       .replaceAll(
-        new RegExp(/<link rel="stylesheet" href="\//gm),
-        `<link rel="stylesheet" href="${window.location.origin}/`,
+        new RegExp(
+          /(<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["'])\/([^'"]*["'][^>]*>)/gm,
+        ),
+        `<link rel="stylesheet" href="${window.location.origin}/$2`, // $2 contains the path and the closing tag
       )
       .replaceAll(
         new RegExp(/<img src="\//gm),
