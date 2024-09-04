@@ -46,9 +46,14 @@ export const makeContactRequestReminder = createTransactionalUseCase<
     });
 
     const maybeNotifications = await Promise.all(
-      discussions.map((discussion) =>
-        makeNotification({ uow, discussion, mode, domain: deps.domain }),
-      ),
+      discussions
+        .filter(
+          (discussion) =>
+            discussion.establishmentContact.contactMethod === "EMAIL",
+        )
+        .map((discussion) =>
+          makeNotification({ uow, discussion, mode, domain: deps.domain }),
+        ),
     );
 
     const notifications = maybeNotifications.filter(
@@ -76,28 +81,28 @@ const makeNotification = async ({
   mode: ContactRequestReminderMode;
   discussion: DiscussionDto;
 }): Promise<NotificationContentAndFollowedIds | null> => {
-  const appelations =
+  const appellations =
     await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
       discussion.appellationCode,
     ]);
-  const appelation = appelations.at(0);
+  const appellation = appellations.at(0);
   const replyTo = createOpaqueEmail(
     discussion.id,
     "potentialBeneficiary",
     `reply.${domain}`,
   );
-  return appelation
+  return appellation
     ? ({
         followedIds: { establishmentSiret: discussion.siret },
         kind: "email",
         templatedContent: {
           kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
           params: {
-            appelationLabel: appelation.appellationLabel,
+            appellationLabel: appellation.appellationLabel,
             beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
             beneficiaryLastName: discussion.potentialBeneficiary.lastName,
             beneficiaryReplyToEmail: replyTo,
-            domain: domain,
+            domain,
             mode,
           },
           replyTo: {

@@ -377,7 +377,7 @@ export const defaultEmailValueByEmailKind: {
     internshipKind: "immersion",
   },
   ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
-    appelationLabel: "Conducteur Poids Lourd",
+    appellationLabel: "Conducteur Poids Lourd",
     beneficiaryFirstName: "Coco",
     beneficiaryLastName: "Channel",
     beneficiaryReplyToEmail: "coco.chanel@notExistEmail.com",
