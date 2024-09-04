@@ -89,7 +89,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
       <Feedback topic="agency-user" />
 
       <Table
-        id={domElementIds.admin.agencyTab.editAgencyUsersTable}
+        id={domElementIds.admin.agencyTab.agencyUsersTable}
         headers={[
           "Utilisateurs",
           "Préférence de communication",
@@ -163,7 +163,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
           });
           manageUserModal.open();
         }}
-        id={domElementIds.manageConvention.openRenewModalButton}
+        id={domElementIds.admin.agencyTab.openManageUserModalButton}
       >
         Ajouter un utilisateur
       </Button>
