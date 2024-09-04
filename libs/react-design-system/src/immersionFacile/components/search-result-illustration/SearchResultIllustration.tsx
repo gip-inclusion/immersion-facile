@@ -17,10 +17,6 @@ export const SearchResultIllustration = ({
       className={cx(Styles.root)}
       style={{
         backgroundImage: `url(${illustration})`,
-        backgroundColor: "var(--blue-france-950-100)",
-        backgroundPosition: "center center",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
       }}
     >
       {children}

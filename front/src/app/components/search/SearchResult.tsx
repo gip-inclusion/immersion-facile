@@ -5,7 +5,6 @@ import { formatDistance } from "date-fns";
 import { fr as frLocale } from "date-fns/locale";
 import { equals } from "ramda";
 import React, { memo } from "react";
-import { SearchResultIllustration, Tag as ImTag } from "react-design-system";
 import {
   DateTimeIsoString,
   SearchResultDto,
@@ -13,22 +12,12 @@ import {
   frenchEstablishmentKinds,
 } from "shared";
 import { routes } from "src/app/routes/routes";
-import illustration1 from "src/assets/img/search-illustration-0.webp";
-import illustration2 from "src/assets/img/search-illustration-1.webp";
-import illustration3 from "src/assets/img/search-illustration-2.webp";
-import illustration4 from "src/assets/img/search-illustration-3.webp";
 import "./SearchResult.scss";
-
-const illustrations = [
-  illustration1,
-  illustration2,
-  illustration3,
-  illustration4,
-];
 
 export type EnterpriseSearchResultProps = {
   establishment: SearchResultDto;
   onButtonClick?: () => void;
+  illustration: React.ReactNode;
   disableButton?: boolean;
   preview?: boolean;
   showDistance?: boolean;
@@ -50,6 +39,7 @@ const getLastDate = (
 const SearchResultComponent = ({
   onButtonClick,
   establishment,
+  illustration,
   preview,
   layout = "fr-col-lg-4",
 }: EnterpriseSearchResultProps) => {
@@ -61,7 +51,6 @@ const SearchResultComponent = ({
     romeLabel,
     appellations,
     voluntaryToImmersion,
-    fitForDisabledWorkers,
     createdAt,
     updatedAt,
     locationId,
@@ -96,7 +85,7 @@ const SearchResultComponent = ({
         desc={establishmentName}
         linkProps={{
           ...routes.searchResult({
-            appellationCode: appellations[0]?.appellationCode ?? "",
+            appellationCode: preview ? "" : appellations[0].appellationCode,
             siret,
             ...(locationId ? { location: locationId } : {}),
           }).link,
@@ -116,19 +105,7 @@ const SearchResultComponent = ({
         }
         enlargeLink
         titleAs="h2"
-        imageComponent={
-          <SearchResultIllustration
-            illustration={
-              illustrations[Math.floor(Math.random() * illustrations.length)]
-            }
-          >
-            <div className={fr.cx("fr-p-1v")}>
-              {fitForDisabledWorkers && <ImTag theme="rqth" />}
-              {!voluntaryToImmersion && <ImTag theme="lbb" />}
-              {voluntaryToImmersion && <ImTag theme="voluntaryToImmersion" />}
-            </div>
-          </SearchResultIllustration>
-        }
+        imageComponent={illustration}
         endDetail={dateJobCreatedAt}
         start={
           <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">

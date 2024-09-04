@@ -1,5 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import { SearchResultIllustration, Tag as ImTag } from "react-design-system";
 import { FormEstablishmentDto, SearchResultDto } from "shared";
+import { searchIllustrations } from "src/assets/img/illustrations";
 import { useStyles } from "tss-react/dsfr";
 import { SearchResult } from "../../search/SearchResult";
 
@@ -68,6 +70,14 @@ export const SearchResultPreview = ({
         )}
       >
         <SearchResult
+          illustration={
+            <SearchResultIllustration illustration={searchIllustrations[0]}>
+              <div className={fr.cx("fr-p-1v")}>
+                {establishment.fitForDisabledWorkers && <ImTag theme="rqth" />}
+                <ImTag theme="voluntaryToImmersion" />
+              </div>
+            </SearchResultIllustration>
+          }
           establishment={establishmentToSearchResultPreview(establishment)}
           preview
           layout="fr-col-md-6"

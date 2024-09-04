@@ -2,9 +2,11 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import React, { useState } from "react";
+import { SearchResultIllustration, Tag as ImTag } from "react-design-system";
 import { SearchResultDto, domElementIds } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { routes } from "src/app/routes/routes";
+import { searchIllustrations } from "src/assets/img/illustrations";
 
 type GroupListResultsProps = {
   results: SearchResultDto[];
@@ -37,7 +39,22 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           {getSearchResultsForPage(currentPage).map((searchResult) => (
             <SearchResult
-              key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
+              key={`${searchResult.siret}-${searchResult.rome}`}
+              illustration={
+                <SearchResultIllustration illustration={searchIllustrations[0]}>
+                  <div className={fr.cx("fr-p-1v")}>
+                    {searchResult.fitForDisabledWorkers && (
+                      <ImTag theme="rqth" />
+                    )}
+                    {!searchResult.voluntaryToImmersion && (
+                      <ImTag theme="lbb" />
+                    )}
+                    {searchResult.voluntaryToImmersion && (
+                      <ImTag theme="voluntaryToImmersion" />
+                    )}
+                  </div>
+                </SearchResultIllustration>
+              }
               establishment={searchResult}
               onButtonClick={() => {
                 const appellationCode =

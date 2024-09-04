@@ -2,11 +2,16 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import React, { useCallback, useEffect, useState } from "react";
-import { useStyleUtils } from "react-design-system";
+import {
+  SearchResultIllustration,
+  Tag as ImTag,
+  useStyleUtils,
+} from "react-design-system";
 import { useDispatch } from "react-redux";
 import { SearchResultDto, domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { searchIllustrations } from "src/assets/img/illustrations";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { SearchResult } from "./SearchResult";
@@ -36,6 +41,8 @@ export const SearchListResults = ({
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const resultsPerPageValue = parseInt(resultsPerPage);
   const totalPages = Math.ceil(searchResults.length / resultsPerPageValue);
+  const hasResults = displayedResults.length > 0;
+
   const getSearchResultsForPage = useCallback(
     (currentPage: number) => {
       const start = currentPage * resultsPerPageValue;
@@ -47,8 +54,8 @@ export const SearchListResults = ({
 
   useEffect(() => {
     setDisplayedResults(getSearchResultsForPage(currentPage));
-  }, [currentPage, resultsPerPage, getSearchResultsForPage]);
-  const hasResults = displayedResults.length > 0;
+  }, [currentPage, getSearchResultsForPage]);
+
   return (
     <>
       <div className={fr.cx("fr-container")}>
@@ -76,10 +83,29 @@ export const SearchListResults = ({
             </div>
           )}
           {hasResults &&
-            displayedResults.map((searchResult) => (
+            displayedResults.map((searchResult, index) => (
               <SearchResult
                 key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
                 establishment={searchResult}
+                illustration={
+                  <SearchResultIllustration
+                    illustration={
+                      searchIllustrations[index % searchIllustrations.length]
+                    }
+                  >
+                    <div className={fr.cx("fr-p-1v")}>
+                      {searchResult.fitForDisabledWorkers && (
+                        <ImTag theme="rqth" />
+                      )}
+                      {!searchResult.voluntaryToImmersion && (
+                        <ImTag theme="lbb" />
+                      )}
+                      {searchResult.voluntaryToImmersion && (
+                        <ImTag theme="voluntaryToImmersion" />
+                      )}
+                    </div>
+                  </SearchResultIllustration>
+                }
                 showDistance={showDistance}
                 onButtonClick={() => {
                   const appellations = searchResult.appellations;
