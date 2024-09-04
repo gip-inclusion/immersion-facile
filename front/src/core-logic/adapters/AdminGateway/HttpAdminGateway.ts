@@ -11,7 +11,7 @@ import {
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   WithUserFilters,
   createApiConsumerParamsFromApiConsumer,
 } from "shared";
@@ -183,7 +183,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public updateUserRoleForAgency$(
-    params: UserUpdateParamsForAgency,
+    params: UserParamsForAgency,
     token: string,
   ): Observable<void> {
     return from(

@@ -1,9 +1,9 @@
 import {
   AgencyRight,
   InclusionConnectedUser,
-  UserCreateParamsForAgency,
+  UserParamsForAgency,
   errors,
-  userCreateParamsForAgencySchema,
+  userParamsForAgencySchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { DomainEvent } from "../../core/events/events";
@@ -14,14 +14,14 @@ import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
 
 export const makeCreateUserForAgency = createTransactionalUseCase<
-  UserCreateParamsForAgency,
+  UserParamsForAgency,
   void,
   InclusionConnectedUser,
   { timeGateway: TimeGateway; createNewEvent: CreateNewEvent }
 >(
   {
     name: "CreateUserForAgency",
-    inputSchema: userCreateParamsForAgencySchema,
+    inputSchema: userParamsForAgencySchema,
   },
   async ({ inputParams, uow, currentUser, deps }) => {
     throwIfNotAdmin(currentUser);

@@ -8,9 +8,9 @@ import { keys } from "react-design-system";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   domElementIds,
-  userUpdateParamsForAgencySchema,
+  userParamsForAgencySchema,
 } from "shared";
 import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
@@ -23,14 +23,14 @@ export const AgencyUserModificationForm = ({
   agencyUser,
   closeModal,
 }: {
-  agencyUser: UserUpdateParamsForAgency & { isIcUser: boolean };
+  agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
 }) => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
   const dispatch = useDispatch();
 
-  const methods = useForm<UserUpdateParamsForAgency>({
-    resolver: zodResolver(userUpdateParamsForAgencySchema),
+  const methods = useForm<UserParamsForAgency>({
+    resolver: zodResolver(userParamsForAgencySchema),
     mode: "onTouched",
     defaultValues: agencyUser,
   });
@@ -41,7 +41,7 @@ export const AgencyUserModificationForm = ({
 
   const getFieldError = makeFieldError(formState);
 
-  const onValidSubmit = (values: UserUpdateParamsForAgency) => {
+  const onValidSubmit = (values: UserParamsForAgency) => {
     dispatch(
       icUsersAdminSlice.actions.updateUserOnAgencyRequested({
         ...values,

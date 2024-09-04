@@ -11,7 +11,7 @@ import {
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   WithUserFilters,
 } from "shared";
 
@@ -42,7 +42,7 @@ export interface AdminGateway {
   ): Observable<NotificationsByKind>;
 
   updateUserRoleForAgency$(
-    params: UserUpdateParamsForAgency,
+    params: UserParamsForAgency,
     token: InclusionConnectJwt,
   ): Observable<void>;
 

@@ -10,7 +10,7 @@ import {
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -89,7 +89,7 @@ export class TestAdminGateway implements AdminGateway {
   }
 
   public updateUserRoleForAgency$(
-    _params: UserUpdateParamsForAgency,
+    _params: UserParamsForAgency,
     _token: string,
   ): Observable<void> {
     return this.updateAgencyRoleForUserResponse$;

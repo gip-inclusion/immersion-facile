@@ -12,7 +12,7 @@ import {
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -157,7 +157,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 
   public updateUserRoleForAgency$(
-    { agencyId }: UserUpdateParamsForAgency,
+    { agencyId }: UserParamsForAgency,
     _token: string,
   ): Observable<void> {
     return agencyId === "non-existing-agency-id"

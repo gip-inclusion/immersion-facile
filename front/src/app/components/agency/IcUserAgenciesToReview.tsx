@@ -14,6 +14,7 @@ import {
   AgencyRight,
   AgencyRole,
   RejectIcUserRoleForAgencyParams,
+  User,
   UserId,
   domElementIds,
   rejectIcUserRoleForAgencyParamsSchema,
@@ -29,16 +30,16 @@ const selectableAgencyRoles = [
 
 type IcUserAgenciesToReviewProps = {
   agenciesNeedingReviewForUser: AgencyRight[];
-  selectedUserId: UserId;
+  selectedUser: User;
 };
 
 function AgencyReviewForm({
   agency,
   setSelectedAgency,
-  selectedUserId,
+  selectedUser,
 }: {
   agency: AgencyDto;
-  selectedUserId: UserId;
+  selectedUser: User;
   setSelectedAgency: (agency: AgencyDto) => void;
 }) {
   const dispatch = useDispatch();
@@ -61,10 +62,10 @@ function AgencyReviewForm({
     dispatch(
       icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested({
         agencyId: agency.id,
-        userId: selectedUserId,
+        userId: selectedUser.id,
         roles: [selectedRole],
         isNotifiedByEmail: false,
-        email: null,
+        email: selectedUser.email,
       }),
     );
   };
@@ -119,7 +120,7 @@ function AgencyReviewForm({
                 {
                   type: "button",
                   priority: "primary",
-                  id: `${domElementIds.admin.agencyTab.registerIcUserToAgencyButton}-${agency.id}-${selectedUserId}`,
+                  id: `${domElementIds.admin.agencyTab.registerIcUserToAgencyButton}-${agency.id}-${selectedUser.id}`,
                   onClick: () => registerIcUserToAgency(agency),
                   children: "Valider",
                   disabled: !selectedRole,
@@ -144,7 +145,7 @@ function AgencyReviewForm({
 
 export const IcUserAgenciesToReview = ({
   agenciesNeedingReviewForUser,
-  selectedUserId,
+  selectedUser,
 }: IcUserAgenciesToReviewProps) => {
   const [selectedAgency, setSelectedAgency] = useState<AgencyDto>();
 
@@ -155,7 +156,7 @@ export const IcUserAgenciesToReview = ({
           key={agency.id}
           agency={agency}
           setSelectedAgency={setSelectedAgency}
-          selectedUserId={selectedUserId}
+          selectedUser={selectedUser}
         />
       ))}
       {createPortal(
@@ -163,8 +164,8 @@ export const IcUserAgenciesToReview = ({
           {selectedAgency ? (
             <RejectIcUserRegistrationToAgencyForm
               agency={{ id: selectedAgency.id, name: selectedAgency.name }}
-              userId={selectedUserId}
-              key={`${selectedAgency.id}-${selectedUserId}`}
+              userId={selectedUser.id}
+              key={`${selectedAgency.id}-${selectedUser.id}`}
             />
           ) : (
             "Pas d'agence sélectionnée"

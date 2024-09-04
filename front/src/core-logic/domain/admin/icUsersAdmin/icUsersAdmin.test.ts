@@ -6,7 +6,7 @@ import {
   AgencyRight,
   RejectIcUserRoleForAgencyParams,
   User,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -111,19 +111,19 @@ describe("Agency registration for authenticated users", () => {
           inclusionConnectedUsersAdmin: {
             ...icUsersAdminInitialState,
             icUsersNeedingReview: testUserSet,
-            selectedUserId: null,
+            selectedUser: null,
             feedback: { kind: "usersToReviewFetchSuccess" },
           },
         }),
       }));
 
       store.dispatch(
-        icUsersAdminSlice.actions.inclusionConnectedUserSelected(user2Id),
+        icUsersAdminSlice.actions.inclusionConnectedUserSelected(authUser2),
       );
 
       expectAgencyAdminStateToMatch({
         icUsersNeedingReview: testUserSet,
-        selectedUserId: user2Id,
+        selectedUser: authUser2,
         feedback: { kind: "usersToReviewFetchSuccess" },
       });
     });
@@ -134,19 +134,19 @@ describe("Agency registration for authenticated users", () => {
           inclusionConnectedUsersAdmin: {
             ...icUsersAdminInitialState,
             icUsersNeedingReview: testUserSet,
-            selectedUserId: null,
+            selectedUser: null,
             feedback: { kind: "errored", errorMessage: "Opps" },
           },
         }),
       }));
 
       store.dispatch(
-        icUsersAdminSlice.actions.inclusionConnectedUserSelected(user2Id),
+        icUsersAdminSlice.actions.inclusionConnectedUserSelected(authUser2),
       );
 
       expectAgencyAdminStateToMatch({
         icUsersNeedingReview: testUserSet,
-        selectedUserId: user2Id,
+        selectedUser: authUser2,
         feedback: { kind: "usersToReviewFetchSuccess" },
       });
     });
@@ -288,12 +288,12 @@ describe("Agency registration for authenticated users", () => {
           inclusionConnectedUsersAdmin: {
             ...icUsersAdminInitialState,
             icUsersNeedingReview: testUserSet,
-            selectedUserId: user2Id,
+            selectedUser: authUser2,
           },
         }),
       }));
 
-      const payload: UserUpdateParamsForAgency = {
+      const payload: UserParamsForAgency = {
         agencyId: "agency-3",
         userId: user2Id,
         roles: ["validator"],
@@ -328,7 +328,7 @@ describe("Agency registration for authenticated users", () => {
     });
 
     it("stores error message when something goes wrong in the update", () => {
-      const payload: UserUpdateParamsForAgency = {
+      const payload: UserParamsForAgency = {
         agencyId: "agency-3",
         userId: "user-id",
         roles: ["validator"],

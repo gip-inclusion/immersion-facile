@@ -1,7 +1,7 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
-  UserCreateParamsForAgency,
+  UserParamsForAgency,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -154,7 +154,7 @@ describe("CreateUserForAgency", () => {
     const newUserId = uuidGenerator.new();
     userRepository.users = [];
 
-    const icUserForAgency: UserCreateParamsForAgency = {
+    const icUserForAgency: UserParamsForAgency = {
       userId: newUserId,
       agencyId: agency.id,
       roles: ["counsellor"],
@@ -220,7 +220,7 @@ describe("CreateUserForAgency", () => {
       ],
     });
 
-    const icUserForAgency: UserCreateParamsForAgency = {
+    const icUserForAgency: UserParamsForAgency = {
       userId,
       agencyId: anotherAgency.id,
       roles: ["counsellor"],

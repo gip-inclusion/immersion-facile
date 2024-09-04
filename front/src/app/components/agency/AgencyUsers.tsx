@@ -11,7 +11,7 @@ import { useDispatch } from "react-redux";
 import {
   AgencyId,
   AgencyRole,
-  UserUpdateParamsForAgency,
+  UserParamsForAgency,
   domElementIds,
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
@@ -65,7 +65,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
   const dispatch = useDispatch();
 
   const [selectedUserData, setSelectedUserData] = useState<
-    (UserUpdateParamsForAgency & { isIcUser: boolean }) | null
+    (UserParamsForAgency & { isIcUser: boolean }) | null
   >(null);
 
   return (
