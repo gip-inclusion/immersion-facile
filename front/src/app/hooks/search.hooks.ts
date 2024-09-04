@@ -10,6 +10,10 @@ import {
 } from "src/core-logic/domain/search/search.slice";
 import { Route } from "type-route";
 
+export const encodedSearchUriParams = [
+  "place",
+] satisfies (keyof SearchPageParams)[];
+
 export const useSearchUseCase = ({
   name,
 }: Route<typeof routes.search | typeof routes.searchDiagoriente>) => {
@@ -22,14 +26,23 @@ export const useSearchUseCase = ({
     dispatch(
       searchSlice.actions.searchRequested({ ...values, appellationCodes }),
     );
-    routes[name](
-      filterParamsForRoute(
-        {
-          ...urlParams,
-          ...values,
-        },
-        searchParams,
-      ),
-    ).replace();
+    const updatedUrlParams = filterParamsForRoute(
+      {
+        ...urlParams,
+        ...values,
+      },
+      searchParams,
+    );
+    const updatedUrlParamsWithEncodedUriValues = {
+      ...updatedUrlParams,
+      ...encodedSearchUriParams.reduce((acc, currentKey) => {
+        const value = values[currentKey];
+        if (value) {
+          acc[currentKey] = encodeURIComponent(value);
+        }
+        return acc;
+      }, updatedUrlParams),
+    };
+    routes[name](updatedUrlParamsWithEncodedUriValues).replace();
   };
 };

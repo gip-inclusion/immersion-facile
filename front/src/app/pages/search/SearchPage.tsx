@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
-import { keys } from "ramda";
+import { includes, keys } from "ramda";
 import React, { ElementRef, useEffect, useRef, useState } from "react";
 import {
   Loader,
@@ -11,7 +11,7 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
-import { LatLonDistance, SearchSortedBy, domElementIds } from "shared";
+import { LatLonDistance, SearchSortedBy, ValueOf, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -19,7 +19,10 @@ import { SearchInfoSection } from "src/app/components/search/SearchInfoSection";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useSearchUseCase } from "src/app/hooks/search.hooks";
+import {
+  encodedSearchUriParams,
+  useSearchUseCase,
+} from "src/app/hooks/search.hooks";
 import { routes } from "src/app/routes/routes";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -38,6 +41,19 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
     value: distance,
   }),
 );
+
+const getSearchRouteParam = (
+  currentKey: keyof SearchPageParams,
+  routeParam: ValueOf<SearchPageParams>,
+  defaultValue: unknown,
+) => {
+  if (!routeParam) {
+    return defaultValue;
+  }
+  return includes(currentKey, encodedSearchUriParams)
+    ? decodeURIComponent(`${routeParam}`)
+    : routeParam;
+};
 
 export const SearchPage = ({
   route,
@@ -81,7 +97,11 @@ export const SearchPage = ({
     defaultValues: keys(initialValues).reduce(
       (acc, currentKey) => ({
         ...acc,
-        [currentKey]: routeParams[currentKey] ?? initialValues[currentKey],
+        [currentKey]: getSearchRouteParam(
+          currentKey,
+          routeParams[currentKey],
+          initialValues[currentKey],
+        ),
       }),
       {},
     ),
