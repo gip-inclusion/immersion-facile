@@ -18,6 +18,7 @@ import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUser
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
+import { v4 as uuidV4 } from "uuid";
 import { Feedback } from "../feedback/Feedback";
 
 type AgencyUsersProperties = {
@@ -55,6 +56,8 @@ export const agencyRoleToDisplay: Record<
   },
 };
 
+export type UserFormMode = "add" | "update";
+
 const manageUserModal = createModal({
   isOpenedByDefault: false,
   id: domElementIds.admin.agencyTab.editAgencyManageUserModal,
@@ -67,6 +70,8 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
   const [selectedUserData, setSelectedUserData] = useState<
     (UserParamsForAgency & { isIcUser: boolean }) | null
   >(null);
+
+  const [mode, setMode] = useState<UserFormMode | null>(null);
 
   return (
     <>
@@ -123,6 +128,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
               id={`${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agencyId}-${index}`}
               onClick={() => {
                 dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+                setMode("update");
                 setSelectedUserData({
                   agencyId,
                   userId: agencyUser.id,
@@ -141,12 +147,33 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
         })}
         fixed
       />
+      <Button
+        iconId="fr-icon-file-add-line"
+        className={fr.cx("fr-m-1w")}
+        priority="secondary"
+        onClick={() => {
+          setMode("add");
+          setSelectedUserData({
+            agencyId,
+            userId: uuidV4(),
+            roles: [],
+            email: "",
+            isNotifiedByEmail: true,
+            isIcUser: false,
+          });
+          manageUserModal.open();
+        }}
+        id={domElementIds.manageConvention.openRenewModalButton}
+      >
+        Ajouter un utilisateur
+      </Button>
       {createPortal(
         <manageUserModal.Component title="Modifier le rôle de l'utilisateur">
-          {selectedUserData && (
+          {selectedUserData && mode && (
             <AgencyUserModificationForm
               agencyUser={selectedUserData}
               closeModal={() => manageUserModal.close()}
+              mode={mode}
             />
           )}
         </manageUserModal.Component>,

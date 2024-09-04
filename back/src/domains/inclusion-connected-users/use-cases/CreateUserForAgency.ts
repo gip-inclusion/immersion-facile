@@ -15,7 +15,7 @@ export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
 
 export const makeCreateUserForAgency = createTransactionalUseCase<
   UserParamsForAgency,
-  void,
+  InclusionConnectedUser,
   InclusionConnectedUser,
   { timeGateway: TimeGateway; createNewEvent: CreateNewEvent }
 >(
@@ -35,7 +35,11 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
         role: "validator",
       });
 
-    const existingUser = await uow.userRepository.getById(inputParams.userId);
+    const existingUser = (
+      await uow.userRepository.getWithFilter({
+        email: inputParams.email,
+      })
+    ).at(0);
 
     if (!existingUser) {
       await uow.userRepository.save({
@@ -49,6 +53,7 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
     }
 
     const existingUserAgencyRights = existingUser?.agencyRights ?? [];
+    const userId = existingUser?.id ?? inputParams.userId;
     const agencyRight: AgencyRight = {
       roles: inputParams.roles,
       isNotifiedByEmail: inputParams.isNotifiedByEmail,
@@ -59,6 +64,7 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
       topic: "IcUserAgencyRightChanged",
       payload: {
         ...inputParams,
+        userId,
         triggeredBy: {
           kind: "inclusion-connected",
           userId: currentUser.id,
@@ -68,10 +74,16 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
 
     await Promise.all([
       uow.userRepository.updateAgencyRights({
-        userId: inputParams.userId,
+        userId,
         agencyRights: [...existingUserAgencyRights, agencyRight],
       }),
       uow.outboxRepository.save(event),
     ]);
+
+    const user = await uow.userRepository.getById(userId);
+
+    if (!user) throw errors.user.notFound({ userId }); //should not happen
+
+    return user;
   },
 );

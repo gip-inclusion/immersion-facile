@@ -151,6 +151,16 @@ export const feedbackMapping: Record<
       message:
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
+    "create.success": {
+      action: icUsersAdminSlice.actions.createUserOnAgencySucceeded,
+      title: "L'utilisateur a été créé",
+      message: "L'utilisateur a été créé et associé à cette agence.",
+    },
+    "create.error": {
+      action: icUsersAdminSlice.actions.createUserOnAgencyFailed,
+      title: "Problème lors de la création de l'utilisateur",
+      message: "Une erreur est survenue lors de la création de l'utilisateur",
+    },
   },
 };
 

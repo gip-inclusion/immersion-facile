@@ -10,6 +10,7 @@ import {
 
 export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
   agencyId?: AgencyId;
+  email?: Email;
 };
 
 export interface UserRepository {

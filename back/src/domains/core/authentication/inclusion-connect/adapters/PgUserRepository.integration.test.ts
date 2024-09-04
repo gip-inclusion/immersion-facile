@@ -611,6 +611,39 @@ describe("PgAuthenticatedUserRepository", () => {
         },
       ]);
     });
+
+    it("fetches Inclusion Connected Users given email", async () => {
+      await agencyRepository.insert(agency1);
+      await insertUser(db, user1);
+      await insertUser(db, user2);
+      await insertAgencyRegistrationToUser(db, {
+        agencyId: agency1.id,
+        userId: user1.id,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      });
+      await insertAgencyRegistrationToUser(db, {
+        agencyId: agency1.id,
+        userId: user2.id,
+        roles: ["toReview"],
+        isNotifiedByEmail: true,
+      });
+
+      const icUsers = await userRepository.getWithFilter({
+        email: user1.email,
+      });
+
+      expectArraysToEqualIgnoringOrder(icUsers, [
+        {
+          ...user1,
+          establishments: [],
+          agencyRights: [
+            { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
+          ],
+          ...withEmptyDashboards,
+        },
+      ]);
+    });
   });
 
   describe("delete", () => {

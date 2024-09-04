@@ -83,9 +83,11 @@ export class InMemoryUserRepository implements UserRepository {
   public async getWithFilter({
     agencyRole,
     agencyId,
+    email,
   }: InclusionConnectedFilters): Promise<InclusionConnectedUser[]> {
     // TODO: gestion des filtres optionnels à améliorer
     return this.users
+      .filter((user) => (email ? user.email === email : true))
       .filter((user) =>
         this.agencyRightsByUserId[user.id].some(({ roles, agency }) => {
           if (agencyId) {
