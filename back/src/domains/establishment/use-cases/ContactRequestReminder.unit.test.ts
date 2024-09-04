@@ -1,5 +1,6 @@
 import { subDays } from "date-fns";
 import {
+  ContactMethod,
   DiscussionBuilder,
   DiscussionDto,
   TemplatedEmail,
@@ -31,27 +32,44 @@ describe("ContactRequestReminder", () => {
   let timeGateway: CustomTimeGateway;
   const now = new Date();
   const domain = "domain.fr";
+
   const [
-    discussionWith2DaysSinceBeneficiairyExchange,
-    discussionWith3DaysSinceBeneficiairyExchange,
-    discussionWith4DaysSinceBeneficiairyExchange,
-    discussionWith6DaysSinceBeneficiairyExchange,
-    discussionWith7DaysSinceBeneficiairyExchange,
-    discussionWith8DaysSinceBeneficiairyExchange,
-  ] = [
-    subDays(now, 2),
-    subDays(now, 3),
-    subDays(now, 4),
-    subDays(now, 6),
-    subDays(now, 7),
-    subDays(now, 8),
-  ].map((date, index) =>
+    discussionWith2DaysSinceBeneficiaryExchange,
+    discussionWith3DaysSinceBeneficiaryExchange,
+    discussionWith3DaysSinceBeneficiaryExchangeWithContactMethodPhone,
+    discussionWith4DaysSinceBeneficiaryExchange,
+    discussionWith6DaysSinceBeneficiaryExchange,
+    discussionWith7DaysSinceBeneficiaryExchange,
+    discussionWith7DaysSinceBeneficiaryExchangeWithContactMethodPhone,
+    discussionWith8DaysSinceBeneficiaryExchange,
+  ] = (
+    [
+      { date: subDays(now, 2), contactMethod: "EMAIL" },
+      { date: subDays(now, 3), contactMethod: "EMAIL" },
+      { date: subDays(now, 3), contactMethod: "PHONE" },
+      { date: subDays(now, 4), contactMethod: "EMAIL" },
+      { date: subDays(now, 6), contactMethod: "EMAIL" },
+      { date: subDays(now, 7), contactMethod: "EMAIL" },
+      { date: subDays(now, 7), contactMethod: "PHONE" },
+      { date: subDays(now, 8), contactMethod: "EMAIL" },
+    ] satisfies {
+      date: Date;
+      contactMethod: ContactMethod;
+    }[]
+  ).map(({ date, contactMethod }, index) =>
     new DiscussionBuilder()
       .withId(uuid())
+      .withEstablishmentContact({
+        contactMethod,
+        email: `test-${index}@email.com`,
+        firstName: `test-${index}`,
+        lastName: `test-${index}`,
+        phone: "0677889944",
+      })
       .withPotentialBeneficiary({
         email: `benef-${index}@email.com`,
         firstName: `mike-${index}`,
-        lastName: `porknoy-${index}`,
+        lastName: `portnoy-${index}`,
         phone: "0677889944",
       })
       .withExchanges([
@@ -98,8 +116,8 @@ describe("ContactRequestReminder", () => {
   describe("wrong paths", () => {
     it("no discussion with missing establishment response since 3 or 7 days", async () => {
       uow.discussionRepository.discussions = [
-        discussionWith2DaysSinceBeneficiairyExchange,
-        discussionWith6DaysSinceBeneficiairyExchange,
+        discussionWith2DaysSinceBeneficiaryExchange,
+        discussionWith6DaysSinceBeneficiaryExchange,
       ];
       const reminderQty3d = await contactRequestReminder.execute(
         "3days",
@@ -213,16 +231,16 @@ describe("ContactRequestReminder", () => {
 
     it("no discussion with status other than PENDING", async () => {
       uow.discussionRepository.discussions = [
-        new DiscussionBuilder(discussionWith3DaysSinceBeneficiairyExchange)
+        new DiscussionBuilder(discussionWith3DaysSinceBeneficiaryExchange)
           .withStatus("ACCEPTED")
           .build(),
-        new DiscussionBuilder(discussionWith4DaysSinceBeneficiairyExchange)
+        new DiscussionBuilder(discussionWith4DaysSinceBeneficiaryExchange)
           .withStatus("REJECTED")
           .build(),
-        new DiscussionBuilder(discussionWith7DaysSinceBeneficiairyExchange)
+        new DiscussionBuilder(discussionWith7DaysSinceBeneficiaryExchange)
           .withStatus("ACCEPTED")
           .build(),
-        new DiscussionBuilder(discussionWith8DaysSinceBeneficiairyExchange)
+        new DiscussionBuilder(discussionWith8DaysSinceBeneficiaryExchange)
           .withStatus("REJECTED")
           .build(),
       ];
@@ -243,12 +261,14 @@ describe("ContactRequestReminder", () => {
   describe("right paths", () => {
     beforeEach(() => {
       uow.discussionRepository.discussions = [
-        discussionWith2DaysSinceBeneficiairyExchange,
-        discussionWith3DaysSinceBeneficiairyExchange,
-        discussionWith4DaysSinceBeneficiairyExchange,
-        discussionWith6DaysSinceBeneficiairyExchange,
-        discussionWith7DaysSinceBeneficiairyExchange,
-        discussionWith8DaysSinceBeneficiairyExchange,
+        discussionWith2DaysSinceBeneficiaryExchange,
+        discussionWith3DaysSinceBeneficiaryExchange,
+        discussionWith3DaysSinceBeneficiaryExchangeWithContactMethodPhone,
+        discussionWith4DaysSinceBeneficiaryExchange,
+        discussionWith6DaysSinceBeneficiaryExchange,
+        discussionWith7DaysSinceBeneficiaryExchange,
+        discussionWith7DaysSinceBeneficiaryExchangeWithContactMethodPhone,
+        discussionWith8DaysSinceBeneficiaryExchange,
       ];
     });
 
@@ -262,12 +282,12 @@ describe("ContactRequestReminder", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           makeEstablishmentContactRequestReminder(
-            discussionWith3DaysSinceBeneficiairyExchange,
+            discussionWith3DaysSinceBeneficiaryExchange,
             domain,
             "3days",
           ),
           makeEstablishmentContactRequestReminder(
-            discussionWith4DaysSinceBeneficiairyExchange,
+            discussionWith4DaysSinceBeneficiaryExchange,
             domain,
             "3days",
           ),
@@ -285,12 +305,12 @@ describe("ContactRequestReminder", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           makeEstablishmentContactRequestReminder(
-            discussionWith7DaysSinceBeneficiairyExchange,
+            discussionWith7DaysSinceBeneficiaryExchange,
             domain,
             "7days",
           ),
           makeEstablishmentContactRequestReminder(
-            discussionWith8DaysSinceBeneficiairyExchange,
+            discussionWith8DaysSinceBeneficiaryExchange,
             domain,
             "7days",
           ),
@@ -313,7 +333,7 @@ const makeEstablishmentContactRequestReminder = (
   return {
     kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
     params: {
-      appelationLabel: cartographeAppellationAndRome.appellationLabel,
+      appellationLabel: cartographeAppellationAndRome.appellationLabel,
       beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
       beneficiaryLastName: discussion.potentialBeneficiary.lastName,
       beneficiaryReplyToEmail: replyEmail,

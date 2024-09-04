@@ -168,7 +168,7 @@ export type EmailParamsByEmailType = {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     beneficiaryReplyToEmail: string;
-    appelationLabel: AppellationLabel;
+    appellationLabel: AppellationLabel;
     domain: string;
     mode: "3days" | "7days";
   };
