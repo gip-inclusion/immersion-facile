@@ -8,6 +8,7 @@ import { keys } from "react-design-system";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  AgencyDto,
   UserParamsForAgency,
   domElementIds,
   userParamsForAgencySchema,
@@ -18,20 +19,20 @@ import {
 } from "src/app/components/agency/AgencyUsers";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { match } from "ts-pattern";
 
 export const AgencyUserModificationForm = ({
   agencyUser,
   closeModal,
   mode,
+  agency,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
   mode: UserFormMode;
+  agency: AgencyDto;
 }) => {
-  const agency = useAppSelector(agencyAdminSelectors.agency);
   const dispatch = useDispatch();
 
   const methods = useForm<UserParamsForAgency>({
@@ -47,19 +48,30 @@ export const AgencyUserModificationForm = ({
   const getFieldError = makeFieldError(formState);
 
   const onValidSubmit = () => {
-    mode === "add"
-      ? dispatch(
+    match(mode)
+      .with("add", () => {
+        dispatch(
           icUsersAdminSlice.actions.createUserOnAgencyRequested({
             ...values,
             feedbackTopic: "agency-user",
           }),
-        )
-      : dispatch(
+        );
+      })
+      .with("update", () => {
+        dispatch(
           icUsersAdminSlice.actions.updateUserOnAgencyRequested({
             ...values,
             feedbackTopic: "agency-user",
           }),
         );
+      })
+      .otherwise(() => {
+        dispatch(
+          icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested({
+            ...values,
+          }),
+        );
+      });
 
     closeModal();
   };

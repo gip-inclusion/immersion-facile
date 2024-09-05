@@ -9,7 +9,7 @@ import { Tooltip } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
-  AgencyId,
+  AgencyDto,
   AgencyRole,
   UserParamsForAgency,
   domElementIds,
@@ -22,7 +22,7 @@ import { v4 as uuidV4 } from "uuid";
 import { Feedback } from "../feedback/Feedback";
 
 type AgencyUsersProperties = {
-  agencyId: AgencyId;
+  agency: AgencyDto;
 };
 
 type AgencyDisplayedRoleAndClass = {
@@ -56,14 +56,14 @@ export const agencyRoleToDisplay: Record<
   },
 };
 
-export type UserFormMode = "add" | "update";
+export type UserFormMode = "add" | "update" | "register";
 
 const manageUserModal = createModal({
   isOpenedByDefault: false,
   id: domElementIds.admin.agencyTab.editAgencyManageUserModal,
 });
 
-export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
+export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
   const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
   const dispatch = useDispatch();
 
@@ -94,7 +94,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
         onClick={() => {
           setMode("add");
           setSelectedUserData({
-            agencyId,
+            agencyId: agency.id,
             userId: uuidV4(),
             roles: [],
             email: "",
@@ -132,10 +132,10 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
               ) : null}
               {agencyUser.email}
             </>,
-            agencyUser.agencyRights[agencyId].isNotifiedByEmail
+            agencyUser.agencyRights[agency.id].isNotifiedByEmail
               ? "Reçoit les notifications"
               : "Ne reçoit pas les notifications",
-            agencyUser.agencyRights[agencyId].roles.map((role) => {
+            agencyUser.agencyRights[agency.id].roles.map((role) => {
               return (
                 <Badge small className={agencyRoleToDisplay[role].className}>
                   {agencyRoleToDisplay[role].label}
@@ -145,17 +145,17 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
             <Button
               priority="secondary"
               className={fr.cx("fr-m-1w")}
-              id={`${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agencyId}-${index}`}
+              id={`${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`}
               onClick={() => {
                 dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
                 setMode("update");
                 setSelectedUserData({
-                  agencyId,
+                  agencyId: agency.id,
                   userId: agencyUser.id,
-                  roles: agencyUser.agencyRights[agencyId].roles,
+                  roles: agencyUser.agencyRights[agency.id].roles,
                   email: agencyUser.email,
                   isNotifiedByEmail:
-                    agencyUser.agencyRights[agencyId].isNotifiedByEmail,
+                    agencyUser.agencyRights[agency.id].isNotifiedByEmail,
                   isIcUser: !!agencyUser.externalId,
                 });
                 manageUserModal.open();
@@ -181,6 +181,7 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
               agencyUser={selectedUserData}
               closeModal={() => manageUserModal.close()}
               mode={mode}
+              agency={agency}
             />
           )}
         </manageUserModal.Component>,

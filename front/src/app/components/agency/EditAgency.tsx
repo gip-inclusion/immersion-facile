@@ -22,7 +22,7 @@ export const EditAgency = () => {
         />
       </div>
       {agency && <EditAgencyForm agency={agency} />}
-      {agency && <AgencyUsers agencyId={agency.id} />}
+      {agency && <AgencyUsers agency={agency} />}
     </>
   );
 };
