@@ -10,7 +10,7 @@ import {
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import {
-  OAuthGatewayMode,
+  OAuthGatewayProvider,
   oAuthModeByFeatureFlags,
 } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
@@ -28,7 +28,7 @@ const rejectIfAgencyWontHaveValidatorsReceivingNotifications = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   agency: AgencyDto,
-  provider: OAuthGatewayMode,
+  provider: OAuthGatewayProvider,
 ) => {
   if (!params.roles.includes("validator") || !params.isNotifiedByEmail) {
     await throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(
@@ -59,7 +59,7 @@ const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   agency: AgencyDto,
-  provider: OAuthGatewayMode,
+  provider: OAuthGatewayProvider,
 ) => {
   if (!params.roles.includes("counsellor") || !params.isNotifiedByEmail) {
     await throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
@@ -75,7 +75,7 @@ const makeAgencyRights = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   userToUpdate: InclusionConnectedUser,
-  provider: OAuthGatewayMode,
+  provider: OAuthGatewayProvider,
 ) => {
   const agency = await uow.agencyRepository.getById(params.agencyId);
 

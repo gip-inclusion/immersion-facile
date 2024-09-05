@@ -14,11 +14,11 @@ import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   InMemoryOAuthGateway,
-  fakeInclusionConnectConfig,
+  fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import { OAuthIdTokenPayload } from "../entities/OAuthIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { OAuthGatewayMode, oAuthGatewayModes } from "../port/OAuthGateway";
+import { OAuthGatewayProvider, oAuthGatewayModes } from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const correctToken = "my-correct-token";
@@ -44,9 +44,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     db = makeKyselyDb(pool);
     uow = createPgUow(db);
     const uuidGenerator = new UuidV4Generator();
-    inclusionConnectGateway = new InMemoryOAuthGateway(
-      fakeInclusionConnectConfig,
-    );
+    inclusionConnectGateway = new InMemoryOAuthGateway(fakeProviderConfig);
     authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
       new PgUowPerformer(db, createPgUow),
       makeCreateNewEvent({
@@ -122,7 +120,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   );
 
   const makeSuccessfulAuthenticationConditions = async (
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
     expectedIcIdTokenPayload = defaultExpectedIcIdTokenPayload,
   ) => {
     const initialOngoingOAuth: OngoingOAuth = {

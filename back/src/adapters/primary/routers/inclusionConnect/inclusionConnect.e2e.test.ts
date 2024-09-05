@@ -16,7 +16,7 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { fakeInclusionConnectConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
+import { fakeProviderConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
@@ -49,11 +49,9 @@ describe("inclusion connection flow", () => {
       } = await buildTestApp(
         new AppConfigBuilder({
           INCLUSION_CONNECT_GATEWAY: "IN_MEMORY",
-          INCLUSION_CONNECT_CLIENT_SECRET:
-            fakeInclusionConnectConfig.clientSecret,
-          INCLUSION_CONNECT_CLIENT_ID: fakeInclusionConnectConfig.clientId,
-          INCLUSION_CONNECT_BASE_URI:
-            fakeInclusionConnectConfig.inclusionConnectBaseUri,
+          INCLUSION_CONNECT_CLIENT_SECRET: fakeProviderConfig.clientSecret,
+          INCLUSION_CONNECT_CLIENT_ID: fakeProviderConfig.clientId,
+          INCLUSION_CONNECT_BASE_URI: fakeProviderConfig.providerBaseUri,
           DOMAIN: immersionDomain,
         }).build(),
       ));
@@ -85,8 +83,8 @@ describe("inclusion connection flow", () => {
           headers: {
             location: encodeURI(
               `${
-                appConfig.inclusionConnectConfig.inclusionConnectBaseUri
-              }/login?${queryParamsAsString({
+                appConfig.inclusionConnectConfig.providerBaseUri
+              }/login-inclusion-connect?${queryParamsAsString({
                 page,
                 nonce,
                 state,
