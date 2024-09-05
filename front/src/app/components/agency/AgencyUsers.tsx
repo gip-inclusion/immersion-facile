@@ -87,6 +87,26 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
         />
       </div>
       <Feedback topic="agency-user" />
+      <Button
+        iconId="fr-icon-file-add-line"
+        className={fr.cx("fr-m-1w", "fr-grid-row--right")}
+        priority="primary"
+        onClick={() => {
+          setMode("add");
+          setSelectedUserData({
+            agencyId,
+            userId: uuidV4(),
+            roles: [],
+            email: "",
+            isNotifiedByEmail: true,
+            isIcUser: false,
+          });
+          manageUserModal.open();
+        }}
+        id={domElementIds.admin.agencyTab.openManageUserModalButton}
+      >
+        Ajouter un utilisateur
+      </Button>
 
       <Table
         id={domElementIds.admin.agencyTab.agencyUsersTable}
@@ -147,28 +167,15 @@ export const AgencyUsers = ({ agencyId }: AgencyUsersProperties) => {
         })}
         fixed
       />
-      <Button
-        iconId="fr-icon-file-add-line"
-        className={fr.cx("fr-m-1w")}
-        priority="secondary"
-        onClick={() => {
-          setMode("add");
-          setSelectedUserData({
-            agencyId,
-            userId: uuidV4(),
-            roles: [],
-            email: "",
-            isNotifiedByEmail: true,
-            isIcUser: false,
-          });
-          manageUserModal.open();
-        }}
-        id={domElementIds.admin.agencyTab.openManageUserModalButton}
-      >
-        Ajouter un utilisateur
-      </Button>
+
       {createPortal(
-        <manageUserModal.Component title="Modifier le rôle de l'utilisateur">
+        <manageUserModal.Component
+          title={
+            mode === "update"
+              ? "Modifier le rôle de l'utilisateur"
+              : "Ajouter un utilisateur"
+          }
+        >
           {selectedUserData && mode && (
             <AgencyUserModificationForm
               agencyUser={selectedUserData}
