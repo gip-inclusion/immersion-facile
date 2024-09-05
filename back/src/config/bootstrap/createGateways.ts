@@ -180,15 +180,14 @@ export const createGateways = async (
       ? new HttpOAuthGateway(
           createAxiosHttpClientForExternalAPIs(
             makeInclusionConnectRoutes(
-              config.inclusionConnectConfig.inclusionConnectBaseUri,
+              config.inclusionConnectConfig.providerBaseUri,
             ),
           ),
           createAxiosHttpClientForExternalAPIs(
-            makeProConnectRoutes(
-              config.inclusionConnectConfig.proConnectBaseUri,
-            ),
+            makeProConnectRoutes(config.proConnectConfig.providerBaseUri),
           ),
           config.inclusionConnectConfig,
+          config.proConnectConfig,
         )
       : new InMemoryOAuthGateway(config.inclusionConnectConfig);
 

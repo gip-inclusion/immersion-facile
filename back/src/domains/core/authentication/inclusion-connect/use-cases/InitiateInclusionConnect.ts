@@ -26,14 +26,15 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
     const nonce = this.uuidGenerator.new();
     const state = this.uuidGenerator.new();
 
-    const mode = oAuthModeByFeatureFlags(
+    const provider = oAuthModeByFeatureFlags(
       await uow.featureFlagRepository.getAll(),
     );
 
     await uow.ongoingOAuthRepository.save({
       nonce,
       state,
-      provider: mode === "InclusionConnect" ? "inclusionConnect" : "proConnect",
+      provider:
+        provider === "InclusionConnect" ? "inclusionConnect" : "proConnect",
     });
 
     return this.oAuthGateway.getLoginUrl(
@@ -42,7 +43,7 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
         nonce,
         state,
       },
-      mode,
+      provider,
     );
   }
 }

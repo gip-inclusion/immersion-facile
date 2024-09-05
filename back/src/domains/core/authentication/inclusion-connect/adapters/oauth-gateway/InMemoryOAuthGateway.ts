@@ -5,53 +5,54 @@ import {
   GetAccessTokenResult,
   GetLoginUrlParams,
   OAuthGateway,
-  OAuthGatewayMode,
+  OAuthGatewayProvider,
 } from "../../port/OAuthGateway";
 
-export const fakeInclusionConnectConfig: OAuthConfig = {
+export const fakeProviderConfig: OAuthConfig = {
   clientId: "my-client-id",
   clientSecret: "my-correct-token",
   immersionRedirectUri: {
     afterLogin: "http://immersion-uri.com/afterlogin",
     afterLogout: "http://immersion-uri.com/afterlogout",
   },
-  inclusionConnectBaseUri: "http://fake-inclusion-connect-uri.com",
-  proConnectBaseUri: "http://fake-pro-connect-uri.com",
+  providerBaseUri: "http://fake-provider-uri.com",
   scope: "my-scope",
 };
 
 export class InMemoryOAuthGateway implements OAuthGateway {
-  constructor(private inclusionConnectConfig: OAuthConfig) {}
+  constructor(private providerConfig: OAuthConfig) {}
 
   public async getLoginUrl(
     params: GetLoginUrlParams,
-    mode: OAuthGatewayMode,
+    provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
-    const loginUri: Record<OAuthGatewayMode, AbsoluteUrl> = {
-      InclusionConnect: `${this.inclusionConnectConfig.inclusionConnectBaseUri}/login`,
-      ProConnect: `${this.inclusionConnectConfig.proConnectBaseUri}/login`, // TODO
+    const loginUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
+      InclusionConnect: `${this.providerConfig.providerBaseUri}/login-inclusion-connect`,
+      ProConnect: `${this.providerConfig.providerBaseUri}/login-pro-connect`,
     };
-    return `${loginUri[mode]}?${queryParamsAsString(params)}`;
+    return `${loginUri[provider]}?${queryParamsAsString(params)}`;
   }
 
   public async getAccessToken(
     _: GetAccessTokenParams,
-    __: OAuthGatewayMode,
+    __: OAuthGatewayProvider,
   ): Promise<GetAccessTokenResult> {
     if (this.#getAccessTokenResult) return this.#getAccessTokenResult;
     throw new Error("No access token provided (in memory)");
   }
 
-  public async getLogoutUrl(mode: OAuthGatewayMode): Promise<AbsoluteUrl> {
-    const logoutUri: Record<OAuthGatewayMode, AbsoluteUrl> = {
-      InclusionConnect: `${this.inclusionConnectConfig.inclusionConnectBaseUri}/logout`,
-      ProConnect: `${this.inclusionConnectConfig.proConnectBaseUri}/logout`, // TODO
+  public async getLogoutUrl(
+    provider: OAuthGatewayProvider,
+  ): Promise<AbsoluteUrl> {
+    const logoutUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
+      InclusionConnect: `${this.providerConfig.providerBaseUri}/logout-inclusion-connect`,
+      ProConnect: `${this.providerConfig.providerBaseUri}/logout-pro-connect`, // TODO
     };
 
-    return `${logoutUri[mode]}?${queryParamsAsString({
+    return `${logoutUri[provider]}?${queryParamsAsString({
       postLogoutRedirectUrl:
-        this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
-      clientId: this.inclusionConnectConfig.clientId,
+        this.providerConfig.immersionRedirectUri.afterLogout,
+      clientId: this.providerConfig.clientId,
     })}`;
   }
 

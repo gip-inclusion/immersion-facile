@@ -24,7 +24,7 @@ import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
 } from "../../../../establishment/helpers/EstablishmentBuilders";
-import { OAuthGatewayMode, oAuthGatewayModes } from "../port/OAuthGateway";
+import { OAuthGatewayProvider, oAuthGatewayModes } from "../port/OAuthGateway";
 import { PgUserRepository } from "./PgUserRepository";
 
 const userExternalId = "my-external-id";
@@ -783,7 +783,7 @@ const agency2 = new AgencyDtoBuilder()
 const insertUser = async (
   db: KyselyDb,
   { id, email, firstName, lastName, externalId, createdAt }: User,
-  mode: OAuthGatewayMode,
+  mode: OAuthGatewayProvider,
 ) => {
   await db
     .insertInto("users")

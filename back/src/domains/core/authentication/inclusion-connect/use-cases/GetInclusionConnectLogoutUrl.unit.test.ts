@@ -6,7 +6,7 @@ import {
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import {
   InMemoryOAuthGateway,
-  fakeInclusionConnectConfig,
+  fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import { oAuthGatewayModes } from "../port/OAuthGateway";
 import { GetInclusionConnectLogoutUrl } from "./GetInclusionConnectLogoutUrl";
@@ -20,7 +20,7 @@ describe("GetInclusionConnectLogoutUrl", () => {
       uow = createInMemoryUow();
       getInclusionConnectLogoutUrl = new GetInclusionConnectLogoutUrl(
         new InMemoryUowPerformer(uow),
-        new InMemoryOAuthGateway(fakeInclusionConnectConfig),
+        new InMemoryOAuthGateway(fakeProviderConfig),
       );
 
       uow.featureFlagRepository.update({
@@ -30,16 +30,16 @@ describe("GetInclusionConnectLogoutUrl", () => {
     });
 
     it("returns the inclusion connect logout url from %s", async () => {
+      const logoutSuffixe =
+        mode === "ProConnect" ? "pro-connect" : "inclusion-connect";
       expectToEqual(
         await getInclusionConnectLogoutUrl.execute(),
         `${
-          mode === "InclusionConnect"
-            ? fakeInclusionConnectConfig.inclusionConnectBaseUri
-            : fakeInclusionConnectConfig.proConnectBaseUri
-        }/logout?${queryParamsAsString({
+          fakeProviderConfig.providerBaseUri
+        }/logout-${logoutSuffixe}?${queryParamsAsString({
           postLogoutRedirectUrl:
-            fakeInclusionConnectConfig.immersionRedirectUri.afterLogout,
-          clientId: fakeInclusionConnectConfig.clientId,
+            fakeProviderConfig.immersionRedirectUri.afterLogout,
+          clientId: fakeProviderConfig.clientId,
         })}`,
       );
     });

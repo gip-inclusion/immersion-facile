@@ -20,7 +20,7 @@ import {
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import {
-  OAuthGatewayMode,
+  OAuthGatewayProvider,
   oAuthModeByFeatureFlags,
 } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
@@ -212,7 +212,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   async #getRoleInPayloadOrUser(
     uow: UnitOfWork,
     payload: UpdateConventionStatusSupportedJwtPayload,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
   ): Promise<
     | { user: InclusionConnectedUser; roleInPayload: undefined }
     | { user: undefined; roleInPayload: Role }
@@ -262,7 +262,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     uow: UnitOfWork,
     userId: UserId,
     agencyId: AgencyId,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
   ): Promise<string> {
     const user = await uow.userRepository.getById(userId, mode);
     if (!user) throw errors.user.notFound({ userId });
@@ -302,7 +302,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     uow: UnitOfWork,
     payload: UpdateConventionStatusSupportedJwtPayload,
     originalConvention: ConventionDto,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
   ): Promise<string> => {
     const getEmailFromEmailHash = async (
       agencyId: AgencyId,
