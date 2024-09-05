@@ -36,8 +36,7 @@ export type OAuthConfig = {
     afterLogin: AbsoluteUrl;
     afterLogout: AbsoluteUrl;
   };
-  inclusionConnectBaseUri: AbsoluteUrl;
-  proConnectBaseUri: AbsoluteUrl;
+  providerBaseUri: AbsoluteUrl;
   scope: string;
 };
 
@@ -265,19 +264,37 @@ export class AppConfig {
         afterLogin: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
         afterLogout: this.immersionFacileBaseUrl,
       },
-      inclusionConnectBaseUri: this.#throwIfNotAbsoluteUrl(
+      providerBaseUri: this.#throwIfNotAbsoluteUrl(
         "INCLUSION_CONNECT_BASE_URI",
         this.inclusionConnectGateway !== "HTTPS"
           ? "https://fake-inclusion-connect.url"
           : undefined,
       ),
-      proConnectBaseUri: this.#throwIfNotAbsoluteUrl(
+      scope: "openid profile email",
+    };
+  }
+
+  public get proConnectConfig(): OAuthConfig {
+    return {
+      clientId: this.#throwIfNotDefinedOrDefault(
+        "PRO_CONNECT_CLIENT_ID",
+        this.proConnectGateway !== "HTTPS" ? "fake id" : undefined,
+      ),
+      clientSecret: this.#throwIfNotDefinedOrDefault(
+        "PRO_CONNECT_CLIENT_SECRET",
+        this.proConnectGateway !== "HTTPS" ? "fake secret" : undefined,
+      ),
+      immersionRedirectUri: {
+        afterLogin: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
+        afterLogout: this.immersionFacileBaseUrl,
+      },
+      providerBaseUri: this.#throwIfNotAbsoluteUrl(
         "PRO_CONNECT_BASE_URI",
-        this.inclusionConnectGateway !== "HTTPS"
+        this.proConnectGateway !== "HTTPS"
           ? "https://fake-pro-connect.url"
           : undefined,
       ),
-      scope: "openid profile email",
+      scope: "openid given_name usual_name email",
     };
   }
 
@@ -285,6 +302,14 @@ export class AppConfig {
   public get inclusionConnectGateway() {
     return this.#throwIfNotInArray({
       variableName: "INCLUSION_CONNECT_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
+  public get proConnectGateway() {
+    return this.#throwIfNotInArray({
+      variableName: "PRO_CONNECT_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
     });

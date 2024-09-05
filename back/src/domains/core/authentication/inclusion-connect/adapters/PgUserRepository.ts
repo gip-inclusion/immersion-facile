@@ -16,7 +16,7 @@ import {
   KyselyDb,
   executeKyselyRawSqlQuery,
 } from "../../../../../config/pg/kysely/kyselyUtils";
-import { OAuthGatewayMode } from "../port/OAuthGateway";
+import { OAuthGatewayProvider } from "../port/OAuthGateway";
 import {
   InclusionConnectedFilters,
   UserRepository,
@@ -40,7 +40,7 @@ export class PgUserRepository implements UserRepository {
 
   public async findByExternalId(
     externalId: string,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
   ): Promise<User | undefined> {
     const response = await this.transaction
       .selectFrom("users")
@@ -67,7 +67,7 @@ export class PgUserRepository implements UserRepository {
 
   public async findByEmail(
     email: Email,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
   ): Promise<User | undefined> {
     const response = await this.#getUserQueryBuilder(mode)
       .where("email", "ilike", email)
@@ -90,7 +90,7 @@ export class PgUserRepository implements UserRepository {
       ]);
   }
 
-  public async save(user: User, mode: OAuthGatewayMode): Promise<void> {
+  public async save(user: User, mode: OAuthGatewayProvider): Promise<void> {
     const { id, email, firstName, lastName, externalId, createdAt } = user;
 
     const existingUser = await this.#findById(id, mode);
@@ -150,7 +150,7 @@ export class PgUserRepository implements UserRepository {
 
   async #findById(
     userId: UserId,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
   ): Promise<User | undefined> {
     const response = await this.#getUserQueryBuilder(mode)
       .where("id", "=", userId)
@@ -160,17 +160,16 @@ export class PgUserRepository implements UserRepository {
 
   public async getById(
     userId: string,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser | undefined> {
     const icUsers = await this.#getInclusionConnectedUsers({ userId }, mode);
     return icUsers[0];
   }
 
-  public async getWithFilter({
-    agencyRole,
-    agencyId,
-    email,
-  }: InclusionConnectedFilters, mode: OAuthGatewayMode): Promise<InclusionConnectedUser[]> {
+  public async getWithFilter(
+    { agencyRole, agencyId, email }: InclusionConnectedFilters,
+    mode: OAuthGatewayProvider,
+  ): Promise<InclusionConnectedUser[]> {
     return this.#getInclusionConnectedUsers({ agencyRole, agencyId, email }, mode);
   }
 
@@ -200,12 +199,15 @@ export class PgUserRepository implements UserRepository {
         .execute();
   }
 
-  async #getInclusionConnectedUsers(filters: {
-    userId?: UserId;
-    agencyRole?: AgencyRole;
-    agencyId?: AgencyId;
-    email?: Email;
-  }, mode: OAuthGatewayMode): Promise<InclusionConnectedUser[]> {
+  async #getInclusionConnectedUsers(
+    filters: {
+      userId?: UserId;
+      agencyRole?: AgencyRole;
+      agencyId?: AgencyId;
+      email?: Email;
+    },
+    mode: OAuthGatewayProvider,
+  ): Promise<InclusionConnectedUser[]> {
     const buildAgencyRight = `JSON_BUILD_OBJECT(
        'roles', users__agencies.roles,
        'isNotifiedByEmail', users__agencies.is_notified_by_email,

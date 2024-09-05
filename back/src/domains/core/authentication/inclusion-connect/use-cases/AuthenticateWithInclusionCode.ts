@@ -25,7 +25,7 @@ import { OAuthIdTokenPayload } from "../entities/OAuthIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
 import {
   OAuthGateway,
-  OAuthGatewayMode,
+  OAuthGatewayProvider,
   oAuthModeByFeatureFlags,
 } from "../port/OAuthGateway";
 
@@ -93,7 +93,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #onOngoingOAuth(
     uow: UnitOfWork,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
     { code, page }: WithSourcePage & { code: OAuthCode },
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
@@ -188,7 +188,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #makeExistingUser(
     uow: UnitOfWork,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
     existingInclusionConnectedUser: User | undefined,
     userWithSameEmail: User | undefined,
   ): Promise<User | undefined> {
@@ -237,7 +237,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #updateUserAgencyRights(
     uow: UnitOfWork,
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
     conflictingUser: User,
     userToKeep: User,
   ): Promise<void> {

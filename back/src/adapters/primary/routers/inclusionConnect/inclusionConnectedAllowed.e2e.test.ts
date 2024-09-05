@@ -392,8 +392,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
         const response = await httpClient.getInclusionConnectLogoutUrl();
         expectHttpResponseToEqual(response, {
           body: `${
-            appConfig.inclusionConnectConfig.inclusionConnectBaseUri
-          }/logout?${queryParamsAsString({
+            appConfig.inclusionConnectConfig.providerBaseUri
+          }/logout-inclusion-connect?${queryParamsAsString({
             postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
             clientId: appConfig.inclusionConnectConfig.clientId,
           })}`,

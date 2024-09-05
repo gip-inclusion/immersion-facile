@@ -21,11 +21,11 @@ import {
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   InMemoryOAuthGateway,
-  fakeInclusionConnectConfig,
+  fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import { OAuthIdTokenPayload } from "../entities/OAuthIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { OAuthGatewayMode, oAuthGatewayModes } from "../port/OAuthGateway";
+import { OAuthGatewayProvider, oAuthGatewayModes } from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
@@ -50,9 +50,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       uow = createInMemoryUow();
       uuidGenerator = new TestUuidGenerator();
       const timeGateway = new CustomTimeGateway();
-      inclusionConnectGateway = new InMemoryOAuthGateway(
-        fakeInclusionConnectConfig,
-      );
+      inclusionConnectGateway = new InMemoryOAuthGateway(fakeProviderConfig);
       authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
         new InMemoryUowPerformer(uow),
         makeCreateNewEvent({
@@ -369,7 +367,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   });
 
   const makeSuccessfulAuthenticationConditions = (
-    mode: OAuthGatewayMode,
+    mode: OAuthGatewayProvider,
     params?: Partial<OAuthIdTokenPayload>,
   ) => {
     const expectedIcIdTokenPayload = {

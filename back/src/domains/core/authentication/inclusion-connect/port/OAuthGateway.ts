@@ -18,21 +18,21 @@ export type GetLoginUrlParams = WithSourcePage & {
 };
 
 export const oAuthGatewayModes = ["InclusionConnect", "ProConnect"] as const;
-export type OAuthGatewayMode = (typeof oAuthGatewayModes)[number];
+export type OAuthGatewayProvider = (typeof oAuthGatewayModes)[number];
 
 export const oAuthModeByFeatureFlags = (
   flags: FeatureFlags,
-): OAuthGatewayMode =>
+): OAuthGatewayProvider =>
   flags.enableProConnect.isActive ? "ProConnect" : "InclusionConnect";
 
 export interface OAuthGateway {
   getLoginUrl(
     params: GetLoginUrlParams,
-    mode: OAuthGatewayMode,
+    provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl>;
   getAccessToken: (
     params: GetAccessTokenParams,
-    mode: OAuthGatewayMode,
+    provider: OAuthGatewayProvider,
   ) => Promise<GetAccessTokenResult>;
-  getLogoutUrl(mode: OAuthGatewayMode): Promise<AbsoluteUrl>;
+  getLogoutUrl(mode: OAuthGatewayProvider): Promise<AbsoluteUrl>;
 }
