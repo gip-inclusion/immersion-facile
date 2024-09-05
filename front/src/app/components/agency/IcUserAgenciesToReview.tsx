@@ -2,7 +2,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,64 +11,38 @@ import {
   AgencyDto,
   AgencyId,
   AgencyRight,
-  AgencyRole,
+  ExtractFromExisting,
   RejectIcUserRoleForAgencyParams,
   User,
   UserId,
   domElementIds,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
+import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
+import { UserFormMode } from "src/app/components/agency/AgencyUsers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-
-type SelectableAgencyRole = (typeof selectableAgencyRoles)[number];
-const selectableAgencyRoles = [
-  "counsellor",
-  "validator",
-] satisfies AgencyRole[];
 
 type IcUserAgenciesToReviewProps = {
   agenciesNeedingReviewForUser: AgencyRight[];
   selectedUser: User;
+};
+type IcUserAgenciesToReviewModalProps = {
+  title: string;
+  mode: ExtractFromExisting<UserFormMode, "register"> | "reject";
 };
 
 function AgencyReviewForm({
   agency,
   setSelectedAgency,
   selectedUser,
+  setModalProps,
 }: {
   agency: AgencyDto;
   selectedUser: User;
   setSelectedAgency: (agency: AgencyDto) => void;
+  setModalProps: (modalProps: IcUserAgenciesToReviewModalProps) => void;
 }) {
-  const dispatch = useDispatch();
-  const agencyHasNoCounsellors = agency.counsellorEmails.length === 0;
-  const agencyRefersToOtherAgency = !!agency.refersToAgencyId;
-
-  const getDefaultRole = (): SelectableAgencyRole | undefined => {
-    if (agencyRefersToOtherAgency) return "counsellor";
-    if (agencyHasNoCounsellors) return "validator";
-    return undefined;
-  };
-
-  const [selectedRole, setSelectedRole] = useState<
-    SelectableAgencyRole | undefined
-  >(getDefaultRole());
-
-  const registerIcUserToAgency = (agency: AgencyDto) => {
-    if (!selectedRole) throw new Error("please select a role");
-
-    dispatch(
-      icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested({
-        agencyId: agency.id,
-        userId: selectedUser.id,
-        roles: [selectedRole],
-        isNotifiedByEmail: false,
-        email: selectedUser.email,
-      }),
-    );
-  };
-
   return (
     <div className={fr.cx("fr-col-4")}>
       <div className={fr.cx("fr-card")}>
@@ -90,26 +63,6 @@ function AgencyReviewForm({
                 emails={agency.validatorEmails}
               />
             </p>
-            <div className={fr.cx("fr-card__desc")}>
-              <Select
-                label="Sélectionner un rôle"
-                disabled={agencyHasNoCounsellors || agencyRefersToOtherAgency}
-                options={[
-                  ...selectableAgencyRoles.map((role) => ({
-                    value: role,
-                    label: labelByRole[role],
-                  })),
-                ]}
-                nativeSelectProps={{
-                  value: selectedRole,
-                  onChange: (event) => {
-                    setSelectedRole(
-                      event.currentTarget.value as SelectableAgencyRole,
-                    );
-                  },
-                }}
-              />
-            </div>
           </div>
           <div className={fr.cx("fr-card__footer")}>
             <ButtonsGroup
@@ -121,16 +74,26 @@ function AgencyReviewForm({
                   type: "button",
                   priority: "primary",
                   id: `${domElementIds.admin.agencyTab.registerIcUserToAgencyButton}-${agency.id}-${selectedUser.id}`,
-                  onClick: () => registerIcUserToAgency(agency),
+                  onClick: () => {
+                    setModalProps({
+                      title: "Rattacher cet utilisateur",
+                      mode: "register",
+                    });
+                    setSelectedAgency(agency);
+                    openIcUserRegistrationToAgencyModal();
+                  },
                   children: "Valider",
-                  disabled: !selectedRole,
                 },
                 {
                   type: "button",
                   priority: "secondary",
                   onClick: () => {
+                    setModalProps({
+                      title: "Refuser le rattachement",
+                      mode: "reject",
+                    });
                     setSelectedAgency(agency);
-                    openRejectIcUserRegistrationToAgencyModal();
+                    openIcUserRegistrationToAgencyModal();
                   },
                   children: "Refuser",
                 },
@@ -148,6 +111,8 @@ export const IcUserAgenciesToReview = ({
   selectedUser,
 }: IcUserAgenciesToReviewProps) => {
   const [selectedAgency, setSelectedAgency] = useState<AgencyDto>();
+  const [modalProps, setModalProps] =
+    useState<IcUserAgenciesToReviewModalProps | null>(null);
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -156,21 +121,38 @@ export const IcUserAgenciesToReview = ({
           key={agency.id}
           agency={agency}
           setSelectedAgency={setSelectedAgency}
+          setModalProps={setModalProps}
           selectedUser={selectedUser}
         />
       ))}
       {createPortal(
-        <RejectIcUserRegistrationToAgencyModal title="Refuser le rattachement">
-          {selectedAgency ? (
-            <RejectIcUserRegistrationToAgencyForm
-              agency={{ id: selectedAgency.id, name: selectedAgency.name }}
-              userId={selectedUser.id}
-              key={`${selectedAgency.id}-${selectedUser.id}`}
-            />
+        <IcUserRegistrationToAgencyModal title={modalProps?.title}>
+          {selectedAgency && modalProps ? (
+            modalProps.mode === "reject" ? (
+              <RejectIcUserRegistrationToAgencyForm
+                agency={{ id: selectedAgency.id, name: selectedAgency.name }}
+                userId={selectedUser.id}
+                key={`${selectedAgency.id}-${selectedUser.id}`}
+              />
+            ) : (
+              <AgencyUserModificationForm
+                agencyUser={{
+                  agencyId: selectedAgency.id,
+                  userId: selectedUser.id,
+                  email: selectedUser.email,
+                  roles: ["toReview"],
+                  isIcUser: true,
+                  isNotifiedByEmail: true,
+                }}
+                closeModal={closeIcUserRegistrationToAgencyModal}
+                mode={modalProps.mode}
+                agency={selectedAgency}
+              />
+            )
           ) : (
             "Pas d'agence sélectionnée"
           )}
-        </RejectIcUserRegistrationToAgencyModal>,
+        </IcUserRegistrationToAgencyModal>,
         document.body,
       )}
     </div>
@@ -196,24 +178,16 @@ const DisplayEmailList = ({
   );
 };
 
-const labelByRole: Record<AgencyRole, string> = {
-  counsellor: "Conseiller",
-  validator: "Validateur",
-  agencyOwner: "Administrateur d'agence",
-  toReview: "À valider",
-  "agency-viewer": "Lecteur",
-};
-
 const {
-  Component: RejectIcUserRegistrationToAgencyModal,
-  open: openRejectIcUserRegistrationToAgencyModal,
-  close: closeRejectIcUserRegistrationToAgencyModal,
+  Component: IcUserRegistrationToAgencyModal,
+  open: openIcUserRegistrationToAgencyModal,
+  close: closeIcUserRegistrationToAgencyModal,
 } = createModal({
   isOpenedByDefault: false,
   id: "siret",
 });
 
-type RejectIcUserRegistrationToAgencyFormProps = {
+type IcUserRegistrationToAgencyFormProps = {
   agency: {
     id: AgencyId;
     name: string;
@@ -224,7 +198,7 @@ type RejectIcUserRegistrationToAgencyFormProps = {
 const RejectIcUserRegistrationToAgencyForm = ({
   agency,
   userId,
-}: RejectIcUserRegistrationToAgencyFormProps) => {
+}: IcUserRegistrationToAgencyFormProps) => {
   const dispatch = useDispatch();
   const { register, handleSubmit, formState } =
     useForm<RejectIcUserRoleForAgencyParams>({
@@ -245,7 +219,7 @@ const RejectIcUserRegistrationToAgencyForm = ({
     dispatch(
       icUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested(values),
     );
-    closeRejectIcUserRegistrationToAgencyModal();
+    closeIcUserRegistrationToAgencyModal();
   };
 
   return (
@@ -262,7 +236,7 @@ const RejectIcUserRegistrationToAgencyForm = ({
           {
             type: "button",
             priority: "secondary",
-            onClick: closeRejectIcUserRegistrationToAgencyModal,
+            onClick: closeIcUserRegistrationToAgencyModal,
             children: "Annuler",
           },
           {
