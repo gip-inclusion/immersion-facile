@@ -575,6 +575,16 @@ describe("convention e2e", () => {
             statut: "REJETÉ",
             telephone: "+33123456780",
             telephoneTuteur: "+33601010101",
+            typeAgence: peAgency.kind,
+            nomAgence: peAgency.name,
+            prenomValidateurRenseigne:
+              convention.validators?.agencyValidator?.firstname,
+            nomValidateurRenseigne:
+              convention.validators?.agencyValidator?.lastname,
+            rqth: "N",
+            prenomTuteur: convention.establishmentTutor.firstName,
+            nomTuteur: convention.establishmentTutor.lastName,
+            fonctionTuteur: convention.establishmentTutor.job,
           },
         ]);
       },

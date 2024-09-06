@@ -122,6 +122,15 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       competencesObservees: convention.immersionSkills,
       signatureBeneficiaire: !!beneficiary.signedAt,
       signatureEntreprise: !!establishmentRepresentative.signedAt,
+      typeAgence: agency.kind,
+      nomAgence: agency.name,
+      prenomValidateurRenseigne:
+        convention.validators?.agencyValidator?.firstname,
+      nomValidateurRenseigne: convention.validators?.agencyValidator?.lastname,
+      rqth: convention.signatories.beneficiary.isRqth ? "O" : "N",
+      prenomTuteur: convention.establishmentTutor.firstName,
+      nomTuteur: convention.establishmentTutor.lastName,
+      fonctionTuteur: convention.establishmentTutor.job,
     };
 
     const response =

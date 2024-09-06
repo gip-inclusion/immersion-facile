@@ -266,7 +266,7 @@ const peConvention: PoleEmploiConvention = {
   emailTuteur: "john.doe.123@disney.com",
   id: "30000000002",
   nom: "Profite",
-  nomPrenomFonctionTuteur: "John Doe Directeur d'agence",
+  nomPrenomFonctionTuteur: "John Doe",
   objectifDeImmersion: 1,
   // peConnectId: "d4de66c2-42c0-4359-bf5d-137fc428355b",
   prenom: "Jean",
@@ -279,6 +279,14 @@ const peConvention: PoleEmploiConvention = {
   statut: "DEMANDE_VALIDÉE",
   telephone: "0611335577",
   telephoneTuteur: "0622446688",
+  typeAgence: "pole-emploi",
+  nomAgence: "Agence de test",
+  prenomValidateurRenseigne: "prénom du valideur",
+  nomValidateurRenseigne: "nom du valideur",
+  rqth: "N",
+  prenomTuteur: "John",
+  nomTuteur: "Doe",
+  fonctionTuteur: "Directeur d'agence",
 };
 
 type TestCase = {
