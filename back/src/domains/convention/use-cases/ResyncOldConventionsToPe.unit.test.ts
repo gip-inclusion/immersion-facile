@@ -1,5 +1,6 @@
 import subDays from "date-fns/subDays";
 import {
+  AgencyDto,
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
@@ -94,8 +95,8 @@ describe("ResyncOldConventionsToPe use case", () => {
         },
       ]);
       expectToEqual(peGateway.notifications, [
-        conventionToConventionNotification(conventionToSync1),
-        conventionToConventionNotification(conventionToSync2),
+        conventionToConventionNotification(conventionToSync1, agencyPE),
+        conventionToConventionNotification(conventionToSync2, agencyPE),
       ]);
       expectToEqual(report, {
         success: 2,
@@ -126,7 +127,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         },
       ]);
       expectToEqual(peGateway.notifications, [
-        conventionToConventionNotification(conventionToSync1),
+        conventionToConventionNotification(conventionToSync1, agencyPE),
       ]);
       expectToEqual(report, {
         success: [conventionToSync1.id].length,
@@ -252,8 +253,8 @@ describe("ResyncOldConventionsToPe use case", () => {
         },
       ]);
       expectToEqual(peGateway.notifications, [
-        conventionToConventionNotification(conventionToSync1),
-        conventionToConventionNotification(conventionToSync2),
+        conventionToConventionNotification(conventionToSync1, agencyPE),
+        conventionToConventionNotification(conventionToSync2, agencyPE),
       ]);
       expectToEqual(report, {
         success: 2,
@@ -303,7 +304,7 @@ describe("ResyncOldConventionsToPe use case", () => {
         },
       ]);
       expectToEqual(peGateway.notifications, [
-        conventionToConventionNotification(conventionToSync1),
+        conventionToConventionNotification(conventionToSync1, agencyPE),
       ]);
       expectToEqual(report, {
         success: 1,
@@ -386,6 +387,7 @@ describe("ResyncOldConventionsToPe use case", () => {
 
 function conventionToConventionNotification(
   convention: ConventionDto,
+  agency: AgencyDto,
 ): PoleEmploiConvention {
   return {
     id: "no-external-id",
@@ -423,5 +425,14 @@ function conventionToConventionNotification(
     signatureBeneficiaire: !!convention.signatories.beneficiary.signedAt,
     signatureEntreprise:
       !!convention.signatories.establishmentRepresentative.signedAt,
+    typeAgence: agency.kind,
+    nomAgence: agency.name,
+    prenomValidateurRenseigne:
+      convention.validators?.agencyValidator?.firstname,
+    nomValidateurRenseigne: convention.validators?.agencyValidator?.lastname,
+    rqth: "N",
+    prenomTuteur: convention.establishmentTutor.firstName,
+    nomTuteur: convention.establishmentTutor.lastName,
+    fonctionTuteur: convention.establishmentTutor.job,
   };
 }

@@ -1,4 +1,4 @@
-import { ConventionStatus, DateString } from "shared";
+import { AgencyKind, ConventionStatus, DateString } from "shared";
 import { SubscriberErrorFeedback } from "../../core/api-consumer/ports/SubscribersGateway";
 
 // This is an interface contract with Pole Emploi (conventions broadcast).
@@ -62,6 +62,14 @@ export type PoleEmploiConvention = {
   competencesObservees: string;
   signatureBeneficiaire: boolean;
   signatureEntreprise: boolean;
+  typeAgence: AgencyKind;
+  nomAgence: string;
+  prenomValidateurRenseigne?: string;
+  nomValidateurRenseigne?: string;
+  rqth: "O" | "N"; // 'O'si bénéficaire est une personne en situation de handicap, sinon 'N'
+  prenomTuteur: string;
+  nomTuteur: string;
+  fonctionTuteur: string;
 };
 
 type PeBroadcastSuccessResponse = { status: 200 | 201 | 204; body: unknown };
