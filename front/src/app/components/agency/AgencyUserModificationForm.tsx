@@ -48,11 +48,15 @@ export const AgencyUserModificationForm = ({
   const getFieldError = makeFieldError(formState);
 
   const onValidSubmit = () => {
+    const validatedUserRoles = values.roles.filter(
+      (role) => role !== "toReview",
+    );
     match(mode)
       .with("add", () => {
         dispatch(
           icUsersAdminSlice.actions.createUserOnAgencyRequested({
             ...values,
+            roles: validatedUserRoles,
             feedbackTopic: "agency-user",
           }),
         );
@@ -61,6 +65,7 @@ export const AgencyUserModificationForm = ({
         dispatch(
           icUsersAdminSlice.actions.updateUserOnAgencyRequested({
             ...values,
+            roles: validatedUserRoles,
             feedbackTopic: "agency-user",
           }),
         );
@@ -69,6 +74,7 @@ export const AgencyUserModificationForm = ({
         dispatch(
           icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested({
             ...values,
+            roles: validatedUserRoles,
           }),
         );
       });
@@ -80,16 +86,19 @@ export const AgencyUserModificationForm = ({
     reset(agencyUser);
   }, [agencyUser, reset]);
 
-  const checkboxOptions = keys(agencyRoleToDisplay).map((roleKey) => {
+  const availableRoles = keys(agencyRoleToDisplay).filter(
+    (role) => role !== "toReview",
+  );
+  const checkboxOptions = availableRoles.map((availableRole) => {
     return {
-      label: agencyRoleToDisplay[roleKey].label,
+      label: agencyRoleToDisplay[availableRole].label,
       nativeInputProps: {
         name: register("roles").name,
-        checked: values.roles.includes(roleKey),
+        checked: values.roles.includes(availableRole),
         onChange: () => {
-          const rolesToSet = values.roles.includes(roleKey)
-            ? values.roles.filter((role) => role !== roleKey)
-            : [...values.roles, roleKey];
+          const rolesToSet = values.roles.includes(availableRole)
+            ? values.roles.filter((role) => role !== availableRole)
+            : [...values.roles, availableRole];
           setValue("roles", rolesToSet, {
             shouldValidate: true,
           });
