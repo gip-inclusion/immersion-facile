@@ -187,6 +187,8 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         appellationCode: contactRequest.appellationCode,
       });
 
+    const discussionId = this.#uuidGenerator.new();
+
     const emailContent =
       contactRequest.contactMode === "EMAIL"
         ? configureGenerateHtmlFromTemplate(emailTemplatesByName, {
@@ -218,12 +220,13 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
               potentialBeneficiaryHasWorkingExperience:
                 contactRequest.hasWorkingExperience,
               domain,
+              discussionId: discussionId,
             },
             { showContentParts: true },
           )
         : null;
     return {
-      id: this.#uuidGenerator.new(),
+      id: discussionId,
       appellationCode: contactRequest.appellationCode,
       siret: contactRequest.siret,
       businessName: establishment.customizedName ?? establishment.name,

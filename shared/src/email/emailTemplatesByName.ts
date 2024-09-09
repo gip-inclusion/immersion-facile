@@ -1486,6 +1486,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         potentialBeneficiaryExperienceAdditionalInformation,
         potentialBeneficiaryHasWorkingExperience,
         domain,
+        discussionId,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
@@ -1522,7 +1523,7 @@ Profil du candidat :
           {
             label: "Répondre au candidat via mon espace",
             target: "_blank",
-            url: `https://${domain}/${frontRoutes.establishmentDashboard}/discussions?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+            url: `https://${domain}/${frontRoutes.establishmentDashboard}/discussions?discussionId=${discussionId}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
           },
         ],
         highlight: {

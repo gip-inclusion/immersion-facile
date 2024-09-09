@@ -102,6 +102,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
             potentialBeneficiaryHasWorkingExperience:
               discussion.potentialBeneficiary.hasWorkingExperience,
             domain: this.#domain,
+            discussionId: discussion.id,
           },
         };
         if (payload.isLegacy) {

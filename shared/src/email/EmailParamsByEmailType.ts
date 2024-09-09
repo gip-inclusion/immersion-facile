@@ -111,6 +111,7 @@ export type EmailParamsByEmailType = {
     potentialBeneficiaryHasWorkingExperience?: boolean;
     potentialBeneficiaryExperienceAdditionalInformation?: string;
     domain: string;
+    discussionId: string;
   };
   CONTACT_BY_EMAIL_REQUEST_LEGACY: {
     businessName: string;
