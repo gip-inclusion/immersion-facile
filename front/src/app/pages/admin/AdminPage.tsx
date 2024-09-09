@@ -1,6 +1,12 @@
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import React from "react";
-import { AdminTab } from "shared";
+import {
+  AdminTab,
+  OmitFromExistingKeys,
+  Prettify,
+  adminTabs,
+  keys,
+} from "shared";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
@@ -10,54 +16,54 @@ import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
 import { isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
+import { ENV } from "src/config/environmentVariables";
 import { Route } from "type-route";
 
-const rawAdminTabs: Array<
-  TabsProps.Controlled["tabs"][number] & { content: React.ReactNode }
-> = [
-  {
+type RawAdminTab = Prettify<
+  OmitFromExistingKeys<TabsProps.Controlled["tabs"][number], "tabId"> & {
+    content: React.ReactNode;
+  }
+>;
+
+const rawAdminTabs: Record<AdminTab, RawAdminTab> = {
+  conventions: {
     label: "Conventions",
-    tabId: "conventions",
     content: <ConventionTab />,
   },
-  {
+  events: {
     label: "Evénements",
-    tabId: "events",
     content: <EventsTab />,
   },
-  {
+  agencies: {
     label: "Agences",
-    tabId: "agencies",
     content: <AgencyTab />,
   },
-  {
+  establishments: {
     label: "Établissements",
-    tabId: "establishments",
     content: <EstablishmentsTab />,
   },
-  {
+  notifications: {
     label: "Notifications",
-    tabId: "notifications",
     content: <NotificationsTab />,
   },
-  {
+  "email-preview": {
     label: "Aperçu email",
-    tabId: "email-preview",
     content: <EmailPreviewTab />,
   },
-  {
+  "technical-options": {
     label: "Options techniques",
-    tabId: "technical-options",
     content: <TechnicalOptionsTab />,
   },
-];
+};
 
 const getAdminTabs = (currentTab: AdminTab) =>
-  rawAdminTabs.map((tab) => ({
-    ...tab,
-    tabId: tab.tabId,
-    isDefault: currentTab === tab.tabId,
-  }));
+  keys(rawAdminTabs)
+    .filter((tabId) => adminTabs[tabId].isVisible(ENV.envType))
+    .map((tabId) => ({
+      ...rawAdminTabs[tabId],
+      tabId,
+      isDefault: currentTab === tabId,
+    }));
 
 export const AdminPage = ({
   route,
