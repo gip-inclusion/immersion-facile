@@ -16,20 +16,23 @@ import {
   InMemoryOAuthGateway,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
-import { OAuthIdTokenPayload } from "../entities/OAuthIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { OAuthGatewayProvider, oAuthGatewayModes } from "../port/OAuthGateway";
+import {
+  GetAccessTokenPayload,
+  OAuthGatewayProvider,
+  oAuthGatewayModes,
+} from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const correctToken = "my-correct-token";
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
 
 describe("AuthenticateWithInclusionCode use case", () => {
-  const defaultExpectedIcIdTokenPayload: OAuthIdTokenPayload = {
+  const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
     nonce: "nounce",
     sub: "my-user-external-id",
-    given_name: "John",
-    family_name: "Doe",
+    firstName: "John",
+    lastName: "Doe",
     email: "john.doe@inclusion.com",
   };
 
@@ -109,8 +112,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
           ),
           {
             id: expectedOngoingOauth?.userId,
-            firstName: defaultExpectedIcIdTokenPayload.given_name,
-            lastName: defaultExpectedIcIdTokenPayload.family_name,
+            firstName: defaultExpectedIcIdTokenPayload.firstName,
+            lastName: defaultExpectedIcIdTokenPayload.lastName,
             email: defaultExpectedIcIdTokenPayload.email,
             externalId: defaultExpectedIcIdTokenPayload.sub,
           },
@@ -132,7 +135,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
     const accessToken = "inclusion-access-token";
     inclusionConnectGateway.setAccessTokenResponse({
-      oAuthIdTokenPayload: expectedIcIdTokenPayload,
+      payload: expectedIcIdTokenPayload,
       accessToken,
       expire: 60,
     });

@@ -105,10 +105,10 @@ describe("inclusion connection flow", () => {
         gateways.oAuthGateway.setAccessTokenResponse({
           accessToken: inclusionToken,
           expire: 1,
-          oAuthIdTokenPayload: {
+          payload: {
             email: "osef@gmail",
-            family_name: "osef",
-            given_name: "jean",
+            firstName: "osef",
+            lastName: "jean",
             nonce,
             sub: "osef",
           },
@@ -153,10 +153,10 @@ describe("inclusion connection flow", () => {
       gateways.oAuthGateway.setAccessTokenResponse({
         accessToken: inclusionToken,
         expire: 1,
-        oAuthIdTokenPayload: {
+        payload: {
           email: "osef@gmail",
-          family_name: "osef",
-          given_name: "jean",
+          firstName: "osef",
+          lastName: "jean",
           nonce,
           structure_pe: codeSafir,
           sub,

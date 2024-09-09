@@ -2,7 +2,7 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 const featureFlagTableName = "feature_flags";
 const columnName = "flag_name";
-const featureFlag = "proConnect";
+const featureFlag = "enableProConnect";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.sql(
