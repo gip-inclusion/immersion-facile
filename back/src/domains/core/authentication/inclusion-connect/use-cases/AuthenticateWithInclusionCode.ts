@@ -21,9 +21,9 @@ import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
-import { OAuthIdTokenPayload } from "../entities/OAuthIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
 import {
+  GetAccessTokenPayload,
   OAuthGateway,
   OAuthGatewayProvider,
   oAuthModeByFeatureFlags,
@@ -93,43 +93,44 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #onOngoingOAuth(
     uow: UnitOfWork,
-    mode: OAuthGatewayProvider,
+    provider: OAuthGatewayProvider,
     { code, page }: WithSourcePage & { code: OAuthCode },
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
-    const { accessToken, expire, oAuthIdTokenPayload } =
+    const { accessToken, expire, payload } =
       await this.#inclusionConnectGateway.getAccessToken(
         {
           code,
           page,
         },
-        mode,
+        provider,
       );
 
-    if (oAuthIdTokenPayload.nonce !== existingOngoingOAuth.nonce)
+    if (payload.nonce !== existingOngoingOAuth.nonce)
       throw errors.inclusionConnect.nonceMismatch();
 
     const existingInclusionConnectedUser =
-      await uow.userRepository.findByExternalId(oAuthIdTokenPayload.sub, mode);
+      await uow.userRepository.findByExternalId(payload.sub, provider);
 
     const userWithSameEmail = await uow.userRepository.findByEmail(
-      oAuthIdTokenPayload.email,
-      mode,
+      payload.email,
+      provider,
     );
 
     const existingUser = await this.#makeExistingUser(
       uow,
-      mode,
+      provider,
       existingInclusionConnectedUser,
       userWithSameEmail,
     );
 
+    const toto = this.#makeAuthenticatedUser(
+      this.#uuidGenerator.new(),
+      this.#timeGateway.now(),
+      payload,
+    );
     const newOrUpdatedAuthenticatedUser: User = {
-      ...this.#makeAuthenticatedUser(
-        this.#uuidGenerator.new(),
-        this.#timeGateway.now(),
-        oAuthIdTokenPayload,
-      ),
+      ...toto,
       ...(existingUser && {
         id: existingUser.id,
         createdAt: existingUser.createdAt,
@@ -139,7 +140,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     const ongoingOAuth: OngoingOAuth = {
       ...existingOngoingOAuth,
       userId: newOrUpdatedAuthenticatedUser.id,
-      externalId: oAuthIdTokenPayload.sub,
+      externalId: payload.sub,
       accessToken,
     };
 
@@ -150,7 +151,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       );
     }
 
-    await uow.userRepository.save(newOrUpdatedAuthenticatedUser, mode);
+    await uow.userRepository.save(newOrUpdatedAuthenticatedUser, provider);
     await uow.ongoingOAuthRepository.save(ongoingOAuth);
 
     await uow.outboxRepository.save(
@@ -159,7 +160,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         payload: {
           userId: newOrUpdatedAuthenticatedUser.id,
           provider: ongoingOAuth.provider,
-          codeSafir: oAuthIdTokenPayload.structure_pe ?? null,
+          codeSafir: payload.structure_pe ?? null,
           triggeredBy: {
             kind: "inclusion-connected",
             userId: newOrUpdatedAuthenticatedUser.id,
@@ -188,7 +189,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #makeExistingUser(
     uow: UnitOfWork,
-    mode: OAuthGatewayProvider,
+    provider: OAuthGatewayProvider,
     existingInclusionConnectedUser: User | undefined,
     userWithSameEmail: User | undefined,
   ): Promise<User | undefined> {
@@ -202,7 +203,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       const conflictingUser = userWithSameEmail;
       await this.#updateUserAgencyRights(
         uow,
-        mode,
+        provider,
         conflictingUser,
         existingInclusionConnectedUser,
       );
@@ -223,12 +224,12 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   #makeAuthenticatedUser(
     userId: string,
     createdAt: Date,
-    jwtPayload: OAuthIdTokenPayload,
+    jwtPayload: GetAccessTokenPayload,
   ): User {
     return {
       id: userId,
-      firstName: jwtPayload.given_name,
-      lastName: jwtPayload.family_name,
+      firstName: jwtPayload.firstName,
+      lastName: jwtPayload.lastName,
       email: jwtPayload.email,
       externalId: jwtPayload.sub,
       createdAt: createdAt.toISOString(),

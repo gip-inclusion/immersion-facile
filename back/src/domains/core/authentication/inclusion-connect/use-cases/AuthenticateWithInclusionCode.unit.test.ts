@@ -23,19 +23,22 @@ import {
   InMemoryOAuthGateway,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
-import { OAuthIdTokenPayload } from "../entities/OAuthIdTokenPayload";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { OAuthGatewayProvider, oAuthGatewayModes } from "../port/OAuthGateway";
+import {
+  GetAccessTokenPayload,
+  OAuthGatewayProvider,
+  oAuthGatewayModes,
+} from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
 const correctToken = "my-correct-token";
 
-const defaultExpectedIcIdTokenPayload: OAuthIdTokenPayload = {
+const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
   nonce: "nounce",
   sub: "my-user-external-id",
-  given_name: "John",
-  family_name: "Doe",
+  firstName: "John",
+  lastName: "Doe",
   email: "john.doe@inclusion.com",
 };
 
@@ -85,8 +88,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
           expectObjectInArrayToMatch(uow.userRepository.users, [
             {
               id: userId,
-              firstName: defaultExpectedIcIdTokenPayload.given_name,
-              lastName: defaultExpectedIcIdTokenPayload.family_name,
+              firstName: defaultExpectedIcIdTokenPayload.firstName,
+              lastName: defaultExpectedIcIdTokenPayload.lastName,
               email: defaultExpectedIcIdTokenPayload.email,
               externalId: defaultExpectedIcIdTokenPayload.sub,
             },
@@ -167,8 +170,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
             {
               id: alreadyExistingUser.id,
               email: defaultExpectedIcIdTokenPayload.email,
-              firstName: defaultExpectedIcIdTokenPayload.given_name,
-              lastName: defaultExpectedIcIdTokenPayload.family_name,
+              firstName: defaultExpectedIcIdTokenPayload.firstName,
+              lastName: defaultExpectedIcIdTokenPayload.lastName,
               externalId: alreadyExistingUser.externalId,
             },
           ]);
@@ -203,8 +206,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
             {
               id: alreadyExistingUser.id,
               email: alreadyExistingUser.email,
-              firstName: defaultExpectedIcIdTokenPayload.given_name,
-              lastName: defaultExpectedIcIdTokenPayload.family_name,
+              firstName: defaultExpectedIcIdTokenPayload.firstName,
+              lastName: defaultExpectedIcIdTokenPayload.lastName,
               externalId: defaultExpectedIcIdTokenPayload.sub,
             },
           ]);
@@ -274,8 +277,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
             code: "my-inclusion-code",
             state: makeSuccessfulAuthenticationConditions(mode, {
               email: updatedUser.email,
-              family_name: updatedUser.lastName,
-              given_name: updatedUser.firstName,
+              firstName: updatedUser.firstName,
+              lastName: updatedUser.lastName,
               sub: externalId,
             }).initialOngoingOAuth.state,
             page: "agencyDashboard",
@@ -350,7 +353,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
         inclusionConnectGateway.setAccessTokenResponse({
           expire: 60,
-          oAuthIdTokenPayload: defaultExpectedIcIdTokenPayload,
+          payload: defaultExpectedIcIdTokenPayload,
           accessToken,
         });
 
@@ -368,7 +371,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
   const makeSuccessfulAuthenticationConditions = (
     mode: OAuthGatewayProvider,
-    params?: Partial<OAuthIdTokenPayload>,
+    params?: Partial<GetAccessTokenPayload>,
   ) => {
     const expectedIcIdTokenPayload = {
       ...defaultExpectedIcIdTokenPayload,
@@ -386,7 +389,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
     const accessToken = "inclusion-access-token";
     inclusionConnectGateway.setAccessTokenResponse({
-      oAuthIdTokenPayload: expectedIcIdTokenPayload,
+      payload: expectedIcIdTokenPayload,
       accessToken,
       expire: 60,
     });

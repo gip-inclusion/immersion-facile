@@ -50,6 +50,10 @@ export const errors = {
       ),
     nonceMismatch: () =>
       new ForbiddenError("Il y a un décalage sur le 'Nonce'."),
+    couldNotGetUserInfo: ({ message }: { message: string }) =>
+      new BadRequestError(
+        `Impossible de récupérer les infos pro connect : ${message}`,
+      ),
   },
   convention: {
     updateBadStatusInParams: ({ id }: { id: ConventionId }) =>

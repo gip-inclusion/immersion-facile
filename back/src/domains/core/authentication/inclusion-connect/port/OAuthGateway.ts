@@ -1,13 +1,27 @@
-import { AbsoluteUrl, FeatureFlags, WithSourcePage } from "shared";
-import { OAuthIdTokenPayload } from "../entities/OAuthIdTokenPayload";
+import {
+  AbsoluteUrl,
+  Email,
+  ExternalId,
+  FeatureFlags,
+  WithSourcePage,
+} from "shared";
 import { OAuthJwt } from "../entities/OngoingOAuth";
 
 export type GetAccessTokenParams = WithSourcePage & {
   code: string;
 };
 
+export type GetAccessTokenPayload = {
+  nonce: string;
+  sub: ExternalId;
+  firstName: string;
+  lastName: string;
+  email: Email;
+  structure_pe?: string;
+};
+
 export type GetAccessTokenResult = {
-  oAuthIdTokenPayload: OAuthIdTokenPayload;
+  payload: GetAccessTokenPayload;
   expire: number;
   accessToken: OAuthJwt;
 };

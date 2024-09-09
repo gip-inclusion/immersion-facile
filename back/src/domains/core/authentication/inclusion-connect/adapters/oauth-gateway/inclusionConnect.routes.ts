@@ -7,7 +7,7 @@ import { z } from "zod";
 // id_token is a jwt that has a payload of kind : InclusionAccessTokenResponse
 // access_token could be used to call UserInfo endpoint
 
-type InclusionConnectAccessTokenResponse = {
+export type InclusionConnectAccessTokenResponse = {
   access_token: string;
   token_type: "Bearer";
   expires_in: number;
