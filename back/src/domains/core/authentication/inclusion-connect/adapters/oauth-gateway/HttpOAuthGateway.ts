@@ -2,6 +2,7 @@ import {
   AbsoluteUrl,
   WithSourcePage,
   decodeJwtWithoutSignatureCheck,
+  errors,
   queryParamsAsString,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -9,8 +10,10 @@ import { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../../../utils/logger";
 import {
-  OAuthIdTokenPayload,
-  oAuthIdTokenPayloadSchema,
+  IcOAuthIdTokenPayload,
+  ProConnectOAuthIdTokenPayload,
+  icAuthTokenPayloadSchema,
+  proConnectAuthTokenPayloadSchema,
 } from "../../entities/OAuthIdTokenPayload";
 import {
   GetAccessTokenParams,
@@ -20,6 +23,7 @@ import {
   OAuthGatewayProvider,
 } from "../../port/OAuthGateway";
 import {
+  InclusionConnectAccessTokenResponse,
   InclusionConnectLogoutQueryParams,
   InclusionConnectRoutes,
 } from "./inclusionConnect.routes";
@@ -28,10 +32,10 @@ import { ProConnectRoutes } from "./proConnect.routes";
 const logger = createLogger(__filename);
 
 export class HttpOAuthGateway implements OAuthGateway {
-  private httpClientByProvider: Record<
-    OAuthGatewayProvider,
-    HttpClient<InclusionConnectRoutes> | HttpClient<ProConnectRoutes>
-  >;
+  private httpClientByProvider: {
+    ProConnect: HttpClient<ProConnectRoutes>;
+    InclusionConnect: HttpClient<InclusionConnectRoutes>;
+  };
 
   constructor(
     httpClientInclusionConnect: HttpClient<InclusionConnectRoutes>,
@@ -52,62 +56,151 @@ export class HttpOAuthGateway implements OAuthGateway {
     // On pourrait placer ces URL au niveau du ProConnect/InclusionConnect HTTP Client ?
     const uriByMode: Record<OAuthGatewayProvider, AbsoluteUrl> = {
       InclusionConnect: this.#makeInclusionConnectAuthorizeUri(),
-      ProConnect: this.#makeProConnectAuthorizeUri(), //TODO a définir
+      ProConnect: this.#makeProConnectAuthorizeUri(),
     };
-    const baseParams: InclusionConnectLoginUrlParams = {
+    const baseParams: Omit<
+      InclusionConnectLoginUrlParams,
+      "client_id" | "scope"
+    > = {
       state,
-      client_id: this.inclusionConnectConfig.clientId,
       nonce,
       redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
       response_type: "code",
-      scope: this.inclusionConnectConfig.scope,
     };
     const queryParams =
       provider === "InclusionConnect"
-        ? queryParamsAsString<InclusionConnectLoginUrlParams>(baseParams)
+        ? queryParamsAsString<InclusionConnectLoginUrlParams>({
+            ...baseParams,
+            client_id: this.inclusionConnectConfig.clientId,
+            scope: this.inclusionConnectConfig.scope,
+          })
         : queryParamsAsString<ProConnectLoginUrlParams>({
             ...baseParams,
             acr_values: "eidas1",
+            client_id: this.proConnectConfig.clientId,
+            scope: this.proConnectConfig.scope,
           });
 
-    return `${uriByMode[provider]}?${queryParams})}`;
+    return `${uriByMode[provider]}?${queryParams}`;
+  }
+
+  async #getAccessTokenProConnect({
+    code,
+    page,
+  }: GetAccessTokenParams): Promise<GetAccessTokenResult> {
+    const queryParams = {
+      body: queryParamsAsString({
+        code,
+        client_id: this.proConnectConfig.clientId,
+        client_secret: this.proConnectConfig.clientSecret,
+        grant_type: "authorization_code",
+        redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
+      }),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded" as const,
+      },
+    };
+
+    const { body: proConnectAccessTokenBody } =
+      await this.httpClientByProvider.ProConnect.getAccessToken(queryParams);
+
+    const { nonce } = decodeJwtWithoutSignatureCheck<{ nonce: string }>(
+      proConnectAccessTokenBody.id_token,
+    );
+
+    const response = await this.httpClientByProvider.ProConnect.getUserInfo({
+      headers: {
+        authorization: `Bearer ${proConnectAccessTokenBody.access_token}`,
+      },
+    });
+
+    if (response.status === 400)
+      throw errors.inclusionConnect.couldNotGetUserInfo({
+        message: JSON.stringify(response.body, null, 2),
+      });
+
+    const tokenWithPayload = response.body;
+    const oAuthIdTokenPayload = validateAndParseZodSchemaV2(
+      proConnectAuthTokenPayloadSchema,
+      decodeJwtWithoutSignatureCheck<ProConnectOAuthIdTokenPayload>(
+        tokenWithPayload,
+      ),
+      logger,
+    );
+
+    return {
+      accessToken: proConnectAccessTokenBody.access_token,
+      expire: proConnectAccessTokenBody.expires_in,
+      payload: {
+        sub: oAuthIdTokenPayload.sub,
+        nonce,
+        firstName: oAuthIdTokenPayload.given_name,
+        lastName: oAuthIdTokenPayload.usual_name,
+        email: oAuthIdTokenPayload.email,
+        // structure_pe: "TODO"
+      },
+    };
+  }
+
+  async #getAccessTokenInclusionConnect({
+    code,
+    page,
+  }: GetAccessTokenParams): Promise<GetAccessTokenResult> {
+    const queryParams = {
+      body: queryParamsAsString({
+        code,
+        client_id: this.inclusionConnectConfig.clientId,
+        client_secret: this.inclusionConnectConfig.clientSecret,
+        grant_type: "authorization_code",
+        redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
+      }),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded" as const,
+      },
+    };
+
+    try {
+      const { body: inclusionConnectAccessTokenBody } =
+        await this.httpClientByProvider.InclusionConnect.getAccessToken(
+          queryParams,
+        );
+
+      const tokenWithPayload = inclusionConnectAccessTokenBody.id_token;
+
+      const oAuthIdTokenPayload = validateAndParseZodSchemaV2(
+        icAuthTokenPayloadSchema,
+        decodeJwtWithoutSignatureCheck<IcOAuthIdTokenPayload>(tokenWithPayload),
+        logger,
+      );
+
+      return {
+        accessToken: inclusionConnectAccessTokenBody.access_token,
+        expire: inclusionConnectAccessTokenBody.expires_in,
+        payload: {
+          sub: oAuthIdTokenPayload.sub,
+          lastName: oAuthIdTokenPayload.family_name,
+          firstName: oAuthIdTokenPayload.given_name,
+          nonce: oAuthIdTokenPayload.nonce,
+          email: oAuthIdTokenPayload.email,
+          structure_pe: oAuthIdTokenPayload.structure_pe,
+        },
+      };
+    } catch (error: any) {
+      logger.error({
+        error,
+        message: "Error trying to get Access Token",
+      });
+      throw error;
+    }
   }
 
   public async getAccessToken(
     { code, page }: GetAccessTokenParams,
     provider: OAuthGatewayProvider,
   ): Promise<GetAccessTokenResult> {
-    return this.httpClientByProvider[provider]
-      .getAccessToken({
-        body: queryParamsAsString({
-          code,
-          client_id: this.inclusionConnectConfig.clientId,
-          client_secret: this.inclusionConnectConfig.clientSecret,
-          grant_type: "authorization_code",
-          redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
-        }),
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      })
-      .then(
-        ({ body }): GetAccessTokenResult => ({
-          accessToken: body.access_token,
-          expire: body.expires_in,
-          oAuthIdTokenPayload: validateAndParseZodSchemaV2(
-            oAuthIdTokenPayloadSchema,
-            decodeJwtWithoutSignatureCheck<OAuthIdTokenPayload>(body.id_token),
-            logger,
-          ),
-        }),
-      )
-      .catch((error) => {
-        logger.error({
-          error,
-          message: "Error trying to get Access Token",
-        });
-        throw error;
-      });
+    return provider === "InclusionConnect"
+      ? this.#getAccessTokenInclusionConnect({ code, page })
+      : this.#getAccessTokenProConnect({ code, page });
   }
 
   public async getLogoutUrl(
@@ -125,6 +218,27 @@ export class HttpOAuthGateway implements OAuthGateway {
       post_logout_redirect_uri:
         this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
     })}`;
+  }
+
+  async #getTokenWithPayload(
+    provider: OAuthGatewayProvider,
+    inclusionConnectAccessTokenBody: InclusionConnectAccessTokenResponse,
+  ): Promise<string> {
+    if (provider === "InclusionConnect")
+      return inclusionConnectAccessTokenBody.id_token;
+
+    const response = await this.httpClientByProvider.ProConnect.getUserInfo({
+      headers: {
+        authorization: `Bearer ${inclusionConnectAccessTokenBody.access_token}`,
+      },
+    });
+
+    if (response.status === 400)
+      throw errors.inclusionConnect.couldNotGetUserInfo({
+        message: JSON.stringify(response.body, null, 2),
+      });
+
+    return response.body;
   }
 
   #makeRedirectAfterLoginUrl(params: WithSourcePage): AbsoluteUrl {

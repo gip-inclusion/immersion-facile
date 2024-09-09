@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 
@@ -37,9 +37,18 @@ export const makeProConnectRoutes = (proConnectBaseUrl: AbsoluteUrl) =>
   defineRoutes({
     getAccessToken: defineRoute({
       method: "post",
-      url: `${proConnectBaseUrl}/token/`,
+      url: `${proConnectBaseUrl}/token`,
       requestBodySchema: z.string(),
       headersSchema: withContentTypeUrlEncodedSchema.passthrough(),
       responses: { 200: proConnectAccessTokenResponseSchema },
+    }),
+    getUserInfo: defineRoute({
+      method: "get",
+      url: `${proConnectBaseUrl}/userinfo`,
+      ...withAuthorizationHeaders,
+      responses: {
+        200: z.string(),
+        400: z.any(),
+      },
     }),
   });
