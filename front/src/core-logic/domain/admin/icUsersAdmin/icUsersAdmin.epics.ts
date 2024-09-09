@@ -132,36 +132,20 @@ const createUserOnAgencyEpic: IcUsersAdminActionEpic = (
       adminGateway
         .createUserForAgency$(action.payload, getAdminToken(state$.value))
         .pipe(
-          map(
-            ({
-              id,
-              email,
-              firstName,
-              lastName,
-              createdAt,
-              dashboards,
-              externalId,
-              agencyRights,
-            }) =>
-              icUsersAdminSlice.actions.createUserOnAgencySucceeded({
-                icUser: {
-                  id,
-                  email,
-                  firstName,
-                  lastName,
-                  externalId,
-                  createdAt,
-                  dashboards,
-                  agencyRights: agencyRights.reduce(
-                    (agenciesAcc, agencyRight) => ({
-                      ...agenciesAcc,
-                      [agencyRight.agency.id]: agencyRight,
-                    }),
-                    {} as Record<AgencyId, AgencyRight>,
-                  ),
-                },
-                feedbackTopic: action.payload.feedbackTopic,
-              }),
+          map((user) =>
+            icUsersAdminSlice.actions.createUserOnAgencySucceeded({
+              icUser: {
+                ...user,
+                agencyRights: user.agencyRights.reduce(
+                  (agenciesAcc, agencyRight) => ({
+                    ...agenciesAcc,
+                    [agencyRight.agency.id]: agencyRight,
+                  }),
+                  {} as Record<AgencyId, AgencyRight>,
+                ),
+              },
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
           ),
           catchEpicError((error) =>
             icUsersAdminSlice.actions.createUserOnAgencyFailed({
