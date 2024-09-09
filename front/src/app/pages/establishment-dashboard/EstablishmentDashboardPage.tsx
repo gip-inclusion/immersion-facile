@@ -10,6 +10,7 @@ import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 
+import { DiscussionManageContent } from "src/app/components/admin/establishments/DiscussionManageContent";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { isEstablishmentDashboardTab } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { routes } from "src/app/routes/routes";
@@ -31,7 +32,7 @@ export const EstablishmentDashboardPage = ({
 }): ReactJSXElement => {
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
-
+  const { params } = route;
   const rawEstablishmentDashboardTabs = ({
     dashboards: {
       establishments: { conventions, discussions },
@@ -71,7 +72,9 @@ export const EstablishmentDashboardPage = ({
     {
       label: "Mises en relation",
       tabId: "discussions",
-      content: (
+      content: params.discussionId ? (
+        <DiscussionManageContent discussionId={params.discussionId} />
+      ) : (
         <>
           <ManageDiscussionFormSection />
           {discussions ? (

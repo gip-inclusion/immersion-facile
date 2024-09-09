@@ -316,6 +316,7 @@ export const defaultEmailValueByEmailKind: {
       "POTENTIAL_BENEFICIARY_EXPERIENCE_ADDITIONAL_INFORMATION",
     potentialBeneficiaryHasWorkingExperience: true,
     domain: "immersion-facile.beta.gouv.fr",
+    discussionId: "fake-discussion-id",
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     businessName: "BUSINESS_NAME",

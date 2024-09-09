@@ -133,6 +133,7 @@ describe("NotifyContactRequest", () => {
                 discussion.potentialBeneficiary.resumeLink,
               businessAddress: addressDtoToString(discussion.address),
               domain,
+              discussionId: discussion.id,
             },
             cc: establishmentContact.copyEmails,
           },

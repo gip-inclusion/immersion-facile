@@ -163,6 +163,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
         .ofType(icUserEstablishmentDashboardTabSerializer)
         .default("conventions"),
       siret: param.query.optional.string,
+      discussionId: param.query.optional.string,
     },
     ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
   ),

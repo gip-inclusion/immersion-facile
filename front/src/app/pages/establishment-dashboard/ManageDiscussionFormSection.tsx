@@ -26,7 +26,9 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ discussionId }) => {
-            routes.manageDiscussion({ discussionId }).push();
+            routes
+              .establishmentDashboard({ discussionId, tab: "discussions" })
+              .push();
           })}
         >
           <div className={fr.cx("fr-grid-row")}>
