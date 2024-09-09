@@ -45,10 +45,12 @@ export const RegisterUsersToAgencies = () => {
           <Select
             label={`Sélectionner un utilisateur (${icUsersNeedingReview.length} en attente de validation)`}
             options={[
-              ...icUsersNeedingReview.map((user) => ({
-                value: user.id,
-                label: `${user.firstName} ${user.lastName} - ${user.email}`,
-              })),
+              ...icUsersNeedingReview
+                .sort((a, b) => a.lastName.localeCompare(b.lastName))
+                .map((user) => ({
+                  value: user.id,
+                  label: `${user.lastName} ${user.firstName} - ${user.email}`,
+                })),
             ]}
             placeholder="Sélectionner un utilisateur"
             nativeSelectProps={{
