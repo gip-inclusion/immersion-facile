@@ -66,13 +66,17 @@ export class HttpInclusionConnectedGateway
     );
   }
 
-  public getLogoutUrl$(): Observable<AbsoluteUrl> {
+  public getLogoutUrl$({ idToken }): Observable<AbsoluteUrl> {
     return from(
-      this.httpClient.getInclusionConnectLogoutUrl().then((response) =>
-        match(response)
-          .with({ status: 200 }, ({ body }) => body)
-          .otherwise(otherwiseThrow),
-      ),
+      this.httpClient
+        .getInclusionConnectLogoutUrl({
+          idToken,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
