@@ -14,14 +14,17 @@ location /api {
   proxy_busy_buffers_size 16k;
 }
 
-location /aide {
-    rewrite /aide/(.*) /$1 break;
-    real_ip_header X-Forwarded-For;
-    proxy_pass https://immersion-facilitee.crisp.help/fr;
-    proxy_http_version 1.1;
+location = /aide {
+    return 301 /aide/;  # Rediriger vers la version avec le slash final
+}
 
-    proxy_ssl_server_name on;
+location /aide/ {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_pass https://immersion-facilitee.crisp.help/fr/;
+    proxy_redirect off;
 
-    proxy_set_header Accept-Encoding "";
-    proxy_set_header Access-Control-Allow-Origin "*";
+    rewrite ^/aide/(.*)$ /$1 break;
 }
