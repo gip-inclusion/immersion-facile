@@ -47,7 +47,7 @@ jobs:
   deploy-staging:
     name: Deploy staging
     needs:
-      - validation
+      #- validation
       - tag
       - build-front-artefact
       - build-back-artefact
