@@ -7,6 +7,7 @@ import {
   WithSourcePage,
 } from "shared";
 import { OAuthJwt } from "../entities/OngoingOAuth";
+import { z } from "zod";
 
 export type GetAccessTokenParams = WithSourcePage & {
   code: string;

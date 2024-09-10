@@ -9,7 +9,7 @@ export class GetInclusionConnectLogoutUrl extends TransactionalUseCase<
   void,
   AbsoluteUrl
 > {
-  protected inputSchema = z.void();
+  protected inputSchema = withIdTokenSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
