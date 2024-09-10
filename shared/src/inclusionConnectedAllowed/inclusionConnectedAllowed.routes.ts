@@ -12,7 +12,10 @@ import {
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
-import { inclusionConnectedUserSchema } from "./inclusionConnectedAllowed.schema";
+import {
+  inclusionConnectedUserSchema,
+  withIdTokenSchema,
+} from "./inclusionConnectedAllowed.schema";
 
 export type InclusionConnectedAllowedRoutes =
   typeof inclusionConnectedAllowedRoutes;
@@ -68,6 +71,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
   getInclusionConnectLogoutUrl: defineRoute({
     method: "get",
     url: "/inclusion-connect-logout",
+    queryParamsSchema: withIdTokenSchema,
     responses: {
       200: absoluteUrlSchema,
     },
