@@ -17,6 +17,7 @@ import {
   WithEstablismentsSiretAndName,
   allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
+import { IdToken } from "../inclusionConnect/inclusionConnect.dto";
 
 export const agencyRoleSchema = z.enum(allAgencyRoles);
 
@@ -70,3 +71,11 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     establishments: z.array(withEstablishmentSiretAndName).optional(),
     isBackofficeAdmin: z.boolean().optional(),
   });
+
+export type WithIdToken = {
+  idToken: IdToken;
+};
+
+export const withIdTokenSchema: z.Schema<WithIdToken> = z.object({
+  idToken: z.string(),
+});
