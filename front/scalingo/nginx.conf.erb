@@ -14,14 +14,8 @@ location /api {
   proxy_busy_buffers_size 16k;
 }
 
-location = /aide {
-    if ($request_uri != "/aide/") {
-        return 301 /aide/;
-    }
-}
-
-location /aide/ {
-    proxy_pass https://immersion-facilitee.crisp.help/fr/;
+location /aide {
+    proxy_pass https://immersion-facilitee.crisp.help/fr;
     proxy_http_version 1.1;
 
     proxy_ssl_server_name on;

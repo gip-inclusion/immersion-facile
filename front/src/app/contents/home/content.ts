@@ -284,7 +284,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
     {
       title: "Comment trouver une entreprise accueillante ?",
       description: `A partir de la page candidat du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement sur la page...`,
-      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-rechercher-une-entreprise-accueillante-ek1x8s/",
     },
     {
       title: "A quoi sert une immersion professionnelle ?",
