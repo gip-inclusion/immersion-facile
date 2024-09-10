@@ -49,8 +49,18 @@ export const InclusionConnectedPrivateRoute = ({
     featureFlagSelectors.featureFlagState,
   );
 
+  const providerName = enableProConnect.isActive
+    ? "ProConnect"
+    : "Inclusion Connect";
+
   useEffect(() => {
-    const { token, email = "", firstName = "", lastName = "" } = route.params;
+    const {
+      token,
+      email = "",
+      firstName = "",
+      lastName = "",
+      idToken = "",
+    } = route.params;
     if (token) {
       dispatch(
         authSlice.actions.federatedIdentityProvided({
@@ -59,6 +69,7 @@ export const InclusionConnectedPrivateRoute = ({
           email,
           lastName,
           firstName,
+          idToken,
         }),
       );
       if (route.name === "agencyDashboard") routes.agencyDashboard().replace();
@@ -66,10 +77,6 @@ export const InclusionConnectedPrivateRoute = ({
         routes.establishmentDashboard({ tab: "conventions" }).replace();
     }
   }, [route.params, route.name, dispatch]);
-
-  const providerName = enableProConnect.isActive
-    ? "Pro Connect"
-    : "Inclusion Connect";
 
   if (!isInclusionConnected)
     return (

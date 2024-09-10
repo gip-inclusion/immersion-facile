@@ -3,6 +3,7 @@ import {
   Email,
   ExternalId,
   FeatureFlags,
+  IdToken,
   WithSourcePage,
 } from "shared";
 import { OAuthJwt } from "../entities/OngoingOAuth";
@@ -24,6 +25,7 @@ export type GetAccessTokenResult = {
   payload: GetAccessTokenPayload;
   expire: number;
   accessToken: OAuthJwt;
+  idToken: IdToken;
 };
 
 export type GetLoginUrlParams = WithSourcePage & {

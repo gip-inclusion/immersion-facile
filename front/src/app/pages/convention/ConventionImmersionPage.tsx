@@ -157,6 +157,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
           email,
           firstName,
           lastName,
+          idToken: "should-not-need-for-pe-connect",
         }),
       );
     }
