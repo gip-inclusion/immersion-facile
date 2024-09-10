@@ -15,7 +15,9 @@ location /api {
 }
 
 location = /aide {
-    return 301 /aide/;
+    if ($request_uri != "/aide/") {
+        return 301 /aide/;
+    }
 }
 
 location /aide/ {
