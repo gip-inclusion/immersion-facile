@@ -130,6 +130,7 @@ export class HttpOAuthGateway implements OAuthGateway {
 
     return {
       accessToken: proConnectAccessTokenBody.access_token,
+      idToken: proConnectAccessTokenBody.id_token,
       expire: proConnectAccessTokenBody.expires_in,
       payload: {
         sub: oAuthIdTokenPayload.sub,
@@ -176,6 +177,7 @@ export class HttpOAuthGateway implements OAuthGateway {
       return {
         accessToken: inclusionConnectAccessTokenBody.access_token,
         expire: inclusionConnectAccessTokenBody.expires_in,
+        idToken: tokenWithPayload,
         payload: {
           sub: oAuthIdTokenPayload.sub,
           lastName: oAuthIdTokenPayload.family_name,
@@ -206,14 +208,12 @@ export class HttpOAuthGateway implements OAuthGateway {
   public async getLogoutUrl(
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
-    const uriByMode: Record<OAuthGatewayProvider, AbsoluteUrl> = {
-      InclusionConnect: `${this.inclusionConnectConfig.providerBaseUri}/logout/`,
-      ProConnect: "http://", // TODO
-    };
+    const uri: AbsoluteUrl =
+      provider === "InclusionConnect"
+        ? `${this.inclusionConnectConfig.providerBaseUri}/logout/`
+        : `${this.proConnectConfig.providerBaseUri}/session/end/`;
 
-    return `${
-      uriByMode[provider]
-    }?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
+    return `${uri}?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
       client_id: this.inclusionConnectConfig.clientId,
       post_logout_redirect_uri:
         this.inclusionConnectConfig.immersionRedirectUri.afterLogout,

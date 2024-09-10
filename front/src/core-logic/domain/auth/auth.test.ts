@@ -31,6 +31,7 @@ const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
   email: "john.doe@mail.com",
   firstName: "John",
   lastName: "Doe",
+  idToken: "inclusion-connect-id-token",
 };
 
 describe("Auth slice", () => {

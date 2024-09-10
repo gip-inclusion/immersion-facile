@@ -9,6 +9,7 @@ import { EstablishmentRole, Role } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
 import { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
+export type IdToken = Flavor<string, "IdToken">;
 export type IdentityProvider = "inclusionConnect" | "proConnect";
 export type OAuthState = Flavor<string, "OAuthState">;
 export type OAuthCode = Flavor<string, "OAuthCode">;
@@ -26,6 +27,7 @@ export type WithSourcePage = {
 
 export type AuthenticatedUserQueryParams = {
   token: InclusionConnectJwt;
+  idToken: string;
 } & Pick<User, "email" | "firstName" | "lastName">;
 
 type InclusionConnectConventionManageAllowedRole =

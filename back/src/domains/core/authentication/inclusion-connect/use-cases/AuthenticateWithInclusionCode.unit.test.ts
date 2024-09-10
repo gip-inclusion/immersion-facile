@@ -2,6 +2,7 @@ import {
   AbsoluteUrl,
   AgencyDtoBuilder,
   AuthenticateWithOAuthCodeParams,
+  IdToken,
   User,
   allowedStartInclusionConnectLoginPages,
   errors,
@@ -316,7 +317,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             });
 
             expect(redirectedUrl).toBe(
-              `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com`,
+              `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com&idToken=inclusion-connect-id-token`,
             );
           },
         );
@@ -350,11 +351,13 @@ describe("AuthenticateWithInclusionCode use case", () => {
         uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
         const accessToken = "inclusion-access-token";
+        const idToken: IdToken = "inclusion-connect-id-token";
 
         inclusionConnectGateway.setAccessTokenResponse({
           expire: 60,
           payload: defaultExpectedIcIdTokenPayload,
           accessToken,
+          idToken,
         });
 
         await expectPromiseToFailWithError(
@@ -388,10 +391,12 @@ describe("AuthenticateWithInclusionCode use case", () => {
     uuidGenerator.setNextUuid(userId);
 
     const accessToken = "inclusion-access-token";
+    const idToken: IdToken = "inclusion-connect-id-token";
     inclusionConnectGateway.setAccessTokenResponse({
       payload: expectedIcIdTokenPayload,
       accessToken,
       expire: 60,
+      idToken,
     });
 
     return {
