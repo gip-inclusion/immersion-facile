@@ -97,7 +97,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     { code, page }: WithSourcePage & { code: OAuthCode },
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
-    const { accessToken, expire, payload } =
+    const { accessToken, expire, payload, idToken } =
       await this.#inclusionConnectGateway.getAccessToken(
         {
           code,
@@ -184,6 +184,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       firstName: newOrUpdatedAuthenticatedUser.firstName,
       lastName: newOrUpdatedAuthenticatedUser.lastName,
       email: newOrUpdatedAuthenticatedUser.email,
+      idToken,
     })}`;
   }
 

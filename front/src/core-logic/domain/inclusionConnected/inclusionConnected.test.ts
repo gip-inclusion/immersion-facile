@@ -53,6 +53,7 @@ describe("InclusionConnected", () => {
     lastName: inclusionConnectedUser.lastName,
     provider: "inclusionConnect",
     token: "fake-token",
+    idToken: "inclusion-connect-id-token",
   };
 
   const peConnectFederatedIdentity: FederatedIdentityWithUser = {
@@ -177,6 +178,7 @@ describe("InclusionConnected", () => {
             firstName: "John",
             lastName: "Doe",
             email: "john.doe@mail.com",
+            idToken: "inclusion-connect-id-token",
           },
         },
       }));

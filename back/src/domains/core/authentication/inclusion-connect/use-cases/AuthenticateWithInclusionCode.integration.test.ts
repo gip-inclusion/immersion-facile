@@ -134,9 +134,11 @@ describe("AuthenticateWithInclusionCode use case", () => {
     await uow.ongoingOAuthRepository.save(initialOngoingOAuth);
 
     const accessToken = "inclusion-access-token";
+    const idToken = "fake-id-token";
     inclusionConnectGateway.setAccessTokenResponse({
       payload: expectedIcIdTokenPayload,
       accessToken,
+      idToken,
       expire: 60,
     });
 

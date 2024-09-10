@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   AllowedStartInclusionConnectLoginSourcesKind,
+  IdToken,
   InclusionConnectImmersionRoutes,
   WithSourcePage,
   allowedStartInclusionConnectLoginPages,
@@ -102,8 +103,10 @@ describe("inclusion connection flow", () => {
       async (page) => {
         const authCode = "inclusion-auth-code";
         const inclusionToken = "inclusion-token";
+        const idToken = "inclusion-id-token";
         gateways.oAuthGateway.setAccessTokenResponse({
           accessToken: inclusionToken,
+          idToken,
           expire: 1,
           payload: {
             email: "osef@gmail",
@@ -150,9 +153,11 @@ describe("inclusion connection flow", () => {
       const authCode = "inclusion-auth-code";
       const inclusionToken = "inclusion-token";
       const sub = "osef";
+      const idToken: IdToken = "inclusion-connect-access-token";
       gateways.oAuthGateway.setAccessTokenResponse({
         accessToken: inclusionToken,
         expire: 1,
+        idToken,
         payload: {
           email: "osef@gmail",
           firstName: "osef",
