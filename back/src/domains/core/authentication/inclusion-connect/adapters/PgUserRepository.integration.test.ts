@@ -667,39 +667,46 @@ describe("PgAuthenticatedUserRepository", () => {
           },
         ]);
       });
-  it("fetches Inclusion Connected Users given email", async () => {
-      await agencyRepository.insert(agency1);
-      await insertUser(db, user1, mode);
-      await insertUser(db, user2, mode);
-      await insertAgencyRegistrationToUser(db, {
-        agencyId: agency1.id,
-        userId: user1.id,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
-      });
-      await insertAgencyRegistrationToUser(db, {
-        agencyId: agency1.id,
-        userId: user2.id,
-        roles: ["toReview"],
-        isNotifiedByEmail: true,
-      });
+      it("fetches Inclusion Connected Users given email", async () => {
+        await agencyRepository.insert(agency1);
+        await insertUser(db, user1, mode);
+        await insertUser(db, user2, mode);
+        await insertAgencyRegistrationToUser(db, {
+          agencyId: agency1.id,
+          userId: user1.id,
+          roles: ["validator"],
+          isNotifiedByEmail: false,
+        });
+        await insertAgencyRegistrationToUser(db, {
+          agencyId: agency1.id,
+          userId: user2.id,
+          roles: ["toReview"],
+          isNotifiedByEmail: true,
+        });
 
-      const icUsers = await userRepository.getWithFilter({
-        email: user1.email,
-      }, mode);
+        const icUsers = await userRepository.getWithFilter(
+          {
+            email: user1.email,
+          },
+          mode,
+        );
 
-      expectArraysToEqualIgnoringOrder(icUsers, [
-        {
-          ...user1,
-          establishments: [],
-          agencyRights: [
-            { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
-          ],
-          ...withEmptyDashboards,
-        },
-      ]);
+        expectArraysToEqualIgnoringOrder(icUsers, [
+          {
+            ...user1,
+            establishments: [],
+            agencyRights: [
+              {
+                agency: agency1,
+                roles: ["validator"],
+                isNotifiedByEmail: false,
+              },
+            ],
+            ...withEmptyDashboards,
+          },
+        ]);
+      });
     });
-  });
 
     describe("delete", () => {
       it("deletes an existing user", async () => {
