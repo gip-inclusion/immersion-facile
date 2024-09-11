@@ -266,6 +266,7 @@ type ConventionQueryParams = typeof conventionValuesFromUrl;
 export const conventionValuesFromUrl = {
   fedId: param.query.optional.string,
   fedIdProvider: param.query.optional.string,
+  fromPeConnectedUser: param.query.optional.boolean,
   email: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,

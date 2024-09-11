@@ -150,6 +150,11 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
 
   useEffect(() => {
     if (fedId && fedIdProvider) {
+      const {
+        fedId: _,
+        fedIdProvider: __,
+        ...paramsWithoutFederatedIdentity
+      } = route.params;
       dispatch(
         authSlice.actions.federatedIdentityProvided({
           provider: fedIdProvider as FederatedIdentityProvider,
@@ -159,6 +164,12 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
           lastName,
         }),
       );
+      routes
+        .conventionImmersion({
+          ...paramsWithoutFederatedIdentity,
+          fromPeConnectedUser: true,
+        })
+        .replace();
     }
   }, [fedId, fedIdProvider, email, firstName, lastName, dispatch]);
 };
