@@ -3,6 +3,7 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencySchema } from "../agency/agency.schema";
 import { discussionIdSchema } from "../discussion/discussion.schema";
 import { emailSchema } from "../email/email.schema";
+import { IdToken } from "../inclusionConnect/inclusionConnect.dto";
 import { establishmentsRoles } from "../role/role.dto";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -17,7 +18,6 @@ import {
   WithEstablismentsSiretAndName,
   allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
-import { IdToken } from "../inclusionConnect/inclusionConnect.dto";
 
 export const agencyRoleSchema = z.enum(allAgencyRoles);
 

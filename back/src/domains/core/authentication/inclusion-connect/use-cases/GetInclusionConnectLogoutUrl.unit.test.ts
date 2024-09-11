@@ -32,14 +32,18 @@ describe("GetInclusionConnectLogoutUrl", () => {
     it("returns the inclusion connect logout url from %s", async () => {
       const logoutSuffixe =
         mode === "ProConnect" ? "pro-connect" : "inclusion-connect";
+      const idToken = "fake-id-token";
       expectToEqual(
-        await getInclusionConnectLogoutUrl.execute(),
+        await getInclusionConnectLogoutUrl.execute({
+          idToken,
+        }),
         `${
           fakeProviderConfig.providerBaseUri
         }/logout-${logoutSuffixe}?${queryParamsAsString({
           postLogoutRedirectUrl:
             fakeProviderConfig.immersionRedirectUri.afterLogout,
           clientId: fakeProviderConfig.clientId,
+          idToken,
         })}`,
       );
     });

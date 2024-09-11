@@ -389,13 +389,18 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inclusionConnectedAllowedRoutes.getInclusionConnectLogoutUrl,
     )} returns the logout url`, () => {
       it("returns a correct logout url with status 200", async () => {
-        const response = await httpClient.getInclusionConnectLogoutUrl();
+        const response = await httpClient.getInclusionConnectLogoutUrl({
+          queryParams: {
+            idToken: "fake-id-token",
+          },
+        });
         expectHttpResponseToEqual(response, {
           body: `${
             appConfig.inclusionConnectConfig.providerBaseUri
           }/logout-inclusion-connect?${queryParamsAsString({
             postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
             clientId: appConfig.inclusionConnectConfig.clientId,
+            idToken: "fake-id-token",
           })}`,
           status: 200,
         });

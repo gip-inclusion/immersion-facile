@@ -1,5 +1,6 @@
 import {
   AbsoluteUrl,
+  WithIdToken,
   WithSourcePage,
   decodeJwtWithoutSignatureCheck,
   errors,
@@ -26,6 +27,7 @@ import {
   InclusionConnectAccessTokenResponse,
   InclusionConnectLogoutQueryParams,
   InclusionConnectRoutes,
+  ProConnectLogoutQueryParams,
 } from "./inclusionConnect.routes";
 import { ProConnectRoutes } from "./proConnect.routes";
 
@@ -206,6 +208,7 @@ export class HttpOAuthGateway implements OAuthGateway {
   }
 
   public async getLogoutUrl(
+    params: WithIdToken,
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const uri: AbsoluteUrl =
@@ -213,11 +216,20 @@ export class HttpOAuthGateway implements OAuthGateway {
         ? `${this.inclusionConnectConfig.providerBaseUri}/logout/`
         : `${this.proConnectConfig.providerBaseUri}/session/end/`;
 
-    return `${uri}?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
-      client_id: this.inclusionConnectConfig.clientId,
-      post_logout_redirect_uri:
-        this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
-    })}`;
+    return provider === "InclusionConnect"
+      ? `${uri}?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
+          client_id: this.inclusionConnectConfig.clientId,
+          post_logout_redirect_uri:
+            this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
+          id_token: params.idToken,
+        })}`
+      : `${uri}?${queryParamsAsString<ProConnectLogoutQueryParams>({
+          post_logout_redirect_uri:
+            this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
+          id_token_hint: params.idToken,
+          state:
+            "3b7bd7fb38ccab89864563f17a89c4cb3bd400164ce828b4cfc2cb01ce8ed9da",
+        })}`;
   }
 
   async #getTokenWithPayload(
