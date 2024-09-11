@@ -64,7 +64,7 @@ describe("BrevoNotificationGateway manual", () => {
       const phones = [];
 
       for (let i = 0; i < times; i++)
-        phones.push("VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER"); // Like 33611223344
+        phones.push("VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER"); // Like +33611223344
       await Promise.all(
         phones.map((phone, index) =>
           notificationGateway.sendSms({
