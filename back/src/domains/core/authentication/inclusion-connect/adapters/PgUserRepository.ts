@@ -168,9 +168,12 @@ export class PgUserRepository implements UserRepository {
 
   public async getWithFilter(
     { agencyRole, agencyId, email }: InclusionConnectedFilters,
-    mode: OAuthGatewayProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser[]> {
-    return this.#getInclusionConnectedUsers({ agencyRole, agencyId, email }, mode);
+    return this.#getInclusionConnectedUsers(
+      { agencyRole, agencyId, email },
+      provider,
+    );
   }
 
   public async updateAgencyRights({
