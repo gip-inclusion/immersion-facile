@@ -11,6 +11,7 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { LatLonDistance, SearchSortedBy, ValueOf, domElementIds } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
@@ -29,6 +30,7 @@ import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchPageParams,
   initialState,
+  searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
@@ -63,6 +65,7 @@ export const SearchPage = ({
   useNaturalLanguageForAppellations?: boolean;
 }) => {
   const { cx } = useStyles();
+  const dispatch = useDispatch();
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
@@ -144,6 +147,12 @@ export const SearchPage = ({
     filterFormValues,
     formValues,
   ]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(searchSlice.actions.clearSearchStatus());
+    };
+  }, [dispatch]);
 
   return (
     <HeaderFooterLayout>
