@@ -6,6 +6,7 @@ import {
   ConventionReadDto,
   ConventionRelatedJwtPayload,
   InclusionConnectJwtPayload,
+  OAuthProvider,
   WithConventionId,
   getIcUserRoleForAccessingConvention,
   stringToMd5,
@@ -14,10 +15,7 @@ import {
 import { ForbiddenError, NotFoundError } from "shared";
 import { conventionEmailsByRole } from "../../../utils/convention";
 import { TransactionalUseCase } from "../../core/UseCase";
-import {
-  OAuthGatewayProvider,
-  oAuthModeByFeatureFlags,
-} from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -82,7 +80,7 @@ export class GetConvention extends TransactionalUseCase<
     authPayload: ConventionDomainPayload;
     convention: ConventionReadDto;
     uow: UnitOfWork;
-    mode: OAuthGatewayProvider;
+    mode: OAuthProvider;
   }): Promise<ConventionReadDto> {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency) {
@@ -113,7 +111,7 @@ export class GetConvention extends TransactionalUseCase<
     authPayload: InclusionConnectJwtPayload;
     convention: ConventionReadDto;
     uow: UnitOfWork;
-    mode: OAuthGatewayProvider;
+    mode: OAuthProvider;
   }): Promise<ConventionReadDto> {
     const user = await uow.userRepository.getById(authPayload.userId, mode);
     if (!user)
@@ -152,7 +150,7 @@ export class GetConvention extends TransactionalUseCase<
     convention: ConventionReadDto;
     agency: AgencyDto;
     userRepository: UserRepository;
-    mode: OAuthGatewayProvider;
+    mode: OAuthProvider;
   }): Promise<boolean> {
     const emailsByRole = conventionEmailsByRole(convention, agency)[
       authPayload.role
@@ -190,7 +188,7 @@ export class GetConvention extends TransactionalUseCase<
     authPayload: ConventionDomainPayload;
     userRepository: UserRepository;
     agencyId: AgencyId;
-    mode: OAuthGatewayProvider;
+    mode: OAuthProvider;
   }) {
     if (authPayload.role !== "counsellor" && authPayload.role !== "validator")
       return false;

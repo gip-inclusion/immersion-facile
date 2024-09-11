@@ -4,15 +4,13 @@ import {
   Email,
   InclusionConnectedUser,
   UserParamsForAgency,
+  OAuthProvider,
   errors,
   replaceElementWhere,
   userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import {
-  OAuthGatewayProvider,
-  oAuthModeByFeatureFlags,
-} from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -24,7 +22,7 @@ const rejectIfAgencyWontHaveValidators = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   agency: AgencyDto,
-  mode: OAuthGatewayProvider,
+  provider: OAuthProvider,
 ) => {
   if (
     (!params.roles.includes("validator") || !params.isNotifiedByEmail) &&
@@ -34,7 +32,7 @@ const rejectIfAgencyWontHaveValidators = async (
       {
         agencyId: params.agencyId,
       },
-      mode,
+      provider,
     );
 
     const agencyHasOtherValidator = agencyUsers.some(
@@ -70,7 +68,7 @@ const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   agency: AgencyDto,
-  mode: OAuthGatewayProvider,
+  provider: OAuthProvider,
 ) => {
   if (
     (!params.roles.includes("counsellor") || !params.isNotifiedByEmail) &&
@@ -80,7 +78,7 @@ const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
       {
         agencyId: params.agencyId,
       },
-      mode,
+      provider,
     );
 
     const agencyHasOtherCounsellor = agencyUsers.some(
@@ -101,7 +99,7 @@ const makeAgencyRights = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   userToUpdate: InclusionConnectedUser,
-  mode: OAuthGatewayProvider,
+  provider: OAuthProvider,
 ) => {
   const agency = await uow.agencyRepository.getById(params.agencyId);
 
@@ -121,12 +119,12 @@ const makeAgencyRights = async (
     params,
     agency,
   );
-  await rejectIfAgencyWontHaveValidators(uow, params, agency, mode);
+  await rejectIfAgencyWontHaveValidators(uow, params, agency, provider);
   await rejectIfAgencyWithRefersToWontHaveCounsellors(
     uow,
     params,
     agency,
-    mode,
+    provider,
   );
 
   const updatedAgencyRight: AgencyRight = {

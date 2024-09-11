@@ -78,6 +78,7 @@ export * from "./acquisition.dto";
 export * from "./naf";
 export * from "./notifications/notifications.dto";
 export * from "./npsForms";
+export * from "./oauth/oauth.dto";
 export * from "./phone.schema";
 export * from "./pagination/pagination.dto";
 export * from "./pagination/pagination.schema";

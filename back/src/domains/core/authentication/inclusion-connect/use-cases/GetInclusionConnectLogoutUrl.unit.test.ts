@@ -1,4 +1,4 @@
-import { expectToEqual, queryParamsAsString } from "shared";
+import { expectToEqual, oAuthProviders, queryParamsAsString } from "shared";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -8,11 +8,10 @@ import {
   InMemoryOAuthGateway,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
-import { oAuthGatewayModes } from "../port/OAuthGateway";
 import { GetInclusionConnectLogoutUrl } from "./GetInclusionConnectLogoutUrl";
 
 describe("GetInclusionConnectLogoutUrl", () => {
-  describe.each(oAuthGatewayModes)("With OAuthGateway mode '%s'", (mode) => {
+  describe.each(oAuthProviders)("With OAuthGateway mode '%s'", (mode) => {
     let uow: InMemoryUnitOfWork;
     let getInclusionConnectLogoutUrl: GetInclusionConnectLogoutUrl;
 

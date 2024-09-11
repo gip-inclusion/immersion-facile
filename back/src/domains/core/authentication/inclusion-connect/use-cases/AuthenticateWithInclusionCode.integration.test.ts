@@ -1,5 +1,10 @@
 import { Pool } from "pg";
-import { AbsoluteUrl, expectObjectsToMatch } from "shared";
+import {
+  AbsoluteUrl,
+  OAuthProvider,
+  expectObjectsToMatch,
+  oAuthProviders,
+} from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
@@ -17,11 +22,7 @@ import {
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import {
-  GetAccessTokenPayload,
-  OAuthGatewayProvider,
-  oAuthGatewayModes,
-} from "../port/OAuthGateway";
+import { GetAccessTokenPayload } from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const correctToken = "my-correct-token";
@@ -66,7 +67,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     await pool.end();
   });
 
-  describe.each(oAuthGatewayModes)(
+  describe.each(oAuthProviders)(
     "when user had never connected before with mode '%s'",
     (mode) => {
       beforeEach(async () => {
@@ -123,11 +124,12 @@ describe("AuthenticateWithInclusionCode use case", () => {
   );
 
   const makeSuccessfulAuthenticationConditions = async (
-    mode: OAuthGatewayProvider,
+    provider: OAuthProvider,
     expectedIcIdTokenPayload = defaultExpectedIcIdTokenPayload,
   ) => {
     const initialOngoingOAuth: OngoingOAuth = {
-      provider: mode === "InclusionConnect" ? "inclusionConnect" : "proConnect",
+      provider:
+        provider === "InclusionConnect" ? "inclusionConnect" : "proConnect",
       state: "da1b4d59-ff5b-4b28-a34a-2a31da76a7b7",
       nonce: "nounce", // matches the one in the payload of the token
     };
