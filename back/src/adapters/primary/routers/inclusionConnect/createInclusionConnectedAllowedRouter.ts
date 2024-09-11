@@ -38,7 +38,9 @@ export const createInclusionConnectedAllowedRouter = (
 
   inclusionConnectedSharedRoutes.getInclusionConnectLogoutUrl((req, res) =>
     sendHttpResponse(req, res, () =>
-      deps.useCases.inclusionConnectLogout.execute(),
+      deps.useCases.inclusionConnectLogout.execute({
+        idToken: req.query.idToken,
+      }),
     ),
   );
 

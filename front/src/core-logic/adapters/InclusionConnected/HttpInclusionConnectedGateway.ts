@@ -7,6 +7,7 @@ import {
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  WithIdToken,
   makeRejection,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -66,11 +67,11 @@ export class HttpInclusionConnectedGateway
     );
   }
 
-  public getLogoutUrl$({ idToken }): Observable<AbsoluteUrl> {
+  public getLogoutUrl$({ idToken }: WithIdToken): Observable<AbsoluteUrl> {
     return from(
       this.httpClient
         .getInclusionConnectLogoutUrl({
-          idToken,
+          queryParams: { idToken },
         })
         .then((response) =>
           match(response)

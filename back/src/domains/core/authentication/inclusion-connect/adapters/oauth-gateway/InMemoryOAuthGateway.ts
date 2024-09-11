@@ -1,4 +1,4 @@
-import { AbsoluteUrl, queryParamsAsString } from "shared";
+import { AbsoluteUrl, WithIdToken, queryParamsAsString } from "shared";
 import { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import {
   GetAccessTokenParams,
@@ -42,6 +42,7 @@ export class InMemoryOAuthGateway implements OAuthGateway {
   }
 
   public async getLogoutUrl(
+    params: WithIdToken,
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const logoutUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
@@ -53,6 +54,7 @@ export class InMemoryOAuthGateway implements OAuthGateway {
       postLogoutRedirectUrl:
         this.providerConfig.immersionRedirectUri.afterLogout,
       clientId: this.providerConfig.clientId,
+      idToken: params.idToken,
     })}`;
   }
 
