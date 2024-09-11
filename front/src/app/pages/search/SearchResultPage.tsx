@@ -250,8 +250,7 @@ export const SearchResultPage = () => {
                     <li>
                       <a
                         href={makeAppellationInformationUrl(
-                          currentSearchResult.appellations[0].appellationCode,
-                          currentSearchResult.address.departmentCode,
+                          currentSearchResult.rome,
                         )}
                         target="_blank"
                         rel="noreferrer"
