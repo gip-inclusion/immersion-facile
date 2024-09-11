@@ -70,14 +70,15 @@ export const AgencyUserModificationForm = ({
           }),
         );
       })
-      .otherwise(() => {
+      .with("register", () => {
         dispatch(
           icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested({
             ...values,
             roles: validatedUserRoles,
           }),
         );
-      });
+      })
+      .exhaustive();
 
     closeModal();
   };
