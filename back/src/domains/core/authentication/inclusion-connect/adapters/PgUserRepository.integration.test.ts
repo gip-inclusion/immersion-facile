@@ -5,6 +5,7 @@ import {
   AgencyRight,
   AgencyRole,
   InclusionConnectedUser,
+  OAuthProvider,
   User,
   UserId,
   defaultValidatorEmail,
@@ -12,6 +13,7 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
+  oAuthProviders,
 } from "shared";
 import {
   KyselyDb,
@@ -24,7 +26,6 @@ import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
 } from "../../../../establishment/helpers/EstablishmentBuilders";
-import { OAuthGatewayProvider, oAuthGatewayModes } from "../port/OAuthGateway";
 import { PgUserRepository } from "./PgUserRepository";
 
 const userExternalId = "my-external-id";
@@ -71,7 +72,7 @@ describe("PgAuthenticatedUserRepository", () => {
     await pool.end();
   });
 
-  describe.each(oAuthGatewayModes)(`With OAuthGatewayMode '%s'`, (mode) => {
+  describe.each(oAuthProviders)(`With OAuthGatewayMode '%s'`, (mode) => {
     it("saves a user, than finds it from external_id, then updates it", async () => {
       await userRepository.save(user, mode);
 
@@ -790,7 +791,7 @@ const agency2 = new AgencyDtoBuilder()
 const insertUser = async (
   db: KyselyDb,
   { id, email, firstName, lastName, externalId, createdAt }: User,
-  mode: OAuthGatewayProvider,
+  provider: OAuthProvider,
 ) => {
   await db
     .insertInto("users")
@@ -800,7 +801,7 @@ const insertUser = async (
       first_name: firstName,
       last_name: lastName,
       created_at: createdAt,
-      [mode === "InclusionConnect"
+      [provider === "InclusionConnect"
         ? "external_id_inclusion_connect"
         : "external_id_pro_connect"]: externalId,
     })

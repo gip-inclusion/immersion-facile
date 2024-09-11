@@ -1,12 +1,11 @@
 import { Pool } from "pg";
-import { IdentityProvider, User, expectToEqual } from "shared";
+import { IdentityProvider, User, expectToEqual, oAuthProviders } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { oAuthGatewayModes } from "../port/OAuthGateway";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 import { PgUserRepository } from "./PgUserRepository";
 
@@ -32,7 +31,7 @@ describe("PgOngoingOAuthRepository", () => {
     await pool.end();
   });
 
-  describe.each(oAuthGatewayModes)("with mode '%s'", (mode) => {
+  describe.each(oAuthProviders)("with mode '%s'", (mode) => {
     it("saves an ongoing OAuth, then gets it from its states, then updates it", async () => {
       const state = "11111111-1111-1111-1111-111111111111";
 

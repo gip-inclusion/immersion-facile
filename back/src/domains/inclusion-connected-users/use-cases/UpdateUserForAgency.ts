@@ -4,15 +4,13 @@ import {
   Email,
   InclusionConnectedUser,
   UserParamsForAgency,
+  OAuthProvider,
   errors,
   replaceElementWhere,
   userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import {
-  OAuthGatewayProvider,
-  oAuthModeByFeatureFlags,
-} from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -95,7 +93,8 @@ const makeAgencyRights = async (
     params,
     agency,
   );
-  await rejectIfAgencyWontHaveValidatorsReceivingNotifications(
+  await rejectIfAgencyWontHaveValidators(uow, params, agency, provider);
+  await rejectIfAgencyWithRefersToWontHaveCounsellors(
     uow,
     params,
     agency,

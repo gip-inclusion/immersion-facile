@@ -1,5 +1,6 @@
 import {
   AbsoluteUrl,
+  OAuthProvider,
   WithIdToken,
   WithSourcePage,
   decodeJwtWithoutSignatureCheck,
@@ -21,7 +22,6 @@ import {
   GetAccessTokenResult,
   GetLoginUrlParams,
   OAuthGateway,
-  OAuthGatewayProvider,
 } from "../../port/OAuthGateway";
 import {
   InclusionConnectAccessTokenResponse,
@@ -53,10 +53,10 @@ export class HttpOAuthGateway implements OAuthGateway {
 
   public async getLoginUrl(
     { nonce, page, state }: GetLoginUrlParams,
-    provider: OAuthGatewayProvider,
+    provider: OAuthProvider,
   ): Promise<AbsoluteUrl> {
     // On pourrait placer ces URL au niveau du ProConnect/InclusionConnect HTTP Client ?
-    const uriByMode: Record<OAuthGatewayProvider, AbsoluteUrl> = {
+    const uriByMode: Record<OAuthProvider, AbsoluteUrl> = {
       InclusionConnect: this.#makeInclusionConnectAuthorizeUri(),
       ProConnect: this.#makeProConnectAuthorizeUri(),
     };
@@ -200,7 +200,7 @@ export class HttpOAuthGateway implements OAuthGateway {
 
   public async getAccessToken(
     { code, page }: GetAccessTokenParams,
-    provider: OAuthGatewayProvider,
+    provider: OAuthProvider,
   ): Promise<GetAccessTokenResult> {
     return provider === "InclusionConnect"
       ? this.#getAccessTokenInclusionConnect({ code, page })
@@ -209,7 +209,7 @@ export class HttpOAuthGateway implements OAuthGateway {
 
   public async getLogoutUrl(
     params: WithIdToken,
-    provider: OAuthGatewayProvider,
+    provider: OAuthProvider,
   ): Promise<AbsoluteUrl> {
     const uri: AbsoluteUrl =
       provider === "InclusionConnect"
@@ -233,7 +233,7 @@ export class HttpOAuthGateway implements OAuthGateway {
   }
 
   async #getTokenWithPayload(
-    provider: OAuthGatewayProvider,
+    provider: OAuthProvider,
     inclusionConnectAccessTokenBody: InclusionConnectAccessTokenResponse,
   ): Promise<string> {
     if (provider === "InclusionConnect")

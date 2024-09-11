@@ -5,6 +5,7 @@ import {
   AuthenticatedUserQueryParams,
   IdentityProvider,
   OAuthCode,
+  OAuthProvider,
   User,
   WithSourcePage,
   authenticateWithOAuthCodeSchema,
@@ -25,7 +26,6 @@ import { OngoingOAuth } from "../entities/OngoingOAuth";
 import {
   GetAccessTokenPayload,
   OAuthGateway,
-  OAuthGatewayProvider,
   oAuthModeByFeatureFlags,
 } from "../port/OAuthGateway";
 
@@ -93,7 +93,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #onOngoingOAuth(
     uow: UnitOfWork,
-    provider: OAuthGatewayProvider,
+    provider: OAuthProvider,
     { code, page }: WithSourcePage & { code: OAuthCode },
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
@@ -190,7 +190,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #makeExistingUser(
     uow: UnitOfWork,
-    provider: OAuthGatewayProvider,
+    provider: OAuthProvider,
     existingInclusionConnectedUser: User | undefined,
     userWithSameEmail: User | undefined,
   ): Promise<User | undefined> {
@@ -239,17 +239,17 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #updateUserAgencyRights(
     uow: UnitOfWork,
-    mode: OAuthGatewayProvider,
+    provider: OAuthProvider,
     conflictingUser: User,
     userToKeep: User,
   ): Promise<void> {
     const conflictingIcUser = await uow.userRepository.getById(
       conflictingUser.id,
-      mode,
+      provider,
     );
     const userToKeepIcUser = await uow.userRepository.getById(
       userToKeep.id,
-      mode,
+      provider,
     );
     if (!conflictingIcUser || !userToKeepIcUser) return;
 
