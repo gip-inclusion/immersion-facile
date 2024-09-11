@@ -313,7 +313,7 @@ export const SearchPage = ({
                               </strong>
                               , étendue au secteur{" "}
                               <a
-                                href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${routeParams.appellations[0].romeCode}`}
+                                href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
                                 target="_blank"
                                 className={fr.cx("fr-text--bold")}
                                 rel="noreferrer"
