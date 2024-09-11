@@ -94,5 +94,8 @@ export const searchSlice = createSlice({
       state.currentSearchResult = initialState.currentSearchResult;
       state.feedback = initialState.feedback;
     },
+    clearSearchStatus: (state) => {
+      state.searchStatus = initialState.searchStatus;
+    },
   },
 });

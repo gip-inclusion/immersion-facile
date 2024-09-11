@@ -229,6 +229,23 @@ describe("search epic", () => {
     );
   });
 
+  it("should reset search status when clicking on an offer", () => {
+    expectStatus("noSearchMade");
+    store.dispatch(
+      searchSlice.actions.searchRequested({
+        sortedBy: "distance",
+        distanceKm: 10,
+        latitude: immersionOffer.position.lat,
+        longitude: immersionOffer.position.lon,
+      }),
+    );
+    feedWithSearchResults([]);
+    feedWithSearchResults([]);
+    expectStatus("ok");
+    store.dispatch(searchSlice.actions.clearSearchStatus());
+    expectStatus("noSearchMade");
+  });
+
   const expectStateToMatchInitialState = () => {
     expectToEqual(store.getState().search, initialState);
   };
