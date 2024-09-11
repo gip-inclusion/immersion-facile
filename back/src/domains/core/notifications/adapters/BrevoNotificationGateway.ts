@@ -11,6 +11,7 @@ import {
   NotificationId,
   type TemplatedEmail,
   type TemplatedSms,
+  castError,
   emailTemplatesByName,
   errors,
   smsTemplatesByName,
@@ -23,6 +24,7 @@ import {
   counterSendTransactEmailTotal,
 } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
+import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import { NotificationGateway } from "../ports/NotificationGateway";
 import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import {
@@ -165,10 +167,15 @@ export class BrevoNotificationGateway implements NotificationGateway {
         }),
       )
       .catch((error) => {
+        const castedError = castError(error);
         logger.error({
           notificationId,
-          error,
+          error: castedError,
           message: "sendTransactSmsError",
+        });
+        notifyObjectDiscord({
+          _message: "Error send sms",
+          ...castedError,
         });
         throw error;
       });
