@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   AuthenticateWithOAuthCodeParams,
   IdToken,
+  OAuthProvider,
   User,
   allowedStartInclusionConnectLoginPages,
   errors,
@@ -10,6 +11,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  oAuthProviders,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
@@ -25,11 +27,7 @@ import {
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import {
-  GetAccessTokenPayload,
-  OAuthGatewayProvider,
-  oAuthGatewayModes,
-} from "../port/OAuthGateway";
+import { GetAccessTokenPayload } from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
@@ -49,7 +47,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   let uuidGenerator: TestUuidGenerator;
   let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
 
-  describe.each(oAuthGatewayModes)("With OAuthGateway mode '%s'", (mode) => {
+  describe.each(oAuthProviders)("With OAuthGateway mode '%s'", (mode) => {
     beforeEach(() => {
       uow = createInMemoryUow();
       uuidGenerator = new TestUuidGenerator();
@@ -373,7 +371,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   });
 
   const makeSuccessfulAuthenticationConditions = (
-    mode: OAuthGatewayProvider,
+    mode: OAuthProvider,
     params?: Partial<GetAccessTokenPayload>,
   ) => {
     const expectedIcIdTokenPayload = {

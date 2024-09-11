@@ -6,9 +6,11 @@ import {
   LoginForm,
   MainWrapper,
   OAuthButton,
+  OAuthButtonProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  OAuthProvider,
   domElementIds,
   inclusionConnectImmersionRoutes,
   queryParamsAsString,
@@ -35,6 +37,28 @@ type InclusionConnectedPrivateRouteProps = {
   allowAdminOnly?: boolean;
 };
 
+const providers: Record<
+  OAuthProvider,
+  {
+    name: string;
+    baseline: string;
+    buttonProvider: OAuthButtonProps["provider"];
+  }
+> = {
+  InclusionConnect: {
+    name: "Inclusion Connect",
+    buttonProvider: "inclusion-connect",
+    baseline:
+      "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
+  },
+  ProConnect: {
+    name: "ProConnect",
+    buttonProvider: "pro-connect",
+    baseline:
+      "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
+  },
+};
+
 export const InclusionConnectedPrivateRoute = ({
   route,
   children,
@@ -51,9 +75,9 @@ export const InclusionConnectedPrivateRoute = ({
     featureFlagSelectors.featureFlagState,
   );
 
-  const providerName = enableProConnect.isActive
-    ? "ProConnect"
-    : "Inclusion Connect";
+  const provider = enableProConnect.isActive
+    ? providers.ProConnect
+    : providers.InclusionConnect;
 
   useEffect(() => {
     const {
@@ -93,14 +117,14 @@ export const InclusionConnectedPrivateRoute = ({
               <LoginForm
                 sections={[
                   {
-                    title: `Se connecter avec ${providerName}`,
-                description: `${providerName} est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.`,
+                    title: `Se connecter avec ${provider.name}`,
+                description: provider.baseline,
                     authComponent: (
                       <OAuthButton
                         id={
                           domElementIds[route.name].login.inclusionConnectButton
                         }
-                        inclusionConnectEndpoint={`${
+                        authenticationEndpoint={`${
                           inclusionConnectImmersionRoutes
                             .startInclusionConnectLogin.url
                     }?${queryParamsAsString(
@@ -108,17 +132,12 @@ export const InclusionConnectedPrivateRoute = ({
                         { page: route.name },
                       ),
                     )}`}
-                    mode={
-                      enableProConnect.isActive
-                        ? "pro-connect"
-                        : "inclusion-connect"
-                        }
-                      />
-                    ),
-                  },
-                ]}
-              />
-            </div>
+                    provider={provider.buttonProvider}
+                  />
+                ),
+              },
+            ]}
+          /></div>
             <div
               className={fr.cx(
                 "fr-col-12",

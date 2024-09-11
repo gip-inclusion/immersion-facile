@@ -3,11 +3,11 @@ import {
   AgencyRight,
   Email,
   InclusionConnectedUser,
+  OAuthProvider,
   User,
   UserId,
   WithAgencyRole,
 } from "shared";
-import { OAuthGatewayProvider } from "./OAuthGateway";
 
 export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
   agencyId?: AgencyId;
@@ -16,22 +16,19 @@ export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
 
 export interface UserRepository {
   delete(id: UserId): Promise<void>;
-  save(user: User, mode: OAuthGatewayProvider): Promise<void>;
+  save(user: User, mode: OAuthProvider): Promise<void>;
   findByExternalId(
     externalId: string,
-    mode: OAuthGatewayProvider,
+    mode: OAuthProvider,
   ): Promise<User | undefined>;
-  findByEmail(
-    email: Email,
-    mode: OAuthGatewayProvider,
-  ): Promise<User | undefined>;
+  findByEmail(email: Email, mode: OAuthProvider): Promise<User | undefined>;
   getWithFilter(
     filters: InclusionConnectedFilters,
-    mode: OAuthGatewayProvider,
+    mode: OAuthProvider,
   ): Promise<InclusionConnectedUser[]>;
   getById(
     userId: string,
-    mode: OAuthGatewayProvider,
+    mode: OAuthProvider,
   ): Promise<InclusionConnectedUser | undefined>;
   updateAgencyRights(params: {
     userId: UserId;

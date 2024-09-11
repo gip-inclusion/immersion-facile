@@ -7,12 +7,12 @@ const argTypes: Partial<ArgTypes<OAuthButtonProps>> | undefined = {};
 
 const componentDescription = `
 \`\`\`tsx  
-import { InclusionConnectButton } from "react-design-system";
+import { OAuthButton } from "react-design-system";
 \`\`\`
 `;
 
 export default {
-  title: "InclusionConnectButton",
+  title: "OAuthButton",
   component: Component,
   argTypes,
   parameters: {
@@ -26,7 +26,7 @@ export default {
 
 export const PeConnectButtonMock: Story = {
   args: {
-    inclusionConnectEndpoint: "fake-endpoint",
+    authenticationEndpoint: "fake-endpoint",
     onClick: () => alert("clicked"),
   },
 };
