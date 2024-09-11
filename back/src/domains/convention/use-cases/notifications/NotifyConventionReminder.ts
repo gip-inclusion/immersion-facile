@@ -9,7 +9,6 @@ import {
   type EstablishmentRepresentative,
   type ExtractFromExisting,
   type GenericActor,
-  type Phone,
   type ReminderKind,
   type Role,
   type TemplatedEmail,
@@ -19,6 +18,7 @@ import {
   frontRoutes,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
+  smsRecipientPhoneSchema,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
@@ -207,7 +207,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     const signatories = Object.values(conventionRead.signatories);
 
     const smsSignatories = signatories.filter(
-      (signatory) => !signatory.signedAt && isValidMobilePhone(signatory.phone),
+      (signatory) =>
+        !signatory.signedAt &&
+        smsRecipientPhoneSchema.safeParse(signatory.phone).success,
     );
 
     const emailActors = [
@@ -276,7 +278,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     return {
       kind,
-      recipientPhone: makeInternationalPhone(phone),
+      recipientPhone: phone,
       params: { shortLink },
     };
   }
@@ -395,21 +397,3 @@ const signStatus = (signAt: string | undefined): string =>
   signAt
     ? `√  - A signé le ${format(new Date(signAt), "dd/MM/yyyy")}`
     : `❌ - N'a pas signé`;
-
-const isValidMobilePhone = (phone: string): boolean =>
-  (phone.startsWith("06") || phone.startsWith("07")) && phone.length === 10;
-
-function makeInternationalPhone(phone: string): Phone {
-  if (phone.startsWith("0690") || phone.startsWith("0691"))
-    return `590${phone.substring(1)}`;
-  if (phone.startsWith("0694")) return `594${phone.substring(1)}`;
-  if (phone.startsWith("0696") || phone.startsWith("0697"))
-    return `596${phone.substring(1)}`;
-  if (
-    phone.startsWith("0692") ||
-    phone.startsWith("0693") ||
-    phone.startsWith("0639")
-  )
-    return `262${phone.substring(1)}`;
-  return `33${phone.substring(1)}`;
-}
