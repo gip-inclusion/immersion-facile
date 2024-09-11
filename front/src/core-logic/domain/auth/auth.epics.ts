@@ -57,7 +57,18 @@ const logoutFromInclusionConnect: AuthEpic = (
         state$.value.auth.federatedIdentityWithUser?.provider ===
           "inclusionConnect" && action.payload.mode === "device-and-inclusion",
     ),
-    switchMap(() => inclusionConnectedGateway.getLogoutUrl$()),
+    switchMap(() => {
+      return state$.value.auth.federatedIdentityWithUser?.provider ===
+        "peConnect"
+        ? inclusionConnectedGateway.getLogoutUrl$({
+            idToken: "",
+          })
+        : inclusionConnectedGateway.getLogoutUrl$({
+            idToken: state$.value.auth.federatedIdentityWithUser
+              ? state$.value.auth.federatedIdentityWithUser.idToken
+              : "",
+          });
+    }),
     map((logoutUrl) => {
       navigationGateway.goToUrl(logoutUrl);
       return authSlice.actions.loggedOutSuccessfullyFromInclusionConnect();

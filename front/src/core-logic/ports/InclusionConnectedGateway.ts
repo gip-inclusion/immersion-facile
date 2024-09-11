@@ -5,9 +5,9 @@ import {
   ConventionSupportedJwt,
   DiscussionReadDto,
   DiscussionRejected,
-  IdToken,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  WithIdToken,
 } from "shared";
 import { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
 
@@ -24,10 +24,8 @@ export interface InclusionConnectedGateway {
   getDiscussionById$(
     payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined>;
-  getLogoutUrl$(payload: {
-    idToken: IdToken;
-  }): Observable<AbsoluteUrl>;
-  updateDiscussiokenonStatus$(
+  getLogoutUrl$(payload: WithIdToken): Observable<AbsoluteUrl>;
+  updateDiscussionStatus$(
     payload: {
       jwt: ConventionSupportedJwt;
       discussionId: string;

@@ -4,10 +4,10 @@ import {
   ExternalId,
   FeatureFlags,
   IdToken,
+  WithIdToken,
   WithSourcePage,
 } from "shared";
 import { OAuthJwt } from "../entities/OngoingOAuth";
-import { z } from "zod";
 
 export type GetAccessTokenParams = WithSourcePage & {
   code: string;
@@ -51,5 +51,8 @@ export interface OAuthGateway {
     params: GetAccessTokenParams,
     provider: OAuthGatewayProvider,
   ) => Promise<GetAccessTokenResult>;
-  getLogoutUrl(mode: OAuthGatewayProvider): Promise<AbsoluteUrl>;
+  getLogoutUrl(
+    params: WithIdToken,
+    provider: OAuthGatewayProvider,
+  ): Promise<AbsoluteUrl>;
 }
