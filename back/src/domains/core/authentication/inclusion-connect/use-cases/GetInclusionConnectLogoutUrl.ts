@@ -1,12 +1,11 @@
-import { AbsoluteUrl } from "shared";
-import { z } from "zod";
+import { AbsoluteUrl, WithIdToken, withIdTokenSchema } from "shared";
 import { TransactionalUseCase } from "../../../UseCase";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { OAuthGateway, oAuthModeByFeatureFlags } from "../port/OAuthGateway";
 
 export class GetInclusionConnectLogoutUrl extends TransactionalUseCase<
-  void,
+  WithIdToken,
   AbsoluteUrl
 > {
   protected inputSchema = withIdTokenSchema;
@@ -18,8 +17,12 @@ export class GetInclusionConnectLogoutUrl extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  public async _execute(_: void, uow: UnitOfWork): Promise<AbsoluteUrl> {
+  public async _execute(
+    params: WithIdToken,
+    uow: UnitOfWork,
+  ): Promise<AbsoluteUrl> {
     return this.inclusionConnectGateway.getLogoutUrl(
+      params,
       oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
     );
   }
