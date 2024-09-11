@@ -6,6 +6,7 @@ import {
   userParamsForAgencySchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -35,21 +36,30 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
         role: "validator",
       });
 
+    const provider = oAuthModeByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
+    );
     const existingUser = (
-      await uow.userRepository.getWithFilter({
-        email: inputParams.email,
-      })
+      await uow.userRepository.getWithFilter(
+        {
+          email: inputParams.email,
+        },
+        provider,
+      )
     ).at(0);
 
     if (!existingUser) {
-      await uow.userRepository.save({
-        createdAt: deps.timeGateway.now().toISOString(),
-        email: inputParams.email,
-        externalId: null,
-        firstName: "",
-        id: inputParams.userId,
-        lastName: "",
-      });
+      await uow.userRepository.save(
+        {
+          createdAt: deps.timeGateway.now().toISOString(),
+          email: inputParams.email,
+          externalId: null,
+          firstName: "",
+          id: inputParams.userId,
+          lastName: "",
+        },
+        provider,
+      );
     }
 
     const existingUserAgencyRights = existingUser?.agencyRights ?? [];
@@ -80,7 +90,7 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
       uow.outboxRepository.save(event),
     ]);
 
-    const user = await uow.userRepository.getById(userId);
+    const user = await uow.userRepository.getById(userId, provider);
 
     if (!user) throw errors.user.notFound({ userId }); //should not happen
 
