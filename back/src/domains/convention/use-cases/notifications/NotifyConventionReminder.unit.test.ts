@@ -45,7 +45,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       email: "boss@mail.com",
       firstName: "lord",
       lastName: "voldemort",
-      phone: "0188776666",
+      phone: "+33188776666",
       role: "establishment-representative",
     };
   let useCase: NotifyConventionReminder;
@@ -456,16 +456,16 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
-          .withBeneficiaryPhone("0611223344")
+          .withBeneficiaryPhone("+33611223344")
           .withBeneficiarySignedAt(undefined)
-          .withEstablishmentRepresentativePhone("0755667788")
+          .withEstablishmentRepresentativePhone("+33755667788")
           .withEstablishmentRepresentativeSignedAt(undefined)
           .withEstablishmentTutor({
             email: "tutor@email.com",
             firstName: "Obiwan",
             lastName: "Kenobi",
             job: "Jedi Master",
-            phone: "0688997755",
+            phone: "+33688997755",
             role: "establishment-tutor",
           })
           .build();
@@ -537,16 +537,13 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           ],
           sms: [
             {
-              recipientPhone: `33${convention.signatories.beneficiary.phone.substring(
-                1,
-              )}`,
+              recipientPhone: convention.signatories.beneficiary.phone,
               kind,
               params: { shortLink: makeShortLinkUrl(config, shortLinkIds[2]) },
             },
             {
-              recipientPhone: `33${convention.signatories.establishmentRepresentative.phone.substring(
-                1,
-              )}`,
+              recipientPhone:
+                convention.signatories.establishmentRepresentative.phone,
               kind,
               params: {
                 shortLink: makeShortLinkUrl(config, shortLinkIds[3]),
@@ -566,8 +563,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
-          .withBeneficiaryPhone("0111223344")
-          .withEstablishmentRepresentativePhone("0211223344")
+          .withBeneficiaryPhone("+33111223344")
+          .withEstablishmentRepresentativePhone("+33211223344")
           .build();
         uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.setAgencies([agency]);
@@ -731,14 +728,14 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
-          .withEstablishmentRepresentativePhone("0611448866")
+          .withEstablishmentRepresentativePhone("+33611448866")
           .withEstablishmentRepresentativeSignedAt(undefined)
           .withEstablishmentTutor({
             email: "tutor@email.com",
             firstName: "Obiwan",
             lastName: "Kenobi",
             job: "Jedi Master",
-            phone: "0688997755",
+            phone: "+33688997755",
             role: "establishment-tutor",
           })
           .build();
@@ -798,9 +795,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           ],
           sms: [
             {
-              recipientPhone: `33${convention.signatories.establishmentRepresentative.phone.substring(
-                1,
-              )}`,
+              recipientPhone:
+                convention.signatories.establishmentRepresentative.phone,
               kind,
               params: {
                 shortLink: makeShortLinkUrl(config, shortLinkIds[2]),
@@ -918,27 +914,26 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
   describe("handle SMS DOM", () => {
     it.each([
-      ["0600000001", "33600000001"], // Metropole
-      ["0639000001", "262639000001"], // Mayotte
-      ["0690000001", "590690000001"], // Guadeloupe
-      ["0691000001", "590691000001"], // Guadeloupe
-      ["0694000001", "594694000001"], // Guyane
-      ["0696000001", "596696000001"], // Martinique
-      ["0697000001", "596697000001"], // Martinique
-      ["0692000001", "262692000001"], // Réunion
-      ["0693000001", "262693000001"], // Réunion
+      ["+33600000001"], // Metropole
+      ["+262639000001"], // Mayotte
+      ["+590690000001"], // Guadeloupe
+      ["+590691000001"], // Guadeloupe
+      ["+594694000001"], // Guyane
+      ["+596696000001"], // Martinique
+      ["+262692000001"], // Réunion
+      ["+262693000001"], // Réunion
     ])(
       "Should send SMS with mobile phone %s",
-      async (mobilePhone, internationalMobilePhone) => {
+      async (internationalMobilePhone) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
 
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus("READY_TO_SIGN")
-          .withBeneficiaryPhone(mobilePhone)
+          .withBeneficiaryPhone(internationalMobilePhone)
           .withBeneficiarySignedAt(undefined)
-          .withEstablishmentRepresentativePhone("0211223344")
+          .withEstablishmentRepresentativePhone("+262693000002")
           .build();
 
         uow.conventionRepository.setConventions([convention]);
