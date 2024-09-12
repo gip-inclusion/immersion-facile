@@ -617,6 +617,24 @@ describe("PgDiscussionRepository", () => {
         errors.discussion.hasDiscussionMissingParams(),
       );
     });
+
+    it("also returns discussion if discussion is searched by contact email and email is in copyEmails", async () => {
+      const discussion = new DiscussionBuilder()
+        .withId("id-for-discussion-with-found-copy-email")
+        .withEstablishmentContact({
+          email: "other@email.com",
+          copyEmails: ["searchedEmail@email.com"],
+        })
+        .build();
+      pgDiscussionRepository.insert(discussion);
+
+      expectToEqual(
+        await pgDiscussionRepository.hasDiscussionMatching({
+          establishmentRepresentativeEmail: "searchedEmail@email.com",
+        }),
+        true,
+      );
+    });
   });
 
   describe("insert/update/getById", () => {

@@ -81,7 +81,10 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
       (discussion: DiscussionDto) =>
         establishmentRepresentativeEmail
           ? discussion.establishmentContact.email ===
-            establishmentRepresentativeEmail
+              establishmentRepresentativeEmail ||
+            discussion.establishmentContact.copyEmails?.includes(
+              establishmentRepresentativeEmail,
+            )
           : true,
     ];
     return this.discussions.some((discussion) =>
