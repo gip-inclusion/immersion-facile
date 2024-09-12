@@ -73,13 +73,14 @@ export const formEstablishmentFieldsLabels = (
     id: domElementIds.establishment[mode].businessContact.phone,
   },
   "businessContact.email": {
-    label: "E-mail",
+    label: "E-mail du référent",
     required: true,
     id: domElementIds.establishment[mode].businessContact.email,
   },
   "businessContact.copyEmails": {
     label: "Autres destinataires",
-    hintText: "Adresses mail à mettre en copie",
+    hintText:
+      "Adresses mail à mettre en copie, les utilisateurs liés à ces adresses auront accès aux discussions",
     placeholder: "Ex : cc1@mail.com, cc2@mail.com (optionnel)",
     id: domElementIds.establishment[mode].businessContact.copyEmails,
   },

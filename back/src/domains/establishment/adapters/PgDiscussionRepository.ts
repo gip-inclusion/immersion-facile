@@ -280,23 +280,13 @@ export class PgDiscussionRepository implements DiscussionRepository {
                       ),
                       eb(
                         "establishment_contact_copy_emails",
-                        "@>",
-                        JSON.stringify([
-                          params.establishmentRepresentativeEmail,
-                        ]),
+                        "?",
+                        establishmentRepresentativeEmail,
                       ),
                     ]),
                   )
                 : builder;
             },
-            (builder) =>
-              params.establishmentRepresentativeEmail
-                ? builder.where(
-                    "establishment_contact_copy_emails",
-                    "@>",
-                    JSON.stringify([params.establishmentRepresentativeEmail]),
-                  )
-                : builder,
           ),
         ).as("exists"),
       ])
