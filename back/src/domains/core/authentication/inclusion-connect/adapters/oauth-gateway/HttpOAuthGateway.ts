@@ -214,7 +214,7 @@ export class HttpOAuthGateway implements OAuthGateway {
     const uri: AbsoluteUrl =
       provider === "InclusionConnect"
         ? `${this.inclusionConnectConfig.providerBaseUri}/logout/`
-        : `${this.proConnectConfig.providerBaseUri}/session/end/`;
+        : `${this.proConnectConfig.providerBaseUri}/session/end`;
 
     return provider === "InclusionConnect"
       ? `${uri}?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
