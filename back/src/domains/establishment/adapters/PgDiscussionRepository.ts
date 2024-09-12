@@ -120,7 +120,11 @@ export class PgDiscussionRepository implements DiscussionRepository {
             (qb) => {
               if (!sirets) return qb;
               if (sirets.length === 0) throw errors.discussion.badSiretFilter();
-              return qb.where("discussions.siret", "in", sirets);
+              return qb.where(
+                "discussions.siret",
+                "=",
+                sql<SiretDto>`ANY(${sirets})`,
+              );
             },
             (qb) =>
               createdSince
