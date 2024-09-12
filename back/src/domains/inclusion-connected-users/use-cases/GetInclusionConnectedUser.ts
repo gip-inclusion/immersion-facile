@@ -106,14 +106,14 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     uow: UnitOfWork,
     user: InclusionConnectedUser,
   ): Promise<WithEstablismentsSiretAndName[]> {
-    const establishementAggregates =
+    const establishmentAggregates =
       await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
         {
           contactEmail: user.email,
         },
       );
 
-    return establishementAggregates.map(({ establishment }) => ({
+    return establishmentAggregates.map(({ establishment }) => ({
       siret: establishment.siret,
       businessName: establishment.customizedName
         ? establishment.customizedName

@@ -361,6 +361,37 @@ describe("GetUserAgencyDashboardUrl", () => {
         });
       });
 
+      it("retrieves dashboard when IC user is establishment contact copy email of a discussion", async () => {
+        uow.userRepository.setInclusionConnectedUsers([
+          {
+            ...john,
+            dashboards: { agencies: {}, establishments: {} },
+            agencyRights: [],
+          },
+        ]);
+        uow.discussionRepository.discussions = [
+          new DiscussionBuilder()
+            .withEstablishmentContact({
+              email: "other@mail.com",
+              copyEmails: [john.email],
+            })
+            .build(),
+        ];
+        const result = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
+
+        expectToEqual(result.dashboards, {
+          agencies: {},
+          establishments: {
+            discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
+              john.id
+            }/${timeGateway.now()}`,
+          },
+        });
+      });
+
       it("do not retrieve dashboard when IC user is not establishment contact in any discussion", async () => {
         uow.userRepository.setInclusionConnectedUsers([
           {

@@ -267,12 +267,34 @@ export class PgDiscussionRepository implements DiscussionRepository {
                     params.potentialBeneficiaryEmail,
                   )
                 : builder,
+            (builder) => {
+              const establishmentRepresentativeEmail =
+                params.establishmentRepresentativeEmail;
+              return establishmentRepresentativeEmail
+                ? builder.where(({ eb, or }) =>
+                    or([
+                      eb(
+                        "establishment_contact_email",
+                        "=",
+                        establishmentRepresentativeEmail,
+                      ),
+                      eb(
+                        "establishment_contact_copy_emails",
+                        "@>",
+                        JSON.stringify([
+                          params.establishmentRepresentativeEmail,
+                        ]),
+                      ),
+                    ]),
+                  )
+                : builder;
+            },
             (builder) =>
               params.establishmentRepresentativeEmail
                 ? builder.where(
-                    "establishment_contact_email",
-                    "=",
-                    params.establishmentRepresentativeEmail,
+                    "establishment_contact_copy_emails",
+                    "@>",
+                    JSON.stringify([params.establishmentRepresentativeEmail]),
                   )
                 : builder,
           ),
