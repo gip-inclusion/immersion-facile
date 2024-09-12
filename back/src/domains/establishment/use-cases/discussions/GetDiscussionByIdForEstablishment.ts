@@ -1,7 +1,9 @@
 import {
+  DiscussionDto,
   DiscussionId,
   DiscussionReadDto,
   InclusionConnectDomainJwtPayload,
+  InclusionConnectedUser,
   discussionIdSchema,
   errors,
 } from "shared";
@@ -29,7 +31,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
 
     if (!discussion) throw errors.discussion.notFound({ discussionId });
 
-    if (discussion.establishmentContact.email !== user.email)
+    if (!this.#hasUserRightToAccessDiscussion(user, discussion))
       throw errors.discussion.accessForbidden({
         discussionId,
         userId: jwtPayload.userId,
@@ -68,5 +70,14 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
         contactMethod: discussion.establishmentContact.contactMethod,
       },
     };
+  }
+  #hasUserRightToAccessDiscussion(
+    user: InclusionConnectedUser,
+    discussion: DiscussionDto,
+  ) {
+    return (
+      discussion.establishmentContact.email === user.email ||
+      discussion.establishmentContact.copyEmails.includes(user.email)
+    );
   }
 }

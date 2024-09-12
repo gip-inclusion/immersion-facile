@@ -28,6 +28,15 @@ const userDiscussion = new DiscussionBuilder()
   .withEstablishmentContact({ email: user.email })
   .withId(uuid())
   .build();
+const userOnCopyEmailsDiscussion = new DiscussionBuilder()
+  .withEstablishmentContact({ copyEmails: [user.email] })
+  .withId(uuid())
+  .build();
+
+const userBothOnCopyEmailsAndContactEmailDiscussion = new DiscussionBuilder()
+  .withEstablishmentContact({ copyEmails: [user.email], email: user.email })
+  .withId(uuid())
+  .build();
 
 describe("GetDiscussionById use case", () => {
   let getDiscussionById: GetDiscussionByIdForEstablishment;
@@ -83,7 +92,7 @@ describe("GetDiscussionById use case", () => {
   });
 
   describe("Happy path", () => {
-    it("Gets the matching discussion", async () => {
+    it("Gets the matching discussion based on establishment contact email", async () => {
       uow.userRepository.users = [user];
       uow.discussionRepository.discussions = [userDiscussion];
       const response = await getDiscussionById.execute(userDiscussion.id, {
@@ -92,6 +101,38 @@ describe("GetDiscussionById use case", () => {
       expectToEqual(
         response,
         new DiscussionBuilder(userDiscussion).buildRead(),
+      );
+    });
+    it("Gets the matching discussion based on establishment copy emails", async () => {
+      uow.userRepository.users = [user];
+      uow.discussionRepository.discussions = [userOnCopyEmailsDiscussion];
+      const response = await getDiscussionById.execute(
+        userOnCopyEmailsDiscussion.id,
+        {
+          userId: user.id,
+        },
+      );
+      expectToEqual(
+        response,
+        new DiscussionBuilder(userOnCopyEmailsDiscussion).buildRead(),
+      );
+    });
+    it("Gets the matching discussion based on establishment copy emails and contact email", async () => {
+      uow.userRepository.users = [user];
+      uow.discussionRepository.discussions = [
+        userBothOnCopyEmailsAndContactEmailDiscussion,
+      ];
+      const response = await getDiscussionById.execute(
+        userBothOnCopyEmailsAndContactEmailDiscussion.id,
+        {
+          userId: user.id,
+        },
+      );
+      expectToEqual(
+        response,
+        new DiscussionBuilder(
+          userBothOnCopyEmailsAndContactEmailDiscussion,
+        ).buildRead(),
       );
     });
   });
