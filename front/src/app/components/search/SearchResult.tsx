@@ -85,7 +85,10 @@ const SearchResultComponent = ({
         desc={establishmentName}
         linkProps={{
           ...routes.searchResult({
-            appellationCode: preview ? "" : appellations[0].appellationCode,
+            appellationCode:
+              preview && appellations.length === 0
+                ? ""
+                : appellations[0].appellationCode,
             siret,
             ...(locationId ? { location: locationId } : {}),
           }).link,
