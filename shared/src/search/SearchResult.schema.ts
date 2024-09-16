@@ -38,7 +38,7 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
     }),
   ),
   updatedAt: dateTimeIsoStringSchema.optional(),
-  createdAt: dateTimeIsoStringSchema,
+  createdAt: dateTimeIsoStringSchema.optional(),
   // locationId: zUuidLike,
   locationId: zUuidLike.or(z.null()),
 });
