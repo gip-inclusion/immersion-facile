@@ -52,7 +52,7 @@ export const errors = {
       new ForbiddenError("Il y a un décalage sur le 'Nonce'."),
     couldNotGetUserInfo: ({ message }: { message: string }) =>
       new BadRequestError(
-        `Impossible de récupérer les infos pro connect : ${message}`,
+        `Impossible de récupérer les infos ProConnect : ${message}`,
       ),
   },
   convention: {
