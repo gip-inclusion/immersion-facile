@@ -11,7 +11,7 @@ import {
 import { GetInclusionConnectLogoutUrl } from "./GetInclusionConnectLogoutUrl";
 
 describe("GetInclusionConnectLogoutUrl", () => {
-  describe.each(oAuthProviders)("With OAuthGateway mode '%s'", (mode) => {
+  describe.each(oAuthProviders)("With OAuthGateway mode '%s'", (provider) => {
     let uow: InMemoryUnitOfWork;
     let getInclusionConnectLogoutUrl: GetInclusionConnectLogoutUrl;
 
@@ -24,13 +24,13 @@ describe("GetInclusionConnectLogoutUrl", () => {
 
       uow.featureFlagRepository.update({
         flagName: "enableProConnect",
-        featureFlag: { isActive: mode === "ProConnect", kind: "boolean" },
+        featureFlag: { isActive: provider === "ProConnect", kind: "boolean" },
       });
     });
 
     it("returns the inclusion connect logout url from %s", async () => {
       const logoutSuffixe =
-        mode === "ProConnect" ? "pro-connect" : "inclusion-connect";
+        provider === "ProConnect" ? "pro-connect" : "inclusion-connect";
       const idToken = "fake-id-token";
       expectToEqual(
         await getInclusionConnectLogoutUrl.execute({
