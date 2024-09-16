@@ -75,7 +75,7 @@ export class PgUserRepository implements UserRepository {
     return toAuthenticatedUser(response);
   }
 
-  #getUserQueryBuilder(provider: string) {
+  #getUserQueryBuilder(provider: OAuthProvider) {
     return this.transaction
       .selectFrom("users")
       .select([
