@@ -13,6 +13,7 @@ import {
   castError,
   errors,
   pipeWithValue,
+  searchResultSchema,
 } from "shared";
 import {
   KyselyDb,
@@ -391,7 +392,7 @@ export class PgEstablishmentAggregateRepository
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
     if (!immersionSearchResultDto) return;
     const { isSearchable: _, ...rest } = immersionSearchResultDto;
-    return rest;
+    return searchResultSchema.parse(rest);
   }
 
   public async updateEstablishmentAggregate(
