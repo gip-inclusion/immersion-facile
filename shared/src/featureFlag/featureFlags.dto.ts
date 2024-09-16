@@ -4,9 +4,10 @@ type FeatureFlagSeverity = (typeof featureFlagSeverities)[number];
 
 const featureFlagSeverities = ["warning", "error", "success", "info"] as const;
 
-export type FeatureFlagName = (typeof featureFlagNames)[number];
+export type FeatureFlagName = keyof FeatureFlags;
 
-export const featureFlagNames = [
+export const featureFlagNames: [FeatureFlagName, ...FeatureFlagName[]] = [
+  // used in z.enum() shouldn't be empty
   "enableTemporaryOperation",
   "enableMaintenance",
   "enableSearchByScore",
@@ -56,7 +57,6 @@ export type FeatureFlag =
   | FeatureFlagTextWithSeverity;
 
 export type FeatureFlags = {
-  // TODO: pas de controle sur les clés ici, on peut mettre ce qu'on veut
   enableMaintenance: FeatureFlagTextWithSeverity;
   enableTemporaryOperation: FeatureFlagTextImageAndRedirect;
   enableSearchByScore: FeatureFlagBoolean;
