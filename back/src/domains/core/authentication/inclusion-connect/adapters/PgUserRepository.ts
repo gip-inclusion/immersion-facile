@@ -67,9 +67,9 @@ export class PgUserRepository implements UserRepository {
 
   public async findByEmail(
     email: Email,
-    mode: OAuthProvider,
+    provider: OAuthProvider,
   ): Promise<User | undefined> {
-    const response = await this.#getUserQueryBuilder(mode)
+    const response = await this.#getUserQueryBuilder(provider)
       .where("email", "ilike", email)
       .executeTakeFirst();
     return toAuthenticatedUser(response);
