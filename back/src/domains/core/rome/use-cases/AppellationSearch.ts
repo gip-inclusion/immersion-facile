@@ -49,7 +49,7 @@ export class AppellationSearch extends TransactionalUseCase<
     if (searchText.length < ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH)
       return [];
     const appellations = fetchAppellationsFromNaturalLanguage
-      ? await this.#naturalLanguageSearchAppelations(uow, searchText)
+      ? await this.#naturalLanguageSearchAppellations(uow, searchText)
       : await uow.romeRepository.searchAppellation(searchText);
 
     const appellationsWithMatch: AppellationMatchDto[] = appellations.map(
@@ -67,15 +67,15 @@ export class AppellationSearch extends TransactionalUseCase<
     return appellationsWithMatch;
   }
 
-  async #naturalLanguageSearchAppelations(
+  async #naturalLanguageSearchAppellations(
     uow: UnitOfWork,
     searchText: string,
   ): Promise<AppellationAndRomeDto[]> {
-    const appelations =
+    const appellations =
       await this.#appellationsGateway.searchAppellations(searchText);
 
     return uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
-      appelations.map(({ appellationCode }) => appellationCode),
+      appellations.map(({ appellationCode }) => appellationCode),
     );
   }
 }

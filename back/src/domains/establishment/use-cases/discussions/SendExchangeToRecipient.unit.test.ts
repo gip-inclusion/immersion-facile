@@ -197,7 +197,7 @@ describe("SendExchangeToRecipient", () => {
       );
     });
 
-    it("throws an error if appelation code does not exist", async () => {
+    it("throws an error if appellation code does not exist", async () => {
       const discussion = new DiscussionBuilder()
         .withAppellationCode("20567")
         .withId(uuid())

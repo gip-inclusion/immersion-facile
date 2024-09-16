@@ -10,7 +10,7 @@ export class InMemoryAppellationsGateway implements AppellationsGateway {
     );
   }
 
-  public setNextSearchAppelationsResult(nextResult: AppellationDto[]) {
+  public setNextSearchAppellationsResult(nextResult: AppellationDto[]) {
     this.#nextResults = nextResult;
   }
 

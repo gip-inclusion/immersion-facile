@@ -747,19 +747,19 @@ export class PgEstablishmentAggregateRepository
         .where("rome_code", "in", offersToRemoveByRomeCode)
         .execute();
 
-    const offersToRemoveByAppelationCode = offersToRemove
+    const offersToRemoveByAppellationCode = offersToRemove
       .filter((offer) => !!offer.appellationCode)
       .map((offer) => offer.appellationCode);
 
-    if (offersToRemoveByAppelationCode.length > 0)
+    if (offersToRemoveByAppellationCode.length > 0)
       await this.transaction
         .deleteFrom("immersion_offers")
         .where("siret", "=", siret)
         .where(
           "appellation_code",
           "in",
-          offersToRemoveByAppelationCode.map((appelationCode) =>
-            parseInt(appelationCode),
+          offersToRemoveByAppellationCode.map((appellationCode) =>
+            parseInt(appellationCode),
           ),
         )
         .execute();
@@ -958,7 +958,7 @@ const searchImmersionResultsQuery = (
             "loc.id as loc_id",
             "offer.rome_code as code_rome",
             sql`JSON_AGG( JSON_BUILD_OBJECT( 'appellationCode', a.ogr_appellation::text, 'appellationLabel', a.libelle_appellation_long, 'score', offer.score ) ORDER BY a.ogr_appellation)`.as(
-              "appelations",
+              "appellations",
             ),
             sql<number>`ROW_NUMBER() OVER (ORDER BY ${makeOrderByClauses(
               sortedBy,
@@ -1025,7 +1025,7 @@ const searchImmersionResultsQuery = (
               }
             : {}),
           voluntaryToImmersion: sql`TRUE`,
-          appellations: ref("r.appelations"),
+          appellations: ref("r.appellations"),
         }),
       ).as("search_immersion_result"),
     )

@@ -140,7 +140,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
     expect(response.status).toBe(200);
   });
 
-  it("returns 404 if no offer can be found with such siret & appelation code", async () => {
+  it("returns 404 if no offer can be found with such siret & appellation code", async () => {
     const siretNotInDB = "11000403200019";
 
     const { status, body } =

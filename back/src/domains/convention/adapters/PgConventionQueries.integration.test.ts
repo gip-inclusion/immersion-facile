@@ -545,7 +545,7 @@ describe("Pg implementation of ConventionQueries", () => {
       const conventionBuilderInitialMatching = new ConventionDtoBuilder()
         .withAgencyId(agency.id)
         .withSiret(matchingSiret)
-        .withImmersionAppelation({
+        .withImmersionAppellation({
           appellationCode: matchingAppellation,
           romeCode: "11111",
           appellationLabel: "osef",
@@ -573,7 +573,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
       const conventionWithWrongAppellation = conventionBuilderInitialMatching
         .withId("33333333-3333-4333-3333-333333333333")
-        .withImmersionAppelation({
+        .withImmersionAppellation({
           appellationCode: "17010",
           romeCode: "11111",
           appellationLabel: "osef",

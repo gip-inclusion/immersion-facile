@@ -1071,7 +1071,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
     });
 
-    describe("getOffersAsAppelationDtoForFormEstablishment", () => {
+    describe("getOffersAsAppellationDtoForFormEstablishment", () => {
       beforeEach(async () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentWithOfferA1101_AtPosition,
@@ -1138,13 +1138,13 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       });
 
-      it("undefined when missing offer appelation code", async () => {
-        const missingAppelationCode = artisteCirqueOffer.appellationCode;
+      it("undefined when missing offer appellation code", async () => {
+        const missingAppellationCode = artisteCirqueOffer.appellationCode;
 
         expectToEqual(
           await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
             establishmentWithOfferA1101_AtPosition.establishment.siret,
-            missingAppelationCode,
+            missingAppellationCode,
             establishmentWithOfferA1101_AtPosition.establishment.locations[0]
               .id,
           ),

@@ -171,14 +171,14 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   constructor(private readonly discussion: DiscussionDto = defaultDiscussion) {}
 
   public buildRead(
-    appelation: AppellationAndRomeDto = cartographeAppellationAndRome,
+    appellation: AppellationAndRomeDto = cartographeAppellationAndRome,
   ): DiscussionReadDto {
     const { appellationCode, ...rest } = this.discussion;
-    if (appelation.appellationCode !== appellationCode)
-      throw new Error("Appelation code mismatch");
+    if (appellation.appellationCode !== appellationCode)
+      throw new Error("Appellation code mismatch");
     return {
       ...rest,
-      appellation: appelation,
+      appellation: appellation,
       potentialBeneficiary: {
         firstName: this.discussion.potentialBeneficiary.firstName,
         lastName: this.discussion.potentialBeneficiary.lastName,
