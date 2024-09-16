@@ -8,7 +8,6 @@ export type FederatedIdentityProvider =
 export const federatedIdentityProviders = [
   "inclusionConnect",
   "peConnect",
-  "proConnect",
 ] as const;
 
 type GenericFederatedIdentity<
@@ -62,12 +61,4 @@ export type InclusionConnectIdentity = GenericFederatedIdentity<
   InclusionConnectJwt
 >;
 
-export type ProConnectIdentity = GenericFederatedIdentity<
-  "proConnect",
-  InclusionConnectJwt
->;
-
-export type FederatedIdentity =
-  | ProConnectIdentity
-  | InclusionConnectIdentity
-  | PeConnectIdentity;
+export type FederatedIdentity = InclusionConnectIdentity | PeConnectIdentity;
