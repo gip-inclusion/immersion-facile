@@ -83,7 +83,7 @@ describe("AppellationSearch", () => {
   });
   describe("with natural language search", () => {
     it("returns the list of found matches with ranges", async () => {
-      appellationsGateway.setNextSearchAppelationsResult([
+      appellationsGateway.setNextSearchAppellationsResult([
         { appellationCode: "19364", appellationLabel: "Secrétaire" },
         {
           appellationCode: "19367",
@@ -136,7 +136,7 @@ describe("AppellationSearch", () => {
     });
 
     it("do not return results if missing on rome repo like ROME 4 results", async () => {
-      appellationsGateway.setNextSearchAppelationsResult([
+      appellationsGateway.setNextSearchAppellationsResult([
         { appellationCode: "19364", appellationLabel: "Secrétaire" },
         {
           appellationCode: "19367",

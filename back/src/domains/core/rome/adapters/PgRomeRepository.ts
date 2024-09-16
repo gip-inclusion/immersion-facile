@@ -41,20 +41,20 @@ export class PgRomeRepository implements RomeRepository {
     codes: AppellationCode[],
   ): Promise<AppellationAndRomeDto[]> {
     return this.transaction
-      .selectFrom("public_appellations_data as appelations")
+      .selectFrom("public_appellations_data as appellations")
       .innerJoin(
         "public_romes_data as romes",
-        "appelations.code_rome",
+        "appellations.code_rome",
         "romes.code_rome",
       )
       .where(
-        "appelations.ogr_appellation",
+        "appellations.ogr_appellation",
         "in",
         codes.map((code) => parseInt(code)),
       )
       .select([
-        "appelations.ogr_appellation",
-        "appelations.libelle_appellation_long",
+        "appellations.ogr_appellation",
+        "appellations.libelle_appellation_long",
         "romes.libelle_rome",
         "romes.code_rome",
       ])

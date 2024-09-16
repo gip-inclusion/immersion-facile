@@ -192,7 +192,7 @@ describe("Broadcasts events to pole-emploi", () => {
     const convention = new ConventionDtoBuilder()
       .withId(immersionConventionId)
       .withAgencyId(peAgency.id)
-      .withImmersionAppelation({
+      .withImmersionAppellation({
         appellationCode: "11111",
         appellationLabel: "some Appellation",
         romeCode: "A1111",
@@ -263,7 +263,7 @@ describe("Broadcasts events to pole-emploi", () => {
     const convention = new ConventionDtoBuilder()
       .withId(immersionConventionId)
       .withAgencyId(agencyWithRefersTo.id)
-      .withImmersionAppelation({
+      .withImmersionAppellation({
         appellationCode: "11111",
         appellationLabel: "some Appellation",
         romeCode: "A1111",

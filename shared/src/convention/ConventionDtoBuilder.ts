@@ -522,7 +522,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withImmersionAppelation(
+  public withImmersionAppellation(
     immersionAppellation: AppellationAndRomeDto,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
