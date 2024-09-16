@@ -16,19 +16,19 @@ export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
 
 export interface UserRepository {
   delete(id: UserId): Promise<void>;
-  save(user: User, mode: OAuthProvider): Promise<void>;
+  save(user: User, provider: OAuthProvider): Promise<void>;
   findByExternalId(
     externalId: string,
-    mode: OAuthProvider,
+    provider: OAuthProvider,
   ): Promise<User | undefined>;
-  findByEmail(email: Email, mode: OAuthProvider): Promise<User | undefined>;
+  findByEmail(email: Email, provider: OAuthProvider): Promise<User | undefined>;
   getWithFilter(
     filters: InclusionConnectedFilters,
-    mode: OAuthProvider,
+    provider: OAuthProvider,
   ): Promise<InclusionConnectedUser[]>;
   getById(
     userId: string,
-    mode: OAuthProvider,
+    provider: OAuthProvider,
   ): Promise<InclusionConnectedUser | undefined>;
   updateAgencyRights(params: {
     userId: UserId;

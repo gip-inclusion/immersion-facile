@@ -40,7 +40,7 @@ export class PgUserRepository implements UserRepository {
 
   public async findByExternalId(
     externalId: string,
-    mode: OAuthProvider,
+    provider: OAuthProvider,
   ): Promise<User | undefined> {
     const response = await this.transaction
       .selectFrom("users")
@@ -50,12 +50,12 @@ export class PgUserRepository implements UserRepository {
         "last_name",
         "email",
         "created_at",
-        mode === "InclusionConnect"
+        provider === "InclusionConnect"
           ? "external_id_inclusion_connect as external_id"
           : "external_id_pro_connect as external_id",
       ])
       .where(
-        mode === "InclusionConnect"
+        provider === "InclusionConnect"
           ? "external_id_inclusion_connect"
           : "external_id_pro_connect",
         "=",
@@ -75,7 +75,7 @@ export class PgUserRepository implements UserRepository {
     return toAuthenticatedUser(response);
   }
 
-  #getUserQueryBuilder(mode: string) {
+  #getUserQueryBuilder(provider: string) {
     return this.transaction
       .selectFrom("users")
       .select([
@@ -84,16 +84,16 @@ export class PgUserRepository implements UserRepository {
         "last_name",
         "email",
         "created_at",
-        mode === "InclusionConnect"
+        provider === "InclusionConnect"
           ? "external_id_inclusion_connect as external_id"
           : "external_id_pro_connect as external_id",
       ]);
   }
 
-  public async save(user: User, mode: OAuthProvider): Promise<void> {
+  public async save(user: User, provider: OAuthProvider): Promise<void> {
     const { id, email, firstName, lastName, externalId, createdAt } = user;
 
-    const existingUser = await this.#findById(id, mode);
+    const existingUser = await this.#findById(id, provider);
 
     if (!existingUser) {
       await this.transaction
@@ -103,7 +103,7 @@ export class PgUserRepository implements UserRepository {
           email,
           first_name: firstName,
           last_name: lastName,
-          [mode === "InclusionConnect"
+          [provider === "InclusionConnect"
             ? "external_id_inclusion_connect"
             : "external_id_pro_connect"]: externalId,
           created_at: createdAt,
@@ -126,7 +126,7 @@ export class PgUserRepository implements UserRepository {
         first_name: firstName,
         last_name: lastName,
         email,
-        [mode === "InclusionConnect"
+        [provider === "InclusionConnect"
           ? "external_id_inclusion_connect"
           : "external_id_pro_connect"]: externalId,
         updated_at: sql`now()`,
@@ -150,9 +150,9 @@ export class PgUserRepository implements UserRepository {
 
   async #findById(
     userId: UserId,
-    mode: OAuthProvider,
+    provider: OAuthProvider,
   ): Promise<User | undefined> {
-    const response = await this.#getUserQueryBuilder(mode)
+    const response = await this.#getUserQueryBuilder(provider)
       .where("id", "=", userId)
       .executeTakeFirst();
     return toAuthenticatedUser(response);
@@ -160,9 +160,12 @@ export class PgUserRepository implements UserRepository {
 
   public async getById(
     userId: string,
-    mode: OAuthProvider,
+    provider: OAuthProvider,
   ): Promise<InclusionConnectedUser | undefined> {
-    const icUsers = await this.#getInclusionConnectedUsers({ userId }, mode);
+    const icUsers = await this.#getInclusionConnectedUsers(
+      { userId },
+      provider,
+    );
     return icUsers[0];
   }
 

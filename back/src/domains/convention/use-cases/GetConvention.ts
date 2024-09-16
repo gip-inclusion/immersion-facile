@@ -55,7 +55,7 @@ export class GetConvention extends TransactionalUseCase<
         authPayload,
         uow,
         convention,
-        mode,
+        provider: mode,
       });
     }
 
@@ -75,12 +75,12 @@ export class GetConvention extends TransactionalUseCase<
     authPayload,
     convention,
     uow,
-    mode,
+    provider,
   }: {
     authPayload: ConventionDomainPayload;
     convention: ConventionReadDto;
     uow: UnitOfWork;
-    mode: OAuthProvider;
+    provider: OAuthProvider;
   }): Promise<ConventionReadDto> {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency) {
@@ -91,7 +91,7 @@ export class GetConvention extends TransactionalUseCase<
       convention,
       agency,
       userRepository: uow.userRepository,
-      mode,
+      provider,
     });
     if (!matchingMd5Emails) {
       throw new ForbiddenError(
@@ -144,13 +144,13 @@ export class GetConvention extends TransactionalUseCase<
     convention,
     agency,
     userRepository,
-    mode,
+    provider,
   }: {
     authPayload: ConventionDomainPayload;
     convention: ConventionReadDto;
     agency: AgencyDto;
     userRepository: UserRepository;
-    mode: OAuthProvider;
+    provider: OAuthProvider;
   }): Promise<boolean> {
     const emailsByRole = conventionEmailsByRole(convention, agency)[
       authPayload.role
@@ -164,7 +164,7 @@ export class GetConvention extends TransactionalUseCase<
         authPayload,
         agencyId: agency.id,
         userRepository,
-        mode,
+        provider,
       });
     const peAdvisorEmail =
       convention.signatories.beneficiary.federatedIdentity?.payload?.advisor
@@ -183,12 +183,12 @@ export class GetConvention extends TransactionalUseCase<
     authPayload,
     userRepository,
     agencyId,
-    mode,
+    provider,
   }: {
     authPayload: ConventionDomainPayload;
     userRepository: UserRepository;
     agencyId: AgencyId;
-    mode: OAuthProvider;
+    provider: OAuthProvider;
   }) {
     if (authPayload.role !== "counsellor" && authPayload.role !== "validator")
       return false;
@@ -198,7 +198,7 @@ export class GetConvention extends TransactionalUseCase<
         agencyRole: authPayload.role,
         agencyId,
       },
-      mode,
+      provider,
     );
 
     return users.some(
