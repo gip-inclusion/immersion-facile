@@ -1,5 +1,6 @@
-import { filter, map, tap } from "rxjs";
+import { filter, map, of, tap } from "rxjs";
 import { switchMap } from "rxjs/operators";
+import { errors } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -52,25 +53,24 @@ const logoutFromInclusionConnect: AuthEpic = (
 ) =>
   action$.pipe(
     filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
-    filter(
-      (action) =>
-        state$.value.auth.federatedIdentityWithUser?.provider ===
-          "inclusionConnect" && action.payload.mode === "device-and-inclusion",
-    ),
-    switchMap(() => {
-      return state$.value.auth.federatedIdentityWithUser?.provider ===
-        "peConnect"
-        ? inclusionConnectedGateway.getLogoutUrl$({
-            idToken: "",
-          })
-        : inclusionConnectedGateway.getLogoutUrl$({
-            idToken: state$.value.auth.federatedIdentityWithUser
-              ? state$.value.auth.federatedIdentityWithUser.idToken
-              : "",
-          });
+    switchMap((action) => {
+      const { federatedIdentityWithUser } = state$.value.auth;
+      if (!federatedIdentityWithUser)
+        throw errors.inclusionConnect.missingOAuth({});
+      const { provider } = federatedIdentityWithUser;
+      if (
+        provider === "inclusionConnect" &&
+        action.payload.mode === "device-and-inclusion"
+      ) {
+        const { idToken } = federatedIdentityWithUser;
+        return inclusionConnectedGateway.getLogoutUrl$({
+          idToken: state$.value.auth.federatedIdentityWithUser ? idToken : "",
+        });
+      }
+      return of(undefined);
     }),
     map((logoutUrl) => {
-      navigationGateway.goToUrl(logoutUrl);
+      if (logoutUrl) navigationGateway.goToUrl(logoutUrl);
       return authSlice.actions.loggedOutSuccessfullyFromInclusionConnect();
     }),
     catchEpicError((_error) =>

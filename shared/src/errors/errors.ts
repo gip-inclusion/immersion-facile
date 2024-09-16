@@ -44,10 +44,12 @@ export const errors = {
     missingOAuth: ({
       state,
       identityProvider,
-    }: { state: OAuthState; identityProvider: IdentityProvider }) =>
-      new ForbiddenError(
-        `Il n'y a pas d'OAuth en cours avec l'état '${state}' et le provider '${identityProvider}'.`,
-      ),
+    }: { state?: OAuthState; identityProvider?: IdentityProvider }) =>
+      state && identityProvider
+        ? new ForbiddenError(
+            `Il n'y a pas d'OAuth en cours avec l'état '${state}' et le provider '${identityProvider}'.`,
+          )
+        : new ForbiddenError("Il n'y a pas d'OAuth en cours"),
     nonceMismatch: () =>
       new ForbiddenError("Il y a un décalage sur le 'Nonce'."),
     couldNotGetUserInfo: ({ message }: { message: string }) =>
