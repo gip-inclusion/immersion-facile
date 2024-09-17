@@ -32,12 +32,6 @@ export type InclusionConnectLogoutQueryParams = {
   id_token: string;
 };
 
-export type ProConnectLogoutQueryParams = {
-  post_logout_redirect_uri: AbsoluteUrl;
-  id_token_hint: string;
-  state: string;
-};
-
 export type InclusionConnectRoutes = ReturnType<
   typeof makeInclusionConnectRoutes
 >;
