@@ -14,7 +14,7 @@ import {
 } from "shared";
 import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DomainTopic } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -113,7 +113,7 @@ export class SignConvention extends TransactionalUseCase<
       return { role: jwtPayload.role, icUser: undefined };
     const icUser = await uow.userRepository.getById(
       jwtPayload.userId,
-      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
     );
     if (!icUser)
       throw new NotFoundError(`No user found with id '${jwtPayload.userId}'`);

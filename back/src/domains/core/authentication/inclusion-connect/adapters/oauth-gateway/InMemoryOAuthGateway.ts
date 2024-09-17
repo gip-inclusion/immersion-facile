@@ -1,6 +1,6 @@
 import {
   AbsoluteUrl,
-  OAuthProvider,
+  OAuthGatewayProvider,
   WithIdToken,
   queryParamsAsString,
 } from "shared";
@@ -28,9 +28,9 @@ export class InMemoryOAuthGateway implements OAuthGateway {
 
   public async getLoginUrl(
     params: GetLoginUrlParams,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
-    const loginUri: Record<OAuthProvider, AbsoluteUrl> = {
+    const loginUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
       InclusionConnect: `${this.providerConfig.providerBaseUri}/login-inclusion-connect`,
       ProConnect: `${this.providerConfig.providerBaseUri}/login-pro-connect`,
     };
@@ -39,7 +39,7 @@ export class InMemoryOAuthGateway implements OAuthGateway {
 
   public async getAccessToken(
     _: GetAccessTokenParams,
-    __: OAuthProvider,
+    __: OAuthGatewayProvider,
   ): Promise<GetAccessTokenResult> {
     if (this.#getAccessTokenResult) return this.#getAccessTokenResult;
     throw new Error("No access token provided (in memory)");
@@ -47,11 +47,11 @@ export class InMemoryOAuthGateway implements OAuthGateway {
 
   public async getLogoutUrl(
     params: WithIdToken,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
-    const logoutUri: Record<OAuthProvider, AbsoluteUrl> = {
+    const logoutUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
       InclusionConnect: `${this.providerConfig.providerBaseUri}/logout-inclusion-connect`,
-      ProConnect: `${this.providerConfig.providerBaseUri}/logout-pro-connect`, // TODO
+      ProConnect: `${this.providerConfig.providerBaseUri}/logout-pro-connect`,
     };
 
     return `${logoutUri[provider]}?${queryParamsAsString({

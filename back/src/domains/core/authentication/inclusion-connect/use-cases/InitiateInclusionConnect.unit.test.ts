@@ -2,7 +2,7 @@ import {
   WithSourcePage,
   allowedStartInclusionConnectLoginPages,
   expectToEqual,
-  oAuthProviders,
+  oAuthGatewayProviders,
   queryParamsAsString,
 } from "shared";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -15,64 +15,67 @@ import {
 import { InitiateInclusionConnect } from "./InitiateInclusionConnect";
 
 describe("InitiateInclusionConnect usecase", () => {
-  describe.each(oAuthProviders)("With OAuthGateway mode '%s'", (provider) => {
-    it.each(allowedStartInclusionConnectLoginPages)(
-      "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
-      async (page) => {
-        const state = "my-state";
-        const nonce = "my-nonce";
-        const uow = createInMemoryUow();
-        const uuidGenerator = new TestUuidGenerator();
-        const useCase = new InitiateInclusionConnect(
-          new InMemoryUowPerformer(uow),
-          uuidGenerator,
-          new InMemoryOAuthGateway(fakeProviderConfig),
-        );
-        await uow.featureFlagRepository.update({
-          flagName: "enableProConnect",
-          featureFlag: {
-            isActive: provider === "ProConnect",
-            kind: "boolean",
-          },
-        });
+  describe.each(oAuthGatewayProviders)(
+    "With OAuthGateway mode '%s'",
+    (provider) => {
+      it.each(allowedStartInclusionConnectLoginPages)(
+        "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
+        async (page) => {
+          const state = "my-state";
+          const nonce = "my-nonce";
+          const uow = createInMemoryUow();
+          const uuidGenerator = new TestUuidGenerator();
+          const useCase = new InitiateInclusionConnect(
+            new InMemoryUowPerformer(uow),
+            uuidGenerator,
+            new InMemoryOAuthGateway(fakeProviderConfig),
+          );
+          await uow.featureFlagRepository.update({
+            flagName: "enableProConnect",
+            featureFlag: {
+              isActive: provider === "ProConnect",
+              kind: "boolean",
+            },
+          });
 
-        uuidGenerator.setNextUuids([nonce, state]);
+          uuidGenerator.setNextUuids([nonce, state]);
 
-        const sourcePage: WithSourcePage = {
-          page,
-        };
-        const redirectUrl = await useCase.execute(sourcePage);
-        const loginEndpoint =
-          provider === "InclusionConnect"
-            ? "login-inclusion-connect"
-            : "login-pro-connect";
+          const sourcePage: WithSourcePage = {
+            page,
+          };
+          const redirectUrl = await useCase.execute(sourcePage);
+          const loginEndpoint =
+            provider === "InclusionConnect"
+              ? "login-inclusion-connect"
+              : "login-pro-connect";
 
-        expectToEqual(
-          redirectUrl,
-          encodeURI(
-            `${
-              fakeProviderConfig.providerBaseUri
-            }/${loginEndpoint}?${queryParamsAsString({
-              page,
+          expectToEqual(
+            redirectUrl,
+            encodeURI(
+              `${
+                fakeProviderConfig.providerBaseUri
+              }/${loginEndpoint}?${queryParamsAsString({
+                page,
+                nonce,
+                state,
+              })}`,
+            ),
+          );
+
+          expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+            {
               nonce,
               state,
-            })}`,
-          ),
-        );
-
-        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-          {
-            nonce,
-            state,
-            provider:
-              provider === "InclusionConnect"
-                ? "inclusionConnect"
-                : "proConnect",
-            externalId: undefined,
-            accessToken: undefined,
-          },
-        ]);
-      },
-    );
-  });
+              provider:
+                provider === "InclusionConnect"
+                  ? "inclusionConnect"
+                  : "proConnect",
+              externalId: undefined,
+              accessToken: undefined,
+            },
+          ]);
+        },
+      );
+    },
+  );
 });

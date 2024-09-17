@@ -5,7 +5,7 @@ import {
   AuthenticatedUserQueryParams,
   IdentityProvider,
   OAuthCode,
-  OAuthProvider,
+  OAuthGatewayProvider,
   User,
   WithSourcePage,
   authenticateWithOAuthCodeSchema,
@@ -26,7 +26,7 @@ import { OngoingOAuth } from "../entities/OngoingOAuth";
 import {
   GetAccessTokenPayload,
   OAuthGateway,
-  oAuthModeByFeatureFlags,
+  oAuthProviderByFeatureFlags,
 } from "../port/OAuthGateway";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
@@ -71,11 +71,11 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     { code, page, state }: AuthenticateWithOAuthCodeParams,
     uow: UnitOfWork,
   ): Promise<ConnectedRedirectUrl> {
-    const mode = oAuthModeByFeatureFlags(
+    const provider = oAuthProviderByFeatureFlags(
       await uow.featureFlagRepository.getAll(),
     );
     const identityProvider: IdentityProvider =
-      mode === "InclusionConnect" ? "inclusionConnect" : "proConnect";
+      provider === "InclusionConnect" ? "inclusionConnect" : "proConnect";
     const existingOngoingOAuth =
       await uow.ongoingOAuthRepository.findByStateAndProvider(
         state,
@@ -84,7 +84,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     if (existingOngoingOAuth)
       return this.#onOngoingOAuth(
         uow,
-        mode,
+        provider,
         { code, page },
         existingOngoingOAuth,
       );
@@ -93,7 +93,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #onOngoingOAuth(
     uow: UnitOfWork,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
     { code, page }: WithSourcePage & { code: OAuthCode },
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
@@ -124,13 +124,14 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       userWithSameEmail,
     );
 
-    const toto = this.#makeAuthenticatedUser(
+    const authenticatedUser = this.#makeAuthenticatedUser(
       this.#uuidGenerator.new(),
       this.#timeGateway.now(),
       payload,
     );
+
     const newOrUpdatedAuthenticatedUser: User = {
-      ...toto,
+      ...authenticatedUser,
       ...(existingUser && {
         id: existingUser.id,
         createdAt: existingUser.createdAt,
@@ -190,7 +191,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #makeExistingUser(
     uow: UnitOfWork,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
     existingInclusionConnectedUser: User | undefined,
     userWithSameEmail: User | undefined,
   ): Promise<User | undefined> {
@@ -239,7 +240,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #updateUserAgencyRights(
     uow: UnitOfWork,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
     conflictingUser: User,
     userToKeep: User,
   ): Promise<void> {

@@ -6,7 +6,7 @@ import {
   AgencyRole,
   Email,
   InclusionConnectedUser,
-  OAuthProvider,
+  OAuthGatewayProvider,
   User,
   UserId,
   activeAgencyStatuses,
@@ -40,7 +40,7 @@ export class PgUserRepository implements UserRepository {
 
   public async findByExternalId(
     externalId: string,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<User | undefined> {
     const response = await this.transaction
       .selectFrom("users")
@@ -67,7 +67,7 @@ export class PgUserRepository implements UserRepository {
 
   public async findByEmail(
     email: Email,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<User | undefined> {
     const response = await this.#getUserQueryBuilder(provider)
       .where("email", "ilike", email)
@@ -75,7 +75,7 @@ export class PgUserRepository implements UserRepository {
     return toAuthenticatedUser(response);
   }
 
-  #getUserQueryBuilder(provider: OAuthProvider) {
+  #getUserQueryBuilder(provider: OAuthGatewayProvider) {
     return this.transaction
       .selectFrom("users")
       .select([
@@ -90,7 +90,7 @@ export class PgUserRepository implements UserRepository {
       ]);
   }
 
-  public async save(user: User, provider: OAuthProvider): Promise<void> {
+  public async save(user: User, provider: OAuthGatewayProvider): Promise<void> {
     const { id, email, firstName, lastName, externalId, createdAt } = user;
 
     const existingUser = await this.#findById(id, provider);
@@ -150,7 +150,7 @@ export class PgUserRepository implements UserRepository {
 
   async #findById(
     userId: UserId,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<User | undefined> {
     const response = await this.#getUserQueryBuilder(provider)
       .where("id", "=", userId)
@@ -160,7 +160,7 @@ export class PgUserRepository implements UserRepository {
 
   public async getById(
     userId: string,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser | undefined> {
     const icUsers = await this.#getInclusionConnectedUsers(
       { userId },
@@ -171,7 +171,7 @@ export class PgUserRepository implements UserRepository {
 
   public async getWithFilter(
     { agencyRole, agencyId, email }: InclusionConnectedFilters,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser[]> {
     return this.#getInclusionConnectedUsers(
       { agencyRole, agencyId, email },
@@ -212,7 +212,7 @@ export class PgUserRepository implements UserRepository {
       agencyId?: AgencyId;
       email?: Email;
     },
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser[]> {
     const buildAgencyRight = `JSON_BUILD_OBJECT(
        'roles', users__agencies.roles,

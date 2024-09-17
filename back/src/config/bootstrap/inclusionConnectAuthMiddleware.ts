@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { errors, inclusionConnectTokenExpiredMessage } from "shared";
-import { oAuthModeByFeatureFlags } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthProviderByFeatureFlags } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 
@@ -25,7 +25,7 @@ export const makeInclusionConnectAuthMiddleware = (
       const currentIcUser = await uowPerformer.perform(async (uow) =>
         uow.userRepository.getById(
           payload.userId,
-          oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+          oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
         ),
       );
       if (!currentIcUser)

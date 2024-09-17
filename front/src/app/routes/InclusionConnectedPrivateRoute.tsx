@@ -10,7 +10,7 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  OAuthProvider,
+  OAuthGatewayProvider,
   domElementIds,
   inclusionConnectImmersionRoutes,
   queryParamsAsString,
@@ -38,7 +38,7 @@ type InclusionConnectedPrivateRouteProps = {
 };
 
 const providers: Record<
-  OAuthProvider,
+  OAuthGatewayProvider,
   {
     name: string;
     baseline: string;

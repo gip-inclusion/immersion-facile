@@ -1,9 +1,9 @@
 import { Pool } from "pg";
 import {
   AbsoluteUrl,
-  OAuthProvider,
+  OAuthGatewayProvider,
   expectObjectsToMatch,
-  oAuthProviders,
+  oAuthGatewayProviders,
 } from "shared";
 import {
   KyselyDb,
@@ -67,7 +67,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     await pool.end();
   });
 
-  describe.each(oAuthProviders)(
+  describe.each(oAuthGatewayProviders)(
     "when user had never connected before with mode '%s'",
     (mode) => {
       beforeEach(async () => {
@@ -124,7 +124,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   );
 
   const makeSuccessfulAuthenticationConditions = async (
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
     expectedIcIdTokenPayload = defaultExpectedIcIdTokenPayload,
   ) => {
     const initialOngoingOAuth: OngoingOAuth = {

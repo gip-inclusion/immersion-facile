@@ -12,7 +12,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -49,7 +49,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     const { userId } = jwtPayload;
     const user = await uow.userRepository.getById(
       userId,
-      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
     );
     if (!user) throw errors.user.notFound({ userId });
     const establishments = await this.#withEstablishments(uow, user);
