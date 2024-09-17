@@ -38,7 +38,7 @@ describe("InclusionConnected", () => {
     },
     agencyRights: [
       {
-        roles: ["agencyOwner"],
+        roles: ["agencyAdmin"],
         agency: new AgencyDtoBuilder().build(),
         isNotifiedByEmail: true,
       },
@@ -261,7 +261,7 @@ describe("InclusionConnected", () => {
       ...inclusionConnectedUser,
       agencyRights: [
         {
-          roles: ["agencyOwner", "validator"],
+          roles: ["agencyAdmin", "validator"],
           agency: new AgencyDtoBuilder().build(),
           isNotifiedByEmail: true,
         },
@@ -283,7 +283,7 @@ describe("InclusionConnected", () => {
         inclusionConnectedSelectors.userRolesForFetchedConvention(
           store.getState(),
         ),
-        ["backOffice", "agencyOwner", "validator"],
+        ["backOffice", "agencyAdmin", "validator"],
       );
     });
   });

@@ -105,7 +105,7 @@ export const AgencyUserModificationForm = ({
           });
         },
       },
-      hintText: agencyRoleToDisplay[roleKey].description,
+      hintText: agencyRoleToDisplay[availableRole].description,
     };
   });
 

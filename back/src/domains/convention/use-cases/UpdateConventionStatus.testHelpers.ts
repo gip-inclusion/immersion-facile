@@ -41,7 +41,7 @@ const allInclusionConnectedTestUsers = [
   "icUserWithRoleToReview",
   "icUserWithRoleCounsellor",
   "icUserWithRoleValidator",
-  "icUserWithRoleAgencyOwner",
+  "icUserWithRoleAgencyAdmin",
   "icUserWithRoleEstablishmentRepresentative",
   "icUserWithRoleBackofficeAdmin",
   "icUserWithRoleBackofficeAdminAndValidator",
@@ -161,25 +161,25 @@ const makeUserIdMapInclusionConnectedUser: Record<
     createdAt: new Date().toISOString(),
   },
 
-  icUserWithRoleAgencyOwner: {
+  icUserWithRoleAgencyAdmin: {
     agencyRights: [
       {
         agency: agencyWithoutCounsellorEmail,
-        roles: ["agencyOwner"],
+        roles: ["agencyAdmin"],
         isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
-        roles: ["agencyOwner"],
+        roles: ["agencyAdmin"],
         isNotifiedByEmail: false,
       },
     ],
-    email: "icUserWithRoleAgencyOwner@mail.com",
-    firstName: "icUserWithRoleAgencyOwner",
-    id: "icUserWithRoleAgencyOwner",
+    email: "icUserWithRoleAgencyAdmin@mail.com",
+    firstName: "icUserWithRoleAgencyAdmin",
+    id: "icUserWithRoleAgencyAdmin",
     lastName: "Owner",
     dashboards: { agencies: {}, establishments: {} },
-    externalId: "icUserWithRoleAgencyOwner-external-id",
+    externalId: "icUserWithRoleAgencyAdmin-external-id",
     createdAt: new Date().toISOString(),
   },
   icUserWithRoleEstablishmentRepresentative: {
@@ -442,7 +442,7 @@ const makeTestAcceptsStatusUpdate =
         expectedConvention,
       );
 
-      if (agencyRolesEmptyOrContainsToReviewOrAgencyOwner(roles)) {
+      if (agencyRolesEmptyOrContainsToReviewOrAgencyAdmin(roles)) {
         throw new Error(
           `Roles '${roles}' not supported according to ${JSON.stringify(
             testAcceptNewStatusParams,
@@ -739,7 +739,7 @@ const defineRolesForTest = (
       (agencyRight) => agencyRight.agency.id === expectedConvention.agencyId,
     )?.roles ?? [];
 
-  if (agencyRolesEmptyOrContainsToReviewOrAgencyOwner(roles)) {
+  if (agencyRolesEmptyOrContainsToReviewOrAgencyAdmin(roles)) {
     throw new Error(
       `Roles '${roles}' not supported according to ${JSON.stringify(
         testAcceptNewStatusParams,
@@ -750,12 +750,12 @@ const defineRolesForTest = (
   return roles;
 };
 
-export const agencyRolesEmptyOrContainsToReviewOrAgencyOwner = (
+export const agencyRolesEmptyOrContainsToReviewOrAgencyAdmin = (
   roles: (AgencyRole | Role)[],
 ): roles is ExcludeFromExisting<
   AgencyRole | Role,
-  "toReview" | "agencyOwner"
+  "toReview" | "agencyAdmin"
 >[] =>
   roles.length === 0 ||
   roles.includes("toReview") ||
-  roles.includes("agencyOwner");
+  roles.includes("agencyAdmin");

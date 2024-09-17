@@ -123,8 +123,8 @@ export const ConventionManageActions = ({
     allowedToSignStatuses.includes(convention.status);
 
   const requesterRoles = roles.filter(
-    (role): role is ExcludeFromExisting<Role, "agencyOwner"> =>
-      role !== "agencyOwner",
+    (role): role is ExcludeFromExisting<Role, "agencyAdmin"> =>
+      role !== "agencyAdmin",
   );
 
   return (

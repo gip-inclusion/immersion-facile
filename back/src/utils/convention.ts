@@ -25,7 +25,7 @@ export const conventionEmailsByRole = (
       }),
   counsellor: agency.counsellorEmails,
   validator: agency.validatorEmails,
-  agencyOwner: errors.convention.roleHasNoMagicLink({ role: "agencyOwner" }),
+  agencyAdmin: errors.convention.roleHasNoMagicLink({ role: "agencyAdmin" }),
   "establishment-representative": [
     convention.signatories.establishmentRepresentative.email,
   ],

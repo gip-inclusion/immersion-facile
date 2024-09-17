@@ -14,7 +14,7 @@ export const allRoles = [
   "counsellor",
   "validator",
   "backOffice",
-  "agencyOwner",
+  "agencyAdmin",
   "toReview",
   "agency-viewer",
 ] as const;

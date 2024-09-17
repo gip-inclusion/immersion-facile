@@ -90,7 +90,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
   const [agencyRolesAllowedToGetDashboard, agencyRolesForbiddenToGetDashboard] =
     splitCasesBetweenPassingAndFailing(allAgencyRoles, [
-      "agencyOwner",
+      "agencyAdmin",
       "validator",
       "counsellor",
       "agency-viewer",
@@ -180,7 +180,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
           { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
           { agency: agency3, roles: ["toReview"], isNotifiedByEmail: false },
-          { agency: agency4, roles: ["agencyOwner"], isNotifiedByEmail: false },
+          { agency: agency4, roles: ["agencyAdmin"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
       },
@@ -196,7 +196,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
         { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
         { agency: agency3, roles: ["toReview"], isNotifiedByEmail: false },
-        { agency: agency4, roles: ["agencyOwner"], isNotifiedByEmail: false },
+        { agency: agency4, roles: ["agencyAdmin"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {
