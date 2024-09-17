@@ -27,9 +27,11 @@ import {
   InclusionConnectAccessTokenResponse,
   InclusionConnectLogoutQueryParams,
   InclusionConnectRoutes,
-  ProConnectLogoutQueryParams,
 } from "./inclusionConnect.routes";
-import { ProConnectRoutes } from "./proConnect.routes";
+import {
+  ProConnectLogoutQueryParams,
+  ProConnectRoutes,
+} from "./proConnect.routes";
 
 const logger = createLogger(__filename);
 
