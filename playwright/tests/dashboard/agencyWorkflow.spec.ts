@@ -94,6 +94,22 @@ test.describe("Agency dashboard workflow", () => {
         .first();
       await expect(registerButton).toBeVisible();
       await registerButton.click();
+      await expect(
+        page.locator(
+          `#${domElementIds.admin.agencyTab.userRegistrationToAgencyModal}`,
+        ),
+      ).toBeVisible();
+      await page
+        .locator(
+          `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-2"]`,
+        )
+        .click();
+      await page
+        .locator(
+          `#${domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}`,
+        )
+        .click();
+      await expect(page.locator(".fr-alert--success").first()).toBeVisible();
       await page.waitForTimeout(testConfig.timeForEventCrawler);
     });
   });

@@ -34,7 +34,7 @@ test.describe("Manage users in admin", () => {
       .fill(faker.internet.email());
     await page
       .locator(
-        `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-3"]`,
+        `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-1"]`,
       )
       .click();
     await page
@@ -74,7 +74,7 @@ test.describe("Manage users in admin", () => {
     ).toBeVisible();
     await page
       .locator(
-        `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-3"]`,
+        `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-2"]`,
       )
       .click();
     await page

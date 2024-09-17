@@ -184,7 +184,7 @@ const {
   close: closeIcUserRegistrationToAgencyModal,
 } = createModal({
   isOpenedByDefault: false,
-  id: "siret",
+  id: domElementIds.admin.agencyTab.userRegistrationToAgencyModal,
 });
 
 type IcUserRegistrationToAgencyFormProps = {
