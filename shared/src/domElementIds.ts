@@ -582,6 +582,8 @@ export const domElementIds = {
       rejectAgencyModalJustificationInput:
         "im-reject-agency-modal__justification-input",
       rejectAgencyModalSubmitButton: "im-reject-agency-modal__submit-button",
+      userRegistrationToAgencyModal:
+        "im-register-user-to-agency__user-registration-modal",
     },
     emailPreviewTab: {
       emailTemplateNameSelect: "selectTemplateName",
