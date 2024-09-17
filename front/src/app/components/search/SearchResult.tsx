@@ -86,7 +86,7 @@ const SearchResultComponent = ({
         linkProps={{
           ...routes.searchResult({
             appellationCode:
-              preview && appellations.length === 0
+              preview || appellations.length === 0
                 ? ""
                 : appellations[0].appellationCode,
             siret,
