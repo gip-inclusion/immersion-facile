@@ -626,7 +626,7 @@ describe("PgDiscussionRepository", () => {
           copyEmails: ["searchedEmail@email.com"],
         })
         .build();
-      pgDiscussionRepository.insert(discussion);
+      await pgDiscussionRepository.insert(discussion);
 
       expectToEqual(
         await pgDiscussionRepository.hasDiscussionMatching({
