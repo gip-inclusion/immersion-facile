@@ -42,7 +42,7 @@ export const EstablishmentDashboardPage = ({
     establishments,
   }: InclusionConnectedUser): DashboardTab[] => [
     {
-      label: "Conventions en cours",
+      label: "Conventions",
       tabId: "conventions",
       content: (
         <>
@@ -68,7 +68,7 @@ export const EstablishmentDashboardPage = ({
       ),
     },
     {
-      label: "Mises en relation",
+      label: "Candidatures",
       tabId: "discussions",
       content: params.discussionId ? (
         <DiscussionManageContent discussionId={params.discussionId} />
@@ -93,7 +93,7 @@ export const EstablishmentDashboardPage = ({
     ...(establishments
       ? [
           {
-            label: "Fiche entreprise",
+            label: "Fiche établissement",
             tabId: "fiche-entreprise",
             content: (
               <ManageEstablishmentsTab
