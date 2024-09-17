@@ -85,7 +85,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [
-          { agency, roles: ["agencyOwner"], isNotifiedByEmail: false },
+          { agency, roles: ["agencyAdmin"], isNotifiedByEmail: false },
         ],
         dashboards: {
           agencies: {},
@@ -103,7 +103,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.userRepository.agencyRightsByUserId, {
         [icUser.id]: [
-          { agency, roles: ["agencyOwner"], isNotifiedByEmail: false },
+          { agency, roles: ["agencyAdmin"], isNotifiedByEmail: false },
         ],
       });
     });

@@ -52,7 +52,7 @@ export const agencyRoleToDisplay: Record<
     description:
       "Peut pré-valider les conventions de l'agence et modifier leur statut.",
   },
-  agencyOwner: {
+  agencyAdmin: {
     label: "Administrateur",
     className: "fr-badge--green-emeraude",
     description:

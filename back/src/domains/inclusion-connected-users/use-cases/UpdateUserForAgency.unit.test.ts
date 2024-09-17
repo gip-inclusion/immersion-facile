@@ -296,7 +296,7 @@ describe("UpdateUserForAgency", () => {
       ]);
 
       const icUserRoleForAgency: UserParamsForAgency = {
-        roles: ["counsellor", "validator", "agencyOwner"],
+        roles: ["counsellor", "validator", "agencyAdmin"],
         agencyId: agency.id,
         userId: notAdminUser.id,
         isNotifiedByEmail: false,

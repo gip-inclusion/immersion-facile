@@ -188,7 +188,7 @@ const requesterNameByRole = (
     counsellor: agency.name,
     validator: agency.name,
     backOffice: "L'équipe Immersion Facilitée",
-    agencyOwner: "Le responsable d'agence",
+    agencyAdmin: "Le responsable d'agence",
     "establishment-tutor": new Error(wrongRequesterUser),
     "agency-viewer": new Error(wrongRequesterUser),
     toReview: new Error(wrongRequesterUser),

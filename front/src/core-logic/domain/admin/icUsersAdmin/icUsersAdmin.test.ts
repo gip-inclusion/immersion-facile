@@ -425,7 +425,7 @@ describe("Agency registration for authenticated users", () => {
           ...originalUser.agencyRights,
           [agency2.id]: {
             ...originalUser.agencyRights[agency2.id],
-            roles: ["agencyOwner", "validator"],
+            roles: ["agencyAdmin", "validator"],
             isNotifiedByEmail: false,
           },
         },
