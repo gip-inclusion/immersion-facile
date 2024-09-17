@@ -44,7 +44,7 @@ export const AgencyDashboardPage = ({
       ? [
           {
             tabId: "dashboard",
-            label: "Tableau de bord agence",
+            label: "Tableau de bord",
             content: (
               <>
                 <ManageConventionFormSection
