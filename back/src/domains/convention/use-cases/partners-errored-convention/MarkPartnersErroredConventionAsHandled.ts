@@ -5,7 +5,7 @@ import {
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { oAuthModeByFeatureFlags } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthProviderByFeatureFlags } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -45,7 +45,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
 
     const currentUser = await uow.userRepository.getById(
       userId,
-      oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
     );
     if (!currentUser) throw errors.user.notFound({ userId });
     const userAgencyRights = currentUser.agencyRights.find(

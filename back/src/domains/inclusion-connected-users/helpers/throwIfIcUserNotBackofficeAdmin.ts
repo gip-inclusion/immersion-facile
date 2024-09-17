@@ -5,7 +5,7 @@ import {
   errors,
 } from "shared";
 
-import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfIcUserNotBackofficeAdmin = async (
@@ -23,7 +23,7 @@ export const getIcUserOrThrow = async (
 ): Promise<InclusionConnectedUser> => {
   const user = await uow.userRepository.getById(
     userId,
-    oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+    oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
   );
   if (!user) throw errors.user.notFound({ userId });
   return user;

@@ -3,14 +3,14 @@ import {
   AgencyRight,
   Email,
   InclusionConnectedUser,
+  OAuthGatewayProvider,
   UserParamsForAgency,
-  OAuthProvider,
   errors,
   replaceElementWhere,
   userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -160,7 +160,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    const mode = oAuthModeByFeatureFlags(
+    const mode = oAuthProviderByFeatureFlags(
       await uow.featureFlagRepository.getAll(),
     );
     const userToUpdate = await uow.userRepository.getById(params.userId, mode);

@@ -1,6 +1,6 @@
 import {
   AbsoluteUrl,
-  OAuthProvider,
+  OAuthGatewayProvider,
   WithIdToken,
   WithSourcePage,
   decodeJwtWithoutSignatureCheck,
@@ -55,9 +55,9 @@ export class HttpOAuthGateway implements OAuthGateway {
 
   public async getLoginUrl(
     { nonce, page, state }: GetLoginUrlParams,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
-    const uriByProvider: Record<OAuthProvider, AbsoluteUrl> = {
+    const uriByProvider: Record<OAuthGatewayProvider, AbsoluteUrl> = {
       InclusionConnect: this.#makeInclusionConnectAuthorizeUri(),
       ProConnect: this.#makeProConnectAuthorizeUri(),
     };
@@ -201,7 +201,7 @@ export class HttpOAuthGateway implements OAuthGateway {
 
   public async getAccessToken(
     { code, page }: GetAccessTokenParams,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<GetAccessTokenResult> {
     return provider === "InclusionConnect"
       ? this.#getAccessTokenInclusionConnect({ code, page })
@@ -210,7 +210,7 @@ export class HttpOAuthGateway implements OAuthGateway {
 
   public async getLogoutUrl(
     params: WithIdToken,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const uri: AbsoluteUrl =
       provider === "InclusionConnect"
@@ -234,7 +234,7 @@ export class HttpOAuthGateway implements OAuthGateway {
   }
 
   async #getTokenWithPayload(
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
     inclusionConnectAccessTokenBody: InclusionConnectAccessTokenResponse,
   ): Promise<string> {
     if (provider === "InclusionConnect")

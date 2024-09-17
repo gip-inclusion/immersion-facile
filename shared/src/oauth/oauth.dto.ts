@@ -1,2 +1,5 @@
-export const oAuthProviders = ["InclusionConnect", "ProConnect"] as const;
-export type OAuthProvider = (typeof oAuthProviders)[number];
+export const oAuthGatewayProviders = [
+  "InclusionConnect",
+  "ProConnect",
+] as const;
+export type OAuthGatewayProvider = (typeof oAuthGatewayProviders)[number];

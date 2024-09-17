@@ -4,7 +4,7 @@ import {
   ExternalId,
   FeatureFlags,
   IdToken,
-  OAuthProvider,
+  OAuthGatewayProvider,
   WithIdToken,
   WithSourcePage,
 } from "shared";
@@ -35,20 +35,22 @@ export type GetLoginUrlParams = WithSourcePage & {
   state: string;
 };
 
-export const oAuthModeByFeatureFlags = (flags: FeatureFlags): OAuthProvider =>
+export const oAuthProviderByFeatureFlags = (
+  flags: FeatureFlags,
+): OAuthGatewayProvider =>
   flags.enableProConnect.isActive ? "ProConnect" : "InclusionConnect";
 
 export interface OAuthGateway {
   getLoginUrl(
     params: GetLoginUrlParams,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl>;
   getAccessToken: (
     params: GetAccessTokenParams,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ) => Promise<GetAccessTokenResult>;
   getLogoutUrl(
     params: WithIdToken,
-    provider: OAuthProvider,
+    provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl>;
 }

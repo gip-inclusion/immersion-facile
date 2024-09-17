@@ -9,7 +9,7 @@ import {
   siretSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthModeByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 
@@ -43,7 +43,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
     if (isValidIcJwtPayload) {
       const currentUser = await uow.userRepository.getById(
         jwtPayload.userId,
-        oAuthModeByFeatureFlags(await uow.featureFlagRepository.getAll()),
+        oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
       );
       if (!currentUser)
         throw errors.user.notFound({ userId: jwtPayload.userId });
