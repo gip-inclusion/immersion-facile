@@ -1,6 +1,7 @@
 import { FrClassName, fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { values } from "ramda";
@@ -72,6 +73,11 @@ const manageUserModal = createModal({
   id: domElementIds.admin.agencyTab.editAgencyManageUserModal,
 });
 
+const removeUserModal = createModal({
+  isOpenedByDefault: false,
+  id: domElementIds.admin.agencyTab.editAgencyRemoveUserModal,
+});
+
 export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
   const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
   const dispatch = useDispatch();
@@ -118,6 +124,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
       </Button>
 
       <Table
+        fixed
         id={domElementIds.admin.agencyTab.agencyUsersTable}
         headers={[
           "Utilisateurs",
@@ -151,30 +158,52 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
                 </Badge>
               );
             }),
-            <Button
-              priority="secondary"
-              className={fr.cx("fr-m-1w")}
-              id={`${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`}
-              onClick={() => {
-                dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-                setMode("update");
-                setSelectedUserData({
-                  agencyId: agency.id,
-                  userId: agencyUser.id,
-                  roles: agencyUser.agencyRights[agency.id].roles,
-                  email: agencyUser.email,
-                  isNotifiedByEmail:
-                    agencyUser.agencyRights[agency.id].isNotifiedByEmail,
-                  isIcUser: !!agencyUser.externalId,
-                });
-                manageUserModal.open();
-              }}
-            >
-              Modifier
-            </Button>,
+            <ButtonsGroup
+              buttons={[
+                {
+                  title: "Modifier",
+                  iconId: "fr-icon-edit-fill",
+                  priority: "secondary",
+                  className: "fr-m-1w",
+                  id: `${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`,
+                  onClick: () => {
+                    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+                    setMode("update");
+                    setSelectedUserData({
+                      agencyId: agency.id,
+                      userId: agencyUser.id,
+                      roles: agencyUser.agencyRights[agency.id].roles,
+                      email: agencyUser.email,
+                      isNotifiedByEmail:
+                        agencyUser.agencyRights[agency.id].isNotifiedByEmail,
+                      isIcUser: !!agencyUser.externalId,
+                    });
+                    manageUserModal.open();
+                  },
+                },
+                {
+                  title: "Supprimer",
+                  iconId: "fr-icon-delete-fill",
+                  priority: "secondary",
+                  id: `${domElementIds.admin.agencyTab.editAgencyRemoveUserButton}-${agency.id}-${index}`,
+                  onClick: () => {
+                    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+                    setSelectedUserData({
+                      agencyId: agency.id,
+                      userId: agencyUser.id,
+                      roles: agencyUser.agencyRights[agency.id].roles,
+                      email: agencyUser.email,
+                      isNotifiedByEmail:
+                        agencyUser.agencyRights[agency.id].isNotifiedByEmail,
+                      isIcUser: !!agencyUser.externalId,
+                    });
+                    removeUserModal.open();
+                  },
+                },
+              ]}
+            />,
           ];
         })}
-        fixed
       />
 
       {createPortal(
@@ -194,6 +223,36 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
             />
           )}
         </manageUserModal.Component>,
+        document.body,
+      )}
+
+      {createPortal(
+        <removeUserModal.Component title="Confirmer la suppression">
+          <p>
+            Vous êtes sur le point de supprimer le rattachement de{" "}
+            {selectedUserData?.email}.
+          </p>
+          <p>Souhaitez-vous continuer ?</p>
+          <ButtonsGroup
+            inlineLayoutWhen="always"
+            buttons={[
+              {
+                priority: "secondary",
+                children: "Annuler",
+                onClick: () => {
+                  removeUserModal.close();
+                },
+              },
+              {
+                priority: "primary",
+                children: "Supprimer le rattachement",
+                onClick: () => {
+                  //TODO
+                },
+              },
+            ]}
+          />
+        </removeUserModal.Component>,
         document.body,
       )}
     </>
