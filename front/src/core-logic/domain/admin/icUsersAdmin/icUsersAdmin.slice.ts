@@ -220,5 +220,12 @@ export const icUsersAdminSlice = createSlice({
     ) => {
       state.isUpdatingIcUserAgency = false;
     },
+
+    removeAgencyUserRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
+    ) => {
+      state.isUpdatingIcUserAgency = true;
+    },
   },
 });

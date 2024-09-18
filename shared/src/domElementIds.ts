@@ -559,7 +559,9 @@ export const domElementIds = {
       agencyUsersTable: "im-form-edit-agency__users-table",
       editAgencyAutocompleteInput: "im-form-edit-agency__agency-autocomplete",
       editAgencyManageUserModal: "im-form-edit-agency__manage-user-modal",
+      editAgencyRemoveUserModal: "im-form-edit-agency__remove-user-modal",
       editAgencyUserRoleButton: "im-form-edit-agency__users-table-edit-button",
+      editAgencyRemoveUserButton: "im-form-edit-agency__remove-user-button",
       editAgencyUserRoleSubmitButton:
         "im-form-edit-agency__users-submit-button",
       editAgencyManageUserCheckbox: "im-form-edit-agency__manage-user-checkbox",
