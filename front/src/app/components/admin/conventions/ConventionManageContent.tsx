@@ -41,7 +41,7 @@ export const ConventionManageContent = ({
     .with(
       { name: "manageConventionAdmin" },
       ({ inclusionConnectedRoles }): Role[] => [
-        "backOffice",
+        "back-office",
         ...inclusionConnectedRoles,
       ],
     )

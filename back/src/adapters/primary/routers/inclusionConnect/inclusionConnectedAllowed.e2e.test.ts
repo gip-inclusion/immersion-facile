@@ -191,7 +191,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectToEqual(await inMemoryUow.userRepository.getById(userId), {
         ...inclusionConnectedUserWithRights,
         agencyRights: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
       });
     });

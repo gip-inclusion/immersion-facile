@@ -85,7 +85,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [
-          { agency, roles: ["agencyAdmin"], isNotifiedByEmail: false },
+          { agency, roles: ["agency-admin"], isNotifiedByEmail: false },
         ],
         dashboards: {
           agencies: {},
@@ -103,16 +103,16 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       expectToEqual(uow.userRepository.agencyRightsByUserId, {
         [icUser.id]: [
-          { agency, roles: ["agencyAdmin"], isNotifiedByEmail: false },
+          { agency, roles: ["agency-admin"], isNotifiedByEmail: false },
         ],
       });
     });
 
-    it("replace agency right to IC user if user already has rights on agency and current right is toReview", async () => {
+    it("replace agency right to IC user if user already has rights on agency and current right is to-review", async () => {
       const icUser: InclusionConnectedUser = {
         ...defaultUser,
         agencyRights: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: {
           agencies: {},
@@ -243,7 +243,7 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
           },
           {
             agency: agency2InGroup,
-            roles: ["toReview"],
+            roles: ["to-review"],
             isNotifiedByEmail: false,
           },
         ],

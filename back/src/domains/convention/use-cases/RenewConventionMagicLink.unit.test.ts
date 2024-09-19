@@ -238,7 +238,7 @@ describe("RenewConventionMagicLink use case", () => {
     it("Refuses to generate backoffice magic links", async () => {
       const payload = createConventionMagicLinkPayload({
         id: validConvention.id,
-        role: "backOffice",
+        role: "back-office",
         email,
         now: timeGateway.now(),
       });
@@ -250,7 +250,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        errors.convention.roleHasNoMagicLink({ role: "backOffice" }),
+        errors.convention.roleHasNoMagicLink({ role: "back-office" }),
       );
     });
 

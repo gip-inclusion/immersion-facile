@@ -18,7 +18,7 @@ import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 const simulatedAgencyDtos: AgencyRight[] = [
   {
-    roles: ["toReview"],
+    roles: ["to-review"],
     agency: new AgencyDtoBuilder()
       .withName("Agence de Bourg en Bresse")
       .withId("fake-agency-id-1")
@@ -34,7 +34,7 @@ const simulatedAgencyDtos: AgencyRight[] = [
     isNotifiedByEmail: true,
   },
   {
-    roles: ["toReview"],
+    roles: ["to-review"],
     agency: new AgencyDtoBuilder()
       .withName("CCI de Quimper")
       .withId("fake-agency-id-3")
@@ -131,7 +131,7 @@ export class SimulatedAdminGateway implements AdminGateway {
         lastName: "Jeplante",
         agencyRights: [
           {
-            roles: ["toReview"],
+            roles: ["to-review"],
             agency: new AgencyDtoBuilder()
               .withName("Mission locale qui plante")
               .withId("non-existing-agency-id")

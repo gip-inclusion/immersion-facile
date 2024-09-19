@@ -30,7 +30,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
     const user = await uow.userRepository.getById(params.userId);
     if (!user) throw errors.user.notFound({ userId: params.userId });
 
-    if (!params.roles.includes("toReview"))
+    if (!params.roles.includes("to-review"))
       await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {

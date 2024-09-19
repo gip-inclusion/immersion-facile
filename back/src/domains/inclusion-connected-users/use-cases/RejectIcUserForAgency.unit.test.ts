@@ -56,7 +56,7 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+        { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -102,7 +102,7 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+        { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -129,7 +129,7 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+        { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -164,8 +164,8 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
-        { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
+        { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
+        { agency: agency2, roles: ["to-review"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {},
@@ -191,7 +191,7 @@ describe("reject IcUser for agency", () => {
 
     expectToEqual(uow.userRepository.agencyRightsByUserId, {
       [icUser.id]: [
-        { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
+        { agency: agency2, roles: ["to-review"], isNotifiedByEmail: false },
       ],
       [backofficeAdminUser.id]: [],
     });

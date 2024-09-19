@@ -80,12 +80,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
     agencyRights: [
       {
         agency: agencyWithoutCounsellorEmail,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       },
     ],
@@ -165,12 +165,12 @@ const makeUserIdMapInclusionConnectedUser: Record<
     agencyRights: [
       {
         agency: agencyWithoutCounsellorEmail,
-        roles: ["agencyAdmin"],
+        roles: ["agency-admin"],
         isNotifiedByEmail: false,
       },
       {
         agency: agencyWithCounsellorEmails,
-        roles: ["agencyAdmin"],
+        roles: ["agency-admin"],
         isNotifiedByEmail: false,
       },
     ],
@@ -607,7 +607,7 @@ export const rejectStatusTransitionTests = ({
           if (user.email === establishmentRepEmail)
             return ["establishment-representative"];
 
-          if (user.isBackofficeAdmin) return ["backOffice"];
+          if (user.isBackofficeAdmin) return ["back-office"];
 
           return (
             user.agencyRights.find(
@@ -730,7 +730,7 @@ const defineRolesForTest = (
     return ["establishment-representative"];
 
   if (testAcceptNewStatusParams.userId === "icUserWithRoleBackofficeAdmin")
-    return ["backOffice"];
+    return ["back-office"];
 
   const roles =
     makeUserIdMapInclusionConnectedUser[
@@ -754,8 +754,8 @@ export const agencyRolesEmptyOrContainsToReviewOrAgencyAdmin = (
   roles: (AgencyRole | Role)[],
 ): roles is ExcludeFromExisting<
   AgencyRole | Role,
-  "toReview" | "agencyAdmin"
+  "to-review" | "agency-admin"
 >[] =>
   roles.length === 0 ||
-  roles.includes("toReview") ||
-  roles.includes("agencyAdmin");
+  roles.includes("to-review") ||
+  roles.includes("agency-admin");

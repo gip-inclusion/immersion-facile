@@ -123,8 +123,8 @@ export const ConventionManageActions = ({
     allowedToSignStatuses.includes(convention.status);
 
   const requesterRoles = roles.filter(
-    (role): role is ExcludeFromExisting<Role, "agencyAdmin"> =>
-      role !== "agencyAdmin",
+    (role): role is ExcludeFromExisting<Role, "agency-admin"> =>
+      role !== "agency-admin",
   );
 
   return (
@@ -292,7 +292,7 @@ export const ConventionManageActions = ({
                   jwtParams.jwt,
                 );
                 const isConventionMagicLinkJwt =
-                  "role" in payload && payload.role !== "backOffice";
+                  "role" in payload && payload.role !== "back-office";
                 return routes
                   .conventionDocument({
                     jwt: isConventionMagicLinkJwt ? jwtParams.jwt : undefined,

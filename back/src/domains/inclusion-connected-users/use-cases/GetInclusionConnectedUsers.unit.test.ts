@@ -20,7 +20,7 @@ const johnWithAgenciesToReview: InclusionConnectedUser = {
   lastName: "Lennon",
   createdAt: new Date().toISOString(),
   agencyRights: [
-    { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+    { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
     { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
   ],
   dashboards: {
@@ -80,7 +80,7 @@ describe("GetInclusionConnectedUsers", () => {
 
   it("throws Unauthorized if no jwt token provided", async () => {
     await expectPromiseToFailWithError(
-      getInclusionConnectedUsers.execute({ agencyRole: "toReview" }),
+      getInclusionConnectedUsers.execute({ agencyRole: "to-review" }),
       errors.user.unauthorized(),
     );
   });
@@ -90,7 +90,7 @@ describe("GetInclusionConnectedUsers", () => {
 
     await expectPromiseToFailWithError(
       getInclusionConnectedUsers.execute(
-        { agencyRole: "toReview" },
+        { agencyRole: "to-review" },
         notBackofficeAdminUser,
       ),
       errors.user.forbidden({ userId: notBackofficeAdminUser.id }),
@@ -104,7 +104,7 @@ describe("GetInclusionConnectedUsers", () => {
       backofficeAdminUser,
     ]);
     const users = await getInclusionConnectedUsers.execute(
-      { agencyRole: "toReview" },
+      { agencyRole: "to-review" },
       backofficeAdminUser,
     );
 

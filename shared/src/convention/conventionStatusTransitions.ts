@@ -61,11 +61,11 @@ export const statusTransitionConfigs: Record<
       "IN_REVIEW",
       "ACCEPTED_BY_COUNSELLOR",
     ],
-    validRoles: ["counsellor", "validator", "backOffice"],
+    validRoles: ["counsellor", "validator", "back-office"],
   },
   CANCELLED: {
     validInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
-    validRoles: ["validator", "backOffice"],
+    validRoles: ["validator", "back-office"],
   },
   // This enables the "require modifications" flow. The agents can put the request
   // back in the draft state for the beneficiary to modify the request and reapply.
@@ -80,7 +80,7 @@ export const statusTransitionConfigs: Record<
     validRoles: [
       "counsellor",
       "validator",
-      "backOffice",
+      "back-office",
       ...validSignatoryRoles,
     ],
     refine: (conventionRead) => {
@@ -99,6 +99,6 @@ export const statusTransitionConfigs: Record<
       "READY_TO_SIGN",
       "DRAFT",
     ],
-    validRoles: ["counsellor", "validator", "backOffice"],
+    validRoles: ["counsellor", "validator", "back-office"],
   },
 };

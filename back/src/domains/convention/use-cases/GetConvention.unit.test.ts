@@ -59,7 +59,7 @@ describe("Get Convention", () => {
           firstName: "John",
           lastName: "Doe",
           agencyRights: [
-            { roles: ["toReview"], agency, isNotifiedByEmail: false },
+            { roles: ["to-review"], agency, isNotifiedByEmail: false },
           ],
           dashboards: { agencies: {}, establishments: {} },
           externalId: "john-external-id",

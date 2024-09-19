@@ -354,9 +354,9 @@ describe("Admin router", () => {
   describe(`${displayRouteName(
     adminRoutes.getInclusionConnectedUsers,
   )} List inclusion connected user`, () => {
-    it("200 - Gets the list of connected users with role 'toReview'", async () => {
+    it("200 - Gets the list of connected users with role 'to-review'", async () => {
       const response = await sharedRequest.getInclusionConnectedUsers({
-        queryParams: { agencyRole: "toReview" },
+        queryParams: { agencyRole: "to-review" },
         headers: { authorization: token },
       });
       expectHttpResponseToEqual(response, {
@@ -367,7 +367,7 @@ describe("Admin router", () => {
 
     it("401 - missing token", async () => {
       const response = await sharedRequest.getInclusionConnectedUsers({
-        queryParams: { agencyRole: "toReview" },
+        queryParams: { agencyRole: "to-review" },
         headers: { authorization: "" },
       });
       expectHttpResponseToEqual(response, {
@@ -380,7 +380,7 @@ describe("Admin router", () => {
   describe(`${displayRouteName(
     adminRoutes.updateUserRoleForAgency,
   )} Update user role for agency`, () => {
-    it("201 - Updates role of user from 'toReview' to 'counsellor' for given agency", async () => {
+    it("201 - Updates role of user from 'to-review' to 'counsellor' for given agency", async () => {
       const agency = new AgencyDtoBuilder()
         .withId("two-steps-validation-agency")
         .withCounsellorEmails(["fake-email@gmail.com"])
@@ -391,7 +391,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
@@ -435,7 +435,7 @@ describe("Admin router", () => {
       });
     });
 
-    it("400 - when trying to Update role of user from 'toReview' to 'counsellor' for agency that have only one step validation", async () => {
+    it("400 - when trying to Update role of user from 'to-review' to 'counsellor' for agency that have only one step validation", async () => {
       const agency = new AgencyDtoBuilder().build();
       const inclusionConnectedUser: InclusionConnectedUser = {
         id: "my-user-id",
@@ -443,7 +443,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
@@ -489,7 +489,7 @@ describe("Admin router", () => {
 
       expectObjectsToMatch(inMemoryUow.userRepository.agencyRightsByUserId, {
         [inclusionConnectedUser.id]: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
       });
     });
@@ -520,7 +520,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
@@ -563,7 +563,7 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",

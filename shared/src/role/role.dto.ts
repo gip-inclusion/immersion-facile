@@ -13,9 +13,9 @@ export const allRoles = [
   "establishment-tutor",
   "counsellor",
   "validator",
-  "backOffice",
-  "agencyAdmin",
-  "toReview",
+  "back-office",
+  "agency-admin",
+  "to-review",
   "agency-viewer",
 ] as const;
 
@@ -41,7 +41,7 @@ export const allModifierRoles = [
 ] as const;
 
 export const getRequesterRole = (roles: Role[]): Role => {
-  if (roles.includes("backOffice")) return "backOffice";
+  if (roles.includes("back-office")) return "back-office";
   if (roles.includes("validator")) return "validator";
   if (roles.includes("counsellor")) return "counsellor";
   return roles[0];

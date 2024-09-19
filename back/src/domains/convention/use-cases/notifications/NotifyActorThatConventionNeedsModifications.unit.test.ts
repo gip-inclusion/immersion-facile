@@ -149,7 +149,7 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
         requesterName: agency.name,
       },
       {
-        requesterRole: "backOffice",
+        requesterRole: "back-office",
         modifierRole: "beneficiary",
         email: [convention.signatories.beneficiary.email],
         requesterName: "L'équipe Immersion Facilitée",

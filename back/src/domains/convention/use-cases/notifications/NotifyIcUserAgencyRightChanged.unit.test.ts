@@ -99,7 +99,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       },
       agencyRights: [
         {
-          roles: ["toReview"],
+          roles: ["to-review"],
           agency,
           isNotifiedByEmail: false,
         },
@@ -151,7 +151,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     uow.userRepository.setInclusionConnectedUsers([icUser]);
 
     await notifyIcUserAgencyRightChanged.execute({
-      roles: ["toReview"],
+      roles: ["to-review"],
       agencyId: "agency-1",
       userId: icUser.id,
       isNotifiedByEmail: false,

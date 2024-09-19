@@ -226,7 +226,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     convention: ConventionDto,
   ): Promise<Role[]> {
     const roles: Role[] = [];
-    if (user.isBackofficeAdmin) roles.push("backOffice");
+    if (user.isBackofficeAdmin) roles.push("back-office");
 
     if (user.email === convention.signatories.establishmentRepresentative.email)
       roles.push("establishment-representative");
