@@ -46,11 +46,9 @@ export const EstablishmentDashboardPage = ({
       tabId: "conventions",
       content: (
         <>
-          {conventions?.role === "establishment-representative" && (
-            <ManageConventionFormSection
-              routeNameToRedirectTo={"manageConventionInclusionConnected"}
-            />
-          )}
+          <ManageConventionFormSection
+            routeNameToRedirectTo={"manageConventionInclusionConnected"}
+          />
           {conventions ? (
             <MetabaseView
               title={`Tableau des conventions en cours
