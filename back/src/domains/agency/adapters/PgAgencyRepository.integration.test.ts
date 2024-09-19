@@ -6,6 +6,7 @@ import {
   WithAcquisition,
   activeAgencyStatuses,
   errors,
+  expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
   miniStageAgencyKinds,
@@ -13,6 +14,7 @@ import {
 import { ConflictError } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import {
   PgAgencyRepository,
   safirConflictErrorMessage,
@@ -75,6 +77,7 @@ const agencyWithRefersTo = agency2builder
 describe("PgAgencyRepository", () => {
   let pool: Pool;
   let agencyRepository: PgAgencyRepository;
+  let userRepository: PgUserRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
@@ -96,6 +99,7 @@ describe("PgAgencyRepository", () => {
     await db.deleteFrom("users").execute();
 
     agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
+    userRepository = new PgUserRepository(makeKyselyDb(pool));
   });
 
   describe("getById", () => {
@@ -599,6 +603,80 @@ describe("PgAgencyRepository", () => {
         status: "rejected",
         rejectionJustification: "justification du rejet",
       });
+    });
+
+    it("switch the counsellor to validator", async () => {
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+      const agencyWithTwoStepValidation = agency1builder
+        .withCounsellorEmails(["counsellor@email.fr"])
+        .withValidatorEmails(["validator@email.fr"])
+        .withStatus("active")
+        .build();
+
+      await agencyRepository.insert(agencyWithTwoStepValidation);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
+      const users = await userRepository.getWithFilter({
+        agencyId: agencyWithTwoStepValidation.id,
+      });
+      const counsellor = users.find(
+        (user) => user.email === "counsellor@email.fr",
+      );
+      const validator = users.find(
+        (user) => user.email === "validator@email.fr",
+      );
+      expect(users).toHaveLength(2);
+      expectArraysToEqualIgnoringOrder(users, [
+        {
+          ...validator,
+          agencyRights: [
+            {
+              agency: agencyWithTwoStepValidation,
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          ],
+        },
+        {
+          ...counsellor,
+          agencyRights: [
+            {
+              agency: agencyWithTwoStepValidation,
+              roles: ["counsellor"],
+              isNotifiedByEmail: true,
+            },
+          ],
+        },
+      ]);
+
+      await agencyRepository.update({
+        id: agencyWithTwoStepValidation.id,
+        validatorEmails: ["counsellor@email.fr"], // the counsellor becomes a validator
+        counsellorEmails: [],
+      });
+      const updatedUsers = await userRepository.getWithFilter({
+        agencyId: agencyWithTwoStepValidation.id,
+      });
+      const expectedUpdatedAgency: AgencyDto = {
+        ...agencyWithTwoStepValidation,
+        validatorEmails: ["counsellor@email.fr"],
+        counsellorEmails: [],
+      };
+      expectArraysToEqualIgnoringOrder(await agencyRepository.getAgencies({}), [
+        expectedUpdatedAgency,
+      ]);
+      expect(updatedUsers).toHaveLength(1);
+      expectArraysToEqualIgnoringOrder(updatedUsers, [
+        {
+          ...counsellor,
+          agencyRights: [
+            {
+              agency: expectedUpdatedAgency,
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          ],
+        },
+      ]);
     });
   });
 

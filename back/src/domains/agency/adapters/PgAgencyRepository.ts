@@ -324,7 +324,18 @@ export class PgAgencyRepository implements AgencyRepository {
         .where("is_notified_by_email", "=", true)
         .where("agency_id", "=", agency.id)
         .execute();
+    }
 
+    if (agency.counsellorEmails) {
+      await this.transaction
+        .deleteFrom("users__agencies")
+        .where(usersAgenciesRolesIncludeCounsellor)
+        .where("is_notified_by_email", "=", true)
+        .where("agency_id", "=", agency.id)
+        .execute();
+    }
+
+    if (agency.validatorEmails) {
       await Promise.all(
         agency.validatorEmails.map(async (email) =>
           this.#addUserAndAgencyRights(
@@ -339,13 +350,6 @@ export class PgAgencyRepository implements AgencyRepository {
     }
 
     if (agency.counsellorEmails) {
-      await this.transaction
-        .deleteFrom("users__agencies")
-        .where(usersAgenciesRolesIncludeCounsellor)
-        .where("is_notified_by_email", "=", true)
-        .where("agency_id", "=", agency.id)
-        .execute();
-
       await Promise.all(
         agency.counsellorEmails.map(async (email) =>
           this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
