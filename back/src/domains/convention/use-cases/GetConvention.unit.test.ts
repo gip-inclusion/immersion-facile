@@ -24,6 +24,17 @@ describe("Get Convention", () => {
     .withValidatorEmails(["validator@mail.fr"])
     .build();
   const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
+  const conventionWithEstablishmentTutor = new ConventionDtoBuilder()
+    .withAgencyId(agency.id)
+    .withEstablishmentTutor({
+      email: "establishment-tutor@mail.fr",
+      firstName: "John",
+      lastName: "Doe",
+      role: "establishment-tutor",
+      phone: "+33602010203",
+      job: "Job",
+    })
+    .build();
   let getConvention: GetConvention;
   let uow: InMemoryUnitOfWork;
 
@@ -248,6 +259,42 @@ describe("Get Convention", () => {
 
         expectToEqual(fetchedConvention, {
           ...convention,
+          agencyName: agency.name,
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencySiret: agency.agencySiret,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+        });
+      });
+
+      it("that establishment tutor is also the inclusion connected user", async () => {
+        uow.conventionRepository.setConventions([
+          conventionWithEstablishmentTutor,
+        ]);
+        const user: InclusionConnectedUser = {
+          id: "my-tutor-user-id",
+          email: conventionWithEstablishmentTutor.establishmentTutor.email,
+          firstName: "John",
+          lastName: "Doe",
+          agencyRights: [],
+          dashboards: { agencies: {}, establishments: {} },
+          externalId: "john-tutor-external-id",
+          createdAt: new Date().toISOString(),
+        };
+        uow.userRepository.setInclusionConnectedUsers([user]);
+
+        const jwtPayload: InclusionConnectDomainJwtPayload = {
+          userId: user.id,
+        };
+
+        const fetchedConvention = await getConvention.execute(
+          { conventionId: conventionWithEstablishmentTutor.id },
+          jwtPayload,
+        );
+
+        expectToEqual(fetchedConvention, {
+          ...conventionWithEstablishmentTutor,
           agencyName: agency.name,
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,
