@@ -4,9 +4,9 @@ import {
   InclusionConnectedUser,
   User,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { SignatoryRole } from "../role/role.dto";
+import { EstablishmentRole } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
-import { ExcludeFromExisting, ExtractFromExisting } from "../utils";
+import { ExcludeFromExisting } from "../utils";
 
 export type AuthenticateWithInclusionCodeConnectParams = WithSourcePage & {
   code: string;
@@ -26,7 +26,7 @@ export type AuthenticatedUserQueryParams = {
 
 type InclusionConnectConventionManageAllowedRole =
   | ExcludeFromExisting<AgencyRole, "toReview">
-  | ExtractFromExisting<SignatoryRole, "establishment-representative">
+  | EstablishmentRole
   | "backOffice";
 
 export const getIcUserRoleForAccessingConvention = (
@@ -37,6 +37,8 @@ export const getIcUserRoleForAccessingConvention = (
   if (user.isBackofficeAdmin) roles.push("backOffice");
   if (convention.signatories.establishmentRepresentative.email === user.email)
     roles.push("establishment-representative");
+  if (convention.establishmentTutor.email === user.email)
+    roles.push("establishment-tutor");
   const agencyRight = user.agencyRights.find(
     (agencyRight) => agencyRight.agency.id === convention.agencyId,
   );
