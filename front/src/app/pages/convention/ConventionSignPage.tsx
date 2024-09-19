@@ -8,7 +8,7 @@ import {
   SignatoryRole,
   allSignatoryRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
-  immersionFacileContactEmail,
+  errors,
   isSignatory,
 } from "shared";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
@@ -17,7 +17,6 @@ import { P, match } from "ts-pattern";
 import { Route } from "type-route";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
-import { commonContent } from "../../contents/commonContent";
 import { useConventionTexts } from "../../contents/forms/convention/textSetup";
 import { useConvention } from "../../hooks/convention.hooks";
 import { useExistingSiret } from "../../hooks/siret.hooks";
@@ -40,45 +39,28 @@ const useClearConventionOnUnmount = () => {
 
 export const ConventionSignPage = ({ route }: ConventionSignPageProperties) => {
   useClearConventionOnUnmount();
+  if (!route.params.jwt) throw errors.routeParams.missingJwt();
+  if (
+    !isSignatory(
+      decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+        route.params.jwt,
+      ).role,
+    )
+  )
+    throw errors.user.notConventionSignatory();
   return (
     <HeaderFooterLayout>
-      {!route.params.jwt ? (
-        <SignPageLayout>
-          <Alert
-            title={commonContent.invalidLinkNotification.title}
-            severity="error"
-            description={commonContent.invalidLinkNotification.details}
-          />
-        </SignPageLayout>
-      ) : (
-        <>
-          {isSignatory(
-            decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-              route.params.jwt,
-            ).role,
-          ) ? (
-            <ConventionSignPageContent jwt={route.params.jwt} />
-          ) : (
-            <SignPageLayout>
-              <Alert
-                title={commonContent.incorrectUserNotification.title}
-                severity="error"
-                description={
-                  <>
-                    <p>{commonContent.incorrectUserNotification.detail}</p>
-                    <p>
-                      {commonContent.incorrectUserNotification.contact}{" "}
-                      <a href={`mailto:${immersionFacileContactEmail}`}>
-                        {immersionFacileContactEmail}
-                      </a>
-                    </p>
-                  </>
-                }
-              />
-            </SignPageLayout>
-          )}
-        </>
-      )}
+      <div
+        className={fr.cx(
+          "fr-grid-row",
+          "fr-grid-row--center",
+          "fr-grid-row--gutters",
+        )}
+      >
+        <div className={fr.cx("fr-col-lg-8", "fr-p-2w")}>
+          <ConventionSignPageContent jwt={route.params.jwt} />
+        </div>
+      </div>
     </HeaderFooterLayout>
   );
 };
@@ -154,7 +136,7 @@ const ConventionSignPageContent = ({
           <Alert
             severity="error"
             title="Convention introuvable"
-            description={commonContent.conventionNotFound}
+            description={errors.convention.notFound({ conventionId }).message}
           />
         ))
         .with(
@@ -239,19 +221,3 @@ const extractRole = (jwt: string): SignatoryRole => {
     `Only ${allSignatoryRoles.join(", ")} are allow to sign, received ${role}`,
   );
 };
-
-const SignPageLayout = ({
-  children,
-}: {
-  children: React.ReactElement;
-}): JSX.Element => (
-  <div
-    className={fr.cx(
-      "fr-grid-row",
-      "fr-grid-row--center",
-      "fr-grid-row--gutters",
-    )}
-  >
-    <div className={fr.cx("fr-col-lg-8", "fr-p-2w")}>{children}</div>
-  </div>
-);

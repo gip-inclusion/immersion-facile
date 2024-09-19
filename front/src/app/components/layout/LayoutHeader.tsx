@@ -6,7 +6,6 @@ import React from "react";
 import { ButtonWithSubMenu, MaintenanceCallout } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
-import { commonContent } from "src/app/contents/commonContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -287,7 +286,7 @@ export const LayoutHeader = () => {
           message={
             enableMaintenance.value.message !== ""
               ? enableMaintenance.value.message
-              : commonContent.maintenanceMessage
+              : "⚠️ Le site est actuellement en maintenance. Il est possible que le service soit dégradé. Nous vous prions de nous excuser pour la gêne occasionnée."
           }
           level={enableMaintenance.value.severity}
         />

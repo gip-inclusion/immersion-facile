@@ -324,6 +324,10 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur '${userId}' n'est pas administrateur Immersion Facilitée.`,
       ),
+    notConventionSignatory: () =>
+      new ForbiddenError(
+        "Seul les signataires peuvent signer la convention. Le lien que vous avez utilisé ne vous permet pas de signer la convention.",
+      ),
     conflictByEmail: ({ userEmail }: { userEmail: Email }) =>
       new ConflictError(
         `L'utilisateur ayant le mail ${userEmail} existe déjà.`,
@@ -456,6 +460,10 @@ export const errors = {
       new BadRequestError(`Province ${province} not foundaaaaaaaaaa`),
   },
   routeParams: {
+    missingJwt: () =>
+      new BadRequestError(
+        "La page que vous avez atteint n'est n'est pas valide : aucun jeton d'authentification fourni.",
+      ),
     malformedJson: ({ paramName }: { paramName: string }) =>
       new BadRequestError(
         `Il semble que le paramètre d'URL '${paramName}' est incorrect : vous n'avez probablement pas copié-collé le lien correctement.`,
