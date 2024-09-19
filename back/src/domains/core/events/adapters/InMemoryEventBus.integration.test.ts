@@ -6,6 +6,7 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { createGetAppellationsByCode } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createPgUow } from "../../unit-of-work/adapters/createPgUow";
@@ -51,7 +52,9 @@ describe("when simulating that an event has failed to force re-run it only for o
     timeGateway = new CustomTimeGateway();
     eventBus = new InMemoryEventBus(
       timeGateway,
-      new InMemoryUowPerformer(createPgUow(db)),
+      new InMemoryUowPerformer(
+        createPgUow(db, createGetAppellationsByCode(db)),
+      ),
     );
     outboxRepository = new PgOutboxRepository(db);
   });

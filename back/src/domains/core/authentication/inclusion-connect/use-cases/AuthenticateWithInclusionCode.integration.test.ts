@@ -10,6 +10,7 @@ import {
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
+import { createGetAppellationsByCode } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { defaultFlags } from "../../../feature-flags/adapters/InMemoryFeatureFlagRepository";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
@@ -46,11 +47,13 @@ describe("AuthenticateWithInclusionCode use case", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
-    uow = createPgUow(db);
+    uow = createPgUow(db, createGetAppellationsByCode(db));
     const uuidGenerator = new UuidV4Generator();
     inclusionConnectGateway = new InMemoryOAuthGateway(fakeProviderConfig);
     authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
-      new PgUowPerformer(db, createPgUow),
+      new PgUowPerformer(db, (db) =>
+        createPgUow(db, createGetAppellationsByCode(db)),
+      ),
       makeCreateNewEvent({
         timeGateway: new CustomTimeGateway(),
         uuidGenerator,

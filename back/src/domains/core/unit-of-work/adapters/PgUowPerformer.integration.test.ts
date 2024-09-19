@@ -5,6 +5,7 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { createGetAppellationsByCode } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
@@ -28,7 +29,9 @@ describe("PgUowPerformer", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
-    pgUowPerformer = new PgUowPerformer(db, createPgUow);
+    pgUowPerformer = new PgUowPerformer(db, (db) =>
+      createPgUow(db, createGetAppellationsByCode(db)),
+    );
   });
 
   beforeEach(async () => {

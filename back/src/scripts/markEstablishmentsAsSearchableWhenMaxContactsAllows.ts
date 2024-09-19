@@ -2,7 +2,10 @@ import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
-import { PgEstablishmentAggregateRepository } from "../domains/establishment/adapters/PgEstablishmentAggregateRepository";
+import {
+  PgEstablishmentAggregateRepository,
+  createGetAppellationsByCode,
+} from "../domains/establishment/adapters/PgEstablishmentAggregateRepository";
 import { MarkEstablishmentsAsSearchableScript } from "../domains/establishment/use-cases/MarkEstablishmentsAsSearchableScript";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
@@ -15,8 +18,9 @@ const startScript = async () => {
     connectionString: dbUrl,
   });
 
+  const db = makeKyselyDb(pool);
   const establishmentAggregateRepository =
-    new PgEstablishmentAggregateRepository(makeKyselyDb(pool));
+    new PgEstablishmentAggregateRepository(db, createGetAppellationsByCode(db));
 
   const markAsSearchableScript = new MarkEstablishmentsAsSearchableScript(
     establishmentAggregateRepository,

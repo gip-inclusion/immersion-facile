@@ -21,7 +21,10 @@ import {
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
-import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
+import {
+  PgEstablishmentAggregateRepository,
+  createGetAppellationsByCode,
+} from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import {
   ContactEntityBuilder,
   EstablishmentAggregateBuilder,
@@ -258,8 +261,10 @@ describe("PgAuthenticatedUserRepository", () => {
             .withContact(contact2)
             .build();
 
-          const establishmentRepository =
-            new PgEstablishmentAggregateRepository(db);
+      const establishmentRepository = new PgEstablishmentAggregateRepository(
+        db,
+        createGetAppellationsByCode(db),
+      );
 
           await establishmentRepository.insertEstablishmentAggregate(
             establishment1,

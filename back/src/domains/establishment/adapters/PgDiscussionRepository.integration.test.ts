@@ -19,7 +19,10 @@ import {
 } from "../helpers/EstablishmentBuilders";
 import { HasDiscussionMatchingParams } from "../ports/DiscussionRepository";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
-import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
+import {
+  PgEstablishmentAggregateRepository,
+  createGetAppellationsByCode,
+} from "./PgEstablishmentAggregateRepository";
 
 const styliste: AppellationAndRomeDto = {
   romeCode: "B1805",
@@ -53,7 +56,10 @@ describe("PgDiscussionRepository", () => {
     await db.deleteFrom("discussions").execute();
     await db.deleteFrom("exchanges").execute();
     pgDiscussionRepository = new PgDiscussionRepository(db);
-    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
+    establishmentAggregateRepo = new PgEstablishmentAggregateRepository(
+      db,
+      createGetAppellationsByCode(db),
+    );
   });
 
   afterAll(async () => {

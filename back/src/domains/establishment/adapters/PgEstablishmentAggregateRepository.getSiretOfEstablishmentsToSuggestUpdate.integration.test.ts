@@ -7,7 +7,10 @@ import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgOutboxRepository } from "../../core/events/adapters/PgOutboxRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
-import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
+import {
+  PgEstablishmentAggregateRepository,
+  createGetAppellationsByCode,
+} from "./PgEstablishmentAggregateRepository";
 
 describe("PgScriptsQueries", () => {
   let pool: Pool;
@@ -23,6 +26,7 @@ describe("PgScriptsQueries", () => {
     pgNotificationRepository = new PgNotificationRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       db,
+      createGetAppellationsByCode(db),
     );
   });
 

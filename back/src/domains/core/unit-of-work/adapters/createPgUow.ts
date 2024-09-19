@@ -10,7 +10,10 @@ import { PgConventionsToSyncRepository } from "../../../convention/adapters/PgCo
 import { PgNpsRepository } from "../../../convention/adapters/PgNpsRepository";
 import { PgDeletedEstablishmentRepository } from "../../../establishment/adapters/PgDeletedEstablishmentRepository";
 import { PgDiscussionRepository } from "../../../establishment/adapters/PgDiscussionRepository";
-import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
+import {
+  GetAppellationsByCode,
+  PgEstablishmentAggregateRepository,
+} from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { PgEstablishmentLeadQueries } from "../../../establishment/adapters/PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "../../../establishment/adapters/PgEstablishmentLeadRepository";
 import { PgFormEstablishmentRepository } from "../../../establishment/adapters/PgFormEstablishmentRepository";
@@ -31,7 +34,10 @@ import { PgShortLinkRepository } from "../../short-link/adapters/short-link-repo
 import { PgStatisticQueries } from "../../statistics/adapters/PgStatisticQueries";
 import { UnitOfWork } from "../ports/UnitOfWork";
 
-export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
+export const createPgUow = (
+  transaction: KyselyDb,
+  getAppellationsByCode: GetAppellationsByCode,
+): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(transaction);
   return {
     agencyRepository: new PgAgencyRepository(transaction),
@@ -56,6 +62,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     ),
     establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
       transaction,
+      getAppellationsByCode,
     ),
     establishmentLeadRepository: new PgEstablishmentLeadRepository(transaction),
     establishmentLeadQueries: new PgEstablishmentLeadQueries(transaction),

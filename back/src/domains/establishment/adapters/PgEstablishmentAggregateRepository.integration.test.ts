@@ -31,7 +31,11 @@ import {
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
-import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
+import {
+  GetAppellationsByCode,
+  PgEstablishmentAggregateRepository,
+  createGetAppellationsByCode,
+} from "./PgEstablishmentAggregateRepository";
 import {
   makeExpectedSearchResult,
   sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
@@ -43,9 +47,12 @@ describe("PgEstablishmentAggregateRepository", () => {
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
   let pgDiscussionRepository: PgDiscussionRepository;
 
+  let getAppellationsByCode: GetAppellationsByCode;
+
   beforeAll(() => {
     pool = getTestPgPool();
     kyselyDb = makeKyselyDb(pool);
+    getAppellationsByCode = createGetAppellationsByCode(kyselyDb);
   });
 
   beforeEach(async () => {
@@ -58,6 +65,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       kyselyDb,
+      getAppellationsByCode,
     );
     pgDiscussionRepository = new PgDiscussionRepository(kyselyDb);
   });

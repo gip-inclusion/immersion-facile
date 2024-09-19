@@ -14,7 +14,10 @@ import {
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
-import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
+import {
+  PgEstablishmentAggregateRepository,
+  createGetAppellationsByCode,
+} from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { PgStatisticQueries } from "./PgStatisticQueries";
 
@@ -37,6 +40,7 @@ describe("PgStatisticQueries", () => {
     pgAgencyRepository = new PgAgencyRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       db,
+      createGetAppellationsByCode(db),
     );
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();

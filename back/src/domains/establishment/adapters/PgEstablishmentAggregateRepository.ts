@@ -49,7 +49,12 @@ const MAX_RESULTS_HARD_LIMIT = 100;
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
-  constructor(private transaction: KyselyDb) {}
+  constructor(
+    private transaction: KyselyDb,
+    private getAppellationsByCode: () => Promise<
+      Record<AppellationCode, AppellationAndRomeDto>
+    >,
+  ) {}
 
   public async getAllEstablishmentAggregates(): Promise<
     EstablishmentAggregate[]
@@ -322,7 +327,7 @@ export class PgEstablishmentAggregateRepository
         ? pick(["lat", "lon", "distanceKm"], searchMade)
         : undefined;
 
-    const results = await searchImmersionResultsQuery(this.transaction, {
+    const results = await this.searchImmersionResultsQuery({
       limit:
         maxResults && maxResults < MAX_RESULTS_HARD_LIMIT
           ? maxResults
@@ -339,14 +344,37 @@ export class PgEstablishmentAggregateRepository
       sortedBy: searchMade.sortedBy ?? "date",
     });
 
+    const appellationsByCode = await this.getAppellationsByCode();
+
     return results.map(
-      ({ search_immersion_result }): SearchImmersionResult => ({
-        ...(search_immersion_result as SearchImmersionResult),
-        nextAvailabilityDate: search_immersion_result.nextAvailabilityDate
-          ? new Date(search_immersion_result.nextAvailabilityDate).toISOString()
-          : undefined,
-        customizedName: search_immersion_result.customizedName ?? undefined,
-      }),
+      ({
+        search_immersion_result: {
+          appellationsCodeAndScore,
+          ...searchImmersionResult
+        },
+      }): SearchImmersionResult => {
+        const appellations = appellationsCodeAndScore.map(
+          ({ appellationCode, score }) => ({
+            score,
+            appellationCode,
+            appellationLabel:
+              appellationsByCode[appellationCode].appellationLabel,
+          }),
+        );
+
+        return {
+          ...(searchImmersionResult as SearchImmersionResult),
+          appellations,
+          romeLabel:
+            // biome-ignore lint/style/noNonNullAssertion: <explanation>
+            appellationsByCode[appellationsCodeAndScore[0]!.appellationCode]
+              .romeLabel,
+          nextAvailabilityDate: searchImmersionResult.nextAvailabilityDate
+            ? new Date(searchImmersionResult.nextAvailabilityDate).toISOString()
+            : undefined,
+          customizedName: searchImmersionResult.customizedName ?? undefined,
+        };
+      },
     );
   }
 
@@ -807,64 +835,8 @@ export class PgEstablishmentAggregateRepository
       )
       .execute();
   }
-}
 
-const offersEqual = (a: OfferEntity, b: OfferEntity) =>
-  // Only compare romeCode and appellationCode
-  a.appellationCode === b.appellationCode;
-
-const objectsDeepEqual = <T>(a: T, b: T) =>
-  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here
-
-const establishmentsEqual = (
-  a: EstablishmentEntity,
-  b: EstablishmentEntity,
-) => {
-  // Ignore key updatedAt
-  const { updatedAt: _unusedUpdatedAtA, ...establishmentAWithoutUpdatedAt } = a;
-  const { updatedAt: _unusedUpdatedAtB, ...establishmentBWithoutUpdatedAt } = b;
-
-  return objectsDeepEqual(
-    establishmentAWithoutUpdatedAt,
-    establishmentBWithoutUpdatedAt,
-  );
-};
-const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
-  // Ignore key id
-  const { id: _unusedIdA, ...contactAWithoutId } = a;
-  const { id: _unusedIdB, ...contactBWithoutId } = b;
-  return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
-};
-
-const makeEstablishmentAggregateFromDb = (
-  aggregate: any,
-): EstablishmentAggregate => ({
-  establishment: {
-    ...aggregate.establishment,
-    updatedAt: aggregate.establishment.updatedAt
-      ? new Date(aggregate.establishment.updatedAt)
-      : undefined,
-    createdAt: new Date(aggregate.establishment.createdAt),
-    lastInseeCheckDate: aggregate.establishment.lastInseeCheckDate
-      ? new Date(aggregate.establishment.lastInseeCheckDate)
-      : undefined,
-    voluntaryToImmersion: true,
-  },
-  offers: aggregate.immersionOffers.map(
-    (immersionOfferWithStringDate: any) => ({
-      ...immersionOfferWithStringDate,
-      createdAt: new Date(immersionOfferWithStringDate.createdAt),
-    }),
-  ),
-  contact:
-    aggregate.contact && keys(aggregate.contact).length > 0
-      ? aggregate.contact
-      : undefined,
-});
-
-const searchImmersionResultsQuery = (
-  transaction: KyselyDb,
-  {
+  async searchImmersionResultsQuery({
     filters,
     sortedBy,
     limit,
@@ -876,12 +848,11 @@ const searchImmersionResultsQuery = (
       geoParams?: GeoParams;
     };
     sortedBy: SearchSortedBy;
-  },
-) => {
-  const geoParams = filters?.geoParams;
-  const searchableBy = filters?.searchableBy;
+  }) {
+    const geoParams = filters?.geoParams;
+    const searchableBy = filters?.searchableBy;
 
-  const query = transaction
+  const query = this.transaction
     .with("filtered_results", (qb) =>
       pipeWithValue(
         qb
@@ -1051,8 +1022,62 @@ const searchImmersionResultsQuery = (
       ).as("search_immersion_result"),
     );
 
-  return query.execute();
+    return query.execute();
+  }
+}
+
+const offersEqual = (a: OfferEntity, b: OfferEntity) =>
+  // Only compare romeCode and appellationCode
+  a.appellationCode === b.appellationCode;
+
+const objectsDeepEqual = <T>(a: T, b: T) =>
+  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here
+
+const establishmentsEqual = (
+  a: EstablishmentEntity,
+  b: EstablishmentEntity,
+) => {
+  // Ignore key updatedAt
+  const { updatedAt: _unusedUpdatedAtA, ...establishmentAWithoutUpdatedAt } = a;
+  const { updatedAt: _unusedUpdatedAtB, ...establishmentBWithoutUpdatedAt } = b;
+
+  return objectsDeepEqual(
+    establishmentAWithoutUpdatedAt,
+    establishmentBWithoutUpdatedAt,
+  );
 };
+const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
+  // Ignore key id
+  const { id: _unusedIdA, ...contactAWithoutId } = a;
+  const { id: _unusedIdB, ...contactBWithoutId } = b;
+  return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
+};
+
+const makeEstablishmentAggregateFromDb = (
+  aggregate: any,
+): EstablishmentAggregate => ({
+  establishment: {
+    ...aggregate.establishment,
+    updatedAt: aggregate.establishment.updatedAt
+      ? new Date(aggregate.establishment.updatedAt)
+      : undefined,
+    createdAt: new Date(aggregate.establishment.createdAt),
+    lastInseeCheckDate: aggregate.establishment.lastInseeCheckDate
+      ? new Date(aggregate.establishment.lastInseeCheckDate)
+      : undefined,
+    voluntaryToImmersion: true,
+  },
+  offers: aggregate.immersionOffers.map(
+    (immersionOfferWithStringDate: any) => ({
+      ...immersionOfferWithStringDate,
+      createdAt: new Date(immersionOfferWithStringDate.createdAt),
+    }),
+  ),
+  contact:
+    aggregate.contact && keys(aggregate.contact).length > 0
+      ? aggregate.contact
+      : undefined,
+});
 
 const makeOrderByClauses = (
   sortedBy: SearchSortedBy,
@@ -1069,4 +1094,44 @@ const makeOrderByClauses = (
     return sql`ST_Distance(loc.position,ST_GeographyFromText(${sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`})) ASC`;
 
   throw errors.establishment.invalidGeoParams();
+};
+
+export type GetAppellationsByCode = () => Promise<
+  Record<AppellationCode, AppellationAndRomeDto>
+>;
+type CreateGetAppellationsByCode = (db: KyselyDb) => GetAppellationsByCode;
+export const createGetAppellationsByCode: CreateGetAppellationsByCode = (
+  db,
+) => {
+  const uncachedGetAppellationsByCode: GetAppellationsByCode = async () => {
+    const appellationAndRomeDto = await db
+      .selectFrom("public_appellations_data as a")
+      .innerJoin("public_romes_data as r", "r.code_rome", "a.code_rome")
+      .select([
+        sql<string>`CAST(a.ogr_appellation AS TEXT)`.as("appellationCode"),
+        "a.libelle_appellation_long as appellationLabel",
+        "r.code_rome as romeCode",
+        "r.libelle_rome as romeLabel",
+      ])
+      .execute();
+
+    const data: Record<AppellationCode, AppellationAndRomeDto> = {};
+    // for loop is preferred here for performance reasons
+    for (let i = 0; i < appellationAndRomeDto.length; i++) {
+      const appellation = appellationAndRomeDto[i];
+      data[appellation.appellationCode] = appellation;
+    }
+    return data;
+  };
+
+  let cachedAppellationsByCode: Record<
+    AppellationCode,
+    AppellationAndRomeDto
+  > | null = null;
+
+  return async () => {
+    if (cachedAppellationsByCode) return cachedAppellationsByCode;
+    cachedAppellationsByCode = await uncachedGetAppellationsByCode();
+    return cachedAppellationsByCode;
+  };
 };

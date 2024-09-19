@@ -18,7 +18,10 @@ import {
   OfferEntityBuilder,
   defaultLocation,
 } from "../helpers/EstablishmentBuilders";
-import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
+import {
+  PgEstablishmentAggregateRepository,
+  createGetAppellationsByCode,
+} from "./PgEstablishmentAggregateRepository";
 import { PgGroupRepository } from "./PgGroupRepository";
 
 const groupOptions: GroupOptions = {
@@ -62,6 +65,7 @@ describe("PgEstablishmentGroupRepository", () => {
     pgEstablishmentGroupRepository = new PgGroupRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       db,
+      createGetAppellationsByCode(db),
     );
   });
 
