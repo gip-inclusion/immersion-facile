@@ -70,7 +70,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
         userId: user.id,
         agencyRights: agencies.map((agency) => ({
           agency,
-          roles: ["toReview"],
+          roles: ["to-review"],
           isNotifiedByEmail: false,
         })),
       }),

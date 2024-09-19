@@ -12,8 +12,8 @@ export type AgencyRole = (typeof allAgencyRoles)[number];
 export const allAgencyRoles = [
   "counsellor",
   "validator",
-  "agencyAdmin",
-  "toReview",
+  "agency-admin",
+  "to-review",
   "agency-viewer",
 ] as const;
 

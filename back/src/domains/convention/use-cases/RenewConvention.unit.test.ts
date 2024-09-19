@@ -273,14 +273,14 @@ describe("RenewConvention", () => {
         {
           ...inclusionConnectedUser,
           agencyRights: [
-            { agency, roles: ["agencyAdmin"], isNotifiedByEmail: false },
+            { agency, roles: ["agency-admin"], isNotifiedByEmail: false },
           ],
         },
       ]);
       await expectPromiseToFailWithError(
         renewConvention.execute(renewConventionParams, inclusionConnectPayload),
         new ForbiddenError(
-          "The role 'agencyAdmin' is not allowed to renew convention",
+          "The role 'agency-admin' is not allowed to renew convention",
         ),
       );
     });

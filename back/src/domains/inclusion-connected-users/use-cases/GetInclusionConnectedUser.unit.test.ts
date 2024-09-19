@@ -90,7 +90,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
   const [agencyRolesAllowedToGetDashboard, agencyRolesForbiddenToGetDashboard] =
     splitCasesBetweenPassingAndFailing(allAgencyRoles, [
-      "agencyAdmin",
+      "agency-admin",
       "validator",
       "counsellor",
       "agency-viewer",
@@ -163,7 +163,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     },
   );
 
-  it("the dashboard url should not include the agency ids where role is 'toReview'", async () => {
+  it("the dashboard url should not include the agency ids where role is 'to-review'", async () => {
     const agencyBuilder = new AgencyDtoBuilder();
     const agency1 = agencyBuilder
       .withId("1111")
@@ -179,8 +179,12 @@ describe("GetUserAgencyDashboardUrl", () => {
         agencyRights: [
           { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
           { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
-          { agency: agency3, roles: ["toReview"], isNotifiedByEmail: false },
-          { agency: agency4, roles: ["agencyAdmin"], isNotifiedByEmail: false },
+          { agency: agency3, roles: ["to-review"], isNotifiedByEmail: false },
+          {
+            agency: agency4,
+            roles: ["agency-admin"],
+            isNotifiedByEmail: false,
+          },
         ],
         dashboards: { agencies: {}, establishments: {} },
       },
@@ -195,8 +199,8 @@ describe("GetUserAgencyDashboardUrl", () => {
       agencyRights: [
         { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
         { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
-        { agency: agency3, roles: ["toReview"], isNotifiedByEmail: false },
-        { agency: agency4, roles: ["agencyAdmin"], isNotifiedByEmail: false },
+        { agency: agency3, roles: ["to-review"], isNotifiedByEmail: false },
+        { agency: agency4, roles: ["agency-admin"], isNotifiedByEmail: false },
       ],
       dashboards: {
         agencies: {

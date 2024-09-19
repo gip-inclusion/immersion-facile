@@ -34,7 +34,7 @@ const agenciesNeedingReviewForSelectedUser = createSelector(
     const inclusionConnectedUser = usersNeedingReview[selectedUser.id];
     if (!inclusionConnectedUser) return [];
     return values(inclusionConnectedUser.agencyRights).filter(({ roles }) =>
-      roles.includes("toReview"),
+      roles.includes("to-review"),
     );
   },
 );
@@ -45,7 +45,7 @@ const icUsersNeedingReview = createSelector(
     values(normalizedUsers)
       .filter((user) =>
         values(user.agencyRights).some((right) =>
-          right.roles.includes("toReview"),
+          right.roles.includes("to-review"),
         ),
       )
       .map(

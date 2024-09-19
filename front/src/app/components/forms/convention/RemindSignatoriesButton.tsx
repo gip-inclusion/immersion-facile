@@ -57,7 +57,7 @@ export const isRemindingAllowed = (
   const validRemindingRoles = [
     "counsellor",
     "validator",
-    "backOffice",
+    "back-office",
     ...validSignatoryRoles,
   ];
 

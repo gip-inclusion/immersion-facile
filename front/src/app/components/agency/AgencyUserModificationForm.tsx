@@ -49,7 +49,7 @@ export const AgencyUserModificationForm = ({
 
   const onValidSubmit = () => {
     const validatedUserRoles = values.roles.filter(
-      (role) => role !== "toReview",
+      (role) => role !== "to-review",
     );
     match(mode)
       .with("add", () => {
@@ -88,7 +88,7 @@ export const AgencyUserModificationForm = ({
   }, [agencyUser, reset]);
 
   const availableRoles = keys(agencyRoleToDisplay).filter(
-    (role) => role !== "toReview",
+    (role) => role !== "to-review",
   );
   const checkboxOptions = availableRoles.map((availableRole) => {
     return {

@@ -109,7 +109,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       expectToEqual(inclusionConnectedUser, {
         ...user,
         agencyRights: [
-          { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
       });
@@ -137,8 +137,8 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       expectToEqual(inclusionConnectedUser, {
         ...user,
         agencyRights: [
-          { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
-          { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
+          { agency: agency2, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: { agencies: {}, establishments: {} },
       });

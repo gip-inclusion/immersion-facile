@@ -140,7 +140,7 @@ export const IcUserAgenciesToReview = ({
                   agencyId: selectedAgency.id,
                   userId: selectedUser.id,
                   email: selectedUser.email,
-                  roles: ["toReview"],
+                  roles: ["to-review"],
                   isIcUser: true,
                   isNotifiedByEmail: true,
                 }}

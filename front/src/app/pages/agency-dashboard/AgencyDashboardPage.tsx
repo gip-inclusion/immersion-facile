@@ -187,7 +187,7 @@ export const AgencyDashboardPage = ({
             currentUser: {
               agencyRights: P.when(
                 all((agencyRight: AgencyRight) =>
-                  agencyRight.roles.includes("toReview"),
+                  agencyRight.roles.includes("to-review"),
                 ),
               ),
             },

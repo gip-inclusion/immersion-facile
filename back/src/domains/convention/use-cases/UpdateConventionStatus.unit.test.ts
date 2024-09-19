@@ -45,7 +45,7 @@ describe("UpdateConventionStatus", () => {
         "beneficiary-current-employer",
         "counsellor",
         "validator",
-        "backOffice",
+        "back-office",
       ],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleCounsellor",
@@ -75,7 +75,7 @@ describe("UpdateConventionStatus", () => {
         "beneficiary-current-employer",
         "counsellor",
         "validator",
-        "backOffice",
+        "back-office",
       ],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleCounsellor",
@@ -452,7 +452,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionRejected",
       updatedFields: { statusJustification: "my rejection justification" },
-      allowedMagicLinkRoles: ["backOffice", "validator", "counsellor"],
+      allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleValidator",
         "icUserWithRoleCounsellor",
@@ -472,7 +472,7 @@ describe("UpdateConventionStatus", () => {
         statusJustification: "my rejection justification",
         conventionId: originalConventionId,
       },
-      allowedMagicLinkRoles: ["backOffice", "validator", "counsellor"],
+      allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleValidator",
         "icUserWithRoleCounsellor",
@@ -497,7 +497,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionCancelled",
       updatedFields: { statusJustification: "Cancelled justification" },
-      allowedMagicLinkRoles: ["validator", "backOffice"],
+      allowedMagicLinkRoles: ["validator", "back-office"],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleValidator",
         "icUserWithRoleBackofficeAdmin",
@@ -511,7 +511,7 @@ describe("UpdateConventionStatus", () => {
         statusJustification: "Cancelled justification",
         conventionId: originalConventionId,
       },
-      allowedMagicLinkRoles: ["validator", "backOffice"],
+      allowedMagicLinkRoles: ["validator", "back-office"],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleValidator",
         "icUserWithRoleBackofficeAdmin",
@@ -530,7 +530,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionDeprecated",
       updatedFields: { statusJustification: "my deprecation justification" },
-      allowedMagicLinkRoles: ["backOffice", "validator", "counsellor"],
+      allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleCounsellor",
         "icUserWithRoleValidator",

@@ -4,8 +4,8 @@ export const conventionEmailsByRole = (
   convention: ConventionDto,
   agency: AgencyDto,
 ): Record<Role, string[] | Error> => ({
-  backOffice: errors.convention.roleHasNoMagicLink({ role: "backOffice" }),
-  toReview: errors.convention.roleHasNoMagicLink({ role: "toReview" }),
+  "back-office": errors.convention.roleHasNoMagicLink({ role: "back-office" }),
+  "to-review": errors.convention.roleHasNoMagicLink({ role: "to-review" }),
   "agency-viewer": errors.convention.roleHasNoMagicLink({
     role: "agency-viewer",
   }),
@@ -25,7 +25,9 @@ export const conventionEmailsByRole = (
       }),
   counsellor: agency.counsellorEmails,
   validator: agency.validatorEmails,
-  agencyAdmin: errors.convention.roleHasNoMagicLink({ role: "agencyAdmin" }),
+  "agency-admin": errors.convention.roleHasNoMagicLink({
+    role: "agency-admin",
+  }),
   "establishment-representative": [
     convention.signatories.establishmentRepresentative.email,
   ],
@@ -39,7 +41,9 @@ export const conventionEmailsByRoleForMagicLinkRenewal = (
 ): Record<Role, string[] | Error> => {
   return {
     ...conventionEmailsByRole(convention, agency),
-    backOffice: errors.convention.roleHasNoMagicLink({ role: "backOffice" }),
+    "back-office": errors.convention.roleHasNoMagicLink({
+      role: "back-office",
+    }),
     "establishment-tutor": errors.convention.unsupportedRoleRenewMagicLink({
       role,
     }),

@@ -35,7 +35,7 @@ export const agencyRoleToDisplay: Record<
   AgencyRole,
   AgencyDisplayedRoleAndClass
 > = {
-  toReview: {
+  "to-review": {
     label: "À valider",
     className: "fr-badge--yellow-tournesol",
     description: "",
@@ -52,7 +52,7 @@ export const agencyRoleToDisplay: Record<
     description:
       "Peut pré-valider les conventions de l'agence et modifier leur statut.",
   },
-  agencyAdmin: {
+  "agency-admin": {
     label: "Administrateur",
     className: "fr-badge--green-emeraude",
     description:

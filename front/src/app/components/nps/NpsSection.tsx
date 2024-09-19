@@ -17,7 +17,7 @@ export const NpsSection = ({
   ];
   return (
     <>
-      {!roles.includes("backOffice") &&
+      {!roles.includes("back-office") &&
         npsShowStatuses.includes(convention.status) && (
           <NPSForm
             mode="embed"

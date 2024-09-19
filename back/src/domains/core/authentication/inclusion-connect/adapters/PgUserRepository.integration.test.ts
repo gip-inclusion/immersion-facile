@@ -173,7 +173,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user1.id,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser(db, {
@@ -188,7 +188,7 @@ describe("PgAuthenticatedUserRepository", () => {
         ...user1,
         establishments: [],
         agencyRights: [
-          { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
           { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
         ],
         ...withEmptyDashboards,
@@ -283,7 +283,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user1.id,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser(db, {
@@ -295,7 +295,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await insertAgencyRegistrationToUser(db, {
         agencyId: closedAgency.id,
         userId: user1.id,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser(db, {
@@ -310,7 +310,7 @@ describe("PgAuthenticatedUserRepository", () => {
         ...user1,
         establishments: [],
         agencyRights: [
-          { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
           { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
         ],
         ...withEmptyDashboards,
@@ -423,7 +423,7 @@ describe("PgAuthenticatedUserRepository", () => {
         establishments: [],
         agencyRights: [
           { agency: agency1, roles: ["validator"], isNotifiedByEmail: false },
-          { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency: agency2, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         ...withEmptyDashboards,
       };
@@ -497,7 +497,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user1.id,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       });
 
@@ -505,7 +505,7 @@ describe("PgAuthenticatedUserRepository", () => {
       expect(icUsers).toEqual([]);
     });
 
-    it("fetches Inclusion Connected Users with status 'toReview'", async () => {
+    it("fetches Inclusion Connected Users with status 'to-review'", async () => {
       await agencyRepository.insert(agency1);
       await agencyRepository.insert(agency2);
       await insertUser(db, user1);
@@ -513,7 +513,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user1.id,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser(db, {
@@ -525,12 +525,12 @@ describe("PgAuthenticatedUserRepository", () => {
       await insertAgencyRegistrationToUser(db, {
         agencyId: agency2.id,
         userId: user2.id,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       });
 
       const icUsers = await userRepository.getWithFilter({
-        agencyRole: "toReview",
+        agencyRole: "to-review",
       });
 
       expectArraysToEqualIgnoringOrder(icUsers, [
@@ -538,7 +538,7 @@ describe("PgAuthenticatedUserRepository", () => {
           ...user1,
           establishments: [],
           agencyRights: [
-            { agency: agency1, roles: ["toReview"], isNotifiedByEmail: false },
+            { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
             { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
           ],
           ...withEmptyDashboards,
@@ -547,7 +547,7 @@ describe("PgAuthenticatedUserRepository", () => {
           ...user2,
           establishments: [],
           agencyRights: [
-            { agency: agency2, roles: ["toReview"], isNotifiedByEmail: false },
+            { agency: agency2, roles: ["to-review"], isNotifiedByEmail: false },
           ],
           ...withEmptyDashboards,
         },
@@ -568,7 +568,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user2.id,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: false,
       });
       await insertAgencyRegistrationToUser(db, {
@@ -625,7 +625,7 @@ describe("PgAuthenticatedUserRepository", () => {
       await insertAgencyRegistrationToUser(db, {
         agencyId: agency1.id,
         userId: user2.id,
-        roles: ["toReview"],
+        roles: ["to-review"],
         isNotifiedByEmail: true,
       });
 

@@ -34,7 +34,7 @@ export class RenewConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload?: ConventionRelatedJwtPayload,
   ): Promise<void> {
-    const allowedRoles: Role[] = ["validator", "counsellor", "backOffice"];
+    const allowedRoles: Role[] = ["validator", "counsellor", "back-office"];
 
     if (!jwtPayload) throw errors.user.unauthorized();
 
@@ -100,7 +100,7 @@ export class RenewConvention extends TransactionalUseCase<
         `Inclusion connected user '${jwtPayload.userId}' not found.`,
       );
 
-    if (inclusionConnectedUser.isBackofficeAdmin) return ["backOffice"];
+    if (inclusionConnectedUser.isBackofficeAdmin) return ["back-office"];
 
     const agencyRight = inclusionConnectedUser.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === convention.agencyId,

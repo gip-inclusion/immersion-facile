@@ -4,9 +4,9 @@ import {
   InclusionConnectedUser,
   User,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { EstablishmentRole } from "../role/role.dto";
+import { EstablishmentRole, Role } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
-import { ExcludeFromExisting } from "../utils";
+import { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
 export type AuthenticateWithInclusionCodeConnectParams = WithSourcePage & {
   code: string;
@@ -25,16 +25,16 @@ export type AuthenticatedUserQueryParams = {
 } & Pick<User, "email" | "firstName" | "lastName">;
 
 type InclusionConnectConventionManageAllowedRole =
-  | ExcludeFromExisting<AgencyRole, "toReview">
   | EstablishmentRole
-  | "backOffice";
+  | ExtractFromExisting<Role, "back-office">
+  | ExcludeFromExisting<AgencyRole, "to-review">;
 
 export const getIcUserRoleForAccessingConvention = (
   convention: ConventionDto,
   user: InclusionConnectedUser,
 ): InclusionConnectConventionManageAllowedRole[] => {
   const roles: InclusionConnectConventionManageAllowedRole[] = [];
-  if (user.isBackofficeAdmin) roles.push("backOffice");
+  if (user.isBackofficeAdmin) roles.push("back-office");
   if (convention.signatories.establishmentRepresentative.email === user.email)
     roles.push("establishment-representative");
   if (convention.establishmentTutor.email === user.email)
@@ -51,7 +51,7 @@ export const getIcUserRoleForAccessingConvention = (
 
 export const agencyRoleIsNotToReview = (
   agencyRoles: AgencyRole[],
-): agencyRoles is ExcludeFromExisting<AgencyRole, "toReview">[] =>
-  !agencyRoles.includes("toReview");
+): agencyRoles is ExcludeFromExisting<AgencyRole, "to-review">[] =>
+  !agencyRoles.includes("to-review");
 
 export const inclusionConnectTokenExpiredMessage = "Token is expired";

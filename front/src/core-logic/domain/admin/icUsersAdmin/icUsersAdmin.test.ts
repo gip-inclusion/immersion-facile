@@ -37,7 +37,7 @@ const agency4 = new AgencyDtoBuilder().withId("agency-4").build();
 
 const agency1Right: AgencyRight = {
   agency: agency1,
-  roles: ["toReview"],
+  roles: ["to-review"],
   isNotifiedByEmail: true,
 };
 const agency2Right: AgencyRight = {
@@ -52,12 +52,12 @@ const user1AgencyRights: Record<AgencyId, AgencyRight> = {
 
 const agency3Right: AgencyRight = {
   agency: agency3,
-  roles: ["toReview"],
+  roles: ["to-review"],
   isNotifiedByEmail: true,
 };
 const agency4Right: AgencyRight = {
   agency: agency4,
-  roles: ["toReview"],
+  roles: ["to-review"],
   isNotifiedByEmail: true,
 };
 const user2AgencyRights: Record<AgencyId, AgencyRight> = {
@@ -192,7 +192,7 @@ describe("Agency registration for authenticated users", () => {
       store.dispatch(
         icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
           {
-            agencyRole: "toReview",
+            agencyRole: "to-review",
           },
         ),
       );
@@ -222,7 +222,7 @@ describe("Agency registration for authenticated users", () => {
       store.dispatch(
         icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(
           {
-            agencyRole: "toReview",
+            agencyRole: "to-review",
           },
         ),
       );
@@ -425,7 +425,7 @@ describe("Agency registration for authenticated users", () => {
           ...originalUser.agencyRights,
           [agency2.id]: {
             ...originalUser.agencyRights[agency2.id],
-            roles: ["agencyAdmin", "validator"],
+            roles: ["agency-admin", "validator"],
             isNotifiedByEmail: false,
           },
         },

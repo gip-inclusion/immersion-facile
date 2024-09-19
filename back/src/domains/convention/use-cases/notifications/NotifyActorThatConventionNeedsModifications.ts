@@ -91,7 +91,7 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
         email: recipient,
         now: this.timeGateway.now(),
         // UGLY : need to rework, handling of JWT payloads
-        ...(recipientRole === "backOffice"
+        ...(recipientRole === "back-office"
           ? { sub: this.config.backofficeUsername }
           : {}),
       };
@@ -187,11 +187,11 @@ const requesterNameByRole = (
     "establishment-representative": `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName} (le représentant légal de l'entreprise)`,
     counsellor: agency.name,
     validator: agency.name,
-    backOffice: "L'équipe Immersion Facilitée",
-    agencyAdmin: "Le responsable d'agence",
+    "back-office": "L'équipe Immersion Facilitée",
+    "agency-admin": "Le responsable d'agence",
     "establishment-tutor": new Error(wrongRequesterUser),
     "agency-viewer": new Error(wrongRequesterUser),
-    toReview: new Error(wrongRequesterUser),
+    "to-review": new Error(wrongRequesterUser),
   };
   return strategy[requesterRole];
 };

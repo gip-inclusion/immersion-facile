@@ -269,7 +269,7 @@ describe("UpdateUserForAgency", () => {
       const icUser: InclusionConnectedUser = {
         ...notAdminUser,
         agencyRights: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: {
           agencies: {},
@@ -296,7 +296,7 @@ describe("UpdateUserForAgency", () => {
       ]);
 
       const icUserRoleForAgency: UserParamsForAgency = {
-        roles: ["counsellor", "validator", "agencyAdmin"],
+        roles: ["counsellor", "validator", "agency-admin"],
         agencyId: agency.id,
         userId: notAdminUser.id,
         isNotifiedByEmail: false,
@@ -346,7 +346,7 @@ describe("UpdateUserForAgency", () => {
       const icUser: InclusionConnectedUser = {
         ...notAdminUser,
         agencyRights: [
-          { agency, roles: ["toReview"], isNotifiedByEmail: false },
+          { agency, roles: ["to-review"], isNotifiedByEmail: false },
         ],
         dashboards: {
           agencies: {},

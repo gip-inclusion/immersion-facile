@@ -111,7 +111,7 @@ export class GetConvention extends TransactionalUseCase<
     conventionId: ConventionId,
   ): authPayload is InclusionConnectJwtPayload {
     if (!("role" in authPayload)) return true;
-    if (authPayload.role === "backOffice") return false;
+    if (authPayload.role === "back-office") return false;
     if (authPayload.applicationId === conventionId) return false;
     throw new ForbiddenError(
       `This token is not allowed to access convention with id ${conventionId}. Role was '${authPayload.role}'`,

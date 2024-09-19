@@ -132,7 +132,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
         now: this.#timeGateway.now(),
         exp: this.#timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
         // UGLY : need to rework, handling of JWT payloads
-        ...(role === "backOffice"
+        ...(role === "back-office"
           ? { sub: this.#config.backofficeUsername }
           : {}),
       };
