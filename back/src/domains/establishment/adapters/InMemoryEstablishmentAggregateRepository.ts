@@ -256,12 +256,12 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation
       customizedName: establishmentAgg.establishment.customizedName,
       rome: romeCode,
       romeLabel: TEST_ROME_LABEL,
+      establishmentScore: establishmentAgg.establishment.score,
       appellations: establishmentAgg.offers
         .filter((immersionOffer) => immersionOffer.romeCode === romeCode)
         .map((immersionOffer) => ({
           appellationLabel: immersionOffer.appellationLabel,
           appellationCode: immersionOffer.appellationCode,
-          score: immersionOffer.score,
         })),
       siret: establishmentAgg.establishment.siret,
       voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
@@ -295,6 +295,7 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
   customScore?: number,
 ): SearchResultDto => ({
   rome: romeCode,
+  establishmentScore: customScore ?? establishmentAggregate.establishment.score,
   naf: establishmentAggregate.establishment.nafDto.code,
   nafLabel: establishmentAggregate.establishment.nafDto.nomenclature,
   siret: establishmentAggregate.establishment.siret,
@@ -317,7 +318,6 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
     .map((offer) => ({
       appellationCode: offer.appellationCode,
       appellationLabel: offer.appellationLabel,
-      score: customScore ?? offer.score,
     })),
   updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
   createdAt: establishmentAggregate.establishment.createdAt.toISOString(),

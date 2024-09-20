@@ -13,11 +13,11 @@ export const stubSearchResult: SearchResultDto = {
   voluntaryToImmersion: true,
   position: { lon: 50, lat: 35 },
   romeLabel: "Boucherie",
+  establishmentScore: 0,
   appellations: [
     {
       appellationLabel: "Boucher / Bouchère",
       appellationCode: "11564",
-      score: 0,
     },
   ],
   naf: "7820Z",

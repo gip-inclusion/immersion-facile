@@ -741,6 +741,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new EstablishmentAggregateBuilder()
               .withEstablishmentSiret("00000000000001")
               .withContactId(uuid())
+              .withScore(10)
               .withLocations([
                 {
                   id: uuid(),
@@ -754,18 +755,17 @@ describe("PgEstablishmentAggregateRepository", () => {
                 },
               ])
               .withOffers([
-                new OfferEntityBuilder(cartographeImmersionOffer)
-                  .withScore(1)
-                  .build(),
-                new OfferEntityBuilder(analysteEnGeomatiqueImmersionOffer)
-                  .withScore(10)
-                  .build(),
+                new OfferEntityBuilder(cartographeImmersionOffer).build(),
+                new OfferEntityBuilder(
+                  analysteEnGeomatiqueImmersionOffer,
+                ).build(),
               ])
               .build();
 
           const establishmentWithMediumScores =
             new EstablishmentAggregateBuilder()
               .withEstablishmentSiret("00000000000002")
+              .withScore(6)
               .withContactId(uuid())
               .withLocations([
                 {
@@ -780,12 +780,10 @@ describe("PgEstablishmentAggregateRepository", () => {
                 },
               ])
               .withOffers([
-                new OfferEntityBuilder(cartographeImmersionOffer)
-                  .withScore(6)
-                  .build(),
-                new OfferEntityBuilder(analysteEnGeomatiqueImmersionOffer)
-                  .withScore(3)
-                  .build(),
+                new OfferEntityBuilder(cartographeImmersionOffer).build(),
+                new OfferEntityBuilder(
+                  analysteEnGeomatiqueImmersionOffer,
+                ).build(),
               ])
               .build();
 
@@ -815,11 +813,13 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
 
       it("when multiple appellationCodes, returns the two related immersion-offers", async () => {
+        const mostRecentDate = new Date("2022-05-05");
         const establishmentWithMostRecentOffer =
           new EstablishmentAggregateBuilder()
+            .withEstablishmentUpdatedAt(mostRecentDate)
             .withOffers([
               new OfferEntityBuilder(cartographeImmersionOffer)
-                .withCreatedAt(new Date("2022-05-05"))
+                .withCreatedAt(mostRecentDate)
                 .build(),
             ])
             .withEstablishmentSiret("99000403200029")
@@ -831,11 +831,13 @@ describe("PgEstablishmentAggregateRepository", () => {
             .withContactId(uuid())
             .build();
 
+        const olderDate = new Date("2022-05-02");
         const establishmentWithMostOlderOffer =
           new EstablishmentAggregateBuilder()
+            .withEstablishmentUpdatedAt(olderDate)
             .withOffers([
               new OfferEntityBuilder(analysteEnGeomatiqueImmersionOffer)
-                .withCreatedAt(new Date("2022-05-02"))
+                .withCreatedAt(olderDate)
                 .build(),
             ])
             .withEstablishmentSiret("11000403200029")
@@ -877,7 +879,8 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
       });
 
-      it("provide next availability date and updated at and created at on result", async () => {
+      it("provide next availability date, update_date and created_at on result", async () => {
+        const recentDate = new Date("2023-12-02");
         const aggregateWithOptionalValues = new EstablishmentAggregateBuilder()
           .withLocations([
             new LocationBuilder(portHubleChaniersLocation)
@@ -885,13 +888,13 @@ describe("PgEstablishmentAggregateRepository", () => {
               .build(),
           ])
           .withOffers([
-            new OfferEntityBuilder()
-              .withCreatedAt(new Date("2023-12-02"))
-              .build(),
+            new OfferEntityBuilder().withCreatedAt(recentDate).build(),
           ])
           .withEstablishmentNextAvailabilityDate(new Date())
-          .withEstablishmentUpdatedAt(new Date())
+          .withEstablishmentUpdatedAt(recentDate)
           .build();
+
+        const olderDate = new Date("2023-12-01");
         const aggregateWithoutOptionalValues =
           new EstablishmentAggregateBuilder()
             .withLocations([
@@ -900,14 +903,12 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .build(),
             ])
             .withOffers([
-              new OfferEntityBuilder()
-                .withCreatedAt(new Date("2023-12-01"))
-                .build(),
+              new OfferEntityBuilder().withCreatedAt(olderDate).build(),
             ])
             .withEstablishmentSiret("12341234123412")
             .withContactId(uuid())
             .withEstablishmentNextAvailabilityDate(undefined)
-            .withEstablishmentUpdatedAt(undefined)
+            .withEstablishmentUpdatedAt(olderDate)
             .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -946,14 +947,15 @@ describe("PgEstablishmentAggregateRepository", () => {
               nextAvailabilityDate:
                 aggregateWithOptionalValues.establishment.nextAvailabilityDate,
               updatedAt:
-                aggregateWithOptionalValues.establishment.updatedAt?.toISOString(),
+                aggregateWithOptionalValues.establishment.updatedAt.toISOString(),
               createdAt:
                 aggregateWithOptionalValues.establishment.createdAt.toISOString(),
             },
             {
               siret: aggregateWithoutOptionalValues.establishment.siret,
               nextAvailabilityDate: undefined,
-              updatedAt: undefined,
+              updatedAt:
+                aggregateWithoutOptionalValues.establishment.updatedAt.toISOString(),
               createdAt:
                 aggregateWithoutOptionalValues.establishment.createdAt.toISOString(),
             },
@@ -1164,6 +1166,8 @@ describe("PgEstablishmentAggregateRepository", () => {
             rome: establishmentWithOfferA1101_AtPosition.offers[0].romeCode,
             romeLabel:
               establishmentWithOfferA1101_AtPosition.offers[0].romeLabel,
+            establishmentScore:
+              establishmentWithOfferA1101_AtPosition.establishment.score,
             appellations: [
               {
                 appellationLabel:
@@ -1172,7 +1176,6 @@ describe("PgEstablishmentAggregateRepository", () => {
                 appellationCode:
                   establishmentWithOfferA1101_AtPosition.offers[0]
                     .appellationCode,
-                score: establishmentWithOfferA1101_AtPosition.offers[0].score,
               },
             ],
             naf: establishmentWithOfferA1101_AtPosition.establishment.nafDto

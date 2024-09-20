@@ -35,11 +35,11 @@ const locationId: LocationId = "123";
 const immersionOffer: SearchResultDto = {
   rome: "A1201",
   romeLabel: "Aide agricole de production fruitière ou viticole",
+  establishmentScore: 0,
   appellations: [
     {
       appellationCode: "A1201",
       appellationLabel: "Aide agricole de production fruitière ou viticole",
-      score: 0,
     },
   ],
   naf: "01.11Z",

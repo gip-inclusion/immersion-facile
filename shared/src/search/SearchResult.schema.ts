@@ -13,6 +13,7 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
   naf: z.string(),
   nafLabel: z.string(),
   siret: siretSchema,
+  establishmentScore: z.number(),
   name: z.string(),
   customizedName: z.string().optional(),
   voluntaryToImmersion: z.boolean(),
@@ -34,7 +35,6 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
     z.object({
       appellationLabel: z.string(),
       appellationCode: appellationCodeSchema,
-      score: z.number(),
     }),
   ),
   updatedAt: dateTimeIsoStringSchema.optional(),

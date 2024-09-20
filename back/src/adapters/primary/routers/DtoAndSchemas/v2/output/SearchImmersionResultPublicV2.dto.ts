@@ -1,6 +1,6 @@
 import {
   AddressDto,
-  AppellationWithScoreDto,
+  AppellationDto,
   GeoPositionDto,
   LocationId,
   RomeCode,
@@ -12,7 +12,8 @@ import { ContactMethod } from "../../../../../../domains/establishment/entities/
 export type SearchImmersionResultPublicV2 = {
   rome: RomeCode;
   romeLabel: string;
-  appellations: AppellationWithScoreDto[];
+  appellations: AppellationDto[];
+  establishmentScore: number;
   naf: string;
   nafLabel: string;
   siret: SiretDto;

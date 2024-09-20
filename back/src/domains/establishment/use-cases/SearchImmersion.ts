@@ -124,11 +124,8 @@ export class SearchImmersion extends TransactionalUseCase<
           this.timeGateway.now(),
         ),
       )
-      .sort(({ appellations: a }, { appellations: b }) =>
-        sortedBy === "score"
-          ? Math.max(...b.map(({ score }) => score)) -
-            Math.max(...a.map(({ score }) => score))
-          : 0,
+      .sort((a, b) =>
+        sortedBy === "score" ? b.establishmentScore - a.establishmentScore : 0,
       );
   }
 
@@ -166,16 +163,12 @@ export class SearchImmersion extends TransactionalUseCase<
       .map(({ isSearchable: _, ...rest }) => rest)
       .map((result) => ({
         ...result,
-        appellations: result.appellations.map((appellation) => ({
-          ...appellation,
-          score:
-            appellation.score +
-            this.#makeEstablishmentResponseRate(
-              discussions.filter(({ siret }) => siret === result.siret),
-            ) +
-            conventions.filter(({ siret }) => siret === result.siret).length *
-              10,
-        })),
+        establishmentScore:
+          result.establishmentScore +
+          this.#makeEstablishmentResponseRate(
+            discussions.filter(({ siret }) => siret === result.siret),
+          ) +
+          conventions.filter(({ siret }) => siret === result.siret).length * 10,
       }));
   }
 

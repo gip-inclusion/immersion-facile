@@ -6,5 +6,4 @@ export type OfferEntity = {
   createdAt: Date;
   romeCode: RomeCode;
   romeLabel: string;
-  score: number;
 };

@@ -17,8 +17,7 @@ SELECT
   JSON_AGG(
     JSON_BUILD_OBJECT(
       'romeCode', rome_code, 
-      'romeLabel', libelle_rome,
-      'score', score, 
+      'romeLabel', libelle_rome, 
       'appellationCode', appellation_code::text, 
       'appellationLabel', pad.libelle_appellation_long::text,
       'createdAt', 
@@ -67,6 +66,7 @@ SELECT
       'establishment', JSON_BUILD_OBJECT(
         'acquisitionCampaign', e.acquisition_campaign,
         'acquisitionKeyword' , e.acquisition_keyword,
+        'score', e.score,
         'siret', e.siret, 
         'name', e.name, 
         'customizedName', e.customized_name, 

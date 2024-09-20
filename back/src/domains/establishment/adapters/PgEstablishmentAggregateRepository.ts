@@ -3,6 +3,7 @@ import { equals, keys, pick } from "ramda";
 import {
   AppellationAndRomeDto,
   AppellationCode,
+  AppellationDto,
   DateTimeIsoString,
   EstablishmentSearchableByValue,
   LocationId,
@@ -74,7 +75,6 @@ export class PgEstablishmentAggregateRepository
           rome_code: offerWithSiret.romeCode,
           appellation_code: parseInt(offerWithSiret.appellationCode),
           siret: offerWithSiret.siret,
-          score: offerWithSiret.score,
           created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
         })),
       )
@@ -363,13 +363,13 @@ export class PgEstablishmentAggregateRepository
           prd.libelle_rome as rome_label,
           (JSON_AGG (JSON_BUILD_OBJECT(
             'appellationCode', ogr_appellation::text,
-            'appellationLabel', libelle_appellation_long,
-            'score', io.score
+            'appellationLabel', libelle_appellation_long
           ) ORDER BY ogr_appellation)) AS appellations,
           null AS distance_m,
           1 AS row_number,
           loc.*,
           loc.id AS location_id,
+          e.score,
           e.naf_code,
           e.is_searchable,
           date_to_iso(e.next_availability_date) as next_availability_date,
@@ -386,7 +386,7 @@ export class PgEstablishmentAggregateRepository
         LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
         WHERE io.siret = $1 AND io.appellation_code = $2 AND loc.id = $3
         GROUP BY (io.siret, io.rome_code, prd.libelle_rome, location_id, e.naf_code, e.is_searchable, e.next_availability_date, e.name, e.website,
-          e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees)`,
+          e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees, e.score)`,
         [siret, appellationCode, locationId],
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
@@ -560,6 +560,7 @@ export class PgEstablishmentAggregateRepository
         JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'rome', io.rome_code,
           'siret', io.siret,
+          'establishmentScore', io.score,
           ${shouldSetDistance ? `'distance_m', io.distance_m,` : ""}
           'isSearchable',io.is_searchable,
           'nextAvailabilityDate', io.next_availability_date,
@@ -617,6 +618,7 @@ export class PgEstablishmentAggregateRepository
       .insertInto("establishments")
       .values({
         siret: aggregate.establishment.siret,
+        score: aggregate.establishment.score,
         name: aggregate.establishment.name,
         customized_name: aggregate.establishment.customizedName,
         website: aggregate.establishment.website,
@@ -722,7 +724,6 @@ export class PgEstablishmentAggregateRepository
           offersToAdd.map((offerToAdd) => ({
             rome_code: offerToAdd.romeCode,
             appellation_code: parseInt(offerToAdd.appellationCode),
-            score: offerToAdd.score,
             created_at: sql`${offerToAdd.createdAt.toISOString()}`,
             siret,
           })),
@@ -893,7 +894,7 @@ const searchImmersionResultsQuery = (
             pipeWithValue(
               qb
                 .selectFrom("establishments")
-                .select("siret")
+                .select(["siret", "score", "update_date"])
                 .where("is_open", "=", true),
               (qb) => {
                 if (searchableBy === "jobSeekers")
@@ -939,7 +940,6 @@ const searchImmersionResultsQuery = (
                     "rome_code",
                     "created_at",
                     "appellation_code",
-                    "score",
                   ]),
                 (eb) =>
                   filters?.romeCodes
@@ -955,19 +955,29 @@ const searchImmersionResultsQuery = (
           )
           .select([
             "e.siret",
+            "e.score",
             "loc.id as loc_id",
             "offer.rome_code as code_rome",
-            sql`JSON_AGG( JSON_BUILD_OBJECT( 'appellationCode', a.ogr_appellation::text, 'appellationLabel', a.libelle_appellation_long, 'score', offer.score ) ORDER BY a.ogr_appellation)`.as(
-              "appellations",
-            ),
+            sql<AppellationDto[]>`JSON_AGG
+            ( JSON_BUILD_OBJECT(
+                'appellationCode', a.ogr_appellation::text,
+                'appellationLabel', a.libelle_appellation_long
+                ) ORDER BY a.ogr_appellation)`.as("appellations"),
             sql<number>`ROW_NUMBER() OVER (ORDER BY ${makeOrderByClauses(
               sortedBy,
               filters,
             )})`.as("rank"),
           ])
-          .groupBy(["e.siret", "offer.rome_code", "loc.position", "loc.id"])
-          .limit(limit)
-          .orderBy(makeOrderByClauses(sortedBy, filters)),
+          .groupBy([
+            "e.siret",
+            "e.score",
+            "e.update_date",
+            "offer.rome_code",
+            "loc.position",
+            "loc.id",
+          ])
+          .orderBy(makeOrderByClauses(sortedBy, filters))
+          .limit(limit),
       ),
     )
     .selectFrom("filtered_results as r")
@@ -984,11 +994,13 @@ const searchImmersionResultsQuery = (
         ),
     )
     .innerJoin("public_romes_data as ro", "ro.code_rome", "r.code_rome")
+    .orderBy("r.rank")
     .select(({ ref, fn }) =>
       jsonStripNulls(
         jsonBuildObject({
           naf: ref("e.naf_code"),
           siret: ref("e.siret"),
+          establishmentScore: ref("r.score"),
           isSearchable: ref("e.is_searchable"),
           nextAvailabilityDate: ref("e.next_availability_date"),
           name: ref("e.name"),
@@ -1028,8 +1040,7 @@ const searchImmersionResultsQuery = (
           appellations: ref("r.appellations"),
         }),
       ).as("search_immersion_result"),
-    )
-    .orderBy("r.rank");
+    );
 
   return query.execute();
 };
@@ -1042,8 +1053,8 @@ const makeOrderByClauses = (
     geoParams?: GeoParams;
   },
 ) => {
-  if (sortedBy === "date") return sql`MAX(offer.created_at) DESC`;
-  if (sortedBy === "score") return sql`MAX(offer.score) DESC`;
+  if (sortedBy === "date") return sql`e.update_date DESC`;
+  if (sortedBy === "score") return sql`e.score DESC`;
   const geoParams = filters?.geoParams;
   if (geoParams && hasSearchGeoParams(geoParams))
     return sql`ST_Distance(loc.position,ST_GeographyFromText(${sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`})) ASC`;

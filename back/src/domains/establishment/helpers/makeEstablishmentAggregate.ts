@@ -4,20 +4,20 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 
-const offerFromFormScore = 10;
-
 export const makeEstablishmentAggregate = ({
   uuidGenerator,
   timeGateway,
   formEstablishment,
   nafAndNumberOfEmployee,
   addressesAndPosition,
+  score = 0,
 }: {
   uuidGenerator: UuidGenerator;
   timeGateway: TimeGateway;
   formEstablishment: FormEstablishmentDto;
   addressesAndPosition: Location[];
   nafAndNumberOfEmployee: NafAndNumberOfEmpolyee;
+  score?: number;
 }): EstablishmentAggregate => ({
   establishment: {
     acquisitionCampaign: formEstablishment.acquisitionCampaign,
@@ -40,6 +40,7 @@ export const makeEstablishmentAggregate = ({
     website: formEstablishment.website,
     nextAvailabilityDate: formEstablishment.nextAvailabilityDate,
     searchableBy: formEstablishment.searchableBy,
+    score,
   },
   contact: {
     id: uuidGenerator.new(),
@@ -51,7 +52,6 @@ export const makeEstablishmentAggregate = ({
       appellationCode,
       appellationLabel,
       romeLabel,
-      score: offerFromFormScore,
       createdAt: timeGateway.now(),
     }),
   ),

@@ -19,13 +19,11 @@ export const makeExpectedSearchResult = ({
   return {
     additionalInformation: establishment.establishment.additionalInformation,
     address: withLocationAndDistance.address,
-    appellations: withOffers.map(
-      ({ appellationCode, appellationLabel, score }) => ({
-        appellationCode,
-        appellationLabel,
-        score,
-      }),
-    ),
+    appellations: withOffers.map(({ appellationCode, appellationLabel }) => ({
+      appellationCode,
+      appellationLabel,
+    })),
+    establishmentScore: establishment.establishment.score,
     contactMode: establishment.contact?.contactMethod,
     customizedName: establishment.establishment.customizedName,
     distance_m: withLocationAndDistance.distance,
