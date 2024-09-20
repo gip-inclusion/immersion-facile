@@ -93,7 +93,7 @@ export class SearchImmersion extends TransactionalUseCase<
       needsToBeSearched: true,
       apiConsumerName: apiConsumer?.name,
       numberOfResults:
-        voluntaryToImmersion !== false
+        voluntaryToImmersion !== false // cases where voluntaryToImmersion is undefined and true
           ? repositorySearchResults.length
           : lbbSearchResults.length,
     });
