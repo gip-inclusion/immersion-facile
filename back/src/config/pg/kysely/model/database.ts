@@ -516,6 +516,7 @@ interface SearchesMade extends WithAcquisition {
   lon: number | null;
   distance: number | null;
   gps: string | null;
+  searchable_by: "jobSeekers" | "students" | null;
 }
 
 interface UsersAgencies {

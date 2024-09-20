@@ -14,7 +14,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
   public async insertSearchMade(searchMade: SearchMadeEntity) {
     await this.#insertSearchMade(searchMade);
 
-    if (searchMade.appellationCodes) {
+    if (searchMade.appellationCodes && searchMade.appellationCodes.length > 0) {
       await this.#insertAppellationCodes(
         searchMade.id,
         searchMade.appellationCodes,
@@ -34,6 +34,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         sorted_by: searchMade.sortedBy,
         address: searchMade.place,
         number_of_results: searchMade.numberOfResults,
+        searchable_by: searchMade.establishmentSearchableBy,
         acquisition_keyword: searchMade.acquisitionKeyword,
         acquisition_campaign: searchMade.acquisitionCampaign,
         ...(hasSearchMadeGeoParams(searchMade)
