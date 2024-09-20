@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import { FooterProps as FooterPropsDsfr } from "@codegouvfr/react-dsfr/Footer";
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import FooterStyles from "./Footer.styles";
@@ -24,7 +25,7 @@ export type NavTopGroupLinks = {
 export type FooterProps = {
   links?: NavLink[];
   navTopGroupLinks?: NavTopGroupLinks[];
-  bottomLinks?: NavLink[];
+  bottomLinks?: (NavLink | FooterPropsDsfr.BottomItem.Button)[];
   partnersLogos?: React.ReactNode;
   plateformeInclusionLogo?: React.ReactNode;
 };
@@ -47,13 +48,36 @@ const TopLink = ({ link }: { link: NavLink }) => {
   );
 };
 
-const BottomLink = ({ link }: { link: NavLink }) => (
-  <li className={fr.cx("fr-footer__bottom-item")}>
-    <a className={fr.cx("fr-footer__bottom-link")} {...link}>
-      {link.label}
-    </a>
-  </li>
-);
+const BottomLink = ({
+  link,
+}: { link: NavLink | FooterPropsDsfr.BottomItem }) => {
+  const { cx } = useStyles();
+  return (
+    <li className={fr.cx("fr-footer__bottom-item")}>
+      {"label" in link ? (
+        <a className={fr.cx("fr-footer__bottom-link")} {...link}>
+          {link.label}
+        </a>
+      ) : (
+        <button
+          type="button"
+          className={cx(
+            fr.cx(
+              "fr-footer__bottom-link",
+              "fr-icon-theme-fill",
+              "fr-link--icon-left",
+              link.iconId,
+            ),
+            link.buttonProps?.className,
+          )}
+          {...link.buttonProps}
+        >
+          {link.text}
+        </button>
+      )}
+    </li>
+  );
+};
 
 export const Footer = ({
   links,
