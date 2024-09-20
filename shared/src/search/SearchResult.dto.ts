@@ -8,12 +8,11 @@ import {
 import { SiretDto } from "../siret/siret";
 import { DateTimeIsoString } from "../utils/date";
 
-export type AppellationWithScoreDto = AppellationDto & { score: number };
-
 export type SearchResultDto = {
   rome: RomeCode;
   romeLabel: string;
-  appellations: AppellationWithScoreDto[];
+  appellations: AppellationDto[];
+  establishmentScore: number;
   naf: string;
   nafLabel: string;
   siret: SiretDto;

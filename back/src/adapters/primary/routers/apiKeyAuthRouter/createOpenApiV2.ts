@@ -60,17 +60,16 @@ const searchImmersionResult: SearchImmersionResultPublicV2 = {
   },
   rome: "B1805",
   romeLabel: "Stylisme",
+  establishmentScore: 0,
   appellations: [
     {
       appellationCode: "19540",
       appellationLabel: "Styliste",
-      score: 0,
     },
     {
       appellationCode: "12831",
       appellationLabel:
         "Concepteur / Conceptrice maquettiste en accessoires de mode",
-      score: 0,
     },
   ],
   contactMode: "EMAIL",

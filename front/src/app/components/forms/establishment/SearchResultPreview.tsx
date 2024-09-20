@@ -16,12 +16,10 @@ const establishmentToSearchResultPreview = ({
   fitForDisabledWorkers,
   additionalInformation,
 }: FormEstablishmentDto): SearchResultDto => ({
+  establishmentScore: 0,
   rome: appellations.length > 0 ? appellations[0].romeCode : "",
   romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
-  appellations: appellations.map((appellation) => ({
-    ...appellation,
-    score: 0,
-  })),
+  appellations: appellations,
   nafLabel: "",
   naf: naf?.code || "",
   name: businessNameCustomized || businessName || "Mon entreprise",

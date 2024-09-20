@@ -22,16 +22,15 @@ export class SimulatedSearchGateway implements SearchGateway {
   #simulatedResponse: SearchResultDto = {
     rome: "A1201",
     romeLabel: "Aide agricole de production fruitière ou viticole",
+    establishmentScore: 0,
     appellations: [
       {
         appellationCode: "20552",
         appellationLabel: "Aide agricole de production fruitière ou viticole",
-        score: 0,
       },
       {
         appellationCode: "15480",
         appellationLabel: "Ouvrier agricole polyvalent",
-        score: 0,
       },
     ],
     naf: "01.11Z",

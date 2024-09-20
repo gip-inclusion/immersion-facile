@@ -83,6 +83,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
         ),
       ),
       formEstablishment,
+      score: initialEstablishmentAggregate.establishment.score,
     });
 
     await uow.establishmentAggregateRepository.updateEstablishmentAggregate(

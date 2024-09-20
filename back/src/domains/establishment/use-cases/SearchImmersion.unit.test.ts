@@ -42,6 +42,8 @@ const secretariatAppellationAndRome: AppellationAndRomeDto = {
   romeLabel: "Secrétariat",
 };
 
+const establishmentScore = 12;
+
 const establishment = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
@@ -55,6 +57,7 @@ const establishment = new EstablishmentAggregateBuilder()
       .withWebsite("www.website.com")
       .build(),
   )
+  .withScore(establishmentScore)
   .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
   .withOffers([secretariatOffer, boulangerOffer, boulangerAssistantOffer])
   .build();
@@ -1054,7 +1057,7 @@ describe("SearchImmersionUseCase", () => {
           establishment,
           secretariatOffer.romeCode,
           606885,
-          4.5,
+          establishmentScore,
         ),
       ]);
       expectToEqual(uow.discussionRepository.discussionCallsCount, 0);
@@ -1108,7 +1111,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatOffer.romeCode,
             606885,
-            104.5,
+            establishmentScore + 100,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1132,7 +1135,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatOffer.romeCode,
             606885,
-            54.5,
+            establishmentScore + 50,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1154,7 +1157,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatOffer.romeCode,
             606885,
-            4.5,
+            establishmentScore,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1179,7 +1182,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatOffer.romeCode,
             606885,
-            4.5,
+            establishmentScore,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1218,7 +1221,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatOffer.romeCode,
             606885,
-            14.5,
+            establishmentScore + 10,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1246,7 +1249,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatOffer.romeCode,
             606885,
-            34.5,
+            establishmentScore + 30,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1279,7 +1282,7 @@ describe("SearchImmersionUseCase", () => {
             establishment,
             secretariatOffer.romeCode,
             606885,
-            4.5,
+            establishmentScore,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1289,12 +1292,13 @@ describe("SearchImmersionUseCase", () => {
 
     describe("search made sortedBy score", () => {
       const establishment1 = new EstablishmentAggregateBuilder(establishment)
-        .withEstablishmentSiret("12312312312311")
+        .withEstablishmentSiret("11112312312311")
         .build();
 
       const establishment2 = new EstablishmentAggregateBuilder(establishment)
-        .withEstablishmentSiret("12312312312312")
+        .withEstablishmentSiret("22222312312312")
         .build();
+
       beforeEach(() => {
         uow.establishmentAggregateRepository.establishmentAggregates = [
           establishment1,
@@ -1318,14 +1322,14 @@ describe("SearchImmersionUseCase", () => {
           establishmentAggregateToSearchResultByRomeForFirstLocation(
             establishment1,
             secretariatOffer.romeCode,
-            281737,
-            104.5,
+            606885,
+            establishmentScore + 100,
           ),
           establishmentAggregateToSearchResultByRomeForFirstLocation(
             establishment2,
             secretariatOffer.romeCode,
-            281737,
-            4.5,
+            606885,
+            establishmentScore,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1348,14 +1352,14 @@ describe("SearchImmersionUseCase", () => {
           establishmentAggregateToSearchResultByRomeForFirstLocation(
             establishment2,
             secretariatOffer.romeCode,
-            281737,
-            104.5,
+            606885,
+            establishmentScore + 100,
           ),
           establishmentAggregateToSearchResultByRomeForFirstLocation(
             establishment1,
             secretariatOffer.romeCode,
-            281737,
-            4.5,
+            606885,
+            establishmentScore,
           ),
         ]);
         expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
@@ -1422,6 +1426,7 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
 
 const lbbToSearchResult = (lbb: LaBonneBoiteCompanyDto): SearchResultDto => ({
   additionalInformation: "",
+  establishmentScore: 0,
   address: addressStringToDto(lbb.props.address),
   appellations: [],
   customizedName: "",

@@ -52,10 +52,10 @@ const toSearchImmersionResults = (
       {
         appellationLabel: offer.appellationLabel,
         appellationCode: offer.appellationCode,
-        score: 4.5,
       },
     ],
     siret,
+    establishmentScore: establishment.score,
     voluntaryToImmersion: true,
     contactMode: "EMAIL",
     numberOfEmployeeRange: "10-19",
@@ -77,12 +77,18 @@ const offer2 = new OfferEntityBuilder()
   .withAppellationCode("16067")
   .build();
 
-const establishment = new EstablishmentEntityBuilder().build();
+const score20 = 20;
+const establishment = new EstablishmentEntityBuilder()
+  .withScore(score20)
+  .build();
 
 const immersionOffer = new OfferEntityBuilder().build();
 const establishmentAggregate1 = new EstablishmentAggregateBuilder()
   .withEstablishment(
-    new EstablishmentEntityBuilder().withSiret("11112222333344").build(),
+    new EstablishmentEntityBuilder()
+      .withSiret("11112222333344")
+      .withScore(score20)
+      .build(),
   )
   .withContact(
     new ContactEntityBuilder()
@@ -113,6 +119,7 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
         },
       ])
       .withWebsite("www.jobs.fr")
+      .withScore(score20)
       .build(),
   )
   .build();
@@ -247,6 +254,7 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret1)
+                .withScore(score20)
                 .withWebsite("www.jobs.fr")
                 .build(),
             )
@@ -257,6 +265,7 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret2)
+                .withScore(score20)
                 .withWebsite("www.jobs.fr")
                 .withSearchableBy({ students: true, jobSeekers: false })
                 .build(),
@@ -268,6 +277,7 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret3)
+                .withScore(score20)
                 .withWebsite("www.jobs.fr")
                 .withSearchableBy({ students: false, jobSeekers: true })
                 .build(),
@@ -378,6 +388,7 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret1)
+                .withScore(score20)
                 .withWebsite("www.jobs.fr")
                 .build(),
             )
@@ -388,6 +399,7 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret2)
+                .withScore(score20)
                 .withWebsite("www.jobs.fr")
                 .withSearchableBy({ students: true, jobSeekers: false })
                 .build(),
@@ -399,6 +411,7 @@ describe("search-immersion route", () => {
             .withEstablishment(
               new EstablishmentEntityBuilder()
                 .withSiret(siret3)
+                .withScore(score20)
                 .withWebsite("www.jobs.fr")
                 .withSearchableBy({ students: false, jobSeekers: true })
                 .build(),
@@ -558,11 +571,11 @@ describe("search-immersion route", () => {
             postcode: "75017",
             streetNumberAndAddress: "30 avenue des champs Elysées",
           },
+          establishmentScore: score20,
           appellations: [
             {
               appellationCode: "19540",
               appellationLabel: "Styliste",
-              score: 4.5,
             },
           ],
           contactMode: "EMAIL",

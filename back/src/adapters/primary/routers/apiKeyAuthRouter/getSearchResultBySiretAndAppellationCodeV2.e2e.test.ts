@@ -69,6 +69,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(immersionOfferSiret)
+            .withScore(15)
             .withLocations([TEST_LOCATION])
             .withNumberOfEmployeeRange("10-19")
             .build(),
@@ -122,11 +123,11 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
       address: TEST_LOCATION.address,
       contactMode: "EMAIL",
       romeLabel: TEST_ROME_LABEL,
+      establishmentScore: 15,
       appellations: [
         {
           appellationLabel: styliste.appellationLabel,
           appellationCode: styliste.appellationCode,
-          score: 4.5,
         },
       ],
       nafLabel: "NAFRev2",

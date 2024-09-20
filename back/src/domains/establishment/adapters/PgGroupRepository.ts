@@ -83,6 +83,7 @@ export class PgGroupRepository implements GroupRepository {
           jsonBuildObject({
             rome: ref("io.rome_code"),
             siret: ref("e.siret"),
+            establishmentScore: ref("e.score"),
             distance_m: sql`0`,
             name: ref("e.name"),
             website: ref("e.website"),
@@ -97,8 +98,7 @@ export class PgGroupRepository implements GroupRepository {
             romeLabel: ref("r.libelle_rome"),
             appellations: sql`JSON_AGG(JSON_BUILD_OBJECT(
               'appellationCode', ap.ogr_appellation::text,
-              'appellationLabel', ap.libelle_appellation_long,
-              'score', io.score
+              'appellationLabel', ap.libelle_appellation_long
             ) ORDER BY ap.ogr_appellation)`,
             naf: ref("e.naf_code"),
             nafLabel: ref("naf.class_label"),

@@ -71,7 +71,7 @@ describe("Insert Establishment aggregate from form data", () => {
   let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
   let uow: InMemoryUnitOfWork;
-  let useCase: InsertEstablishmentAggregateFromForm;
+  let insertEstablishmentAggregateFromForm: InsertEstablishmentAggregateFromForm;
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
@@ -80,14 +80,15 @@ describe("Insert Establishment aggregate from form data", () => {
     timeGateway = new CustomTimeGateway();
     uow = createInMemoryUow();
 
-    useCase = new InsertEstablishmentAggregateFromForm(
-      new InMemoryUowPerformer(uow),
-      siretGateway,
-      addressAPI,
-      uuidGenerator,
-      timeGateway,
-      makeCreateNewEvent({ timeGateway, uuidGenerator }),
-    );
+    insertEstablishmentAggregateFromForm =
+      new InsertEstablishmentAggregateFromForm(
+        new InMemoryUowPerformer(uow),
+        siretGateway,
+        addressAPI,
+        uuidGenerator,
+        timeGateway,
+        makeCreateNewEvent({ timeGateway, uuidGenerator }),
+      );
 
     uuidGenerator.setNextUuid(fakeBusinessContact.id);
     addressAPI.setAddressAndPosition([
@@ -98,7 +99,7 @@ describe("Insert Establishment aggregate from form data", () => {
     ]);
   });
 
-  it("Converts Form Establishment in search format", async () => {
+  it("Converts Form Establishment in Aggregate", async () => {
     // Prepare
     const withAcquisition = {
       acquisitionKeyword: "yolo",
@@ -137,7 +138,7 @@ describe("Insert Establishment aggregate from form data", () => {
     prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
 
     // Act
-    await useCase.execute({ formEstablishment });
+    await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
 
     // Assert
     expectToEqual(
@@ -158,6 +159,7 @@ describe("Insert Establishment aggregate from form data", () => {
               .withWebsite(formEstablishment.website)
               .withNextAvailabilityDate(nextAvailabilityDate)
               .withAcquisition(withAcquisition)
+              .withScore(0)
               .build(),
           )
           .withFitForDisabledWorkers(true)
@@ -166,7 +168,6 @@ describe("Insert Establishment aggregate from form data", () => {
               new OfferEntityBuilder({
                 ...prof,
                 createdAt: timeGateway.now(),
-                score: 10,
               }).build(),
             ),
           )
@@ -183,7 +184,7 @@ describe("Insert Establishment aggregate from form data", () => {
 
     prepareSirenGateway(siretGateway, fakeSiret, "0");
 
-    await useCase.execute({ formEstablishment });
+    await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
 
     const establishmentAggregate =
       uow.establishmentAggregateRepository.establishmentAggregates[0];
@@ -252,7 +253,7 @@ describe("Insert Establishment aggregate from form data", () => {
     ]);
 
     await expectPromiseToFailWithError(
-      useCase.execute({ formEstablishment }),
+      insertEstablishmentAggregateFromForm.execute({ formEstablishment }),
       errors.establishment.conflictError({ siret }),
     );
 
@@ -269,7 +270,7 @@ describe("Insert Establishment aggregate from form data", () => {
 
     prepareSirenGateway(siretGateway, fakeSiret, "0");
 
-    await useCase.execute({ formEstablishment });
+    await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
 
     const establishmentAggregate =
       uow.establishmentAggregateRepository.establishmentAggregates[0];

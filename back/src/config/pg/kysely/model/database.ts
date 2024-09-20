@@ -394,6 +394,7 @@ interface Establishments extends WithAcquisition {
   source_provider: string;
   update_date: Timestamp | null;
   website: Generated<string | null>;
+  score: number;
 }
 
 interface PublicAppellationsData {

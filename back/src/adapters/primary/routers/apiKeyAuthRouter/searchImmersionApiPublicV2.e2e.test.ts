@@ -112,6 +112,7 @@ describe("search route", () => {
             .withOffers([offer1, offer2])
             .withEstablishment(
               new EstablishmentEntityBuilder()
+                .withScore(15)
                 .withLocations([
                   {
                     position: {
@@ -139,16 +140,15 @@ describe("search route", () => {
             additionalInformation: "",
             rome: "M1808",
             romeLabel: "test_rome_label",
+            establishmentScore: 15,
             appellations: [
               {
                 appellationLabel: offer1.appellationLabel,
                 appellationCode: offer1.appellationCode,
-                score: 4.5,
               },
               {
                 appellationLabel: offer2.appellationLabel,
                 appellationCode: offer2.appellationCode,
-                score: 4.5,
               },
             ],
             siret: "78000403200019",
@@ -241,6 +241,8 @@ describe("search route", () => {
         const siret2 = "11111111111111";
         const siret3 = "12341234123455";
 
+        const score = 15;
+
         const toSearchImmersionResults = (
           sirets: SiretDto[],
         ): SearchImmersionResultPublicV2[] =>
@@ -253,16 +255,15 @@ describe("search route", () => {
             additionalInformation: "",
             rome: "M1808",
             romeLabel: "test_rome_label",
+            establishmentScore: 15,
             appellations: [
               {
                 appellationLabel: offer1.appellationLabel,
                 appellationCode: offer1.appellationCode,
-                score: 4.5,
               },
               {
                 appellationLabel: offer2.appellationLabel,
                 appellationCode: offer2.appellationCode,
-                score: 4.5,
               },
             ],
             siret,
@@ -293,6 +294,7 @@ describe("search route", () => {
                 .withEstablishment(
                   new EstablishmentEntityBuilder()
                     .withSiret(siret1)
+                    .withScore(score)
                     .withLocations([
                       {
                         position: {
@@ -313,6 +315,7 @@ describe("search route", () => {
                 .withEstablishment(
                   new EstablishmentEntityBuilder()
                     .withSiret(siret2)
+                    .withScore(score)
                     .withLocations([
                       {
                         position: {
@@ -334,6 +337,7 @@ describe("search route", () => {
                 .withEstablishment(
                   new EstablishmentEntityBuilder()
                     .withSiret(siret3)
+                    .withScore(score)
                     .withLocations([
                       {
                         position: {
@@ -353,7 +357,7 @@ describe("search route", () => {
         });
 
         it("with filter establishmentSearchableBy defined to students", async () => {
-          await request
+          const response = await request
             .get(
               "/v2/search?distanceKm=30&longitude=2.34999&latitude=48.8531&establishmentSearchableBy=students&sortedBy=distance",
             )
@@ -362,8 +366,12 @@ describe("search route", () => {
               generateApiConsumerJwt({
                 id: authorizedUnJeuneUneSolutionApiConsumer.id,
               }),
-            )
-            .expect(200, toSearchImmersionResults([siret1, siret2]));
+            );
+
+          expect(response.body).toEqual(
+            toSearchImmersionResults([siret1, siret2]),
+          );
+          expect(response.status).toBe(200);
         });
 
         it("with filter establishmentSearchableBy defined to jobSeekers", async () => {

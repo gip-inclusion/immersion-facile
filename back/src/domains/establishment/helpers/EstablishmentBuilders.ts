@@ -107,6 +107,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   additionalInformation: "",
   website: "",
   fitForDisabledWorkers: false,
+  score: 10,
 };
 
 export class EstablishmentEntityBuilder
@@ -228,7 +229,7 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  public withUpdatedAt(updatedAt?: Date) {
+  public withUpdatedAt(updatedAt: Date) {
     return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
   }
 
@@ -240,6 +241,13 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({
       ...this.entity,
       ...withAcquisition,
+    });
+  }
+
+  public withScore(score: number) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      score,
     });
   }
 }
@@ -263,6 +271,17 @@ export class EstablishmentAggregateBuilder
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact,
+    });
+  }
+
+  public withScore(score: number) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withScore(score)
+        .build(),
     });
   }
 
@@ -336,7 +355,11 @@ export class EstablishmentAggregateBuilder
   public withEstablishmentSiret(siret: string) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
-      establishment: new EstablishmentEntityBuilder().withSiret(siret).build(),
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withSiret(siret)
+        .build(),
     });
   }
 
@@ -373,7 +396,7 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withEstablishmentUpdatedAt(updatedAt?: Date) {
+  public withEstablishmentUpdatedAt(updatedAt: Date) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(
@@ -478,7 +501,6 @@ const defaultValidOfferEntity: OfferEntity = {
   appellationLabel: "Styliste",
   appellationCode: "19540",
   romeLabel: "Stylisme",
-  score: 4.5,
   createdAt: new Date("2022-05-15T12:00:00.000"),
 };
 
@@ -525,13 +547,6 @@ export class OfferEntityBuilder implements Builder<OfferEntity> {
     return new OfferEntityBuilder({
       ...this.entity,
       romeLabel,
-    });
-  }
-
-  public withScore(score = 4.5) {
-    return new OfferEntityBuilder({
-      ...this.entity,
-      score,
     });
   }
 }

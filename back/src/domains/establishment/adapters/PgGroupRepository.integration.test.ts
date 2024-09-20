@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import {
-  AppellationWithScoreDto,
+  AppellationDto,
   Group,
   GroupOptions,
   Location,
@@ -135,6 +135,7 @@ describe("PgEstablishmentGroupRepository", () => {
 
     const establishmentAggregate1 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(carrefourGroupEntity.sirets[0])
+      .withScore(15)
       .withContactId("11111111-1111-4444-1111-111111111111")
       .withLocationId("aaaaaaaa-aaaa-4444-bbbb-bbbbbbbbbbbb")
       .withOffers([offerBoulanger, offerAideBoulanger, offerBoucher])
@@ -186,7 +187,7 @@ describe("PgEstablishmentGroupRepository", () => {
       location,
     }: {
       establishment: EstablishmentEntity;
-      appellations: AppellationWithScoreDto[];
+      appellations: AppellationDto[];
       rome: string;
       romeLabel: string;
       location: Location;
@@ -206,6 +207,7 @@ describe("PgEstablishmentGroupRepository", () => {
       numberOfEmployeeRange: establishment.numberEmployeesRange,
       position: location.position,
       siret: establishment.siret,
+      establishmentScore: establishment.score,
       voluntaryToImmersion: establishment.voluntaryToImmersion,
       website: establishment.website,
       locationId: location.id,
@@ -224,7 +226,6 @@ describe("PgEstablishmentGroupRepository", () => {
             {
               appellationLabel: "Boucher / Bouchère",
               appellationCode: "11564",
-              score: 4.5,
             },
           ],
           location: establishment1.locations[0],
@@ -237,12 +238,10 @@ describe("PgEstablishmentGroupRepository", () => {
             {
               appellationLabel: "Aide-boulanger / Aide-boulangère",
               appellationCode: "10868",
-              score: 4.5,
             },
             {
               appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
               appellationCode: "11574",
-              score: 4.5,
             },
           ],
           location: establishment1.locations[0],
@@ -255,7 +254,6 @@ describe("PgEstablishmentGroupRepository", () => {
             {
               appellationLabel: "Vendeur / Vendeuse en alimentation générale",
               appellationCode: "20540",
-              score: 4.5,
             },
           ],
           location: establishment2.locations[0],
@@ -268,7 +266,6 @@ describe("PgEstablishmentGroupRepository", () => {
             {
               appellationLabel: "Vendeur / Vendeuse en alimentation générale",
               appellationCode: "20540",
-              score: 4.5,
             },
           ],
           location: establishment2.locations[1],

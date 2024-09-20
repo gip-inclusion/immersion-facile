@@ -32,9 +32,10 @@ export type EstablishmentEntity = {
   searchableBy: EstablishmentSearchableBy;
   siret: SiretDto;
   sourceProvider: SourceProvider;
-  updatedAt?: Date;
+  updatedAt: Date;
   voluntaryToImmersion: boolean;
   website?: string;
+  score: number;
 } & WithAcquisition;
 
 export type EstablishmentAggregate = {

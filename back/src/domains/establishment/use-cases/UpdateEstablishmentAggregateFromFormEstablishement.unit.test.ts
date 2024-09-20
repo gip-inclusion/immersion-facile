@@ -94,7 +94,7 @@ describe("Update Establishment aggregate from form data", () => {
       .build();
     const previousAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
-        new EstablishmentEntityBuilder().withSiret(siret).build(),
+        new EstablishmentEntityBuilder().withSiret(siret).withScore(25).build(),
       )
       .withOffers([
         new OfferEntityBuilder().build(),
@@ -185,7 +185,6 @@ describe("Update Establishment aggregate from form data", () => {
               .withAppellationCode(updatedAppellation.appellationCode)
               .withAppellationLabel(updatedAppellation.appellationLabel)
               .withCreatedAt(timeGateway.now())
-              .withScore(10)
               .build(),
           ])
           .withContact(updatedContact)

@@ -26,10 +26,10 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Designer industriel / Designeuse industrielle",
         appellationCode: "14000",
-        score: 0,
       },
     ],
     naf: "6820B",
+    establishmentScore: 0,
     nafLabel: "Location et exploitation de biens immobiliers propres ou loués",
     address: {
       streetNumberAndAddress: "Rue Jean Perrin",
@@ -60,10 +60,10 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Conseiller sportif / Conseillère sportive",
         appellationCode: "13480",
-        score: 0,
       },
     ],
     naf: "4764Z",
+    establishmentScore: 0,
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
       streetNumberAndAddress: "",
@@ -93,10 +93,10 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
-        score: 0,
       },
     ],
     naf: "4764Z",
+    establishmentScore: 0,
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
       streetNumberAndAddress: "Rue de la Louvetière",
@@ -126,10 +126,10 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
-        score: 0,
       },
     ],
     naf: "4764Z",
+    establishmentScore: 0,
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
       streetNumberAndAddress: "N 6",
@@ -159,10 +159,10 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
-        score: 0,
       },
     ],
     naf: "4764Z",
+    establishmentScore: 0,
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
       streetNumberAndAddress: "Boulevard de la Prairie",
@@ -192,10 +192,10 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Hôte / Hôtesse de caisse services clients",
         appellationCode: "38655",
-        score: 0,
       },
     ],
     naf: "4764Z",
+    establishmentScore: 0,
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
       streetNumberAndAddress: "Boulevard de la Prairie",
@@ -225,10 +225,10 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
-        score: 0,
       },
     ],
     naf: "4764Z",
+    establishmentScore: 0,
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
       streetNumberAndAddress: "32 Boulevard du Vendée Globe",
@@ -259,10 +259,10 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Vendeur / Vendeuse en articles de sport",
         appellationCode: "20552",
-        score: 0,
       },
     ],
     naf: "4764Z",
+    establishmentScore: 0,
     nafLabel: "Commerce de détail d'articles de sport en magasin spécialisé",
     address: {
       streetNumberAndAddress:
@@ -292,25 +292,22 @@ const groupSearchResultBySlugStub: SearchResultDto[] = [
       {
         appellationLabel: "Aide-magasinier / Aide-magasinière",
         appellationCode: "10880",
-        score: 0,
       },
       {
         appellationLabel: "Magasinier / Magasinière",
         appellationCode: "16276",
-        score: 0,
       },
       {
         appellationLabel: "Magasinier / Magasinière cariste",
         appellationCode: "16277",
-        score: 0,
       },
       {
         appellationLabel: "Préparateur / Préparatrice de commandes",
         appellationCode: "17993",
-        score: 0,
       },
     ],
     naf: "5210B",
+    establishmentScore: 0,
     nafLabel: "Entreposage et stockage",
     address: {
       streetNumberAndAddress: "Rue du Périgord",
@@ -347,6 +344,7 @@ export const seedSearchResults: SearchResultDto[] = [
   {
     rome: "A0000",
     naf: defaultNaf,
+    establishmentScore: 0,
     siret: "12345678901234",
     name: "Super Corp",
     voluntaryToImmersion: true,
@@ -359,12 +357,10 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Facteur / Factrice",
         appellationCode: "15044",
-        score: 0,
       },
       {
         appellationLabel: "Développeur / Développeuse web",
         appellationCode: "14156",
-        score: 0,
       },
     ],
     nafLabel: "Métallurgie",
@@ -379,6 +375,7 @@ export const seedSearchResults: SearchResultDto[] = [
   {
     rome: "A0001",
     naf: defaultNaf,
+    establishmentScore: 0,
     siret: "12345678901234",
     name: "Mega Corp",
     customizedName: "Mega Corp nom personnalisé",
@@ -391,7 +388,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Développeur / Développeuse web",
         appellationCode: "14156",
-        score: 0,
       },
     ],
     nafLabel: "Accueil et Restauration",
@@ -406,6 +402,7 @@ export const seedSearchResults: SearchResultDto[] = [
   {
     rome: "A0003",
     naf: defaultNaf,
+    establishmentScore: 0,
     siret: "12345678901234",
     name: "Coolitude .Inc",
     customizedName: "Tu peux pas test",
@@ -419,7 +416,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Développeur / Développeuse web",
         appellationCode: "14156",
-        score: 0,
       },
     ],
     nafLabel: "Accueil et Restauration",
@@ -442,6 +438,7 @@ export const seedSearchResults: SearchResultDto[] = [
   {
     rome: "A0002",
     naf: defaultNaf,
+    establishmentScore: 0,
     siret: "99345678901234",
     name: "Hyper Corp",
     customizedName: "Hyper Corp nom personnalisé",
@@ -454,12 +451,10 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Facteur / Factrice",
         appellationCode: "15044",
-        score: 0,
       },
       {
         appellationLabel: "Développeur / Développeuse web",
         appellationCode: "14156",
-        score: 0,
       },
     ],
     nafLabel: "",
@@ -471,6 +466,7 @@ export const seedSearchResults: SearchResultDto[] = [
   {
     rome: "A0003",
     naf: defaultNaf,
+    establishmentScore: 0,
     siret: "12341678901235",
     name: "Giga Corp",
     voluntaryToImmersion: false,
@@ -482,7 +478,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Développeur / Développeuse web",
         appellationCode: "14156",
-        score: 0,
       },
     ],
     nafLabel: "",
@@ -493,6 +488,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LES GOURMANDS DU PRE",
     rome: "D1102",
     siret: "85363850000019",
@@ -512,7 +508,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -524,6 +519,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "TRANCHE DE CAKE",
     rome: "D1102",
     siret: "49049275800027",
@@ -544,7 +540,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -556,6 +551,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "SAS LORETTE VOUILLE (avec custom name vide)",
     rome: "D1102",
     siret: "87804354600018",
@@ -576,7 +572,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -588,6 +583,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LES JARDINS DE DELICE",
     rome: "D1102",
     siret: "53855085600040",
@@ -608,7 +604,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -620,6 +615,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "BELAYAN",
     rome: "D1102",
     siret: "79310870500013",
@@ -639,7 +635,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -651,6 +646,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "5610C",
+    establishmentScore: 0,
     name: "MERCI JEROME LEVALLOIS",
     rome: "D1102",
     siret: "81211017900015",
@@ -671,7 +667,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -683,6 +678,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "FATIMA OUSLIMANE",
     rome: "D1102",
     siret: "53143530300023",
@@ -702,7 +698,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -714,6 +709,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "SOCIETE DESGRANGES",
     rome: "D1102",
     siret: "50849936500015",
@@ -734,7 +730,6 @@ export const seedSearchResults: SearchResultDto[] = [
         appellationLabel:
           "Boulanger-pâtissier-traiteur / Boulangère-pâtissière-traiteuse",
         appellationCode: "11575",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -746,6 +741,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "MAILLARD",
     rome: "D1102",
     siret: "80535660700012",
@@ -766,7 +762,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -778,6 +773,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "SARL SOPHIA",
     rome: "D1102",
     siret: "84044966400019",
@@ -797,7 +793,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -809,6 +804,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "AU PARADIS DU GOURMAND",
     rome: "D1102",
     siret: "48999132300028",
@@ -828,7 +824,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -840,6 +835,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "FRANCOIS HOHL",
     rome: "D1102",
     siret: "37825294400046",
@@ -860,7 +856,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -872,6 +867,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "EFB",
     rome: "D1102",
     siret: "89836129000015",
@@ -892,7 +888,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -904,6 +899,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "RAINETTE",
     rome: "D1102",
     siret: "53388732900027",
@@ -924,7 +920,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -936,6 +931,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "SAS ANDRE STEVENS",
     rome: "D1102",
     siret: "83134157300010",
@@ -955,7 +951,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -967,6 +962,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "BEKKARY",
     rome: "D1102",
     siret: "87978073200027",
@@ -986,7 +982,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -998,6 +993,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "4724Z",
+    establishmentScore: 0,
     name: "BOULANGERIE DU NIL",
     rome: "D1102",
     siret: "81280923400014",
@@ -1018,7 +1014,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1030,6 +1025,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "AUX DELICES D'IVRY",
     rome: "D1102",
     siret: "89505033400013",
@@ -1050,7 +1046,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1062,6 +1057,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "KILANI OUNISSI",
     rome: "D1102",
     siret: "50300068900011",
@@ -1082,7 +1078,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1094,6 +1089,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "BOULANGERIE DU FAUBOURG",
     rome: "D1102",
     siret: "83801538600017",
@@ -1113,7 +1109,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1125,6 +1120,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "YACINE",
     rome: "D1102",
     siret: "82315238400017",
@@ -1144,7 +1140,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1156,6 +1151,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "SAS EFB WALLONS",
     rome: "D1102",
     siret: "90481565100016",
@@ -1176,7 +1172,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1188,6 +1183,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LA PREMIERE",
     rome: "D1102",
     siret: "81182056200015",
@@ -1208,7 +1204,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1220,6 +1215,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LA MAISON KERCK",
     rome: "D1102",
     siret: "81960978500012",
@@ -1240,7 +1236,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1252,6 +1247,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "BENOIT CASTEL MENILMONTANT",
     rome: "D1102",
     siret: "80207258700024",
@@ -1271,7 +1267,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1283,6 +1278,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "AUX PLAISIRS DE VASCO",
     rome: "D1102",
     siret: "50519430800019",
@@ -1302,7 +1298,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1314,6 +1309,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "SIMON QUILLET",
     rome: "D1102",
     siret: "84952296600019",
@@ -1334,7 +1330,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1346,6 +1341,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LE GRENIER A PAIN BILLANCOURT",
     rome: "D1102",
     siret: "52772015500029",
@@ -1366,7 +1362,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1378,6 +1373,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LE DELICES DE MARCEAU",
     rome: "D1102",
     siret: "82014870800010",
@@ -1398,7 +1394,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1410,6 +1405,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "ETINCELLE DE GOURMANDISE",
     rome: "D1102",
     siret: "89005892800015",
@@ -1429,7 +1425,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1441,6 +1436,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "AUX DELICES DE GLACIERE",
     rome: "D1102",
     siret: "81901203000014",
@@ -1460,7 +1456,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1472,6 +1467,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LE GRENIER A PAIN SEVRES",
     rome: "D1102",
     siret: "48396966300028",
@@ -1492,7 +1488,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1504,6 +1499,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "GRANDS MAGASINS DU PAIN",
     rome: "D1102",
     siret: "82256907500028",
@@ -1523,7 +1519,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1535,6 +1530,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LE GRENIER A PAIN LEVALLOIS",
     rome: "D1102",
     siret: "48241939700021",
@@ -1555,12 +1551,10 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1572,6 +1566,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "TRANCHE DE CAKE",
     rome: "D1102",
     siret: "49049275800035",
@@ -1591,7 +1586,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1603,6 +1597,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "S.A.S.U BERTHE",
     rome: "D1102",
     siret: "84049762200018",
@@ -1623,7 +1618,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1635,6 +1629,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "POILANE",
     rome: "D1102",
     siret: "32444503000012",
@@ -1654,7 +1649,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1666,6 +1660,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "MLG EXPLOITATION",
     rome: "D1102",
     siret: "52007182000010",
@@ -1686,7 +1681,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1698,6 +1692,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LA TRADITION GOURMANDE",
     rome: "D1102",
     siret: "75228611200012",
@@ -1718,7 +1713,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1730,6 +1724,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "5610C",
+    establishmentScore: 0,
     name: "MERCI JEROME PONT-NEUF",
     rome: "D1102",
     siret: "82467102800028",
@@ -1750,7 +1745,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1762,6 +1756,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "M D M",
     rome: "D1102",
     siret: "80344637600011",
@@ -1782,7 +1777,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1794,6 +1788,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "MAISON AURELIE RIBAY",
     rome: "D1102",
     siret: "83518647900019",
@@ -1814,7 +1809,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1826,6 +1820,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "S.A.S LEPARQ JEROME",
     rome: "D1102",
     siret: "82253123200012",
@@ -1846,7 +1841,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1858,6 +1852,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "MERCI JEROME NEUILLY - TERNES",
     rome: "D1102",
     siret: "79376010900025",
@@ -1878,7 +1873,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1890,6 +1884,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "FATIMA OUSLIMANE",
     rome: "D1102",
     siret: "53143530300015",
@@ -1909,7 +1904,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1921,6 +1915,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "L'ATELIER DU PAIN",
     rome: "D1102",
     siret: "82184494100012",
@@ -1941,7 +1936,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1953,6 +1947,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "MAISON MARNAY",
     rome: "D1102",
     siret: "80748375500011",
@@ -1973,7 +1968,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -1985,6 +1979,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "MAISON LOUISE",
     rome: "D1102",
     siret: "80889123800012",
@@ -2005,7 +2000,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2017,6 +2011,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "TAL",
     rome: "D1102",
     siret: "75198013700028",
@@ -2036,7 +2031,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2048,6 +2042,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "4724Z",
+    establishmentScore: 0,
     name: "BOULANGERIE DU NIL",
     rome: "D1102",
     siret: "81280923400063",
@@ -2068,7 +2063,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2080,6 +2074,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "AU BON PAIN",
     rome: "D1102",
     siret: "52422448200033",
@@ -2099,7 +2094,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2111,6 +2105,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LA FABRIQUE",
     rome: "D1102",
     siret: "84832695500020",
@@ -2131,7 +2126,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2143,6 +2137,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "MAISON LE SURFIN",
     rome: "D1102",
     siret: "89485321700012",
@@ -2163,7 +2158,6 @@ export const seedSearchResults: SearchResultDto[] = [
         appellationLabel:
           "Boulanger-pâtissier-traiteur / Boulangère-pâtissière-traiteuse",
         appellationCode: "11575",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2175,6 +2169,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "4724Z",
+    establishmentScore: 0,
     name: "BOULANGERIE DU NIL",
     rome: "D1102",
     siret: "81280923400030",
@@ -2195,7 +2190,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2207,6 +2201,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LAPIERRE'S ET FILLE",
     rome: "D1102",
     siret: "83427852500029",
@@ -2227,7 +2222,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2239,6 +2233,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LE MOULIN DE LA CROIX NIVERT",
     rome: "D1102",
     siret: "80838011700016",
@@ -2258,7 +2253,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2270,6 +2264,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "AU COIN DES DELICES",
     rome: "D1102",
     siret: "84200004400011",
@@ -2289,7 +2284,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2300,6 +2294,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "LE GRENIER A PAIN ITALIE",
     rome: "D1102",
     siret: "41525551200014",
@@ -2320,7 +2315,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2332,6 +2326,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "5610A",
+    establishmentScore: 0,
     name: "B.O.U.L.O.M",
     rome: "D1102",
     siret: "42987567700016",
@@ -2351,7 +2346,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2362,6 +2356,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "4724Z",
+    establishmentScore: 0,
     name: "MAISON KONTEH",
     rome: "D1102",
     siret: "81751896200011",
@@ -2383,7 +2378,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2394,6 +2388,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "1071C",
+    establishmentScore: 0,
     name: "BOULANGERIE BAC",
     rome: "D1102",
     siret: "81320286800010",
@@ -2413,7 +2408,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger / Boulangère",
         appellationCode: "11573",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,
@@ -2425,6 +2419,7 @@ export const seedSearchResults: SearchResultDto[] = [
   },
   {
     naf: "6820B",
+    establishmentScore: 0,
     name: "LE GRENIER A PAIN ABBESSES",
     rome: "D1102",
     siret: "45216931100019",
@@ -2445,7 +2440,6 @@ export const seedSearchResults: SearchResultDto[] = [
       {
         appellationLabel: "Boulanger-pâtissier / Boulangère-pâtissière",
         appellationCode: "11574",
-        score: 0,
       },
     ],
     voluntaryToImmersion: true,

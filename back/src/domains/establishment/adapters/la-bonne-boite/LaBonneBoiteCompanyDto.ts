@@ -71,6 +71,7 @@ export class LaBonneBoiteCompanyDto {
   public toSearchResult(): SearchResultDto {
     return {
       siret: this.props.siret,
+      establishmentScore: 0,
       name: this.props.name,
       address: addressStringToDto(this.props.address),
       additionalInformation: "",
