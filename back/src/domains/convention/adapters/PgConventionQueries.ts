@@ -9,6 +9,7 @@ import {
   ConventionStatus,
   DateRange,
   FindSimilarConventionsParams,
+  SiretDto,
   conventionReadSchema,
   conventionSchema,
   pipeWithValue,
@@ -279,7 +280,7 @@ const addFiltersToBuilder =
 
     const addWithSiretsIfNeeded: AddToBuilder = (b) =>
       withSirets && withSirets.length > 0
-        ? b.where("conventions.siret", "in", withSirets)
+        ? b.where("conventions.siret", "=", sql<SiretDto>`ANY(${withSirets})`)
         : b;
 
     return pipeWithValue(

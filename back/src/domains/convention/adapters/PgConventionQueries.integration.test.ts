@@ -336,7 +336,12 @@ describe("Pg implementation of ConventionQueries", () => {
   describe("PG implementation of method getConventionsByFilters", () => {
     const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
     const agency = AgencyDtoBuilder.create().withId(agencyId).build();
+    const siret1 = "11110000111100";
+    const siret2 = "22220000222200";
+    const siret3 = "33330000333300";
+
     const conventionCancelledAndDateStart20230327 = new ConventionDtoBuilder()
+      .withSiret(siret1)
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
       .withDateStart(new Date("2023-03-27").toISOString())
       .withDateEnd(new Date("2023-03-28").toISOString())
@@ -346,6 +351,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     const conventionDraftAndDateStart20230330 = new ConventionDtoBuilder()
+      .withSiret(siret3)
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
       .withDateSubmission(new Date("2023-03-05").toISOString())
       .withDateStart(new Date("2023-03-30").toISOString())
@@ -356,6 +362,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     const firstValidatedConvention = new ConventionDtoBuilder()
+      .withSiret(siret1)
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa03")
       .withDateSubmission(new Date("2024-06-20").toISOString())
       .withDateStart(new Date("2024-07-01").toISOString())
@@ -368,6 +375,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     const secondValidatedConvention = new ConventionDtoBuilder()
+      .withSiret(siret2)
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa04")
       .withDateSubmission(new Date("2024-06-21").toISOString())
       .withDateStart(new Date("2024-07-02").toISOString())
@@ -521,6 +529,21 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(resultAll, [
         secondValidatedConvention,
         firstValidatedConvention,
+      ]);
+    });
+
+    it("getConventionsByFilters with some sirets", async () => {
+      const resultAll = await conventionQueries.getConventions({
+        filters: {
+          withSirets: [siret1, siret2],
+        },
+        sortBy: "dateStart",
+      });
+
+      expectToEqual(resultAll, [
+        secondValidatedConvention,
+        firstValidatedConvention,
+        conventionCancelledAndDateStart20230327,
       ]);
     });
   });
