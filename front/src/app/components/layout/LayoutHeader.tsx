@@ -1,8 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import {
-  Display,
-  headerFooterDisplayItem,
-} from "@codegouvfr/react-dsfr/Display";
 import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
@@ -54,7 +50,6 @@ export const LayoutHeader = () => {
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const tools: HeaderProps["quickAccessItems"] = [
-    headerFooterDisplayItem,
     {
       text: "Remplir la demande de convention",
       iconId: "fr-icon-draft-line",
@@ -318,7 +313,6 @@ export const LayoutHeader = () => {
         navigation={links}
         quickAccessItems={tools}
       />
-      <Display />
     </>
   );
 };

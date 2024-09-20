@@ -1,4 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import {
+  Display,
+  headerFooterDisplayItem,
+} from "@codegouvfr/react-dsfr/Display";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import React from "react";
 import {
@@ -139,7 +143,7 @@ const links: NavLink[] = [
     target: "_blank",
   },
 ];
-const bottomsLinks: NavLink[] = [
+const bottomsLinks: (NavLink | typeof headerFooterDisplayItem)[] = [
   {
     label: "Accessibilité : partiellement conforme",
     ...routes.standard({ pagePath: "accessibilite" }).link,
@@ -207,6 +211,7 @@ const bottomsLinks: NavLink[] = [
     id: bottomsLinksIds.communicationKit,
     target: "_blank",
   },
+  headerFooterDisplayItem,
 ];
 
 const navTopGroupLinks: NavTopGroupLinks[] = [
@@ -282,6 +287,7 @@ export const LayoutFooter = () => (
       bottomLinks={bottomsLinks}
       plateformeInclusionLogo={<PlateformeInclusionLogo />}
     />
+    <Display />
   </>
 );
 
