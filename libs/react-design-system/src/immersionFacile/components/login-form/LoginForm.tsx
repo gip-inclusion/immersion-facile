@@ -42,7 +42,7 @@ export const LoginForm = ({ sections }: LoginFormProps) => {
   return (
     <div
       className={cx(
-        fr.cx("fr-py-6w", "fr-px-4w", "fr-px-md-12w"),
+        fr.cx("fr-py-6w", "fr-px-2w", "fr-px-md-12w", "fr-mb-8w"),
         Styles.inner,
       )}
     >

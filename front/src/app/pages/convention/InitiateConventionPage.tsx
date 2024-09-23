@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr/fr";
 import { useState } from "react";
 import { MainWrapper, NavCard, PageHeader } from "react-design-system";
 import { domElementIds, loginPeConnect } from "shared";
+import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes, useRoute } from "src/app/routes/routes";
 import { Route } from "type-route";
@@ -17,13 +18,16 @@ export const InitiateConventionPage = () => {
       <MainWrapper
         layout="default"
         pageHeader={
-          <PageHeader
-            title={
-              showCandidateOptions
-                ? "Qui vous accompagne dans votre projet d'immersion ?"
-                : "Remplir la demande de convention"
-            }
-          />
+          <>
+            <Breadcrumbs />
+            <PageHeader
+              title={
+                showCandidateOptions
+                  ? "Qui vous accompagne dans votre projet d'immersion ?"
+                  : "Remplir la demande de convention"
+              }
+            />
+          </>
         }
       >
         {!showCandidateOptions && (

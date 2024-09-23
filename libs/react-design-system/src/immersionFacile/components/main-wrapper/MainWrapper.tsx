@@ -54,7 +54,7 @@ export const MainWrapper = ({
       {pageHeader}
       <main className={classNameValue} id="main-content">
         {layout === "boxed" && (
-          <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
+          <div className={fr.cx("fr-grid-row")}>
             <div className={fr.cx("fr-col-lg-7", "fr-px-2w")}>{children}</div>
           </div>
         )}

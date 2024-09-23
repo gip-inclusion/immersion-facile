@@ -13,6 +13,7 @@ import {
 import { useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { LatLonDistance, SearchSortedBy, ValueOf, domElementIds } from "shared";
+import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -157,6 +158,7 @@ export const SearchPage = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
+        <Breadcrumbs />
         <PageHeader title="Je trouve une entreprise pour réaliser mon immersion professionnelle">
           <form
             onSubmit={handleSubmit((value) =>

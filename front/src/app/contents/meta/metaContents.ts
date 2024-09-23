@@ -1,6 +1,6 @@
 import { AdminTab, GroupName } from "shared";
 import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
-import { routes } from "src/app/routes/routes";
+import { FrontRouteKeys } from "src/app/routes/routes";
 
 export type MetaContentType = {
   title: string;
@@ -12,9 +12,7 @@ export const defaultMetaContents: MetaContentType = {
   description: "Faciliter la réalisation des immersions professionnelles.",
 };
 
-export const metaContents: Partial<
-  Record<keyof typeof routes, MetaContentType>
-> = {
+export const metaContents: Partial<Record<FrontRouteKeys, MetaContentType>> = {
   addAgency: {
     title: "Formulaire d'ajout d'un prescripteur",
     description: "Devenir prescripteur de PMSMP et immersions professionnelles",

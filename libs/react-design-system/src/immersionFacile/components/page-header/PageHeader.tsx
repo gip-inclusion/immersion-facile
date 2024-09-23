@@ -1,7 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
-import Styles from "./PageHeader.styles";
 
 export type PageHeaderProps = {
   title: string;
@@ -16,13 +15,12 @@ export const PageHeader = ({
   className,
   children,
   classes = {},
-  centered = false,
 }: PageHeaderProps) => {
   const { cx } = useStyles();
   return (
     <section
       className={cx(
-        fr.cx("fr-pt-9w", "fr-pb-2w"),
+        fr.cx("fr-pt-2w", "fr-pb-2w"),
         ` ${className ?? ""}`,
         classes.root,
       )}
@@ -30,13 +28,7 @@ export const PageHeader = ({
       aria-label="En-tête de page"
     >
       <div className={cx(fr.cx("fr-container"), classes.inner)}>
-        <h1
-          className={cx(
-            children ? "" : "fr-my-auto",
-            centered && Styles.titleCentered,
-            classes.title,
-          )}
-        >
+        <h1 className={cx(children ? "" : "fr-my-auto", classes.title)}>
           {title}
         </h1>
         {children}
