@@ -826,8 +826,8 @@ const insertUser = async (
       last_name: lastName,
       created_at: createdAt,
       [provider === "InclusionConnect"
-        ? "external_id_inclusion_connect"
-        : "external_id_pro_connect"]: externalId,
+        ? "inclusion_connect_sub"
+        : "pro_connect_sub"]: externalId,
     })
     .execute();
 };
