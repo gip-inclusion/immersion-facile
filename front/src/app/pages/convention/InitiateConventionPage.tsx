@@ -18,16 +18,14 @@ export const InitiateConventionPage = () => {
       <MainWrapper
         layout="default"
         pageHeader={
-          <>
-            <Breadcrumbs />
-            <PageHeader
-              title={
-                showCandidateOptions
-                  ? "Qui vous accompagne dans votre projet d'immersion ?"
-                  : "Remplir la demande de convention"
-              }
-            />
-          </>
+          <PageHeader
+            title={
+              showCandidateOptions
+                ? "Qui vous accompagne dans votre projet d'immersion ?"
+                : "Remplir la demande de convention"
+            }
+            breadcrumbs={<Breadcrumbs />}
+          />
         }
       >
         {!showCandidateOptions && (

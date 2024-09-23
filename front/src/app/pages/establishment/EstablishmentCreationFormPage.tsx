@@ -9,10 +9,10 @@ export const EstablishmentCreationFormPage = () => (
     <MainWrapper
       layout="default"
       pageHeader={
-        <>
-          <Breadcrumbs />
-          <PageHeader title="Proposer une immersion" />
-        </>
+        <PageHeader
+          title="Proposer une immersion"
+          breadcrumbs={<Breadcrumbs />}
+        />
       }
     >
       <EstablishmentForm mode="create" />

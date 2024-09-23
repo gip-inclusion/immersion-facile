@@ -9,10 +9,10 @@ export const AddAgencyPage = () => (
     <MainWrapper
       layout="default"
       pageHeader={
-        <>
-          <Breadcrumbs />
-          <PageHeader title="Ajout d'organisme encadrant les PMSMP" />
-        </>
+        <PageHeader
+          title="Ajout d'organisme encadrant les PMSMP"
+          breadcrumbs={<Breadcrumbs />}
+        />
       }
     >
       <AddAgencyForm />
