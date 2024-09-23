@@ -226,8 +226,13 @@ export const ConventionDocumentPage = ({
               en qualité de <strong>bénéficiaire</strong> {""}
               {beneficiary.isRqth && "reconnu en situation de handicap"}
               <ul>
-                <li>tel: {beneficiary.phone}</li>
-                <li>email: {beneficiary.email}</li>
+                <li>tel.&nbsp;: {beneficiary.phone}</li>
+                <li>email&nbsp;: {beneficiary.email}</li>
+                {convention.internshipKind === "mini-stage-cci" && (
+                  <li>
+                    adresse&nbsp;: {convention.signatories.beneficiary.address}
+                  </li>
+                )}
               </ul>
             </li>
             {beneficiaryRepresentative && (
@@ -239,8 +244,8 @@ export const ConventionDocumentPage = ({
                 en qualité de{" "}
                 <strong>représentant(e) légal(e) du bénéficiaire</strong>
                 <ul>
-                  <li>tel: {beneficiaryRepresentative.phone}</li>
-                  <li>email: {beneficiaryRepresentative.email}</li>
+                  <li>tel.&nbsp;: {beneficiaryRepresentative.phone}</li>
+                  <li>email&nbsp;: {beneficiaryRepresentative.email}</li>
                 </ul>
               </li>
             )}
@@ -254,9 +259,11 @@ export const ConventionDocumentPage = ({
                 {beneficiaryCurrentEmployer.businessName}{" "}
                 <strong>employant actuellement le bénéficiaire</strong>
                 <ul>
-                  <li>tel: {beneficiaryCurrentEmployer.phone}</li>
-                  <li>email: {beneficiaryCurrentEmployer.email}</li>
-                  <li>adresse: {beneficiaryCurrentEmployer.businessAddress}</li>
+                  <li>tel.&nbsp;: {beneficiaryCurrentEmployer.phone}</li>
+                  <li>email&nbsp;: {beneficiaryCurrentEmployer.email}</li>
+                  <li>
+                    adresse&nbsp;: {beneficiaryCurrentEmployer.businessAddress}
+                  </li>
                 </ul>
               </li>
             )}
@@ -269,8 +276,8 @@ export const ConventionDocumentPage = ({
                 en qualité de <strong>représentant de l'entreprise</strong>{" "}
                 {convention.businessName}
                 <ul>
-                  <li>tel: {establishmentRepresentative.phone}</li>
-                  <li>email: {establishmentRepresentative.email}</li>
+                  <li>tel.&nbsp;: {establishmentRepresentative.phone}</li>
+                  <li>email&nbsp;: {establishmentRepresentative.email}</li>
                 </ul>
               </li>
             )}
@@ -482,7 +489,7 @@ export const ConventionDocumentPage = ({
             {isStartingByVowel(convention.establishmentTutor.job)
               ? `d'${convention.establishmentTutor.job}`
               : `de ${convention.establishmentTutor.job}`}{" "}
-            (tel: {convention.establishmentTutor.phone}
+            (tel.&nbsp;: {convention.establishmentTutor.phone}
             {convention.establishmentTutor.email !==
               establishmentRepresentative.email &&
               `, mail: ${convention.establishmentTutor.email}`}

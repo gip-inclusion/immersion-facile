@@ -10,10 +10,12 @@ import {
   BeneficiaryRepresentative,
   ConventionReadDto,
   InternshipKind,
+  domElementIds,
   emailSchema,
   isBeneficiaryStudent,
   levelsOfEducation,
 } from "shared";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import {
   EmailValidationErrorsState,
@@ -204,6 +206,16 @@ export const BeneficiaryFormSection = ({
       />
       {values.internshipKind === "mini-stage-cci" && (
         <>
+          <AddressAutocomplete
+            {...formContents["signatories.beneficiary.address"]}
+            setFormValue={(value) => {
+              setValue(
+                "signatories.beneficiary.address",
+                `${value.address.streetNumberAndAddress}, ${value.address.postcode} ${value.address.city}`,
+              );
+            }}
+            id={domElementIds.addAgency.addressAutocomplete}
+          />
           <Select
             label={
               formContents["signatories.beneficiary.levelOfEducation"].label

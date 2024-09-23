@@ -108,6 +108,12 @@ export const createConventionQueryBuilder = (transaction: KyselyDb) => {
               .then(sql`b.extra_fields ->> 'financiaryHelp'`)
               .else(null)
               .end(),
+            address: eb
+              .case()
+              .when(sql`b.extra_fields ->> 'address'`, "is not", null)
+              .then(sql`b.extra_fields ->> 'address'`)
+              .else(null)
+              .end(),
             birthdate: eb
               .case()
               .when(sql`b.extra_fields ->> 'birthdate'`, "is not", null)

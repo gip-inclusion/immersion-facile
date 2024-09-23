@@ -214,7 +214,7 @@ const ConventionSummarySection = () => {
         <Alert
           severity={"info"}
           title="Validation"
-          description="Attention ! Vérifiez que tous les éléments sont bien intégrés et exacts.En cas de demande de modification après validation, tous les signataires devront signer à nouveau la convention."
+          description="Attention ! Vérifiez que tous les éléments sont bien intégrés et exacts. En cas de demande de modification après validation, tous les signataires devront signer à nouveau la convention."
           small
         />
       )}
