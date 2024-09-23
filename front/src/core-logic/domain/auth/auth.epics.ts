@@ -71,7 +71,7 @@ const logoutFromInclusionConnect: AuthEpic = (
     }),
     map((logoutUrl) => {
       if (logoutUrl) navigationGateway.goToUrl(logoutUrl);
-      return authSlice.actions.loggedOutSuccessfullyFromInclusionConnect();
+      return authSlice.actions.loggedOutSuccessfullyFromProvider();
     }),
     catchEpicError((_error) =>
       authSlice.actions.loggedOutFailedFromInclusionConnect(),

@@ -42,7 +42,7 @@ export const authSlice = createSlice({
     federatedIdentityInDeviceDeletionSucceeded: (state) => {
       state.federatedIdentityWithUser = null;
     },
-    loggedOutSuccessfullyFromInclusionConnect: (state) => state,
+    loggedOutSuccessfullyFromProvider: (state) => state,
     loggedOutFailedFromInclusionConnect: (state) => {
       state.federatedIdentityWithUser = null;
     },
