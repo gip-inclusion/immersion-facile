@@ -60,7 +60,7 @@ import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
-import { GetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
+import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
 import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/pe-connect/use-cases/BindConventionToFederatedIdentity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../domains/core/authentication/pe-connect/use-cases/LinkPoleEmploiAdvisorAndRedirectToConvention";
@@ -241,10 +241,6 @@ export const createUseCases = (
       ),
       linkFranceTravailUsersToTheirAgencies:
         new LinkFranceTravailUsersToTheirAgencies(uowPerformer),
-      inclusionConnectLogout: new GetInclusionConnectLogoutUrl(
-        uowPerformer,
-        gateways.oAuthGateway,
-      ),
       bindConventionToFederatedIdentity: new BindConventionToFederatedIdentity(
         uowPerformer,
         createNewEvent,
@@ -624,6 +620,10 @@ export const createUseCases = (
           similarConventionIds:
             await uow.conventionQueries.findSimilarConventions(params),
         })),
+    }),
+    inclusionConnectLogout: makeGetInclusionConnectLogoutUrl({
+      uowPerformer,
+      deps: { oAuthGateway: gateways.oAuthGateway },
     }),
     createAssessment: makeCreateAssessment({
       uowPerformer,
