@@ -127,4 +127,40 @@ describe("GetInclusionConnectedUsers", () => {
       paulWithAllAgenciesReviewed,
     ]);
   });
+
+  it("returns results ordered Alphabetically, people with no name should be first", async () => {
+    const genericUser: InclusionConnectedUser = {
+      id: "generic-222",
+      email: "john@mail.com",
+      firstName: "",
+      lastName: "",
+      createdAt: new Date().toISOString(),
+      agencyRights: [
+        { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
+        { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
+      ],
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
+      externalId: null,
+    };
+
+    userRepository.setInclusionConnectedUsers([
+      paulWithAllAgenciesReviewed,
+      johnWithAgenciesToReview,
+      genericUser,
+    ]);
+
+    const users = await getInclusionConnectedUsers.execute(
+      { agencyId: agency1.id },
+      backofficeAdminUser,
+    );
+
+    expectToEqual(users, [
+      genericUser,
+      johnWithAgenciesToReview,
+      paulWithAllAgenciesReviewed,
+    ]);
+  });
 });

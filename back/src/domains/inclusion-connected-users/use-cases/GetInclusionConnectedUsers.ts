@@ -1,3 +1,4 @@
+import { sort } from "ramda";
 import {
   InclusionConnectedUser,
   WithUserFilters,
@@ -20,6 +21,12 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
     currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser[]> {
     throwIfNotAdmin(currentUser);
-    return uow.userRepository.getWithFilter(filters);
+    return uow.userRepository
+      .getWithFilter(filters)
+      .then(
+        sort((a, b) =>
+          a.lastName.toLowerCase() < b.lastName.toLowerCase() ? -1 : 1,
+        ),
+      );
   }
 }
