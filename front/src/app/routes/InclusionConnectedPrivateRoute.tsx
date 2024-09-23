@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import React, { useEffect } from "react";
 import {
@@ -15,6 +16,7 @@ import {
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { loginIllustration } from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -67,32 +69,50 @@ export const InclusionConnectedPrivateRoute = ({
     return (
       <HeaderFooterLayout>
         <MainWrapper
-          layout="boxed"
+          layout="default"
           pageHeader={inclusionConnectConnexionPageHeader}
-          vSpacing={2}
+          vSpacing={6}
         >
-          <LoginForm
-            sections={[
-              {
-                title: "Se connecter avec Inclusion Connect",
-                description:
-                  "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
-                authComponent: (
-                  <InclusionConnectButton
-                    id={domElementIds[route.name].login.inclusionConnectButton}
-                    inclusionConnectEndpoint={`${
-                      inclusionConnectImmersionRoutes.startInclusionConnectLogin
-                        .url
-                    }?${queryParamsAsString(
-                      inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
-                        { page: route.name },
-                      ),
-                    )}`}
-                  />
-                ),
-              },
-            ]}
-          />
+          <div className={fr.cx("fr-grid-row")}>
+            <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+              <LoginForm
+                sections={[
+                  {
+                    title: "Se connecter avec Inclusion Connect",
+                    description:
+                      "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
+                    authComponent: (
+                      <InclusionConnectButton
+                        id={
+                          domElementIds[route.name].login.inclusionConnectButton
+                        }
+                        inclusionConnectEndpoint={`${
+                          inclusionConnectImmersionRoutes
+                            .startInclusionConnectLogin.url
+                        }?${queryParamsAsString(
+                          inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
+                            { page: route.name },
+                          ),
+                        )}`}
+                      />
+                    ),
+                  },
+                ]}
+              />
+            </div>
+            <div
+              className={fr.cx(
+                "fr-col-12",
+                "fr-col-lg-6",
+                "fr-hidden",
+                "fr-unhidden-lg",
+                "fr-px-12w",
+                "fr-py-4w",
+              )}
+            >
+              <img src={loginIllustration} width={400} height={260} alt="" />
+            </div>
+          </div>
         </MainWrapper>
       </HeaderFooterLayout>
     );

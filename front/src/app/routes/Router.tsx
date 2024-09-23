@@ -65,10 +65,7 @@ const getPageByRouteName: {
       allowAdminOnly={true}
       route={routes.admin({ tab: "conventions" })}
       inclusionConnectConnexionPageHeader={
-        <PageHeader
-          title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀"
-          centered
-        />
+        <PageHeader title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀" />
       }
     >
       <AdminPage route={routes.admin({ tab: "conventions" })} />
@@ -80,10 +77,7 @@ const getPageByRouteName: {
         allowAdminOnly={true}
         route={route}
         inclusionConnectConnexionPageHeader={
-          <PageHeader
-            title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀"
-            centered
-          />
+          <PageHeader title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀" />
         }
       >
         <AdminPage route={route} />
@@ -96,13 +90,10 @@ const getPageByRouteName: {
       <InclusionConnectedPrivateRoute
         route={route}
         inclusionConnectConnexionPageHeader={
-          <>
-            <Breadcrumbs />
-            <PageHeader
-              title="Retrouvez vos conventions en tant que prescripteur"
-              centered
-            />
-          </>
+          <PageHeader
+            title="Retrouvez vos conventions en tant que prescripteur"
+            breadcrumbs={<Breadcrumbs />}
+          />
         }
       >
         <AgencyDashboardPage route={route} />
@@ -135,13 +126,10 @@ const getPageByRouteName: {
       <InclusionConnectedPrivateRoute
         route={route}
         inclusionConnectConnexionPageHeader={
-          <>
-            <Breadcrumbs />
-            <PageHeader
-              title="Retrouvez vos conventions en tant qu'entreprise"
-              centered
-            />
-          </>
+          <PageHeader
+            title="Retrouvez vos conventions en tant qu'entreprise"
+            breadcrumbs={<Breadcrumbs />}
+          />
         }
       >
         <EstablishmentDashboardPage route={route} />

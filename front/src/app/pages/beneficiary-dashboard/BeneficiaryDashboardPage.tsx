@@ -12,10 +12,10 @@ export const BeneficiaryDashboardPage = () => {
         layout="default"
         vSpacing={8}
         pageHeader={
-          <>
-            <Breadcrumbs />
-            <PageHeader title="Vous n’avez pas besoin de compte pour utiliser Immersion Facilitée" />
-          </>
+          <PageHeader
+            title="Vous n’avez pas besoin de compte pour utiliser Immersion Facilitée"
+            breadcrumbs={<Breadcrumbs />}
+          />
         }
       >
         <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>

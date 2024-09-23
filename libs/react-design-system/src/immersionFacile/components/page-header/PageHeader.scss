@@ -1,7 +1,5 @@
 .im-page-header {
-  &__title {
-    &--centered {
-      text-align: center;
-    }
+  &__breadcrumbs-wrapper + .fr-container {
+    margin-top: 0 !important;
   }
 }

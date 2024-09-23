@@ -92,10 +92,10 @@ export const ConventionImmersionPage = ({
         layout={"default"}
         pageHeader={
           !displaySharedConventionMessage && (
-            <>
-              <Breadcrumbs />
-              <PageHeader title={getPageHeaderTitle(jwt, showSummary)} />
-            </>
+            <PageHeader
+              title={getPageHeaderTitle(jwt, showSummary)}
+              breadcrumbs={<Breadcrumbs />}
+            />
           )
         }
       >

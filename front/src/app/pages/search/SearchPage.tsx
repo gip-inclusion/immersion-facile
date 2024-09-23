@@ -158,8 +158,10 @@ export const SearchPage = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
-        <Breadcrumbs />
-        <PageHeader title="Je trouve une entreprise pour réaliser mon immersion professionnelle">
+        <PageHeader
+          title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
+          breadcrumbs={<Breadcrumbs />}
+        >
           <form
             onSubmit={handleSubmit((value) =>
               triggerSearch(filterFormValues(value)),
