@@ -306,6 +306,11 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     id: beneficiarySectionIds.emergencyContactEmail,
     placeholder: "Ex : contact@urgence.com (optionnel)",
   },
+  "signatories.beneficiary.address": {
+    label: "Adresse du candidat",
+    id: beneficiarySectionIds.address,
+    placeholder: "Ex : 10 Rue de la Paix, 75001 Paris",
+  },
   "signatories.beneficiary.schoolName": {
     label: "Nom de l'établissement scolaire du candidat",
     id: beneficiarySectionIds.schoolName,

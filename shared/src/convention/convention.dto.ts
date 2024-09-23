@@ -224,6 +224,7 @@ type StudentProperties = {
   levelOfEducation: LevelOfEducation;
   schoolName: string;
   schoolPostcode: Postcode;
+  address?: string;
 };
 
 export type Beneficiary<T extends InternshipKind> =

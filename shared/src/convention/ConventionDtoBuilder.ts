@@ -571,6 +571,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
               levelOfEducation: "3ème",
               schoolName: "École du quartier ouest",
               schoolPostcode: "87000",
+              address: "1 rue de la paix, 75001 Paris",
             },
           },
         });

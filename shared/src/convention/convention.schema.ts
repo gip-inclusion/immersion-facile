@@ -145,6 +145,7 @@ const studentBeneficiarySchema: z.Schema<Beneficiary<"mini-stage-cci">> =
       ),
       schoolName: zStringMinLength1,
       schoolPostcode: zStringMinLength1,
+      address: zStringMinLength1.optional(),
     }),
   );
 

@@ -240,6 +240,10 @@ const beneficiarySummary = (
       ...(convention.internshipKind === "mini-stage-cci"
         ? ([
             [
+              fields["signatories.beneficiary.address"].label,
+              convention.signatories.beneficiary.address,
+            ],
+            [
               fields["signatories.beneficiary.levelOfEducation"].label,
               convention.signatories.beneficiary.levelOfEducation,
             ],

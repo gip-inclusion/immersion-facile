@@ -332,7 +332,8 @@ export class PgConventionRepository implements ConventionRepository {
           'isRqth', ${beneficiary.isRqth}::boolean,
           'levelOfEducation', ${studentFields.levelOfEducation}::text,
           'schoolName', ${studentFields.schoolName}::text,
-          'schoolPostcode', ${studentFields.schoolPostcode}::text
+          'schoolPostcode', ${studentFields.schoolPostcode}::text,
+          'address', ${studentFields.address}::text
           ))`,
       })
       .returning("actors.id")
@@ -462,7 +463,8 @@ export class PgConventionRepository implements ConventionRepository {
           'financiaryHelp',  ${beneficiary.financiaryHelp}::text,
           'isRqth',  ${beneficiary.isRqth}::boolean,
           'schoolName',  ${studentFields.schoolName}::text,
-          'schoolPostcode',  ${studentFields.schoolPostcode}::text
+          'schoolPostcode',  ${studentFields.schoolPostcode}::text,
+          'address', ${studentFields.address}::text
       ))`,
       })
       .from("conventions")
@@ -637,7 +639,7 @@ const getStudentFields = (
 ):
   | Pick<
       Beneficiary<"mini-stage-cci">,
-      "levelOfEducation" | "schoolName" | "schoolPostcode"
+      "levelOfEducation" | "schoolName" | "schoolPostcode" | "address"
     >
   | Record<string, never> =>
   isBeneficiaryStudent(beneficiary)
@@ -645,5 +647,6 @@ const getStudentFields = (
         levelOfEducation: beneficiary.levelOfEducation,
         schoolPostcode: beneficiary.schoolPostcode,
         schoolName: beneficiary.schoolName,
+        address: beneficiary.address,
       }
     : {};

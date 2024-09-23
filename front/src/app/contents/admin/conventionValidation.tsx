@@ -131,6 +131,8 @@ const beneficiaryFields: ColField[] = [
         </div>
         {convention.internshipKind === "mini-stage-cci" && (
           <div className={fr.cx("fr-text--xs")}>
+            Adresse du candidat : {convention.signatories.beneficiary.address}
+            <br />
             Niveau d'études :{" "}
             {convention.signatories.beneficiary.levelOfEducation}
             <br />
