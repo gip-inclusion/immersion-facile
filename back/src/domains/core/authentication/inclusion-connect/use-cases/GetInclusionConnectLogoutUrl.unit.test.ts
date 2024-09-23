@@ -12,7 +12,10 @@ import {
   InMemoryOAuthGateway,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
-import { GetInclusionConnectLogoutUrl } from "./GetInclusionConnectLogoutUrl";
+import {
+  GetInclusionConnectLogoutUrl,
+  makeGetInclusionConnectLogoutUrl,
+} from "./GetInclusionConnectLogoutUrl";
 
 describe("GetInclusionConnectLogoutUrl", () => {
   describe.each(oAuthGatewayProviders)(
@@ -23,10 +26,12 @@ describe("GetInclusionConnectLogoutUrl", () => {
 
       beforeEach(() => {
         uow = createInMemoryUow();
-        getInclusionConnectLogoutUrl = new GetInclusionConnectLogoutUrl(
-          new InMemoryUowPerformer(uow),
-          new InMemoryOAuthGateway(fakeProviderConfig),
-        );
+        getInclusionConnectLogoutUrl = makeGetInclusionConnectLogoutUrl({
+          uowPerformer: new InMemoryUowPerformer(uow),
+          deps: {
+            oAuthGateway: new InMemoryOAuthGateway(fakeProviderConfig),
+          },
+        });
 
         uow.featureFlagRepository.update({
           flagName: "enableProConnect",
