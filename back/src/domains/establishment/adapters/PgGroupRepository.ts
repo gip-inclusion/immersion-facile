@@ -63,7 +63,7 @@ export class PgGroupRepository implements GroupRepository {
         ),
       )
       .leftJoin(
-        "establishments_locations as loc",
+        "establishments_location_infos as loc",
         "e.siret",
         "loc.establishment_siret",
       )

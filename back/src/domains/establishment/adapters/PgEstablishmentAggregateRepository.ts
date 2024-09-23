@@ -271,7 +271,7 @@ export class PgEstablishmentAggregateRepository
 
   public async insertEstablishmentAggregate(aggregate: EstablishmentAggregate) {
     await this.#insertEstablishmentFromAggregate(aggregate);
-    await this.#insertLocations(aggregate);
+    await this.#insertLocations(aggregate.establishment);
     await this.#insertContactFromAggregate(aggregate);
     await this.createImmersionOffersToEstablishments(
       aggregate.offers.map((immersionOffer) => ({
@@ -367,8 +367,9 @@ export class PgEstablishmentAggregateRepository
           ) ORDER BY ogr_appellation)) AS appellations,
           null AS distance_m,
           1 AS row_number,
-          loc.*,
-          loc.id AS location_id,
+          loc_inf.*,
+          loc_inf.id AS location_id,
+          loc_pos.position,
           e.score,
           e.naf_code,
           e.is_searchable,
@@ -383,10 +384,12 @@ export class PgEstablishmentAggregateRepository
         LEFT JOIN establishments e ON io.siret = e.siret
         LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
         LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
-        LEFT JOIN establishments_locations AS loc ON loc.establishment_siret = io.siret
-        WHERE io.siret = $1 AND io.appellation_code = $2 AND loc.id = $3
-        GROUP BY (io.siret, io.rome_code, prd.libelle_rome, location_id, e.naf_code, e.is_searchable, e.next_availability_date, e.name, e.website,
-          e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees, e.score)`,
+        LEFT JOIN establishments_location_infos AS loc_inf ON loc_inf.establishment_siret = io.siret
+        LEFT JOIN establishments_location_positions AS loc_pos ON loc_inf.id = loc_pos.id
+        WHERE io.siret = $1 AND io.appellation_code = $2 AND loc_inf.id = $3
+        GROUP BY (io.siret, io.rome_code, prd.libelle_rome, e.naf_code, e.is_searchable, e.next_availability_date, e.name, e.website,
+          e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees, e.score,
+          loc_pos.id, loc_inf.id )`,
         [siret, appellationCode, locationId],
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
@@ -504,28 +507,11 @@ export class PgEstablishmentAggregateRepository
       .execute();
 
     await this.transaction
-      .deleteFrom("establishments_locations")
+      .deleteFrom("establishments_location_infos")
       .where("establishment_siret", "=", establishment.siret)
       .execute();
 
-    await this.transaction
-      .insertInto("establishments_locations")
-      .values((eb) =>
-        establishment.locations.map(({ address, id, position }) => ({
-          id,
-          establishment_siret: establishment.siret,
-          city: address.city,
-          department_code: address.departmentCode,
-          post_code: address.postcode,
-          street_number_and_address: address.streetNumberAndAddress,
-          lat: position.lat,
-          lon: position.lon,
-          position: eb.fn("ST_MakePoint", [
-            sql`${position.lon}, ${position.lat}`,
-          ]),
-        })),
-      )
-      .execute();
+    await this.#insertLocations(establishment);
   }
 
   async #deleteEstablishmentContactBySiret(siret: SiretDto): Promise<void> {
@@ -792,19 +778,28 @@ export class PgEstablishmentAggregateRepository
     }
   }
 
-  async #insertLocations(aggregate: EstablishmentAggregate) {
+  async #insertLocations(establishment: EstablishmentEntity) {
     await this.transaction
-      .insertInto("establishments_locations")
-      .values((eb) =>
-        aggregate.establishment.locations.map(({ position, address, id }) => ({
-          id: id,
-          establishment_siret: aggregate.establishment.siret,
+      .insertInto("establishments_location_infos")
+      .values(
+        establishment.locations.map(({ position, address, id }) => ({
+          id,
+          establishment_siret: establishment.siret,
           city: address.city,
           department_code: address.departmentCode,
           post_code: address.postcode,
           street_number_and_address: address.streetNumberAndAddress,
           lat: position.lat,
           lon: position.lon,
+        })),
+      )
+      .execute();
+
+    await this.transaction
+      .insertInto("establishments_location_positions")
+      .values((eb) =>
+        establishment.locations.map(({ position, id }) => ({
+          id,
           position: eb.fn("ST_GeographyFromText", [
             sql`${`POINT(${position.lon} ${position.lat})`}`,
           ]),
@@ -913,8 +908,17 @@ const searchImmersionResultsQuery = (
             (eb) =>
               pipeWithValue(
                 eb
-                  .selectFrom("establishments_locations")
-                  .select(["establishment_siret as siret", "id", "position"]),
+                  .selectFrom("establishments_location_positions")
+                  .innerJoin(
+                    "establishments_location_infos",
+                    "establishments_location_infos.id",
+                    "establishments_location_positions.id",
+                  )
+                  .select([
+                    "establishment_siret as siret",
+                    "establishments_location_infos.id",
+                    "position",
+                  ]),
                 (eb) =>
                   geoParams && hasSearchGeoParams(geoParams)
                     ? eb.where(({ fn }) =>
@@ -983,7 +987,12 @@ const searchImmersionResultsQuery = (
     .selectFrom("filtered_results as r")
     .innerJoin("establishments as e", "e.siret", "r.siret")
     .innerJoin("establishments_contacts as c", "c.siret", "r.siret")
-    .innerJoin("establishments_locations as loc", "loc.id", "r.loc_id")
+    .innerJoin("establishments_location_infos as loc", "loc.id", "r.loc_id")
+    .innerJoin(
+      "establishments_location_positions as loc_pos",
+      "loc.id",
+      "loc_pos.id",
+    )
     .innerJoin(
       (eb) => eb.selectFrom("public_naf_classes_2008").selectAll().as("n"),
       (join) =>
@@ -1029,7 +1038,7 @@ const searchImmersionResultsQuery = (
           ...(geoParams && hasSearchGeoParams(geoParams)
             ? {
                 distance_m: fn("ST_Distance", [
-                  ref("loc.position"),
+                  ref("loc_pos.position"),
                   fn("ST_GeographyFromText", [
                     sql`${`POINT(${geoParams.lon} ${geoParams.lat})`}`,
                   ]),

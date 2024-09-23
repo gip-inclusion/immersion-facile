@@ -69,7 +69,8 @@ describe("PgEstablishmentGroupRepository", () => {
     await db.deleteFrom("groups__sirets").execute();
     await db.deleteFrom("groups").execute();
     await db.deleteFrom("establishments_contacts").execute();
-    await db.deleteFrom("establishments_locations").execute();
+    await db.deleteFrom("establishments_location_infos").execute();
+    await db.deleteFrom("establishments_location_positions").execute();
     await db.deleteFrom("establishments").execute();
     await db.deleteFrom("discussions").execute();
   });
