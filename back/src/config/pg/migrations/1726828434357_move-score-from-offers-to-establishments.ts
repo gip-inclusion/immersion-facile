@@ -6,7 +6,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     score: {
       type: "int",
       notNull: true,
-      default: 0,
+      default: 10,
     },
   });
 

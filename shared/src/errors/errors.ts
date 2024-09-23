@@ -178,7 +178,7 @@ export const errors = {
     }) =>
       new ConflictError(
         [
-          `Une demande de mise en contact existe déjà pour l'entreprise '${siret}', le code métier '${appellationCode}' et l'émail du candidat.`,
+          `Une demande de mise en contact existe déjà pour l'entreprise '${siret}', le code métier '${appellationCode}' et l'email du candidat.`,
           `Un minimum de ${minimumNumberOfDaysBetweenSimilarContactRequests} jours entre deux demande de mise en contact sont permises.`,
         ].join("\n"),
       ),
