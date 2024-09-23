@@ -96,8 +96,8 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
         email: user.email,
         first_name: user.firstName,
         last_name: user.lastName,
-        external_id_inclusion_connect: user.externalId, // Attention ici c'est pour tester le script de mig
-        external_id_pro_connect: null, // Il faudra inverser une fois migré
+        inclusion_connect_sub: user.externalId,
+        pro_connect_sub: null,
         created_at: user.createdAt,
       })),
     )

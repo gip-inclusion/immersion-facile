@@ -51,13 +51,13 @@ export class PgUserRepository implements UserRepository {
         "email",
         "created_at",
         provider === "InclusionConnect"
-          ? "external_id_inclusion_connect as external_id"
-          : "external_id_pro_connect as external_id",
+          ? "inclusion_connect_sub as external_id"
+          : "pro_connect_sub as external_id",
       ])
       .where(
         provider === "InclusionConnect"
-          ? "external_id_inclusion_connect"
-          : "external_id_pro_connect",
+          ? "inclusion_connect_sub"
+          : "pro_connect_sub",
         "=",
         externalId,
       )
@@ -85,8 +85,8 @@ export class PgUserRepository implements UserRepository {
         "email",
         "created_at",
         provider === "InclusionConnect"
-          ? "external_id_inclusion_connect as external_id"
-          : "external_id_pro_connect as external_id",
+          ? "inclusion_connect_sub as external_id"
+          : "pro_connect_sub as external_id",
       ]);
   }
 
@@ -104,8 +104,8 @@ export class PgUserRepository implements UserRepository {
           first_name: firstName,
           last_name: lastName,
           [provider === "InclusionConnect"
-            ? "external_id_inclusion_connect"
-            : "external_id_pro_connect"]: externalId,
+            ? "inclusion_connect_sub"
+            : "pro_connect_sub"]: externalId,
           created_at: createdAt,
         })
         .execute();
@@ -127,8 +127,8 @@ export class PgUserRepository implements UserRepository {
         last_name: lastName,
         email,
         [provider === "InclusionConnect"
-          ? "external_id_inclusion_connect"
-          : "external_id_pro_connect"]: externalId,
+          ? "inclusion_connect_sub"
+          : "pro_connect_sub"]: externalId,
         updated_at: sql`now()`,
       })
       .where("id", "=", id)
@@ -266,8 +266,8 @@ export class PgUserRepository implements UserRepository {
         'createdAt', users.created_at,
         'externalId', users.${
           provider === "InclusionConnect"
-            ? "external_id_inclusion_connect"
-            : "external_id_pro_connect"
+            ? "inclusion_connect_sub"
+            : "pro_connect_sub"
         },
         'agencyRights', COALESCE(${agencyRightsJsonAgg}, '[]'),
         'establishments', COALESCE(${establishmentsJsonAgg}, '[]'),

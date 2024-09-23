@@ -3,8 +3,8 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 const tableName = "users";
 const legacyInclusionConnectExternalIdColumnName = "external_id";
-const newInclusionConnectExternalIdColumnName = "external_id_inclusion_connect";
-const proConnectExternalIdColumnName = "external_id_pro_connect";
+const newInclusionConnectExternalIdColumnName = "inclusion_connect_sub";
+const proConnectExternalIdColumnName = "pro_connect_sub";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.renameColumn(
