@@ -52,7 +52,8 @@ describe("PgEstablishmentAggregateRepository", () => {
     await kyselyDb.deleteFrom("establishments_contacts").execute();
     await kyselyDb.deleteFrom("immersion_offers").execute();
     await kyselyDb.deleteFrom("discussions").execute();
-    await kyselyDb.deleteFrom("establishments_locations").execute();
+    await kyselyDb.deleteFrom("establishments_location_infos").execute();
+    await kyselyDb.deleteFrom("establishments_location_positions").execute();
     await kyselyDb.deleteFrom("establishments").execute();
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
