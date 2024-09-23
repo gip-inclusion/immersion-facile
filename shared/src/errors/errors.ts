@@ -476,4 +476,10 @@ export const errors = {
         `Il semble que le paramètre d'URL '${paramName}' est incorrect : vous n'avez probablement pas copié-collé le lien correctement.`,
       ),
   },
+  breadcrumbs: {
+    notFound: ({ currentRouteName }: { currentRouteName: string }) =>
+      new NotFoundError(
+        `Le fil d'arianne n'est pas défini pour cette page ('${currentRouteName}').`,
+      ),
+  },
 };

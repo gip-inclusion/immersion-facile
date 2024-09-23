@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
+import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import beneficiaryFaqImg from "src/assets/img/beneficiary-faq.svg";
 
@@ -11,7 +12,10 @@ export const BeneficiaryDashboardPage = () => {
         layout="default"
         vSpacing={8}
         pageHeader={
-          <PageHeader title="Vous n’avez pas besoin de compte pour utiliser Immersion Facilitée" />
+          <>
+            <Breadcrumbs />
+            <PageHeader title="Vous n’avez pas besoin de compte pour utiliser Immersion Facilitée" />
+          </>
         }
       >
         <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>

@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { FederatedIdentityProvider, loginPeConnect } from "shared";
+import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   ConventionFormMode,
   ConventionFormWrapper,
@@ -91,7 +92,10 @@ export const ConventionImmersionPage = ({
         layout={"default"}
         pageHeader={
           !displaySharedConventionMessage && (
-            <PageHeader title={getPageHeaderTitle(jwt, showSummary)} />
+            <>
+              <Breadcrumbs />
+              <PageHeader title={getPageHeaderTitle(jwt, showSummary)} />
+            </>
           )
         }
       >

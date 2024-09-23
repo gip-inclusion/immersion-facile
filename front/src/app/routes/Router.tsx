@@ -8,6 +8,7 @@ import {
   agencyDashboardTabsList,
   establishmentDashboardTabsList,
 } from "shared";
+import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
@@ -95,10 +96,13 @@ const getPageByRouteName: {
       <InclusionConnectedPrivateRoute
         route={route}
         inclusionConnectConnexionPageHeader={
-          <PageHeader
-            title="Retrouvez vos conventions en tant que prescripteur"
-            centered
-          />
+          <>
+            <Breadcrumbs />
+            <PageHeader
+              title="Retrouvez vos conventions en tant que prescripteur"
+              centered
+            />
+          </>
         }
       >
         <AgencyDashboardPage route={route} />
@@ -131,10 +135,13 @@ const getPageByRouteName: {
       <InclusionConnectedPrivateRoute
         route={route}
         inclusionConnectConnexionPageHeader={
-          <PageHeader
-            title="Retrouvez vos conventions en tant qu'entreprise"
-            centered
-          />
+          <>
+            <Breadcrumbs />
+            <PageHeader
+              title="Retrouvez vos conventions en tant qu'entreprise"
+              centered
+            />
+          </>
         }
       >
         <EstablishmentDashboardPage route={route} />
