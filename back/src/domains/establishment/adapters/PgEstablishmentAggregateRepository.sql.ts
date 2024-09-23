@@ -55,7 +55,7 @@ SELECT
       )
     )
   ) AS locations
-FROM establishments_locations
+FROM establishments_location_infos
 GROUP BY establishment_siret
 `;
 

@@ -28,7 +28,8 @@ describe("PgScriptsQueries", () => {
 
   beforeEach(async () => {
     await db.deleteFrom("establishments_contacts").execute();
-    await db.deleteFrom("establishments_locations").execute();
+    await db.deleteFrom("establishments_location_infos").execute();
+    await db.deleteFrom("establishments_location_positions").execute();
     await db.deleteFrom("establishments").execute();
     await db.deleteFrom("outbox_failures").execute();
     await db.deleteFrom("outbox_publications").execute();

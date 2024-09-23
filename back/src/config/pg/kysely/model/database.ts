@@ -28,7 +28,8 @@ export interface Database {
   establishment_lead_events: EstablishmentLeadEvents;
   establishments_contacts: EstablishmentsContacts;
   establishments_deleted: EstablishmentsDeleted;
-  establishments_locations: EstablishmentsLocations;
+  establishments_location_infos: EstablishmentsLocationInfos;
+  establishments_location_positions: EstablishmentsLocationPositions;
   establishments: Establishments;
   exchanges: Exchanges;
   feature_flags: FeatureFlags;
@@ -411,7 +412,12 @@ interface PublicRomesData {
   libelle_rome_tsvector: string | null;
 }
 
-interface EstablishmentsLocations {
+interface EstablishmentsLocationPositions {
+  id: string;
+  position: string;
+}
+
+type EstablishmentsLocationInfos = {
   id: string;
   establishment_siret: string;
   post_code: string;
@@ -420,8 +426,7 @@ interface EstablishmentsLocations {
   department_code: string;
   lat: number;
   lon: number;
-  position: string;
-}
+};
 
 interface ImmersionOffers {
   rome_code: string;
