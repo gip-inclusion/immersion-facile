@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { GetDashboardParams, adminRoutes, agencyRoutes, errors } from "shared";
+import {
+  GetDashboardParams,
+  RemoveAgencyUserParams,
+  adminRoutes,
+  agencyRoutes,
+  errors,
+} from "shared";
 import { BadRequestError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
@@ -90,6 +96,23 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
         if (!currentUser) throw errors.user.unauthorized();
         return await deps.useCases.createUserForAgency.execute(
           req.body,
+          currentUser,
+        );
+      }),
+  );
+
+  sharedAdminRouter.removeUserFromAgency(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        const userWithAgency: RemoveAgencyUserParams = {
+          agencyId: req.params.agencyId,
+          userId: req.params.userId,
+        };
+        return await deps.useCases.removeUserFromAgency.execute(
+          userWithAgency,
           currentUser,
         );
       }),
