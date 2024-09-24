@@ -74,13 +74,9 @@ export const rueSaintHonoreDto: AddressDto = {
   departmentCode: "75",
 };
 
-export const rueSaintHonore = "55 rue de Faubourg Saint Honoré 75008 Paris";
-
 export const avenueChampsElyseesDto: AddressDto = {
   streetNumberAndAddress: "30 avenue des champs Elysées",
   departmentCode: "75",
   city: "Paris",
   postcode: "75017",
 };
-
-export const avenueChampsElysees = "30 avenue des champs Elysées 75017 Paris";

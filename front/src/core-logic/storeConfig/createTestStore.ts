@@ -41,5 +41,3 @@ export const createTestStore = (preloadedState?: Partial<RootState>) => {
   const dependencies = createTestDependencies();
   return { store: createStore({ dependencies, preloadedState }), dependencies };
 };
-
-export type StoreAndDeps = ReturnType<typeof createTestStore>;
