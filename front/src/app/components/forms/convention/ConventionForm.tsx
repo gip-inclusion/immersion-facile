@@ -548,13 +548,12 @@ export const ConventionForm = ({
                   )}
                 </>
               </>
-              <div className={fr.cx("fr-mt-4w")}>
+              <div className={fr.cx("fr-mt-4w", "fr-hidden", "fr-unhidden-lg")}>
                 <Button
                   disabled={shouldSubmitButtonBeDisabled}
                   iconId="fr-icon-checkbox-circle-line"
                   iconPosition="left"
                   type="button"
-                  className={fr.cx("fr-hidden", "fr-unhidden-lg")}
                   nativeButtonProps={{
                     id: domElementIds.conventionImmersionRoute.submitFormButton,
                   }}
