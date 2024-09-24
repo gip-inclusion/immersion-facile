@@ -8,8 +8,8 @@ import { PgEstablishmentMarketingRepository } from "./PgEstablishmentMarketingRe
 
 describe("PgAgencyRepository", () => {
   let pool: Pool;
-  let establishmentMarketingRepository: PgEstablishmentMarketingRepository;
   let db: KyselyDb;
+  let establishmentMarketingRepository: PgEstablishmentMarketingRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();

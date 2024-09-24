@@ -43,6 +43,7 @@
     "trigger-sending-beneficiary-assessment-emails": "ts-node src/scripts/triggerSendingBeneficiaryPdfAssessmentEmails.ts",
     "trigger-suggest-edit-form-establishment-every-6-months": "ts-node src/scripts/triggerSuggestEditFormEstablishmentEvery6Months.ts",
     "trigger-update-establishments-from-sirene": "ts-node src/scripts/triggerUpdateEstablishmentsFromSireneApiScript.ts",
+    "trigger-update-all-establishments-scores": "ts-node src/scripts/triggerUpdateAllEstablishmentsScores.ts",
     "typecheck": "tsc --noEmit",
     "kysely-codegen": "kysely-codegen --dialect postgres",
     "update-agencies-from-PE-referential": "ts-node src/scripts/updateAllPEAgenciesFromPeAgencyReferential.ts",

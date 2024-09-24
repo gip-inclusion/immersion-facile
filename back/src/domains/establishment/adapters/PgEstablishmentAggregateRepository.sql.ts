@@ -1,3 +1,6 @@
+import { sql } from "kysely";
+import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+
 const uniqueEstablishmentContacts = (
   mode: "siret" | "contactEmail" | "all",
 ) => `
@@ -126,3 +129,40 @@ LEFT JOIN establishments_contacts AS ec ON uec.uuid = ec.uuid
 LEFT JOIN establishment_locations_agg AS ela ON e.siret = ela.establishment_siret
 ORDER BY e.siret
 `;
+
+export const updateAllEstablishmentScoresQuery = async (
+  db: KyselyDb,
+): Promise<void> => {
+  const minimumScore = 10;
+  const conventionCountCoefficient = 10;
+  const discussionCountCoefficient = 100;
+
+  await db
+    .with("convention_counts", (qb) =>
+      qb
+        .selectFrom("conventions")
+        .where("date_submission", ">=", sql<Date>`NOW() - INTERVAL '1 year'`)
+        .where("status", "=", "ACCEPTED_BY_VALIDATOR")
+        .groupBy("siret")
+        .select([
+          "siret",
+          ({ fn }) => fn.count("siret").as("convention_count"),
+        ]),
+    )
+    .with("discussion_counts", (qb) =>
+      qb
+        .selectFrom("discussions as d")
+        .innerJoin("exchanges", "d.id", "exchanges.discussion_id")
+        .where("d.created_at", ">=", sql<Date>`NOW() - INTERVAL '1 year'`)
+        .where("exchanges.sender", "=", "establishment")
+        .select(["siret", sql`COUNT(DISTINCT d.id)`.as("discussion_count")])
+        .groupBy("siret"),
+    )
+    .updateTable("establishments as e")
+    .set({
+      score: sql`${minimumScore} +
+        COALESCE((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0) +
+        COALESCE((SELECT discussion_count * ${discussionCountCoefficient} FROM discussion_counts WHERE siret = e.siret), 0)`,
+    })
+    .execute();
+};
