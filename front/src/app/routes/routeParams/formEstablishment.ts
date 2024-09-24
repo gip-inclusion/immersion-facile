@@ -7,7 +7,6 @@ import {
   defaultMaxContactsPerMonth,
 } from "shared";
 import { AcquisitionParams } from "src/app/routes/routes";
-import { ENV } from "src/config/environmentVariables";
 import { ValueSerializer, param } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
@@ -139,55 +138,3 @@ export const formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams =
         : {}),
     };
   };
-
-export const createInitialFormValues = (
-  routeParams: FormEstablishmentParamsInUrl,
-): FormEstablishmentDto => {
-  if (ENV.prefilledForms) {
-    return {
-      source: "immersion-facile",
-      siret: "1234567890123",
-      website: "www@boucherie.fr/immersions",
-      additionalInformation: "Végétariens, s'abstenir !",
-      businessName: "My business name, replaced by result from API",
-      businessNameCustomized:
-        "My Customized Business name, not replaced by API",
-      businessAddresses: [
-        {
-          id: uuidV4(),
-          rawAddress: "My business address, replaced by result from API",
-        },
-      ],
-      isEngagedEnterprise: true,
-      maxContactsPerMonth: defaultMaxContactsPerMonth,
-      appellations: [
-        {
-          appellationCode: "11573",
-          romeCode: "D1102",
-          romeLabel: "Boulangerie",
-          appellationLabel: "Boulanger - Boulangère",
-        },
-        {
-          appellationCode: "11564",
-          romeCode: "D1101",
-          romeLabel: "Boucherie",
-          appellationLabel: "Boucher - Bouchère",
-        },
-      ],
-      businessContact: {
-        firstName: "John",
-        lastName: "Doe",
-        job: "super job",
-        phone: "02837",
-        email: "joe@mail.com",
-        contactMethod: "EMAIL",
-        copyEmails: ["recrutement@boucherie.net"],
-      },
-      searchableBy: {
-        jobSeekers: true,
-        students: true,
-      },
-    };
-  }
-  return formEstablishmentQueryParamsToFormEstablishmentDto(routeParams);
-};

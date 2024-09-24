@@ -1,4 +1,4 @@
-import { AuthenticatedUserQueryParams, ValueOf, frontRoutes } from "shared";
+import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
 import { icUserAgencyDashboardTabSerializer } from "src/app/routes/routeParams/agencyDashboardTabs";
 import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { ValueSerializer, createRouter, defineRoute, param } from "type-route";
@@ -68,8 +68,6 @@ export const searchParams = {
   place: param.query.optional.string,
   ...acquisitionParams,
 };
-
-export type FrontRouteUnion = ValueOf<typeof routes>;
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),

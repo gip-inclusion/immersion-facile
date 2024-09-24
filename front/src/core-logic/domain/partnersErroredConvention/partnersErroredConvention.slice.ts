@@ -3,13 +3,7 @@ import {
   ConventionSupportedJwt,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
-import { SubmitFeedBack } from "../SubmitFeedback";
 import { PayloadActionWithFeedbackTopic } from "../feedback/feedback.slice";
-
-export type PartnersErroredConventionFeedbackKind = "markedAsHandled";
-
-export type PartnersErroredConventionSubmitFeedback =
-  SubmitFeedBack<PartnersErroredConventionFeedbackKind>;
 
 export interface PartnersErroredConventionState {
   isLoading: boolean;

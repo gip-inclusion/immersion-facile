@@ -7,19 +7,6 @@ export const apiKeyAuthMiddlewareRequestsTotal = new Counter({
   labelNames: ["route", "method", "consumerName", "authorisationStatus"],
 });
 
-//ESTABLISHMENT
-export const counterFormEstablishmentCaller = new Counter({
-  name: "form_establishment_callers_counter",
-  help: "The total count form establishment adds, broken down by referer.",
-  labelNames: ["referer"],
-});
-
-export const counterFormEstablishmentCallerV1 = new Counter({
-  name: "form_establishment_v1_callers_counter",
-  help: "The total count form establishment adds, broken down by referer.",
-  labelNames: ["referer"],
-});
-
 //EVENT BUS
 export const counterPublishedEventsTotal = new Counter({
   name: "in_memory_event_bus_published_events_total",
