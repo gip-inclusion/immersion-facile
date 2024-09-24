@@ -313,6 +313,13 @@ export const errors = {
       new BadRequestError(
         `L'utilisateur qui a l'identifiant "${userId}" a déjà les droits pour cette agence.`,
       ),
+    expectedRightsOnAgency: ({
+      agencyId,
+      userId,
+    }: { userId: UserId; agencyId: AgencyId }) =>
+      new BadRequestError(
+        `L'utilisateur qui a l'identifiant "${userId}" n'a pas de droits sur l'agence "${agencyId}".`,
+      ),
     noRightsOnAgency: ({
       agencyId,
       userId,

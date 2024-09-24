@@ -59,6 +59,17 @@ export const adminRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
+  removeUserFromAgency: defineRoute({
+    method: "delete",
+    url: "/admin/inclusion-connected/users/:userId/agency/:agencyId",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
 
   createUserForAgency: defineRoute({
     method: "post",

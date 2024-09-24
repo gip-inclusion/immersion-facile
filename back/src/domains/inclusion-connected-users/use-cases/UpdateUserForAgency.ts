@@ -14,32 +14,23 @@ import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import {
+  throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
+  throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
+} from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
-const rejectIfAgencyWontHaveValidators = async (
+const rejectIfAgencyWontHaveValidatorsReceivingNotifications = async (
   uow: UnitOfWork,
   params: UserParamsForAgency,
   agency: AgencyDto,
 ) => {
-  if (
-    (!params.roles.includes("validator") || !params.isNotifiedByEmail) &&
-    agency.refersToAgencyId === null
-  ) {
-    const agencyUsers = await uow.userRepository.getWithFilter({
-      agencyId: params.agencyId,
-    });
-
-    const agencyHasOtherValidator = agencyUsers.some(
-      (agencyUser) =>
-        agencyUser.id !== params.userId &&
-        agencyUser.agencyRights.some(
-          (right) =>
-            right.isNotifiedByEmail && right.roles.includes("validator"),
-        ),
+  if (!params.roles.includes("validator") || !params.isNotifiedByEmail) {
+    await throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(
+      uow,
+      agency,
+      params.userId,
     );
-
-    if (!agencyHasOtherValidator)
-      throw errors.agency.notEnoughValidators({ agencyId: params.agencyId });
   }
 };
 
@@ -63,25 +54,12 @@ const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
   params: UserParamsForAgency,
   agency: AgencyDto,
 ) => {
-  if (
-    (!params.roles.includes("counsellor") || !params.isNotifiedByEmail) &&
-    agency.refersToAgencyId
-  ) {
-    const agencyUsers = await uow.userRepository.getWithFilter({
-      agencyId: params.agencyId,
-    });
-
-    const agencyHasOtherCounsellor = agencyUsers.some(
-      (agencyUser) =>
-        agencyUser.id !== params.userId &&
-        agencyUser.agencyRights.some(
-          (right) =>
-            right.isNotifiedByEmail && right.roles.includes("counsellor"),
-        ),
+  if (!params.roles.includes("counsellor") || !params.isNotifiedByEmail) {
+    await throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
+      uow,
+      agency,
+      params.userId,
     );
-
-    if (!agencyHasOtherCounsellor)
-      throw errors.agency.notEnoughCounsellors({ agencyId: params.agencyId });
   }
 };
 
@@ -108,7 +86,11 @@ const makeAgencyRights = async (
     params,
     agency,
   );
-  await rejectIfAgencyWontHaveValidators(uow, params, agency);
+  await rejectIfAgencyWontHaveValidatorsReceivingNotifications(
+    uow,
+    params,
+    agency,
+  );
   await rejectIfAgencyWithRefersToWontHaveCounsellors(uow, params, agency);
 
   const updatedAgencyRight: AgencyRight = {
