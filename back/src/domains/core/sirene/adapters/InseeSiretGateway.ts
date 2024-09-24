@@ -5,12 +5,12 @@ import { Logger } from "pino";
 import {
   NafDto,
   NumberEmployeesRange,
+  OmitFromExistingKeys,
   SiretDto,
   SiretEstablishmentDto,
   castError,
   errors,
   filterNotFalsy,
-  propEq,
   queryParamsAsString,
 } from "shared";
 import { AxiosConfig } from "../../../../config/bootstrap/appConfig";
@@ -203,6 +203,19 @@ export class InseeSiretGateway implements SiretGateway {
   }
 }
 
+type InseePeriodeEtablissment = Partial<{
+  dateFin: string | null;
+  dateDebut: string | null;
+  etatAdministratifEtablissement: "A" | "F";
+}>;
+
+type InseePeriodeEtablissmentWithDateFin = OmitFromExistingKeys<
+  InseePeriodeEtablissment,
+  "dateFin"
+> & {
+  dateFin: string | null;
+};
+
 export type InseeApiRawEstablishment = {
   siret: string;
   uniteLegale: Partial<{
@@ -221,13 +234,7 @@ export type InseeApiRawEstablishment = {
     codePostalEtablissement?: string;
     libelleCommuneEtablissement?: string;
   }>;
-  periodesEtablissement: Array<
-    Partial<{
-      dateFin: string | null;
-      dateDebut: string | null;
-      etatAdministratifEtablissement: "A" | "F";
-    }>
-  >;
+  periodesEtablissement: Array<InseePeriodeEtablissment>;
 };
 
 type SirenGatewayAnswer = {
@@ -285,11 +292,20 @@ const getFormattedAddress = ({
     .filter(filterNotFalsy)
     .join(" ");
 
+const hasDateFin = (
+  periode: InseePeriodeEtablissment,
+): periode is InseePeriodeEtablissmentWithDateFin =>
+  periode.dateFin !== undefined;
+
 const getIsActive = ({
   uniteLegale,
   periodesEtablissement,
 }: InseeApiRawEstablishment) => {
-  const lastPeriod = periodesEtablissement.find(propEq("dateFin", null));
+  const periodesEtablissementWithDateFin =
+    periodesEtablissement.filter(hasDateFin);
+  const lastPeriod = periodesEtablissementWithDateFin.find(
+    ({ dateFin }) => dateFin === null,
+  );
   if (!lastPeriod) return false;
 
   return (

@@ -1,4 +1,4 @@
-import { groupBy, map, prop, values } from "ramda";
+import { groupBy, isNil, map, prop, reject, values } from "ramda";
 import { pipeWithValue } from "shared";
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { DomainEvent } from "../events";
@@ -68,5 +68,6 @@ const convertRowsToDomainEvents = (rows: StoredEventRow[]): DomainEvent[] =>
     rows,
     groupBy(prop("id")),
     values,
+    reject(isNil),
     map(storedEventRowsToDomainEvent),
   );

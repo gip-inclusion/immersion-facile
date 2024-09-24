@@ -87,7 +87,7 @@ const reminderReport = ({
   establishmentsReminded,
   errors,
 }: SendEstablishmentLeadReminderOutput) => {
-  const failures = keys(errors);
+  const failures = errors ? keys(errors) : [];
   const numberOfFailures = failures.length;
 
   return [

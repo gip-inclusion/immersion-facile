@@ -243,7 +243,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       expectToEqual(eventsToRerun, [eventFailedToRerun]);
     });
 
-    it("finds all events that have failed and should be reprocessed, event if some publication was OK before", async () => {
+    it("finds all events that have failed and should be reprocessed, even if some publication was OK before", async () => {
       await storeInOutbox([
         neverPublished1,
         withFailureButEventuallySuccessfulEvent,

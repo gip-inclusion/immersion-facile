@@ -241,7 +241,7 @@ const isSiretIsNotInNotSearchableResults =
   (searchImmersionQueryResults: SearchImmersionResult[]) =>
   <T extends { siret: SiretDto }>({ siret }: T) =>
     !searchImmersionQueryResults
-      .filter(propEq("isSearchable", false))
+      .filter(propEq(false, "isSearchable"))
       .map(prop("siret"))
       .includes(siret);
 

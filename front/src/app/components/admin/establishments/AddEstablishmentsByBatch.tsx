@@ -301,17 +301,19 @@ export const AddEstablishmentsByBatch = () => {
               }}
             />
             <table className={cx(fr.cx("fr-mt-2w"), classes.table)}>
-              <thead>
-                <tr>
-                  {keys(candidateEstablishments[0].formEstablishment).map(
-                    (key) => (
-                      <th scope="col" key={key}>
-                        {key}
-                      </th>
-                    ),
-                  )}
-                </tr>
-              </thead>
+              {candidateEstablishments[0].formEstablishment && (
+                <thead>
+                  <tr>
+                    {keys(candidateEstablishments[0].formEstablishment).map(
+                      (key) => (
+                        <th scope="col" key={key}>
+                          {key}
+                        </th>
+                      ),
+                    )}
+                  </tr>
+                </thead>
+              )}
               <tbody>
                 {candidateEstablishments.map((establishment, index) => (
                   <>
