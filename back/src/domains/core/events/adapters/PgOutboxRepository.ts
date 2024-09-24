@@ -1,5 +1,5 @@
-import { differenceWith } from "ramda";
-import { DateString, propEq, replaceArrayElement } from "shared";
+import { differenceWith, propEq } from "ramda";
+import { DateString, replaceArrayElement } from "shared";
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
@@ -188,12 +188,11 @@ export const storedEventRowsToDomainEvent = (
       const publishedAt: DateString = row.published_at.toISOString();
 
       const existingPublicationIndex = acc.publications.findIndex(
-        propEq("publishedAt", publishedAt),
+        propEq(publishedAt, "publishedAt"),
       );
 
       const existingPublication: EventPublication | undefined =
         acc.publications[existingPublicationIndex];
-
       if (!existingPublication) {
         const failures: EventFailure[] = row.subscription_id
           ? [

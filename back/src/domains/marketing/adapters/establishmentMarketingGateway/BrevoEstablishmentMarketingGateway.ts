@@ -96,14 +96,7 @@ export class BrevoEstablishmentMarketingGateway
       updateEnabled: !!existingContact,
     };
 
-    return this.#createContact(body).then((response) => {
-      if (existingContact ? 204 : 201) return;
-      throw new Error(
-        `Bad response with status '${
-          response.status
-        }' and body '${JSON.stringify(response.body)}'`,
-      );
-    });
+    await this.#createContact(body);
   }
 
   async delete(contactEmail: Email): Promise<void> {

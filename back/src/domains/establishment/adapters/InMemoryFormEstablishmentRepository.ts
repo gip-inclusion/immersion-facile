@@ -1,4 +1,5 @@
-import { FormEstablishmentDto, SiretDto, errors, propEq } from "shared";
+import { propEq } from "ramda";
+import { FormEstablishmentDto, SiretDto, errors } from "shared";
 import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 
 export class InMemoryFormEstablishmentRepository
@@ -29,7 +30,7 @@ export class InMemoryFormEstablishmentRepository
   public async getBySiret(
     siretToGet: SiretDto,
   ): Promise<FormEstablishmentDto | undefined> {
-    return this.#formEstablishments.find(propEq("siret", siretToGet));
+    return this.#formEstablishments.find(propEq(siretToGet, "siret"));
   }
 
   // for testing purpose

@@ -82,7 +82,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     id: ConventionId,
   ): Promise<ConventionReadDto | undefined> {
     const convention = this.conventionRepository.conventions.find(
-      propEq("id", id),
+      propEq(id, "id"),
     );
     if (!convention) return;
 

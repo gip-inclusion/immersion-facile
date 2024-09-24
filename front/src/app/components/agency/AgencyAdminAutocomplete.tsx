@@ -2,10 +2,10 @@ import { fr } from "@codegouvfr/react-dsfr";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
-import { prop } from "ramda";
+import { prop, propEq } from "ramda";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { AgencyId, AgencyOption, domElementIds, propEq } from "shared";
+import { AgencyId, AgencyOption, domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
@@ -62,7 +62,7 @@ export const AgencyAdminAutocomplete = ({
 
   const getNameFromAgencyId = (agencyId?: AgencyId) => {
     if (!agencyId) return;
-    return agencyOptions.find(propEq("id", agencyId))?.name;
+    return agencyOptions.find(propEq(agencyId, "id"))?.name;
   };
 
   return (
