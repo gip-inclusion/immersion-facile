@@ -6,6 +6,7 @@ import {
   DateIntervalDto,
   DotNestedKeys,
   ScheduleDto,
+  addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
   prettyPrintSchedule,
   toDisplayedDate,
@@ -237,12 +238,17 @@ const beneficiarySummary = (
         fields["signatories.beneficiary.birthdate"].label,
         displayDate(convention.signatories.beneficiary.birthdate),
       ],
-      ...(convention.internshipKind === "mini-stage-cci"
+      ...(convention.internshipKind === "mini-stage-cci" &&
+      convention.signatories.beneficiary.address
         ? ([
             [
               fields["signatories.beneficiary.address"].label,
-              convention.signatories.beneficiary.address,
+              addressDtoToString(convention.signatories.beneficiary.address),
             ],
+          ] satisfies ConventionSummaryRow[])
+        : []),
+      ...(convention.internshipKind === "mini-stage-cci"
+        ? ([
             [
               fields["signatories.beneficiary.levelOfEducation"].label,
               convention.signatories.beneficiary.levelOfEducation,

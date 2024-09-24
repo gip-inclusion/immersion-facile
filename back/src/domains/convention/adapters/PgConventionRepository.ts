@@ -333,7 +333,7 @@ export class PgConventionRepository implements ConventionRepository {
           'levelOfEducation', ${studentFields.levelOfEducation}::text,
           'schoolName', ${studentFields.schoolName}::text,
           'schoolPostcode', ${studentFields.schoolPostcode}::text,
-          'address', ${studentFields.address}::text
+          'address', ${studentFields.address}::jsonb
           ))`,
       })
       .returning("actors.id")
@@ -464,7 +464,7 @@ export class PgConventionRepository implements ConventionRepository {
           'isRqth',  ${beneficiary.isRqth}::boolean,
           'schoolName',  ${studentFields.schoolName}::text,
           'schoolPostcode',  ${studentFields.schoolPostcode}::text,
-          'address', ${studentFields.address}::text
+          'address', ${studentFields.address}::jsonb
       ))`,
       })
       .from("conventions")

@@ -111,7 +111,14 @@ export const createConventionQueryBuilder = (transaction: KyselyDb) => {
             address: eb
               .case()
               .when(sql`b.extra_fields ->> 'address'`, "is not", null)
-              .then(sql`b.extra_fields ->> 'address'`)
+              .then(
+                jsonBuildObject({
+                  city: sql`b.extra_fields -> 'address' ->> 'city'`,
+                  departmentCode: sql`b.extra_fields -> 'address' ->> 'departmentCode'`,
+                  postcode: sql`b.extra_fields -> 'address' ->> 'postcode'`,
+                  streetNumberAndAddress: sql`b.extra_fields -> 'address' ->> 'streetNumberAndAddress'`,
+                }),
+              )
               .else(null)
               .end(),
             birthdate: eb

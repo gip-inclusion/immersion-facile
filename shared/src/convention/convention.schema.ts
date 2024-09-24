@@ -95,6 +95,7 @@ import {
   isTutorEmailDifferentThanBeneficiaryRelatedEmails,
   minorBeneficiaryHasRepresentative,
   mustBeSignedByEveryone,
+  shouldValidateBeneficiaryAddressAndParse,
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
 } from "./conventionRefinements";
@@ -145,7 +146,14 @@ const studentBeneficiarySchema: z.Schema<Beneficiary<"mini-stage-cci">> =
       ),
       schoolName: zStringMinLength1,
       schoolPostcode: zStringMinLength1,
-      address: zStringMinLength1.optional(),
+      address: z
+        .object({
+          streetNumberAndAddress: zStringCanBeEmpty,
+          postcode: zStringMinLength1,
+          departmentCode: zStringMinLength1,
+          city: zStringMinLength1,
+        })
+        .optional(),
     }),
   );
 
@@ -355,6 +363,10 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
   .refine(mustBeSignedByEveryone, {
     message: localization.mustBeSignedByEveryone,
     path: [getConventionFieldName("status")],
+  })
+  .refine(shouldValidateBeneficiaryAddressAndParse, {
+    message: localization.invalidBeneficiaryAddress,
+    path: [getConventionFieldName("signatories.beneficiary.address")],
   });
 
 export const conventionReadSchema: z.Schema<ConventionReadDto> =

@@ -38,6 +38,8 @@ export const localization = {
   expectedBoolean: "La sélection d'une valeur (oui/non) est obligatoire",
   expectText: "Une chaine de caractères est attendue",
   expectRadioButtonSelected: "Veuillez sélectionner une option.",
+  invalidBeneficiaryAddress:
+    "L'adresse complète du candidat doit être renseignée.",
   invalidDate: "Le format de la date saisie est invalide",
   invalidDateEnd: "Le format de la date de fin est invalide",
   invalidDateStart: "Le format de la date de début est invalide",
