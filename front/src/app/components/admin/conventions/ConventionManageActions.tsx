@@ -28,7 +28,6 @@ import {
   isConventionValidated,
   reasonableSchedule,
   renewConventionParamsSchema,
-  statusTransitionConfigs,
   userHasEnoughRightsOnConvention,
 } from "shared";
 import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
@@ -48,6 +47,7 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   ConventionFeedbackKind,
@@ -158,7 +158,7 @@ export const ConventionManageActions = ({
           justifyContent: "center",
         }}
       >
-        {isAllowedTransition(convention, "REJECTED", roles) && (
+        {isAllowedConventionTransition(convention, "REJECTED", roles) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
@@ -172,7 +172,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention, "DEPRECATED", roles) && (
+        {isAllowedConventionTransition(convention, "DEPRECATED", roles) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
@@ -195,7 +195,7 @@ export const ConventionManageActions = ({
           />
         )}
 
-        {isAllowedTransition(convention, "DRAFT", roles) && (
+        {isAllowedConventionTransition(convention, "DRAFT", roles) && (
           <VerificationActionButton
             disabled={disabled}
             initialStatus={convention.status}
@@ -211,7 +211,11 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention, "ACCEPTED_BY_COUNSELLOR", roles) && (
+        {isAllowedConventionTransition(
+          convention,
+          "ACCEPTED_BY_COUNSELLOR",
+          roles,
+        ) && (
           <VerificationActionButton
             initialStatus={convention.status}
             newStatus="ACCEPTED_BY_COUNSELLOR"
@@ -234,7 +238,11 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention, "ACCEPTED_BY_VALIDATOR", roles) && (
+        {isAllowedConventionTransition(
+          convention,
+          "ACCEPTED_BY_VALIDATOR",
+          roles,
+        ) && (
           <VerificationActionButton
             initialStatus={convention.status}
             newStatus="ACCEPTED_BY_VALIDATOR"
@@ -261,7 +269,7 @@ export const ConventionManageActions = ({
           </VerificationActionButton>
         )}
 
-        {isAllowedTransition(convention, "CANCELLED", roles) && (
+        {isAllowedConventionTransition(convention, "CANCELLED", roles) && (
           <>
             <VerificationActionButton
               initialStatus={convention.status}
@@ -452,21 +460,5 @@ export const RenewConventionForm = ({
         </Button>
       </form>
     </FormProvider>
-  );
-};
-
-const isAllowedTransition = (
-  convention: ConventionReadDto,
-  targetStatus: ConventionStatus,
-  actingRoles: Role[],
-): boolean => {
-  const transitionConfig = statusTransitionConfigs[targetStatus];
-
-  return (
-    transitionConfig.validInitialStatuses.includes(convention.status) &&
-    actingRoles.some((actingRole) =>
-      transitionConfig.validRoles.includes(actingRole),
-    ) &&
-    (!transitionConfig.refine?.(convention).isError ?? true)
   );
 };
