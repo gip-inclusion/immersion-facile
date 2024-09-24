@@ -310,6 +310,7 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     label: "Adresse du candidat",
     id: beneficiarySectionIds.address,
     placeholder: "Ex : 10 Rue de la Paix, 75001 Paris",
+    required: true,
   },
   "signatories.beneficiary.schoolName": {
     label: "Nom de l'établissement scolaire du candidat",

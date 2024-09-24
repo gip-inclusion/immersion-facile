@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux";
 import {
   ConventionId,
   ConventionReadDto,
+  addressDtoToString,
   domElementIds,
   isConventionRenewed,
   isStringDate,
@@ -230,7 +231,11 @@ export const ConventionDocumentPage = ({
                 <li>email&nbsp;: {beneficiary.email}</li>
                 {convention.internshipKind === "mini-stage-cci" && (
                   <li>
-                    adresse&nbsp;: {convention.signatories.beneficiary.address}
+                    adresse&nbsp;:{" "}
+                    {convention.signatories.beneficiary.address &&
+                      addressDtoToString(
+                        convention.signatories.beneficiary.address,
+                      )}
                   </li>
                 )}
               </ul>

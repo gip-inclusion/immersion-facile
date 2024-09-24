@@ -1,6 +1,6 @@
 import { keys } from "ramda";
 import { WithAcquisition } from "../acquisition.dto";
-import { Postcode } from "../address/address.dto";
+import { AddressDto, Postcode } from "../address/address.dto";
 import { AgencyId, AgencyKind } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
 import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
@@ -224,7 +224,7 @@ type StudentProperties = {
   levelOfEducation: LevelOfEducation;
   schoolName: string;
   schoolPostcode: Postcode;
-  address?: string;
+  address?: AddressDto;
 };
 
 export type Beneficiary<T extends InternshipKind> =

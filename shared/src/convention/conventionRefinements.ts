@@ -1,5 +1,6 @@
 import { differenceInYears } from "date-fns";
 import differenceInDays from "date-fns/differenceInDays";
+import { addressSchema } from "../address/address.schema";
 import { DateString } from "../utils/date";
 import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
@@ -74,6 +75,22 @@ export const minorBeneficiaryHasRepresentative = ({
     beneficiaryAgeAtConventionStart >= 18 ||
     !!signatories.beneficiaryRepresentative
   );
+};
+
+export const shouldValidateBeneficiaryAddressAndParse = (
+  convention: ConventionDto,
+) => {
+  const ruleAppliesFrom = new Date("2024-09-28");
+  const conventionWasSubmittedBeforeRuleApplies =
+    new Date(convention.dateSubmission).getTime() < ruleAppliesFrom.getTime();
+  if (
+    convention.internshipKind === "immersion" ||
+    conventionWasSubmittedBeforeRuleApplies
+  )
+    return true;
+
+  return addressSchema.safeParse(convention.signatories.beneficiary.address)
+    .success;
 };
 
 const statusesAllowedWithoutSign: ConventionStatus[] = [

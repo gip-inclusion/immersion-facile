@@ -208,13 +208,24 @@ export const BeneficiaryFormSection = ({
         <>
           <AddressAutocomplete
             {...formContents["signatories.beneficiary.address"]}
-            setFormValue={(value) => {
+            setFormValue={({ address }) => {
+              setValue("signatories.beneficiary.address.city", address.city);
               setValue(
-                "signatories.beneficiary.address",
-                `${value.address.streetNumberAndAddress}, ${value.address.postcode} ${value.address.city}`,
+                "signatories.beneficiary.address.postcode",
+                address.postcode,
+              );
+              setValue(
+                "signatories.beneficiary.address.streetNumberAndAddress",
+                address.streetNumberAndAddress,
+              );
+              setValue(
+                "signatories.beneficiary.address.departmentCode",
+                address.departmentCode,
               );
             }}
-            id={domElementIds.addAgency.addressAutocomplete}
+            id={
+              domElementIds.conventionImmersionRoute.beneficiarySection.address
+            }
           />
           <Select
             label={
