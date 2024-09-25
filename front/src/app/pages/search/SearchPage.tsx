@@ -74,9 +74,12 @@ export const SearchPage = ({
   const searchResultsWrapper = useRef<ElementRef<"div">>(null);
   const innerSearchResultWrapper = useRef<ElementRef<"div">>(null);
   const acquisitionParams = useGetAcquisitionParams();
+  const { enableSearchByScore } = useAppSelector(
+    featureFlagSelectors.featureFlagState,
+  );
   const initialValues: SearchPageParams = {
     place: "",
-    sortedBy: "date",
+    sortedBy: enableSearchByScore ? "score" : "date",
     appellations: undefined,
     distanceKm: undefined,
     latitude: undefined,
