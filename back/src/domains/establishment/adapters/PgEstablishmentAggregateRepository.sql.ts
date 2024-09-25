@@ -154,15 +154,31 @@ export const updateAllEstablishmentScoresQuery = async (
         .selectFrom("discussions as d")
         .innerJoin("exchanges", "d.id", "exchanges.discussion_id")
         .where("d.created_at", ">=", sql<Date>`NOW() - INTERVAL '1 year'`)
-        .where("exchanges.sender", "=", "establishment")
-        .select(["siret", sql`COUNT(DISTINCT d.id)`.as("discussion_count")])
+        .select([
+          "siret",
+          sql`COUNT(DISTINCT d.id)`.as("total_discussions"),
+          sql`COUNT(DISTINCT CASE WHEN exchanges.sender = 'establishment'::exchange_role THEN d.id END)`.as(
+            "answered_discussions",
+          ),
+        ])
         .groupBy("siret"),
     )
     .updateTable("establishments as e")
     .set({
-      score: sql`${minimumScore} +
-        COALESCE((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0) +
-        COALESCE((SELECT discussion_count * ${discussionCountCoefficient} FROM discussion_counts WHERE siret = e.siret), 0)`,
+      score: sql`ROUND(
+          ${minimumScore}
+          + COALESCE((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0)
+          + COALESCE((
+            SELECT
+              CASE
+                WHEN total_discussions > 0
+                THEN (answered_discussions::float / total_discussions) * ${discussionCountCoefficient}
+                ELSE 0
+              END
+            FROM discussion_counts
+            WHERE siret = e.siret
+          ), 0)
+        )`,
     })
     .execute();
 };
