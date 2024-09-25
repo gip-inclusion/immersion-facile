@@ -79,7 +79,7 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
   },
 };
 
-export const getBreadcrumbs = makeBreadcrumbsSegments(
+export const getBreadcrumbs = makeBreadcrumbsSegments<typeof breadcrumbs>(
   breadcrumbs,
   defaultAncestor,
 );
