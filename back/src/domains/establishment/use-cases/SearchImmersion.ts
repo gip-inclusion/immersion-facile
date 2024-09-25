@@ -1,17 +1,13 @@
-import { subYears } from "date-fns";
-import { prop, propEq, uniq } from "ramda";
+import { prop, propEq } from "ramda";
 import {
   ApiConsumer,
   AppellationCode,
-  DiscussionDto,
   SearchQueryParamsDto,
   SearchResultDto,
-  SearchSortedBy,
   SiretDto,
   castError,
   searchParamsSchema,
 } from "shared";
-import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -23,8 +19,6 @@ import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository
 import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 const logger = createLogger(__filename);
-
-const MAX_DISCUSSIONS = 10000;
 
 export class SearchImmersion extends TransactionalUseCase<
   SearchQueryParamsDto,
@@ -105,11 +99,7 @@ export class SearchImmersion extends TransactionalUseCase<
 
     const searchResultsInRepo =
       voluntaryToImmersion !== false && repositorySearchResults.length > 0
-        ? await this.#prepareVoluntaryToImmersionResults(
-            uow,
-            repositorySearchResults,
-            searchMade.sortedBy,
-          )
+        ? repositorySearchResults.map(({ isSearchable: _, ...rest }) => rest)
         : [];
 
     const lbbAllowedResults = lbbSearchResults
@@ -127,59 +117,6 @@ export class SearchImmersion extends TransactionalUseCase<
       .sort((a, b) =>
         sortedBy === "score" ? b.establishmentScore - a.establishmentScore : 0,
       );
-  }
-
-  async #prepareVoluntaryToImmersionResults(
-    uow: UnitOfWork,
-    results: SearchImmersionResult[],
-    sortedBy?: SearchSortedBy,
-  ): Promise<SearchResultDto[]> {
-    const oneYearAgo = subYears(this.timeGateway.now(), 1);
-    const sirets = uniq(results.map(({ siret }) => siret));
-
-    const [discussions, conventions] =
-      sortedBy === "score"
-        ? await Promise.all([
-            uow.discussionRepository.getDiscussions({
-              filters: {
-                sirets,
-                createdSince: oneYearAgo,
-              },
-              limit: MAX_DISCUSSIONS,
-            }),
-            uow.conventionQueries.getConventions({
-              filters: {
-                withSirets: sirets,
-                withStatuses: ["ACCEPTED_BY_VALIDATOR"],
-                dateSubmissionSince: oneYearAgo,
-              },
-              sortBy: "dateStart",
-            }),
-          ])
-        : [[], []];
-
-    histogramSearchImmersionStoredCount.observe(results.length);
-    return results
-      .map(({ isSearchable: _, ...rest }) => rest)
-      .map((result) => ({
-        ...result,
-        establishmentScore:
-          result.establishmentScore +
-          this.#makeEstablishmentResponseRate(
-            discussions.filter(({ siret }) => siret === result.siret),
-          ) +
-          conventions.filter(({ siret }) => siret === result.siret).length * 10,
-      }));
-  }
-
-  #makeEstablishmentResponseRate(discussionsForSiret: DiscussionDto[]): number {
-    return discussionsForSiret.length === 0
-      ? 0
-      : (discussionsForSiret.filter((discussion) =>
-          discussion.exchanges.some(({ sender }) => sender === "establishment"),
-        ).length /
-          discussionsForSiret.length) *
-          100;
   }
 
   async #searchOnLbb(

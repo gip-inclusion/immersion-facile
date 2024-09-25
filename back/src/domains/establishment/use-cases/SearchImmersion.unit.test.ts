@@ -1,18 +1,13 @@
-import { addDays, subDays, subYears } from "date-fns";
+import { addDays } from "date-fns";
 import {
-  AgencyDtoBuilder,
   ApiConsumer,
   AppellationAndRomeDto,
-  ConventionDtoBuilder,
-  DiscussionBuilder,
-  Exchange,
   SearchQueryParamsDto,
   SearchQueryParamsWithGeoParams,
   SearchResultDto,
   addressStringToDto,
   expectToEqual,
 } from "shared";
-import { v4 as uuid } from "uuid";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -97,23 +92,6 @@ const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
   .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
   .withOffers([secretariatOffer, boulangerOffer])
   .build();
-
-const establishmentExchange: Exchange = {
-  message: "",
-  recipient: "potentialBeneficiary",
-  sender: "establishment",
-  sentAt: new Date("2024-04-03").toISOString(),
-  subject: "",
-  attachments: [],
-};
-const potentialBeneficiaryExchange: Exchange = {
-  message: "",
-  recipient: "establishment",
-  sender: "potentialBeneficiary",
-  sentAt: new Date("2024-04-02").toISOString(),
-  subject: "",
-  attachments: [],
-};
 
 describe("SearchImmersionUseCase", () => {
   let uow: InMemoryUnitOfWork;
@@ -1066,305 +1044,41 @@ describe("SearchImmersionUseCase", () => {
   });
 
   describe("scoring capabilities", () => {
-    const discussionWithEstablishmentResponse = new DiscussionBuilder()
-      .withId(uuid())
-      .withCreatedAt(subDays(now, 1))
-      .withSiret(establishment.establishment.siret)
-      .withExchanges([potentialBeneficiaryExchange, establishmentExchange])
-      .build();
-
-    beforeEach(() => {
-      uow.establishmentAggregateRepository.establishmentAggregates = [
-        establishment,
-      ];
-    });
-
-    describe("discussion response rate impact on scoring", () => {
-      const discussionWithoutEstablishmentResponse = new DiscussionBuilder()
-        .withId(uuid())
-        .withCreatedAt(subDays(now, 1))
-        .withSiret(establishment.establishment.siret)
-        .withExchanges([potentialBeneficiaryExchange])
-        .build();
-
-      const discussionWithoutEstablishmentResponseOutOfYear =
-        new DiscussionBuilder()
-          .withId(uuid())
-          .withCreatedAt(subYears(subDays(now, 1), 1))
-          .withSiret(establishment.establishment.siret)
-          .withExchanges([potentialBeneficiaryExchange])
-          .build();
-
-      it("Increase score by 100 if discussion yearly response rate is 100%", async () => {
-        uow.discussionRepository.discussions = [
-          discussionWithEstablishmentResponse,
-          discussionWithoutEstablishmentResponseOutOfYear,
-        ];
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore + 100,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
-
-      it("Increase score by 50 if discussion yearly response rate is 50%", async () => {
-        uow.discussionRepository.discussions = [
-          discussionWithEstablishmentResponse,
-          discussionWithoutEstablishmentResponse,
-          discussionWithoutEstablishmentResponseOutOfYear,
-        ];
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore + 50,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
-      it("Increase score by 0 if discussion yearly response rate is 0%", async () => {
-        uow.discussionRepository.discussions = [
-          discussionWithoutEstablishmentResponse,
-          discussionWithoutEstablishmentResponseOutOfYear,
-        ];
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
-
-      it("Increase score by 0 if no yearly discussion", async () => {
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          establishment,
-        ];
-        uow.discussionRepository.discussions = [
-          discussionWithoutEstablishmentResponseOutOfYear,
-        ];
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
-    });
-
-    describe("valid convention impact on scoring", () => {
-      const establishmentValidatedConvention = new ConventionDtoBuilder()
-        .withId(uuid())
-        .withSiret(establishment.establishment.siret)
-        .withStatus("ACCEPTED_BY_VALIDATOR")
-        .withDateSubmission(now.toISOString())
-        .build();
-
-      beforeEach(() => {
-        uow.agencyRepository.setAgencies([
-          new AgencyDtoBuilder()
-            .withId(establishmentValidatedConvention.agencyId)
-            .build(),
-        ]);
-      });
-
-      it("Increase score by 10 if 1 establishment validated convention done since last year", async () => {
-        uow.conventionRepository.setConventions([
-          establishmentValidatedConvention,
-        ]);
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore + 10,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
-
-      it("Increase score by 30 if 3 establishment validated convention done since last year", async () => {
-        uow.conventionRepository.setConventions([
-          establishmentValidatedConvention,
-          new ConventionDtoBuilder(establishmentValidatedConvention)
-            .withId(uuid())
-            .build(),
-          new ConventionDtoBuilder(establishmentValidatedConvention)
-            .withId(uuid())
-            .build(),
-        ]);
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore + 30,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
-
-      it("Increase score by 0 if 0 establishment validated convention done since last year", async () => {
-        uow.conventionRepository.setConventions([
-          new ConventionDtoBuilder(establishmentValidatedConvention)
-            .withId(uuid())
-            .withDateSubmission(subYears(subDays(now, 1), 1).toISOString())
-            .build(),
-          new ConventionDtoBuilder(establishmentValidatedConvention)
-            .withId(uuid())
-            .withStatus("ACCEPTED_BY_COUNSELLOR")
-            .build(),
-          new ConventionDtoBuilder(establishmentValidatedConvention)
-            .withId(uuid())
-            .withSiret("00000000000000")
-            .build(),
-        ]);
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
-    });
-
-    describe("search made sortedBy score", () => {
+    it("orders search results by score", async () => {
       const establishment1 = new EstablishmentAggregateBuilder(establishment)
         .withEstablishmentSiret("11112312312311")
+        .withScore(100)
         .build();
 
       const establishment2 = new EstablishmentAggregateBuilder(establishment)
         .withEstablishmentSiret("22222312312312")
+        .withScore(200)
         .build();
 
-      beforeEach(() => {
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          establishment1,
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishment1,
+        establishment2,
+      ];
+
+      const response = await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+        sortedBy: "score",
+      });
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
           establishment2,
-        ];
-      });
-
-      it("First establishment first because higher score", async () => {
-        uow.discussionRepository.discussions = [
-          new DiscussionBuilder(discussionWithEstablishmentResponse)
-            .withSiret(establishment1.establishment.siret)
-            .build(),
-        ];
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment1,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore + 100,
-          ),
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment2,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
-
-      it("Second establishment first because higher score", async () => {
-        uow.discussionRepository.discussions = [
-          new DiscussionBuilder(discussionWithEstablishmentResponse)
-            .withSiret(establishment2.establishment.siret)
-            .build(),
-        ];
-
-        const response = await searchImmersionUseCase.execute({
-          ...searchSecretariatInMetzRequestDto,
-          sortedBy: "score",
-        });
-
-        expectToEqual(response, [
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment2,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore + 100,
-          ),
-          establishmentAggregateToSearchResultByRomeForFirstLocation(
-            establishment1,
-            secretariatOffer.romeCode,
-            606885,
-            establishmentScore,
-          ),
-        ]);
-        expectToEqual(uow.discussionRepository.discussionCallsCount, 1);
-        expectToEqual(uow.conventionQueries.getConventionsByFiltersCalled, 1);
-      });
+          secretariatOffer.romeCode,
+          606885,
+          establishment2.establishment.score,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment1,
+          secretariatOffer.romeCode,
+          606885,
+          establishment1.establishment.score,
+        ),
+      ]);
     });
   });
 });
