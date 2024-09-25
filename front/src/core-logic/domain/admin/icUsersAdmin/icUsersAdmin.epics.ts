@@ -183,6 +183,32 @@ const updateUserOnAgencyEpic: IcUsersAdminActionEpic = (
     ),
   );
 
+const removeAgencyUserRequestedEpic: IcUsersAdminActionEpic = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(icUsersAdminSlice.actions.removeUserFromAgencyRequested.match),
+    switchMap((action) =>
+      adminGateway
+        .removeUserFromAgency$(action.payload, getAdminToken(state$.value))
+        .pipe(
+          map(() =>
+            icUsersAdminSlice.actions.removeUserFromAgencySucceeded(
+              action.payload,
+            ),
+          ),
+          catchEpicError((error) =>
+            icUsersAdminSlice.actions.removeUserFromAgencyFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 const fetchInclusionConnectedUserOnAgencyUpdateEpic: AppEpic<
   IcUsersAdminAction | AgencyAction
 > = (action$) =>
@@ -223,4 +249,5 @@ export const icUsersAdminEpics = [
   updateUserOnAgencyEpic,
   fetchInclusionConnectedUserOnAgencyUpdateEpic,
   createUserOnAgencyEpic,
+  removeAgencyUserRequestedEpic,
 ];

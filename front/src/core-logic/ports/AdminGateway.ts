@@ -10,6 +10,7 @@ import {
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
+  RemoveAgencyUserParams,
   SetFeatureFlagParam,
   UserParamsForAgency,
   WithUserFilters,
@@ -48,6 +49,11 @@ export interface AdminGateway {
 
   updateUserRoleForAgency$(
     params: UserParamsForAgency,
+    token: InclusionConnectJwt,
+  ): Observable<void>;
+
+  removeUserFromAgency$(
+    params: RemoveAgencyUserParams,
     token: InclusionConnectJwt,
   ): Observable<void>;
 

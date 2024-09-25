@@ -10,6 +10,7 @@ import {
   InclusionConnectJwt,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
+  RemoveAgencyUserParams,
   SetFeatureFlagParam,
   UserParamsForAgency,
   WithUserFilters,
@@ -215,6 +216,26 @@ export class HttpAdminGateway implements AdminGateway {
         .then((response) =>
           match(response)
             .with({ status: 201 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public removeUserFromAgency$(
+    params: RemoveAgencyUserParams,
+    token: string,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .removeUserFromAgency({
+          headers: { authorization: token },
+          urlParams: params,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),

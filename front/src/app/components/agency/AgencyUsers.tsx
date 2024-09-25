@@ -18,6 +18,7 @@ import {
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
+import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
 import { Feedback } from "../feedback/Feedback";
@@ -159,12 +160,11 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
               );
             }),
             <ButtonsGroup
+              inlineLayoutWhen={"always"}
               buttons={[
                 {
-                  title: "Modifier",
-                  iconId: "fr-icon-edit-fill",
+                  children: "Modifier",
                   priority: "secondary",
-                  className: "fr-m-1w",
                   id: `${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`,
                   onClick: () => {
                     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
@@ -182,8 +182,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
                   },
                 },
                 {
-                  title: "Supprimer",
-                  iconId: "fr-icon-delete-fill",
+                  children: "Supprimer",
                   priority: "secondary",
                   id: `${domElementIds.admin.agencyTab.editAgencyRemoveUserButton}-${agency.id}-${index}`,
                   onClick: () => {
@@ -230,7 +229,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
         <removeUserModal.Component title="Confirmer la suppression">
           <p>
             Vous êtes sur le point de supprimer le rattachement de{" "}
-            {selectedUserData?.email}.
+            {selectedUserData?.email} à l'agence "{agency.name}".
           </p>
           <p>Souhaitez-vous continuer ?</p>
           <ButtonsGroup
@@ -247,7 +246,15 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
                 priority: "primary",
                 children: "Supprimer le rattachement",
                 onClick: () => {
-                  //TODO
+                  if (!selectedUserData) return;
+                  dispatch(
+                    icUsersAdminSlice.actions.removeUserFromAgencyRequested({
+                      userId: selectedUserData.userId,
+                      agencyId: agency.id,
+                      feedbackTopic: "agency-user",
+                    }),
+                  );
+                  removeUserModal.close();
                 },
               },
             ]}

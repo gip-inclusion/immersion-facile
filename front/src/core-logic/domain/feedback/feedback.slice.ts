@@ -161,6 +161,18 @@ export const feedbackMapping: Record<
       title: "Problème lors de la création de l'utilisateur",
       message: "Une erreur est survenue lors de la création de l'utilisateur",
     },
+    "delete.success": {
+      action: icUsersAdminSlice.actions.removeUserFromAgencySucceeded,
+      title: "L'utilisateur n'est plus rattaché à cette agence",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "delete.error": {
+      action: icUsersAdminSlice.actions.removeUserFromAgencyFailed,
+      title:
+        "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
+      message:
+        "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur.",
+    },
   },
 };
 

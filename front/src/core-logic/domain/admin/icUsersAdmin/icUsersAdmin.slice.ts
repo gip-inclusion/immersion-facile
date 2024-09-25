@@ -1,10 +1,12 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { filter } from "ramda";
 import {
   AgencyId,
   AgencyRight,
   InclusionConnectedUser,
   OmitFromExistingKeys,
   RejectIcUserRoleForAgencyParams,
+  RemoveAgencyUserParams,
   User,
   UserId,
   UserParamsForAgency,
@@ -221,11 +223,29 @@ export const icUsersAdminSlice = createSlice({
       state.isUpdatingIcUserAgency = false;
     },
 
-    removeAgencyUserRequested: (
+    removeUserFromAgencyRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
+      _action: PayloadActionWithFeedbackTopic<RemoveAgencyUserParams>,
     ) => {
       state.isUpdatingIcUserAgency = true;
+    },
+
+    removeUserFromAgencySucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<RemoveAgencyUserParams>,
+    ) => {
+      state.isUpdatingIcUserAgency = false;
+      state.agencyUsers = filter(
+        (agencyUser) => agencyUser.id !== action.payload.userId,
+        state.agencyUsers,
+      );
+    },
+
+    removeUserFromAgencyFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
+      state.isUpdatingIcUserAgency = false;
     },
   },
 });

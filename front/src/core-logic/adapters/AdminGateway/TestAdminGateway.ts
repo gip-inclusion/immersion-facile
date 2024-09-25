@@ -9,6 +9,7 @@ import {
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
+  RemoveAgencyUserParams,
   SetFeatureFlagParam,
   UserParamsForAgency,
 } from "shared";
@@ -42,6 +43,8 @@ export class TestAdminGateway implements AdminGateway {
   public token$ = new Subject<string>();
 
   public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
+
+  public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
   public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
 
@@ -102,5 +105,12 @@ export class TestAdminGateway implements AdminGateway {
     _token: string,
   ): Observable<void> {
     return this.updateAgencyRoleForUserResponse$;
+  }
+
+  public removeUserFromAgency$(
+    _params: RemoveAgencyUserParams,
+    _token: string,
+  ): Observable<void> {
+    return this.removeUserFromAgencyResponse$;
   }
 }
