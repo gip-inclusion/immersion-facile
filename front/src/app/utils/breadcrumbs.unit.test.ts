@@ -135,7 +135,6 @@ const testRootAncestor: BreadcrumbProps["segments"][0] = {
   },
 };
 
-const getTestBreadcrumbs = makeBreadcrumbsSegments(
-  testBreadcrumbsSet,
-  testRootAncestor,
-);
+export const getTestBreadcrumbs = makeBreadcrumbsSegments<
+  typeof testBreadcrumbsSet
+>(testBreadcrumbsSet, testRootAncestor);

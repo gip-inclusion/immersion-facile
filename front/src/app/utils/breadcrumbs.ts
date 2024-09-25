@@ -5,15 +5,23 @@ import {
   BreadcrumbsItem,
 } from "src/app/contents/breadcrumbs/breadcrumbs";
 
+type RoutesKeysFromBreadcrumbs<T extends Record<keyof T, BreadcrumbsItem>> = {
+  [K in keyof T]:
+    | K
+    | (T[K]["children"] extends Record<keyof T[K]["children"], BreadcrumbsItem>
+        ? RoutesKeysFromBreadcrumbs<T[K]["children"]>
+        : never);
+}[keyof T];
+
 export const makeBreadcrumbsSegments =
-  <K>(
-    breadcrumbsSet: Breadcrumbs<K extends string ? K : never>,
+  <T extends Record<string, BreadcrumbsItem>>(
+    breadcrumbsSet: Breadcrumbs<keyof T extends string ? keyof T : never>,
     rootAncestor: BreadcrumbProps["segments"][0],
   ) =>
   ({
     currentRouteKey,
   }: {
-    currentRouteKey: K;
+    currentRouteKey: RoutesKeysFromBreadcrumbs<T>;
   }): BreadcrumbProps["segments"] => {
     const currentRouteAncestor = keys(breadcrumbsSet).find((key) => {
       const currentRouteInBreadcrumbs = breadcrumbsSet[key];
