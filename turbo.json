@@ -20,6 +20,9 @@
       "dependsOn": ["^typecheck"],
       "outputs": []
     },
+    "verify-migrations-order": {
+      "outputs": []
+    },
     "test": {
       "dependsOn": ["typecheck"],
       "outputs": []
