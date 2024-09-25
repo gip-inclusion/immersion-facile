@@ -686,6 +686,96 @@ describe("Agency registration for authenticated users", () => {
     });
   });
 
+  describe("Remove users from agency", () => {
+    it("should remove user successfully", () => {
+      const prefilledAdminState = adminPreloadedState({
+        inclusionConnectedUsersAdmin: {
+          ...icUsersAdminInitialState,
+          agencyUsers: testUserSet,
+        },
+      });
+      ({ store, dependencies } = createTestStore({
+        admin: prefilledAdminState,
+      }));
+      const userToRemove = testUserSet[user1Id];
+
+      expectToEqual(
+        store.getState().admin.inclusionConnectedUsersAdmin,
+        prefilledAdminState.inclusionConnectedUsersAdmin,
+      );
+
+      store.dispatch(
+        icUsersAdminSlice.actions.removeUserFromAgencyRequested({
+          userId: userToRemove.id,
+          agencyId: agency1.id,
+          feedbackTopic: "agency-user",
+        }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(true);
+      dependencies.adminGateway.removeUserFromAgencyResponse$.next(undefined);
+
+      expectIsUpdatingUserAgencyToBe(false);
+      expectToEqual(icUsersAdminSelectors.agencyUsers(store.getState()), {
+        [user2Id]: testUserSet[user2Id],
+      });
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["agency-user"],
+        {
+          level: "success",
+          message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+          on: "delete",
+          title: "L'utilisateur n'est plus rattaché à cette agence",
+        },
+      );
+    });
+
+    it("should return an error if user removal went wrong", () => {
+      const prefilledAdminState = adminPreloadedState({
+        inclusionConnectedUsersAdmin: {
+          ...icUsersAdminInitialState,
+          agencyUsers: testUserSet,
+        },
+      });
+      ({ store, dependencies } = createTestStore({
+        admin: prefilledAdminState,
+      }));
+      const userToRemove = testUserSet[user1Id];
+      const errorMessage =
+        "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur";
+
+      expectToEqual(
+        store.getState().admin.inclusionConnectedUsersAdmin,
+        prefilledAdminState.inclusionConnectedUsersAdmin,
+      );
+
+      store.dispatch(
+        icUsersAdminSlice.actions.removeUserFromAgencyRequested({
+          userId: userToRemove.id,
+          agencyId: agency1.id,
+          feedbackTopic: "agency-user",
+        }),
+      );
+
+      expectIsUpdatingUserAgencyToBe(true);
+      dependencies.adminGateway.removeUserFromAgencyResponse$.error(
+        new Error(errorMessage),
+      );
+      expectIsUpdatingUserAgencyToBe(false);
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["agency-user"],
+        {
+          level: "error",
+          message: errorMessage,
+          on: "delete",
+          title:
+            "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
+        },
+      );
+    });
+  });
+
   const expectIsUpdatingUserAgencyToBe = (expected: boolean) => {
     expect(icUsersAdminSelectors.isUpdatingIcUserAgency(store.getState())).toBe(
       expected,
