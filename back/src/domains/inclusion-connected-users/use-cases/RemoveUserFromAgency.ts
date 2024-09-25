@@ -27,7 +27,7 @@ const getUserAndThrowIfNotFound = async (
   return requestedUser;
 };
 
-const getAgencyAndThrowIfUserHasNoAgencyRight = (
+const getUserAgencyRightsAndThrowIfUserHasNoAgencyRight = (
   user: InclusionConnectedUser,
   agencyId: AgencyId,
 ): AgencyDto => {
@@ -57,7 +57,7 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
       uow.userRepository,
       inputParams.userId,
     );
-    const agency = getAgencyAndThrowIfUserHasNoAgencyRight(
+    const agency = getUserAgencyRightsAndThrowIfUserHasNoAgencyRight(
       requestedUser,
       inputParams.agencyId,
     );
