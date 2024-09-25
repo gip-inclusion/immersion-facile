@@ -1,8 +1,16 @@
 import { subMonths } from "date-fns";
 import { Pool } from "pg";
-import { DiscussionBuilder, Exchange, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  DiscussionBuilder,
+  Exchange,
+  expectToEqual,
+} from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
+import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -20,6 +28,9 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
   beforeEach(async () => {
     await db.deleteFrom("establishments").execute();
     await db.deleteFrom("discussions").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agencies").execute();
   });
 
   afterAll(async () => {
@@ -32,11 +43,25 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
         new PgEstablishmentAggregateRepository(db);
 
       const pgDiscussionRepository = new PgDiscussionRepository(db);
+      const pgConventionRepository = new PgConventionRepository(db);
+      const pgAgencyRepository = new PgAgencyRepository(db);
 
       const establishment = new EstablishmentAggregateBuilder()
         .withScore(0)
         .build();
       const { siret } = establishment.establishment;
+
+      const agency = new AgencyDtoBuilder().build();
+      await pgAgencyRepository.insert(agency);
+
+      const convention = new ConventionDtoBuilder()
+        .withSiret(siret)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withAgencyId(agency.id)
+        .withDateSubmission(new Date().toISOString())
+        .build();
+
+      await pgConventionRepository.save(convention);
 
       const initialExchange: Exchange = {
         subject: "Hello",
@@ -106,7 +131,11 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
           siret,
         );
 
-      expectToEqual(establishmentAfter?.establishment.score, 110);
+      const minimunScore = 10;
+      const discussionScore = 100 * (1 / 2);
+      const conventionScore = 10 * 1;
+      const expectedScore = minimunScore + discussionScore + conventionScore;
+      expectToEqual(establishmentAfter?.establishment.score, expectedScore);
     });
   });
 });
