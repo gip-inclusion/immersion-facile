@@ -40,7 +40,7 @@ export const formConventionFieldsLabels: (
   ...beneficiaryRepresentativeSection(internshipKind),
   ...beneficiaryCurrentEmployerSection,
   ...establishmentTutorSection(internshipKind),
-  ...establishmentRepresentativeSection(internshipKind),
+  ...establishmentRepresentativeSection(),
   //
   // TODO: exclude these fields from typing
   //
@@ -359,8 +359,8 @@ const establishmentTutorSection = (internshipKind: InternshipKind) => ({
   },
   "establishmentTutor.email": {
     label: "Email du tuteur",
-    hintText: "pour envoyer la validation de la convention",
-    placeholder: "nom@exemple.com",
+    hintText:
+      "Le tuteur recevra une copie de la convention à cette adresse email. Pensez à bien vérifier son exactitude. Ex: nom@domain.com",
     id: establishmentTutorSectionIds.email,
     required: true,
   },
@@ -370,10 +370,7 @@ const establishmentTutorSection = (internshipKind: InternshipKind) => ({
         ? "Numéro de téléphone du tuteur ou de la structure d'accueil"
         : "Numéro de téléphone du tuteur ou de l’entreprise",
     hintText:
-      internshipKind === "immersion"
-        ? "pour qu’on puisse le/la contacter à propos de l’immersion"
-        : "pour qu’on puisse le/la contacter à propos du stage",
-    placeholder: "0605040302",
+      "Renseignez de préférence un téléphone portable pour recevoir une copie de la convention par SMS. Ex: 0605040302",
     id: establishmentTutorSectionIds.phone,
     required: true,
   },
@@ -457,9 +454,7 @@ const beneficiaryCurrentEmployerSection = {
   },
 };
 
-const establishmentRepresentativeSection = (
-  internshipKind: InternshipKind,
-) => ({
+const establishmentRepresentativeSection = () => ({
   "signatories.establishmentRepresentative.firstName": {
     label: "Indiquez le prénom du représentant de l'entreprise",
     hintText: "Ex : Alain",
@@ -474,18 +469,15 @@ const establishmentRepresentativeSection = (
   },
   "signatories.establishmentRepresentative.email": {
     label: "Indiquez l'e-mail du représentant de l'entreprise",
-    placeholder: "nom@exemple.com",
-    hintText: "pour envoyer la validation de la convention",
+    hintText:
+      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Ex: nom@domain.com",
     id: establishmentRepresentativeSectionIds.email,
     required: true,
   },
   "signatories.establishmentRepresentative.phone": {
     label: "Indiquez le numéro de téléphone du représentant de l'entreprise",
-    placeholder: "0605040302",
     hintText:
-      internshipKind === "immersion"
-        ? "pour qu’on puisse le/la contacter à propos de l’immersion"
-        : "pour qu’on puisse le/la contacter à propos du stage",
+      "Renseignez de préférence un téléphone portable pour signer la convention par SMS. Ex: 0605040302",
     id: establishmentRepresentativeSectionIds.phone,
     required: true,
   },
@@ -851,7 +843,7 @@ export const formUiSections: Partial<FormFieldKeys>[][] = [
   [
     ...keys(
       mergeRight(
-        establishmentRepresentativeSection("immersion"),
+        establishmentRepresentativeSection(),
         establishmentTutorSection("immersion"),
       ),
     ),
