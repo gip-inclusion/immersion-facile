@@ -6,9 +6,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test:local": "playwright test",
-    "test:local-on-dev": "BASE_URL=https://dev.immersion-facile.beta.gouv.fr playwright test",
-    "test:ci": "CI=true BASE_URL=https://dev.immersion-facile.beta.gouv.fr EVENT_CRAWLER_PERIOD_MS=1000 playwright test",
-    "test:ci-v2": "CI=true playwright test",
+    "test:local-on-staging": "BASE_URL=https://staging.immersion-facile.beta.gouv.fr playwright test",
+    "test:ci": "CI=true playwright test",
     "show-report": "playwright show-report",
     "install": "playwright install --with-deps chromium"
   },

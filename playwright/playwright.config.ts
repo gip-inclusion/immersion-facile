@@ -24,7 +24,7 @@ export default defineConfig({
     },
     storageState: "./data/storageState.json" /* Accept cookies by default */,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
   },
   timeout: 60_000,
   /* Configure projects for major browsers */
