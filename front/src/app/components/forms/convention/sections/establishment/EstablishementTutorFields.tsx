@@ -19,9 +19,11 @@ import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 export const EstablishementTutorFields = ({
   setEmailValidationErrors,
   emailValidationErrors,
+  isTutorEstablishmentRepresentative,
 }: {
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
+  isTutorEstablishmentRepresentative: boolean;
 }): JSX.Element => {
   const { register, getValues, formState } =
     useFormContext<ConventionReadDto>();
@@ -34,26 +36,63 @@ export const EstablishementTutorFields = ({
   const isFetchingSiret = useSelector(siretSelectors.isFetching);
   return (
     <>
-      <Input
-        label={formContents["establishmentTutor.firstName"].label}
-        hintText={formContents["establishmentTutor.firstName"].hintText}
-        nativeInputProps={{
-          ...formContents["establishmentTutor.firstName"],
-          ...register("establishmentTutor.firstName"),
-        }}
-        disabled={isFetchingSiret}
-        {...getFieldError("establishmentTutor.firstName")}
-      />
-      <Input
-        label={formContents["establishmentTutor.lastName"].label}
-        hintText={formContents["establishmentTutor.lastName"].hintText}
-        nativeInputProps={{
-          ...formContents["establishmentTutor.lastName"],
-          ...register("establishmentTutor.lastName"),
-        }}
-        disabled={isFetchingSiret}
-        {...getFieldError("establishmentTutor.lastName")}
-      />
+      {!isTutorEstablishmentRepresentative && (
+        <>
+          <Input
+            label={formContents["establishmentTutor.firstName"].label}
+            hintText={formContents["establishmentTutor.firstName"].hintText}
+            nativeInputProps={{
+              ...formContents["establishmentTutor.firstName"],
+              ...register("establishmentTutor.firstName"),
+            }}
+            disabled={isFetchingSiret}
+            {...getFieldError("establishmentTutor.firstName")}
+          />
+          <Input
+            label={formContents["establishmentTutor.lastName"].label}
+            hintText={formContents["establishmentTutor.lastName"].hintText}
+            nativeInputProps={{
+              ...formContents["establishmentTutor.lastName"],
+              ...register("establishmentTutor.lastName"),
+            }}
+            disabled={isFetchingSiret}
+            {...getFieldError("establishmentTutor.lastName")}
+          />
+          <Input
+            label={formContents["establishmentTutor.phone"].label}
+            hintText={formContents["establishmentTutor.phone"].hintText}
+            nativeInputProps={{
+              ...formContents["establishmentTutor.phone"],
+              ...register("establishmentTutor.phone"),
+              type: "tel",
+            }}
+            {...getFieldError("establishmentTutor.phone")}
+          />
+          <EmailValidationInput
+            label={formContents["establishmentTutor.email"].label}
+            hintText={formContents["establishmentTutor.email"].hintText}
+            nativeInputProps={{
+              ...formContents["establishmentTutor.email"],
+              ...register("establishmentTutor.email"),
+            }}
+            {...getFieldError("establishmentTutor.email")}
+            onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
+              const { "Tuteur de l'entreprise": _, ...rest } =
+                emailValidationErrors;
+
+              setEmailValidationErrors({
+                ...rest,
+                ...(state === "error"
+                  ? {
+                      "Tuteur de l'entreprise": stateRelatedMessage,
+                    }
+                  : {}),
+              });
+            }}
+          />
+          {values.establishmentTutor?.email && <ConventionEmailWarning />}
+        </>
+      )}
       <Input
         label={formContents["establishmentTutor.job"].label}
         hintText={formContents["establishmentTutor.job"].hintText}
@@ -64,39 +103,6 @@ export const EstablishementTutorFields = ({
         disabled={isFetchingSiret}
         {...getFieldError("establishmentTutor.job")}
       />
-      <Input
-        label={formContents["establishmentTutor.phone"].label}
-        hintText={formContents["establishmentTutor.phone"].hintText}
-        nativeInputProps={{
-          ...formContents["establishmentTutor.phone"],
-          ...register("establishmentTutor.phone"),
-          type: "tel",
-        }}
-        {...getFieldError("establishmentTutor.phone")}
-      />
-      <EmailValidationInput
-        label={formContents["establishmentTutor.email"].label}
-        hintText={formContents["establishmentTutor.email"].hintText}
-        nativeInputProps={{
-          ...formContents["establishmentTutor.email"],
-          ...register("establishmentTutor.email"),
-        }}
-        {...getFieldError("establishmentTutor.email")}
-        onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
-          const { "Tuteur de l'entreprise": _, ...rest } =
-            emailValidationErrors;
-
-          setEmailValidationErrors({
-            ...rest,
-            ...(state === "error"
-              ? {
-                  "Tuteur de l'entreprise": stateRelatedMessage,
-                }
-              : {}),
-          });
-        }}
-      />
-      {values.establishmentTutor?.email && <ConventionEmailWarning />}
     </>
   );
 };
