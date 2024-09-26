@@ -10,6 +10,8 @@ import {
   LevelOfEducation,
   PeConnectIdentity,
   ScheduleDto,
+  addressDtoToString,
+  addressStringToDto,
   appellationCodeSchema,
   errors,
   isBeneficiaryStudent,
@@ -163,6 +165,7 @@ const conventionToConventionInUrl = (
         led: beneficiary.levelOfEducation,
         schoolName: beneficiary.schoolName,
         schoolPostcode: beneficiary.schoolPostcode,
+        address: beneficiary.address && addressDtoToString(beneficiary.address),
       }
     : undefined;
 
@@ -273,6 +276,7 @@ export const conventionValuesFromUrl = {
   phone: param.query.optional.string,
   financiaryHelp: param.query.optional.string,
   led: param.query.optional.string,
+  address: param.query.optional.string,
   schoolName: param.query.optional.string,
   schoolPostcode: param.query.optional.string,
   emergencyContact: param.query.optional.string,
@@ -422,6 +426,7 @@ const conventionPresentationFromParams = (
       emergencyContact: params.emergencyContact ?? "",
       emergencyContactPhone: params.emergencyContactPhone ?? "",
       emergencyContactEmail: params.emergencyContactEmail ?? "",
+      address: params.address ? addressStringToDto(params.address) : undefined,
       levelOfEducation: (params.led as LevelOfEducation) ?? "",
       schoolName: params.schoolName ?? "",
       schoolPostcode: params.schoolPostcode ?? "",

@@ -10,6 +10,7 @@ import {
   BeneficiaryRepresentative,
   ConventionReadDto,
   InternshipKind,
+  addressDtoToString,
   domElementIds,
   emailSchema,
   isBeneficiaryStudent,
@@ -208,6 +209,10 @@ export const BeneficiaryFormSection = ({
         <>
           <AddressAutocomplete
             {...formContents["signatories.beneficiary.address"]}
+            initialSearchTerm={
+              values.signatories.beneficiary.address &&
+              addressDtoToString(values.signatories.beneficiary.address)
+            }
             setFormValue={({ address }) => {
               setValue("signatories.beneficiary.address.city", address.city);
               setValue(
