@@ -3,7 +3,6 @@ import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   ConventionReadDto,
-  getSignatoryKey,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -38,16 +37,18 @@ export const useTutorIsEstablishmentRepresentative = () => {
   const { getValues, setValue } = useFormContext<ConventionReadDto>();
   const values = getValues();
 
-  const { firstName, lastName, email, phone } = values.establishmentTutor;
+  const { firstName, lastName, email, phone } =
+    values.signatories.establishmentRepresentative;
 
   useEffect(() => {
     if (isTutorEstablismentRepresentative) {
-      setValue(getSignatoryKey("signatories.establishmentRepresentative"), {
-        role: "establishment-representative",
+      setValue("establishmentTutor", {
+        role: "establishment-tutor",
         firstName,
         lastName,
         phone,
         email,
+        job: getValues("establishmentTutor").job,
       });
       return;
     }
@@ -55,10 +56,7 @@ export const useTutorIsEstablishmentRepresentative = () => {
     if (!convention) return;
 
     if (!isEstablishmentTutorIsEstablishmentRepresentative(convention))
-      setValue(
-        getSignatoryKey("signatories.establishmentRepresentative"),
-        convention.signatories.establishmentRepresentative,
-      );
+      setValue("establishmentTutor", convention.establishmentTutor);
   }, [
     isTutorEstablismentRepresentative,
     firstName,

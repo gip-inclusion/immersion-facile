@@ -1,15 +1,17 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
+import {
+  RadioButtons,
+  RadioButtonsProps,
+} from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { ConventionDto } from "shared";
+import { ConventionDto, InternshipKind } from "shared";
 import {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
 } from "src/app/components/forms/convention/ConventionForm";
-import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useTutorIsEstablishmentRepresentative } from "src/app/hooks/convention.hooks";
@@ -21,6 +23,29 @@ import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
+
+export const tutorSelectOptions = (
+  internshipKind: InternshipKind,
+): RadioButtonsProps["options"] => [
+  {
+    label: "Le représentant de la structure d'accueil sera également le tuteur",
+    hintText: `La même personne signera la convention, accompagnera le candidat en ${
+      internshipKind === "immersion" ? "immersion" : "stage"
+    } au sein de la structure d'accueil et remplira le bilan avec lui.`,
+    nativeInputProps: {
+      value: 1,
+    },
+  },
+  {
+    label: "Le tuteur est différent du représentant de la structure d'accueil",
+    hintText: `Le tuteur accompagnera le candidat en ${
+      internshipKind === "immersion" ? "immersion" : "stage"
+    } dans l'entreprise et remplira le bilan avec lui. Il ne signera pas la convention, mais la recevra tout de même par email.`,
+    nativeInputProps: {
+      value: 0,
+    },
+  },
+];
 
 export const EstablishmentFormSection = ({
   setEmailValidationErrors,
@@ -55,41 +80,38 @@ export const EstablishmentFormSection = ({
       />
 
       <EstablishmentBusinessFields />
+      <EstablishmentRepresentativeFields
+        emailValidationErrors={emailValidationErrors}
+        setEmailValidationErrors={setEmailValidationErrors}
+      />
       <RadioButtons
         legend={
           formContents.isEstablishmentTutorIsEstablishmentRepresentative.label
         }
-        hintText={
-          formContents.isEstablishmentTutorIsEstablishmentRepresentative
-            .hintText
-        }
-        options={booleanSelectOptions.map((option) => ({
-          ...option,
-          nativeInputProps: {
-            checked:
-              Boolean(option.nativeInputProps.value) ===
-              isTutorEstablishmentRepresentative,
-            onChange: () => {
-              dispatch(
-                conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
-                  option.nativeInputProps.value === 1,
-                ),
-              );
+        options={tutorSelectOptions(getValues("internshipKind")).map(
+          (option) => ({
+            ...option,
+            nativeInputProps: {
+              checked:
+                Boolean(option.nativeInputProps.value) ===
+                isTutorEstablishmentRepresentative,
+              onChange: () => {
+                dispatch(
+                  conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
+                    option.nativeInputProps.value === 1,
+                  ),
+                );
+              },
             },
-          },
-        }))}
+          }),
+        )}
         disabled={isFetchingSiret}
       />
       <EstablishementTutorFields
         emailValidationErrors={emailValidationErrors}
         setEmailValidationErrors={setEmailValidationErrors}
+        isTutorEstablishmentRepresentative={isTutorEstablishmentRepresentative}
       />
-      {!isTutorEstablishmentRepresentative && (
-        <EstablishmentRepresentativeFields
-          emailValidationErrors={emailValidationErrors}
-          setEmailValidationErrors={setEmailValidationErrors}
-        />
-      )}
     </>
   );
 };

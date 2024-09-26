@@ -211,11 +211,9 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     ),
   },
   isEstablishmentTutorIsEstablishmentRepresentative: {
-    label:
-      internshipKind === "immersion"
-        ? "Est-ce que le tuteur de l'immersion est le représentant de l'entreprise, signataire de la convention ?"
-        : "Est-ce que le tuteur de stage est le représentant de l'entreprise, signataire de la convention ?",
-
+    label: `Qui sera le tuteur du candidat durant son ${
+      internshipKind === "immersion" ? "immersion" : "stage"
+    } ?`,
     id: conventionSectionIds.isEstablishmentTutorIsEstablishmentRepresentative,
     required: true,
   },
