@@ -167,7 +167,7 @@ jobs:
         run: curl -X GET http://localhost:3000/api
       - name: Run playwright tests
         run: |
-          pnpm playwright test:ci-v2
+          pnpm playwright test:ci
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
