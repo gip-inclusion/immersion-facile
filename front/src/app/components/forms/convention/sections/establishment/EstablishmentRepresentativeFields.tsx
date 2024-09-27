@@ -10,7 +10,10 @@ import {
   SetEmailValidationErrorsState,
 } from "src/app/components/forms/convention/ConventionForm";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { getFormContents } from "src/app/hooks/formContents.hooks";
+import {
+  getFormContents,
+  makeFieldError,
+} from "src/app/hooks/formContents.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
@@ -21,43 +24,71 @@ export const EstablishmentRepresentativeFields = ({
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
 }): JSX.Element => {
-  const { getValues, register } = useFormContext<ConventionReadDto>();
+  const { getValues, register, formState } =
+    useFormContext<ConventionReadDto>();
   const values = getValues();
   const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
+  const getFieldError = makeFieldError(formState);
   const formContents = getFormFields();
   const isFetchingSiret = useSelector(siretSelectors.isFetching);
   return (
     <>
       <hr className={fr.cx("fr-hr")} />
       <Input
-        {...formContents["signatories.establishmentRepresentative.firstName"]}
+        label={
+          formContents["signatories.establishmentRepresentative.firstName"]
+            .label
+        }
+        hintText={
+          formContents["signatories.establishmentRepresentative.firstName"]
+            .hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.establishmentRepresentative.firstName"],
           ...register("signatories.establishmentRepresentative.firstName"),
         }}
         disabled={isFetchingSiret}
+        {...getFieldError("signatories.establishmentRepresentative.firstName")}
       />
       <Input
-        {...formContents["signatories.establishmentRepresentative.lastName"]}
+        label={
+          formContents["signatories.establishmentRepresentative.lastName"].label
+        }
+        hintText={
+          formContents["signatories.establishmentRepresentative.lastName"]
+            .hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.establishmentRepresentative.lastName"],
           ...register("signatories.establishmentRepresentative.lastName"),
         }}
         disabled={isFetchingSiret}
+        {...getFieldError("signatories.establishmentRepresentative.lastName")}
       />
       <Input
-        {...formContents["signatories.establishmentRepresentative.phone"]}
+        label={
+          formContents["signatories.establishmentRepresentative.phone"].label
+        }
+        hintText={
+          formContents["signatories.establishmentRepresentative.phone"].hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.establishmentRepresentative.phone"],
           ...register("signatories.establishmentRepresentative.phone"),
           type: "tel",
         }}
         disabled={isFetchingSiret}
+        {...getFieldError("signatories.establishmentRepresentative.phone")}
       />
       <EmailValidationInput
-        {...formContents["signatories.establishmentRepresentative.email"]}
+        label={
+          formContents["signatories.establishmentRepresentative.email"].label
+        }
+        hintText={
+          formContents["signatories.establishmentRepresentative.email"].hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.establishmentRepresentative.email"],
           ...register("signatories.establishmentRepresentative.email"),

@@ -80,24 +80,24 @@ export const submitBasicConventionForm = async (
     getRandomSiret(),
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.firstName}`,
+    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.firstName}`,
     faker.person.firstName(),
   );
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.lastName}`,
+    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.lastName}`,
     faker.person.lastName(),
+  );
+  await page.fill(
+    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.phone}`,
+    faker.helpers.fromRegExp(phoneRegexp),
+  );
+  await page.fill(
+    `#${domElementIds.conventionImmersionRoute.establishmentRepresentativeSection.email}`,
+    "recette+establishment-tutor@immersion-facile.beta.gouv.fr",
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,
     faker.person.jobType(),
-  );
-  await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.phone}`,
-    faker.helpers.fromRegExp(phoneRegexp),
-  );
-  await page.fill(
-    `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.email}`,
-    "recette+establishment-tutor@immersion-facile.beta.gouv.fr",
   );
   await openNextSection(page); // Open place / hour section
   await page.fill(
