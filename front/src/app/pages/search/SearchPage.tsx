@@ -70,6 +70,7 @@ export const SearchPage = ({
   const initialSearchSliceState = initialState;
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
+  const isLoading = useAppSelector(searchSelectors.isLoading);
   const requestSearch = useSearchUseCase(route);
   const [searchMade, setSearchMade] = useState<SearchPageParams | null>(null);
   const searchResultsWrapper = useRef<ElementRef<"div">>(null);
@@ -151,7 +152,7 @@ export const SearchPage = ({
 
   useEffect(() => {
     return () => {
-      dispatch(searchSlice.actions.clearSearchStatus());
+      dispatch(searchSlice.actions.clearSearchStatusRequested());
     };
   }, [dispatch]);
 
@@ -334,8 +335,7 @@ export const SearchPage = ({
               <SearchListResults showDistance={areValidGeoParams(searchMade)} />
             </div>
           )}
-          {searchStatus === "extraFetch" ||
-            (searchStatus === "initialFetch" && <Loader />)}
+          {isLoading && <Loader />}
 
           {searchMade === null && (
             <div className={fr.cx("fr-pt-10w")}>

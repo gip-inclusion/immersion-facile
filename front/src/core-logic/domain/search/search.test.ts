@@ -82,6 +82,7 @@ describe("search epic", () => {
     it("with extra fetch if less than minimum results", () => {
       expectStatus("noSearchMade");
       expectSearchInfo("Veuillez sélectionner vos critères");
+      expectIsLoading(false);
 
       store.dispatch(
         searchSlice.actions.searchRequested({
@@ -93,19 +94,23 @@ describe("search epic", () => {
           place: "23 rue lunaire, 44000 Nantes",
         }),
       );
+      expectIsLoading(true);
       expectStatus("initialFetch");
 
       feedWithSearchResults([formSearchResult1]);
       expectSearchResults([formSearchResult1]);
       expectStatus("extraFetch");
+      expectIsLoading(true);
       expectSearchInfo("Nous cherchons à compléter les résultats...");
 
       feedWithSearchResults([lbbSearchResult]);
       expectSearchResults([formSearchResult1, lbbSearchResult]);
       expectStatus("ok");
+      expectIsLoading(false);
     });
 
     it("without extra fetch if enough results in initial fetch", () => {
+      expectIsLoading(false);
       store.dispatch(
         searchSlice.actions.searchRequested({
           distanceKm: 10,
@@ -117,13 +122,16 @@ describe("search epic", () => {
         }),
       );
       expectStatus("initialFetch");
+      expectIsLoading(true);
 
       feedWithSearchResults([formSearchResult1, formSearchResult2]);
       expectStatus("ok");
+      expectIsLoading(false);
       expectSearchResults([formSearchResult1, formSearchResult2]);
     });
 
     it("displays message when there are no results", () => {
+      expectIsLoading(false);
       store.dispatch(
         searchSlice.actions.searchRequested({
           distanceKm: 10,
@@ -137,9 +145,11 @@ describe("search epic", () => {
 
       feedWithSearchResults([]);
       expectStatus("extraFetch");
+      expectIsLoading(true);
 
       feedWithSearchResults([]);
       expectStatus("ok");
+      expectIsLoading(false);
       expectSearchInfo(
         "Pas de résultat. Essayez avec un plus grand rayon de recherche...",
       );
@@ -196,41 +206,6 @@ describe("search epic", () => {
     });
   });
 
-  it("should clear the current search result", () => {
-    expectStateToMatchInitialState();
-
-    store.dispatch(
-      searchSlice.actions.fetchSearchResultRequested({
-        appellationCode: immersionOffer.appellations[0].appellationCode,
-        siret: immersionOffer.siret,
-        locationId: locationId,
-      }),
-    );
-    expect(searchSelectors.isLoading(store.getState())).toBe(true);
-
-    dependencies.searchGateway.currentSearchResult$.next(immersionOffer);
-
-    expect(searchSelectors.isLoading(store.getState())).toBe(false);
-
-    expectToEqual(searchSelectors.feedback(store.getState()), {
-      kind: "success",
-    });
-    expectToEqual(
-      searchSelectors.currentSearchResult(store.getState()),
-      immersionOffer,
-    );
-
-    store.dispatch(searchSlice.actions.clearSearchResult());
-
-    expectToEqual(searchSelectors.feedback(store.getState()), {
-      kind: "idle",
-    });
-    expectToEqual(
-      searchSelectors.currentSearchResult(store.getState()),
-      initialState.currentSearchResult,
-    );
-  });
-
   it("should reset search status when clicking on an offer", () => {
     expectStatus("noSearchMade");
     store.dispatch(
@@ -244,7 +219,7 @@ describe("search epic", () => {
     feedWithSearchResults([]);
     feedWithSearchResults([]);
     expectStatus("ok");
-    store.dispatch(searchSlice.actions.clearSearchStatus());
+    store.dispatch(searchSlice.actions.clearSearchStatusRequested());
     expectStatus("noSearchMade");
   });
 
@@ -264,6 +239,9 @@ describe("search epic", () => {
       searchSelectors.searchResults(store.getState()),
       searchResults,
     );
+
+  const expectIsLoading = (isLoading: boolean) =>
+    expect(searchSelectors.isLoading(store.getState())).toBe(isLoading);
 
   const feedWithSearchResults = (results: SearchResultDto[]) =>
     dependencies.searchGateway.searchResults$.next(results);
