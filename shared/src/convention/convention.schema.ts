@@ -95,9 +95,9 @@ import {
   isTutorEmailDifferentThanBeneficiaryRelatedEmails,
   minorBeneficiaryHasRepresentative,
   mustBeSignedByEveryone,
-  shouldValidateBeneficiaryAddressAndParse,
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
+  validateBeneficiaryAddressAndParse,
 } from "./conventionRefinements";
 
 const zTrimmedStringMax255 = zTrimmedStringWithMax(255);
@@ -364,7 +364,7 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
     message: localization.mustBeSignedByEveryone,
     path: [getConventionFieldName("status")],
   })
-  .refine(shouldValidateBeneficiaryAddressAndParse, {
+  .refine(validateBeneficiaryAddressAndParse, {
     message: localization.invalidBeneficiaryAddress,
     path: [getConventionFieldName("signatories.beneficiary.address")],
   });
