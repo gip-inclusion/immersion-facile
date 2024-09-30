@@ -49,6 +49,7 @@ export const searchSlice = createSlice({
     searchRequested: (state, _action: PayloadAction<SearchQueryParamsDto>) => {
       state.searchStatus = "initialFetch";
       state.searchResults = [];
+      state.isLoading = true;
     },
     initialSearchSucceeded: (
       state,
@@ -59,13 +60,16 @@ export const searchSlice = createSlice({
     ) => {
       state.searchResults = action.payload.results;
       state.searchStatus = "ok";
+      state.isLoading = false;
     },
     extraFetchRequested: (state) => {
       state.searchStatus = "extraFetch";
+      state.isLoading = true;
     },
     extraFetchSucceeded: (state, action: PayloadAction<SearchResultDto[]>) => {
       state.searchResults.push(...action.payload);
       state.searchStatus = "ok";
+      state.isLoading = false;
     },
     fetchSearchResultRequested: (
       state,
@@ -90,11 +94,7 @@ export const searchSlice = createSlice({
         errorMessage: action.payload,
       };
     },
-    clearSearchResult: (state) => {
-      state.currentSearchResult = initialState.currentSearchResult;
-      state.feedback = initialState.feedback;
-    },
-    clearSearchStatus: (state) => {
+    clearSearchStatusRequested: (state) => {
       state.searchStatus = initialState.searchStatus;
     },
   },
