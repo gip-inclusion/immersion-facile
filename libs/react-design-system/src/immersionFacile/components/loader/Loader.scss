@@ -23,10 +23,9 @@
       height: 5rem;
       animation: rotate 2s linear infinite;
       // Fix flickering of spinner as mask-image on Firefox
-      background: url(./node_modules/@codegouvfr/react-dsfr/dsfr/icons/system/refresh-line.svg);
+      background: url(./refresh-line.svg);
       background-size: cover;
-      filter: invert(12%) sepia(76%) saturate(5227%) hue-rotate(242deg)
-        brightness(66%) contrast(137%); // match blue-france-sun-113-625
+      filter: invert(12%) sepia(76%) saturate(5227%) hue-rotate(242deg) brightness(66%) contrast(137%); // match blue-france-sun-113-625
       html[data-fr-theme="dark"] & {
         filter: invert(90%);
       }
