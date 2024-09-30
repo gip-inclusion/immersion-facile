@@ -149,7 +149,7 @@ const DiscussionDetails = ({
         href: `mailto:${createOpaqueEmail(
           discussion.id,
           "potentialBeneficiary",
-          window.location.hostname,
+          `reply.${window.location.hostname}`,
         )}?subject=${encodeURI(
           `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
         )}`,
