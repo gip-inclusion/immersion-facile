@@ -77,10 +77,10 @@ export const minorBeneficiaryHasRepresentative = ({
   );
 };
 
-export const shouldValidateBeneficiaryAddressAndParse = (
+export const validateBeneficiaryAddressAndParse = (
   convention: ConventionDto,
 ) => {
-  const ruleAppliesFrom = new Date("2024-09-30");
+  const ruleAppliesFrom = new Date("2024-10-01");
   const conventionWasSubmittedBeforeRuleApplies =
     new Date(convention.dateSubmission).getTime() < ruleAppliesFrom.getTime();
   if (
