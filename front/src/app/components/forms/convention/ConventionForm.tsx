@@ -64,7 +64,6 @@ import {
 } from "src/app/components/forms/convention/conventionHelpers";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isValid } from "date-fns";
 import {
   ConventionFormMode,
   SupportedConventionRoutes,
@@ -557,17 +556,12 @@ export const ConventionForm = ({
                   nativeButtonProps={{
                     id: domElementIds.conventionImmersionRoute.submitFormButton,
                   }}
-                  onClick={(e) => {
-                    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-                    console.log("beforeHandleSubmit", {
-                      errors,
-                      isValid,
-                    });
-                    return handleSubmit(onSubmit, (errors) => {
+                  onClick={(e) =>
+                    handleSubmit(onSubmit, (errors) => {
                       validateSteps("doNotClear");
                       console.error(conventionValues, errors);
-                    })(e);
-                  }}
+                    })(e)
+                  }
                 >
                   Vérifier la demande
                 </Button>
@@ -596,17 +590,12 @@ export const ConventionForm = ({
                 <ShareConventionLink />
                 <Button
                   type="submit"
-                  onClick={(e) => {
-                    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-                    console.log("beforeHandleSubmit", {
-                      errors,
-                      isValid,
-                    });
-                    return handleSubmit(onSubmit, (errors) => {
+                  onClick={(e) =>
+                    handleSubmit(onSubmit, (errors) => {
                       validateSteps("doNotClear");
                       console.error(conventionValues, errors);
-                    })(e);
-                  }}
+                    })(e)
+                  }
                   id={
                     domElementIds.conventionImmersionRoute
                       .submitFormButtonMobile
