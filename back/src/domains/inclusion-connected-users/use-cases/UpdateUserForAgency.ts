@@ -93,14 +93,24 @@ const makeAgencyRights = async (
     params,
     agency,
   );
-  await rejectIfAgencyWontHaveValidators(uow, params, agency, provider);
+  await rejectIfAgencyWontHaveValidatorsReceivingNotifications(
+    uow,
+    params,
+    agency,
+    provider,
+  );
   await rejectIfAgencyWithRefersToWontHaveCounsellors(
     uow,
     params,
     agency,
     provider,
   );
-  await rejectIfAgencyWithRefersToWontHaveCounsellors(uow, params, agency, provider);
+  await rejectIfAgencyWithRefersToWontHaveCounsellors(
+    uow,
+    params,
+    agency,
+    provider,
+  );
 
   const updatedAgencyRight: AgencyRight = {
     ...agencyRightToUpdate,

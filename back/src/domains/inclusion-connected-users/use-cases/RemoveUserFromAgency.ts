@@ -2,12 +2,14 @@ import {
   AgencyDto,
   AgencyId,
   InclusionConnectedUser,
+  OAuthGatewayProvider,
   RemoveAgencyUserParams,
   UserId,
   errors,
   removeAgencyUserParamsSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import {
@@ -21,8 +23,9 @@ export type RemoveUserFromAgency = ReturnType<typeof makeRemoveUserFromAgency>;
 const getUserAndThrowIfNotFound = async (
   userRepository: UserRepository,
   userId: UserId,
+  provider: OAuthGatewayProvider,
 ): Promise<InclusionConnectedUser> => {
-  const requestedUser = await userRepository.getById(userId);
+  const requestedUser = await userRepository.getById(userId, provider);
   if (!requestedUser) throw errors.user.notFound({ userId });
   return requestedUser;
 };
@@ -52,10 +55,14 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
 >(
   { name: "RemoveUserFromAgency", inputSchema: removeAgencyUserParamsSchema },
   async ({ currentUser, uow, inputParams }) => {
+    const provider = oAuthProviderByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
+    );
     throwIfNotAdmin(currentUser);
     const requestedUser = await getUserAndThrowIfNotFound(
       uow.userRepository,
       inputParams.userId,
+      provider,
     );
     const agency = getUserAgencyRightsAndThrowIfUserHasNoAgencyRight(
       requestedUser,
@@ -65,11 +72,13 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
       uow,
       agency,
       inputParams.userId,
+      provider,
     );
     await throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
       uow,
       agency,
       inputParams.userId,
+      provider,
     );
 
     const filteredAgencyRights = requestedUser.agencyRights.filter(

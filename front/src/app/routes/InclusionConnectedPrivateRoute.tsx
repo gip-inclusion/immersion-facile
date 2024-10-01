@@ -118,7 +118,7 @@ export const InclusionConnectedPrivateRoute = ({
                 sections={[
                   {
                     title: `Se connecter avec ${provider.name}`,
-                description: provider.baseline,
+                    description: provider.baseline,
                     authComponent: (
                       <OAuthButton
                         id={
@@ -127,17 +127,18 @@ export const InclusionConnectedPrivateRoute = ({
                         authenticationEndpoint={`${
                           inclusionConnectImmersionRoutes
                             .startInclusionConnectLogin.url
-                    }?${queryParamsAsString(
-                      inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
-                        { page: route.name },
-                      ),
-                    )}`}
-                    provider={provider.buttonProvider}
-                  />
-                ),
-              },
-            ]}
-          /></div>
+                        }?${queryParamsAsString(
+                          inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
+                            { page: route.name },
+                          ),
+                        )}`}
+                        provider={provider.buttonProvider}
+                      />
+                    ),
+                  },
+                ]}
+              />
+            </div>
             <div
               className={fr.cx(
                 "fr-col-12",
