@@ -615,9 +615,12 @@ describe("PgAgencyRepository", () => {
 
       await agencyRepository.insert(agencyWithTwoStepValidation);
       expect(await agencyRepository.getAgencies({})).toHaveLength(1);
-      const users = await userRepository.getWithFilter({
-        agencyId: agencyWithTwoStepValidation.id,
-      });
+      const users = await userRepository.getWithFilter(
+        {
+          agencyId: agencyWithTwoStepValidation.id,
+        },
+        "InclusionConnect",
+      );
       const counsellor = users.find(
         (user) => user.email === "counsellor@email.fr",
       );
@@ -653,9 +656,12 @@ describe("PgAgencyRepository", () => {
         validatorEmails: ["counsellor@email.fr"], // the counsellor becomes a validator
         counsellorEmails: [],
       });
-      const updatedUsers = await userRepository.getWithFilter({
-        agencyId: agencyWithTwoStepValidation.id,
-      });
+      const updatedUsers = await userRepository.getWithFilter(
+        {
+          agencyId: agencyWithTwoStepValidation.id,
+        },
+        "InclusionConnect",
+      );
       const expectedUpdatedAgency: AgencyDto = {
         ...agencyWithTwoStepValidation,
         validatorEmails: ["counsellor@email.fr"],

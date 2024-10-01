@@ -1,13 +1,21 @@
-import { AgencyDto, UserId, errors } from "shared";
+import { AgencyDto, OAuthGatewayProvider, UserId, errors } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfAgencyDontHaveOtherValidatorsReceivingNotifications =
-  async (uow: UnitOfWork, agency: AgencyDto, userId: UserId) => {
+  async (
+    uow: UnitOfWork,
+    agency: AgencyDto,
+    userId: UserId,
+    provider: OAuthGatewayProvider,
+  ) => {
     if (agency.refersToAgencyId !== null) return;
 
-    const agencyUsers = await uow.userRepository.getWithFilter({
-      agencyId: agency.id,
-    });
+    const agencyUsers = await uow.userRepository.getWithFilter(
+      {
+        agencyId: agency.id,
+      },
+      provider,
+    );
 
     const agencyHasOtherValidator = agencyUsers.some(
       (agencyUser) =>
@@ -23,12 +31,20 @@ export const throwIfAgencyDontHaveOtherValidatorsReceivingNotifications =
   };
 
 export const throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications =
-  async (uow: UnitOfWork, agency: AgencyDto, userId: UserId) => {
+  async (
+    uow: UnitOfWork,
+    agency: AgencyDto,
+    userId: UserId,
+    provider: OAuthGatewayProvider,
+  ) => {
     if (!agency.refersToAgencyId) return;
 
-    const agencyUsers = await uow.userRepository.getWithFilter({
-      agencyId: agency.id,
-    });
+    const agencyUsers = await uow.userRepository.getWithFilter(
+      {
+        agencyId: agency.id,
+      },
+      provider,
+    );
 
     const agencyHasOtherCounsellor = agencyUsers.some(
       (agencyUser) =>
