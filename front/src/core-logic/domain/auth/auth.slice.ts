@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { FederatedIdentity } from "shared";
+import { AbsoluteUrl, FederatedIdentity } from "shared";
 
 export type FederatedIdentityWithUser = FederatedIdentity & {
   email: string;
@@ -9,10 +9,12 @@ export type FederatedIdentityWithUser = FederatedIdentity & {
 
 interface AuthState {
   federatedIdentityWithUser: FederatedIdentityWithUser | null;
+  afterLoginRedirectionUrl: AbsoluteUrl | null;
 }
 
 const initialState: AuthState = {
   federatedIdentityWithUser: null,
+  afterLoginRedirectionUrl: null,
 };
 
 const onFederatedIdentityReceived = (
@@ -26,6 +28,24 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    saveRedirectionAfterLoginRequested: (
+      _state,
+      _action: PayloadAction<{
+        url: AbsoluteUrl;
+      }>,
+    ) => {},
+    saveRedirectAfterLoginSucceeded: (
+      state,
+      action: PayloadAction<{
+        url: AbsoluteUrl;
+      }>,
+    ) => {
+      state.afterLoginRedirectionUrl = action.payload.url;
+    },
+    clearRedirectAfterLoginRequested: () => {},
+    clearRedirectAfterLoginSucceeded: (state) => {
+      state.afterLoginRedirectionUrl = null;
+    },
     federatedIdentityProvided: onFederatedIdentityReceived,
     federatedIdentityFoundInDevice: onFederatedIdentityReceived,
     federatedIdentityFromStoreToDeviceStorageSucceeded: (

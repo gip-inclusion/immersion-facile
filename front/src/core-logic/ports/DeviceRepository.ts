@@ -14,10 +14,9 @@ export type LocalStoragePair =
   | GenericPair<"adminToken", string>
   | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>;
 
-export type SessionStoragePair = GenericPair<
-  "acquisitionParams",
-  WithAcquisition
->;
+export type SessionStoragePair =
+  | GenericPair<"acquisitionParams", WithAcquisition>
+  | GenericPair<"afterLoginRedirectionUrl", string>;
 
 export type KeyInDevice<S extends GenericStorage> = S["key"];
 
