@@ -1,7 +1,8 @@
 .im-form-overlay {
   position: absolute;
+  background-color: var(--background-default-grey);
+  background-color: color-mix(in srgb, var(--background-default-grey) 70%, transparent);
   backdrop-filter: blur(5px);
-  background-color: rgba(255, 255, 255, 0.7);
   top: 0;
   left: 0;
   right: 0;
