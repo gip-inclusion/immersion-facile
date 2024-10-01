@@ -7,12 +7,18 @@ export type FederatedIdentityWithUser = FederatedIdentity & {
   lastName: string;
 };
 
+type WithUrl = {
+  url: AbsoluteUrl;
+};
+
 interface AuthState {
+  isLoading: boolean;
   federatedIdentityWithUser: FederatedIdentityWithUser | null;
   afterLoginRedirectionUrl: AbsoluteUrl | null;
 }
 
 const initialState: AuthState = {
+  isLoading: true,
   federatedIdentityWithUser: null,
   afterLoginRedirectionUrl: null,
 };
@@ -21,6 +27,7 @@ const onFederatedIdentityReceived = (
   state: AuthState,
   action: PayloadAction<FederatedIdentityWithUser | null>,
 ) => {
+  state.isLoading = false;
   state.federatedIdentityWithUser = action.payload;
 };
 
@@ -30,20 +37,26 @@ export const authSlice = createSlice({
   reducers: {
     saveRedirectionAfterLoginRequested: (
       _state,
-      _action: PayloadAction<{
-        url: AbsoluteUrl;
-      }>,
+      _action: PayloadAction<WithUrl>,
     ) => {},
     saveRedirectAfterLoginSucceeded: (
       state,
-      action: PayloadAction<{
-        url: AbsoluteUrl;
-      }>,
+      action: PayloadAction<WithUrl>,
     ) => {
       state.afterLoginRedirectionUrl = action.payload.url;
     },
-    clearRedirectAfterLoginRequested: () => {},
-    clearRedirectAfterLoginSucceeded: (state) => {
+    redirectionAfterLoginFoundInDevice: (
+      state,
+      action: PayloadAction<WithUrl>,
+    ) => {
+      state.afterLoginRedirectionUrl = action.payload.url;
+    },
+    redirectionAfterLoginNotFoundInDevice: (state) => state,
+    redirectAndClearUrlAfterLoginRequested: () => {},
+    redirectAndClearUrlAfterLoginSucceeded: (
+      state,
+      _action: PayloadAction<WithUrl | undefined>,
+    ) => {
       state.afterLoginRedirectionUrl = null;
     },
     federatedIdentityProvided: onFederatedIdentityReceived,
@@ -52,7 +65,9 @@ export const authSlice = createSlice({
       state,
       _action: PayloadAction<FederatedIdentityWithUser | null>,
     ) => state,
-    federatedIdentityNotFoundInDevice: (state) => state,
+    federatedIdentityNotFoundInDevice: (state) => {
+      state.isLoading = false;
+    },
     federatedIdentityDeletionTriggered: (
       state,
       _action: PayloadAction<{

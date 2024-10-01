@@ -70,6 +70,7 @@ export const InclusionConnectedPrivateRoute = ({
   const isInclusionConnected = useAppSelector(
     authSelectors.isInclusionConnected,
   );
+  const authIsLoading = useAppSelector(authSelectors.isLoading);
   const isLoadingUser = useAppSelector(inclusionConnectedSelectors.isLoading);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const { enableProConnect } = useAppSelector(
@@ -102,19 +103,23 @@ export const InclusionConnectedPrivateRoute = ({
           idToken,
         }),
       );
-      if (route.name === "agencyDashboard") routes.agencyDashboard().replace();
-      if (route.name === "establishmentDashboard")
-        routes.establishmentDashboard({ tab: "conventions" }).replace();
     }
-  }, [route.params, route.name, dispatch]);
+  }, [route.params, dispatch, afterLoginRedirectionUrl]);
+
+  useEffect(() => {
+    if (!authIsLoading && !isInclusionConnected) {
+      const windowUrl = absoluteUrlSchema.parse(window.location.href);
+      dispatch(
+        authSlice.actions.saveRedirectionAfterLoginRequested({
+          url: windowUrl,
+        }),
+      );
+    }
+    if (!authIsLoading && isInclusionConnected && afterLoginRedirectionUrl)
+      dispatch(authSlice.actions.redirectAndClearUrlAfterLoginRequested());
+  }, [authIsLoading, isInclusionConnected, afterLoginRedirectionUrl, dispatch]);
 
   if (!isInclusionConnected) {
-    const windowUrl = absoluteUrlSchema.parse(window.location.href);
-    dispatch(
-      authSlice.actions.saveRedirectionAfterLoginRequested({
-        url: windowUrl,
-      }),
-    );
     return (
       <HeaderFooterLayout>
         <MainWrapper
@@ -183,9 +188,6 @@ export const InclusionConnectedPrivateRoute = ({
         </MainWrapper>
       </HeaderFooterLayout>
     );
-  if (afterLoginRedirectionUrl) {
-    window.location.href = afterLoginRedirectionUrl;
-  }
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default">{children}</MainWrapper>

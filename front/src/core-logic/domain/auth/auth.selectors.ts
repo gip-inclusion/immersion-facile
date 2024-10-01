@@ -16,6 +16,8 @@ const afterLoginRedirectionUrl = createSelector(
   (auth) => auth.afterLoginRedirectionUrl,
 );
 
+const isLoading = createSelector(rootAuthSelector, (auth) => auth.isLoading);
+
 const isPeConnected = createSelector(
   currentFederatedIdentity,
   (federatedIdentity) =>
@@ -69,4 +71,5 @@ export const authSelectors = {
   inclusionConnectToken,
   connectedUser,
   afterLoginRedirectionUrl,
+  isLoading,
 };

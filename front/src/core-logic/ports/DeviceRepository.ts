@@ -1,4 +1,4 @@
-import { WithAcquisition } from "shared";
+import { AbsoluteUrl, WithAcquisition } from "shared";
 import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 
@@ -16,7 +16,7 @@ export type LocalStoragePair =
 
 export type SessionStoragePair =
   | GenericPair<"acquisitionParams", WithAcquisition>
-  | GenericPair<"afterLoginRedirectionUrl", string>;
+  | GenericPair<"afterLoginRedirectionUrl", AbsoluteUrl>;
 
 export type KeyInDevice<S extends GenericStorage> = S["key"];
 
