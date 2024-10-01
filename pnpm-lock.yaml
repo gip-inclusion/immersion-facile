@@ -259,8 +259,8 @@ importers:
         specifier: ^7.18.6
         version: 7.18.6(@babel/core@7.20.12)
       '@codegouvfr/react-dsfr':
-        specifier: ^1.10.11
-        version: 1.10.11
+        specifier: ^1.13.2
+        version: 1.13.6
       '@emotion/react':
         specifier: ^11.10.5
         version: 11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0)
@@ -451,8 +451,8 @@ importers:
         specifier: ^7.20.12
         version: 7.20.12
       '@codegouvfr/react-dsfr':
-        specifier: ^1.10.11
-        version: 1.10.11
+        specifier: ^1.13.2
+        version: 1.13.6
       '@emotion/react':
         specifier: ^11.10.5
         version: 11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0)
@@ -2125,9 +2125,14 @@ packages:
   '@braintree/sanitize-url@6.0.2':
     resolution: {integrity: sha512-Tbsj02wXCbqGmzdnXNk0SOF19ChhRU70BsroIi4Pm6Ehp56in6vch94mfbdQ17DozxkL3BAVjbZ4Qc1a0HFRAg==}
 
-  '@codegouvfr/react-dsfr@1.10.11':
-    resolution: {integrity: sha512-ZkVu6r9KnOJEtBzBZ/iIx6jkB6vxDEK//4+EHI8OYsfJGGDy8+v3RvSpAF/5Sj6RyjYexA7WKTQpt+VDMamOTA==}
+  '@codegouvfr/react-dsfr@1.13.6':
+    resolution: {integrity: sha512-/ERzY5MhgZ8X8uz40qfBAx6wNjsqHk2BqjPbcrLNtsj5o3DIGYL6HBF7hRA3fRGq+l8CrFfLgE9xOIQRtTVfvA==}
     hasBin: true
+    peerDependencies:
+      '@gouvfr/dsfr-chart': ^1.0.0
+    peerDependenciesMeta:
+      '@gouvfr/dsfr-chart':
+        optional: true
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -4041,11 +4046,6 @@ packages:
 
   acorn@7.4.1:
     resolution: {integrity: sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==}
-    engines: {node: '>=0.4.0'}
-    hasBin: true
-
-  acorn@8.10.0:
-    resolution: {integrity: sha512-F0SAmZ8iUtS//m8DmCTA0jlh6TDKkHQyK6xc6V4KDTyZKA9dnvX9/3sRTVQrWm79glUAZbnmmNcdYwUIHWVybw==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -12000,7 +12000,7 @@ snapshots:
 
   '@braintree/sanitize-url@6.0.2': {}
 
-  '@codegouvfr/react-dsfr@1.10.11':
+  '@codegouvfr/react-dsfr@1.13.6':
     dependencies:
       tsafe: 1.7.2
       yargs-parser: 21.1.1
@@ -14782,8 +14782,6 @@ snapshots:
 
   acorn@7.4.1: {}
 
-  acorn@8.10.0: {}
-
   acorn@8.12.1: {}
 
   acorn@8.8.1: {}
@@ -17489,7 +17487,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.6.1
+      '@types/node': 20.16.6
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -20358,7 +20356,7 @@ snapshots:
 
   unplugin@0.10.2:
     dependencies:
-      acorn: 8.10.0
+      acorn: 8.12.1
       chokidar: 3.5.3
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.4.6
