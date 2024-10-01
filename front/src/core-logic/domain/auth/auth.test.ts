@@ -55,6 +55,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+        afterLoginRedirectionUrl: null,
       },
     }));
     dependencies.localDeviceRepository.set(
@@ -84,6 +85,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+        afterLoginRedirectionUrl: null,
       },
     }));
     dependencies.localDeviceRepository.set(
@@ -111,6 +113,7 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+        afterLoginRedirectionUrl: null,
       },
     }));
     dependencies.localDeviceRepository.set(
@@ -163,6 +166,39 @@ describe("Auth slice", () => {
     store.dispatch(rootAppSlice.actions.appIsReady());
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
+  });
+
+  it("should store redirection url in device storage", () => {
+    const urlToRedirectAfterLogin =
+      "https://fake-url.com/after-login-redirection";
+    store.dispatch(
+      authSlice.actions.saveRedirectionAfterLoginRequested({
+        url: urlToRedirectAfterLogin,
+      }),
+    );
+    expect(
+      dependencies.sessionDeviceRepository.get("afterLoginRedirectionUrl"),
+    ).toEqual(urlToRedirectAfterLogin);
+    expect(authSelectors.afterLoginRedirectionUrl(store.getState())).toEqual(
+      urlToRedirectAfterLogin,
+    );
+  });
+
+  it("should clear redirection url from device after login and redirection complete", () => {
+    const urlToRedirectAfterLogin =
+      "https://fake-url.com/after-login-redirection";
+    store.dispatch(
+      authSlice.actions.saveRedirectionAfterLoginRequested({
+        url: urlToRedirectAfterLogin,
+      }),
+    );
+    expect(authSelectors.afterLoginRedirectionUrl(store.getState())).toEqual(
+      urlToRedirectAfterLogin,
+    );
+    store.dispatch(authSlice.actions.clearRedirectAfterLoginRequested());
+    expect(authSelectors.afterLoginRedirectionUrl(store.getState())).toEqual(
+      null,
+    );
   });
 
   const expectFederatedIdentityToEqual = (

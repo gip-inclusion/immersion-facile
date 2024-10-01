@@ -4,8 +4,16 @@ import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-const currentFederatedIdentity = createRootSelector(
-  (state) => state.auth.federatedIdentityWithUser,
+const rootAuthSelector = createRootSelector((state) => state.auth);
+
+const currentFederatedIdentity = createSelector(
+  rootAuthSelector,
+  (auth) => auth.federatedIdentityWithUser,
+);
+
+const afterLoginRedirectionUrl = createSelector(
+  rootAuthSelector,
+  (auth) => auth.afterLoginRedirectionUrl,
 );
 
 const isPeConnected = createSelector(
@@ -60,4 +68,5 @@ export const authSelectors = {
   isInclusionConnected,
   inclusionConnectToken,
   connectedUser,
+  afterLoginRedirectionUrl,
 };

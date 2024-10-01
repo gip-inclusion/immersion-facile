@@ -12,6 +12,34 @@ import { authSlice } from "./auth.slice";
 export type AuthAction = ActionOfSlice<typeof authSlice>;
 type AuthEpic = AppEpic<AuthAction>;
 
+const storeRedirectionUrlAfterLoginInDevice: AuthEpic = (
+  action$,
+  _,
+  { sessionDeviceRepository },
+) =>
+  action$.pipe(
+    filter(authSlice.actions.saveRedirectionAfterLoginRequested.match),
+    map(({ payload }) => {
+      sessionDeviceRepository.set("afterLoginRedirectionUrl", payload.url);
+      return authSlice.actions.saveRedirectAfterLoginSucceeded({
+        url: payload.url,
+      });
+    }),
+  );
+
+const clearRedirectAfterLoginFromDevice: AuthEpic = (
+  action$,
+  _,
+  { sessionDeviceRepository },
+) =>
+  action$.pipe(
+    filter(authSlice.actions.clearRedirectAfterLoginRequested.match),
+    map(() => {
+      sessionDeviceRepository.delete("afterLoginRedirectionUrl");
+      return authSlice.actions.clearRedirectAfterLoginSucceeded();
+    }),
+  );
+
 const storeFederatedIdentityInDevice: AuthEpic = (
   action$,
   state$,
@@ -100,4 +128,6 @@ export const authEpics = [
   checkConnectedWithFederatedIdentity,
   logoutFromInclusionConnect,
   deleteFederatedIdentityFromDevice,
+  storeRedirectionUrlAfterLoginInDevice,
+  clearRedirectAfterLoginFromDevice,
 ];
