@@ -11,6 +11,7 @@ import {
 import { useDispatch } from "react-redux";
 import {
   OAuthGatewayProvider,
+  absoluteUrlSchema,
   domElementIds,
   inclusionConnectImmersionRoutes,
   queryParamsAsString,
@@ -78,6 +79,9 @@ export const InclusionConnectedPrivateRoute = ({
   const provider = enableProConnect.isActive
     ? providers.ProConnect
     : providers.InclusionConnect;
+  const afterLoginRedirectionUrl = useAppSelector(
+    authSelectors.afterLoginRedirectionUrl,
+  );
 
   useEffect(() => {
     const {
@@ -104,7 +108,13 @@ export const InclusionConnectedPrivateRoute = ({
     }
   }, [route.params, route.name, dispatch]);
 
-  if (!isInclusionConnected)
+  if (!isInclusionConnected) {
+    const windowUrl = absoluteUrlSchema.parse(window.location.href);
+    dispatch(
+      authSlice.actions.saveRedirectionAfterLoginRequested({
+        url: windowUrl,
+      }),
+    );
     return (
       <HeaderFooterLayout>
         <MainWrapper
@@ -155,6 +165,7 @@ export const InclusionConnectedPrivateRoute = ({
         </MainWrapper>
       </HeaderFooterLayout>
     );
+  }
 
   if (isLoadingUser) return <Loader />;
 
@@ -172,7 +183,9 @@ export const InclusionConnectedPrivateRoute = ({
         </MainWrapper>
       </HeaderFooterLayout>
     );
-
+  if (afterLoginRedirectionUrl) {
+    window.location.href = afterLoginRedirectionUrl;
+  }
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default">{children}</MainWrapper>
