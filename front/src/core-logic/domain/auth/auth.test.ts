@@ -49,6 +49,7 @@ describe("Auth slice", () => {
     );
     expectFederatedIdentityToEqual(peConnectedFederatedIdentity);
     expectFederatedIdentityInDevice(peConnectedFederatedIdentity);
+    expectIsLoadingToBe(false);
   });
 
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for, and redirects to provider logout page", () => {
@@ -56,6 +57,7 @@ describe("Auth slice", () => {
       auth: {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
+        isLoading: true,
       },
     }));
     dependencies.localDeviceRepository.set(
@@ -86,6 +88,7 @@ describe("Auth slice", () => {
       auth: {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
+        isLoading: true,
       },
     }));
     dependencies.localDeviceRepository.set(
@@ -114,6 +117,7 @@ describe("Auth slice", () => {
       auth: {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
+        isLoading: true,
       },
     }));
     dependencies.localDeviceRepository.set(
@@ -158,6 +162,7 @@ describe("Auth slice", () => {
       inclusionConnectedSelectors.currentUser(store.getState()),
       icUser,
     );
+    expectIsLoadingToBe(false);
   });
 
   it("shouldn't be logged in if no federatedIdentity stored in device", () => {
@@ -166,6 +171,7 @@ describe("Auth slice", () => {
     store.dispatch(rootAppSlice.actions.appIsReady());
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
+    expectIsLoadingToBe(false);
   });
 
   it("should store redirection url in device storage", () => {
@@ -195,16 +201,23 @@ describe("Auth slice", () => {
     expect(authSelectors.afterLoginRedirectionUrl(store.getState())).toEqual(
       urlToRedirectAfterLogin,
     );
-    store.dispatch(authSlice.actions.clearRedirectAfterLoginRequested());
+    store.dispatch(authSlice.actions.redirectAndClearUrlAfterLoginRequested());
     expect(authSelectors.afterLoginRedirectionUrl(store.getState())).toEqual(
       null,
     );
+    expectToEqual(dependencies.navigationGateway.wentToUrls, [
+      urlToRedirectAfterLogin,
+    ]);
   });
 
   const expectFederatedIdentityToEqual = (
     expected: FederatedIdentity | null,
   ) => {
     expectToEqual(authSelectors.federatedIdentity(store.getState()), expected);
+  };
+
+  const expectIsLoadingToBe = (expected: boolean) => {
+    expect(authSelectors.isLoading(store.getState())).toBe(expected);
   };
 
   const expectFederatedIdentityInDevice = (

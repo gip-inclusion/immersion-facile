@@ -180,6 +180,7 @@ describe("InclusionConnected", () => {
             email: "john.doe@mail.com",
             idToken: "inclusion-connect-id-token",
           },
+          isLoading: true,
           afterLoginRedirectionUrl: null,
         },
       }));

@@ -27,16 +27,20 @@ const storeRedirectionUrlAfterLoginInDevice: AuthEpic = (
     }),
   );
 
-const clearRedirectAfterLoginFromDevice: AuthEpic = (
+const clearAndRedirectAfterLoginFromDevice: AuthEpic = (
   action$,
-  _,
-  { sessionDeviceRepository },
+  state$,
+  { sessionDeviceRepository, navigationGateway },
 ) =>
   action$.pipe(
-    filter(authSlice.actions.clearRedirectAfterLoginRequested.match),
-    map(() => {
+    filter(authSlice.actions.redirectAndClearUrlAfterLoginRequested.match),
+    tap(() => {
       sessionDeviceRepository.delete("afterLoginRedirectionUrl");
-      return authSlice.actions.clearRedirectAfterLoginSucceeded();
+    }),
+    map(() => authSlice.actions.redirectAndClearUrlAfterLoginSucceeded()),
+    tap(() => {
+      if (state$.value.auth.afterLoginRedirectionUrl)
+        navigationGateway.goToUrl(state$.value.auth.afterLoginRedirectionUrl);
     }),
   );
 
@@ -123,11 +127,31 @@ const checkConnectedWithFederatedIdentity: AuthEpic = (
     }),
   );
 
+const checkRedirectionAfterLogin: AuthEpic = (
+  action$,
+  _,
+  { sessionDeviceRepository },
+) =>
+  action$.pipe(
+    filter(rootAppSlice.actions.appIsReady.match),
+    map(() => {
+      const afterLoginRedirectionUrl = sessionDeviceRepository.get(
+        "afterLoginRedirectionUrl",
+      );
+      return afterLoginRedirectionUrl
+        ? authSlice.actions.redirectionAfterLoginFoundInDevice({
+            url: afterLoginRedirectionUrl,
+          })
+        : authSlice.actions.redirectionAfterLoginNotFoundInDevice();
+    }),
+  );
+
 export const authEpics = [
   storeFederatedIdentityInDevice,
   checkConnectedWithFederatedIdentity,
   logoutFromInclusionConnect,
   deleteFederatedIdentityFromDevice,
   storeRedirectionUrlAfterLoginInDevice,
-  clearRedirectAfterLoginFromDevice,
+  clearAndRedirectAfterLoginFromDevice,
+  checkRedirectionAfterLogin,
 ];

@@ -18,6 +18,14 @@ describe("rootApp epic", () => {
   });
 
   it("should reset the app store", () => {
+    const afterReadyStoreState = {
+      ...afterResetStoreState,
+      auth: {
+        isLoading: false,
+        afterLoginRedirectionUrl: null,
+        federatedIdentityWithUser: null,
+      },
+    };
     store.dispatch(
       searchSlice.actions.searchRequested({
         distanceKm: 10,
@@ -28,11 +36,11 @@ describe("rootApp epic", () => {
         place: "23 rue lunaire, 44000 Nantes",
       }),
     );
-    expect(store.getState()).not.toEqual(afterResetStoreState);
+    expect(store.getState()).not.toEqual(afterReadyStoreState);
 
     store.dispatch(rootAppSlice.actions.appResetRequested());
 
-    expect(store.getState()).toEqual(afterResetStoreState);
+    expect(store.getState()).toEqual(afterReadyStoreState);
   });
 
   it("should dispatch appIsReady action", () => {
