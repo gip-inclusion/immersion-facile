@@ -412,6 +412,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   currentStep={currentStep}
                   setAvailableForImmersion={setAvailableForImmersion}
                   availableForImmersion={availableForImmersion}
+                  shouldUpdateAvailability={
+                    Boolean(
+                      initialUrlParams.current.shouldUpdateAvailability,
+                    ) ?? undefined
+                  }
                 />
                 <h2>{steps[2].title}</h2>
                 <SearchableBySection
@@ -455,6 +460,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                       currentStep={currentStep}
                       availableForImmersion={availableForImmersion}
                       setAvailableForImmersion={setAvailableForImmersion}
+                      shouldUpdateAvailability={undefined}
                     />
                   ))
                   .with(2, () => (

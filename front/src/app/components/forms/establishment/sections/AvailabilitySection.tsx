@@ -28,13 +28,15 @@ export const AvailabilitySection = ({
   onStepChange,
   currentStep,
   setAvailableForImmersion,
-  availableForImmersion,
+  availableForImmersion: availableForImmersionClicked,
+  shouldUpdateAvailability,
 }: {
   mode: Mode;
   onStepChange: OnStepChange;
   currentStep: Step;
   setAvailableForImmersion: (value: boolean) => void;
   availableForImmersion: boolean | undefined;
+  shouldUpdateAvailability: boolean | undefined;
 }) => {
   const { register, setValue, getValues, formState, clearErrors } =
     useFormContext<FormEstablishmentDto>();
@@ -44,7 +46,7 @@ export const AvailabilitySection = ({
   const getFieldError = makeFieldError(formState);
 
   const shouldShowErrorOnAvailableForImmersion =
-    availableForImmersion === undefined &&
+    availableForImmersionClicked === undefined &&
     (getFieldError("maxContactsPerMonth") ||
       getFieldError("nextAvailabilityDate"));
 
@@ -55,6 +57,18 @@ export const AvailabilitySection = ({
     toDateString(new Date(currentNextAvailabilityDate));
 
   const isStepMode = currentStep !== null;
+
+  const isAvailableForImmersion = () => {
+    if (availableForImmersionClicked !== undefined)
+      return availableForImmersionClicked;
+    if (mode === "create" || shouldUpdateAvailability) return undefined;
+    if (currentNextAvailabilityDate === undefined) return true;
+    if (currentNextAvailabilityDate < new Date().toISOString())
+      return undefined;
+    return false;
+  };
+
+  const availableForImmersion = isAvailableForImmersion();
 
   return (
     <section className={fr.cx("fr-mb-4w")}>
@@ -128,7 +142,7 @@ export const AvailabilitySection = ({
             {...getFieldError("maxContactsPerMonth")}
           />
         )}
-      {mode === "admin" && availableForImmersion === undefined && (
+      {mode === "admin" && availableForImmersion === true && (
         <div>
           <Alert
             severity="info"
