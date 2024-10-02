@@ -4,6 +4,7 @@ import React from "react";
 import { WithEstablismentsSiretAndName } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes } from "src/app/routes/routes";
+import { getUrlParameters } from "src/app/utils/url.utils";
 import { Route } from "type-route";
 type ManageEstablishmentTabProps = {
   establishments: WithEstablismentsSiretAndName[];
@@ -13,11 +14,13 @@ export const ManageEstablishmentsTab = ({
   establishments,
   route,
 }: ManageEstablishmentTabProps) => {
+  const initialUrlParams = getUrlParameters(window.location);
   if (establishments.length === 1) {
     routes
       .establishmentDashboard({
         tab: "fiche-entreprise",
         siret: establishments[0].siret,
+        shouldUpdateAvailability: initialUrlParams.shouldUpdateAvailability,
       })
       .push();
   }

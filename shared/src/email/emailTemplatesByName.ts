@@ -1414,7 +1414,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         buttons: [
           {
             label: "Mettre à jour ma fiche établissement",
-            url: `${editFrontUrl}&mtm_campaign=transactionnel-etablissement-suggestion-mise-a-jour`,
+            url: `${editFrontUrl}&shouldUpdateAvailability=true&mtm_campaign=transactionnel-etablissement-suggestion-mise-a-jour`,
           },
         ],
         highlight: {
