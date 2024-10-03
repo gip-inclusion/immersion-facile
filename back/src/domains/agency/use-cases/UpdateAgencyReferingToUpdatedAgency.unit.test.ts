@@ -67,7 +67,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
       ]);
 
       await updateAgencyReferringToUpdatedAgency.execute(
-        { agency: updatedAgency },
+        { agencyId: updatedAgency.id },
         icUser,
       );
 
@@ -88,10 +88,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
           ...createNewEvent({
             topic: "AgencyUpdated",
             payload: {
-              agency: {
-                ...agencyRefersToUpdatedAgency1,
-                validatorEmails: updatedAgency.validatorEmails,
-              },
+              agencyId: agencyRefersToUpdatedAgency1.id,
               triggeredBy: {
                 kind: "crawler",
               },
@@ -103,10 +100,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
           ...createNewEvent({
             topic: "AgencyUpdated",
             payload: {
-              agency: {
-                ...agencyRefersToUpdatedAgency2,
-                validatorEmails: updatedAgency.validatorEmails,
-              },
+              agencyId: agencyRefersToUpdatedAgency2.id,
               triggeredBy: {
                 kind: "crawler",
               },
@@ -124,7 +118,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
       ]);
 
       await updateAgencyReferringToUpdatedAgency.execute({
-        agency: updatedAgency,
+        agencyId: updatedAgency.id,
       });
 
       expectToEqual(uow.agencyRepository.agencies, [

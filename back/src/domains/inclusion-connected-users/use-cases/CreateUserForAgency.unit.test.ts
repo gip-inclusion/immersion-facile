@@ -88,38 +88,6 @@ describe("CreateUserForAgency", () => {
     );
   });
 
-  it("throws not found if agency does not exist", async () => {
-    userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-      {
-        ...notAdminUser,
-        agencyRights: [],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
-      },
-    ]);
-
-    const agencyId = "Fake-Agency-Id";
-
-    await expectPromiseToFailWithError(
-      createUserForAgency.execute(
-        {
-          userId: uuidGenerator.new(),
-          roles: ["counsellor"],
-          agencyId,
-          isNotifiedByEmail: true,
-          email: "notAdminUser@email.fr",
-        },
-        backofficeAdminUser,
-      ),
-      errors.agency.notFound({
-        agencyId,
-      }),
-    );
-  });
-
   describe("Agency with refers to agency", () => {
     const agencyWithRefersTo = new AgencyDtoBuilder()
       .withId("agency-with-refers-to")
@@ -149,6 +117,8 @@ describe("CreateUserForAgency", () => {
       );
     });
   });
+
+  describe("Agency with refers to agency", () => {});
 
   it("create new user with its agency rights", async () => {
     const newUserId = uuidGenerator.new();

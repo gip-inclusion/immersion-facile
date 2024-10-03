@@ -6,10 +6,10 @@ import {
   InclusionConnectedUser,
   OmitFromExistingKeys,
   RejectIcUserRoleForAgencyParams,
-  RemoveAgencyUserParams,
   User,
   UserId,
   UserParamsForAgency,
+  WithAgencyIdAndUserId,
   WithUserFilters,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
@@ -225,14 +225,14 @@ export const icUsersAdminSlice = createSlice({
 
     removeUserFromAgencyRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<RemoveAgencyUserParams>,
+      _action: PayloadActionWithFeedbackTopic<WithAgencyIdAndUserId>,
     ) => {
       state.isUpdatingIcUserAgency = true;
     },
 
     removeUserFromAgencySucceeded: (
       state,
-      action: PayloadActionWithFeedbackTopic<RemoveAgencyUserParams>,
+      action: PayloadActionWithFeedbackTopic<WithAgencyIdAndUserId>,
     ) => {
       state.isUpdatingIcUserAgency = false;
       state.agencyUsers = filter(

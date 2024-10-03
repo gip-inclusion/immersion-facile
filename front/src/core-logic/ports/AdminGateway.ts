@@ -11,10 +11,10 @@ import {
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
-  RemoveAgencyUserParams,
   SetFeatureFlagParam,
   UserInList,
   UserParamsForAgency,
+  WithAgencyIdAndUserId,
   WithUserFilters,
 } from "shared";
 
@@ -55,7 +55,7 @@ export interface AdminGateway {
   ): Observable<void>;
 
   removeUserFromAgency$(
-    params: RemoveAgencyUserParams,
+    params: WithAgencyIdAndUserId,
     token: InclusionConnectJwt,
   ): Observable<void>;
 

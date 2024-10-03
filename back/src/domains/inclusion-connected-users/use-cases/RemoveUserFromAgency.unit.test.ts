@@ -4,12 +4,14 @@ import {
   AgencyRight,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  RemoveAgencyUserParams,
+  WithAgencyIdAndUserId,
   errors,
   expectPromiseToFailWithError,
+  expectToEqual,
 } from "shared";
 import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
+import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -46,6 +48,7 @@ describe("RemoveUserFromAgency", () => {
   let removeUserFromAgency: RemoveUserFromAgency;
   let userRepository: InMemoryUserRepository;
   let agencyRepository: InMemoryAgencyRepository;
+  let outboxRepo: InMemoryOutboxRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
@@ -63,6 +66,8 @@ describe("RemoveUserFromAgency", () => {
       notAdminUser,
     ]);
     agencyRepository.setAgencies([agency]);
+    outboxRepo = uow.outboxRepository;
+
     removeUserFromAgency = makeRemoveUserFromAgency({
       uowPerformer,
       deps: { createNewEvent },
@@ -83,7 +88,7 @@ describe("RemoveUserFromAgency", () => {
   });
 
   it("throws notFound if user to delete not found", async () => {
-    const inputParams: RemoveAgencyUserParams = {
+    const inputParams: WithAgencyIdAndUserId = {
       agencyId: agency.id,
       userId: "unexisting-user",
     };
@@ -95,7 +100,7 @@ describe("RemoveUserFromAgency", () => {
   });
 
   it("throws forbidden if user to delete has not rights on agency", async () => {
-    const inputParams: RemoveAgencyUserParams = {
+    const inputParams: WithAgencyIdAndUserId = {
       agencyId: agency.id,
       userId: notAdminUser.id,
     };
@@ -123,7 +128,7 @@ describe("RemoveUserFromAgency", () => {
       },
     };
     userRepository.setInclusionConnectedUsers([user]);
-    const inputParams: RemoveAgencyUserParams = {
+    const inputParams: WithAgencyIdAndUserId = {
       agencyId: agency.id,
       userId: notAdminUser.id,
     };
@@ -151,7 +156,7 @@ describe("RemoveUserFromAgency", () => {
       },
     };
     userRepository.setInclusionConnectedUsers([user]);
-    const inputParams: RemoveAgencyUserParams = {
+    const inputParams: WithAgencyIdAndUserId = {
       agencyId: agency.id,
       userId: notAdminUser.id,
     };
@@ -186,7 +191,7 @@ describe("RemoveUserFromAgency", () => {
       },
     };
     userRepository.setInclusionConnectedUsers([user]);
-    const inputParams: RemoveAgencyUserParams = {
+    const inputParams: WithAgencyIdAndUserId = {
       agencyId: agencyWithRefersTo.id,
       userId: notAdminUser.id,
     };
@@ -237,7 +242,7 @@ describe("RemoveUserFromAgency", () => {
         (await userRepository.getById(notAdminUser.id))?.agencyRights,
       ).toEqual(initialAgencyRights);
 
-      const inputParams: RemoveAgencyUserParams = {
+      const inputParams: WithAgencyIdAndUserId = {
         agencyId: agency.id,
         userId: notAdminUser.id,
       };
@@ -252,6 +257,20 @@ describe("RemoveUserFromAgency", () => {
           isNotifiedByEmail: true,
         },
       ]);
+      expectToEqual(
+        outboxRepo.events[0],
+        createNewEvent({
+          topic: "IcUserAgencyRightChanged",
+          payload: {
+            agencyId: agency.id,
+            userId: notAdminUser.id,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: backofficeAdminUser.id,
+            },
+          },
+        }),
+      );
     });
   });
 });

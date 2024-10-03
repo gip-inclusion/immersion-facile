@@ -1,8 +1,9 @@
 import {
   AgencyDto,
   InclusionConnectedUser,
-  WithAgencyDto,
-  withAgencySchema,
+  WithAgencyId,
+  errors,
+  withAgencyIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -10,11 +11,11 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
-  WithAgencyDto,
+  WithAgencyId,
   void,
   InclusionConnectedUser
 > {
-  protected inputSchema = withAgencySchema;
+  protected inputSchema = withAgencyIdSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
@@ -26,12 +27,15 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
     this.#createNewEvent = createNewEvent;
   }
 
-  public async _execute(params: WithAgencyDto, uow: UnitOfWork): Promise<void> {
+  public async _execute(params: WithAgencyId, uow: UnitOfWork): Promise<void> {
+    const agencyUpdated = await uow.agencyRepository.getById(params.agencyId);
+
+    if (!agencyUpdated) throw errors.agency.notFound(params);
     const updatedRelatedAgencies: AgencyDto[] = (
-      await uow.agencyRepository.getAgenciesRelatedToAgency(params.agency.id)
+      await uow.agencyRepository.getAgenciesRelatedToAgency(agencyUpdated.id)
     ).map((agency) => ({
       ...agency,
-      validatorEmails: params.agency.validatorEmails,
+      validatorEmails: agencyUpdated.validatorEmails,
     }));
 
     await Promise.all(
@@ -41,7 +45,7 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
           this.#createNewEvent({
             topic: "AgencyUpdated",
             payload: {
-              agency,
+              agencyId: agency.id,
               triggeredBy: {
                 kind: "crawler",
               },

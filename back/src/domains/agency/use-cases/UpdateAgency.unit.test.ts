@@ -131,7 +131,7 @@ describe("Update agency", () => {
     expectObjectsToMatch(outboxRepository.events[0], {
       topic: "AgencyUpdated",
       payload: {
-        agency: updatedAgency,
+        agencyId: updatedAgency.id,
         triggeredBy: {
           kind: "inclusion-connected",
           userId: backofficeAdmin.id,

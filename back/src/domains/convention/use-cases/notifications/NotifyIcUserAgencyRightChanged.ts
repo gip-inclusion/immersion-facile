@@ -1,4 +1,8 @@
-import { UserParamsForAgency, errors, userParamsForAgencySchema } from "shared";
+import {
+  WithAgencyIdAndUserId,
+  errors,
+  withAgencyIdAndUserIdSchema,
+} from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { oAuthProviderByFeatureFlags } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -6,10 +10,10 @@ import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
-  UserParamsForAgency,
+  WithAgencyIdAndUserId,
   void
 > {
-  protected inputSchema = userParamsForAgencySchema;
+  protected inputSchema = withAgencyIdAndUserIdSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -22,7 +26,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: UserParamsForAgency,
+    params: WithAgencyIdAndUserId,
     uow: UnitOfWork,
   ): Promise<void> {
     const agency = await uow.agencyRepository.getById(params.agencyId);
@@ -34,7 +38,13 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
     );
     if (!user) throw errors.user.notFound({ userId: params.userId });
 
-    if (!params.roles.includes("to-review"))
+    const agencyRight = user.agencyRights.find(
+      (agencyRight) => agencyRight.agency.id === params.agencyId,
+    );
+
+    if (!agencyRight) throw errors.user.noRightsOnAgency(params);
+
+    if (!agencyRight.roles.includes("to-review"))
       await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {

@@ -12,15 +12,13 @@ import {
 import { SiretDto } from "../siret/siret";
 import { OmitFromExistingKeys } from "../utils";
 
-export type RemoveAgencyUserParams = {
+export type WithAgencyIdAndUserId = {
   agencyId: AgencyId;
   userId: UserId;
 };
 
-export type UserParamsForAgency = {
-  agencyId: AgencyId;
+export type UserParamsForAgency = WithAgencyIdAndUserId & {
   roles: AgencyRole[];
-  userId: UserId;
   isNotifiedByEmail: boolean;
   email: Email;
 };
