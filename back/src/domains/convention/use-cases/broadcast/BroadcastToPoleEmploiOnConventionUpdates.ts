@@ -122,7 +122,8 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       competencesObservees: convention.immersionSkills,
       signatureBeneficiaire: !!beneficiary.signedAt,
       signatureEntreprise: !!establishmentRepresentative.signedAt,
-      typeAgence: agency.kind,
+      typeAgence:
+        agency.kind === "pole-emploi" ? "france-travail" : agency.kind,
       nomAgence: agency.name,
       prenomValidateurRenseigne:
         convention.validators?.agencyValidator?.firstname,

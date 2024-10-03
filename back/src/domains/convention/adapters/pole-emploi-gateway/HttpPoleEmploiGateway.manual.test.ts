@@ -279,7 +279,7 @@ const peConvention: PoleEmploiConvention = {
   statut: "DEMANDE_VALIDÉE",
   telephone: "0611335577",
   telephoneTuteur: "0622446688",
-  typeAgence: "pole-emploi",
+  typeAgence: "france-travail",
   nomAgence: "Agence de test",
   prenomValidateurRenseigne: "prénom du valideur",
   nomValidateurRenseigne: "nom du valideur",
