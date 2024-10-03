@@ -1,15 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React, { useEffect } from "react";
+import React from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { ConventionDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import {
-  useSiretFetcher,
-  useSiretRelatedField,
-} from "src/app/hooks/siret.hooks";
+import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
 export const EstablishmentBusinessFields = (): JSX.Element => {
@@ -22,25 +19,11 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
   } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: true });
   const convention = useAppSelector(conventionSelectors.convention);
 
-  const { getValues, register, control } = useFormContext<ConventionDto>();
+  const { getValues, register, control, setValue } =
+    useFormContext<ConventionDto>();
   const values = getValues();
+  const siretValueOnForm = useWatch({ control, name: "siret" });
 
-  // ADDED PREVIOUS FORM BEHAVIOR FOR FIXING BAD FORM UPDATE
-  const currentSiretOnSiretField = useWatch({
-    control,
-    name: "siret",
-  });
-
-  useEffect(() => {
-    if (currentSiret !== currentSiretOnSiretField) {
-      updateSiret(currentSiretOnSiretField);
-    }
-  }, [currentSiretOnSiretField, currentSiret]);
-  // ====================
-
-  useSiretRelatedField("businessName", {
-    disabled: values.status !== "DRAFT",
-  });
   const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
@@ -53,11 +36,11 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
         hintText={formContents.siret.hintText}
         nativeInputProps={{
           ...formContents.siret,
-          ...register("siret"),
-          onBlur: (event) => {
+          onChange: (event) => {
+            setValue("siret", event.target.value);
             updateSiret(event.target.value);
           },
-          value: currentSiret || values.siret,
+          value: currentSiret || siretValueOnForm,
         }}
         disabled={isFetchingSiret}
         state={siretErrorToDisplay ? "error" : undefined}
