@@ -3,14 +3,15 @@ import {
   AgencyId,
   InclusionConnectedUser,
   OAuthGatewayProvider,
-  RemoveAgencyUserParams,
   UserId,
+  WithAgencyIdAndUserId,
   errors,
-  removeAgencyUserParamsSchema,
+  withAgencyIdAndUserIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import {
   throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
@@ -48,13 +49,13 @@ const getUserAgencyRightsAndThrowIfUserHasNoAgencyRight = (
 };
 
 export const makeRemoveUserFromAgency = createTransactionalUseCase<
-  RemoveAgencyUserParams,
+  WithAgencyIdAndUserId,
   void,
   InclusionConnectedUser,
   { createNewEvent: CreateNewEvent }
 >(
-  { name: "RemoveUserFromAgency", inputSchema: removeAgencyUserParamsSchema },
-  async ({ currentUser, uow, inputParams }) => {
+  { name: "RemoveUserFromAgency", inputSchema: withAgencyIdAndUserIdSchema },
+  async ({ currentUser, uow, inputParams, deps }) => {
     const provider = oAuthProviderByFeatureFlags(
       await uow.featureFlagRepository.getAll(),
     );
@@ -89,5 +90,18 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
       userId: inputParams.userId,
       agencyRights: filteredAgencyRights,
     });
+
+    const event: DomainEvent = deps.createNewEvent({
+      topic: "IcUserAgencyRightChanged",
+      payload: {
+        ...inputParams,
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: currentUser.id,
+        },
+      },
+    });
+
+    await uow.outboxRepository.save(event);
   },
 );
