@@ -14,6 +14,7 @@ import {
   unauthenticatedConventionRoutes,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
+import type { UnknownSharedRoute } from "shared-routes/src";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
 import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";
@@ -28,50 +29,59 @@ import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/Inclusion
 import { HttpSearchGateway } from "src/core-logic/adapters/SearchGateway/HttpSearchGateway";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
 
-export const createHttpDependencies = (): Dependencies => {
-  const withBaseUrlConfig = { baseURL: "/api" };
-  const axiosOnSlashApi = axios.create({
-    ...withBaseUrlConfig,
-    validateStatus: () => true,
+const withBaseUrlConfig = { baseURL: "/api" };
+const axiosOnSlashApi = axios.create({
+  ...withBaseUrlConfig,
+  validateStatus: () => true,
+});
+
+const createAxiosHttpClientOnSlashApi = <
+  SharedRoutes extends Record<string, UnknownSharedRoute>,
+>(
+  routes: SharedRoutes,
+) =>
+  createAxiosSharedClient(routes, axiosOnSlashApi, {
+    skipResponseValidationForStatuses: [500],
   });
 
+export const createHttpDependencies = (): Dependencies => {
   return {
     ...createCommonDependencies(),
     addressGateway: new HttpAddressGateway(
-      createAxiosSharedClient(addressRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(addressRoutes),
     ),
     adminGateway: new HttpAdminGateway(
-      createAxiosSharedClient(adminRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(adminRoutes),
     ),
     agencyGateway: new HttpAgencyGateway(
-      createAxiosSharedClient(agencyRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(agencyRoutes),
     ),
     assessmentGateway: new HttpAssessmentGateway(
-      createAxiosSharedClient(conventionMagicLinkRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(conventionMagicLinkRoutes),
     ),
     conventionGateway: new HttpConventionGateway(
-      createAxiosSharedClient(conventionMagicLinkRoutes, axiosOnSlashApi),
-      createAxiosSharedClient(unauthenticatedConventionRoutes, axiosOnSlashApi),
-      createAxiosSharedClient(authenticatedConventionRoutes, axiosOnSlashApi),
-      createAxiosSharedClient(inclusionConnectedAllowedRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(conventionMagicLinkRoutes),
+      createAxiosHttpClientOnSlashApi(unauthenticatedConventionRoutes),
+      createAxiosHttpClientOnSlashApi(authenticatedConventionRoutes),
+      createAxiosHttpClientOnSlashApi(inclusionConnectedAllowedRoutes),
     ),
     establishmentGateway: new HttpEstablishmentGateway(
-      createAxiosSharedClient(establishmentRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(establishmentRoutes),
     ),
     establishmentLeadGateway: new HttpEstablishmentLeadGateway(
-      createAxiosSharedClient(establishmentLeadRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(establishmentLeadRoutes),
     ),
     formCompletionGateway: new HttpFormCompletionGateway(
-      createAxiosSharedClient(formCompletionRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(formCompletionRoutes),
     ),
     inclusionConnectedGateway: new HttpInclusionConnectedGateway(
-      createAxiosSharedClient(inclusionConnectedAllowedRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(inclusionConnectedAllowedRoutes),
     ),
     searchGateway: new HttpSearchGateway(
-      createAxiosSharedClient(searchImmersionRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(searchImmersionRoutes),
     ),
     technicalGateway: new HttpTechnicalGateway(
-      createAxiosSharedClient(technicalRoutes, axiosOnSlashApi),
+      createAxiosHttpClientOnSlashApi(technicalRoutes),
       axiosOnSlashApi,
     ),
   };
