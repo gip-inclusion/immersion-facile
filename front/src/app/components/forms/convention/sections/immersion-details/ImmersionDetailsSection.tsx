@@ -14,7 +14,10 @@ import { useSiretRelatedField } from "src/app/hooks/siret.hooks";
 export const ImmersionDetailsSection = () => {
   const { setValue, getValues, register } = useFormContext<ConventionReadDto>();
   const values = getValues();
-  const isSiretFetcherDisabled = values.status !== "DRAFT";
+  const isSiretFetcherEnabled =
+    values.status === "DRAFT" && values.immersionAddress === "";
+
+  const isSiretFetcherDisabled = !isSiretFetcherEnabled;
 
   useSiretRelatedField("businessName", {
     disabled: isSiretFetcherDisabled,
