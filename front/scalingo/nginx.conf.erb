@@ -23,3 +23,7 @@ location /aide {
     proxy_set_header Accept-Encoding "";
     proxy_set_header Access-Control-Allow-Origin "*";
 }
+
+location = /etablissement {
+    return 301 $scheme://$http_host/accueil-entreprises;
+}
