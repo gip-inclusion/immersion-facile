@@ -11,10 +11,10 @@ import {
   InclusionConnectJwt,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
-  RemoveAgencyUserParams,
   SetFeatureFlagParam,
   UserInList,
   UserParamsForAgency,
+  WithAgencyIdAndUserId,
   WithUserFilters,
   createApiConsumerParamsFromApiConsumer,
 } from "shared";
@@ -226,7 +226,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public removeUserFromAgency$(
-    params: RemoveAgencyUserParams,
+    params: WithAgencyIdAndUserId,
     token: string,
   ): Observable<void> {
     return from(

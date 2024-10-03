@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   GetDashboardParams,
-  RemoveAgencyUserParams,
+  WithAgencyIdAndUserId,
   adminRoutes,
   agencyRoutes,
   errors,
@@ -107,7 +107,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
         if (!currentUser) throw errors.user.unauthorized();
-        const userWithAgency: RemoveAgencyUserParams = {
+        const userWithAgency: WithAgencyIdAndUserId = {
           agencyId: req.params.agencyId,
           userId: req.params.userId,
         };
