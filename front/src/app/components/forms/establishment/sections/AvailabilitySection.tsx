@@ -28,7 +28,7 @@ export const AvailabilitySection = ({
   onStepChange,
   currentStep,
   setAvailableForImmersion,
-  availableForImmersion: availableForImmersionClicked,
+  availableForImmersion: availableForImmersionInProps,
   shouldUpdateAvailability,
 }: {
   mode: Mode;
@@ -46,7 +46,7 @@ export const AvailabilitySection = ({
   const getFieldError = makeFieldError(formState);
 
   const shouldShowErrorOnAvailableForImmersion =
-    availableForImmersionClicked === undefined &&
+    availableForImmersionInProps === undefined &&
     (getFieldError("maxContactsPerMonth") ||
       getFieldError("nextAvailabilityDate"));
 
@@ -59,8 +59,8 @@ export const AvailabilitySection = ({
   const isStepMode = currentStep !== null;
 
   const isAvailableForImmersion = () => {
-    if (availableForImmersionClicked !== undefined)
-      return availableForImmersionClicked;
+    if (availableForImmersionInProps !== undefined)
+      return availableForImmersionInProps;
     if (mode === "create" || shouldUpdateAvailability) return undefined;
     if (currentNextAvailabilityDate === undefined) return true;
     if (currentNextAvailabilityDate < new Date().toISOString())
@@ -142,7 +142,7 @@ export const AvailabilitySection = ({
             {...getFieldError("maxContactsPerMonth")}
           />
         )}
-      {mode === "admin" && availableForImmersion === true && (
+      {mode === "admin" && (
         <div>
           <Alert
             severity="info"
