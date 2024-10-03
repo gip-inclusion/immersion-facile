@@ -575,7 +575,7 @@ describe("convention e2e", () => {
             statut: "REJETÉ",
             telephone: "+33123456780",
             telephoneTuteur: "+33601010101",
-            typeAgence: peAgency.kind,
+            typeAgence: "france-travail",
             nomAgence: peAgency.name,
             prenomValidateurRenseigne:
               convention.validators?.agencyValidator?.firstname,

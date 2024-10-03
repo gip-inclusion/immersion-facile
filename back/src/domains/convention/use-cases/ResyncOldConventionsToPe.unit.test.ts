@@ -425,7 +425,7 @@ function conventionToConventionNotification(
     signatureBeneficiaire: !!convention.signatories.beneficiary.signedAt,
     signatureEntreprise:
       !!convention.signatories.establishmentRepresentative.signedAt,
-    typeAgence: agency.kind,
+    typeAgence: agency.kind === "pole-emploi" ? "france-travail" : agency.kind,
     nomAgence: agency.name,
     prenomValidateurRenseigne:
       convention.validators?.agencyValidator?.firstname,

@@ -32,6 +32,8 @@ type ConventionStatusToPeStatus = typeof conventionStatusToPoleEmploiStatus;
 type PeConventionStatus =
   ConventionStatusToPeStatus[keyof ConventionStatusToPeStatus];
 
+type AgencyKindForPe = Exclude<AgencyKind, "pole-emploi"> | "france-travail";
+
 export type PoleEmploiConvention = {
   id: string; // id numérique sur 11 caractères
   originalId: string; // exemple: 31bd445d-54fa-4b53-8875-0ada1673fe3c
@@ -62,7 +64,7 @@ export type PoleEmploiConvention = {
   competencesObservees: string;
   signatureBeneficiaire: boolean;
   signatureEntreprise: boolean;
-  typeAgence: AgencyKind;
+  typeAgence: AgencyKindForPe;
   nomAgence: string;
   prenomValidateurRenseigne?: string;
   nomValidateurRenseigne?: string;
