@@ -902,6 +902,23 @@ const searchImmersionResultsQuery = (
                   return qb.whereRef("searchable_by_students", "is", sql`TRUE`);
                 return qb;
               },
+              (qb) => {
+                if (
+                  !filters?.geoParams &&
+                  !filters?.romeCodes &&
+                  (sortedBy === "date" || sortedBy === "score")
+                ) {
+                  // this is in the case when NO filters are provided, to avoid doing the joins on the whole table when we will only keep 100 results in the end
+                  // still doing a limit of 5000 because they will be aggregated by ROME and siret
+                  return qb
+                    .orderBy(
+                      sortedBy === "date" ? "update_date" : "score",
+                      "desc",
+                    )
+                    .limit(5000);
+                }
+                return qb;
+              },
             ).as("e"),
           )
           .innerJoin(
