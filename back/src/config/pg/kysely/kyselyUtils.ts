@@ -42,11 +42,16 @@ export const executeKyselyRawSqlQuery = <T extends QueryResultRow>(
   values?: any[],
 ) => transaction.executeQuery<T>(CompiledQuery.raw(sqlQuery, values));
 
-export const makeKyselyDb = (pool: Pool): KyselyDb => {
+type KyselyOptions = {
+  skipErrorLog?: boolean;
+};
+
+export const makeKyselyDb = (pool: Pool, options?: KyselyOptions): KyselyDb => {
   const logger = createLogger(__filename);
   return new Kysely<Database>({
     dialect: new PostgresDialect({ pool }),
     log(event): void {
+      if (options?.skipErrorLog) return;
       if (event.level === "error") {
         const error: any = event.error;
         const params = {
