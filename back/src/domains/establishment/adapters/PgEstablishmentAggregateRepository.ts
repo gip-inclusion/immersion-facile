@@ -904,7 +904,7 @@ const searchImmersionResultsQuery = (
               },
               (qb) => {
                 if (
-                  !filters?.geoParams &&
+                  !hasSearchGeoParams(filters?.geoParams ?? {}) &&
                   !filters?.romeCodes &&
                   (sortedBy === "date" || sortedBy === "score")
                 ) {
