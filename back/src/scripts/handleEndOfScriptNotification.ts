@@ -63,9 +63,11 @@ const onScriptError =
   ({ start, context, logger, name }: ScriptContextParams) =>
   (error: any): Promise<void> => {
     const durationInSeconds = calculateDurationInSecondsFrom(start);
-    const reportTitle = `❌ Failure at ${new Date().toISOString()} - ${context}`;
+    const reportTitle = `❌ Failure at ${new Date().toISOString()} - ${context} - ${
+      error.message
+    }`;
 
-    logger.error({ error, durationInSeconds, message: reportTitle });
+    logger.error({ durationInSeconds, message: reportTitle, error });
     const report = [
       reportTitle,
       `Script [${name}]`,
