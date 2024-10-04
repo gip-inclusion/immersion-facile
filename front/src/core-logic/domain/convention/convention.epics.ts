@@ -191,12 +191,15 @@ const broadcastConventionAgainEpic: ConventionEpic = (
               feedbackTopic: payload.feedbackTopic,
             }),
           ),
-          catchEpicError((error: Error) =>
-            conventionSlice.actions.broadcastConventionToPartnerFailed({
-              errorMessage: error.message,
+          catchEpicError((error: Error) => {
+            const isJsonError = error.message.at(0) === "{";
+            return conventionSlice.actions.broadcastConventionToPartnerFailed({
+              errorMessage: isJsonError
+                ? JSON.parse(error.message).message
+                : error.message,
               feedbackTopic: payload.feedbackTopic,
-            }),
-          ),
+            });
+          }),
         ),
     ),
   );
