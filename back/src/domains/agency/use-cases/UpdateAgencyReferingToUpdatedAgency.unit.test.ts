@@ -1,6 +1,8 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
+  errors,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
@@ -55,6 +57,16 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
         new InMemoryUowPerformer(uow),
         createNewEvent,
       );
+  });
+
+  it("throw error when agency not found", () => {
+    expectPromiseToFailWithError(
+      updateAgencyReferringToUpdatedAgency.execute(
+        { agencyId: updatedAgency.id },
+        icUser,
+      ),
+      errors.agency.notFound({ agencyId: updatedAgency.id }),
+    );
   });
 
   describe("right paths", () => {

@@ -164,11 +164,7 @@ const getUseCasesByTopics = (
   ],
   IcUserAgencyRightChanged: [
     useCases.notifyIcUserAgencyRightChanged,
-    {
-      useCaseName: useCases.updateAgencyReferringToUpdatedAgency.useCaseName,
-      execute: ({ agencyId }) =>
-        useCases.updateAgencyReferringToUpdatedAgency.execute({ agencyId }),
-    },
+    useCases.updateAgencyReferringToUpdatedAgency,
   ],
   IcUserAgencyRightRejected: [useCases.notifyIcUserAgencyRightRejected],
 
