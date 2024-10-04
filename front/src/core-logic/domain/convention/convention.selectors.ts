@@ -24,6 +24,11 @@ const fetchError = createSelector(
 
 const isLoading = createSelector(conventionState, ({ isLoading }) => isLoading);
 
+const isBroadcasting = createSelector(
+  conventionState,
+  ({ isBroadcasting }) => isBroadcasting,
+);
+
 const similarConventionIds = createSelector(
   conventionState,
   ({ similarConventionIds }) => similarConventionIds,
@@ -94,6 +99,7 @@ export const conventionSelectors = {
   showSummary,
   agencyDepartment,
   similarConventionIds,
+  isBroadcasting,
 };
 
 export const signatoryDataFromConvention = (

@@ -63,6 +63,7 @@ export interface ConventionState {
   feedback: ConventionSubmitFeedback;
   currentSignatoryRole: SignatoryRole | null;
   similarConventionIds: ConventionId[];
+  isBroadcasting: boolean;
 }
 
 export const initialConventionState: ConventionState = {
@@ -83,6 +84,7 @@ export const initialConventionState: ConventionState = {
   feedback: { kind: "idle" },
   currentSignatoryRole: null,
   similarConventionIds: [],
+  isBroadcasting: false,
 };
 
 export type FetchConventionRequestedPayload = {
@@ -296,19 +298,19 @@ export const conventionSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<WithConventionId>,
     ) => {
-      state.isLoading = true;
+      state.isBroadcasting = true;
     },
     broadcastConventionToPartnerSucceeded: (
       state,
       _action: PayloadActionWithFeedbackTopic,
     ) => {
-      state.isLoading = false;
+      state.isBroadcasting = false;
     },
     broadcastConventionToPartnerFailed: (
       state,
       _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
     ) => {
-      state.isLoading = false;
+      state.isBroadcasting = false;
     },
   },
 });

@@ -100,6 +100,7 @@ describe("Convention slice", () => {
           feedback: { kind: "idle" },
           currentSignatoryRole: null,
           similarConventionIds: [],
+          isBroadcasting: false,
         },
       }));
       const convention = new ConventionDtoBuilder().build();
@@ -329,6 +330,7 @@ describe("Convention slice", () => {
           jwt: null,
           currentSignatoryRole: null,
           similarConventionIds: [],
+          isBroadcasting: false,
         },
       }));
       store.dispatch(
@@ -694,6 +696,7 @@ describe("Convention slice", () => {
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: null,
           similarConventionIds: [],
+          isBroadcasting: false,
         },
       }));
       const signatoryData = conventionSelectors.signatoryData(store.getState());
@@ -742,6 +745,7 @@ describe("Convention slice", () => {
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: "beneficiary",
           similarConventionIds: [],
+          isBroadcasting: false,
         },
       }));
 
@@ -891,7 +895,7 @@ describe("Convention slice", () => {
         }),
       );
       expectConventionState({
-        isLoading: true,
+        isBroadcasting: true,
       });
 
       dependencies.conventionGateway.broadcastConventionAgainResult$.next(
@@ -899,7 +903,7 @@ describe("Convention slice", () => {
       );
 
       expectConventionState({
-        isLoading: false,
+        isBroadcasting: false,
       });
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "broadcast-convention-again": {
@@ -921,7 +925,7 @@ describe("Convention slice", () => {
         }),
       );
       expectConventionState({
-        isLoading: true,
+        isBroadcasting: true,
       });
 
       dependencies.conventionGateway.broadcastConventionAgainResult$.error(
@@ -929,7 +933,7 @@ describe("Convention slice", () => {
       );
 
       expectConventionState({
-        isLoading: false,
+        isBroadcasting: false,
       });
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "broadcast-convention-again": {
@@ -1000,6 +1004,7 @@ describe("Convention slice", () => {
         fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
+        isBroadcasting: false,
       },
     }));
     store.dispatch(conventionSlice.actions.clearFeedbackTriggered());
@@ -1026,6 +1031,7 @@ describe("Convention slice", () => {
         fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
+        isBroadcasting: false,
       },
     }));
     expectConventionState({
@@ -1057,6 +1063,7 @@ describe("Convention slice", () => {
         fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
+        isBroadcasting: false,
       },
     }));
     expectConventionState({
@@ -1092,6 +1099,7 @@ describe("Convention slice", () => {
         fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
+        isBroadcasting: false,
       },
     }));
     expectConventionState({
@@ -1168,6 +1176,7 @@ describe("Convention slice", () => {
         fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
+        isBroadcasting: false,
       },
     }));
     expectConventionState({ convention });
