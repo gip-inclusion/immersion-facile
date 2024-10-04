@@ -57,7 +57,7 @@
     "@types/geojson": "^7946.0.10",
     "aws-sdk": "^2.1213.0",
     "axios": "^1.6.0",
-    "body-parser": "^1.20.0",
+    "body-parser": "^1.20.3",
     "bottleneck": "^2.19.5",
     "date-fns": "2.28.0",
     "dotenv": "^16.0.0",
