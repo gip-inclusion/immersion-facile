@@ -26,7 +26,7 @@ test.describe("Establishment creation and modification workflow", () => {
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "recette+updated-establishment@immersion-facile.beta.gouv.fr",
+      email: "admin+playwright@immersion-facile.beta.gouv.fr",
       contactMethod: "PHONE",
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
@@ -51,22 +51,7 @@ test.describe("Establishment creation and modification workflow", () => {
     isEngagedEnterprise: true,
   } satisfies Partial<FormEstablishmentDto>;
   test("creates a new establishment", async ({ page }) => {
-    await page.goto("/");
-    await page.click(`#${domElementIds.home.heroHeader.establishment}`);
-    await page.click(
-      `#${domElementIds.homeEstablishments.heroHeader.addEstablishmentForm}`,
-    );
-    await page.fill(
-      `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
-      providedSiret,
-    );
-    const addEstablishmentButton = await page.locator(
-      `#${domElementIds.establishment.create.startFormButton}`,
-    );
-
-    await expectLocatorToBeVisibleAndEnabled(addEstablishmentButton);
-
-    await addEstablishmentButton.click();
+    firstStepsEstablishmentFormCreation(page, providedSiret);
 
     await page.locator(".fr-radio-rich").getByText("Oui").click();
 
@@ -499,6 +484,44 @@ test.describe("Establishment creation and modification workflow", () => {
     await expect(await page.locator(resultsSelector)).toHaveCount(1);
   });
 
+  test.describe("Check displayed availability", () => {
+    test.use({ storageState: testConfig.adminAuthFile });
+
+    test("in admin manage establishment", async ({ page }) => {
+      await page.goto("/");
+      await goToAdminTab(page, "establishments");
+      await page.fill(
+        `#${domElementIds.admin.manageEstablishment.siretInput}`,
+        providedSiret,
+      );
+      await page
+        .locator(`#${domElementIds.admin.manageEstablishment.searchButton}`)
+        .click();
+      await checkAvailibilityButtons(page);
+    });
+
+    test("at immersion offer creation", async ({ page }) => {
+      const siretForAvailabilityCheck = "88462068300018";
+      await firstStepsEstablishmentFormCreation(
+        page,
+        siretForAvailabilityCheck,
+      );
+      const initialRadioButton = page.locator(".fr-radio-rich");
+      await expect(initialRadioButton.getByText("Oui")).not.toBeChecked();
+      await expect(initialRadioButton.getByText("Non")).not.toBeChecked();
+    });
+
+    test("in establishment dashboard", async ({ page }) => {
+      await page.goto("/");
+      await page.locator("#fr-header-main-navigation-button-2").click();
+      await page
+        .locator(`#${domElementIds.header.navLinks.establishment.dashboard}`)
+        .click();
+      await page.locator(".fr-tabs").getByText("Fiche établissement").click();
+      await checkAvailibilityButtons(page);
+    });
+  });
+
   test.describe("Admin deletes an establishment", () => {
     test.use({ storageState: testConfig.adminAuthFile });
     test("deletes an establishment", async ({ page }) => {
@@ -524,6 +547,34 @@ test.describe("Establishment creation and modification workflow", () => {
     });
   });
 });
+
+const firstStepsEstablishmentFormCreation = async (
+  page: Page,
+  siret: string,
+) => {
+  await page.goto("/");
+  await page.click(`#${domElementIds.home.heroHeader.establishment}`);
+  await page.click(
+    `#${domElementIds.homeEstablishments.heroHeader.addEstablishmentForm}`,
+  );
+  await page.fill(
+    `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
+    siret,
+  );
+  const addEstablishmentButton = await page.locator(
+    `#${domElementIds.establishment.create.startFormButton}`,
+  );
+  await expectLocatorToBeVisibleAndEnabled(addEstablishmentButton);
+  await addEstablishmentButton.click();
+};
+
+const checkAvailibilityButtons = async (page: Page) => {
+  const availibilityRadioButton = page.locator(".fr-radio-rich");
+  await expect(availibilityRadioButton.getByText("Oui")).toBeChecked();
+  await expect(
+    availibilityRadioButton.getByText("Non").first(),
+  ).not.toBeChecked();
+};
 
 const goToNextStep = async (
   page: Page,
