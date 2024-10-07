@@ -4,7 +4,6 @@ import { Pool } from "pg";
 import { expectToEqual } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { PgOutboxRepository } from "../../core/events/adapters/PgOutboxRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -13,13 +12,11 @@ describe("PgScriptsQueries", () => {
   let pool: Pool;
   let db: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
-  let pgOutboxRepository: PgOutboxRepository;
   let pgNotificationRepository: PgNotificationRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
-    pgOutboxRepository = new PgOutboxRepository(db);
     pgNotificationRepository = new PgNotificationRepository(db);
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       db,
@@ -52,35 +49,6 @@ describe("PgScriptsQueries", () => {
         .withContactId("11111111-1111-4000-1111-111111111111")
         .withLocationId("aaaaaaaa-aaaa-4000-aaaa-aaaaaaaaaaaa")
         .build();
-
-      // <<<<<----------- this is the legacy behavior, we keep it until we reach the 6 months.
-      // We can remove this part of the code, and the FormEstablishmentEditLinkSent events in january 2024
-
-      const establishmentWithLinkSentEvent = new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret("22220000222200")
-        .withEstablishmentUpdatedAt(toUpdateDate)
-        .withContactId("22222222-2222-4000-2222-222222222222")
-        .withLocationId("aaaaaaaa-aaaa-4000-bbbb-bbbbbbbbbbbb")
-        .build();
-
-      await pgOutboxRepository.save({
-        id: "22222222-2222-4000-2222-000000000000",
-        topic: "FormEstablishmentEditLinkSent",
-        payload: {
-          siret: establishmentWithLinkSentEvent.establishment.siret,
-          version: 1,
-          triggeredBy: {
-            kind: "establishment-magic-link",
-            siret: establishmentWithLinkSentEvent.establishment.siret,
-          },
-        },
-        occurredAt: addDays(before, 1).toISOString(),
-        publications: [],
-        status: "never-published",
-        wasQuarantined: false,
-      });
-
-      // end of legacy ----------->>>>>>
 
       const eventWithNotificationSavedButLongAgo =
         new EstablishmentAggregateBuilder()
@@ -147,7 +115,6 @@ describe("PgScriptsQueries", () => {
           establishmentToUpdate,
           eventWithNotificationSavedButLongAgo,
           eventWithRecentNotificationSaved,
-          establishmentWithLinkSentEvent,
           recentlyUpdatedEstablishment,
         ].map((aggregate) =>
           pgEstablishmentAggregateRepository.insertEstablishmentAggregate(

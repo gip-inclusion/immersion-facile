@@ -189,18 +189,6 @@ export class PgEstablishmentAggregateRepository
       .where(({ not, exists, selectFrom }) =>
         not(
           exists(
-            selectFrom("outbox as o")
-              .select(sql`1`.as("_"))
-              .where("o.topic", "=", "FormEstablishmentEditLinkSent")
-              .whereRef(sql`o.payload ->> 'siret'`, "=", "establishments.siret")
-              .where("o.occurred_at", ">", before)
-              .limit(1),
-          ),
-        ),
-      )
-      .where(({ not, exists, selectFrom }) =>
-        not(
-          exists(
             selectFrom("notifications_email as n")
               .select(sql`1`.as("__"))
               .where("n.email_kind", "=", "SUGGEST_EDIT_FORM_ESTABLISHMENT")
