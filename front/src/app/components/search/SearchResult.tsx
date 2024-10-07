@@ -100,12 +100,10 @@ const SearchResultComponent = ({
                   onButtonClick();
                 }
               },
-        }}
-        id={
-          voluntaryToImmersion
+          id: voluntaryToImmersion
             ? `${domElementIds.search.searchResultButton}-${siret}`
-            : `${domElementIds.search.lbbSearchResultButton}-${siret}`
-        }
+            : `${domElementIds.search.lbbSearchResultButton}-${siret}`,
+        }}
         enlargeLink
         titleAs="h2"
         imageComponent={illustration}
