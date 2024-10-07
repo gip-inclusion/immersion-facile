@@ -14,6 +14,7 @@ import {
 export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
   agencyId?: AgencyId;
   email?: Email;
+  isNotifiedByEmail?: boolean;
 };
 
 export interface UserRepository {
