@@ -728,6 +728,7 @@ describe("PgAuthenticatedUserRepository", () => {
             },
           ]);
         });
+
         it("fetches connected users given email", async () => {
           await agencyRepository.insert(agency1);
           await insertUser(db, user1, provider);
@@ -764,6 +765,56 @@ describe("PgAuthenticatedUserRepository", () => {
                 },
               ],
               ...withEmptyDashboards,
+            },
+          ]);
+        });
+
+        it("fetches connected users given its status, agencyId and notifiedByEmail", async () => {
+          await agencyRepository.insert(agency1);
+          await agencyRepository.insert(agency2);
+          await insertUser(db, user1, provider);
+          await insertUser(db, user2, provider);
+          await insertAgencyRegistrationToUser(db, {
+            agencyId: agency1.id,
+            userId: user1.id,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          });
+          await insertAgencyRegistrationToUser(db, {
+            agencyId: agency1.id,
+            userId: user2.id,
+            roles: ["to-review"],
+            isNotifiedByEmail: false,
+          });
+          await insertAgencyRegistrationToUser(db, {
+            agencyId: agency2.id,
+            userId: user1.id,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          });
+
+          const icUsers = await userRepository.getIcUsersWithFilter(
+            {
+              agencyRole: "validator",
+              agencyId: agency1.id,
+              isNotifiedByEmail: false,
+            },
+            provider,
+          );
+
+          expectArraysToEqualIgnoringOrder(
+            icUsers.map((icUser) => icUser.email),
+            [user1.email],
+          );
+
+          // biome-ignore lint/style/noNonNullAssertion: <explanation>
+          const icUser1 = icUsers.find((u) => u.email === user1.email)!;
+
+          expectToEqual(icUser1.agencyRights, [
+            {
+              roles: ["validator"],
+              agency: agency1,
+              isNotifiedByEmail: false,
             },
           ]);
         });
