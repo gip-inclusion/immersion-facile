@@ -12,7 +12,9 @@ import {
   RemoveAgencyUserParams,
   SetFeatureFlagParam,
   UserParamsForAgency,
+  User,
 } from "shared";
+import { type UserFilters } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
@@ -47,6 +49,8 @@ export class TestAdminGateway implements AdminGateway {
   public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
   public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
+
+  public listUsersResponse$ = new Subject<User[]>();
 
   public updateFeatureFlags$ = (
     params: SetFeatureFlagParam,
@@ -112,5 +116,9 @@ export class TestAdminGateway implements AdminGateway {
     _token: string,
   ): Observable<void> {
     return this.removeUserFromAgencyResponse$;
+  }
+
+  public listUsers$(_params: UserFilters, _token: string): Observable<User[]> {
+    return this.listUsersResponse$;
   }
 }
