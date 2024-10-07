@@ -592,6 +592,9 @@ export const domElementIds = {
       userRegistrationToAgencyModal:
         "im-register-user-to-agency__user-registration-modal",
     },
+    usersTab: {
+      usersTable: "im-users__users-table",
+    },
     emailPreviewTab: {
       emailTemplateNameSelect: "selectTemplateName",
       internshipKindSelect: "email-preview-internshipKind-select",
