@@ -1,8 +1,7 @@
-import axios from "axios";
 import { expectToEqual } from "shared";
-import { createAxiosSharedClient } from "shared-routes/axios";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createPeFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { PoleEmploiGetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
@@ -21,12 +20,11 @@ describe("HttpLaBonneBoiteGateway", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    const axiosHttpClient = createPeAxiosSharedClient(config);
-
+    const peFetchSharedClient = createPeFetchSharedClient(config);
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
-      createAxiosSharedClient(createLbbRoutes(config.peApiUrl), axios),
+      createFetchSharedClient(createLbbRoutes(config.peApiUrl), fetch),
       new HttpPoleEmploiGateway(
-        axiosHttpClient,
+        peFetchSharedClient,
         new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
           new RealTimeGateway(),
           "expires_in",
@@ -46,7 +44,6 @@ describe("HttpLaBonneBoiteGateway", () => {
       lat: benodetLonLat.lat,
       distanceKm: 100,
     });
-
     expect(actualSearchedCompanies).toHaveLength(90);
   });
 

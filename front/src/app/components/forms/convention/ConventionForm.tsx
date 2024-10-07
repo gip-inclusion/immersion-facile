@@ -178,9 +178,9 @@ export const ConventionForm = ({
     reset,
   } = methods;
 
-  useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(getValues()));
-
   const conventionValues = getValues();
+
+  useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(conventionValues));
 
   const { getFormFields, getFormErrors } = getFormContents(
     formConventionFieldsLabels(conventionValues.internshipKind),
