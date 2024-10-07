@@ -73,6 +73,7 @@ export const AvailabilitySection = ({
   return (
     <section className={fr.cx("fr-mb-4w")}>
       <RadioButtons
+        id={domElementIds.establishment[mode].availabilityButton}
         legend="Êtes-vous disponible actuellement pour recevoir des personnes en immersion ?"
         name="availableForImmersion"
         options={richBooleanSelectOptions.map((option) => ({

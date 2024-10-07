@@ -381,6 +381,7 @@ export const domElementIds = {
         "im-form-create-establishment__edit-establishment-button",
       startFormButton: "im-form-create-establishment__start-button",
       submitFormButton: "im-form-create-establishment__submit-button",
+      availabilityButton: "im-form-create-establishment__availability-button",
       nextAvailabilityDateInput:
         "im-form-create-establishment__next-availability-date",
       previousButtonFromStepAndMode: ({ currentStep }) =>
@@ -425,6 +426,7 @@ export const domElementIds = {
         "im-form-edit-establishment__edit-establishment-button",
       startFormButton: "im-form-edit-establishment__start-button",
       submitFormButton: "im-form-edit-establishment__submit-button",
+      availabilityButton: "im-form-edit-establishment__availability-button",
       nextAvailabilityDateInput:
         "im-form-edit-establishment__next-availability-date",
       previousButtonFromStepAndMode: ({ currentStep }) =>
@@ -482,6 +484,8 @@ export const domElementIds = {
         "im-form-manage-establishment-admin__add-address-button",
       errorSiretAlreadyExistButton:
         "im-form-manage-establishment-admin__edit-establishment-button",
+      availabilityButton:
+        "im-form-manage-establishment-admin__availability-button",
       nextAvailabilityDateInput:
         "im-form-manage-establishment-admin__next-availability-date",
       maxContactsPerMonthValue:

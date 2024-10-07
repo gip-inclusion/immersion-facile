@@ -51,9 +51,12 @@ test.describe("Establishment creation and modification workflow", () => {
     isEngagedEnterprise: true,
   } satisfies Partial<FormEstablishmentDto>;
   test("creates a new establishment", async ({ page }) => {
-    firstStepsEstablishmentFormCreation(page, providedSiret);
+    await fillEstablishmentFormFirstStep(page, providedSiret);
 
-    await page.locator(".fr-radio-rich").getByText("Oui").click();
+    await page
+      .locator(`#${domElementIds.establishment.create.availabilityButton}`)
+      .getByText("Oui")
+      .click();
 
     await goToNextStep(page, 1, "create");
     await page
@@ -180,7 +183,10 @@ test.describe("Establishment creation and modification workflow", () => {
       await expectLocatorToBeVisibleAndEnabled(startFormButtonLocator);
 
       await startFormButtonLocator.click();
-      await page.locator(".fr-radio-rich").getByText("Non").click();
+      await page
+        .locator(`#${domElementIds.establishment.edit.availabilityButton}`)
+        .getByText("Non")
+        .click();
       await page
         .locator(
           `#${domElementIds.establishment.edit.nextAvailabilityDateInput}`,
@@ -459,7 +465,10 @@ test.describe("Establishment creation and modification workflow", () => {
       await page.click(
         `#${domElementIds.admin.manageEstablishment.searchButton}`,
       );
-      await page.locator(".fr-radio-rich").getByText("Oui").click();
+      await page
+        .locator(`#${domElementIds.establishment.admin.availabilityButton}`)
+        .getByText("Oui")
+        .click();
       await page.click(
         `#${domElementIds.establishment.admin.submitFormButton}`,
       );
@@ -497,16 +506,15 @@ test.describe("Establishment creation and modification workflow", () => {
       await page
         .locator(`#${domElementIds.admin.manageEstablishment.searchButton}`)
         .click();
-      await checkAvailibilityButtons(page);
+      await checkAvailibilityButtons(page, "admin");
     });
 
-    test("at immersion offer creation", async ({ page }) => {
+    test("in establishment form", async ({ page }) => {
       const siretForAvailabilityCheck = "88462068300018";
-      await firstStepsEstablishmentFormCreation(
-        page,
-        siretForAvailabilityCheck,
+      await fillEstablishmentFormFirstStep(page, siretForAvailabilityCheck);
+      const initialRadioButton = page.locator(
+        `#${domElementIds.establishment.create.availabilityButton}`,
       );
-      const initialRadioButton = page.locator(".fr-radio-rich");
       await expect(initialRadioButton.getByText("Oui")).not.toBeChecked();
       await expect(initialRadioButton.getByText("Non")).not.toBeChecked();
     });
@@ -518,7 +526,7 @@ test.describe("Establishment creation and modification workflow", () => {
         .locator(`#${domElementIds.header.navLinks.establishment.dashboard}`)
         .click();
       await page.locator(".fr-tabs").getByText("Fiche établissement").click();
-      await checkAvailibilityButtons(page);
+      await checkAvailibilityButtons(page, "edit");
     });
   });
 
@@ -548,10 +556,7 @@ test.describe("Establishment creation and modification workflow", () => {
   });
 });
 
-const firstStepsEstablishmentFormCreation = async (
-  page: Page,
-  siret: string,
-) => {
+const fillEstablishmentFormFirstStep = async (page: Page, siret: string) => {
   await page.goto("/");
   await page.click(`#${domElementIds.home.heroHeader.establishment}`);
   await page.click(
@@ -561,19 +566,19 @@ const firstStepsEstablishmentFormCreation = async (
     `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
     siret,
   );
-  const addEstablishmentButton = await page.locator(
+  const addEstablishmentButton = page.locator(
     `#${domElementIds.establishment.create.startFormButton}`,
   );
   await expectLocatorToBeVisibleAndEnabled(addEstablishmentButton);
   await addEstablishmentButton.click();
 };
 
-const checkAvailibilityButtons = async (page: Page) => {
-  const availibilityRadioButton = page.locator(".fr-radio-rich");
+const checkAvailibilityButtons = async (page: Page, mode: "edit" | "admin") => {
+  const availibilityRadioButton = page.locator(
+    `#${domElementIds.establishment[mode].availabilityButton}`,
+  );
   await expect(availibilityRadioButton.getByText("Oui")).toBeChecked();
-  await expect(
-    availibilityRadioButton.getByText("Non").first(),
-  ).not.toBeChecked();
+  await expect(availibilityRadioButton.getByText("Non")).not.toBeChecked();
 };
 
 const goToNextStep = async (
