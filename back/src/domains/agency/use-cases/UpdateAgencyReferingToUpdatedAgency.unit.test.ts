@@ -1,7 +1,9 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
+  User,
   errors,
+  expectArraysToEqual,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -77,6 +79,49 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
         agencyRefersToUpdatedAgency1,
         agencyRefersToUpdatedAgency2,
       ]);
+      const notifiedUser: User = {
+        id: "notified-user",
+        email: updatedAgency.validatorEmails.at(0) ?? "",
+        lastName: "Notified",
+        firstName: "User",
+        createdAt: new Date().toISOString(),
+        externalId: null,
+      };
+      const notNotifiedUser: User = {
+        id: "not-notified-by-email-user",
+        email: "notNotifiedByEmailUser@email.fr",
+        lastName: "Doe",
+        firstName: "John",
+        createdAt: new Date().toISOString(),
+        externalId: null,
+      };
+      await uow.userRepository.save(notifiedUser);
+      await uow.userRepository.save(notNotifiedUser);
+      await uow.userRepository.updateAgencyRights({
+        userId: notifiedUser.id,
+        agencyRights: [
+          {
+            agency: updatedAgency,
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+        ],
+      });
+      await uow.userRepository.updateAgencyRights({
+        userId: notNotifiedUser.id,
+        agencyRights: [
+          {
+            agency: updatedAgency,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: agencyRefersToUpdatedAgency1,
+            roles: ["counsellor"],
+            isNotifiedByEmail: false,
+          },
+        ],
+      });
 
       await updateAgencyReferringToUpdatedAgency.execute(
         { agencyId: updatedAgency.id },
@@ -94,6 +139,33 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
           validatorEmails: updatedAgency.validatorEmails,
         },
       ]);
+
+      expectArraysToEqual(
+        uow.userRepository.agencyRightsByUserId[notNotifiedUser.id],
+        [
+          {
+            agency: updatedAgency,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: {
+              ...agencyRefersToUpdatedAgency1,
+              validatorEmails: updatedAgency.validatorEmails,
+            },
+            roles: ["counsellor", "validator"],
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: {
+              ...agencyRefersToUpdatedAgency2,
+              validatorEmails: updatedAgency.validatorEmails,
+            },
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        ],
+      );
 
       expectToEqual(uow.outboxRepository.events, [
         {

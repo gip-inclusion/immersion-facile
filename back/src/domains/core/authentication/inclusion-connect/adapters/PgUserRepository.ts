@@ -172,11 +172,16 @@ export class PgUserRepository implements UserRepository {
   }
 
   public async getIcUsersWithFilter(
-    { agencyRole, agencyId, email }: InclusionConnectedFilters,
+    {
+      agencyRole,
+      agencyId,
+      email,
+      isNotifiedByEmail,
+    }: InclusionConnectedFilters,
     provider: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser[]> {
     return this.#getInclusionConnectedUsers(
-      { agencyRole, agencyId, email },
+      { agencyRole, agencyId, email, isNotifiedByEmail },
       provider,
     );
   }
@@ -213,6 +218,7 @@ export class PgUserRepository implements UserRepository {
       agencyRole?: AgencyRole;
       agencyId?: AgencyId;
       email?: Email;
+      isNotifiedByEmail?: boolean;
     },
     provider: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser[]> {
@@ -397,6 +403,7 @@ type Filters = {
   agencyRole?: AgencyRole;
   agencyId?: AgencyId;
   email?: Email;
+  isNotifiedByEmail?: boolean;
 };
 
 type WhereClause = {
@@ -440,6 +447,13 @@ const getWhereClause = (filters: Filters): WhereClause => {
       searchParams.length > 0 ? "AND" : ""
     } users__agencies.agency_id = $${searchParams.length + 1}`;
     searchParams = [...searchParams, filters.agencyId];
+  }
+
+  if (filters.isNotifiedByEmail !== undefined) {
+    searchClause = `${searchClause} ${
+      searchParams.length > 0 ? "AND" : ""
+    } users__agencies.is_notified_by_email = $${searchParams.length + 1}`;
+    searchParams = [...searchParams, JSON.stringify(filters.isNotifiedByEmail)];
   }
 
   return {
