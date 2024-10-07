@@ -9,6 +9,7 @@ import { domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes, useRoute } from "src/app/routes/routes";
+import { ENV } from "src/config/environmentVariables";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { makeStyles } from "tss-react/dsfr";
@@ -83,6 +84,20 @@ export const LayoutHeader = () => {
             id: quickAccessIds.agency,
           },
         },
+        ...(isInclusionConnected
+          ? [
+              {
+                text: "Modifier mes informations",
+                isActive: false,
+                linkProps: {
+                  href: `https://${
+                    ENV.envType === "production" ? "" : "recette."
+                  }connect.inclusion.beta.gouv.fr/accounts/my-account`,
+                  target: "_blank",
+                },
+              },
+            ]
+          : []),
       ]}
       id={quickAccessIds.myAccount}
       buttonLabel={"Mon espace"}
