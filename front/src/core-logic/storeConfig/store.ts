@@ -9,9 +9,8 @@ import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/da
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { icUsersAdminEpics } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.epics";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import {
-  listUsersSlice
-} from "src/core-logic/domain/admin/listUsers/listUsers.slice";
+import { listUsersEpics } from "src/core-logic/domain/admin/listUsers/listUsers.epics";
+import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { notificationsEpics } from "src/core-logic/domain/admin/notifications/notifications.epics";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 import { apiConsumerEpics } from "src/core-logic/domain/apiConsumer/apiConsumer.epics";
@@ -70,6 +69,7 @@ const allEpics: AppEpic<any>[] = [
   ...rootAppEpics,
   ...searchEpics,
   ...siretEpics,
+  ...listUsersEpics,
 ];
 
 const appReducer = combineReducers({

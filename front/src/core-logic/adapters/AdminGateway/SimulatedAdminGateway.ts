@@ -14,7 +14,9 @@ import {
   RejectIcUserRoleForAgencyParams,
   RemoveAgencyUserParams,
   UserParamsForAgency,
+  User,
 } from "shared";
+import { UserFilters } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 const simulatedAgencyDtos: AgencyRight[] = [
@@ -190,7 +192,37 @@ export class SimulatedAdminGateway implements AdminGateway {
   ): Observable<void> {
     return of(undefined);
   }
+
+  public listUsers$(
+    { emailContains }: UserFilters,
+    _token: string,
+  ): Observable<User[]> {
+    return of(
+      simulatedUsers.filter((user) =>
+        user.email.includes(emailContains),
+      ),
+    );
+  }
 }
+
+const simulatedUsers: User[] = [
+  {
+    id: "fake-user-id-1",
+    email: "jerome@mail.com",
+    firstName: "Jerome",
+    lastName: "Yolo",
+    externalId: "external-id-1",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "fake-user-id-2",
+    email: "john@mail.com",
+    firstName: "john",
+    lastName: "Lala",
+    externalId: "external-id-1",
+    createdAt: new Date().toISOString(),
+  },
+];
 
 const apiConsumers: ApiConsumer[] = [
   {

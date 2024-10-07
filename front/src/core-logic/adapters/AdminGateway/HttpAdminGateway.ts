@@ -1,4 +1,4 @@
-import { Observable, from } from "rxjs";
+import { Observable, from, of, throwError } from "rxjs";
 import {
   AdminRoutes,
   ApiConsumer,
@@ -15,6 +15,7 @@ import {
   UserParamsForAgency,
   WithUserFilters,
   createApiConsumerParamsFromApiConsumer,
+  User,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -22,6 +23,7 @@ import {
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
+import { UserFilters } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { P, match } from "ts-pattern";
 
@@ -241,5 +243,13 @@ export class HttpAdminGateway implements AdminGateway {
             .otherwise(otherwiseThrow),
         ),
     );
+  }
+
+  public listUsers$(
+    _params: UserFilters,
+    _token: InclusionConnectJwt,
+  ): Observable<User[]> {
+    throw new Error("yolo");
+    // return of([]);
   }
 }

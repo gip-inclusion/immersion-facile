@@ -14,7 +14,9 @@ import {
   SetFeatureFlagParam,
   UserParamsForAgency,
   WithUserFilters,
+  User,
 } from "shared";
+import { UserFilters } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 
 export interface AdminGateway {
   addEstablishmentBatch$: (
@@ -66,4 +68,9 @@ export interface AdminGateway {
     apiConsumer: ApiConsumer,
     adminToken: InclusionConnectJwt,
   ): Observable<ApiConsumerJwt | undefined>;
+
+  listUsers$(
+    params: UserFilters,
+    token: InclusionConnectJwt,
+  ): Observable<User[]>;
 }

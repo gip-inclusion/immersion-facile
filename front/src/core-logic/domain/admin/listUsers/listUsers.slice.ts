@@ -7,33 +7,29 @@ type UsersState = {
   query: string;
 };
 
-const initialState: UsersState = {
+export const listUsersInitialState: UsersState = {
   users: [],
   isFetching: false,
   query: "",
 };
 
-type UserFilters = {
+export type UserFilters = {
   emailContains: string;
 };
 
 export const listUsersSlice = createSlice({
   name: "listUsers",
-  initialState,
+  initialState: listUsersInitialState,
   reducers: {
     queryUpdated: (state, action: PayloadAction<string>) => {
       state.query = action.payload;
     },
-    fetchUsersRequested: (_, _action: PayloadAction<UserFilters>) => {
-      // TODO isFetching = true;
+    fetchUsersRequested: (state, _action: PayloadAction<UserFilters>) => {
+      state.isFetching = true;
     },
     fetchUsersSucceeded: (state, action: PayloadAction<User[]>) => {
-      // TODO state.users = action.payload;
-      //   isFetching = false;
-    },
-    fetchusersFailed: (state, action) => {
-      // TODO
-      // isFetching = false;
+      state.users = action.payload;
+      state.isFetching = false;
     },
   },
 });
