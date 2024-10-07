@@ -2,6 +2,7 @@ export const adminTabsList = [
   "conventions",
   "events",
   "agencies",
+  "users",
   "establishments",
   "notifications",
   "email-preview",
@@ -20,6 +21,9 @@ export const adminTabs: Record<AdminTab, AdminTabProps> = {
     isVisible: () => true,
   },
   agencies: {
+    isVisible: () => true,
+  },
+  users: {
     isVisible: () => true,
   },
   establishments: {

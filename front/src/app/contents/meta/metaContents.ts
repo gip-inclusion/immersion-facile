@@ -214,6 +214,10 @@ export const adminMetaContent: Record<AdminTab, MetaContentType> = {
     title: "Admin: validation d'agence",
     description: "Page admin: Validation d'agence",
   },
+  users: {
+    title: "Admin: utilisateurs",
+    description: "Page admin: Utilisateurs",
+  },
   notifications: {
     title: "Admin: notifications",
     description: "Page admin: Notifications",

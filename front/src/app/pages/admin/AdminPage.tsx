@@ -14,6 +14,7 @@ import { EstablishmentsTab } from "src/app/pages/admin/EstablishmentsTab";
 import { EventsTab } from "src/app/pages/admin/EventsTabs";
 import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
+import { UsersTab } from "src/app/pages/admin/UsersTab";
 import { isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
@@ -37,6 +38,10 @@ const rawAdminTabs: Record<AdminTab, RawAdminTab> = {
   agencies: {
     label: "Agences",
     content: <AgencyTab />,
+  },
+  users: {
+    label: "Utilisateurs",
+    content: <UsersTab />,
   },
   establishments: {
     label: "Établissements",
