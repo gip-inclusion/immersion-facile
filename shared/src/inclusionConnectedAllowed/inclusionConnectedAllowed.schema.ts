@@ -11,7 +11,9 @@ import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   AgencyRight,
   InclusionConnectedUser,
+  User,
   UserId,
+  UserInList,
   WithAgencyDashboards,
   WithDiscussionId,
   WithEstablishmentDashboards,
@@ -58,19 +60,30 @@ const dashboardsSchema: z.Schema<
   }),
 });
 
-export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
+const userSchema: z.Schema<User> = z.object({
+  id: userIdSchema,
+  email: emailSchema,
+  createdAt: dateTimeIsoStringSchema,
+  firstName: zStringCanBeEmpty,
+  lastName: zStringCanBeEmpty,
+  externalId: zStringCanBeEmpty.or(z.null()),
+});
+
+export const userInListSchema: z.Schema<UserInList> = userSchema.and(
   z.object({
-    id: userIdSchema,
-    email: emailSchema,
-    createdAt: dateTimeIsoStringSchema,
-    agencyRights: z.array(agencyRightSchema),
-    firstName: zStringCanBeEmpty,
-    lastName: zStringCanBeEmpty,
-    externalId: zStringCanBeEmpty.or(z.null()),
-    dashboards: dashboardsSchema,
-    establishments: z.array(withEstablishmentSiretAndName).optional(),
-    isBackofficeAdmin: z.boolean().optional(),
-  });
+    numberOfAgencies: z.number(),
+  }),
+);
+
+export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
+  userSchema.and(
+    z.object({
+      agencyRights: z.array(agencyRightSchema),
+      dashboards: dashboardsSchema,
+      establishments: z.array(withEstablishmentSiretAndName).optional(),
+      isBackofficeAdmin: z.boolean().optional(),
+    }),
+  );
 
 export type WithIdToken = {
   idToken: IdToken;

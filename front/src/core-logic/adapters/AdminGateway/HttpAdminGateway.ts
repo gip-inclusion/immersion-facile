@@ -1,4 +1,4 @@
-import { Observable, from, of, throwError } from "rxjs";
+import { Observable, from } from "rxjs";
 import {
   AdminRoutes,
   ApiConsumer,
@@ -7,15 +7,16 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  GetUsersFilters,
   InclusionConnectJwt,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   RemoveAgencyUserParams,
   SetFeatureFlagParam,
+  UserInList,
   UserParamsForAgency,
   WithUserFilters,
   createApiConsumerParamsFromApiConsumer,
-  User,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -23,7 +24,6 @@ import {
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import { UserFilters } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { P, match } from "ts-pattern";
 
@@ -246,10 +246,18 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public listUsers$(
-    _params: UserFilters,
-    _token: InclusionConnectJwt,
-  ): Observable<User[]> {
-    throw new Error("yolo");
-    // return of([]);
+    filters: GetUsersFilters,
+    token: InclusionConnectJwt,
+  ): Observable<UserInList[]> {
+    return from(
+      this.httpClient
+        .getUsers({ headers: { authorization: token }, queryParams: filters })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
   }
 }
