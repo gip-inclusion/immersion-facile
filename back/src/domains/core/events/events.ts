@@ -79,7 +79,8 @@ export type UserAuthenticatedPayload = {
 export type TriggeredBy =
   | { kind: "inclusion-connected"; userId: UserId }
   | { kind: "convention-magic-link"; role: Role }
-  | { kind: "establishment-magic-link"; siret: SiretDto };
+  | { kind: "establishment-magic-link"; siret: SiretDto }
+  | { kind: "crawler" };
 
 export const triggeredBySchema: z.Schema<TriggeredBy> = z.discriminatedUnion(
   "kind",

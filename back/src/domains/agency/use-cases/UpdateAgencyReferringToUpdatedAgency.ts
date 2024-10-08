@@ -26,11 +26,7 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
     this.#createNewEvent = createNewEvent;
   }
 
-  public async _execute(
-    params: WithAgencyDto,
-    uow: UnitOfWork,
-    currentUser: InclusionConnectedUser,
-  ): Promise<void> {
+  public async _execute(params: WithAgencyDto, uow: UnitOfWork): Promise<void> {
     const updatedRelatedAgencies: AgencyDto[] = (
       await uow.agencyRepository.getAgenciesRelatedToAgency(params.agency.id)
     ).map((agency) => ({
@@ -47,8 +43,7 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
             payload: {
               agency,
               triggeredBy: {
-                kind: "inclusion-connected",
-                userId: currentUser.id,
+                kind: "crawler",
               },
             },
           }),
