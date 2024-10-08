@@ -12,7 +12,9 @@ export const defaultMetaContents: MetaContentType = {
   description: "Faciliter la réalisation des immersions professionnelles.",
 };
 
-export const metaContents: Partial<Record<FrontRouteKeys, MetaContentType>> = {
+export const defaultPageMetaContents: Partial<
+  Record<FrontRouteKeys, MetaContentType>
+> = {
   addAgency: {
     title: "Formulaire d'ajout d'un prescripteur",
     description: "Devenir prescripteur de PMSMP et immersions professionnelles",

@@ -4,10 +4,12 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import React, { ElementRef, useEffect, useRef, useState } from "react";
 import { Loader, MainWrapper } from "react-design-system";
+import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
 import {
   AppellationDto,
   ContactMethod,
+  SearchResultDto,
   getMapsLink,
   makeAppellationInformationUrl,
   makeNafClassInformationUrl,
@@ -18,6 +20,7 @@ import { ContactByPhone } from "src/app/components/immersion-offer/ContactByPhon
 import { ContactInPerson } from "src/app/components/immersion-offer/ContactInPerson";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { SearchResultLabels } from "src/app/components/search/SearchResultLabels";
+import { defaultPageMetaContents } from "src/app/contents/meta/metaContents";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -50,6 +53,34 @@ const SearchResultSection = ({
   </div>
 );
 
+const getMetaForSearchResult = (
+  currentSearchResult: SearchResultDto | null,
+): {
+  title: string;
+  description: string;
+} => {
+  if (!currentSearchResult) return { title: "", description: "" };
+  const hasAppellations = currentSearchResult.appellations?.length;
+  return {
+    title: `${currentSearchResult.name}${
+      hasAppellations
+        ? ` - ${currentSearchResult.appellations
+            .map((appellation) => `${appellation.appellationLabel}`)
+            .join(", ")}`
+        : ""
+    }`,
+    description: `Fiche présentant l'immersion proposée par l'entreprise ${
+      currentSearchResult?.name
+    }${
+      hasAppellations
+        ? `en tant que ${currentSearchResult.appellations.map(
+            (appellation) => appellation.appellationLabel,
+          )}`
+        : ""
+    }`,
+  };
+};
+
 export const SearchResultPage = () => {
   const route = useRoute() as Route<
     typeof routes.searchResult | typeof routes.searchResultExternal
@@ -57,6 +88,7 @@ export const SearchResultPage = () => {
   const currentSearchResult = useAppSelector(
     searchSelectors.currentSearchResult,
   );
+  const defaultMetaContents = defaultPageMetaContents.searchResult;
   const feedback = useAppSelector(searchSelectors.feedback);
   const isLoading = useAppSelector(searchSelectors.isLoading);
   const formContactRef = useRef<ElementRef<"div">>(null);
@@ -99,6 +131,16 @@ export const SearchResultPage = () => {
 
   return (
     <HeaderFooterLayout>
+      <Helmet>
+        <title>
+          {getMetaForSearchResult(currentSearchResult).title} :{" "}
+          {defaultMetaContents?.title}
+        </title>
+        <meta
+          name="description"
+          content={getMetaForSearchResult(currentSearchResult).description}
+        />
+      </Helmet>
       <MainWrapper layout="boxed">
         <>
           {isLoading && <Loader />}

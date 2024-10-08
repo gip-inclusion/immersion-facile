@@ -1,37 +1,35 @@
 import React from "react";
-import { Helmet, HelmetProvider } from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
 import {
   MetaContentType,
   adminMetaContent,
   defaultMetaContents,
+  defaultPageMetaContents,
   groupMetaContent,
-  metaContents,
   standardMetaContent,
 } from "src/app/contents/meta/metaContents";
 import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import { routes, useRoute } from "src/app/routes/routes";
 import { Route } from "type-route";
 
-export const MetaContent = (): JSX.Element => {
+export const DefaultMetaContent = (): JSX.Element => {
   const route = useRoute();
   const contents = getMetaContents(route);
 
   return (
-    <HelmetProvider>
-      <Helmet>
-        <title>
-          {contents
-            ? `${contents.title} - PMSMP: Immersion Facile`
-            : defaultMetaContents.title}
-        </title>
-        <meta
-          name="description"
-          content={
-            contents ? contents.description : defaultMetaContents.description
-          }
-        />
-      </Helmet>
-    </HelmetProvider>
+    <Helmet>
+      <title>
+        {contents
+          ? `${contents.title} - PMSMP: Immersion Facile`
+          : defaultMetaContents.title}
+      </title>
+      <meta
+        name="description"
+        content={
+          contents ? contents.description : defaultMetaContents.description
+        }
+      />
+    </Helmet>
   );
 };
 
@@ -48,6 +46,6 @@ const getMetaContents = (
     if (route.name === "admin") {
       return adminMetaContent[route.params.tab];
     }
-    return metaContents[route.name];
+    return defaultPageMetaContents[route.name];
   }
 };
