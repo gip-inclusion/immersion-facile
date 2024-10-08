@@ -88,6 +88,7 @@ export class InMemoryUserRepository implements UserRepository {
     // TODO: gestion des filtres optionnels à améliorer
     return this.users
       .filter((user) => (email ? user.email === email : true))
+      .filter((user) => (email ? user.email === email : true))
       .filter((user) =>
         this.agencyRightsByUserId[user.id].some(({ roles, agency }) => {
           if (agencyId) {
