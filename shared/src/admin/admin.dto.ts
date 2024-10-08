@@ -58,3 +58,7 @@ export type UpdateAgencyStatusParamsWithoutId =
       status: Extract<ActiveOrRejectedStatus, "rejected">;
       rejectionJustification: string;
     };
+
+export type GetUsersFilters = {
+  emailContains: string;
+};

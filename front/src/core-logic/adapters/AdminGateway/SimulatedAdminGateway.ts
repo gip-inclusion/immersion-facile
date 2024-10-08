@@ -8,15 +8,15 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  GetUsersFilters,
   InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   RemoveAgencyUserParams,
+  UserInList,
   UserParamsForAgency,
-  User,
 } from "shared";
-import { UserFilters } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 const simulatedAgencyDtos: AgencyRight[] = [
@@ -194,18 +194,16 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 
   public listUsers$(
-    { emailContains }: UserFilters,
+    { emailContains }: GetUsersFilters,
     _token: string,
-  ): Observable<User[]> {
+  ): Observable<UserInList[]> {
     return of(
-      simulatedUsers.filter((user) =>
-        user.email.includes(emailContains),
-      ),
+      simulatedUsers.filter((user) => user.email.includes(emailContains)),
     );
   }
 }
 
-const simulatedUsers: User[] = [
+const simulatedUsers: UserInList[] = [
   {
     id: "fake-user-id-1",
     email: "jerome@mail.com",
@@ -213,6 +211,7 @@ const simulatedUsers: User[] = [
     lastName: "Yolo",
     externalId: "external-id-1",
     createdAt: new Date().toISOString(),
+    numberOfAgencies: 10,
   },
   {
     id: "fake-user-id-2",
@@ -221,6 +220,7 @@ const simulatedUsers: User[] = [
     lastName: "Lala",
     externalId: "external-id-1",
     createdAt: new Date().toISOString(),
+    numberOfAgencies: 3,
   },
 ];
 

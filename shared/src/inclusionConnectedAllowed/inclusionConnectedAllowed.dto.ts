@@ -35,6 +35,10 @@ export type User = {
   createdAt: DateTimeIsoString;
 };
 
+export type UserInList = User & {
+  numberOfAgencies: number;
+};
+
 type WithAgencyRights = {
   agencyRights: AgencyRight[];
 };

@@ -6,17 +6,17 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  GetUsersFilters,
   InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   RemoveAgencyUserParams,
   SetFeatureFlagParam,
+  UserInList,
   UserParamsForAgency,
   WithUserFilters,
-  User,
 } from "shared";
-import { UserFilters } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 
 export interface AdminGateway {
   addEstablishmentBatch$: (
@@ -70,7 +70,7 @@ export interface AdminGateway {
   ): Observable<ApiConsumerJwt | undefined>;
 
   listUsers$(
-    params: UserFilters,
+    params: GetUsersFilters,
     token: InclusionConnectJwt,
-  ): Observable<User[]>;
+  ): Observable<UserInList[]>;
 }

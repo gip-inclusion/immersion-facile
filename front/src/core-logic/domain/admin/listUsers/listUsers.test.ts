@@ -1,19 +1,20 @@
-import { expectToEqual, User } from "shared";
+import { UserInList, expectToEqual } from "shared";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import {
-  createTestStore,
   TestDependencies,
+  createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
-const someUser: User = {
+const someUser: UserInList = {
   id: "some-user-id",
   email: "yolo@mail.com",
   firstName: "Yo",
   lastName: "Lo",
   externalId: "external-123",
   createdAt: new Date().toISOString(),
+  numberOfAgencies: 2,
 };
 
 describe("Admin Users slice", () => {
@@ -50,15 +51,15 @@ describe("Admin Users slice", () => {
     const query = "my query";
     store.dispatch(listUsersSlice.actions.queryUpdated(query));
     expectToEqual(listUsersSelectors.isFetching(store.getState()), false);
-    fastForwardObservables()
+    fastForwardObservables();
     expectToEqual(listUsersSelectors.isFetching(store.getState()), true);
 
     feedWithUsers([someUser]);
     expectToEqual(listUsersSelectors.isFetching(store.getState()), false);
     expectToEqual(listUsersSelectors.users(store.getState()), [someUser]);
-  })
+  });
 
-  const feedWithUsers = (users: User[]) => {
+  const feedWithUsers = (users: UserInList[]) => {
     dependencies.adminGateway.listUsersResponse$.next(users);
   };
 

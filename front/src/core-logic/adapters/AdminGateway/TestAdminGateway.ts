@@ -5,16 +5,16 @@ import {
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
+  GetUsersFilters,
   InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   RemoveAgencyUserParams,
   SetFeatureFlagParam,
+  UserInList,
   UserParamsForAgency,
-  User,
 } from "shared";
-import { type UserFilters } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
@@ -50,7 +50,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
 
-  public listUsersResponse$ = new Subject<User[]>();
+  public listUsersResponse$ = new Subject<UserInList[]>();
 
   public updateFeatureFlags$ = (
     params: SetFeatureFlagParam,
@@ -118,7 +118,10 @@ export class TestAdminGateway implements AdminGateway {
     return this.removeUserFromAgencyResponse$;
   }
 
-  public listUsers$(_params: UserFilters, _token: string): Observable<User[]> {
+  public listUsers$(
+    _params: GetUsersFilters,
+    _token: string,
+  ): Observable<UserInList[]> {
     return this.listUsersResponse$;
   }
 }

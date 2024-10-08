@@ -14,10 +14,14 @@ import {
 } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
-import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
+import {
+  inclusionConnectedUserSchema,
+  userInListSchema,
+} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
+  getUsersFiltersSchema,
   rejectIcUserRoleForAgencyParamsSchema,
   userParamsForAgencySchema,
   withUserFiltersSchema,
@@ -137,6 +141,16 @@ export const adminRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: z.array(apiConsumerSchema),
+      401: httpErrorSchema,
+    },
+  }),
+  getUsers: defineRoute({
+    method: "get",
+    url: "/admin/users",
+    ...withAuthorizationHeaders,
+    queryParamsSchema: getUsersFiltersSchema,
+    responses: {
+      200: z.array(userInListSchema),
       401: httpErrorSchema,
     },
   }),

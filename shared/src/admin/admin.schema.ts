@@ -9,6 +9,7 @@ import {
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1 } from "../zodUtils";
 import {
+  GetUsersFilters,
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
   RejectIcUserRoleForAgencyParams,
@@ -58,3 +59,7 @@ export const manageEstablishmentAdminFormSchema: z.Schema<ManageEstablishmentAdm
   z.object({
     siret: siretSchema,
   });
+
+export const getUsersFiltersSchema: z.Schema<GetUsersFilters> = z.object({
+  emailContains: z.string(),
+});

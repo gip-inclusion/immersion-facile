@@ -20,10 +20,7 @@ const fetchUsersEpic: ListUserActionEpic = (
     switchMap((action) =>
       adminGateway.listUsers$(action.payload, getAdminToken(state$.value)),
     ),
-    map((action) => {
-      console.log("reached here : ", action);
-      return listUsersSlice.actions.fetchUsersSucceeded(action);
-    }),
+    map((action) => listUsersSlice.actions.fetchUsersSucceeded(action)),
   );
 
 const triggerFetchOnQueryChangeEpic: ListUserActionEpic = (
