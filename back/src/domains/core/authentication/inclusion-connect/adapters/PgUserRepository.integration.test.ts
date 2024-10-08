@@ -549,7 +549,41 @@ describe("PgAuthenticatedUserRepository", () => {
         });
       });
 
-      describe("getWithFilters", () => {
+      describe("getUsers", () => {
+        it("returns no users when emailContains is empty string", async () => {
+          const users = await userRepository.getUsers({ emailContains: "" });
+          expectToEqual(users, []);
+        });
+
+        it("returns all the users with email matching filter", async () => {
+          const userNotIcConnected: User = {
+            ...user,
+            firstName: "",
+            lastName: "",
+            externalId: null,
+          };
+          await agencyRepository.insert(agency1);
+          await insertUser(db, user1, "InclusionConnect");
+          await insertAgencyRegistrationToUser(db, {
+            agencyId: agency1.id,
+            userId: user1.id,
+            roles: ["counsellor"],
+            isNotifiedByEmail: false,
+          });
+
+          await insertUser(db, user2, "ProConnect");
+          await insertUser(db, userNotIcConnected, null);
+
+          const users = await userRepository.getUsers({ emailContains: "j" });
+          expectToEqual(users, [
+            { ...user2, numberOfAgencies: 0 },
+            { ...userNotIcConnected, numberOfAgencies: 0 },
+            { ...user1, numberOfAgencies: 1 },
+          ]);
+        });
+      });
+
+      describe("getIcUsersWithFilters", () => {
         it("returns empty array if no filters are given", async () => {
           await Promise.all([
             agencyRepository.insert(agency1),
@@ -818,8 +852,15 @@ const agency2 = new AgencyDtoBuilder()
 const insertUser = async (
   db: KyselyDb,
   { id, email, firstName, lastName, externalId, createdAt }: User,
-  provider: OAuthGatewayProvider,
+  provider: OAuthGatewayProvider | null,
 ) => {
+  const icProvider =
+    provider === "InclusionConnect"
+      ? { inclusion_connect_sub: externalId }
+      : {};
+  const proConnectProvider =
+    provider === "ProConnect" ? { pro_connect_sub: externalId } : {};
+
   await db
     .insertInto("users")
     .values({
@@ -828,9 +869,8 @@ const insertUser = async (
       first_name: firstName,
       last_name: lastName,
       created_at: createdAt,
-      [provider === "InclusionConnect"
-        ? "inclusion_connect_sub"
-        : "pro_connect_sub"]: externalId,
+      ...icProvider,
+      ...proConnectProvider,
     })
     .execute();
 };

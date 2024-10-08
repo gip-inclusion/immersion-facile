@@ -794,9 +794,6 @@ describe("Admin router", () => {
 
     it("401 - not with backOfficeJwt", async () => {
       const response = await sharedRequest.getUsers({
-        body: createApiConsumerParamsFromApiConsumer(
-          authorizedUnJeuneUneSolutionApiConsumer,
-        ),
         headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
         queryParams: { emailContains: "yolo" },
       });

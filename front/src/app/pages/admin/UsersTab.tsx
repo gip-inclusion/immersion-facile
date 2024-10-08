@@ -1,18 +1,15 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React, {ElementRef} from "react";
+import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import { Table } from "@codegouvfr/react-dsfr/Table";
-import {useDispatch} from "react-redux";
+import React, { ElementRef } from "react";
+import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
 import { SomeUsersWithoutName } from "src/app/components/agency/SomeUsersWithoutName";
-import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
-import {
-  listUsersSlice
-} from "src/core-logic/domain/admin/listUsers/listUsers.slice";
+import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 
 export const UsersTab = () => {
-
   const dispatch = useDispatch();
   const query = useAppSelector(listUsersSelectors.query);
 
@@ -38,11 +35,17 @@ export const UsersTab = () => {
                 // Note: The default behavior for an input of type 'text' is to clear the input value when the escape key is pressed.
                 // However, due to a bug in @gouvfr/dsfr the escape key event is not propagated to the input element.
                 // As a result this onChange is not called when the escape key is pressed.
-                onChange={(event) => dispatch(listUsersSlice.actions.queryUpdated(event.currentTarget.value))}
+                onChange={(event) =>
+                  dispatch(
+                    listUsersSlice.actions.queryUpdated(
+                      event.currentTarget.value,
+                    ),
+                  )
+                }
                 // Same goes for the keydown event so this is useless but we hope the bug will be fixed soon.
                 onKeyDown={(event) => {
                   if (event.key === "Escape") {
-                    inputElement.current?.blur()
+                    inputElement.current?.blur();
                   }
                 }}
               />
