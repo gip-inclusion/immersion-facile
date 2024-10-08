@@ -141,7 +141,7 @@ export class HttpOAuthGateway implements OAuthGateway {
         firstName: oAuthIdTokenPayload.given_name,
         lastName: oAuthIdTokenPayload.usual_name,
         email: oAuthIdTokenPayload.email,
-        // structure_pe: "TODO"
+        structure_pe: oAuthIdTokenPayload.custom.structure_travail,
       },
     };
   }
