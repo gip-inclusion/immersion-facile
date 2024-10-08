@@ -169,7 +169,7 @@ export class PgUserRepository implements UserRepository {
     return icUsers[0];
   }
 
-  public async getWithFilter(
+  public async getIcUsersWithFilter(
     { agencyRole, agencyId, email }: InclusionConnectedFilters,
     provider: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser[]> {

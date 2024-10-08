@@ -10,7 +10,7 @@ export const throwIfAgencyDontHaveOtherValidatorsReceivingNotifications =
   ) => {
     if (agency.refersToAgencyId !== null) return;
 
-    const agencyUsers = await uow.userRepository.getWithFilter(
+    const agencyUsers = await uow.userRepository.getIcUsersWithFilter(
       {
         agencyId: agency.id,
       },
@@ -39,7 +39,7 @@ export const throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications =
   ) => {
     if (!agency.refersToAgencyId) return;
 
-    const agencyUsers = await uow.userRepository.getWithFilter(
+    const agencyUsers = await uow.userRepository.getIcUsersWithFilter(
       {
         agencyId: agency.id,
       },

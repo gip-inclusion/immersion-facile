@@ -17,8 +17,8 @@ export const makeGetUsers = createTransactionalUseCase<
     name: "GetUsers",
     inputSchema: getUsersFiltersSchema,
   },
-  async ({ uow, currentUser }) => {
+  async ({ uow, currentUser, inputParams }) => {
     throwIfNotAdmin(currentUser);
-    return uow.userRepository.getWithFilter({});
+    return uow.userRepository.getUsers(inputParams);
   },
 );

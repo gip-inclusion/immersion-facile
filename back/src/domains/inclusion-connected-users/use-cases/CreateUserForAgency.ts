@@ -40,7 +40,7 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
       await uow.featureFlagRepository.getAll(),
     );
     const existingUser = (
-      await uow.userRepository.getWithFilter(
+      await uow.userRepository.getIcUsersWithFilter(
         {
           email: inputParams.email,
         },

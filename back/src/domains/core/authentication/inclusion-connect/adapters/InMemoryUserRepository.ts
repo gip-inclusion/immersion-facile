@@ -2,9 +2,11 @@ import { values } from "ramda";
 import {
   AgencyRight,
   Email,
+  GetUsersFilters,
   InclusionConnectedUser,
   User,
   UserId,
+  UserInList,
   errors,
 } from "shared";
 import {
@@ -80,7 +82,7 @@ export class InMemoryUserRepository implements UserRepository {
     };
   }
 
-  public async getWithFilter({
+  public async getIcUsersWithFilter({
     agencyRole,
     agencyId,
     email,
@@ -110,6 +112,18 @@ export class InMemoryUserRepository implements UserRepository {
           establishments: {},
         },
       }));
+  }
+
+  public async getUsers(filters: GetUsersFilters): Promise<UserInList[]> {
+    const emailContains = filters.emailContains.toLowerCase();
+    return this.users
+      .filter((user) => user.email.toLowerCase().includes(emailContains))
+      .map(
+        (user): UserInList => ({
+          ...user,
+          numberOfAgencies: this.agencyRightsByUserId[user.id].length,
+        }),
+      );
   }
 
   public setInclusionConnectedUsers(

@@ -2,10 +2,12 @@ import {
   AgencyId,
   AgencyRight,
   Email,
+  GetUsersFilters,
   InclusionConnectedUser,
   OAuthGatewayProvider,
   User,
   UserId,
+  UserInList,
   WithAgencyRole,
 } from "shared";
 
@@ -25,10 +27,11 @@ export interface UserRepository {
     email: Email,
     provider: OAuthGatewayProvider,
   ): Promise<User | undefined>;
-  getWithFilter(
+  getIcUsersWithFilter(
     filters: InclusionConnectedFilters,
     provider: OAuthGatewayProvider,
   ): Promise<InclusionConnectedUser[]>;
+  getUsers(filters: GetUsersFilters): Promise<UserInList[]>;
   getById(
     userId: string,
     provider: OAuthGatewayProvider,
