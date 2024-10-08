@@ -151,7 +151,7 @@ export const AgencyUserModificationForm = ({
 
         <ToggleSwitch
           id={domElementIds.admin.agencyTab.editAgencyUserIsNotifiedByEmail}
-          label="Recevoir les notifications par email"
+          label="Recevoir les notifications pour toutes les conventions de cette structure"
           checked={values.isNotifiedByEmail}
           onChange={() =>
             setValue("isNotifiedByEmail", !values.isNotifiedByEmail, {

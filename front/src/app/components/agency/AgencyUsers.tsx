@@ -19,6 +19,7 @@ import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUser
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
 import { Feedback } from "../feedback/Feedback";
@@ -37,6 +38,12 @@ export const agencyRoleToDisplay: Record<
   AgencyRole,
   AgencyDisplayedRoleAndClass
 > = {
+  "agency-admin": {
+    label: "Administrateur",
+    className: "fr-badge--green-emeraude",
+    description:
+      "Peut modifier les informations de l'organisme, ajouter et supprimer des utilisateurs, modifier leur rôles, consulter les conventions.",
+  },
   "to-review": {
     label: "À valider",
     className: "fr-badge--yellow-tournesol",
@@ -53,12 +60,6 @@ export const agencyRoleToDisplay: Record<
     className: "fr-badge--brown-caramel",
     description:
       "Peut pré-valider les conventions de l'agence et modifier leur statut.",
-  },
-  "agency-admin": {
-    label: "Administrateur",
-    className: "fr-badge--green-emeraude",
-    description:
-      "Peut modifier les informations de l'organisme, ajouter et supprimer des utilisateurs, modifier leur rôles, consulter les conventions.",
   },
   "agency-viewer": {
     label: "Lecteur",
@@ -80,6 +81,9 @@ const removeUserModal = createModal({
 });
 
 export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
+  const { enableProConnect } = useAppSelector(
+    featureFlagSelectors.featureFlagState,
+  );
   const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
   const dispatch = useDispatch();
 
@@ -88,6 +92,8 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
   >(null);
 
   const [mode, setMode] = useState<UserFormMode | null>(null);
+
+  const provider = enableProConnect ? "ProConnect" : "Inclusion Connect";
 
   return (
     <>
@@ -214,12 +220,24 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
           }
         >
           {selectedUserData && mode && (
-            <AgencyUserModificationForm
-              agencyUser={selectedUserData}
-              closeModal={() => manageUserModal.close()}
-              mode={mode}
-              agency={agency}
-            />
+            <>
+              <h5 className={fr.cx("fr-text--bold", "fr-text--sm")}>
+                Informations personnelles
+              </h5>
+              <p className={fr.cx("fr-text--sm")}>
+                {selectedUserData.isIcUser
+                  ? `Pour modifier ses informations personnelles, l'utilisateur doit passer par son compte ${provider} créé avec l'email ${selectedUserData.email}`
+                  : `Pour ajouter un nom, prénom et mot de passe, l'utilisateur doit se créer un compte 
+                  via ${provider}, avec l'email ${selectedUserData.email}.
+                  Nous vous déconseillons de créer un compte pour les boites génériques pour conserver la traçabilité des actions sur les demandes de conventions d'immersion.`}
+              </p>
+              <AgencyUserModificationForm
+                agencyUser={selectedUserData}
+                closeModal={() => manageUserModal.close()}
+                mode={mode}
+                agency={agency}
+              />
+            </>
           )}
         </manageUserModal.Component>,
         document.body,
