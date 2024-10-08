@@ -296,7 +296,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       title: "Comment signer ma convention ou envoyer un lien de signature ?",
       description:
         "Pour signer votre convention vous devez connaitre votre ID de convention et utiliser le mail que vous nous avez indiqué...",
-      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-signer-ma-convention-ou-envoyer-un-lien-de-signature-125bxxd/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/comment-signer-ma-convention-ou-envoyer-un-lien-de-signature-si-je-nai-plus-le-lien-envoye-par-mail-125bxxd/",
     },
   ],
   candidate: [
@@ -348,7 +348,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
         "Puis-je faire une demande de convention avec une entreprise non inscrite sur le site ?",
       description:
         "La réponse en trois mots : oui, bien sûr. Les entreprises accueillantes sont des entreprises que nous avons contactées et qui se sont engagées à accueillir des immersions...",
-      url: "https://immersion-facile.beta.gouv.fr/aide/article/puis-je-faire-une-demande-de-convention-avec-une-entreprise-non-inscrite-sur-le-site-f9z742/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/puis-je-faire-une-immersion-dans-une-entreprise-non-referencee-sur-immersion-facilitee-ee9tak/",
     },
     {
       title: "Qui peut prescrire une immersion ?",
@@ -360,7 +360,7 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       title:
         "Le bénéficiaire, l'entreprise ou le prescripteur n'a pas reçu la convention à signer",
       description: `Que vous soyez bénéficiaire, entreprise accueillante ou prescripteur d'immersions, il est nécéssaire de pouvoir recevoir nos emails afin de signer éléctroniquement la convention....`,
-      url: "https://immersion-facile.beta.gouv.fr/aide/article/le-beneficiaire-lentreprise-ou-le-prescripteur-na-pas-recu-la-convention-a-signer-125bxxd/",
+      url: "https://immersion-facile.beta.gouv.fr/aide/article/prescripteur-comment-envoyer-un-lien-de-signature-a-un-candidat-ou-une-entreprise-qui-na-pas-le-mail-de-signature-119woyc/",
     },
   ],
 };

@@ -200,7 +200,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     hintText: (
       <>
         <a
-          href="https://immersion-facile.beta.gouv.fr/aide/article/comment-remplir-la-demande-de-convention-xryn5j/#3-le-beneficiaire-est-actuellement-salarie-dune-entreprise-et-limmersion-va-se-derouler-pendant-le-temps-de-travail-habituel-optionnel"
+          href="https://immersion-facile.beta.gouv.fr/aide/article/est-il-possible-de-realiser-une-immersion-lorsque-lon-est-en-activite-1yb59te/"
           target="_blank"
           rel="noreferrer"
         >
@@ -328,15 +328,8 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     id: beneficiarySectionIds.isRqth,
     hintText: (
       <>
-        Il n'est pas obligatoire de le préciser, mais{" "}
-        <a
-          href="https://immersion-facile.beta.gouv.fr/aide/article/comment-remplir-la-demande-de-convention-xryn5j/#3-le-candidat-a-une-reconnaissance-travailleur-handicape-rqth-ou-equivalent-optionnel"
-          target="_blank"
-          rel="noreferrer"
-        >
-          cela peut être utile au candidat et à l'entreprise
-        </a>
-        .
+        Il n'est pas obligatoire de le préciser, mais cela peut être utile au
+        candidat et à l'entreprise.
       </>
     ),
   },
@@ -683,7 +676,7 @@ export const sidebarStepContent = (
               <strong>
                 Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
                 <a
-                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/"
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -772,7 +765,7 @@ export const sidebarStepContent = (
               <strong>
                 Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
                 <a
-                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/"
                   target="_blank"
                   rel="noreferrer"
                 >

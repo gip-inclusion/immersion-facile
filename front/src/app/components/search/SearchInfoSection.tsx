@@ -18,17 +18,7 @@ export const SearchInfoSection = () => (
       </h2>
       <p>
         Les entreprises ne répondent pas à 100% des sollicitations, cela n’a
-        rien à voir avec vous, ne vous découragez pas ! Retrouvez{" "}
-        <a
-          href={
-            "https://immersion-facile.beta.gouv.fr/aide/article/choisir-lobjet-et-rediger-un-email-de-motivation-pour-decrocher-une-immersion-xytzii/"
-          }
-          rel="noreferrer"
-          target="_blank"
-        >
-          nos conseils pour vous démarquer
-        </a>{" "}
-        lors de la première prise de contact.
+        rien à voir avec vous, ne vous découragez pas !
       </p>
     </div>
     <div className={fr.cx("fr-col-lg-4")}>

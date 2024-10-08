@@ -27,17 +27,18 @@ export const BeneficiaryDashboardPage = () => {
             <ul>
               <li>
                 <a
-                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-recu-la-convention-validee-que-faire-1y3t9xw/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/comment-acceder-a-la-convention-une-fois-quelle-est-validee-o46xhq/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
                 >
-                  Je n'ai pas reçu la convention validée, que faire ?
+                  Comment accéder à la convention une fois qu'elle est
+                  validée&nbsp;?
                 </a>
               </li>
               <li>
                 <a
-                  href="https://immersion-facile.beta.gouv.fr/aide/article/comment-signer-ma-convention-ou-envoyer-un-lien-de-signature-125bxxd/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/comment-signer-ma-convention-ou-envoyer-un-lien-de-signature-si-je-nai-plus-le-lien-envoye-par-mail-125bxxd/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
@@ -47,17 +48,17 @@ export const BeneficiaryDashboardPage = () => {
               </li>
               <li>
                 <a
-                  href="https://immersion-facile.beta.gouv.fr/aide/article/comment-connaitre-letat-dune-demande-de-convention-1gbhxt4/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/comment-suivre-ma-demande-de-convention-1gbhxt4/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
                 >
-                  Comment connaître l'état d'une demande de convention ?
+                  Comment suivre ma demande de convention ?
                 </a>
               </li>
               <li>
                 <a
-                  href="https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-etapes-de-signature-de-la-convention-17hf59q/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/les-etapes-de-validation-dune-convention-dimmersion-twqxi7/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
@@ -87,7 +88,7 @@ export const BeneficiaryDashboardPage = () => {
             <ul>
               <li>
                 <a
-                  href="https://immersion-facile.beta.gouv.fr/aide/category/guide-de-limmersion-v19aod/"
+                  href="https://immersion-facile.beta.gouv.fr/aide/category/candidat-jikpz1/"
                   target="_blank"
                   rel="noreferrer"
                   className={fr.cx("fr-link")}
