@@ -112,6 +112,55 @@ export const metaContents: Partial<Record<FrontRouteKeys, MetaContentType>> = {
     description:
       "Utilisez notre moteur de recherche pour trouver une entreprise accueillante d'Immersions Professionnelles ou PMSMP",
   },
+  agencyDashboard: {
+    title: "Tableau de bord agence",
+    description: "Retrouvez vos conventions en cours et passées",
+  },
+  beneficiaryDashboard: {
+    title: "Tableau de bord bénéficiaire",
+    description: "Bientôt disponible",
+  },
+  establishmentDashboard: {
+    title: "Tableau de bord entreprise",
+    description:
+      "Retrouvez vos conventions en cours et passées, les candidatures faites à votre entreprise",
+  },
+  initiateConvention: {
+    title: "Initier une convention",
+    description:
+      "Initier une convention pour une Immersion Professionnelle (PMSMP)",
+  },
+  openApiDoc: {
+    title: "Documentation API",
+    description: "Documentation de l'API de l'application Immersion Facilitée",
+  },
+  conventionConfirmation: {
+    title: "Confirmation de la convention",
+    description:
+      "Confirmation de la convention d'immersion professionnelle (PMSMP)",
+  },
+  searchResult: {
+    title: "Offre d'immersion (PMSMP)",
+    description: "Fiche présentant une offre d'immersion (PMSMP)",
+  },
+  searchResultExternal: {
+    title: "Offre d'immersion (PMSMP)",
+    description: "Fiche présentant une offre d'immersion (PMSMP)",
+  },
+  searchDiagoriente: {
+    title:
+      "Rechercher une entreprise pour réaliser une immersion professionnelle",
+    description:
+      "Utilisez notre moteur de recherche pour trouver une entreprise accueillante d'Immersions Professionnelles ou PMSMP",
+  },
+  conventionDocument: {
+    title: "Document de convention d'immersion (PMSMP) finalisé",
+    description: "Document de convention d'immersion (PMSMP) finalisé",
+  },
+  group: {
+    title: "Page de regroupement d'immersions",
+    description: "Page de regroupement d'immersions",
+  },
 };
 
 export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
