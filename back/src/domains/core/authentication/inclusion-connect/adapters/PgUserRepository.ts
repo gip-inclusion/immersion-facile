@@ -5,10 +5,12 @@ import {
   AgencyRight,
   AgencyRole,
   Email,
+  GetUsersFilters,
   InclusionConnectedUser,
   OAuthGatewayProvider,
   User,
   UserId,
+  UserInList,
   activeAgencyStatuses,
   errors,
   pipeWithValue,
@@ -333,6 +335,37 @@ export class PgUserRepository implements UserRepository {
         ...(isBackofficeAdmin ? { isBackofficeAdmin: true } : {}),
       }),
     );
+  }
+
+  public async getUsers(filters: GetUsersFilters): Promise<UserInList[]> {
+    if (filters.emailContains === "") return [];
+    return this.transaction
+      .selectFrom("users")
+      .leftJoin("users__agencies as ua", "ua.user_id", "users.id")
+      .select([
+        "email",
+        (qb) =>
+          sql<string>`date_to_iso(${qb.ref("created_at")})`.as("createdAt"),
+        "id",
+        "first_name as firstName",
+        "last_name as lastName",
+        (qb) =>
+          qb.fn
+            .coalesce(
+              qb.ref("pro_connect_sub"),
+              qb.ref("inclusion_connect_sub"),
+            )
+            .as("externalId"),
+        (qb) =>
+          sql<number>`${qb.fn.count("ua.agency_id")}::int`.as(
+            "numberOfAgencies",
+          ),
+      ])
+      .where("email", "ilike", `%${filters.emailContains}%`)
+      .groupBy("users.id")
+      .orderBy("users.email")
+      .limit(100)
+      .execute();
   }
 
   public async updateEmail(userId: string, email: string): Promise<void> {

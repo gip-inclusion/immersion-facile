@@ -1,9 +1,7 @@
 import { agencyAdminInitialState } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { dashboardInitialState } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { icUsersAdminInitialState } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import {
-  listUsersInitialState
-} from "src/core-logic/domain/admin/listUsers/listUsers.slice";
+import { listUsersInitialState } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { notificationsInitialState } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 import { RootState } from "src/core-logic/storeConfig/store";
 import { apiConsumerInitialState } from "../apiConsumer/apiConsumer.slice";
