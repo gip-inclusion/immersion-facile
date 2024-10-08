@@ -4,6 +4,7 @@ import { Table } from "@codegouvfr/react-dsfr/Table";
 import React, { ElementRef } from "react";
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
+import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { SomeUsersWithoutName } from "src/app/components/agency/SomeUsersWithoutName";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
@@ -70,8 +71,15 @@ const UsersTable = () => {
     <Table
       fixed
       id={domElementIds.admin.usersTab.usersTable}
-      headers={["Utilisateur", "Type", "Structures"]}
-      data={users.map((user) => [user.email, "Some typeof user", "...yo"])}
+      headers={["Utilisateur", "Nombre d'agence liées"]}
+      data={users.map((user) => [
+        <NameAndEmailInTable
+          firstName={user.firstName}
+          lastName={user.lastName}
+          email={user.email}
+        />,
+        user.numberOfAgencies,
+      ])}
     />
   );
 };

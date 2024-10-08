@@ -14,6 +14,7 @@ import {
   UserParamsForAgency,
   domElementIds,
 } from "shared";
+import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { SomeUsersWithoutName } from "src/app/components/agency/SomeUsersWithoutName";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -130,76 +131,65 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
           "Rôles",
           "Actions",
         ]}
-        data={values(agencyUsers).map((agencyUser, index) => {
-          const hasFirstNameOrLastName =
-            agencyUser.firstName || agencyUsers.lastName;
-
-          return [
-            <>
-              {hasFirstNameOrLastName ? (
-                <>
-                  <strong>
-                    {agencyUser.firstName} {agencyUser.lastName}
-                  </strong>
-                  <br />
-                </>
-              ) : null}
-              {agencyUser.email}
-            </>,
-            agencyUser.agencyRights[agency.id].isNotifiedByEmail
-              ? "Reçoit les notifications"
-              : "Ne reçoit pas les notifications",
-            agencyUser.agencyRights[agency.id].roles.map((role) => {
-              return (
-                <Badge small className={agencyRoleToDisplay[role].className}>
-                  {agencyRoleToDisplay[role].label}
-                </Badge>
-              );
-            }),
-            <ButtonsGroup
-              inlineLayoutWhen={"always"}
-              buttons={[
-                {
-                  children: "Modifier",
-                  priority: "secondary",
-                  id: `${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`,
-                  onClick: () => {
-                    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-                    setMode("update");
-                    setSelectedUserData({
-                      agencyId: agency.id,
-                      userId: agencyUser.id,
-                      roles: agencyUser.agencyRights[agency.id].roles,
-                      email: agencyUser.email,
-                      isNotifiedByEmail:
-                        agencyUser.agencyRights[agency.id].isNotifiedByEmail,
-                      isIcUser: !!agencyUser.externalId,
-                    });
-                    manageUserModal.open();
-                  },
+        data={values(agencyUsers).map((agencyUser, index) => [
+          <NameAndEmailInTable
+            firstName={agencyUser.firstName}
+            lastName={agencyUser.lastName}
+            email={agencyUser.email}
+          />,
+          agencyUser.agencyRights[agency.id].isNotifiedByEmail
+            ? "Reçoit les notifications"
+            : "Ne reçoit pas les notifications",
+          agencyUser.agencyRights[agency.id].roles.map((role) => {
+            return (
+              <Badge small className={agencyRoleToDisplay[role].className}>
+                {agencyRoleToDisplay[role].label}
+              </Badge>
+            );
+          }),
+          <ButtonsGroup
+            inlineLayoutWhen={"always"}
+            buttons={[
+              {
+                children: "Modifier",
+                priority: "secondary",
+                id: `${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`,
+                onClick: () => {
+                  dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+                  setMode("update");
+                  setSelectedUserData({
+                    agencyId: agency.id,
+                    userId: agencyUser.id,
+                    roles: agencyUser.agencyRights[agency.id].roles,
+                    email: agencyUser.email,
+                    isNotifiedByEmail:
+                      agencyUser.agencyRights[agency.id].isNotifiedByEmail,
+                    isIcUser: !!agencyUser.externalId,
+                  });
+                  manageUserModal.open();
                 },
-                {
-                  children: "Supprimer",
-                  priority: "secondary",
-                  id: `${domElementIds.admin.agencyTab.editAgencyRemoveUserButton}-${agency.id}-${index}`,
-                  onClick: () => {
-                    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-                    setSelectedUserData({
-                      agencyId: agency.id,
-                      userId: agencyUser.id,
-                      roles: agencyUser.agencyRights[agency.id].roles,
-                      email: agencyUser.email,
-                      isNotifiedByEmail:
-                        agencyUser.agencyRights[agency.id].isNotifiedByEmail,
-                      isIcUser: !!agencyUser.externalId,
-                    });
-                    removeUserModal.open();
-                  },
+              },
+              {
+                children: "Supprimer",
+                priority: "secondary",
+                id: `${domElementIds.admin.agencyTab.editAgencyRemoveUserButton}-${agency.id}-${index}`,
+                onClick: () => {
+                  dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+                  setSelectedUserData({
+                    agencyId: agency.id,
+                    userId: agencyUser.id,
+                    roles: agencyUser.agencyRights[agency.id].roles,
+                    email: agencyUser.email,
+                    isNotifiedByEmail:
+                      agencyUser.agencyRights[agency.id].isNotifiedByEmail,
+                    isIcUser: !!agencyUser.externalId,
+                  });
+                  removeUserModal.open();
                 },
-              ]}
-            />,
-          ];
-        })}
+              },
+            ]}
+          />,
+        ])}
       />
 
       {createPortal(
