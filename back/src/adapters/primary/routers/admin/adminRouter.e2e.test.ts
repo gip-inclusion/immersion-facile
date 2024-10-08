@@ -765,6 +765,48 @@ describe("Admin router", () => {
       });
     });
   });
+
+  describe(`${displayRouteName(
+    adminRoutes.getUsers,
+  )} gets users appling filters`, () => {
+    it("200 - gets all users matching the query", async () => {
+      const response = await sharedRequest.getUsers({
+        headers: { authorization: token },
+        queryParams: { emailContains: "yolo" },
+      });
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: [],
+      });
+    });
+
+    it("401 - without auth", async () => {
+      const response = await sharedRequest.getUsers({
+        headers: { authorization: "" },
+        queryParams: { emailContains: "yolo" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: { status: 401, message: "Veuillez vous authentifier" },
+      });
+    });
+
+    it("401 - not with backOfficeJwt", async () => {
+      const response = await sharedRequest.getUsers({
+        body: createApiConsumerParamsFromApiConsumer(
+          authorizedUnJeuneUneSolutionApiConsumer,
+        ),
+        headers: { authorization: generateApiConsumerJwt({ id: "osef" }) },
+        queryParams: { emailContains: "yolo" },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: { status: 401, message: "Provided token is invalid" },
+      });
+    });
+  });
 });
 
 const expectResponseAndReturnJwt = <

@@ -120,6 +120,7 @@ import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../
 import { makeCreateUserForAgency } from "../../domains/inclusion-connected-users/use-cases/CreateUserForAgency";
 import { GetInclusionConnectedUser } from "../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUser";
 import { GetInclusionConnectedUsers } from "../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUsers";
+import { makeGetUsers } from "../../domains/inclusion-connected-users/use-cases/GetUsers";
 import { LinkFranceTravailUsersToTheirAgencies } from "../../domains/inclusion-connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import { RejectIcUserForAgency } from "../../domains/inclusion-connected-users/use-cases/RejectIcUserForAgency";
 import { makeRemoveUserFromAgency } from "../../domains/inclusion-connected-users/use-cases/RemoveUserFromAgency";
@@ -681,6 +682,9 @@ export const createUseCases = (
         },
         uowPerformer,
       }),
+    getUsers: makeGetUsers({
+      uowPerformer,
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
