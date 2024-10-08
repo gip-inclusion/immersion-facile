@@ -93,8 +93,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
                 validatorEmails: updatedAgency.validatorEmails,
               },
               triggeredBy: {
-                kind: "inclusion-connected",
-                userId: icUser.id,
+                kind: "crawler",
               },
             },
           }),
@@ -109,8 +108,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
                 validatorEmails: updatedAgency.validatorEmails,
               },
               triggeredBy: {
-                kind: "inclusion-connected",
-                userId: icUser.id,
+                kind: "crawler",
               },
             },
           }),
