@@ -23,7 +23,7 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
   ): Promise<InclusionConnectedUser[]> {
     throwIfNotAdmin(currentUser);
     return uow.userRepository
-      .getWithFilter(
+      .getIcUsersWithFilter(
         filters,
         oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
       )

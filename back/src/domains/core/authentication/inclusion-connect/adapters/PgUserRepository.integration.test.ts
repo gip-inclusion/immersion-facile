@@ -563,7 +563,10 @@ describe("PgAuthenticatedUserRepository", () => {
             isNotifiedByEmail: false,
           });
 
-          const icUsers = await userRepository.getWithFilter({}, provider);
+          const icUsers = await userRepository.getIcUsersWithFilter(
+            {},
+            provider,
+          );
           expect(icUsers).toEqual([]);
         });
 
@@ -591,7 +594,7 @@ describe("PgAuthenticatedUserRepository", () => {
             isNotifiedByEmail: false,
           });
 
-          const icUsers = await userRepository.getWithFilter(
+          const icUsers = await userRepository.getIcUsersWithFilter(
             {
               agencyRole: "to-review",
             },
@@ -655,7 +658,7 @@ describe("PgAuthenticatedUserRepository", () => {
             isNotifiedByEmail: false,
           });
 
-          const icUsers = await userRepository.getWithFilter(
+          const icUsers = await userRepository.getIcUsersWithFilter(
             {
               agencyRole: "validator",
               agencyId: agency1.id,
@@ -708,7 +711,7 @@ describe("PgAuthenticatedUserRepository", () => {
             isNotifiedByEmail: true,
           });
 
-          const icUsers = await userRepository.getWithFilter(
+          const icUsers = await userRepository.getIcUsersWithFilter(
             {
               email: user1.email,
             },

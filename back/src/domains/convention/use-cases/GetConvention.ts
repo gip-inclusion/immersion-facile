@@ -193,7 +193,7 @@ export class GetConvention extends TransactionalUseCase<
     if (authPayload.role !== "counsellor" && authPayload.role !== "validator")
       return false;
 
-    const users = await userRepository.getWithFilter(
+    const users = await userRepository.getIcUsersWithFilter(
       {
         agencyRole: authPayload.role,
         agencyId,
