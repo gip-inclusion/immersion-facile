@@ -1,38 +1,41 @@
 import { Builder, GeoPositionDto, NafDto } from "shared";
 import {
-  LaBonneBoiteApiResultProps,
+  LaBonneBoiteApiResultV2Props,
   LaBonneBoiteCompanyDto,
 } from "./LaBonneBoiteCompanyDto";
 
-const validEstablishmentFromLaBonneBoite: LaBonneBoiteApiResultProps = {
-  address:
-    "Service des ressources humaines,  IMPASSE FENDERIE, 57290 SEREMANGE-ERZANGE",
+const validEstablishmentFromLaBonneBoite: LaBonneBoiteApiResultV2Props = {
+  //address:
+  //  "Service des ressources humaines,  IMPASSE FENDERIE, 57290 SEREMANGE-ERZANGE",
   city: "SEREMANGE-ERZANGE",
-  lat: 49.3225,
-  lon: 6.08067,
-  matched_rome_code: "M1607",
-  matched_rome_label: "Some label",
+  location: {
+    lat: 49.3225,
+    lon: 6.08067,
+  },
+  rome: "M1607",
   naf: "8810C",
-  name: "BLANCHISSERIE LA FENSCH",
+  company_name: "BLANCHISSERIE LA FENSCH",
   siret: "77561959600155",
-  stars: 4.5,
-  url: "",
-  headcount_text: "",
-  distance: 10,
-  alternance: false,
-  contact_mode: "phone",
-  raison_sociale: "",
-  naf_text: "",
-  social_network: "",
-  boosted: false,
-  website: "",
+  hiring_potential: 4.5,
+  citycode: "57647",
+  is_high_potential: false,
+  postcode: "57290",
+  department: "Moselle",
+  region: "Grand Est",
+  department_number: "57",
+  headcount_min: 5,
+  headcount_max: 10,
+  naf_label: "Activités de services administratifs et de soutien",
+  office_name: "BLANCHISSERIE LA FENSCH",
+  id: 1000,
+  email: "contact@blanchissele.fr",
 };
 
 export class LaBonneBoiteCompanyDtoBuilder
   implements Builder<LaBonneBoiteCompanyDto>
 {
   constructor(
-    private props: LaBonneBoiteApiResultProps = validEstablishmentFromLaBonneBoite,
+    private props: LaBonneBoiteApiResultV2Props = validEstablishmentFromLaBonneBoite,
   ) {}
 
   public build() {
@@ -53,10 +56,14 @@ export class LaBonneBoiteCompanyDtoBuilder
     });
   }
 
-  public withEmployeeRange(employeeRange: string) {
+  public withEmployeeRange(
+    min: number,
+    max: number,
+  ): LaBonneBoiteCompanyDtoBuilder {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
-      headcount_text: employeeRange,
+      headcount_min: min,
+      headcount_max: max,
     });
   }
 
@@ -64,29 +71,28 @@ export class LaBonneBoiteCompanyDtoBuilder
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
       naf: naf.code,
-      naf_text: naf.nomenclature,
+      naf_label: naf.nomenclature,
     });
   }
 
   public withName(name: string) {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
-      name,
+      company_name: name,
     });
   }
 
-  public withPosition(position: GeoPositionDto) {
+  public withPosition(location: GeoPositionDto) {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
-      lat: position.lat,
-      lon: position.lon,
+      location,
     });
   }
 
   public withRome(rome: string): LaBonneBoiteCompanyDtoBuilder {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
-      matched_rome_code: rome,
+      rome,
     });
   }
 

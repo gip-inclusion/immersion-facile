@@ -2,7 +2,7 @@ import axios from "axios";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
-import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
+import { createPeFetchSharedClient } from "../config/helpers/createFetchSharedClients";
 import { HttpPeAgenciesReferential } from "../domains/agency/adapters/pe-agencies-referential/HttpPeAgenciesReferential";
 import { UpdateAllPeAgencies } from "../domains/agency/use-cases/UpdateAllPeAgencies";
 import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
@@ -19,7 +19,7 @@ import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGen
 const updateAllPeAgenciesScript = async () => {
   const config = AppConfig.createFromEnv();
   const axiosInstance = axios.create({ timeout: config.externalAxiosTimeout });
-  const peAxiosHttpClient = createPeAxiosSharedClient(config, axiosInstance);
+  const peAxiosHttpClient = createPeFetchSharedClient(config);
 
   const httpPeAgenciesReferential = new HttpPeAgenciesReferential(
     config.peApiUrl,
