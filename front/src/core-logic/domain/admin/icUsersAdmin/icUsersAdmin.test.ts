@@ -524,12 +524,16 @@ describe("Agency registration for authenticated users", () => {
         .withCounsellorEmails(["bob@mail.com"])
         .withValidatorEmails(["validator@mail.com"])
         .build();
+      const agencyWithRefersToAgencyFields = {
+        ...agency,
+        refersToAgencyName: null,
+      };
 
       ({ store, dependencies } = createTestStore({
         admin: adminPreloadedState({
           agencyAdmin: {
             ...agencyAdminInitialState,
-            agency,
+            agency: agencyWithRefersToAgencyFields,
           },
           inclusionConnectedUsersAdmin: {
             ...icUsersAdminInitialState,
@@ -554,7 +558,7 @@ describe("Agency registration for authenticated users", () => {
       );
 
       const expectedAgency: AgencyDto = {
-        ...agency,
+        ...agencyWithRefersToAgencyFields,
         validatorEmails: ["bob@mail.com", "validator@mail.com"],
         counsellorEmails: [],
       };

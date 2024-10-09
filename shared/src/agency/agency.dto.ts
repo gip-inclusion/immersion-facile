@@ -40,6 +40,10 @@ export type AgencyDtoSensitiveFields = {
   rejectionJustification: string | null;
 };
 
+export type AgencyDtoRefersToAgencyFields = AgencyDto & {
+  refersToAgencyName: string | null;
+};
+
 export type WithAgencyDto = {
   agency: AgencyDto;
 };
