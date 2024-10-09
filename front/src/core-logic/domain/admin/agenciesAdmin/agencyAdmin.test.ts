@@ -1,6 +1,7 @@
 import {
   AgencyDto,
   AgencyDtoBuilder,
+  AgencyDtoRefersToAgencyFields,
   AgencyId,
   AgencyOption,
   AgencyRight,
@@ -216,6 +217,10 @@ describe("agencyAdmin", () => {
       it("selects one of the results and fetches the corresponding Agency", () => {
         const agencySearchText = "My ";
         const agencyDto = new AgencyDtoBuilder().build();
+        const agencyDtoRefersToAgencyFields: AgencyDtoRefersToAgencyFields = {
+          ...agencyDto,
+          refersToAgencyName: null,
+        };
         const agencyOptions: AgencyOption[] = [
           { id: agencyDto.id, name: agencyDto.name, kind: "pole-emploi" },
           { id: "456", name: "My other agency", kind: "cci" },
@@ -239,7 +244,7 @@ describe("agencyAdmin", () => {
 
         expectAgencyAdminStateToMatch({
           isSearching: false,
-          agency: agencyDto,
+          agency: agencyDtoRefersToAgencyFields,
           agencyOptions,
           agencySearchQuery: agencySearchText,
         });
@@ -312,6 +317,10 @@ describe("agencyAdmin", () => {
 
     it("clears feedback and agency on agency selection", () => {
       const agencyDto1 = new AgencyDtoBuilder().withId("1").build();
+      const AgencyDtoRefersToAgencyFields1: AgencyDtoRefersToAgencyFields = {
+        ...agencyDto1,
+        refersToAgencyName: null,
+      };
       const agencyOptions: AgencyOption[] = [
         { id: agencyDto1.id, name: agencyDto1.name, kind: "autre" },
       ];
@@ -321,7 +330,7 @@ describe("agencyAdmin", () => {
             ...agencyAdminInitialState,
             feedback: { kind: "agencyUpdated" },
             agencyOptions,
-            agency: agencyDto1,
+            agency: AgencyDtoRefersToAgencyFields1,
           },
         }),
       }));
