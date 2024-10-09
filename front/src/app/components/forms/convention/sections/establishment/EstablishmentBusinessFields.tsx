@@ -6,7 +6,10 @@ import { ConventionDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useSiretFetcher } from "src/app/hooks/siret.hooks";
+import {
+  useSiretFetcher,
+  useSiretRelatedField,
+} from "src/app/hooks/siret.hooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
 export const EstablishmentBusinessFields = (): JSX.Element => {
@@ -18,10 +21,22 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
     isFetchingSiret,
   } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: true });
   const convention = useAppSelector(conventionSelectors.convention);
-
   const { getValues, register, control, setValue } =
     useFormContext<ConventionDto>();
   const values = getValues();
+  const isSiretFetcherEnabled =
+    values.status === "DRAFT" && values.immersionAddress === "";
+
+  const isSiretFetcherDisabled = !isSiretFetcherEnabled;
+
+  useSiretRelatedField("businessName", {
+    disabled: false, // the input is always disabled, so we can safely update businessName from siret
+  });
+  useSiretRelatedField("businessAddress", {
+    fieldToUpdate: "immersionAddress",
+    disabled: isSiretFetcherDisabled,
+  });
+
   const siretValueOnForm = useWatch({ control, name: "siret" });
 
   const { getFormFields } = getFormContents(

@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { FederatedIdentityProvider, loginPeConnect } from "shared";
@@ -143,29 +143,29 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
 
 const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
   const dispatch = useDispatch();
-
-  const {
-    fedId,
-    fedIdProvider,
-    email = "",
-    firstName = "",
-    lastName = "",
-  } = route.params;
+  const initialRouteParams = useRef(route.params).current;
 
   useEffect(() => {
-    if (fedId && fedIdProvider) {
+    if (
+      initialRouteParams.fedId &&
+      initialRouteParams.fedIdProvider &&
+      initialRouteParams.email &&
+      initialRouteParams.firstName &&
+      initialRouteParams.lastName
+    ) {
       const {
         fedId: _,
         fedIdProvider: __,
         ...paramsWithoutFederatedIdentity
-      } = route.params;
+      } = initialRouteParams;
       dispatch(
         authSlice.actions.federatedIdentityProvided({
-          provider: fedIdProvider as FederatedIdentityProvider,
-          token: fedId,
-          email,
-          firstName,
-          lastName,
+          provider:
+            initialRouteParams.fedIdProvider as FederatedIdentityProvider,
+          token: initialRouteParams.fedId,
+          email: initialRouteParams.email,
+          firstName: initialRouteParams.firstName,
+          lastName: initialRouteParams.lastName,
           idToken: "should-not-need-for-pe-connect",
         }),
       );
@@ -176,7 +176,7 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
         })
         .replace();
     }
-  }, [fedId, fedIdProvider, email, firstName, lastName, dispatch]);
+  }, [initialRouteParams, dispatch]);
 };
 
 const SharedConventionMessage = ({

@@ -6,7 +6,10 @@ export const getUrlParameters: (location: Location) => {
 export const filterParamsForRoute = (
   urlParams: Record<string, unknown>,
   matchingParams: Record<string, unknown>,
+  forceExcludeParams?: string[],
 ) =>
   Object.fromEntries(
-    Object.entries(urlParams).filter(([key]) => key in matchingParams),
+    Object.entries(urlParams).filter(
+      ([key]) => key in matchingParams && !forceExcludeParams?.includes(key),
+    ),
   );

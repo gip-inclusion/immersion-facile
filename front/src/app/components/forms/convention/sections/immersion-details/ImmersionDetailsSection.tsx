@@ -9,23 +9,11 @@ import { ConventionFormProfession } from "src/app/components/forms/convention/Co
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { getFormContents } from "src/app/hooks/formContents.hooks";
-import { useSiretRelatedField } from "src/app/hooks/siret.hooks";
 
 export const ImmersionDetailsSection = () => {
   const { setValue, getValues, register } = useFormContext<ConventionReadDto>();
   const values = getValues();
-  const isSiretFetcherEnabled =
-    values.status === "DRAFT" && values.immersionAddress === "";
 
-  const isSiretFetcherDisabled = !isSiretFetcherEnabled;
-
-  useSiretRelatedField("businessName", {
-    disabled: isSiretFetcherDisabled,
-  });
-  useSiretRelatedField("businessAddress", {
-    fieldToUpdate: "immersionAddress",
-    disabled: isSiretFetcherDisabled,
-  });
   const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
