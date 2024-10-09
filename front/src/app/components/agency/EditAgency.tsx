@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Tag from "@codegouvfr/react-dsfr/Tag";
 import React from "react";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -21,7 +22,18 @@ export const EditAgency = () => {
           placeholder={"Ex : Agence de Berry"}
         />
       </div>
-      {agency && <EditAgencyForm agency={agency} />}
+      {agency && (
+        <>
+          {agency.refersToAgencyId ? (
+            <Tag className={fr.cx("fr-my-4w")}>
+              Structure d'accompagnement liée à {agency.refersToAgencyName}
+            </Tag>
+          ) : (
+            <Tag className={fr.cx("fr-my-4w")}>Prescripteur</Tag>
+          )}
+          <EditAgencyForm agency={agency} />
+        </>
+      )}
       {agency && <AgencyUsers agency={agency} />}
     </>
   );

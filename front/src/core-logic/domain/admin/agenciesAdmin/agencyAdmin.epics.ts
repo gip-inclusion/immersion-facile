@@ -1,7 +1,17 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { debounceTime, distinctUntilChanged, filter } from "rxjs";
+import {
+  Observable,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  of,
+} from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { type AgencyId, looksLikeSiret } from "shared";
+import {
+  AgencyDtoRefersToAgencyFields,
+  type AgencyId,
+  looksLikeSiret,
+} from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -83,10 +93,32 @@ const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (
   action$.pipe(
     filter(agencyAdminSlice.actions.setSelectedAgencyId.match),
     switchMap((action: PayloadAction<AgencyId>) =>
-      dependencies.agencyGateway.getAgencyAdminById$(
-        action.payload,
-        getAdminToken(state$.value),
-      ),
+      dependencies.agencyGateway
+        .getAgencyAdminById$(action.payload, getAdminToken(state$.value))
+        .pipe(
+          switchMap((agency): Observable<AgencyDtoRefersToAgencyFields> => {
+            if (!agency?.refersToAgencyId) {
+              return of({
+                ...agency,
+                refersToAgencyName: null,
+              } as AgencyDtoRefersToAgencyFields);
+            }
+            return dependencies.agencyGateway
+              .getAgencyAdminById$(
+                agency.refersToAgencyId,
+                getAdminToken(state$.value),
+              )
+              .pipe(
+                map(
+                  (agencyReferred) =>
+                    ({
+                      ...agency,
+                      refersToAgencyName: agencyReferred?.name ?? null,
+                    }) as AgencyDtoRefersToAgencyFields,
+                ),
+              );
+          }),
+        ),
     ),
     map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
   );
