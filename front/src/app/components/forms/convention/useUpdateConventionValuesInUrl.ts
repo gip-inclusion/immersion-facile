@@ -38,14 +38,24 @@ export const useUpdateConventionValuesInUrl = (
         const filteredParams = filterParamsForRoute(
           urlParams,
           conventionParams,
+          ["fedId", "fedIdProvider"],
         );
-        routes[route.name]({ ...filteredParams, ...watchedValues }).replace();
+        const {
+          fedId: _,
+          fedIdProvider: __,
+          ...watchedValuesWithoutFederatedIdentity
+        } = watchedValues;
+        routes[route.name]({
+          ...filteredParams,
+          ...watchedValuesWithoutFederatedIdentity,
+        }).replace();
       }
 
       if (route.name === "conventionImmersionForExternals") {
         const filteredParams = filterParamsForRoute(
           urlParams,
           conventionForExternalParams,
+          ["fedId", "fedIdProvider"],
         );
         routes
           .conventionImmersionForExternals({
