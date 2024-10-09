@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import {
   AgencyDto,
   AgencyStatus,
+  agencyKindToLabel,
   allAgencyStatuses,
   domElementIds,
   editAgencySchema,
@@ -41,6 +42,11 @@ const agencyStatusToLabel: Record<AgencyStatus, string> = {
   "from-api-PE": "Import Api",
 };
 
+const kindOption = Object.entries(agencyKindToLabel).map(([value, label]) => ({
+  label,
+  value: value,
+}));
+
 const statusListOfOptions = allAgencyStatuses.map((agencyStatus) => ({
   value: agencyStatus,
   label: agencyStatusToLabel[agencyStatus],
@@ -65,7 +71,6 @@ export const EditAgencyForm = ({
   return (
     <FormProvider {...methods}>
       <form
-        className={fr.cx("fr-my-4w")}
         onSubmit={handleSubmit((values) => {
           dispatch(agencyAdminSlice.actions.updateAgencyRequested(values));
         })}
@@ -76,6 +81,15 @@ export const EditAgencyForm = ({
           <AgencyFormCommonFields
             addressInitialValue={agency.address}
             refersToOtherAgency={refersToOtherAgency}
+          />
+
+          <Select
+            label={"!Type de structure!"}
+            options={kindOption}
+            nativeSelectProps={{
+              ...register("kind"),
+              id: domElementIds.admin.agencyTab.editAgencyFormKindSelector,
+            }}
           />
 
           <Select
