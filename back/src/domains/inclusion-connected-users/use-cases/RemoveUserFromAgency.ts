@@ -1,6 +1,6 @@
 import {
-  AgencyDto,
   AgencyId,
+  AgencyRight,
   InclusionConnectedUser,
   OAuthGatewayProvider,
   RemoveAgencyUserParams,
@@ -33,7 +33,7 @@ const getUserAndThrowIfNotFound = async (
 const getUserAgencyRightsAndThrowIfUserHasNoAgencyRight = (
   user: InclusionConnectedUser,
   agencyId: AgencyId,
-): AgencyDto => {
+): AgencyRight => {
   const userRight = user.agencyRights.find(
     (agencyRight) => agencyRight.agency.id === agencyId,
   );
@@ -44,7 +44,17 @@ const getUserAgencyRightsAndThrowIfUserHasNoAgencyRight = (
       userId: user.id,
     });
 
-  return userRight.agency;
+  return userRight;
+};
+
+const throwIfUserIsValidatorAndAgencyHasRefersTo = (
+  agencyRight: AgencyRight,
+) => {
+  const agency = agencyRight.agency;
+
+  if (agency.refersToAgencyId && agencyRight.roles.includes("validator")) {
+    throw errors.agency.invalidUserRemovalWhenAgencyWithRefersTo(agency.id);
+  }
 };
 
 export const makeRemoveUserFromAgency = createTransactionalUseCase<
@@ -64,10 +74,13 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
       inputParams.userId,
       provider,
     );
-    const agency = getUserAgencyRightsAndThrowIfUserHasNoAgencyRight(
+    const agencyRight = getUserAgencyRightsAndThrowIfUserHasNoAgencyRight(
       requestedUser,
       inputParams.agencyId,
     );
+    const agency = agencyRight.agency;
+
+    throwIfUserIsValidatorAndAgencyHasRefersTo(agencyRight);
     await throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(
       uow,
       agency,
