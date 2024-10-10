@@ -30,6 +30,7 @@ interface SearchState {
   feedback: SearchFeedback;
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
+  searchParams: SearchQueryParamsDto;
 }
 
 export const initialState: SearchState = {
@@ -40,15 +41,24 @@ export const initialState: SearchState = {
   feedback: {
     kind: "idle",
   },
+  searchParams: {
+    appellationCodes: [],
+    rome: "",
+    distanceKm: 10,
+    latitude: 0,
+    longitude: 0,
+    sortedBy: "score",
+  },
 };
 
 export const searchSlice = createSlice({
   name: "search",
   initialState,
   reducers: {
-    searchRequested: (state, _action: PayloadAction<SearchQueryParamsDto>) => {
+    searchRequested: (state, action: PayloadAction<SearchQueryParamsDto>) => {
       state.searchStatus = "initialFetch";
       state.searchResults = [];
+      state.searchParams = action.payload;
       state.isLoading = true;
     },
     initialSearchSucceeded: (
