@@ -26,7 +26,7 @@ describe("url.utils", () => {
         param1: "value1",
       };
 
-      const result = filterParamsForRoute(urlParams, matchingParams);
+      const result = filterParamsForRoute({ urlParams, matchingParams });
       expect(result).toEqual({
         param1: "value1",
       });

@@ -26,13 +26,13 @@ export const useSearchUseCase = ({
     dispatch(
       searchSlice.actions.searchRequested({ ...values, appellationCodes }),
     );
-    const updatedUrlParams = filterParamsForRoute(
-      {
+    const updatedUrlParams = filterParamsForRoute({
+      urlParams: {
         ...urlParams,
         ...values,
       },
-      searchParams,
-    );
+      matchingParams: searchParams,
+    });
     const updatedUrlParamsWithEncodedUriValues = {
       ...updatedUrlParams,
       ...encodedSearchUriParams.reduce((acc, currentKey) => {

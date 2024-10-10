@@ -249,10 +249,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   useEffect(() => {
     if (isEstablishmentCreation) {
-      const filteredParams = filterParamsForRoute(
-        initialUrlParams.current,
-        establishmentParams,
-      );
+      const filteredParams = filterParamsForRoute({
+        urlParams: initialUrlParams.current,
+        matchingParams: establishmentParams,
+      });
       routes
         .formEstablishment(
           formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams({
