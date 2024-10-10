@@ -28,6 +28,10 @@ type WithIntershipKind = {
   internshipKind: InternshipKind;
 };
 
+type WithFromPeConnectedUser = {
+  fromPeConnectedUser?: boolean;
+};
+
 export type ConventionPresentation = OmitFromExistingKeys<
   Partial<ConventionDto>,
   "statusJustification"
@@ -35,4 +39,5 @@ export type ConventionPresentation = OmitFromExistingKeys<
   WithSignatures &
   WithEstablishmentTutor &
   WithIntershipKind &
-  WithAgencyDepartment;
+  WithAgencyDepartment &
+  WithFromPeConnectedUser;

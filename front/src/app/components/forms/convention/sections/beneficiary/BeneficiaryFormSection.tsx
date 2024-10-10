@@ -41,19 +41,22 @@ type beneficiaryFormSectionProperties = {
   internshipKind: InternshipKind;
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
+  fromPeConnectedUser?: boolean;
 };
 
 export const BeneficiaryFormSection = ({
   internshipKind,
   setEmailValidationErrors,
   emailValidationErrors,
+  fromPeConnectedUser,
 }: beneficiaryFormSectionProperties): JSX.Element => {
   const [isMinorAccordingToAge, setIsMinorAccordingToAge] = useState(false);
   const isMinorOrProtected = useAppSelector(conventionSelectors.isMinor);
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
   );
-  const isSuccessfullyPeConnected = useAppSelector(authSelectors.isPeConnected);
+  const isSuccessfullyPeConnected =
+    useAppSelector(authSelectors.isPeConnected) || fromPeConnectedUser;
   const connectedUser = useAppSelector(authSelectors.connectedUser);
   const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
   const { register, getValues, setValue, formState } =

@@ -178,9 +178,14 @@ export const ConventionForm = ({
     reset,
   } = methods;
 
-  useUpdateConventionValuesInUrl(makeValuesToWatchInUrl(getValues()));
-
   const conventionValues = getValues();
+
+  useUpdateConventionValuesInUrl(
+    makeValuesToWatchInUrl({
+      ...conventionValues,
+      fromPeConnectedUser: route.params.fromPeConnectedUser,
+    }),
+  );
 
   const { getFormFields, getFormErrors } = getFormContents(
     formConventionFieldsLabels(conventionValues.internshipKind),
@@ -434,6 +439,7 @@ export const ConventionForm = ({
                         internshipKind={conventionValues.internshipKind}
                         emailValidationErrors={emailValidationErrors}
                         setEmailValidationErrors={setEmailValidationErrors}
+                        fromPeConnectedUser={route.params.fromPeConnectedUser}
                       />
                     </Accordion>
                     <Accordion
