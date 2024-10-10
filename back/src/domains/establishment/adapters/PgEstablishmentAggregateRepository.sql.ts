@@ -134,8 +134,7 @@ export const updateAllEstablishmentScoresQuery = async (
   db: KyselyDb,
 ): Promise<void> => {
   const minimumScore = 10;
-  const conventionCountCoefficient = 10;
-  const discussionCountCoefficient = 100;
+  const conventionCountCoefficient = 20;
 
   await db
     .with("convention_counts", (qb) =>
@@ -166,19 +165,18 @@ export const updateAllEstablishmentScoresQuery = async (
     .updateTable("establishments as e")
     .set({
       score: sql`ROUND(
-          ${minimumScore}
-          + COALESCE((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0)
-          + COALESCE((
+          (${minimumScore} + COALESCE((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0))
+          * (COALESCE((
             SELECT
               CASE
                 WHEN total_discussions > 0
-                THEN (answered_discussions::float / total_discussions) * ${discussionCountCoefficient}
-                ELSE 0
+                THEN (answered_discussions::float / total_discussions)
+                ELSE 1
               END
             FROM discussion_counts
             WHERE siret = e.siret
-          ), 0)
-        )`,
+          ), 1)
+        ))`,
     })
     .execute();
 };

@@ -131,10 +131,10 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
           siret,
         );
 
-      const minimunScore = 10;
-      const discussionScore = 100 * (1 / 2);
-      const conventionScore = 10 * 1;
-      const expectedScore = minimunScore + discussionScore + conventionScore;
+      const minimumScore = 10;
+      const discussionScore = 1 / 2;
+      const conventionScore = 20 * 1;
+      const expectedScore = (minimumScore + conventionScore) * discussionScore;
       expectToEqual(establishmentAfter?.establishment.score, expectedScore);
     });
   });
