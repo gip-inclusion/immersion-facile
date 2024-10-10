@@ -15,6 +15,7 @@ import { expressEmptyResponseBody } from "../zodUtils";
 import {
   inclusionConnectedUserSchema,
   withIdTokenSchema,
+  withOptionalUserIdSchema,
 } from "./inclusionConnectedAllowed.schema";
 
 export type InclusionConnectedAllowedRoutes =
@@ -25,6 +26,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     method: "get",
     url: "/inclusion-connected/user",
     ...withAuthorizationHeaders,
+    queryParamsSchema: withOptionalUserIdSchema,
     responses: {
       200: inclusionConnectedUserSchema,
       400: httpErrorSchema,

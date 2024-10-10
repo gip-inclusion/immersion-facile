@@ -56,6 +56,7 @@ export class HttpInclusionConnectedGateway
       this.httpClient
         .getInclusionConnectedUser({
           headers: { authorization: token },
+          queryParams: {},
         })
         .then((response) =>
           match(response)

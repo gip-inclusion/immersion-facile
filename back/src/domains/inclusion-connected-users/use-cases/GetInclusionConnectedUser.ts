@@ -6,12 +6,11 @@ import {
   InclusionConnectedUser,
   WithDashboards,
   WithEstablismentsSiretAndName,
-  WithUserId,
+  WithOptionalUserId,
   agencyRoleIsNotToReview,
   errors,
-  withUserIdSchema,
+  withOptionalUserIdSchema,
 } from "shared";
-import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
@@ -21,11 +20,11 @@ import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPer
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class GetInclusionConnectedUser extends TransactionalUseCase<
-  void | WithUserId,
+  WithOptionalUserId,
   InclusionConnectedUser,
   InclusionConnectedUser
 > {
-  protected inputSchema = z.void().or(withUserIdSchema);
+  protected inputSchema = withOptionalUserIdSchema;
 
   readonly #dashboardGateway: DashboardGateway;
 
@@ -43,15 +42,15 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: void | WithUserId,
+    params: WithOptionalUserId,
     uow: UnitOfWork,
     currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser> {
     if (!currentUser) throw errors.user.noJwtProvided();
 
-    if (params?.userId) throwIfNotAdmin(currentUser);
+    if (params.userId) throwIfNotAdmin(currentUser);
 
-    const userIdToFetch = params?.userId ?? currentUser.id;
+    const userIdToFetch = params.userId ?? currentUser.id;
 
     const user = await uow.userRepository.getById(
       userIdToFetch,
