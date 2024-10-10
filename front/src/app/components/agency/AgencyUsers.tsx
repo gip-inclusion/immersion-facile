@@ -16,7 +16,7 @@ import {
 } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
-import { SomeUsersWithoutName } from "src/app/components/agency/SomeUsersWithoutName";
+import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -99,7 +99,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
   return (
     <>
       <h5 className={fr.cx("fr-h5", "fr-mb-1v", "fr-mt-4w")}>Utilisateurs</h5>
-      <SomeUsersWithoutName />
+      <UsersWithoutNameHint />
       <Feedback topic="agency-user" />
       <Button
         iconId="fr-icon-file-add-line"

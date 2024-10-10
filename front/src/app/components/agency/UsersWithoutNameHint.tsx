@@ -3,7 +3,7 @@ import React from "react";
 import { Tooltip } from "react-design-system";
 import { domElementIds } from "shared";
 
-export const SomeUsersWithoutName = () => (
+export const UsersWithoutNameHint = () => (
   <div className={fr.cx("fr-mb-2w", "fr-mt-0", "fr-hint-text")}>
     Pourquoi certains utilisateurs n'ont pas de nom ?
     <Tooltip
