@@ -3,7 +3,6 @@ import {
   AgencyDashboards,
   ConventionsEstablishmentDashboard,
   EstablishmentDashboards,
-  InclusionConnectJwtPayload,
   InclusionConnectedUser,
   WithDashboards,
   WithEstablismentsSiretAndName,
@@ -21,7 +20,7 @@ import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPer
 export class GetInclusionConnectedUser extends TransactionalUseCase<
   void,
   InclusionConnectedUser,
-  InclusionConnectJwtPayload
+  InclusionConnectedUser
 > {
   protected inputSchema = z.void();
 
@@ -43,15 +42,15 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   protected async _execute(
     _: void,
     uow: UnitOfWork,
-    jwtPayload?: InclusionConnectJwtPayload,
+    currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser> {
-    if (!jwtPayload) throw errors.user.noJwtProvided();
-    const { userId } = jwtPayload;
+    if (!currentUser) throw errors.user.noJwtProvided();
+
     const user = await uow.userRepository.getById(
-      userId,
+      currentUser.id,
       oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
     );
-    if (!user) throw errors.user.notFound({ userId });
+    if (!user) throw errors.user.notFound({ userId: currentUser.id });
     const establishments = await this.#withEstablishments(uow, user);
     return {
       ...user,
