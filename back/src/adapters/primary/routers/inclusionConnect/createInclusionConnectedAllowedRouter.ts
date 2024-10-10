@@ -19,7 +19,7 @@ export const createInclusionConnectedAllowedRouter = (
     (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.getInclusionConnectedUser.execute(
-          undefined,
+          req.query,
           req.payloads?.currentUser,
         ),
       ),
