@@ -67,19 +67,22 @@ export const SearchResultPreview = ({
           "im-establishment-preview__inner",
         )}
       >
-        <SearchResult
-          illustration={
-            <SearchResultIllustration illustration={searchIllustrations[0]}>
-              <div className={fr.cx("fr-p-1v")}>
-                {establishment.fitForDisabledWorkers && <ImTag theme="rqth" />}
-                <ImTag theme="voluntaryToImmersion" />
-              </div>
-            </SearchResultIllustration>
-          }
-          establishment={establishmentToSearchResultPreview(establishment)}
-          preview
-          layout="fr-col-md-6"
-        />
+        <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+          <SearchResult
+            illustration={
+              <SearchResultIllustration illustration={searchIllustrations[0]}>
+                <div className={fr.cx("fr-p-1v")}>
+                  {establishment.fitForDisabledWorkers && (
+                    <ImTag theme="rqth" />
+                  )}
+                  <ImTag theme="voluntaryToImmersion" />
+                </div>
+              </SearchResultIllustration>
+            }
+            establishment={establishmentToSearchResultPreview(establishment)}
+            preview
+          />
+        </div>
       </div>
     </section>
   );
