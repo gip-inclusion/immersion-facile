@@ -9,6 +9,7 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { SearchResultDto, domElementIds } from "shared";
+import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { searchIllustrations } from "src/assets/img/illustrations";
@@ -36,6 +37,7 @@ export const SearchListResults = ({
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
+  const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
   const dispatch = useDispatch();
   const { cx, classes } = useStyleUtils();
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
@@ -57,136 +59,154 @@ export const SearchListResults = ({
   }, [currentPage, getSearchResultsForPage]);
 
   return (
-    <>
-      <div className={fr.cx("fr-container")}>
-        <div
-          className={fr.cx(
-            "fr-grid-row",
-            "fr-grid-row--gutters",
-            !hasResults && "fr-grid-row--center",
-          )}
-        >
-          {!hasResults && (
-            <div
-              className={cx(
-                fr.cx("fr-col-6", "fr-py-6w"),
-                classes["text-centered"],
-              )}
-            >
-              <p className={fr.cx("fr-h6")}>
-                Aucun résultat ne correspond à votre recherche 😓
-              </p>
-              <p>
-                Vous pouvez essayer d'élargir votre recherche en augmentant le
-                rayon de recherche ou en ne sélectionnant pas de métier.
-              </p>
-            </div>
-          )}
-          {hasResults &&
-            displayedResults.map((searchResult, index) => (
-              <SearchResult
-                key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
-                establishment={searchResult}
-                illustration={
-                  <SearchResultIllustration
+    <div className={fr.cx("fr-container")}>
+      <div
+        className={fr.cx(
+          "fr-grid-row",
+          "fr-grid-row--gutters",
+          !hasResults && "fr-grid-row--center",
+        )}
+      >
+        <div className={fr.cx("fr-col-8")}>
+          <div
+            className={fr.cx(
+              "fr-grid-row",
+              "fr-grid-row--gutters",
+              !hasResults && "fr-grid-row--center",
+            )}
+          >
+            {!hasResults && (
+              <div
+                className={cx(
+                  fr.cx("fr-col-6", "fr-py-6w"),
+                  classes["text-centered"],
+                )}
+              >
+                <p className={fr.cx("fr-h6")}>
+                  Aucun résultat ne correspond à votre recherche 😓
+                </p>
+                <p>
+                  Vous pouvez essayer d'élargir votre recherche en augmentant le
+                  rayon de recherche ou en ne sélectionnant pas de métier.
+                </p>
+              </div>
+            )}
+            {hasResults &&
+              displayedResults.map((searchResult, index) => (
+                <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+                  <SearchResult
+                    key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
+                    establishment={searchResult}
                     illustration={
-                      searchIllustrations[index % searchIllustrations.length]
+                      <SearchResultIllustration
+                        illustration={
+                          searchIllustrations[
+                            index % searchIllustrations.length
+                          ]
+                        }
+                      >
+                        <div className={fr.cx("fr-p-1v")}>
+                          {searchResult.establishmentScore > 50 && (
+                            <ImTag theme="superEnterprise" />
+                          )}
+                          {searchResult.fitForDisabledWorkers && (
+                            <ImTag theme="rqth" />
+                          )}
+                          {!searchResult.voluntaryToImmersion && (
+                            <ImTag theme="lbb" />
+                          )}
+                          {searchResult.voluntaryToImmersion && (
+                            <ImTag theme="voluntaryToImmersion" />
+                          )}
+                        </div>
+                      </SearchResultIllustration>
                     }
-                  >
-                    <div className={fr.cx("fr-p-1v")}>
-                      {searchResult.establishmentScore > 50 && (
-                        <ImTag theme="superEnterprise" />
-                      )}
-                      {searchResult.fitForDisabledWorkers && (
-                        <ImTag theme="rqth" />
-                      )}
-                      {!searchResult.voluntaryToImmersion && (
-                        <ImTag theme="lbb" />
-                      )}
-                      {searchResult.voluntaryToImmersion && (
-                        <ImTag theme="voluntaryToImmersion" />
-                      )}
-                    </div>
-                  </SearchResultIllustration>
-                }
-                showDistance={showDistance}
-                onButtonClick={() => {
-                  const appellations = searchResult.appellations;
-                  const appellationCode = appellations?.length
-                    ? appellations[0].appellationCode
-                    : null;
-                  if (appellationCode && searchResult.locationId) {
-                    routes
-                      .searchResult({
-                        siret: searchResult.siret,
-                        appellationCode,
-                        location: searchResult.locationId,
-                      })
-                      .push();
-                    return;
-                  }
-                  dispatch(
-                    searchSlice.actions.fetchSearchResultRequested(
-                      searchResult,
-                    ),
-                  );
-                  routes
-                    .searchResultExternal({
-                      siret: searchResult.siret,
-                    })
-                    .push();
+                    showDistance={showDistance}
+                    onButtonClick={() => {
+                      const appellations = searchResult.appellations;
+                      const appellationCode = appellations?.length
+                        ? appellations[0].appellationCode
+                        : null;
+                      if (appellationCode && searchResult.locationId) {
+                        routes
+                          .searchResult({
+                            siret: searchResult.siret,
+                            appellationCode,
+                            location: searchResult.locationId,
+                          })
+                          .push();
+                        return;
+                      }
+                      dispatch(
+                        searchSlice.actions.fetchSearchResultRequested(
+                          searchResult,
+                        ),
+                      );
+                      routes
+                        .searchResultExternal({
+                          siret: searchResult.siret,
+                        })
+                        .push();
+                    }}
+                  />
+                </div>
+              ))}
+          </div>
+        </div>
+        <div className={fr.cx("fr-col-4")}>
+          <SearchMiniMap
+            activeMarkerKey={activeMarkerKey}
+            setActiveMarkerKey={setActiveMarkerKey}
+          />
+        </div>
+        <div className={fr.cx("fr-container", "fr-mb-10w")}>
+          <div
+            className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mt-4w")}
+          >
+            <div className={fr.cx("fr-col-10", "fr-grid-row")}>
+              <Pagination
+                showFirstLast
+                count={totalPages}
+                defaultPage={currentPage + 1}
+                getPageLinkProps={(pageNumber) => ({
+                  title: `Résultats de recherche, page : ${pageNumber}`,
+                  onClick: (event) => {
+                    event.preventDefault();
+                    setCurrentPage(pageNumber - 1);
+                  },
+                  href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
+                  key: `pagination-link-${pageNumber}`,
+                })}
+                className={fr.cx("fr-mt-1w")}
+              />
+            </div>
+            <div
+              className={fr.cx("fr-col-2", "fr-grid-row", "fr-grid-row--right")}
+            >
+              <Select
+                label=""
+                options={[
+                  ...resultsPerPageOptions.map((numberAsString) => ({
+                    label: `${numberAsString} résultats / page`,
+                    value: numberAsString,
+                  })),
+                ]}
+                nativeSelectProps={{
+                  id: domElementIds.search.resultPerPageDropdown,
+                  onChange: (event) => {
+                    const value = event.currentTarget.value;
+                    if (isResultPerPageOption(value)) {
+                      setResultsPerPage(value);
+                    }
+                  },
+                  value: resultsPerPage,
+                  "aria-label": "Nombre de résultats par page",
                 }}
               />
-            ))}
-        </div>
-      </div>
-      <div className={fr.cx("fr-container", "fr-mb-10w")}>
-        <div
-          className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mt-4w")}
-        >
-          <div className={fr.cx("fr-col-10", "fr-grid-row")}>
-            <Pagination
-              showFirstLast
-              count={totalPages}
-              defaultPage={currentPage + 1}
-              getPageLinkProps={(pageNumber) => ({
-                title: `Résultats de recherche, page : ${pageNumber}`,
-                onClick: (event) => {
-                  event.preventDefault();
-                  setCurrentPage(pageNumber - 1);
-                },
-                href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
-                key: `pagination-link-${pageNumber}`,
-              })}
-              className={fr.cx("fr-mt-1w")}
-            />
-          </div>
-          <div
-            className={fr.cx("fr-col-2", "fr-grid-row", "fr-grid-row--right")}
-          >
-            <Select
-              label=""
-              options={[
-                ...resultsPerPageOptions.map((numberAsString) => ({
-                  label: `${numberAsString} résultats / page`,
-                  value: numberAsString,
-                })),
-              ]}
-              nativeSelectProps={{
-                id: domElementIds.search.resultPerPageDropdown,
-                onChange: (event) => {
-                  const value = event.currentTarget.value;
-                  if (isResultPerPageOption(value)) {
-                    setResultsPerPage(value);
-                  }
-                },
-                value: resultsPerPage,
-                "aria-label": "Nombre de résultats par page",
-              }}
-            />
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };

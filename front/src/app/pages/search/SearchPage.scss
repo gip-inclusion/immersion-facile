@@ -11,3 +11,29 @@
     text-align: right;
   }
 }
+.search-map-results {
+  border-radius: 1rem;
+  overflow: hidden;
+  background-image: linear-gradient(0deg, var(--border-default-grey), var(--border-default-grey)), linear-gradient(0deg, var(--border-default-grey), var(--border-default-grey)), linear-gradient(0deg, var(--border-default-grey), var(--border-default-grey)), linear-gradient(0deg, var(--border-default-grey), var(--border-default-grey));
+}
+.leaflet-control-zoom [href] {
+  background-image: none;
+}
+.leaflet-popup {
+  z-index: 9999;
+}
+.leaflet-popup-content {
+  margin: 0;
+  .fr-card {
+    background-image: none !important;
+    width: 100%;
+  }
+  .fr-card__content {
+    padding: 1rem !important;
+  }
+}
+.leaflet-popup-content-wrapper {
+  max-height: 340px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
