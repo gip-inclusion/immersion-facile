@@ -344,7 +344,7 @@ export const seedSearchResults: SearchResultDto[] = [
   {
     rome: "A0000",
     naf: defaultNaf,
-    establishmentScore: 0,
+    establishmentScore: 102,
     siret: "12345678901234",
     name: "Super Corp",
     voluntaryToImmersion: true,
