@@ -2,12 +2,7 @@ import { useEffect } from "react";
 import { objectToDependencyList } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
-import {
-  conventionForExternalParams,
-  conventionParams,
-  routes,
-  useRoute,
-} from "src/app/routes/routes";
+import { conventionParams, routes, useRoute } from "src/app/routes/routes";
 import {
   filterParamsForRoute,
   getUrlParameters,
@@ -35,11 +30,11 @@ export const useUpdateConventionValuesInUrl = (
         route.name === "conventionCustomAgency" ||
         route.name === "conventionMiniStage"
       ) {
-        const filteredParams = filterParamsForRoute(
+        const filteredParams = filterParamsForRoute({
           urlParams,
-          conventionParams,
-          ["fedId", "fedIdProvider"],
-        );
+          matchingParams: conventionParams,
+          forceExcludeParams: ["fedId", "fedIdProvider"],
+        });
         const {
           fedId: _,
           fedIdProvider: __,
@@ -52,11 +47,11 @@ export const useUpdateConventionValuesInUrl = (
       }
 
       if (route.name === "conventionImmersionForExternals") {
-        const filteredParams = filterParamsForRoute(
+        const filteredParams = filterParamsForRoute({
           urlParams,
-          conventionForExternalParams,
-          ["fedId", "fedIdProvider"],
-        );
+          matchingParams: conventionParams,
+          forceExcludeParams: ["fedId", "fedIdProvider"],
+        });
         routes
           .conventionImmersionForExternals({
             ...filteredParams,

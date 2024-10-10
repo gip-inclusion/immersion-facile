@@ -3,11 +3,15 @@ export const getUrlParameters: (location: Location) => {
 } = (location) =>
   Object.fromEntries(new URLSearchParams(location.search).entries());
 
-export const filterParamsForRoute = (
-  urlParams: Record<string, unknown>,
-  matchingParams: Record<string, unknown>,
-  forceExcludeParams?: string[],
-) =>
+export const filterParamsForRoute = ({
+  urlParams,
+  matchingParams,
+  forceExcludeParams,
+}: {
+  urlParams: Record<string, unknown>;
+  matchingParams: Record<string, unknown>;
+  forceExcludeParams?: string[];
+}) =>
   Object.fromEntries(
     Object.entries(urlParams).filter(
       ([key]) => key in matchingParams && !forceExcludeParams?.includes(key),
