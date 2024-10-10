@@ -6,8 +6,10 @@ import {
   InclusionConnectedUser,
   WithDashboards,
   WithEstablismentsSiretAndName,
+  WithUserId,
   agencyRoleIsNotToReview,
   errors,
+  withUserIdSchema,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -16,13 +18,14 @@ import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class GetInclusionConnectedUser extends TransactionalUseCase<
-  void,
+  void | WithUserId,
   InclusionConnectedUser,
   InclusionConnectedUser
 > {
-  protected inputSchema = z.void();
+  protected inputSchema = z.void().or(withUserIdSchema);
 
   readonly #dashboardGateway: DashboardGateway;
 
@@ -40,17 +43,21 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   }
 
   protected async _execute(
-    _: void,
+    params: void | WithUserId,
     uow: UnitOfWork,
     currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser> {
     if (!currentUser) throw errors.user.noJwtProvided();
 
+    if (params?.userId) throwIfNotAdmin(currentUser);
+
+    const userIdToFetch = params?.userId ?? currentUser.id;
+
     const user = await uow.userRepository.getById(
-      currentUser.id,
+      userIdToFetch,
       oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
     );
-    if (!user) throw errors.user.notFound({ userId: currentUser.id });
+    if (!user) throw errors.user.notFound({ userId: userIdToFetch });
     const establishments = await this.#withEstablishments(uow, user);
     return {
       ...user,
