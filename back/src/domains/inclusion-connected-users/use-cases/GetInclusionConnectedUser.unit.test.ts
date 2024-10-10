@@ -56,14 +56,14 @@ describe("GetUserAgencyDashboardUrl", () => {
   describe("For getting the current user's data", () => {
     it("throws NotFoundError if the user is not found", async () => {
       await expectPromiseToFailWithError(
-        getInclusionConnectedUser.execute(undefined, randomUser),
+        getInclusionConnectedUser.execute({}, randomUser),
         errors.user.notFound({ userId: randomUser.id }),
       );
     });
 
     it("throws Forbidden if no user is provided", async () => {
       await expectPromiseToFailWithError(
-        getInclusionConnectedUser.execute(),
+        getInclusionConnectedUser.execute({}),
         errors.user.noJwtProvided(),
       );
     });
@@ -94,10 +94,7 @@ describe("GetUserAgencyDashboardUrl", () => {
             },
           },
         ]);
-        const url = await getInclusionConnectedUser.execute(
-          undefined,
-          randomUser,
-        );
+        const url = await getInclusionConnectedUser.execute({}, randomUser);
 
         expectToEqual(url, {
           ...randomUser,
@@ -137,7 +134,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           storedInclusionConnectedUser,
         ]);
         const inclusionConnectedUser = await getInclusionConnectedUser.execute(
-          undefined,
+          {},
           randomUser,
         );
 
@@ -175,10 +172,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           dashboards: { agencies: {}, establishments: {} },
         },
       ]);
-      const url = await getInclusionConnectedUser.execute(
-        undefined,
-        randomUser,
-      );
+      const url = await getInclusionConnectedUser.execute({}, randomUser);
 
       expectToEqual(url, {
         ...randomUser,
@@ -222,7 +216,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           uow.conventionRepository.setConventions([convention]);
 
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
@@ -253,7 +247,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           uow.conventionRepository.setConventions([convention]);
 
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
@@ -285,7 +279,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           uow.conventionRepository.setConventions([convention]);
 
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
@@ -312,7 +306,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           ]);
 
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
@@ -341,7 +335,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           ];
 
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
@@ -372,7 +366,7 @@ describe("GetUserAgencyDashboardUrl", () => {
               .build(),
           ];
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
@@ -396,7 +390,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           ]);
 
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
@@ -408,7 +402,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       describe("establishments", () => {
-        it("retrieve establishments when IC user is establishement rep in at least one establishment", async () => {
+        it("retrieve establishments when IC user is establishment rep in at least one establishment", async () => {
           uow.userRepository.setInclusionConnectedUsers([
             {
               ...randomUser,
@@ -437,7 +431,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           ];
 
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
@@ -453,7 +447,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           ]);
         });
 
-        it("do not retrieve  establishment  when IC user is not establishment representative in at least one establishment", async () => {
+        it("do not retrieve establishment when IC user is not establishment representative in at least one establishment", async () => {
           uow.userRepository.setInclusionConnectedUsers([
             {
               ...randomUser,
@@ -467,7 +461,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           uow.conventionRepository.setConventions([convention]);
 
           const result = await getInclusionConnectedUser.execute(
-            undefined,
+            {},
             randomUser,
           );
 
