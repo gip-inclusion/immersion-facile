@@ -3,27 +3,28 @@ import {
   AgencyDashboards,
   ConventionsEstablishmentDashboard,
   EstablishmentDashboards,
-  InclusionConnectJwtPayload,
   InclusionConnectedUser,
   WithDashboards,
   WithEstablismentsSiretAndName,
+  WithOptionalUserId,
   agencyRoleIsNotToReview,
   errors,
+  withOptionalUserIdSchema,
 } from "shared";
-import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class GetInclusionConnectedUser extends TransactionalUseCase<
-  void,
+  WithOptionalUserId,
   InclusionConnectedUser,
-  InclusionConnectJwtPayload
+  InclusionConnectedUser
 > {
-  protected inputSchema = z.void();
+  protected inputSchema = withOptionalUserIdSchema;
 
   readonly #dashboardGateway: DashboardGateway;
 
@@ -41,17 +42,21 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   }
 
   protected async _execute(
-    _: void,
+    params: WithOptionalUserId,
     uow: UnitOfWork,
-    jwtPayload?: InclusionConnectJwtPayload,
+    currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser> {
-    if (!jwtPayload) throw errors.user.noJwtProvided();
-    const { userId } = jwtPayload;
+    if (!currentUser) throw errors.user.noJwtProvided();
+
+    if (params.userId) throwIfNotAdmin(currentUser);
+
+    const userIdToFetch = params.userId ?? currentUser.id;
+
     const user = await uow.userRepository.getById(
-      userId,
+      userIdToFetch,
       oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
     );
-    if (!user) throw errors.user.notFound({ userId });
+    if (!user) throw errors.user.notFound({ userId: userIdToFetch });
     const establishments = await this.#withEstablishments(uow, user);
     return {
       ...user,

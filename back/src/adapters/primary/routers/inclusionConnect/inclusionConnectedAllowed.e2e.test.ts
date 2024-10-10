@@ -91,6 +91,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       const response = await httpClient.getInclusionConnectedUser({
         headers: { authorization: token },
+        queryParams: {},
       });
 
       expectHttpResponseToEqual(response, {
@@ -124,6 +125,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     )} 400 without headers`, async () => {
       const response = await httpClient.getInclusionConnectedUser({
         headers: {} as any,
+        queryParams: {},
       });
       expectHttpResponseToEqual(response, {
         body: {
@@ -141,6 +143,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     )} 401 with bad token`, async () => {
       const response = await httpClient.getInclusionConnectedUser({
         headers: { authorization: "wrong-token" },
+        queryParams: {},
       });
 
       expectHttpResponseToEqual(response, {
@@ -160,6 +163,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       const response = await httpClient.getInclusionConnectedUser({
         headers: { authorization: token },
+        queryParams: {},
       });
 
       expectHttpResponseToEqual(response, {

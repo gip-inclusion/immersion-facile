@@ -18,6 +18,7 @@ import {
   WithDiscussionId,
   WithEstablishmentDashboards,
   WithEstablismentsSiretAndName,
+  WithOptionalUserId,
   allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
 
@@ -34,6 +35,10 @@ export const withDiscussionSchemaId: z.Schema<WithDiscussionId> = z.object({
 });
 
 export const userIdSchema: z.Schema<UserId> = zStringMinLength1;
+
+export const withOptionalUserIdSchema: z.Schema<WithOptionalUserId> = z.object({
+  userId: userIdSchema.optional(),
+});
 
 const withEstablishmentSiretAndName: z.Schema<WithEstablismentsSiretAndName> =
   z.object({
