@@ -71,7 +71,7 @@ const UsersTable = () => {
     <Table
       fixed
       id={domElementIds.admin.usersTab.usersTable}
-      headers={["Utilisateur", "Nombre d'agence liées"]}
+      headers={["Utilisateur", "Nombre d'agences liées"]}
       data={users.map((user) => [
         <NameAndEmailInTable
           firstName={user.firstName}
