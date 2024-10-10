@@ -30,11 +30,11 @@ const randomUser = new InclusionConnectedUserBuilder()
   .withEstablishments(undefined)
   .build();
 
-// const adminUser = new InclusionConnectedUserBuilder()
-//   .withId("admin-id")
-//   .withFirstName("Admin")
-//   .withIsAdmin(true)
-//   .build();
+const adminUser = new InclusionConnectedUserBuilder()
+  .withId("admin-id")
+  .withFirstName("Admin")
+  .withIsAdmin(true)
+  .build();
 
 describe("GetUserAgencyDashboardUrl", () => {
   let getInclusionConnectedUser: GetInclusionConnectedUser;
@@ -53,7 +53,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     );
   });
 
-  describe("For getting the current user's rights", () => {
+  describe("For getting the current user's data", () => {
     it("throws NotFoundError if the user is not found", async () => {
       await expectPromiseToFailWithError(
         getInclusionConnectedUser.execute(undefined, randomUser),
@@ -474,6 +474,24 @@ describe("GetUserAgencyDashboardUrl", () => {
           expectToEqual(result.establishments, undefined);
         });
       });
+    });
+  });
+
+  describe("for an admin getting another user's data", () => {
+    it("throws if currentUser is not admin", async () => {
+      await expectPromiseToFailWithError(
+        getInclusionConnectedUser.execute({ userId: "yolo" }, randomUser),
+        errors.user.forbidden({ userId: randomUser.id }),
+      );
+    });
+
+    it("gets another user's data if currentUser is admin", async () => {
+      uow.userRepository.setInclusionConnectedUsers([randomUser]);
+      const fetchedUser = await getInclusionConnectedUser.execute(
+        { userId: randomUser.id },
+        adminUser,
+      );
+      expectToEqual(fetchedUser, randomUser);
     });
   });
 });
