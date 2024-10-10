@@ -172,6 +172,11 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
               {
                 children: "Supprimer",
                 priority: "secondary",
+                disabled:
+                  agency.refersToAgencyId !== null &&
+                  agencyUser.agencyRights[agency.id].roles.includes(
+                    "validator",
+                  ),
                 id: `${domElementIds.admin.agencyTab.editAgencyRemoveUserButton}-${agency.id}-${index}`,
                 onClick: () => {
                   dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
