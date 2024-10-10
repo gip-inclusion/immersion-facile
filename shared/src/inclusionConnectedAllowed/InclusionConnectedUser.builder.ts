@@ -4,6 +4,7 @@ import {
   AgencyRight,
   InclusionConnectedUser,
   UserId,
+  WithEstablismentsSiretAndName,
 } from "./inclusionConnectedAllowed.dto";
 
 const defaultInclusionConnectedUser: InclusionConnectedUser = {
@@ -67,5 +68,11 @@ export class InclusionConnectedUserBuilder
 
   withAgencyRights(agencyRights: AgencyRight[]) {
     return new InclusionConnectedUserBuilder({ ...this.#dto, agencyRights });
+  }
+
+  withEstablishments(
+    establishments: WithEstablismentsSiretAndName[] | undefined,
+  ) {
+    return new InclusionConnectedUserBuilder({ ...this.#dto, establishments });
   }
 }
