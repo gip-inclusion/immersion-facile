@@ -32,7 +32,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
           </h2>
           <p className="fr-text">
             Complétez ce formulaire pour réaliser votre immersion
-            professionnelle. <br /> Il vaut équivalence du CERFA 13912 * 04.
+            professionnelle. <br /> Il vaut équivalence du CERFA 13912 * 05.
           </p>
         </>
       ) : (
