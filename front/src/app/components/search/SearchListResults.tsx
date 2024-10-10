@@ -94,6 +94,9 @@ export const SearchListResults = ({
                     }
                   >
                     <div className={fr.cx("fr-p-1v")}>
+                      {searchResult.establishmentScore > 50 && (
+                        <ImTag theme="superEnterprise" />
+                      )}
                       {searchResult.fitForDisabledWorkers && (
                         <ImTag theme="rqth" />
                       )}
