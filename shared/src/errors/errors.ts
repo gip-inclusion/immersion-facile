@@ -309,6 +309,11 @@ export const errors = {
       new BadRequestError(
         `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
       ),
+
+    invalidUserRemovalWhenAgencyWithRefersTo: (agencyId: AgencyId) =>
+      new BadRequestError(
+        `La suppression d'un valideur n'est pas autorisée pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
+      ),
   },
   user: {
     unauthorized: () => new UnauthorizedError(),

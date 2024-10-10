@@ -94,24 +94,17 @@ describe("RemoveUserFromAgency", () => {
     );
   });
 
-  it("throws forbidden if user to delete has not rights on agency", async () => {
-    const inputParams: RemoveAgencyUserParams = {
-      agencyId: agency.id,
-      userId: notAdminUser.id,
-    };
-
-    expectPromiseToFailWithError(
-      removeUserFromAgency.execute(inputParams, backofficeAdminUser),
-      errors.user.expectedRightsOnAgency(inputParams),
-    );
-  });
-
-  it("throws forbidden if user to delete is the last validator receiving notifications", async () => {
+  it("throws bad request if user attempts to delete validator when agency has refersTo", async () => {
+    const agencyWithRefersTo = new AgencyDtoBuilder()
+      .withId("agency-with-refers-to-id")
+      .withRefersToAgencyId(agency.id)
+      .withCounsellorEmails([notAdminUser.email])
+      .build();
     const initialAgencyRights: AgencyRight[] = [
       {
-        agency,
+        agency: agencyWithRefersTo,
         roles: ["validator"],
-        isNotifiedByEmail: true,
+        isNotifiedByEmail: false,
       },
     ];
     const user: InclusionConnectedUser = {
@@ -122,7 +115,23 @@ describe("RemoveUserFromAgency", () => {
         establishments: {},
       },
     };
+    agencyRepository.insert(agencyWithRefersTo);
     userRepository.setInclusionConnectedUsers([user]);
+
+    const inputParams: RemoveAgencyUserParams = {
+      agencyId: agencyWithRefersTo.id,
+      userId: user.id,
+    };
+
+    expectPromiseToFailWithError(
+      removeUserFromAgency.execute(inputParams, backofficeAdminUser),
+      errors.agency.invalidUserRemovalWhenAgencyWithRefersTo(
+        agencyWithRefersTo.id,
+      ),
+    );
+  });
+
+  it("throws forbidden if user to delete has not rights on agency", async () => {
     const inputParams: RemoveAgencyUserParams = {
       agencyId: agency.id,
       userId: notAdminUser.id,
@@ -130,7 +139,7 @@ describe("RemoveUserFromAgency", () => {
 
     expectPromiseToFailWithError(
       removeUserFromAgency.execute(inputParams, backofficeAdminUser),
-      errors.agency.notEnoughValidators(inputParams),
+      errors.user.expectedRightsOnAgency(inputParams),
     );
   });
 
@@ -173,7 +182,7 @@ describe("RemoveUserFromAgency", () => {
     const initialAgencyRights: AgencyRight[] = [
       {
         agency: agencyWithRefersTo,
-        roles: ["validator"],
+        roles: ["counsellor"],
         isNotifiedByEmail: true,
       },
     ];
