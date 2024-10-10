@@ -86,23 +86,30 @@ export class InMemoryUserRepository implements UserRepository {
     agencyRole,
     agencyId,
     email,
+    isNotifiedByEmail: isNotifiedByEmailFilter,
   }: InclusionConnectedFilters): Promise<InclusionConnectedUser[]> {
     // TODO: gestion des filtres optionnels à améliorer
     return this.users
       .filter((user) => (email ? user.email === email : true))
       .filter((user) => (email ? user.email === email : true))
       .filter((user) =>
-        this.agencyRightsByUserId[user.id].some(({ roles, agency }) => {
-          if (agencyId) {
-            if (agency.id !== agencyId) return false;
-          }
+        this.agencyRightsByUserId[user.id].some(
+          ({ roles, agency, isNotifiedByEmail }) => {
+            if (agencyId) {
+              if (agency.id !== agencyId) return false;
+            }
 
-          if (agencyRole) {
-            if (!roles.includes(agencyRole)) return false;
-          }
+            if (agencyRole) {
+              if (!roles.includes(agencyRole)) return false;
+            }
 
-          return true;
-        }),
+            if (isNotifiedByEmailFilter !== undefined) {
+              return isNotifiedByEmail === isNotifiedByEmailFilter;
+            }
+
+            return true;
+          },
+        ),
       )
       .map((user) => ({
         ...user,

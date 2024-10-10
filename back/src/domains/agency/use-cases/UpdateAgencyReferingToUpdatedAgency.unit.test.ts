@@ -1,6 +1,10 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
+  User,
+  errors,
+  expectArraysToEqual,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
@@ -57,6 +61,16 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
       );
   });
 
+  it("throw error when agency not found", () => {
+    expectPromiseToFailWithError(
+      updateAgencyReferringToUpdatedAgency.execute(
+        { agencyId: updatedAgency.id },
+        icUser,
+      ),
+      errors.agency.notFound({ agencyId: updatedAgency.id }),
+    );
+  });
+
   describe("right paths", () => {
     it("update agencies validator emails that refers to updated agency", async () => {
       uuidGenerator.setNextUuids(["event1", "event2"]);
@@ -65,9 +79,52 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
         agencyRefersToUpdatedAgency1,
         agencyRefersToUpdatedAgency2,
       ]);
+      const notifiedUser: User = {
+        id: "notified-user",
+        email: updatedAgency.validatorEmails.at(0) ?? "",
+        lastName: "Notified",
+        firstName: "User",
+        createdAt: new Date().toISOString(),
+        externalId: null,
+      };
+      const notNotifiedUser: User = {
+        id: "not-notified-by-email-user",
+        email: "notNotifiedByEmailUser@email.fr",
+        lastName: "Doe",
+        firstName: "John",
+        createdAt: new Date().toISOString(),
+        externalId: null,
+      };
+      await uow.userRepository.save(notifiedUser);
+      await uow.userRepository.save(notNotifiedUser);
+      await uow.userRepository.updateAgencyRights({
+        userId: notifiedUser.id,
+        agencyRights: [
+          {
+            agency: updatedAgency,
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+        ],
+      });
+      await uow.userRepository.updateAgencyRights({
+        userId: notNotifiedUser.id,
+        agencyRights: [
+          {
+            agency: updatedAgency,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: agencyRefersToUpdatedAgency1,
+            roles: ["counsellor"],
+            isNotifiedByEmail: false,
+          },
+        ],
+      });
 
       await updateAgencyReferringToUpdatedAgency.execute(
-        { agency: updatedAgency },
+        { agencyId: updatedAgency.id },
         icUser,
       );
 
@@ -83,15 +140,39 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
         },
       ]);
 
+      expectArraysToEqual(
+        uow.userRepository.agencyRightsByUserId[notNotifiedUser.id],
+        [
+          {
+            agency: updatedAgency,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: {
+              ...agencyRefersToUpdatedAgency1,
+              validatorEmails: updatedAgency.validatorEmails,
+            },
+            roles: ["counsellor", "validator"],
+            isNotifiedByEmail: false,
+          },
+          {
+            agency: {
+              ...agencyRefersToUpdatedAgency2,
+              validatorEmails: updatedAgency.validatorEmails,
+            },
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        ],
+      );
+
       expectToEqual(uow.outboxRepository.events, [
         {
           ...createNewEvent({
             topic: "AgencyUpdated",
             payload: {
-              agency: {
-                ...agencyRefersToUpdatedAgency1,
-                validatorEmails: updatedAgency.validatorEmails,
-              },
+              agencyId: agencyRefersToUpdatedAgency1.id,
               triggeredBy: {
                 kind: "crawler",
               },
@@ -103,10 +184,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
           ...createNewEvent({
             topic: "AgencyUpdated",
             payload: {
-              agency: {
-                ...agencyRefersToUpdatedAgency2,
-                validatorEmails: updatedAgency.validatorEmails,
-              },
+              agencyId: agencyRefersToUpdatedAgency2.id,
               triggeredBy: {
                 kind: "crawler",
               },
@@ -124,7 +202,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
       ]);
 
       await updateAgencyReferringToUpdatedAgency.execute({
-        agency: updatedAgency,
+        agencyId: updatedAgency.id,
       });
 
       expectToEqual(uow.agencyRepository.agencies, [

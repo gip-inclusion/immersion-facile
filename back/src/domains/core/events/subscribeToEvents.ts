@@ -162,7 +162,10 @@ const getUseCasesByTopics = (
   UserAuthenticatedSuccessfully: [
     useCases.linkFranceTravailUsersToTheirAgencies,
   ],
-  IcUserAgencyRightChanged: [useCases.notifyIcUserAgencyRightChanged],
+  IcUserAgencyRightChanged: [
+    useCases.notifyIcUserAgencyRightChanged,
+    useCases.updateAgencyReferringToUpdatedAgency,
+  ],
   IcUserAgencyRightRejected: [useCases.notifyIcUserAgencyRightRejected],
 
   //Api Consumer related:

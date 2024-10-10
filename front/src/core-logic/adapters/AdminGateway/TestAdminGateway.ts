@@ -10,10 +10,10 @@ import {
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
-  RemoveAgencyUserParams,
   SetFeatureFlagParam,
   UserInList,
   UserParamsForAgency,
+  WithAgencyIdAndUserId,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -112,7 +112,7 @@ export class TestAdminGateway implements AdminGateway {
   }
 
   public removeUserFromAgency$(
-    _params: RemoveAgencyUserParams,
+    _params: WithAgencyIdAndUserId,
     _token: string,
   ): Observable<void> {
     return this.removeUserFromAgencyResponse$;

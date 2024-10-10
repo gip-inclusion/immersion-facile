@@ -13,12 +13,12 @@ import {
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
   RejectIcUserRoleForAgencyParams,
-  RemoveAgencyUserParams,
   UserParamsForAgency,
+  WithAgencyIdAndUserId,
   WithUserFilters,
 } from "./admin.dto";
 
-export const removeAgencyUserParamsSchema: z.Schema<RemoveAgencyUserParams> =
+export const withAgencyIdAndUserIdSchema: z.Schema<WithAgencyIdAndUserId> =
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,

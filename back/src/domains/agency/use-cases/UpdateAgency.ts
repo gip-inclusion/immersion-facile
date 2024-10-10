@@ -44,7 +44,7 @@ export class UpdateAgency extends TransactionalUseCase<
       this.#createNewEvent({
         topic: "AgencyUpdated",
         payload: {
-          agency,
+          agencyId: agency.id,
           triggeredBy: {
             kind: "inclusion-connected",
             userId: currentUser.id,
