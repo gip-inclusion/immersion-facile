@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { LocationId } from "../address/address.dto";
 import { AgencyId } from "../agency/agency.dto";
 import {
@@ -29,6 +28,7 @@ import { Role } from "../role/role.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ShortLinkId } from "../shortLink/shortLink.dto";
 import { SiretDto } from "../siret/siret";
+import { toDisplayedDate } from "../utils/date";
 import {
   BadRequestError,
   ConflictError,
@@ -375,10 +375,11 @@ export const errors = {
       formattedWaitingTime: string;
     }) =>
       new TooManyRequestApiError(
-        `La convention a été synchronisée le ${format(
-          params.lastBroadcastDate,
-          "dd/MM/yyyy 'à' hh'h'mm",
-        )}. Merci d'essayer à nouveau dans ${params.formattedWaitingTime}.`,
+        `La convention a été synchronisée le ${toDisplayedDate({
+          date: params.lastBroadcastDate,
+          withHours: true,
+          showGMT: true,
+        })}. Merci d'essayer à nouveau dans ${params.formattedWaitingTime}.`,
       ),
   },
   discussion: {
