@@ -155,6 +155,7 @@ export const SearchListResults = ({
         </div>
         <div className={fr.cx("fr-col-4")}>
           <SearchMiniMap
+            kind="list"
             activeMarkerKey={activeMarkerKey}
             setActiveMarkerKey={setActiveMarkerKey}
           />
