@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
-import { AutocompleteInput } from "react-design-system";
+import { AutocompleteInput, AutocompleteInputProps } from "react-design-system";
 import { AddressAndPosition, addressDtoToString } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { useStyles } from "tss-react/dsfr";
@@ -18,6 +18,8 @@ export type AddressAutocompleteProps = {
   notice?: string;
   id?: string;
   useFirstAddressOnInitialSearchTerm?: boolean;
+  state?: AutocompleteInputProps["state"];
+  stateRelatedMessage?: AutocompleteInputProps["stateRelatedMessage"];
 };
 
 export const AddressAutocomplete = ({
@@ -31,6 +33,8 @@ export const AddressAutocomplete = ({
   notice,
   id = "im-address-autocomplete",
   useFirstAddressOnInitialSearchTerm,
+  state,
+  stateRelatedMessage,
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] =
     useState<AddressAndPosition | null>(null);
@@ -121,6 +125,8 @@ export const AddressAutocomplete = ({
             placeholder={placeholder}
             id={id}
             params={params}
+            state={state}
+            stateRelatedMessage={stateRelatedMessage}
           />
         )}
       />

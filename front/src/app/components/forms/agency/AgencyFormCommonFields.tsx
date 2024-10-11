@@ -114,6 +114,7 @@ export const AgencyFormCommonFields = ({
         id={domElementIds.addAgency.addressAutocomplete}
         disabled={isFetchingSiret}
         useFirstAddressOnInitialSearchTerm
+        {...getFieldError("address")}
       />
       {!refersToOtherAgency && (
         <RadioGroup

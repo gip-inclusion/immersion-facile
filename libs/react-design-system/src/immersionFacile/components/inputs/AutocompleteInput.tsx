@@ -1,7 +1,6 @@
-import { fr } from "@codegouvfr/react-dsfr";
+import Input, { InputProps } from "@codegouvfr/react-dsfr/Input";
 import { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
 import React from "react";
-import { useStyles } from "tss-react/dsfr";
 import "./AutocompleteInput.css";
 
 export type AutocompleteInputProps = {
@@ -12,35 +11,31 @@ export type AutocompleteInputProps = {
   label: string;
   params: AutocompleteRenderInputParams;
   placeholder: string | undefined;
+  state?: InputProps["state"];
+  stateRelatedMessage?: InputProps["stateRelatedMessage"];
 };
 
 export const AutocompleteInput = ({
   disabled,
-  headerClassName,
   id,
   inputStyle,
   label,
   params,
   placeholder,
-}: AutocompleteInputProps) => {
-  const { cx } = useStyles();
-  return (
-    <div ref={params.InputProps.ref} className={cx("if-autocomplete-input")}>
-      <div className={cx("if-autocomplete-input__wrapper")}>
-        <label className={cx(fr.cx("fr-label"), headerClassName)} htmlFor={id}>
-          {label}
-        </label>
-
-        <input
-          {...params.inputProps}
-          id={id}
-          style={inputStyle}
-          disabled={disabled}
-          className={fr.cx("fr-input")}
-          placeholder={placeholder}
-          type="text"
-        />
-      </div>
-    </div>
-  );
-};
+  state,
+  stateRelatedMessage,
+}: AutocompleteInputProps) => (
+  <Input
+    ref={params.InputProps.ref}
+    label={label}
+    nativeInputProps={{
+      ...params.inputProps,
+      id,
+      style: inputStyle,
+      placeholder,
+    }}
+    disabled={disabled}
+    state={state}
+    stateRelatedMessage={stateRelatedMessage}
+  />
+);

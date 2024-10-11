@@ -55,6 +55,7 @@ import { useConventionTexts } from "src/app/contents/forms/convention/textSetup"
 import {
   displayReadableError,
   getFormContents,
+  makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
@@ -174,9 +175,11 @@ export const ConventionForm = ({
     clearErrors,
     getValues,
     getFieldState,
-    formState: { errors, submitCount, isSubmitted },
+    formState,
     reset,
   } = methods;
+
+  const { errors, submitCount, isSubmitted } = formState;
 
   const conventionValues = getValues();
 
@@ -190,6 +193,7 @@ export const ConventionForm = ({
   const { getFormFields, getFormErrors } = getFormContents(
     formConventionFieldsLabels(conventionValues.internshipKind),
   );
+  const getFieldError = makeFieldError(formState);
   const formContents = getFormFields();
 
   const t = useConventionTexts(conventionValues.internshipKind);
@@ -483,6 +487,7 @@ export const ConventionForm = ({
                           )
                         }
                         disabled={isFetchingSiret}
+                        {...getFieldError("immersionAddress")}
                       />
                     </Accordion>
                     <Accordion

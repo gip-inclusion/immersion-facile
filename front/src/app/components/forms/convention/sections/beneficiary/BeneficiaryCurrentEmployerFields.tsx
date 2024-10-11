@@ -104,6 +104,9 @@ export const BeneficiaryCurrentEmployerFields = ({
             addressDtoToString(address),
           )
         }
+        {...getFieldError(
+          "signatories.beneficiaryCurrentEmployer.businessAddress",
+        )}
       />
       <Input
         label={
