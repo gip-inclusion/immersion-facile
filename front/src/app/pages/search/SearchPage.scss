@@ -37,3 +37,6 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
+.leaflet-popup-close-button {
+  z-index: 9999;
+}
