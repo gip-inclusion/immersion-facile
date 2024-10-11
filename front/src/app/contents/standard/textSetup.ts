@@ -1,3 +1,4 @@
+import { MainWrapperProps } from "react-design-system";
 import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import accessibilityContent from "./accessibilite";
 import budgetContent from "./budget";
@@ -7,9 +8,10 @@ import obligationsContent from "./obligations-des-parties";
 import policiesContent from "./politique-de-confidentialite";
 import siteMapContent from "./siteMap";
 
-type StandardPageContent = {
+export type StandardPageContent = {
   title: string;
   content: string;
+  layout?: MainWrapperProps["layout"];
 };
 
 const mappedContents: Record<StandardPageSlugs, StandardPageContent> = {
