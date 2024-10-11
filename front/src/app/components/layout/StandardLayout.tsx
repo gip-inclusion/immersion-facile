@@ -16,10 +16,10 @@ export const StandardLayout = ({ route }: StandardLayoutProps) => {
   const contents = getStandardContents(
     route.params.pagePath as StandardPageSlugs,
   );
-  const { title, content } = contents;
+  const { title, content, layout } = contents;
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout="boxed">
+      <MainWrapper layout={layout ?? "boxed"}>
         <h1 className={fr.cx("fr-h2")}>{title}</h1>
         <div
           dangerouslySetInnerHTML={{
