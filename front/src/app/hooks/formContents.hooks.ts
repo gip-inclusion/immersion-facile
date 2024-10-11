@@ -1,5 +1,5 @@
 import { type FieldValues, type FormState, get } from "react-hook-form";
-import { DotNestedKeys, keys, toDotNotation } from "shared";
+import { AddressDto, DotNestedKeys, keys, toDotNotation } from "shared";
 import {
   FormFieldAttributes,
   FormFieldAttributesForContent,
@@ -75,6 +75,14 @@ export const makeFieldError =
     stateRelatedMessage: string | undefined;
   } | null => {
     const error = get(context.errors, name.toString());
+    if (isErrorAddressError(error)) {
+      return {
+        state: "error" as const,
+        stateRelatedMessage: `L'adresse fournie semble invalide (${keys(
+          error,
+        ).join(", ")})`,
+      };
+    }
     return error
       ? {
           state: "error" as const,
@@ -82,6 +90,19 @@ export const makeFieldError =
         }
       : null;
   };
+
+const isErrorAddressError = (error: unknown) => {
+  const keysOfAddressSchema: (keyof AddressDto)[] = [
+    "postcode",
+    "city",
+    "departmentCode",
+  ];
+  return (
+    error &&
+    typeof error === "object" &&
+    keys(error).every((key) => keysOfAddressSchema.includes(key))
+  );
+};
 
 export const formErrorsToFlatErrors = (
   obj: Record<string, any>,

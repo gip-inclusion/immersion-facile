@@ -234,6 +234,7 @@ export const BeneficiaryFormSection = ({
             id={
               domElementIds.conventionImmersionRoute.beneficiarySection.address
             }
+            {...getFieldError("signatories.beneficiary.address")}
           />
           <Select
             label={
