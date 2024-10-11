@@ -17,7 +17,7 @@ import "./SearchResult.scss";
 export type EnterpriseSearchResultProps = {
   establishment: SearchResultDto;
   onButtonClick?: () => void;
-  illustration: React.ReactNode;
+  illustration?: React.ReactNode;
   disableButton?: boolean;
   preview?: boolean;
   showDistance?: boolean;
