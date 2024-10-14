@@ -23,6 +23,7 @@ import {
 import {
   displayReadableError,
   getFormContents,
+  toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
@@ -184,8 +185,10 @@ const FeatureFlagTextWithSeverityForm = ({
       )}
 
       <ErrorNotifications
-        labels={getFormErrors()}
-        errors={displayReadableError(formState.errors)}
+        errorsWithLabels={toErrorsWithLabels({
+          errors: displayReadableError(formState.errors),
+          labels: getFormErrors(),
+        })}
         visible={
           formState.submitCount !== 0 &&
           Object.values(formState.errors).length > 0
@@ -276,8 +279,10 @@ const FeatureFlagTextImageAndRedirectForm = ({
         }}
       />
       <ErrorNotifications
-        labels={getFormErrors()}
-        errors={displayReadableError(formState.errors)}
+        errorsWithLabels={toErrorsWithLabels({
+          errors: displayReadableError(formState.errors),
+          labels: getFormErrors(),
+        })}
         visible={
           formState.submitCount !== 0 &&
           Object.values(formState.errors).length > 0

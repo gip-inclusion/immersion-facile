@@ -44,6 +44,7 @@ import {
   displayReadableError,
   getFormContents,
   makeFieldError,
+  toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -451,8 +452,10 @@ export const RenewConventionForm = ({
           {...getFieldError("renewed.justification")}
         />
         <ErrorNotifications
-          labels={getFormErrors()}
-          errors={displayReadableError(errors)}
+          errorsWithLabels={toErrorsWithLabels({
+            labels: getFormErrors(),
+            errors: displayReadableError(errors),
+          })}
           visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
         <Button id={domElementIds.manageConvention.submitRenewModalButton}>
