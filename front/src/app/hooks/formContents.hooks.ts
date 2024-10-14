@@ -1,3 +1,4 @@
+import { type ErrorNotificationsProps } from "react-design-system";
 import { type FieldValues, type FormState, get } from "react-hook-form";
 import { AddressDto, DotNestedKeys, keys, toDotNotation } from "shared";
 import {
@@ -10,6 +11,8 @@ export type FormFieldsObjectForContent<T> = Record<
   keyof T,
   FormFieldAttributesForContent
 >;
+
+type Error = Record<string, any>;
 
 export const getFormContents = <T>(
   formFieldsLabels: FormFieldsObjectForContent<T>,
@@ -104,10 +107,8 @@ const isErrorAddressError = (error: unknown) => {
   );
 };
 
-export const formErrorsToFlatErrors = (
-  obj: Record<string, any>,
-): Record<string, any> => {
-  const errorObj: Record<string, any> = {};
+export const formErrorsToFlatErrors = (obj: Error): Error => {
+  const errorObj: Error = {};
   for (const key in obj) {
     if (key in obj) {
       if (typeof obj[key] === "object" && "message" in obj[key]) {
@@ -125,7 +126,7 @@ export const formErrorsToFlatErrors = (
 const doesSplittedKeyContainsIndex = (splittedKey: string[]) =>
   splittedKey.length > 1 && !Number.isNaN(Number(splittedKey[1]));
 
-const replaceArrayPath = (flatErrorsObject: Record<string, any>) =>
+const replaceArrayPath = (flatErrorsObject: Error) =>
   keys(flatErrorsObject).reduce((acc, dotNestedKey) => {
     const separator = ".";
     const keySplitted = dotNestedKey.split(separator);
@@ -138,7 +139,33 @@ const replaceArrayPath = (flatErrorsObject: Record<string, any>) =>
     };
   }, {});
 
-export const displayReadableError = (
-  errors: Record<string, any>,
-): Record<string, any> =>
+export const displayReadableError = (errors: Error): Error =>
   replaceArrayPath(toDotNotation(formErrorsToFlatErrors(errors)));
+
+export const toErrorsWithLabels = ({
+  labels,
+  errors,
+}: {
+  labels: Record<string, string>;
+  errors: Error;
+}): ErrorNotificationsProps["errorsWithLabels"] =>
+  keys(errors).map((error) => ({
+    error: {
+      field: error,
+      message: errors[error],
+    },
+    label: getErrorLabel(error, labels),
+  }));
+
+const getErrorLabel = (
+  field: string,
+  labels: Record<string, string | undefined>,
+) => {
+  if (!labels) return field;
+  if (field.includes(".") && doesSplittedKeyContainsIndex(field.split("."))) {
+    const splittedField = field.split(".");
+    const [domain, entryIndex] = splittedField;
+    return `${labels[domain]} (${parseInt(entryIndex) + 1})`;
+  }
+  return labels[field];
+};

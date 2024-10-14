@@ -56,6 +56,7 @@ import {
   displayReadableError,
   getFormContents,
   makeFieldError,
+  toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
@@ -506,8 +507,10 @@ export const ConventionForm = ({
                   </div>
 
                   <ErrorNotifications
-                    labels={getFormErrors()}
-                    errors={displayReadableError(errors)}
+                    errorsWithLabels={toErrorsWithLabels({
+                      errors: displayReadableError(errors),
+                      labels: getFormErrors(),
+                    })}
                     visible={
                       submitCount !== 0 && Object.values(errors).length > 0
                     }
