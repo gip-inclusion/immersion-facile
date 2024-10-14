@@ -31,12 +31,15 @@ export default {
 
 export const Default: Story = {
   args: {
-    errors: {
-      birthdate: "Format invalide",
-    },
-    labels: {
-      birthdate: "date de naissance",
-    },
+    errorsWithLabels: [
+      {
+        error: {
+          field: "email",
+          message: "Ce champ est obligatoire",
+        },
+        label: "Email",
+      },
+    ],
     visible: true,
   },
 };
