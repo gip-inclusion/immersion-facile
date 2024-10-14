@@ -58,8 +58,8 @@ const onNotHttpError = (error: any, req: Request, res: Response) => {
       ...(error.response
         ? {
             httpStatus: error.response.status,
-            responseBody: error.response.data,
             path: error.response?.request?.path,
+            responseBody: error.response.data,
           }
         : {}),
     });
@@ -92,7 +92,7 @@ const onNotHttpError = (error: any, req: Request, res: Response) => {
 
 const logErrorAndNotifyDiscord = (
   type: string,
-  { path, method, body }: Request,
+  { path, method }: Request,
   otherContent: object,
 ): void => {
   const params: LoggerParamsWithMessage = {
@@ -100,7 +100,6 @@ const logErrorAndNotifyDiscord = (
     request: {
       path,
       method,
-      body,
     },
     ...otherContent,
   };
