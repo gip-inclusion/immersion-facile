@@ -82,7 +82,7 @@ type LoggerParams = Partial<{
     isJobSeeker: boolean;
   }>;
   reportContent: string;
-  request: Pick<Request, "path" | "method"> & { body: unknown | "sanitized" };
+  request: Pick<Request, "path" | "method">;
   requestId: string;
   sharedRouteResponse: HttpResponse<any, any>;
   axiosResponse: AxiosResponse;

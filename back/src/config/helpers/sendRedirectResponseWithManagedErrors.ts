@@ -25,7 +25,6 @@ export const sendRedirectResponseWithManagedErrors = async (
       request: {
         path: req.path,
         method: req.method,
-        body: req.body,
       },
       message: "Redirect error",
     });

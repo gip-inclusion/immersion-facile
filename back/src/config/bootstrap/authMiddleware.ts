@@ -50,7 +50,6 @@ const createIncTotalCountForRequest =
       request: {
         method: req.method,
         path: route,
-        body: "sanitized",
       },
       authorisationStatus,
       message: `apiKeyAuthMiddlewareRequestsTotal for ${consumerName}`,
