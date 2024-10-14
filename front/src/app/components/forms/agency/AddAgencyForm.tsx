@@ -36,6 +36,7 @@ import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import {
   displayReadableError,
   getFormContents,
+  toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
@@ -334,8 +335,10 @@ const AgencyForm = ({
                 <AgencyLogoUpload />
 
                 <ErrorNotifications
-                  labels={getFormErrors()}
-                  errors={displayReadableError(formState.errors)}
+                  errorsWithLabels={toErrorsWithLabels({
+                    labels: getFormErrors(),
+                    errors: displayReadableError(formState.errors),
+                  })}
                   visible={
                     formState.submitCount !== 0 &&
                     Object.values(formState.errors).length > 0

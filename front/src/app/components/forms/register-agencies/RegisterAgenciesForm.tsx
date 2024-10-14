@@ -7,7 +7,12 @@ import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { AgencyOption, agencyIdAndNameSchema, domElementIds } from "shared";
-import { displayReadableError } from "src/app/hooks/formContents.hooks";
+import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
+import {
+  displayReadableError,
+  getFormContents,
+  toErrorsWithLabels,
+} from "src/app/hooks/formContents.hooks";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { z } from "zod";
 import { MultipleAgencyInput } from "./MultipleAgencyInput";
@@ -28,6 +33,7 @@ export const RegisterAgenciesForm = () => {
       },
       resolver: zodResolver(registerAgenciesFormSchema),
     });
+  const { getFormErrors } = getFormContents(formAgencyFieldsLabels);
   const dispatch = useDispatch();
   return (
     <>
@@ -63,7 +69,10 @@ export const RegisterAgenciesForm = () => {
           }}
         />
         <ErrorNotifications
-          errors={displayReadableError(formState.errors)}
+          errorsWithLabels={toErrorsWithLabels({
+            errors: displayReadableError(formState.errors),
+            labels: getFormErrors(),
+          })}
           visible={keys(formState.errors).length > 0}
         />
         <div className={fr.cx("fr-mt-2w")}>
