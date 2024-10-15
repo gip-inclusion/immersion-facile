@@ -84,9 +84,14 @@ export type WithDashboards = {
 
 export type UserWithAgencyRights = User & WithAgencyRights;
 
+export type WithIsBackOfficeAdmin = {
+  isBackofficeAdmin?: boolean;
+};
+
 export type InclusionConnectedUser = UserWithAgencyRights &
   WithEstablishments &
-  WithDashboards & { isBackofficeAdmin?: boolean };
+  WithDashboards &
+  WithIsBackOfficeAdmin;
 
 export type WithOptionalUserId = {
   userId?: UserId;

@@ -26,10 +26,14 @@ export const getIcUserOrThrow = async (
     oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
   );
   if (!user) throw errors.user.notFound({ userId });
-  return user;
+  return {
+    ...user,
+    agencyRights: await uow.agencyRepository.getAgenciesRightsByUserId(userId),
+    dashboards: { agencies: {}, establishments: {} },
+  };
 };
 
-export const throwIfNotAdmin = (user: InclusionConnectedUser | undefined) => {
+export const throwIfNotAdmin = (user: InclusionConnectedUser) => {
   if (!user) throw errors.user.unauthorized();
   if (!user.isBackofficeAdmin) throw errors.user.forbidden({ userId: user.id });
 };
