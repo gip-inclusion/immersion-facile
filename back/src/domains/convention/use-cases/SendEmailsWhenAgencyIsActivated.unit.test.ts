@@ -27,7 +27,10 @@ const agency = new AgencyDtoBuilder()
 
 const agencyWithRefersTo = new AgencyDtoBuilder()
   .withId("id-of-agency-refering-to-other")
-  .withRefersToAgencyId(agency.id)
+  .withRefersToAgencyInfo({
+    refersToAgencyId: agency.id,
+    refersToAgencyName: agency.name,
+  })
   .withCounsellorEmails(["councellor@email.com"])
   .withValidatorEmails(agency.validatorEmails)
   .withName("just-activated-agency-refering-to-other-one")

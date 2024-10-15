@@ -1,17 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import {
-  Observable,
-  debounceTime,
-  distinctUntilChanged,
-  filter,
-  of,
-} from "rxjs";
+import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import {
-  AgencyDtoRefersToAgencyFields,
-  type AgencyId,
-  looksLikeSiret,
-} from "shared";
+import { type AgencyId, looksLikeSiret } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -93,36 +83,10 @@ const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (
   action$.pipe(
     filter(agencyAdminSlice.actions.setSelectedAgencyId.match),
     switchMap((action: PayloadAction<AgencyId>) =>
-      dependencies.agencyGateway
-        .getAgencyAdminById$(action.payload, getAdminToken(state$.value))
-        .pipe(
-          switchMap(
-            (agency): Observable<AgencyDtoRefersToAgencyFields | undefined> => {
-              if (!agency) return of();
-              if (!agency.refersToAgencyId) {
-                const agencyWithRefersToAgencyName: AgencyDtoRefersToAgencyFields =
-                  {
-                    ...agency,
-                    refersToAgencyName: null,
-                  };
-                return of(agencyWithRefersToAgencyName);
-              }
-              return dependencies.agencyGateway
-                .getAgencyAdminById$(
-                  agency.refersToAgencyId,
-                  getAdminToken(state$.value),
-                )
-                .pipe(
-                  map(
-                    (agencyReferred): AgencyDtoRefersToAgencyFields => ({
-                      ...agency,
-                      refersToAgencyName: agencyReferred?.name ?? null,
-                    }),
-                  ),
-                );
-            },
-          ),
-        ),
+      dependencies.agencyGateway.getAgencyAdminById$(
+        action.payload,
+        getAdminToken(state$.value),
+      ),
     ),
     map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
   );

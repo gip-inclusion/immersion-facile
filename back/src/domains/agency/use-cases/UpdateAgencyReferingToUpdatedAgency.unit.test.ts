@@ -36,13 +36,19 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
     .withId("2")
     .withName("Structure accompagnement 2 referent à l'agence 1")
     .withValidatorEmails(["not.updated@mail.com"])
-    .withRefersToAgencyId(updatedAgency.id)
+    .withRefersToAgencyInfo({
+      refersToAgencyId: updatedAgency.id,
+      refersToAgencyName: updatedAgency.name,
+    })
     .build();
   const agency3RefersToUpdatedAgency = new AgencyDtoBuilder()
     .withId("3")
     .withName("Structure accompagnement 3 referent à l'agence 1")
     .withValidatorEmails(["not.updated@mail.com"])
-    .withRefersToAgencyId(updatedAgency.id)
+    .withRefersToAgencyInfo({
+      refersToAgencyId: updatedAgency.id,
+      refersToAgencyName: updatedAgency.name,
+    })
     .build();
   const agencyNotReferingToUpdatedAgency = new AgencyDtoBuilder()
     .withId("4")

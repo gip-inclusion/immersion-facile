@@ -128,6 +128,10 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     label: "Combien d'étapes de validation des immersions y a-t-il ?",
     required: true,
   },
+  refersToAgencyName: {
+    label: "",
+    id: "",
+  },
   acquisitionCampaign: {
     label: "",
     id: "",

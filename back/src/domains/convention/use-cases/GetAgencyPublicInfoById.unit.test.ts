@@ -15,7 +15,10 @@ import { GetAgencyPublicInfoById } from "./GetAgencyPublicInfoById";
 describe("GetAgencyPublicInfoById", () => {
   const agency = new AgencyDtoBuilder().withId("1").build();
   const agency2 = new AgencyDtoBuilder()
-    .withRefersToAgencyId(agency.id)
+    .withRefersToAgencyInfo({
+      refersToAgencyId: agency.id,
+      refersToAgencyName: agency.name,
+    })
     .withId("2")
     .build();
   let uow: InMemoryUnitOfWork;

@@ -32,6 +32,7 @@ const emptyAgency: AgencyDto = {
   },
   logoUrl: null,
   refersToAgencyId: null,
+  refersToAgencyName: null,
   codeSafir: null,
   rejectionJustification: null,
 };
@@ -144,10 +145,14 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withRefersToAgencyId(refersToAgencyId: AgencyId | null) {
+  public withRefersToAgencyInfo(
+    params: { refersToAgencyId: AgencyId; refersToAgencyName: string } | null,
+  ) {
     return new AgencyDtoBuilder({
       ...this.#agency,
-      refersToAgencyId,
+      ...(params
+        ? params
+        : { refersToAgencyId: null, refersToAgencyName: null }),
     });
   }
 

@@ -125,7 +125,10 @@ describe("CreateUserForAgency", () => {
       .withId("agency-with-refers-to")
       .withValidatorEmails([])
       .withCounsellorEmails(["fake-counsellor-email@gmail.com"])
-      .withRefersToAgencyId(agency.id)
+      .withRefersToAgencyInfo({
+        refersToAgencyId: agency.id,
+        refersToAgencyName: agency.name,
+      })
       .build();
 
     it("Throw when user have role validator", async () => {

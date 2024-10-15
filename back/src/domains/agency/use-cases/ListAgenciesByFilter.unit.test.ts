@@ -56,7 +56,10 @@ const peAgency2InParis = new AgencyDtoBuilder()
   .withAddress(parisAddress)
   .build();
 const otherAgencyWithRefersToInCergy = new AgencyDtoBuilder()
-  .withRefersToAgencyId(peAgency2InParis.id)
+  .withRefersToAgencyInfo({
+    refersToAgencyId: peAgency2InParis.id,
+    refersToAgencyName: peAgency2InParis.name,
+  })
   .withId("5")
   .withName("Agence avec refersTo")
   .withAddress(cergyAddress)

@@ -85,20 +85,50 @@ export class PgAgencyRepository implements AgencyRepository {
     const results = await pipeWithValue(
       this.transaction
         .selectFrom("agencies")
-        .selectAll()
-        .select((eb) => eb.fn("ST_AsGeoJSON", ["position"]).as("position")),
+        .leftJoin(
+          "agencies as refered_agencies",
+          "agencies.refers_to_agency_id",
+          "refered_agencies.id",
+        )
+        .select((eb) => [
+          "agencies.id",
+          "agencies.name",
+          "agencies.city",
+          "agencies.department_code",
+          "agencies.agency_siret",
+          "agencies.covered_departments",
+          "agencies.post_code",
+          "agencies.street_number_and_address",
+          "agencies.code_safir",
+          "agencies.kind",
+          "agencies.questionnaire_url",
+          "agencies.logo_url",
+          "agencies.rejection_justification",
+          "agencies.email_signature",
+          "agencies.status",
+          "refered_agencies.id as refers_to_agency_id",
+          "refered_agencies.name as refers_to_agency_name",
+          eb.fn<string>("ST_AsGeoJSON", ["agencies.position"]).as("position"),
+        ]),
       (b) =>
         departmentCode
-          ? b.where("covered_departments", "@>", `["${departmentCode}"]`)
+          ? b.where(
+              "agencies.covered_departments",
+              "@>",
+              `["${departmentCode}"]`,
+            )
           : b,
-      (b) => (nameIncludes ? b.where("name", "ilike", `%${nameIncludes}%`) : b),
-      (b) => (kinds ? b.where("kind", "in", kinds) : b),
-      (b) => (status ? b.where("status", "in", status) : b),
+      (b) =>
+        nameIncludes
+          ? b.where("agencies.name", "ilike", `%${nameIncludes}%`)
+          : b,
+      (b) => (kinds ? b.where("agencies.kind", "in", kinds) : b),
+      (b) => (status ? b.where("agencies.status", "in", status) : b),
       (b) =>
         doesNotReferToOtherAgency
-          ? b.where("refers_to_agency_id", "is", null)
+          ? b.where("agencies.refers_to_agency_id", "is", null)
           : b,
-      (b) => (siret ? b.where("agency_siret", "=", siret) : b),
+      (b) => (siret ? b.where("agencies.agency_siret", "=", siret) : b),
       (b) =>
         b.limit(
           Math.min(limit ?? MAX_AGENCIES_RETURNED, MAX_AGENCIES_RETURNED),
@@ -111,7 +141,7 @@ export class PgAgencyRepository implements AgencyRepository {
                   fn("ST_GeographyFromText", [
                     sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
                   ]),
-                  "position",
+                  "agencies.position",
                 ]).as("distance-km"),
               )
               .where(
@@ -120,7 +150,7 @@ export class PgAgencyRepository implements AgencyRepository {
                     fn("ST_GeographyFromText", [
                       sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
                     ]),
-                    "position",
+                    "agencies.position",
                   ]),
                 "<=",
                 position.distance_km * 1000,
@@ -154,6 +184,7 @@ export class PgAgencyRepository implements AgencyRepository {
         status: result.status as AgencyStatus,
         rejectionJustification: result.rejection_justification,
         refersToAgencyId: result.refers_to_agency_id,
+        refersToAgencyName: result.refers_to_agency_name,
       }),
     );
 
@@ -426,38 +457,46 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   #getAgencyWithJsonBuiltQueryBuilder = () =>
-    this.transaction.selectFrom("agencies as a").select(({ ref }) => [
-      jsonBuildObject({
-        id: cast<AgencyId>(ref("a.id")),
-        name: ref("a.name"),
-        status: cast<AgencyStatus>(ref("a.status")),
-        kind: cast<AgencyKind>(ref("a.kind")),
-        questionnaireUrl: sql<AbsoluteUrl>`${ref("a.questionnaire_url")}`,
-        logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
-        position: jsonBuildObject({
-          lat: sql<number>`(ST_AsGeoJSON(${ref(
-            "a.position",
-          )})::json->'coordinates'->>1)::numeric`,
-          lon: sql<number>`(ST_AsGeoJSON(${ref(
-            "a.position",
-          )})::json->'coordinates'->>0)::numeric`,
-        }),
-        address: jsonBuildObject({
-          streetNumberAndAddress: ref("a.street_number_and_address"),
-          postcode: ref("a.post_code"),
-          city: ref("a.city"),
-          departmentCode: ref("a.department_code"),
-        }),
-        coveredDepartments: cast<DepartmentCode[]>(
-          ref("a.covered_departments"),
-        ),
-        agencySiret: ref("a.agency_siret"),
-        codeSafir: ref("a.code_safir"),
-        signature: ref("a.email_signature"),
-        refersToAgencyId: cast<AgencyId>(ref("a.refers_to_agency_id")),
-        rejectionJustification: ref("a.rejection_justification"),
-      }).as("agency"),
-    ]);
+    this.transaction
+      .selectFrom("agencies as a")
+      .leftJoin(
+        "agencies as refered_agencies",
+        "a.refers_to_agency_id",
+        "refered_agencies.id",
+      )
+      .select(({ ref }) => [
+        jsonBuildObject({
+          id: cast<AgencyId>(ref("a.id")),
+          name: ref("a.name"),
+          status: cast<AgencyStatus>(ref("a.status")),
+          kind: cast<AgencyKind>(ref("a.kind")),
+          questionnaireUrl: sql<AbsoluteUrl>`${ref("a.questionnaire_url")}`,
+          logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
+          position: jsonBuildObject({
+            lat: sql<number>`(ST_AsGeoJSON(${ref(
+              "a.position",
+            )})::json->'coordinates'->>1)::numeric`,
+            lon: sql<number>`(ST_AsGeoJSON(${ref(
+              "a.position",
+            )})::json->'coordinates'->>0)::numeric`,
+          }),
+          address: jsonBuildObject({
+            streetNumberAndAddress: ref("a.street_number_and_address"),
+            postcode: ref("a.post_code"),
+            city: ref("a.city"),
+            departmentCode: ref("a.department_code"),
+          }),
+          coveredDepartments: cast<DepartmentCode[]>(
+            ref("a.covered_departments"),
+          ),
+          agencySiret: ref("a.agency_siret"),
+          codeSafir: ref("a.code_safir"),
+          signature: ref("a.email_signature"),
+          refersToAgencyId: cast<AgencyId>(ref("a.refers_to_agency_id")),
+          refersToAgencyName: ref("refered_agencies.name"),
+          rejectionJustification: ref("a.rejection_justification"),
+        }).as("agency"),
+      ]);
 }
 
 const parseGeoJson = (raw: string): GeoPositionDto => {

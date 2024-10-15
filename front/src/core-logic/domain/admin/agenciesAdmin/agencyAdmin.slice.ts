@@ -1,7 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type {
   AgencyDto,
-  AgencyDtoRefersToAgencyFields,
   AgencyId,
   AgencyOption,
   UpdateAgencyStatusParams,
@@ -17,7 +16,7 @@ export interface AgencyAdminState {
   agencySearchQuery: string;
   agencyOptions: AgencyOption[];
   agencyNeedingReviewOptions: AgencyOption[];
-  agency: AgencyDtoRefersToAgencyFields | null;
+  agency: AgencyDto | null;
   agencyNeedingReview: AgencyDto | null;
   // inclusionConnectedUsersNeedingReview: NormalizedInclusionConnectedUserById;
   // selectedUserId: AuthenticatedUserId | null;
@@ -87,10 +86,7 @@ export const agencyAdminSlice = createSlice({
     ) => {
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
-    setAgency: (
-      state,
-      action: PayloadAction<AgencyDtoRefersToAgencyFields | null>,
-    ) => {
+    setAgency: (state, action: PayloadAction<AgencyDto | null>) => {
       state.agency = action.payload ?? null;
     },
     setAgencyNeedingReview: (

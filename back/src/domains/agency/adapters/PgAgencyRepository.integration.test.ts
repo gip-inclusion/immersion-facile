@@ -71,7 +71,10 @@ const agency1 = agency1builder
 const agency2 = agency2builder.withCodeSafir(safirCode).build();
 
 const agencyWithRefersTo = agency2builder
-  .withRefersToAgencyId(agency1.id)
+  .withRefersToAgencyInfo({
+    refersToAgencyId: agency1.id,
+    refersToAgencyName: agency1.name,
+  })
   .build();
 
 describe("PgAgencyRepository", () => {

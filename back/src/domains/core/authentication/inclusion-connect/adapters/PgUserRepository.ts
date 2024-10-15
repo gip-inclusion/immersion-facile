@@ -245,6 +245,7 @@ export class PgUserRepository implements UserRepository {
           ),
           'questionnaireUrl', agencies.questionnaire_url,
           'refersToAgencyId', agencies.refers_to_agency_id,
+          'refersToAgencyName', refered_agencies.name,
           'rejectionJustification', agencies.rejection_justification,
           'signature', agencies.email_signature,
           'status', agencies.status
@@ -285,6 +286,7 @@ export class PgUserRepository implements UserRepository {
       LEFT JOIN users__agencies ON users.id = users__agencies.user_id
       LEFT JOIN users_admins ON users.id = users_admins.user_id
       LEFT JOIN agencies ON users__agencies.agency_id = agencies.id
+      LEFT JOIN agencies as refered_agencies ON agencies.refers_to_agency_id = refered_agencies.id
       LEFT JOIN establishments_contacts ec ON users.email = ec.email
       LEFT JOIN establishments ON ec.siret = establishments.siret
       ${whereClause.statement}
