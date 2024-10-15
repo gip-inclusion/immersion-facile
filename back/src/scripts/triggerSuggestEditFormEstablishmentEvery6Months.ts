@@ -9,7 +9,7 @@ import { createUowPerformer } from "../domains/core/unit-of-work/adapters/create
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SuggestEditEstablishment } from "../domains/establishment/use-cases/SuggestEditEstablishment";
 import { SuggestEditEstablishmentsScript } from "../domains/establishment/use-cases/SuggestEditEstablishmentsScript";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const config = AppConfig.createFromEnv();
 
@@ -55,7 +55,7 @@ const startScript = async (): Promise<Report> => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "triggerSuggestEditFormEstablishmentEvery6Months",
   config,
   startScript,

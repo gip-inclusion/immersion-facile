@@ -16,7 +16,7 @@ import {
   SendEstablishmentLeadReminderScript,
 } from "../domains/establishment/use-cases/SendEstablishmentLeadReminderScript";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -68,7 +68,7 @@ const triggerEstablishmentLeadReminders = async () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "sendEstablishmentLeadFirstReminderScript",
   config,
   triggerEstablishmentLeadReminders,

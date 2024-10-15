@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 
@@ -31,7 +31,7 @@ const triggerRefreshMaterializedViews = async () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "refresh materialized views",
   config,
   triggerRefreshMaterializedViews,

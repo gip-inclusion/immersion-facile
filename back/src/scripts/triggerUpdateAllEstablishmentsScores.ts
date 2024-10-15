@@ -3,7 +3,7 @@ import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { updateAllEstablishmentScoresQuery } from "../domains/establishment/adapters/PgEstablishmentAggregateRepository.sql";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -25,7 +25,7 @@ const updateScores = async (): Promise<Report> => {
     .finally(() => pool.end());
 };
 
-handleEndOfScriptNotification(
+handleCRONScript(
   "updateAllEstablishmentsScores",
   config,
   updateScores,

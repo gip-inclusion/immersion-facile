@@ -3,7 +3,7 @@ import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { PgNotificationRepository } from "../domains/core/notifications/adapters/PgNotificationRepository";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -25,7 +25,7 @@ const executeTriggerDeleteEmailAttachements = async () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "deleteEmailAttachements",
   config,
   executeTriggerDeleteEmailAttachements,

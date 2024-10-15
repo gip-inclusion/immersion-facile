@@ -18,7 +18,7 @@ import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -138,7 +138,7 @@ const insertAppellations =
       )
       .execute();
 
-handleEndOfScriptNotification(
+handleCRONScript(
   "update-rome-data-from-france-travail-ROME-4-api",
   config,
   main,

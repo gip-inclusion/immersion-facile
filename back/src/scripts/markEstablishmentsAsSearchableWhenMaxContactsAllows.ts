@@ -4,7 +4,7 @@ import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../domains/establishment/adapters/PgEstablishmentAggregateRepository";
 import { MarkEstablishmentsAsSearchableScript } from "../domains/establishment/use-cases/MarkEstablishmentsAsSearchableScript";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const config = AppConfig.createFromEnv();
 const dbUrl = config.pgImmersionDbUrl;
@@ -28,7 +28,7 @@ const startScript = async () => {
 };
 
 /* eslint-disable-next-line @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "markEstablishmentsAsSearchableWhenMaxContactsAllows",
   config,
   startScript,

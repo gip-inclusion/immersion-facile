@@ -9,7 +9,7 @@ import { createUowPerformer } from "../domains/core/unit-of-work/adapters/create
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SendBeneficiariesPdfAssessmentsEmails } from "../domains/establishment/use-cases/SendBeneficiariesPdfAssessmentsEmails";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 import { getDateRangeFromScriptParams } from "./utils";
 
 /**
@@ -70,7 +70,7 @@ const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "sendBeneficiaryPdfAssessmentEmailsScript",
   config,
   sendBeneficiaryPdfAssessmentEmailsScript,
