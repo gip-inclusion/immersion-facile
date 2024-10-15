@@ -1,8 +1,8 @@
-import * as Sentry from "@sentry/node";
 import axios from "axios";
 import { calculateDurationInSecondsFrom } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { OpacifiedLogger, createLogger } from "../utils/logger";
+import { SentryInstance, configureSentry } from "./configureSentry";
 
 export const handleCRONScript = async <
   T extends Record<string, unknown> | void,
@@ -15,7 +15,9 @@ export const handleCRONScript = async <
 ) => {
   const context = `${config.envType} - ${config.immersionFacileBaseUrl}`;
 
-  const sentryCheckInId = Sentry.captureCheckIn({
+  const sentry = configureSentry(config);
+
+  const sentryCheckInId = sentry.captureCheckIn({
     monitorSlug: name,
     status: "in_progress",
   });
@@ -26,6 +28,7 @@ export const handleCRONScript = async <
     name,
     start: new Date(),
     sentryCheckInId,
+    sentry,
   };
   return script()
     .then(onScriptSuccess<T>({ ...contextParams, handleResults }))
@@ -38,6 +41,7 @@ type ScriptContextParams = {
   logger: OpacifiedLogger;
   name: string;
   sentryCheckInId: string;
+  sentry: SentryInstance;
 };
 
 const onScriptSuccess =
@@ -48,6 +52,7 @@ const onScriptSuccess =
     name,
     handleResults,
     sentryCheckInId,
+    sentry,
   }: ScriptContextParams & {
     handleResults: (results: T) => string;
   }) =>
@@ -69,7 +74,7 @@ const onScriptSuccess =
       reportContent,
       "----------------------------------------",
     ].join("\n");
-    Sentry.captureCheckIn({
+    sentry.captureCheckIn({
       checkInId: sentryCheckInId,
       status: "ok",
       monitorSlug: name,
@@ -79,7 +84,14 @@ const onScriptSuccess =
   };
 
 const onScriptError =
-  ({ start, context, logger, name, sentryCheckInId }: ScriptContextParams) =>
+  ({
+    start,
+    context,
+    logger,
+    name,
+    sentryCheckInId,
+    sentry,
+  }: ScriptContextParams) =>
   (error: any): Promise<void> => {
     const durationInSeconds = calculateDurationInSecondsFrom(start);
     const reportTitle = `❌ Failure at ${new Date().toISOString()} - ${context} - ${
@@ -99,7 +111,7 @@ const onScriptError =
       "----------------------------------------",
     ].join("\n");
 
-    Sentry.captureCheckIn({
+    sentry.captureCheckIn({
       checkInId: sentryCheckInId,
       status: "error",
       monitorSlug: name,
