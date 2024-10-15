@@ -95,6 +95,7 @@ test.describe("Establishment creation and modification workflow", () => {
     await expect(
       page.locator(`#${domElementIds.establishment.create.siret}`),
     ).toHaveValue(providedSiret);
+
     await expect(
       page.locator(`#${domElementIds.establishment.create.businessName}`),
     ).not.toHaveValue("");
@@ -103,6 +104,11 @@ test.describe("Establishment creation and modification workflow", () => {
         `#${domElementIds.establishment.create.addressAutocomplete}`,
       ),
     ).not.toHaveValue("");
+    await expect(
+      page.locator(
+        `#${domElementIds.establishment.create.businessAddresses}-0`,
+      ),
+    ).toHaveValue("Avenue des Grands Crus 26600 Tain-l'Hermitage");
     await page.click(
       `#${domElementIds.establishment.create.appellations}-add-option-button`,
     );
@@ -116,12 +122,6 @@ test.describe("Establishment creation and modification workflow", () => {
       )
       .first()
       .click();
-
-    await expect(
-      page.locator(
-        `#${domElementIds.establishment.create.businessAddresses}-0`,
-      ),
-    ).toHaveValue("Avenue des Grands Crus 26600 Tain-l'Hermitage");
 
     await page.click(
       `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
