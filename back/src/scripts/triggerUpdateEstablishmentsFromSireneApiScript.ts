@@ -12,7 +12,7 @@ import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeG
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UpdateEstablishmentsFromSirenApiScript } from "../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 
@@ -68,7 +68,7 @@ const main = async () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "update-establishments-from-insee-api",
   config,
   main,

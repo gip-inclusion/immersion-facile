@@ -3,7 +3,7 @@ import { calculateDurationInSecondsFrom } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { OpacifiedLogger, createLogger } from "../utils/logger";
 
-export const handleEndOfScriptNotification = async <
+export const handleCRONScript = async <
   T extends Record<string, unknown> | void,
 >(
   name: string,

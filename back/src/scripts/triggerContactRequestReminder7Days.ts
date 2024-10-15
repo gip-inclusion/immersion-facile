@@ -6,7 +6,7 @@ import { createUowPerformer } from "../domains/core/unit-of-work/adapters/create
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { makeContactRequestReminder } from "../domains/establishment/use-cases/ContactRequestReminder";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -32,7 +32,7 @@ const executeContactRequestReminder = () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "contactRequestReminderScript7Days",
   config,
   executeContactRequestReminder,

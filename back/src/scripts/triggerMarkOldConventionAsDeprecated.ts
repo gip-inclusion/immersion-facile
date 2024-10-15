@@ -4,7 +4,7 @@ import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { PgConventionRepository } from "../domains/convention/adapters/PgConventionRepository";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 
@@ -30,7 +30,7 @@ const triggerMarkOldConventionAsDeprecated = async () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "triggerMarkOldConventionAsDeprecated",
   config,
   triggerMarkOldConventionAsDeprecated,

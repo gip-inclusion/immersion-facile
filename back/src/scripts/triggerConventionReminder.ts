@@ -7,7 +7,7 @@ import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeG
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -27,7 +27,7 @@ const executeConventionReminder = () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "conventionReminderScript",
   config,
   executeConventionReminder,

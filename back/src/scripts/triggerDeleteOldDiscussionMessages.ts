@@ -4,7 +4,7 @@ import { AppConfig } from "../config/bootstrap/appConfig";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { PgDiscussionRepository } from "../domains/establishment/adapters/PgDiscussionRepository";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
@@ -31,7 +31,7 @@ const triggerDeleteOldDiscussionMessages = async () => {
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "triggerDeleteOldDiscussionMessages",
   config,
   triggerDeleteOldDiscussionMessages,
