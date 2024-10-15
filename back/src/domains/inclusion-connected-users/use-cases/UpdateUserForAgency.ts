@@ -20,7 +20,10 @@ import {
   throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import {
+  getIcUserOrThrow,
+  throwIfNotAdmin,
+} from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 const rejectIfAgencyWontHaveValidatorsReceivingNotifications = async (
   uow: UnitOfWork,
@@ -173,7 +176,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     const mode = oAuthProviderByFeatureFlags(
       await uow.featureFlagRepository.getAll(),
     );
-    const userToUpdate = await uow.userRepository.getById(params.userId, mode);
+    const userToUpdate = await getIcUserOrThrow(uow, params.userId);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
     const newAgencyRights = await makeAgencyRights(
@@ -196,7 +199,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     });
 
     await Promise.all([
-      uow.userRepository.updateAgencyRights({
+      uow.agencyRepository.updateAgencyRights({
         userId: params.userId,
         agencyRights: newAgencyRights,
       }),

@@ -4,10 +4,11 @@ import type {
   AgencyId,
   AgencyKind,
   AgencyPositionFilter,
+  AgencyRight,
   AgencyStatus,
   DepartmentCode,
-  PartialAgencyDto,
   SiretDto,
+  UserId,
 } from "shared";
 
 export type GetAgenciesFilters = {
@@ -19,6 +20,11 @@ export type GetAgenciesFilters = {
   siret?: SiretDto;
   doesNotReferToOtherAgency?: true;
 };
+
+export type AgencyWithoutRights = Omit<
+  AgencyDto,
+  "counsellorEmails" | "validatorEmails"
+>;
 
 export interface AgencyRepository {
   alreadyHasActiveAgencyWithSameAddressAndKind(params: {
@@ -35,6 +41,12 @@ export interface AgencyRepository {
   getByIds(ids: AgencyId[]): Promise<AgencyDto[]>;
   getBySafir(safirCode: string): Promise<AgencyDto | undefined>;
   getImmersionFacileAgencyId(): Promise<AgencyId | undefined>;
-  insert(agency: AgencyDto): Promise<AgencyId | undefined>;
-  update(partialAgency: PartialAgencyDto): Promise<void>;
+
+  insert(agency: AgencyWithoutRights): Promise<AgencyId | undefined>;
+  update(partialAgency: AgencyWithoutRights): Promise<void>;
+  updateAgencyRights(params: {
+    userId: UserId;
+    agencyRights: AgencyRight[];
+  }): Promise<void>;
+  getAgenciesRightsByUserId(id: UserId): Promise<AgencyRight[]>;
 }

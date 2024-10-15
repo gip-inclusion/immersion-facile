@@ -6,11 +6,13 @@ import {
   AgencyKind,
   AgencyOption,
   AgencyPositionFilter,
+  AgencyRight,
   AgencyStatus,
   DepartmentCode,
   GeoPositionDto,
   PartialAgencyDto,
   SiretDto,
+  UserId,
   WithGeoPosition,
   errors,
   isTruthy,
@@ -20,6 +22,250 @@ import {
   AgencyRepository,
   GetAgenciesFilters,
 } from "../ports/AgencyRepository";
+
+type AgencyRightsByUserId = Partial<Record<UserId, AgencyRight[]>>;
+
+type AgencyById = Partial<{
+  [id: string]: AgencyDto;
+}>;
+
+export class InMemoryAgencyRepository implements AgencyRepository {
+  #agencies: AgencyById = {};
+  #agencyRightsByUserId: AgencyRightsByUserId = {};
+
+  // test purpose only
+  setAgencyRights(agencyRightsByUserId: AgencyRightsByUserId) {
+    this.#agencyRightsByUserId = agencyRightsByUserId;
+  }
+
+  public get agencyRightsByUserId(): AgencyRightsByUserId {
+    return this.#agencyRightsByUserId;
+  }
+
+  constructor(agencyList: AgencyDto[] = testAgencies) {
+    agencyList.forEach((agency) => {
+      this.#agencies[agency.id] = agency;
+    });
+  }
+
+  async getAgenciesRightsByUserId(id: UserId): Promise<AgencyRight[]> {
+    const agencyRights = this.#agencyRightsByUserId[id];
+    return agencyRights ?? [];
+  }
+
+  // test purpose only
+  public get agencies(): AgencyDto[] {
+    return values(this.#agencies).filter(isTruthy);
+  }
+
+  public set agencies(agencies: AgencyDto[]) {
+    this.#agencies = agencies.reduce(
+      (acc, agency) => ({
+        ...acc,
+        [agency.id]: agency,
+      }),
+      {} as AgencyById,
+    );
+  }
+
+  public async alreadyHasActiveAgencyWithSameAddressAndKind({
+    address,
+    kind,
+    idToIgnore,
+  }: {
+    address: AddressDto;
+    kind: AgencyKind;
+    idToIgnore: AgencyId;
+  }): Promise<boolean> {
+    return this.agencies.some(
+      (agency) =>
+        agency.kind === kind &&
+        agency.address.streetNumberAndAddress ===
+          address.streetNumberAndAddress &&
+        agency.address.city === address.city &&
+        agency.status !== "rejected" &&
+        agency.id !== idToIgnore,
+    );
+  }
+
+  public async getAgencies({
+    filters = {},
+    limit,
+  }: {
+    filters?: GetAgenciesFilters;
+    limit?: number;
+  }): Promise<AgencyDto[]> {
+    const filteredAgencies = Object.values(this.#agencies)
+      .filter(isTruthy)
+      .filter(
+        (agency) =>
+          ![
+            agencyHasDepartmentCode(agency, filters?.departmentCode),
+            agencyHasName(agency, filters?.nameIncludes),
+            agencyIsOfKind(agency, filters?.kinds),
+            agencyIsOfPosition(agency, filters?.position),
+            agencyIsOfStatus(agency, filters?.status),
+            agencyHasSiret(agency, filters?.siret),
+            agencyDoesNotReferToOtherAgency(
+              agency,
+              filters?.doesNotReferToOtherAgency,
+            ),
+          ].includes(false),
+      )
+      .slice(0, limit);
+
+    return filters?.position
+      ? filteredAgencies.sort(sortByNearestFrom(filters.position.position))
+      : filteredAgencies;
+  }
+
+  public async getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]> {
+    return values(this.#agencies)
+      .filter(isTruthy)
+      .filter((agency) => agency.refersToAgencyId === id);
+  }
+
+  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
+    return this.#agencies[id];
+  }
+
+  public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
+    const result = ids.reduce<{
+      agencies: AgencyDto[];
+      missingIds: AgencyId[];
+    }>(
+      (prev, id) => {
+        const agency = this.#agencies[id];
+        return {
+          agencies: agency ? [...prev.agencies, agency] : prev.agencies,
+          missingIds: !agency ? [...prev.missingIds, id] : prev.missingIds,
+        };
+      },
+      {
+        agencies: [],
+        missingIds: [],
+      },
+    );
+    if (result.missingIds.length)
+      throw errors.agencies.notFound({ agencyIds: result.missingIds });
+    return result.agencies;
+  }
+
+  public async getBySafir(safirCode: string): Promise<AgencyDto | undefined> {
+    return values(this.#agencies)
+      .filter(isTruthy)
+      .find((agency) => agency.codeSafir === safirCode);
+  }
+
+  public async getImmersionFacileAgencyId(): Promise<AgencyId> {
+    return "immersion-facile-agency";
+  }
+
+  public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
+    if (this.#agencies[agency.id]) return undefined;
+    this.#agencies[agency.id] = agency;
+    return agency.id;
+  }
+
+  public setAgencies(agencyList: AgencyDto[]) {
+    this.#agencies = {};
+    agencyList.forEach((agency) => {
+      this.#agencies[agency.id] = agency;
+    });
+  }
+
+  public async update(agency: PartialAgencyDto) {
+    const agencyToUdpate = this.#agencies[agency.id];
+    if (!agencyToUdpate) {
+      throw new Error(`Agency ${agency.id} does not exist`);
+    }
+    this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
+  }
+
+  public async updateAgencyRights({
+    userId,
+    agencyRights,
+  }: {
+    userId: UserId;
+    agencyRights: AgencyRight[];
+  }): Promise<void> {
+    this.#agencyRightsByUserId[userId] = agencyRights;
+  }
+}
+
+const sortByNearestFrom =
+  (position: GeoPositionDto) =>
+  (a: AgencyOption & WithGeoPosition, b: AgencyOption & WithGeoPosition) =>
+    distanceBetweenCoordinatesInMeters(
+      a.position.lat,
+      a.position.lon,
+      position.lat,
+      position.lon,
+    ) -
+    distanceBetweenCoordinatesInMeters(
+      b.position.lat,
+      b.position.lon,
+      position.lat,
+      position.lon,
+    );
+
+const agencyIsOfKind = (
+  agency: AgencyDto,
+  agencyKinds?: AgencyKind[],
+): boolean => {
+  if (!agencyKinds) return true;
+  return agencyKinds.includes(agency.kind);
+};
+
+const agencyIsOfStatus = (
+  agency: AgencyDto,
+  statuses?: AgencyStatus[],
+): boolean => {
+  if (!statuses) return true;
+  return statuses.includes(agency.status);
+};
+
+const agencyHasDepartmentCode = (
+  agency: AgencyDto,
+  departmentCode?: DepartmentCode,
+): boolean => {
+  if (!departmentCode) return true;
+  return departmentCode === agency.address.departmentCode;
+};
+
+const agencyHasName = (agency: AgencyDto, name?: string): boolean => {
+  if (!name) return true;
+  return agency.name.toLowerCase().includes(name.toLowerCase());
+};
+
+const agencyHasSiret = (agency: AgencyDto, siret?: SiretDto): boolean => {
+  if (!siret) return true;
+  return agency.agencySiret === siret;
+};
+
+const agencyDoesNotReferToOtherAgency = (
+  agency: AgencyDto,
+  shouldNotReferToOtherAgency?: true,
+): boolean => {
+  if (shouldNotReferToOtherAgency === undefined) return true;
+  return agency.refersToAgencyId === null;
+};
+
+const agencyIsOfPosition = (
+  agency: AgencyDto,
+  positionFilter?: AgencyPositionFilter,
+): boolean => {
+  if (!positionFilter) return true;
+  return (
+    distanceBetweenCoordinatesInMeters(
+      agency.position.lat,
+      agency.position.lon,
+      positionFilter.position.lat,
+      positionFilter.position.lon,
+    ) <
+    positionFilter.distance_km * 1000
+  );
+};
 
 const testAgencies: AgencyDto[] = [
   {
@@ -179,220 +425,3 @@ const testAgencies: AgencyDto[] = [
     codeSafir: null,
   },
 ];
-
-type AgencyById = Partial<{
-  [id: string]: AgencyDto;
-}>;
-
-export class InMemoryAgencyRepository implements AgencyRepository {
-  #agencies: AgencyById = {};
-
-  constructor(agencyList: AgencyDto[] = testAgencies) {
-    agencyList.forEach((agency) => {
-      this.#agencies[agency.id] = agency;
-    });
-  }
-
-  // test purpose only
-  public get agencies(): AgencyDto[] {
-    return values(this.#agencies).filter(isTruthy);
-  }
-
-  public set agencies(agencies: AgencyDto[]) {
-    this.#agencies = agencies.reduce(
-      (acc, agency) => ({
-        ...acc,
-        [agency.id]: agency,
-      }),
-      {} as AgencyById,
-    );
-  }
-
-  public async alreadyHasActiveAgencyWithSameAddressAndKind({
-    address,
-    kind,
-    idToIgnore,
-  }: {
-    address: AddressDto;
-    kind: AgencyKind;
-    idToIgnore: AgencyId;
-  }): Promise<boolean> {
-    return this.agencies.some(
-      (agency) =>
-        agency.kind === kind &&
-        agency.address.streetNumberAndAddress ===
-          address.streetNumberAndAddress &&
-        agency.address.city === address.city &&
-        agency.status !== "rejected" &&
-        agency.id !== idToIgnore,
-    );
-  }
-
-  public async getAgencies({
-    filters = {},
-    limit,
-  }: {
-    filters?: GetAgenciesFilters;
-    limit?: number;
-  }): Promise<AgencyDto[]> {
-    const filteredAgencies = Object.values(this.#agencies)
-      .filter(isTruthy)
-      .filter(
-        (agency) =>
-          ![
-            agencyHasDepartmentCode(agency, filters?.departmentCode),
-            agencyHasName(agency, filters?.nameIncludes),
-            agencyIsOfKind(agency, filters?.kinds),
-            agencyIsOfPosition(agency, filters?.position),
-            agencyIsOfStatus(agency, filters?.status),
-            agencyHasSiret(agency, filters?.siret),
-            agencyDoesNotReferToOtherAgency(
-              agency,
-              filters?.doesNotReferToOtherAgency,
-            ),
-          ].includes(false),
-      )
-      .slice(0, limit);
-
-    return filters?.position
-      ? filteredAgencies.sort(sortByNearestFrom(filters.position.position))
-      : filteredAgencies;
-  }
-
-  public async getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]> {
-    return values(this.#agencies)
-      .filter(isTruthy)
-      .filter((agency) => agency.refersToAgencyId === id);
-  }
-
-  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
-    return this.#agencies[id];
-  }
-
-  public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    const result = ids.reduce<{
-      agencies: AgencyDto[];
-      missingIds: AgencyId[];
-    }>(
-      (prev, id) => {
-        const agency = this.#agencies[id];
-        return {
-          agencies: agency ? [...prev.agencies, agency] : prev.agencies,
-          missingIds: !agency ? [...prev.missingIds, id] : prev.missingIds,
-        };
-      },
-      {
-        agencies: [],
-        missingIds: [],
-      },
-    );
-    if (result.missingIds.length)
-      throw errors.agencies.notFound({ agencyIds: result.missingIds });
-    return result.agencies;
-  }
-
-  public async getBySafir(safirCode: string): Promise<AgencyDto | undefined> {
-    return values(this.#agencies)
-      .filter(isTruthy)
-      .find((agency) => agency.codeSafir === safirCode);
-  }
-
-  public async getImmersionFacileAgencyId(): Promise<AgencyId> {
-    return "immersion-facile-agency";
-  }
-
-  public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
-    if (this.#agencies[agency.id]) return undefined;
-    this.#agencies[agency.id] = agency;
-    return agency.id;
-  }
-
-  public setAgencies(agencyList: AgencyDto[]) {
-    this.#agencies = {};
-    agencyList.forEach((agency) => {
-      this.#agencies[agency.id] = agency;
-    });
-  }
-
-  public async update(agency: PartialAgencyDto) {
-    const agencyToUdpate = this.#agencies[agency.id];
-    if (!agencyToUdpate) {
-      throw new Error(`Agency ${agency.id} does not exist`);
-    }
-    this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
-  }
-}
-
-const sortByNearestFrom =
-  (position: GeoPositionDto) =>
-  (a: AgencyOption & WithGeoPosition, b: AgencyOption & WithGeoPosition) =>
-    distanceBetweenCoordinatesInMeters(
-      a.position.lat,
-      a.position.lon,
-      position.lat,
-      position.lon,
-    ) -
-    distanceBetweenCoordinatesInMeters(
-      b.position.lat,
-      b.position.lon,
-      position.lat,
-      position.lon,
-    );
-
-const agencyIsOfKind = (
-  agency: AgencyDto,
-  agencyKinds?: AgencyKind[],
-): boolean => {
-  if (!agencyKinds) return true;
-  return agencyKinds.includes(agency.kind);
-};
-
-const agencyIsOfStatus = (
-  agency: AgencyDto,
-  statuses?: AgencyStatus[],
-): boolean => {
-  if (!statuses) return true;
-  return statuses.includes(agency.status);
-};
-
-const agencyHasDepartmentCode = (
-  agency: AgencyDto,
-  departmentCode?: DepartmentCode,
-): boolean => {
-  if (!departmentCode) return true;
-  return departmentCode === agency.address.departmentCode;
-};
-
-const agencyHasName = (agency: AgencyDto, name?: string): boolean => {
-  if (!name) return true;
-  return agency.name.toLowerCase().includes(name.toLowerCase());
-};
-
-const agencyHasSiret = (agency: AgencyDto, siret?: SiretDto): boolean => {
-  if (!siret) return true;
-  return agency.agencySiret === siret;
-};
-
-const agencyDoesNotReferToOtherAgency = (
-  agency: AgencyDto,
-  shouldNotReferToOtherAgency?: true,
-): boolean => {
-  if (shouldNotReferToOtherAgency === undefined) return true;
-  return agency.refersToAgencyId === null;
-};
-
-const agencyIsOfPosition = (
-  agency: AgencyDto,
-  positionFilter?: AgencyPositionFilter,
-): boolean => {
-  if (!positionFilter) return true;
-  return (
-    distanceBetweenCoordinatesInMeters(
-      agency.position.lat,
-      agency.position.lon,
-      positionFilter.position.lat,
-      positionFilter.position.lon,
-    ) <
-    positionFilter.distance_km * 1000
-  );
-};
