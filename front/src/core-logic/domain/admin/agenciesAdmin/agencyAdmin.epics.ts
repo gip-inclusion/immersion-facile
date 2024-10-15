@@ -96,28 +96,32 @@ const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (
       dependencies.agencyGateway
         .getAgencyAdminById$(action.payload, getAdminToken(state$.value))
         .pipe(
-          switchMap((agency): Observable<AgencyDtoRefersToAgencyFields> => {
-            if (!agency?.refersToAgencyId) {
-              return of({
-                ...agency,
-                refersToAgencyName: null,
-              } as AgencyDtoRefersToAgencyFields);
-            }
-            return dependencies.agencyGateway
-              .getAgencyAdminById$(
-                agency.refersToAgencyId,
-                getAdminToken(state$.value),
-              )
-              .pipe(
-                map(
-                  (agencyReferred) =>
-                    ({
+          switchMap(
+            (agency): Observable<AgencyDtoRefersToAgencyFields | undefined> => {
+              if (!agency) return of();
+              if (!agency.refersToAgencyId) {
+                const agencyWithRefersToAgencyName: AgencyDtoRefersToAgencyFields =
+                  {
+                    ...agency,
+                    refersToAgencyName: null,
+                  };
+                return of(agencyWithRefersToAgencyName);
+              }
+              return dependencies.agencyGateway
+                .getAgencyAdminById$(
+                  agency.refersToAgencyId,
+                  getAdminToken(state$.value),
+                )
+                .pipe(
+                  map(
+                    (agencyReferred): AgencyDtoRefersToAgencyFields => ({
                       ...agency,
                       refersToAgencyName: agencyReferred?.name ?? null,
-                    }) as AgencyDtoRefersToAgencyFields,
-                ),
-              );
-          }),
+                    }),
+                  ),
+                );
+            },
+          ),
         ),
     ),
     map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
