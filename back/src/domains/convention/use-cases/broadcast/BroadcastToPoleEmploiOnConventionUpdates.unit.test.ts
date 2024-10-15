@@ -246,7 +246,10 @@ describe("Broadcasts events to pole-emploi", () => {
       await prepareUseCase();
     const agencyWithRefersTo = new AgencyDtoBuilder()
       .withKind("autre")
-      .withRefersToAgencyId(peAgency.id)
+      .withRefersToAgencyInfo({
+        refersToAgencyId: peAgency.id,
+        refersToAgencyName: peAgency.name,
+      })
       .build();
 
     await uow.agencyRepository.setAgencies([peAgency, agencyWithRefersTo]);

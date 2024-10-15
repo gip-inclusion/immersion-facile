@@ -45,6 +45,7 @@ describe("AddAgency use case", () => {
     logoUrl: "https://www.myUrl.com",
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
     refersToAgencyId: null,
+    refersToAgencyName: null,
   };
 
   const createAgencyWithRefersToParams: CreateAgencyDto = {
@@ -64,6 +65,7 @@ describe("AddAgency use case", () => {
     signature: "Super signature of the agency bis",
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
     refersToAgencyId: createParisMissionLocaleParams.id,
+    refersToAgencyName: createParisMissionLocaleParams.name,
     questionnaireUrl: null,
     logoUrl: null,
   };

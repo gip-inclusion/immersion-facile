@@ -215,6 +215,7 @@ describe("Agency routes", () => {
         signature: "Super signature of the agency",
         agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
         refersToAgencyId: null,
+        refersToAgencyName: null,
         logoUrl: null,
       };
 

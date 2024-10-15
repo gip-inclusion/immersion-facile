@@ -285,7 +285,10 @@ describe("Broadcast to partners on updated convention", () => {
     const agencyWithRefersTo = new AgencyDtoBuilder()
       .withId("agency-with-refers-to")
       .withKind("autre")
-      .withRefersToAgencyId(agency1.id)
+      .withRefersToAgencyInfo({
+        refersToAgencyId: agency1.id,
+        refersToAgencyName: agency1.name,
+      })
       .build();
 
     const conventionFromAgencyWithRefersTo = new ConventionDtoBuilder()

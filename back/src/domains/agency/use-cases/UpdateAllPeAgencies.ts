@@ -167,6 +167,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       kind: "pole-emploi",
       status: "from-api-PE",
       refersToAgencyId: null,
+      refersToAgencyName: null,
       questionnaireUrl: null,
       logoUrl: null,
       rejectionJustification: null,

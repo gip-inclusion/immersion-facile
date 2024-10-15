@@ -93,6 +93,7 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
   .and(
     z.object({
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+      refersToAgencyName: zStringMinLength1.or(z.null()),
     }),
   )
   .and(withAcquisitionSchema)
@@ -120,6 +121,7 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
       status: agencyStatusSchema,
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+      refersToAgencyName: zStringMinLength1.or(z.null()),
       rejectionJustification: zStringMinLength1.or(z.null()),
     }),
   )
@@ -134,6 +136,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       status: agencyStatusSchema,
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+      refersToAgencyName: zStringMinLength1.or(z.null()),
       rejectionJustification: z.string().or(z.null()),
     }),
   )

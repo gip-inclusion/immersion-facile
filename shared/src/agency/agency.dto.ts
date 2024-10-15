@@ -32,16 +32,13 @@ export type CreateAgencyDto = {
   logoUrl: AbsoluteUrl | null;
   signature: string;
   refersToAgencyId: AgencyId | null;
+  refersToAgencyName: string | null;
 } & WithAcquisition;
 
 export type AgencyDtoSensitiveFields = {
   status: AgencyStatus;
   codeSafir: CodeSafir | null;
   rejectionJustification: string | null;
-};
-
-export type AgencyDtoRefersToAgencyFields = AgencyDto & {
-  refersToAgencyName: string | null;
 };
 
 export type WithAgencyDto = {

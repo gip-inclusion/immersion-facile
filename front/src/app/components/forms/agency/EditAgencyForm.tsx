@@ -42,7 +42,7 @@ const agencyStatusToLabel: Record<AgencyStatus, string> = {
   "from-api-PE": "Import Api",
 };
 
-const kindOption = Object.entries(agencyKindToLabel).map(([value, label]) => ({
+const kindOptions = Object.entries(agencyKindToLabel).map(([value, label]) => ({
   label,
   value: value,
 }));
@@ -85,7 +85,7 @@ export const EditAgencyForm = ({
 
           <Select
             label={"!Type de structure!"}
-            options={kindOption}
+            options={kindOptions}
             nativeSelectProps={{
               ...register("kind"),
               id: domElementIds.admin.agencyTab.editAgencyFormKindSelector,

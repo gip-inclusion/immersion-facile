@@ -393,6 +393,7 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   signature: "",
   agencySiret: "",
   refersToAgencyId: null,
+  refersToAgencyName: null,
 });
 
 const agencyErrorMessage = (

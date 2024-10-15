@@ -590,7 +590,10 @@ describe("UpdateUserForAgency", () => {
         agencyWithRefersTo = new AgencyDtoBuilder()
           .withId("agency-with-refers-to")
           .withCounsellorEmails(["user1@email.com"])
-          .withRefersToAgencyId(agency.id)
+          .withRefersToAgencyInfo({
+            refersToAgencyId: agency.id,
+            refersToAgencyName: agency.name,
+          })
           .build();
         user = {
           id: "user1",
