@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import axios from "axios";
 import { calculateDurationInSecondsFrom } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
@@ -14,11 +15,17 @@ export const handleCRONScript = async <
 ) => {
   const context = `${config.envType} - ${config.immersionFacileBaseUrl}`;
 
+  const sentryCheckInId = Sentry.captureCheckIn({
+    monitorSlug: name,
+    status: "in_progress",
+  });
+
   const contextParams: ScriptContextParams = {
     context,
     logger,
     name,
     start: new Date(),
+    sentryCheckInId,
   };
   return script()
     .then(onScriptSuccess<T>({ ...contextParams, handleResults }))
@@ -30,6 +37,7 @@ type ScriptContextParams = {
   context: string;
   logger: OpacifiedLogger;
   name: string;
+  sentryCheckInId: string;
 };
 
 const onScriptSuccess =
@@ -39,6 +47,7 @@ const onScriptSuccess =
     logger,
     name,
     handleResults,
+    sentryCheckInId,
   }: ScriptContextParams & {
     handleResults: (results: T) => string;
   }) =>
@@ -47,7 +56,11 @@ const onScriptSuccess =
     const reportTitle = `✅ Success at ${new Date().toISOString()} - ${context}`;
     const reportContent = handleResults({ ...results, durationInSeconds });
 
-    logger.info({ message: reportTitle, reportContent, durationInSeconds });
+    logger.info({
+      message: `${name} - ${reportTitle}`,
+      reportContent,
+      durationInSeconds,
+    });
     const report = [
       reportTitle,
       `Script [${name}]`,
@@ -56,18 +69,28 @@ const onScriptSuccess =
       reportContent,
       "----------------------------------------",
     ].join("\n");
+    Sentry.captureCheckIn({
+      checkInId: sentryCheckInId,
+      status: "ok",
+      monitorSlug: name,
+      duration: durationInSeconds,
+    });
     return notifyDiscordPipelineReport(report).finally(() => process.exit(0));
   };
 
 const onScriptError =
-  ({ start, context, logger, name }: ScriptContextParams) =>
+  ({ start, context, logger, name, sentryCheckInId }: ScriptContextParams) =>
   (error: any): Promise<void> => {
     const durationInSeconds = calculateDurationInSecondsFrom(start);
     const reportTitle = `❌ Failure at ${new Date().toISOString()} - ${context} - ${
       error.message
     }`;
 
-    logger.error({ durationInSeconds, message: reportTitle, error });
+    logger.error({
+      durationInSeconds,
+      message: `${name} - ${reportTitle}`,
+      error,
+    });
     const report = [
       reportTitle,
       `Script [${name}]`,
@@ -75,6 +98,14 @@ const onScriptError =
       `Error message :${error.message}`,
       "----------------------------------------",
     ].join("\n");
+
+    Sentry.captureCheckIn({
+      checkInId: sentryCheckInId,
+      status: "error",
+      monitorSlug: name,
+      duration: durationInSeconds,
+    });
+
     return notifyDiscordPipelineReport(report).finally(() => process.exit(1));
   };
 
