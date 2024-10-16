@@ -73,6 +73,16 @@ Pour les éléments et modifiers, nous utiliserons la syntaxe :
 sudo apt-get update && sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
 ```
 
+##### Report / Trace viewer
+
+Playwright est lancé en CI pour valider nos parcours principaux. En cas de souci, si les tests ne passent pas, il est possible d'accéder au trace viewer de la PR concernée. Par exemple, [sur cette PR](https://github.com/gip-inclusion/immersion-facile/actions/runs/11277188528), le job Playwright tests n'est pas passé. On a un peu de détail dans les annotations faites directement sous le workflow, et en scrollant en bas de page, on a accès au report, à télécharger (zip).
+Une fois téléchargé : 
+- dezipper l'archive (ça doit produire un dossier `playwright-report`)
+- se placer avec un terminal dans le dossier contenant le dossier `playwright-report`
+- lancer `npx playwright show-report` (par défaut, il va aller chercher le dossier `playwright-report`), mais sinon il est possible de lancer `npx playwright show-report my-other-dir`
+- le navigateur va s'ouvrir et afficher le report
+- en cliquant sur un test qui a echoué, la trace sera dispo en cliquant sur la miniature en bas de page
+
 ### Sass to TS
 
 Sass to TS permet de générer des fichiers TS à partir de fichier Sass. C'est un moyen simple et pratique pour s'assurer que les classes que l'on utilise sont toujours employées et prévenir le dev en cas de faute de frappe, autocomplétion ou changement de naming.
