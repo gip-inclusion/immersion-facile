@@ -102,7 +102,10 @@ describe("RemoveUserFromAgency", () => {
   it("throws bad request if user attempts to delete validator when agency has refersTo", async () => {
     const agencyWithRefersTo = new AgencyDtoBuilder()
       .withId("agency-with-refers-to-id")
-      .withRefersToAgencyId(agency.id)
+      .withRefersToAgencyInfo({
+        refersToAgencyId: agency.id,
+        refersToAgencyName: agency.name,
+      })
       .withCounsellorEmails([notAdminUser.email])
       .build();
     const initialAgencyRights: AgencyRight[] = [
