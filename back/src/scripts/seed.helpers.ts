@@ -1,6 +1,7 @@
 import { AddressDto, AgencyDtoBuilder, AgencyId, AgencyKind } from "shared";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { toAgencyWithRights } from "../utils/agency";
 import { seedAddresses } from "./seedAddresses";
 
 let agencyIds: Record<AgencyKind, AgencyId[]> = {
@@ -43,7 +44,7 @@ export const insertAgencySeed = async ({
     .withAddress(address)
     .build();
 
-  await uow.agencyRepository.insert(agency);
+  await uow.agencyRepository.insert(toAgencyWithRights(agency, {}));
 
   agencyIds = {
     ...agencyIds,
@@ -92,10 +93,12 @@ export const insertAgencies = async ({ uow }: { uow: UnitOfWork }) => {
     .withAddress(seedAddresses[3])
     .build();
 
-  await uow.agencyRepository.insert(peAgency);
-  await uow.agencyRepository.insert(cciAgency);
-  await uow.agencyRepository.insert(capEmploiAgency);
-  await uow.agencyRepository.insert(missionLocaleAgency);
+  await uow.agencyRepository.insert(toAgencyWithRights(peAgency, {}));
+  await uow.agencyRepository.insert(toAgencyWithRights(cciAgency, {}));
+  await uow.agencyRepository.insert(toAgencyWithRights(capEmploiAgency, {}));
+  await uow.agencyRepository.insert(
+    toAgencyWithRights(missionLocaleAgency, {}),
+  );
 
   agencyIds = {
     ...agencyIds,
