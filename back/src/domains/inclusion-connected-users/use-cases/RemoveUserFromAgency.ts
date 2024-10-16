@@ -1,40 +1,71 @@
 import {
-  AgencyDto,
   AgencyId,
   InclusionConnectedUser,
-  OAuthGatewayProvider,
-  UserId,
   WithAgencyIdAndUserId,
   errors,
   withAgencyIdAndUserIdSchema,
 } from "shared";
+import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
-import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
-import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
   throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import {
+  getIcUserOrThrow,
+  throwIfNotAdmin,
+} from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export type RemoveUserFromAgency = ReturnType<typeof makeRemoveUserFromAgency>;
 
-const getUserAndThrowIfNotFound = async (
-  userRepository: UserRepository,
-  userId: UserId,
-  provider: OAuthGatewayProvider,
-): Promise<InclusionConnectedUser> => {
-  const requestedUser = await userRepository.getById(userId, provider);
-  if (!requestedUser) throw errors.user.notFound({ userId });
-  return requestedUser;
-};
+export const makeRemoveUserFromAgency = createTransactionalUseCase<
+  WithAgencyIdAndUserId,
+  void,
+  InclusionConnectedUser,
+  { createNewEvent: CreateNewEvent }
+>(
+  { name: "RemoveUserFromAgency", inputSchema: withAgencyIdAndUserIdSchema },
+  async ({ currentUser, uow, inputParams: { agencyId, userId }, deps }) => {
+    throwIfNotAdmin(currentUser);
+    const agency = await getUserAgencyRightsAndThrowIfUserHasNoAgencyRight(
+      uow,
+      await getIcUserOrThrow(uow, userId),
+      agencyId,
+    );
+    throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(agency, userId);
+    throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(agency, userId);
 
-const getUserAgencyRightsAndThrowIfUserHasNoAgencyRight = (
+    const { [userId]: _, ...usersRights } = agency.usersRights;
+
+    await Promise.all([
+      uow.agencyRepository.update({
+        id: agency.id,
+        usersRights,
+      }),
+      uow.outboxRepository.save(
+        deps.createNewEvent({
+          topic: "IcUserAgencyRightChanged",
+          payload: {
+            userId,
+            agencyId,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: currentUser.id,
+            },
+          },
+        }),
+      ),
+    ]);
+  },
+);
+
+const getUserAgencyRightsAndThrowIfUserHasNoAgencyRight = async (
+  uow: UnitOfWork,
   user: InclusionConnectedUser,
   agencyId: AgencyId,
-): AgencyDto => {
+): Promise<AgencyWithUsersRights> => {
   const userRight = user.agencyRights.find(
     (agencyRight) => agencyRight.agency.id === agencyId,
   );
@@ -44,64 +75,7 @@ const getUserAgencyRightsAndThrowIfUserHasNoAgencyRight = (
       agencyId,
       userId: user.id,
     });
-
-  return userRight.agency;
+  const agency = await uow.agencyRepository.getById(agencyId);
+  if (!agency) throw errors.agencies.notFound({ agencyIds: [agencyId] });
+  return agency;
 };
-
-export const makeRemoveUserFromAgency = createTransactionalUseCase<
-  WithAgencyIdAndUserId,
-  void,
-  InclusionConnectedUser,
-  { createNewEvent: CreateNewEvent }
->(
-  { name: "RemoveUserFromAgency", inputSchema: withAgencyIdAndUserIdSchema },
-  async ({ currentUser, uow, inputParams, deps }) => {
-    const provider = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
-    throwIfNotAdmin(currentUser);
-    const requestedUser = await getUserAndThrowIfNotFound(
-      uow.userRepository,
-      inputParams.userId,
-      provider,
-    );
-    const agency = getUserAgencyRightsAndThrowIfUserHasNoAgencyRight(
-      requestedUser,
-      inputParams.agencyId,
-    );
-    await throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(
-      uow,
-      agency,
-      inputParams.userId,
-      provider,
-    );
-    await throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
-      uow,
-      agency,
-      inputParams.userId,
-      provider,
-    );
-
-    const filteredAgencyRights = requestedUser.agencyRights.filter(
-      (agencyRight) => agencyRight.agency.id !== inputParams.agencyId,
-    );
-
-    await uow.userRepository.updateAgencyRights({
-      userId: inputParams.userId,
-      agencyRights: filteredAgencyRights,
-    });
-
-    const event: DomainEvent = deps.createNewEvent({
-      topic: "IcUserAgencyRightChanged",
-      payload: {
-        ...inputParams,
-        triggeredBy: {
-          kind: "inclusion-connected",
-          userId: currentUser.id,
-        },
-      },
-    });
-
-    await uow.outboxRepository.save(event);
-  },
-);
