@@ -170,17 +170,20 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    const mode = oAuthProviderByFeatureFlags(
+    const provider = oAuthProviderByFeatureFlags(
       await uow.featureFlagRepository.getAll(),
     );
-    const userToUpdate = await uow.userRepository.getById(params.userId, mode);
+    const userToUpdate = await uow.userRepository.getById(
+      params.userId,
+      provider,
+    );
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
     const newAgencyRights = await makeAgencyRights(
       uow,
       params,
       userToUpdate,
-      mode,
+      provider,
     );
     rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 

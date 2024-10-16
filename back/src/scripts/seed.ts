@@ -74,7 +74,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom IcUser")
     .withLastName("Nom IcUser")
-    .withId(new UuidV4Generator().new())
+    .withId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
     .withExternalId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
     .build();
 
@@ -84,7 +84,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom Admin")
     .withLastName("Nom Admin")
-    .withId(new UuidV4Generator().new())
+    .withId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
     .withExternalId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
     .build();
 
