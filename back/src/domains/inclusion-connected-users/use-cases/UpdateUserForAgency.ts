@@ -1,18 +1,17 @@
+import { values } from "ramda";
 import {
-  AgencyDto,
-  AgencyRight,
   Email,
   InclusionConnectedUser,
-  OAuthGatewayProvider,
   UserParamsForAgency,
   errors,
-  replaceElementWhere,
   userParamsForAgencySchema,
 } from "shared";
+import {
+  AgencyUsersRights,
+  AgencyWithUsersRights,
+} from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
-import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -20,32 +19,28 @@ import {
   throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import {
+  getIcUserOrThrow,
+  throwIfNotAdmin,
+} from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
-const rejectIfAgencyWontHaveValidatorsReceivingNotifications = async (
-  uow: UnitOfWork,
+const rejectIfAgencyWontHaveValidatorsReceivingNotifications = (
   params: UserParamsForAgency,
-  agency: AgencyDto,
-  provider: OAuthGatewayProvider,
-) => {
+  agency: AgencyWithUsersRights,
+): void => {
   if (!params.roles.includes("validator") || !params.isNotifiedByEmail) {
-    await throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(
-      uow,
+    throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(
       agency,
       params.userId,
-      provider,
     );
   }
 };
 
-const rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails = async (
+const rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails = (
   params: UserParamsForAgency,
-  agency: AgencyDto,
-) => {
-  if (
-    agency.counsellorEmails.length === 0 &&
-    params.roles.includes("counsellor")
-  ) {
+  agency: AgencyWithUsersRights,
+): void => {
+  if (!hasCounsellors(agency) && params.roles.includes("counsellor")) {
     throw errors.agency.invalidRoleUpdateForOneStepValidationAgency({
       agencyId: params.agencyId,
       role: "counsellor",
@@ -53,32 +48,23 @@ const rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails = async (
   }
 };
 
-const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
-  uow: UnitOfWork,
+const rejectIfAgencyWithRefersToWontHaveCounsellors = (
   params: UserParamsForAgency,
-  agency: AgencyDto,
-  provider: OAuthGatewayProvider,
-) => {
+  agency: AgencyWithUsersRights,
+): void => {
   if (!params.roles.includes("counsellor") || !params.isNotifiedByEmail) {
-    await throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
-      uow,
+    throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
       agency,
       params.userId,
-      provider,
     );
   }
 };
 
-const makeAgencyRights = async (
-  uow: UnitOfWork,
+const makeAgencyRights = (
+  agency: AgencyWithUsersRights,
   params: UserParamsForAgency,
   userToUpdate: InclusionConnectedUser,
-  provider: OAuthGatewayProvider,
-) => {
-  const agency = await uow.agencyRepository.getById(params.agencyId);
-
-  if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
-
+): AgencyUsersRights => {
   const agencyRightToUpdate = userToUpdate.agencyRights.find(
     ({ agency }) => agency.id === params.agencyId,
   );
@@ -89,48 +75,28 @@ const makeAgencyRights = async (
       userId: params.userId,
     });
 
-  await rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails(
+  rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails(
     params,
     agency,
   );
-  await rejectIfAgencyWontHaveValidatorsReceivingNotifications(
-    uow,
-    params,
-    agency,
-    provider,
-  );
-  await rejectIfAgencyWithRefersToWontHaveCounsellors(
-    uow,
-    params,
-    agency,
-    provider,
-  );
-  await rejectIfAgencyWithRefersToWontHaveCounsellors(
-    uow,
-    params,
-    agency,
-    provider,
-  );
+  rejectIfAgencyWontHaveValidatorsReceivingNotifications(params, agency);
+  //pourquoi 2 fois ?
+  rejectIfAgencyWithRefersToWontHaveCounsellors(params, agency);
+  rejectIfAgencyWithRefersToWontHaveCounsellors(params, agency);
 
-  const updatedAgencyRight: AgencyRight = {
-    ...agencyRightToUpdate,
-    roles: params.roles,
-    isNotifiedByEmail: params.isNotifiedByEmail,
+  return {
+    ...agency.usersRights,
+    [userToUpdate.id]: {
+      roles: params.roles,
+      isNotifiedByEmail: params.isNotifiedByEmail,
+    },
   };
-
-  const newAgencyRights = replaceElementWhere(
-    userToUpdate.agencyRights,
-    updatedAgencyRight,
-    ({ agency }) => agency.id === params.agencyId,
-  );
-
-  return newAgencyRights;
 };
 
 const rejectEmailModificationIfInclusionConnectedUser = (
   user: InclusionConnectedUser,
   newEmail: Email,
-) => {
+): void => {
   if (!newEmail || !user.externalId) return;
   if (user.email !== newEmail) {
     throw errors.user.forbiddenToChangeEmailForUIcUser();
@@ -141,11 +107,10 @@ const updateIfUserEmailChanged = async (
   user: InclusionConnectedUser,
   newEmail: Email,
   userRepository: UserRepository,
-) => {
+): Promise<void> => {
   if (user.email === newEmail || user.externalId) return;
   await userRepository.updateEmail(user.id, newEmail);
 };
-
 export class UpdateUserForAgency extends TransactionalUseCase<
   UserParamsForAgency,
   void,
@@ -170,38 +135,37 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    const mode = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
-    const userToUpdate = await uow.userRepository.getById(params.userId, mode);
+    const userToUpdate = await getIcUserOrThrow(uow, params.userId);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
-    const newAgencyRights = await makeAgencyRights(
-      uow,
-      params,
-      userToUpdate,
-      mode,
-    );
+    const agency = await uow.agencyRepository.getById(params.agencyId);
+    if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
+
+    const usersRights = makeAgencyRights(agency, params, userToUpdate);
     rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 
-    const event: DomainEvent = this.#createNewEvent({
-      topic: "IcUserAgencyRightChanged",
-      payload: {
-        ...params,
-        triggeredBy: {
-          kind: "inclusion-connected",
-          userId: currentUser.id,
-        },
-      },
-    });
-
     await Promise.all([
-      uow.userRepository.updateAgencyRights({
-        userId: params.userId,
-        agencyRights: newAgencyRights,
+      uow.agencyRepository.update({
+        id: agency.id,
+        usersRights,
       }),
       updateIfUserEmailChanged(userToUpdate, params.email, uow.userRepository),
-      uow.outboxRepository.save(event),
+      uow.outboxRepository.save(
+        this.#createNewEvent({
+          topic: "IcUserAgencyRightChanged",
+          payload: {
+            ...params,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: currentUser.id,
+            },
+          },
+        }),
+      ),
     ]);
   }
 }
+const hasCounsellors = (agency: AgencyWithUsersRights) =>
+  values(agency.usersRights).some((userRight) =>
+    userRight.roles.includes("counsellor"),
+  );
