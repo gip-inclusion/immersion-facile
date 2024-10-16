@@ -59,6 +59,7 @@ import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/De
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
+import { oAuthProviderByFeatureFlags } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
@@ -126,6 +127,7 @@ import { RejectIcUserForAgency } from "../../domains/inclusion-connected-users/u
 import { makeRemoveUserFromAgency } from "../../domains/inclusion-connected-users/use-cases/RemoveUserFromAgency";
 import { UpdateUserForAgency } from "../../domains/inclusion-connected-users/use-cases/UpdateUserForAgency";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
+import { agencyWithRightToAgencyDto } from "../../utils/agency";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import {
@@ -590,7 +592,10 @@ export const createUseCases = (
       getAgencyById: (id: AgencyId) =>
         uowPerformer.perform(async (uow) => {
           const [agency] = await uow.agencyRepository.getByIds([id]);
-          return agency;
+          const provider = oAuthProviderByFeatureFlags(
+            await uow.featureFlagRepository.getAll(),
+          );
+          return agencyWithRightToAgencyDto(uow, provider, agency);
         }),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
         uowPerformer.perform((uow) =>
