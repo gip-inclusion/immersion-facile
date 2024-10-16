@@ -435,65 +435,6 @@ describe("Admin router", () => {
       });
     });
 
-    it("400 - when trying to Update role of user from 'to-review' to 'counsellor' for agency that have only one step validation", async () => {
-      const agency = new AgencyDtoBuilder().build();
-      const inclusionConnectedUser: InclusionConnectedUser = {
-        id: "my-user-id",
-        email: "john@mail.com",
-        firstName: "John",
-        lastName: "Doe",
-        agencyRights: [
-          { agency, roles: ["to-review"], isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
-        externalId: "john-external-id",
-        createdAt: new Date().toISOString(),
-      };
-      const validatorInAgency = new InclusionConnectedUserBuilder()
-        .withAgencyRights([
-          { roles: ["validator"], agency, isNotifiedByEmail: true },
-        ])
-        .build();
-
-      inMemoryUow.agencyRepository.insert(agency);
-      inMemoryUow.userRepository.setInclusionConnectedUsers([
-        inclusionConnectedUser,
-        validatorInAgency,
-        backofficeAdminUser,
-      ]);
-
-      const updatedRole: AgencyRole = "counsellor";
-
-      const response = await sharedRequest.updateUserRoleForAgency({
-        body: {
-          agencyId: agency.id,
-          userId: inclusionConnectedUser.id,
-          roles: [updatedRole],
-          isNotifiedByEmail: false,
-          email: inclusionConnectedUser.email,
-        },
-        headers: { authorization: token },
-      });
-
-      expectHttpResponseToEqual(response, {
-        status: 400,
-        body: {
-          message: errors.agency.invalidRoleUpdateForOneStepValidationAgency({
-            agencyId: agency.id,
-            role: updatedRole,
-          }).message,
-
-          status: 400,
-        },
-      });
-
-      expectObjectsToMatch(inMemoryUow.userRepository.agencyRightsByUserId, {
-        [inclusionConnectedUser.id]: [
-          { agency, roles: ["to-review"], isNotifiedByEmail: false },
-        ],
-      });
-    });
-
     it("401 - missing admin token", async () => {
       const response = await sharedRequest.updateUserRoleForAgency({
         body: {

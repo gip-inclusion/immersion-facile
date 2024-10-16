@@ -74,8 +74,8 @@ describe("RemoveUserFromAgency", () => {
     });
   });
 
-  it("throws forbidden when token payload is not backoffice token", () => {
-    expectPromiseToFailWithError(
+  it("throws forbidden when token payload is not backoffice token", async () => {
+    await expectPromiseToFailWithError(
       removeUserFromAgency.execute(
         {
           agencyId: "agency-id",
@@ -93,7 +93,7 @@ describe("RemoveUserFromAgency", () => {
       userId: "unexisting-user",
     };
 
-    expectPromiseToFailWithError(
+    await expectPromiseToFailWithError(
       removeUserFromAgency.execute(inputParams, backofficeAdminUser),
       errors.user.notFound({ userId: inputParams.userId }),
     );
@@ -131,9 +131,9 @@ describe("RemoveUserFromAgency", () => {
       userId: user.id,
     };
 
-    expectPromiseToFailWithError(
+    await expectPromiseToFailWithError(
       removeUserFromAgency.execute(inputParams, backofficeAdminUser),
-      errors.agency.invalidUserRemovalWhenAgencyWithRefersTo(
+      errors.agency.invalidValidatorEditionWhenAgencyWithRefersTo(
         agencyWithRefersTo.id,
       ),
     );
@@ -145,7 +145,7 @@ describe("RemoveUserFromAgency", () => {
       userId: notAdminUser.id,
     };
 
-    expectPromiseToFailWithError(
+    await expectPromiseToFailWithError(
       removeUserFromAgency.execute(inputParams, backofficeAdminUser),
       errors.user.expectedRightsOnAgency(inputParams),
     );
@@ -173,7 +173,7 @@ describe("RemoveUserFromAgency", () => {
       userId: notAdminUser.id,
     };
 
-    expectPromiseToFailWithError(
+    await expectPromiseToFailWithError(
       removeUserFromAgency.execute(inputParams, backofficeAdminUser),
       errors.agency.notEnoughValidators(inputParams),
     );
@@ -183,32 +183,47 @@ describe("RemoveUserFromAgency", () => {
     const agencyWithRefersTo: AgencyDto = {
       ...agency,
       id: "agency-with-refers-to-id",
-      counsellorEmails: [],
+      counsellorEmails: [notAdminUser.email],
       validatorEmails: [],
       refersToAgencyId: agency.id,
     };
-    const initialAgencyRights: AgencyRight[] = [
-      {
-        agency: agencyWithRefersTo,
-        roles: ["counsellor"],
-        isNotifiedByEmail: true,
-      },
-    ];
-    const user: InclusionConnectedUser = {
+    const otherCounsellor: InclusionConnectedUser = {
       ...notAdminUser,
-      agencyRights: initialAgencyRights,
+      id: "other-counsellor-id",
+      email: "other-counsellor@mail.fr",
+      agencyRights: [
+        {
+          agency: agencyWithRefersTo,
+          roles: ["counsellor"],
+          isNotifiedByEmail: false,
+        },
+      ],
       dashboards: {
         agencies: {},
         establishments: {},
       },
     };
-    userRepository.setInclusionConnectedUsers([user]);
+    const user: InclusionConnectedUser = {
+      ...notAdminUser,
+      agencyRights: [
+        {
+          agency: agencyWithRefersTo,
+          roles: ["counsellor"],
+          isNotifiedByEmail: true,
+        },
+      ],
+      dashboards: {
+        agencies: {},
+        establishments: {},
+      },
+    };
+    userRepository.setInclusionConnectedUsers([user, otherCounsellor]);
     const inputParams: WithAgencyIdAndUserId = {
       agencyId: agencyWithRefersTo.id,
-      userId: notAdminUser.id,
+      userId: user.id,
     };
 
-    expectPromiseToFailWithError(
+    await expectPromiseToFailWithError(
       removeUserFromAgency.execute(inputParams, backofficeAdminUser),
       errors.agency.notEnoughCounsellors(inputParams),
     );
