@@ -1,5 +1,6 @@
 import {
   AgencyDto,
+  Email,
   InclusionConnectedUser,
   agencySchema,
   errors,
@@ -33,24 +34,40 @@ export class UpdateAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    await uow.agencyRepository.update(agency).catch((error) => {
-      if (error.message === `Agency ${agency.id} does not exist`)
-        throw errors.agency.notFound({ agencyId: agency.id });
+    const { validatorEmails, counsellorEmails, ...agencyToUpdate } = agency;
 
-      throw error;
-    });
-
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "AgencyUpdated",
-        payload: {
-          agencyId: agency.id,
-          triggeredBy: {
-            kind: "inclusion-connected",
-            userId: currentUser.id,
-          },
-        },
-      }),
+    this.#handleUpdatedValidatorAndCounsellorEmails(
+      validatorEmails,
+      counsellorEmails,
     );
+
+    await Promise.all([
+      uow.agencyRepository.update(agencyToUpdate).catch((error) => {
+        if (error.message === `Agency ${agency.id} does not exist`)
+          throw errors.agency.notFound({ agencyId: agency.id });
+        throw error;
+      }),
+      uow.outboxRepository.save(
+        this.#createNewEvent({
+          topic: "AgencyUpdated",
+          payload: {
+            agencyId: agency.id,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: currentUser.id,
+            },
+          },
+        }),
+      ),
+    ]);
+  }
+
+  #handleUpdatedValidatorAndCounsellorEmails(
+    _validatorEmails: Email[],
+    _counsellorEmails: Email[],
+  ): void {
+    // Do nothing with updated emails
+    // Agency rights and user creation is
+    // no more the responsibility for agency update usecase
   }
 }
