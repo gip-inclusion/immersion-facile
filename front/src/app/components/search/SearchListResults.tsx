@@ -67,7 +67,7 @@ export const SearchListResults = ({
           !hasResults && "fr-grid-row--center",
         )}
       >
-        <div className={fr.cx("fr-col-8")}>
+        <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
           <div
             className={fr.cx(
               "fr-grid-row",
@@ -93,7 +93,9 @@ export const SearchListResults = ({
             )}
             {hasResults &&
               displayedResults.map((searchResult, index) => (
-                <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+                <div
+                  className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-6")}
+                >
                   <SearchResult
                     key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
                     establishment={searchResult}
@@ -153,7 +155,7 @@ export const SearchListResults = ({
               ))}
           </div>
         </div>
-        <div className={fr.cx("fr-col-4")}>
+        <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
           <SearchMiniMap
             kind="list"
             activeMarkerKey={activeMarkerKey}
