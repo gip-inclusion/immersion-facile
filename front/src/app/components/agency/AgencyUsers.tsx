@@ -153,6 +153,11 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
               {
                 children: "Modifier",
                 priority: "secondary",
+                disabled:
+                  agency.refersToAgencyId !== null &&
+                  agencyUser.agencyRights[agency.id].roles.includes(
+                    "validator",
+                  ),
                 id: `${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`,
                 onClick: () => {
                   dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
