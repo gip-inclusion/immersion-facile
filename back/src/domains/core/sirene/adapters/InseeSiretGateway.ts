@@ -13,7 +13,7 @@ import {
   filterNotFalsy,
   queryParamsAsString,
 } from "shared";
-import { AxiosConfig } from "../../../../config/bootstrap/appConfig";
+import { InseeAccessTokenConfig } from "../../../../config/bootstrap/appConfig";
 import {
   createAxiosInstance,
   isRetryableError,
@@ -42,12 +42,12 @@ export class InseeSiretGateway implements SiretGateway {
 
   readonly #retryStrategy: RetryStrategy;
 
-  readonly #axiosConfig: AxiosConfig;
+  readonly #axiosConfig: InseeAccessTokenConfig;
 
   readonly #timeGateway: TimeGateway;
 
   constructor(
-    axiosConfig: AxiosConfig,
+    axiosConfig: InseeAccessTokenConfig,
     timeGateway: TimeGateway,
     retryStrategy: RetryStrategy,
   ) {
