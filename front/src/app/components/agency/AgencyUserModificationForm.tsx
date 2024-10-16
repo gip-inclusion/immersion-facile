@@ -110,10 +110,6 @@ export const AgencyUserModificationForm = ({
   });
 
   const checkboxOptionsWithFilter = () => {
-    if (agency && agency.counsellorEmails.length === 0)
-      return checkboxOptions.filter(
-        (option) => option.label !== "Pré-validateur",
-      );
     if (agency && agency.refersToAgencyId !== null)
       return checkboxOptions.filter((option) => option.label !== "Validateur");
     return checkboxOptions;
