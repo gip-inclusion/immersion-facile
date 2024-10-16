@@ -294,12 +294,11 @@ export const errors = {
       new BadRequestError(
         `L'agence ${agencyId} doit avoir au moins un validateur recevant les emails.`,
       ),
-    invalidRoleUpdateForOneStepValidationAgency: ({
+    oneStepValidationAgencyWontHaveValidatorsReceivingEmails: ({
       agencyId,
-      role,
-    }: { agencyId: AgencyId; role: AgencyRole }) =>
+    }: { agencyId: AgencyId }) =>
       new BadRequestError(
-        `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence n'a qu'une seul étape de validation.`,
+        `L'agence "${agencyId}" à une seule étape de validation ne peut pas avoir aucun validateur recevant des notifications.`,
       ),
 
     invalidRoleUpdateForAgencyWithRefersTo: ({
