@@ -35,6 +35,8 @@ export type User = {
   createdAt: DateTimeIsoString;
 };
 
+export type UserWithAdminRights = User & WithIsBackOfficeAdmin;
+
 export type UserInList = User & {
   numberOfAgencies: number;
 };
