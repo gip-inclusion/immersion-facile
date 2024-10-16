@@ -17,16 +17,17 @@ import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapt
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
+const adminBuilder = new InclusionConnectedUserBuilder()
   .withId("backoffice-admin-user")
-  .withIsAdmin(true)
-  .build();
+  .withIsAdmin(true);
+const icAdmin = adminBuilder.build();
+const admin = adminBuilder.buildUser();
 
 const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
   version: currentJwtVersions.inclusion,
   iat: new Date().getTime(),
   exp: addDays(new Date(), 30).getTime(),
-  userId: backofficeAdminUser.id,
+  userId: icAdmin.id,
 };
 
 describe("POST /add-form-establishment-batch", () => {
@@ -54,9 +55,7 @@ describe("POST /add-form-establishment-batch", () => {
 
     ({ gateways } = testApp);
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
-    testApp.inMemoryUow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    testApp.inMemoryUow.userRepository.users = [admin];
 
     gateways.timeGateway.defaultDate = new Date();
 
