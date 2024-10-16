@@ -25,6 +25,7 @@ import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
   refersToOtherAgency: boolean;
+  mode: "edit" | "create";
 };
 
 type ValidationSteps = "validatorsOnly" | "counsellorsAndValidators";
@@ -32,6 +33,7 @@ type ValidationSteps = "validatorsOnly" | "counsellorsAndValidators";
 export const AgencyFormCommonFields = ({
   addressInitialValue,
   refersToOtherAgency,
+  mode,
 }: AgencyFormCommonFieldsProps) => {
   const { getValues, setValue, register, formState, watch } =
     useFormContext<CreateAgencyDto>();
@@ -123,6 +125,7 @@ export const AgencyFormCommonFields = ({
           currentValue={validationSteps}
           setCurrentValue={setValidationSteps}
           groupLabel={formContents.stepsForValidation.label}
+          disabled={mode === "edit"}
         />
       )}
       {(validationSteps === "counsellorsAndValidators" ||
@@ -133,6 +136,7 @@ export const AgencyFormCommonFields = ({
           valuesInList={watch("counsellorEmails")}
           setValues={(values) => setValue("counsellorEmails", values)}
           validationSchema={emailSchema}
+          disabled={mode === "edit"}
         />
       )}
       {!refersToOtherAgency && (
@@ -143,6 +147,7 @@ export const AgencyFormCommonFields = ({
           valuesInList={watch("validatorEmails")}
           setValues={(values) => setValue("validatorEmails", values)}
           validationSchema={emailSchema}
+          disabled={mode === "edit"}
         />
       )}
       <Input
