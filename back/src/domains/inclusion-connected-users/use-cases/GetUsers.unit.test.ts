@@ -42,4 +42,6 @@ describe("GetUsers", () => {
     const users = await getUsers.execute({ emailContains: "yolo" }, adminUser);
     expectToEqual(users, []);
   });
+
+  //TODO : c'est pas un peu trop léger comme test suite?
 });
