@@ -81,6 +81,7 @@ export const EditAgencyForm = ({
           <AgencyFormCommonFields
             addressInitialValue={agency.address}
             refersToOtherAgency={refersToOtherAgency}
+            mode="edit"
           />
 
           <Select

@@ -329,6 +329,7 @@ const AgencyForm = ({
               <>
                 <AgencyFormCommonFields
                   refersToOtherAgency={refersToOtherAgency}
+                  mode="create"
                 />
                 <AgencyLogoUpload />
 
