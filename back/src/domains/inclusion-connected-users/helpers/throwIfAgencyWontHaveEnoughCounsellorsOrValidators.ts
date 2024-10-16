@@ -8,7 +8,7 @@ export const throwIfAgencyDontHaveOtherValidatorsReceivingNotifications = (
 ): void => {
   if (
     agency.refersToAgencyId === null &&
-    !hasOtherNotifiedUserWithRole(agency, userId, "validator")
+    !hasOtherUserWithRoleAndNotificationMode(agency, userId, "validator", true)
   )
     throw errors.agency.notEnoughValidators({ agencyId: agency.id });
 };
@@ -19,17 +19,33 @@ export const throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications = (
 ): void => {
   if (
     agency.refersToAgencyId &&
-    !hasOtherNotifiedUserWithRole(agency, userId, "counsellor")
+    !hasOtherUserWithRoleAndNotificationMode(agency, userId, "counsellor", true)
   )
     throw errors.agency.notEnoughCounsellors({ agencyId: agency.id });
 };
 
-const hasOtherNotifiedUserWithRole = (
+export const throwIfAgencyRefersToAndUserIsValidator = (
+  agency: AgencyWithUsersRights,
+  userId: UserId,
+) => {
+  if (
+    agency.refersToAgencyId &&
+    agency.usersRights[userId].roles.includes("validator")
+  )
+    throw errors.agency.invalidValidatorEditionWhenAgencyWithRefersTo(
+      agency.id,
+    );
+};
+
+const hasOtherUserWithRoleAndNotificationMode = (
   agency: AgencyWithUsersRights,
   userId: UserId,
   role: AgencyRole,
+  isNotifiedByEmail: boolean,
 ): boolean =>
   toPairs(agency.usersRights).some(
-    ([id, { roles, isNotifiedByEmail }]) =>
-      id !== userId && isNotifiedByEmail && roles.includes(role),
+    ([id, right]) =>
+      id !== userId &&
+      right.isNotifiedByEmail === isNotifiedByEmail &&
+      right.roles.includes(role),
   );
