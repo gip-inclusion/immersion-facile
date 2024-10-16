@@ -1,9 +1,16 @@
 import { values } from "ramda";
-import { Email, GetUsersFilters, User, UserId, errors } from "shared";
+import {
+  Email,
+  GetUsersFilters,
+  User,
+  UserId,
+  UserWithAdminRights,
+  errors,
+} from "shared";
 import { UserRepository } from "../port/UserRepository";
 
 export class InMemoryUserRepository implements UserRepository {
-  #usersById: Record<string, User> = {};
+  #usersById: Record<string, UserWithAdminRights> = {};
 
   public async findByExternalId(externalId: string): Promise<User | undefined> {
     return this.users.find((user) => user.externalId === externalId);

@@ -3,8 +3,8 @@ import { Email } from "../email/email.dto";
 import {
   AgencyRight,
   InclusionConnectedUser,
-  User,
   UserId,
+  UserWithAdminRights,
   WithEstablismentsSiretAndName,
 } from "./inclusionConnectedAllowed.dto";
 
@@ -34,11 +34,10 @@ export class InclusionConnectedUserBuilder
     return this.#dto;
   }
 
-  buildUser(): User {
+  buildUser(): UserWithAdminRights {
     const {
       agencyRights: _,
       establishments: __,
-      isBackofficeAdmin: ___,
       dashboards: ____,
       ...user
     } = this.#dto;
