@@ -1,0 +1,13 @@
+@import "react-design-system/src/config/responsive";
+
+
+.search-map-results {
+  display: none;
+  @include for-screen-min($bp-lg) {
+    display: block;
+  }
+  &__map {
+    height: 42vh;
+    min-height: 386px;
+  }
+}
