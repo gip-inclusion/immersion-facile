@@ -24,9 +24,12 @@ export type AccessTokenConfig = {
   clientSecret: string;
 };
 
-export type AxiosConfig = {
+export type InseeAccessTokenConfig = {
   endpoint: string;
-  bearerToken: string;
+  clientId: string;
+  clientSecret: string;
+  username: string;
+  password: string;
 };
 
 export type OAuthConfig = {
@@ -315,10 +318,13 @@ export class AppConfig {
     });
   }
 
-  public get inseeHttpConfig(): AxiosConfig {
+  public get inseeHttpConfig(): InseeAccessTokenConfig {
     return {
       endpoint: this.#throwIfNotDefinedOrDefault("SIRENE_ENDPOINT"),
-      bearerToken: this.#throwIfNotDefinedOrDefault("SIRENE_BEARER_TOKEN"),
+      clientId: this.#throwIfNotDefinedOrDefault("SIRENE_CLIENT_ID"),
+      clientSecret: this.#throwIfNotDefinedOrDefault("SIRENE_CLIENT_SECRET"),
+      username: this.#throwIfNotDefinedOrDefault("SIRENE_USERNAME"),
+      password: this.#throwIfNotDefinedOrDefault("SIRENE_PASSWORD"),
     };
   }
 
