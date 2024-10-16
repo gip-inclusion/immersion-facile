@@ -8,6 +8,7 @@ import {
   UserId,
   WithAgencyRole,
   WithIsBackOfficeAdmin,
+  errors,
 } from "shared";
 
 export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
@@ -43,3 +44,17 @@ export interface UserRepository {
 
   getUsers(filters: GetUsersFilters): Promise<User[]>;
 }
+
+export const getUsersByIds = async (
+  userRepository: UserRepository,
+  provider: OAuthGatewayProvider,
+  ids: UserId[],
+): Promise<UserWithAdminRights[]> =>
+  Promise.all(
+    ids.map((id) =>
+      userRepository.getById(id, provider).then((user) => {
+        if (!user) throw errors.user.notFound({ userId: id });
+        return user;
+      }),
+    ),
+  );
