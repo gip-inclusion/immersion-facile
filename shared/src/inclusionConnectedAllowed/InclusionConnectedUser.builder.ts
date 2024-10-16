@@ -3,6 +3,7 @@ import { Email } from "../email/email.dto";
 import {
   AgencyRight,
   InclusionConnectedUser,
+  User,
   UserId,
   WithEstablismentsSiretAndName,
 } from "./inclusionConnectedAllowed.dto";
@@ -31,6 +32,21 @@ export class InclusionConnectedUserBuilder
 
   build() {
     return this.#dto;
+  }
+
+  buildUser(): User {
+    const {
+      agencyRights: _,
+      establishments: __,
+      isBackofficeAdmin: ___,
+      dashboards: ____,
+      ...user
+    } = this.#dto;
+    return user;
+  }
+
+  buildAgencyRights(): AgencyRight[] {
+    return this.#dto.agencyRights;
   }
 
   withCreatedAt(createdAt: Date): InclusionConnectedUserBuilder {
