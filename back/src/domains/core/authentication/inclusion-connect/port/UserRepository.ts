@@ -1,14 +1,13 @@
 import {
   AgencyId,
-  AgencyRight,
   Email,
   GetUsersFilters,
   InclusionConnectedUser,
   OAuthGatewayProvider,
   User,
   UserId,
-  UserInList,
   WithAgencyRole,
+  WithIsBackOfficeAdmin,
 } from "shared";
 
 export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
@@ -17,9 +16,17 @@ export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
   isNotifiedByEmail?: boolean;
 };
 
+export type InclusionConnectedUserWithoutRights = Omit<
+  InclusionConnectedUser,
+  "agencyRights"
+>;
+
+export type UserWithAdminRights = User & WithIsBackOfficeAdmin;
+
 export interface UserRepository {
   delete(id: UserId): Promise<void>;
   save(user: User, provider: OAuthGatewayProvider): Promise<void>;
+  updateEmail(userId: string, email: string): Promise<void>;
   findByExternalId(
     externalId: string,
     provider: OAuthGatewayProvider,
@@ -28,18 +35,11 @@ export interface UserRepository {
     email: Email,
     provider: OAuthGatewayProvider,
   ): Promise<User | undefined>;
-  getIcUsersWithFilter(
-    filters: InclusionConnectedFilters,
-    provider: OAuthGatewayProvider,
-  ): Promise<InclusionConnectedUser[]>;
-  getUsers(filters: GetUsersFilters): Promise<UserInList[]>;
+
   getById(
     userId: string,
     provider: OAuthGatewayProvider,
-  ): Promise<InclusionConnectedUser | undefined>;
-  updateAgencyRights(params: {
-    userId: UserId;
-    agencyRights: AgencyRight[];
-  }): Promise<void>;
-  updateEmail(userId: string, email: string): Promise<void>;
+  ): Promise<UserWithAdminRights | undefined>;
+
+  getUsers(filters: GetUsersFilters): Promise<User[]>;
 }
