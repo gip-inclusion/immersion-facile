@@ -14,7 +14,12 @@ import { SearchResult } from "src/app/components/search/SearchResult";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import {
+  SearchPageParams,
+  searchSlice,
+} from "src/core-logic/domain/search/search.slice";
+import { useStyles } from "tss-react/dsfr";
+import "./SearchMiniMap.scss";
 
 type SearchMiniMapListProps = {
   kind: "list";
@@ -67,6 +72,18 @@ export const getIconMarker = (
   return searchResult.voluntaryToImmersion ? defaultMarkerIcon : lbbMarkerIcon;
 };
 
+const getDefaultZoomLevel = (
+  kind: SearchMiniMapProps["kind"],
+  searchParams: SearchPageParams,
+) => {
+  if (kind === "single") {
+    return 17;
+  }
+  return searchParams.distanceKm
+    ? distanceToZoomOptions[searchParams.distanceKm]
+    : 10;
+};
+
 export const SearchMiniMap = ({
   kind,
   activeMarkerKey,
@@ -78,6 +95,7 @@ export const SearchMiniMap = ({
   const searchParams = useAppSelector(searchSelectors.searchParams);
   const mapRef = useRef<L.Map | null>(null);
   const dispatch = useDispatch();
+  const { cx } = useStyles();
 
   const { latitude, longitude } = {
     latitude: searchParams.latitude ?? 48.8589384,
@@ -85,18 +103,14 @@ export const SearchMiniMap = ({
   };
   return (
     <div ref={searchResultsWrapper} key={`map-${kind}`}>
-      <div className="search-map-results">
+      <div className={cx("search-map-results")}>
         <MapContainer
+          className={cx("search-map-results__map")}
           scrollWheelZoom={false}
-          style={{ height: "42vh", width: "100%" }}
           center={
             kind === "single" ? markerProps.position : [latitude, longitude]
           }
-          zoom={
-            searchParams.distanceKm
-              ? distanceToZoomOptions[searchParams.distanceKm]
-              : 10
-          }
+          zoom={getDefaultZoomLevel(kind, searchParams)}
           touchZoom={true}
           minZoom={6}
           ref={mapRef}
