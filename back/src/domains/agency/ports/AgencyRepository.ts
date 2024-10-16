@@ -4,10 +4,13 @@ import type {
   AgencyId,
   AgencyKind,
   AgencyPositionFilter,
+  AgencyRight,
+  AgencyRole,
   AgencyStatus,
   DepartmentCode,
-  PartialAgencyDto,
+  OmitFromExistingKeys,
   SiretDto,
+  UserId,
 } from "shared";
 
 export type GetAgenciesFilters = {
@@ -20,6 +23,38 @@ export type GetAgenciesFilters = {
   doesNotReferToOtherAgency?: true;
 };
 
+export type AgencyWithoutRights = Omit<
+  AgencyDto,
+  "counsellorEmails" | "validatorEmails"
+>;
+
+export type UsersAgencyRights = Record<UserId, AgencyRight[]>;
+
+export type PartialAgencyWithUsersRights = Partial<AgencyWithUsersRights> & {
+  id: AgencyId;
+};
+export type AgencyRightWithAgencyWithUsersRights = OmitFromExistingKeys<
+  AgencyRight,
+  "agency"
+> & { agency: AgencyWithUsersRights };
+
+export type AgencyUserRight = {
+  roles: AgencyRole[];
+  isNotifiedByEmail: boolean;
+};
+
+export type AgencyUsersRights = Record<UserId, AgencyUserRight>;
+
+export type WithAgencyUserRights = {
+  usersRights: AgencyUsersRights;
+};
+
+export type AgencyWithUsersRights = OmitFromExistingKeys<
+  AgencyDto,
+  "counsellorEmails" | "validatorEmails"
+> &
+  WithAgencyUserRights;
+
 export interface AgencyRepository {
   alreadyHasActiveAgencyWithSameAddressAndKind(params: {
     address: AddressDto;
@@ -29,12 +64,15 @@ export interface AgencyRepository {
   getAgencies(props: {
     filters?: GetAgenciesFilters;
     limit?: number;
-  }): Promise<AgencyDto[]>;
-  getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]>;
-  getById(id: AgencyId): Promise<AgencyDto | undefined>;
-  getByIds(ids: AgencyId[]): Promise<AgencyDto[]>;
-  getBySafir(safirCode: string): Promise<AgencyDto | undefined>;
+  }): Promise<AgencyWithUsersRights[]>;
+  getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyWithUsersRights[]>;
+  getById(id: AgencyId): Promise<AgencyWithUsersRights | undefined>;
+  getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]>;
+  getBySafir(safirCode: string): Promise<AgencyWithUsersRights | undefined>;
   getImmersionFacileAgencyId(): Promise<AgencyId | undefined>;
-  insert(agency: AgencyDto): Promise<AgencyId | undefined>;
-  update(partialAgency: PartialAgencyDto): Promise<void>;
+  insert(agency: AgencyWithUsersRights): Promise<AgencyId | undefined>;
+  update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
+  getAgenciesRightsByUserId(
+    id: UserId,
+  ): Promise<AgencyRightWithAgencyWithUsersRights[]>;
 }
