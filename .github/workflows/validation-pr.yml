@@ -21,6 +21,10 @@ jobs:
       IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
       IC_USERNAME: ${{ secrets.IC_USERNAME }}
       SIRENE_BEARER_TOKEN: ${{ secrets.SIRENE_BEARER_TOKEN }}
+      SIRENE_CLIENT_ID: ${{ secrets.SIRENE_CLIENT_ID }}
+      SIRENE_CLIENT_SECRET: ${{ secrets.SIRENE_CLIENT_SECRET }}
+      SIRENE_USERNAME: ${{ secrets.SIRENE_USERNAME }}
+      SIRENE_PASSWORD: ${{ secrets.SIRENE_PASSWORD }}
       INCLUSION_CONNECT_CLIENT_SECRET: ${{ secrets.INCLUSION_CONNECT_CLIENT_SECRET }}
 
   verify-migration-order:
