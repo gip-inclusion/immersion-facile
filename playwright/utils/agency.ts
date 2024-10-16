@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker";
 import { Page, expect } from "@playwright/test";
 import { AgencyId, addressRoutes, domElementIds, frontRoutes } from "shared";
 import { goToAdminTab } from "./admin";
@@ -100,4 +101,42 @@ export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
     .click();
 
   await expect(page.locator(".fr-alert--success")).toBeVisible();
+};
+
+export const addUserToAgency = async (page: Page, agencyName: string) => {
+  await page.goto("/");
+  await goToAdminTab(page, "agencies");
+  await fillAutocomplete({
+    page,
+    locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,
+    value: agencyName,
+  });
+  await expect(
+    page.locator(`#${domElementIds.admin.agencyTab.agencyUsersTable}`),
+  ).toBeVisible();
+  const addUserButton = page.locator(
+    `#${domElementIds.admin.agencyTab.openManageUserModalButton}`,
+  );
+  await expect(addUserButton).toBeVisible();
+  await addUserButton.click();
+  await expect(
+    page.locator(`#${domElementIds.admin.agencyTab.editAgencyManageUserModal}`),
+  ).toBeVisible();
+  await page
+    .locator(`#${domElementIds.admin.agencyTab.editAgencyUserEmail}`)
+    .fill(faker.internet.email());
+  await page
+    .locator(
+      `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-1"]`,
+    )
+    .click();
+  await page
+    .locator(
+      `#${domElementIds.admin.agencyTab.editAgencyUserIsNotifiedByEmail}`,
+    )
+    .click();
+  await page
+    .locator(`#${domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}`)
+    .click();
+  await expect(page.locator(".fr-alert--success").first()).toBeVisible();
 };

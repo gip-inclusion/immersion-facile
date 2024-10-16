@@ -17,8 +17,8 @@ import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
-  throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
+  throwIfThereAreNoOtherCounsellorReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
@@ -38,33 +38,13 @@ const rejectIfAgencyWontHaveValidatorsReceivingNotifications = async (
   }
 };
 
-const rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails = async (
+const rejectIfEditionOfValidatorsOfAgencyWithRefersTo = async (
   params: UserParamsForAgency,
   agency: AgencyDto,
 ) => {
-  if (
-    agency.counsellorEmails.length === 0 &&
-    params.roles.includes("counsellor")
-  ) {
-    throw errors.agency.invalidRoleUpdateForOneStepValidationAgency({
-      agencyId: params.agencyId,
-      role: "counsellor",
-    });
-  }
-};
-
-const rejectIfAgencyWithRefersToWontHaveCounsellors = async (
-  uow: UnitOfWork,
-  params: UserParamsForAgency,
-  agency: AgencyDto,
-  provider: OAuthGatewayProvider,
-) => {
-  if (!params.roles.includes("counsellor") || !params.isNotifiedByEmail) {
-    await throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
-      uow,
-      agency,
-      params.userId,
-      provider,
+  if (params.roles.includes("validator") && agency.refersToAgencyId) {
+    throw errors.agency.invalidValidatorEditionWhenAgencyWithRefersTo(
+      agency.id,
     );
   }
 };
@@ -89,9 +69,11 @@ const makeAgencyRights = async (
       userId: params.userId,
     });
 
-  await rejectIfOneStepValidationAgencyWontHaveValidatorsReceivingEmails(
+  await throwIfThereAreNoOtherCounsellorReceivingNotifications(
+    uow,
     params,
     agency,
+    provider,
   );
   await rejectIfAgencyWontHaveValidatorsReceivingNotifications(
     uow,
@@ -99,18 +81,7 @@ const makeAgencyRights = async (
     agency,
     provider,
   );
-  await rejectIfAgencyWithRefersToWontHaveCounsellors(
-    uow,
-    params,
-    agency,
-    provider,
-  );
-  await rejectIfAgencyWithRefersToWontHaveCounsellors(
-    uow,
-    params,
-    agency,
-    provider,
-  );
+  await rejectIfEditionOfValidatorsOfAgencyWithRefersTo(params, agency);
 
   const updatedAgencyRight: AgencyRight = {
     ...agencyRightToUpdate,

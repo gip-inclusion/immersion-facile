@@ -8,6 +8,7 @@ import {
   User,
   UserParamsForAgency,
   errors,
+  expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -541,43 +542,315 @@ describe("UpdateUserForAgency", () => {
       });
     });
 
-    it("Throw an error when trying to update user Role to counsellor when agency is only one step validation", async () => {
-      const oneStepValidationAgency = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .build();
+    describe("when counsellor role", () => {
+      const user: User = {
+        id: "user",
+        email: "user1@email.com",
+        createdAt: new Date().toISOString(),
+        externalId: null,
+        lastName: "",
+        firstName: "",
+      };
+      const validator: User = {
+        id: "validator-notified",
+        email: "validator@email.com",
+        createdAt: new Date().toISOString(),
+        externalId: null,
+        lastName: "",
+        firstName: "",
+      };
 
-      agencyRepository.setAgencies([oneStepValidationAgency]);
+      describe("is added", () => {
+        it("throw an error if not notified by email and no other user of same agency is counsellor notified by email", async () => {
+          const agency = new AgencyDtoBuilder()
+            .withValidatorEmails(["validator@gmail.com"])
+            .build();
+          agencyRepository.setAgencies([agency]);
+          userRepository.users = [user, validator];
+          await userRepository.updateAgencyRights({
+            userId: user.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["to-review"],
+                isNotifiedByEmail: false,
+              },
+            ],
+          });
+          await userRepository.updateAgencyRights({
+            userId: validator.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
 
-      const icUserWithRoleValidator = new InclusionConnectedUserBuilder()
-        .withId("not-admin-id")
-        .withIsAdmin(false)
-        .withAgencyRights([
-          {
-            agency: oneStepValidationAgency,
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-        ])
-        .build();
+          await expectPromiseToFailWithError(
+            updateIcUserRoleForAgency.execute(
+              {
+                agencyId: agency.id,
+                roles: ["counsellor"],
+                userId: user.id,
+                isNotifiedByEmail: false,
+                email: user.email,
+              },
+              backofficeAdminUser,
+            ),
+            errors.agency.notEnoughCounsellors({ agencyId: agency.id }),
+          );
+        });
+      });
 
-      userRepository.setInclusionConnectedUsers([icUserWithRoleValidator]);
+      describe("is updated", () => {
+        it("throw when trying to remove notifications from last counsellor receiving notifications", async () => {
+          const agency = new AgencyDtoBuilder()
+            .withValidatorEmails(["validator@gmail.com"])
+            .withCounsellorEmails([user.email])
+            .build();
+          agencyRepository.setAgencies([agency]);
+          const counsellor: User = {
+            id: "counsellor-not-notified",
+            email: "counsellor@email.com",
+            createdAt: timeGateway.now().toISOString(),
+            externalId: null,
+            lastName: "",
+            firstName: "",
+          };
+          userRepository.users = [user, validator, counsellor];
+          await userRepository.updateAgencyRights({
+            userId: user.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["counsellor"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
+          await userRepository.updateAgencyRights({
+            userId: counsellor.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["counsellor"],
+                isNotifiedByEmail: false,
+              },
+            ],
+          });
+          await userRepository.updateAgencyRights({
+            userId: validator.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
 
-      await expectPromiseToFailWithError(
-        updateIcUserRoleForAgency.execute(
-          {
-            agencyId: oneStepValidationAgency.id,
-            roles: ["counsellor"],
-            userId: icUserWithRoleValidator.id,
-            isNotifiedByEmail: true,
-            email: icUserWithRoleValidator.email,
-          },
-          backofficeAdminUser,
-        ),
-        errors.agency.invalidRoleUpdateForOneStepValidationAgency({
-          agencyId: oneStepValidationAgency.id,
-          role: "counsellor",
-        }),
-      );
+          await expectPromiseToFailWithError(
+            updateIcUserRoleForAgency.execute(
+              {
+                agencyId: agency.id,
+                roles: ["counsellor"],
+                userId: user.id,
+                isNotifiedByEmail: false,
+                email: user.email,
+              },
+              backofficeAdminUser,
+            ),
+            errors.agency.notEnoughCounsellors({ agencyId: agency.id }),
+          );
+        });
+
+        it("can update remove notifications from a counsellor receiving notifications (not the last one)", async () => {
+          const counsellor: User = {
+            id: "counsellor-not-notified",
+            email: "counsellor@email.com",
+            createdAt: timeGateway.now().toISOString(),
+            externalId: null,
+            lastName: "",
+            firstName: "",
+          };
+          const agency = new AgencyDtoBuilder()
+            .withValidatorEmails(["validator@gmail.com"])
+            .withCounsellorEmails([user.email, counsellor.email])
+            .build();
+          agencyRepository.setAgencies([agency]);
+          userRepository.users = [user, validator, counsellor];
+          await userRepository.updateAgencyRights({
+            userId: user.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["counsellor"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
+          await userRepository.updateAgencyRights({
+            userId: counsellor.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["counsellor"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
+          await userRepository.updateAgencyRights({
+            userId: validator.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
+
+          await updateIcUserRoleForAgency.execute(
+            {
+              agencyId: agency.id,
+              roles: ["counsellor"],
+              userId: user.id,
+              isNotifiedByEmail: false,
+              email: user.email,
+            },
+            backofficeAdminUser,
+          );
+
+          const updatedUser = await userRepository.getById(user.id);
+          expectObjectsToMatch(updatedUser, {
+            email: user.email,
+            agencyRights: [
+              {
+                agency: agency,
+                isNotifiedByEmail: false,
+                roles: ["counsellor"],
+              },
+            ],
+          });
+        });
+      });
+
+      describe("is removed", () => {
+        it("can remove counsellor if no other", async () => {
+          const agency = new AgencyDtoBuilder()
+            .withValidatorEmails(["validator@gmail.com"])
+            .withCounsellorEmails([user.email])
+            .build();
+          agencyRepository.setAgencies([agency]);
+          userRepository.users = [user, validator];
+          await userRepository.updateAgencyRights({
+            userId: user.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["counsellor"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
+          await userRepository.updateAgencyRights({
+            userId: validator.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
+
+          await updateIcUserRoleForAgency.execute(
+            {
+              agencyId: agency.id,
+              roles: ["agency-viewer"],
+              userId: user.id,
+              isNotifiedByEmail: false,
+              email: user.email,
+            },
+            backofficeAdminUser,
+          );
+
+          const updatedUser = await userRepository.getById(user.id);
+          expectObjectsToMatch(updatedUser, {
+            email: user.email,
+            agencyRights: [
+              {
+                agency: agency,
+                isNotifiedByEmail: false,
+                roles: ["agency-viewer"],
+              },
+            ],
+          });
+        });
+
+        it("throw error if not notified and there are other counsellor but none is notified by email", async () => {
+          const agency = new AgencyDtoBuilder()
+            .withValidatorEmails(["validator@gmail.com"])
+            .withCounsellorEmails([user.email])
+            .build();
+          agencyRepository.setAgencies([agency]);
+          const counsellor: User = {
+            id: "counsellor-not-notified",
+            email: "counsellor@email.com",
+            createdAt: timeGateway.now().toISOString(),
+            externalId: null,
+            lastName: "",
+            firstName: "",
+          };
+          userRepository.users = [user, validator, counsellor];
+          await userRepository.updateAgencyRights({
+            userId: user.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["counsellor"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
+          await userRepository.updateAgencyRights({
+            userId: counsellor.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["counsellor"],
+                isNotifiedByEmail: false,
+              },
+            ],
+          });
+          await userRepository.updateAgencyRights({
+            userId: validator.id,
+            agencyRights: [
+              {
+                agency: agency,
+                roles: ["validator"],
+                isNotifiedByEmail: true,
+              },
+            ],
+          });
+
+          await expectPromiseToFailWithError(
+            updateIcUserRoleForAgency.execute(
+              {
+                agencyId: agency.id,
+                roles: ["agency-viewer"],
+                userId: user.id,
+                isNotifiedByEmail: false,
+                email: user.email,
+              },
+              backofficeAdminUser,
+            ),
+            errors.agency.notEnoughCounsellors({ agencyId: agency.id }),
+          );
+        });
+      });
     });
 
     describe("cannot remove the last counsellor receiving notifications of an agency with refersTo", () => {
@@ -631,9 +904,9 @@ describe("UpdateUserForAgency", () => {
             },
             backofficeAdminUser,
           ),
-          errors.agency.notEnoughCounsellors({
-            agencyId: agencyWithRefersTo.id,
-          }),
+          errors.agency.invalidValidatorEditionWhenAgencyWithRefersTo(
+            agencyWithRefersTo.id,
+          ),
         );
       });
 

@@ -310,9 +310,9 @@ export const errors = {
         `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
       ),
 
-    invalidUserRemovalWhenAgencyWithRefersTo: (agencyId: AgencyId) =>
+    invalidValidatorEditionWhenAgencyWithRefersTo: (agencyId: AgencyId) =>
       new BadRequestError(
-        `La suppression d'un valideur n'est pas autorisée pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
+        `L'ajout, la suppression ou l'édition d'un valideur n'est pas autorisée pour l'agence "${agencyId}" car il s'agit d'une structure d'accompagnement. Cette action est autorisée seulement par l'agence prescriptrice à laquelle elle est rattachée.`,
       ),
   },
   user: {

@@ -1,4 +1,10 @@
-import { AgencyDto, OAuthGatewayProvider, UserId, errors } from "shared";
+import {
+  AgencyDto,
+  OAuthGatewayProvider,
+  UserId,
+  UserParamsForAgency,
+  errors,
+} from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfAgencyDontHaveOtherValidatorsReceivingNotifications =
@@ -30,31 +36,37 @@ export const throwIfAgencyDontHaveOtherValidatorsReceivingNotifications =
       throw errors.agency.notEnoughValidators({ agencyId: agency.id });
   };
 
-export const throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications =
-  async (
-    uow: UnitOfWork,
-    agency: AgencyDto,
-    userId: UserId,
-    provider: OAuthGatewayProvider,
-  ) => {
-    if (!agency.refersToAgencyId) return;
+export const throwIfThereAreNoOtherCounsellorReceivingNotifications = async (
+  uow: UnitOfWork,
+  params: UserParamsForAgency,
+  agency: AgencyDto,
+  provider: OAuthGatewayProvider,
+) => {
+  const otherCounsellorsReceivingNotifications = agency.counsellorEmails.filter(
+    (email) => email !== params.email,
+  );
 
-    const agencyUsers = await uow.userRepository.getIcUsersWithFilter(
-      {
-        agencyId: agency.id,
-      },
-      provider,
-    );
+  if (params.roles.includes("counsellor")) {
+    if (otherCounsellorsReceivingNotifications.length > 0) return;
+    if (params.isNotifiedByEmail) return;
+    throw errors.agency.notEnoughCounsellors({ agencyId: agency.id });
+  }
 
-    const agencyHasOtherCounsellor = agencyUsers.some(
-      (agencyUser) =>
-        agencyUser.id !== userId &&
-        agencyUser.agencyRights.some(
-          (right) =>
-            right.isNotifiedByEmail && right.roles.includes("counsellor"),
-        ),
-    );
+  const agencyUsers = await uow.userRepository.getIcUsersWithFilter(
+    { agencyId: agency.id },
+    provider,
+  );
 
-    if (!agencyHasOtherCounsellor)
-      throw errors.agency.notEnoughCounsellors({ agencyId: agency.id });
-  };
+  const counsellorNotReceivingNotifications = agencyUsers.filter(
+    ({ agencyRights }) => {
+      const right = agencyRights.find((right) => right.agency.id === agency.id);
+      if (!right) throw new Error("this is not suppose to happen");
+      return right.roles.includes("counsellor") && !right.isNotifiedByEmail;
+    },
+  );
+
+  if (counsellorNotReceivingNotifications.length === 0) return;
+
+  if (otherCounsellorsReceivingNotifications.length === 0)
+    throw errors.agency.notEnoughCounsellors({ agencyId: agency.id });
+};

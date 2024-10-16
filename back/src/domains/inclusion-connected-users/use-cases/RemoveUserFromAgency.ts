@@ -14,8 +14,8 @@ import { UserRepository } from "../../core/authentication/inclusion-connect/port
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import {
-  throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
+  throwIfThereAreNoOtherCounsellorReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
@@ -54,7 +54,9 @@ const throwIfUserIsValidatorAndAgencyHasRefersTo = (
   const agency = agencyRight.agency;
 
   if (agency.refersToAgencyId && agencyRight.roles.includes("validator")) {
-    throw errors.agency.invalidUserRemovalWhenAgencyWithRefersTo(agency.id);
+    throw errors.agency.invalidValidatorEditionWhenAgencyWithRefersTo(
+      agency.id,
+    );
   }
 };
 
@@ -88,10 +90,17 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
       inputParams.userId,
       provider,
     );
-    await throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
+
+    await throwIfThereAreNoOtherCounsellorReceivingNotifications(
       uow,
+      {
+        email: requestedUser.email,
+        agencyId: agency.id,
+        isNotifiedByEmail: false,
+        userId: requestedUser.id,
+        roles: [],
+      },
       agency,
-      inputParams.userId,
       provider,
     );
 
