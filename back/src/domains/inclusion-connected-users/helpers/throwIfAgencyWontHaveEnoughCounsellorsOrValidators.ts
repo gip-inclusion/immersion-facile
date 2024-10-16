@@ -1,60 +1,35 @@
-import { AgencyDto, OAuthGatewayProvider, UserId, errors } from "shared";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { toPairs } from "ramda";
+import { AgencyRole, UserId, errors } from "shared";
+import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 
-export const throwIfAgencyDontHaveOtherValidatorsReceivingNotifications =
-  async (
-    uow: UnitOfWork,
-    agency: AgencyDto,
-    userId: UserId,
-    provider: OAuthGatewayProvider,
-  ) => {
-    if (agency.refersToAgencyId !== null) return;
+export const throwIfAgencyDontHaveOtherValidatorsReceivingNotifications = (
+  agency: AgencyWithUsersRights,
+  userId: UserId,
+): void => {
+  if (
+    agency.refersToAgencyId === null &&
+    !hasOtherNotifiedUserWithRole(agency, userId, "validator")
+  )
+    throw errors.agency.notEnoughValidators({ agencyId: agency.id });
+};
 
-    const agencyUsers = await uow.userRepository.getIcUsersWithFilter(
-      {
-        agencyId: agency.id,
-      },
-      provider,
-    );
+export const throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications = (
+  agency: AgencyWithUsersRights,
+  userId: UserId,
+): void => {
+  if (
+    agency.refersToAgencyId &&
+    !hasOtherNotifiedUserWithRole(agency, userId, "counsellor")
+  )
+    throw errors.agency.notEnoughCounsellors({ agencyId: agency.id });
+};
 
-    const agencyHasOtherValidator = agencyUsers.some(
-      (agencyUser) =>
-        agencyUser.id !== userId &&
-        agencyUser.agencyRights.some(
-          (right) =>
-            right.isNotifiedByEmail && right.roles.includes("validator"),
-        ),
-    );
-
-    if (!agencyHasOtherValidator)
-      throw errors.agency.notEnoughValidators({ agencyId: agency.id });
-  };
-
-export const throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications =
-  async (
-    uow: UnitOfWork,
-    agency: AgencyDto,
-    userId: UserId,
-    provider: OAuthGatewayProvider,
-  ) => {
-    if (!agency.refersToAgencyId) return;
-
-    const agencyUsers = await uow.userRepository.getIcUsersWithFilter(
-      {
-        agencyId: agency.id,
-      },
-      provider,
-    );
-
-    const agencyHasOtherCounsellor = agencyUsers.some(
-      (agencyUser) =>
-        agencyUser.id !== userId &&
-        agencyUser.agencyRights.some(
-          (right) =>
-            right.isNotifiedByEmail && right.roles.includes("counsellor"),
-        ),
-    );
-
-    if (!agencyHasOtherCounsellor)
-      throw errors.agency.notEnoughCounsellors({ agencyId: agency.id });
-  };
+const hasOtherNotifiedUserWithRole = (
+  agency: AgencyWithUsersRights,
+  userId: UserId,
+  role: AgencyRole,
+): boolean =>
+  toPairs(agency.usersRights).some(
+    ([id, { roles, isNotifiedByEmail }]) =>
+      id !== userId && isNotifiedByEmail && roles.includes(role),
+  );
