@@ -1,23 +1,8 @@
 import { values } from "ramda";
-import {
-  AgencyRight,
-  Email,
-  GetUsersFilters,
-  InclusionConnectedUser,
-  User,
-  UserId,
-  UserInList,
-  errors,
-} from "shared";
-import {
-  InclusionConnectedFilters,
-  UserRepository,
-} from "../port/UserRepository";
-
-type AgencyRightsByUserId = Record<UserId, AgencyRight[]>;
+import { Email, GetUsersFilters, User, UserId, errors } from "shared";
+import { UserRepository } from "../port/UserRepository";
 
 export class InMemoryUserRepository implements UserRepository {
-  public agencyRightsByUserId: AgencyRightsByUserId = {};
   #usersById: Record<string, User> = {};
 
   public async findByExternalId(externalId: string): Promise<User | undefined> {
@@ -49,7 +34,6 @@ export class InMemoryUserRepository implements UserRepository {
     if (!user) throw errors.user.notFound({ userId: id });
 
     delete this.#usersById[id];
-    delete this.agencyRightsByUserId[id];
   }
 
   // for test purpose
@@ -67,95 +51,14 @@ export class InMemoryUserRepository implements UserRepository {
     );
   }
 
-  public async getById(
-    userId: string,
-  ): Promise<InclusionConnectedUser | undefined> {
-    const foundUser = await this.users.find((user) => user.id === userId);
-    if (!foundUser) return;
-    return {
-      ...foundUser,
-      agencyRights: this.agencyRightsByUserId[userId] ?? [],
-      dashboards: {
-        agencies: {},
-        establishments: {},
-      },
-    };
+  public async getById(userId: string): Promise<User | undefined> {
+    return this.users.find((user) => user.id === userId);
   }
 
-  public async getIcUsersWithFilter({
-    agencyRole,
-    agencyId,
-    email,
-    isNotifiedByEmail: isNotifiedByEmailFilter,
-  }: InclusionConnectedFilters): Promise<InclusionConnectedUser[]> {
-    // TODO: gestion des filtres optionnels à améliorer
-    return this.users
-      .filter((user) => (email ? user.email === email : true))
-      .filter((user) => (email ? user.email === email : true))
-      .filter((user) =>
-        this.agencyRightsByUserId[user.id].some(
-          ({ roles, agency, isNotifiedByEmail }) => {
-            if (agencyId) {
-              if (agency.id !== agencyId) return false;
-            }
-
-            if (agencyRole) {
-              if (!roles.includes(agencyRole)) return false;
-            }
-
-            if (isNotifiedByEmailFilter !== undefined) {
-              return isNotifiedByEmail === isNotifiedByEmailFilter;
-            }
-
-            return true;
-          },
-        ),
-      )
-      .map((user) => ({
-        ...user,
-        agencyRights: this.agencyRightsByUserId[user.id],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
-      }));
-  }
-
-  public async getUsers(filters: GetUsersFilters): Promise<UserInList[]> {
-    const emailContains = filters.emailContains.toLowerCase();
-    return this.users
-      .filter((user) => user.email.toLowerCase().includes(emailContains))
-      .map(
-        (user): UserInList => ({
-          ...user,
-          numberOfAgencies: this.agencyRightsByUserId[user.id].length,
-        }),
-      );
-  }
-
-  public setInclusionConnectedUsers(
-    inclusionConnectedUsers: InclusionConnectedUser[],
-  ) {
-    this.users = inclusionConnectedUsers.map(
-      ({ agencyRights: _, ...user }) => user,
+  public async getUsers(filters: GetUsersFilters): Promise<User[]> {
+    return this.users.filter((user) =>
+      user.email.toLowerCase().includes(filters.emailContains.toLowerCase()),
     );
-    this.agencyRightsByUserId = inclusionConnectedUsers.reduce(
-      (acc, icUser) => ({
-        ...acc,
-        [icUser.id]: icUser.agencyRights,
-      }),
-      {} satisfies AgencyRightsByUserId,
-    );
-  }
-
-  public async updateAgencyRights({
-    userId,
-    agencyRights,
-  }: {
-    userId: UserId;
-    agencyRights: AgencyRight[];
-  }): Promise<void> {
-    this.agencyRightsByUserId[userId] = agencyRights;
   }
 
   public async updateEmail(userId: string, email: string): Promise<void> {
