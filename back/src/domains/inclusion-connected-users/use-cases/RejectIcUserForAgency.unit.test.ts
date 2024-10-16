@@ -7,6 +7,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -26,10 +27,17 @@ const user: User = {
   createdAt: new Date().toISOString(),
 };
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
+const adminBuilder = new InclusionConnectedUserBuilder()
   .withIsAdmin(true)
-  .withId("backoffice-admin")
-  .build();
+  .withId("backoffice-admin");
+const icAdmin = adminBuilder.build();
+const admin = adminBuilder.buildUser();
+
+const notAdminBuilder = new InclusionConnectedUserBuilder().withId(
+  "not-an-admin-id",
+);
+const icNotAdmin = notAdminBuilder.build();
+const notAdmin = notAdminBuilder.buildUser();
 
 describe("reject IcUser for agency", () => {
   let uow: InMemoryUnitOfWork;
@@ -43,7 +51,7 @@ describe("reject IcUser for agency", () => {
     uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ timeGateway, uuidGenerator });
     const uowPerformer = new InMemoryUowPerformer(uow);
-    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
+    uow.userRepository.users = [admin];
     rejectIcUserForAgencyUsecase = new RejectIcUserForAgency(
       uowPerformer,
       createNewEvent,
@@ -75,13 +83,7 @@ describe("reject IcUser for agency", () => {
   });
 
   it("Throws if current user is not a backoffice admin", async () => {
-    const currentUser = {
-      ...backofficeAdminUser,
-      id: "not-an-admin-id",
-      isBackofficeAdmin: false,
-    };
-
-    uow.userRepository.setInclusionConnectedUsers([currentUser]);
+    uow.userRepository.users = [notAdmin];
 
     await expectPromiseToFailWithError(
       rejectIcUserForAgencyUsecase.execute(
@@ -90,9 +92,9 @@ describe("reject IcUser for agency", () => {
           agencyId: "osef",
           justification: "osef",
         },
-        currentUser,
+        icNotAdmin,
       ),
-      errors.user.forbidden({ userId: currentUser.id }),
+      errors.user.forbidden({ userId: notAdmin.id }),
     );
   });
 
@@ -117,7 +119,7 @@ describe("reject IcUser for agency", () => {
           agencyId: agency1.id,
           justification: "osef",
         },
-        backofficeAdminUser,
+        icAdmin,
       ),
       errors.user.notFound({ userId: icUser.id }),
     );
@@ -137,10 +139,7 @@ describe("reject IcUser for agency", () => {
       },
     };
 
-    uow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-      icUser,
-    ]);
+    uow.userRepository.users = [icAdmin, icUser];
 
     await expectPromiseToFailWithError(
       rejectIcUserForAgencyUsecase.execute(
@@ -149,7 +148,7 @@ describe("reject IcUser for agency", () => {
           agencyId: agency1.id,
           justification: "osef",
         },
-        backofficeAdminUser,
+        icAdmin,
       ),
       errors.agency.notFound({ agencyId: agency1.id }),
     );
@@ -158,43 +157,46 @@ describe("reject IcUser for agency", () => {
   it("Remove agency right for IcUser", async () => {
     const now = new Date("2023-11-07");
     timeGateway.setNextDate(now);
-    const agency1 = new AgencyDtoBuilder().withId("agency1").build();
-    const agency2 = new AgencyDtoBuilder().withId("agency2").build();
+    const agency1 = new AgencyDtoBuilder()
+      .withValidatorEmails([])
+      .withCounsellorEmails([])
+      .withId("agency1")
+      .build();
+    const agency2 = new AgencyDtoBuilder()
+      .withValidatorEmails([])
+      .withCounsellorEmails([])
+      .withId("agency2")
+      .build();
 
-    const icUser: InclusionConnectedUser = {
-      ...user,
-      agencyRights: [
-        { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
-        { agency: agency2, roles: ["to-review"], isNotifiedByEmail: false },
-      ],
-      dashboards: {
-        agencies: {},
-        establishments: {},
-      },
-    };
-
-    uow.agencyRepository.setAgencies([agency1, agency2]);
-
-    uow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-      icUser,
+    uow.agencyRepository.setAgencies([
+      toAgencyWithRights(agency1, {
+        [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        [notAdmin.id]: { roles: ["validator"], isNotifiedByEmail: false },
+      }),
+      toAgencyWithRights(agency2, {
+        [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+      }),
     ]);
+
+    uow.userRepository.users = [admin, user];
 
     await rejectIcUserForAgencyUsecase.execute(
       {
-        userId: icUser.id,
+        userId: user.id,
         agencyId: agency1.id,
         justification: "osef",
       },
-      backofficeAdminUser,
+      icAdmin,
     );
 
-    expectToEqual(uow.userRepository.agencyRightsByUserId, {
-      [icUser.id]: [
-        { agency: agency2, roles: ["to-review"], isNotifiedByEmail: false },
-      ],
-      [backofficeAdminUser.id]: [],
-    });
+    expectToEqual(uow.agencyRepository.agencies, [
+      toAgencyWithRights(agency1, {
+        [notAdmin.id]: { roles: ["validator"], isNotifiedByEmail: false },
+      }),
+      toAgencyWithRights(agency2, {
+        [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+      }),
+    ]);
 
     expectToEqual(uow.outboxRepository.events, [
       {
@@ -202,12 +204,12 @@ describe("reject IcUser for agency", () => {
         occurredAt: now.toISOString(),
         topic: "IcUserAgencyRightRejected",
         payload: {
-          userId: icUser.id,
+          userId: user.id,
           agencyId: agency1.id,
           justification: "osef",
           triggeredBy: {
             kind: "inclusion-connected",
-            userId: backofficeAdminUser.id,
+            userId: icAdmin.id,
           },
         },
         publications: [],
