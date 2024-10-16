@@ -5,6 +5,7 @@ import {
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -76,7 +77,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: { establishmentMarketingGateway: marketingGateway, timeGateway },
       });
-    uow.agencyRepository.agencies = [agency];
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
   });
 
   describe("With Establishment in repo", () => {
