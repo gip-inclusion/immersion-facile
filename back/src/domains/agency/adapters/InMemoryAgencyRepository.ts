@@ -49,6 +49,34 @@ const agency1: AgencyDto = {
   rejectionJustification: null,
 };
 
+const agency2: AgencyDto = {
+  id: "test-agency-2-back",
+  name: "Test Agency 2 (back)",
+  status: "active",
+  kind: "mission-locale",
+  agencySiret: "00000000000000",
+  counsellorEmails: ["counsellor1@agency2.fr", "counsellor2@agency2.fr"],
+  validatorEmails: ["validator1@agency2.fr", "validator2@agency2.fr"],
+  questionnaireUrl: "http://questionnaire.agency2.fr",
+  signature: "Signature of Test Agency 2",
+  coveredDepartments: ["68"],
+  address: {
+    city: "Mulhouse",
+    departmentCode: "68",
+    postcode: "68100",
+    streetNumberAndAddress: "48 Rue Franklin",
+  },
+  position: {
+    lat: 40,
+    lon: 50,
+  },
+  logoUrl: "http://LOGO AGENCY 2 URL",
+  refersToAgencyId: null,
+  refersToAgencyName: null,
+  rejectionJustification: null,
+  codeSafir: null,
+};
+
 const agency3: AgencyDto = {
   id: "test-agency-3-back",
   name: "Test Agency 3 (back)",
@@ -106,33 +134,7 @@ const testAgencies: AgencyDto[] = [
     rejectionJustification: null,
   },
   agency1,
-  {
-    id: "test-agency-2-back",
-    name: "Test Agency 2 (back)",
-    status: "active",
-    kind: "mission-locale",
-    agencySiret: "00000000000000",
-    counsellorEmails: ["counsellor1@agency2.fr", "counsellor2@agency2.fr"],
-    validatorEmails: ["validator1@agency2.fr", "validator2@agency2.fr"],
-    questionnaireUrl: "http://questionnaire.agency2.fr",
-    signature: "Signature of Test Agency 2",
-    coveredDepartments: ["68"],
-    address: {
-      city: "Mulhouse",
-      departmentCode: "68",
-      postcode: "68100",
-      streetNumberAndAddress: "48 Rue Franklin",
-    },
-    position: {
-      lat: 40,
-      lon: 50,
-    },
-    logoUrl: "http://LOGO AGENCY 2 URL",
-    refersToAgencyId: null,
-    refersToAgencyName: null,
-    rejectionJustification: null,
-    codeSafir: null,
-  },
+  agency2,
   agency3,
   {
     id: "test-agency-4-back-with-refers-to",
