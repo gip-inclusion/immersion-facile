@@ -30,6 +30,7 @@ import { InMemoryLaBonneBoiteGateway } from "../domains/establishment/adapters/l
 import { InMemoryPassEmploiGateway } from "../domains/establishment/adapters/pass-emploi/InMemoryPassEmploiGateway";
 import { InMemoryEstablishmentMarketingGateway } from "../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { AppConfigBuilder } from "./AppConfigBuilder";
+import { toAgencyWithRights } from "./agency";
 
 export type InMemoryGateways = {
   notification: InMemoryNotificationGateway;
@@ -129,7 +130,7 @@ export const buildTestApp = async (
   // biome-ignore lint/style/noNonNullAssertion: <explanation>
   const inMemoryUow = uow!;
 
-  await inMemoryUow.agencyRepository.insert(agency);
+  await inMemoryUow.agencyRepository.insert(toAgencyWithRights(agency, {}));
 
   return {
     request,
