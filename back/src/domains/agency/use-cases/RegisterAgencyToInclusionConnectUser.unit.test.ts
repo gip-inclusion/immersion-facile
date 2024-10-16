@@ -2,153 +2,151 @@ import {
   AgencyDtoBuilder,
   User,
   errors,
+  expectArraysToMatch,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
 import { RegisterAgencyToInclusionConnectUser } from "./RegisterAgencyToInclusionConnectUser";
 
-const userId = "456";
-const agencyId1 = "agency-111";
-const agencyId2 = "agency-222";
-
-const user: User = {
-  id: userId,
-  email: "john.doe@mail.com",
-  firstName: "Joe",
-  lastName: "Doe",
-  externalId: "john-external-id",
-  createdAt: new Date().toISOString(),
-};
-
-const agency1 = new AgencyDtoBuilder().withId(agencyId1).build();
-const agency2 = new AgencyDtoBuilder().withId(agencyId2).build();
-
 describe("RegisterAgencyToInclusionConnectUser use case", () => {
+  const user: User = {
+    id: "456",
+    email: "john.doe@mail.com",
+    firstName: "Joe",
+    lastName: "Doe",
+    externalId: "john-external-id",
+    createdAt: new Date().toISOString(),
+  };
+
+  const agency1 = new AgencyDtoBuilder().withId("agency-111").build();
+  const agency2 = new AgencyDtoBuilder().withId("agency-222").build();
+
   let registerAgencyToInclusionConnectUser: RegisterAgencyToInclusionConnectUser;
-  let uowPerformer: InMemoryUowPerformer;
-  let userRepository: InMemoryUserRepository;
-  let agencyRepository: InMemoryAgencyRepository;
-  let outboxRepository: InMemoryOutboxRepository;
+  let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    userRepository = uow.userRepository;
-    agencyRepository = uow.agencyRepository;
-    userRepository = uow.userRepository;
-    outboxRepository = uow.outboxRepository;
-    uowPerformer = new InMemoryUowPerformer(uow);
-    const createNewEvent = makeCreateNewEvent({
-      timeGateway: new CustomTimeGateway(),
-      uuidGenerator: new TestUuidGenerator(),
-    });
+    uow = createInMemoryUow();
     registerAgencyToInclusionConnectUser =
-      new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent);
+      new RegisterAgencyToInclusionConnectUser(
+        new InMemoryUowPerformer(uow),
+        makeCreateNewEvent({
+          timeGateway: new CustomTimeGateway(),
+          uuidGenerator: new TestUuidGenerator(),
+        }),
+      );
   });
 
-  it("fails if no Jwt Token provided", async () => {
-    await expectPromiseToFailWithError(
-      registerAgencyToInclusionConnectUser.execute([agencyId1]),
-      errors.user.noJwtProvided(),
-    );
-  });
+  describe("Wrong path", () => {
+    it("fails if no Jwt Token provided", async () => {
+      await expectPromiseToFailWithError(
+        registerAgencyToInclusionConnectUser.execute([agency1.id]),
+        errors.user.noJwtProvided(),
+      );
+    });
 
-  it("fails if user does not exist", async () => {
-    await expectPromiseToFailWithError(
-      registerAgencyToInclusionConnectUser.execute([agencyId1], { userId }),
-      errors.user.notFound({ userId }),
-    );
-  });
+    it("fails if user does not exist", async () => {
+      await expectPromiseToFailWithError(
+        registerAgencyToInclusionConnectUser.execute([agency1.id], {
+          userId: user.id,
+        }),
+        errors.user.notFound({ userId: user.id }),
+      );
+    });
 
-  it("fails if no agency exist", async () => {
-    userRepository.users = [user];
-    await expectPromiseToFailWithError(
-      registerAgencyToInclusionConnectUser.execute([agencyId1], { userId }),
-      errors.agencies.notFound({ agencyIds: [agencyId1] }),
-    );
-  });
+    it("fails if no agency exist", async () => {
+      uow.userRepository.users = [user];
+      await expectPromiseToFailWithError(
+        registerAgencyToInclusionConnectUser.execute([agency1.id], {
+          userId: user.id,
+        }),
+        errors.agencies.notFound({ agencyIds: [agency1.id] }),
+      );
+    });
 
-  it("fails if user already has agency rights", async () => {
-    agencyRepository.setAgencies([agency1]);
-    userRepository.setInclusionConnectedUsers([
-      {
-        ...user,
-        agencyRights: [
-          { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
-      },
-    ]);
-    await expectPromiseToFailWithError(
-      registerAgencyToInclusionConnectUser.execute([agency1.id], { userId }),
-      errors.user.alreadyHaveAgencyRights({ userId }),
-    );
+    it("fails if user already has agency rights", async () => {
+      uow.userRepository.users = [user];
+      uow.agencyRepository.setAgencies([
+        toAgencyWithRights(agency1, {
+          [user.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
+        }),
+      ]);
+
+      await expectPromiseToFailWithError(
+        registerAgencyToInclusionConnectUser.execute([agency1.id], {
+          userId: user.id,
+        }),
+        errors.user.alreadyHaveAgencyRights({ userId: user.id }),
+      );
+    });
   });
 
   describe("When User and agencies exist", () => {
     beforeEach(() => {
-      userRepository.users = [user];
-      agencyRepository.setAgencies([agency1, agency2]);
+      uow.userRepository.users = [user];
+      uow.agencyRepository.setAgencies([
+        toAgencyWithRights(agency1, {}),
+        toAgencyWithRights(agency2, {}),
+      ]);
     });
 
     it("makes the link between user and provided agency id, and saves the corresponding event", async () => {
-      await registerAgencyToInclusionConnectUser.execute([agencyId1], {
-        userId,
+      await registerAgencyToInclusionConnectUser.execute([agency1.id], {
+        userId: user.id,
       });
 
-      const inclusionConnectedUser = await userRepository.getById(userId);
-
-      expectToEqual(inclusionConnectedUser, {
-        ...user,
-        agencyRights: [
-          { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
-      });
-      expect(outboxRepository.events).toHaveLength(1);
-      expectObjectsToMatch(outboxRepository.events[0], {
-        topic: "AgencyRegisteredToInclusionConnectedUser",
-        payload: {
-          userId,
-          agencyIds: [agencyId1],
-          triggeredBy: { kind: "inclusion-connected", userId },
+      expectToEqual(await uow.userRepository.users, [user]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency1, {
+          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+        toAgencyWithRights(agency2, {}),
+      ]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "AgencyRegisteredToInclusionConnectedUser",
+          payload: {
+            userId: user.id,
+            agencyIds: [agency1.id],
+            triggeredBy: { kind: "inclusion-connected", userId: user.id },
+          },
         },
-      });
+      ]);
     });
 
     it("makes the links with all the given agencies, and events has all relevant ids", async () => {
       await registerAgencyToInclusionConnectUser.execute(
-        [agencyId1, agencyId2],
+        [agency1.id, agency2.id],
         {
-          userId,
+          userId: user.id,
         },
       );
 
-      const inclusionConnectedUser = await userRepository.getById(userId);
-
-      expectToEqual(inclusionConnectedUser, {
-        ...user,
-        agencyRights: [
-          { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
-          { agency: agency2, roles: ["to-review"], isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
-      });
-      expect(outboxRepository.events).toHaveLength(1);
-      expectObjectsToMatch(outboxRepository.events[0], {
+      expectToEqual(await uow.userRepository.users, [user]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency1, {
+          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+        toAgencyWithRights(agency2, {
+          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+      ]);
+      expect(uow.outboxRepository.events).toHaveLength(1);
+      expectObjectsToMatch(uow.outboxRepository.events[0], {
         topic: "AgencyRegisteredToInclusionConnectedUser",
         payload: {
-          userId,
-          agencyIds: [agencyId1, agencyId2],
-          triggeredBy: { kind: "inclusion-connected", userId },
+          userId: user.id,
+          agencyIds: [agency1.id, agency2.id],
+          triggeredBy: { kind: "inclusion-connected", userId: user.id },
         },
       });
     });

@@ -43,7 +43,11 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
       throw errors.user.notFound({
         userId: inclusionConnectedPayload.userId,
       });
-    if (user.agencyRights.length > 0) {
+
+    const agencyRights = await uow.agencyRepository.getAgenciesRightsByUserId(
+      user.id,
+    );
+    if (agencyRights.length > 0) {
       throw errors.user.alreadyHaveAgencyRights({
         userId: user.id,
       });
@@ -56,28 +60,32 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
       });
     }
 
-    const event = this.#createNewEvent({
-      topic: "AgencyRegisteredToInclusionConnectedUser",
-      payload: {
-        userId: user.id,
-        agencyIds,
-        triggeredBy: {
-          kind: "inclusion-connected",
-          userId: user.id,
-        },
-      },
-    });
-
     await Promise.all([
-      uow.userRepository.updateAgencyRights({
-        userId: user.id,
-        agencyRights: agencies.map((agency) => ({
-          agency,
-          roles: ["to-review"],
-          isNotifiedByEmail: false,
-        })),
-      }),
-      uow.outboxRepository.save(event),
+      ...agencies.map(({ id, usersRights }) =>
+        uow.agencyRepository.update({
+          id,
+          usersRights: {
+            ...usersRights,
+            [user.id]: {
+              isNotifiedByEmail: false,
+              roles: ["to-review"],
+            },
+          },
+        }),
+      ),
+      uow.outboxRepository.save(
+        this.#createNewEvent({
+          topic: "AgencyRegisteredToInclusionConnectedUser",
+          payload: {
+            userId: user.id,
+            agencyIds,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: user.id,
+            },
+          },
+        }),
+      ),
     ]);
   }
 }
