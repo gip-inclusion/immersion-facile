@@ -611,8 +611,8 @@ describe("PgDiscussionRepository", () => {
       },
     );
 
-    it("throws when no params provided", () => {
-      expectPromiseToFailWithError(
+    it("throws when no params provided", async () => {
+      await expectPromiseToFailWithError(
         pgDiscussionRepository.hasDiscussionMatching({}),
         errors.discussion.hasDiscussionMissingParams(),
       );
