@@ -3,10 +3,12 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
+  InclusionConnectedUserBuilder,
   Notification,
   TemplatedEmail,
   expectToEqual,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -23,6 +25,12 @@ import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGenerato
 import { SendBeneficiariesPdfAssessmentsEmails } from "./SendBeneficiariesPdfAssessmentsEmails";
 
 describe("SendBeneficiariesPdfAssessmentsEmails", () => {
+  const agency = new AgencyDtoBuilder()
+    .withValidatorEmails([])
+    .withCounsellorEmails([])
+    .build();
+  const validator = new InclusionConnectedUserBuilder().buildUser();
+
   const id: ConventionId = "immersion-ending-tomorrow-id";
 
   let uow: InMemoryUnitOfWork;
@@ -51,6 +59,13 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
         uuidGenerator: new UuidV4Generator(),
       }),
     );
+
+    uow.userRepository.users = [validator];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    ];
   });
 
   it("Sends an email to immersions ending tomorrow", async () => {
@@ -93,7 +108,7 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
               conventionEndingTomorrow.signatories.beneficiary.lastName,
             beneficiaryFirstName:
               conventionEndingTomorrow.signatories.beneficiary.firstName,
-            agencyValidatorEmail: expectedAgency.validatorEmails[0],
+            agencyValidatorEmail: validator.email,
             businessName: conventionEndingTomorrow.businessName,
             internshipKind: conventionEndingTomorrow.internshipKind,
             agencyAssessmentDocumentLink:
@@ -119,7 +134,6 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
   });
 
   it("Doesn't send an email to beneficiary that already received one", async () => {
-    const agency = new AgencyDtoBuilder().build();
     const conventionEndingTomorrow = new ConventionDtoBuilder()
       .withDateEnd("2023-11-22T10:00:00.000Z")
       .validated()
@@ -159,7 +173,6 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
       templatedContent: email,
     };
 
-    uow.agencyRepository.agencies = [agency];
     uow.conventionRepository.setConventions([conventionEndingTomorrow]);
     uow.notificationRepository.notifications = [notification];
 
