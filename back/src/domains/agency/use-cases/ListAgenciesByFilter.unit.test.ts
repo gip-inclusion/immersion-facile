@@ -1,4 +1,5 @@
 import { AddressDto, AgencyDtoBuilder, expectToEqual } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import {
@@ -6,97 +7,113 @@ import {
   toAgencyOption,
 } from "./ListAgenciesByFilter";
 
-const parisAddress: AddressDto = {
-  city: "Paris",
-  departmentCode: "75",
-  postcode: "75001",
-  streetNumberAndAddress: "OSEF",
-};
-const cergyAddress: AddressDto = {
-  city: "Cergy",
-  departmentCode: "95",
-  postcode: "95000",
-  streetNumberAndAddress: "OSEF",
-};
-const uzercheAddress: AddressDto = {
-  city: "Uzerche",
-  departmentCode: "19",
-  postcode: "19140",
-  streetNumberAndAddress: "OSEF",
-};
-
-const otherAgencyInParis = new AgencyDtoBuilder()
-  .withId("0")
-  .withName("Agence autre 0")
-  .withKind("autre")
-  .withAddress(parisAddress)
-  .build();
-const cciAgency1InCergy = new AgencyDtoBuilder()
-  .withId("1")
-  .withName("Agence CCI 1")
-  .withKind("cci")
-  .withAddress(cergyAddress)
-  .build();
-const cciAgency2InParis = new AgencyDtoBuilder()
-  .withId("2")
-  .withName("Agence CCI 2")
-  .withAddress(parisAddress)
-  .withKind("cci")
-  .build();
-const peAgency1InParis = new AgencyDtoBuilder()
-  .withId("3")
-  .withName("Agence PE 3")
-  .withKind("pole-emploi")
-  .withAddress(parisAddress)
-  .build();
-const peAgency2InParis = new AgencyDtoBuilder()
-  .withId("4")
-  .withName("Agence PE 4")
-  .withKind("pole-emploi")
-  .withAddress(parisAddress)
-  .build();
-const otherAgencyWithRefersToInCergy = new AgencyDtoBuilder()
-  .withRefersToAgencyInfo({
-    refersToAgencyId: peAgency2InParis.id,
-    refersToAgencyName: peAgency2InParis.name,
-  })
-  .withId("5")
-  .withName("Agence avec refersTo")
-  .withAddress(cergyAddress)
-  .build();
-const agencyWithSiret = new AgencyDtoBuilder()
-  .withId("6")
-  .withName("Agence avec Siret")
-  .withKind("autre")
-  .withAddress(uzercheAddress)
-  .withAgencySiret("11122233344455")
-  .build();
-
-const agencyChambreAgriculture = new AgencyDtoBuilder()
-  .withId("7")
-  .withName("Agence chambre d'agriculture")
-  .withKind("chambre-agriculture")
-  .build();
-
-const agencyCma = new AgencyDtoBuilder()
-  .withId("8")
-  .withName("Agency CMA")
-  .withKind("cma")
-  .build();
-
-const allAgencies = [
-  otherAgencyInParis,
-  cciAgency1InCergy,
-  cciAgency2InParis,
-  peAgency1InParis,
-  peAgency2InParis,
-  otherAgencyWithRefersToInCergy,
-  agencyWithSiret,
-  agencyChambreAgriculture,
-  agencyCma,
-];
-
 describe("Query: List agencies by filter", () => {
+  const parisAddress: AddressDto = {
+    city: "Paris",
+    departmentCode: "75",
+    postcode: "75001",
+    streetNumberAndAddress: "OSEF",
+  };
+  const cergyAddress: AddressDto = {
+    city: "Cergy",
+    departmentCode: "95",
+    postcode: "95000",
+    streetNumberAndAddress: "OSEF",
+  };
+  const uzercheAddress: AddressDto = {
+    city: "Uzerche",
+    departmentCode: "19",
+    postcode: "19140",
+    streetNumberAndAddress: "OSEF",
+  };
+
+  const otherAgencyInParis = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("0")
+      .withName("Agence autre 0")
+      .withKind("autre")
+      .withAddress(parisAddress)
+      .build(),
+  );
+  const cciAgency1InCergy = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("1")
+      .withName("Agence CCI 1")
+      .withKind("cci")
+      .withAddress(cergyAddress)
+      .build(),
+  );
+  const cciAgency2InParis = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("2")
+      .withName("Agence CCI 2")
+      .withAddress(parisAddress)
+      .withKind("cci")
+      .build(),
+  );
+  const peAgency1InParis = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("3")
+      .withName("Agence PE 3")
+      .withKind("pole-emploi")
+      .withAddress(parisAddress)
+      .build(),
+  );
+  const peAgency2InParis = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("4")
+      .withName("Agence PE 4")
+      .withKind("pole-emploi")
+      .withAddress(parisAddress)
+      .build(),
+  );
+  const otherAgencyWithRefersToInCergy = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withRefersToAgencyInfo({
+        refersToAgencyId: peAgency2InParis.id,
+        refersToAgencyName: peAgency2InParis.name,
+      })
+      .withId("5")
+      .withName("Agence avec refersTo")
+      .withAddress(cergyAddress)
+      .build(),
+  );
+  const agencyWithSiret = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("6")
+      .withName("Agence avec Siret")
+      .withKind("autre")
+      .withAddress(uzercheAddress)
+      .withAgencySiret("11122233344455")
+      .build(),
+  );
+  const agencyChambreAgriculture = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("7")
+      .withName("Agence chambre d'agriculture")
+      .withKind("chambre-agriculture")
+      .build(),
+  );
+  const agencyCma = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("8")
+      .withName("Agency CMA")
+      .withKind("cma")
+      .build(),
+  );
+
+  const allAgencies = [
+    otherAgencyInParis,
+    cciAgency1InCergy,
+    cciAgency2InParis,
+    peAgency1InParis,
+    peAgency2InParis,
+    otherAgencyWithRefersToInCergy,
+    agencyWithSiret,
+    agencyChambreAgriculture,
+    agencyCma,
+  ];
+
   let listAgencyOptionsByFilter: ListAgencyOptionsByFilter;
 
   beforeEach(() => {
