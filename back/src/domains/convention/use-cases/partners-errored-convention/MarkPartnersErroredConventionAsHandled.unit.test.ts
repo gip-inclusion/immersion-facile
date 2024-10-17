@@ -2,11 +2,12 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   InclusionConnectDomainJwtPayload,
-  InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
 import {
   CreateNewEvent,
@@ -37,35 +38,25 @@ describe("mark partners errored convention as handled", () => {
 
   const icJwtDomainPayload: InclusionConnectDomainJwtPayload = { userId };
 
-  const agency = new AgencyDtoBuilder().build();
+  const icuser = new InclusionConnectedUserBuilder()
+    .withId(userId)
+    .withFirstName("John")
+    .withLastName("Doe")
+    .withEmail("my-user@email.com")
+    .withCreatedAt(new Date())
+    .withExternalId("icUser-external-id")
+    .build();
 
-  const icUserWithoutRight: InclusionConnectedUser = {
-    id: userId,
-    email: "my-user@email.com",
-    firstName: "John",
-    lastName: "Doe",
-    agencyRights: [],
-    dashboards: {
-      agencies: {},
-      establishments: {},
+  const agency = new AgencyDtoBuilder()
+    .withValidatorEmails([])
+    .withCounsellorEmails([])
+    .build();
+  const agencyWithRights = toAgencyWithRights(agency, {
+    [icuser.id]: {
+      roles: ["validator"],
+      isNotifiedByEmail: false,
     },
-    externalId: "icUserWithoutRight-external-id",
-    createdAt: new Date().toISOString(),
-  };
-
-  const icUserWithAgencyRights: InclusionConnectedUser = {
-    id: userId,
-    email: "my-user@email.com",
-    firstName: "John",
-    lastName: "Doe",
-    agencyRights: [{ roles: ["validator"], agency, isNotifiedByEmail: false }],
-    dashboards: {
-      agencies: {},
-      establishments: {},
-    },
-    externalId: "icUserWithAgencyRights-external-id",
-    createdAt: new Date().toISOString(),
-  };
+  });
 
   const convention = new ConventionDtoBuilder()
     .withId(conventionId)
@@ -91,10 +82,6 @@ describe("mark partners errored convention as handled", () => {
   });
 
   it("Mark partner errored convention as handled", async () => {
-    const conventionRepository = uow.conventionRepository;
-    const userRepository = uow.userRepository;
-    const broadcastFeedbacksRepository = uow.broadcastFeedbacksRepository;
-
     const savedErrorConvention: BroadcastFeedback = {
       serviceName: broadcastToPeServiceName,
       consumerName: "Yolo",
@@ -108,10 +95,11 @@ describe("mark partners errored convention as handled", () => {
       handledByAgency: false,
     };
 
-    await conventionRepository.save(convention);
-    await broadcastFeedbacksRepository.save(savedErrorConvention);
+    await uow.conventionRepository.save(convention);
+    await uow.broadcastFeedbacksRepository.save(savedErrorConvention);
 
-    await userRepository.setInclusionConnectedUsers([icUserWithAgencyRights]);
+    uow.userRepository.users = [icuser];
+    uow.agencyRepository.agencies = [agencyWithRights];
 
     await markPartnersErroredConventionAsHandled.execute(
       {
@@ -120,7 +108,7 @@ describe("mark partners errored convention as handled", () => {
       icJwtDomainPayload,
     );
 
-    expectToEqual(broadcastFeedbacksRepository.broadcastFeedbacks, [
+    expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
       {
         ...savedErrorConvention,
         handledByAgency: true,
@@ -144,10 +132,11 @@ describe("mark partners errored convention as handled", () => {
 
   it("Throw when convention is not errored", async () => {
     const conventionRepository = uow.conventionRepository;
-    const userRepository = uow.userRepository;
 
     await conventionRepository.save(convention);
-    await userRepository.setInclusionConnectedUsers([icUserWithAgencyRights]);
+
+    uow.userRepository.users = [icuser];
+    uow.agencyRepository.agencies = [agencyWithRights];
 
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
@@ -182,7 +171,8 @@ describe("mark partners errored convention as handled", () => {
 
     await conventionRepository.save(convention);
     await broadcastFeedbacksRepository.save(savedHandledErrorConvention);
-    await userRepository.setInclusionConnectedUsers([icUserWithAgencyRights]);
+    userRepository.users = [icuser];
+    uow.agencyRepository.agencies = [agencyWithRights];
 
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
@@ -237,7 +227,7 @@ describe("mark partners errored convention as handled", () => {
     const userRepository = uow.userRepository;
 
     await conventionRepository.save(convention);
-    await userRepository.setInclusionConnectedUsers([icUserWithoutRight]);
+    userRepository.users = [icuser];
 
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
