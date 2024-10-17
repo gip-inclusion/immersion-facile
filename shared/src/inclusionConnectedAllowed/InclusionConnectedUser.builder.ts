@@ -35,12 +35,7 @@ export class InclusionConnectedUserBuilder
   }
 
   buildUser(): UserWithAdminRights {
-    const {
-      agencyRights: _,
-      establishments: __,
-      dashboards: ____,
-      ...user
-    } = this.#dto;
+    const { agencyRights: _, dashboards: ____, ...user } = this.#dto;
     return user;
   }
 
