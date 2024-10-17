@@ -505,28 +505,6 @@ export const ConventionForm = ({
                     </Accordion>
                   </div>
 
-                  <Alert
-                    small
-                    severity="warning"
-                    className={fr.cx("fr-my-2w")}
-                    description={
-                      <ol>
-                        <li>
-                          Une fois le formulaire envoyé, chaque signataire de la
-                          convention va recevoir un email.
-                        </li>
-                        <li>
-                          Pensez à vérifier votre boîte email et votre dossier
-                          de spams.
-                        </li>
-                        <li>
-                          Pensez également à informer les autres signataires de
-                          la convention qu'ils devront vérifier leur boîte email
-                          et leur dossier de spams.
-                        </li>
-                      </ol>
-                    }
-                  />
                   <ErrorNotifications
                     labels={getFormErrors()}
                     errors={displayReadableError(errors)}
