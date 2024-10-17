@@ -94,7 +94,7 @@ export class LaBonneBoiteCompanyDto {
     return this.props.siret;
   }
 
-  public toSearchResult(): SearchResultDto {
+  public toSearchResult(romeLabel: string): SearchResultDto {
     return {
       siret: this.props.siret,
       establishmentScore: 0,
@@ -118,7 +118,7 @@ export class LaBonneBoiteCompanyDto {
         lon: this.props.location.lon,
       },
       rome: this.props.rome,
-      romeLabel: "TODO ROME LABEL",
+      romeLabel,
       voluntaryToImmersion: false,
       website: "",
       locationId: null,
