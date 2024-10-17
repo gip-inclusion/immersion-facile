@@ -6,7 +6,7 @@ import {
   errors,
   withConventionSchema,
 } from "shared";
-import { AgencyRepository } from "../../../agency/ports/AgencyRepository";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -28,25 +28,6 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Initier une démarche de recrutement": 3,
 };
 
-const getLinkedAgencies = async (
-  agencyRepository: AgencyRepository,
-  convention: ConventionDto,
-): Promise<{ agency: AgencyDto; refersToAgency: AgencyDto | null }> => {
-  const agency = await agencyRepository.getById(convention.agencyId);
-  if (!agency) throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-  if (!agency.refersToAgencyId) return { agency, refersToAgency: null };
-
-  const refersToAgency = await agencyRepository.getById(
-    agency.refersToAgencyId,
-  );
-
-  if (!refersToAgency)
-    throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
-
-  return { agency, refersToAgency };
-};
-
 export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;
 
@@ -63,10 +44,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const { agency, refersToAgency } = await getLinkedAgencies(
-      uow.agencyRepository,
-      convention,
-    );
+    const { agency, refersToAgency } = await getLinkedAgencies(uow, convention);
 
     if (
       (!refersToAgency && agency.kind !== "pole-emploi") ||
@@ -163,3 +141,30 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     });
   }
 }
+
+const getLinkedAgencies = async (
+  uow: UnitOfWork,
+  convention: ConventionDto,
+): Promise<{ agency: AgencyDto; refersToAgency: AgencyDto | null }> => {
+  const agencyWithRights = await uow.agencyRepository.getById(
+    convention.agencyId,
+  );
+  if (!agencyWithRights)
+    throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+  const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+
+  if (!agency.refersToAgencyId) return { agency, refersToAgency: null };
+
+  const refersToAgency = await uow.agencyRepository.getById(
+    agency.refersToAgencyId,
+  );
+
+  if (!refersToAgency)
+    throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
+
+  return {
+    agency,
+    refersToAgency: await agencyWithRightToAgencyDto(uow, refersToAgency),
+  };
+};
