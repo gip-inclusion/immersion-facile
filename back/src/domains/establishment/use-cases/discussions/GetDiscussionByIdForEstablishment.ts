@@ -3,12 +3,12 @@ import {
   DiscussionId,
   DiscussionReadDto,
   InclusionConnectDomainJwtPayload,
-  InclusionConnectedUser,
   discussionIdSchema,
   errors,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { makeProvider } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { UserOnRepository } from "../../../core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
 export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
@@ -73,7 +73,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     };
   }
   #hasUserRightToAccessDiscussion(
-    user: InclusionConnectedUser,
+    user: UserOnRepository,
     discussion: DiscussionDto,
   ) {
     return (
