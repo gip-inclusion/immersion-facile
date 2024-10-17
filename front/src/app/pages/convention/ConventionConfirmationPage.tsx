@@ -25,7 +25,7 @@ export const ConventionConfirmationPage = ({
   if (!isValidConventionId) throw errors.convention.notFound({ conventionId });
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout="default">
+      <MainWrapper layout="default" useBackground>
         <SubmitConfirmationSection
           idToCopy={conventionId}
           copyButtonIsDisabled={copyButtonIsDisabled}
