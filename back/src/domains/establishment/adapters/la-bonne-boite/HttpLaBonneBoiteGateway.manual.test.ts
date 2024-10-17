@@ -1,8 +1,8 @@
-import axios from "axios";
+import fetch from "node-fetch";
 import { expectToEqual } from "shared";
-import { createAxiosSharedClient } from "shared-routes/axios";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createPeFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { PoleEmploiGetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
@@ -21,12 +21,11 @@ describe("HttpLaBonneBoiteGateway", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    const axiosHttpClient = createPeAxiosSharedClient(config);
-
+    const peFetchSharedClient = createPeFetchSharedClient(config);
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
-      createAxiosSharedClient(createLbbRoutes(config.peApiUrl), axios),
+      createFetchSharedClient(createLbbRoutes(config.peApiUrl), fetch),
       new HttpPoleEmploiGateway(
-        axiosHttpClient,
+        peFetchSharedClient,
         new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
           new RealTimeGateway(),
           "expires_in",
@@ -46,8 +45,7 @@ describe("HttpLaBonneBoiteGateway", () => {
       lat: benodetLonLat.lat,
       distanceKm: 100,
     });
-
-    expect(actualSearchedCompanies).toHaveLength(90);
+    expect(actualSearchedCompanies).toHaveLength(100);
   });
 
   it("Should return the closest 1 `company` susceptible to offer immersion of given rome located within the geographical area at 1km distance", async () => {
@@ -62,8 +60,7 @@ describe("HttpLaBonneBoiteGateway", () => {
       new LaBonneBoiteCompanyDtoBuilder()
         .withName("L'ENTREMETS GOURMAND")
         .withSiret("83906399700028")
-        .withEmployeeRange("0")
-        .withDistanceKm(1)
+        .withEmployeeRange(0, 0)
         .withNaf({
           code: "1071C",
           nomenclature: "Boulangerie et boulangerie-pâtisserie",
@@ -72,12 +69,12 @@ describe("HttpLaBonneBoiteGateway", () => {
           lat: 47.8734,
           lon: -4.12564,
         })
-        .withRomeLabel("Boulangerie - viennoiserie")
         .withRome(boulangerRome)
-        .withAddress("52 RUE DE L ODET, 29120 COMBRIT")
-        .withUrlOfPartner(
-          "https://labonneboite.pole-emploi.fr/83906399700028/details?rome_code=D1102&utm_medium=web&utm_source=api__emploi_store_dev&utm_campaign=api__emploi_store_dev__immersionfaciledev",
-        )
+        .withAddress({
+          city: "COMBRIT",
+          postcode: "29120",
+          departmentCode: "29",
+        })
         .build()
         .toSearchResult(),
     ]);
