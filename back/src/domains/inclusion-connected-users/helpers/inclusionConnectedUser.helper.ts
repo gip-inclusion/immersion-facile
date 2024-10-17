@@ -12,7 +12,7 @@ export const getIcUserByUserId = async (
 
   return {
     ...user,
-    agencyRights: await getAgencyRightByUserId(uow, provider, user.id),
+    agencyRights: await getAgencyRightByUserId(uow, user.id),
     dashboards: { agencies: {}, establishments: {} },
   };
 };
