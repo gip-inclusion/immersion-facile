@@ -15,7 +15,7 @@ import {
 import { ForbiddenError, NotFoundError } from "shared";
 import { conventionEmailsByRole } from "../../../utils/convention";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -46,9 +46,7 @@ export class GetConvention extends TransactionalUseCase<
       conventionId,
     );
 
-    const provider = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
+    const provider = await makeProvider(uow);
 
     if (isConventionDomainPayload) {
       return this.#onConventionDomainPayload({

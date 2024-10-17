@@ -1,9 +1,6 @@
 import { AbsoluteUrl, WithIdToken, withIdTokenSchema } from "shared";
 import { createTransactionalUseCase } from "../../../UseCase";
-import {
-  OAuthGateway,
-  oAuthProviderByFeatureFlags,
-} from "../port/OAuthGateway";
+import { OAuthGateway, makeProvider } from "../port/OAuthGateway";
 
 export type GetInclusionConnectLogoutUrl = ReturnType<
   typeof makeGetInclusionConnectLogoutUrl
@@ -20,9 +17,6 @@ export const makeGetInclusionConnectLogoutUrl = createTransactionalUseCase<
     inputSchema: withIdTokenSchema,
   },
   async ({ inputParams, uow, deps: { oAuthGateway } }) => {
-    return oAuthGateway.getLogoutUrl(
-      inputParams,
-      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
-    );
+    return oAuthGateway.getLogoutUrl(inputParams, await makeProvider(uow));
   },
 );

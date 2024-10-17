@@ -20,7 +20,7 @@ import {
   validatedConventionStatuses,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import {
   DomainTopic,
@@ -85,9 +85,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         agencyId: conventionRead.agencyId,
       });
 
-    const provider = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
+    const provider = await makeProvider(uow);
 
     const { user, roleInPayload } = await this.#getRoleInPayloadOrUser(
       uow,

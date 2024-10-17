@@ -7,7 +7,7 @@ import {
   formEstablishmentSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -75,7 +75,7 @@ export class EditFormEstablishment extends TransactionalUseCase<
     if ("userId" in jwtPayload) {
       const user = await uow.userRepository.getById(
         jwtPayload.userId,
-        oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
+        await makeProvider(uow),
       );
       if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 

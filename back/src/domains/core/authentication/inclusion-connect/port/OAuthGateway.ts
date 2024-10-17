@@ -8,6 +8,7 @@ import {
   WithIdToken,
   WithSourcePage,
 } from "shared";
+import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { OAuthJwt } from "../entities/OngoingOAuth";
 
 export type GetAccessTokenParams = WithSourcePage & {
@@ -35,10 +36,13 @@ export type GetLoginUrlParams = WithSourcePage & {
   state: string;
 };
 
-export const oAuthProviderByFeatureFlags = (
+const oAuthProviderByFeatureFlags = (
   flags: FeatureFlags,
 ): OAuthGatewayProvider =>
   flags.enableProConnect.isActive ? "ProConnect" : "InclusionConnect";
+
+export const makeProvider = async (uow: UnitOfWork) =>
+  oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll());
 
 export interface OAuthGateway {
   getLoginUrl(

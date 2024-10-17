@@ -8,7 +8,7 @@ import {
   withAgencyIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -18,9 +18,7 @@ const addValidatorsNotReceivingNotifications = async (
   agencyId: AgencyId,
   agenciesWithRefersTo: AgencyDto[],
 ) => {
-  const provider = oAuthProviderByFeatureFlags(
-    await uow.featureFlagRepository.getAll(),
-  );
+  const provider = await makeProvider(uow);
 
   const validatorsNotNotifiedToCopy =
     await uow.userRepository.getIcUsersWithFilter(
