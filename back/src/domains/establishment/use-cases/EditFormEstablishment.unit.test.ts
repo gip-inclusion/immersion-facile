@@ -20,14 +20,16 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { EditFormEstablishment } from "./EditFormEstablishment";
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withIsAdmin(true)
-  .build();
+const backofficeAdminUserBuilder =
+  new InclusionConnectedUserBuilder().withIsAdmin(true);
+const icBackofficeAdminUser = backofficeAdminUserBuilder.build();
+const backofficeAdminUser = backofficeAdminUserBuilder.buildUser();
 
-const inclusionConnectedUser = new InclusionConnectedUserBuilder()
+const inclusionConnectedUserBuilder = new InclusionConnectedUserBuilder()
   .withId("inclusion-connected-user")
-  .withIsAdmin(false)
-  .build();
+  .withIsAdmin(false);
+const icInclusionConnectedUser = inclusionConnectedUserBuilder.build();
+const inclusionConnectedUser = inclusionConnectedUserBuilder.buildUser();
 
 describe("Edit Form Establishment", () => {
   let uow: InMemoryUnitOfWork;
@@ -36,7 +38,7 @@ describe("Edit Form Establishment", () => {
   let uuidGenerator: UuidGenerator;
 
   const inclusionConnectJwtPayload: InclusionConnectDomainJwtPayload = {
-    userId: inclusionConnectedUser.id,
+    userId: icInclusionConnectedUser.id,
   };
 
   const formSiret = "12345678901234";
@@ -55,7 +57,7 @@ describe("Edit Form Establishment", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
+    uow.userRepository.users = [backofficeAdminUser];
     editFormEstablishment = new EditFormEstablishment(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
@@ -86,13 +88,13 @@ describe("Edit Form Establishment", () => {
     });
 
     it("Forbidden error on InclusionConnectJwtPayload with ic user that doesn't have rights on establishment", async () => {
-      uow.userRepository.setInclusionConnectedUsers([inclusionConnectedUser]);
+      uow.userRepository.users = [inclusionConnectedUser];
       await expectPromiseToFailWithError(
         editFormEstablishment.execute(
           updatedFormEstablishment,
           inclusionConnectJwtPayload,
         ),
-        errors.user.forbidden({ userId: inclusionConnectedUser.id }),
+        errors.user.forbidden({ userId: icInclusionConnectedUser.id }),
       );
     });
 
@@ -159,11 +161,11 @@ describe("Edit Form Establishment", () => {
         existingFormEstablishment,
       ]);
 
-      uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
+      uow.userRepository.users = [backofficeAdminUser];
 
       // Act
       await editFormEstablishment.execute(updatedFormEstablishment, {
-        userId: backofficeAdminUser.id,
+        userId: icBackofficeAdminUser.id,
       });
 
       // Assert
@@ -175,7 +177,7 @@ describe("Edit Form Establishment", () => {
             formEstablishment: updatedFormEstablishment,
             triggeredBy: {
               kind: "inclusion-connected",
-              userId: backofficeAdminUser.id,
+              userId: icBackofficeAdminUser.id,
             },
           },
           status: "never-published",
