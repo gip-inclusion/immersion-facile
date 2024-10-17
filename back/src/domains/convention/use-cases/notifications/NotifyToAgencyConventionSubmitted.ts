@@ -9,6 +9,7 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
@@ -54,9 +55,13 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
     { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
-    if (!agency)
+    const [agencyWithRights] = await uow.agencyRepository.getByIds([
+      convention.agencyId,
+    ]);
+    if (!agencyWithRights)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
     const conventionAdvisorEntity =
       await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
