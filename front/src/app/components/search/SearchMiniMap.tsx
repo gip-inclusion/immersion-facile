@@ -1,6 +1,6 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import React, { useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import {
   MapContainer,
   Marker,
@@ -101,6 +101,18 @@ export const SearchMiniMap = ({
     latitude: searchParams.latitude ?? 48.8589384,
     longitude: searchParams.longitude ?? 2.2646348,
   };
+
+  const zoom = useMemo(
+    () => getDefaultZoomLevel(kind, searchParams),
+    [kind, searchParams],
+  );
+
+  useEffect(() => {
+    if (markerProps?.position) {
+      mapRef.current?.setView(markerProps.position, zoom);
+    }
+  }, [markerProps?.position, zoom]);
+
   return (
     <div ref={searchResultsWrapper} key={`map-${kind}`}>
       <div className={cx("search-map-results")}>
@@ -110,7 +122,7 @@ export const SearchMiniMap = ({
           center={
             kind === "single" ? markerProps.position : [latitude, longitude]
           }
-          zoom={getDefaultZoomLevel(kind, searchParams)}
+          zoom={zoom}
           touchZoom={true}
           minZoom={6}
           ref={mapRef}
