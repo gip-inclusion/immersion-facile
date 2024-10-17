@@ -17,11 +17,10 @@ import "./SearchResult.scss";
 export type EnterpriseSearchResultProps = {
   establishment: SearchResultDto;
   onButtonClick?: () => void;
-  illustration: React.ReactNode;
+  illustration?: React.ReactNode;
   disableButton?: boolean;
   preview?: boolean;
   showDistance?: boolean;
-  layout?: "fr-col-lg-4" | "fr-col-md-6";
 };
 
 const getLastDate = (
@@ -41,7 +40,6 @@ const SearchResultComponent = ({
   establishment,
   illustration,
   preview,
-  layout = "fr-col-lg-4",
 }: EnterpriseSearchResultProps) => {
   const {
     siret,
@@ -79,42 +77,40 @@ const SearchResultComponent = ({
   const dateJobCreatedAt = getLastDate(createdAt, updatedAt);
 
   return (
-    <div className={fr.cx("fr-col-12", "fr-col-md-6", layout)}>
-      <Card
-        title={jobTitle}
-        desc={establishmentName}
-        linkProps={{
-          ...routes.searchResult({
-            appellationCode:
-              preview || appellations.length === 0
-                ? ""
-                : appellations[0].appellationCode,
-            siret,
-            ...(locationId ? { location: locationId } : {}),
-          }).link,
-          onClick: preview
-            ? () => {}
-            : (event) => {
-                event.preventDefault();
-                if (onButtonClick) {
-                  onButtonClick();
-                }
-              },
-          id: voluntaryToImmersion
-            ? `${domElementIds.search.searchResultButton}-${siret}`
-            : `${domElementIds.search.lbbSearchResultButton}-${siret}`,
-        }}
-        enlargeLink
-        titleAs="h2"
-        imageComponent={illustration}
-        endDetail={dateJobCreatedAt}
-        start={
-          <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">
-            {address.city} ({address.departmentCode})
-          </Tag>
-        }
-      />
-    </div>
+    <Card
+      title={jobTitle}
+      desc={establishmentName}
+      linkProps={{
+        ...routes.searchResult({
+          appellationCode:
+            preview || appellations.length === 0
+              ? ""
+              : appellations[0].appellationCode,
+          siret,
+          ...(locationId ? { location: locationId } : {}),
+        }).link,
+        onClick: preview
+          ? () => {}
+          : (event) => {
+              event.preventDefault();
+              if (onButtonClick) {
+                onButtonClick();
+              }
+            },
+        id: voluntaryToImmersion
+          ? `${domElementIds.search.searchResultButton}-${siret}`
+          : `${domElementIds.search.lbbSearchResultButton}-${siret}`,
+      }}
+      enlargeLink
+      titleAs="h2"
+      imageComponent={illustration}
+      endDetail={dateJobCreatedAt}
+      start={
+        <Tag className={fr.cx("fr-mb-2w")} iconId="fr-icon-map-pin-2-line">
+          {address.city} ({address.departmentCode})
+        </Tag>
+      }
+    />
   );
 };
 

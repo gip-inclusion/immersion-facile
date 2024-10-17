@@ -1,4 +1,9 @@
-import { LocationId, SearchResultDto, expectToEqual } from "shared";
+import {
+  LocationId,
+  SearchQueryParamsDto,
+  SearchResultDto,
+  expectToEqual,
+} from "shared";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchStatus,
@@ -83,19 +88,18 @@ describe("search epic", () => {
       expectStatus("noSearchMade");
       expectSearchInfo("Veuillez sélectionner vos critères");
       expectIsLoading(false);
-
-      store.dispatch(
-        searchSlice.actions.searchRequested({
-          distanceKm: 10,
-          longitude: 0,
-          latitude: 0,
-          appellationCodes: ["11000"],
-          sortedBy: "distance",
-          place: "23 rue lunaire, 44000 Nantes",
-        }),
-      );
+      const searchParams: SearchQueryParamsDto = {
+        distanceKm: 10,
+        longitude: 0,
+        latitude: 0,
+        appellationCodes: ["11000"],
+        sortedBy: "distance",
+        place: "23 rue lunaire, 44000 Nantes",
+      };
+      store.dispatch(searchSlice.actions.searchRequested(searchParams));
       expectIsLoading(true);
       expectStatus("initialFetch");
+      expectedSearchParamsToEqual(searchParams);
 
       feedWithSearchResults([formSearchResult1]);
       expectSearchResults([formSearchResult1]);
@@ -242,6 +246,14 @@ describe("search epic", () => {
 
   const expectIsLoading = (isLoading: boolean) =>
     expect(searchSelectors.isLoading(store.getState())).toBe(isLoading);
+
+  const expectedSearchParamsToEqual = (
+    expectedSearchParams: SearchQueryParamsDto,
+  ) =>
+    expectToEqual(
+      searchSelectors.searchParams(store.getState()),
+      expectedSearchParams,
+    );
 
   const feedWithSearchResults = (results: SearchResultDto[]) =>
     dependencies.searchGateway.searchResults$.next(results);

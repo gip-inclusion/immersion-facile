@@ -294,13 +294,7 @@ export const SearchPage = ({
                   </div>
                   <div
                     className={cx(
-                      fr.cx(
-                        "fr-col-12",
-                        "fr-col-md-5",
-                        "fr-grid-row",
-                        "fr-grid-row--right",
-                        "fr-ml-auto",
-                      ),
+                      fr.cx("fr-col-12", "fr-col-md-5", "fr-ml-auto"),
                       Styles.resultsSummary,
                     )}
                   >
@@ -311,7 +305,7 @@ export const SearchPage = ({
                         </h2>
                         {routeParams.appellations &&
                           routeParams.appellations.length > 0 && (
-                            <span className={cx(fr.cx("fr-text--xs"))}>
+                            <p className={cx(fr.cx("fr-text--xs"))}>
                               pour la recherche{" "}
                               <strong className={fr.cx("fr-text--bold")}>
                                 {routeParams.appellations[0].appellationLabel}
@@ -325,7 +319,7 @@ export const SearchPage = ({
                               >
                                 {routeParams.appellations[0].romeLabel}
                               </a>
-                            </span>
+                            </p>
                           )}
                       </>
                     )}
