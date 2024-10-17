@@ -27,6 +27,7 @@ import {
   displayReadableError,
   getFormContents,
   makeFieldError,
+  toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -249,8 +250,10 @@ export const DetailsSection = ({
         <SearchResultPreview establishment={formValues} />
       )}
       <ErrorNotifications
-        labels={formErrors}
-        errors={displayReadableError(errors)}
+        errorsWithLabels={toErrorsWithLabels({
+          labels: formErrors,
+          errors: displayReadableError(errors),
+        })}
         visible={submitCount !== 0 && Object.values(errors).length > 0}
       />
       {feedback.kind === "submitErrored" && (
