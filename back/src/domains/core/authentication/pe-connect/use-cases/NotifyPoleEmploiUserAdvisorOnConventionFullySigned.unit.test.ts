@@ -1,5 +1,4 @@
 import {
-  AgencyDto,
   ConventionDto,
   ConventionDtoBuilder,
   frontRoutes,
@@ -10,6 +9,7 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { AgencyWithUsersRights } from "../../../../agency/ports/AgencyRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -25,7 +25,7 @@ import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPole
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let uow: InMemoryUnitOfWork;
   let usecase: NotifyPoleEmploiUserAdvisorOnConventionFullySigned;
-  let agency: AgencyDto;
+  let agency: AgencyWithUsersRights;
   const timeGateway = new CustomTimeGateway();
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
