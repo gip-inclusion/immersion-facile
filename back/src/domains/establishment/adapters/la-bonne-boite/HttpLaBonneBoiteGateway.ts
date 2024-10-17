@@ -18,7 +18,6 @@ const MAX_DISTANCE_IN_KM = 100;
 
 const lbbMaxQueryPerSeconds = 1;
 
-const _lbbV1App = "api_labonneboitev1";
 const lbbV2App = "api_labonneboitev2";
 
 const logger = createLogger(__filename);

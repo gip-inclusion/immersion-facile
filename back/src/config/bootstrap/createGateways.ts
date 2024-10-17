@@ -104,17 +104,6 @@ const configureCreateFetchHttpClientForExternalAPIs =
   <R extends Record<string, UnknownSharedRoute>>(routes: R) =>
     createFetchSharedClient(routes, fetch, { skipResponseValidation: true });
 
-// const configureCreateAxiosHttpClientForExternalAPIs =
-//   (config: AppConfig) =>
-//   <R extends Record<string, UnknownSharedRoute>>(routes: R) =>
-//     createAxiosSharedClient(
-//       routes,
-//       axios.create({
-//         timeout: config.externalAxiosTimeout,
-//       }),
-//       { skipResponseValidation: true },
-//     );
-
 // prettier-ignore
 export type Gateways = ReturnType<typeof createGateways> extends Promise<
   infer T
