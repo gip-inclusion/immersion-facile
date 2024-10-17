@@ -2,12 +2,12 @@ import {
   EstablishmentDomainPayload,
   FormEstablishmentDto,
   InclusionConnectDomainJwtPayload,
-  InclusionConnectedUser,
   errors,
   formEstablishmentSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -86,7 +86,7 @@ export class EditFormEstablishment extends TransactionalUseCase<
 }
 
 const throwIfIcUserNotAllowed = (
-  user: InclusionConnectedUser,
+  user: UserOnRepository,
   formEstablishment: FormEstablishmentDto,
 ) => {
   if (user.isBackofficeAdmin) return;
