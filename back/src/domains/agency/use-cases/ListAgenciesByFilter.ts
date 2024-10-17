@@ -1,5 +1,4 @@
 import {
-  AgencyDto,
   AgencyKind,
   AgencyKindFilter,
   AgencyOption,
@@ -12,7 +11,10 @@ import {
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { GetAgenciesFilters } from "../ports/AgencyRepository";
+import {
+  AgencyWithUsersRights,
+  GetAgenciesFilters,
+} from "../ports/AgencyRepository";
 
 export class ListAgencyOptionsByFilter extends TransactionalUseCase<
   ListAgencyOptionsRequestDto,
@@ -72,11 +74,13 @@ const getAgencyKindsFromFilterKind = (
   const _exhaustiveCheck: never = filterKind;
 };
 
-export const toAgencyOption = (agency: AgencyDto): AgencyOption => ({
+export const toAgencyOption = (
+  agency: AgencyWithUsersRights,
+): AgencyOption => ({
   id: agency.id,
   name: toAgencyOptionName(agency),
   kind: agency.kind,
 });
 
-export const toAgencyOptionName = (agency: AgencyDto): string =>
+const toAgencyOptionName = (agency: AgencyWithUsersRights): string =>
   `${agency.name} (${agency.address.city})`;
