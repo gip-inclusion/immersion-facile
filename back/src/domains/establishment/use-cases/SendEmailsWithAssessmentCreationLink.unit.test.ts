@@ -8,6 +8,7 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -170,7 +171,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       templatedContent: email,
     };
 
-    uow.agencyRepository.agencies = [agency];
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
     uow.conventionRepository.setConventions([
       immersionApplicationEndingYesterday,
     ]);
