@@ -604,13 +604,13 @@ importers:
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.8.2
-        version: 4.8.2(playwright-core@1.45.3)
+        version: 4.8.2(playwright-core@1.48.1)
       '@faker-js/faker':
         specifier: ^8.3.1
         version: 8.3.1
       '@playwright/test':
-        specifier: ^1.45.3
-        version: 1.45.3
+        specifier: ^1.48.1
+        version: 1.48.1
       '@types/jest':
         specifier: ^29.5.2
         version: 29.5.2
@@ -2962,8 +2962,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@playwright/test@1.45.3':
-    resolution: {integrity: sha512-UKF4XsBfy+u3MFWEH44hva1Q8Da28G6RFtR2+5saw+jgAFQV5yYnB1fu68Mz7fO+5GJF3wgwAIs0UelU8TxFrA==}
+  '@playwright/test@1.48.1':
+    resolution: {integrity: sha512-s9RtWoxkOLmRJdw3oFvhFbs9OJS0BzrLUc8Hf6l2UdCNd1rqeEyD4BhCJkvzeEoD1FsK4mirsWwGerhVmYKtZg==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -7224,13 +7224,13 @@ packages:
     resolution: {integrity: sha512-NPE8TDbzl/3YQYY7CSS228s3g2ollTFnc+Qi3tqmqJp9Vg2ovUpixcJEo2HJScN2Ez+kEaal6y70c0ehqJBJeA==}
     engines: {node: '>=10'}
 
-  playwright-core@1.45.3:
-    resolution: {integrity: sha512-+ym0jNbcjikaOwwSZycFbwkWgfruWvYlJfThKYAlImbxUgdWFO2oW70ojPm4OpE4t6TAo2FY/smM+hpVTtkhDA==}
+  playwright-core@1.48.1:
+    resolution: {integrity: sha512-Yw/t4VAFX/bBr1OzwCuOMZkY1Cnb4z/doAFSwf4huqAGWmf9eMNjmK7NiOljCdLmxeRYcGPPmcDgU0zOlzP0YA==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.45.3:
-    resolution: {integrity: sha512-QhVaS+lpluxCaioejDZ95l4Y4jSFCsBvl2UZkpeXlzxmqS+aABr5c82YmfMHrL6x27nvrvykJAFpkzT2eWdJww==}
+  playwright@1.48.1:
+    resolution: {integrity: sha512-j8CiHW/V6HxmbntOfyB4+T/uk08tBy6ph0MpBXwuoofkSnLmlfdYNNkFTYD6ofzzlSqLA1fwH4vwvVFvJgLN0w==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -9149,10 +9149,10 @@ snapshots:
     dependencies:
       default-browser-id: 3.0.0
 
-  '@axe-core/playwright@4.8.2(playwright-core@1.45.3)':
+  '@axe-core/playwright@4.8.2(playwright-core@1.48.1)':
     dependencies:
       axe-core: 4.8.3
-      playwright-core: 1.45.3
+      playwright-core: 1.48.1
 
   '@babel/code-frame@7.18.6':
     dependencies:
@@ -12797,9 +12797,9 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  '@playwright/test@1.45.3':
+  '@playwright/test@1.48.1':
     dependencies:
-      playwright: 1.45.3
+      playwright: 1.48.1
 
   '@popperjs/core@2.11.6': {}
 
@@ -18808,11 +18808,11 @@ snapshots:
     dependencies:
       find-up: 5.0.0
 
-  playwright-core@1.45.3: {}
+  playwright-core@1.48.1: {}
 
-  playwright@1.45.3:
+  playwright@1.48.1:
     dependencies:
-      playwright-core: 1.45.3
+      playwright-core: 1.48.1
     optionalDependencies:
       fsevents: 2.3.2
 

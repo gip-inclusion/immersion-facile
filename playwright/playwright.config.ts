@@ -27,6 +27,9 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   timeout: 60_000,
+  expect: {
+    timeout: 10_000,
+  },
   /* Configure projects for major browsers */
   projects: [
     { name: "setup", testMatch: /auth\.setup\.ts/ },
