@@ -17,6 +17,7 @@ import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 
 export class GetInclusionConnectedUser extends TransactionalUseCase<
   void,
@@ -50,10 +51,11 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     const provider = await makeProvider(uow);
     const user = await uow.userRepository.getById(userId, provider);
     if (!user) throw errors.user.notFound({ userId });
-    const establishments = await this.#withEstablishments(uow, user);
+    const icUser = await getIcUserByUserId(uow, provider, user.id);
+    const establishments = await this.#withEstablishments(uow, icUser);
     return {
-      ...user,
-      ...(await this.#withEstablishmentDashboards(user, uow)),
+      ...icUser,
+      ...(await this.#withEstablishmentDashboards(icUser, uow)),
       ...(establishments.length > 0 ? { establishments } : {}),
     };
   }

@@ -3,15 +3,14 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   InclusionConnectJwtPayload,
-  InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  User,
   allAgencyRoles,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { StubDashboardGateway } from "../../core/dashboard/adapters/StubDashboardGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -33,14 +32,21 @@ describe("GetUserAgencyDashboardUrl", () => {
     version: 1,
     userId,
   };
-  const john: User = {
-    id: userId,
-    email: "john@mail.com",
-    firstName: "John",
-    lastName: "Doe",
-    externalId: "john-external-id",
-    createdAt: new Date().toISOString(),
-  };
+
+  const johnBuilder = new InclusionConnectedUserBuilder()
+    .withId(userId)
+    .withFirstName("John")
+    .withLastName("Doe")
+    .withEmail("john@mail.com")
+    .withCreatedAt(new Date())
+    .withExternalId("john-external-id");
+
+  const john = johnBuilder.buildUser();
+  const icJohn = johnBuilder.build();
+
+  const agencyWithoutCounsellorAndValidatorBuilder = new AgencyDtoBuilder()
+    .withValidatorEmails([])
+    .withCounsellorEmails([]);
 
   let getInclusionConnectedUser: GetInclusionConnectedUser;
   let uowPerformer: InMemoryUowPerformer;
@@ -78,7 +84,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       .withId(john.id)
       .build();
 
-    uow.userRepository.setInclusionConnectedUsers([adminUser]);
+    uow.userRepository.users = [adminUser];
 
     const result = await getInclusionConnectedUser.execute(undefined, {
       ...inclusionConnectJwtPayload,
@@ -96,109 +102,167 @@ describe("GetUserAgencyDashboardUrl", () => {
       "agency-viewer",
     ]);
 
-  it.each(agencyRolesAllowedToGetDashboard)(
-    "returns the dashboard url when role is '%s'",
-    async (agencyUserRole) => {
-      const agency = new AgencyDtoBuilder().build();
-      uow.userRepository.setInclusionConnectedUsers([
-        {
-          ...john,
+  describe("", () => {
+    it.each(agencyRolesAllowedToGetDashboard)(
+      "returns the dashboard url when role is '%s'",
+      async (agencyUserRole) => {
+        const agency = agencyWithoutCounsellorAndValidatorBuilder.build();
+
+        const agencyWithRights = toAgencyWithRights(agency, {
+          [john.id]: {
+            roles: [agencyUserRole],
+            isNotifiedByEmail: false,
+          },
+        });
+
+        uow.userRepository.users = [john];
+        uow.agencyRepository.agencies = [agencyWithRights];
+
+        const user = await getInclusionConnectedUser.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        );
+
+        expectToEqual(user, {
+          ...icJohn,
           agencyRights: [
-            { agency, roles: [agencyUserRole], isNotifiedByEmail: false },
+            {
+              agency: {
+                ...agency,
+                ...(agencyUserRole === "counsellor"
+                  ? { counsellorEmails: [icJohn.email] }
+                  : {}),
+                ...(agencyUserRole === "validator"
+                  ? { validatorEmails: [icJohn.email] }
+                  : {}),
+              },
+              roles: [agencyUserRole],
+              isNotifiedByEmail: false,
+            },
           ],
           dashboards: {
-            agencies: {},
+            agencies: {
+              agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+                john.id
+              }/${timeGateway.now()}`,
+              erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+                john.id
+              }/${timeGateway.now()}`,
+            },
             establishments: {},
           },
-        },
-      ]);
-      const url = await getInclusionConnectedUser.execute(
-        undefined,
-        inclusionConnectJwtPayload,
-      );
-
-      expectToEqual(url, {
-        ...john,
-        agencyRights: [
-          { agency, roles: [agencyUserRole], isNotifiedByEmail: false },
-        ],
-        dashboards: {
-          agencies: {
-            agencyDashboardUrl: `http://stubAgencyUserDashboard/${
-              john.id
-            }/${timeGateway.now()}`,
-            erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
-              john.id
-            }/${timeGateway.now()}`,
-          },
-          establishments: {},
-        },
-      }); // coming from StubDashboardGateway
-    },
-  );
+        });
+      },
+    );
+  });
 
   it.each(agencyRolesForbiddenToGetDashboard)(
     "gets the user without dashboard url for role '%s'",
     async (agencyUserRole) => {
-      const storedInclusionConnectedUser: InclusionConnectedUser = {
-        ...john,
-        agencyRights: [
-          {
-            agency: new AgencyDtoBuilder().build(),
-            roles: [agencyUserRole],
-            isNotifiedByEmail: false,
-          },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
-      };
-      uow.userRepository.setInclusionConnectedUsers([
-        storedInclusionConnectedUser,
-      ]);
+      const agency = agencyWithoutCounsellorAndValidatorBuilder.build();
+
+      const agencyWithRights = toAgencyWithRights(agency, {
+        [john.id]: {
+          roles: [agencyUserRole],
+          isNotifiedByEmail: false,
+        },
+      });
+
+      uow.userRepository.users = [john];
+      uow.agencyRepository.agencies = [agencyWithRights];
+
       const inclusionConnectedUser = await getInclusionConnectedUser.execute(
         undefined,
         inclusionConnectJwtPayload,
       );
 
-      expectToEqual(inclusionConnectedUser, storedInclusionConnectedUser);
+      expectToEqual(inclusionConnectedUser, {
+        ...icJohn,
+        agencyRights: [
+          { agency, roles: [agencyUserRole], isNotifiedByEmail: false },
+        ],
+        dashboards: { agencies: {}, establishments: {} },
+      });
     },
   );
 
   it("the dashboard url should not include the agency ids where role is 'to-review'", async () => {
-    const agencyBuilder = new AgencyDtoBuilder();
-    const agency1 = agencyBuilder
+    const agency1 = new AgencyDtoBuilder()
       .withId("1111")
       .withKind("pole-emploi")
+      .withValidatorEmails([])
+      .withCounsellorEmails([])
       .build();
-    const agency2 = agencyBuilder.withId("2222").build();
-    const agency3 = agencyBuilder.withId("3333").build();
-    const agency4 = agencyBuilder.withId("4444").build();
+    const agency2 = new AgencyDtoBuilder()
+      .withId("2222")
+      .withValidatorEmails([])
+      .withCounsellorEmails([])
+      .build();
+    const agency3 = new AgencyDtoBuilder()
+      .withId("3333")
+      .withValidatorEmails([])
+      .withCounsellorEmails([])
+      .build();
+    const agency4 = new AgencyDtoBuilder()
+      .withId("4444")
+      .withValidatorEmails([])
+      .withCounsellorEmails([])
+      .build();
 
-    uow.userRepository.setInclusionConnectedUsers([
-      {
-        ...john,
-        agencyRights: [
-          { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
-          { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
-          { agency: agency3, roles: ["to-review"], isNotifiedByEmail: false },
-          {
-            agency: agency4,
-            roles: ["agency-admin"],
-            isNotifiedByEmail: false,
-          },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
+    const agency1WithRights = toAgencyWithRights(agency1, {
+      [john.id]: {
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
       },
-    ]);
-    const url = await getInclusionConnectedUser.execute(
+    });
+    const agency2WithRights = toAgencyWithRights(agency2, {
+      [john.id]: {
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      },
+    });
+    const agency3WithRights = toAgencyWithRights(agency3, {
+      [john.id]: {
+        roles: ["to-review"],
+        isNotifiedByEmail: false,
+      },
+    });
+    const agency4WithRights = toAgencyWithRights(agency4, {
+      [john.id]: {
+        roles: ["agency-admin"],
+        isNotifiedByEmail: false,
+      },
+    });
+
+    uow.userRepository.users = [john];
+    uow.agencyRepository.agencies = [
+      agency1WithRights,
+      agency2WithRights,
+      agency3WithRights,
+      agency4WithRights,
+    ];
+
+    const user = await getInclusionConnectedUser.execute(
       undefined,
       inclusionConnectJwtPayload,
     );
 
-    expectToEqual(url, {
-      ...john,
+    expectToEqual(user, {
+      ...icJohn,
       agencyRights: [
-        { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
-        { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
+        {
+          agency: { ...agency1, counsellorEmails: [john.email] },
+          isNotifiedByEmail: false,
+          roles: ["counsellor"],
+        },
+        {
+          agency: {
+            ...agency2,
+            validatorEmails: [john.email],
+          },
+          isNotifiedByEmail: false,
+          roles: ["validator"],
+        },
         { agency: agency3, roles: ["to-review"], isNotifiedByEmail: false },
         { agency: agency4, roles: ["agency-admin"], isNotifiedByEmail: false },
       ],
@@ -219,13 +283,8 @@ describe("GetUserAgencyDashboardUrl", () => {
   describe("establishment dashboards", () => {
     describe("convention", () => {
       it("retrieve dashboard when IC user is establishement rep in at least one convention", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            dashboards: { agencies: {}, establishments: {} },
-            agencyRights: [],
-          },
-        ]);
+        uow.userRepository.users = [john];
+
         const convention = new ConventionDtoBuilder()
           .withEstablishmentRepresentativeEmail(john.email)
           .build();
@@ -250,13 +309,8 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("retrieve dashboard when IC user is establishement tutor in at least one convention", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
-          },
-        ]);
+        uow.userRepository.users = [john];
+
         const convention = new ConventionDtoBuilder()
           .withEstablishmentTutorEmail(john.email)
           .build();
@@ -281,13 +335,8 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("should retrieve dashboard when ic user is establishment representative and tutor for at least one convention", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
-          },
-        ]);
+        uow.userRepository.users = [john];
+
         const convention = new ConventionDtoBuilder()
           .withEstablishmentTutorEmail(john.email)
           .withEstablishmentRepresentativeEmail(john.email)
@@ -313,13 +362,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("do not retrieve dashboard when IC user is not establishement tutor or respresentative in any conventions", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
-          },
-        ]);
+        uow.userRepository.users = [john];
 
         const result = await getInclusionConnectedUser.execute(
           undefined,
@@ -335,13 +378,8 @@ describe("GetUserAgencyDashboardUrl", () => {
 
     describe("discussions", () => {
       it("retrieve dashboard when IC user is establishment contact for at least one discussion", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            dashboards: { agencies: {}, establishments: {} },
-            agencyRights: [],
-          },
-        ]);
+        uow.userRepository.users = [john];
+
         uow.discussionRepository.discussions = [
           new DiscussionBuilder()
             .withEstablishmentContact({
@@ -366,13 +404,8 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("retrieves dashboard when IC user is establishment contact copy email of a discussion", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            dashboards: { agencies: {}, establishments: {} },
-            agencyRights: [],
-          },
-        ]);
+        uow.userRepository.users = [john];
+
         uow.discussionRepository.discussions = [
           new DiscussionBuilder()
             .withEstablishmentContact({
@@ -397,13 +430,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("do not retrieve dashboard when IC user is not establishment contact in any discussion", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
-          },
-        ]);
+        uow.userRepository.users = [john];
 
         const result = await getInclusionConnectedUser.execute(
           undefined,
@@ -419,13 +446,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
     describe("establishments", () => {
       it("retrieve establishments when IC user is establishement rep in at least one establishment", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            dashboards: { agencies: {}, establishments: {} },
-            agencyRights: [],
-          },
-        ]);
+        uow.userRepository.users = [john];
 
         const fakeBusinessContact = new ContactEntityBuilder()
           .withEmail(john.email)
@@ -464,13 +485,8 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       it("do not retrieve  establishment  when IC user is not establishment representative in at least one establishment", async () => {
-        uow.userRepository.setInclusionConnectedUsers([
-          {
-            ...john,
-            agencyRights: [],
-            dashboards: { agencies: {}, establishments: {} },
-          },
-        ]);
+        uow.userRepository.users = [john];
+
         const convention = new ConventionDtoBuilder()
           .withEstablishmentTutorEmail(john.email)
           .build();
@@ -481,7 +497,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           inclusionConnectJwtPayload,
         );
 
-        expectToEqual(result.establishments, undefined);
+        expectToEqual(result.establishments, []);
       });
     });
   });
