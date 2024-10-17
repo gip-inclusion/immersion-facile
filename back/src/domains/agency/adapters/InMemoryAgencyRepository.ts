@@ -1,4 +1,4 @@
-import { values } from "ramda";
+import { keys, toPairs, uniq, values } from "ramda";
 import {
   AddressDto,
   AgencyId,
@@ -12,8 +12,10 @@ import {
   SiretDto,
   UserId,
   WithGeoPosition,
+  WithUserFilters,
   errors,
   isTruthy,
+  isWithAgencyRole,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import {
@@ -169,6 +171,25 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     return "immersion-facile-agency";
   }
 
+  public async getUserIdByFilters(filters: WithUserFilters): Promise<UserId[]> {
+    if (!isWithAgencyRole(filters)) {
+      const agency = this.#agencies[filters.agencyId];
+      if (!agency) throw errors.agency.notFound(filters);
+      return keys(agency.usersRights);
+    }
+
+    return uniq(
+      values(this.#agencies)
+        .filter(isTruthy)
+        .reduce<UserId[]>((acc, agency) => {
+          const userIds = toPairs(agency.usersRights)
+            .filter(([_, right]) => right.roles.includes(filters.agencyRole))
+            .map(([userId]) => userId);
+          return [...acc, ...userIds];
+        }, []),
+    );
+  }
+
   public async insert(
     agency: AgencyWithUsersRights,
   ): Promise<AgencyId | undefined> {
@@ -191,16 +212,6 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     }
     this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
   }
-
-  // public async updateAgencyRights({
-  //   userId,
-  //   agencyRights,
-  // }: {
-  //   userId: UserId;
-  //   agencyRights: AgencyRight[];
-  // }): Promise<void> {
-  //   this.#agencyRightsByUserId[userId] = agencyRights;
-  // }
 }
 
 const sortByNearestFrom =
