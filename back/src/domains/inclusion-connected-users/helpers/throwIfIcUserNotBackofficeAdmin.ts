@@ -49,7 +49,7 @@ export const getIcUserOrThrow = async (
   };
 };
 
-export const throwIfNotAdmin = (user: InclusionConnectedUser | undefined) => {
+export const throwIfNotAdmin = (user: UserOnRepository | undefined) => {
   if (!user) throw errors.user.unauthorized();
   if (!user.isBackofficeAdmin) throw errors.user.forbidden({ userId: user.id });
 };
