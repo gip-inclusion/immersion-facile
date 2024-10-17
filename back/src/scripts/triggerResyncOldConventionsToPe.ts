@@ -1,6 +1,6 @@
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
-import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
+import { createPeFetchSharedClient } from "../config/helpers/createFetchSharedClients";
 import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { PoleEmploiGetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
 import { ResyncOldConventionsToPe } from "../domains/convention/use-cases/ResyncOldConventionsToPe";
@@ -17,7 +17,7 @@ const config = AppConfig.createFromEnv();
 
 const executeUsecase = async () => {
   const timeGateway = new RealTimeGateway();
-  const peAxiosHttpClient = createPeAxiosSharedClient(config);
+  const peAxiosHttpClient = createPeFetchSharedClient(config);
 
   const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
     peAxiosHttpClient,

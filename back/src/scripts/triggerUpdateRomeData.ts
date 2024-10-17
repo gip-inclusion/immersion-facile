@@ -5,7 +5,7 @@ import { map, splitEvery } from "ramda";
 import { pipeWithValue, removeDiacritics, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
+import { createPeFetchSharedClient } from "../config/helpers/createFetchSharedClients";
 import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import {
   AppellationWithShortLabel,
@@ -40,7 +40,7 @@ const main = async () => {
     );
 
   const franceTravailGateway = new HttpPoleEmploiGateway(
-    createPeAxiosSharedClient(config),
+    createPeFetchSharedClient(config),
     cachingGateway,
     config.peApiUrl,
     config.poleEmploiAccessTokenConfig,

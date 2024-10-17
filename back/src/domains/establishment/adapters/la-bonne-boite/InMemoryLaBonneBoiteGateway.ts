@@ -1,8 +1,5 @@
 import { SearchResultDto } from "shared";
-import {
-  LaBonneBoiteGateway,
-  LaBonneBoiteRequestParams,
-} from "../../ports/LaBonneBoiteGateway";
+import { LaBonneBoiteGateway } from "../../ports/LaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDto } from "./LaBonneBoiteCompanyDto";
 
 export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
@@ -12,17 +9,11 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
     public nbOfCalls = 0,
   ) {}
 
-  public async searchCompanies(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { distanceKm }: LaBonneBoiteRequestParams,
-  ): Promise<SearchResultDto[]> {
+  public async searchCompanies(): Promise<SearchResultDto[]> {
     this.nbOfCalls = this.nbOfCalls + 1;
     if (this._error) throw this._error;
     return this._results
-      .filter(
-        (result) =>
-          result.props.distance <= distanceKm && result.isCompanyRelevant(),
-      )
+      .filter((result) => result.isCompanyRelevant())
       .map((result) => result.toSearchResult());
   }
 
