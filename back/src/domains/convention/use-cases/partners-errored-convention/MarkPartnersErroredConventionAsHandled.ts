@@ -10,6 +10,7 @@ import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getIcUserByUserId } from "../../../inclusion-connected-users/helpers/inclusionConnectedUser.helper";
 
 export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase<
   MarkPartnersErroredConventionAsHandledRequest,
@@ -35,6 +36,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
       throw errors.user.unauthorized();
     }
     const { userId } = payload;
+    const provider = await makeProvider(uow);
     const conventionToMarkAsHandled = await uow.conventionRepository.getById(
       params.conventionId,
     );
@@ -43,12 +45,15 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
         conventionId: params.conventionId,
       });
 
-    const currentUser = await uow.userRepository.getById(
-      userId,
-      await makeProvider(uow),
-    );
+    const currentUser = await uow.userRepository.getById(userId, provider);
     if (!currentUser) throw errors.user.notFound({ userId });
-    const userAgencyRights = currentUser.agencyRights.find(
+
+    const icCurrentUser = await getIcUserByUserId(
+      uow,
+      provider,
+      currentUser.id,
+    );
+    const userAgencyRights = icCurrentUser.agencyRights.find(
       (agencyRight) =>
         agencyRight.agency.id === conventionToMarkAsHandled.agencyId,
     );
