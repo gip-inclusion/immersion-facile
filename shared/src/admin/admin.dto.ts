@@ -35,6 +35,9 @@ export type WithAgencyRole = {
 };
 
 export type WithUserFilters = WithAgencyId | WithAgencyRole;
+export const isWithAgencyRole = (
+  filter: WithUserFilters,
+): filter is WithAgencyRole => "agencyRole" in filter;
 
 export type ManageConventionAdminForm = {
   conventionId: ConventionId;

@@ -11,6 +11,7 @@ import type {
   OmitFromExistingKeys,
   SiretDto,
   UserId,
+  WithUserFilters,
 } from "shared";
 
 export type GetAgenciesFilters = {
@@ -75,4 +76,5 @@ export interface AgencyRepository {
   getAgenciesRightsByUserId(
     id: UserId,
   ): Promise<AgencyRightWithAgencyWithUsersRights[]>;
+  getUserIdByFilters(filters: WithUserFilters): Promise<UserId[]>;
 }
