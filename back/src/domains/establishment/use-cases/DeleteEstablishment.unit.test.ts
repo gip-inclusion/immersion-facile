@@ -24,9 +24,11 @@ import { ContactEntity } from "../entities/ContactEntity";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { DeleteEstablishment } from "./DeleteEstablishment";
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withIsAdmin(true)
-  .build();
+const backofficeAdminBuilder = new InclusionConnectedUserBuilder().withIsAdmin(
+  true,
+);
+const icBackofficeAdminUser = backofficeAdminBuilder.build();
+const backofficeAdminUser = backofficeAdminBuilder.buildUser();
 
 const groupOptions: GroupOptions = {
   heroHeader: {
@@ -69,7 +71,7 @@ describe("Delete Establishment", () => {
       timeGateway,
       makeSaveNotificationAndRelatedEvent(new TestUuidGenerator(), timeGateway),
     );
-    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
+    uow.userRepository.users = [backofficeAdminUser];
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -92,7 +94,7 @@ describe("Delete Establishment", () => {
           {
             siret: establishmentAggregate.establishment.siret,
           },
-          backofficeAdminUser,
+          icBackofficeAdminUser,
         ),
         errors.establishment.notFound({
           siret: establishmentAggregate.establishment.siret,
@@ -109,7 +111,7 @@ describe("Delete Establishment", () => {
           {
             siret: formEstablishment.siret,
           },
-          backofficeAdminUser,
+          icBackofficeAdminUser,
         ),
         errors.establishment.notFound({
           siret: formEstablishment.siret,
@@ -139,7 +141,7 @@ describe("Delete Establishment", () => {
         {
           siret: establishmentAggregate.establishment.siret,
         },
-        backofficeAdminUser,
+        icBackofficeAdminUser,
       );
 
       expectToEqual(
