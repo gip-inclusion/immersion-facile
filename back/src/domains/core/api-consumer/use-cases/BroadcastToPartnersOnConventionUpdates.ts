@@ -12,7 +12,6 @@ import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
 import { isConventionInScope } from "../../../convention/entities/Convention";
 import { TransactionalUseCase } from "../../UseCase";
-import { makeProvider } from "../../authentication/inclusion-connect/port/OAuthGateway";
 import { broadcastToPartnersServiceName } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -54,11 +53,7 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
     if (!agencyWithRights) {
       throw errors.agency.notFound({ agencyId: convention.agencyId });
     }
-    const agency = await agencyWithRightToAgencyDto(
-      uow,
-      await makeProvider(uow),
-      agencyWithRights,
-    );
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
     const {
       acquisitionCampaign: _,
       acquisitionKeyword: __,

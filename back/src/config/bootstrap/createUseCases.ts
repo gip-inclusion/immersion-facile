@@ -4,10 +4,10 @@ import {
   ApiConsumerId,
   FindSimilarConventionsParams,
   FindSimilarConventionsResponseDto,
+  NotFoundError,
   ShortLinkId,
   SiretDto,
 } from "shared";
-import { NotFoundError } from "shared";
 import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
@@ -59,7 +59,6 @@ import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/De
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
-import { makeProvider } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
@@ -592,8 +591,7 @@ export const createUseCases = (
       getAgencyById: (id: AgencyId) =>
         uowPerformer.perform(async (uow) => {
           const [agency] = await uow.agencyRepository.getByIds([id]);
-          const provider = await makeProvider(uow);
-          return agencyWithRightToAgencyDto(uow, provider, agency);
+          return agencyWithRightToAgencyDto(uow, agency);
         }),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
         uowPerformer.perform((uow) =>
