@@ -10,8 +10,10 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { makeProvider } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { PeConnectImmersionAdvisorDto } from "../../../core/authentication/pe-connect/dto/PeConnectAdvisor.dto";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
@@ -73,7 +75,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
 
     const recipients = determineRecipients(
       convention.status,
-      agency,
+      await agencyWithRightToAgencyDto(uow, await makeProvider(uow), agency),
       peAdvisor,
     );
 
