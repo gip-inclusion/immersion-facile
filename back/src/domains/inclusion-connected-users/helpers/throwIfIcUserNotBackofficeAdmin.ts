@@ -51,7 +51,7 @@ export const getIcUserOrThrow = async (
   };
 };
 
-export const throwIfNotAdmin = (user: InclusionConnectedUser) => {
+export const throwIfNotAdmin = (user: InclusionConnectedUser | undefined) => {
   if (!user) throw errors.user.unauthorized();
   if (!user.isBackofficeAdmin) throw errors.user.forbidden({ userId: user.id });
 };
