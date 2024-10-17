@@ -21,13 +21,14 @@ import {
 } from "../helpers/EstablishmentBuilders";
 import { RetrieveFormEstablishmentFromAggregates } from "./RetrieveFormEstablishmentFromAggregates";
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
+const adminBuilder = new InclusionConnectedUserBuilder()
   .withIsAdmin(true)
-  .withId("backoffice-admin")
-  .build();
+  .withId("backoffice-admin");
+const icAdmin = adminBuilder.build();
+const adminUser = adminBuilder.buildUser();
 
 const backofficeAdminJwtPayload = {
-  userId: backofficeAdminUser.id,
+  userId: icAdmin.id,
 } as InclusionConnectJwtPayload;
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
@@ -140,7 +141,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         .build(),
     );
 
-    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
+    uow.userRepository.users = [adminUser];
     // Act
     const retrievedForm = await useCase.execute(
       siret,
@@ -198,7 +199,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     );
 
     const userWithEstablishmentRights: InclusionConnectedUser = {
-      ...backofficeAdminUser,
+      ...icAdmin,
       isBackofficeAdmin: false,
       id: "not-backoffice-user-id",
       establishments: [
@@ -209,9 +210,11 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       ],
     };
 
-    uow.userRepository.setInclusionConnectedUsers([
-      userWithEstablishmentRights,
-    ]);
+    uow.userRepository.users = [
+      new InclusionConnectedUserBuilder(
+        userWithEstablishmentRights,
+      ).buildUser(),
+    ];
 
     // Act
     const retrievedForm = await useCase.execute(siret, {
