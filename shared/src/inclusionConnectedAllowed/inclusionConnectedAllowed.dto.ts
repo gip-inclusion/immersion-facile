@@ -50,7 +50,7 @@ export type WithEstablismentsSiretAndName = {
   businessName: string;
 };
 
-type WithEstablishments = {
+export type WithEstablishments = {
   establishments?: WithEstablismentsSiretAndName[];
 };
 
