@@ -44,6 +44,30 @@ test.describe("Manage users in admin", () => {
         `#${domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}`,
       )
       .click();
+    await expect(page.locator(".fr-alert--error").first()).toBeVisible();
+
+    await page
+      .locator(
+        `[id^=${domElementIds.admin.agencyTab.editAgencyUserRoleButton}]`,
+      )
+      .first()
+      .click();
+    await expect(
+      page.locator(
+        `#${domElementIds.admin.agencyTab.editAgencyManageUserModal}`,
+      ),
+    ).toBeVisible();
+    await page
+      .locator(
+        `[for="${domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}-3"]`,
+      )
+      .click();
+
+    await page
+      .locator(
+        `#${domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}`,
+      )
+      .click();
     await expect(page.locator(".fr-alert--success").first()).toBeVisible();
   });
 });
