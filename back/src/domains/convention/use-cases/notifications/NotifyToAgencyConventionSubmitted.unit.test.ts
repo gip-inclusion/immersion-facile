@@ -1,19 +1,21 @@
 import {
-  AgencyDto,
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
+  InclusionConnectedUserBuilder,
   PeConnectIdentity,
   expectToEqual,
   frontRoutes,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
@@ -28,33 +30,91 @@ import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGener
 import { NotifyToAgencyConventionSubmitted } from "./NotifyToAgencyConventionSubmitted";
 
 describe("NotifyToAgencyConventionSubmitted", () => {
-  const councellorEmail = "councellor@email.fr";
-  const councellorEmail2 = "councellor2@email.fr";
-  const validatorEmail = "validator@mail.com";
-
-  const agencyWithOnlyValidator = AgencyDtoBuilder.create(
-    "agency-with-only-validator",
-  )
-    .withValidatorEmails([validatorEmail])
-    .withName("test-agency-name")
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator-id")
+    .withFirstName("validatorName")
+    .withLastName("validatorLastName")
+    .withEmail("validator@mail.com")
+    .withCreatedAt(new Date())
+    .withExternalId("validator-external-id")
     .build();
 
-  const agencyWithConsellorsAndValidator = AgencyDtoBuilder.create(
-    "agency-with-councellors-and-validator",
-  )
-    .withCounsellorEmails([councellorEmail, councellorEmail2])
-    .withValidatorEmails([validatorEmail])
-    .withName("test-agency-name")
-    .build();
-  const agencyPeWithCouncellors = AgencyDtoBuilder.create(
-    "agency-pe-with-councellors",
-  )
-    .withCounsellorEmails([councellorEmail, councellorEmail2])
-    .withKind("pole-emploi")
-    .withName("test-agency-name")
+  const councellor1 = new InclusionConnectedUserBuilder()
+    .withId("councellor1-id")
+    .withFirstName("councellor1Name")
+    .withLastName("councellor1LastName")
+    .withEmail("councellor1@email.fr")
+    .withCreatedAt(new Date())
+    .withExternalId("councellor1-external-id")
     .build();
 
-  const expectedParams = (agency: AgencyDto, convention: ConventionDto) => ({
+  const councellor2 = new InclusionConnectedUserBuilder()
+    .withId("councellor2-id")
+    .withFirstName("councellor2Name")
+    .withLastName("councellor2LastName")
+    .withEmail("councellor2@email.fr")
+    .withCreatedAt(new Date())
+    .withExternalId("councellor2-external-id")
+    .build();
+
+  const agencyWithOnlyValidator = toAgencyWithRights(
+    AgencyDtoBuilder.create("agency-with-only-validator")
+      .withValidatorEmails([])
+      .withCounsellorEmails([])
+      .withName("test-agency-name")
+      .build(),
+    {
+      [validator.id]: {
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      },
+    },
+  );
+
+  const agencyWithConsellorsAndValidator = toAgencyWithRights(
+    AgencyDtoBuilder.create("agency-with-councellors-and-validator")
+      .withCounsellorEmails([])
+      .withValidatorEmails([])
+      .withName("test-agency-name")
+      .build(),
+    {
+      [validator.id]: {
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      },
+      [councellor1.id]: {
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+      },
+      [councellor2.id]: {
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+      },
+    },
+  );
+  const agencyPeWithCouncellors = toAgencyWithRights(
+    AgencyDtoBuilder.create("agency-pe-with-councellors")
+      .withValidatorEmails([])
+      .withCounsellorEmails([])
+      .withKind("pole-emploi")
+      .withName("test-agency-name")
+      .build(),
+    {
+      [councellor1.id]: {
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+      },
+      [councellor2.id]: {
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+      },
+    },
+  );
+
+  const expectedParams = (
+    agency: AgencyWithUsersRights,
+    convention: ConventionDto,
+  ) => ({
     agencyName: agency.name,
     businessName: convention.businessName,
     dateEnd: convention.dateEnd,
@@ -80,6 +140,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       agencyWithConsellorsAndValidator,
       agencyPeWithCouncellors,
     ]);
+    uow.userRepository.users = [validator, councellor1, councellor2];
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -120,14 +181,14 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "validator",
-        email: validatorEmail,
+        email: validator.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.manageConvention,
       }),
       [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "validator",
-        email: validatorEmail,
+        email: validator.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionStatusDashboard,
       }),
@@ -137,7 +198,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       emails: [
         {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [validatorEmail],
+          recipients: [validator.email],
           params: {
             internshipKind: validConvention.internshipKind,
             ...expectedParams(agencyWithOnlyValidator, validConvention),
@@ -172,28 +233,28 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         id: validConvention.id,
         role: "counsellor",
         targetRoute: frontRoutes.manageConvention,
-        email: councellorEmail,
+        email: councellor1.email,
         now: timeGateway.now(),
       }),
       [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "counsellor",
         targetRoute: frontRoutes.manageConvention,
-        email: councellorEmail2,
+        email: councellor2.email,
         now: timeGateway.now(),
       }),
       [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "counsellor",
         targetRoute: frontRoutes.conventionStatusDashboard,
-        email: councellorEmail,
+        email: councellor1.email,
         now: timeGateway.now(),
       }),
       [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "counsellor",
         targetRoute: frontRoutes.conventionStatusDashboard,
-        email: councellorEmail2,
+        email: councellor2.email,
         now: timeGateway.now(),
       }),
     });
@@ -202,7 +263,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       emails: [
         {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [councellorEmail],
+          recipients: [councellor1.email],
           params: {
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
@@ -217,7 +278,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         },
         {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [councellorEmail2],
+          recipients: [councellor2.email],
           params: {
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
@@ -271,28 +332,28 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         id: validConvention.id,
         role: "counsellor",
         targetRoute: frontRoutes.manageConvention,
-        email: councellorEmail,
+        email: councellor1.email,
         now: timeGateway.now(),
       }),
       [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "counsellor",
         targetRoute: frontRoutes.manageConvention,
-        email: councellorEmail2,
+        email: councellor2.email,
         now: timeGateway.now(),
       }),
       [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "counsellor",
         targetRoute: frontRoutes.conventionStatusDashboard,
-        email: councellorEmail,
+        email: councellor1.email,
         now: timeGateway.now(),
       }),
       [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "counsellor",
         targetRoute: frontRoutes.conventionStatusDashboard,
-        email: councellorEmail2,
+        email: councellor2.email,
         now: timeGateway.now(),
       }),
     });
@@ -301,7 +362,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       emails: [
         {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [councellorEmail],
+          recipients: [councellor1.email],
           params: {
             internshipKind: validConvention.internshipKind,
             warning:
@@ -318,7 +379,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         },
         {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [councellorEmail2],
+          recipients: [councellor2.email],
           params: {
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
