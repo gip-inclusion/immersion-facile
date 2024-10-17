@@ -158,7 +158,12 @@ const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
   IcUsersAdminAction | AgencyAction
 > = (action$) =>
   action$.pipe(
-    filter(icUsersAdminSlice.actions.updateUserOnAgencySucceeded.match),
+    filter(
+      (action) =>
+        icUsersAdminSlice.actions.updateUserOnAgencySucceeded.match(action) ||
+        icUsersAdminSlice.actions.removeUserFromAgencySucceeded.match(action) ||
+        icUsersAdminSlice.actions.createUserOnAgencySucceeded.match(action),
+    ),
     map((action) =>
       agencyAdminSlice.actions.setSelectedAgencyId(action.payload.agencyId),
     ),

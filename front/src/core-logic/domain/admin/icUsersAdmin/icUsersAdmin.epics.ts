@@ -144,6 +144,7 @@ const createUserOnAgencyEpic: IcUsersAdminActionEpic = (
                   {} as Record<AgencyId, AgencyRight>,
                 ),
               },
+              agencyId: action.payload.agencyId,
               feedbackTopic: action.payload.feedbackTopic,
             }),
           ),
