@@ -317,7 +317,7 @@ describe("SearchImmersionUseCase", () => {
         boulangerOffer.romeCode,
         606885,
       ),
-      lbbToSearchResult(lbbCompanyVO),
+      lbbToSearchResult(lbbCompanyVO, secretariatOffer.romeLabel),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -354,7 +354,7 @@ describe("SearchImmersionUseCase", () => {
         secretariatOffer.romeCode,
         606885,
       ),
-      lbbToSearchResult(lbbCompanyVO),
+      lbbToSearchResult(lbbCompanyVO, secretariatOffer.romeLabel),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -457,7 +457,12 @@ describe("SearchImmersionUseCase", () => {
       distanceKm: range,
     });
 
-    expectToEqual(response, companiesInRangeFromLbb.map(lbbToSearchResult));
+    expectToEqual(
+      response,
+      companiesInRangeFromLbb.map((result) =>
+        lbbToSearchResult(result, secretariatOffer.romeLabel),
+      ),
+    );
 
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -1119,7 +1124,10 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
   },
 };
 
-const lbbToSearchResult = (lbb: LaBonneBoiteCompanyDto): SearchResultDto => ({
+const lbbToSearchResult = (
+  lbb: LaBonneBoiteCompanyDto,
+  romeLabel: string,
+): SearchResultDto => ({
   additionalInformation: "",
   establishmentScore: 0,
   address: {
@@ -1138,7 +1146,7 @@ const lbbToSearchResult = (lbb: LaBonneBoiteCompanyDto): SearchResultDto => ({
   numberOfEmployeeRange: `${lbb.props.headcount_min}-${lbb.props.headcount_max}`,
   position: lbb.props.location,
   rome: lbb.props.rome,
-  romeLabel: "TODO ROME LABEL",
+  romeLabel,
   siret: lbb.siret,
   voluntaryToImmersion: false,
   locationId: null,

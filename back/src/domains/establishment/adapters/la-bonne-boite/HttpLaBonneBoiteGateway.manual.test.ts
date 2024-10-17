@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { expectToEqual } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -14,7 +13,10 @@ import { createLbbRoutes } from "./LaBonneBoite.routes";
 import { LaBonneBoiteCompanyDtoBuilder } from "./LaBonneBoiteCompanyDtoBuilder";
 
 const benodetLonLat = { lat: 47.8667, lon: -4.1167 };
-const boulangerRome = "D1102";
+const boulangerRomeData = {
+  rome: "D1102",
+  romeLabel: "Boulangerie - viennoiserie",
+};
 
 describe("HttpLaBonneBoiteGateway", () => {
   let laBonneBoiteGateway: HttpLaBonneBoiteGateway;
@@ -40,20 +42,20 @@ describe("HttpLaBonneBoiteGateway", () => {
 
   it("Should return the closest 90 `companies` susceptible to offer immersion of given rome located within the geographical area at 100km distance", async () => {
     const actualSearchedCompanies = await laBonneBoiteGateway.searchCompanies({
-      rome: boulangerRome,
       lon: benodetLonLat.lon,
       lat: benodetLonLat.lat,
       distanceKm: 100,
+      ...boulangerRomeData,
     });
     expect(actualSearchedCompanies).toHaveLength(100);
   });
 
   it("Should return the closest 1 `company` susceptible to offer immersion of given rome located within the geographical area at 1km distance", async () => {
     const actualSearchedCompanies = await laBonneBoiteGateway.searchCompanies({
-      rome: boulangerRome,
       lon: benodetLonLat.lon,
       lat: benodetLonLat.lat,
       distanceKm: 1,
+      ...boulangerRomeData,
     });
 
     expectToEqual(actualSearchedCompanies, [
@@ -69,37 +71,97 @@ describe("HttpLaBonneBoiteGateway", () => {
           lat: 47.8734,
           lon: -4.12564,
         })
-        .withRome(boulangerRome)
+        .withRome(boulangerRomeData.rome)
         .withAddress({
           city: "COMBRIT",
           postcode: "29120",
           departmentCode: "29",
         })
         .build()
-        .toSearchResult(),
+        .toSearchResult(boulangerRomeData.romeLabel),
     ]);
   });
 
   it("Should support several of parallel calls, and queue the calls if over accepted rate", async () => {
     const searches: LaBonneBoiteRequestParams[] = [
       {
-        rome: boulangerRome,
         lon: benodetLonLat.lon,
         lat: benodetLonLat.lat,
         distanceKm: 1,
+        ...boulangerRomeData,
       },
-      { ...benodetLonLat, rome: "A1201", distanceKm: 1 },
-      { ...benodetLonLat, rome: "A1205", distanceKm: 1 },
-      { ...benodetLonLat, rome: "A1404", distanceKm: 1 },
-      { ...benodetLonLat, rome: "A1411", distanceKm: 1 },
-      { ...benodetLonLat, rome: "B1601", distanceKm: 1 },
-      { ...benodetLonLat, rome: "D1408", distanceKm: 1 },
-      { ...benodetLonLat, rome: "E1104", distanceKm: 1 },
-      { ...benodetLonLat, rome: "F1101", distanceKm: 1 },
-      { ...benodetLonLat, rome: "B1601", distanceKm: 1 },
-      { ...benodetLonLat, rome: "D1408", distanceKm: 1 },
-      { ...benodetLonLat, rome: "E1104", distanceKm: 1 },
-      { ...benodetLonLat, rome: "F1101", distanceKm: 1 },
+      {
+        ...benodetLonLat,
+        rome: "A1201",
+        distanceKm: 1,
+        romeLabel: "Bûcheronnage et élagage",
+      },
+      {
+        ...benodetLonLat,
+        rome: "A1205",
+        distanceKm: 1,
+        romeLabel: "Sylviculture",
+      },
+      {
+        ...benodetLonLat,
+        rome: "A1404",
+        distanceKm: 1,
+        romeLabel: "Aquaculture",
+      },
+      {
+        ...benodetLonLat,
+        rome: "A1411",
+        distanceKm: 1,
+        romeLabel: "Élevage porcin",
+      },
+      {
+        ...benodetLonLat,
+        rome: "B1601",
+        distanceKm: 1,
+        romeLabel: "Métallerie d'art",
+      },
+      {
+        ...benodetLonLat,
+        rome: "D1408",
+        distanceKm: 1,
+        romeLabel: "Téléconseil et télévente",
+      },
+      {
+        ...benodetLonLat,
+        rome: "E1104",
+        distanceKm: 1,
+        romeLabel: "Conception de contenus multimédias",
+      },
+      {
+        ...benodetLonLat,
+        rome: "F1101",
+        distanceKm: 1,
+        romeLabel: "Architecture du BTP",
+      },
+      {
+        ...benodetLonLat,
+        rome: "B1601",
+        distanceKm: 1,
+        romeLabel: "Métallerie d'art",
+      },
+      {
+        ...benodetLonLat,
+        rome: "D1408",
+        distanceKm: 1,
+        romeLabel: "Téléconseil et télévente",
+      },
+      {
+        ...benodetLonLat,
+        rome: "E1104",
+        distanceKm: 1,
+        romeLabel: "Conception de contenus multimédias",
+      },
+      {
+        ...benodetLonLat,
+        rome: "F1101",
+        distanceKm: 1,
+        romeLabel: "Architecture du BTP",
+      },
     ];
 
     const results = await Promise.all(
