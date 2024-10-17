@@ -1,7 +1,6 @@
 import { SearchResultDto, SiretDto } from "shared";
 
 export type LaBonneBoiteApiResultV2Props = {
-  // pas d'adresse ?
   rome: string;
   id: number;
   siret: SiretDto;
@@ -24,29 +23,6 @@ export type LaBonneBoiteApiResultV2Props = {
   department_number: string;
   hiring_potential: number;
   is_high_potential: boolean;
-};
-
-export type LaBonneBoiteApiResultV1Props = {
-  address: string;
-  city: string;
-  lat: number;
-  lon: number;
-  matched_rome_code: string;
-  matched_rome_label: string;
-  naf: string;
-  naf_text: string;
-  name: string;
-  siret: SiretDto;
-  stars: number;
-  raison_sociale: string;
-  url: string; // URL to the company reference page on LaBonneBoite
-  social_network: string; // Lien vers réseaux sociaux
-  website: string; // URL vers la page de l'entreprise
-  headcount_text: string; // Libelle of nb of employees
-  distance: number; // Distance to searched geographical position
-  alternance: boolean; // Whether or not the company accepts alternance contracts
-  boosted: boolean;
-  contact_mode: string; // | "Envoyez votre candidature par mail" | "Se présenter spontanément" | "Postulez via le site internet de l'entreprise" |  "Envoyer un CV et une lettre de motivation"
 };
 
 // Careful, value objects should be immutable
