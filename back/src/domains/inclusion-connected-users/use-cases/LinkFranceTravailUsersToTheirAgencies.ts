@@ -1,18 +1,23 @@
 import { partition } from "ramda";
 import {
-  AgencyDto,
   AgencyGroup,
   AgencyRight,
   InclusionConnectedUser,
+  OAuthGatewayProvider,
   activeAgencyStatuses,
   agencyRoleIsNotToReview,
-  errors,
 } from "shared";
 import { z } from "zod";
+import {
+  agencyWithRightToAgencyDto,
+  updateRightsOnMultipleAgenciesForUser,
+} from "../../../utils/agency";
+import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserAuthenticatedPayload } from "../../core/events/events";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 
 const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
   userId: z.string(),
@@ -28,76 +33,90 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     if (!codeSafir) return;
-    const icUser = await uow.userRepository.getById(
-      userId,
-      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
+    const provider = oAuthProviderByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
     );
-    if (!icUser) throw errors.user.notFound({ userId });
+    const user = await getIcUserByUserId(uow, provider, userId);
+    if (isIcUserAlreadyHasValidRight(user, codeSafir)) return;
 
-    if (isIcUserAlreadyHasValidRight(icUser, codeSafir)) return;
+    const agencyWithSafir = await uow.agencyRepository.getBySafir(codeSafir);
+    if (
+      agencyWithSafir &&
+      activeAgencyStatuses.includes(agencyWithSafir.status)
+    )
+      return updateActiveAgencyWithSafir(uow, agencyWithSafir, userId);
 
-    const agency: AgencyDto | undefined =
-      await uow.agencyRepository.getBySafir(codeSafir);
-    if (agency && activeAgencyStatuses.includes(agency.status)) {
-      await uow.userRepository.updateAgencyRights({
-        userId,
-        agencyRights: [
-          ...icUser.agencyRights.filter(
-            (agencyRight) => agencyRight.agency.codeSafir !== codeSafir,
-          ),
-          { agency, roles: ["validator"], isNotifiedByEmail: false },
-        ],
-      });
-      return;
-    }
-    const agencyGroup: AgencyGroup | undefined =
+    const groupWithSafir =
       await uow.agencyGroupRepository.getByCodeSafir(codeSafir);
-
-    if (agencyGroup) {
-      const agencies = await uow.agencyRepository.getByIds(
-        agencyGroup.agencyIds,
-      );
-
-      const [agencyRightsWithConflicts, agencyRightsWithoutConflicts] =
-        partition(
-          ({ agency }) => agencyGroup.agencyIds.includes(agency.id),
-          icUser.agencyRights,
-        );
-
-      await uow.userRepository.updateAgencyRights({
-        userId,
-        agencyRights: [
-          ...agencyRightsWithoutConflicts,
-          ...agencies
-            .filter((agency) => activeAgencyStatuses.includes(agency.status))
-            .map((agency): AgencyRight => {
-              const existingAgencyRight = agencyRightsWithConflicts.find(
-                (agencyRight) => agencyRight.agency.id === agency.id,
-              );
-              if (
-                existingAgencyRight &&
-                agencyRoleIsNotToReview(existingAgencyRight.roles)
-              )
-                return existingAgencyRight;
-
-              return {
-                agency,
-                roles: ["agency-viewer"],
-                isNotifiedByEmail: false,
-              };
-            }),
-        ],
-      });
-      return;
-    }
+    if (groupWithSafir)
+      return updateAgenciesOfGroup(uow, provider, groupWithSafir, user);
   }
 }
 
 const isIcUserAlreadyHasValidRight = (
   icUser: InclusionConnectedUser,
   codeSafir: string,
-) =>
+): boolean =>
   icUser.agencyRights.some(
     ({ agency, roles }) =>
       agency.codeSafir === codeSafir && agencyRoleIsNotToReview(roles),
   );
+
+const updateActiveAgencyWithSafir = (
+  uow: UnitOfWork,
+  agencyWithSafir: AgencyWithUsersRights,
+  userId: string,
+): Promise<void> =>
+  uow.agencyRepository.update({
+    id: agencyWithSafir.id,
+    usersRights: {
+      ...agencyWithSafir.usersRights,
+      [userId]: { roles: ["validator"], isNotifiedByEmail: false },
+    },
+  });
+
+const updateAgenciesOfGroup = async (
+  uow: UnitOfWork,
+  provider: OAuthGatewayProvider,
+  agencyGroupWithSafir: AgencyGroup,
+  user: InclusionConnectedUser,
+): Promise<void> => {
+  const agenciesRelatedToGroup = await uow.agencyRepository.getByIds(
+    agencyGroupWithSafir.agencyIds,
+  );
+
+  const [agencyRightsWithConflicts, agencyRightsWithoutConflicts] = partition(
+    ({ agency }) => agencyGroupWithSafir.agencyIds.includes(agency.id),
+    user.agencyRights,
+  );
+
+  const otherAgencyRights = await Promise.all(
+    agenciesRelatedToGroup
+      .filter((agency) => activeAgencyStatuses.includes(agency.status))
+      .map(async (agency): Promise<AgencyRight> => {
+        const existingAgencyRight = agencyRightsWithConflicts.find(
+          (agencyRight) => agencyRight.agency.id === agency.id,
+        );
+
+        return existingAgencyRight &&
+          agencyRoleIsNotToReview(existingAgencyRight.roles)
+          ? existingAgencyRight
+          : {
+              agency: await agencyWithRightToAgencyDto(uow, provider, agency),
+              roles: ["agency-viewer"],
+              isNotifiedByEmail: false,
+            };
+      }),
+  );
+
+  const agencyRightsForUser: AgencyRight[] = [
+    ...agencyRightsWithoutConflicts,
+    ...otherAgencyRights,
+  ];
+
+  return updateRightsOnMultipleAgenciesForUser(
+    uow,
+    user.id,
+    agencyRightsForUser,
+  );
+};

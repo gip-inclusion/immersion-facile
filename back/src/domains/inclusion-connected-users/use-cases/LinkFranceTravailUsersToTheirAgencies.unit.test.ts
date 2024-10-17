@@ -1,10 +1,5 @@
-import {
-  AgencyDtoBuilder,
-  AgencyGroup,
-  InclusionConnectedUser,
-  User,
-  expectToEqual,
-} from "shared";
+import { AgencyDtoBuilder, AgencyGroup, User, expectToEqual } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -14,18 +9,28 @@ import { LinkFranceTravailUsersToTheirAgencies } from "./LinkFranceTravailUsersT
 
 const codeSafir = "546546645";
 const agencyGroupCodeSafir = "my-group-safir-code";
-const agency = new AgencyDtoBuilder().withCodeSafir(codeSafir).build();
+const agency = new AgencyDtoBuilder()
+  .withValidatorEmails([])
+  .withCounsellorEmails([])
+  .withCodeSafir(codeSafir)
+  .build();
 const agency1InGroup = new AgencyDtoBuilder()
+  .withValidatorEmails([])
+  .withCounsellorEmails([])
   .withId("agency-id-1")
   .withCodeSafir("agency-safir-1")
   .build();
 
 const agency2InGroup = new AgencyDtoBuilder()
+  .withValidatorEmails([])
+  .withCounsellorEmails([])
   .withId("agency-id-2")
   .withCodeSafir("agency-safir-2")
   .build();
 
 const agency3InGroup = new AgencyDtoBuilder()
+  .withValidatorEmails([])
+  .withCounsellorEmails([])
   .withId("agency-id-3")
   .withCodeSafir("agency-safir-3")
   .build();
@@ -50,7 +55,9 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
     linkFranceTravailUsersToTheirAgencies =
       new LinkFranceTravailUsersToTheirAgencies(new InMemoryUowPerformer(uow));
     uow.userRepository.users = [defaultUser];
-    uow.agencyRepository.setAgencies(agenciesInRepo);
+    uow.agencyRepository.agencies = agenciesInRepo.map((agency) =>
+      toAgencyWithRights(agency, {}),
+    );
   });
 
   describe("when no safir code is provided", () => {
@@ -62,7 +69,10 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       });
 
       expectToEqual(uow.userRepository.users, [defaultUser]);
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {});
+      expectToEqual(
+        uow.agencyRepository.agencies,
+        agenciesInRepo.map((agency) => toAgencyWithRights(agency)),
+      );
     });
   });
 
@@ -74,26 +84,29 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: codeSafir,
       });
 
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {
-        [defaultUser.id]: [
-          { agency, roles: ["validator"], isNotifiedByEmail: false },
-        ],
-      });
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency, {
+          [defaultUser.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+        toAgencyWithRights(agency1InGroup),
+        toAgencyWithRights(agency2InGroup),
+        toAgencyWithRights(agency3InGroup),
+      ]);
     });
 
     it("don't add agency right to IC user if user already has rights on agency", async () => {
-      const icUser: InclusionConnectedUser = {
-        ...defaultUser,
-        agencyRights: [
-          { agency, roles: ["agency-admin"], isNotifiedByEmail: false },
-        ],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
-      };
-
-      uow.userRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.users = [defaultUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [defaultUser.id]: {
+            roles: ["agency-admin"],
+            isNotifiedByEmail: false,
+          },
+        }),
+        toAgencyWithRights(agency1InGroup),
+        toAgencyWithRights(agency2InGroup),
+        toAgencyWithRights(agency3InGroup),
+      ];
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
@@ -101,26 +114,33 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: codeSafir,
       });
 
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {
-        [icUser.id]: [
-          { agency, roles: ["agency-admin"], isNotifiedByEmail: false },
-        ],
-      });
+      expectToEqual(uow.userRepository.users, [defaultUser]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency, {
+          [defaultUser.id]: {
+            roles: ["agency-admin"],
+            isNotifiedByEmail: false,
+          },
+        }),
+        toAgencyWithRights(agency1InGroup),
+        toAgencyWithRights(agency2InGroup),
+        toAgencyWithRights(agency3InGroup),
+      ]);
     });
 
     it("replace agency right to IC user if user already has rights on agency and current right is to-review", async () => {
-      const icUser: InclusionConnectedUser = {
-        ...defaultUser,
-        agencyRights: [
-          { agency, roles: ["to-review"], isNotifiedByEmail: false },
-        ],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
-      };
-
-      uow.userRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.users = [defaultUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [defaultUser.id]: {
+            roles: ["to-review"],
+            isNotifiedByEmail: false,
+          },
+        }),
+        toAgencyWithRights(agency1InGroup),
+        toAgencyWithRights(agency2InGroup),
+        toAgencyWithRights(agency3InGroup),
+      ];
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
@@ -128,11 +148,18 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: codeSafir,
       });
 
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {
-        [icUser.id]: [
-          { agency, roles: ["validator"], isNotifiedByEmail: false },
-        ],
-      });
+      expectToEqual(uow.userRepository.users, [defaultUser]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency, {
+          [defaultUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+        toAgencyWithRights(agency1InGroup),
+        toAgencyWithRights(agency2InGroup),
+        toAgencyWithRights(agency3InGroup),
+      ]);
     });
 
     it("don't add agency right to IC user if there is no agency with this code safir", async () => {
@@ -142,7 +169,12 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         codeSafir: "not-existing-code-safir",
       });
 
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {});
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency),
+        toAgencyWithRights(agency1InGroup),
+        toAgencyWithRights(agency2InGroup),
+        toAgencyWithRights(agency3InGroup),
+      ]);
     });
 
     it("don't add agency right to IC user if agency is closed or rejected", async () => {
@@ -157,25 +189,31 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         .withCodeSafir("agency-safir-5")
         .withStatus("rejected")
         .build();
-      uow.agencyRepository.setAgencies([
-        ...agenciesInRepo,
-        closedAgency,
-        rejectedAgency,
+
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(closedAgency),
+        toAgencyWithRights(rejectedAgency),
+      ];
+
+      await linkFranceTravailUsersToTheirAgencies.execute({
+        userId: defaultUser.id,
+        provider: "inclusionConnect",
+        codeSafir: closedAgency.codeSafir,
+      });
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(closedAgency),
+        toAgencyWithRights(rejectedAgency),
       ]);
 
       await linkFranceTravailUsersToTheirAgencies.execute({
-        userId: "my-user-id",
+        userId: defaultUser.id,
         provider: "inclusionConnect",
-        codeSafir: "agency-safir-4",
+        codeSafir: rejectedAgency.codeSafir,
       });
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {});
-
-      await linkFranceTravailUsersToTheirAgencies.execute({
-        userId: "my-user-id",
-        provider: "inclusionConnect",
-        codeSafir: "agency-safir-5",
-      });
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {});
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(closedAgency),
+        toAgencyWithRights(rejectedAgency),
+      ]);
     });
   });
   describe("when safir code matches agency group", () => {
@@ -193,93 +231,84 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
     it("adds rights to ic user for all agencies in agency group when safir code matches", async () => {
       uow.agencyGroupRepository.agencyGroups = [agencyGroup];
-      const icUser: InclusionConnectedUser = {
-        ...defaultUser,
-        agencyRights: [],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
-      };
-
-      uow.userRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.users = [defaultUser];
 
       await linkFranceTravailUsersToTheirAgencies.execute({
-        userId: icUser.id,
+        userId: defaultUser.id,
         provider: "inclusionConnect",
         codeSafir: agencyGroupCodeSafir,
       });
 
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {
-        [icUser.id]: [
-          {
-            agency: agency1InGroup,
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency),
+        toAgencyWithRights(agency1InGroup, {
+          [defaultUser.id]: {
             roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
-          {
-            agency: agency2InGroup,
+        }),
+        toAgencyWithRights(agency2InGroup, {
+          [defaultUser.id]: {
             roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
-          {
-            agency: agency3InGroup,
+        }),
+        toAgencyWithRights(agency3InGroup, {
+          [defaultUser.id]: {
             roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
-        ],
-      });
+        }),
+      ]);
     });
 
     it("doesn't override an agency role except if it's to review", async () => {
       uow.agencyGroupRepository.agencyGroups = [agencyGroup];
-      const icUser: InclusionConnectedUser = {
-        ...defaultUser,
-        agencyRights: [
-          {
-            agency: agency1InGroup,
+      uow.userRepository.users = [defaultUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency),
+        toAgencyWithRights(agency1InGroup, {
+          [defaultUser.id]: {
             roles: ["validator"],
             isNotifiedByEmail: false,
           },
-          {
-            agency: agency2InGroup,
+        }),
+        toAgencyWithRights(agency2InGroup, {
+          [defaultUser.id]: {
             roles: ["to-review"],
             isNotifiedByEmail: false,
           },
-        ],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
-      };
-
-      uow.userRepository.setInclusionConnectedUsers([icUser]);
+        }),
+        toAgencyWithRights(agency3InGroup),
+      ];
 
       await linkFranceTravailUsersToTheirAgencies.execute({
-        userId: icUser.id,
+        userId: defaultUser.id,
         provider: "inclusionConnect",
         codeSafir: agencyGroupCodeSafir,
       });
 
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {
-        [icUser.id]: [
-          {
-            agency: agency1InGroup,
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency),
+        toAgencyWithRights(agency1InGroup, {
+          [defaultUser.id]: {
             roles: ["validator"],
             isNotifiedByEmail: false,
           },
-          {
-            agency: agency2InGroup,
+        }),
+        toAgencyWithRights(agency2InGroup, {
+          [defaultUser.id]: {
             roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
-          {
-            agency: agency3InGroup,
+        }),
+        toAgencyWithRights(agency3InGroup, {
+          [defaultUser.id]: {
             roles: ["agency-viewer"],
             isNotifiedByEmail: false,
           },
-        ],
-      });
+        }),
+      ]);
     });
 
     it("don't add agency right to IC user if agency is closed or rejected", async () => {
@@ -288,17 +317,11 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         .withCodeSafir("agency-safir-4")
         .withStatus("closed")
         .build();
-
       const rejectedAgency = new AgencyDtoBuilder()
         .withId("agency-id-4")
         .withCodeSafir("agency-safir-5")
         .withStatus("rejected")
         .build();
-      uow.agencyRepository.setAgencies([
-        ...agenciesInRepo,
-        closedAgency,
-        rejectedAgency,
-      ]);
       const agencyGroupWithClosedAndRejectedAgencies: AgencyGroup = {
         siret: "12345678902345",
         kind: "france-travail",
@@ -310,28 +333,26 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         agencyIds: [closedAgency.id, rejectedAgency.id],
         ccEmails: ["fake-email1@gmail.com", "fake-email2@gmail.com"],
       };
+
+      uow.userRepository.users = [defaultUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(closedAgency),
+        toAgencyWithRights(rejectedAgency),
+      ];
       uow.agencyGroupRepository.agencyGroups = [
         agencyGroupWithClosedAndRejectedAgencies,
       ];
-      const icUser: InclusionConnectedUser = {
-        ...defaultUser,
-        agencyRights: [],
-        dashboards: {
-          agencies: {},
-          establishments: {},
-        },
-      };
-      uow.userRepository.setInclusionConnectedUsers([icUser]);
 
       await linkFranceTravailUsersToTheirAgencies.execute({
-        userId: icUser.id,
+        userId: defaultUser.id,
         provider: "inclusionConnect",
         codeSafir: agencyGroupCodeSafir,
       });
 
-      expectToEqual(uow.userRepository.agencyRightsByUserId, {
-        [icUser.id]: [],
-      });
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(closedAgency),
+        toAgencyWithRights(rejectedAgency),
+      ]);
     });
   });
 });
