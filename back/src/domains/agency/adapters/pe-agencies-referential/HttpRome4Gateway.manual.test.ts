@@ -2,7 +2,7 @@ import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createPeFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { PoleEmploiGetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
@@ -20,7 +20,7 @@ describe("HttpRome4Gateway", () => {
     );
 
   const franceTravailGateway = new HttpPoleEmploiGateway(
-    createPeAxiosSharedClient(config),
+    createPeFetchSharedClient(config),
     cachingGateway,
     config.peApiUrl,
     config.poleEmploiAccessTokenConfig,
