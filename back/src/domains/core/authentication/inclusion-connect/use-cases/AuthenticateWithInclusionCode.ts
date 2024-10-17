@@ -1,6 +1,5 @@
 import {
   AbsoluteUrl,
-  AgencyRight,
   AuthenticateWithOAuthCodeParams,
   AuthenticatedUserQueryParams,
   IdentityProvider,
@@ -15,6 +14,11 @@ import {
   queryParamsAsString,
 } from "shared";
 import { notifyDiscord } from "../../../../../utils/notifyDiscord";
+import {
+  AgencyRightWithAgencyWithUsersRights,
+  removeAgencyRightsForUser,
+  updateAgencyRightsForUser,
+} from "../../../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../../UseCase";
 import { CreateNewEvent } from "../../../events/ports/EventBus";
 import { GenerateInclusionConnectJwt } from "../../../jwt";
@@ -254,40 +258,62 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     );
     if (!conflictingIcUser || !userToKeepIcUser) return;
 
-    const conflictingUserAgencyRights = conflictingIcUser.agencyRights;
-    const userToKeepAgencyRights = userToKeepIcUser.agencyRights;
+    const conflictingUserAgencyRights =
+      await uow.agencyRepository.getAgenciesRightsByUserId(
+        conflictingIcUser.id,
+      );
+    const userToKeepAgencyRights =
+      await uow.agencyRepository.getAgenciesRightsByUserId(userToKeepIcUser.id);
 
-    await uow.userRepository.updateAgencyRights({
-      agencyRights: this.#mergeAgencyRights(
-        conflictingUserAgencyRights,
-        userToKeepAgencyRights,
+    const newAgenciesRightForUser = this.#mergeAgencyRights(
+      conflictingUserAgencyRights,
+      userToKeepAgencyRights,
+    );
+
+    await Promise.all(
+      newAgenciesRightForUser.map(async (agencyRightsForUser) =>
+        updateAgencyRightsForUser(
+          uow,
+          userToKeepIcUser.id,
+          agencyRightsForUser,
+        ),
       ),
-      userId: userToKeepIcUser.id,
-    });
+    );
+    await Promise.all(
+      conflictingUserAgencyRights.map(async (agencyRightsForUser) =>
+        removeAgencyRightsForUser(
+          uow,
+          conflictingIcUser.id,
+          agencyRightsForUser,
+        ),
+      ),
+    );
   }
 
   #mergeAgencyRights(
-    oldAgencyRights: AgencyRight[],
-    newAgencyRights: AgencyRight[],
-  ): AgencyRight[] {
-    return oldAgencyRights.reduce<AgencyRight[]>((acc, oldAgencyRight) => {
-      const newAgencyRight = newAgencyRights.find(
-        (newAgencyRight) =>
-          newAgencyRight.agency.id === oldAgencyRight.agency.id,
-      );
-      if (newAgencyRight) {
+    oldAgencyRights: AgencyRightWithAgencyWithUsersRights[],
+    newAgencyRights: AgencyRightWithAgencyWithUsersRights[],
+  ): AgencyRightWithAgencyWithUsersRights[] {
+    return oldAgencyRights.reduce<AgencyRightWithAgencyWithUsersRights[]>(
+      (acc, oldAgencyRight) => {
+        const newAgencyRight = newAgencyRights.find(
+          (newAgencyRight) =>
+            newAgencyRight.agency.id === oldAgencyRight.agency.id,
+        );
         return [
           ...acc,
-          {
-            ...newAgencyRight,
-            isNotifiedByEmail:
-              newAgencyRight.isNotifiedByEmail ||
-              oldAgencyRight.isNotifiedByEmail,
-            roles: [...newAgencyRight.roles, ...oldAgencyRight.roles],
-          },
+          newAgencyRight
+            ? {
+                ...newAgencyRight,
+                isNotifiedByEmail:
+                  newAgencyRight.isNotifiedByEmail ||
+                  oldAgencyRight.isNotifiedByEmail,
+                roles: [...newAgencyRight.roles, ...oldAgencyRight.roles],
+              }
+            : oldAgencyRight,
         ];
-      }
-      return [...acc, oldAgencyRight];
-    }, []);
+      },
+      [],
+    );
   }
 }
