@@ -1,81 +1,101 @@
 import {
   AgencyDtoBuilder,
-  InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { GetInclusionConnectedUsers } from "./GetInclusionConnectedUsers";
 
-const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
-const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
+const johnBuilder = new InclusionConnectedUserBuilder()
+  .withId("john-123")
+  .withFirstName("John")
+  .withLastName("Lennon")
+  .withEmail("john@mail.com")
+  .withCreatedAt(new Date())
+  .withExternalId("john-external-id");
 
-const johnWithAgenciesToReview: InclusionConnectedUser = {
-  id: "john-123",
-  email: "john@mail.com",
-  firstName: "John",
-  lastName: "Lennon",
-  createdAt: new Date().toISOString(),
-  agencyRights: [
-    { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
-    { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
-  ],
-  dashboards: {
-    agencies: {},
-    establishments: {},
+const johnUser = johnBuilder.buildUser();
+const icJohn = johnBuilder.build();
+
+const paulBuilder = new InclusionConnectedUserBuilder()
+  .withId("paul-456")
+  .withFirstName("Paul")
+  .withLastName("McCartney")
+  .withEmail("paul@mail.com")
+  .withCreatedAt(new Date())
+  .withExternalId("paul-external-id");
+
+const paulUser = paulBuilder.buildUser();
+const icPaul = paulBuilder.build();
+
+const backOfficeUserBuilder = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin")
+  .withFirstName("Jack")
+  .withLastName("The Admin")
+  .withEmail("jack.admin@mail.com")
+  .withCreatedAt(new Date())
+  .withExternalId("jack-admin-external-id")
+  .withIsAdmin(true);
+
+const backOfficeUser = backOfficeUserBuilder.buildUser();
+const icbackOffice = backOfficeUserBuilder.build();
+
+const notBackOfficeUserBuilder = new InclusionConnectedUserBuilder(icbackOffice)
+  .withExternalId("not-backoffice-admin")
+  .withIsAdmin(false);
+const notBackOfficeUser = notBackOfficeUserBuilder.buildUser();
+const icNotBackOffice = notBackOfficeUserBuilder.build();
+
+const agency1 = new AgencyDtoBuilder()
+  .withValidatorEmails([])
+  .withCounsellorEmails([])
+  .withId("agency-1")
+  .build();
+const agency2 = new AgencyDtoBuilder()
+  .withValidatorEmails([])
+  .withCounsellorEmails([])
+  .withId("agency-2")
+  .build();
+
+const agency1WithRights = toAgencyWithRights(agency1, {
+  [johnUser.id]: {
+    roles: ["to-review"],
+    isNotifiedByEmail: false,
   },
-  externalId: "john-external-id",
-};
-
-const paulWithAllAgenciesReviewed: InclusionConnectedUser = {
-  id: "paul-456",
-  email: "paul@mail.com",
-  firstName: "Paul",
-  lastName: "McCartney",
-  createdAt: new Date().toISOString(),
-  agencyRights: [
-    { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
-    { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
-  ],
-  dashboards: {
-    agencies: {},
-    establishments: {},
+  [paulUser.id]: {
+    roles: ["counsellor"],
+    isNotifiedByEmail: false,
   },
-  externalId: "paul-external-id",
-};
+});
 
-const backofficeAdminUser: InclusionConnectedUser = {
-  id: "backoffice-admin",
-  email: "jack.admin@mail.com",
-  firstName: "Jack",
-  lastName: "The Admin",
-  externalId: "jack-admin-external-id",
-  createdAt: new Date().toISOString(),
-  isBackofficeAdmin: true,
-  agencyRights: [],
-  dashboards: { agencies: {}, establishments: {} },
-  establishments: [],
-};
-
-const notBackofficeAdminUser: InclusionConnectedUser = {
-  ...backofficeAdminUser,
-  isBackofficeAdmin: false,
-  id: "not-backoffice-admin",
-};
+const agency2WithRights = toAgencyWithRights(agency2, {
+  [johnUser.id]: {
+    roles: ["validator"],
+    isNotifiedByEmail: false,
+  },
+  [paulUser.id]: {
+    roles: ["validator"],
+    isNotifiedByEmail: false,
+  },
+});
 
 describe("GetInclusionConnectedUsers", () => {
   let getInclusionConnectedUsers: GetInclusionConnectedUsers;
-  let uowPerformer: InMemoryUowPerformer;
-  let userRepository: InMemoryUserRepository;
+
+  let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    userRepository = uow.userRepository;
-    uowPerformer = new InMemoryUowPerformer(uow);
-    getInclusionConnectedUsers = new GetInclusionConnectedUsers(uowPerformer);
+    uow = createInMemoryUow();
+    getInclusionConnectedUsers = new GetInclusionConnectedUsers(
+      new InMemoryUowPerformer(uow),
+    );
   });
 
   it("throws Unauthorized if no jwt token provided", async () => {
@@ -86,81 +106,227 @@ describe("GetInclusionConnectedUsers", () => {
   });
 
   it("throws Forbidden if token payload is not backoffice token", async () => {
-    userRepository.setInclusionConnectedUsers([notBackofficeAdminUser]);
+    uow.userRepository.users = [notBackOfficeUser];
 
     await expectPromiseToFailWithError(
       getInclusionConnectedUsers.execute(
         { agencyRole: "to-review" },
-        notBackofficeAdminUser,
+        icNotBackOffice,
       ),
-      errors.user.forbidden({ userId: notBackofficeAdminUser.id }),
+      errors.user.forbidden({ userId: notBackOfficeUser.id }),
     );
   });
 
   it("gets the users by agencyRole which have at least one agency with the given role", async () => {
-    userRepository.setInclusionConnectedUsers([
-      johnWithAgenciesToReview,
-      paulWithAllAgenciesReviewed,
-      backofficeAdminUser,
-    ]);
+    uow.userRepository.users = [johnUser, paulUser, backOfficeUser];
+    uow.agencyRepository.agencies = [agency1WithRights, agency2WithRights];
+
     const users = await getInclusionConnectedUsers.execute(
       { agencyRole: "to-review" },
-      backofficeAdminUser,
-    );
-
-    expectToEqual(users, [johnWithAgenciesToReview]);
-  });
-
-  it("gets the users by agencyId which have at least one agency with the given role", async () => {
-    userRepository.setInclusionConnectedUsers([
-      johnWithAgenciesToReview,
-      paulWithAllAgenciesReviewed,
-      backofficeAdminUser,
-    ]);
-    const users = await getInclusionConnectedUsers.execute(
-      { agencyId: agency1.id },
-      backofficeAdminUser,
+      icbackOffice,
     );
 
     expectToEqual(users, [
-      johnWithAgenciesToReview,
-      paulWithAllAgenciesReviewed,
+      {
+        ...icJohn,
+        agencyRights: [
+          {
+            agency: { ...agency1, counsellorEmails: [paulUser.email] },
+            isNotifiedByEmail: false,
+            roles: ["to-review"],
+          },
+          {
+            agency: {
+              ...agency2,
+              validatorEmails: [johnUser.email, paulUser.email],
+            },
+            isNotifiedByEmail: false,
+            roles: ["validator"],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("gets the users by agencyId which have at least one agency with the given role", async () => {
+    uow.userRepository.users = [johnUser, paulUser, backOfficeUser];
+    uow.agencyRepository.agencies = [agency1WithRights, agency2WithRights];
+
+    const users = await getInclusionConnectedUsers.execute(
+      { agencyId: agency1.id },
+      icbackOffice,
+    );
+
+    expectToEqual(users, [
+      {
+        ...icJohn,
+        agencyRights: [
+          {
+            agency: { ...agency1, counsellorEmails: [paulUser.email] },
+            isNotifiedByEmail: false,
+            roles: ["to-review"],
+          },
+          {
+            agency: {
+              ...agency2,
+              validatorEmails: [johnUser.email, paulUser.email],
+            },
+            isNotifiedByEmail: false,
+            roles: ["validator"],
+          },
+        ],
+      },
+      {
+        ...icPaul,
+        agencyRights: [
+          {
+            agency: { ...agency1, counsellorEmails: [paulUser.email] },
+            isNotifiedByEmail: false,
+            roles: ["counsellor"],
+          },
+          {
+            agency: {
+              ...agency2,
+              validatorEmails: [johnUser.email, paulUser.email],
+            },
+            isNotifiedByEmail: false,
+            roles: ["validator"],
+          },
+        ],
+      },
     ]);
   });
 
   it("returns results ordered Alphabetically, people with no name should be first", async () => {
-    const genericUser: InclusionConnectedUser = {
-      id: "generic-222",
-      email: "john@mail.com",
-      firstName: "",
-      lastName: "",
-      createdAt: new Date().toISOString(),
-      agencyRights: [
-        { agency: agency1, roles: ["counsellor"], isNotifiedByEmail: false },
-        { agency: agency2, roles: ["validator"], isNotifiedByEmail: false },
-      ],
-      dashboards: {
-        agencies: {},
-        establishments: {},
-      },
-      externalId: null,
-    };
+    const genericUserBuilder = new InclusionConnectedUserBuilder()
+      .withId("generic-222")
+      .withFirstName("")
+      .withLastName("")
+      .withEmail("generic@mail.com")
+      .withCreatedAt(new Date());
 
-    userRepository.setInclusionConnectedUsers([
-      paulWithAllAgenciesReviewed,
-      johnWithAgenciesToReview,
+    const genericUser = genericUserBuilder.buildUser();
+    const icGenericUser = genericUserBuilder.build();
+
+    const agency1WithRights = toAgencyWithRights(agency1, {
+      [johnUser.id]: {
+        roles: ["to-review"],
+        isNotifiedByEmail: false,
+      },
+      [paulUser.id]: {
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+      },
+      [genericUser.id]: {
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+      },
+    });
+
+    const agency2WithRights = toAgencyWithRights(agency2, {
+      [johnUser.id]: {
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      },
+      [paulUser.id]: {
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      },
+      [genericUser.id]: {
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      },
+    });
+
+    uow.userRepository.users = [
+      johnUser,
+      paulUser,
+      backOfficeUser,
       genericUser,
-    ]);
+    ];
+    uow.agencyRepository.agencies = [agency1WithRights, agency2WithRights];
 
     const users = await getInclusionConnectedUsers.execute(
       { agencyId: agency1.id },
-      backofficeAdminUser,
+      icbackOffice,
     );
 
     expectToEqual(users, [
-      genericUser,
-      johnWithAgenciesToReview,
-      paulWithAllAgenciesReviewed,
+      {
+        ...icGenericUser,
+        agencyRights: [
+          {
+            agency: {
+              ...agency1,
+              counsellorEmails: [paulUser.email, genericUser.email],
+            },
+            isNotifiedByEmail: false,
+            roles: ["counsellor"],
+          },
+          {
+            agency: {
+              ...agency2,
+              validatorEmails: [
+                johnUser.email,
+                paulUser.email,
+                genericUser.email,
+              ],
+            },
+            isNotifiedByEmail: false,
+            roles: ["validator"],
+          },
+        ],
+      },
+      {
+        ...icJohn,
+        agencyRights: [
+          {
+            agency: {
+              ...agency1,
+              counsellorEmails: [paulUser.email, genericUser.email],
+            },
+            isNotifiedByEmail: false,
+            roles: ["to-review"],
+          },
+          {
+            agency: {
+              ...agency2,
+              validatorEmails: [
+                johnUser.email,
+                paulUser.email,
+                genericUser.email,
+              ],
+            },
+            isNotifiedByEmail: false,
+            roles: ["validator"],
+          },
+        ],
+      },
+      {
+        ...icPaul,
+        agencyRights: [
+          {
+            agency: {
+              ...agency1,
+              counsellorEmails: [paulUser.email, genericUser.email],
+            },
+            isNotifiedByEmail: false,
+            roles: ["counsellor"],
+          },
+          {
+            agency: {
+              ...agency2,
+              validatorEmails: [
+                johnUser.email,
+                paulUser.email,
+                genericUser.email,
+              ],
+            },
+            isNotifiedByEmail: false,
+            roles: ["validator"],
+          },
+        ],
+      },
     ]);
   });
 });
