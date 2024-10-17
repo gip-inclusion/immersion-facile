@@ -1,16 +1,10 @@
 import { toPairs } from "ramda";
-import {
-  AgencyDto,
-  AgencyRight,
-  AgencyRole,
-  OAuthGatewayProvider,
-  UserId,
-  errors,
-} from "shared";
+import { AgencyDto, AgencyRight, AgencyRole, UserId, errors } from "shared";
 import {
   AgencyUsersRights,
   AgencyWithUsersRights,
 } from "../domains/agency/ports/AgencyRepository";
+import { makeProvider } from "../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { getUsersByIds } from "../domains/core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 
@@ -46,9 +40,9 @@ export const toAgencyWithRights = (
 
 export const agencyWithRightToAgencyDto = async (
   uow: UnitOfWork,
-  provider: OAuthGatewayProvider,
   { usersRights, ...rest }: AgencyWithUsersRights,
 ): Promise<AgencyDto> => {
+  const provider = await makeProvider(uow);
   const counsellorUsers = await getUsersByIds(
     uow.userRepository,
     provider,
@@ -68,7 +62,6 @@ export const agencyWithRightToAgencyDto = async (
 
 export const getAgencyRightByUserId = async (
   uow: UnitOfWork,
-  provider: OAuthGatewayProvider,
   userId: UserId,
 ): Promise<AgencyRight[]> => {
   const agenciesRightsForUser =
@@ -78,7 +71,7 @@ export const getAgencyRightByUserId = async (
     agenciesRightsForUser.map(async ({ isNotifiedByEmail, roles, agency }) => ({
       isNotifiedByEmail,
       roles,
-      agency: await agencyWithRightToAgencyDto(uow, provider, agency),
+      agency: await agencyWithRightToAgencyDto(uow, agency),
     })),
   );
 };

@@ -3,7 +3,6 @@ import {
   AgencyGroup,
   AgencyRight,
   InclusionConnectedUser,
-  OAuthGatewayProvider,
   activeAgencyStatuses,
   agencyRoleIsNotToReview,
 } from "shared";
@@ -46,8 +45,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
 
     const groupWithSafir =
       await uow.agencyGroupRepository.getByCodeSafir(codeSafir);
-    if (groupWithSafir)
-      return updateAgenciesOfGroup(uow, provider, groupWithSafir, user);
+    if (groupWithSafir) return updateAgenciesOfGroup(uow, groupWithSafir, user);
   }
 }
 
@@ -75,7 +73,6 @@ const updateActiveAgencyWithSafir = (
 
 const updateAgenciesOfGroup = async (
   uow: UnitOfWork,
-  provider: OAuthGatewayProvider,
   agencyGroupWithSafir: AgencyGroup,
   user: InclusionConnectedUser,
 ): Promise<void> => {
@@ -100,7 +97,7 @@ const updateAgenciesOfGroup = async (
           agencyRoleIsNotToReview(existingAgencyRight.roles)
           ? existingAgencyRight
           : {
-              agency: await agencyWithRightToAgencyDto(uow, provider, agency),
+              agency: await agencyWithRightToAgencyDto(uow, agency),
               roles: ["agency-viewer"],
               isNotifiedByEmail: false,
             };
