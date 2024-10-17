@@ -10,6 +10,8 @@ import {
   statusTransitionConfigs,
 } from "shared";
 import { ForbiddenError } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfTransitionNotAllowed = ({
@@ -71,7 +73,15 @@ export async function retrieveConventionWithAgency(
     });
   const agency = await uow.agencyRepository.getById(convention.agencyId);
   if (!agency) throw errors.agency.notFound({ agencyId: convention.agencyId });
-  return { agency, convention };
+
+  return {
+    agency: await agencyWithRightToAgencyDto(
+      uow,
+      await makeProvider(uow),
+      agency,
+    ),
+    convention,
+  };
 }
 
 export const getAllConventionRecipientsEmail = (
