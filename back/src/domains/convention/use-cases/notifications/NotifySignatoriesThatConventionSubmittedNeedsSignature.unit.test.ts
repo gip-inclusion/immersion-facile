@@ -1,75 +1,82 @@
 import {
   AgencyDto,
+  AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
+  EmailNotification,
+  InclusionConnectedUserBuilder,
   ShortLinkId,
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { EmailNotification } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
-import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
-import {
-  InMemoryNotificationRepository,
-  expectEmailSignatoryConfirmationSignatureRequestMatchingConvention,
-} from "../../../core/notifications/adapters/InMemoryNotificationRepository";
+import { expectEmailSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
   WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,
 } from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
-import { InMemoryShortLinkQuery } from "../../../core/short-link/adapters/short-link-query/InMemoryShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "./NotifySignatoriesThatConventionSubmittedNeedsSignature";
 
 describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
+  const config: AppConfig = new AppConfigBuilder({}).build();
+  const agency: AgencyDto = new AgencyDtoBuilder()
+    .withCounsellorEmails([])
+    .withValidatorEmails([])
+    .build();
+  const counsellor = new InclusionConnectedUserBuilder()
+    .withId("counsellor")
+    .withEmail("counsellor@mail.com")
+    .buildUser();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator")
+    .withEmail("validator@mail.com")
+    .buildUser();
+  const validConvention: ConventionDto = new ConventionDtoBuilder()
+    .withBeneficiaryRepresentative({
+      firstName: "Tom",
+      lastName: "Cruise",
+      phone: "0665454271",
+      role: "beneficiary-representative",
+      email: "beneficiary@representative.fr",
+    })
+    .withAgencyId(agency.id)
+    .build();
+
+  let uow: InMemoryUnitOfWork;
   let useCase: NotifySignatoriesThatConventionSubmittedNeedsSignature;
   let timeGateway: CustomTimeGateway;
-  let validConvention: ConventionDto;
-  let agency: AgencyDto;
-  let shortLinkQuery: InMemoryShortLinkQuery;
-  let config: AppConfig;
   let shortLinkGenerator: DeterministShortLinkIdGeneratorGateway;
-  let notificationRepository: InMemoryNotificationRepository;
-  let outboxRepository: InMemoryOutboxRepository;
 
   beforeEach(() => {
-    config = new AppConfigBuilder({}).build();
-    timeGateway = new CustomTimeGateway(new Date());
-    const uow = createInMemoryUow();
-    notificationRepository = uow.notificationRepository;
-    outboxRepository = uow.outboxRepository;
-    agency = uow.agencyRepository.agencies[0];
-    shortLinkQuery = uow.shortLinkQuery;
-    validConvention = new ConventionDtoBuilder()
-      .withBeneficiaryRepresentative({
-        firstName: "Tom",
-        lastName: "Cruise",
-        phone: "0665454271",
-        role: "beneficiary-representative",
-        email: "beneficiary@representative.fr",
-      })
-      .withAgencyId(agency.id)
-      .build();
+    uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway();
     shortLinkGenerator = new DeterministShortLinkIdGeneratorGateway();
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
     useCase = new NotifySignatoriesThatConventionSubmittedNeedsSignature(
       new InMemoryUowPerformer(uow),
       timeGateway,
       shortLinkGenerator,
       fakeGenerateMagicLinkUrlFn,
       config,
-      saveNotificationAndRelatedEvent,
+      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
     );
+    uow.userRepository.users = [counsellor, validator];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      }),
+    ];
   });
 
   it("Sends confirmation email to all signatories", async () => {
@@ -85,7 +92,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
 
     await useCase.execute({ convention: validConvention });
 
-    expectToEqual(shortLinkQuery.getShortLinks(), {
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
       [deterministicShortLinks[0]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: validConvention.signatories.beneficiary.role,
@@ -138,12 +145,12 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       }),
     });
 
-    const emailNotifications = notificationRepository.notifications.filter(
+    const emailNotifications = uow.notificationRepository.notifications.filter(
       (notification): notification is EmailNotification =>
         notification.kind === "email",
     );
 
-    expect(outboxRepository.events.map(({ payload }) => payload)).toEqual(
+    expect(uow.outboxRepository.events.map(({ payload }) => payload)).toEqual(
       emailNotifications.map(
         ({ id }): WithNotificationIdAndKind => ({ id, kind: "email" }),
       ),
