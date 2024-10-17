@@ -1,18 +1,20 @@
-import type {
-  AddressDto,
-  AgencyDto,
-  AgencyId,
-  AgencyKind,
-  AgencyPositionFilter,
-  AgencyRight,
-  AgencyRole,
-  AgencyStatus,
-  DepartmentCode,
-  OmitFromExistingKeys,
-  SiretDto,
-  UserId,
-  WithUserFilters,
+import {
+  type AddressDto,
+  type AgencyDto,
+  type AgencyId,
+  type AgencyKind,
+  type AgencyPositionFilter,
+  type AgencyRight,
+  type AgencyRole,
+  type AgencyStatus,
+  type DepartmentCode,
+  type OmitFromExistingKeys,
+  type SiretDto,
+  type UserId,
+  type WithUserFilters,
+  errors,
 } from "shared";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export type GetAgenciesFilters = {
   nameIncludes?: string;
@@ -78,3 +80,33 @@ export interface AgencyRepository {
   ): Promise<AgencyRightWithAgencyWithUsersRights[]>;
   getUserIdByFilters(filters: WithUserFilters): Promise<UserId[]>;
 }
+
+export const updateAgencyRightsForUser = async (
+  uow: UnitOfWork,
+  userId: UserId,
+  { agency, isNotifiedByEmail, roles }: AgencyRightWithAgencyWithUsersRights,
+): Promise<void> => {
+  const agencyWithRights = await uow.agencyRepository.getById(agency.id);
+  if (!agencyWithRights) throw errors.agency.notFound({ agencyId: agency.id });
+  return uow.agencyRepository.update({
+    id: agency.id,
+    usersRights: {
+      ...agencyWithRights.usersRights,
+      [userId]: { isNotifiedByEmail, roles },
+    },
+  });
+};
+
+export const removeAgencyRightsForUser = async (
+  uow: UnitOfWork,
+  userId: UserId,
+  { agency }: AgencyRightWithAgencyWithUsersRights,
+): Promise<void> => {
+  const agencyWithRights = await uow.agencyRepository.getById(agency.id);
+  if (!agencyWithRights) throw errors.agency.notFound({ agencyId: agency.id });
+  const { [userId]: _, ...rightsToKeep } = agencyWithRights.usersRights;
+  return uow.agencyRepository.update({
+    id: agency.id,
+    usersRights: rightsToKeep,
+  });
+};
