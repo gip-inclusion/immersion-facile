@@ -14,6 +14,7 @@ import {
   oAuthGatewayProviders,
 } from "shared";
 import { v4 as uuid } from "uuid";
+import { toAgencyWithRights } from "../../../../../utils/agency";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -30,18 +31,18 @@ import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { GetAccessTokenPayload } from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
-const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
-const correctToken = "my-correct-token";
-
-const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
-  nonce: "nounce",
-  sub: "my-user-external-id",
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@inclusion.com",
-};
-
 describe("AuthenticateWithInclusionCode use case", () => {
+  const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
+  const correctToken = "my-correct-token";
+
+  const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
+    nonce: "nounce",
+    sub: "my-user-external-id",
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@inclusion.com",
+  };
+
   let uow: InMemoryUnitOfWork;
   let inclusionConnectGateway: InMemoryOAuthGateway;
   let uuidGenerator: TestUuidGenerator;
@@ -240,30 +241,38 @@ describe("AuthenticateWithInclusionCode use case", () => {
               previousMigrationUserWithUpdatedEmail,
             ];
 
-            const agency1 = new AgencyDtoBuilder().withId(uuid()).build();
-            const agency2 = new AgencyDtoBuilder().withId(uuid()).build();
-
-            uow.userRepository.agencyRightsByUserId = {
-              [initialUser.id]: [
-                {
-                  agency: agency1,
+            const agency1 = toAgencyWithRights(
+              new AgencyDtoBuilder()
+                .withId(uuid())
+                .withCounsellorEmails([])
+                .withValidatorEmails([])
+                .build(),
+              {
+                [initialUser.id]: {
                   isNotifiedByEmail: false,
                   roles: ["counsellor"],
                 },
-              ],
-              [previousMigrationUserWithUpdatedEmail.id]: [
-                {
-                  agency: agency1,
+                [previousMigrationUserWithUpdatedEmail.id]: {
                   isNotifiedByEmail: true,
                   roles: ["validator"],
                 },
-                {
-                  agency: agency2,
+              },
+            );
+            const agency2 = toAgencyWithRights(
+              new AgencyDtoBuilder()
+                .withId(uuid())
+                .withCounsellorEmails([])
+                .withValidatorEmails([])
+                .build(),
+              {
+                [previousMigrationUserWithUpdatedEmail.id]: {
                   isNotifiedByEmail: true,
                   roles: ["counsellor"],
                 },
-              ],
-            };
+              },
+            );
+
+            uow.agencyRepository.agencies = [agency1, agency2];
 
             const updatedUser: User = {
               id: initialUser.id,
@@ -285,21 +294,27 @@ describe("AuthenticateWithInclusionCode use case", () => {
               page: "agencyDashboard",
             });
 
-            expectObjectInArrayToMatch(uow.userRepository.users, [updatedUser]);
-            expectToEqual(uow.userRepository.agencyRightsByUserId, {
-              [initialUser.id]: [
-                {
-                  agency: agency1,
-                  isNotifiedByEmail: true,
-                  roles: ["counsellor", "validator"],
+            expectToEqual(uow.userRepository.users, [updatedUser]);
+            expectToEqual(uow.agencyRepository.agencies, [
+              {
+                ...agency1,
+                usersRights: {
+                  [initialUser.id]: {
+                    isNotifiedByEmail: true,
+                    roles: ["counsellor", "validator"],
+                  },
                 },
-                {
-                  agency: agency2,
-                  isNotifiedByEmail: true,
-                  roles: ["counsellor"],
+              },
+              {
+                ...agency2,
+                usersRights: {
+                  [initialUser.id]: {
+                    isNotifiedByEmail: true,
+                    roles: ["counsellor"],
+                  },
                 },
-              ],
-            });
+              },
+            ]);
           });
         });
 
