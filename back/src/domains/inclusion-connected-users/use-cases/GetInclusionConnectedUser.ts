@@ -17,6 +17,7 @@ import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class GetInclusionConnectedUser extends TransactionalUseCase<
@@ -44,20 +45,78 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   protected async _execute(
     params: WithOptionalUserId,
     uow: UnitOfWork,
-    currentUser?: InclusionConnectedUser,
+    currentIcUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser> {
-    if (!currentUser) throw errors.user.noJwtProvided();
-    const { id } = currentUser;
-    if (!currentUser) throw errors.user.noJwtProvided();
-    if (params.userId) throwIfNotAdmin(currentUser);
+    if (!currentIcUser) throw errors.user.noJwtProvided();
     const provider = await makeProvider(uow);
-    const user = await uow.userRepository.getById(id, provider);
-    if (!user) throw errors.user.notFound({ userId: id });
-    const establishments = await this.#withEstablishments(uow, user);
+
+    const currentUser = await uow.userRepository.getById(
+      currentIcUser.id,
+      provider,
+    );
+    if (params.userId) throwIfNotAdmin(currentUser);
+
+    const userIdToFetch = params.userId ?? currentIcUser.id;
+
+    const user = await uow.userRepository.getById(userIdToFetch, provider);
+    if (!user) throw errors.user.notFound({ userId: userIdToFetch });
+
+    const icUser = await getIcUserByUserId(uow, provider, user.id);
+
     return {
-      ...user,
-      ...(await this.#withEstablishmentDashboards(user, uow)),
-      ...(establishments.length > 0 ? { establishments } : {}),
+      ...icUser,
+      ...(await this.#withEstablishmentDashboards(icUser, uow)),
+      ...(await this.#withEstablishments(uow, icUser)),
+    };
+  }
+
+  async #withEstablishmentDashboards(
+    user: InclusionConnectedUser,
+    uow: UnitOfWork,
+  ): Promise<WithDashboards> {
+    return {
+      dashboards: {
+        agencies: await this.makeAgencyDashboards(user),
+        establishments: await this.#makeEstablishmentDashboard(user, uow),
+      },
+    };
+  }
+
+  async #withEstablishments(
+    uow: UnitOfWork,
+    user: InclusionConnectedUser,
+  ): Promise<{ establishments?: WithEstablismentsSiretAndName[] }> {
+    const establishmentAggregates =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
+        {
+          contactEmail: user.email,
+        },
+      );
+
+    const establishments = establishmentAggregates.map(({ establishment }) => ({
+      siret: establishment.siret,
+      businessName: establishment.customizedName
+        ? establishment.customizedName
+        : establishment.name,
+    }));
+    return establishments.length ? { establishments } : {};
+  }
+
+  async #makeEstablishmentDashboard(
+    user: InclusionConnectedUser,
+    uow: UnitOfWork,
+  ): Promise<EstablishmentDashboards> {
+    const conventions = await this.#makeConventionEstablishmentDashboard(
+      uow,
+      user,
+    );
+    const discussions = await this.#makeDiscussionsEstablishmentDashboard(
+      uow,
+      user,
+    );
+    return {
+      ...(conventions ? { conventions } : {}),
+      ...(discussions ? { discussions } : {}),
     };
   }
 
@@ -105,55 +164,6 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
           this.#timeGateway.now(),
         )
       : undefined;
-  }
-
-  async #withEstablishments(
-    uow: UnitOfWork,
-    user: InclusionConnectedUser,
-  ): Promise<WithEstablismentsSiretAndName[]> {
-    const establishmentAggregates =
-      await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
-        {
-          contactEmail: user.email,
-        },
-      );
-
-    return establishmentAggregates.map(({ establishment }) => ({
-      siret: establishment.siret,
-      businessName: establishment.customizedName
-        ? establishment.customizedName
-        : establishment.name,
-    }));
-  }
-
-  async #makeEstablishmentDashboard(
-    user: InclusionConnectedUser,
-    uow: UnitOfWork,
-  ): Promise<EstablishmentDashboards> {
-    const conventions = await this.#makeConventionEstablishmentDashboard(
-      uow,
-      user,
-    );
-    const discussions = await this.#makeDiscussionsEstablishmentDashboard(
-      uow,
-      user,
-    );
-    return {
-      ...(conventions ? { conventions } : {}),
-      ...(discussions ? { discussions } : {}),
-    };
-  }
-
-  async #withEstablishmentDashboards(
-    user: InclusionConnectedUser,
-    uow: UnitOfWork,
-  ): Promise<WithDashboards> {
-    return {
-      dashboards: {
-        agencies: await this.makeAgencyDashboards(user),
-        establishments: await this.#makeEstablishmentDashboard(user, uow),
-      },
-    };
   }
 
   private async makeAgencyDashboards(
