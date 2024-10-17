@@ -14,7 +14,7 @@ import {
   AgencyWithUsersRights,
 } from "../../agency/ports/AgencyRepository";
 import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
-import { UserWithAdminRights } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfIcUserNotBackofficeAdmin = async (
@@ -86,7 +86,7 @@ const usersWithRoleFromRights = async (
   provider: OAuthGatewayProvider,
   usersRights: AgencyUsersRights,
   role: AgencyRole,
-): Promise<UserWithAdminRights[]> => {
+): Promise<UserOnRepository[]> => {
   const userIdsWithRole = toPairs(usersRights).filter(([_, right]) =>
     right.roles.includes(role),
   );
