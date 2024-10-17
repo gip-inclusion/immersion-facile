@@ -9,6 +9,7 @@ import {
   User,
   UserId,
   UserParamsForAgency,
+  WithAgencyId,
   WithAgencyIdAndUserId,
   WithUserFilters,
 } from "shared";
@@ -173,9 +174,11 @@ export const icUsersAdminSlice = createSlice({
 
     createUserOnAgencySucceeded: (
       state,
-      action: PayloadActionWithFeedbackTopic<{
-        icUser: NormalizedInclusionConnectedUser;
-      }>,
+      action: PayloadActionWithFeedbackTopic<
+        {
+          icUser: NormalizedInclusionConnectedUser;
+        } & WithAgencyId
+      >,
     ) => {
       state.isUpdatingIcUserAgency = false;
       const { id } = action.payload.icUser;
