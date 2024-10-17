@@ -20,15 +20,17 @@ import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorIm
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../adapters/InMemoryApiConsumerRepository";
 import { SaveApiConsumer } from "./SaveApiConsumer";
 
-const backofficeAdmin = new InclusionConnectedUserBuilder()
+const backofficeAdminBuilder = new InclusionConnectedUserBuilder()
   .withId("backoffice-admin")
-  .withIsAdmin(true)
-  .build();
+  .withIsAdmin(true);
+const icBackofficeAdmin = backofficeAdminBuilder.build();
+const backofficeAdmin = backofficeAdminBuilder.buildUser();
 
-const simpleUser = new InclusionConnectedUserBuilder()
+const simpleUserBuilder = new InclusionConnectedUserBuilder()
   .withId("simple-user")
-  .withIsAdmin(false)
-  .build();
+  .withIsAdmin(false);
+const icSimpleUser = simpleUserBuilder.build();
+const simpleUser = simpleUserBuilder.buildUser();
 
 describe("SaveApiConsumer", () => {
   let uow: InMemoryUnitOfWork;
@@ -40,10 +42,7 @@ describe("SaveApiConsumer", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    uow.userRepository.setInclusionConnectedUsers([
-      backofficeAdmin,
-      simpleUser,
-    ]);
+    uow.userRepository.users = [backofficeAdmin, simpleUser];
     saveApiConsumer = new SaveApiConsumer(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
@@ -64,7 +63,7 @@ describe("SaveApiConsumer", () => {
         createApiConsumerParamsFromApiConsumer(
           authorizedUnJeuneUneSolutionApiConsumer,
         ),
-        backofficeAdmin,
+        icBackofficeAdmin,
       );
 
       expectToEqual(
@@ -88,7 +87,7 @@ describe("SaveApiConsumer", () => {
             consumerId: authorizedUnJeuneUneSolutionApiConsumer.id,
             triggeredBy: {
               kind: "inclusion-connected",
-              userId: backofficeAdmin.id,
+              userId: icBackofficeAdmin.id,
             },
           },
           publications: [],
@@ -152,7 +151,7 @@ describe("SaveApiConsumer", () => {
 
       const result = await saveApiConsumer.execute(
         updatedConsumer,
-        backofficeAdmin,
+        icBackofficeAdmin,
       );
 
       expectToEqual(result, undefined);
@@ -173,7 +172,7 @@ describe("SaveApiConsumer", () => {
             consumerId: authorizedApiConsumerWithSubscription.id,
             triggeredBy: {
               kind: "inclusion-connected",
-              userId: backofficeAdmin.id,
+              userId: icBackofficeAdmin.id,
             },
           },
           publications: [],
@@ -206,9 +205,9 @@ describe("SaveApiConsumer", () => {
           createApiConsumerParamsFromApiConsumer(
             authorizedUnJeuneUneSolutionApiConsumer,
           ),
-          simpleUser,
+          icSimpleUser,
         ),
-        errors.user.forbidden({ userId: simpleUser.id }),
+        errors.user.forbidden({ userId: icSimpleUser.id }),
       );
 
       expectToEqual(uow.apiConsumerRepository.consumers, []);
