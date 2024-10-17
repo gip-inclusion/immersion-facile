@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { createPoleEmploiRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/PoleEmploiRoutes";
 import { AppConfig } from "../bootstrap/appConfig";

@@ -40,10 +40,12 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     lat,
     lon,
     rome,
+    romeLabel,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
     logger.warn({
       message: "searchCompanies",
       searchLBB: {
+        romeLabel,
         distanceKm,
         lat,
         lon,
@@ -76,7 +78,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
               new LaBonneBoiteCompanyDto(props),
           )
           .filter((result) => result.isCompanyRelevant())
-          .map((result) => result.toSearchResult());
+          .map((result) => result.toSearchResult(romeLabel));
       })
       .catch((error) => {
         logger.error({
@@ -87,6 +89,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
             lat,
             lon,
             rome,
+            romeLabel,
           },
         });
         throw error;

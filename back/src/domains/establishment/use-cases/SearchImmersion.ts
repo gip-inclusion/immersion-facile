@@ -131,15 +131,17 @@ export class SearchImmersion extends TransactionalUseCase<
         appellationCodes,
       );
 
-    const romeCode = matches.at(0)?.romeCode;
-    if (!romeCode)
+    const romeAndAppellationData = matches.at(0);
+    if (!romeAndAppellationData)
       throw new Error(
         `No Rome code matching appellation codes ${appellationCodes}`,
       );
+    const { romeCode, romeLabel } = romeAndAppellationData;
     if (hasSearchGeoParams(geoParams))
       try {
         return await this.laBonneBoiteAPI.searchCompanies({
           rome: romeCode,
+          romeLabel,
           ...geoParams,
         });
       } catch (error) {
