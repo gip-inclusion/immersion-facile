@@ -13,6 +13,7 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -66,8 +67,10 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
       return;
     }
 
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
-    if (!agency)
+    const [agencyWithRights] = await uow.agencyRepository.getByIds([
+      convention.agencyId,
+    ]);
+    if (!agencyWithRights)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
     for (const signatory of values(convention.signatories).filter(
@@ -78,7 +81,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
         templatedContent: await this.#makeEmail(
           signatory,
           convention,
-          agency,
+          await agencyWithRightToAgencyDto(uow, agencyWithRights),
           uow,
         ),
         followedIds: {
