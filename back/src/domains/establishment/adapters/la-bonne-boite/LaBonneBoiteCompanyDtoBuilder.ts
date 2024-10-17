@@ -11,8 +11,6 @@ import {
 } from "./LaBonneBoiteCompanyDto";
 
 const validEstablishmentFromLaBonneBoite: LaBonneBoiteApiResultV2Props = {
-  //address:
-  //  "Service des ressources humaines,  IMPASSE FENDERIE, 57290 SEREMANGE-ERZANGE",
   city: "SEREMANGE-ERZANGE",
   location: {
     lat: 49.3225,
