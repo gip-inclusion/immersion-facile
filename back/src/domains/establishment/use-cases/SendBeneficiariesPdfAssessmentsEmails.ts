@@ -1,13 +1,16 @@
+import { toPairs } from "ramda";
 import {
   ConventionDto,
   ConventionId,
   DateRange,
   castError,
+  errors,
   immersionFacileNoReplyEmailSender,
   withDateRangeSchema,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -79,6 +82,18 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
     if (!agency)
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
+    const firstValidatorRight = toPairs(agency.usersRights).find(([_, right]) =>
+      right.roles.includes("validator"),
+    );
+    if (!firstValidatorRight)
+      throw errors.agency.notEnoughValidators({ agencyId: agency.id });
+    const firstValidatorUserId = firstValidatorRight[0];
+    const firstValidatorUser = await uow.userRepository.getById(
+      firstValidatorUserId,
+      await makeProvider(uow),
+    );
+    if (!firstValidatorUser)
+      throw errors.user.notFound({ userId: firstValidatorUserId });
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
