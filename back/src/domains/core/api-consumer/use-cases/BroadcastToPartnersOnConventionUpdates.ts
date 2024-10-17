@@ -8,9 +8,11 @@ import {
   pipeWithValue,
   withConventionSchema,
 } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
 import { isConventionInScope } from "../../../convention/entities/Convention";
 import { TransactionalUseCase } from "../../UseCase";
+import { makeProvider } from "../../authentication/inclusion-connect/port/OAuthGateway";
 import { broadcastToPartnersServiceName } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -46,10 +48,17 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
   }
 
   protected async _execute({ convention }: WithConventionDto, uow: UnitOfWork) {
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
-    if (!agency) {
+    const agencyWithRights = await uow.agencyRepository.getById(
+      convention.agencyId,
+    );
+    if (!agencyWithRights) {
       throw errors.agency.notFound({ agencyId: convention.agencyId });
     }
+    const agency = await agencyWithRightToAgencyDto(
+      uow,
+      await makeProvider(uow),
+      agencyWithRights,
+    );
     const {
       acquisitionCampaign: _,
       acquisitionKeyword: __,
@@ -58,12 +67,12 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
 
     const conventionRead: ConventionReadDto = {
       ...conventionWithoutAcquisitionParams,
-      agencyName: agency.name,
-      agencyDepartment: agency.address.departmentCode,
-      agencyKind: agency.kind,
-      agencySiret: agency.agencySiret,
-      agencyRefersTo: agency.refersToAgencyId
-        ? await getReferedAgency(uow, agency.refersToAgencyId)
+      agencyName: agencyWithRights.name,
+      agencyDepartment: agencyWithRights.address.departmentCode,
+      agencyKind: agencyWithRights.kind,
+      agencySiret: agencyWithRights.agencySiret,
+      agencyRefersTo: agencyWithRights.refersToAgencyId
+        ? await getReferedAgency(uow, agencyWithRights.refersToAgencyId)
         : undefined,
       agencyCounsellorEmails: agency.counsellorEmails,
       agencyValidatorEmails: agency.validatorEmails,
