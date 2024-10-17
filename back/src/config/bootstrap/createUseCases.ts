@@ -59,7 +59,7 @@ import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/De
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
-import { oAuthProviderByFeatureFlags } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
@@ -592,9 +592,7 @@ export const createUseCases = (
       getAgencyById: (id: AgencyId) =>
         uowPerformer.perform(async (uow) => {
           const [agency] = await uow.agencyRepository.getByIds([id]);
-          const provider = oAuthProviderByFeatureFlags(
-            await uow.featureFlagRepository.getAll(),
-          );
+          const provider = await makeProvider(uow);
           return agencyWithRightToAgencyDto(uow, provider, agency);
         }),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>

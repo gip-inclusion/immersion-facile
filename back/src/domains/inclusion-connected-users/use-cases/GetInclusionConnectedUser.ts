@@ -12,7 +12,7 @@ import {
   withOptionalUserIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -47,16 +47,12 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser> {
     if (!currentUser) throw errors.user.noJwtProvided();
-
+    const { id } = currentUser;
+    if (!currentUser) throw errors.user.noJwtProvided();
     if (params.userId) throwIfNotAdmin(currentUser);
-
-    const userIdToFetch = params.userId ?? currentUser.id;
-
-    const user = await uow.userRepository.getById(
-      userIdToFetch,
-      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
-    );
-    if (!user) throw errors.user.notFound({ userId: userIdToFetch });
+    const provider = await makeProvider(uow);
+    const user = await uow.userRepository.getById(id, provider);
+    if (!user) throw errors.user.notFound({ userId: id });
     const establishments = await this.#withEstablishments(uow, user);
     return {
       ...user,

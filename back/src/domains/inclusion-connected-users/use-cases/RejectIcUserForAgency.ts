@@ -5,7 +5,7 @@ import {
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -35,11 +35,8 @@ export class RejectIcUserForAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-
-    const user = await uow.userRepository.getById(
-      params.userId,
-      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
-    );
+    const provider = await makeProvider(uow);
+    const user = await uow.userRepository.getById(params.userId, provider);
 
     if (!user) throw errors.user.notFound({ userId: params.userId });
 

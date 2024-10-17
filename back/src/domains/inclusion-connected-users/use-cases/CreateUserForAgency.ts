@@ -6,7 +6,7 @@ import {
   userParamsForAgencySchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -36,9 +36,7 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
         role: "validator",
       });
 
-    const provider = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
+    const provider = await makeProvider(uow);
     const existingUser = (
       await uow.userRepository.getIcUsersWithFilter(
         {
