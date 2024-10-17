@@ -7,6 +7,7 @@ import {
 } from "shared";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -165,7 +166,7 @@ describe("SendEstablishmentLeadReminder", () => {
         establishmentLeadAccepted,
         establishmentLeadToBeReminded,
       ];
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
       uow.conventionRepository.setConventions([
         oldestConvention,
         newestConvention,
@@ -272,7 +273,7 @@ describe("SendEstablishmentLeadReminder", () => {
         establishmentLeadWithOneReminderSentYesterday,
       ];
 
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
       uow.conventionRepository.setConventions([
         convention1,
         convention2,
