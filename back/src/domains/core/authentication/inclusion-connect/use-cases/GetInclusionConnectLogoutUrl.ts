@@ -27,7 +27,6 @@ export const makeGetInclusionConnectLogoutUrl = createTransactionalUseCase<
       currentUser.id,
     );
     if (!ongoingOAuth) throw errors.inclusionConnect.missingOAuth({});
-
     return oAuthGateway.getLogoutUrl(
       { idToken: inputParams.idToken, state: ongoingOAuth.state },
       ongoingOAuth.provider,

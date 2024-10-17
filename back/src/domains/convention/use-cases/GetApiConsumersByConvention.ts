@@ -9,7 +9,7 @@ import {
   withConventionIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 
 export type GetApiConsumersByConvention = ReturnType<
   typeof makeGetApiConsumersByConvention
@@ -33,7 +33,7 @@ export const makeGetApiConsumersByConvention = createTransactionalUseCase<
 
     const user = await uow.userRepository.getById(
       currentUser.id,
-      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
+      await makeProvider(uow),
     );
 
     if (!user)

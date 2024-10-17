@@ -3,10 +3,7 @@ import { TransactionalUseCase } from "../../../UseCase";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
-import {
-  OAuthGateway,
-  oAuthProviderByFeatureFlags,
-} from "../port/OAuthGateway";
+import { OAuthGateway, makeProvider } from "../port/OAuthGateway";
 
 export class InitiateInclusionConnect extends TransactionalUseCase<
   WithSourcePage,
@@ -29,9 +26,7 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
     const nonce = this.uuidGenerator.new();
     const state = this.uuidGenerator.new();
 
-    const provider = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
+    const provider = await makeProvider(uow);
 
     await uow.ongoingOAuthRepository.save({
       nonce,

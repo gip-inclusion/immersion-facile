@@ -14,7 +14,7 @@ import {
 } from "../../../utils/agency";
 import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserAuthenticatedPayload } from "../../core/events/events";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
@@ -33,9 +33,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     if (!codeSafir) return;
-    const provider = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
+    const provider = await makeProvider(uow);
     const user = await getIcUserByUserId(uow, provider, userId);
     if (isIcUserAlreadyHasValidRight(user, codeSafir)) return;
 

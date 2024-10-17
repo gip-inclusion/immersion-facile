@@ -26,7 +26,7 @@ import { OngoingOAuth } from "../entities/OngoingOAuth";
 import {
   GetAccessTokenPayload,
   OAuthGateway,
-  oAuthProviderByFeatureFlags,
+  makeProvider,
 } from "../port/OAuthGateway";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
@@ -71,9 +71,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     { code, page, state }: AuthenticateWithOAuthCodeParams,
     uow: UnitOfWork,
   ): Promise<ConnectedRedirectUrl> {
-    const provider = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
+    const provider = await makeProvider(uow);
     const identityProvider: IdentityProvider =
       provider === "inclusionConnect" ? "inclusionConnect" : "proConnect";
     const existingOngoingOAuth =
