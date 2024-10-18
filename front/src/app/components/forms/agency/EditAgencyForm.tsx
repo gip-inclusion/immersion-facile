@@ -24,6 +24,7 @@ import {
   displayReadableError,
   getFormContents,
   makeFieldError,
+  toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
@@ -116,8 +117,10 @@ export const EditAgencyForm = ({
           <AgencyLogoUpload />
         </div>
         <ErrorNotifications
-          labels={getFormErrors()}
-          errors={displayReadableError(formState.errors)}
+          errorsWithLabels={toErrorsWithLabels({
+            labels: getFormErrors(),
+            errors: displayReadableError(formState.errors),
+          })}
           visible={
             formState.submitCount !== 0 &&
             Object.values(formState.errors).length > 0
