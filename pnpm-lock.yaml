@@ -14373,7 +14373,7 @@ snapshots:
   '@types/glob@8.0.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 16.18.108
+      '@types/node': 20.16.10
 
   '@types/graceful-fs@4.1.6':
     dependencies:

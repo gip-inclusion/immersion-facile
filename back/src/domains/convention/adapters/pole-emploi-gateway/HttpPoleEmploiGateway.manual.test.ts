@@ -6,7 +6,7 @@ import {
   AccessTokenConfig,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createPeFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
@@ -58,7 +58,7 @@ describe("HttpPoleEmploiGateway", () => {
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
       const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
-        createPeAxiosSharedClient(config),
+        createPeFetchSharedClient(config),
         cachingGateway,
         config.peApiUrl,
         config.poleEmploiAccessTokenConfig,
@@ -111,7 +111,7 @@ describe("HttpPoleEmploiGateway", () => {
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
       const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
-        createPeAxiosSharedClient(config),
+        createPeFetchSharedClient(config),
         cachingGateway,
         config.peApiUrl,
         config.poleEmploiAccessTokenConfig,
