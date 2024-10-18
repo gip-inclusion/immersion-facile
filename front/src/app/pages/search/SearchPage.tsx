@@ -7,6 +7,7 @@ import {
   Loader,
   MainWrapper,
   PageHeader,
+  SearchFilter,
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
@@ -174,6 +175,9 @@ export const SearchPage = ({
             )}
             id={domElementIds.search.searchForm}
           >
+            <>
+              <SearchFilter />
+            </>
             <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
               <AppellationAutocomplete
                 label={
