@@ -38,9 +38,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
     );
     if (!user) throw errors.user.notFound({ userId: params.userId });
 
-    const agencyRight = user.agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === params.agencyId,
-    );
+    const agencyRight = agency.usersRights[user.id];
 
     if (!agencyRight) throw errors.user.noRightsOnAgency(params);
 
