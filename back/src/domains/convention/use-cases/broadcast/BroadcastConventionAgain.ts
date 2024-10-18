@@ -22,6 +22,7 @@ const BROADCAST_FEEDBACK_DEBOUNCE_HOUR = 4;
 export type BroadcastConventionAgain = ReturnType<
   typeof makeBroadcastConventionAgain
 >;
+
 export const makeBroadcastConventionAgain = createTransactionalUseCase<
   WithConventionId,
   void,
@@ -33,13 +34,13 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
     inputSchema: withConventionIdSchema,
   },
   async ({ inputParams: { conventionId }, uow, deps, currentUser }) => {
-    const convention =
-      await uow.conventionQueries.getConventionById(conventionId);
+    const convention = await uow.conventionRepository.getById(conventionId);
 
     if (!convention)
       throw errors.convention.notFound({
         conventionId,
       });
+
     if (
       !userHasEnoughRightsOnConvention(currentUser, convention, [
         "counsellor",
@@ -56,18 +57,18 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
       now: deps.timeGateway.now(),
     });
 
-    const broadcastConventionAgainEvent = deps.createNewEvent({
-      topic: "ConventionBroadcastRequested",
-      payload: {
-        convention,
-        triggeredBy: {
-          kind: "inclusion-connected",
-          userId: currentUser.id,
+    await uow.outboxRepository.save(
+      deps.createNewEvent({
+        topic: "ConventionBroadcastRequested",
+        payload: {
+          convention,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: currentUser.id,
+          },
         },
-      },
-    });
-
-    await uow.outboxRepository.save(broadcastConventionAgainEvent);
+      }),
+    );
   },
 );
 
