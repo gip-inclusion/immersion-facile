@@ -60,16 +60,14 @@ export const errors = {
   convention: {
     updateBadStatusInParams: ({ id }: { id: ConventionId }) =>
       new ForbiddenError(
-        `Convention ${id} with modifications should have status READY_TO_SIGNaaaaa`,
+        `Convention ${id} with modifications should have status READY_TO_SIGN`,
       ),
     updateBadStatusInRepo: ({ id }: { id: ConventionId }) =>
       new BadRequestError(
-        `Convention ${id} cannot be modified as it has status PARTIALLY_SIGNEDaaaaaa`,
+        `Convention ${id} cannot be modified as it has status PARTIALLY_SIGNED`,
       ),
     updateForbidden: ({ id }: { id: ConventionId }) =>
-      new ForbiddenError(
-        `User is not allowed to update convention ${id}aaaaaaaaaa`,
-      ),
+      new ForbiddenError(`User is not allowed to update convention ${id}`),
     missingFTAdvisor: ({ ftExternalId }: { ftExternalId: PeExternalId }) =>
       new NotFoundError(
         `Il n'y a pas de conseiller France Travail attaché à l'identifiant OAuth ftExternalId '${ftExternalId}'.`,
@@ -138,7 +136,7 @@ export const errors = {
       kind,
     }: { convention: ConventionDto; kind: ReminderKind }) =>
       new ForbiddenError(
-        `Convention with id: '${convention.id}' and status: '${convention.status}' is not supported for reminder ${kind}.aaaaaaa`,
+        `Convention with id: '${convention.id}' and status: '${convention.status}' is not supported for reminder ${kind}.`,
       ),
   },
   establishment: {
@@ -166,7 +164,7 @@ export const errors = {
       ),
     missingOrClosed: ({ siret }: { siret: SiretDto }) =>
       new BadRequestError(
-        `Ce SIRET (${siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.aaaaaaaaaaaaa`,
+        `Ce SIRET (${siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
       ),
     notFound: ({ siret }: { siret: SiretDto }) =>
       new NotFoundError(
@@ -284,7 +282,7 @@ export const errors = {
       ),
     emailNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
       new NotFoundError(
-        `Mail not found for agency with id: ${agencyId} on agency repository.aaaaaaaaa`,
+        `Mail not found for agency with id: ${agencyId} on agency repository.`,
       ),
     notEnoughCounsellors: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
@@ -481,9 +479,9 @@ export const errors = {
   },
   delegation: {
     missingLabel: ({ label }: { label: ShortLinkId }) =>
-      new BadRequestError(`No value found for label "${label}".aaaaaa`),
+      new BadRequestError(`No value found for label "${label}".`),
     missingEmail: ({ province }: { province: ShortLinkId }) =>
-      new BadRequestError(`Province ${province} not foundaaaaaaaaaa`),
+      new BadRequestError(`Province ${province} not found`),
   },
   routeParams: {
     missingJwt: () =>
