@@ -22,6 +22,8 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
+import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionReminderPayload } from "../../../core/events/eventPayload.dto";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
@@ -153,9 +155,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   async #onAgencyReminder(
     reminderKind: AgenciesReminderKind,
     conventionRead: ConventionReadDto,
-    agency: AgencyDto,
+    agencyWithRights: AgencyWithUsersRights,
     uow: UnitOfWork,
   ): Promise<void> {
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
     if (conventionRead.status !== "IN_REVIEW")
       throw errors.convention.forbiddenReminder({
         convention: conventionRead,
