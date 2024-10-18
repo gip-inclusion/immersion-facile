@@ -1,5 +1,9 @@
 import { expectObjectsToMatch, expectToEqual } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import {
+  AccessTokenResponse,
+  AppConfig,
+} from "../../../../config/bootstrap/appConfig";
+import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import { InseeSiretGateway } from "./InseeSiretGateway";
@@ -20,6 +24,10 @@ describe("HttpSirenGateway", () => {
       config.inseeHttpConfig,
       new RealTimeGateway(),
       noRetries,
+      new InMemoryCachingGateway<AccessTokenResponse>(
+        new RealTimeGateway(),
+        "expires_in",
+      ),
     );
   });
 

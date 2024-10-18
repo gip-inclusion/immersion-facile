@@ -1,13 +1,13 @@
 import minutesToSeconds from "date-fns/minutesToSeconds";
-import { PoleEmploiGetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
+import { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryCachingGateway } from "./InMemoryCachingGateway";
 
-const testResponse1: PoleEmploiGetAccessTokenResponse = {
+const testResponse1: AccessTokenResponse = {
   access_token: "token1",
   expires_in: minutesToSeconds(10),
 };
-const testResponse2: PoleEmploiGetAccessTokenResponse = {
+const testResponse2: AccessTokenResponse = {
   access_token: "token2",
   expires_in: minutesToSeconds(10),
 };
@@ -15,16 +15,15 @@ const testResponse2: PoleEmploiGetAccessTokenResponse = {
 describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
   let mockGetAccessTokenFn: jest.Mock;
   let timeGateway: CustomTimeGateway;
-  let cachedAccessTokenGateway: InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>;
+  let cachedAccessTokenGateway: InMemoryCachingGateway<AccessTokenResponse>;
 
   beforeEach(() => {
     mockGetAccessTokenFn = jest.fn();
     timeGateway = new CustomTimeGateway(new Date("2021-01-01T00:00:00Z"));
-    cachedAccessTokenGateway =
-      new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
-        timeGateway,
-        "expires_in",
-      );
+    cachedAccessTokenGateway = new InMemoryCachingGateway<AccessTokenResponse>(
+      timeGateway,
+      "expires_in",
+    );
   });
 
   it("fetches a new token if none is cached", async () => {
