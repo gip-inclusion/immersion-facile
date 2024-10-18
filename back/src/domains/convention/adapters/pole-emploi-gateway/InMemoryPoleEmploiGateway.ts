@@ -1,8 +1,8 @@
+import { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
 import {
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
-  PoleEmploiGetAccessTokenResponse,
 } from "../../ports/PoleEmploiGateway";
 
 export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
@@ -13,9 +13,7 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
 
   constructor(public notifications: PoleEmploiConvention[] = []) {}
 
-  public async getAccessToken(
-    scope: string,
-  ): Promise<PoleEmploiGetAccessTokenResponse> {
+  public async getAccessToken(scope: string): Promise<AccessTokenResponse> {
     return {
       access_token: `fake_access_token_for_scope_${scope}`,
       expires_in: 600,

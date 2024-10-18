@@ -1,7 +1,8 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
-import { AppConfig } from "../config/bootstrap/appConfig";
+import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
   ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
@@ -36,8 +37,8 @@ const main = async () => {
   const siretGateway = new InseeSiretGateway(
     config.inseeHttpConfig,
     timeGateway,
-
     retryStrategy,
+    new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),
   );
 
   const dbUrl = config.pgImmersionDbUrl;

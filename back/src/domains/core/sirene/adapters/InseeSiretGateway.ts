@@ -1,3 +1,4 @@
+import querystring from "querystring";
 import axios from "axios";
 import Bottleneck from "bottleneck";
 import { format, formatISO, secondsToMilliseconds } from "date-fns";
@@ -13,12 +14,16 @@ import {
   filterNotFalsy,
   queryParamsAsString,
 } from "shared";
-import { InseeAccessTokenConfig } from "../../../../config/bootstrap/appConfig";
+import {
+  AccessTokenResponse,
+  InseeAccessTokenConfig,
+} from "../../../../config/bootstrap/appConfig";
 import {
   createAxiosInstance,
   isRetryableError,
 } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
+import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import {
   RetryStrategy,
   RetryableError,
@@ -29,9 +34,11 @@ import { SiretGateway } from "../ports/SirenGateway";
 const logger = createLogger(__filename);
 
 const inseeMaxRequestsPerMinute = 500;
+const inseeMaxRequestPerInterval = 1;
+const rate_ms = 3_000;
 
-// The documentation can be found here (it is a pdf) :
-// https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/templates/api/documentation/download.jag?tenant=carbon.super&resourceUrl=/registry/resource/_system/governance/apimgt/applicationdata/provider/insee/Sirene/V3/documentation/files/INSEE%20Documentation%20API%20Sirene%20Services-V3.9.pdf
+// The documentation can be found here:
+// https://portail-api.insee.fr/catalog/all > Api Sirene Privée > Documentation
 
 export class InseeSiretGateway implements SiretGateway {
   #limiter = new Bottleneck({
@@ -40,20 +47,33 @@ export class InseeSiretGateway implements SiretGateway {
     reservoirRefreshAmount: inseeMaxRequestsPerMinute,
   });
 
+  // 1 call every 3 seconds
+  #tokenLimiter = new Bottleneck({
+    maxConcurrent: 1,
+    reservoir: inseeMaxRequestPerInterval,
+    reservoirRefreshInterval: rate_ms,
+    reservoirRefreshAmount: inseeMaxRequestPerInterval,
+    minTime: Math.ceil(rate_ms / inseeMaxRequestPerInterval),
+  });
+
   readonly #retryStrategy: RetryStrategy;
 
   readonly #axiosConfig: InseeAccessTokenConfig;
 
   readonly #timeGateway: TimeGateway;
 
+  readonly #caching: InMemoryCachingGateway<AccessTokenResponse>;
+
   constructor(
     axiosConfig: InseeAccessTokenConfig,
     timeGateway: TimeGateway,
     retryStrategy: RetryStrategy,
+    caching: InMemoryCachingGateway<AccessTokenResponse>,
   ) {
     this.#axiosConfig = axiosConfig;
     this.#retryStrategy = retryStrategy;
     this.#timeGateway = timeGateway;
+    this.#caching = caching;
   }
 
   public async getEstablishmentBySiret(
@@ -67,7 +87,7 @@ export class InseeSiretGateway implements SiretGateway {
     return this.#retryStrategy
       .apply(async () => {
         try {
-          const axios = this.#createAxiosInstance();
+          const axios = await this.#createAxiosInstance();
           const response = await this.#limiter.schedule(() =>
             axios.get<SirenGatewayAnswer>("/siret", {
               params: this.#createSiretQueryParams(
@@ -115,7 +135,7 @@ export class InseeSiretGateway implements SiretGateway {
     try {
       const formattedFromDate = format(fromDate, "yyyy-MM-dd");
       const formattedToDate = format(toDate, "yyyy-MM-dd");
-      const axios = this.#createAxiosInstance();
+      const axios = await this.#createAxiosInstance();
 
       const requestBody = queryParamsAsString({
         q: [
@@ -169,15 +189,54 @@ export class InseeSiretGateway implements SiretGateway {
     }
   }
 
-  #createAxiosInstance() {
+  async #createAxiosInstance() {
+    const accessToken = await this.#getAccessToken();
     return createAxiosInstance(logger, {
       baseURL: this.#axiosConfig.endpoint,
       headers: {
-        Authorization: `Bearer ${this.#axiosConfig.bearerToken}`,
+        Authorization: `Bearer ${accessToken.access_token}`,
         Accept: "application/json",
       },
       timeout: secondsToMilliseconds(10),
     });
+  }
+
+  async #getAccessToken() {
+    return this.#caching.caching(this.#axiosConfig.clientId, () =>
+      this.#retryStrategy.apply(() =>
+        this.#tokenLimiter.schedule(() => {
+          return createAxiosInstance(logger)
+            .post(
+              "https://auth.insee.net/auth/realms/apim-gravitee/protocol/openid-connect/token?",
+              querystring.stringify({
+                grant_type: "password",
+                client_id: this.#axiosConfig.clientId,
+                client_secret: this.#axiosConfig.clientSecret,
+                username: this.#axiosConfig.username,
+                password: this.#axiosConfig.password,
+              }),
+              {
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                timeout: secondsToMilliseconds(10),
+              },
+            )
+            .then((response) => {
+              return response.data;
+            })
+            .catch((error) => {
+              logger.error({
+                error,
+                message: "Raw error getting access token",
+              });
+              if (isRetryableError(logger, error))
+                throw new RetryableError(error);
+              throw error;
+            });
+        }),
+      ),
+    );
   }
 
   #createSiretQueryParams(

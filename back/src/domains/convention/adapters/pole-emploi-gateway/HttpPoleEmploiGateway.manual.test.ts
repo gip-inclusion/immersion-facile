@@ -4,6 +4,7 @@ import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   AccessTokenConfig,
+  AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
@@ -13,7 +14,6 @@ import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGat
 import {
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
-  PoleEmploiGetAccessTokenResponse,
   isBroadcastResponseOk,
 } from "../../ports/PoleEmploiGateway";
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
@@ -138,11 +138,10 @@ describe("HttpPoleEmploiGateway", () => {
       skipResponseValidation: true,
     });
 
-    const cachingGateway =
-      new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
-        new RealTimeGateway(),
-        "expires_in",
-      );
+    const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
+      new RealTimeGateway(),
+      "expires_in",
+    );
 
     const accessTokenConfig: AccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
@@ -192,11 +191,10 @@ describe("HttpPoleEmploiGateway", () => {
       skipResponseValidation: true,
     });
 
-    const cachingGateway =
-      new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
-        new RealTimeGateway(),
-        "expires_in",
-      );
+    const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
+      new RealTimeGateway(),
+      "expires_in",
+    );
 
     const accessTokenConfig: AccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
@@ -242,11 +240,10 @@ describe("HttpPoleEmploiGateway", () => {
 });
 
 const config = AppConfig.createFromEnv();
-const cachingGateway =
-  new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
-    new RealTimeGateway(),
-    "expires_in",
-  );
+const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
+  new RealTimeGateway(),
+  "expires_in",
+);
 
 const peConvention: PoleEmploiConvention = {
   activitesObservees: "Tenir une conversation client",

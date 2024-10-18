@@ -32,6 +32,11 @@ export type InseeAccessTokenConfig = {
   password: string;
 };
 
+export type AccessTokenResponse = {
+  access_token: string;
+  expires_in: number;
+};
+
 export type OAuthConfig = {
   clientId: string;
   clientSecret: string;

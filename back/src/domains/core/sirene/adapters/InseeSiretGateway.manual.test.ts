@@ -1,5 +1,10 @@
+import { subMonths } from "date-fns";
 import { expectObjectsToMatch, expectToEqual } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import {
+  AccessTokenResponse,
+  AppConfig,
+} from "../../../../config/bootstrap/appConfig";
+import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import { InseeSiretGateway } from "./InseeSiretGateway";
@@ -20,6 +25,10 @@ describe("HttpSirenGateway", () => {
       config.inseeHttpConfig,
       new RealTimeGateway(),
       noRetries,
+      new InMemoryCachingGateway<AccessTokenResponse>(
+        new RealTimeGateway(),
+        "expires_in",
+      ),
     );
   });
 
@@ -38,8 +47,9 @@ describe("HttpSirenGateway", () => {
   });
 
   it("returns establishments updated since a date", async () => {
-    const fromDate = new Date("2023-05-20");
-    const toDate = new Date("2023-06-20");
+    const now = new Date();
+    const fromDate = subMonths(now, 10);
+    const toDate = now;
 
     const testSiret = "32085382300013";
     // prettier-ignore
@@ -65,7 +75,7 @@ describe("HttpSirenGateway", () => {
           code: "1101Z",
           nomenclature: "NAFRev2",
         },
-        numberEmployeesRange: "20-49",
+        numberEmployeesRange: "10-19",
       },
     });
   });
