@@ -5,7 +5,6 @@ import {
   AgencyWithUsersRights,
 } from "../domains/agency/ports/AgencyRepository";
 import { makeProvider } from "../domains/core/authentication/inclusion-connect/port/OAuthGateway";
-import { getUsersByIds } from "../domains/core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 
 export const toAgencyWithRights = (
@@ -43,15 +42,21 @@ export const agencyWithRightToAgencyDto = async (
   { usersRights, ...rest }: AgencyWithUsersRights,
 ): Promise<AgencyDto> => {
   const provider = await makeProvider(uow);
-  const counsellorUsers = await getUsersByIds(
-    uow.userRepository,
-    provider,
-    userIdWithRole(usersRights, "counsellor"),
+  const counsellorUsers = await Promise.all(
+    userIdWithRole(usersRights, "counsellor").map((id) =>
+      uow.userRepository.getById(id, provider).then((user) => {
+        if (!user) throw errors.user.notFound({ userId: id });
+        return user;
+      }),
+    ),
   );
-  const validatorUsers = await getUsersByIds(
-    uow.userRepository,
-    provider,
-    userIdWithRole(usersRights, "validator"),
+  const validatorUsers = await Promise.all(
+    userIdWithRole(usersRights, "validator").map((id) =>
+      uow.userRepository.getById(id, provider).then((user) => {
+        if (!user) throw errors.user.notFound({ userId: id });
+        return user;
+      }),
+    ),
   );
   return {
     ...rest,
