@@ -62,7 +62,7 @@ const activeMarkerIcon = L.icon({
 });
 
 export const getIconMarker = (
-  activeMarkerKey: string | null,
+  activeMarkerKey: string | undefined | null,
   searchResult: SearchResultDto,
   key: string,
 ) => {
