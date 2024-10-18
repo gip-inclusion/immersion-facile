@@ -1,5 +1,4 @@
 import {
-  AgencyDto,
   ConventionDto,
   ConventionDtoBuilder,
   errors,
@@ -11,6 +10,7 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -26,7 +26,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let notifyLastSignee: NotifyLastSigneeThatConventionHasBeenSigned;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
-  let agency: AgencyDto;
+  let agency: AgencyWithUsersRights;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {

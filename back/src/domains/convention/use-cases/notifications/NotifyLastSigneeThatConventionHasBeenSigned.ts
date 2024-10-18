@@ -1,5 +1,4 @@
 import {
-  AgencyDto,
   ConventionDto,
   Signatory,
   SignatoryRole,
@@ -10,6 +9,7 @@ import {
   withConventionSchema,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -63,7 +63,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
   #emailToSend(
     convention: ConventionDto,
     lastSignee: { signedAt: string; email: string; role: SignatoryRole },
-    agency: AgencyDto,
+    agency: AgencyWithUsersRights,
   ): TemplatedEmail {
     const conventionStatusLink = this.#generateConventionMagicLinkUrl({
       targetRoute: frontRoutes.conventionStatusDashboard,
@@ -110,7 +110,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
   async #onRepositoryConvention(
     uow: UnitOfWork,
     convention: ConventionDto,
-    agency: AgencyDto,
+    agency: AgencyWithUsersRights,
   ): Promise<void> {
     const lastSigneeEmail = this.#lastSigneeEmail(
       Object.values(convention.signatories),
