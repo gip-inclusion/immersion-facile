@@ -1,13 +1,12 @@
 import {
   AgencyDtoBuilder,
-  ConventionDto,
   ConventionDtoBuilder,
-  ShortLinkId,
   errors,
   expectPromiseToFailWithError,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -58,16 +57,21 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
   });
 
   describe("Right paths", () => {
+    const agency = new AgencyDtoBuilder().build();
+    const shortLinks = ["shortLink1", "shortLink2", "shortLink3", "shortLink4"];
+
+    beforeEach(() => {
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      shortLinkGenerator.addMoreShortLinkIds(shortLinks);
+    });
+
     it("Convention with minimal signatories", async () => {
       const justification = "justif";
-      const { convention, agency, shortLinks } = prepareScenario(
-        uow,
-        shortLinkGenerator,
-        new ConventionDtoBuilder()
-          .withStatusJustification(justification)
-          .build(),
-        ["shortLink1", "shortLink2"],
-      );
+      const convention = new ConventionDtoBuilder()
+        .withAgencyId(agency.id)
+        .withStatusJustification(justification)
+        .build();
+      uow.conventionRepository.setConventions([convention]);
 
       await useCase.execute({ convention });
 
@@ -116,12 +120,10 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
     });
 
     it("Convention without justification", async () => {
-      const { convention, agency, shortLinks } = prepareScenario(
-        uow,
-        shortLinkGenerator,
-        new ConventionDtoBuilder().build(),
-        ["shortLink1", "shortLink2"],
-      );
+      const convention = new ConventionDtoBuilder()
+        .withAgencyId(agency.id)
+        .build();
+      uow.conventionRepository.setConventions([convention]);
 
       await useCase.execute({ convention });
 
@@ -171,33 +173,29 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
     it("Convention with all signatories", async () => {
       const justification = "justif";
-
-      const { convention, agency, shortLinks } = prepareScenario(
-        uow,
-        shortLinkGenerator,
-        new ConventionDtoBuilder()
-          .withStatusJustification(justification)
-          .withBeneficiaryRepresentative({
-            firstName: "benef rep first name",
-            lastName: "benef rep last name",
-            email: "benefrep@email.com",
-            phone: "0600558877",
-            role: "beneficiary-representative",
-          })
-          .withBeneficiaryCurrentEmployer({
-            firstName: "benef cur emp first name",
-            lastName: "benef cur emp last name",
-            email: "benefcuremp@email.com",
-            phone: "0600777777",
-            businessAddress: "13 rue de la soif, 60666 Quimper",
-            businessName: "Merguez Corp",
-            businessSiret: "77884455998877",
-            job: "Lanceur de guezmer",
-            role: "beneficiary-current-employer",
-          })
-          .build(),
-        ["shortLink1", "shortLink2", "shortLink3", "shortLink4"],
-      );
+      const convention = new ConventionDtoBuilder()
+        .withAgencyId(agency.id)
+        .withStatusJustification(justification)
+        .withBeneficiaryRepresentative({
+          firstName: "benef rep first name",
+          lastName: "benef rep last name",
+          email: "benefrep@email.com",
+          phone: "0600558877",
+          role: "beneficiary-representative",
+        })
+        .withBeneficiaryCurrentEmployer({
+          firstName: "benef cur emp first name",
+          lastName: "benef cur emp last name",
+          email: "benefcuremp@email.com",
+          phone: "0600777777",
+          businessAddress: "13 rue de la soif, 60666 Quimper",
+          businessName: "Merguez Corp",
+          businessSiret: "77884455998877",
+          job: "Lanceur de guezmer",
+          role: "beneficiary-current-employer",
+        })
+        .build();
+      uow.conventionRepository.setConventions([convention]);
 
       await useCase.execute({ convention });
 
@@ -298,7 +296,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
   describe("Wrong paths", () => {
     it("Convention missing", async () => {
       const convention = new ConventionDtoBuilder().build();
-      uow.agencyRepository.setAgencies([new AgencyDtoBuilder().build()]);
+      uow.agencyRepository.setAgencies([
+        toAgencyWithRights(new AgencyDtoBuilder().build()),
+      ]);
 
       await expectPromiseToFailWithError(
         useCase.execute({ convention }),
@@ -324,19 +324,3 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
     });
   });
 });
-
-const prepareScenario = (
-  uow: InMemoryUnitOfWork,
-  shortLinkGenerator: DeterministShortLinkIdGeneratorGateway,
-  convention: ConventionDto,
-  shortLinks: ShortLinkId[],
-) => {
-  const agency = new AgencyDtoBuilder().build();
-
-  uow.agencyRepository.setAgencies([agency]);
-  uow.conventionRepository.setConventions([
-    new ConventionDtoBuilder(convention).withAgencyId(agency.id).build(),
-  ]);
-  shortLinkGenerator.addMoreShortLinkIds(shortLinks);
-  return { convention, agency, shortLinks };
-};
