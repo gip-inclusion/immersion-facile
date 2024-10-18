@@ -10,7 +10,7 @@ import {
   errors,
   statusTransitionConfigs,
 } from "shared";
-import { agencyWithRightToAgencyDto } from "../../../utils/agency";
+import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfTransitionNotAllowed = ({
@@ -60,7 +60,7 @@ export async function retrieveConventionWithAgency(
   uow: UnitOfWork,
   conventionInPayload: ConventionDto,
 ): Promise<{
-  agency: AgencyDto;
+  agency: AgencyWithUsersRights;
   convention: ConventionReadDto;
 }> {
   const convention = await uow.conventionQueries.getConventionById(
@@ -74,7 +74,7 @@ export async function retrieveConventionWithAgency(
   if (!agency) throw errors.agency.notFound({ agencyId: convention.agencyId });
 
   return {
-    agency: await agencyWithRightToAgencyDto(uow, agency),
+    agency,
     convention,
   };
 }
