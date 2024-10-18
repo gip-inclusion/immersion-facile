@@ -12,7 +12,7 @@ export type FormFieldsObjectForContent<T> = Record<
   FormFieldAttributesForContent
 >;
 
-type Error = Record<string, any>;
+type AnyErrors = Record<string, any>;
 
 export const getFormContents = <T>(
   formFieldsLabels: FormFieldsObjectForContent<T>,
@@ -107,8 +107,8 @@ const isErrorAddressError = (error: unknown) => {
   );
 };
 
-export const formErrorsToFlatErrors = (obj: Error): Error => {
-  const errorObj: Error = {};
+export const formErrorsToFlatErrors = (obj: AnyErrors): AnyErrors => {
+  const errorObj: AnyErrors = {};
   for (const key in obj) {
     if (key in obj) {
       if (typeof obj[key] === "object" && "message" in obj[key]) {
@@ -126,7 +126,7 @@ export const formErrorsToFlatErrors = (obj: Error): Error => {
 const doesSplittedKeyContainsIndex = (splittedKey: string[]) =>
   splittedKey.length > 1 && !Number.isNaN(Number(splittedKey[1]));
 
-const replaceArrayPath = (flatErrorsObject: Error) =>
+const replaceArrayPath = (flatErrorsObject: AnyErrors) =>
   keys(flatErrorsObject).reduce((acc, dotNestedKey) => {
     const separator = ".";
     const keySplitted = dotNestedKey.split(separator);
@@ -139,7 +139,7 @@ const replaceArrayPath = (flatErrorsObject: Error) =>
     };
   }, {});
 
-export const displayReadableError = (errors: Error): Error =>
+export const displayReadableError = (errors: AnyErrors): AnyErrors =>
   replaceArrayPath(toDotNotation(formErrorsToFlatErrors(errors)));
 
 export const toErrorsWithLabels = ({
@@ -147,7 +147,7 @@ export const toErrorsWithLabels = ({
   errors,
 }: {
   labels: Record<string, string>;
-  errors: Error;
+  errors: AnyErrors;
 }): ErrorNotificationsProps["errorsWithLabels"] =>
   keys(errors).map((error) => ({
     error: {
