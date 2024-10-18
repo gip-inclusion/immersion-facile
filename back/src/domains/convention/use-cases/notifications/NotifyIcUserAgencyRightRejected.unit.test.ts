@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
-  InclusionConnectedUser,
   User,
   errors,
   expectPromiseToFailWithError,
 } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -28,15 +28,6 @@ const user: User = {
   lastName: "Lennon",
   externalId: "john-external-id",
   createdAt: new Date().toISOString(),
-};
-
-const icUser: InclusionConnectedUser = {
-  ...user,
-  agencyRights: [],
-  dashboards: {
-    agencies: {},
-    establishments: {},
-  },
 };
 
 describe("Notify icUser agency right rejected", () => {
@@ -70,35 +61,35 @@ describe("Notify icUser agency right rejected", () => {
       notifyIcUserAgencyRightRejected.execute({
         agencyId: agency.id,
         justification: "osef",
-        userId: icUser.id,
+        userId: user.id,
       }),
       errors.agency.notFound({ agencyId: agency.id }),
     );
   });
 
   it("Throw when no icUser were found", async () => {
-    uow.agencyRepository.setAgencies([agency]);
+    uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
     await expectPromiseToFailWithError(
       notifyIcUserAgencyRightRejected.execute({
         agencyId: agency.id,
         justification: "osef",
-        userId: icUser.id,
+        userId: user.id,
       }),
       errors.user.notFound({
-        userId: icUser.id,
+        userId: user.id,
       }),
     );
   });
 
   it("Send an email to icUser to notify that registration to agency was rejected", async () => {
-    uow.agencyRepository.setAgencies([agency]);
-    uow.userRepository.setInclusionConnectedUsers([icUser]);
+    uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+    uow.userRepository.users = [user];
 
     await notifyIcUserAgencyRightRejected.execute({
       agencyId: agency.id,
       justification: "osef",
-      userId: icUser.id,
+      userId: user.id,
     });
 
     expectSavedNotificationsAndEvents({
@@ -106,7 +97,7 @@ describe("Notify icUser agency right rejected", () => {
         {
           kind: "IC_USER_REGISTRATION_TO_AGENCY_REJECTED",
           params: { agencyName: agency.name, justification: "osef" },
-          recipients: [icUser.email],
+          recipients: [user.email],
         },
       ],
     });
