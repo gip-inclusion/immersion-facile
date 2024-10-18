@@ -48,11 +48,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
     const currentUser = await uow.userRepository.getById(userId, provider);
     if (!currentUser) throw errors.user.notFound({ userId });
 
-    const icCurrentUser = await getIcUserByUserId(
-      uow,
-      provider,
-      currentUser.id,
-    );
+    const icCurrentUser = await getIcUserByUserId(uow, currentUser.id);
     const userAgencyRights = icCurrentUser.agencyRights.find(
       (agencyRight) =>
         agencyRight.agency.id === conventionToMarkAsHandled.agencyId,

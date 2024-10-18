@@ -13,7 +13,6 @@ import {
 } from "../../../utils/agency";
 import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserAuthenticatedPayload } from "../../core/events/events";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
@@ -32,8 +31,7 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<void> {
     if (!codeSafir) return;
-    const provider = await makeProvider(uow);
-    const user = await getIcUserByUserId(uow, provider, userId);
+    const user = await getIcUserByUserId(uow, userId);
     if (isIcUserAlreadyHasValidRight(user, codeSafir)) return;
 
     const agencyWithSafir = await uow.agencyRepository.getBySafir(codeSafir);
