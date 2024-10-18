@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { addDays, differenceInDays } from "date-fns";
+import { addDays, differenceInCalendarDays, differenceInDays } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
@@ -52,9 +52,12 @@ export const ScheduleSection = () => {
 
   const getFieldError = makeFieldError(formState);
 
-  const shouldUpdateDateAndSchedule = (dateStart: string, dateEnd: string) =>
-    differenceInDays(new Date(dateEnd), new Date(dateStart)) <=
-    maximumCalendarDayByInternshipKind[values.internshipKind];
+  const shouldUpdateDateAndSchedule = (dateStart: Date, dateEnd: Date) => {
+    return (
+      differenceInCalendarDays(dateEnd, dateStart) <=
+      maximumCalendarDayByInternshipKind[values.internshipKind]
+    );
+  };
 
   const [dateStartInputValue, setDateStartInputValue] = useState<string>(
     values.dateStart,
@@ -86,12 +89,7 @@ export const ScheduleSection = () => {
           newDates.start = newDates.end;
       }
 
-      if (
-        !shouldUpdateDateAndSchedule(
-          newDates.start.toISOString(),
-          newDates.end.toISOString(),
-        )
-      ) {
+      if (!shouldUpdateDateAndSchedule(newDates.start, newDates.end)) {
         alert(
           `Attention, votre ${
             values.internshipKind === "immersion" ? "immersion" : "stage"
