@@ -1,11 +1,12 @@
 import {
-  AgencyDto,
   AgencyDtoBuilder,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDtoBuilder,
+  EmailNotification,
+  InclusionConnectedUserBuilder,
 } from "shared";
-import { EmailNotification } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { expectNotifyConventionRejected } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
@@ -16,88 +17,94 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyAllActorsThatConventionIsRejected } from "./NotifyAllActorsThatConventionIsRejected";
-const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "beneficiary-representative",
-  email: "legal@representative.com",
-  firstName: "The",
-  lastName: "Representative",
-  phone: "+33112233445",
-};
-
-const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
-  firstName: "ali",
-  lastName: "baba",
-  businessName: "business",
-  businessSiret: "01234567890123",
-  email: "beneficiary-current-employer@gmail.com",
-  job: "job",
-  phone: "+33112233445",
-  role: "beneficiary-current-employer",
-  signedAt: new Date().toISOString(),
-  businessAddress: "Rue des Bouchers 67065 Strasbourg",
-};
-const rejectedConvention = new ConventionDtoBuilder()
-  .withStatus("REJECTED")
-  .withBeneficiaryRepresentative(beneficiaryRepresentative)
-  .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-  .withStatusJustification("test-rejection-justification")
-  .build();
-
-const rejectedConventionWithDuplicatedEmails = new ConventionDtoBuilder()
-  .withStatus("REJECTED")
-  .withAgencyId("fakeAgencyId")
-  .withBeneficiaryRepresentative(beneficiaryRepresentative)
-  .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-  .withStatusJustification("test-rejection-justification")
-  .withEstablishmentRepresentativeEmail(
-    "establishment-representative@gmail.com",
-  )
-  .withEstablishmentTutorEmail("establishment-representative@gmail.com")
-  .build();
-
-const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
-const signature = "test-signature";
-
-const defaultAgency = AgencyDtoBuilder.create(rejectedConvention.agencyId)
-  .withName("test-agency-name")
-  .withCounsellorEmails(counsellorEmails)
-  .withSignature(signature)
-  .build();
-
-const agencyWithSameEmailAdressForCounsellorAndValidator =
-  AgencyDtoBuilder.create(rejectedConventionWithDuplicatedEmails.agencyId)
-    .withName("duplicated-email-test-agency-name")
-    .withCounsellorEmails(counsellorEmails)
-    .withValidatorEmails(counsellorEmails)
-    .withSignature(signature)
-    .build();
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
-  let agency: AgencyDto;
+  const beneficiaryRepresentative: BeneficiaryRepresentative = {
+    role: "beneficiary-representative",
+    email: "legal@representative.com",
+    firstName: "The",
+    lastName: "Representative",
+    phone: "+33112233445",
+  };
+
+  const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
+    firstName: "ali",
+    lastName: "baba",
+    businessName: "business",
+    businessSiret: "01234567890123",
+    email: "beneficiary-current-employer@gmail.com",
+    job: "job",
+    phone: "+33112233445",
+    role: "beneficiary-current-employer",
+    signedAt: new Date().toISOString(),
+    businessAddress: "Rue des Bouchers 67065 Strasbourg",
+  };
+  const rejectedConvention = new ConventionDtoBuilder()
+    .withStatus("REJECTED")
+    .withBeneficiaryRepresentative(beneficiaryRepresentative)
+    .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+    .withStatusJustification("test-rejection-justification")
+    .build();
+
+  const rejectedConventionWithDuplicatedEmails = new ConventionDtoBuilder()
+    .withStatus("REJECTED")
+    .withAgencyId("fakeAgencyId")
+    .withBeneficiaryRepresentative(beneficiaryRepresentative)
+    .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+    .withStatusJustification("test-rejection-justification")
+    .withEstablishmentRepresentativeEmail(
+      "establishment-representative@gmail.com",
+    )
+    .withEstablishmentTutorEmail("establishment-representative@gmail.com")
+    .build();
+
+  const counsellor1 = new InclusionConnectedUserBuilder()
+    .withId("counsellor1")
+    .withEmail("counsellor1@email.fr")
+    .buildUser();
+  const counsellor2 = new InclusionConnectedUserBuilder()
+    .withId("counsellor2")
+    .withEmail("counsellor2@email.fr")
+    .buildUser();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator1")
+    .withEmail("validator1@email.fr")
+    .buildUser();
+  const signature = "test-signature";
 
   let useCase: NotifyAllActorsThatConventionIsRejected;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    agency = defaultAgency;
-
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([agency]);
-
-    const timeGateway = new CustomTimeGateway();
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
-
     useCase = new NotifyAllActorsThatConventionIsRejected(
       new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
+      makeSaveNotificationAndRelatedEvent(
+        new UuidV4Generator(),
+        new CustomTimeGateway(),
+      ),
     );
+
+    uow.userRepository.users = [counsellor1, counsellor2, validator];
   });
 
-  it("Sends rejection email to  beneficiary, establishment tutor, and counsellors, validor, beneficiary Representativ and beneficiary current employer", async () => {
+  it("Sends rejection email to  beneficiary, establishment tutor, and counsellors, validor, beneficiary Representative and beneficiary current employer", async () => {
+    const agency = toAgencyWithRights(
+      AgencyDtoBuilder.create(rejectedConvention.agencyId)
+        .withName("test-agency-name")
+        .withCounsellorEmails([])
+        .withValidatorEmails([])
+        .withSignature(signature)
+        .build(),
+      {
+        [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
+    );
+
+    uow.agencyRepository.setAgencies([agency]);
+
     await useCase.execute({ convention: rejectedConvention });
 
     const templatedEmailsSent = uow.notificationRepository.notifications
@@ -109,6 +116,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
       beneficiaryCurrentEmployer,
       beneficiaryRepresentative,
     } = rejectedConvention.signatories;
+
     expect(templatedEmailsSent).toHaveLength(1);
 
     expectNotifyConventionRejected(
@@ -120,8 +128,9 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
         beneficiaryRepresentative!.email,
         // biome-ignore lint/style/noNonNullAssertion:
         beneficiaryCurrentEmployer!.email,
-        ...counsellorEmails,
-        ...agency.validatorEmails,
+        counsellor1.email,
+        counsellor2.email,
+        validator.email,
       ],
       rejectedConvention,
       agency,
@@ -129,6 +138,27 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
   });
 
   it("doesn't send duplicated rejection emails if validator email is also in counsellor emails and establishment tutor email is the same as establishment representative", async () => {
+    const agencyWithSameEmailAdressForCounsellorAndValidator =
+      toAgencyWithRights(
+        AgencyDtoBuilder.create(rejectedConventionWithDuplicatedEmails.agencyId)
+          .withName("duplicated-email-test-agency-name")
+          .withCounsellorEmails([])
+          .withValidatorEmails([])
+          .withSignature(signature)
+          .build(),
+        {
+          [counsellor1.id]: {
+            isNotifiedByEmail: false,
+            roles: ["counsellor", "validator"],
+          },
+          [counsellor2.id]: {
+            isNotifiedByEmail: false,
+            roles: ["counsellor", "validator"],
+          },
+          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
+      );
+
     uow.agencyRepository.setAgencies([
       agencyWithSameEmailAdressForCounsellorAndValidator,
     ]);
@@ -159,7 +189,9 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
         beneficiaryRepresentative!.email,
         // biome-ignore lint/style/noNonNullAssertion:
         beneficiaryCurrentEmployer!.email,
-        ...agencyWithSameEmailAdressForCounsellorAndValidator.validatorEmails,
+        counsellor1.email,
+        counsellor2.email,
+        validator.email,
       ],
       rejectedConventionWithDuplicatedEmails,
       agencyWithSameEmailAdressForCounsellorAndValidator,
