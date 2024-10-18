@@ -291,6 +291,9 @@ importers:
       '@types/jest':
         specifier: ^29.5.2
         version: 29.5.2
+      '@types/leaflet':
+        specifier: ^1.9.12
+        version: 1.9.12
       '@types/node':
         specifier: ^20.15.0
         version: 20.15.0
@@ -341,13 +344,16 @@ importers:
         version: 8.10.0(eslint@8.57.1)
       eslint-plugin-jest:
         specifier: ^28.8.3
-        version: 28.8.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.5.0(@types/node@20.15.0))(typescript@5.6.2)
+        version: 28.8.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.5.0)(typescript@5.6.2)
       html-templates:
         specifier: workspace:*
         version: link:../libs/html-templates
       jest:
         specifier: ^29.5.0
-        version: 29.5.0(@types/node@20.15.0)
+        version: 29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
+      leaflet:
+        specifier: ^1.9.4
+        version: 1.9.4
       openapi-types:
         specifier: ^12.1.3
         version: 12.1.3
@@ -378,6 +384,9 @@ importers:
       react-hook-form:
         specifier: ^7.42.1
         version: 7.42.1(react@18.2.0)
+      react-leaflet:
+        specifier: ^4.2.1
+        version: 4.2.1(leaflet@1.9.4)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-redux:
         specifier: ^7.2.8
         version: 7.2.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -668,7 +677,7 @@ importers:
         version: link:../libs/html-templates
       jest:
         specifier: ^29.5.0
-        version: 29.5.0(@types/node@20.15.0)
+        version: 29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
       js-base64:
         specifier: ^3.7.3
         version: 3.7.4
@@ -2970,6 +2979,13 @@ packages:
   '@popperjs/core@2.11.6':
     resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
 
+  '@react-leaflet/core@2.1.0':
+    resolution: {integrity: sha512-Qk7Pfu8BSarKGqILj4x7bCSZ1pjuAPZ+qmRwH5S7mDS91VSbVVsJSrW4qA+GPrro8t69gFYVMWb1Zc4yFmPiVg==}
+    peerDependencies:
+      leaflet: ^1.9.0
+      react: ^18.0.0
+      react-dom: ^18.0.0
+
   '@reduxjs/toolkit@1.8.1':
     resolution: {integrity: sha512-Q6mzbTpO9nOYRnkwpDlFOAbQnd3g7zj7CtHAZWz5SzE5lcV97Tf8f3SzOO8BoPOMYBFgfZaqTUZqgGu+a0+Fng==}
     peerDependencies:
@@ -3720,6 +3736,9 @@ packages:
 
   '@types/jsonwebtoken@9.0.2':
     resolution: {integrity: sha512-drE6uz7QBKq1fYqqoFKTDRdFCPHd5TCub75BM+D+cMx7NU9hUz7SESLfC2fSCXVFMO5Yj8sOWHuGqPgjc+fz0Q==}
+
+  '@types/leaflet@1.9.12':
+    resolution: {integrity: sha512-BK7XS+NyRI291HIo0HCfE18Lp8oA30H1gpi1tf0mF3TgiCEzanQjOqNZ4x126SXzzi2oNSZhZ5axJp1k0iM6jg==}
 
   '@types/lodash@4.14.191':
     resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
@@ -6398,6 +6417,9 @@ packages:
     resolution: {integrity: sha512-aXpZJRnTkpK6gQ/z4nk+ZBLd/Qdp118cvPruLSIQzQNRhKwEcdXCOzXuF55VDqIiuAaY3UGZ10DJtvZzDcvsxg==}
     engines: {node: '>=14.0.0'}
 
+  leaflet@1.9.4:
+    resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
+
   leven@2.1.0:
     resolution: {integrity: sha512-nvVPLpIHUxCUoRLrFqTgSxXJ614d8AgQoWl7zPe/2VadE8+1dpU3LBhowRuBAcuwruWtOdD8oYC9jDNJjXDPyA==}
     engines: {node: '>=0.10.0'}
@@ -7551,6 +7573,13 @@ packages:
 
   react-is@18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
+
+  react-leaflet@4.2.1:
+    resolution: {integrity: sha512-p9chkvhcKrWn/H/1FFeVSqLdReGwn2qmiobOQGO3BifX+/vV/39qhY8dGqbdcPh1e6jxh/QHriLXr7a4eLFK4Q==}
+    peerDependencies:
+      leaflet: ^1.9.0
+      react: ^18.0.0
+      react-dom: ^18.0.0
 
   react-lifecycles-compat@3.0.4:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
@@ -12803,6 +12832,12 @@ snapshots:
 
   '@popperjs/core@2.11.6': {}
 
+  '@react-leaflet/core@2.1.0(leaflet@1.9.4)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      leaflet: 1.9.4
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+
   '@reduxjs/toolkit@1.8.1(react-redux@7.2.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react@18.2.0)':
     dependencies:
       immer: 9.0.14
@@ -14410,6 +14445,10 @@ snapshots:
   '@types/jsonwebtoken@9.0.2':
     dependencies:
       '@types/node': 20.15.0
+
+  '@types/leaflet@1.9.12':
+    dependencies:
+      '@types/geojson': 7946.0.10
 
   '@types/lodash@4.14.191': {}
 
@@ -16212,24 +16251,13 @@ snapshots:
     dependencies:
       eslint: 8.57.1
 
-  eslint-plugin-jest@28.8.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.5.0(@types/node@20.15.0))(typescript@5.6.2):
-    dependencies:
-      '@typescript-eslint/utils': 6.12.0(eslint@8.57.1)(typescript@5.6.2)
-      eslint: 8.57.1
-    optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
-      jest: 29.5.0(@types/node@20.15.0)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
   eslint-plugin-jest@28.8.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.5.0)(typescript@5.6.2):
     dependencies:
       '@typescript-eslint/utils': 6.12.0(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
-      jest: 29.5.0
+      jest: 29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -17293,25 +17321,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  jest-cli@29.5.0(@types/node@20.15.0):
-    dependencies:
-      '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
-      '@jest/test-result': 29.5.0
-      '@jest/types': 29.5.0
-      chalk: 4.1.2
-      exit: 0.1.2
-      graceful-fs: 4.2.11
-      import-local: 3.1.0
-      jest-config: 29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
-      jest-util: 29.5.0
-      jest-validate: 29.5.0
-      prompts: 2.4.2
-      yargs: 17.7.2
-    transitivePeerDependencies:
-      - '@types/node'
-      - supports-color
-      - ts-node
-
   jest-cli@29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2)):
     dependencies:
       '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
@@ -17600,29 +17609,6 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jest@29.5.0:
-    dependencies:
-      '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
-      '@jest/types': 29.5.0
-      import-local: 3.1.0
-      jest-cli: 29.5.0(@types/node@20.15.0)
-    transitivePeerDependencies:
-      - '@types/node'
-      - supports-color
-      - ts-node
-    optional: true
-
-  jest@29.5.0(@types/node@20.15.0):
-    dependencies:
-      '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
-      '@jest/types': 29.5.0
-      import-local: 3.1.0
-      jest-cli: 29.5.0(@types/node@20.15.0)
-    transitivePeerDependencies:
-      - '@types/node'
-      - supports-color
-      - ts-node
-
   jest@29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2)):
     dependencies:
       '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
@@ -17829,6 +17815,8 @@ snapshots:
       app-root-dir: 1.0.2
       dotenv: 16.0.3
       dotenv-expand: 10.0.0
+
+  leaflet@1.9.4: {}
 
   leven@2.1.0: {}
 
@@ -19137,6 +19125,13 @@ snapshots:
   react-is@18.1.0: {}
 
   react-is@18.2.0: {}
+
+  react-leaflet@4.2.1(leaflet@1.9.4)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+    dependencies:
+      '@react-leaflet/core': 2.1.0(leaflet@1.9.4)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      leaflet: 1.9.4
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
 
   react-lifecycles-compat@3.0.4: {}
 

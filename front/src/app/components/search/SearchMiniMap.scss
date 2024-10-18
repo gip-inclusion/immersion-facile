@@ -1,0 +1,53 @@
+@import "react-design-system/src/config/responsive";
+
+
+.search-map-results {
+  display: none;
+  overflow: hidden;
+  background-image: linear-gradient(0deg, var(--border-default-grey), var(--border-default-grey)), linear-gradient(0deg, var(--border-default-grey), var(--border-default-grey)), linear-gradient(0deg, var(--border-default-grey), var(--border-default-grey)), linear-gradient(0deg, var(--border-default-grey), var(--border-default-grey));
+  @include for-screen-min($bp-lg) {
+    display: block;
+  }
+  &__map {
+    height: 42vh;
+    min-height: 386px;
+  }
+
+  .leaflet-control-zoom [href] {
+    background-image: none;
+  }
+  .leaflet-popup {
+    z-index: 9999;
+  }
+  .leaflet-popup-content {
+    margin: 0;
+    .fr-card {
+      background-image: none !important;
+      width: 100%;
+      height: auto;
+      &__end {
+        margin-bottom: auto !important;
+      }
+      &__content {
+        padding: 1rem !important;
+      }
+      &__detail {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      &__title {
+        a:after {
+          bottom: 1rem !important;
+        }
+      }
+    }
+    
+  }
+  .leaflet-popup-content-wrapper {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .leaflet-popup-close-button {
+    z-index: 9999;
+  }
+}
