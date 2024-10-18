@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
-  InclusionConnectedUser,
-  UserParamsForAgency,
+  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
 } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -19,151 +19,165 @@ import {
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyIcUserAgencyRightChanged } from "./NotifyIcUserAgencyRightChanged";
 
-const icUserRoleParams: UserParamsForAgency = {
-  roles: ["counsellor"],
-  agencyId: "agency-1",
-  userId: "jbab-123",
-  isNotifiedByEmail: false,
-  email: "icUserRoleParams@email.fr",
-};
-
 describe("SendEmailWhenAgencyIsActivated", () => {
+  const user = new InclusionConnectedUserBuilder()
+    .withEmail("user@email.fr")
+    .withId("jbab-123")
+    .buildUser();
+  const agency = new AgencyDtoBuilder()
+    .withId("agency-1")
+    .withName("Agence de limoges")
+    .build();
+
   let uow: InMemoryUnitOfWork;
-  let uowPerformer: InMemoryUowPerformer;
   let notifyIcUserAgencyRightChanged: NotifyIcUserAgencyRightChanged;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uowPerformer = new InMemoryUowPerformer(uow);
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
     );
 
-    const timeGateway = new CustomTimeGateway();
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
     notifyIcUserAgencyRightChanged = new NotifyIcUserAgencyRightChanged(
-      uowPerformer,
-      saveNotificationAndRelatedEvent,
+      new InMemoryUowPerformer(uow),
+      makeSaveNotificationAndRelatedEvent(
+        new UuidV4Generator(),
+        new CustomTimeGateway(),
+      ),
     );
   });
 
-  it("throw error when no agency found", async () => {
-    await expectPromiseToFailWithError(
-      notifyIcUserAgencyRightChanged.execute(icUserRoleParams),
-      errors.agency.notFound({ agencyId: icUserRoleParams.agencyId }),
-    );
+  describe("Wrong paths", () => {
+    it("throw error when no agency found", async () => {
+      await expectPromiseToFailWithError(
+        notifyIcUserAgencyRightChanged.execute({
+          agencyId: agency.id,
+          userId: user.id,
+        }),
+        errors.agency.notFound({ agencyId: agency.id }),
+      );
 
-    expectSavedNotificationsAndEvents({
-      emails: [],
+      expectSavedNotificationsAndEvents({
+        emails: [],
+      });
+    });
+
+    it("throw error when no user found", async () => {
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+
+      await expectPromiseToFailWithError(
+        notifyIcUserAgencyRightChanged.execute({
+          agencyId: agency.id,
+          userId: user.id,
+        }),
+        errors.user.notFound({ userId: user.id }),
+      );
+
+      expectSavedNotificationsAndEvents({
+        emails: [],
+      });
+    });
+
+    it("throw error when no user has no rights on agency", async () => {
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.userRepository.users = [user];
+
+      await expectPromiseToFailWithError(
+        notifyIcUserAgencyRightChanged.execute({
+          agencyId: agency.id,
+          userId: user.id,
+        }),
+        errors.user.noRightsOnAgency({ userId: user.id, agencyId: agency.id }),
+      );
+
+      expectSavedNotificationsAndEvents({
+        emails: [],
+      });
     });
   });
 
-  it("throw error when no user found", async () => {
-    const agency = new AgencyDtoBuilder()
-      .withId("agency-1")
-      .withName("Agence de limoges ")
-      .build();
-    uow.agencyRepository.setAgencies([agency]);
-
-    await expectPromiseToFailWithError(
-      notifyIcUserAgencyRightChanged.execute(icUserRoleParams),
-      errors.user.notFound({ userId: icUserRoleParams.userId }),
-    );
-
-    expectSavedNotificationsAndEvents({
-      emails: [],
+  describe("Right paths", () => {
+    beforeEach(() => {
+      uow.userRepository.users = [user];
     });
-  });
 
-  it("Sends an email to validators with agency name", async () => {
-    const agency = new AgencyDtoBuilder()
-      .withId("agency-1")
-      .withName("Agence de limoges")
-      .build();
-    uow.agencyRepository.setAgencies([agency]);
+    it("Sends an email to counsellors with agency name", async () => {
+      uow.agencyRepository.setAgencies([
+        toAgencyWithRights(agency, {
+          [user.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        }),
+      ]);
 
-    const icUser: InclusionConnectedUser = {
-      email: "fake-user@inclusion-connect.fr",
-      firstName: "jean",
-      lastName: "babouche",
-      id: "jbab-123",
-      dashboards: {
-        agencies: { agencyDashboardUrl: "https://placeholder.com/" },
-        establishments: {},
-      },
-      agencyRights: [
-        {
-          roles: ["counsellor"],
-          agency,
-          isNotifiedByEmail: false,
-        },
-      ],
-      externalId: "jean-external-id",
-      createdAt: new Date().toISOString(),
-    };
-    uow.userRepository.setInclusionConnectedUsers([icUser]);
+      await notifyIcUserAgencyRightChanged.execute({
+        agencyId: agency.id,
+        userId: user.id,
+      });
 
-    await notifyIcUserAgencyRightChanged.execute(icUserRoleParams);
-
-    expectSavedNotificationsAndEvents({
-      emails: [
-        {
-          kind: "IC_USER_RIGHTS_HAS_CHANGED",
-          params: {
-            agencyName: agency.name,
-            email: icUser.email,
-            firstName: icUser.firstName,
-            lastName: icUser.lastName,
-            isNotifiedByEmail: false,
-            roles: ["counsellor"],
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "IC_USER_RIGHTS_HAS_CHANGED",
+            params: {
+              agencyName: agency.name,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+            recipients: [user.email],
           },
-          recipients: [icUser.email],
-        },
-      ],
-    });
-  });
-
-  it("Should not sends an email to validators with agency name when the new role is: to review", async () => {
-    const agency = new AgencyDtoBuilder()
-      .withId("agency-1")
-      .withName("Agence de limoges")
-      .build();
-    uow.agencyRepository.setAgencies([agency]);
-
-    const icUser: InclusionConnectedUser = {
-      email: "fake-user@inclusion-connect.fr",
-      firstName: "jean",
-      lastName: "babouche",
-      id: "jbab-123",
-      dashboards: {
-        agencies: { agencyDashboardUrl: "https://placeholder.com/" },
-        establishments: {},
-      },
-      agencyRights: [
-        {
-          roles: ["to-review"],
-          agency,
-          isNotifiedByEmail: false,
-        },
-      ],
-      externalId: "jean-external-id",
-      createdAt: new Date().toISOString(),
-    };
-    uow.userRepository.setInclusionConnectedUsers([icUser]);
-
-    await notifyIcUserAgencyRightChanged.execute({
-      agencyId: "agency-1",
-      userId: icUser.id,
+        ],
+      });
     });
 
-    expectSavedNotificationsAndEvents({
-      emails: [],
+    it("Sends an email to validators with agency name", async () => {
+      uow.agencyRepository.setAgencies([
+        toAgencyWithRights(agency, {
+          [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        }),
+      ]);
+
+      await notifyIcUserAgencyRightChanged.execute({
+        agencyId: agency.id,
+        userId: user.id,
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "IC_USER_RIGHTS_HAS_CHANGED",
+            params: {
+              agencyName: agency.name,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              isNotifiedByEmail: false,
+              roles: ["validator"],
+            },
+            recipients: [user.email],
+          },
+        ],
+      });
+    });
+
+    it("Should not sends an email to validators with agency name when the new role is: to review", async () => {
+      uow.agencyRepository.setAgencies([
+        toAgencyWithRights(agency, {
+          [user.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
+        }),
+      ]);
+
+      await notifyIcUserAgencyRightChanged.execute({
+        agencyId: agency.id,
+        userId: user.id,
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [],
+      });
     });
   });
 });
