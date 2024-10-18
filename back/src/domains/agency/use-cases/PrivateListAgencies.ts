@@ -1,6 +1,5 @@
 import { map } from "ramda";
 import {
-  AgencyDto,
   AgencyOption,
   PrivateListAgenciesRequestDto,
   privateListAgenciesRequestSchema,
@@ -22,10 +21,6 @@ export class PrivateListAgencies extends TransactionalUseCase<
       .getAgencies({
         filters: { status: status && [status] },
       })
-      .then(
-        map(
-          ({ id, name, kind }: AgencyDto): AgencyOption => ({ id, name, kind }),
-        ),
-      );
+      .then(map(({ id, name, kind }): AgencyOption => ({ id, name, kind })));
   }
 }
