@@ -15,6 +15,7 @@ import {
   expectToEqual,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
 import {
   EmailNotificationFilters,
@@ -196,7 +197,7 @@ export const expectNotifyConventionRejected = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
   convention: ConventionDto,
-  agency: AgencyDto,
+  agency: AgencyWithUsersRights,
 ) => {
   expectToEqual(templatedEmail, {
     kind: "REJECTED_CONVENTION_NOTIFICATION",
