@@ -6,7 +6,6 @@ import { createAxiosSharedClient } from "shared-routes/axios";
 import { HttpPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/PoleEmploiRoutes";
-import { PoleEmploiGetAccessTokenResponse } from "../../domains/convention/ports/PoleEmploiGateway";
 import { HttpAddressGateway } from "../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
@@ -68,7 +67,11 @@ import { brevoContactRoutes } from "../../domains/marketing/adapters/establishme
 import { BrevoEstablishmentMarketingGateway } from "../../domains/marketing/adapters/establishmentMarketingGateway/BrevoEstablishmentMarketingGateway";
 import { InMemoryEstablishmentMarketingGateway } from "../../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { createLogger } from "../../utils/logger";
-import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import {
+  AccessTokenResponse,
+  AppConfig,
+  makeEmailAllowListPredicate,
+} from "./appConfig";
 
 const logger = createLogger(__filename);
 
@@ -147,7 +150,7 @@ export const createGateways = async (
           createAxiosHttpClientForExternalAPIs(
             createPoleEmploiRoutes(config.peApiUrl),
           ),
-          new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
+          new InMemoryCachingGateway<AccessTokenResponse>(
             timeGateway,
             "expires_in",
           ),
@@ -267,16 +270,40 @@ export const createGateways = async (
   ) => {
     const gatewayByProvider = {
       HTTPS: () =>
-        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+        new InseeSiretGateway(
+          config.inseeHttpConfig,
+          timeGateway,
+          noRetries,
+          new InMemoryCachingGateway<AccessTokenResponse>(
+            timeGateway,
+            "expires_in",
+          ),
+        ),
       INSEE: () =>
-        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+        new InseeSiretGateway(
+          config.inseeHttpConfig,
+          timeGateway,
+          noRetries,
+          new InMemoryCachingGateway<AccessTokenResponse>(
+            timeGateway,
+            "expires_in",
+          ),
+        ),
       IN_MEMORY: () => new InMemorySiretGateway(),
       ANNUAIRE_DES_ENTREPRISES: () =>
         new AnnuaireDesEntreprisesSiretGateway(
           createAxiosHttpClientForExternalAPIs(
             annuaireDesEntreprisesSiretRoutes,
           ),
-          new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
+          new InseeSiretGateway(
+            config.inseeHttpConfig,
+            timeGateway,
+            noRetries,
+            new InMemoryCachingGateway<AccessTokenResponse>(
+              timeGateway,
+              "expires_in",
+            ),
+          ),
         ),
     };
     return gatewayByProvider[provider]();

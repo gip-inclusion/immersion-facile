@@ -1,7 +1,11 @@
 import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import {
+  AccessTokenResponse,
+  AppConfig,
+} from "../../../../config/bootstrap/appConfig";
+import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import {
@@ -29,6 +33,10 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
         config.inseeHttpConfig,
         new RealTimeGateway(),
         noRetries,
+        new InMemoryCachingGateway<AccessTokenResponse>(
+          new RealTimeGateway(),
+          "expires_in",
+        ),
       ),
     );
   });
