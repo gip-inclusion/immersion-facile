@@ -1,9 +1,11 @@
 import { expectToEqual } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import {
+  AccessTokenResponse,
+  AppConfig,
+} from "../../../../config/bootstrap/appConfig";
 import { createPeFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
-import { PoleEmploiGetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
@@ -28,7 +30,7 @@ describe("HttpLaBonneBoiteGateway", () => {
       createFetchSharedClient(createLbbRoutes(config.peApiUrl), fetch),
       new HttpPoleEmploiGateway(
         peFetchSharedClient,
-        new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
+        new InMemoryCachingGateway<AccessTokenResponse>(
           new RealTimeGateway(),
           "expires_in",
         ),
