@@ -2,7 +2,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
-import { SectionConventionNextSteps } from "../section-convention-next-steps/SectionConventionNextSteps";
 import Styles from "./SubmitConfirmationSection.styles";
 
 export type SubmitConfirmationSectionProps = {
@@ -57,8 +56,6 @@ export const SubmitConfirmationSection = ({
           </Button>
         </div>
       </div>
-
-      <SectionConventionNextSteps />
     </div>
   );
 };
