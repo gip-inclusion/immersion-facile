@@ -1,18 +1,17 @@
 import {
-  AgencyDto,
-  agencySchema,
+  WithAgencyId,
+  errors,
   getCounsellorsAndValidatorsEmailsDeduplicated,
+  withAgencyIdSchema,
 } from "shared";
-import { z } from "zod";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-type WithAgency = { agency: AgencyDto };
-
-export class SendEmailWhenNewAgencyOfTypeOtherAdded extends TransactionalUseCase<WithAgency> {
-  protected inputSchema = z.object({ agency: agencySchema });
+export class SendEmailWhenNewAgencyOfTypeOtherAdded extends TransactionalUseCase<WithAgencyId> {
+  protected inputSchema = withAgencyIdSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -25,11 +24,15 @@ export class SendEmailWhenNewAgencyOfTypeOtherAdded extends TransactionalUseCase
   }
 
   public async _execute(
-    { agency }: WithAgency,
+    { agencyId }: WithAgencyId,
     uow: UnitOfWork,
   ): Promise<void> {
+    const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+    if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
     if (agency.refersToAgencyId) return;
     if (agency.kind !== "autre") return;
+
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
