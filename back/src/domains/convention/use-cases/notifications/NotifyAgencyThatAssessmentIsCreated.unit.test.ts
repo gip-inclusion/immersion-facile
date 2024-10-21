@@ -22,7 +22,7 @@ import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGener
 import { createAssessmentEntity } from "../../entities/AssessmentEntity";
 import { NotifyAgencyThatAssessmentIsCreated } from "./NotifyAgencyThatAssessmentIsCreated";
 
-const agency = new AgencyDtoBuilder().withValidatorEmails([]).build();
+const agency = new AgencyDtoBuilder().build();
 const validator = new InclusionConnectedUserBuilder()
   .withEmail("validator@email.com")
   .withId("validator")

@@ -59,8 +59,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
 
   const agencyWithOnlyValidator = toAgencyWithRights(
     AgencyDtoBuilder.create("agency-with-only-validator")
-      .withValidatorEmails([])
-      .withCounsellorEmails([])
       .withName("test-agency-name")
       .build(),
     {
@@ -73,8 +71,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
 
   const agencyWithConsellorsAndValidator = toAgencyWithRights(
     AgencyDtoBuilder.create("agency-with-councellors-and-validator")
-      .withCounsellorEmails([])
-      .withValidatorEmails([])
+
       .withName("test-agency-name")
       .build(),
     {
@@ -94,8 +91,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
   );
   const agencyPeWithCouncellors = toAgencyWithRights(
     AgencyDtoBuilder.create("agency-pe-with-councellors")
-      .withValidatorEmails([])
-      .withCounsellorEmails([])
+
       .withKind("pole-emploi")
       .withName("test-agency-name")
       .build(),

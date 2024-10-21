@@ -27,10 +27,7 @@ import {
 } from "./RemoveUserFromAgency";
 
 describe("RemoveUserFromAgency", () => {
-  const agency = new AgencyDtoBuilder()
-    .withCounsellorEmails([])
-    .withValidatorEmails([])
-    .build();
+  const agency = new AgencyDtoBuilder().build();
 
   const adminBuilder = new InclusionConnectedUserBuilder()
     .withId("backoffice-admin-id")
@@ -141,8 +138,6 @@ describe("RemoveUserFromAgency", () => {
 
     it("throws forbidden if user to delete is the last counsellor receiving notifications on agency with refers to another agency", async () => {
       const agencyWithRefersTo: AgencyDto = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
         .withRefersToAgencyId(agency.id)
         .build();
 

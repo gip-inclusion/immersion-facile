@@ -242,11 +242,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             ];
 
             const agency1 = toAgencyWithRights(
-              new AgencyDtoBuilder()
-                .withId(uuid())
-                .withCounsellorEmails([])
-                .withValidatorEmails([])
-                .build(),
+              new AgencyDtoBuilder().withId(uuid()).build(),
               {
                 [initialUser.id]: {
                   isNotifiedByEmail: false,
@@ -259,11 +255,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
               },
             );
             const agency2 = toAgencyWithRights(
-              new AgencyDtoBuilder()
-                .withId(uuid())
-                .withCounsellorEmails([])
-                .withValidatorEmails([])
-                .build(),
+              new AgencyDtoBuilder().withId(uuid()).build(),
               {
                 [previousMigrationUserWithUpdatedEmail.id]: {
                   isNotifiedByEmail: true,

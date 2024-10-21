@@ -22,8 +22,6 @@ describe("Broadcasts events to pole-emploi", () => {
   const peAgencyWithoutCounsellorsAndValidators = new AgencyDtoBuilder()
     .withId("some-pe-agency")
     .withKind("pole-emploi")
-    .withValidatorEmails([])
-    .withCounsellorEmails([])
     .build();
 
   let poleEmploiGateWay: InMemoryPoleEmploiGateway;

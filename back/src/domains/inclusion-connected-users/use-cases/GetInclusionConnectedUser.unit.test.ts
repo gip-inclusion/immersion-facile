@@ -44,9 +44,7 @@ describe("GetUserAgencyDashboardUrl", () => {
   const john = johnBuilder.buildUser();
   const icJohn = johnBuilder.build();
 
-  const agencyWithoutCounsellorAndValidatorBuilder = new AgencyDtoBuilder()
-    .withValidatorEmails([])
-    .withCounsellorEmails([]);
+  const agencyWithoutCounsellorAndValidatorBuilder = new AgencyDtoBuilder();
 
   let getInclusionConnectedUser: GetInclusionConnectedUser;
   let uowPerformer: InMemoryUowPerformer;
@@ -190,24 +188,10 @@ describe("GetUserAgencyDashboardUrl", () => {
     const agency1 = new AgencyDtoBuilder()
       .withId("1111")
       .withKind("pole-emploi")
-      .withValidatorEmails([])
-      .withCounsellorEmails([])
       .build();
-    const agency2 = new AgencyDtoBuilder()
-      .withId("2222")
-      .withValidatorEmails([])
-      .withCounsellorEmails([])
-      .build();
-    const agency3 = new AgencyDtoBuilder()
-      .withId("3333")
-      .withValidatorEmails([])
-      .withCounsellorEmails([])
-      .build();
-    const agency4 = new AgencyDtoBuilder()
-      .withId("4444")
-      .withValidatorEmails([])
-      .withCounsellorEmails([])
-      .build();
+    const agency2 = new AgencyDtoBuilder().withId("2222").build();
+    const agency3 = new AgencyDtoBuilder().withId("3333").build();
+    const agency4 = new AgencyDtoBuilder().withId("4444").build();
 
     const agency1WithRights = toAgencyWithRights(agency1, {
       [john.id]: {

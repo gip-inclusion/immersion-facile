@@ -60,8 +60,7 @@ const convention = new ConventionDtoBuilder()
   .build();
 
 const agency = new AgencyDtoBuilder()
-  .withCounsellorEmails([])
-  .withValidatorEmails([])
+
   .withId(convention.agencyId)
   .build();
 

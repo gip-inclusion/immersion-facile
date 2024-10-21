@@ -420,7 +420,7 @@ describe("Sign convention", () => {
 
   const conventionId: ConventionId = "abd5c20e-6dd2-45af-affe-927358005251";
   const prepareAgencyAndConventionWithStatus = (status: ConventionStatus) => {
-    const agency = new AgencyDtoBuilder().withValidatorEmails([]).build();
+    const agency = new AgencyDtoBuilder().build();
 
     return {
       agency,

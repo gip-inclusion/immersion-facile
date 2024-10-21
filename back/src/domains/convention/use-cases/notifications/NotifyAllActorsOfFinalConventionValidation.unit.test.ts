@@ -70,10 +70,9 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     .withEstablishmentRepresentativeEmail(establishmentRepresentativeEmail)
     .build();
 
-  const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId)
-    .withValidatorEmails([])
-    .withCounsellorEmails([])
-    .build();
+  const defaultAgency = AgencyDtoBuilder.create(
+    validConvention.agencyId,
+  ).build();
 
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
