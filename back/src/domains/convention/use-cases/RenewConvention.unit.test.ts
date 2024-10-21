@@ -1,13 +1,14 @@
 import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
+  BadRequestError,
   ConventionDomainPayload,
   ConventionDtoBuilder,
   ConventionId,
   ConventionRelatedJwtPayload,
-  InclusionConnectDomainJwtPayload,
-  InclusionConnectedUser,
+  ForbiddenError,
   InclusionConnectedUserBuilder,
+  NotFoundError,
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
@@ -15,7 +16,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -28,33 +29,39 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { AddConvention } from "./AddConvention";
 import { RenewConvention } from "./RenewConvention";
 
-const createJwtPayload = ({
-  conventionId,
-  role,
-}: {
-  conventionId: ConventionId;
-  role: Role;
-}): ConventionDomainPayload => ({
-  applicationId: conventionId,
-  role,
-  emailHash: "my-hash",
-});
-
 describe("RenewConvention", () => {
   let renewConvention: RenewConvention;
   let uow: InMemoryUnitOfWork;
   let uuidGenerator: TestUuidGenerator;
 
-  const existingDraftConvention = new ConventionDtoBuilder().build();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator")
+    .withEmail("validator@mail.com")
+    .buildUser();
+  const agencyAdmin = new InclusionConnectedUserBuilder()
+    .withId("agency-admin")
+    .withEmail("agency-admin@mail.com")
+    .buildUser();
+  const backofficeAdmin = new InclusionConnectedUserBuilder()
+    .withId("admin")
+    .withIsAdmin(true)
+    .buildUser();
+
+  const agency = new AgencyDtoBuilder().build();
+
+  const existingValidatedConvention = new ConventionDtoBuilder()
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .withAgencyId(agency.id)
+    .build();
+
   const renewedConventionStartDate = addDays(
-    new Date(existingDraftConvention.dateEnd),
+    new Date(existingValidatedConvention.dateEnd),
     1,
   );
   const renewConventionEndDate = addDays(renewedConventionStartDate, 5);
-  const renewedConventionId: ConventionId =
-    "11111111-1111-4111-1111-111111111111";
+
   const renewConventionParams: RenewConventionParams = {
-    id: renewedConventionId,
+    id: "11111111-1111-4111-1111-111111111111",
     dateStart: renewedConventionStartDate.toISOString(),
     dateEnd: renewConventionEndDate.toISOString(),
     schedule: new ScheduleDtoBuilder()
@@ -64,51 +71,46 @@ describe("RenewConvention", () => {
       })
       .build(),
     renewed: {
-      from: existingDraftConvention.id,
+      from: existingValidatedConvention.id,
       justification: "Il faut bien...",
     },
   };
 
-  const agency = new AgencyDtoBuilder().build();
-  const existingValidatedConvention = new ConventionDtoBuilder()
-    .withStatus("ACCEPTED_BY_VALIDATOR")
-    .withAgencyId(agency.id)
-    .build();
-  const inclusionConnectedUser: InclusionConnectedUser = {
-    id: "my-user-id",
-    email: "my-user@email.com",
-    firstName: "John",
-    lastName: "Doe",
-    agencyRights: [{ roles: ["validator"], agency, isNotifiedByEmail: false }],
-    dashboards: { agencies: {}, establishments: {} },
-    externalId: "my-user-external-id",
-    createdAt: new Date().toISOString(),
-  };
-  const inclusionConnectPayload: InclusionConnectDomainJwtPayload = {
-    userId: inclusionConnectedUser.id,
-  };
-
-  const backofficeAdmin = new InclusionConnectedUserBuilder()
-    .withIsAdmin(true)
-    .build();
-
   beforeEach(() => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
-
-    const timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({
-      timeGateway,
-      uuidGenerator,
-    });
-    const siretGateway = new InMemorySiretGateway();
-    const addConvention = new AddConvention(
+    renewConvention = new RenewConvention(
       uowPerformer,
-      createNewEvent,
-      siretGateway,
+      new AddConvention(
+        uowPerformer,
+        makeCreateNewEvent({
+          timeGateway: new CustomTimeGateway(),
+          uuidGenerator,
+        }),
+        new InMemorySiretGateway(),
+      ),
     );
-    renewConvention = new RenewConvention(uowPerformer, addConvention);
+    uow.conventionRepository.setConventions([existingValidatedConvention]);
+    uow.userRepository.users = [backofficeAdmin, validator, agencyAdmin];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [agencyAdmin.id]: { isNotifiedByEmail: false, roles: ["agency-admin"] },
+      }),
+    ];
+  });
+
+  const createJwtPayload = ({
+    conventionId,
+    role,
+  }: {
+    conventionId: ConventionId;
+    role: Role;
+  }): ConventionDomainPayload => ({
+    applicationId: conventionId,
+    role,
+    emailHash: "my-hash",
   });
 
   describe("Happy paths", () => {
@@ -126,7 +128,9 @@ describe("RenewConvention", () => {
       },
       {
         payloadKind: "inclusionConnect",
-        payload: inclusionConnectPayload,
+        payload: {
+          userId: validator.id,
+        },
       },
     ] satisfies {
       payloadKind: string;
@@ -134,13 +138,6 @@ describe("RenewConvention", () => {
     }[])(
       "renews the convention with $payloadKind jwt payload",
       async ({ payload }) => {
-        uow.conventionRepository.setConventions([existingValidatedConvention]);
-
-        uow.userRepository.setInclusionConnectedUsers([
-          inclusionConnectedUser,
-          backofficeAdmin,
-        ]);
-
         const result = await renewConvention.execute(
           renewConventionParams,
           payload,
@@ -180,8 +177,6 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when convention id in params does not match to convention id in JWT payload", async () => {
-      uow.conventionRepository.setConventions([existingDraftConvention]);
-
       await expectPromiseToFailWithError(
         renewConvention.execute(
           renewConventionParams,
@@ -197,23 +192,27 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when convention not found", async () => {
-      const notSavedConvention = existingDraftConvention;
+      uow.conventionRepository.setConventions([]);
+
       await expectPromiseToFailWithError(
         renewConvention.execute(
           renewConventionParams,
           createJwtPayload({
             role: "validator",
-            conventionId: notSavedConvention.id,
+            conventionId: existingValidatedConvention.id,
           }),
         ),
         errors.convention.notFound({
-          conventionId: notSavedConvention.id,
+          conventionId: existingValidatedConvention.id,
         }),
       );
     });
 
     it("throws an error when convention is not ACCEPTED_BY_VALIDATOR", async () => {
+      const existingDraftConvention = new ConventionDtoBuilder().build();
+
       uow.conventionRepository.setConventions([existingDraftConvention]);
+
       await expectPromiseToFailWithError(
         renewConvention.execute(
           renewConventionParams,
@@ -229,13 +228,12 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when jwt role has not enough privileges", async () => {
-      uow.conventionRepository.setConventions([existingDraftConvention]);
       await expectPromiseToFailWithError(
         renewConvention.execute(
           renewConventionParams,
           createJwtPayload({
             role: "beneficiary",
-            conventionId: existingDraftConvention.id,
+            conventionId: existingValidatedConvention.id,
           }),
         ),
         new ForbiddenError(
@@ -245,22 +243,25 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when missing inclusion connect user", async () => {
-      uow.conventionRepository.setConventions([existingValidatedConvention]);
+      uow.userRepository.users = [];
+
       await expectPromiseToFailWithError(
-        renewConvention.execute(renewConventionParams, inclusionConnectPayload),
+        renewConvention.execute(renewConventionParams, {
+          userId: validator.id,
+        }),
         new NotFoundError(
-          `Inclusion connected user '${inclusionConnectPayload.userId}' not found.`,
+          `Inclusion connected user '${validator.id}' not found.`,
         ),
       );
     });
 
     it("throws an error when inclusion connect user has no rights on agency", async () => {
-      uow.conventionRepository.setConventions([existingValidatedConvention]);
-      uow.userRepository.setInclusionConnectedUsers([
-        { ...inclusionConnectedUser, agencyRights: [] },
-      ]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+
       await expectPromiseToFailWithError(
-        renewConvention.execute(renewConventionParams, inclusionConnectPayload),
+        renewConvention.execute(renewConventionParams, {
+          userId: validator.id,
+        }),
         new ForbiddenError(
           `You don't have sufficient rights on agency '${existingValidatedConvention.agencyId}'.`,
         ),
@@ -268,17 +269,10 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when inclusion connect user has bad rights on agency", async () => {
-      uow.conventionRepository.setConventions([existingValidatedConvention]);
-      uow.userRepository.setInclusionConnectedUsers([
-        {
-          ...inclusionConnectedUser,
-          agencyRights: [
-            { agency, roles: ["agency-admin"], isNotifiedByEmail: false },
-          ],
-        },
-      ]);
       await expectPromiseToFailWithError(
-        renewConvention.execute(renewConventionParams, inclusionConnectPayload),
+        renewConvention.execute(renewConventionParams, {
+          userId: agencyAdmin.id,
+        }),
         new ForbiddenError(
           "The role 'agency-admin' is not allowed to renew convention",
         ),
