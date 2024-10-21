@@ -467,7 +467,10 @@ export const ConventionDocumentPage = ({
                   </li>
                 )}
                 {convention.individualProtection && (
-                  <li>un équipement de protection est fourni</li>
+                  <li>
+                    des équipements de protection sont fournis :{" "}
+                    {convention.individualProtectionDescription}
+                  </li>
                 )}
               </ul>
             </>

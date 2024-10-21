@@ -131,6 +131,12 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     id: conventionSectionIds.individualProtection,
     required: true,
   },
+  individualProtectionDescription: {
+    label: "Précisez le ou les équipement(s) :",
+    hintText:
+      "Ex : gants, gilets, combinaisons, chaussures, casques, harnais de sécurité, protections auditives, ...",
+    id: conventionSectionIds.individualProtectionDescription,
+  },
   sanitaryPrevention: {
     label:
       internshipKind === "immersion"

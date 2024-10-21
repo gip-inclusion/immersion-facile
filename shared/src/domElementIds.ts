@@ -221,6 +221,8 @@ export const domElementIds = {
       businessName: "im-convention-form__businessName",
       workConditions: "im-convention-form__workConditions",
       individualProtection: "im-convention-form__individualProtection",
+      individualProtectionDescription:
+        "im-convention-form__workConditionsDescription",
       sanitaryPrevention: "im-convention-form__sanitaryPrevention",
       sanitaryPreventionDescription:
         "im-convention-form__sanitaryPreventionDescription",

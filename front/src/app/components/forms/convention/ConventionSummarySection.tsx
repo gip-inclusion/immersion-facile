@@ -334,6 +334,10 @@ const immersionConditionsSummary = (
         convention.individualProtection ? "✅" : "❌",
       ],
       [
+        fields.individualProtectionDescription.label,
+        convention.individualProtectionDescription,
+      ],
+      [
         fields.sanitaryPrevention.label,
         convention.sanitaryPrevention ? "✅" : "❌",
       ],
