@@ -17,6 +17,7 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -60,10 +61,14 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
     { convention }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
+    const [agencyWithRights] = await uow.agencyRepository.getByIds([
+      convention.agencyId,
+    ]);
 
-    if (!agency)
+    if (!agencyWithRights)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
     const recipientsRoleAndEmail: { role: Role; email: Email }[] = uniq([
       ...Object.values(convention.signatories).map((signatory) => ({

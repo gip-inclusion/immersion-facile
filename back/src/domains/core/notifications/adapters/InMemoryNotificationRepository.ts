@@ -2,6 +2,7 @@ import { parseISO } from "date-fns";
 import {
   AgencyDto,
   ConventionDto,
+  Email,
   EmailNotification,
   Notification,
   NotificationId,
@@ -163,6 +164,8 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
   convention: ConventionDto,
   config: AppConfig,
   conventionToSignLinkId: ShortLinkId,
+  counsellorEmails: Email[],
+  validatorEmails: Email[],
 ) =>
   expectToEqual(templatedEmails, {
     kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
@@ -191,8 +194,8 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
         : "",
       agencyAssessmentDocumentLink: agency.questionnaireUrl ?? undefined,
       agencyReferentEmail: agency.refersToAgencyId
-        ? agency.counsellorEmails[0]
-        : agency.validatorEmails[0],
+        ? counsellorEmails[0]
+        : validatorEmails[0],
     },
   });
 
