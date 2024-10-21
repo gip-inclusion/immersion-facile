@@ -2,9 +2,11 @@ import {
   AgencyDtoBuilder,
   AssessmentDto,
   ConventionDtoBuilder,
+  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
 } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -20,7 +22,11 @@ import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGener
 import { createAssessmentEntity } from "../../entities/AssessmentEntity";
 import { NotifyAgencyThatAssessmentIsCreated } from "./NotifyAgencyThatAssessmentIsCreated";
 
-const agency = new AgencyDtoBuilder().build();
+const agency = new AgencyDtoBuilder().withValidatorEmails([]).build();
+const validator = new InclusionConnectedUserBuilder()
+  .withEmail("validator@email.com")
+  .withId("validator")
+  .buildUser();
 const convention = new ConventionDtoBuilder()
   .withAgencyId(agency.id)
   .withStatus("ACCEPTED_BY_VALIDATOR")
@@ -34,22 +40,17 @@ const assessment: AssessmentDto = {
 
 describe("NotifyAgencyThatAssessmentIsCreated", () => {
   let uow: InMemoryUnitOfWork;
-  let uowPerformer: InMemoryUowPerformer;
   let usecase: NotifyAgencyThatAssessmentIsCreated;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uowPerformer = new InMemoryUowPerformer(uow);
-    const timeGateway = new CustomTimeGateway();
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
     usecase = new NotifyAgencyThatAssessmentIsCreated(
-      uowPerformer,
-      saveNotificationAndRelatedEvent,
+      new InMemoryUowPerformer(uow),
+      makeSaveNotificationAndRelatedEvent(
+        new UuidV4Generator(),
+        new CustomTimeGateway(),
+      ),
     );
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
@@ -82,7 +83,12 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   });
 
   it("Send an email to first validator", async () => {
-    await uow.agencyRepository.insert(agency);
+    uow.userRepository.users = [validator];
+    await uow.agencyRepository.insert(
+      toAgencyWithRights(agency, {
+        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      }),
+    );
     await uow.conventionRepository.save(convention);
     await uow.assessmentRepository.save(
       createAssessmentEntity(assessment, convention),
@@ -106,7 +112,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             assessmentStatus: assessment.status,
             internshipKind: convention.internshipKind,
           },
-          recipients: [agency.validatorEmails[0]],
+          recipients: [validator.email],
         },
       ],
     });
