@@ -6,7 +6,7 @@ import {
   ConventionId,
   ConventionStatus,
   EstablishmentRepresentative,
-  InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   Signatories,
   allRoles,
   allSignatoryRoles,
@@ -17,6 +17,7 @@ import {
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { ForbiddenError, NotFoundError } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -98,7 +99,7 @@ describe("Sign convention", () => {
           const { convention, agency } =
             prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([agency]);
+          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
           await expectPromiseToFailWithError(
             signConvention.execute(
@@ -122,18 +123,16 @@ describe("Sign convention", () => {
         const { convention, agency } =
           prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
         uow.conventionRepository.setConventions([convention]);
-        uow.agencyRepository.setAgencies([agency]);
-        const icUser: InclusionConnectedUser = {
-          agencyRights: [],
-          dashboards: { agencies: {}, establishments: {} },
-          email: "other@mail.com",
-          firstName: "Billy",
-          lastName: "Idol",
-          id: "my-user-id",
-          externalId: "billy-external-id",
-          createdAt: new Date().toISOString(),
-        };
-        uow.userRepository.setInclusionConnectedUsers([icUser]);
+        const user = new InclusionConnectedUserBuilder()
+          .withId("my-user-id")
+          .withEmail("other@mail.com")
+          .buildUser();
+        uow.agencyRepository.setAgencies([
+          toAgencyWithRights(agency, {
+            [user.id]: { roles: ["validator"], isNotifiedByEmail: false },
+          }),
+        ]);
+        uow.userRepository.users = [user];
         const signedAt = new Date("2022-01-01");
         timeGateway.setNextDate(signedAt);
 
@@ -141,11 +140,11 @@ describe("Sign convention", () => {
           signConvention.execute(
             { conventionId },
             {
-              userId: icUser.id,
+              userId: user.id,
             },
           ),
           new ForbiddenError(
-            `User '${icUser.id}' is not the establishment representative for convention '${conventionId}'`,
+            `User '${user.id}' is not the establishment representative for convention '${conventionId}'`,
           ),
         );
       });
@@ -160,7 +159,7 @@ describe("Sign convention", () => {
           const { convention, agency } =
             prepareAgencyAndConventionWithStatus(initialStatus);
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([agency]);
+          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
           await expectPromiseToFailWithError(
             signConvention.execute(
@@ -189,7 +188,7 @@ describe("Sign convention", () => {
           const { convention, agency } =
             prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([agency]);
+          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
           const signedAt = new Date("2022-01-01");
           timeGateway.setNextDate(signedAt);
 
@@ -233,25 +232,19 @@ describe("Sign convention", () => {
         const { convention, agency } =
           prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
         uow.conventionRepository.setConventions([convention]);
-        uow.agencyRepository.setAgencies([agency]);
-        const icUser: InclusionConnectedUser = {
-          agencyRights: [],
-          dashboards: { agencies: {}, establishments: {} },
-          email: convention.signatories.establishmentRepresentative.email,
-          firstName: "Billy",
-          lastName: "Idol",
-          id: "id",
-          externalId: "billy-external-id",
-          createdAt: new Date().toISOString(),
-        };
-        uow.userRepository.setInclusionConnectedUsers([icUser]);
+        const user = new InclusionConnectedUserBuilder()
+          .withEmail(convention.signatories.establishmentRepresentative.email)
+          .withExternalId("billy-external-id")
+          .buildUser();
+        uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+        uow.userRepository.users = [user];
         const signedAt = new Date("2022-01-01");
         timeGateway.setNextDate(signedAt);
 
         await signConvention.execute(
           { conventionId },
           {
-            userId: icUser.id,
+            userId: user.id,
           },
         );
 
@@ -273,7 +266,7 @@ describe("Sign convention", () => {
         const { convention: initialConvention, agency } =
           prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
         uow.conventionRepository.setConventions([initialConvention]);
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
         const signedAt = new Date("2022-01-01");
         timeGateway.setNextDate(signedAt);
 
@@ -324,7 +317,7 @@ describe("Sign convention", () => {
           .build();
 
         uow.conventionRepository.setConventions([initialConvention]);
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
         const establishmentRepresentativeSignedAt = new Date("2022-01-01");
         timeGateway.setNextDate(establishmentRepresentativeSignedAt);
@@ -383,7 +376,7 @@ describe("Sign convention", () => {
           .build();
 
         uow.conventionRepository.setConventions([initialConvention]);
-        uow.agencyRepository.setAgencies([agency]);
+        uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
         const establishmentRepresentativeSignedAt = new Date("2022-01-01");
         timeGateway.setNextDate(establishmentRepresentativeSignedAt);
@@ -427,7 +420,7 @@ describe("Sign convention", () => {
 
   const conventionId: ConventionId = "abd5c20e-6dd2-45af-affe-927358005251";
   const prepareAgencyAndConventionWithStatus = (status: ConventionStatus) => {
-    const agency = new AgencyDtoBuilder().build();
+    const agency = new AgencyDtoBuilder().withValidatorEmails([]).build();
 
     return {
       agency,

@@ -14,12 +14,12 @@ import {
 } from "shared";
 import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DomainTopic } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getIcUserByUserId } from "../../inclusion-connected-users/helpers/inclusionConnectedUser.helper";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
 
 const domainTopicByTargetStatusMap: Partial<
@@ -111,10 +111,9 @@ export class SignConvention extends TransactionalUseCase<
   ): Promise<{ role: Role; icUser: InclusionConnectedUser | undefined }> {
     if ("role" in jwtPayload)
       return { role: jwtPayload.role, icUser: undefined };
-    const icUser = await uow.userRepository.getById(
-      jwtPayload.userId,
-      await makeProvider(uow),
-    );
+
+    const icUser = await getIcUserByUserId(uow, jwtPayload.userId);
+
     if (!icUser)
       throw new NotFoundError(`No user found with id '${jwtPayload.userId}'`);
 
