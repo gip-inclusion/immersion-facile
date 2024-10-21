@@ -1,4 +1,5 @@
 import { WithConventionDto, withConventionSchema } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -31,7 +32,10 @@ export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseC
 
     const { beneficiary } = convention.signatories;
 
-    const recipients = getAllConventionRecipientsEmail(convention, agency);
+    const recipients = getAllConventionRecipientsEmail(
+      convention,
+      await agencyWithRightToAgencyDto(uow, agency),
+    );
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
