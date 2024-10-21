@@ -1,6 +1,6 @@
 import { addDays, isBefore } from "date-fns";
 import subDays from "date-fns/subDays";
-import { propEq } from "ramda";
+import { propEq, toPairs } from "ramda";
 import {
   ConventionDto,
   ConventionId,
@@ -9,11 +9,13 @@ import {
   DateRange,
   FindSimilarConventionsParams,
   SiretDto,
+  UserId,
   errors,
   validatedConventionStatuses,
 } from "shared";
 import { NotFoundError } from "shared";
 import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
+import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
   AssessmentEmailKind,
@@ -28,6 +30,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly agencyRepository: InMemoryAgencyRepository,
     private readonly notificationRepository: InMemoryNotificationRepository,
+    private readonly userRepository: InMemoryUserRepository,
   ) {}
 
   public async findSimilarConventions(
@@ -67,15 +70,17 @@ export class InMemoryConventionQueries implements ConventionQueries {
           (notification) => notification.followedIds.conventionId,
         )
       : [];
-    return this.conventionRepository.conventions
-      .filter(
-        (convention) =>
-          new Date(convention.dateEnd).getDate() >= dateEnd.from.getDate() &&
-          new Date(convention.dateEnd).getDate() < dateEnd.to.getDate() &&
-          validatedConventionStatuses.includes(convention.status) &&
-          !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
-      )
-      .map((convention) => this.#addAgencyDataToConvention(convention));
+    return await Promise.all(
+      this.conventionRepository.conventions
+        .filter(
+          (convention) =>
+            new Date(convention.dateEnd).getDate() >= dateEnd.from.getDate() &&
+            new Date(convention.dateEnd).getDate() < dateEnd.to.getDate() &&
+            validatedConventionStatuses.includes(convention.status) &&
+            !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
+        )
+        .map((convention) => this.#addAgencyDataToConvention(convention)),
+    );
   }
 
   public async getConventionById(
@@ -95,9 +100,11 @@ export class InMemoryConventionQueries implements ConventionQueries {
     params: GetConventionsParams,
   ): Promise<ConventionDto[]> {
     this.getConventionsByFiltersCalled++;
-    const conventions = this.conventionRepository.conventions
-      .filter(makeApplyFiltersToConventions(params.filters))
-      .map((convention) => this.#addAgencyDataToConvention(convention));
+    const conventions = await Promise.all(
+      this.conventionRepository.conventions
+        .filter(makeApplyFiltersToConventions(params.filters))
+        .map((convention) => this.#addAgencyDataToConvention(convention)),
+    );
 
     return conventions.sort((previous, current) => {
       const previousDate = previous[params.sortBy];
@@ -115,35 +122,41 @@ export class InMemoryConventionQueries implements ConventionQueries {
     limit: number;
     filters: GetConventionsFilters;
   }): Promise<ConventionReadDto[]> {
-    return this.conventionRepository.conventions
-      .filter((convention) => {
-        //TODO : dépendance agency repo dans convention repo à gérer plutot dans le usecase pour garder le repo convention indépendant
-        const agency = this.agencyRepository.agencies.find(
-          (agency) => agency.id === convention.agencyId,
-        );
+    return await Promise.all(
+      this.conventionRepository.conventions
+        .filter((convention) => {
+          //TODO : dépendance agency repo dans convention repo à gérer plutot dans le usecase pour garder le repo convention indépendant
+          const agency = this.agencyRepository.agencies.find(
+            (agency) => agency.id === convention.agencyId,
+          );
 
-        if (!agency) throw new NotFoundError("agency not found");
+          if (!agency) throw new NotFoundError("agency not found");
 
-        return (
-          params.scope.agencyKinds?.includes(agency.kind) ||
-          params.scope.agencyIds?.includes(agency.id)
-        );
-      })
-      .filter(makeApplyFiltersToConventions(params.filters))
-      .map((convention) => this.#addAgencyDataToConvention(convention));
+          return (
+            params.scope.agencyKinds?.includes(agency.kind) ||
+            params.scope.agencyIds?.includes(agency.id)
+          );
+        })
+        .filter(makeApplyFiltersToConventions(params.filters))
+        .map((convention) => this.#addAgencyDataToConvention(convention)),
+    );
   }
 
   public async getLatestConventionBySirets(
     sirets: SiretDto[],
   ): Promise<ConventionReadDto[]> {
-    const latestConventionsBySiret = this.conventionRepository.conventions
-      .filter(
-        (conventionDto) =>
-          sirets?.includes(conventionDto.siret) &&
-          !!conventionDto.dateValidation,
-      )
-      .map((conventionDto) => this.#addAgencyDataToConvention(conventionDto))
-      .reduce((acc: Record<SiretDto, ConventionReadDto>, conventionReadDto) => {
+    const conventionReadDtos = await Promise.all(
+      this.conventionRepository.conventions
+        .filter(
+          (conventionDto) =>
+            sirets?.includes(conventionDto.siret) &&
+            !!conventionDto.dateValidation,
+        )
+        .map((conventionDto) => this.#addAgencyDataToConvention(conventionDto)),
+    );
+
+    const latestConventionsBySiret = conventionReadDtos.reduce(
+      (acc: Record<SiretDto, ConventionReadDto>, conventionReadDto) => {
         const dateFromCurrentConvention =
           acc[conventionReadDto.siret]?.dateValidation;
         const dateFromIncomingConvention = conventionReadDto.dateValidation;
@@ -163,14 +176,16 @@ export class InMemoryConventionQueries implements ConventionQueries {
           };
 
         return acc;
-      }, {});
+      },
+      {},
+    );
 
     return Object.values(latestConventionsBySiret);
   }
 
-  #addAgencyDataToConvention = (
+  #addAgencyDataToConvention = async (
     convention: ConventionDto,
-  ): ConventionReadDto => {
+  ): Promise<ConventionReadDto> => {
     const agency = this.agencyRepository.agencies.find(
       (agency) => agency.id === convention.agencyId,
     );
@@ -179,10 +194,40 @@ export class InMemoryConventionQueries implements ConventionQueries {
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
     const referedAgency =
-      agency?.refersToAgencyId &&
+      agency.refersToAgencyId &&
       this.agencyRepository.agencies.find(
         (agency) => agency.id === agency.refersToAgencyId,
       );
+
+    const { counsellorIds, validatorIds } = toPairs(agency.usersRights).reduce<{
+      counsellorIds: UserId[];
+      validatorIds: UserId[];
+    }>(
+      (acc, item) => {
+        const [userId, userRights] = item;
+
+        return {
+          counsellorIds: [
+            ...acc.counsellorIds,
+            ...(userRights.roles.includes("counsellor") ? [userId] : []),
+          ],
+          validatorIds: [
+            ...acc.validatorIds,
+            ...(userRights.roles.includes("validator") ? [userId] : []),
+          ],
+        };
+      },
+      { counsellorIds: [], validatorIds: [] },
+    );
+
+    const counsellors = await this.userRepository.getByIds(
+      counsellorIds,
+      "InclusionConnect",
+    );
+    const validators = await this.userRepository.getByIds(
+      validatorIds,
+      "InclusionConnect",
+    );
 
     return {
       ...convention,
@@ -190,8 +235,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
       agencyDepartment: agency.address.departmentCode,
       agencyKind: agency.kind,
       agencySiret: agency.agencySiret,
-      agencyCounsellorEmails: agency.counsellorEmails,
-      agencyValidatorEmails: agency.validatorEmails,
+      agencyCounsellorEmails: counsellors.map(({ email }) => email),
+      agencyValidatorEmails: validators.map(({ email }) => email),
       agencyRefersTo: referedAgency
         ? {
             id: referedAgency.id,

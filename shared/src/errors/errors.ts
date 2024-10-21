@@ -310,6 +310,14 @@ export const errors = {
         `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
       ),
   },
+  users: {
+    notFound: ({ userIds }: { userIds: UserId[] }) =>
+      new NotFoundError(
+        `Nous n'avons pas trouvé les utilisateurs avec les identifiants suivants : ${userIds.join(
+          ", ",
+        )}.`,
+      ),
+  },
   user: {
     unauthorized: () => new UnauthorizedError(),
     noJwtProvided: () =>
