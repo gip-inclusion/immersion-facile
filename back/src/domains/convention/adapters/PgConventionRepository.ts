@@ -112,6 +112,7 @@ export class PgConventionRepository implements ConventionRepository {
       businessName,
       schedule,
       individualProtection,
+      individualProtectionDescription,
       sanitaryPrevention,
       sanitaryPreventionDescription,
       immersionAddress,
@@ -161,6 +162,7 @@ export class PgConventionRepository implements ConventionRepository {
         business_name: businessName,
         schedule: sql`${JSON.stringify(schedule)}`,
         individual_protection: individualProtection,
+        individual_protection_description: individualProtectionDescription,
         sanitary_prevention: sanitaryPrevention,
         sanitary_prevention_description: sanitaryPreventionDescription,
         immersion_address: immersionAddress,
@@ -556,6 +558,8 @@ export class PgConventionRepository implements ConventionRepository {
         business_name: convention.businessName,
         schedule: sql`${JSON.stringify(convention.schedule)}`,
         individual_protection: convention.individualProtection,
+        individual_protection_description:
+          convention.individualProtectionDescription,
         sanitary_prevention: convention.sanitaryPrevention,
         sanitary_prevention_description:
           convention.sanitaryPreventionDescription,

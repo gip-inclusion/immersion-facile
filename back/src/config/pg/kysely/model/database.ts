@@ -256,6 +256,7 @@ interface Conventions extends WithAcquisition {
   renewed_justification: string | null;
   date_approval: Timestamp | null;
   establishment_number_employees: NumberEmployeesRange | null;
+  individual_protection_description: Generated<string>;
 }
 
 interface ConventionsToSyncWithPe {
