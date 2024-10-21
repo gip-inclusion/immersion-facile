@@ -30,7 +30,7 @@ export const throwIfAgencyRefersToAndUserIsValidator = (
 ) => {
   if (
     agency.refersToAgencyId &&
-    agency.usersRights[userId].roles.includes("validator")
+    agency.usersRights[userId]?.roles.includes("validator")
   )
     throw errors.agency.invalidValidatorEditionWhenAgencyWithRefersTo(
       agency.id,
@@ -46,6 +46,6 @@ const hasOtherUserWithRoleAndNotificationMode = (
   toPairs(agency.usersRights).some(
     ([id, right]) =>
       id !== userId &&
-      right.isNotifiedByEmail === isNotifiedByEmail &&
+      right?.isNotifiedByEmail === isNotifiedByEmail &&
       right.roles.includes(role),
   );
