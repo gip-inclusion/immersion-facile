@@ -13,6 +13,7 @@ export type AutocompleteInputProps = {
   placeholder: string | undefined;
   state?: InputProps["state"];
   stateRelatedMessage?: InputProps["stateRelatedMessage"];
+  hintText?: React.ReactNode;
 };
 
 export const AutocompleteInput = ({
@@ -24,6 +25,7 @@ export const AutocompleteInput = ({
   placeholder,
   state,
   stateRelatedMessage,
+  hintText,
 }: AutocompleteInputProps) => (
   <Input
     ref={params.InputProps.ref}
@@ -34,6 +36,7 @@ export const AutocompleteInput = ({
       style: inputStyle,
       placeholder,
     }}
+    hintText={hintText}
     disabled={disabled}
     state={state}
     stateRelatedMessage={stateRelatedMessage}

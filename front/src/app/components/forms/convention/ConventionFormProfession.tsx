@@ -12,14 +12,14 @@ import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/A
 
 type ConventionFormProfessionProps = {
   label: string;
-  description?: string;
+  hintText?: React.ReactNode;
   disabled?: boolean;
   initialFieldValue: AppellationAndRomeDto;
 };
 
 export const ConventionFormProfession = ({
   label,
-  description,
+  hintText,
   disabled,
   initialFieldValue,
 }: ConventionFormProfessionProps) => {
@@ -78,14 +78,13 @@ export const ConventionFormProfession = ({
                 getValues().immersionAppellation?.appellationLabel ?? "",
             },
           ]}
-          description={description}
+          hintText={hintText}
           onInputClear={() => {
             setValue("immersionAppellation.romeCode", "");
             setValue("immersionAppellation.romeLabel", "");
             setValue("immersionAppellation.appellationCode", "");
             setValue("immersionAppellation.appellationLabel", "");
           }}
-          placeholder="Ex : agent d'entretien"
         />
         {error && <TextInputError errorMessage={error} />}
       </div>

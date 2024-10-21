@@ -97,13 +97,12 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   siret: {
     label:
       internshipKind === "immersion"
-        ? "SIRET de la structure d'accueil"
-        : "SIRET de l’entreprise où vous allez faire votre stage",
+        ? "SIRET de la structure d'accueil "
+        : "SIRET de l’entreprise",
     hintText:
       internshipKind === "immersion"
-        ? "la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
-        : "la structure d'accueil, où vous allez faire votre stage",
-    placeholder: "362 521 879 00034",
+        ? "la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où le candidat va faire son immersion. Format attendu : 362 521 879 00034"
+        : "la structure d'accueil, où le candidat va faire son stage. Format attendu : 362 521 879 00034",
     id: conventionSectionIds.siret,
     required: true,
   },
@@ -120,10 +119,9 @@ const conventionSection = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Conditions de travail, propres au métier observé pendant l’immersion "
         : "Conditions de travail, propres au métier observé pendant le stage ",
-    hintText: "Précisez les conditions de travail, propres au métier observé ",
+    hintText:
+      "Ex : transport de marchandises longue distance pas de retour au domicile pendant 2 jours",
     id: conventionSectionIds.workConditions,
-    placeholder:
-      "Ex : transport de marchandises longue distance - pas de retour au domicile pendant 2 jours (optionnel)",
   },
   individualProtection: {
     label:
@@ -142,18 +140,20 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     required: true,
   },
   sanitaryPreventionDescription: {
-    label: "Si oui, précisez-les",
-    hintText: "Mesures de prévention sanitaire prévues pour l’immersion",
+    label: "Si oui, précisez les mesures de prévention sanitaire",
+    hintText:
+      internshipKind === "immersion"
+        ? "Mesures de prévention sanitaire prévues pour l’immersion. Ex : fourniture de gel, masques..."
+        : "Mesures de prévention sanitaire prévues pour le stage. Ex : fourniture de gel, masques...",
     id: conventionSectionIds.sanitaryPreventionDescription,
-    placeholder: "Ex : fourniture de gel, de masques (optionnel)",
   },
   immersionAddress: {
     label:
       internshipKind === "immersion"
         ? "Adresse du lieu où se fera l'immersion"
         : "Adresse du lieu où se fera le stage",
-    placeholder: "Ex: 26 rue du labrador, 37000 Tours",
     id: conventionSectionIds.immersionAddress,
+    hintText: "Ex : 35, Rue Édouard Danaux, 91220 Brétigny-sur-Orge",
     required: true,
   },
   immersionObjective: {
@@ -167,7 +167,6 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Intitulé du poste / métier observé pendant l'immersion"
         : "Intitulé du métier observé pendant le stage",
     hintText: "Ex : employé libre service, web développeur, boulanger …",
-    placeholder: "Prêt à porter",
     id: conventionSectionIds.immersionAppellation,
     required: true,
   },
@@ -177,20 +176,18 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Activités observées / pratiquées pendant l'immersion"
         : "Activités observées / pratiquées pendant le stage",
     hintText:
-      "Précisez les éléments clefs de la période, son contexte, les tâches confiées, les objectifs assignés au bénéficiaire.",
+      "Précisez les éléments clefs de la période, son contexte, les tâches confiées, les objectifs assignés au candidat.",
     id: conventionSectionIds.immersionActivities,
     required: true,
-    placeholder: "Ex : mise en rayon, accueil et aide à la clientèle",
   },
   immersionSkills: {
     label:
       internshipKind === "immersion"
         ? "Compétences/aptitudes observées / évaluées pendant l'immersion"
         : "Compétences/aptitudes observées / évaluées pendant le stage",
-    hintText: "Précisez les compétences/aptitudes observées",
+    hintText:
+      "Ex : communiquer à l’oral, résoudre des problèmes, travailler en équipe...",
     id: conventionSectionIds.immersionSkills,
-    placeholder:
-      "Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe (optionnel)",
   },
   isCurrentEmployer: {
     label:
@@ -220,14 +217,15 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   businessAdvantages: {
     label: "Avantages proposés par l'entreprise",
     id: conventionSectionIds.businessAdvantages,
-    hintText: "Précisez les avantages proposés par l'entreprise",
-    placeholder:
-      "Ex : navettes jusqu'au lieu de travail, panier repas, hébergement... (optionnel)",
+    hintText:
+      "Ex : navettes jusqu’au lieu de travail, paniers repas, hébergement...",
   },
   isMinor: {
-    label: "Êtes-vous majeur protégé ?",
+    label: "Le candidat est-il majeur protégé ?",
     id: conventionSectionIds.isMinor,
     required: true,
+    hintText:
+      "Les majeurs protégés sont les personnes qui sont dans l'impossibilité de pourvoir seules à leurs intérêts en raison de l'altération de leurs facultés mentales ou corporelles de nature à empêcher l'expression de leur volonté.",
   },
   schedule: {
     label: `Dates et horaires ${
@@ -257,32 +255,29 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     label: "E-mail du candidat",
     id: beneficiarySectionIds.email,
     required: true,
-    placeholder: "nom@exemple.com",
     hintText:
-      "cela nous permet de vous transmettre la validation de la convention",
+      "Cette adresse email sera utilisée dans le cadre de la signature de la convention d'immersion. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
   },
   "signatories.beneficiary.phone": {
     label: "Téléphone du candidat",
     hintText:
       internshipKind === "immersion"
-        ? "pour qu’on puisse vous contacter à propos de l’immersion"
-        : "pour qu’on puisse vous contacter à propos du stage",
-    placeholder: "0605040302",
+        ? "Renseignez de préférence un téléphone portable pour pouvoir signer la convention par SMS. Format attendu : (+33) 6 22 33 44 55"
+        : "Renseignez de préférence un téléphone portable pour pouvoir signer la convention de stage par SMS. Format attendu :  (+33) 6 22 33 44 55",
     id: beneficiarySectionIds.phone,
     required: true,
   },
   "signatories.beneficiary.levelOfEducation": {
     label: "Classe actuelle fréquentée par le candidat",
     id: beneficiarySectionIds.levelOfEducation,
-    placeholder: "Précisez votre statut",
     required: true,
+    hintText: "Précisez votre statut",
   },
   "signatories.beneficiary.financiaryHelp": {
     label: "Aide matérielle",
     id: beneficiarySectionIds.financiaryHelp,
-    placeholder: "Ex : aide à la mobilité (optionnel)",
     hintText:
-      "Le bénéficiaire a-t-il besoin d'une aide matérielle pour réaliser l'immersion ? Les aides sont soumises à des conditions de ressources. Renseignez-vous auprès de votre conseiller.",
+      "Le candidat a-t-il besoin d'une aide matérielle pour réaliser l'immersion ? Par exemple : aide à la mobilité. Les aides sont soumises à des conditions de ressources. Renseignez-vous auprès de votre conseiller.",
   },
   "signatories.beneficiary.federatedIdentity": {
     // hidden field
@@ -292,35 +287,33 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiary.emergencyContact": {
     label: "Prénom et nom de la personne à prévenir en cas d'urgence",
     id: beneficiarySectionIds.emergencyContact,
-    placeholder: "Ex : Jean Dupont (optionnel)",
+    hintText: "Ex : Jean Dupont",
   },
   "signatories.beneficiary.emergencyContactPhone": {
     label: "Téléphone de la personne à prévenir en cas d'urgence",
     id: beneficiarySectionIds.emergencyContactPhone,
-    placeholder: "Ex : 0606060607 (optionnel)",
+    hintText: "Format attendu : (+33) 6 22 33 44 55",
   },
   "signatories.beneficiary.emergencyContactEmail": {
     label: "E-mail de la personne à prévenir en cas d'urgence",
     id: beneficiarySectionIds.emergencyContactEmail,
-    placeholder: "Ex : contact@urgence.com (optionnel)",
+    hintText: "Format attendu : nom@exemple.com",
   },
   "signatories.beneficiary.address": {
     label: "Adresse du candidat",
     id: beneficiarySectionIds.address,
-    placeholder: "Ex : 10 Rue de la Paix, 75001 Paris",
     required: true,
   },
   "signatories.beneficiary.schoolName": {
     label: "Nom de l'établissement scolaire du candidat",
     id: beneficiarySectionIds.schoolName,
-    placeholder: "Ex : Lycée Jean Moulin",
     required: true,
   },
   "signatories.beneficiary.schoolPostcode": {
     label: "Code postal de l'établissement scolaire du candidat",
     id: beneficiarySectionIds.schoolPostcode,
-    placeholder: "Ex : 06530",
     required: true,
+    hintText: "Ex : 06530",
   },
   "signatories.beneficiary.isRqth": {
     label:
@@ -388,7 +381,7 @@ const beneficiaryRepresentativeSection = (internshipKind: InternshipKind) => ({
     label: "Adresse email du représentant légal",
     id: beneficiaryRepresentativeSectionIds.email,
     hintText:
-      "cela nous permet de vous transmettre la validation de la convention",
+      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
     required: true,
   },
   "signatories.beneficiaryRepresentative.phone": {
@@ -396,8 +389,8 @@ const beneficiaryRepresentativeSection = (internshipKind: InternshipKind) => ({
     id: beneficiaryRepresentativeSectionIds.phone,
     hintText:
       internshipKind === "immersion"
-        ? "pour qu’on puisse vous contacter à propos de l’immersion"
-        : "pour qu’on puisse vous contacter à propos du stage",
+        ? "Renseignez de préférence un téléphone portable pour pouvoir signer la convention par SMS. Format attendu : (+33) 6 22 33 44 55"
+        : "Renseignez de préférence un téléphone portable pour pouvoir signer la convention de stage par SMS. Format attendu :  (+33) 6 22 33 44 55",
     required: true,
   },
 });
@@ -413,14 +406,18 @@ const beneficiaryCurrentEmployerSection = {
     id: beneficiaryCurrentEmployerSectionIds.job,
   },
   "signatories.beneficiaryCurrentEmployer.email": {
-    label: "E-mail de l'entreprise actuelle du candidat",
+    label: "E-mail du signataire dans l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.email,
     required: true,
+    hintText:
+      "Cette adresse email sera utilisée dans le cadre de la signature de la convention. Pensez à bien vérifier son exactitude. Format attendu : nom@exemple.com",
   },
   "signatories.beneficiaryCurrentEmployer.phone": {
     label: "Téléphone de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.phone,
     required: true,
+    hintText:
+      "Renseignez de préférence un téléphone portable pour pouvoir signer la convention par SMS. Format attendu : (+33) 6 22 33 44 55",
   },
   "signatories.beneficiaryCurrentEmployer.firstName": {
     label: "Prénom du signataire dans l'entreprise actuelle du candidat",
@@ -439,7 +436,7 @@ const beneficiaryCurrentEmployerSection = {
     required: true,
   },
   "signatories.beneficiaryCurrentEmployer.businessAddress": {
-    label: "Addresse de l'entreprise actuelle du candidat",
+    label: "Adresse de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.businessAddress,
     required: true,
   },

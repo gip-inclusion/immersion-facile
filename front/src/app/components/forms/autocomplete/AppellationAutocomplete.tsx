@@ -28,7 +28,7 @@ type AppellationAutocompleteProps = {
   onInputClear?: () => void;
   className?: string;
   selectedAppellations?: AppellationAndRomeDto[];
-  description?: string;
+  hintText?: React.ReactNode;
   placeholder?: string;
   id?: string;
   disabled?: boolean;
@@ -44,7 +44,7 @@ export const AppellationAutocomplete = ({
   label,
   className,
   selectedAppellations = [],
-  description,
+  hintText,
   placeholder,
   id = "im-appellation-autocomplete",
   disabled = false,
@@ -187,15 +187,15 @@ export const AppellationAutocomplete = ({
               <label className={cx(fr.cx("fr-label"), className)} htmlFor={id}>
                 {label}
               </label>
-              {description && (
-                <span className={fr.cx("fr-hint-text")}>{description}</span>
+              {hintText && (
+                <span className={fr.cx("fr-hint-text")}>{hintText}</span>
               )}
               <input
                 {...params.inputProps}
                 value={searchTerm}
                 id={id}
                 className={fr.cx("fr-input")}
-                placeholder={placeholder ?? "Ex: boulanger, styliste, etc."}
+                placeholder={placeholder}
               />
             </div>
           );
