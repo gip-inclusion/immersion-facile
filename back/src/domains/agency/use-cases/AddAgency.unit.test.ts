@@ -113,13 +113,7 @@ describe("AddAgency use case", () => {
         createNewEvent({
           topic: "NewAgencyAdded",
           payload: {
-            agency: {
-              ...createParisMissionLocaleParams,
-              questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
-              status: "needsReview",
-              rejectionJustification: null,
-              codeSafir: null,
-            },
+            agencyId: createParisMissionLocaleParams.id,
             triggeredBy: null,
           },
         }),

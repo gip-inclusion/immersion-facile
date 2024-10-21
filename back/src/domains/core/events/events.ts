@@ -140,7 +140,7 @@ export type DomainEvent =
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
   
   // AGENCY RELATED
-  | GenericEvent<"NewAgencyAdded", WithAgencyDto & WithTriggeredBy>
+  | GenericEvent<"NewAgencyAdded", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyActivated", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyUpdated", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyRejected", WithAgencyDto & WithTriggeredBy>
