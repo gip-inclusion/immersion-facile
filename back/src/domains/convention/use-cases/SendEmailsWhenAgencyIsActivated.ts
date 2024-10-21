@@ -2,20 +2,20 @@ import {
   AgencyDto,
   UserParamsForMail,
   agencySchema,
+  WithAgencyId,
   errors,
   getCounsellorsAndValidatorsEmailsDeduplicated,
+  withAgencyIdSchema,
 } from "shared";
-import { z } from "zod";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-type WithAgency = { agency: AgencyDto };
-
-export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAgency> {
-  protected inputSchema = z.object({ agency: agencySchema });
+export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAgencyId> {
+  protected inputSchema = withAgencyIdSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -28,7 +28,7 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
   }
 
   public async _execute(
-    { agency }: WithAgency,
+    { agencyId }: WithAgencyId,
     uow: UnitOfWork,
   ): Promise<void> {
     const provider = oAuthProviderByFeatureFlags(
@@ -71,14 +71,25 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
           roles: agencyRight.roles,
         };
       });
+    const agency = await uow.agencyRepository.getById(agencyId);
+    if (!agency) throw errors.agency.notFound({ agencyId });
+
+    const agencyDto = await agencyWithRightToAgencyDto(uow, agency);
+
+    const refersToOtherAgencyParams = agency.refersToAgencyId
+      ? {
+          refersToOtherAgency: true as const,
+          validatorEmails: agencyDto.validatorEmails,
+        }
+      : { refersToOtherAgency: false as const };
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "AGENCY_WAS_ACTIVATED",
         recipients: agency.refersToAgencyId
-          ? agency.counsellorEmails
-          : getCounsellorsAndValidatorsEmailsDeduplicated(agency),
+          ? agencyDto.counsellorEmails
+          : getCounsellorsAndValidatorsEmailsDeduplicated(agencyDto),
         params: {
           agencyName: agency.name,
           agencyLogoUrl: agency.logoUrl ?? undefined,
@@ -99,16 +110,21 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
       if (!agencyReferredTo)
         throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
 
+      const agencyRefersToDto = await agencyWithRightToAgencyDto(
+        uow,
+        agencyReferredTo,
+      );
+
       this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "AGENCY_WITH_REFERS_TO_ACTIVATED",
-          recipients: agencyReferredTo.validatorEmails,
+          recipients: agencyRefersToDto.validatorEmails,
           params: {
             nameOfAgencyRefering: agency.name,
             agencyLogoUrl: agencyReferredTo.logoUrl ?? undefined,
             refersToAgencyName: agencyReferredTo.name,
-            validatorEmails: agencyReferredTo.validatorEmails,
+            validatorEmails: agencyRefersToDto.validatorEmails,
           },
         },
         followedIds: {
