@@ -5,6 +5,7 @@ import {
   expectToEqual,
 } from "shared";
 import { ForbiddenError } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -13,34 +14,37 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { GetConventionsForApiConsumer } from "./GetConventionsForApiConsumer";
 
-const agencyPoleEmploi = new AgencyDtoBuilder()
-  .withId("agency-pole-emploi")
-  .withKind("pole-emploi")
-  .build();
-
-const agencyMissionLocale = new AgencyDtoBuilder()
-  .withId("agency-mission-locale")
-  .withKind("mission-locale")
-  .build();
-
-const conventionPoleEmploi = new ConventionDtoBuilder()
-  .withId("convention-pole-emploi-id")
-  .withAgencyId(agencyPoleEmploi.id)
-  .withStatus("IN_REVIEW")
-  .build();
-
-const conventionMissionLocale = new ConventionDtoBuilder()
-  .withId("convention-mission-locale-id")
-  .withAgencyId(agencyMissionLocale.id)
-  .build();
-
 describe("Get Conventions for ApiConsumer", () => {
+  const agencyPoleEmploi = new AgencyDtoBuilder()
+    .withId("agency-pole-emploi")
+    .withKind("pole-emploi")
+    .build();
+
+  const agencyMissionLocale = new AgencyDtoBuilder()
+    .withId("agency-mission-locale")
+    .withKind("mission-locale")
+    .build();
+
+  const conventionPoleEmploi = new ConventionDtoBuilder()
+    .withId("convention-pole-emploi-id")
+    .withAgencyId(agencyPoleEmploi.id)
+    .withStatus("IN_REVIEW")
+    .build();
+
+  const conventionMissionLocale = new ConventionDtoBuilder()
+    .withId("convention-mission-locale-id")
+    .withAgencyId(agencyMissionLocale.id)
+    .build();
+
   let getConventionsForApiConsumer: GetConventionsForApiConsumer;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([agencyPoleEmploi, agencyMissionLocale]);
+    uow.agencyRepository.setAgencies([
+      toAgencyWithRights(agencyPoleEmploi),
+      toAgencyWithRights(agencyMissionLocale),
+    ]);
     uow.conventionRepository.setConventions([
       conventionPoleEmploi,
       conventionMissionLocale,
