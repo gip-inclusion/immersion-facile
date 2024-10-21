@@ -1,5 +1,4 @@
 import {
-  AgencyDto,
   ApiConsumer,
   ApiConsumerName,
   InclusionConnectedUser,
@@ -8,8 +7,9 @@ import {
   userHasEnoughRightsOnConvention,
   withConventionIdSchema,
 } from "shared";
+import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { getIcUserByUserId } from "../../inclusion-connected-users/helpers/inclusionConnectedUser.helper";
 
 export type GetApiConsumersByConvention = ReturnType<
   typeof makeGetApiConsumersByConvention
@@ -31,10 +31,7 @@ export const makeGetApiConsumersByConvention = createTransactionalUseCase<
         conventionId,
       });
 
-    const user = await uow.userRepository.getById(
-      currentUser.id,
-      await makeProvider(uow),
-    );
+    const user = await getIcUserByUserId(uow, currentUser.id);
 
     if (!user)
       throw errors.user.notFound({
@@ -72,7 +69,7 @@ export const makeGetApiConsumersByConvention = createTransactionalUseCase<
 
 const isConventionInScope = (
   apiConsumer: ApiConsumer,
-  conventionAgency: AgencyDto,
+  conventionAgency: AgencyWithUsersRights,
 ) => {
   return (
     apiConsumer.rights.convention.scope.agencyKinds?.includes(
