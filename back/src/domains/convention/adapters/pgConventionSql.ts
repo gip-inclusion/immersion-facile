@@ -189,6 +189,9 @@ export const createConventionQueryBuilder = (transaction: KyselyDb) => {
         workConditions: ref("conventions.work_conditions"),
         agencyId: ref("conventions.agency_id"),
         individualProtection: ref("conventions.individual_protection"),
+        individualProtectionDescription: ref(
+          "conventions.individual_protection_description",
+        ),
         sanitaryPrevention: ref("conventions.sanitary_prevention"),
         sanitaryPreventionDescription: ref(
           "conventions.sanitary_prevention_description",
