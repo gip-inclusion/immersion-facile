@@ -4,6 +4,7 @@ import {
   ConventionDtoBuilder,
   CreateConventionMagicLinkPayloadProperties,
   Email,
+  InclusionConnectedUserBuilder,
   ModifierRole,
   Role,
   ShortLinkId,
@@ -13,6 +14,7 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
   ExpectSavedNotificationsAndEvents,
@@ -58,10 +60,25 @@ const convention = new ConventionDtoBuilder()
   .build();
 
 const agency = new AgencyDtoBuilder()
-  .withCounsellorEmails([agencyActorEmail, "b@b.com"])
-  .withValidatorEmails([agencyActorEmail, "d@d.com"])
+  .withCounsellorEmails([])
+  .withValidatorEmails([])
   .withId(convention.agencyId)
   .build();
+
+const user = new InclusionConnectedUserBuilder()
+  .withEmail(agencyActorEmail)
+  .withId("agency-actor-id")
+  .buildUser();
+
+const counsellorUser = new InclusionConnectedUserBuilder()
+  .withEmail("counsellor@mail.com")
+  .withId("counsellor")
+  .buildUser();
+
+const validatorUser = new InclusionConnectedUserBuilder()
+  .withEmail("validator@mail.com")
+  .withId("validator")
+  .buildUser();
 
 describe("NotifyActorThatConventionNeedsModifications", () => {
   let usecase: NotifyActorThatConventionNeedsModifications;
@@ -75,7 +92,23 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
     config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
     uow.conventionRepository.setConventions([convention]);
-    uow.agencyRepository.setAgencies([agency]);
+    uow.agencyRepository.setAgencies([
+      toAgencyWithRights(agency, {
+        [user.id]: {
+          isNotifiedByEmail: false,
+          roles: ["counsellor", "validator"],
+        },
+        [validatorUser.id]: {
+          isNotifiedByEmail: false,
+          roles: ["validator"],
+        },
+        [counsellorUser.id]: {
+          isNotifiedByEmail: false,
+          roles: ["counsellor"],
+        },
+      }),
+    ]);
+    uow.userRepository.users = [user, validatorUser, counsellorUser];
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
