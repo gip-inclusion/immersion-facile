@@ -7,6 +7,7 @@ import {
   Loader,
   MainWrapper,
   PageHeader,
+  SearchFilter,
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
@@ -33,6 +34,7 @@ import {
   initialState,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
+import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
 import "./SearchPage.scss";
@@ -159,191 +161,306 @@ export const SearchPage = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
-        <PageHeader
-          title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
-          breadcrumbs={<Breadcrumbs />}
-        >
-          <form
-            onSubmit={handleSubmit((value) =>
-              triggerSearch(filterFormValues(value)),
-            )}
-            className={cx(
-              fr.cx("fr-grid-row", "fr-grid-row--gutters"),
-              Styles.form,
-              Styles.formV2,
-            )}
-            id={domElementIds.search.searchForm}
-          >
-            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
-              <AppellationAutocomplete
-                label={
-                  useNaturalLanguageForAppellations
-                    ? "Je recherche le métier ou la compétence :"
-                    : "Je recherche le métier :"
-                }
-                initialValue={
-                  formValues.appellations
-                    ? formValues.appellations[0]
-                    : undefined
-                }
-                onAppellationSelected={(newAppellationAndRome) => {
-                  setValue("appellations", [newAppellationAndRome]);
-                }}
-                selectedAppellations={
-                  formValues.appellations
-                    ? [formValues.appellations[0]]
-                    : undefined
-                }
-                onInputClear={() => {
-                  setValue("appellations", undefined);
-                }}
-                id={domElementIds.search.appellationAutocomplete}
-                placeholder={
-                  useNaturalLanguageForAppellations
-                    ? "Ex: boulanger, faire du pain, etc"
-                    : "Ex: boulanger, styliste, etc"
-                }
-                useNaturalLanguage={useNaturalLanguageForAppellations}
-              />
-            </div>
-            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
-              <PlaceAutocomplete
-                label="Je me situe dans la ville de :"
-                initialInputValue={formValues.place}
-                onValueChange={(lookupSearchResult) => {
-                  if (!lookupSearchResult) return;
-                  setValue("latitude", lookupSearchResult.position.lat);
-                  setValue("longitude", lookupSearchResult.position.lon);
-                  setValue("place", lookupSearchResult.label);
-                  if (!formValues.distanceKm) {
-                    setValue("distanceKm", 10);
-                  }
-                }}
-                id={domElementIds.search.placeAutocompleteInput}
-                onInputClear={() => {
-                  setValue("latitude", initialValues.latitude);
-                  setValue("longitude", initialValues.latitude);
-                  setValue("place", initialValues.place);
-                  if (formValues.sortedBy === "distance") {
-                    setValue("sortedBy", "date");
-                  }
-                  setValue("distanceKm", initialValues.distanceKm);
-                }}
-              />
-            </div>
-            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
-              <Select
-                label="Distance maximum"
-                options={radiusOptions}
-                disabled={!lat || !lon}
-                nativeSelectProps={{
-                  ...register("distanceKm"),
-                  title:
-                    !lat || !lon
-                      ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
-                      : undefined,
-                  id: domElementIds.search.distanceSelect,
-                  value: `${distanceKm === undefined ? "" : distanceKm}`,
-                  onChange: (event) => {
-                    const value = parseInt(event.currentTarget.value);
-                    setValue("distanceKm", value);
-                    if (!value) {
-                      setValue("sortedBy", "date");
-                    }
-                  },
-                }}
-              />
-            </div>
-
-            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
-              <Button
-                type="submit"
-                nativeButtonProps={{
-                  id: domElementIds.search.searchSubmitButton,
-                }}
-                disabled={!canSubmitSearch(formValues)}
-              >
-                Rechercher
-              </Button>
-            </div>
-          </form>
-        </PageHeader>
-        <div ref={searchResultsWrapper}>
-          {searchStatus === "ok" && searchMade !== null && (
-            <div
-              ref={innerSearchResultWrapper}
-              className={fr.cx("fr-pt-6w", "fr-pb-1w")}
-            >
-              <div className={fr.cx("fr-container")}>
-                <div
-                  className={fr.cx(
-                    "fr-grid-row",
-                    "fr-grid-row--gutters",
-                    "fr-grid-row--middle",
-                    "fr-mb-4w",
-                  )}
+        {match({
+          isLoading,
+          searchStatus,
+        })
+          .with(
+            {
+              isLoading: true,
+            },
+            () => <Loader />,
+          )
+          .with(
+            {
+              isLoading: false,
+              searchStatus: "noSearchMade",
+            },
+            () => (
+              <>
+                <PageHeader
+                  title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
+                  breadcrumbs={<Breadcrumbs />}
                 >
-                  <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                    <SearchSortedBySelect
-                      searchValues={formValues}
-                      triggerSearch={triggerSearch}
-                      setSortedBy={(sortedBy: SearchSortedBy) =>
-                        setValue("sortedBy", sortedBy)
-                      }
-                    />
-                  </div>
-                  <div
+                  <form
+                    onSubmit={handleSubmit((value) =>
+                      triggerSearch(filterFormValues(value)),
+                    )}
                     className={cx(
-                      fr.cx("fr-col-12", "fr-col-md-5", "fr-ml-auto"),
-                      Styles.resultsSummary,
+                      fr.cx("fr-grid-row", "fr-grid-row--gutters"),
+                      Styles.form,
+                      Styles.formV2,
                     )}
+                    id={domElementIds.search.searchForm}
                   >
-                    {searchStatus === "ok" && (
-                      <>
-                        <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
-                          {getSearchResultsSummary(searchResults.length)}
-                        </h2>
-                        {routeParams.appellations &&
-                          routeParams.appellations.length > 0 && (
-                            <p className={cx(fr.cx("fr-text--xs"))}>
-                              pour la recherche{" "}
-                              <strong className={fr.cx("fr-text--bold")}>
-                                {routeParams.appellations[0].appellationLabel}
-                              </strong>
-                              , étendue au secteur{" "}
-                              <a
-                                href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
-                                target="_blank"
-                                className={fr.cx("fr-text--bold")}
-                                rel="noreferrer"
-                              >
-                                {routeParams.appellations[0].romeLabel}
-                              </a>
-                            </p>
-                          )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <SearchListResults showDistance={areValidGeoParams(searchMade)} />
-            </div>
-          )}
-          {isLoading && <Loader />}
+                    <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
+                      <AppellationAutocomplete
+                        label={
+                          useNaturalLanguageForAppellations
+                            ? "Je recherche le métier ou la compétence :"
+                            : "Je recherche le métier :"
+                        }
+                        initialValue={
+                          formValues.appellations
+                            ? formValues.appellations[0]
+                            : undefined
+                        }
+                        onAppellationSelected={(newAppellationAndRome) => {
+                          setValue("appellations", [newAppellationAndRome]);
+                        }}
+                        selectedAppellations={
+                          formValues.appellations
+                            ? [formValues.appellations[0]]
+                            : undefined
+                        }
+                        onInputClear={() => {
+                          setValue("appellations", undefined);
+                        }}
+                        id={domElementIds.search.appellationAutocomplete}
+                        placeholder={
+                          useNaturalLanguageForAppellations
+                            ? "Ex: boulanger, faire du pain, etc"
+                            : "Ex: boulanger, styliste, etc"
+                        }
+                        useNaturalLanguage={useNaturalLanguageForAppellations}
+                      />
+                    </div>
+                    <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
+                      <PlaceAutocomplete
+                        label="Je me situe dans la ville de :"
+                        initialInputValue={formValues.place}
+                        onValueChange={(lookupSearchResult) => {
+                          if (!lookupSearchResult) return;
+                          setValue("latitude", lookupSearchResult.position.lat);
+                          setValue(
+                            "longitude",
+                            lookupSearchResult.position.lon,
+                          );
+                          setValue("place", lookupSearchResult.label);
+                          if (!formValues.distanceKm) {
+                            setValue("distanceKm", 10);
+                          }
+                        }}
+                        id={domElementIds.search.placeAutocompleteInput}
+                        onInputClear={() => {
+                          setValue("latitude", initialValues.latitude);
+                          setValue("longitude", initialValues.latitude);
+                          setValue("place", initialValues.place);
+                          if (formValues.sortedBy === "distance") {
+                            setValue("sortedBy", "date");
+                          }
+                          setValue("distanceKm", initialValues.distanceKm);
+                        }}
+                      />
+                    </div>
+                    <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
+                      <Select
+                        label="Distance maximum"
+                        options={radiusOptions}
+                        disabled={!lat || !lon}
+                        nativeSelectProps={{
+                          ...register("distanceKm"),
+                          title:
+                            !lat || !lon
+                              ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
+                              : undefined,
+                          id: domElementIds.search.distanceSelect,
+                          value: `${
+                            distanceKm === undefined ? "" : distanceKm
+                          }`,
+                          onChange: (event) => {
+                            const value = parseInt(event.currentTarget.value);
+                            setValue("distanceKm", value);
+                            if (!value) {
+                              setValue("sortedBy", "date");
+                            }
+                          },
+                        }}
+                      />
+                    </div>
 
-          {searchMade === null && (
-            <div className={fr.cx("fr-pt-10w")}>
-              <SearchInfoSection />
-              <SectionAccordion />
-              <SectionTextEmbed
-                videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
-                videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
-                videoDescription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.vtt"
-                videoTranscription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.txt"
-              />
-            </div>
-          )}
-        </div>
+                    <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
+                      <Button
+                        type="submit"
+                        nativeButtonProps={{
+                          id: domElementIds.search.searchSubmitButton,
+                        }}
+                        disabled={!canSubmitSearch(formValues)}
+                      >
+                        Rechercher
+                      </Button>
+                    </div>
+                  </form>
+                </PageHeader>
+
+                <div className={fr.cx("fr-pt-10w")}>
+                  <SearchInfoSection />
+                  <SectionAccordion />
+                  <SectionTextEmbed
+                    videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
+                    videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
+                    videoDescription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.vtt"
+                    videoTranscription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.txt"
+                  />
+                </div>
+              </>
+            ),
+          )
+          .with(
+            {
+              isLoading: false,
+              searchStatus: "ok",
+            },
+            () => (
+              <>
+                <Breadcrumbs />
+                <form
+                  onSubmit={handleSubmit(
+                    (value) => triggerSearch(filterFormValues(value)),
+                    (error) => console.error(error),
+                  )}
+                  className={cx(fr.cx("fr-container"))}
+                  id={domElementIds.search.searchForm}
+                >
+                  <SearchFilter
+                    defaultValue="Tous les métiers"
+                    values={
+                      formValues.appellations
+                        ? formValues.appellations.map(
+                            (appellation) => appellation.appellationLabel,
+                          )
+                        : []
+                    }
+                    submenu={{
+                      title: "Quel métier souhaitez-vous découvrir ?",
+                      content: (
+                        <>
+                          <AppellationAutocomplete
+                            label={
+                              useNaturalLanguageForAppellations
+                                ? "Je recherche le métier ou la compétence :"
+                                : "Je recherche le métier :"
+                            }
+                            initialValue={
+                              formValues.appellations
+                                ? formValues.appellations[0]
+                                : undefined
+                            }
+                            onAppellationSelected={(newAppellationAndRome) => {
+                              setValue("appellations", [newAppellationAndRome]);
+                            }}
+                            selectedAppellations={
+                              formValues.appellations
+                                ? [formValues.appellations[0]]
+                                : undefined
+                            }
+                            onInputClear={() => {
+                              setValue("appellations", undefined);
+                            }}
+                            id={domElementIds.search.appellationAutocomplete}
+                            placeholder={
+                              useNaturalLanguageForAppellations
+                                ? "Ex: boulanger, faire du pain, etc"
+                                : "Ex: boulanger, styliste, etc"
+                            }
+                            useNaturalLanguage={
+                              useNaturalLanguageForAppellations
+                            }
+                          />
+                          <p className={fr.cx("fr-hint-text")}>
+                            Les résultats sont étendus aux autres métiers de la
+                            Réalisation de contenus multimédias, c’est pour cela
+                            que vous pourrez voir des métiers proches mais ne
+                            correspondant pas précisément à votre recherche dans
+                            les résultats.
+                          </p>
+                        </>
+                      ),
+                    }}
+                  />
+                </form>
+
+                <div ref={searchResultsWrapper}>
+                  {searchStatus === "ok" && searchMade !== null && (
+                    <div
+                      ref={innerSearchResultWrapper}
+                      className={fr.cx("fr-pt-6w", "fr-pb-1w")}
+                    >
+                      <div className={fr.cx("fr-container")}>
+                        <div
+                          className={fr.cx(
+                            "fr-grid-row",
+                            "fr-grid-row--gutters",
+                            "fr-grid-row--middle",
+                            "fr-mb-4w",
+                          )}
+                        >
+                          <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
+                            <SearchSortedBySelect
+                              searchValues={formValues}
+                              triggerSearch={triggerSearch}
+                              setSortedBy={(sortedBy: SearchSortedBy) =>
+                                setValue("sortedBy", sortedBy)
+                              }
+                            />
+                          </div>
+                          <div
+                            className={cx(
+                              fr.cx(
+                                "fr-col-12",
+                                "fr-col-md-5",
+                                "fr-grid-row",
+                                "fr-grid-row--right",
+                                "fr-ml-auto",
+                              ),
+                              Styles.resultsSummary,
+                            )}
+                          >
+                            {searchStatus === "ok" && (
+                              <>
+                                <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
+                                  {getSearchResultsSummary(
+                                    searchResults.length,
+                                  )}
+                                </h2>
+                                {routeParams.appellations &&
+                                  routeParams.appellations.length > 0 && (
+                                    <span className={cx(fr.cx("fr-text--xs"))}>
+                                      pour la recherche{" "}
+                                      <strong
+                                        className={fr.cx("fr-text--bold")}
+                                      >
+                                        {
+                                          routeParams.appellations[0]
+                                            .appellationLabel
+                                        }
+                                      </strong>
+                                      , étendue au secteur{" "}
+                                      <a
+                                        href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
+                                        target="_blank"
+                                        className={fr.cx("fr-text--bold")}
+                                        rel="noreferrer"
+                                      >
+                                        {routeParams.appellations[0].romeLabel}
+                                      </a>
+                                    </span>
+                                  )}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <SearchListResults
+                        showDistance={areValidGeoParams(searchMade)}
+                      />
+                    </div>
+                  )}
+                </div>
+              </>
+            ),
+          )
+          .exhaustive()}
       </MainWrapper>
     </HeaderFooterLayout>
   );

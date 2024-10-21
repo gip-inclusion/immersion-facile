@@ -26,6 +26,7 @@ export * from "./nps-form";
 export * from "./over-footer";
 export * from "./page-header";
 export * from "./pe-connect-button";
+export * from "./search-filter";
 export * from "./section-accordion";
 export * from "./section-convention-next-steps";
 export * from "./section-faq";

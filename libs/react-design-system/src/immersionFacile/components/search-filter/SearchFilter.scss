@@ -1,0 +1,9 @@
+.im-search-filter {
+  position: relative;
+  &__submenu {
+    position: absolute;
+    background: var(--background-overlap-grey);
+    box-shadow: var(--overlap-shadow);
+    z-index: calc(var(--ground) + 1000);
+  }
+}
