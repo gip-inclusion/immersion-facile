@@ -3,6 +3,7 @@ import {
   InclusionConnectedUserBuilder,
   UpdateAgencyStatusParamsWithoutId,
   errors,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
 } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -73,20 +74,22 @@ describe("Update agency status", () => {
         expect(uow.agencyRepository.agencies[0].status).toBe(
           testParams?.status,
         );
-        expect(uow.outboxRepository.events[0]).toMatchObject({
-          id: nextUuid,
-          topic:
-            testParams.status === "active"
-              ? "AgencyActivated"
-              : "AgencyRejected",
-          payload: {
-            agency: { ...existingAgency, ...testParams },
-            triggeredBy: {
-              kind: "inclusion-connected",
-              userId: backofficeAdmin.id,
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            id: nextUuid,
+            topic:
+              testParams.status === "active"
+                ? "AgencyActivated"
+                : "AgencyRejected",
+            payload: {
+              agencyId: existingAgency.id,
+              triggeredBy: {
+                kind: "inclusion-connected",
+                userId: backofficeAdmin.id,
+              },
             },
           },
-        });
+        ]);
       },
     );
   });
