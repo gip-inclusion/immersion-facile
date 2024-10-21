@@ -30,6 +30,8 @@ const hasOtherNotifiedUserWithRole = (
   role: AgencyRole,
 ): boolean =>
   toPairs(agency.usersRights).some(
-    ([id, { roles, isNotifiedByEmail }]) =>
-      id !== userId && isNotifiedByEmail && roles.includes(role),
+    ([id, rights]) =>
+      id !== userId &&
+      rights?.isNotifiedByEmail &&
+      rights?.roles.includes(role),
   );

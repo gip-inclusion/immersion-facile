@@ -167,5 +167,5 @@ export class UpdateUserForAgency extends TransactionalUseCase<
 }
 const hasCounsellors = (agency: AgencyWithUsersRights) =>
   values(agency.usersRights).some((userRight) =>
-    userRight.roles.includes("counsellor"),
+    userRight?.roles.includes("counsellor"),
   );

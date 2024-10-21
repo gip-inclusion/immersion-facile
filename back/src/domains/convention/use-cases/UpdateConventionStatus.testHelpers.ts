@@ -709,7 +709,7 @@ const defineRolesForTest = (
   const roles =
     [agencyWithCounsellorEmails, agencyWithoutCounsellorEmail].find(
       (agency) => agency.id === expectedConvention.agencyId,
-    )?.usersRights[testAcceptNewStatusParams.userId].roles ?? [];
+    )?.usersRights[testAcceptNewStatusParams.userId]?.roles ?? [];
 
   if (agencyRolesEmptyOrContainsToReviewOrAgencyAdmin(roles)) {
     throw new Error(

@@ -86,7 +86,7 @@ const usersWithRoleFromRights = async (
   role: AgencyRole,
 ): Promise<UserOnRepository[]> => {
   const userIdsWithRole = toPairs(usersRights).filter(([_, right]) =>
-    right.roles.includes(role),
+    right?.roles.includes(role),
   );
   const users = await Promise.all(
     userIdsWithRole.map(([userId]) =>
