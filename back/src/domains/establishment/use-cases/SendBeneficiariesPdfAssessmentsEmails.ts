@@ -83,7 +83,7 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
     const firstValidatorRight = toPairs(agency.usersRights).find(([_, right]) =>
-      right.roles.includes("validator"),
+      right?.roles.includes("validator"),
     );
     if (!firstValidatorRight)
       throw errors.agency.notEnoughValidators({ agencyId: agency.id });

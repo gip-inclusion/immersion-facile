@@ -183,7 +183,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
         .filter(isTruthy)
         .reduce<UserId[]>((acc, agency) => {
           const userIds = toPairs(agency.usersRights)
-            .filter(([_, right]) => right.roles.includes(filters.agencyRole))
+            .filter(([_, right]) => right?.roles.includes(filters.agencyRole))
             .map(([userId]) => userId);
           return [...acc, ...userIds];
         }, []),
