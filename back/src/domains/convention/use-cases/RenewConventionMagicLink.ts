@@ -1,21 +1,25 @@
 import { TokenExpiredError, decode } from "jsonwebtoken";
 import {
+  BadRequestError,
   ConventionDto,
   ConventionId,
   ConventionJwtPayload,
+  ForbiddenError,
   InternshipKind,
+  NotFoundError,
   RenewMagicLinkRequestDto,
   Role,
   frontRoutes,
   renewMagicLinkRequestSchema,
   stringToMd5,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { conventionEmailsByRoleForMagicLinkRenewal } from "../../../utils/convention";
 import { createLogger } from "../../../utils/logger";
+import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
@@ -68,10 +72,14 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     );
 
     const convention = await this.#getConvention(uow, applicationId);
+
     const emails = conventionEmailsByRoleForMagicLinkRenewal(
       role,
       convention,
-      await this.#getAgency(uow, convention),
+      await agencyWithRightToAgencyDto(
+        uow,
+        await this.#getAgency(uow, convention),
+      ),
     )[role];
     if (emails instanceof Error) throw emails;
 
@@ -138,7 +146,10 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     );
   }
 
-  async #getAgency(uow: UnitOfWork, convention: ConventionDto) {
+  async #getAgency(
+    uow: UnitOfWork,
+    convention: ConventionDto,
+  ): Promise<AgencyWithUsersRights> {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
     if (agency) return agency;
     logger.error({
