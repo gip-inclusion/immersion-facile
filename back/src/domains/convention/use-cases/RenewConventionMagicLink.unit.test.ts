@@ -15,6 +15,7 @@ import {
 import { BadRequestError, NotFoundError } from "shared";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { WithTriggeredBy } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -30,33 +31,34 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 
-const currentEmployer: BeneficiaryCurrentEmployer = {
-  email: "currentEmployer@mail.com",
-  businessName: "",
-  businessSiret: "",
-  firstName: "",
-  lastName: "",
-  job: "",
-  role: "beneficiary-current-employer",
-  phone: "",
-  businessAddress: "Rue des Bouchers 67065 Strasbourg",
-};
-const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  email: "beneficiaryRepresentative@mail.com",
-  firstName: "",
-  lastName: "",
-  phone: "",
-  role: "beneficiary-representative",
-};
-const validConvention: ConventionDto = new ConventionDtoBuilder()
-  .withBeneficiaryCurrentEmployer(currentEmployer)
-  .withBeneficiaryRepresentative(beneficiaryRepresentative)
-  .build();
-
-const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
-const email = "some email";
-
 describe("RenewConventionMagicLink use case", () => {
+  const currentEmployer: BeneficiaryCurrentEmployer = {
+    email: "currentEmployer@mail.com",
+    businessName: "",
+    businessSiret: "",
+    firstName: "",
+    lastName: "",
+    job: "",
+    role: "beneficiary-current-employer",
+    phone: "",
+    businessAddress: "Rue des Bouchers 67065 Strasbourg",
+  };
+  const beneficiaryRepresentative: BeneficiaryRepresentative = {
+    email: "beneficiaryRepresentative@mail.com",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    role: "beneficiary-representative",
+  };
+  const validConvention: ConventionDto = new ConventionDtoBuilder()
+    .withBeneficiaryCurrentEmployer(currentEmployer)
+    .withBeneficiaryRepresentative(beneficiaryRepresentative)
+    .build();
+
+  const defaultAgency = AgencyDtoBuilder.create(
+    validConvention.agencyId,
+  ).build();
+  const email = "some email";
   const config: AppConfig = new AppConfigBuilder()
     .withTestPresetPreviousKeys()
     .build();
@@ -72,7 +74,7 @@ describe("RenewConventionMagicLink use case", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([defaultAgency]);
+    uow.agencyRepository.setAgencies([toAgencyWithRights(defaultAgency)]);
     uow.conventionRepository.setConventions([validConvention]);
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     useCase = new RenewConventionMagicLink(
