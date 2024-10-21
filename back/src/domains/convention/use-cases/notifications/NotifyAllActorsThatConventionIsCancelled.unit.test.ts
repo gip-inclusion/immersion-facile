@@ -74,16 +74,12 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
 
   const defaultAgency = AgencyDtoBuilder.create(cancelledConvention.agencyId)
     .withName("test-agency-name")
-    .withCounsellorEmails([])
-    .withValidatorEmails([])
     .withSignature(signature)
     .build();
 
   const agencyWithSameEmailAdressForCounsellorAndValidator =
     AgencyDtoBuilder.create(cancelledConventionWithDuplicatedEmails.agencyId)
       .withName("duplicated-email-test-agency-name")
-      .withCounsellorEmails([])
-      .withValidatorEmails([])
       .withSignature(signature)
       .build();
 

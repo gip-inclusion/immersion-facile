@@ -53,16 +53,8 @@ const notBackOfficeUserBuilder = new InclusionConnectedUserBuilder(icbackOffice)
 const notBackOfficeUser = notBackOfficeUserBuilder.buildUser();
 const icNotBackOffice = notBackOfficeUserBuilder.build();
 
-const agency1 = new AgencyDtoBuilder()
-  .withValidatorEmails([])
-  .withCounsellorEmails([])
-  .withId("agency-1")
-  .build();
-const agency2 = new AgencyDtoBuilder()
-  .withValidatorEmails([])
-  .withCounsellorEmails([])
-  .withId("agency-2")
-  .build();
+const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
+const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
 
 const agency1WithRights = toAgencyWithRights(agency1, {
   [johnUser.id]: {

@@ -157,16 +157,8 @@ describe("reject IcUser for agency", () => {
   it("Remove agency right for IcUser", async () => {
     const now = new Date("2023-11-07");
     timeGateway.setNextDate(now);
-    const agency1 = new AgencyDtoBuilder()
-      .withValidatorEmails([])
-      .withCounsellorEmails([])
-      .withId("agency1")
-      .build();
-    const agency2 = new AgencyDtoBuilder()
-      .withValidatorEmails([])
-      .withCounsellorEmails([])
-      .withId("agency2")
-      .build();
+    const agency1 = new AgencyDtoBuilder().withId("agency1").build();
+    const agency2 = new AgencyDtoBuilder().withId("agency2").build();
 
     uow.agencyRepository.setAgencies([
       toAgencyWithRights(agency1, {

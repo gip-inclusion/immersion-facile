@@ -45,22 +45,14 @@ describe("Broadcast to partners on updated convention", () => {
     .buildUser();
 
   const agency1 = toAgencyWithRights(
-    new AgencyDtoBuilder()
-      .withCounsellorEmails([])
-      .withValidatorEmails([])
-      .withId("agency-1")
-      .build(),
+    new AgencyDtoBuilder().withId("agency-1").build(),
     {
       [counsellor1.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
       [validator1.id]: { roles: ["validator"], isNotifiedByEmail: false },
     },
   );
   const agency2 = toAgencyWithRights(
-    new AgencyDtoBuilder()
-      .withCounsellorEmails([])
-      .withValidatorEmails([])
-      .withId("agency-2")
-      .build(),
+    new AgencyDtoBuilder().withId("agency-2").build(),
     {
       [counsellor2.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
       [validator2.id]: { roles: ["validator"], isNotifiedByEmail: false },
@@ -69,8 +61,6 @@ describe("Broadcast to partners on updated convention", () => {
 
   const agencyWithRefersTo = toAgencyWithRights(
     new AgencyDtoBuilder()
-      .withCounsellorEmails([])
-      .withValidatorEmails([])
       .withId("agency-with-refers-to")
       .withKind("autre")
       .withRefersToAgencyInfo({

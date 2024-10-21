@@ -51,10 +51,7 @@ describe("NotifyConventionNeedsReview", () => {
 
   const agencyWithoutCouncellorsAndValidators = AgencyDtoBuilder.create(
     defaultConvention.agencyId,
-  )
-    .withValidatorEmails([])
-    .withCounsellorEmails([])
-    .build();
+  ).build();
 
   const agencyWithValidatorsOnly = toAgencyWithRights(
     agencyWithoutCouncellorsAndValidators,

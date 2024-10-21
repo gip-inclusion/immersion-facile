@@ -92,8 +92,6 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     const agency = toAgencyWithRights(
       AgencyDtoBuilder.create(rejectedConvention.agencyId)
         .withName("test-agency-name")
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
         .withSignature(signature)
         .build(),
       {
@@ -142,8 +140,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
       toAgencyWithRights(
         AgencyDtoBuilder.create(rejectedConventionWithDuplicatedEmails.agencyId)
           .withName("duplicated-email-test-agency-name")
-          .withCounsellorEmails([])
-          .withValidatorEmails([])
+
           .withSignature(signature)
           .build(),
         {

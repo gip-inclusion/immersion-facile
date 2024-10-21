@@ -9,28 +9,18 @@ import { LinkFranceTravailUsersToTheirAgencies } from "./LinkFranceTravailUsersT
 
 const codeSafir = "546546645";
 const agencyGroupCodeSafir = "my-group-safir-code";
-const agency = new AgencyDtoBuilder()
-  .withValidatorEmails([])
-  .withCounsellorEmails([])
-  .withCodeSafir(codeSafir)
-  .build();
+const agency = new AgencyDtoBuilder().withCodeSafir(codeSafir).build();
 const agency1InGroup = new AgencyDtoBuilder()
-  .withValidatorEmails([])
-  .withCounsellorEmails([])
   .withId("agency-id-1")
   .withCodeSafir("agency-safir-1")
   .build();
 
 const agency2InGroup = new AgencyDtoBuilder()
-  .withValidatorEmails([])
-  .withCounsellorEmails([])
   .withId("agency-id-2")
   .withCodeSafir("agency-safir-2")
   .build();
 
 const agency3InGroup = new AgencyDtoBuilder()
-  .withValidatorEmails([])
-  .withCounsellorEmails([])
   .withId("agency-id-3")
   .withCodeSafir("agency-safir-3")
   .build();

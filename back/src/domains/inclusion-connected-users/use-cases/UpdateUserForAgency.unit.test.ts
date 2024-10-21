@@ -108,10 +108,7 @@ describe("UpdateUserForAgency", () => {
     });
 
     it("throws forbidden if user has no rights on agency", async () => {
-      const agency = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
-        .build();
+      const agency = new AgencyDtoBuilder().build();
       uow.agencyRepository.setAgencies([toAgencyWithRights(agency, {})]);
       uow.userRepository.users = [adminUser, notAdminUser];
 
@@ -135,10 +132,7 @@ describe("UpdateUserForAgency", () => {
   });
 
   describe("when updating email", () => {
-    const agency: AgencyDto = new AgencyDtoBuilder()
-      .withCounsellorEmails([])
-      .withValidatorEmails([])
-      .build();
+    const agency: AgencyDto = new AgencyDtoBuilder().build();
 
     beforeEach(() => {
       uow.agencyRepository.setAgencies([toAgencyWithRights(agency, {})]);
@@ -220,10 +214,7 @@ describe("UpdateUserForAgency", () => {
 
   describe("when roles are updated", () => {
     it("can change to more than one role", async () => {
-      const agency = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
-        .build();
+      const agency = new AgencyDtoBuilder().build();
 
       const validator: User = {
         ...notAdminUser,
@@ -277,10 +268,7 @@ describe("UpdateUserForAgency", () => {
     });
 
     it("should save IcUserAgencyRightChanged event when successful", async () => {
-      const agency = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
-        .build();
+      const agency = new AgencyDtoBuilder().build();
 
       uow.userRepository.users = [adminUser, notAdminUser];
       uow.agencyRepository.agencies = [
@@ -314,10 +302,7 @@ describe("UpdateUserForAgency", () => {
     });
 
     it("changes the role and email notification of a user for a given agency", async () => {
-      const agency = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
-        .build();
+      const agency = new AgencyDtoBuilder().build();
 
       const icUserWithNotif: User = {
         ...icNotAdmin,
@@ -373,10 +358,7 @@ describe("UpdateUserForAgency", () => {
     });
 
     describe("cannot remove the last validator receiving notifications of an agency", () => {
-      const agencyWithCounsellor: AgencyDto = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
-        .build();
+      const agencyWithCounsellor: AgencyDto = new AgencyDtoBuilder().build();
       const counsellor = new InclusionConnectedUserBuilder()
         .withId("counsellor")
         .withEmail("counsellor@mail.com")
@@ -488,10 +470,7 @@ describe("UpdateUserForAgency", () => {
 
       describe("is added", () => {
         it("throw an error if not notified by email and no other user of same agency is counsellor notified by email", async () => {
-          const agency = new AgencyDtoBuilder()
-            .withCounsellorEmails([])
-            .withValidatorEmails([])
-            .build();
+          const agency = new AgencyDtoBuilder().build();
 
           uow.userRepository.users = [user, validator];
           uow.agencyRepository.setAgencies([
@@ -527,10 +506,7 @@ describe("UpdateUserForAgency", () => {
             lastName: "",
             firstName: "",
           };
-          const agency = new AgencyDtoBuilder()
-            .withCounsellorEmails([])
-            .withValidatorEmails([])
-            .build();
+          const agency = new AgencyDtoBuilder().build();
 
           uow.agencyRepository.setAgencies([
             toAgencyWithRights(agency, {
@@ -569,10 +545,7 @@ describe("UpdateUserForAgency", () => {
             lastName: "",
             firstName: "",
           };
-          const agency = new AgencyDtoBuilder()
-            .withValidatorEmails([])
-            .withCounsellorEmails([])
-            .build();
+          const agency = new AgencyDtoBuilder().build();
           uow.agencyRepository.setAgencies([
             toAgencyWithRights(agency, {
               [user.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
@@ -611,10 +584,7 @@ describe("UpdateUserForAgency", () => {
 
       describe("is removed", () => {
         it("can remove counsellor if no other", async () => {
-          const agency = new AgencyDtoBuilder()
-            .withValidatorEmails([])
-            .withCounsellorEmails([])
-            .build();
+          const agency = new AgencyDtoBuilder().build();
           uow.agencyRepository.setAgencies([
             toAgencyWithRights(agency, {
               [user.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
@@ -651,10 +621,7 @@ describe("UpdateUserForAgency", () => {
             lastName: "",
             firstName: "",
           };
-          const agency = new AgencyDtoBuilder()
-            .withValidatorEmails([])
-            .withCounsellorEmails([])
-            .build();
+          const agency = new AgencyDtoBuilder().build();
           uow.agencyRepository.setAgencies([
             toAgencyWithRights(agency, {
               [user.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
@@ -704,14 +671,9 @@ describe("UpdateUserForAgency", () => {
         lastName: "",
         firstName: "",
       };
-      const agency: AgencyDto = new AgencyDtoBuilder()
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
-        .build();
+      const agency: AgencyDto = new AgencyDtoBuilder().build();
       const agencyWithRefersTo: AgencyDto = new AgencyDtoBuilder()
         .withId("agency-with-refers-to")
-        .withCounsellorEmails([])
-        .withValidatorEmails([])
         .withRefersToAgencyInfo({
           refersToAgencyId: agency.id,
           refersToAgencyName: agency.name,
@@ -781,10 +743,7 @@ describe("UpdateUserForAgency", () => {
         );
       });
       it("Throw an error when trying to update user Role to counsellor when agency is only one step validation", async () => {
-        const oneStepValidationAgency = new AgencyDtoBuilder()
-          .withCounsellorEmails([])
-          .withValidatorEmails([])
-          .build();
+        const oneStepValidationAgency = new AgencyDtoBuilder().build();
 
         uow.userRepository.users = [notAdminUser, icAdmin];
         uow.agencyRepository.agencies = [

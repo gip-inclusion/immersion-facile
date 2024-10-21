@@ -73,15 +73,11 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
 
   const defaultAgency = AgencyDtoBuilder.create(deprecatedConvention.agencyId)
     .withName("test-agency-name")
-    .withCounsellorEmails([])
-    .withValidatorEmails([])
     .build();
 
   const agencyWithSameEmailAdressForCounsellorAndValidator =
     AgencyDtoBuilder.create(deprecatedConventionWithDuplicatedEmails.agencyId)
       .withName("duplicated-email-test-agency-name")
-      .withCounsellorEmails([])
-      .withValidatorEmails([])
       .build();
 
   let useCase: NotifyAllActorsThatConventionIsDeprecated;

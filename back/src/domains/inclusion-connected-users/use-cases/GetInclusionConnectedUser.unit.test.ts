@@ -32,9 +32,7 @@ describe("GetUserAgencyDashboardUrl", () => {
   const icNotAdmin = notAdminBuilder.build();
   const notAdmin = notAdminBuilder.buildUser();
 
-  const agencyWithoutCounsellorAndValidatorBuilder = new AgencyDtoBuilder()
-    .withValidatorEmails([])
-    .withCounsellorEmails([]);
+  const agencyWithoutCounsellorAndValidatorBuilder = new AgencyDtoBuilder();
 
   let getInclusionConnectedUser: GetInclusionConnectedUser;
   let uowPerformer: InMemoryUowPerformer;
@@ -159,9 +157,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     });
 
     it("the dashboard url should not include the agency ids where role is 'to-review'", async () => {
-      const agencyBuilder = new AgencyDtoBuilder()
-        .withValidatorEmails([])
-        .withCounsellorEmails([]);
+      const agencyBuilder = new AgencyDtoBuilder();
 
       const agency1 = agencyBuilder
         .withId("1111")

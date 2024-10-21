@@ -123,7 +123,6 @@ describe("CreateUserForAgency", () => {
   describe("Agency with refers to agency", () => {
     const agencyWithRefersTo = new AgencyDtoBuilder()
       .withId("agency-with-refers-to")
-      .withValidatorEmails([])
       .withCounsellorEmails(["fake-counsellor-email@gmail.com"])
       .withRefersToAgencyInfo({
         refersToAgencyId: agency.id,

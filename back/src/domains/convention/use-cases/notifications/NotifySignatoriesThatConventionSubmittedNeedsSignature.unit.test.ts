@@ -30,10 +30,7 @@ import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "./Notify
 
 describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
   const config: AppConfig = new AppConfigBuilder({}).build();
-  const agency: AgencyDto = new AgencyDtoBuilder()
-    .withCounsellorEmails([])
-    .withValidatorEmails([])
-    .build();
+  const agency: AgencyDto = new AgencyDtoBuilder().build();
   const counsellor = new InclusionConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@mail.com")
