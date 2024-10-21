@@ -103,10 +103,11 @@ export class RenewConvention extends TransactionalUseCase<
       );
 
     if (inclusionConnectedUser.isBackofficeAdmin) return ["back-office"];
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
 
-    const agencyRight = inclusionConnectedUser.agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === convention.agencyId,
-    );
+    const agencyRight = agency.usersRights[jwtPayload.userId];
 
     if (!agencyRight)
       throw new ForbiddenError(
