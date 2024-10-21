@@ -6,7 +6,6 @@ import {
   ConventionStatus,
   Email,
   InclusionConnectedUser,
-  OAuthGatewayProvider,
   Role,
   UpdateConventionStatusRequestDto,
   UserId,
@@ -19,8 +18,8 @@ import {
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
 } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import {
   DomainTopic,
@@ -31,6 +30,7 @@ import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getIcUserByUserId } from "../../inclusion-connected-users/helpers/inclusionConnectedUser.helper";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
 
 const domainTopicByTargetStatusMap: Record<
@@ -85,12 +85,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         agencyId: conventionRead.agencyId,
       });
 
-    const provider = await makeProvider(uow);
-
     const { user, roleInPayload } = await this.#getRoleInPayloadOrUser(
       uow,
       payload,
-      provider,
     );
 
     const roles = roleInPayload
@@ -182,7 +179,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
                       uow,
                       payload,
                       conventionRead,
-                      provider,
                     ),
                     triggeredBy,
                   }
@@ -208,7 +204,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   async #getRoleInPayloadOrUser(
     uow: UnitOfWork,
     payload: UpdateConventionStatusSupportedJwtPayload,
-    provider: OAuthGatewayProvider,
   ): Promise<
     | { user: InclusionConnectedUser; roleInPayload: undefined }
     | { user: undefined; roleInPayload: Role }
@@ -216,7 +211,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     if ("role" in payload)
       return { roleInPayload: payload.role, user: undefined };
 
-    const user = await uow.userRepository.getById(payload.userId, provider);
+    const user = await getIcUserByUserId(uow, payload.userId);
     if (!user)
       throw errors.user.notFound({
         userId: payload.userId,
@@ -258,9 +253,8 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     uow: UnitOfWork,
     userId: UserId,
     agencyId: AgencyId,
-    provider: OAuthGatewayProvider,
   ): Promise<string> {
-    const user = await uow.userRepository.getById(userId, provider);
+    const user = await getIcUserByUserId(uow, userId);
     if (!user) throw errors.user.notFound({ userId });
     const userAgencyRights = user.agencyRights.find(
       (agencyRight) => agencyRight.agency.id === agencyId,
@@ -298,15 +292,14 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     uow: UnitOfWork,
     payload: UpdateConventionStatusSupportedJwtPayload,
     originalConvention: ConventionDto,
-    provider: OAuthGatewayProvider,
   ): Promise<string> => {
     const getEmailFromEmailHash = async (
       agencyId: AgencyId,
       emailHash: string,
     ): Promise<Email> => {
-      const agencies = await uow.agencyRepository.getByIds([agencyId]);
-      const agency = agencies.at(0);
-      if (!agency) throw errors.agency.notFound({ agencyId });
+      const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+      if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
+      const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
       const agencyEmails = [
         ...agency.validatorEmails,
@@ -327,7 +320,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         uow,
         payload.userId,
         originalConvention.agencyId,
-        provider,
       );
       return agencyIcUserEmail;
     }

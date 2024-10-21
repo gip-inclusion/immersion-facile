@@ -10,7 +10,6 @@ import {
   ConventionStatus,
   Email,
   ExcludeFromExisting,
-  InclusionConnectedUser,
   Role,
   UnauthorizedError,
   UpdateConventionStatusRequestDto,
@@ -22,6 +21,8 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
+import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
@@ -50,149 +51,128 @@ const allInclusionConnectedTestUsers = [
 type InclusionConnectedTestUser =
   (typeof allInclusionConnectedTestUsers)[number];
 
-const agencyWithoutCounsellorEmail = new AgencyDtoBuilder()
-  .withId("agency-without-counsellors")
-  .build();
-
-const agencyWithCounsellorEmails = new AgencyDtoBuilder()
-  .withCounsellorEmails(["counsellor1@mail.com", "counsellor2@mail.com"])
-  .withId("agency-with-two-step-validation")
-  .build();
-
 const establishmentRepEmail: Email = "establishmentrep@email.com";
 
+const icUserWithRoleBackofficeAdmin: UserOnRepository = {
+  email: "icUserWithRoleBackofficeAdmin@mail.com",
+  id: "icUserWithRoleBackofficeAdmin",
+  firstName: "icUserWithRoleBackofficeAdmin",
+  lastName: "BackofficeAdmin",
+  externalId: "icUserWithRoleBackOfficeAdmin-external-id",
+  createdAt: new Date().toISOString(),
+  isBackofficeAdmin: true,
+};
+
+const icUserWithRoleToReview: UserOnRepository = {
+  email: "icUserWithRoleToReview@mail.com",
+  firstName: "icUserWithRoleToReview",
+  id: "icUserWithRoleToReview",
+  lastName: "ToReview",
+  externalId: "icUserWithRoleToReview-external-id",
+  createdAt: new Date().toISOString(),
+};
+const icUserWithRoleCounsellor: UserOnRepository = {
+  email: "icUserWithRoleCounsellor@mail.com",
+  firstName: "icUserWithRoleCounsellor",
+  id: "icUserWithRoleCounsellor",
+  lastName: "Consellor",
+  externalId: "icUserWithRoleCounsellor-external-id",
+  createdAt: new Date().toISOString(),
+};
+
+const icUserWithRoleValidator: UserOnRepository = {
+  email: "icUserWithRoleValidator@mail.com",
+  firstName: "icUserWithRoleValidator",
+  id: "icUserWithRoleValidator",
+  lastName: "Validator",
+  externalId: "icUserWithRoleValidator-external-id",
+  createdAt: new Date().toISOString(),
+};
+
+const icUserWithRoleBackofficeAdminAndValidator: UserOnRepository = {
+  email: "icUserWithRoleBackofficeAdminAndValidator@mail.com",
+  firstName: "icUserWithRoleBackofficeAdminAndValidator",
+  id: "icUserWithRoleBackofficeAdminAndValidator",
+  lastName: "Validator",
+  externalId: "icUserWithRoleBackofficeAdminAndValidator-external-id",
+  createdAt: new Date().toISOString(),
+};
+const icUserWithRoleAgencyAdmin: UserOnRepository = {
+  email: "icUserWithRoleAgencyAdmin@mail.com",
+  firstName: "icUserWithRoleAgencyAdmin",
+  id: "icUserWithRoleAgencyAdmin",
+  lastName: "Owner",
+  externalId: "icUserWithRoleAgencyAdmin-external-id",
+  createdAt: new Date().toISOString(),
+};
+const icUserWithRoleEstablishmentRepresentative: UserOnRepository = {
+  email: establishmentRepEmail,
+  firstName: "icUserWithRoleEstablishmentRepresentativeFirstName",
+  id: "icUserWithRoleEstablishmentRepresentative",
+  lastName: "Owner",
+  externalId: "icUserWithRoleEstablishmentRepresentative-external-id",
+  createdAt: new Date().toISOString(),
+};
 const makeUserIdMapInclusionConnectedUser: Record<
   InclusionConnectedTestUser,
-  InclusionConnectedUser
+  UserOnRepository
 > = {
-  icUserWithRoleBackofficeAdmin: {
-    agencyRights: [],
-    email: "icUserWithRoleBackofficeAdmin@mail.com",
-    id: "icUserWithRoleBackofficeAdmin",
-    firstName: "icUserWithRoleBackofficeAdmin",
-    lastName: "BackofficeAdmin",
-    dashboards: { agencies: {}, establishments: {} },
-    externalId: "icUserWithRoleBackOfficeAdmin-external-id",
-    createdAt: new Date().toISOString(),
-    isBackofficeAdmin: true,
-  },
-  icUserWithRoleToReview: {
-    agencyRights: [
-      {
-        agency: agencyWithoutCounsellorEmail,
-        roles: ["to-review"],
-        isNotifiedByEmail: false,
-      },
-      {
-        agency: agencyWithCounsellorEmails,
-        roles: ["to-review"],
-        isNotifiedByEmail: false,
-      },
-    ],
-    email: "icUserWithRoleToReview@mail.com",
-    firstName: "icUserWithRoleToReview",
-    id: "icUserWithRoleToReview",
-    lastName: "ToReview",
-    dashboards: { agencies: {}, establishments: {} },
-    externalId: "icUserWithRoleToReview-external-id",
-    createdAt: new Date().toISOString(),
-  },
-  icUserWithRoleCounsellor: {
-    agencyRights: [
-      {
-        agency: agencyWithoutCounsellorEmail,
-        roles: ["counsellor"],
-        isNotifiedByEmail: false,
-      },
-      {
-        agency: agencyWithCounsellorEmails,
-        roles: ["counsellor"],
-        isNotifiedByEmail: false,
-      },
-    ],
-    email: "icUserWithRoleCounsellor@mail.com",
-    firstName: "icUserWithRoleCounsellor",
-    id: "icUserWithRoleCounsellor",
-    lastName: "Consellor",
-    dashboards: { agencies: {}, establishments: {} },
-    externalId: "icUserWithRoleCounsellor-external-id",
-    createdAt: new Date().toISOString(),
-  },
-  icUserWithRoleValidator: {
-    agencyRights: [
-      {
-        agency: agencyWithoutCounsellorEmail,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
-      },
-      {
-        agency: agencyWithCounsellorEmails,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
-      },
-    ],
-    email: "icUserWithRoleValidator@mail.com",
-    firstName: "icUserWithRoleValidator",
-    id: "icUserWithRoleValidator",
-    lastName: "Validator",
-    dashboards: { agencies: {}, establishments: {} },
-    externalId: "icUserWithRoleValidator-external-id",
-    createdAt: new Date().toISOString(),
-  },
-  icUserWithRoleBackofficeAdminAndValidator: {
-    agencyRights: [
-      {
-        agency: agencyWithoutCounsellorEmail,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
-      },
-      {
-        agency: agencyWithCounsellorEmails,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
-      },
-    ],
-    email: "icUserWithRoleBackofficeAdminAndValidator@mail.com",
-    firstName: "icUserWithRoleBackofficeAdminAndValidator",
-    id: "icUserWithRoleBackofficeAdminAndValidator",
-    lastName: "Validator",
-    dashboards: { agencies: {}, establishments: {} },
-    externalId: "icUserWithRoleBackofficeAdminAndValidator-external-id",
-    createdAt: new Date().toISOString(),
-  },
-
-  icUserWithRoleAgencyAdmin: {
-    agencyRights: [
-      {
-        agency: agencyWithoutCounsellorEmail,
-        roles: ["agency-admin"],
-        isNotifiedByEmail: false,
-      },
-      {
-        agency: agencyWithCounsellorEmails,
-        roles: ["agency-admin"],
-        isNotifiedByEmail: false,
-      },
-    ],
-    email: "icUserWithRoleAgencyAdmin@mail.com",
-    firstName: "icUserWithRoleAgencyAdmin",
-    id: "icUserWithRoleAgencyAdmin",
-    lastName: "Owner",
-    dashboards: { agencies: {}, establishments: {} },
-    externalId: "icUserWithRoleAgencyAdmin-external-id",
-    createdAt: new Date().toISOString(),
-  },
-  icUserWithRoleEstablishmentRepresentative: {
-    agencyRights: [],
-    email: establishmentRepEmail,
-    firstName: "icUserWithRoleEstablishmentRepresentativeFirstName",
-    id: "icUserWithRoleEstablishmentRepresentative",
-    lastName: "Owner",
-    dashboards: { agencies: {}, establishments: {} },
-    externalId: "icUserWithRoleEstablishmentRepresentative-external-id",
-    createdAt: new Date().toISOString(),
-  },
+  icUserWithRoleBackofficeAdmin,
+  icUserWithRoleToReview,
+  icUserWithRoleCounsellor,
+  icUserWithRoleValidator,
+  icUserWithRoleBackofficeAdminAndValidator,
+  icUserWithRoleAgencyAdmin,
+  icUserWithRoleEstablishmentRepresentative,
 };
+
+const agencyWithoutCounsellorEmail = toAgencyWithRights(
+  new AgencyDtoBuilder().withId("agency-without-counsellors").build(),
+  {
+    [icUserWithRoleAgencyAdmin.id]: {
+      isNotifiedByEmail: false,
+      roles: ["agency-admin"],
+    },
+    [icUserWithRoleBackofficeAdminAndValidator.id]: {
+      isNotifiedByEmail: false,
+      roles: ["validator"],
+    },
+    [icUserWithRoleValidator.id]: {
+      isNotifiedByEmail: false,
+      roles: ["validator"],
+    },
+    [icUserWithRoleToReview.id]: {
+      isNotifiedByEmail: false,
+      roles: ["to-review"],
+    },
+  },
+);
+
+const agencyWithCounsellorEmails = toAgencyWithRights(
+  new AgencyDtoBuilder().withId("agency-with-two-step-validation").build(),
+  {
+    [icUserWithRoleAgencyAdmin.id]: {
+      isNotifiedByEmail: false,
+      roles: ["agency-admin"],
+    },
+    [icUserWithRoleBackofficeAdminAndValidator.id]: {
+      isNotifiedByEmail: false,
+      roles: ["validator"],
+    },
+    [icUserWithRoleValidator.id]: {
+      isNotifiedByEmail: false,
+      roles: ["validator"],
+    },
+    [icUserWithRoleCounsellor.id]: {
+      isNotifiedByEmail: false,
+      roles: ["counsellor"],
+    },
+    [icUserWithRoleToReview.id]: {
+      isNotifiedByEmail: false,
+      roles: ["to-review"],
+    },
+  },
+);
 
 type ExtractFromDomainTopics<T extends DomainTopic> = Extract<DomainTopic, T>;
 
@@ -210,11 +190,10 @@ type ConventionDomainTopic = ExtractFromDomainTopics<
 
 type SetupInitialStateParams = {
   initialStatus: ConventionStatus;
-  withIcUser: boolean;
   conventionId: ConventionId;
   alreadySigned?: boolean;
 };
-export const originalConventionId: ConventionId =
+export const conventionWithAgencyOneStepValidationId: ConventionId =
   "add5c20e-6dd2-45af-affe-927358005251";
 export const conventionWithAgencyTwoStepsValidationId: ConventionId =
   "add5c20e-6dd2-45af-affe-927358005252";
@@ -223,10 +202,9 @@ export const setupInitialState = ({
   initialStatus,
   alreadySigned = true,
   conventionId,
-  withIcUser,
 }: SetupInitialStateParams) => {
   const conventionBuilder = new ConventionDtoBuilder()
-    .withId(originalConventionId)
+    .withId(conventionWithAgencyOneStepValidationId)
     .withStatus(initialStatus)
     .withEstablishmentRepresentativeEmail(establishmentRepEmail)
     .withAgencyId(agencyWithoutCounsellorEmail.id);
@@ -276,10 +254,7 @@ export const setupInitialState = ({
     agencyWithoutCounsellorEmail,
   ]);
   conventionRepository.setConventions(values(conventionsToTest));
-  withIcUser &&
-    uow.userRepository.setInclusionConnectedUsers(
-      values(makeUserIdMapInclusionConnectedUser),
-    );
+  uow.userRepository.users = values(makeUserIdMapInclusionConnectedUser);
 
   return {
     originalConvention: conventionsToTest[conventionId],
@@ -361,7 +336,6 @@ const makeTestAcceptsStatusUpdate =
     } = await setupInitialState({
       initialStatus: testAcceptNewStatusParams.initialStatus,
       conventionId: updateStatusParams.conventionId,
-      withIcUser: "userId" in testAcceptNewStatusParams,
     });
 
     if (nextDate) timeGateway.setNextDate(nextDate);
@@ -519,7 +493,6 @@ const makeTestRejectsStatusUpdate =
       timeGateway,
     } = await setupInitialState({
       initialStatus: testRejectsNewStatusParams.initialStatus,
-      withIcUser: "userId" in testRejectsNewStatusParams,
       conventionId: updateStatusParams.conventionId,
     });
     const jwtPayload: ConventionRelatedJwtPayload =
@@ -609,22 +582,23 @@ export const rejectStatusTransitionTests = ({
 
           if (user.isBackofficeAdmin) return ["back-office"];
 
-          return (
-            user.agencyRights.find(
-              (agencyRight) =>
-                agencyRight.agency.id === agencyWithoutCounsellorEmail.id,
-            )?.roles ?? []
-          );
+          return agencyWithoutCounsellorEmail.usersRights[userId]?.roles ?? [];
         };
 
+        const roles = getRoles();
         return testRejectsStatusUpdate({
           userId,
           initialStatus: someValidInitialStatus,
-          expectedError: errors.convention.badRoleStatusChange({
-            roles: getRoles(),
-            status: updateStatusParams.status,
-            conventionId: updateStatusParams.conventionId,
-          }),
+          expectedError: roles.length
+            ? errors.convention.badRoleStatusChange({
+                roles,
+                status: updateStatusParams.status,
+                conventionId: updateStatusParams.conventionId,
+              })
+            : errors.user.noRightsOnAgency({
+                agencyId: agencyWithoutCounsellorEmail.id,
+                userId: user.id,
+              }),
         });
       });
     }
@@ -675,7 +649,7 @@ export const acceptStatusTransitionTests = ({
   nextDate?: Date;
   updateStatusParams: UpdateConventionStatusRequestDto;
 }) => {
-  describe("Accepted", () => {
+  describe(`Accepted with convention id ${updateStatusParams.conventionId}`, () => {
     const someValidInitialStatus = allowedInitialStatuses[0];
     const someValidRole = allowedMagicLinkRoles[0];
 
@@ -733,11 +707,9 @@ const defineRolesForTest = (
     return ["back-office"];
 
   const roles =
-    makeUserIdMapInclusionConnectedUser[
-      testAcceptNewStatusParams.userId
-    ].agencyRights.find(
-      (agencyRight) => agencyRight.agency.id === expectedConvention.agencyId,
-    )?.roles ?? [];
+    [agencyWithCounsellorEmails, agencyWithoutCounsellorEmail].find(
+      (agency) => agency.id === expectedConvention.agencyId,
+    )?.usersRights[testAcceptNewStatusParams.userId].roles ?? [];
 
   if (agencyRolesEmptyOrContainsToReviewOrAgencyAdmin(roles)) {
     throw new Error(
