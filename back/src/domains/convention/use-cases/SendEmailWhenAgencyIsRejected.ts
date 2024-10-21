@@ -1,14 +1,12 @@
-import { AgencyDto, agencySchema } from "shared";
-import { z } from "zod";
+import { WithAgencyId, errors, withAgencyIdSchema } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-type WithAgency = { agency: AgencyDto };
-
-export class SendEmailWhenAgencyIsRejected extends TransactionalUseCase<WithAgency> {
-  protected inputSchema = z.object({ agency: agencySchema });
+export class SendEmailWhenAgencyIsRejected extends TransactionalUseCase<WithAgencyId> {
+  protected inputSchema = withAgencyIdSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
@@ -21,9 +19,14 @@ export class SendEmailWhenAgencyIsRejected extends TransactionalUseCase<WithAgen
   }
 
   public async _execute(
-    { agency }: WithAgency & { agency: { rejectionJustification: string } },
+    { agencyId }: WithAgencyId,
     uow: UnitOfWork,
   ): Promise<void> {
+    const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+    if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+    if (!agency.rejectionJustification)
+      throw errors.agency.notRejected({ agencyId });
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {

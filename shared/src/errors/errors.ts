@@ -294,6 +294,8 @@ export const errors = {
       new BadRequestError(
         `L'agence ${agencyId} doit avoir au moins un validateur recevant les emails.`,
       ),
+    notRejected: ({ agencyId }: { agencyId: AgencyId }) =>
+      new BadRequestError(`L'agence ${agencyId} n'est pas rejetée.`),
     invalidRoleUpdateForOneStepValidationAgency: ({
       agencyId,
       role,

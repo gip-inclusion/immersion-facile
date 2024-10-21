@@ -10,7 +10,6 @@ import {
   Role,
   SiretDto,
   UserId,
-  WithAgencyDto,
   WithAgencyId,
   WithAgencyIdAndUserId,
   WithAssessmentDto,
@@ -143,7 +142,7 @@ export type DomainEvent =
   | GenericEvent<"NewAgencyAdded", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyActivated", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyUpdated", WithAgencyId & WithTriggeredBy>
-  | GenericEvent<"AgencyRejected", WithAgencyDto & WithTriggeredBy>
+  | GenericEvent<"AgencyRejected", WithAgencyId & WithTriggeredBy>
 
   // IMMERSION ASSESSMENT related
   | GenericEvent<"AssessmentCreated", WithAssessmentDto & WithTriggeredBy>
