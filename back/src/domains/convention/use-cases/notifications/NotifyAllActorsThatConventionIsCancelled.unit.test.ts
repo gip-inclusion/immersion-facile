@@ -1,11 +1,12 @@
 import {
-  AgencyDto,
   AgencyDtoBuilder,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDtoBuilder,
+  EmailNotification,
+  InclusionConnectedUserBuilder,
 } from "shared";
-import { EmailNotification } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { expectNotifyConventionCancelled } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
@@ -17,85 +18,99 @@ import {
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyAllActorsThatConventionIsCancelled } from "./NotifyAllActorsThatConventionIsCancelled";
 
-const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "beneficiary-representative",
-  email: "legal@representative.com",
-  firstName: "The",
-  lastName: "Representative",
-  phone: "+33112233446",
-};
+describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
+  const beneficiaryRepresentative: BeneficiaryRepresentative = {
+    role: "beneficiary-representative",
+    email: "legal@representative.com",
+    firstName: "The",
+    lastName: "Representative",
+    phone: "+33112233446",
+  };
 
-const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
-  firstName: "ali",
-  lastName: "baba",
-  businessName: "business",
-  businessSiret: "01234567890123",
-  email: "beneficiary-current-employer@gmail.com",
-  job: "job",
-  phone: "+33112233445",
-  role: "beneficiary-current-employer",
-  signedAt: new Date().toISOString(),
-  businessAddress: "Rue des Bouchers 67065 Strasbourg",
-};
+  const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
+    firstName: "ali",
+    lastName: "baba",
+    businessName: "business",
+    businessSiret: "01234567890123",
+    email: "beneficiary-current-employer@gmail.com",
+    job: "job",
+    phone: "+33112233445",
+    role: "beneficiary-current-employer",
+    signedAt: new Date().toISOString(),
+    businessAddress: "Rue des Bouchers 67065 Strasbourg",
+  };
 
-const cancelledConvention = new ConventionDtoBuilder()
-  .withStatus("CANCELLED")
-  .withBeneficiaryRepresentative(beneficiaryRepresentative)
-  .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-  .build();
+  const cancelledConvention = new ConventionDtoBuilder()
+    .withStatus("CANCELLED")
+    .withBeneficiaryRepresentative(beneficiaryRepresentative)
+    .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+    .build();
 
-const cancelledConventionWithDuplicatedEmails = new ConventionDtoBuilder()
-  .withStatus("CANCELLED")
-  .withAgencyId("fakeAgencyId")
-  .withBeneficiaryRepresentative(beneficiaryRepresentative)
-  .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-  .withEstablishmentRepresentativeEmail(
-    "establishment-representative@gmail.com",
-  )
-  .withEstablishmentTutorEmail("establishment-representative@gmail.com")
-  .build();
+  const cancelledConventionWithDuplicatedEmails = new ConventionDtoBuilder()
+    .withStatus("CANCELLED")
+    .withAgencyId("fakeAgencyId")
+    .withBeneficiaryRepresentative(beneficiaryRepresentative)
+    .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+    .withEstablishmentRepresentativeEmail(
+      "establishment-representative@gmail.com",
+    )
+    .withEstablishmentTutorEmail("establishment-representative@gmail.com")
+    .build();
 
-const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
-const signature = "test-signature";
+  const counsellor1 = new InclusionConnectedUserBuilder()
+    .withId("counsellor1")
+    .withEmail("counsellor1@email.fr")
+    .build();
+  const counsellor2 = new InclusionConnectedUserBuilder()
+    .withId("counsellor2")
+    .withEmail("counsellor2@email.fr")
+    .build();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator")
+    .withEmail("validator@email.fr")
+    .build();
 
-const defaultAgency = AgencyDtoBuilder.create(cancelledConvention.agencyId)
-  .withName("test-agency-name")
-  .withCounsellorEmails(counsellorEmails)
-  .withSignature(signature)
-  .build();
+  const signature = "test-signature";
 
-const agencyWithSameEmailAdressForCounsellorAndValidator =
-  AgencyDtoBuilder.create(cancelledConventionWithDuplicatedEmails.agencyId)
-    .withName("duplicated-email-test-agency-name")
-    .withCounsellorEmails(counsellorEmails)
-    .withValidatorEmails(counsellorEmails)
+  const defaultAgency = AgencyDtoBuilder.create(cancelledConvention.agencyId)
+    .withName("test-agency-name")
+    .withCounsellorEmails([])
+    .withValidatorEmails([])
     .withSignature(signature)
     .build();
 
-describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
-  let agency: AgencyDto;
+  const agencyWithSameEmailAdressForCounsellorAndValidator =
+    AgencyDtoBuilder.create(cancelledConventionWithDuplicatedEmails.agencyId)
+      .withName("duplicated-email-test-agency-name")
+      .withCounsellorEmails([])
+      .withValidatorEmails([])
+      .withSignature(signature)
+      .build();
+
   let useCase: NotifyAllActorsThatConventionIsCancelled;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    agency = defaultAgency;
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([agency]);
-
-    const timeGateway = new CustomTimeGateway();
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
-
     useCase = new NotifyAllActorsThatConventionIsCancelled(
       new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
+      makeSaveNotificationAndRelatedEvent(
+        new UuidV4Generator(),
+        new CustomTimeGateway(),
+      ),
     );
+    uow.userRepository.users = [counsellor1, counsellor2, validator];
   });
 
   it("Sends cancelation email to beneficiary, establishment tutor, and counsellors, validor, beneficiary Representativ and beneficiary current employer", async () => {
+    uow.agencyRepository.setAgencies([
+      toAgencyWithRights(defaultAgency, {
+        [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      }),
+    ]);
+
     await useCase.execute({ convention: cancelledConvention });
     const {
       beneficiaryCurrentEmployer,
@@ -119,17 +134,27 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
         beneficiaryRepresentative!.email,
         // biome-ignore lint/style/noNonNullAssertion:
         beneficiaryCurrentEmployer!.email,
-        ...counsellorEmails,
-        ...agency.validatorEmails,
+        counsellor1.email,
+        counsellor2.email,
+        validator.email,
       ],
       cancelledConvention,
-      agency,
+      defaultAgency,
     );
   });
 
   it("doesn't send duplicated emails if validator email is also in counsellor emails and establishment tutor email is the same as establishment representative", async () => {
     uow.agencyRepository.setAgencies([
-      agencyWithSameEmailAdressForCounsellorAndValidator,
+      toAgencyWithRights(agencyWithSameEmailAdressForCounsellorAndValidator, {
+        [counsellor1.id]: {
+          isNotifiedByEmail: false,
+          roles: ["counsellor", "validator"],
+        },
+        [counsellor2.id]: {
+          isNotifiedByEmail: false,
+          roles: ["counsellor", "validator"],
+        },
+      }),
     ]);
 
     await useCase.execute({
@@ -158,7 +183,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
         beneficiaryRepresentative!.email,
         // biome-ignore lint/style/noNonNullAssertion:
         beneficiaryCurrentEmployer!.email,
-        ...agencyWithSameEmailAdressForCounsellorAndValidator.validatorEmails,
+        counsellor1.email,
+        counsellor2.email,
       ],
       cancelledConventionWithDuplicatedEmails,
       agencyWithSameEmailAdressForCounsellorAndValidator,
