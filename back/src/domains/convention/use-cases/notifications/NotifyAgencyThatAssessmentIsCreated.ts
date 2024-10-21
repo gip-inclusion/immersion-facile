@@ -1,4 +1,5 @@
 import { WithAssessmentDto, errors, withAssessmentSchema } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -29,9 +30,13 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         conventionId: assessment.conventionId,
       });
 
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
-    if (!agency)
+    const agencyWithRights = await uow.agencyRepository.getById(
+      convention.agencyId,
+    );
+    if (!agencyWithRights)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
