@@ -15,6 +15,7 @@ export type AddressAutocompleteProps = {
   inputStyle?: React.CSSProperties;
   setFormValue: (p: AddressAndPosition) => void;
   placeholder?: string;
+  hintText?: React.ReactNode;
   notice?: string;
   id?: string;
   useFirstAddressOnInitialSearchTerm?: boolean;
@@ -29,7 +30,8 @@ export const AddressAutocomplete = ({
   headerClassName,
   inputStyle,
   initialSearchTerm = "",
-  placeholder = "Ex : Bordeaux 33000",
+  placeholder = "",
+  hintText,
   notice,
   id = "im-address-autocomplete",
   useFirstAddressOnInitialSearchTerm,
@@ -124,6 +126,7 @@ export const AddressAutocomplete = ({
             disabled={disabled}
             placeholder={placeholder}
             id={id}
+            hintText={hintText}
             params={params}
             state={state}
             stateRelatedMessage={stateRelatedMessage}
