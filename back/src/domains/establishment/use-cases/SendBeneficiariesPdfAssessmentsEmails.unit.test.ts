@@ -25,10 +25,7 @@ import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGenerato
 import { SendBeneficiariesPdfAssessmentsEmails } from "./SendBeneficiariesPdfAssessmentsEmails";
 
 describe("SendBeneficiariesPdfAssessmentsEmails", () => {
-  const agency = new AgencyDtoBuilder()
-    .withValidatorEmails([])
-    .withCounsellorEmails([])
-    .build();
+  const agency = new AgencyDtoBuilder().build();
   const validator = new InclusionConnectedUserBuilder().buildUser();
 
   const id: ConventionId = "immersion-ending-tomorrow-id";

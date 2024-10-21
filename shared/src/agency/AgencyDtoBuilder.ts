@@ -2,7 +2,6 @@ import { AbsoluteUrl } from "../AbsoluteUrl";
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
-import { Email } from "../email/email.dto";
 import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
 
 const defaultAddress: AddressDto = {
@@ -20,7 +19,7 @@ const emptyAgency: AgencyDto = {
   status: "active",
   kind: "autre",
   counsellorEmails: [],
-  validatorEmails: [defaultValidatorEmail],
+  validatorEmails: [],
   agencySiret: "12345678904444",
   questionnaireUrl: "https://empty-questionnaire-url",
   signature: "empty-signature",
@@ -90,13 +89,6 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({
       ...this.#agency,
       codeSafir: code,
-    });
-  }
-
-  public withCounsellorEmails(counsellorEmails: Email[]) {
-    return new AgencyDtoBuilder({
-      ...this.#agency,
-      counsellorEmails,
     });
   }
 
@@ -174,13 +166,6 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     return new AgencyDtoBuilder({
       ...this.#agency,
       status,
-    });
-  }
-
-  public withValidatorEmails(validatorEmails: Email[]) {
-    return new AgencyDtoBuilder({
-      ...this.#agency,
-      validatorEmails,
     });
   }
 

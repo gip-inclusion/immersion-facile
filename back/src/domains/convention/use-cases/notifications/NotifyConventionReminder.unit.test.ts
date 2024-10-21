@@ -145,11 +145,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       .withEmail("validator2@email.com")
       .buildUser();
     const agencyWithRight = toAgencyWithRights(
-      new AgencyDtoBuilder()
-        .withId("agencyId")
-        .withValidatorEmails([])
-        .withCounsellorEmails([])
-        .build(),
+      new AgencyDtoBuilder().withId("agencyId").build(),
       {
         [councellor1.id]: {
           isNotifiedByEmail: false,

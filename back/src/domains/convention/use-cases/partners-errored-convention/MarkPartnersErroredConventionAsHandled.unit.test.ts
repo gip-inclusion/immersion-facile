@@ -47,10 +47,7 @@ describe("mark partners errored convention as handled", () => {
     .withExternalId("icUser-external-id")
     .build();
 
-  const agency = new AgencyDtoBuilder()
-    .withValidatorEmails([])
-    .withCounsellorEmails([])
-    .build();
+  const agency = new AgencyDtoBuilder().build();
   const agencyWithRights = toAgencyWithRights(agency, {
     [icuser.id]: {
       roles: ["validator"],
