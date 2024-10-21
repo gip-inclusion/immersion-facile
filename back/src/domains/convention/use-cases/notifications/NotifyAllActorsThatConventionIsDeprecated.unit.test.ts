@@ -1,11 +1,12 @@
 import {
-  AgencyDto,
   AgencyDtoBuilder,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDtoBuilder,
+  EmailNotification,
+  InclusionConnectedUserBuilder,
 } from "shared";
-import { EmailNotification } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { expectNotifyConventionIsDeprecated } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
@@ -17,84 +18,92 @@ import {
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyAllActorsThatConventionIsDeprecated } from "./NotifyAllActorsThatConventionIsDeprecated";
 
-const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "beneficiary-representative",
-  email: "legal@representative.com",
-  firstName: "The",
-  lastName: "Representative",
-  phone: "+33112233446",
-};
+describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
+  const beneficiaryRepresentative: BeneficiaryRepresentative = {
+    role: "beneficiary-representative",
+    email: "legal@representative.com",
+    firstName: "The",
+    lastName: "Representative",
+    phone: "+33112233446",
+  };
 
-const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
-  firstName: "ali",
-  lastName: "baba",
-  businessName: "business",
-  businessSiret: "01234567890123",
-  email: "beneficiary-current-employer@gmail.com",
-  job: "job",
-  phone: "+33112233445",
-  role: "beneficiary-current-employer",
-  signedAt: new Date().toISOString(),
-  businessAddress: "Rue des Bouchers 67065 Strasbourg",
-};
+  const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
+    firstName: "ali",
+    lastName: "baba",
+    businessName: "business",
+    businessSiret: "01234567890123",
+    email: "beneficiary-current-employer@gmail.com",
+    job: "job",
+    phone: "+33112233445",
+    role: "beneficiary-current-employer",
+    signedAt: new Date().toISOString(),
+    businessAddress: "Rue des Bouchers 67065 Strasbourg",
+  };
 
-const deprecatedConvention = new ConventionDtoBuilder()
-  .withStatus("DEPRECATED")
-  .withStatusJustification("test-deprecation-justification")
-  .withBeneficiaryRepresentative(beneficiaryRepresentative)
-  .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-  .build();
-
-const deprecatedConventionWithDuplicatedEmails = new ConventionDtoBuilder()
-  .withStatus("DEPRECATED")
-  .withAgencyId("fakeAgencyId")
-  .withBeneficiaryRepresentative(beneficiaryRepresentative)
-  .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-  .withEstablishmentRepresentativeEmail(
-    "establishment-representative@gmail.com",
-  )
-  .withEstablishmentTutorEmail("establishment-representative@gmail.com")
-  .build();
-
-const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
-
-const validatorEmails = ["validator@gmail.com"];
-
-const defaultAgency = AgencyDtoBuilder.create(deprecatedConvention.agencyId)
-  .withName("test-agency-name")
-  .withCounsellorEmails(counsellorEmails)
-  .withValidatorEmails(validatorEmails)
-  .build();
-
-const agencyWithSameEmailAdressForCounsellorAndValidator =
-  AgencyDtoBuilder.create(deprecatedConventionWithDuplicatedEmails.agencyId)
-    .withName("duplicated-email-test-agency-name")
-    .withCounsellorEmails(counsellorEmails)
-    .withValidatorEmails(counsellorEmails)
+  const deprecatedConvention = new ConventionDtoBuilder()
+    .withStatus("DEPRECATED")
+    .withStatusJustification("test-deprecation-justification")
+    .withBeneficiaryRepresentative(beneficiaryRepresentative)
+    .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
     .build();
 
-describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
-  let useCase: NotifyAllActorsThatConventionIsDeprecated;
-  let agency: AgencyDto;
+  const deprecatedConventionWithDuplicatedEmails = new ConventionDtoBuilder()
+    .withStatus("DEPRECATED")
+    .withAgencyId("fakeAgencyId")
+    .withBeneficiaryRepresentative(beneficiaryRepresentative)
+    .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+    .withEstablishmentRepresentativeEmail(
+      "establishment-representative@gmail.com",
+    )
+    .withEstablishmentTutorEmail("establishment-representative@gmail.com")
+    .build();
 
+  const counsellor1 = new InclusionConnectedUserBuilder()
+    .withId("counsellor1")
+    .withEmail("counsellor1@email.fr")
+    .buildUser();
+  const counsellor2 = new InclusionConnectedUserBuilder()
+    .withId("counsellor2")
+    .withEmail("counsellor2@email.fr")
+    .buildUser();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator")
+    .withEmail("validator@email.fr")
+    .buildUser();
+
+  const defaultAgency = AgencyDtoBuilder.create(deprecatedConvention.agencyId)
+    .withName("test-agency-name")
+    .withCounsellorEmails([])
+    .withValidatorEmails([])
+    .build();
+
+  const agencyWithSameEmailAdressForCounsellorAndValidator =
+    AgencyDtoBuilder.create(deprecatedConventionWithDuplicatedEmails.agencyId)
+      .withName("duplicated-email-test-agency-name")
+      .withCounsellorEmails([])
+      .withValidatorEmails([])
+      .build();
+
+  let useCase: NotifyAllActorsThatConventionIsDeprecated;
   let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    agency = defaultAgency;
-
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([agency]);
-
-    const timeGateway = new CustomTimeGateway();
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
     useCase = new NotifyAllActorsThatConventionIsDeprecated(
       new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
+      makeSaveNotificationAndRelatedEvent(
+        new UuidV4Generator(),
+        new CustomTimeGateway(),
+      ),
     );
+    uow.agencyRepository.setAgencies([
+      toAgencyWithRights(defaultAgency, {
+        [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      }),
+    ]);
+    uow.userRepository.users = [counsellor1, counsellor2, validator];
   });
 
   it("Sends a conevention deprecated notification to all actors", async () => {
@@ -121,8 +130,9 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
         beneficiaryRepresentative!.email,
         // biome-ignore lint/style/noNonNullAssertion:
         beneficiaryCurrentEmployer!.email,
-        ...counsellorEmails,
-        ...validatorEmails,
+        counsellor1.email,
+        counsellor2.email,
+        validator.email,
       ],
       deprecatedConvention,
     );
@@ -130,7 +140,16 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
 
   it("doesn't send duplicated rejection emails if validator email is also in counsellor emails and establishment tutor email is the same as establishment representative", async () => {
     uow.agencyRepository.setAgencies([
-      agencyWithSameEmailAdressForCounsellorAndValidator,
+      toAgencyWithRights(agencyWithSameEmailAdressForCounsellorAndValidator, {
+        [counsellor1.id]: {
+          isNotifiedByEmail: false,
+          roles: ["counsellor", "validator"],
+        },
+        [counsellor2.id]: {
+          isNotifiedByEmail: false,
+          roles: ["counsellor", "validator"],
+        },
+      }),
     ]);
 
     await useCase.execute({
@@ -159,7 +178,8 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
         beneficiaryRepresentative!.email,
         // biome-ignore lint/style/noNonNullAssertion:
         beneficiaryCurrentEmployer!.email,
-        ...agencyWithSameEmailAdressForCounsellorAndValidator.validatorEmails,
+        counsellor1.email,
+        counsellor2.email,
       ],
       deprecatedConventionWithDuplicatedEmails,
     );
