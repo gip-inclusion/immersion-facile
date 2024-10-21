@@ -9,6 +9,7 @@ import {
 import { P, match } from "ts-pattern";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../../core/events/eventPayload.dto";
 import { conventionRequiresModificationPayloadSchema } from "../../../core/events/eventPayload.schema";
@@ -49,10 +50,11 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
     const recipientOrError = recipientByModifierRole(payload);
     if (recipientOrError instanceof Error) throw recipientOrError;
 
+    const agencyDto = await agencyWithRightToAgencyDto(uow, agency);
     const requesterNameOrError = requesterNameByRole(
       payload.requesterRole,
       payload.convention,
-      agency,
+      agencyDto,
     );
     if (requesterNameOrError instanceof Error) throw requesterNameOrError;
 
@@ -64,7 +66,7 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
         recipientOrError,
         uow,
         payload.justification,
-        agency,
+        agencyDto,
         requesterNameOrError,
       ),
       followedIds: {
