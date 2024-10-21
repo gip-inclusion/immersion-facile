@@ -62,7 +62,7 @@ export const miniStageAgencyKinds: AgencyKind[] = [
 export type AgencyKind = (typeof agencyKindList)[number];
 
 export const agencyKindList = [
-  "pole-emploi",
+  "pole-emploi", // TODO: remplacer l'agency kind PE par FT
   "mission-locale",
   "cap-emploi",
   "conseil-departemental",
