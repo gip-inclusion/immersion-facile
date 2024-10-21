@@ -22,12 +22,11 @@ import {
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateConvention } from "./UpdateConvention";
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withId("backoffice-admin-user-id")
-  .withIsAdmin(true)
-  .build();
-
 describe("Update Convention", () => {
+  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+    .withId("backoffice-admin-user-id")
+    .withIsAdmin(true)
+    .buildUser();
   let updateConvention: UpdateConvention;
   let createNewEvent: CreateNewEvent;
   let uowPerformer: InMemoryUowPerformer;
@@ -36,7 +35,7 @@ describe("Update Convention", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
 
-    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
+    uow.userRepository.users = [backofficeAdminUser];
 
     createNewEvent = makeCreateNewEvent({
       timeGateway: new CustomTimeGateway(),
@@ -63,9 +62,9 @@ describe("Update Convention", () => {
       const convention = new ConventionDtoBuilder().build();
       const icUser = new InclusionConnectedUserBuilder()
         .withIsAdmin(false)
-        .build();
+        .buildUser();
 
-      uow.userRepository.setInclusionConnectedUsers([icUser]);
+      uow.userRepository.users = [icUser];
 
       await expectPromiseToFailWithError(
         updateConvention.execute({ convention }, { userId: icUser.id }),
