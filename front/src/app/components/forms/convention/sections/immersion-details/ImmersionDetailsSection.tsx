@@ -11,8 +11,12 @@ import { formConventionFieldsLabels } from "src/app/contents/forms/convention/fo
 import { getFormContents } from "src/app/hooks/formContents.hooks";
 
 export const ImmersionDetailsSection = () => {
-  const { setValue, getValues, register } = useFormContext<ConventionReadDto>();
+  const { setValue, getValues, register, watch } =
+    useFormContext<ConventionReadDto>();
   const values = getValues();
+
+  const hasIndividualProtection = watch("individualProtection");
+  const hasSanitaryPrevention = watch("sanitaryPrevention");
 
   const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
@@ -33,6 +37,9 @@ export const ImmersionDetailsSection = () => {
               Boolean(option.nativeInputProps.value) ===
               values.individualProtection,
             onChange: () => {
+              if (option.nativeInputProps.value === 0) {
+                setValue("individualProtectionDescription", "");
+              }
               setValue(
                 "individualProtection",
                 option.nativeInputProps.value === 1,
@@ -41,6 +48,17 @@ export const ImmersionDetailsSection = () => {
           },
         }))}
       />
+
+      {hasIndividualProtection && (
+        <Input
+          label={formContents.individualProtectionDescription.label}
+          hintText={formContents.individualProtectionDescription.hintText}
+          nativeInputProps={{
+            ...formContents.individualProtectionDescription,
+            ...register("individualProtectionDescription"),
+          }}
+        />
+      )}
 
       {values.internshipKind === "mini-stage-cci" && (
         <Alert
@@ -69,6 +87,9 @@ export const ImmersionDetailsSection = () => {
               Boolean(option.nativeInputProps.value) ===
               values.sanitaryPrevention,
             onChange: () => {
+              if (option.nativeInputProps.value === 0) {
+                setValue("sanitaryPreventionDescription", "");
+              }
               setValue(
                 "sanitaryPrevention",
                 option.nativeInputProps.value === 1,
@@ -81,14 +102,16 @@ export const ImmersionDetailsSection = () => {
         }))}
       />
 
-      <Input
-        label={formContents.sanitaryPreventionDescription.label}
-        hintText={formContents.sanitaryPreventionDescription.hintText}
-        nativeInputProps={{
-          ...formContents.sanitaryPreventionDescription,
-          ...register("sanitaryPreventionDescription"),
-        }}
-      />
+      {hasSanitaryPrevention && (
+        <Input
+          label={formContents.sanitaryPreventionDescription.label}
+          hintText={formContents.sanitaryPreventionDescription.hintText}
+          nativeInputProps={{
+            ...formContents.sanitaryPreventionDescription,
+            ...register("sanitaryPreventionDescription"),
+          }}
+        />
+      )}
       {values.internshipKind === "mini-stage-cci" && (
         <Alert
           small

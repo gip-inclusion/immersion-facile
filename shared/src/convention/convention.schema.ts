@@ -234,6 +234,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     workConditions: z.string().optional(),
     businessAdvantages: z.string().optional(),
     individualProtection: zBoolean,
+    individualProtectionDescription: zStringPossiblyEmptyWithMax(255),
     sanitaryPrevention: zBoolean,
     sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
     immersionAddress: addressWithPostalCodeSchema,

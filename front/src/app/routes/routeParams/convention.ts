@@ -131,6 +131,8 @@ const withDevPrefilledValues = (
 
     // Covid
     individualProtection: emptyForm.individualProtection ?? true,
+    individualProtectionDescription:
+      emptyForm.individualProtectionDescription || "Aucunes",
     sanitaryPrevention: emptyForm.sanitaryPrevention ?? true,
     sanitaryPreventionDescription:
       emptyForm.sanitaryPreventionDescription || "Aucunes",
@@ -323,6 +325,7 @@ export const conventionValuesFromUrl = {
 
   sanitaryPrevention: param.query.optional.boolean,
   individualProtection: param.query.optional.boolean,
+  individualProtectionDescription: param.query.optional.string,
 
   dateStart: param.query.optional.string,
   dateEnd: param.query.optional.string,
@@ -465,6 +468,7 @@ const conventionPresentationFromParams = (
 
   // Covid
   individualProtection: params.individualProtection ?? undefined,
+  individualProtectionDescription: params.individualProtectionDescription ?? "",
   sanitaryPrevention: params.sanitaryPrevention ?? undefined,
   sanitaryPreventionDescription: params.sanitaryPreventionDescription ?? "",
 

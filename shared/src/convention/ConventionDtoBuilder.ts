@@ -94,6 +94,7 @@ const validConvention: ConventionDto = {
     end: new Date(DATE_END),
   }),
   individualProtection: true,
+  individualProtectionDescription: "casque et lunnettes",
   sanitaryPrevention: true,
   sanitaryPreventionDescription: "fourniture de gel",
   immersionObjective: "Confirmer un projet professionnel",
@@ -546,6 +547,15 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({
       ...this.dto,
       individualProtection,
+    });
+  }
+
+  public withIndividualProtectionDescription(
+    individualProtectionDescription: string,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      individualProtectionDescription,
     });
   }
 

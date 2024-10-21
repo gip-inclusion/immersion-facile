@@ -151,6 +151,7 @@ export type ConventionCommon = {
   workConditions?: string;
   businessAdvantages?: string;
   individualProtection: boolean;
+  individualProtectionDescription: string;
   sanitaryPrevention: boolean;
   sanitaryPreventionDescription: string;
   immersionAddress: string;
