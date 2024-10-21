@@ -58,7 +58,7 @@ export default {
   
   Si vous n’arrivez pas à accéder à un contenu ou à un service, vous pouvez contacter le responsable du site Immersion Facilitée pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme.
   
-    • Envoyer un message https://immersion-facile.beta.gouv.fr ;
+    • Envoyer un message <a target="_blank" href="https://immersion-facile.beta.gouv.fr/aide/">https://immersion-facile.beta.gouv.fr/aide/</a> ;
     • Contacter GIP Plateforme de l'Inclusion : ${immersionFacileContactEmail}. 
   
   <strong>Voies de recours</strong>
