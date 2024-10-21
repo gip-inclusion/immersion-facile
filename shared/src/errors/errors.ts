@@ -314,6 +314,14 @@ export const errors = {
         `L'ajout, la suppression ou l'édition d'un valideur n'est pas autorisée pour l'agence "${agencyId}" car il s'agit d'une structure d'accompagnement. Cette action est autorisée seulement par l'agence prescriptrice à laquelle elle est rattachée.`,
       ),
   },
+  users: {
+    notFound: ({ userIds }: { userIds: UserId[] }) =>
+      new NotFoundError(
+        `Nous n'avons pas trouvé les utilisateurs avec les identifiants suivants : ${userIds.join(
+          ", ",
+        )}.`,
+      ),
+  },
   user: {
     unauthorized: () => new UnauthorizedError(),
     noJwtProvided: () =>

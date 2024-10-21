@@ -1,5 +1,5 @@
 import { toPairs } from "ramda";
-import { AgencyDto, AgencyRight, AgencyRole, UserId, errors } from "shared";
+import { AgencyDto, AgencyRight, UserId, errors } from "shared";
 import {
   AgencyUsersRights,
   AgencyWithUsersRights,
@@ -42,26 +42,39 @@ export const agencyWithRightToAgencyDto = async (
   { usersRights, ...rest }: AgencyWithUsersRights,
 ): Promise<AgencyDto> => {
   const provider = await makeProvider(uow);
-  const counsellorUsers = await Promise.all(
-    userIdWithRole(usersRights, "counsellor").map((id) =>
-      uow.userRepository.getById(id, provider).then((user) => {
-        if (!user) throw errors.user.notFound({ userId: id });
-        return user;
-      }),
-    ),
+
+  const { counsellorIds, validatorIds } = toPairs(usersRights).reduce<{
+    counsellorIds: UserId[];
+    validatorIds: UserId[];
+  }>(
+    (acc, item) => {
+      const [userId, userRights] = item;
+
+      return {
+        counsellorIds: [
+          ...acc.counsellorIds,
+          ...(userRights.roles.includes("counsellor") ? [userId] : []),
+        ],
+        validatorIds: [
+          ...acc.validatorIds,
+          ...(userRights.roles.includes("validator") ? [userId] : []),
+        ],
+      };
+    },
+    { counsellorIds: [], validatorIds: [] },
   );
-  const validatorUsers = await Promise.all(
-    userIdWithRole(usersRights, "validator").map((id) =>
-      uow.userRepository.getById(id, provider).then((user) => {
-        if (!user) throw errors.user.notFound({ userId: id });
-        return user;
-      }),
-    ),
+
+  const counsellors = await uow.userRepository.getByIds(
+    counsellorIds,
+    provider,
   );
+
+  const validators = await uow.userRepository.getByIds(validatorIds, provider);
+
   return {
     ...rest,
-    counsellorEmails: counsellorUsers.map(({ email }) => email),
-    validatorEmails: validatorUsers.map(({ email }) => email),
+    counsellorEmails: counsellors.map(({ email }) => email),
+    validatorEmails: validators.map(({ email }) => email),
   };
 };
 
@@ -102,8 +115,3 @@ export const updateRightsOnMultipleAgenciesForUser = async (
     ),
   );
 };
-
-const userIdWithRole = (usersRights: AgencyUsersRights, role: AgencyRole) =>
-  toPairs(usersRights)
-    .filter(([_, rights]) => rights.roles.includes(role))
-    .map(([id]) => id);

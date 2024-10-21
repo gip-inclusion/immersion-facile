@@ -2,12 +2,13 @@ import { values } from "ramda";
 import {
   Email,
   GetUsersFilters,
+  OAuthGatewayProvider,
   User,
   UserId,
   UserWithAdminRights,
   errors,
 } from "shared";
-import { UserRepository } from "../port/UserRepository";
+import { UserOnRepository, UserRepository } from "../port/UserRepository";
 
 export class InMemoryUserRepository implements UserRepository {
   #usersById: Record<string, UserWithAdminRights> = {};
@@ -18,6 +19,22 @@ export class InMemoryUserRepository implements UserRepository {
 
   public async findByEmail(email: Email): Promise<User | undefined> {
     return this.users.find((user) => user.email === email);
+  }
+
+  public async getByIds(
+    userIds: UserId[],
+    _: OAuthGatewayProvider,
+  ): Promise<UserOnRepository[]> {
+    const users = this.users.filter((user) => userIds.includes(user.id));
+
+    const missingUserIds = userIds.filter(
+      (userId) => !users.some((user) => user.id === userId),
+    );
+
+    if (missingUserIds.length > 0)
+      throw errors.users.notFound({ userIds: missingUserIds });
+
+    return users;
   }
 
   public async save(user: User): Promise<void> {

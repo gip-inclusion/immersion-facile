@@ -40,9 +40,13 @@ export interface UserRepository {
   ): Promise<User | undefined>;
 
   getById(
-    userId: string,
+    userId: UserId,
     provider: OAuthGatewayProvider,
   ): Promise<UserOnRepository | undefined>;
+  getByIds(
+    userIds: UserId[],
+    provider: OAuthGatewayProvider,
+  ): Promise<UserOnRepository[]>;
 
   getUsers(filters: GetUsersFilters): Promise<User[]>;
 }
