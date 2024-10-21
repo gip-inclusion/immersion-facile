@@ -8,6 +8,7 @@ import {
   expectToEqual,
 } from "shared";
 import { ForbiddenError, NotFoundError } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -15,39 +16,39 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { GetConventionForApiConsumer } from "./GetConventionForApiConsumer";
 
-const agencyIdInScope = "agency-id-in-scope";
-const agency = new AgencyDtoBuilder()
-  .withId(agencyIdInScope)
-  .withKind("pole-emploi")
-  .build();
-
-const convention = new ConventionDtoBuilder()
-  .withAgencyId(agencyIdInScope)
-  .build();
-
-const createApiConsumer = (
-  conventionRight: ApiConsumerRights["convention"],
-): ApiConsumer => ({
-  id: "my-api-consumer-id",
-  description: "Some description",
-  name: "pole-emploi",
-  createdAt: new Date().toISOString(),
-  expirationDate: addYears(new Date(), 2).toISOString(),
-  contact: {
-    firstName: "John",
-    lastName: "Doe",
-    job: "job",
-    emails: ["john.doe@mail.com"],
-    phone: "0601010101",
-  },
-  rights: {
-    searchEstablishment: { kinds: [], scope: "no-scope", subscriptions: [] },
-    convention: conventionRight,
-    statistics: { kinds: [], scope: "no-scope", subscriptions: [] },
-  },
-});
-
 describe("Get Convention for ApiConsumer", () => {
+  const agencyIdInScope = "agency-id-in-scope";
+  const agency = new AgencyDtoBuilder()
+    .withId(agencyIdInScope)
+    .withKind("pole-emploi")
+    .build();
+
+  const convention = new ConventionDtoBuilder()
+    .withAgencyId(agencyIdInScope)
+    .build();
+
+  const createApiConsumer = (
+    conventionRight: ApiConsumerRights["convention"],
+  ): ApiConsumer => ({
+    id: "my-api-consumer-id",
+    description: "Some description",
+    name: "pole-emploi",
+    createdAt: new Date().toISOString(),
+    expirationDate: addYears(new Date(), 2).toISOString(),
+    contact: {
+      firstName: "John",
+      lastName: "Doe",
+      job: "job",
+      emails: ["john.doe@mail.com"],
+      phone: "0601010101",
+    },
+    rights: {
+      searchEstablishment: { kinds: [], scope: "no-scope", subscriptions: [] },
+      convention: conventionRight,
+      statistics: { kinds: [], scope: "no-scope", subscriptions: [] },
+    },
+  });
+
   let getConventionForApiConsumer: GetConventionForApiConsumer;
   let uow: InMemoryUnitOfWork;
 
@@ -56,7 +57,7 @@ describe("Get Convention for ApiConsumer", () => {
     getConventionForApiConsumer = new GetConventionForApiConsumer(
       new InMemoryUowPerformer(uow),
     );
-    uow.agencyRepository.setAgencies([agency]);
+    uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
     uow.conventionRepository.setConventions([convention]);
   });
 
