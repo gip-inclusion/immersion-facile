@@ -5,6 +5,7 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   EmailNotification,
+  InclusionConnectedUserBuilder,
   Role,
   ShortLinkId,
   expectToEqual,
@@ -12,6 +13,7 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
@@ -20,7 +22,6 @@ import {
   makeSaveNotificationAndRelatedEvent,
 } from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
-import { InMemoryShortLinkQuery } from "../../../core/short-link/adapters/short-link-query/InMemoryShortLinkQuery";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -30,72 +31,79 @@ import {
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 
-const establishmentTutorEmail = "establishment-tutor@mail.com";
-const establishmentRepresentativeEmail =
-  "establishment-representativ@gmail.com";
-const beneficiaryCurrentEmployerEmail = "current@employer.com";
-const beneficiaryRepresentativeEmail = "beneficiary@representative.fr";
-const peAdvisorEmail = "pe-advisor@pole-emploi.net";
-const counsellorEmail = "counsellor@email.fr";
-const validatorEmail = "myValidator@mail.com";
-const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "beneficiary-representative",
-  email: beneficiaryRepresentativeEmail,
-  phone: "+33665565432",
-  firstName: "Bob",
-  lastName: "L'éponge",
-};
-const currentEmployer: BeneficiaryCurrentEmployer = {
-  businessName: "boss",
-  role: "beneficiary-current-employer",
-  email: beneficiaryCurrentEmployerEmail,
-  phone: "+33611223344",
-  firstName: "Harry",
-  lastName: "Potter",
-  job: "Magician",
-  businessSiret: "01234567891234",
-  businessAddress: "Rue des Bouchers 67065 Strasbourg",
-};
-const validConvention: ConventionDto = new ConventionDtoBuilder()
-  .withEstablishmentTutorEmail(establishmentRepresentativeEmail)
-  .withEstablishmentRepresentativeEmail(establishmentRepresentativeEmail)
-  .build();
-
-const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId)
-  .withValidatorEmails([validatorEmail])
-  .withCounsellorEmails([counsellorEmail])
-  .build();
-
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {
+  const establishmentTutorEmail = "establishment-tutor@mail.com";
+  const establishmentRepresentativeEmail =
+    "establishment-representativ@gmail.com";
+  const beneficiaryCurrentEmployerEmail = "current@employer.com";
+  const beneficiaryRepresentativeEmail = "beneficiary@representative.fr";
+  const peAdvisorEmail = "pe-advisor@pole-emploi.net";
+  const counsellor = new InclusionConnectedUserBuilder()
+    .withId("counsellor")
+    .withEmail("counsellor@email.fr")
+    .build();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("myValidator")
+    .withEmail("myValidator@mail.com")
+    .build();
+
+  const beneficiaryRepresentative: BeneficiaryRepresentative = {
+    role: "beneficiary-representative",
+    email: beneficiaryRepresentativeEmail,
+    phone: "+33665565432",
+    firstName: "Bob",
+    lastName: "L'éponge",
+  };
+  const currentEmployer: BeneficiaryCurrentEmployer = {
+    businessName: "boss",
+    role: "beneficiary-current-employer",
+    email: beneficiaryCurrentEmployerEmail,
+    phone: "+33611223344",
+    firstName: "Harry",
+    lastName: "Potter",
+    job: "Magician",
+    businessSiret: "01234567891234",
+    businessAddress: "Rue des Bouchers 67065 Strasbourg",
+  };
+  const validConvention: ConventionDto = new ConventionDtoBuilder()
+    .withEstablishmentTutorEmail(establishmentRepresentativeEmail)
+    .withEstablishmentRepresentativeEmail(establishmentRepresentativeEmail)
+    .build();
+
+  const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId)
+    .withValidatorEmails([])
+    .withCounsellorEmails([])
+    .build();
+
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let notifyAllActorsOfFinalConventionValidation: NotifyAllActorsOfFinalConventionValidation;
   let config: AppConfig;
   let shortLinkIdGenerator: DeterministShortLinkIdGeneratorGateway;
-  let shortLinkQuery: InMemoryShortLinkQuery;
 
   beforeEach(() => {
     config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     shortLinkIdGenerator = new DeterministShortLinkIdGeneratorGateway();
-    shortLinkQuery = uow.shortLinkQuery;
-
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
 
     notifyAllActorsOfFinalConventionValidation =
       new NotifyAllActorsOfFinalConventionValidation(
         new InMemoryUowPerformer(uow),
-        saveNotificationAndRelatedEvent,
+        makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
         fakeGenerateMagicLinkUrlFn,
         timeGateway,
         shortLinkIdGenerator,
         config,
       );
+
+    uow.agencyRepository.setAgencies([
+      toAgencyWithRights(defaultAgency, {
+        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      }),
+    ]);
+    uow.userRepository.users = [counsellor, validator];
   });
 
   describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
@@ -114,19 +122,15 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
           {
             role: "counsellor",
-            email: counsellorEmail,
+            email: counsellor.email,
             shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
-            email: validatorEmail,
+            email: validator.email,
             shortlinkId: "shortLinkId_6",
           },
         ];
-
-      const agency = new AgencyDtoBuilder(defaultAgency).build();
-
-      uow.agencyRepository.setAgencies([agency]);
 
       const shortlinkIds = actors.map((truc) => truc.shortlinkId);
 
@@ -151,7 +155,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         {},
       );
 
-      expectToEqual(shortLinkQuery.getShortLinks(), expectedShorlinks);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -170,7 +174,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         expectEmailFinalValidationConfirmationMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
-          agency,
+          defaultAgency,
           validConvention,
           config,
           actor.shortlinkId,
@@ -198,18 +202,15 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
           {
             role: "counsellor",
-            email: counsellorEmail,
+            email: counsellor.email,
             shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
-            email: validatorEmail,
+            email: validator.email,
             shortlinkId: "shortLinkId_6",
           },
         ];
-      const agency = new AgencyDtoBuilder(defaultAgency).build();
-
-      uow.agencyRepository.setAgencies([agency]);
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
         validConvention,
@@ -240,7 +241,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         {},
       );
 
-      expectToEqual(shortLinkQuery.getShortLinks(), expectedShorlinks);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -259,7 +260,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         expectEmailFinalValidationConfirmationMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
-          agency,
+          defaultAgency,
           conventionWithBeneficiaryCurrentEmployer,
           config,
           actor.shortlinkId,
@@ -285,21 +286,17 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             email: beneficiaryRepresentativeEmail,
             shortlinkId: "shortLinkId_2",
           },
-
           {
             role: "counsellor",
-            email: counsellorEmail,
+            email: counsellor.email,
             shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
-            email: validatorEmail,
+            email: validator.email,
             shortlinkId: "shortLinkId_6",
           },
         ];
-      const agency = new AgencyDtoBuilder(defaultAgency).build();
-
-      uow.agencyRepository.setAgencies([agency]);
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
         validConvention,
@@ -330,7 +327,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         {},
       );
 
-      expectToEqual(shortLinkQuery.getShortLinks(), expectedShorlinks);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -349,7 +346,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         expectEmailFinalValidationConfirmationMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
-          agency,
+          defaultAgency,
           conventionWithBeneficiaryCurrentEmployer,
           config,
           actor.shortlinkId,
@@ -377,19 +374,15 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
           {
             role: "counsellor",
-            email: counsellorEmail,
+            email: counsellor.email,
             shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
-            email: validatorEmail,
+            email: validator.email,
             shortlinkId: "shortLinkId_6",
           },
         ];
-
-      const agency = new AgencyDtoBuilder(defaultAgency).build();
-
-      uow.agencyRepository.setAgencies([agency]);
 
       const shortlinkIds = actors.map((truc) => truc.shortlinkId);
 
@@ -420,7 +413,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         {},
       );
 
-      expectToEqual(shortLinkQuery.getShortLinks(), expectedShorlinks);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -439,7 +432,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         expectEmailFinalValidationConfirmationMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
-          agency,
+          defaultAgency,
           conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative,
           config,
           actor.shortlinkId,
@@ -462,12 +455,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
           {
             role: "counsellor",
-            email: counsellorEmail,
+            email: counsellor.email,
             shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
-            email: validatorEmail,
+            email: validator.email,
             shortlinkId: "shortLinkId_6",
           },
           {
@@ -493,10 +486,6 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         [userConventionAdvisor],
       );
 
-      const agency = new AgencyDtoBuilder(defaultAgency).build();
-
-      uow.agencyRepository.setAgencies([agency]);
-
       const shortlinkIds = actors.map((truc) => truc.shortlinkId);
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
@@ -520,7 +509,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         {},
       );
 
-      expectToEqual(shortLinkQuery.getShortLinks(), expectedShorlinks);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -539,7 +528,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         expectEmailFinalValidationConfirmationMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
-          agency,
+          defaultAgency,
           validConvention,
           config,
           actor.shortlinkId,
@@ -562,12 +551,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
           {
             role: "counsellor",
-            email: counsellorEmail,
+            email: counsellor.email,
             shortlinkId: "shortLinkId_5",
           },
           {
             role: "validator",
-            email: validatorEmail,
+            email: validator.email,
             shortlinkId: "shortLinkId_6",
           },
         ];
@@ -582,10 +571,6 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
         [userConventionAdvisor],
       );
-
-      const agency = new AgencyDtoBuilder(defaultAgency).build();
-
-      uow.agencyRepository.setAgencies([agency]);
 
       const shortlinkIds = actors.map((truc) => truc.shortlinkId);
 
@@ -610,7 +595,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         {},
       );
 
-      expectToEqual(shortLinkQuery.getShortLinks(), expectedShorlinks);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
         uow.notificationRepository.notifications.filter(
@@ -629,7 +614,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         expectEmailFinalValidationConfirmationMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
-          agency,
+          defaultAgency,
           validConvention,
           config,
           actor.shortlinkId,
