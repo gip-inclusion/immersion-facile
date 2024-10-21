@@ -1,4 +1,10 @@
-import { AgencyDtoBuilder, errors, expectPromiseToFailWithError } from "shared";
+import {
+  AgencyDtoBuilder,
+  InclusionConnectedUserBuilder,
+  errors,
+  expectPromiseToFailWithError,
+} from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -14,25 +20,48 @@ import {
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SendEmailsWhenAgencyIsActivated } from "./SendEmailsWhenAgencyIsActivated";
 
-const emailPresentInBoth = "in-both@mail.com";
-const counsellorEmails = ["councellor@email.com"];
-const validatorEmails = ["toto-valide@email.com"];
+const counsellor = new InclusionConnectedUserBuilder()
+  .withEmail("counsellor@mail.com")
+  .withId("counsellor-id")
+  .buildUser();
+const validator = new InclusionConnectedUserBuilder()
+  .withEmail("validator@mail.com")
+  .withId("validator-id")
+  .buildUser();
+const userWithBothRoles = new InclusionConnectedUserBuilder()
+  .withEmail("both-roles@mail.com")
+  .withId("user-with-both-roles-id")
+  .buildUser();
 
 const agency = new AgencyDtoBuilder()
-  .withCounsellorEmails([...counsellorEmails, emailPresentInBoth])
-  .withValidatorEmails([...validatorEmails, emailPresentInBoth])
   .withName("just-activated-agency")
   .withLogoUrl("https://agency-logo.com")
   .build();
 
+const agencyWithRights = toAgencyWithRights(agency, {
+  [counsellor.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
+  [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+  [userWithBothRoles.id]: {
+    roles: ["counsellor", "validator"],
+    isNotifiedByEmail: false,
+  },
+});
+
 const agencyWithRefersTo = new AgencyDtoBuilder()
   .withId("id-of-agency-refering-to-other")
   .withRefersToAgencyId(agency.id)
-  .withCounsellorEmails(["councellor@email.com"])
-  .withValidatorEmails(agency.validatorEmails)
   .withName("just-activated-agency-refering-to-other-one")
   .withLogoUrl("https://agency-refering-logo.com")
   .build();
+
+const agencyWithRefersToWithRights = toAgencyWithRights(agencyWithRefersTo, {
+  [counsellor.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
+  [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+  [userWithBothRoles.id]: {
+    roles: ["validator"],
+    isNotifiedByEmail: false,
+  },
+});
 
 describe("SendEmailWhenAgencyIsActivated", () => {
   let uow: InMemoryUnitOfWork;
@@ -42,6 +71,8 @@ describe("SendEmailWhenAgencyIsActivated", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
+    uow.userRepository.users = [counsellor, validator, userWithBothRoles];
+    uow.agencyRepository.agencies = [agencyWithRights];
     const uowPerformer = new InMemoryUowPerformer(uow);
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
@@ -61,7 +92,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
 
   it("Sends activation email to counsellors and validators when agency without refers to id got activated", async () => {
     // Act
-    await sendEmailsWhenAencyActivated.execute({ agency });
+    await sendEmailsWhenAencyActivated.execute({ agencyId: agency.id });
 
     // Assert
     expectSavedNotificationsAndEvents({
@@ -69,9 +100,9 @@ describe("SendEmailWhenAgencyIsActivated", () => {
         {
           kind: "AGENCY_WAS_ACTIVATED",
           recipients: [
-            ...validatorEmails,
-            emailPresentInBoth,
-            ...counsellorEmails,
+            validator.email,
+            userWithBothRoles.email,
+            counsellor.email,
           ],
           params: {
             agencyName: "just-activated-agency",
@@ -84,37 +115,43 @@ describe("SendEmailWhenAgencyIsActivated", () => {
   });
 
   it("throw not found error if no agency were found with agency refers to id when agency refering to other activated", async () => {
+    uow.agencyRepository.agencies = [agencyWithRefersToWithRights];
     await expectPromiseToFailWithError(
-      sendEmailsWhenAencyActivated.execute({ agency: agencyWithRefersTo }),
+      sendEmailsWhenAencyActivated.execute({ agencyId: agencyWithRefersTo.id }),
       errors.agency.notFound({ agencyId: agency.id }),
     );
   });
 
   it("send a notification email to validating agency when agency refering to other was activated and one activation email to the counsellors of the agency refering to other", async () => {
-    uow.agencyRepository.agencies = [agency];
+    uow.agencyRepository.agencies = [
+      agencyWithRights,
+      agencyWithRefersToWithRights,
+    ];
 
-    await sendEmailsWhenAencyActivated.execute({ agency: agencyWithRefersTo });
+    await sendEmailsWhenAencyActivated.execute({
+      agencyId: agencyWithRefersTo.id,
+    });
 
     expectSavedNotificationsAndEvents({
       emails: [
         {
           kind: "AGENCY_WAS_ACTIVATED",
-          recipients: [...agencyWithRefersTo.counsellorEmails],
+          recipients: [counsellor.email],
           params: {
             agencyName: agencyWithRefersTo.name,
             agencyLogoUrl: "https://agency-refering-logo.com",
             refersToOtherAgency: true,
-            validatorEmails: agencyWithRefersTo.validatorEmails,
+            validatorEmails: [validator.email, userWithBothRoles.email],
           },
         },
         {
           kind: "AGENCY_WITH_REFERS_TO_ACTIVATED",
-          recipients: [...agency.validatorEmails],
+          recipients: [validator.email, userWithBothRoles.email],
           params: {
             agencyLogoUrl: "https://agency-logo.com",
             nameOfAgencyRefering: agencyWithRefersTo.name,
             refersToAgencyName: agency.name,
-            validatorEmails: agencyWithRefersTo.validatorEmails,
+            validatorEmails: [validator.email, userWithBothRoles.email],
           },
         },
       ],
