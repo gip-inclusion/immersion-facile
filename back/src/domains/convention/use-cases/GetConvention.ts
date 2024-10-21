@@ -1,23 +1,24 @@
+import { toPairs } from "ramda";
 import {
-  AgencyDto,
-  AgencyId,
   ConventionDomainPayload,
   ConventionId,
   ConventionReadDto,
   ConventionRelatedJwtPayload,
+  ForbiddenError,
   InclusionConnectJwtPayload,
-  OAuthGatewayProvider,
+  NotFoundError,
   WithConventionId,
   getIcUserRoleForAccessingConvention,
   stringToMd5,
   withConventionIdSchema,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { conventionEmailsByRole } from "../../../utils/convention";
+import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
-import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { getIcUserByUserId } from "../../inclusion-connected-users/helpers/inclusionConnectedUser.helper";
 
 export class GetConvention extends TransactionalUseCase<
   WithConventionId,
@@ -46,14 +47,17 @@ export class GetConvention extends TransactionalUseCase<
       conventionId,
     );
 
-    const provider = await makeProvider(uow);
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (!agency) {
+      throw new NotFoundError(`Agency ${convention.agencyId} not found`);
+    }
 
     if (isConventionDomainPayload) {
       return this.#onConventionDomainPayload({
         authPayload,
         uow,
         convention,
-        provider,
+        agency,
       });
     }
 
@@ -62,7 +66,6 @@ export class GetConvention extends TransactionalUseCase<
         authPayload,
         uow,
         convention,
-        provider,
       });
     }
 
@@ -72,24 +75,19 @@ export class GetConvention extends TransactionalUseCase<
   async #onConventionDomainPayload({
     authPayload,
     convention,
+    agency,
     uow,
-    provider,
   }: {
     authPayload: ConventionDomainPayload;
     convention: ConventionReadDto;
+    agency: AgencyWithUsersRights;
     uow: UnitOfWork;
-    provider: OAuthGatewayProvider;
   }): Promise<ConventionReadDto> {
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
-    if (!agency) {
-      throw new NotFoundError(`Agency ${convention.agencyId} not found`);
-    }
     const matchingMd5Emails = await this.#isMatchingMd5Emails({
       authPayload,
       convention,
       agency,
-      userRepository: uow.userRepository,
-      provider,
+      uow,
     });
     if (!matchingMd5Emails) {
       throw new ForbiddenError(
@@ -104,18 +102,15 @@ export class GetConvention extends TransactionalUseCase<
     authPayload,
     convention,
     uow,
-    provider,
   }: {
     authPayload: InclusionConnectJwtPayload;
     convention: ConventionReadDto;
     uow: UnitOfWork;
-    provider: OAuthGatewayProvider;
   }): Promise<ConventionReadDto> {
-    const user = await uow.userRepository.getById(authPayload.userId, provider);
-    if (!user)
-      throw new NotFoundError(`No user found with id '${authPayload.userId}'`);
-
-    const roles = getIcUserRoleForAccessingConvention(convention, user);
+    const roles = getIcUserRoleForAccessingConvention(
+      convention,
+      await getIcUserByUserId(uow, authPayload.userId),
+    );
 
     if (!roles.length)
       throw new ForbiddenError(
@@ -141,18 +136,17 @@ export class GetConvention extends TransactionalUseCase<
     authPayload,
     convention,
     agency,
-    userRepository,
-    provider,
+    uow,
   }: {
     authPayload: ConventionDomainPayload;
     convention: ConventionReadDto;
-    agency: AgencyDto;
-    userRepository: UserRepository;
-    provider: OAuthGatewayProvider;
+    agency: AgencyWithUsersRights;
+    uow: UnitOfWork;
   }): Promise<boolean> {
-    const emailsByRole = conventionEmailsByRole(convention, agency)[
-      authPayload.role
-    ];
+    const emailsByRole = conventionEmailsByRole(
+      convention,
+      await agencyWithRightToAgencyDto(uow, agency),
+    )[authPayload.role];
     if (emailsByRole instanceof Error) throw emailsByRole;
     const isEmailMatchingConventionEmails = !!emailsByRole.find(
       (email) => authPayload.emailHash === stringToMd5(email),
@@ -160,9 +154,8 @@ export class GetConvention extends TransactionalUseCase<
     const isEmailMatchingIcUserEmails =
       await this.#isInclusionConnectedCounsellorOrValidator({
         authPayload,
-        agencyId: agency.id,
-        userRepository,
-        provider,
+        agencyWithRights: agency,
+        uow,
       });
     const peAdvisorEmail =
       convention.signatories.beneficiary.federatedIdentity?.payload?.advisor
@@ -178,29 +171,25 @@ export class GetConvention extends TransactionalUseCase<
   }
 
   async #isInclusionConnectedCounsellorOrValidator({
-    authPayload,
-    userRepository,
-    agencyId,
-    provider,
+    authPayload: { role, emailHash },
+    agencyWithRights,
+    uow,
   }: {
     authPayload: ConventionDomainPayload;
-    userRepository: UserRepository;
-    agencyId: AgencyId;
-    provider: OAuthGatewayProvider;
+    agencyWithRights: AgencyWithUsersRights;
+    uow: UnitOfWork;
   }) {
-    if (authPayload.role !== "counsellor" && authPayload.role !== "validator")
-      return false;
+    if (role !== "counsellor" && role !== "validator") return false;
 
-    const users = await userRepository.getIcUsersWithFilter(
-      {
-        agencyRole: authPayload.role,
-        agencyId,
-      },
-      provider,
+    const userIdsWithRoleOnAgency = toPairs(agencyWithRights.usersRights)
+      .filter(([_, right]) => right?.roles.includes(role))
+      .map(([id]) => id);
+
+    const users = await uow.userRepository.getByIds(
+      userIdsWithRoleOnAgency,
+      await makeProvider(uow),
     );
 
-    return users.some(
-      (user) => stringToMd5(user.email) === authPayload.emailHash,
-    );
+    return users.some((user) => stringToMd5(user.email) === emailHash);
   }
 }
