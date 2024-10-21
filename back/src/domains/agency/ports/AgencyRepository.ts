@@ -46,7 +46,7 @@ export type AgencyUserRight = {
   isNotifiedByEmail: boolean;
 };
 
-export type AgencyUsersRights = Record<UserId, AgencyUserRight>;
+export type AgencyUsersRights = Partial<Record<UserId, AgencyUserRight>>;
 
 export type WithAgencyUserRights = {
   usersRights: AgencyUsersRights;
