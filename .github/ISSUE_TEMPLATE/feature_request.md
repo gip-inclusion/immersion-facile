@@ -2,6 +2,9 @@
 name: Fonctionnalité
 about: Un nouveau use case ou fonctionnalité.
 title: ETQ 'qui?', un titre court svp
+labels: ''
+assignees: ''
+
 ---
 
 ### :construction: Epic
@@ -19,3 +22,9 @@ title: ETQ 'qui?', un titre court svp
 ### :camera: Maquettes
 
 <!-- Si possible, un lien vers les maquettes -->
+
+
+### Score PIC
+Portée :
+Impact : 
+Confiance :
