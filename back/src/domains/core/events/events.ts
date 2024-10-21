@@ -141,7 +141,7 @@ export type DomainEvent =
   
   // AGENCY RELATED
   | GenericEvent<"NewAgencyAdded", WithAgencyDto & WithTriggeredBy>
-  | GenericEvent<"AgencyActivated", WithAgencyDto & WithTriggeredBy>
+  | GenericEvent<"AgencyActivated", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyUpdated", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyRejected", WithAgencyDto & WithTriggeredBy>
 
