@@ -660,24 +660,14 @@ export const sidebarStepContent = (
         description: (
           <>
             <p>
-              Vérifiez que votre structure d’accompagnement est disponible dans
-              la liste ci-dessous.{" "}
-              <strong>
-                Si ce n’est pas le cas, contactez votre conseiller.
-              </strong>
+              Cette étape vise à identifier la structure qui accompagne le
+              candidat dans son parcours d’immersion. Cela permet de garantir un
+              suivi et que le candidat soit assuré pendant toute la durée de
+              l’immersion.
             </p>
             <p>
-              <strong>
-                Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
-                <a
-                  href="https://immersion-facile.beta.gouv.fr/aide/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  nos conseils ici
-                </a>
-                .
-              </strong>
+              Pour toute question, n’hésitez pas à contacter le conseiller du
+              candidat.
             </p>
           </>
         ),
@@ -687,16 +677,15 @@ export const sidebarStepContent = (
         description: (
           <>
             <p>
-              Les informations de contact (email, téléphone) seront uniquement
-              utilisées pour valider la convention avec l’entreprise et
-              l’organisme d’accompagnement.
+              Cette étape recueille les informations personnelles du candidat
+              pour assurer le bon déroulement de l’immersion. Ces informations
+              seront utilisées uniquement pour le suivi et la validation de la
+              convention.
             </p>
             <p>
-              <strong>
-                Renseignez de préférence{" "}
-                <strong>un numéro de téléphone portable</strong> pour recevoir
-                les informations urgentes concernant la convention par SMS.
-              </strong>
+              Assurez-vous que les informations saisies sont exactes, car elles
+              seront utilisées pour les communications concernant la convention
+              et pour la validation auprès de la structure d’accueil.
             </p>
           </>
         ),
@@ -706,40 +695,61 @@ export const sidebarStepContent = (
         description: (
           <>
             <p>
-              Les informations de contact (email, téléphone) seront uniquement
-              utilisées pour valider la convention avec l’entreprise et
-              l’organisme d’accompagnement.
+              L’objectif de cette étape est de fournir les informations
+              nécessaires sur la structure d’accueil (entreprise, collectivité,
+              association, etc.) qui recevra le candidat en immersion. Ces
+              informations permettent de faciliter la signature de la convention
+              par la structure d’accueil.
             </p>
             <p>
-              <strong>
-                Renseignez de préférence{" "}
-                <strong>un numéro de téléphone portable</strong> pour recevoir
-                les informations urgentes concernant la convention par SMS.
-              </strong>
+              Vérifiez les informations sur le tuteur, car il sera le point de
+              contact principal pour l’organisation et la validation de
+              l’immersion.
             </p>
           </>
         ),
       },
       {
         title: "Lieu et heures de l'immersion professionnelle",
-        description: <></>,
+        description: (
+          <>
+            <p>
+              Définir précisément le lieu et les horaires de l’immersion permet
+              de garantir la couverture du candidat pendant cette période.
+            </p>
+            <p>
+              Assurez-vous que ces informations sont exactes et reflètent les
+              horaires réels de l’immersion, car elles sont essentielles pour la
+              couverture du candidat et le suivi des allocations si applicable.
+            </p>
+            <p>Pour toute question, contactez la structure d’accueil.</p>
+          </>
+        ),
       },
       {
         title: "Détails de l'immersion professionnelle",
         description: (
-          <p>
-            <strong>
-              Consultez les{" "}
-              <a
-                href="https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/?bust=1690274462053"
-                rel="noreferrer"
-                target="_blank"
-              >
-                conditions réglementaires
-              </a>
-              applicables aux immersions.
-            </strong>
-          </p>
+          <>
+            <p>
+              Cette étape vise à préciser les tâches et activités prévues lors
+              de l’immersion, afin de s’assurer que le candidat tirera le
+              meilleur parti de cette expérience.
+            </p>
+            <p>
+              <strong>
+                Consultez les{" "}
+                <a
+                  href="https://immersion-facile.beta.gouv.fr/aide/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/?bust=1690274462053"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  conditions réglementaires
+                </a>
+                applicables aux immersions pour vous informer sur les exigences
+                légales.
+              </strong>
+            </p>
+          </>
         ),
       },
     ],
