@@ -4,7 +4,5 @@ export const establishmentDashboardTabsList = [
   "fiche-entreprise",
 ] as const;
 
-export type EstablishmentDashboardTabList =
-  typeof establishmentDashboardTabsList;
-
-export type EstablishmentDashboardTab = EstablishmentDashboardTabList[number];
+export type EstablishmentDashboardTab =
+  (typeof establishmentDashboardTabsList)[number];
