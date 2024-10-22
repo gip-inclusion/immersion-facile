@@ -39,7 +39,7 @@ describe("PgOngoingOAuthRepository", () => {
   describe.each(oAuthGatewayProviders)(
     "with provider '%s'",
     (gatewayProvider) => {
-      it("saves an ongoing OAuth, then gets it from its states, then updates it", async () => {
+      it("saves an ongoing OAuth, then gets it from its states, then updates it, than gets ongoingOauth from userId", async () => {
         const state = "11111111-1111-1111-1111-111111111111";
 
         const provider: IdentityProvider =
@@ -63,11 +63,12 @@ describe("PgOngoingOAuthRepository", () => {
         await pgUserRepository.save(user, gatewayProvider);
         await pgOngoingOAuthRepository.save(ongoingOAuth);
 
-        const fetched = await pgOngoingOAuthRepository.findByStateAndProvider(
-          state,
-          provider,
-        );
-        expectToEqual(fetched, ongoingOAuth);
+        const fetchedFromState =
+          await pgOngoingOAuthRepository.findByStateAndProvider(
+            state,
+            provider,
+          );
+        expectToEqual(fetchedFromState, ongoingOAuth);
 
         const results = await db
           .selectFrom("users_ongoing_oauths")
@@ -83,12 +84,11 @@ describe("PgOngoingOAuthRepository", () => {
           accessToken: "some-token",
         };
         await pgOngoingOAuthRepository.save(updatedOngoingOAuth);
-        const fetchedUpdated =
-          await pgOngoingOAuthRepository.findByStateAndProvider(
-            state,
-            provider,
-          );
-        expectToEqual(fetchedUpdated, updatedOngoingOAuth);
+
+        const fetchedFromUserId = await pgOngoingOAuthRepository.findByUserId(
+          user.id,
+        );
+        expectToEqual(fetchedFromUserId, updatedOngoingOAuth);
       });
     },
   );
