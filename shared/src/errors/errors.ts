@@ -270,6 +270,11 @@ export const errors = {
             : "Aucune agence trouvée.",
         ].join(""),
       ),
+    refersToMismatch: ({
+      agencyWithRefersToId,
+      referedAgencyId,
+    }: { agencyWithRefersToId: AgencyId; referedAgencyId: AgencyId }) =>
+      `Le refersToAgencyId de l'agence '${agencyWithRefersToId}' ne correspond pas avec l'agence '${referedAgencyId}' à laquelle elle est référencée.`,
   },
   agency: {
     notFound: ({ agencyId }: { agencyId: AgencyId }) =>
