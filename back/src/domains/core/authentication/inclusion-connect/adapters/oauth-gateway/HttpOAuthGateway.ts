@@ -24,7 +24,6 @@ import {
   OAuthGateway,
 } from "../../port/OAuthGateway";
 import {
-  InclusionConnectAccessTokenResponse,
   InclusionConnectLogoutQueryParams,
   InclusionConnectRoutes,
 } from "./inclusionConnect.routes";
@@ -231,27 +230,6 @@ export class HttpOAuthGateway implements OAuthGateway {
           id_token_hint: params.idToken,
           state: params.state,
         })}`;
-  }
-
-  async #getTokenWithPayload(
-    provider: OAuthGatewayProvider,
-    inclusionConnectAccessTokenBody: InclusionConnectAccessTokenResponse,
-  ): Promise<string> {
-    if (provider === "InclusionConnect")
-      return inclusionConnectAccessTokenBody.id_token;
-
-    const response = await this.httpClientByProvider.ProConnect.getUserInfo({
-      headers: {
-        authorization: `Bearer ${inclusionConnectAccessTokenBody.access_token}`,
-      },
-    });
-
-    if (response.status === 400)
-      throw errors.inclusionConnect.couldNotGetUserInfo({
-        message: JSON.stringify(response.body, null, 2),
-      });
-
-    return response.body;
   }
 
   #makeRedirectAfterLoginUrl(params: WithSourcePage): AbsoluteUrl {
