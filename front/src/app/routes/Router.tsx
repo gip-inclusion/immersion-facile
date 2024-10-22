@@ -1,10 +1,10 @@
 import React, { lazy } from "react";
 import { PageHeader } from "react-design-system";
 import {
-  AdminTab,
+  AdminTabRouteName,
   AgencyDashboardTab,
   EstablishmentDashboardTab,
-  adminTabsList,
+  adminTabRouteNames,
   agencyDashboardTabsList,
   establishmentDashboardTabsList,
 } from "shared";
@@ -27,6 +27,7 @@ import { EstablishmentEditionFormPage } from "src/app/pages/establishment/Establ
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
+import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { Route } from "type-route";
@@ -56,35 +57,29 @@ const OpenApiDocPage = lazy(
 
 type Routes = typeof routes;
 
+const adminRoutes: {
+  [K in AdminTabRouteName]: (route: Route<Routes[K]>) => React.ReactElement;
+} = adminTabRouteNames.reduce(
+  (acc, tabRouteName) => ({
+    ...acc,
+    [tabRouteName]: (route: Route<any>) => <AdminPage route={route} />,
+  }),
+
+  {} as {
+    [K in AdminTabRouteName]: (route: Route<Routes[K]>) => React.ReactElement;
+  },
+);
+
 const getPageByRouteName: {
   [K in keyof Routes]: (route: Route<Routes[K]>) => unknown;
 } = {
   addAgency: () => <AddAgencyPage />,
-  adminRoot: () => (
-    <InclusionConnectedPrivateRoute
-      allowAdminOnly={true}
-      route={routes.admin({ tab: "conventions" })}
-      inclusionConnectConnexionPageHeader={
-        <PageHeader title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀" />
-      }
-    >
-      <AdminPage route={routes.admin({ tab: "conventions" })} />
-    </InclusionConnectedPrivateRoute>
+  admin: (route) => (
+    <AdminPrivateRoute route={routes.adminConventions(route.params)}>
+      <AdminPage route={routes.adminConventions(route.params)} />
+    </AdminPrivateRoute>
   ),
-  admin: (route) =>
-    adminTabsList.includes(route.params.tab as AdminTab) ? (
-      <InclusionConnectedPrivateRoute
-        allowAdminOnly={true}
-        route={route}
-        inclusionConnectConnexionPageHeader={
-          <PageHeader title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀" />
-        }
-      >
-        <AdminPage route={route} />
-      </InclusionConnectedPrivateRoute>
-    ) : (
-      <ErrorPage type="httpClientNotFoundError" />
-    ),
+  ...adminRoutes,
   agencyDashboard: (route) =>
     agencyDashboardTabsList.includes(route.params.tab as AgencyDashboardTab) ? (
       <InclusionConnectedPrivateRoute

@@ -397,7 +397,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               <>
                 <Button
                   onClick={() => {
-                    routes.admin({ tab: "establishments" }).push();
+                    routes.adminEstablishments().push();
                   }}
                   children="Retour au pilotage des établissements"
                   type="button"

@@ -1,45 +1,37 @@
-export const adminTabsList = [
-  "conventions",
-  "events",
-  "agencies",
-  "users",
-  "establishments",
-  "notifications",
-  "email-preview",
-  "technical-options",
-] as const;
+import { keys } from "ramda";
 
 type AdminTabProps = {
   isVisible: (env: "dev" | "staging" | "production" | "local") => boolean;
 };
 
-export const adminTabs: Record<AdminTab, AdminTabProps> = {
-  conventions: {
+export const adminTabs = {
+  adminConventions: {
     isVisible: () => true,
   },
-  events: {
+  adminEvents: {
     isVisible: () => true,
   },
-  agencies: {
+  adminAgencies: {
     isVisible: () => true,
   },
-  users: {
+  adminUsers: {
     isVisible: () => true,
   },
-  establishments: {
+  adminEstablishments: {
     isVisible: () => true,
   },
-  notifications: {
+  adminNotifications: {
     isVisible: (env: "dev" | "staging" | "production" | "local") =>
       env !== "production",
   },
-  "email-preview": {
+  adminEmailPreview: {
     isVisible: () => true,
   },
-  "technical-options": {
+  adminTechnicalOptions: {
     isVisible: () => true,
   },
-} as const;
+} satisfies Record<string, AdminTabProps>;
 
-export type AdminTabList = typeof adminTabsList;
-export type AdminTab = AdminTabList[number];
+export const adminTabRouteNames = keys(adminTabs);
+
+export type AdminTabRouteName = keyof typeof adminTabs;

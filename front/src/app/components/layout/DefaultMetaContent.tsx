@@ -2,7 +2,6 @@ import React from "react";
 import { Helmet } from "react-helmet-async";
 import {
   MetaContentType,
-  adminMetaContent,
   defaultMetaContents,
   defaultPageMetaContents,
   groupMetaContent,
@@ -43,9 +42,7 @@ const getMetaContents = (
     if (route.name === "group") {
       return groupMetaContent(route.params.groupSlug);
     }
-    if (route.name === "admin") {
-      return adminMetaContent[route.params.tab];
-    }
+
     return defaultPageMetaContents[route.name];
   }
 };
