@@ -101,7 +101,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         : "SIRET de l’entreprise",
     hintText:
       internshipKind === "immersion"
-        ? "la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où le candidat va faire son immersion. Format attendu : 362 521 879 00034"
+        ? "la structure d'accueil, c'est l'entreprise, le commerce, l'association... où le candidat va faire son immersion. Format attendu : 362 521 879 00034"
         : "la structure d'accueil, où le candidat va faire son stage. Format attendu : 362 521 879 00034",
     id: conventionSectionIds.siret,
     required: true,
@@ -140,11 +140,8 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     required: true,
   },
   sanitaryPreventionDescription: {
-    label: "Si oui, précisez les mesures de prévention sanitaire",
-    hintText:
-      internshipKind === "immersion"
-        ? "Mesures de prévention sanitaire prévues pour l’immersion. Ex : fourniture de gel, masques..."
-        : "Mesures de prévention sanitaire prévues pour le stage. Ex : fourniture de gel, masques...",
+    label: "Précisez les mesures de prévention sanitaire",
+    hintText: "Ex : fourniture de gel, masques...",
     id: conventionSectionIds.sanitaryPreventionDescription,
   },
   immersionAddress: {
@@ -176,7 +173,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Activités observées / pratiquées pendant l'immersion"
         : "Activités observées / pratiquées pendant le stage",
     hintText:
-      "Précisez les éléments clefs de la période, son contexte, les tâches confiées, les objectifs assignés au candidat.",
+      "Précisez les éléments-clés de la période, son contexte, les tâches confiées, les objectifs assignés au candidat.",
     id: conventionSectionIds.immersionActivities,
     required: true,
   },
