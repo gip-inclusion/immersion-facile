@@ -15,6 +15,7 @@ import {
   InMemoryOAuthGateway,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
+import { OngoingOAuth } from "../entities/OngoingOAuth";
 import {
   GetInclusionConnectLogoutUrl,
   makeGetInclusionConnectLogoutUrl,
@@ -61,18 +62,19 @@ describe("GetInclusionConnectLogoutUrl", () => {
       });
 
       it("returns the inclusion connect logout url from %s", async () => {
-        uow.ongoingOAuthRepository.ongoingOAuths = [
-          {
-            state: "some-state",
-            nonce: "some-nonce",
-            provider: "proConnect",
-            userId: user.id,
-            externalId: user.externalId ?? undefined,
-            accessToken: "fake-access-token",
-          },
-        ];
+        const ongoingOAuth: OngoingOAuth = {
+          state: "some-state",
+          nonce: "some-nonce",
+          provider: "proConnect",
+          userId: user.id,
+          externalId: user.externalId ?? undefined,
+          accessToken: "fake-access-token",
+        };
+        uow.ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];
         const logoutSuffixe =
-          provider === "ProConnect" ? "pro-connect" : "inclusion-connect";
+          ongoingOAuth.provider === "proConnect"
+            ? "pro-connect"
+            : "inclusion-connect";
         const idToken = "fake-id-token";
         expectToEqual(
           await getInclusionConnectLogoutUrl.execute({ idToken }, user),
@@ -83,7 +85,7 @@ describe("GetInclusionConnectLogoutUrl", () => {
               fakeProviderConfig.immersionRedirectUri.afterLogout,
             clientId: fakeProviderConfig.clientId,
             idToken,
-            state: "some-state",
+            state: ongoingOAuth.state,
           })}`,
         );
       });
