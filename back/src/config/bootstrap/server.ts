@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import express, { Express } from "express";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
+import type { HttpError } from "http-errors";
 import PinoHttp from "pino-http";
 import { createAddressRouter } from "../../adapters/primary/routers/address/createAddressRouter";
 import { createAdminRouter } from "../../adapters/primary/routers/admin/createAdminRouter";
@@ -65,7 +66,18 @@ export const createApp = async (
     }),
   );
   app.use(metrics);
-  app.use(bodyParser.json({ limit: "800kb" }));
+  app.use((req, res, next) => {
+    bodyParser.json({ limit: "800kb" })(req, res, (httpError?: HttpError) => {
+      if (httpError) {
+        const { expose: _, ...rest } = httpError;
+        res.status(httpError.statusCode).json({
+          url: req.url,
+          headers: req.headers,
+          ...rest,
+        });
+      } else next();
+    });
+  });
 
   const deps = await createAppDependencies(config);
 
