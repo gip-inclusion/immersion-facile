@@ -1,10 +1,12 @@
 import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import {
+  AccessTokenResponse,
+  AppConfig,
+} from "../../../../config/bootstrap/appConfig";
 import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
 import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
-import { PoleEmploiGetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
@@ -13,11 +15,10 @@ import { HttpRome4Gateway, makeRome4Routes } from "./HttpRome4Gateway";
 describe("HttpRome4Gateway", () => {
   const config = AppConfig.createFromEnv();
 
-  const cachingGateway =
-    new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
-      new RealTimeGateway(),
-      "expires_in",
-    );
+  const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
+    new RealTimeGateway(),
+    "expires_in",
+  );
 
   const franceTravailGateway = new HttpPoleEmploiGateway(
     createPeAxiosSharedClient(config),

@@ -1,4 +1,5 @@
 import { AgencyKind, ConventionStatus, DateString } from "shared";
+import { AccessTokenResponse } from "../../../config/bootstrap/appConfig";
 import { SubscriberErrorFeedback } from "../../core/api-consumer/ports/SubscribersGateway";
 
 // This is an interface contract with Pole Emploi (conventions broadcast).
@@ -90,16 +91,10 @@ export const isBroadcastResponseOk = (
 ): response is PeBroadcastSuccessResponse =>
   [200, 201, 204].includes(response.status);
 
-// https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
-export type PoleEmploiGetAccessTokenResponse = {
-  access_token: string;
-  expires_in: number;
-};
-
 export interface PoleEmploiGateway {
   notifyOnConventionUpdated: (
     poleEmploiConvention: PoleEmploiConvention,
   ) => Promise<PoleEmploiBroadcastResponse>;
 
-  getAccessToken: (scope: string) => Promise<PoleEmploiGetAccessTokenResponse>;
+  getAccessToken: (scope: string) => Promise<AccessTokenResponse>;
 }

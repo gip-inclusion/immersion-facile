@@ -4,7 +4,10 @@ import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
 import { AbsoluteUrl, castError } from "shared";
 import { HttpClient } from "shared-routes";
-import { AccessTokenConfig } from "../../../../config/bootstrap/appConfig";
+import {
+  AccessTokenConfig,
+  AccessTokenResponse,
+} from "../../../../config/bootstrap/appConfig";
 import {
   createAxiosInstance,
   isRetryableError,
@@ -26,7 +29,6 @@ import {
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
-  PoleEmploiGetAccessTokenResponse,
 } from "../../ports/PoleEmploiGateway";
 import { PoleEmploiRoutes, getPeTestPrefix } from "./PoleEmploiRoutes";
 
@@ -60,7 +62,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
   readonly #httpClient: HttpClient<PoleEmploiRoutes>;
 
-  readonly #caching: InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>;
+  readonly #caching: InMemoryCachingGateway<AccessTokenResponse>;
 
   readonly #accessTokenConfig: AccessTokenConfig;
 
@@ -68,7 +70,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
   constructor(
     httpClient: HttpClient<PoleEmploiRoutes>,
-    caching: InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>,
+    caching: InMemoryCachingGateway<AccessTokenResponse>,
     peApiUrl: AbsoluteUrl,
     accessTokenConfig: AccessTokenConfig,
     retryStrategy: RetryStrategy,
@@ -82,9 +84,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     this.#isDev = isDev;
   }
 
-  public async getAccessToken(
-    scope: string,
-  ): Promise<PoleEmploiGetAccessTokenResponse> {
+  public async getAccessToken(scope: string): Promise<AccessTokenResponse> {
     return this.#caching.caching(scope, () =>
       this.#retryStrategy.apply(() =>
         this.#commonlimiter.schedule(() =>

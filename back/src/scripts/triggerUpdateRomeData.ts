@@ -4,7 +4,7 @@ import { Pool } from "pg";
 import { map, splitEvery } from "ramda";
 import { pipeWithValue, removeDiacritics, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AppConfig } from "../config/bootstrap/appConfig";
+import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import {
@@ -13,7 +13,6 @@ import {
   makeRome4Routes,
 } from "../domains/agency/adapters/pe-agencies-referential/HttpRome4Gateway";
 import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
-import { PoleEmploiGetAccessTokenResponse } from "../domains/convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -33,11 +32,10 @@ const main = async () => {
   });
   const db = makeKyselyDb(pool, { skipErrorLog: true });
 
-  const cachingGateway =
-    new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
-      new RealTimeGateway(),
-      "expires_in",
-    );
+  const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
+    new RealTimeGateway(),
+    "expires_in",
+  );
 
   const franceTravailGateway = new HttpPoleEmploiGateway(
     createPeAxiosSharedClient(config),
