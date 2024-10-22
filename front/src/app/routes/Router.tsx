@@ -62,7 +62,11 @@ const adminRoutes: {
 } = adminTabRouteNames.reduce(
   (acc, tabRouteName) => ({
     ...acc,
-    [tabRouteName]: (route: Route<any>) => <AdminPage route={route} />,
+    [tabRouteName]: (route: Route<any>) => (
+      <AdminPrivateRoute route={route}>
+        <AdminPage route={route} />
+      </AdminPrivateRoute>
+    ),
   }),
 
   {} as {

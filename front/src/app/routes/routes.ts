@@ -3,6 +3,7 @@ import {
   AuthenticatedUserQueryParams,
   ValueOf,
   adminTabRouteNames,
+  adminTabs,
   frontRoutes,
 } from "shared";
 import { icUserAgencyDashboardTabSerializer } from "src/app/routes/routeParams/agencyDashboardTabs";
@@ -83,10 +84,10 @@ const admin = defineRoute(
   () => `/${frontRoutes.admin}`,
 );
 
-const adminTabRoutes = adminTabRouteNames.reduce(
-  (acc, tabName) => ({
+const adminRoutes = adminTabRouteNames.reduce(
+  (acc, adminTabName) => ({
     ...acc,
-    [tabName]: admin.extend(`/${frontRoutes.admin}/${tabName}`),
+    [adminTabName]: admin.extend(`/${adminTabs[adminTabName].slug}`),
   }),
   {} as Record<AdminTabRouteName, typeof admin>,
 );
@@ -95,7 +96,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
 
   admin,
-  ...adminTabRoutes,
+  ...adminRoutes,
   agencyDashboard: defineRoute(
     {
       ...inclusionConnectedParams,
