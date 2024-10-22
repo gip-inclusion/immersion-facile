@@ -1,8 +1,13 @@
-import { AuthenticatedUserQueryParams, ValueOf, frontRoutes } from "shared";
+import {
+  AdminTabRouteName,
+  AuthenticatedUserQueryParams,
+  ValueOf,
+  adminTabRouteNames,
+  frontRoutes,
+} from "shared";
 import { icUserAgencyDashboardTabSerializer } from "src/app/routes/routeParams/agencyDashboardTabs";
 import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { ValueSerializer, createRouter, defineRoute, param } from "type-route";
-import { adminTabSerializer } from "./routeParams/adminTabs";
 import {
   appellationAndRomeDtoArraySerializer,
   appellationStringSerializer,
@@ -73,18 +78,24 @@ export const searchParams = {
 export type FrontRouteUnion = ValueOf<typeof routes>;
 export type FrontRouteKeys = keyof typeof routes;
 
+const admin = defineRoute(
+  inclusionConnectedParams,
+  () => `/${frontRoutes.admin}`,
+);
+
+const adminTabRoutes = adminTabRouteNames.reduce(
+  (acc, tabName) => ({
+    ...acc,
+    [tabName]: admin.extend(`/${frontRoutes.admin}/${tabName}`),
+  }),
+  {} as Record<AdminTabRouteName, typeof admin>,
+);
+
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
-  adminRoot: defineRoute(`/${frontRoutes.admin}`),
-  admin: defineRoute(
-    {
-      ...inclusionConnectedParams,
-      tab: param.path.optional
-        .ofType(adminTabSerializer)
-        .default("conventions"),
-    },
-    ({ tab }) => `/${frontRoutes.admin}/${tab}`,
-  ),
+
+  admin,
+  ...adminTabRoutes,
   agencyDashboard: defineRoute(
     {
       ...inclusionConnectedParams,

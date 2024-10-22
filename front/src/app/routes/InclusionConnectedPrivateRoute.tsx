@@ -10,6 +10,7 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  AllowedStartInclusionConnectLoginPage,
   OAuthGatewayProvider,
   absoluteUrlSchema,
   domElementIds,
@@ -18,6 +19,7 @@ import {
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { FrontAdminRoute } from "src/app/pages/admin/AdminPage";
 import { routes } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -29,7 +31,7 @@ import { Route } from "type-route";
 type InclusionConnectPrivateRoute =
   | Route<typeof routes.agencyDashboard>
   | Route<typeof routes.establishmentDashboard>
-  | Route<typeof routes.admin>;
+  | FrontAdminRoute;
 
 type InclusionConnectedPrivateRouteProps = {
   route: InclusionConnectPrivateRoute;
@@ -84,6 +86,11 @@ export const InclusionConnectedPrivateRoute = ({
     authSelectors.afterLoginRedirectionUrl,
   );
 
+  const page: AllowedStartInclusionConnectLoginPage =
+    route.name === "establishmentDashboard" || route.name === "agencyDashboard"
+      ? route.name
+      : "admin";
+
   useEffect(() => {
     const {
       token,
@@ -92,6 +99,7 @@ export const InclusionConnectedPrivateRoute = ({
       lastName = "",
       idToken = "",
     } = route.params;
+
     if (token) {
       dispatch(
         authSlice.actions.federatedIdentityProvided({
@@ -136,15 +144,13 @@ export const InclusionConnectedPrivateRoute = ({
                     description: provider.baseline,
                     authComponent: (
                       <OAuthButton
-                        id={
-                          domElementIds[route.name].login.inclusionConnectButton
-                        }
+                        id={domElementIds[page].login.inclusionConnectButton}
                         authenticationEndpoint={`${
                           inclusionConnectImmersionRoutes
                             .startInclusionConnectLogin.url
                         }?${queryParamsAsString(
                           inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
-                            { page: route.name },
+                            { page },
                           ),
                         )}`}
                         provider={provider.buttonProvider}

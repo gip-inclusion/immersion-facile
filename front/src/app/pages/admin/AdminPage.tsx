@@ -1,7 +1,7 @@
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import React from "react";
 import {
-  AdminTab,
+  AdminTabRouteName,
   OmitFromExistingKeys,
   Prettify,
   adminTabs,
@@ -15,7 +15,6 @@ import { EventsTab } from "src/app/pages/admin/EventsTabs";
 import { NotificationsTab } from "src/app/pages/admin/NotificationsTab";
 import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
 import { UsersTab } from "src/app/pages/admin/UsersTab";
-import { isAdminTab } from "src/app/routes/routeParams/adminTabs";
 import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
 import { Route } from "type-route";
@@ -26,42 +25,44 @@ type RawAdminTab = Prettify<
   }
 >;
 
-const rawAdminTabs: Record<AdminTab, RawAdminTab> = {
-  conventions: {
+const rawAdminTabs: Record<AdminTabRouteName, RawAdminTab> = {
+  adminConventions: {
     label: "Conventions",
     content: <ConventionTab />,
   },
-  events: {
+  adminEvents: {
     label: "Evénements",
     content: <EventsTab />,
   },
-  agencies: {
+  adminAgencies: {
     label: "Agences",
     content: <AgencyTab />,
   },
-  users: {
+  adminUsers: {
     label: "Utilisateurs",
     content: <UsersTab />,
   },
-  establishments: {
+  adminEstablishments: {
     label: "Établissements",
     content: <EstablishmentsTab />,
   },
-  notifications: {
+  adminNotifications: {
     label: "Notifications",
     content: <NotificationsTab />,
   },
-  "email-preview": {
+  adminEmailPreview: {
     label: "Aperçu email",
     content: <EmailPreviewTab />,
   },
-  "technical-options": {
+  adminTechnicalOptions: {
     label: "Options techniques",
     content: <TechnicalOptionsTab />,
   },
 };
 
-const getAdminTabs = (currentTab: AdminTab) =>
+export type FrontAdminRoute = Route<(typeof routes)[AdminTabRouteName]>;
+
+const getAdminTabs = (currentTab: AdminTabRouteName) =>
   keys(rawAdminTabs)
     .filter((tabId) => adminTabs[tabId].isVisible(ENV.envType))
     .map((tabId) => ({
@@ -73,21 +74,17 @@ const getAdminTabs = (currentTab: AdminTab) =>
 export const AdminPage = ({
   route,
 }: {
-  route: Route<typeof routes.admin>;
+  route: FrontAdminRoute;
 }) => {
-  const currentTab = route.params.tab;
-  const tabs = getAdminTabs(currentTab);
+  const currentTab = route.name;
+  const tabs = getAdminTabs(route.name);
+
   return (
     <Tabs
       tabs={tabs}
       selectedTabId={currentTab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
       onTabChange={(tab) => {
-        if (isAdminTab(tab))
-          routes
-            .admin({
-              tab,
-            })
-            .push();
+        routes[tab as AdminTabRouteName]().push();
       }}
       id="admin-tabs"
     >
