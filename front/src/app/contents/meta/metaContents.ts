@@ -1,4 +1,4 @@
-import { AdminTab, GroupName } from "shared";
+import { GroupName } from "shared";
 import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import { FrontRouteKeys } from "src/app/routes/routes";
 
@@ -20,12 +20,40 @@ export const defaultPageMetaContents: Partial<
     description: "Devenir prescripteur de PMSMP et immersions professionnelles",
   },
   admin: {
-    title: "AdminTab",
-    description: "Faciliter la réalisation des immersions professionnelles.",
-  },
-  adminRoot: {
     title: "Admin",
     description: "Faciliter la réalisation des immersions professionnelles.",
+  },
+  adminConventions: {
+    title: "Admin: conventions",
+    description: "Page admin: Conventions",
+  },
+  adminEvents: {
+    title: "Admin: évenement",
+    description: "Page admin: Evenement",
+  },
+  adminAgencies: {
+    title: "Admin: validation d'agence",
+    description: "Page admin: Validation d'agence",
+  },
+  adminUsers: {
+    title: "Admin: utilisateurs",
+    description: "Page admin: Utilisateurs",
+  },
+  adminNotifications: {
+    title: "Admin: notifications",
+    description: "Page admin: Notifications",
+  },
+  adminTechnicalOptions: {
+    title: "Admin: options techniques",
+    description: "Page admin: Options techniques",
+  },
+  adminEmailPreview: {
+    title: "Admin: aperçus email",
+    description: "Page admin: Aperçus email",
+  },
+  adminEstablishments: {
+    title: "Admin: établissements",
+    description: "Page admin: Établissements",
   },
   debugPopulateDB: {
     title: "DebugPopulateDB",
@@ -200,38 +228,3 @@ export const groupMetaContent = (groupName: GroupName): MetaContentType => ({
   title: `${groupName} - toutes les immersions`,
   description: `Toutes les immersions proposées par ${groupName}`,
 });
-
-export const adminMetaContent: Record<AdminTab, MetaContentType> = {
-  conventions: {
-    title: "Admin: conventions",
-    description: "Page admin: Conventions",
-  },
-  events: {
-    title: "Admin: évenement",
-    description: "Page admin: Evenement",
-  },
-  agencies: {
-    title: "Admin: validation d'agence",
-    description: "Page admin: Validation d'agence",
-  },
-  users: {
-    title: "Admin: utilisateurs",
-    description: "Page admin: Utilisateurs",
-  },
-  notifications: {
-    title: "Admin: notifications",
-    description: "Page admin: Notifications",
-  },
-  "technical-options": {
-    title: "Admin: options techniques",
-    description: "Page admin: Options techniques",
-  },
-  "email-preview": {
-    title: "Admin: aperçus email",
-    description: "Page admin: Aperçus email",
-  },
-  establishments: {
-    title: "Admin: établissements",
-    description: "Page admin: Établissements",
-  },
-};
