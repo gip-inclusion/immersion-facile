@@ -35,6 +35,10 @@ export type GetLoginUrlParams = WithSourcePage & {
   state: string;
 };
 
+export type GetLogoutUrlParams = WithIdToken & {
+  state: string;
+};
+
 export const oAuthProviderByFeatureFlags = (
   flags: FeatureFlags,
 ): OAuthGatewayProvider =>
@@ -50,7 +54,7 @@ export interface OAuthGateway {
     provider: OAuthGatewayProvider,
   ) => Promise<GetAccessTokenResult>;
   getLogoutUrl(
-    params: WithIdToken,
+    params: GetLogoutUrlParams,
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl>;
 }

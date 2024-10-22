@@ -1,4 +1,4 @@
-import { IdentityProvider, OAuthState } from "shared";
+import { IdentityProvider, OAuthState, UserId } from "shared";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
@@ -13,6 +13,12 @@ export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
     return this.ongoingOAuths.find(
       (ongoingOAuth) =>
         ongoingOAuth.state === state && ongoingOAuth.provider === provider,
+    );
+  }
+
+  public async findByUserId(userId: UserId): Promise<OngoingOAuth | undefined> {
+    return this.ongoingOAuths.find(
+      (ongoingOAuth) => ongoingOAuth.userId === userId,
     );
   }
 

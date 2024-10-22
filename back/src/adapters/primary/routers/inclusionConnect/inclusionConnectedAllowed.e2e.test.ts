@@ -392,12 +392,49 @@ describe("InclusionConnectedAllowedRoutes", () => {
     describe(`${displayRouteName(
       inclusionConnectedAllowedRoutes.getInclusionConnectLogoutUrl,
     )} returns the logout url`, () => {
-      it("returns a correct logout url with status 200", async () => {
+      it("returns 401 if not logged in", async () => {
         const response = await httpClient.getInclusionConnectLogoutUrl({
+          queryParams: { idToken: "fake-id-token" },
+          headers: { authorization: "" },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 401,
+          body: {
+            status: 401,
+            message: "Veuillez vous authentifier",
+          },
+        });
+      });
+
+      it("returns a correct logout url with status 200", async () => {
+        inMemoryUow.userRepository.setInclusionConnectedUsers([
+          inclusionConnectedUserWithoutRights,
+        ]);
+        const state = "fake-state";
+        inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
+          {
+            userId: inclusionConnectedUserWithoutRights.id,
+            accessToken: "yolo",
+            provider: "inclusionConnect",
+            state,
+            nonce: "fake-nonce",
+            externalId:
+              inclusionConnectedUserWithoutRights.externalId ?? undefined,
+          },
+        ];
+
+        const token = generateInclusionConnectJwt({
+          userId,
+          version: currentJwtVersions.inclusion,
+        });
+        const response = await httpClient.getInclusionConnectLogoutUrl({
+          headers: { authorization: token },
           queryParams: {
             idToken: "fake-id-token",
           },
         });
+
         expectHttpResponseToEqual(response, {
           body: `${
             appConfig.inclusionConnectConfig.providerBaseUri
@@ -405,6 +442,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
             postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
             clientId: appConfig.inclusionConnectConfig.clientId,
             idToken: "fake-id-token",
+            state,
           })}`,
           status: 200,
         });

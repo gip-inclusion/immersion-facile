@@ -1,7 +1,6 @@
 import {
   AbsoluteUrl,
   OAuthGatewayProvider,
-  WithIdToken,
   WithSourcePage,
   decodeJwtWithoutSignatureCheck,
   errors,
@@ -21,6 +20,7 @@ import {
   GetAccessTokenParams,
   GetAccessTokenResult,
   GetLoginUrlParams,
+  GetLogoutUrlParams,
   OAuthGateway,
 } from "../../port/OAuthGateway";
 import {
@@ -209,7 +209,7 @@ export class HttpOAuthGateway implements OAuthGateway {
   }
 
   public async getLogoutUrl(
-    params: WithIdToken,
+    params: GetLogoutUrlParams,
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const uri: AbsoluteUrl =
@@ -223,13 +223,13 @@ export class HttpOAuthGateway implements OAuthGateway {
           post_logout_redirect_uri:
             this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
           id_token: params.idToken,
+          state: params.state,
         })}`
       : `${uri}?${queryParamsAsString<ProConnectLogoutQueryParams>({
           post_logout_redirect_uri:
             this.inclusionConnectConfig.immersionRedirectUri.afterLogout,
           id_token_hint: params.idToken,
-          state:
-            "3b7bd7fb38ccab89864563f17a89c4cb3bd400164ce828b4cfc2cb01ce8ed9da",
+          state: params.state,
         })}`;
   }
 

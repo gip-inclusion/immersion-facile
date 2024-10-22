@@ -24,7 +24,9 @@ export interface InclusionConnectedGateway {
   getDiscussionById$(
     payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined>;
-  getLogoutUrl$(payload: WithIdToken): Observable<AbsoluteUrl>;
+  getLogoutUrl$(
+    payload: WithIdToken & { authToken: string },
+  ): Observable<AbsoluteUrl>;
   updateDiscussionStatus$(
     payload: {
       jwt: ConventionSupportedJwt;

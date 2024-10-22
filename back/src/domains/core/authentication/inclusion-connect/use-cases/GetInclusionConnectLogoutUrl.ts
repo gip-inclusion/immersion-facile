@@ -1,4 +1,10 @@
-import { AbsoluteUrl, WithIdToken, withIdTokenSchema } from "shared";
+import {
+  AbsoluteUrl,
+  User,
+  WithIdToken,
+  errors,
+  withIdTokenSchema,
+} from "shared";
 import { createTransactionalUseCase } from "../../../UseCase";
 import {
   OAuthGateway,
@@ -12,17 +18,26 @@ export type GetInclusionConnectLogoutUrl = ReturnType<
 export const makeGetInclusionConnectLogoutUrl = createTransactionalUseCase<
   WithIdToken,
   AbsoluteUrl,
-  void,
+  User,
   { oAuthGateway: OAuthGateway }
 >(
   {
     name: "GetInclusionConnectLogoutUrl",
     inputSchema: withIdTokenSchema,
   },
-  async ({ inputParams, uow, deps: { oAuthGateway } }) => {
+  async ({ inputParams, uow, deps: { oAuthGateway }, currentUser }) => {
+    const provider = oAuthProviderByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
+    );
+
+    const ongoingOAuth = await uow.ongoingOAuthRepository.findByUserId(
+      currentUser.id,
+    );
+    if (!ongoingOAuth) throw errors.inclusionConnect.missingOAuth({});
+
     return oAuthGateway.getLogoutUrl(
-      inputParams,
-      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
+      { idToken: inputParams.idToken, state: ongoingOAuth.state },
+      provider,
     );
   },
 );
