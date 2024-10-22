@@ -36,12 +36,17 @@ export const createInclusionConnectedAllowedRouter = (
       ),
   );
 
-  inclusionConnectedSharedRoutes.getInclusionConnectLogoutUrl((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.inclusionConnectLogout.execute({
-        idToken: req.query.idToken,
+  inclusionConnectedSharedRoutes.getInclusionConnectLogoutUrl(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        return deps.useCases.inclusionConnectLogout.execute(
+          { idToken: req.query.idToken },
+          currentUser,
+        );
       }),
-    ),
   );
 
   inclusionConnectedSharedRoutes.markPartnersErroredConventionAsHandled(

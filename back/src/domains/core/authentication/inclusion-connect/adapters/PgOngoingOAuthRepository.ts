@@ -32,6 +32,12 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
     return this.#toOngoingOAuth(pgOngoingOAuth);
   }
 
+  public async findByUserId(
+    _userId: string,
+  ): Promise<OngoingOAuth | undefined> {
+    throw new Error("Not implemented");
+  }
+
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
     const { state, nonce, provider, userId, externalId, accessToken } =
       ongoingOAuth;

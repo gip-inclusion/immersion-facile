@@ -30,6 +30,7 @@ export type InclusionConnectLogoutQueryParams = {
   client_id: string;
   post_logout_redirect_uri: AbsoluteUrl;
   id_token: string;
+  state: string;
 };
 
 export type InclusionConnectRoutes = ReturnType<

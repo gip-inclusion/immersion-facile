@@ -7,4 +7,5 @@ export interface OngoingOAuthRepository {
     state: OAuthState,
     provider: IdentityProvider,
   ): Promise<OngoingOAuth | undefined>;
+  findByUserId(userId: string): Promise<OngoingOAuth | undefined>;
 }
