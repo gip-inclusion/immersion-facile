@@ -5,6 +5,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -13,10 +14,10 @@ import {
 import { GetAgencyPublicInfoById } from "./GetAgencyPublicInfoById";
 
 describe("GetAgencyPublicInfoById", () => {
-  const agency = new AgencyDtoBuilder().withId("1").build();
+  const agency = new AgencyDtoBuilder().withId("agency1").build();
   const agency2 = new AgencyDtoBuilder()
     .withRefersToAgencyId(agency.id)
-    .withId("2")
+    .withId("agency2")
     .build();
   let uow: InMemoryUnitOfWork;
   let useCase: GetAgencyPublicInfoById;
@@ -27,7 +28,10 @@ describe("GetAgencyPublicInfoById", () => {
 
   describe("Happy path", () => {
     it("Should return agency public info for agency with referred agency", async () => {
-      uow.agencyRepository.setAgencies([agency, agency2]);
+      uow.agencyRepository.setAgencies([
+        toAgencyWithRights(agency),
+        toAgencyWithRights(agency2),
+      ]);
 
       const expectedAgencyPublicDisplay: AgencyPublicDisplayDto = {
         id: agency2.id,
@@ -57,7 +61,7 @@ describe("GetAgencyPublicInfoById", () => {
     });
 
     it("Should return agency public info for agency without referred agency", async () => {
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
       const expectedAgencyPublicDisplay: AgencyPublicDisplayDto = {
         id: agency.id,
@@ -82,15 +86,15 @@ describe("GetAgencyPublicInfoById", () => {
     it("Should throw NotFoundError if agency does not exist", async () => {
       await expectPromiseToFailWithError(
         useCase.execute({ agencyId: agency.id }),
-        errors.agencies.notFound({ agencyIds: [agency.id] }),
+        errors.agency.notFound({ agencyId: agency.id }),
       );
     });
 
     it("Should throw if referred agency doesn't exist", async () => {
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
       await expectPromiseToFailWithError(
         useCase.execute({ agencyId: agency2.id }),
-        errors.agencies.notFound({ agencyIds: [agency2.id] }),
+        errors.agency.notFound({ agencyId: agency2.id }),
       );
     });
   });

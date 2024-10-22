@@ -1,3 +1,4 @@
+import { errors } from "../errors/errors";
 import { AgencyDto } from "./agency.dto";
 import { AgencyPublicDisplayDto } from "./publicAgency.dto";
 
@@ -10,9 +11,10 @@ export const toAgencyPublicDisplayDto = (
     referedAgency &&
     agency.refersToAgencyId !== referedAgency.id
   )
-    throw new Error(
-      "Agency.refersToAgencyId and referedAgency.id are not identical.",
-    );
+    throw errors.agencies.refersToMismatch({
+      agencyWithRefersToId: agency.id,
+      referedAgencyId: referedAgency.id,
+    });
 
   return {
     id: agency.id,
