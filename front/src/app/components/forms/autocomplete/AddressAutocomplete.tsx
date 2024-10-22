@@ -30,7 +30,7 @@ export const AddressAutocomplete = ({
   headerClassName,
   inputStyle,
   initialSearchTerm = "",
-  placeholder = "",
+  placeholder,
   hintText,
   notice,
   id = "im-address-autocomplete",
