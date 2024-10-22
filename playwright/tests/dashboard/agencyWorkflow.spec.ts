@@ -29,7 +29,7 @@ test.describe("Agency dashboard workflow", () => {
     test("activate agency in admin", async ({ page }) => {
       if (!agencyId) throw new Error("Agency ID is null");
       await page.goto("/");
-      await goToAdminTab(page, "agencies");
+      await goToAdminTab(page, "adminAgencies");
       await page
         .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
         .fill(agencyId);
@@ -81,7 +81,7 @@ test.describe("Agency dashboard workflow", () => {
     test.use({ storageState: testConfig.adminAuthFile });
     test("admin validates user registration to agency", async ({ page }) => {
       await page.goto("/");
-      await goToAdminTab(page, "agencies");
+      await goToAdminTab(page, "adminAgencies");
       await page
         .locator(`#${domElementIds.admin.agencyTab.selectIcUserToReview}`)
         .selectOption({
