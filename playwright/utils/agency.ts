@@ -64,7 +64,7 @@ export const fillAndSubmitBasicAgencyForm = async (
 
 export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
   await page.goto("/");
-  await goToAdminTab(page, "agencies");
+  await goToAdminTab(page, "adminAgencies");
   await page
     .locator(`#${domElementIds.admin.agencyTab.agencyToReviewInput}`)
     .click();
@@ -105,7 +105,7 @@ export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
 
 export const addUserToAgency = async (page: Page, agencyName: string) => {
   await page.goto("/");
-  await goToAdminTab(page, "agencies");
+  await goToAdminTab(page, "adminAgencies");
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,

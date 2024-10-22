@@ -30,7 +30,7 @@ test.describe("Convention creation and modification workflow", () => {
     test("get signatories magicLink urls from email", async ({ page }) => {
       const maxEmails = 2;
       await page.goto("/");
-      await goToAdminTab(page, "notifications");
+      await goToAdminTab(page, "adminNotifications");
       for (let index = 0; index < maxEmails; index++) {
         const emailWrapper = await openEmailInAdmin(
           page,
@@ -51,7 +51,7 @@ test.describe("Convention creation and modification workflow", () => {
       page,
     }) => {
       await signConvention(page, magicLinks, 0);
-      await goToAdminTab(page, "notifications");
+      await goToAdminTab(page, "adminNotifications");
       const emailWrapper = await openEmailInAdmin(
         page,
         "NEW_CONVENTION_AGENCY_NOTIFICATION",
@@ -87,7 +87,7 @@ test.describe("Convention creation and modification workflow", () => {
     });
     test("signatory edit the convention and re-submit it", async ({ page }) => {
       await page.goto("/");
-      await goToAdminTab(page, "notifications");
+      await goToAdminTab(page, "adminNotifications");
       const emailWrapper = await openEmailInAdmin(
         page,
         "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
@@ -133,7 +133,7 @@ test.describe("Convention creation and modification workflow", () => {
       });
       test("validator can remind missing signatories", async ({ page }) => {
         await page.goto("/");
-        await goToAdminTab(page, "notifications");
+        await goToAdminTab(page, "adminNotifications");
         const emailWrapper = await openEmailInAdmin(
           page,
           "NEW_CONVENTION_AGENCY_NOTIFICATION",
@@ -171,7 +171,7 @@ test.describe("Convention creation and modification workflow", () => {
 
       test("reviews and validate convention", async ({ page }) => {
         await page.goto("/");
-        await goToAdminTab(page, "notifications");
+        await goToAdminTab(page, "adminNotifications");
         const emailWrapper = await openEmailInAdmin(
           page,
           "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",

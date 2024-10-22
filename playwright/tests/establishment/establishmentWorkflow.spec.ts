@@ -165,7 +165,7 @@ test.describe("Establishment creation and modification workflow", () => {
       await page.waitForTimeout(testConfig.timeForEventCrawler);
       await closeModal(page);
       // Go to admin page / go to notifications tab
-      await goToAdminTab(page, "notifications");
+      await goToAdminTab(page, "adminNotifications");
       const emailWrapper = page
         .locator(".fr-accordion:has-text('EDIT_FORM_ESTABLISHMENT_LINK')")
         .first();
@@ -301,7 +301,7 @@ test.describe("Establishment creation and modification workflow", () => {
     test("check that establishment has been updated", async ({ page }) => {
       // Check if the establishment has been updated
       await page.goto("/");
-      await goToAdminTab(page, "establishments");
+      await goToAdminTab(page, "adminEstablishments");
       await page.fill(
         `#${domElementIds.admin.manageEstablishment.siretInput}`,
         providedSiret,
@@ -457,7 +457,7 @@ test.describe("Establishment creation and modification workflow", () => {
     test.use({ storageState: testConfig.adminAuthFile });
     test("make the establishment available", async ({ page }) => {
       await page.goto("/");
-      await goToAdminTab(page, "establishments");
+      await goToAdminTab(page, "adminEstablishments");
       await page.fill(
         `#${domElementIds.admin.manageEstablishment.siretInput}`,
         providedSiret,
@@ -498,7 +498,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
     test("in admin manage establishment", async ({ page }) => {
       await page.goto("/");
-      await goToAdminTab(page, "establishments");
+      await goToAdminTab(page, "adminEstablishments");
       await page.fill(
         `#${domElementIds.admin.manageEstablishment.siretInput}`,
         providedSiret,
@@ -535,7 +535,7 @@ test.describe("Establishment creation and modification workflow", () => {
     test("deletes an establishment", async ({ page }) => {
       page.on("dialog", (dialog) => dialog.accept());
       await page.goto("/");
-      await goToAdminTab(page, "establishments");
+      await goToAdminTab(page, "adminEstablishments");
       const siretInputLocator = page.locator(
         `#${domElementIds.admin.manageEstablishment.siretInput}`,
       );
