@@ -32,10 +32,16 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
     return this.#toOngoingOAuth(pgOngoingOAuth);
   }
 
-  public async findByUserId(
-    _userId: string,
-  ): Promise<OngoingOAuth | undefined> {
-    throw new Error("Not implemented");
+  public async findByUserId(userId: string): Promise<OngoingOAuth | undefined> {
+    const pgOngoingOAuth: PersistenceOngoingOAuth | undefined =
+      await this.transaction
+        .selectFrom("users_ongoing_oauths")
+        .selectAll()
+        .where("user_id", "=", userId)
+        .orderBy("updated_at", "desc")
+        .executeTakeFirst();
+
+    return this.#toOngoingOAuth(pgOngoingOAuth);
   }
 
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
