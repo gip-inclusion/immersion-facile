@@ -180,6 +180,9 @@ importers:
       '@types/express-prometheus-middleware':
         specifier: ^1.2.1
         version: 1.2.1
+      '@types/http-errors':
+        specifier: ^2.0.4
+        version: 2.0.4
       '@types/jest':
         specifier: ^29.5.2
         version: 29.5.2
@@ -344,13 +347,13 @@ importers:
         version: 8.10.0(eslint@8.57.1)
       eslint-plugin-jest:
         specifier: ^28.8.3
-        version: 28.8.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.5.0)(typescript@5.6.2)
+        version: 28.8.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.5.0(@types/node@20.15.0))(typescript@5.6.2)
       html-templates:
         specifier: workspace:*
         version: link:../libs/html-templates
       jest:
         specifier: ^29.5.0
-        version: 29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
+        version: 29.5.0(@types/node@20.15.0)
       leaflet:
         specifier: ^1.9.4
         version: 1.9.4
@@ -677,7 +680,7 @@ importers:
         version: link:../libs/html-templates
       jest:
         specifier: ^29.5.0
-        version: 29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
+        version: 29.5.0(@types/node@20.15.0)
       js-base64:
         specifier: ^3.7.3
         version: 3.7.4
@@ -3715,6 +3718,9 @@ packages:
 
   '@types/hoist-non-react-statics@3.3.1':
     resolution: {integrity: sha512-iMIqiko6ooLrTh1joXodJK5X9xeEALT1kM5G3ZLhD3hszxBdIEd5C75U834D9mLcINgD4OyZf5uQXjkuYydWvA==}
+
+  '@types/http-errors@2.0.4':
+    resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
 
   '@types/istanbul-lib-coverage@2.0.4':
     resolution: {integrity: sha512-z/QT1XN4K4KYuslS23k62yDIDLwLFkzxOuMplDtObz0+y7VqJCaO2o+SPwHCvLFZh7xazvvoor2tA/hPz9ee7g==}
@@ -9001,7 +9007,6 @@ packages:
 
   workbox-google-analytics@7.0.0:
     resolution: {integrity: sha512-MEYM1JTn/qiC3DbpvP2BVhyIH+dV/5BjHk756u9VbwuAhu0QHyKscTnisQuz21lfRpOwiS9z4XdqeVAKol0bzg==}
-    deprecated: It is not compatible with newer versions of GA starting with v4, as long as you are using GAv3 it should be ok, but the package is not longer being maintained
 
   workbox-navigation-preload@7.0.0:
     resolution: {integrity: sha512-juWCSrxo/fiMz3RsvDspeSLGmbgC0U9tKqcUPZBCf35s64wlaLXyn2KdHHXVQrb2cqF7I0Hc9siQalainmnXJA==}
@@ -14423,6 +14428,8 @@ snapshots:
       '@types/react': 18.0.28
       hoist-non-react-statics: 3.3.2
 
+  '@types/http-errors@2.0.4': {}
+
   '@types/istanbul-lib-coverage@2.0.4': {}
 
   '@types/istanbul-lib-report@3.0.0':
@@ -16251,13 +16258,24 @@ snapshots:
     dependencies:
       eslint: 8.57.1
 
+  eslint-plugin-jest@28.8.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.5.0(@types/node@20.15.0))(typescript@5.6.2):
+    dependencies:
+      '@typescript-eslint/utils': 6.12.0(eslint@8.57.1)(typescript@5.6.2)
+      eslint: 8.57.1
+    optionalDependencies:
+      '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
+      jest: 29.5.0(@types/node@20.15.0)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
   eslint-plugin-jest@28.8.3(@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(jest@29.5.0)(typescript@5.6.2):
     dependencies:
       '@typescript-eslint/utils': 6.12.0(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 6.21.0(@typescript-eslint/parser@6.12.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
-      jest: 29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
+      jest: 29.5.0
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -17321,6 +17339,25 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  jest-cli@29.5.0(@types/node@20.15.0):
+    dependencies:
+      '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
+      '@jest/test-result': 29.5.0
+      '@jest/types': 29.5.0
+      chalk: 4.1.2
+      exit: 0.1.2
+      graceful-fs: 4.2.11
+      import-local: 3.1.0
+      jest-config: 29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
+      jest-util: 29.5.0
+      jest-validate: 29.5.0
+      prompts: 2.4.2
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - supports-color
+      - ts-node
+
   jest-cli@29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2)):
     dependencies:
       '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
@@ -17608,6 +17645,29 @@ snapshots:
       jest-util: 29.5.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
+
+  jest@29.5.0:
+    dependencies:
+      '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
+      '@jest/types': 29.5.0
+      import-local: 3.1.0
+      jest-cli: 29.5.0(@types/node@20.15.0)
+    transitivePeerDependencies:
+      - '@types/node'
+      - supports-color
+      - ts-node
+    optional: true
+
+  jest@29.5.0(@types/node@20.15.0):
+    dependencies:
+      '@jest/core': 29.5.0(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2))
+      '@jest/types': 29.5.0
+      import-local: 3.1.0
+      jest-cli: 29.5.0(@types/node@20.15.0)
+    transitivePeerDependencies:
+      - '@types/node'
+      - supports-color
+      - ts-node
 
   jest@29.5.0(@types/node@20.15.0)(ts-node@10.9.1(@types/node@20.15.0)(typescript@5.6.2)):
     dependencies:
