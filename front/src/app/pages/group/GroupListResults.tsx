@@ -38,39 +38,43 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
       <div className={fr.cx("fr-container")}>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           {getSearchResultsForPage(currentPage).map((searchResult) => (
-            <SearchResult
-              key={`${searchResult.siret}-${searchResult.rome}`}
-              illustration={
-                <SearchResultIllustration illustration={searchIllustrations[0]}>
-                  <div className={fr.cx("fr-p-1v")}>
-                    {searchResult.fitForDisabledWorkers && (
-                      <ImTag theme="rqth" />
-                    )}
-                    {!searchResult.voluntaryToImmersion && (
-                      <ImTag theme="lbb" />
-                    )}
-                    {searchResult.voluntaryToImmersion && (
-                      <ImTag theme="voluntaryToImmersion" />
-                    )}
-                  </div>
-                </SearchResultIllustration>
-              }
-              establishment={searchResult}
-              onButtonClick={() => {
-                const appellationCode =
-                  searchResult.appellations.length &&
-                  searchResult.appellations[0]?.appellationCode;
-                if (appellationCode) {
-                  routes
-                    .searchResult({
-                      appellationCode,
-                      siret: searchResult.siret,
-                      location: searchResult.locationId ?? undefined,
-                    })
-                    .push();
+            <div className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-4")}>
+              <SearchResult
+                key={`${searchResult.siret}-${searchResult.rome}`}
+                illustration={
+                  <SearchResultIllustration
+                    illustration={searchIllustrations[0]}
+                  >
+                    <div className={fr.cx("fr-p-1v")}>
+                      {searchResult.fitForDisabledWorkers && (
+                        <ImTag theme="rqth" />
+                      )}
+                      {!searchResult.voluntaryToImmersion && (
+                        <ImTag theme="lbb" />
+                      )}
+                      {searchResult.voluntaryToImmersion && (
+                        <ImTag theme="voluntaryToImmersion" />
+                      )}
+                    </div>
+                  </SearchResultIllustration>
                 }
-              }}
-            />
+                establishment={searchResult}
+                onButtonClick={() => {
+                  const appellationCode =
+                    searchResult.appellations.length &&
+                    searchResult.appellations[0]?.appellationCode;
+                  if (appellationCode) {
+                    routes
+                      .searchResult({
+                        appellationCode,
+                        siret: searchResult.siret,
+                        location: searchResult.locationId ?? undefined,
+                      })
+                      .push();
+                  }
+                }}
+              />
+            </div>
           ))}
         </div>
       </div>
