@@ -14,7 +14,7 @@ test.describe("Manage users in admin", () => {
 
   test("Can edit roles of a user", async ({ page }) => {
     await page.goto("/");
-    await goToAdminTab(page, "agencies");
+    await goToAdminTab(page, "adminAgencies");
     await fillAutocomplete({
       page,
       locator: `#${domElementIds.admin.agencyTab.editAgencyAutocompleteInput}`,

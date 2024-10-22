@@ -1,9 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import {
-  AdminTabList,
   AdminTabRouteName,
   EstablishmentDashboardTab,
-  EstablishmentDashboardTabList,
   adminTabRouteNames,
   domElementIds,
   frontRoutes,
@@ -31,7 +29,7 @@ export const openEmailInAdmin = async (
   emailType: string,
   elementIndex = 0,
 ) => {
-  await goToAdminTab(page, "notifications");
+  await goToAdminTab(page, "adminNotifications");
   const emailSection = page
     .locator(`.fr-accordion:has-text("${emailType}")`)
     .nth(elementIndex);
@@ -54,7 +52,7 @@ export const getMagicLinkInEmailWrapper = (
     .getAttribute("href");
 
 export const getTabIndexByTabName = (
-  tabList: AdminTabList | EstablishmentDashboardTabList,
+  tabList: readonly AdminTabRouteName[] | readonly EstablishmentDashboardTab[],
   tabName: AdminTabRouteName | EstablishmentDashboardTab,
 ) => {
   const index = tabList.findIndex((tab) => tab === tabName);
