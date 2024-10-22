@@ -1,10 +1,11 @@
 import {
   AgencyPublicDisplayDto,
   WithAgencyId,
+  errors,
   toAgencyPublicDisplayDto,
   withAgencyIdSchema,
 } from "shared";
-import { NotFoundError } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -18,14 +19,17 @@ export class GetAgencyPublicInfoById extends TransactionalUseCase<
     { agencyId }: WithAgencyId,
     uow: UnitOfWork,
   ): Promise<AgencyPublicDisplayDto> {
-    const [agencyDto] = await uow.agencyRepository.getByIds([agencyId]);
-    if (!agencyDto) throw new NotFoundError(agencyId);
+    const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+    if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
     const referedAgency =
-      agencyDto.refersToAgencyId &&
-      (await uow.agencyRepository.getById(agencyDto.refersToAgencyId));
+      agencyWithRights.refersToAgencyId &&
+      (await uow.agencyRepository.getById(agencyWithRights.refersToAgencyId));
+
     return toAgencyPublicDisplayDto(
-      agencyDto,
-      referedAgency ? referedAgency : null,
+      await agencyWithRightToAgencyDto(uow, agencyWithRights),
+      referedAgency
+        ? await agencyWithRightToAgencyDto(uow, referedAgency)
+        : null,
     );
   }
 }
