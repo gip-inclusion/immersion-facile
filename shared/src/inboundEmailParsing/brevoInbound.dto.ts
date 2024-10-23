@@ -17,11 +17,11 @@ export type BrevoEmailItem = {
   InReplyTo: string | null;
   From: BrevoRecipient;
   To: BrevoRecipient[];
-  Cc: BrevoRecipient[];
+  Cc: BrevoRecipient[] | null;
   ReplyTo: BrevoRecipient | null;
   SentAtDate: string;
   Subject: string;
-  Attachments: BrevoAttachment[];
+  Attachments: BrevoAttachment[] | null;
   RawHtmlBody: string | null;
   RawTextBody: string | null;
 };

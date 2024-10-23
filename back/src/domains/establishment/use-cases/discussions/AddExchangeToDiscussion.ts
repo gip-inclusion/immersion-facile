@@ -84,10 +84,12 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBo
       sentAt: new Date(item.SentAtDate).toISOString(),
       recipient: recipientKind,
       sender,
-      attachments: item.Attachments.map(({ Name, DownloadToken }) => ({
-        name: Name,
-        link: DownloadToken,
-      })),
+      attachments: item.Attachments
+        ? item.Attachments.map(({ Name, DownloadToken }) => ({
+            name: Name,
+            link: DownloadToken,
+          }))
+        : [],
     };
 
     await uow.discussionRepository.update(

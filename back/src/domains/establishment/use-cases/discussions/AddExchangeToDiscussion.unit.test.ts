@@ -89,12 +89,14 @@ describe("AddExchangeToDiscussion", () => {
               sentAt: "2023-06-28T08:06:52.000Z",
               recipient: "potentialBeneficiary",
               subject: brevoResponse.items[0].Subject,
-              attachments: [
-                {
-                  name: brevoResponse.items[0].Attachments[0].Name,
-                  link: brevoResponse.items[0].Attachments[0].DownloadToken,
-                },
-              ],
+              attachments: brevoResponse.items[0].Attachments?.length
+                ? [
+                    {
+                      name: brevoResponse.items[0].Attachments[0].Name,
+                      link: brevoResponse.items[0].Attachments[0].DownloadToken,
+                    },
+                  ]
+                : [],
             },
           ],
         },
@@ -108,12 +110,14 @@ describe("AddExchangeToDiscussion", () => {
               sentAt: "2023-06-28T08:06:52.000Z",
               recipient: "establishment",
               subject: brevoResponse.items[1].Subject,
-              attachments: [
-                {
-                  name: brevoResponse.items[1].Attachments[0].Name,
-                  link: brevoResponse.items[1].Attachments[0].DownloadToken,
-                },
-              ],
+              attachments: brevoResponse.items[1].Attachments?.length
+                ? [
+                    {
+                      name: brevoResponse.items[1].Attachments[0].Name,
+                      link: brevoResponse.items[1].Attachments[0].DownloadToken,
+                    },
+                  ]
+                : [],
             },
           ],
         },
@@ -152,12 +156,14 @@ describe("AddExchangeToDiscussion", () => {
               subject: "Sans objet",
               message: brevoResponse.items[0].RawHtmlBody,
               sentAt: new Date(brevoResponse.items[0].SentAtDate).toISOString(),
-              attachments: [
-                {
-                  name: brevoResponse.items[0].Attachments[0].Name,
-                  link: brevoResponse.items[0].Attachments[0].DownloadToken,
-                },
-              ],
+              attachments: brevoResponse.items[0].Attachments?.length
+                ? [
+                    {
+                      name: brevoResponse.items[0].Attachments[0].Name,
+                      link: brevoResponse.items[0].Attachments[0].DownloadToken,
+                    },
+                  ]
+                : [],
             },
           ],
         },
@@ -171,12 +177,14 @@ describe("AddExchangeToDiscussion", () => {
               subject: "Sans objet",
               sentAt: new Date(brevoResponse.items[1].SentAtDate).toISOString(),
               message: brevoResponse.items[1].RawHtmlBody,
-              attachments: [
-                {
-                  name: brevoResponse.items[1].Attachments[0].Name,
-                  link: brevoResponse.items[1].Attachments[0].DownloadToken,
-                },
-              ],
+              attachments: brevoResponse.items[1].Attachments?.length
+                ? [
+                    {
+                      name: brevoResponse.items[1].Attachments[0].Name,
+                      link: brevoResponse.items[1].Attachments[0].DownloadToken,
+                    },
+                  ]
+                : [],
             },
           ],
         },
