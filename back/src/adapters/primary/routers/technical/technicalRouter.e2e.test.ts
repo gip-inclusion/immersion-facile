@@ -164,7 +164,7 @@ describe("technical router", () => {
       });
     });
 
-    it.skip(`${displayRouteName(
+    it(`${displayRouteName(
       technicalRoutes.inboundEmailParsing,
     )} 400 - when IP is allowed and body is wrong`, async () => {
       const response = await httpClient.inboundEmailParsing({
@@ -258,7 +258,7 @@ describe("technical router", () => {
       });
     });
 
-    it.skip(`${displayRouteName(
+    it(`${displayRouteName(
       technicalRoutes.validateEmail,
     )} 400 with '?email="invalid-email"`, async () => {
       const invalidEmail = "invalid-email";
