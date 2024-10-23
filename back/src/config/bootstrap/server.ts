@@ -70,6 +70,12 @@ export const createApp = async (
     bodyParser.json({ limit: "800kb" })(req, res, (httpError?: HttpError) => {
       if (httpError) {
         const { expose: _, ...rest } = httpError;
+        logger.error({
+          key: "bodyParser",
+          url: req.url,
+          headers: req.headers,
+          ...rest,
+        });
         res.status(httpError.statusCode).json({
           url: req.url,
           headers: req.headers,
