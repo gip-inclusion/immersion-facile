@@ -11,51 +11,52 @@ import { SuperTest, Test } from "supertest";
 import { ApiConsumerBuilder } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   PublicApiV2ConventionRoutes,
   publicApiV2ConventionRoutes,
 } from "./publicApiV2.routes";
 
-const createApiCall = (
-  sharedRequest: HttpClient<PublicApiV2ConventionRoutes>,
-  authorization: string,
-  conventionId: ConventionId,
-) =>
-  sharedRequest.getConventionById({
-    headers: {
-      authorization,
-    },
-    urlParams: { conventionId },
-  });
-
-const agency = new AgencyDtoBuilder().build();
-
-const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
-
-const consumer1 = new ApiConsumerBuilder()
-  .withId("id-consumer-1")
-  .withConventionRight({
-    kinds: ["READ"],
-    scope: {
-      agencyIds: [agency.id],
-    },
-    subscriptions: [],
-  })
-  .build();
-
-const consumer2 = new ApiConsumerBuilder()
-  .withId("id-consumer-2")
-  .withConventionRight({
-    kinds: ["READ"],
-    scope: {
-      agencyIds: [agency.id],
-    },
-    subscriptions: [],
-  })
-  .build();
-
 describe("bottleneck", () => {
+  const createApiCall = (
+    sharedRequest: HttpClient<PublicApiV2ConventionRoutes>,
+    authorization: string,
+    conventionId: ConventionId,
+  ) =>
+    sharedRequest.getConventionById({
+      headers: {
+        authorization,
+      },
+      urlParams: { conventionId },
+    });
+
+  const agency = new AgencyDtoBuilder().build();
+
+  const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
+
+  const consumer1 = new ApiConsumerBuilder()
+    .withId("id-consumer-1")
+    .withConventionRight({
+      kinds: ["READ"],
+      scope: {
+        agencyIds: [agency.id],
+      },
+      subscriptions: [],
+    })
+    .build();
+
+  const consumer2 = new ApiConsumerBuilder()
+    .withId("id-consumer-2")
+    .withConventionRight({
+      kinds: ["READ"],
+      scope: {
+        agencyIds: [agency.id],
+      },
+      subscriptions: [],
+    })
+    .build();
+
   let request: SuperTest<Test>;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let sharedRequest: HttpClient<PublicApiV2ConventionRoutes>;
@@ -79,7 +80,7 @@ describe("bottleneck", () => {
   });
 
   it("fails when too many request for a same bottleneck group", async () => {
-    inMemoryUow.agencyRepository.setAgencies([agency]);
+    inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
     inMemoryUow.conventionRepository.setConventions([convention]);
 
     const response = await Promise.all([
@@ -102,7 +103,7 @@ describe("bottleneck", () => {
   });
 
   it("success when two different bottleneck groups", async () => {
-    inMemoryUow.agencyRepository.setAgencies([agency]);
+    inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
     inMemoryUow.conventionRepository.setConventions([convention]);
 
     const response = await Promise.all([
