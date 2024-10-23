@@ -415,9 +415,9 @@ export const errors = {
         `L'utilisateur '${userId}' n'a pas accès à la discussion '${discussionId}'.`,
       ),
     badEmailFormat: ({ email }: { email: Email }) =>
-      new BadRequestError(`L'émail n'a pas le bon format '${email}'.`),
+      new BadRequestError(`L'email n'a pas le bon format '${email}'.`),
     badRecipientKindFormat: ({ kind }: { kind: string }) =>
-      new BadRequestError(`L'émail n'a pas le bon type '${kind}'.`),
+      new BadRequestError(`L'email n'a pas le bon type '${kind}'.`),
     hasDiscussionMissingParams: () =>
       new BadRequestError(
         "Aucun critère n'a été fourni pour vérifier l'existence d'une mise en relation.",
