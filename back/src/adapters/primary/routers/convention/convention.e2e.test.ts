@@ -7,10 +7,10 @@ import {
   ConventionId,
   ConventionMagicLinkRoutes,
   InclusionConnectJwtPayload,
-  InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   TechnicalRoutes,
   UnauthenticatedConventionRoutes,
+  User,
   WithAuthorizationHeader,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
@@ -40,44 +40,41 @@ import {
 } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
-const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
-
-const inclusionConnectedUser: InclusionConnectedUser = {
-  id: "my-user-id",
-  email: "my-user@email.com",
-  firstName: "John",
-  lastName: "Doe",
-  agencyRights: [
-    { roles: ["validator"], agency: peAgency, isNotifiedByEmail: false },
-  ],
-  dashboards: { agencies: {}, establishments: {} },
-  externalId: "john-external-id",
-  createdAt: new Date().toISOString(),
-};
-const convention = new ConventionDtoBuilder()
-  .withAgencyId(peAgency.id)
-  .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
-  .build();
-
-const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
-
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withId("backoffice-admin-user")
-  .withIsAdmin(true)
-  .build();
-
-const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-  version: currentJwtVersions.inclusion,
-  iat: new Date().getTime(),
-  exp: addDays(new Date(), 30).getTime(),
-  userId: backofficeAdminUser.id,
-};
-
 describe("convention e2e", () => {
+  const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
+
+  const validator: User = {
+    id: "my-user-id",
+    email: "my-user@email.com",
+    firstName: "John",
+    lastName: "Doe",
+    externalId: "john-external-id",
+    createdAt: new Date().toISOString(),
+  };
+  const convention = new ConventionDtoBuilder()
+    .withAgencyId(peAgency.id)
+    .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
+    .build();
+
+  const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
+
+  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+    .withId("backoffice-admin-user")
+    .withIsAdmin(true)
+    .buildUser();
+
+  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+    version: currentJwtVersions.inclusion,
+    iat: new Date().getTime(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: backofficeAdminUser.id,
+  };
+
   let unauthenticatedRequest: HttpClient<UnauthenticatedConventionRoutes>;
   let magicLinkRequest: HttpClient<ConventionMagicLinkRoutes>;
   let technicalRoutesClient: HttpClient<TechnicalRoutes>;
@@ -268,16 +265,17 @@ describe("convention e2e", () => {
   )} gets a convention from a magic link`, () => {
     beforeEach(() => {
       inMemoryUow.conventionRepository.setConventions([convention]);
-      inMemoryUow.agencyRepository.setAgencies([peAgency]);
+      inMemoryUow.agencyRepository.setAgencies([
+        toAgencyWithRights(peAgency, {
+          [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+      ]);
     });
 
     it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
       "200 - succeeds with JWT %s",
       async (scenario) => {
-        inMemoryUow.userRepository.setInclusionConnectedUsers([
-          inclusionConnectedUser,
-          backofficeAdminUser,
-        ]);
+        inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
 
         const jwt = match(scenario)
           .with("ConventionJwt", () =>
@@ -297,7 +295,7 @@ describe("convention e2e", () => {
           )
           .with("InclusionConnectJwt", () =>
             generateInclusionConnectJwt({
-              userId: inclusionConnectedUser.id,
+              userId: validator.id,
               version: currentJwtVersions.inclusion,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
             }),
@@ -318,7 +316,7 @@ describe("convention e2e", () => {
             agencyKind: peAgency.kind,
             agencySiret: peAgency.agencySiret,
             agencyCounsellorEmails: peAgency.counsellorEmails,
-            agencyValidatorEmails: peAgency.validatorEmails,
+            agencyValidatorEmails: [validator.email],
           },
         });
       },
@@ -481,7 +479,11 @@ describe("convention e2e", () => {
     const externalId = "00000000001";
 
     beforeEach(() => {
-      inMemoryUow.agencyRepository.setAgencies([peAgency]);
+      inMemoryUow.agencyRepository.setAgencies([
+        toAgencyWithRights(peAgency, {
+          [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+      ]);
       const inReviewConvention = new ConventionDtoBuilder(convention)
         .withStatus("IN_REVIEW")
         .build();
@@ -489,10 +491,7 @@ describe("convention e2e", () => {
       inMemoryUow.conventionExternalIdRepository.externalIdsByConventionId = {
         [inReviewConvention.id]: externalId,
       };
-      inMemoryUow.userRepository.setInclusionConnectedUsers([
-        inclusionConnectedUser,
-        backofficeAdminUser,
-      ]);
+      inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
     });
 
     it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
@@ -511,7 +510,7 @@ describe("convention e2e", () => {
           )
           .with("BackOfficeJwt", () =>
             generateInclusionConnectJwt({
-              userId: inclusionConnectedUser.id,
+              userId: validator.id,
               version: currentJwtVersions.inclusion,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
               exp:
@@ -520,7 +519,7 @@ describe("convention e2e", () => {
           )
           .with("InclusionConnectJwt", () =>
             generateInclusionConnectJwt({
-              userId: inclusionConnectedUser.id,
+              userId: validator.id,
               version: currentJwtVersions.inclusion,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
             }),
@@ -737,7 +736,7 @@ describe("convention e2e", () => {
 
       const convention = new ConventionDtoBuilder().build();
       inMemoryUow.conventionRepository.setConventions([convention]);
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
       gateways.timeGateway.setNextDate(new Date());
 
