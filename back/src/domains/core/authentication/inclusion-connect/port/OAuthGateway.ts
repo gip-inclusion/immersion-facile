@@ -41,7 +41,9 @@ const oAuthProviderByFeatureFlags = (
 ): OAuthGatewayProvider =>
   flags.enableProConnect.isActive ? "ProConnect" : "InclusionConnect";
 
-export const makeProvider = async (uow: UnitOfWork) =>
+export const makeProvider = async (
+  uow: UnitOfWork,
+): Promise<OAuthGatewayProvider> =>
   oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll());
 
 export interface OAuthGateway {
