@@ -101,8 +101,8 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         : "SIRET de l’entreprise",
     hintText:
       internshipKind === "immersion"
-        ? "la structure d'accueil, c'est l'entreprise, le commerce, l'association... où le candidat va faire son immersion. Format attendu : 362 521 879 00034"
-        : "la structure d'accueil, où le candidat va faire son stage. Format attendu : 362 521 879 00034",
+        ? "La structure d'accueil, c'est l'entreprise, le commerce, l'association... où le candidat va faire son immersion. Format attendu : 362 521 879 00034"
+        : "La structure d'accueil, où le candidat va faire son stage. Format attendu : 362 521 879 00034",
     id: conventionSectionIds.siret,
     required: true,
   },
