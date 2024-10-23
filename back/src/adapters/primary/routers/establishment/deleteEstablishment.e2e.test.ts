@@ -23,19 +23,19 @@ import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapte
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withId("backoffice-admin-user")
-  .withIsAdmin(true)
-  .build();
-
-const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-  version: currentJwtVersions.inclusion,
-  iat: new Date().getTime(),
-  exp: addDays(new Date(), 30).getTime(),
-  userId: backofficeAdminUser.id,
-};
-
 describe("Delete form establishment", () => {
+  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+    .withId("backoffice-admin-user")
+    .withIsAdmin(true)
+    .buildUser();
+
+  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+    version: currentJwtVersions.inclusion,
+    iat: new Date().getTime(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: backofficeAdminUser.id,
+  };
+
   const establishmentAggregate = new EstablishmentAggregateBuilder().build();
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(establishmentAggregate.establishment.siret)
@@ -57,7 +57,7 @@ describe("Delete form establishment", () => {
     const request = testAppAndDeps.request;
     timeGateway = testAppAndDeps.gateways.timeGateway;
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
-    uow.userRepository.setInclusionConnectedUsers([backofficeAdminUser]);
+    uow.userRepository.users = [backofficeAdminUser];
   });
 
   it(`${displayRouteName(
