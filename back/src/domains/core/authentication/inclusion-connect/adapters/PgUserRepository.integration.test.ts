@@ -563,7 +563,7 @@ describe("PgAuthenticatedUserRepository", () => {
             externalId: null,
           };
           await agencyRepository.insert(agency1);
-          await insertUser(db, user1, "InclusionConnect");
+          await insertUser(db, user1, "inclusionConnect");
           await insertAgencyRegistrationToUser(db, {
             agencyId: agency1.id,
             userId: user1.id,
@@ -571,7 +571,7 @@ describe("PgAuthenticatedUserRepository", () => {
             isNotifiedByEmail: false,
           });
 
-          await insertUser(db, user2, "ProConnect");
+          await insertUser(db, user2, "proConnect");
           await insertUser(db, userNotIcConnected, null);
 
           const users = await userRepository.getUsers({ emailContains: "j" });
@@ -906,11 +906,11 @@ const insertUser = async (
   provider: OAuthGatewayProvider | null,
 ) => {
   const icProvider =
-    provider === "InclusionConnect"
+    provider === "inclusionConnect"
       ? { inclusion_connect_sub: externalId }
       : {};
   const proConnectProvider =
-    provider === "ProConnect" ? { pro_connect_sub: externalId } : {};
+    provider === "proConnect" ? { pro_connect_sub: externalId } : {};
 
   await db
     .insertInto("users")

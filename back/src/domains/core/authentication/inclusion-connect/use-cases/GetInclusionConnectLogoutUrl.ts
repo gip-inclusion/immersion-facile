@@ -1,7 +1,5 @@
 import {
   AbsoluteUrl,
-  IdentityProvider,
-  OAuthGatewayProvider,
   User,
   WithIdToken,
   errors,
@@ -30,19 +28,9 @@ export const makeGetInclusionConnectLogoutUrl = createTransactionalUseCase<
     );
     if (!ongoingOAuth) throw errors.inclusionConnect.missingOAuth({});
 
-    const provider = getProvider(ongoingOAuth.provider);
-
     return oAuthGateway.getLogoutUrl(
       { idToken: inputParams.idToken, state: ongoingOAuth.state },
-      provider,
+      ongoingOAuth.provider,
     );
   },
 );
-
-const getProvider = (
-  identityProvider: IdentityProvider,
-): OAuthGatewayProvider => {
-  if (identityProvider === "inclusionConnect") return "InclusionConnect";
-  if (identityProvider === "proConnect") return "ProConnect";
-  throw new Error(`Unknown identityProvider : ${identityProvider}`);
-};

@@ -1,10 +1,5 @@
 import { Pool } from "pg";
-import {
-  IdentityProvider,
-  User,
-  expectToEqual,
-  oAuthGatewayProviders,
-} from "shared";
+import { User, expectToEqual, oAuthGatewayProviders } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
@@ -36,60 +31,48 @@ describe("PgOngoingOAuthRepository", () => {
     await pool.end();
   });
 
-  describe.each(oAuthGatewayProviders)(
-    "with provider '%s'",
-    (gatewayProvider) => {
-      it("saves an ongoing OAuth, then gets it from its states, then updates it, than gets ongoingOauth from userId", async () => {
-        const state = "11111111-1111-1111-1111-111111111111";
+  describe.each(oAuthGatewayProviders)("with provider '%s'", (provider) => {
+    it("saves an ongoing OAuth, then gets it from its states, then updates it, than gets ongoingOauth from userId", async () => {
+      const state = "11111111-1111-1111-1111-111111111111";
+      const ongoingOAuth: OngoingOAuth = {
+        state,
+        nonce: "123",
+        provider,
+      };
+      const user: User = {
+        id: "22222222-2222-2222-2222-222222222222",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.doe@mail.com",
+        externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
+      };
+      await pgUserRepository.save(user, provider);
+      await pgOngoingOAuthRepository.save(ongoingOAuth);
 
-        const provider: IdentityProvider =
-          gatewayProvider === "InclusionConnect"
-            ? "inclusionConnect"
-            : "proConnect";
+      const fetchedFromState =
+        await pgOngoingOAuthRepository.findByStateAndProvider(state, provider);
+      expectToEqual(fetchedFromState, ongoingOAuth);
 
-        const ongoingOAuth: OngoingOAuth = {
-          state,
-          nonce: "123",
-          provider,
-        };
-        const user: User = {
-          id: "22222222-2222-2222-2222-222222222222",
-          firstName: "John",
-          lastName: "Doe",
-          email: "john.doe@mail.com",
-          externalId: "john-external-id",
-          createdAt: new Date().toISOString(),
-        };
-        await pgUserRepository.save(user, gatewayProvider);
-        await pgOngoingOAuthRepository.save(ongoingOAuth);
+      const results = await db
+        .selectFrom("users_ongoing_oauths")
+        .selectAll()
+        .execute();
+      expect(results).toHaveLength(1);
 
-        const fetchedFromState =
-          await pgOngoingOAuthRepository.findByStateAndProvider(
-            state,
-            provider,
-          );
-        expectToEqual(fetchedFromState, ongoingOAuth);
+      await pgUserRepository.save(user, provider);
+      const updatedOngoingOAuth: OngoingOAuth = {
+        ...ongoingOAuth,
+        userId: user.id,
+        externalId: user.externalId ?? undefined,
+        accessToken: "some-token",
+      };
+      await pgOngoingOAuthRepository.save(updatedOngoingOAuth);
 
-        const results = await db
-          .selectFrom("users_ongoing_oauths")
-          .selectAll()
-          .execute();
-        expect(results).toHaveLength(1);
-
-        await pgUserRepository.save(user, gatewayProvider);
-        const updatedOngoingOAuth: OngoingOAuth = {
-          ...ongoingOAuth,
-          userId: user.id,
-          externalId: user.externalId ?? undefined,
-          accessToken: "some-token",
-        };
-        await pgOngoingOAuthRepository.save(updatedOngoingOAuth);
-
-        const fetchedFromUserId = await pgOngoingOAuthRepository.findByUserId(
-          user.id,
-        );
-        expectToEqual(fetchedFromUserId, updatedOngoingOAuth);
-      });
-    },
-  );
+      const fetchedFromUserId = await pgOngoingOAuthRepository.findByUserId(
+        user.id,
+      );
+      expectToEqual(fetchedFromUserId, updatedOngoingOAuth);
+    });
+  });
 });

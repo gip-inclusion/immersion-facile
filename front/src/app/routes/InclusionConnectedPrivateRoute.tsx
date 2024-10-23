@@ -46,13 +46,13 @@ const providers: Record<
     buttonProvider: OAuthButtonProps["provider"];
   }
 > = {
-  InclusionConnect: {
+  inclusionConnect: {
     name: "Inclusion Connect",
     buttonProvider: "inclusion-connect",
     baseline:
       "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
   },
-  ProConnect: {
+  proConnect: {
     name: "ProConnect",
     buttonProvider: "pro-connect",
     baseline:
@@ -78,8 +78,8 @@ export const InclusionConnectedPrivateRoute = ({
   );
 
   const provider = enableProConnect.isActive
-    ? providers.ProConnect
-    : providers.InclusionConnect;
+    ? providers.proConnect
+    : providers.inclusionConnect;
   const afterLoginRedirectionUrl = useAppSelector(
     authSelectors.afterLoginRedirectionUrl,
   );

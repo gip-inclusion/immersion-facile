@@ -42,7 +42,7 @@ export type GetLogoutUrlParams = WithIdToken & {
 export const oAuthProviderByFeatureFlags = (
   flags: FeatureFlags,
 ): OAuthGatewayProvider =>
-  flags.enableProConnect.isActive ? "ProConnect" : "InclusionConnect";
+  flags.enableProConnect.isActive ? "proConnect" : "inclusionConnect";
 
 export interface OAuthGateway {
   getLoginUrl(

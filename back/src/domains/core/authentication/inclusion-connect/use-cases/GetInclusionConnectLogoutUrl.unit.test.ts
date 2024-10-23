@@ -49,7 +49,7 @@ describe("GetInclusionConnectLogoutUrl", () => {
 
         uow.featureFlagRepository.update({
           flagName: "enableProConnect",
-          featureFlag: { isActive: provider === "ProConnect", kind: "boolean" },
+          featureFlag: { isActive: provider === "proConnect", kind: "boolean" },
         });
       });
 
