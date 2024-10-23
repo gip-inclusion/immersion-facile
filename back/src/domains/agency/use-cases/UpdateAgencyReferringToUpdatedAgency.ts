@@ -1,82 +1,16 @@
+import { keys, toPairs, uniq } from "ramda";
 import {
-  AgencyDto,
-  AgencyId,
-  AgencyRight,
   InclusionConnectedUser,
+  UserId,
   WithAgencyId,
   errors,
   withAgencyIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-
-const addValidatorsNotReceivingNotifications = async (
-  uow: UnitOfWork,
-  agencyId: AgencyId,
-  agenciesWithRefersTo: AgencyDto[],
-) => {
-  const provider = await makeProvider(uow);
-
-  const validatorsNotNotifiedToCopy =
-    await uow.userRepository.getIcUsersWithFilter(
-      {
-        agencyId: agencyId,
-        agencyRole: "validator",
-        isNotifiedByEmail: false,
-      },
-      provider,
-    );
-
-  const updatedUsers: InclusionConnectedUser[] =
-    validatorsNotNotifiedToCopy.map((user) => {
-      const newOrUpdatedAgencyRights: AgencyRight[] = agenciesWithRefersTo.map(
-        (agency) => {
-          const agencyRightToUpdate = user.agencyRights.find(
-            (agencyRight) => agencyRight.agency.id === agency.id,
-          );
-          const updatedAgencyRight: AgencyRight = {
-            agency,
-            isNotifiedByEmail: false,
-            roles:
-              agencyRightToUpdate !== undefined
-                ? [...agencyRightToUpdate.roles, "validator"]
-                : ["validator"],
-          };
-
-          return updatedAgencyRight;
-        },
-      );
-
-      const newOrUpdatedAgencyRightsAgencyIds = newOrUpdatedAgencyRights.map(
-        (agencyRight) => agencyRight.agency.id,
-      );
-
-      return {
-        ...user,
-        agencyRights: [
-          ...user.agencyRights.filter(
-            (agencyRight) =>
-              !newOrUpdatedAgencyRightsAgencyIds.includes(
-                agencyRight.agency.id,
-              ),
-          ),
-          ...newOrUpdatedAgencyRights,
-        ],
-      };
-    });
-
-  await Promise.all(
-    updatedUsers.map((user) =>
-      uow.userRepository.updateAgencyRights({
-        userId: user.id,
-        agencyRights: user.agencyRights,
-      }),
-    ),
-  );
-};
+import { AgencyUsersRights } from "../ports/AgencyRepository";
 
 export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   WithAgencyId,
@@ -96,37 +30,78 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   }
 
   public async _execute(params: WithAgencyId, uow: UnitOfWork): Promise<void> {
-    const agencyUpdated = await uow.agencyRepository.getById(params.agencyId);
+    const agency = await uow.agencyRepository.getById(params.agencyId);
 
-    if (!agencyUpdated) throw errors.agency.notFound(params);
-    const updatedRelatedAgencies: AgencyDto[] = (
-      await uow.agencyRepository.getAgenciesRelatedToAgency(agencyUpdated.id)
-    ).map((agency) => ({
-      ...agency,
-      validatorEmails: agencyUpdated.validatorEmails,
-    }));
+    if (!agency) throw errors.agency.notFound(params);
 
-    await addValidatorsNotReceivingNotifications(
-      uow,
-      agencyUpdated.id,
-      updatedRelatedAgencies,
-    );
+    const validatorsNotNotifiedToCopyIds = toPairs(agency.usersRights)
+      .filter(
+        ([_, rights]) =>
+          rights?.roles.includes("validator") &&
+          rights.isNotifiedByEmail === false,
+      )
+      .map(([id]) => id);
+
+    const relatedAgencies =
+      await uow.agencyRepository.getAgenciesRelatedToAgency(agency.id);
 
     await Promise.all(
-      updatedRelatedAgencies.flatMap((agency) => [
-        uow.agencyRepository.update(agency),
-        uow.outboxRepository.save(
+      relatedAgencies.map(async ({ usersRights, id }) => {
+        await uow.agencyRepository.update({
+          id,
+          usersRights: this.#updateRights(
+            usersRights,
+            validatorsNotNotifiedToCopyIds,
+          ),
+        });
+        await uow.outboxRepository.save(
           this.#createNewEvent({
             topic: "AgencyUpdated",
             payload: {
-              agencyId: agency.id,
+              agencyId: id,
               triggeredBy: {
                 kind: "crawler",
               },
             },
           }),
-        ),
-      ]),
+        );
+      }),
     );
+  }
+
+  #updateRights(
+    rights: AgencyUsersRights,
+    validatorsNotNotifiedToCopyIds: UserId[],
+  ): AgencyUsersRights {
+    //TODO: de tête on a un utilitaire qui fait 2 en 1 ici
+    const idsToUpdate: UserId[] = validatorsNotNotifiedToCopyIds.filter((id) =>
+      keys(rights).includes(id),
+    );
+    const idsToAdd: UserId[] = validatorsNotNotifiedToCopyIds.filter(
+      (id) => !keys(rights).includes(id),
+    );
+
+    return {
+      ...toPairs(rights).reduce<AgencyUsersRights>(
+        (acc, [id, right]) => ({
+          ...acc,
+          [id]:
+            right && idsToUpdate.includes(id)
+              ? {
+                  isNotifiedByEmail: right.isNotifiedByEmail,
+                  roles: uniq([...right.roles, "validator"]),
+                }
+              : right,
+        }),
+        {},
+      ),
+      ...idsToAdd.reduce<AgencyUsersRights>(
+        (acc, id) => ({
+          ...acc,
+          [id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        }),
+        {},
+      ),
+    };
   }
 }
