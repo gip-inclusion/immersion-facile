@@ -1,51 +1,81 @@
 import { AddressDto, AgencyDto, expectToEqual } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryAddressGateway } from "../../core/address/adapters/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../core/app-logger/adapters/ConsoleAppLogger";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { PeAgencyFromReferenciel } from "../../establishment/ports/PeAgenciesReferential";
-import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
 import { InMemoryPeAgenciesReferential } from "../adapters/pe-agencies-referential/InMemoryPeAgenciesReferential";
 import { UpdateAllPeAgencies } from "./UpdateAllPeAgencies";
-
-const address: AddressDto = {
-  city: "Molsheim",
-  departmentCode: "67",
-  postcode: "67120",
-  streetNumberAndAddress: "6B RUE Gaston Romazzotti",
-};
 
 describe("UpdateAllPeAgencies use case", () => {
   let updateAllPeAgencies: UpdateAllPeAgencies;
   let peAgenciesReferential: InMemoryPeAgenciesReferential;
-  let agencyRepository: InMemoryAgencyRepository;
-  let uuid: TestUuidGenerator;
+  let uow: InMemoryUnitOfWork;
+  let uuidGenerator: TestUuidGenerator;
   let addressApi: InMemoryAddressGateway;
+  let timeGateway: CustomTimeGateway;
+
+  const address: AddressDto = {
+    city: "Molsheim",
+    departmentCode: "67",
+    postcode: "67120",
+    streetNumberAndAddress: "6B RUE Gaston Romazzotti",
+  };
+
+  const peReferentialAgency: PeAgencyFromReferenciel = {
+    code: "GRE0187",
+    codeSafir: "63019",
+    libelle: "MOLSHEIM",
+    libelleEtendu: "Agence Pôle emploi MOLSHEIM",
+    type: "APE",
+    typeAccueil: "3",
+    codeRegionINSEE: "44",
+    dispositifADEDA: true,
+    contact: { telephonePublic: "39-49", email: "molsheim@pole-emploi.fr" },
+    siret: "13000548120984",
+    adressePrincipale: {
+      ligne4: "16 b RUE Gaston Romazzotti",
+      ligne5: "",
+      ligne6: "67120 MOLSHEIM",
+      gpsLon: 7.511,
+      gpsLat: 48.532571,
+      communeImplantation: "67300",
+      bureauDistributeur: "67120",
+    },
+  };
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
+    uow = createInMemoryUow();
     peAgenciesReferential = new InMemoryPeAgenciesReferential();
-    agencyRepository = uow.agencyRepository;
-    uuid = new TestUuidGenerator();
+    uuidGenerator = new TestUuidGenerator();
     addressApi = new InMemoryAddressGateway();
+    timeGateway = new CustomTimeGateway();
     updateAllPeAgencies = new UpdateAllPeAgencies(
       new InMemoryUowPerformer(uow),
       peAgenciesReferential,
       addressApi,
-      uuid,
+      uuidGenerator,
       new ConsoleAppLogger(),
+      timeGateway,
     );
+    uuidGenerator.setNextUuids(["other-uuid", "another-one"]);
   });
 
   it("should save agencies which have never been saved", async () => {
     peAgenciesReferential.setPeAgencies([peReferentialAgency]);
-    agencyRepository.setAgencies([]);
-    uuid.setNextUuid("some-uuid");
+    uow.agencyRepository.setAgencies([]);
     addressApi.setNextAddress(address);
+
     await updateAllPeAgencies.execute();
-    expectToEqual(agencyRepository.agencies, [
-      {
+
+    expectToEqual(uow.agencyRepository.agencies, [
+      toAgencyWithRights({
         id: "some-uuid",
         name: "Agence Pôle emploi MOLSHEIM",
         counsellorEmails: [],
@@ -66,7 +96,7 @@ describe("UpdateAllPeAgencies use case", () => {
         logoUrl: null,
         questionnaireUrl: null,
         rejectionJustification: null,
-      },
+      }),
     ]);
   });
 
@@ -102,12 +132,12 @@ describe("UpdateAllPeAgencies use case", () => {
         codeSafir: "63019",
       };
 
-      agencyRepository.setAgencies([initialAgency]);
-      uuid.setNextUuid("other-uuid");
+      uow.agencyRepository.setAgencies([toAgencyWithRights(initialAgency)]);
+
       await updateAllPeAgencies.execute();
 
-      expectToEqual(agencyRepository.agencies, [
-        {
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights({
           ...initialAgency,
           validatorEmails: [commonEmail],
           address,
@@ -117,7 +147,7 @@ describe("UpdateAllPeAgencies use case", () => {
           },
           agencySiret: "13000548120984",
           codeSafir: "63019",
-        },
+        }),
       ]);
     });
 
@@ -152,12 +182,12 @@ describe("UpdateAllPeAgencies use case", () => {
         codeSafir: "63019",
       };
 
-      agencyRepository.setAgencies([initialAgency]);
-      uuid.setNextUuid("other-uuid");
+      uow.agencyRepository.setAgencies([toAgencyWithRights(initialAgency)]);
+
       await updateAllPeAgencies.execute();
 
-      expectToEqual(agencyRepository.agencies, [
-        {
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights({
           ...initialAgency,
           counsellorEmails: [commonEmail],
           validatorEmails: [],
@@ -168,7 +198,7 @@ describe("UpdateAllPeAgencies use case", () => {
           },
           agencySiret: "13000548120984",
           codeSafir: "63019",
-        },
+        }),
       ]);
     });
 
@@ -197,12 +227,13 @@ describe("UpdateAllPeAgencies use case", () => {
         codeSafir: "",
       };
 
-      agencyRepository.setAgencies([initialAgency]);
-      uuid.setNextUuid("other-uuid");
+      uow.agencyRepository.setAgencies([toAgencyWithRights(initialAgency)]);
+
       await updateAllPeAgencies.execute();
 
-      expectToEqual(agencyRepository.agencies, [
-        {
+      expectToEqual(uow.userRepository.users, []);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights({
           ...initialAgency,
           validatorEmails: [
             ...initialAgency.validatorEmails,
@@ -215,7 +246,7 @@ describe("UpdateAllPeAgencies use case", () => {
           },
           agencySiret: "13000548120984",
           codeSafir: "63019",
-        },
+        }),
       ]);
     });
   });
@@ -245,57 +276,48 @@ describe("UpdateAllPeAgencies use case", () => {
       codeSafir: "",
     };
 
-    agencyRepository.setAgencies([initialAgency]);
-    uuid.setNextUuid("other-uuid");
+    uow.agencyRepository.setAgencies([toAgencyWithRights(initialAgency)]);
     addressApi.setNextAddress(address);
+
     await updateAllPeAgencies.execute();
 
-    expectToEqual(agencyRepository.agencies, [
-      initialAgency,
+    expectToEqual(uow.userRepository.users, [
       {
-        id: "other-uuid",
-        name: "Agence Pôle emploi MOLSHEIM",
-        counsellorEmails: [],
-        validatorEmails: ["molsheim@pole-emploi.fr"],
-        coveredDepartments: [address.departmentCode],
-        address,
-        position: {
-          lon: 7.511,
-          lat: 48.532571,
-        },
-        signature: "L'équipe de l'Agence Pôle emploi MOLSHEIM",
-        agencySiret: "13000548120984",
-        codeSafir: "63019",
-        kind: "pole-emploi",
-        status: "from-api-PE",
-        logoUrl: null,
-        questionnaireUrl: null,
-        refersToAgencyId: null,
-        refersToAgencyName: null,
-        rejectionJustification: null,
+        createdAt: timeGateway.now().toISOString(),
+        email: "molsheim@pole-emploi.fr",
+        externalId: null,
+        firstName: "",
+        id: "another-one",
+        lastName: "",
       },
+    ]);
+    expectToEqual(uow.agencyRepository.agencies, [
+      toAgencyWithRights(initialAgency),
+      toAgencyWithRights(
+        {
+          id: "other-uuid",
+          name: "Agence Pôle emploi MOLSHEIM",
+          counsellorEmails: [],
+          validatorEmails: [],
+          coveredDepartments: [address.departmentCode],
+          address,
+          position: {
+            lon: 7.511,
+            lat: 48.532571,
+          },
+          signature: "L'équipe de l'Agence Pôle emploi MOLSHEIM",
+          agencySiret: "13000548120984",
+          codeSafir: "63019",
+          kind: "pole-emploi",
+          status: "from-api-PE",
+          logoUrl: null,
+          questionnaireUrl: null,
+          refersToAgencyName: null,
+          refersToAgencyId: null,
+          rejectionJustification: null,
+        },
+        { "another-one": { isNotifiedByEmail: false, roles: ["validator"] } },
+      ),
     ]);
   });
 });
-
-const peReferentialAgency: PeAgencyFromReferenciel = {
-  code: "GRE0187",
-  codeSafir: "63019",
-  libelle: "MOLSHEIM",
-  libelleEtendu: "Agence Pôle emploi MOLSHEIM",
-  type: "APE",
-  typeAccueil: "3",
-  codeRegionINSEE: "44",
-  dispositifADEDA: true,
-  contact: { telephonePublic: "39-49", email: "molsheim@pole-emploi.fr" },
-  siret: "13000548120984",
-  adressePrincipale: {
-    ligne4: "16 b RUE Gaston Romazzotti",
-    ligne5: "",
-    ligne6: "67120 MOLSHEIM",
-    gpsLon: 7.511,
-    gpsLat: 48.532571,
-    communeImplantation: "67300",
-    bureauDistributeur: "67120",
-  },
-};
