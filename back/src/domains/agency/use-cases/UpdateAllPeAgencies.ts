@@ -1,6 +1,8 @@
+import { uniq } from "ramda";
 import {
   AddressDto,
-  AgencyDto,
+  Email,
+  UserId,
   WithGeoPosition,
   activeAgencyStatuses,
 } from "shared";
@@ -8,6 +10,8 @@ import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { AppLogger } from "../../core/app-logger/ports/AppLogger";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
@@ -15,6 +19,10 @@ import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
 } from "../../establishment/ports/PeAgenciesReferential";
+import {
+  AgencyUsersRights,
+  AgencyWithUsersRights,
+} from "../ports/AgencyRepository";
 
 const counts = {
   added: 0,
@@ -38,18 +46,22 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
 
   readonly #logger: AppLogger;
 
+  readonly #timeGateway: TimeGateway;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     referencielAgencesPe: PeAgenciesReferential,
     adresseGateway: AddressGateway,
     uuidGenerator: UuidGenerator,
     logger: AppLogger,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
     this.#referencielAgencesPe = referencielAgencesPe;
     this.#adresseGateway = adresseGateway;
     this.#uuidGenerator = uuidGenerator;
     this.#logger = logger;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
@@ -77,13 +89,19 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
         continue;
       }
 
-      const matchedEmailAgency = await uow.agencyRepository.getBySafir(
+      const matchedSafirAgency = await uow.agencyRepository.getBySafir(
         peReferentialAgency.codeSafir,
       );
 
-      if (matchedEmailAgency) {
+      if (matchedSafirAgency) {
         counts.matchedEmail++;
-        await updateAgency(uow, matchedEmailAgency, peReferentialAgency);
+        await updateAgency(
+          uow,
+          this.#timeGateway,
+          this.#uuidGenerator,
+          matchedSafirAgency,
+          peReferentialAgency,
+        );
         continue;
       }
 
@@ -106,12 +124,13 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
             continue;
           }
 
-          const newAgency = this.#convertToAgency(
-            peReferentialAgency,
-            geocodedAddress,
+          await uow.agencyRepository.insert(
+            await this.#convertToAgency(
+              uow,
+              peReferentialAgency,
+              geocodedAddress,
+            ),
           );
-
-          await uow.agencyRepository.insert(newAgency);
           counts.added++;
           break;
         }
@@ -119,7 +138,13 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
         case 1: {
           const matchedAgency = matchedNearbyAgencies[0];
           if (matchedAgency.status === "from-api-PE") break;
-          await updateAgency(uow, matchedAgency, peReferentialAgency);
+          await updateAgency(
+            uow,
+            this.#timeGateway,
+            this.#uuidGenerator,
+            matchedAgency,
+            peReferentialAgency,
+          );
           counts.matchedNearby++;
           break;
         }
@@ -147,17 +172,14 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
     );
   }
 
-  #convertToAgency(
+  async #convertToAgency(
+    uow: UnitOfWork,
     peReferentialAgency: PeAgencyFromReferenciel,
     geocodedAddress: AddressDto,
-  ): AgencyDto {
+  ): Promise<AgencyWithUsersRights> {
     return {
       id: this.#uuidGenerator.new(),
       name: peReferentialAgency.libelleEtendu,
-      counsellorEmails: [],
-      validatorEmails: peReferentialAgency.contact?.email
-        ? [peReferentialAgency.contact.email]
-        : [],
       ...normalizePosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
       coveredDepartments: [geocodedAddress.departmentCode],
@@ -171,6 +193,16 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       questionnaireUrl: null,
       logoUrl: null,
       rejectionJustification: null,
+      usersRights: peReferentialAgency.contact?.email
+        ? {
+            [await createOrGetUserIdByEmail(
+              uow,
+              this.#timeGateway,
+              this.#uuidGenerator,
+              peReferentialAgency.contact?.email,
+            )]: { isNotifiedByEmail: false, roles: ["validator"] },
+          }
+        : {},
     };
   }
 }
@@ -178,7 +210,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
 const getNearestPeAgencies = async (
   uow: UnitOfWork,
   peReferentialAgency: PeAgencyFromReferenciel,
-): Promise<AgencyDto[]> => {
+): Promise<AgencyWithUsersRights[]> => {
   const agencies = await uow.agencyRepository.getAgencies({
     filters: {
       status: activeAgencyStatuses,
@@ -196,45 +228,64 @@ const getNearestPeAgencies = async (
 
 const updateAgency = async (
   uow: UnitOfWork,
-  existingAgency: AgencyDto,
+  timeGateway: TimeGateway,
+  uuidGenerator: UuidGenerator,
+  existingAgency: AgencyWithUsersRights,
   peReferentialAgency: PeAgencyFromReferenciel,
 ): Promise<void> => {
   counts.updated++;
-  const updatedAgency: AgencyDto = {
+  const email: Email = peReferentialAgency.contact?.email;
+
+  await uow.agencyRepository.update({
     ...existingAgency,
-    ...normalizePosition(peReferentialAgency),
-    ...updateEmails({
-      validatorEmails: existingAgency.validatorEmails,
-      counsellorEmails: existingAgency.counsellorEmails,
-      newEmail: peReferentialAgency.contact?.email,
-    }),
     agencySiret: peReferentialAgency.siret,
     codeSafir: peReferentialAgency.codeSafir,
-  };
-  await uow.agencyRepository.update(updatedAgency);
+    ...normalizePosition(peReferentialAgency),
+    ...(email
+      ? {
+          usersRights: await updateRights({
+            existingUserRights: existingAgency.usersRights,
+            email,
+            timeGateway,
+            uuidGenerator,
+            uow,
+          }),
+        }
+      : {}),
+  });
 };
 
-const updateEmails = ({
-  counsellorEmails,
-  validatorEmails,
-  newEmail,
+const updateRights = async ({
+  existingUserRights,
+  email,
+  timeGateway,
+  uow,
+  uuidGenerator,
 }: {
-  counsellorEmails: string[];
-  validatorEmails: string[];
-  newEmail: string | undefined;
-}): { validatorEmails: string[]; counsellorEmails: string[] } => {
-  if (
-    !newEmail ||
-    validatorEmails.includes(newEmail) ||
-    counsellorEmails.includes(newEmail)
-  ) {
-    return {
-      validatorEmails,
-      counsellorEmails,
-    };
-  }
+  existingUserRights: AgencyUsersRights;
+  email: Email;
+  uow: UnitOfWork;
+  timeGateway: TimeGateway;
+  uuidGenerator: UuidGenerator;
+}): Promise<AgencyUsersRights> => {
+  const userId = await createOrGetUserIdByEmail(
+    uow,
+    timeGateway,
+    uuidGenerator,
+    email,
+  );
 
-  return { counsellorEmails, validatorEmails: [...validatorEmails, newEmail] };
+  const existingUserRight = existingUserRights[userId];
+
+  return {
+    ...existingUserRights,
+    [userId]: existingUserRight
+      ? {
+          isNotifiedByEmail: existingUserRight.isNotifiedByEmail,
+          roles: uniq([...existingUserRight.roles, "validator"]),
+        }
+      : { isNotifiedByEmail: true, roles: ["validator"] },
+  };
 };
 
 const normalizePosition = ({
@@ -245,3 +296,28 @@ const normalizePosition = ({
     lon: adressePrincipale.gpsLon,
   },
 });
+
+const createOrGetUserIdByEmail = async (
+  uow: UnitOfWork,
+  timeGateway: TimeGateway,
+  uuidGenerator: UuidGenerator,
+  email: Email,
+): Promise<UserId> => {
+  const provider = await makeProvider(uow);
+  const user = await uow.userRepository.findByEmail(email, provider);
+  if (user) return user.id;
+
+  const userId: UserId = uuidGenerator.new();
+  await uow.userRepository.save(
+    {
+      id: userId,
+      email,
+      createdAt: timeGateway.now().toISOString(),
+      externalId: null,
+      firstName: "",
+      lastName: "",
+    },
+    provider,
+  );
+  return userId;
+};
