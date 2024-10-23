@@ -89,6 +89,11 @@ const getPageByRouteName: {
       <AdminConventionDetail route={route} />
     </AdminPrivateRoute>
   ),
+  adminUserDetail: (route) => (
+    <AdminPrivateRoute route={route}>
+      <div>User detail, user id is : ${route.params.userId}</div>
+    </AdminPrivateRoute>
+  ),
   agencyDashboard: (route) =>
     agencyDashboardTabsList.includes(route.params.tab as AgencyDashboardTab) ? (
       <InclusionConnectedPrivateRoute
