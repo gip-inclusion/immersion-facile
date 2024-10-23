@@ -1,13 +1,13 @@
-import { AgencyDto } from "shared";
 import { ConflictError } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { AgencyWithUsersRights } from "../ports/AgencyRepository";
 
 export const throwConflictErrorOnSimilarAgencyFound = async ({
   uow,
   agency,
 }: {
   uow: UnitOfWork;
-  agency: AgencyDto;
+  agency: AgencyWithUsersRights;
 }) => {
   const hasSimilarAgency =
     await uow.agencyRepository.alreadyHasActiveAgencyWithSameAddressAndKind({
