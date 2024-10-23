@@ -36,8 +36,7 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
     await uow.ongoingOAuthRepository.save({
       nonce,
       state,
-      provider:
-        provider === "InclusionConnect" ? "inclusionConnect" : "proConnect",
+      provider,
     });
 
     return this.oAuthGateway.getLoginUrl(

@@ -57,8 +57,8 @@ export class HttpOAuthGateway implements OAuthGateway {
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const uriByProvider: Record<OAuthGatewayProvider, AbsoluteUrl> = {
-      InclusionConnect: this.#makeInclusionConnectAuthorizeUri(),
-      ProConnect: this.#makeProConnectAuthorizeUri(),
+      inclusionConnect: this.#makeInclusionConnectAuthorizeUri(),
+      proConnect: this.#makeProConnectAuthorizeUri(),
     };
     const baseParams: Omit<
       InclusionConnectLoginUrlParams,
@@ -70,7 +70,7 @@ export class HttpOAuthGateway implements OAuthGateway {
       response_type: "code",
     };
     const queryParams =
-      provider === "InclusionConnect"
+      provider === "inclusionConnect"
         ? queryParamsAsString<InclusionConnectLoginUrlParams>({
             ...baseParams,
             client_id: this.inclusionConnectConfig.clientId,
@@ -202,7 +202,7 @@ export class HttpOAuthGateway implements OAuthGateway {
     { code, page }: GetAccessTokenParams,
     provider: OAuthGatewayProvider,
   ): Promise<GetAccessTokenResult> {
-    return provider === "InclusionConnect"
+    return provider === "inclusionConnect"
       ? this.#getAccessTokenInclusionConnect({ code, page })
       : this.#getAccessTokenProConnect({ code, page });
   }
@@ -212,11 +212,11 @@ export class HttpOAuthGateway implements OAuthGateway {
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const uri: AbsoluteUrl =
-      provider === "InclusionConnect"
+      provider === "inclusionConnect"
         ? `${this.inclusionConnectConfig.providerBaseUri}/logout/`
         : `${this.proConnectConfig.providerBaseUri}/session/end`;
 
-    return provider === "InclusionConnect"
+    return provider === "inclusionConnect"
       ? `${uri}?${queryParamsAsString<InclusionConnectLogoutQueryParams>({
           client_id: this.inclusionConnectConfig.clientId,
           post_logout_redirect_uri:

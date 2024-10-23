@@ -75,7 +75,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       await uow.featureFlagRepository.getAll(),
     );
     const identityProvider: IdentityProvider =
-      provider === "InclusionConnect" ? "inclusionConnect" : "proConnect";
+      provider === "inclusionConnect" ? "inclusionConnect" : "proConnect";
     const existingOngoingOAuth =
       await uow.ongoingOAuthRepository.findByStateAndProvider(
         state,
