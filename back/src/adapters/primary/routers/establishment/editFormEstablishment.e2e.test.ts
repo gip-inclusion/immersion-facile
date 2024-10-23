@@ -129,7 +129,7 @@ describe("Edit form establishments", () => {
     const backofficeAdminUser = new InclusionConnectedUserBuilder()
       .withId("backoffice-admin-user")
       .withIsAdmin(true)
-      .build();
+      .buildUser();
 
     const backofficeAdminICJwtPayload: InclusionConnectJwtPayload = {
       version: currentJwtVersions.inclusion,
@@ -138,9 +138,7 @@ describe("Edit form establishments", () => {
       userId: backofficeAdminUser.id,
     };
 
-    inMemoryUow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    inMemoryUow.userRepository.users = [backofficeAdminUser];
 
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
