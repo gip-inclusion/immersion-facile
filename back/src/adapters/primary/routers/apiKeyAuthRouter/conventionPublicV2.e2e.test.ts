@@ -11,48 +11,49 @@ import { SuperTest, Test } from "supertest";
 import { ApiConsumerBuilder } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
   PublicApiV2ConventionRoutes,
   publicApiV2ConventionRoutes,
 } from "./publicApiV2.routes";
 
-const agency = new AgencyDtoBuilder().build();
-
-const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
-const conventionReadConsumerWithAgencyIdsScope = new ApiConsumerBuilder()
-  .withConventionRight({
-    kinds: ["READ"],
-    scope: {
-      agencyIds: [agency.id],
-    },
-    subscriptions: [],
-  })
-  .build();
-
-const conventionReadConsumerWithNoScope = new ApiConsumerBuilder()
-  .withId("convention-read-with-no-scope-id")
-  .withConventionRight({
-    kinds: ["READ"],
-    scope: {
-      agencyIds: [],
-    },
-    subscriptions: [],
-  })
-  .build();
-
-const conventionUnauthorizedConsumer = new ApiConsumerBuilder()
-  .withId("unauthorized-consumer-id")
-  .withConventionRight({
-    kinds: [],
-    scope: {
-      agencyIds: [],
-    },
-    subscriptions: [],
-  })
-  .build();
-
 describe("Convention routes", () => {
+  const agency = new AgencyDtoBuilder().build();
+
+  const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
+  const conventionReadConsumerWithAgencyIdsScope = new ApiConsumerBuilder()
+    .withConventionRight({
+      kinds: ["READ"],
+      scope: {
+        agencyIds: [agency.id],
+      },
+      subscriptions: [],
+    })
+    .build();
+
+  const conventionReadConsumerWithNoScope = new ApiConsumerBuilder()
+    .withId("convention-read-with-no-scope-id")
+    .withConventionRight({
+      kinds: ["READ"],
+      scope: {
+        agencyIds: [],
+      },
+      subscriptions: [],
+    })
+    .build();
+
+  const conventionUnauthorizedConsumer = new ApiConsumerBuilder()
+    .withId("unauthorized-consumer-id")
+    .withConventionRight({
+      kinds: [],
+      scope: {
+        agencyIds: [],
+      },
+      subscriptions: [],
+    })
+    .build();
+
   let request: SuperTest<Test>;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let sharedRequest: HttpClient<PublicApiV2ConventionRoutes>;
@@ -97,7 +98,7 @@ describe("Convention routes", () => {
     });
 
     it("403 when the apiConsumer has READ access to convention but no scope", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const { body, status } = await sharedRequest.getConventionById({
@@ -128,7 +129,7 @@ describe("Convention routes", () => {
     });
 
     it("returns 200 with the convention", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       expect(
@@ -190,7 +191,7 @@ describe("Convention routes", () => {
     });
 
     it("200 - returns the conventions matching agencyIds in scope", async () => {
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       expect(displayRouteName(publicApiV2ConventionRoutes.getConventions)).toBe(
