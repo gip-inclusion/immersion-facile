@@ -11,6 +11,7 @@ import {
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   SetFeatureFlagParam,
+  User,
   adminRoutes,
   createApiConsumerParamsFromApiConsumer,
   currentJwtVersions,
@@ -37,22 +38,24 @@ import {
 } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withId("backoffice-admin-user")
-  .withIsAdmin(true)
-  .build();
-
-const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-  version: currentJwtVersions.inclusion,
-  iat: new Date().getTime(),
-  exp: addDays(new Date(), 30).getTime(),
-  userId: backofficeAdminUser.id,
-};
-
 describe("Admin router", () => {
+  const backofficeAdminUserBuilder = new InclusionConnectedUserBuilder()
+    .withId("backoffice-admin-user")
+    .withIsAdmin(true);
+  const icBackofficeAdminUser = backofficeAdminUserBuilder.build();
+  const backOfficeAdminUser = backofficeAdminUserBuilder.buildUser();
+
+  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+    version: currentJwtVersions.inclusion,
+    iat: new Date().getTime(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: icBackofficeAdminUser.id,
+  };
+
   const now = new Date();
   let sharedRequest: HttpClient<AdminRoutes>;
   let token: InclusionConnectJwt;
@@ -85,9 +88,8 @@ describe("Admin router", () => {
 
     sharedRequest = createSupertestSharedClient(adminRoutes, request);
 
-    inMemoryUow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    inMemoryUow.userRepository.users = [backOfficeAdminUser];
+    inMemoryUow.agencyRepository.agencies = [];
 
     gateways.timeGateway.defaultDate = now;
     token = generateInclusionConnectJwt(backofficeAdminJwtPayload);
@@ -380,45 +382,57 @@ describe("Admin router", () => {
   describe(`${displayRouteName(
     adminRoutes.updateUserRoleForAgency,
   )} Update user role for agency`, () => {
-    it("201 - Updates role of user from 'to-review' to 'counsellor' for given agency", async () => {
+    const validatorInAgency = new InclusionConnectedUserBuilder()
+      .withId("validator-in-agency")
+      .buildUser();
+
+    const counsellorInAgency = new InclusionConnectedUserBuilder()
+      .withId("counsellor-in-agency")
+      .buildUser();
+
+    const toReviewUser: User = {
+      id: "to-review",
+      email: "john@mail.com",
+      firstName: "John",
+      lastName: "Doe",
+      externalId: "john-external-id",
+      createdAt: new Date().toISOString(),
+    };
+
+    it("201 - Updates role of user from 'to-review' to 'counsellor' with notification for given agency", async () => {
       const agency = new AgencyDtoBuilder()
         .withId("two-steps-validation-agency")
-        .withCounsellorEmails(["fake-email@gmail.com"])
-        .build();
-      const inclusionConnectedUser: InclusionConnectedUser = {
-        id: "my-user-id",
-        email: "john@mail.com",
-        firstName: "John",
-        lastName: "Doe",
-        agencyRights: [
-          { agency, roles: ["to-review"], isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
-        externalId: "john-external-id",
-        createdAt: new Date().toISOString(),
-      };
-      const validatorInAgency = new InclusionConnectedUserBuilder()
-        .withAgencyRights([
-          { roles: ["validator"], agency, isNotifiedByEmail: true },
-        ])
         .build();
 
-      inMemoryUow.agencyRepository.insert(agency);
-      inMemoryUow.userRepository.setInclusionConnectedUsers([
-        inclusionConnectedUser,
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validatorInAgency.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+          [counsellorInAgency.id]: {
+            isNotifiedByEmail: false,
+            roles: ["counsellor"],
+          },
+          [toReviewUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+      );
+      inMemoryUow.userRepository.users = [
+        toReviewUser,
         validatorInAgency,
-        backofficeAdminUser,
-      ]);
+        counsellorInAgency,
+        backOfficeAdminUser,
+      ];
 
       const updatedRole: AgencyRole = "counsellor";
 
       const response = await sharedRequest.updateUserRoleForAgency({
         body: {
           agencyId: agency.id,
-          userId: inclusionConnectedUser.id,
+          userId: toReviewUser.id,
           roles: [updatedRole],
-          isNotifiedByEmail: false,
-          email: inclusionConnectedUser.email,
+          isNotifiedByEmail: true,
+          email: toReviewUser.email,
         },
         headers: { authorization: token },
       });
@@ -428,11 +442,81 @@ describe("Admin router", () => {
         body: "",
       });
 
-      expectObjectsToMatch(inMemoryUow.userRepository.agencyRightsByUserId, {
-        [inclusionConnectedUser.id]: [
-          { agency, roles: [updatedRole], isNotifiedByEmail: false },
-        ],
+      expectToEqual(inMemoryUow.agencyRepository.agencies, [
+        toAgencyWithRights(agency, {
+          [validatorInAgency.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+          [counsellorInAgency.id]: {
+            isNotifiedByEmail: false,
+            roles: ["counsellor"],
+          },
+          [toReviewUser.id]: { roles: [updatedRole], isNotifiedByEmail: true },
+        }),
+      ]);
+    });
+
+    it("400 - when trying to Update role of user from 'to-review' to 'counsellor' without notification for agency that have only one step validation", async () => {
+      const toReviewUser: User = {
+        id: "to-review-user",
+        email: "john@mail.com",
+        firstName: "John",
+        lastName: "Doe",
+        externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
+      };
+
+      inMemoryUow.userRepository.users = [
+        toReviewUser,
+        validatorInAgency,
+        backOfficeAdminUser,
+      ];
+
+      const agencyWithOneStep = new AgencyDtoBuilder().build();
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agencyWithOneStep, {
+          [validatorInAgency.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+          [toReviewUser.id]: { roles: ["to-review"], isNotifiedByEmail: true },
+        }),
+      );
+
+      const updatedRole: AgencyRole = "counsellor";
+
+      const response = await sharedRequest.updateUserRoleForAgency({
+        body: {
+          agencyId: agencyWithOneStep.id,
+          userId: toReviewUser.id,
+          roles: [updatedRole],
+          isNotifiedByEmail: false,
+          email: toReviewUser.email,
+        },
+        headers: { authorization: token },
       });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          message: errors.agency.notEnoughCounsellors({
+            agencyId: agencyWithOneStep.id,
+          }).message,
+
+          status: 400,
+        },
+      });
+
+      expectToEqual(inMemoryUow.agencyRepository.agencies, [
+        toAgencyWithRights(agencyWithOneStep, {
+          [validatorInAgency.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+          [toReviewUser.id]: { roles: ["to-review"], isNotifiedByEmail: true },
+        }),
+      ]);
     });
 
     it("401 - missing admin token", async () => {
@@ -498,28 +582,26 @@ describe("Admin router", () => {
     it("201 - Reject user registration to agency and send a notification email", async () => {
       const agency = new AgencyDtoBuilder().build();
 
-      const inclusionConnectedUser: InclusionConnectedUser = {
+      const user: User = {
         id: "my-user-id",
         email: "john@mail.com",
         firstName: "John",
         lastName: "Doe",
-        agencyRights: [
-          { agency, roles: ["to-review"], isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.userRepository.setInclusionConnectedUsers([
-        inclusionConnectedUser,
-        backofficeAdminUser,
-      ]);
+      inMemoryUow.userRepository.users = [user, backOfficeAdminUser];
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+      ];
 
       const response = await sharedRequest.rejectIcUserForAgency({
         body: {
           agencyId: agency.id,
-          userId: inclusionConnectedUser.id,
+          userId: user.id,
           justification: "osef",
         },
         headers: { authorization: token },
@@ -530,16 +612,16 @@ describe("Admin router", () => {
         body: "",
       });
 
-      expectObjectsToMatch(inMemoryUow.userRepository.agencyRightsByUserId, {
-        [inclusionConnectedUser.id]: [],
-      });
+      expectObjectsToMatch(inMemoryUow.agencyRepository.agencies, [
+        toAgencyWithRights(agency, {}),
+      ]);
 
       await processEventsForEmailToBeSent(eventCrawler);
 
       expect(gateways.notification.getSentEmails()).toMatchObject([
         {
           kind: "IC_USER_REGISTRATION_TO_AGENCY_REJECTED",
-          recipients: [inclusionConnectedUser.email],
+          recipients: [user.email],
         },
       ]);
     });
