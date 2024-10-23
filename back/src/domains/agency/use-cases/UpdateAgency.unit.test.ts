@@ -53,7 +53,7 @@ describe("Update agency", () => {
     it("throws Unauthorized if no current user", async () => {
       const agency = new AgencyDtoBuilder().build();
       await expectPromiseToFailWithError(
-        updateAgency.execute(agency),
+        updateAgency.execute({ ...agency, validatorEmails: ["mail@mail.com"] }),
         errors.user.unauthorized(),
       );
     });
@@ -61,7 +61,10 @@ describe("Update agency", () => {
     it("throws Forbidden if current user is not admin", async () => {
       const agency = new AgencyDtoBuilder().build();
       await expectPromiseToFailWithError(
-        updateAgency.execute(agency, icNotAdmin),
+        updateAgency.execute(
+          { ...agency, validatorEmails: ["mail@mail.com"] },
+          icNotAdmin,
+        ),
         errors.user.forbidden({ userId: notAdmin.id }),
       );
     });
@@ -69,7 +72,10 @@ describe("Update agency", () => {
     it("Fails trying to update if no matching agency was found", async () => {
       const agency = new AgencyDtoBuilder().build();
       await expectPromiseToFailWithError(
-        updateAgency.execute(agency, icAdmin),
+        updateAgency.execute(
+          { ...agency, validatorEmails: ["mail@mail.com"] },
+          icAdmin,
+        ),
         errors.agency.notFound({ agencyId: agency.id }),
       );
     });
@@ -81,7 +87,6 @@ describe("Update agency", () => {
       const updatedAgency = new AgencyDtoBuilder()
         .withId(initialAgencyInRepo.id)
         .withName("L'agence modifié")
-        .withValidatorEmails(["new-validator@mail.com"])
         .withAddress({
           streetNumberAndAddress: "",
           postcode: "",
@@ -89,7 +94,12 @@ describe("Update agency", () => {
           departmentCode: "",
         })
         .build();
-      await expectPromiseToFail(updateAgency.execute(updatedAgency, icAdmin));
+      await expectPromiseToFail(
+        updateAgency.execute(
+          { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
+          icAdmin,
+        ),
+      );
     });
 
     it("Fails to update agency if geo components are 0,0", async () => {
@@ -100,12 +110,14 @@ describe("Update agency", () => {
       const updatedAgency = new AgencyDtoBuilder()
         .withId(initialAgencyInRepo.id)
         .withName("L'agence modifié")
-        .withValidatorEmails(["new-validator@mail.com"])
         .withPosition(0, 0)
         .build();
 
       await expectPromiseToFailWithError(
-        updateAgency.execute(updatedAgency, icAdmin),
+        updateAgency.execute(
+          { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
+          icAdmin,
+        ),
         new BadRequestError(
           "Schema validation failed. See issues for details.",
           [
@@ -124,10 +136,12 @@ describe("Update agency", () => {
 
     const updatedAgency = new AgencyDtoBuilder(initialAgencyInRepo)
       .withName("L'agence modifié")
-      .withValidatorEmails(["new-validator@mail.com"])
       .build();
 
-    await updateAgency.execute(updatedAgency, icAdmin);
+    await updateAgency.execute(
+      { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
+      icAdmin,
+    );
 
     expectToEqual(uow.agencyRepository.agencies, [
       toAgencyWithRights(
