@@ -15,10 +15,8 @@ import {
   rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
   validateAgencyRights,
 } from "../helpers/agencyRights.helper";
-import {
-  getIcUserOrThrow,
-  throwIfNotAdmin,
-} from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
+import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class UpdateUserForAgency extends TransactionalUseCase<
   UserParamsForAgency,
@@ -44,24 +42,24 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    const user = await getIcUserOrThrow(uow, params.userId);
-    if (!user) throw errors.user.notFound({ userId: params.userId });
+    const userToUpdate = await getIcUserByUserId(uow, params.userId);
+    if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
     const agency = await uow.agencyRepository.getById(params.agencyId);
     if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
 
-    const agencyRightToUpdate = agency.usersRights[user.id];
+    const agencyRightToUpdate = agency.usersRights[userToUpdate.id];
     if (!agencyRightToUpdate)
       throw errors.user.noRightsOnAgency({
         agencyId: agency.id,
-        userId: user.id,
+        userId: userToUpdate.id,
       });
     rejectIfEditionOfValidatorsOfAgencyWithRefersTo(params, agency);
-    rejectEmailModificationIfInclusionConnectedUser(user, params.email);
+    rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 
     const updatedRights: AgencyUsersRights = {
       ...agency.usersRights,
-      [user.id]: {
+      [userToUpdate.id]: {
         roles: params.roles,
         isNotifiedByEmail: params.isNotifiedByEmail,
       },
@@ -74,7 +72,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
         id: agency.id,
         usersRights: updatedRights,
       }),
-      updateIfUserEmailChanged(user, params.email, uow.userRepository),
+      updateIfUserEmailChanged(userToUpdate, params.email, uow.userRepository),
       uow.outboxRepository.save(
         this.#createNewEvent({
           topic: "IcUserAgencyRightChanged",
