@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import Input from "@codegouvfr/react-dsfr/Input";
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
 import React, { ElementRef, useEffect, useRef, useState } from "react";
@@ -320,11 +319,12 @@ export const SearchPage = ({
                     (value) => triggerSearch(filterFormValues(value)),
                     (error) => console.error(error),
                   )}
-                  className={cx(fr.cx("fr-container"))}
+                  className={cx(fr.cx("fr-container", "fr-grid-row"))}
                   id={domElementIds.search.searchForm}
                 >
                   <SearchFilter
                     defaultValue="Tous les métiers"
+                    iconId="fr-icon-suitcase-2-line"
                     values={
                       formValues.appellations
                         ? formValues.appellations.map(
@@ -368,7 +368,7 @@ export const SearchPage = ({
                               useNaturalLanguageForAppellations
                             }
                           />
-                          <p className={fr.cx("fr-hint-text")}>
+                          <p className={fr.cx("fr-hint-text", "fr-mt-2w")}>
                             Les résultats sont étendus aux autres métiers de la
                             Réalisation de contenus multimédias, c’est pour cela
                             que vous pourrez voir des métiers proches mais ne
@@ -379,77 +379,135 @@ export const SearchPage = ({
                       ),
                     }}
                   />
+
+                  <SearchFilter
+                    defaultValue="France entière"
+                    iconId="fr-icon-map-pin-2-line"
+                    className="fr-ml-2w"
+                    values={formValues.place ? [formValues.place] : []}
+                    submenu={{
+                      title: "Où souhaitez-vous faire votre immersion ?",
+                      content: (
+                        <>
+                          <PlaceAutocomplete
+                            label="...dans la ville"
+                            initialInputValue={formValues.place}
+                            onValueChange={(lookupSearchResult) => {
+                              if (!lookupSearchResult) return;
+                              setValue(
+                                "latitude",
+                                lookupSearchResult.position.lat,
+                              );
+                              setValue(
+                                "longitude",
+                                lookupSearchResult.position.lon,
+                              );
+                              setValue("place", lookupSearchResult.label);
+                              if (!formValues.distanceKm) {
+                                setValue("distanceKm", 10);
+                              }
+                            }}
+                            id={domElementIds.search.placeAutocompleteInput}
+                            onInputClear={() => {
+                              setValue("latitude", initialValues.latitude);
+                              setValue("longitude", initialValues.latitude);
+                              setValue("place", initialValues.place);
+                              if (formValues.sortedBy === "distance") {
+                                setValue("sortedBy", "date");
+                              }
+                              setValue("distanceKm", initialValues.distanceKm);
+                            }}
+                          />
+                          <Select
+                            label="Dans un rayon de :"
+                            options={radiusOptions}
+                            disabled={!lat || !lon}
+                            nativeSelectProps={{
+                              ...register("distanceKm"),
+                              title:
+                                !lat || !lon
+                                  ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
+                                  : undefined,
+                              id: domElementIds.search.distanceSelect,
+                              value: `${
+                                distanceKm === undefined ? "" : distanceKm
+                              }`,
+                              onChange: (event) => {
+                                const value = parseInt(
+                                  event.currentTarget.value,
+                                );
+                                setValue("distanceKm", value);
+                                if (!value) {
+                                  setValue("sortedBy", "date");
+                                }
+                              },
+                            }}
+                          />
+                        </>
+                      ),
+                    }}
+                  />
+                  <SearchFilter
+                    defaultValue="Trier par pertinence"
+                    iconId="fr-icon-map-pin-2-line"
+                    className="fr-ml-2w"
+                    values={formValues.place ? [formValues.place] : []}
+                    submenu={{
+                      title: "Ordre d’affichage",
+                      content: (
+                        <SearchSortedBySelect
+                          searchValues={formValues}
+                          triggerSearch={triggerSearch}
+                          setSortedBy={(sortedBy: SearchSortedBy) =>
+                            setValue("sortedBy", sortedBy)
+                          }
+                        />
+                      ),
+                    }}
+                  />
                 </form>
 
                 <div ref={searchResultsWrapper}>
-                  {searchStatus === "ok" && searchMade !== null && (
+                  {searchMade !== null && (
                     <div
                       ref={innerSearchResultWrapper}
                       className={fr.cx("fr-pt-6w", "fr-pb-1w")}
                     >
                       <div className={fr.cx("fr-container")}>
                         <div
-                          className={fr.cx(
-                            "fr-grid-row",
-                            "fr-grid-row--gutters",
-                            "fr-grid-row--middle",
-                            "fr-mb-4w",
+                          className={cx(
+                            fr.cx("fr-mb-4w"),
+                            Styles.resultsSummary,
                           )}
                         >
-                          <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                            <SearchSortedBySelect
-                              searchValues={formValues}
-                              triggerSearch={triggerSearch}
-                              setSortedBy={(sortedBy: SearchSortedBy) =>
-                                setValue("sortedBy", sortedBy)
-                              }
-                            />
-                          </div>
-                          <div
-                            className={cx(
-                              fr.cx(
-                                "fr-col-12",
-                                "fr-col-md-5",
-                                "fr-grid-row",
-                                "fr-grid-row--right",
-                                "fr-ml-auto",
-                              ),
-                              Styles.resultsSummary,
-                            )}
-                          >
-                            {searchStatus === "ok" && (
-                              <>
-                                <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
-                                  {getSearchResultsSummary(
-                                    searchResults.length,
-                                  )}
-                                </h2>
-                                {routeParams.appellations &&
-                                  routeParams.appellations.length > 0 && (
-                                    <span className={cx(fr.cx("fr-text--xs"))}>
-                                      pour la recherche{" "}
-                                      <strong
-                                        className={fr.cx("fr-text--bold")}
-                                      >
-                                        {
-                                          routeParams.appellations[0]
-                                            .appellationLabel
-                                        }
-                                      </strong>
-                                      , étendue au secteur{" "}
-                                      <a
-                                        href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
-                                        target="_blank"
-                                        className={fr.cx("fr-text--bold")}
-                                        rel="noreferrer"
-                                      >
-                                        {routeParams.appellations[0].romeLabel}
-                                      </a>
-                                    </span>
-                                  )}
-                              </>
-                            )}
-                          </div>
+                          {searchStatus === "ok" && (
+                            <>
+                              <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
+                                {getSearchResultsSummary(searchResults.length)}
+                              </h2>
+                              {routeParams.appellations &&
+                                routeParams.appellations.length > 0 && (
+                                  <span className={cx(fr.cx("fr-text--xs"))}>
+                                    pour la recherche{" "}
+                                    <strong className={fr.cx("fr-text--bold")}>
+                                      {
+                                        routeParams.appellations[0]
+                                          .appellationLabel
+                                      }
+                                    </strong>
+                                    , étendue au secteur{" "}
+                                    <a
+                                      href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
+                                      target="_blank"
+                                      className={fr.cx("fr-text--bold")}
+                                      rel="noreferrer"
+                                    >
+                                      {routeParams.appellations[0].romeLabel}
+                                    </a>
+                                  </span>
+                                )}
+                            </>
+                          )}
                         </div>
                       </div>
                       <SearchListResults

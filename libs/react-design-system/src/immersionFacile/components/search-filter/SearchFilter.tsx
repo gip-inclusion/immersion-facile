@@ -1,5 +1,5 @@
-import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
+import { FrClassName, FrIconClassName, fr } from "@codegouvfr/react-dsfr";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import React, { useState } from "react";
 import { useStyles } from "tss-react/dsfr";
@@ -12,18 +12,25 @@ export type SearchFilterProps = {
     title: string;
     content: React.ReactNode;
   };
+  iconId: FrIconClassName;
+  className?: FrClassName;
 };
 
 export const SearchFilter = ({
   defaultValue,
   values,
   submenu,
+  iconId,
+  className,
 }: SearchFilterProps) => {
   const { cx } = useStyles();
   const [isOpened, setIsOpened] = useState<boolean>(false);
+  const hasValue = values && values.length > 0;
   return (
     <div className={cx(Styles.root)}>
       <Tag
+        iconId={iconId}
+        className={className}
         nativeButtonProps={{
           onClick: (event) => {
             event.preventDefault();
@@ -31,24 +38,32 @@ export const SearchFilter = ({
           },
         }}
       >
-        {values && values.length > 0 ? values.join(", ") : defaultValue}
+        {hasValue ? values.join(", ") : defaultValue}
       </Tag>
       {isOpened && (
-        <section className={cx(fr.cx("fr-p-2w"), Styles.submenu)}>
+        <section className={cx(fr.cx("fr-p-3w"), Styles.submenu)}>
           <p className={fr.cx("fr-text--bold")}>{submenu.title}</p>
           {submenu.content}
-          <div>
-            <Button
-              priority="secondary"
-              type="button"
-              onClick={() => {
-                setIsOpened(false);
-              }}
-            >
-              Annuler
-            </Button>
-            <Button type="submit">Valider</Button>
-          </div>
+          <ButtonsGroup
+            className={fr.cx("fr-hr", "fr-pt-2w", "fr-pb-0")}
+            inlineLayoutWhen="always"
+            alignment="right"
+            buttons={[
+              {
+                children: "Annuler",
+                type: "button",
+                priority: "secondary",
+                onClick: () => setIsOpened(false),
+                className: fr.cx("fr-mb-0"),
+              },
+              {
+                children: "Appliquer",
+                type: "submit",
+                onClick: () => setIsOpened(false),
+                className: fr.cx("fr-mb-0"),
+              },
+            ]}
+          />
         </section>
       )}
     </div>
