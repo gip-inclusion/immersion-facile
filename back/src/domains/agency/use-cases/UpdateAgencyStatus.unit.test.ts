@@ -6,6 +6,7 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -19,9 +20,11 @@ import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
 const nextDate = new Date("2022-01-01T10:00:00.000");
 const nextUuid = "event-uuid";
 
-const backofficeAdmin = new InclusionConnectedUserBuilder()
-  .withIsAdmin(true)
-  .build();
+const backofficeAdminBuilder = new InclusionConnectedUserBuilder().withIsAdmin(
+  true,
+);
+const icBackofficeAdmin = backofficeAdminBuilder.build();
+const backofficeAdmin = backofficeAdminBuilder.buildUser();
 
 describe("Update agency status", () => {
   let updateAgencyStatus: UpdateAgencyStatus;
@@ -34,7 +37,7 @@ describe("Update agency status", () => {
     timeGateway.setNextDate(nextDate);
     uuidGenerator.setNextUuid(nextUuid);
 
-    uow.userRepository.setInclusionConnectedUsers([backofficeAdmin]);
+    uow.userRepository.users = [backofficeAdmin];
 
     const createNewEvent = makeCreateNewEvent({
       uuidGenerator,
@@ -59,7 +62,7 @@ describe("Update agency status", () => {
       "Updates an agency status in repository and publishes an event to notify if status becomes $status",
       async (testParams) => {
         // Prepare
-        uow.agencyRepository.setAgencies([existingAgency]);
+        uow.agencyRepository.setAgencies([toAgencyWithRights(existingAgency)]);
 
         // Act
         await updateAgencyStatus.execute(
@@ -67,7 +70,7 @@ describe("Update agency status", () => {
             id: existingAgency.id,
             ...testParams,
           },
-          backofficeAdmin,
+          icBackofficeAdmin,
         );
 
         // Assert
@@ -113,7 +116,7 @@ describe("Update agency status", () => {
       await expectPromiseToFailWithError(
         updateAgencyStatus.execute(
           { id: existingAgency.id, status: "active" },
-          { ...backofficeAdmin, isBackofficeAdmin: false },
+          { ...icBackofficeAdmin, isBackofficeAdmin: false },
         ),
         errors.user.forbidden({ userId: backofficeAdmin.id }),
       );
@@ -124,7 +127,7 @@ describe("Update agency status", () => {
       await expectPromiseToFailWithError(
         updateAgencyStatus.execute(
           { id: agencyId, status: "active" },
-          backofficeAdmin,
+          icBackofficeAdmin,
         ),
         errors.agency.notFound({
           agencyId,
