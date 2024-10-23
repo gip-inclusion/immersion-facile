@@ -47,7 +47,6 @@
     "trigger-update-rome-data": "ts-node src/scripts/triggerUpdateRomeData.ts",
     "typecheck": "tsc --noEmit",
     "kysely-codegen": "kysely-codegen --dialect postgres",
-    "update-agencies-from-PE-referential": "ts-node src/scripts/updateAllPEAgenciesFromPeAgencyReferential.ts",
     "verify-migrations-order": "./src/scripts/verifyDatabaseMigrationsOrder.sh"
   },
   "keywords": [],
