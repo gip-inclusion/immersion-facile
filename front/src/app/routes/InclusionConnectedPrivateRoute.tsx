@@ -19,7 +19,7 @@ import {
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { FrontAdminRoute } from "src/app/pages/admin/AdminPage";
+import { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
 import { routes } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -27,6 +27,10 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { Route } from "type-route";
+
+export type FrontAdminRoute =
+  | FrontAdminRouteTab
+  | Route<typeof routes.adminConventionDetail>;
 
 type InclusionConnectPrivateRoute =
   | Route<typeof routes.agencyDashboard>

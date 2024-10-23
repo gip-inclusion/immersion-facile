@@ -10,7 +10,7 @@ import {
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { StatsPage } from "src/app/pages/StatsPage";
-import { AdminPage } from "src/app/pages/admin/AdminPage";
+import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardPage";
@@ -33,9 +33,9 @@ import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
+import { AdminConventionDetail } from "../pages/convention/AdminConventionDetail";
 import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
-import { ConventionManageAdminPage } from "../pages/convention/ConventionManageAdminPage";
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 import { DiscussionManagePage } from "../pages/discussion/DiscussionManagePage";
@@ -64,7 +64,7 @@ const adminRoutes: {
     ...acc,
     [tabRouteName]: (route: Route<any>) => (
       <AdminPrivateRoute route={route}>
-        <AdminPage route={route} />
+        <AdminTabs route={route} />
       </AdminPrivateRoute>
     ),
   }),
@@ -80,10 +80,15 @@ const getPageByRouteName: {
   addAgency: () => <AddAgencyPage />,
   admin: (route) => (
     <AdminPrivateRoute route={routes.adminConventions(route.params)}>
-      <AdminPage route={routes.adminConventions(route.params)} />
+      <AdminTabs route={routes.adminConventions(route.params)} />
     </AdminPrivateRoute>
   ),
   ...adminRoutes,
+  adminConventionDetail: (route) => (
+    <AdminPrivateRoute route={route}>
+      <AdminConventionDetail route={route} />
+    </AdminPrivateRoute>
+  ),
   agencyDashboard: (route) =>
     agencyDashboardTabsList.includes(route.params.tab as AgencyDashboardTab) ? (
       <InclusionConnectedPrivateRoute
@@ -151,7 +156,6 @@ const getPageByRouteName: {
   searchResult: () => <SearchResultPage />,
   searchResultExternal: () => <SearchResultPage />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
-  manageConventionAdmin: (route) => <ConventionManageAdminPage route={route} />,
   manageConventionInclusionConnected: (route) => (
     <ConventionManageInclusionConnectedPage route={route} />
   ),

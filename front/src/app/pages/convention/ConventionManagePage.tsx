@@ -15,7 +15,7 @@ import { ConventionManageContent } from "../../components/admin/conventions/Conv
 type ConventionManagePageProps = {
   route:
     | Route<typeof routes.manageConvention>
-    | Route<typeof routes.manageConventionAdmin>;
+    | Route<typeof routes.adminConventionDetail>;
 };
 
 export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
@@ -23,7 +23,7 @@ export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
   const jwtParams: JwtKindProps | undefined = match(route)
     .with(
       {
-        name: "manageConventionAdmin",
+        name: "adminConventionDetail",
       },
       () =>
         (adminToken

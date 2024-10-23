@@ -11,7 +11,7 @@ export const ConventionTab = () => {
   ) : (
     <>
       <ManageConventionFormSection
-        routeNameToRedirectTo={"manageConventionAdmin"}
+        routeNameToRedirectTo={"adminConventionDetail"}
       />
       <MetabaseView title="Consulter les conventions" url={url} />
     </>
