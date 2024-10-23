@@ -26,13 +26,6 @@ const withContentTypeUrlEncodedSchema = z.object({
   "Content-Type": z.literal("application/x-www-form-urlencoded"),
 });
 
-export type InclusionConnectLogoutQueryParams = {
-  client_id: string;
-  post_logout_redirect_uri: AbsoluteUrl;
-  id_token: string;
-  state: string;
-};
-
 export type InclusionConnectRoutes = ReturnType<
   typeof makeInclusionConnectRoutes
 >;

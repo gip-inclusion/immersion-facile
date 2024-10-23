@@ -83,7 +83,6 @@ describe("GetInclusionConnectLogoutUrl", () => {
           }/logout-${logoutSuffixe}?${queryParamsAsString({
             postLogoutRedirectUrl:
               fakeProviderConfig.immersionRedirectUri.afterLogout,
-            clientId: fakeProviderConfig.clientId,
             idToken,
             state: ongoingOAuth.state,
           })}`,
