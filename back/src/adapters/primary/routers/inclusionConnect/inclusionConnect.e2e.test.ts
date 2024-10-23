@@ -22,6 +22,7 @@ import { BasicEventCrawler } from "../../../../domains/core/events/adapters/Even
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("inclusion connection flow", () => {
@@ -148,7 +149,7 @@ describe("inclusion connection flow", () => {
       const codeSafir = "my-safir-code";
       const agency = new AgencyDtoBuilder().withCodeSafir(codeSafir).build();
 
-      inMemoryUow.agencyRepository.agencies = [agency];
+      inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       const authCode = "inclusion-auth-code";
       const inclusionToken = "inclusion-token";
@@ -183,14 +184,13 @@ describe("inclusion connection flow", () => {
       await eventCrawler.processNewEvents();
 
       const user = await inMemoryUow.userRepository.findByExternalId(sub);
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      const userId = user!.id;
 
-      const icUser = await inMemoryUow.userRepository.getById(
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        user!.id,
-      );
-
-      expectToEqual(icUser?.agencyRights, [
-        { agency, roles: ["validator"], isNotifiedByEmail: false },
+      expectToEqual(inMemoryUow.agencyRepository.agencies, [
+        toAgencyWithRights(agency, {
+          [userId]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
       ]);
     });
   });
