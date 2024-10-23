@@ -52,6 +52,11 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
           recipients: [user.email],
           params: {
             agencyName: agency.name,
+            isNotified: agencyRight.isNotifiedByEmail,
+            roles: agencyRight.roles,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
           },
         },
         followedIds: {

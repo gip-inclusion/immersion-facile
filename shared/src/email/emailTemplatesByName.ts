@@ -4,6 +4,7 @@ import {
   InternshipKind,
   labelsForImmersionObjective,
 } from "../convention/convention.dto";
+import { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { frontRoutes } from "../routes/routes";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
@@ -1310,21 +1311,28 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     IC_USER_RIGHTS_HAS_CHANGED: {
       niceName: "Inclusion Connect - Changement de droit sur agence",
       tags: ["activation BO prescripteur"],
-      createEmailVariables: ({ agencyName }) => ({
+      createEmailVariables: ({
+        agencyName,
+        isNotified,
+        roles,
+        firstName,
+        lastName,
+        email,
+      }) => ({
         subject:
           "Immersion Facilitée - Activation de l’accès au back office de votre structure",
-        greetings: "Bonjour,",
-        content: `<strong>Vous pouvez désormais accéder au tableau de bord de votre structure: ${agencyName}.</strong>
+        greetings: `Bonjour ${firstName} ${lastName},`,
+        content: `<p>Vous pouvez désormais accéder au tableau de bord de votre structure: ${agencyName}.</p>
+        <strong>Voici le récapitulatif de votre profil utilisateur :</strong>
 
-        Vous avez ainsi la possibilité de:
-         <ul>
-            <li>consulter l’ensemble des conventions d’immersion établies et à traiter,</li>
-            <li>les exporter sous format excel ou csv,</li>
-            <li>les modifier, valider, rendre obsolètes,</li>
-            <li>faire une demande de renouvellement.</li>
-         </ul>
-
-        Nous allons progressivement enrichir ce tableau de bord et vous proposer de nouvelles fonctionnalités.
+        ${generateUserInfo(
+          firstName,
+          lastName,
+          email,
+          roles,
+          isNotified,
+          agencyName,
+        )}
       `,
         subContent: defaultSignature("immersion"),
       }),
@@ -1750,3 +1758,46 @@ const greetingsWithConventionId = (
   `<strong>Identifiant de la convention : ${conventionId}</strong>
         
 Bonjour ${actor ?? ""},`;
+
+const descriptionByRole: Record<AgencyRole, string> = {
+  validator:
+    "<strong>Valideur</strong> (peut valider des conventions de l’agence et modifier leur statut)",
+  counsellor:
+    "<strong>Pré-Valideur</strong> (peut pré-valider les conventions de l’agence et modifier leur statut)",
+  "agency-viewer":
+    "<strong>Lecteur</strong> (peut consulter les conventions de l’agence)",
+  "agency-admin":
+    "<strong>Administrateur</strong> (Peut modifier les informations de l’agence, ajouter et supprimer des utilisateurs, modifier leurs rôles, consulter les conventions)",
+  "to-review":
+    "<strong>À valider</strong> (Souhaite être rattaché à l'organisme)",
+};
+
+const generateUserInfo = (
+  firstName: string,
+  lastName: string,
+  email: string,
+  roles: AgencyRole[],
+  isNotified: boolean,
+  agencyName: string,
+): string => {
+  const rolesDescriptionList = roles
+    .filter((role) => role !== "to-review")
+    .map((role) => `<li>${descriptionByRole[role]}</li>`)
+    .join("\n");
+
+  const nameDisplay =
+    firstName && lastName ? `${firstName} ${lastName} - ${email}` : email;
+
+  return `
+    <ul style="list-style-type: none; border: 1px solid #ddd; padding: 5px;">
+      <li><strong>${nameDisplay}</strong></li>
+      ${rolesDescriptionList}
+      <li>${
+        isNotified
+          ? "Reçoit les emails de toutes les conventions de "
+          : "Ne reçoit aucun email pour "
+      } ${agencyName}</li>
+      <li><a href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" target="_blank">Espace personnel</a></li>
+    </ul>
+  `;
+};

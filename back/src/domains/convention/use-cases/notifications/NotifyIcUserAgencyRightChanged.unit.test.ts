@@ -115,7 +115,14 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       emails: [
         {
           kind: "IC_USER_RIGHTS_HAS_CHANGED",
-          params: { agencyName: agency.name },
+          params: {
+            agencyName: agency.name,
+            email: icUser.email,
+            firstName: icUser.firstName,
+            lastName: icUser.lastName,
+            isNotified: false,
+            roles: ["counsellor"],
+          },
           recipients: [icUser.email],
         },
       ],
