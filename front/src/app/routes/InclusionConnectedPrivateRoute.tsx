@@ -30,6 +30,7 @@ import { Route } from "type-route";
 
 export type FrontAdminRoute =
   | FrontAdminRouteTab
+  | Route<typeof routes.adminUserDetail>
   | Route<typeof routes.adminConventionDetail>
   | Route<typeof routes.adminAgencyDetail>;
 
