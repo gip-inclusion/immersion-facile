@@ -9,14 +9,12 @@ import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 import {
   throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
-import {
-  getIcUserOrThrow,
-  throwIfNotAdmin,
-} from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export type RemoveUserFromAgency = ReturnType<typeof makeRemoveUserFromAgency>;
 
@@ -31,7 +29,7 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
     throwIfNotAdmin(currentUser);
     const agency = await getUserAgencyRightsAndThrowIfUserHasNoAgencyRight(
       uow,
-      await getIcUserOrThrow(uow, userId),
+      await getIcUserByUserId(uow, userId),
       agencyId,
     );
     throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(agency, userId);
