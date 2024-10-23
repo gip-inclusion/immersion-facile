@@ -3,7 +3,6 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   InclusionConnectedAllowedRoutes,
-  InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   User,
   currentJwtVersions,
@@ -25,24 +24,18 @@ import { BasicEventCrawler } from "../../../../domains/core/events/adapters/Even
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToPeServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {
-  const userId = "123";
   const agency = new AgencyDtoBuilder().build();
-  const inclusionConnectedUserWithoutRights: InclusionConnectedUser = {
-    id: userId,
+  const agencyUser: User = {
+    id: "123",
     email: "joe@mail.com",
     firstName: "Joe",
     lastName: "Doe",
-    agencyRights: [],
-    dashboards: { agencies: {}, establishments: {} },
     externalId: "joe-external-id",
     createdAt: new Date().toISOString(),
-  };
-  const inclusionConnectedUserWithRights: InclusionConnectedUser = {
-    ...inclusionConnectedUserWithoutRights,
-    agencyRights: [{ agency, roles: ["validator"], isNotifiedByEmail: false }],
   };
 
   let httpClient: HttpClient<InclusionConnectedAllowedRoutes>;
@@ -73,47 +66,57 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inclusionConnectedAllowedRoutes.getInclusionConnectedUser,
     )} 200 with agency dashboard url on response body`, async () => {
       const convention = new ConventionDtoBuilder()
-        .withEstablishmentRepresentativeEmail(
-          inclusionConnectedUserWithRights.email,
-        )
+        .withEstablishmentRepresentativeEmail(agencyUser.email)
         .build();
 
       inMemoryUow.conventionRepository.setConventions([convention]);
-
-      inMemoryUow.userRepository.setInclusionConnectedUsers([
-        inclusionConnectedUserWithRights,
-      ]);
-
-      const token = generateInclusionConnectJwt({
-        userId,
-        version: currentJwtVersions.inclusion,
-      });
+      inMemoryUow.userRepository.users = [agencyUser];
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [agencyUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
 
       const response = await httpClient.getInclusionConnectedUser({
-        headers: { authorization: token },
+        headers: {
+          authorization: generateInclusionConnectJwt({
+            userId: agencyUser.id,
+            version: currentJwtVersions.inclusion,
+          }),
+        },
       });
 
       expectHttpResponseToEqual(response, {
         body: {
-          ...inclusionConnectedUserWithRights,
+          ...agencyUser,
           dashboards: {
             agencies: {
               agencyDashboardUrl: `http://stubAgencyUserDashboard/${
-                inclusionConnectedUserWithRights.id
+                agencyUser.id
               }/${gateways.timeGateway.now()}`,
               erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
-                inclusionConnectedUserWithRights.id
+                agencyUser.id
               }/${gateways.timeGateway.now()}`,
             },
             establishments: {
               conventions: {
                 url: `http://stubEstablishmentConventionsDashboardUrl/${
-                  inclusionConnectedUserWithRights.id
+                  agencyUser.id
                 }/${gateways.timeGateway.now()}`,
                 role: "establishment-representative",
               },
             },
           },
+          agencyRights: [
+            {
+              agency: { ...agency, validatorEmails: [agencyUser.email] },
+              roles: ["validator"],
+              isNotifiedByEmail: false,
+            },
+          ],
         },
         status: 200,
       });
@@ -173,15 +176,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
     it(`${displayRouteName(
       inclusionConnectedAllowedRoutes.registerAgenciesToUser,
     )} 200 add an agency as registered to an Inclusion Connected user`, async () => {
-      inMemoryUow.userRepository.setInclusionConnectedUsers([
-        inclusionConnectedUserWithoutRights,
-      ]);
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.userRepository.users = [agencyUser];
+      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
       const response = await httpClient.registerAgenciesToUser({
         headers: {
           authorization: generateInclusionConnectJwt({
-            userId,
+            userId: agencyUser.id,
             version: currentJwtVersions.inclusion,
           }),
         },
@@ -192,12 +193,16 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: "",
         status: 200,
       });
-      expectToEqual(await inMemoryUow.userRepository.getById(userId), {
-        ...inclusionConnectedUserWithRights,
-        agencyRights: [
-          { agency, roles: ["to-review"], isNotifiedByEmail: false },
-        ],
-      });
+
+      expectToEqual(inMemoryUow.userRepository.users, [agencyUser]);
+      expectToEqual(inMemoryUow.agencyRepository.agencies, [
+        toAgencyWithRights(agency, {
+          [agencyUser.id]: {
+            isNotifiedByEmail: false,
+            roles: ["to-review"],
+          },
+        }),
+      ]);
     });
 
     it(`${displayRouteName(
@@ -272,38 +277,34 @@ describe("InclusionConnectedAllowedRoutes", () => {
     it(`${displayRouteName(
       inclusionConnectedAllowedRoutes.markPartnersErroredConventionAsHandled,
     )} 403 when user has no rights on agency`, async () => {
-      const userId = "123456ab";
       const userAgency = new AgencyDtoBuilder().withId("agency-id-1").build();
       const conventionAgency = new AgencyDtoBuilder()
         .withId("agency-id-2")
         .build();
       const conventionId = "11111111-1111-4111-1111-111111111111";
-      const user: InclusionConnectedUser = {
-        id: userId,
+      const user: User = {
+        id: "123456ab",
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        agencyRights: [
-          {
-            agency: userAgency,
-            roles: ["validator"],
-            isNotifiedByEmail: false,
-          },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
         externalId: "joe-external-id",
         createdAt: new Date().toISOString(),
       };
       const token = generateInclusionConnectJwt({
-        userId,
+        userId: user.id,
         version: currentJwtVersions.inclusion,
       });
       const convention = new ConventionDtoBuilder()
         .withId(conventionId)
         .withAgencyId(conventionAgency.id)
         .build();
-      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
-      inMemoryUow.agencyRepository.setAgencies([userAgency, conventionAgency]);
+      inMemoryUow.userRepository.users = [user];
+      inMemoryUow.agencyRepository.setAgencies([
+        toAgencyWithRights(userAgency, {
+          [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        }),
+        toAgencyWithRights(conventionAgency),
+      ]);
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await httpClient.markPartnersErroredConventionAsHandled({
@@ -324,18 +325,13 @@ describe("InclusionConnectedAllowedRoutes", () => {
     });
 
     it("mark partners errored convention as handled", async () => {
-      const userId = "123456ab";
       const conventionId = "11111111-1111-4111-1111-111111111111";
       const agency = new AgencyDtoBuilder().build();
-      const user: InclusionConnectedUser = {
-        id: userId,
+      const user: User = {
+        id: "123456ab",
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        agencyRights: [
-          { agency, roles: ["validator"], isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
         externalId: "joe-external-id",
         createdAt: new Date().toISOString(),
       };
@@ -343,8 +339,12 @@ describe("InclusionConnectedAllowedRoutes", () => {
         .withId(conventionId)
         .withAgencyId(agency.id)
         .build();
-      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
-      inMemoryUow.agencyRepository.setAgencies([agency]);
+      inMemoryUow.userRepository.users = [user];
+      inMemoryUow.agencyRepository.setAgencies([
+        toAgencyWithRights(agency, {
+          [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        }),
+      ]);
       inMemoryUow.conventionRepository.setConventions([convention]);
       await inMemoryUow.broadcastFeedbacksRepository.save({
         serviceName: broadcastToPeServiceName,
@@ -357,7 +357,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         handledByAgency: false,
       });
       const token = generateInclusionConnectJwt({
-        userId,
+        userId: user.id,
         version: currentJwtVersions.inclusion,
       });
 
@@ -447,7 +447,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     inclusionConnectedAllowedRoutes.updateDiscussionStatus,
   )}`, () => {
     it("400 - throws if discussion is already rejected", async () => {
-      const user = new InclusionConnectedUserBuilder().build();
+      const user = new InclusionConnectedUserBuilder().buildUser();
       const discussion = new DiscussionBuilder()
         .withEstablishmentContact({
           email: user.email,
@@ -459,7 +459,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         version: currentJwtVersions.inclusion,
       });
       inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
+      inMemoryUow.userRepository.users = [user];
 
       const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
@@ -509,14 +509,14 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
     });
     it("403 - throws if user is not bound to discussion", async () => {
-      const user = new InclusionConnectedUserBuilder().build();
+      const user = new InclusionConnectedUserBuilder().buildUser();
       const discussion = new DiscussionBuilder().build();
       const existingToken = generateInclusionConnectJwt({
         userId: user.id,
         version: currentJwtVersions.inclusion,
       });
       inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
+      inMemoryUow.userRepository.users = [user];
 
       const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
@@ -541,7 +541,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
     });
     it("200 - rejects discussion", async () => {
-      const user = new InclusionConnectedUserBuilder().build();
+      const user = new InclusionConnectedUserBuilder().buildUser();
       const discussion = new DiscussionBuilder()
         .withEstablishmentContact({
           email: user.email,
@@ -552,7 +552,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         version: currentJwtVersions.inclusion,
       });
       inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
+      inMemoryUow.userRepository.users = [user];
 
       const response = await httpClient.updateDiscussionStatus({
         headers: { authorization: existingToken },
@@ -589,9 +589,9 @@ describe("InclusionConnectedAllowedRoutes", () => {
     it("save the event to Broadcast Convention again, than it event triggers calling partners", async () => {
       const adminUser = new InclusionConnectedUserBuilder()
         .withIsAdmin(true)
-        .build();
+        .buildUser();
 
-      inMemoryUow.userRepository.setInclusionConnectedUsers([adminUser]);
+      inMemoryUow.userRepository.users = [adminUser];
 
       const token = generateInclusionConnectJwt({
         userId: adminUser.id,
