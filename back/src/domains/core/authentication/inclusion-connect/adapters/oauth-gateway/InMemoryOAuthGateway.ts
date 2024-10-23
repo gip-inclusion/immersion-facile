@@ -53,7 +53,6 @@ export class InMemoryOAuthGateway implements OAuthGateway {
     return `${logoutUri[provider]}?${queryParamsAsString({
       postLogoutRedirectUrl:
         this.providerConfig.immersionRedirectUri.afterLogout,
-      clientId: this.providerConfig.clientId,
       idToken: params.idToken,
       state: params.state,
     })}`;

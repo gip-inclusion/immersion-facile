@@ -440,7 +440,6 @@ describe("InclusionConnectedAllowedRoutes", () => {
             appConfig.inclusionConnectConfig.providerBaseUri
           }/logout-inclusion-connect?${queryParamsAsString({
             postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
-            clientId: appConfig.inclusionConnectConfig.clientId,
             idToken: "fake-id-token",
             state,
           })}`,
