@@ -60,7 +60,7 @@ const rawAdminTabs: Record<AdminTabRouteName, RawAdminTab> = {
   },
 };
 
-export type FrontAdminRoute = Route<(typeof routes)[AdminTabRouteName]>;
+export type FrontAdminRouteTab = Route<(typeof routes)[AdminTabRouteName]>;
 
 const getAdminTabs = (currentTab: AdminTabRouteName) =>
   keys(rawAdminTabs)
@@ -71,10 +71,10 @@ const getAdminTabs = (currentTab: AdminTabRouteName) =>
       isDefault: currentTab === tabId,
     }));
 
-export const AdminPage = ({
+export const AdminTabs = ({
   route,
 }: {
-  route: FrontAdminRoute;
+  route: FrontAdminRouteTab;
 }) => {
   const currentTab = route.name;
   const tabs = getAdminTabs(route.name);

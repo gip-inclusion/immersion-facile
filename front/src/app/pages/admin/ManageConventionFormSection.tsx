@@ -15,7 +15,7 @@ import { Route } from "type-route";
 
 type ManageConventionFormSectionProps = {
   routeNameToRedirectTo: Route<
-    | typeof routes.manageConventionAdmin
+    | typeof routes.adminConventionDetail
     | typeof routes.manageConventionInclusionConnected
   >["name"];
 };
