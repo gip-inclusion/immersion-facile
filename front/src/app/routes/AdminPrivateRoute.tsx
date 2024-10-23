@@ -1,7 +1,9 @@
 import React from "react";
 import { PageHeader } from "react-design-system";
-import { FrontAdminRoute } from "src/app/pages/admin/AdminPage";
-import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
+import {
+  FrontAdminRoute,
+  InclusionConnectedPrivateRoute,
+} from "src/app/routes/InclusionConnectedPrivateRoute";
 
 type AdminPrivateRouteProps = {
   route: FrontAdminRoute;
