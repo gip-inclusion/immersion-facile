@@ -84,7 +84,7 @@ const admin = defineRoute(
   () => `/${frontRoutes.admin}`,
 );
 
-const { adminConventions, adminAgencies, ...restOfAdminRoutes } =
+const { adminConventions, adminAgencies, adminUsers, ...restOfAdminRoutes } =
   adminTabRouteNames.reduce(
     (acc, adminTabName) => ({
       ...acc,
@@ -102,6 +102,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   adminConventionDetail: adminConventions.extend(
     { conventionId: param.path.string },
     ({ conventionId }) => `/${conventionId}`,
+  ),
+  adminUsers,
+  adminUserDetail: adminUsers.extend(
+    { userId: param.path.string },
+    ({ userId }) => `/${userId}`,
   ),
   adminAgencies,
   adminAgencyDetail: adminAgencies.extend(
