@@ -14,6 +14,7 @@ import {
   expectObjectInArrayToMatch,
   expectToEqual,
 } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -141,7 +142,7 @@ describe("ConventionReminder use case", () => {
         convention2,
         conventionNeedsReminder,
       ]);
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
       const summary = await conventionsReminder.execute();
       expectToEqual(summary, {
@@ -172,7 +173,7 @@ describe("ConventionReminder use case", () => {
         agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -209,7 +210,7 @@ describe("ConventionReminder use case", () => {
         agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -247,7 +248,7 @@ describe("ConventionReminder use case", () => {
         agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -304,7 +305,7 @@ describe("ConventionReminder use case", () => {
         agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
 
       // Act
       const summary = await conventionsReminder.execute();
