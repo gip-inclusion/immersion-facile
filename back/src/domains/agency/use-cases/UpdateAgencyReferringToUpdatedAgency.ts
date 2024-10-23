@@ -1,7 +1,6 @@
 import { toPairs, uniq } from "ramda";
 import {
   InclusionConnectedUser,
-  UserId,
   WithAgencyId,
   errors,
   keys,
@@ -11,7 +10,10 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { AgencyUsersRights } from "../ports/AgencyRepository";
+import {
+  AgencyUsersRights,
+  AgencyWithUsersRights,
+} from "../ports/AgencyRepository";
 
 export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   WithAgencyId,
@@ -31,29 +33,18 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   }
 
   public async _execute(params: WithAgencyId, uow: UnitOfWork): Promise<void> {
-    const agency = await uow.agencyRepository.getById(params.agencyId);
+    const updatedAgency = await uow.agencyRepository.getById(params.agencyId);
 
-    if (!agency) throw errors.agency.notFound(params);
-
-    const validatorsNotNotifiedToCopyIds = toPairs(agency.usersRights)
-      .filter(
-        ([_, rights]) =>
-          rights?.roles.includes("validator") &&
-          rights.isNotifiedByEmail === false,
-      )
-      .map(([id]) => id);
+    if (!updatedAgency) throw errors.agency.notFound(params);
 
     const relatedAgencies =
-      await uow.agencyRepository.getAgenciesRelatedToAgency(agency.id);
+      await uow.agencyRepository.getAgenciesRelatedToAgency(updatedAgency.id);
 
     await Promise.all(
       relatedAgencies.map(async ({ usersRights, id }) => {
         await uow.agencyRepository.update({
           id,
-          usersRights: this.#updateRights(
-            usersRights,
-            validatorsNotNotifiedToCopyIds,
-          ),
+          usersRights: this.#updateRights(usersRights, updatedAgency),
         });
         await uow.outboxRepository.save(
           this.#createNewEvent({
@@ -71,35 +62,50 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   }
 
   #updateRights(
-    rights: AgencyUsersRights,
-    validatorsNotNotifiedToCopyIds: UserId[],
+    rightsOfRelatedAgency: AgencyUsersRights,
+    updatedAgency: AgencyWithUsersRights,
   ): AgencyUsersRights {
+    const validatorsOfUpdatedAgency = toPairs(updatedAgency.usersRights)
+      .filter(([_, rights]) => rights?.roles.includes("validator"))
+      .map(([id, rights]) => ({
+        id,
+        isNotifiedByEmail: rights?.isNotifiedByEmail,
+      }));
+
     //TODO: de tête on a un utilitaire qui fait 2 en 1 ici
-    const idsToUpdate: UserId[] = validatorsNotNotifiedToCopyIds.filter((id) =>
-      keys(rights).includes(id),
+    const idsToUpdate = validatorsOfUpdatedAgency.filter(({ id }) =>
+      keys(rightsOfRelatedAgency).includes(id),
     );
-    const idsToAdd: UserId[] = validatorsNotNotifiedToCopyIds.filter(
-      (id) => !keys(rights).includes(id),
+    const idsToAdd = validatorsOfUpdatedAgency.filter(
+      ({ id }) => !keys(rightsOfRelatedAgency).includes(id),
     );
 
     return {
-      ...toPairs(rights).reduce<AgencyUsersRights>(
-        (acc, [id, right]) => ({
-          ...acc,
-          [id]:
-            right && idsToUpdate.includes(id)
-              ? {
-                  isNotifiedByEmail: right.isNotifiedByEmail,
-                  roles: uniq([...right.roles, "validator"]),
-                }
-              : right,
-        }),
+      ...toPairs(rightsOfRelatedAgency).reduce<AgencyUsersRights>(
+        (acc, [id, right]) => {
+          const idToUpdate = idsToUpdate.find(
+            (idToUpdate) => idToUpdate.id === id,
+          );
+          return {
+            ...acc,
+            [id]:
+              right && idToUpdate
+                ? {
+                    isNotifiedByEmail: idToUpdate.isNotifiedByEmail,
+                    roles: uniq([...right.roles, "validator"]),
+                  }
+                : right,
+          };
+        },
         {},
       ),
       ...idsToAdd.reduce<AgencyUsersRights>(
-        (acc, id) => ({
+        (acc, idsToAdd) => ({
           ...acc,
-          [id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          [idsToAdd.id]: {
+            isNotifiedByEmail: idsToAdd.isNotifiedByEmail,
+            roles: ["validator"],
+          },
         }),
         {},
       ),
