@@ -36,6 +36,11 @@ describe("UpdateUserForAgency", () => {
   const icNotAdmin = notAdminBuilder.build();
   const notAdminUser = notAdminBuilder.buildUser();
 
+  const counsellor = new InclusionConnectedUserBuilder()
+    .withId("counsellor")
+    .withEmail("counsellor@mail.com")
+    .buildUser();
+
   let updateIcUserRoleForAgency: UpdateUserForAgency;
   const timeGateway: CustomTimeGateway = new CustomTimeGateway();
   let createNewEvent: CreateNewEvent;
@@ -226,6 +231,7 @@ describe("UpdateUserForAgency", () => {
         toAgencyWithRights(agency, {
           [notAdminUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
           [validator.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [counsellor.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
         }),
       ];
 
@@ -251,6 +257,7 @@ describe("UpdateUserForAgency", () => {
             isNotifiedByEmail: icUserRoleForAgency.isNotifiedByEmail,
           },
           [validator.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [counsellor.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
         }),
       ]);
       expectToEqual(uow.outboxRepository.events, [
@@ -378,6 +385,7 @@ describe("UpdateUserForAgency", () => {
           adminUser,
           userReceivingNotif,
           userWithoutNotif,
+          counsellor,
         ];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agencyWithCounsellor, {
@@ -387,6 +395,10 @@ describe("UpdateUserForAgency", () => {
             },
             [userWithoutNotif.id]: {
               roles: ["validator"],
+              isNotifiedByEmail: false,
+            },
+            [counsellor.id]: {
+              roles: ["counsellor"],
               isNotifiedByEmail: false,
             },
           }),
