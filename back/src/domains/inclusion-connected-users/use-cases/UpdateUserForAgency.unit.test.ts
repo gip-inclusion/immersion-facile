@@ -226,7 +226,12 @@ describe("UpdateUserForAgency", () => {
         id: "validator-id",
         email: "validator@email.fr",
       };
-      uow.userRepository.users = [adminUser, notAdminUser, validator];
+      uow.userRepository.users = [
+        adminUser,
+        notAdminUser,
+        validator,
+        counsellor,
+      ];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [notAdminUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
@@ -254,6 +259,7 @@ describe("UpdateUserForAgency", () => {
         adminUser,
         notAdminUser,
         validator,
+        counsellor,
       ]);
       expectToEqual(uow.agencyRepository.agencies, [
         toAgencyWithRights(agency, {

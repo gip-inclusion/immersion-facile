@@ -15,14 +15,12 @@ import { UserRepository } from "../../core/authentication/inclusion-connect/port
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 import {
   throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
   throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
 } from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
-import {
-  getIcUserOrThrow,
-  throwIfNotAdmin,
-} from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 const rejectIfAgencyWontHaveValidatorsReceivingNotifications = (
   params: UserParamsForAgency,
@@ -135,7 +133,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    const userToUpdate = await getIcUserOrThrow(uow, params.userId);
+    const userToUpdate = await getIcUserByUserId(uow, params.userId);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
     const agency = await uow.agencyRepository.getById(params.agencyId);
