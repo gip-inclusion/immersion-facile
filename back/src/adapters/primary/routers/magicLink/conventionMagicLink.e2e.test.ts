@@ -5,11 +5,11 @@ import {
   ConventionId,
   ConventionMagicLinkRoutes,
   InclusionConnectJwtPayload,
-  InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   RenewConventionParams,
   Role,
   ScheduleDtoBuilder,
+  User,
   conventionMagicLinkRoutes,
   currentJwtVersions,
   errors,
@@ -24,29 +24,31 @@ import {
   GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
-const payloadMeta = {
-  exp: new Date().getTime() / 1000 + 1000,
-  iat: new Date().getTime() / 1000,
-  version: 1,
-};
-
-const conventionBuilder = new ConventionDtoBuilder().withStatus("DRAFT");
-
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withId("backoffice-admin-user")
-  .withIsAdmin(true)
-  .build();
-
-const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-  version: currentJwtVersions.inclusion,
-  iat: new Date().getTime(),
-  exp: addDays(new Date(), 30).getTime(),
-  userId: backofficeAdminUser.id,
-};
-
 describe("Magic link router", () => {
+  const payloadMeta = {
+    exp: new Date().getTime() / 1000 + 1000,
+    iat: new Date().getTime() / 1000,
+    version: 1,
+  };
+
+  const conventionBuilder = new ConventionDtoBuilder().withStatus("DRAFT");
+
+  const backofficeAdminUserBuilder = new InclusionConnectedUserBuilder()
+    .withId("backoffice-admin-user")
+    .withIsAdmin(true);
+  const icBackofficeAdminUser = backofficeAdminUserBuilder.build();
+  const backofficeAdminUser = backofficeAdminUserBuilder.build();
+
+  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+    version: currentJwtVersions.inclusion,
+    iat: new Date().getTime(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: icBackofficeAdminUser.id,
+  };
+
   let request: SuperTest<Test>;
   let generateConventionJwt: GenerateConventionJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
@@ -66,9 +68,7 @@ describe("Magic link router", () => {
     );
     const initialConvention = conventionBuilder.build();
     inMemoryUow.conventionRepository.setConventions([initialConvention]);
-    inMemoryUow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    inMemoryUow.userRepository.users = [backofficeAdminUser];
   });
 
   describe("POST /auth/demande-immersion/:conventionId", () => {
@@ -115,28 +115,28 @@ describe("Magic link router", () => {
           .withStatusJustification("Justif")
           .build();
 
-        const user = new InclusionConnectedUserBuilder()
+        const notAdminUser = new InclusionConnectedUserBuilder()
           .withIsAdmin(false)
-          .build();
+          .buildUser();
 
-        inMemoryUow.userRepository.setInclusionConnectedUsers([user]);
-
-        const userJwt = generateInclusionConnectJwt({
-          userId: user.id,
-          version: currentJwtVersions.inclusion,
-        });
+        inMemoryUow.userRepository.users = [notAdminUser];
 
         const response = await httpClient.updateConvention({
           urlParams: { conventionId: updatedConvention.id },
           body: { convention: updatedConvention },
-          headers: { authorization: userJwt },
+          headers: {
+            authorization: generateInclusionConnectJwt({
+              userId: notAdminUser.id,
+              version: currentJwtVersions.inclusion,
+            }),
+          },
         });
 
         expectHttpResponseToEqual(response, {
           status: 403,
           body: {
             status: 403,
-            message: errors.user.notBackOfficeAdmin({ userId: user.id })
+            message: errors.user.notBackOfficeAdmin({ userId: notAdminUser.id })
               .message,
           },
         });
@@ -341,22 +341,22 @@ describe("Magic link router", () => {
         .build();
       inMemoryUow.conventionRepository.setConventions([existingConvention]);
 
-      const inclusionConnectedUser: InclusionConnectedUser = {
+      const validator: User = {
         id: "my-user-id",
         email: "my-user@email.com",
         firstName: "John",
         lastName: "Doe",
-        agencyRights: [
-          { roles: ["validator"], agency, isNotifiedByEmail: false },
-        ],
-        dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.userRepository.setInclusionConnectedUsers([
-        inclusionConnectedUser,
-      ]);
+      inMemoryUow.userRepository.users = [validator];
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        }),
+      ];
+
       const renewedConventionStartDate = addDays(
         new Date(existingConvention.dateEnd),
         1,
@@ -382,7 +382,7 @@ describe("Magic link router", () => {
         .send(renewedConventionParams)
         .set({
           authorization: generateInclusionConnectJwt({
-            userId: inclusionConnectedUser.id,
+            userId: validator.id,
             version: 1,
             iat: new Date().getTime() / 1000,
             exp: new Date().getTime() / 1000 + 1000,
@@ -469,9 +469,7 @@ describe("Magic link router", () => {
         .withStatus("READY_TO_SIGN")
         .notSigned()
         .build();
-      const icUser: InclusionConnectedUser = {
-        agencyRights: [],
-        dashboards: { agencies: {}, establishments: {} },
+      const establishmentRepresentative: User = {
         email: convention.signatories.establishmentRepresentative.email,
         firstName: "",
         lastName: "",
@@ -480,7 +478,7 @@ describe("Magic link router", () => {
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.userRepository.setInclusionConnectedUsers([icUser]);
+      inMemoryUow.userRepository.users = [establishmentRepresentative];
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await request
@@ -488,7 +486,7 @@ describe("Magic link router", () => {
         .send()
         .set({
           authorization: generateInclusionConnectJwt({
-            userId: icUser.id,
+            userId: establishmentRepresentative.id,
             version: 1,
           }),
         });
@@ -503,9 +501,7 @@ describe("Magic link router", () => {
         .withStatus("READY_TO_SIGN")
         .notSigned()
         .build();
-      const icUser: InclusionConnectedUser = {
-        agencyRights: [],
-        dashboards: { agencies: {}, establishments: {} },
+      const notEstablishmentRepresentative: User = {
         email: "email@mail.com",
         firstName: "",
         lastName: "",
@@ -514,23 +510,23 @@ describe("Magic link router", () => {
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.userRepository.setInclusionConnectedUsers([icUser]);
+      inMemoryUow.userRepository.users = [notEstablishmentRepresentative];
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await request
         .post(`/auth/sign-application/${convention.id}`)
-        .send()
         .set({
           authorization: generateInclusionConnectJwt({
-            userId: icUser.id,
+            userId: notEstablishmentRepresentative.id,
             version: 1,
           }),
-        });
+        })
+        .send();
 
       expectToEqual(response.status, 403);
       expectToEqual(response.body, {
         status: 403,
-        message: `User '${icUser.id}' is not the establishment representative for convention '${convention.id}'`,
+        message: `User '${notEstablishmentRepresentative.id}' is not the establishment representative for convention '${convention.id}'`,
       });
     });
   });
