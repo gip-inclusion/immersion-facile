@@ -35,9 +35,6 @@ export const createTechnicalRouter = (
   const technicalSharedRouter = createExpressSharedRouter(
     technicalRoutes,
     technicalRouter,
-    {
-      skipInputValidation: true,
-    },
   );
 
   technicalSharedRouter.inboundEmailParsing(
@@ -55,16 +52,7 @@ export const createTechnicalRouter = (
     }),
     async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.addExchangeToDiscussion
-          .execute(req.body)
-          .catch((error) => {
-            console.error({
-              message: "error in addExchangeToDiscussion",
-              errorMessage: error.message,
-              error,
-            });
-            throw error;
-          }),
+        deps.useCases.addExchangeToDiscussion.execute(req.body),
       ),
   );
 
