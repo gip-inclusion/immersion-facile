@@ -36,6 +36,11 @@ describe("UpdateUserForAgency", () => {
   const icNotAdmin = notAdminBuilder.build();
   const notAdminUser = notAdminBuilder.buildUser();
 
+  const counsellor = new InclusionConnectedUserBuilder()
+    .withId("counsellor")
+    .withEmail("counsellor@mail.com")
+    .buildUser();
+
   let updateIcUserRoleForAgency: UpdateUserForAgency;
   const timeGateway: CustomTimeGateway = new CustomTimeGateway();
   let createNewEvent: CreateNewEvent;
@@ -132,9 +137,7 @@ describe("UpdateUserForAgency", () => {
   });
 
   describe("when updating email", () => {
-    const agency: AgencyDto = new AgencyDtoBuilder()
-      .withCounsellorEmails(["fake-email@gmail.com"])
-      .build();
+    const agency: AgencyDto = new AgencyDtoBuilder().build();
 
     beforeEach(() => {
       uow.agencyRepository.setAgencies([toAgencyWithRights(agency, {})]);
@@ -216,10 +219,7 @@ describe("UpdateUserForAgency", () => {
 
   describe("when roles are updated", () => {
     it("can change to more than one role", async () => {
-      const agency = new AgencyDtoBuilder()
-        .withCounsellorEmails(["fake-email@gmail.com"])
-        .withValidatorEmails(["validator@gmail.com"])
-        .build();
+      const agency = new AgencyDtoBuilder().build();
 
       const validator: User = {
         ...notAdminUser,
@@ -231,6 +231,7 @@ describe("UpdateUserForAgency", () => {
         toAgencyWithRights(agency, {
           [notAdminUser.id]: { roles: ["to-review"], isNotifiedByEmail: false },
           [validator.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [counsellor.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
         }),
       ];
 
@@ -258,6 +259,7 @@ describe("UpdateUserForAgency", () => {
         toAgencyWithRights(agency, {
           [notAdminUser.id]: { roles: newRoles, isNotifiedByEmail: false },
           [validator.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [counsellor.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
         }),
       ]);
       expectToEqual(uow.outboxRepository.events, [
@@ -309,9 +311,7 @@ describe("UpdateUserForAgency", () => {
     });
 
     it("changes the role and email notificatgion of a user for a given agency", async () => {
-      const agency = new AgencyDtoBuilder()
-        .withValidatorEmails(["icUserWithNotif@email.fr", ""])
-        .build();
+      const agency = new AgencyDtoBuilder().build();
 
       const icUserWithNotif: User = {
         ...icNotAdmin,
@@ -396,9 +396,7 @@ describe("UpdateUserForAgency", () => {
     });
 
     describe("cannot remove the last validator receiving notifications of an agency", () => {
-      const agencyWithCounsellor: AgencyDto = new AgencyDtoBuilder()
-        .withCounsellorEmails(["fake-email@gmail.com"])
-        .build();
+      const agencyWithCounsellor: AgencyDto = new AgencyDtoBuilder().build();
 
       it("when last validator role is updated to counsellor", async () => {
         const userReceivingNotif: User = {
@@ -414,6 +412,7 @@ describe("UpdateUserForAgency", () => {
           adminUser,
           userReceivingNotif,
           userWithoutNotif,
+          counsellor,
         ];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agencyWithCounsellor, {
@@ -423,6 +422,10 @@ describe("UpdateUserForAgency", () => {
             },
             [userWithoutNotif.id]: {
               roles: ["validator"],
+              isNotifiedByEmail: false,
+            },
+            [counsellor.id]: {
+              roles: ["counsellor"],
               isNotifiedByEmail: false,
             },
           }),
