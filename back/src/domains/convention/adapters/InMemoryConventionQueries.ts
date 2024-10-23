@@ -209,11 +209,11 @@ export class InMemoryConventionQueries implements ConventionQueries {
         return {
           counsellorIds: [
             ...acc.counsellorIds,
-            ...(userRights.roles.includes("counsellor") ? [userId] : []),
+            ...(userRights?.roles.includes("counsellor") ? [userId] : []),
           ],
           validatorIds: [
             ...acc.validatorIds,
-            ...(userRights.roles.includes("validator") ? [userId] : []),
+            ...(userRights?.roles.includes("validator") ? [userId] : []),
           ],
         };
       },
