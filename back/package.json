@@ -48,7 +48,6 @@
     "trigger-import-pro-connect-external-ids": "ts-node src/scripts/triggerImportProConnectExternalIds",
     "typecheck": "tsc --noEmit",
     "kysely-codegen": "kysely-codegen --dialect postgres",
-    "update-agencies-from-PE-referential": "ts-node src/scripts/updateAllPEAgenciesFromPeAgencyReferential.ts",
     "verify-migrations-order": "./src/scripts/verifyDatabaseMigrationsOrder.sh"
   },
   "keywords": [],
