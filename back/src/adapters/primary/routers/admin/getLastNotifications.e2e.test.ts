@@ -15,7 +15,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
-describe(`${adminRoutes.getLastNotifications.url} route`, () => {
+describe("Get last notification route", () => {
   let adminToken: InclusionConnectJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<AdminRoutes>;
@@ -27,7 +27,7 @@ describe(`${adminRoutes.getLastNotifications.url} route`, () => {
     const backofficeAdminUser = new InclusionConnectedUserBuilder()
       .withId("backoffice-admin-user")
       .withIsAdmin(true)
-      .build();
+      .buildUser();
 
     const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
       version: currentJwtVersions.inclusion,
@@ -36,15 +36,13 @@ describe(`${adminRoutes.getLastNotifications.url} route`, () => {
       userId: backofficeAdminUser.id,
     };
 
-    inMemoryUow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    inMemoryUow.userRepository.users = [backofficeAdminUser];
 
     adminToken = testApp.generateInclusionConnectJwt(backofficeAdminJwtPayload);
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
   });
 
-  describe("private route to get last email sent", () => {
+  describe(`${adminRoutes.getLastNotifications.url} private route to get last email sent`, () => {
     it("throws 400 if missing token", async () => {
       const response = await httpClient.getLastNotifications({
         headers: {} as { authorization: string },
