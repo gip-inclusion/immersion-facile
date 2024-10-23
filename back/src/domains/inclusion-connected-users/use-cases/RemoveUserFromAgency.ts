@@ -5,7 +5,7 @@ import {
   withAgencyIdAndUserIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import {
   throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
@@ -27,7 +27,7 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
     throwIfNotAdmin(currentUser);
     const user = await uow.userRepository.getById(
       userId,
-      oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll()),
+      await makeProvider(uow),
     );
     if (!user) throw errors.user.notFound({ userId });
 
