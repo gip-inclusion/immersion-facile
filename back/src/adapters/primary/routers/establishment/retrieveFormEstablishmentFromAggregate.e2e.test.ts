@@ -31,7 +31,7 @@ import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 const backofficeAdminUser = new InclusionConnectedUserBuilder()
   .withId("backoffice-admin-user")
   .withIsAdmin(true)
-  .build();
+  .buildUser();
 
 const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
   version: currentJwtVersions.inclusion,
@@ -78,9 +78,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       generateInclusionConnectJwt,
       generateEditEstablishmentJwt,
     } = await buildTestApp());
-    inMemoryUow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
+    inMemoryUow.userRepository.users = [backofficeAdminUser];
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
   });
 
