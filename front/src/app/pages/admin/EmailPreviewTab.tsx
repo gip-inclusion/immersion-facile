@@ -415,6 +415,11 @@ export const defaultEmailValueByEmailKind: {
   },
   IC_USER_RIGHTS_HAS_CHANGED: {
     agencyName: "AGENCY_NAME",
+    roles: ["validator"],
+    isNotified: true,
+    email: "USER_EMAIL",
+    firstName: "USER_FIRST_NAME",
+    lastName: "USER_LAST_NAME",
   },
   MAGIC_LINK_RENEWAL: {
     conventionStatusLink: "CONVENTION_STATUS_LINK",

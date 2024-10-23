@@ -6,6 +6,7 @@ import {
   InternshipKind,
   Renewed,
 } from "../convention/convention.dto";
+import { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import { Email } from "./email.dto";
@@ -225,6 +226,11 @@ export type EmailParamsByEmailType = {
   };
   IC_USER_RIGHTS_HAS_CHANGED: {
     agencyName: string;
+    isNotified: boolean;
+    roles: AgencyRole[];
+    firstName: string;
+    lastName: string;
+    email: Email;
   };
   IC_USER_REGISTRATION_TO_AGENCY_REJECTED: {
     agencyName: string;
