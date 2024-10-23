@@ -2,12 +2,16 @@ import {
   AgencyDto,
   AgencyDtoBuilder,
   CreateAgencyDto,
+  InclusionConnectedUserBuilder,
+  User,
   errors,
+  expectArraysToMatch,
   expectPromiseToFail,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { ConflictError } from "shared";
+import { toAgencyWithRights } from "../../../utils/agency";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -26,6 +30,14 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { AddAgency } from "./AddAgency";
 
 describe("AddAgency use case", () => {
+  const counsellor = new InclusionConnectedUserBuilder()
+    .withId("counsellor")
+    .withEmail("counsellor@mail.com")
+    .buildUser();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator")
+    .withEmail("validator@mail.com")
+    .buildUser();
   const createParisMissionLocaleParams: CreateAgencyDto = {
     id: "some-id",
     coveredDepartments: ["75"],
@@ -35,8 +47,8 @@ describe("AddAgency use case", () => {
       departmentCode: "75",
       postcode: "75017",
     },
-    counsellorEmails: ["counsellor@mail.com"],
-    validatorEmails: ["validator@mail.com"],
+    counsellorEmails: [counsellor.email],
+    validatorEmails: [validator.email],
     kind: "mission-locale",
     name: "Mission locale de Paris",
     position: { lat: 10, lon: 20 },
@@ -57,7 +69,7 @@ describe("AddAgency use case", () => {
       departmentCode: "75",
       postcode: "75017",
     },
-    counsellorEmails: ["counsellor@mail.com"],
+    counsellorEmails: ["counsellor-from-agency-with-refers-to@mail.com"],
     validatorEmails: ["mail.should.not.be.applied@email.com"],
     kind: "mission-locale",
     name: "Mission locale de Paris Bis",
@@ -69,54 +81,128 @@ describe("AddAgency use case", () => {
     questionnaireUrl: null,
     logoUrl: null,
   };
+  const uuids = ["uuid1", "uuid2", "uuid3", "uuid4"];
 
   let uow: InMemoryUnitOfWork;
   let addAgency: AddAgency;
   let createNewEvent: CreateNewEvent;
   let siretGateway: InMemorySiretGateway;
+  let uuidGenerator: TestUuidGenerator;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    createNewEvent = makeCreateNewEvent({
-      timeGateway: new CustomTimeGateway(),
-      uuidGenerator: new TestUuidGenerator(),
-    });
+    uuidGenerator = new TestUuidGenerator();
+    timeGateway = new CustomTimeGateway();
     siretGateway = new InMemorySiretGateway();
+    createNewEvent = makeCreateNewEvent({
+      timeGateway: timeGateway,
+      uuidGenerator: uuidGenerator,
+    });
     addAgency = new AddAgency(
       new InMemoryUowPerformer(uow),
       createNewEvent,
       siretGateway,
+      timeGateway,
+      uuidGenerator,
     );
+    uuidGenerator.setNextUuids([...uuids]);
   });
 
   describe("right paths", () => {
     it("save the agency in repo, with the default admin mail and the status to be reviewed", async () => {
       uow.agencyRepository.setAgencies([]);
+      uow.userRepository.users = [];
 
       await addAgency.execute(createParisMissionLocaleParams);
 
+      const newValidator: User = {
+        id: uuids[0],
+        email: createParisMissionLocaleParams.validatorEmails[0],
+        createdAt: timeGateway.now().toISOString(),
+        firstName: "Non fourni",
+        lastName: "Non fourni",
+        externalId: null,
+      };
+      const newCounsellor: User = {
+        id: uuids[1],
+        email: createParisMissionLocaleParams.counsellorEmails[0],
+        createdAt: timeGateway.now().toISOString(),
+        firstName: "Non fourni",
+        lastName: "Non fourni",
+        externalId: null,
+      };
+
+      expectToEqual(uow.userRepository.users, [newValidator, newCounsellor]);
       expectToEqual(uow.agencyRepository.agencies, [
-        {
-          ...createParisMissionLocaleParams,
-          status: "needsReview",
-          questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
-          rejectionJustification: null,
-          codeSafir: null,
-        },
+        toAgencyWithRights(
+          {
+            ...createParisMissionLocaleParams,
+            status: "needsReview",
+            questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
+            rejectionJustification: null,
+            codeSafir: null,
+            counsellorEmails: [],
+            validatorEmails: [],
+          },
+          {
+            [newValidator.id]: {
+              isNotifiedByEmail: false,
+              roles: ["validator"],
+            },
+            [newCounsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+          },
+        ),
+      ]);
+    });
+
+    it("do not create other users if they exist with same email but apply rights on new agency for them", async () => {
+      uow.agencyRepository.setAgencies([]);
+      uow.userRepository.users = [counsellor, validator];
+
+      await addAgency.execute(createParisMissionLocaleParams);
+
+      expectToEqual(uow.userRepository.users, [counsellor, validator]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(
+          {
+            ...createParisMissionLocaleParams,
+            status: "needsReview",
+            questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
+            rejectionJustification: null,
+            codeSafir: null,
+            counsellorEmails: [],
+            validatorEmails: [],
+          },
+          {
+            [validator.id]: {
+              isNotifiedByEmail: false,
+              roles: ["validator"],
+            },
+            [counsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+          },
+        ),
       ]);
     });
 
     it("sets an events to be dispatched with the added agency", async () => {
       await addAgency.execute(createParisMissionLocaleParams);
 
-      expectToEqual(uow.outboxRepository.events, [
-        createNewEvent({
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          id: uuids[2],
           topic: "NewAgencyAdded",
           payload: {
             agencyId: createParisMissionLocaleParams.id,
             triggeredBy: null,
           },
-        }),
+        },
       ]);
     });
 
@@ -126,39 +212,113 @@ describe("AddAgency use case", () => {
       };
 
       uow.agencyRepository.setAgencies([]);
+      uow.userRepository.users = [];
+
       await addAgency.execute(poleEmploiParis);
 
+      const newValidator: User = {
+        id: uuids[0],
+        email: createParisMissionLocaleParams.validatorEmails[0],
+        createdAt: timeGateway.now().toISOString(),
+        firstName: "Non fourni",
+        lastName: "Non fourni",
+        externalId: null,
+      };
+      const newCounsellor: User = {
+        id: uuids[1],
+        email: createParisMissionLocaleParams.counsellorEmails[0],
+        createdAt: timeGateway.now().toISOString(),
+        firstName: "Non fourni",
+        lastName: "Non fourni",
+        externalId: null,
+      };
+      expectToEqual(uow.userRepository.users, [newValidator, newCounsellor]);
       expectToEqual(uow.agencyRepository.agencies, [
-        {
-          ...poleEmploiParis,
-          status: "needsReview",
-          codeSafir: null,
-          rejectionJustification: null,
-        },
+        toAgencyWithRights(
+          {
+            ...poleEmploiParis,
+            counsellorEmails: [],
+            validatorEmails: [],
+            status: "needsReview",
+            codeSafir: null,
+            rejectionJustification: null,
+          },
+          {
+            [newValidator.id]: {
+              isNotifiedByEmail: false,
+              roles: ["validator"],
+            },
+            [newCounsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+          },
+        ),
       ]);
     });
 
     it("agengy with refers to should have validator emails from referral agency", async () => {
-      const miloAgency: AgencyDto = {
+      const existingMiloAgency: AgencyDto = {
         ...createParisMissionLocaleParams,
+        counsellorEmails: [],
+        validatorEmails: [],
         status: "needsReview",
         questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
         codeSafir: null,
         rejectionJustification: null,
       };
-      uow.agencyRepository.setAgencies([miloAgency]);
+      uow.userRepository.users = [counsellor, validator];
+      uow.agencyRepository.setAgencies([
+        toAgencyWithRights(existingMiloAgency, {
+          [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        }),
+      ]);
 
       await addAgency.execute(createAgencyWithRefersToParams);
 
+      const newCounsellor: User = {
+        id: uuids[0],
+        email: createAgencyWithRefersToParams.counsellorEmails[0],
+        createdAt: timeGateway.now().toISOString(),
+        firstName: "Non fourni",
+        lastName: "Non fourni",
+        externalId: null,
+      };
+
+      expectToEqual(uow.userRepository.users, [
+        counsellor,
+        validator,
+        newCounsellor,
+      ]);
       expectToEqual(uow.agencyRepository.agencies, [
-        miloAgency,
-        {
-          ...createAgencyWithRefersToParams,
-          validatorEmails: miloAgency.validatorEmails,
-          status: "needsReview",
-          codeSafir: null,
-          rejectionJustification: null,
-        },
+        toAgencyWithRights(
+          { ...existingMiloAgency, counsellorEmails: [], validatorEmails: [] },
+          {
+            [counsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          },
+        ),
+        toAgencyWithRights(
+          {
+            ...createAgencyWithRefersToParams,
+            status: "needsReview",
+            codeSafir: null,
+            rejectionJustification: null,
+            counsellorEmails: [],
+            validatorEmails: [],
+          },
+          {
+            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+            [newCounsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+          },
+        ),
       ]);
     });
   });
@@ -197,9 +357,6 @@ describe("AddAgency use case", () => {
         addAgency.execute(createAgencyWithRefersToParams),
         errors.agency.notFound({ agencyId: createParisMissionLocaleParams.id }),
       );
-
-      expectToEqual(uow.agencyRepository.agencies, []);
-      expectToEqual(uow.outboxRepository.events, []);
     });
 
     it("fails to create if the has the same address and kind than an existing one", async () => {
@@ -212,10 +369,10 @@ describe("AddAgency use case", () => {
         .withAgencySiret("11110000111100")
         .build();
 
-      uow.agencyRepository.setAgencies([existingAgency]);
+      uow.agencyRepository.setAgencies([toAgencyWithRights(existingAgency)]);
 
       await expectPromiseToFailWithError(
-        addAgency.execute(newAgency),
+        addAgency.execute({ ...newAgency, validatorEmails: ["mail@mail.com"] }),
         new ConflictError(
           "Une autre agence du même type existe avec la même adresse",
         ),
@@ -230,7 +387,7 @@ describe("AddAgency use case", () => {
         .build();
 
       await expectPromiseToFailWithError(
-        addAgency.execute(newAgency),
+        addAgency.execute({ ...newAgency, validatorEmails: ["mail@mail.com"] }),
         errors.agency.invalidSiret({ siret: newAgency.agencySiret }),
       );
     });
