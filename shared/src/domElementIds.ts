@@ -654,7 +654,6 @@ export const domElementIds = {
       tabContainer: "im-agency-dashboard__tab-container",
     },
   },
-  manageConventionAdmin: {},
   manageConventionInclusionConnected: {
     erroredConventionHandledModal:
       "im-errored-convention-handled-confirmation-modal",
