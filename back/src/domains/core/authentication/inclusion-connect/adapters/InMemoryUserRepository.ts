@@ -3,7 +3,6 @@ import {
   Email,
   GetUsersFilters,
   OAuthGatewayProvider,
-  User,
   UserId,
   UserWithAdminRights,
   errors,
@@ -13,11 +12,15 @@ import { UserOnRepository, UserRepository } from "../port/UserRepository";
 export class InMemoryUserRepository implements UserRepository {
   #usersById: Record<string, UserWithAdminRights> = {};
 
-  public async findByExternalId(externalId: string): Promise<User | undefined> {
+  public async findByExternalId(
+    externalId: string,
+  ): Promise<UserOnRepository | undefined> {
     return this.users.find((user) => user.externalId === externalId);
   }
 
-  public async findByEmail(email: Email): Promise<User | undefined> {
+  public async findByEmail(
+    email: Email,
+  ): Promise<UserOnRepository | undefined> {
     return this.users.find((user) => user.email === email);
   }
 
@@ -37,7 +40,7 @@ export class InMemoryUserRepository implements UserRepository {
     return users;
   }
 
-  public async save(user: User): Promise<void> {
+  public async save(user: UserOnRepository): Promise<void> {
     this.#usersById[user.id] = user;
     if (
       values(this.#usersById).filter(({ email }) => email === user.email)
@@ -61,31 +64,31 @@ export class InMemoryUserRepository implements UserRepository {
   }
 
   // for test purpose
-  public get users(): User[] {
+  public get users(): UserOnRepository[] {
     return values(this.#usersById);
   }
 
-  public set users(users: User[]) {
-    this.#usersById = users.reduce(
+  public set users(users: UserOnRepository[]) {
+    this.#usersById = users.reduce<Record<UserId, UserOnRepository>>(
       (acc, user) => ({
         ...acc,
         [user.id]: user,
       }),
-      {} as Record<string, User>,
+      {},
     );
   }
 
-  public async getById(userId: string): Promise<User | undefined> {
+  public async getById(userId: string): Promise<UserOnRepository | undefined> {
     return this.users.find((user) => user.id === userId);
   }
 
-  public async getUsers(filters: GetUsersFilters): Promise<User[]> {
+  public async getUsers(filters: GetUsersFilters): Promise<UserOnRepository[]> {
     return this.users.filter((user) =>
       user.email.toLowerCase().includes(filters.emailContains.toLowerCase()),
     );
   }
 
-  public async updateEmail(userId: string, email: string): Promise<void> {
+  public async updateEmail(userId: UserId, email: string): Promise<void> {
     this.#usersById[userId].email = email;
   }
 }
