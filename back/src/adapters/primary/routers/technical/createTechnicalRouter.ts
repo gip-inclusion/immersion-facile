@@ -9,7 +9,10 @@ import type { AppDependencies } from "../../../../config/bootstrap/createAppDepe
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
 import { UploadFileInput } from "../../../../domains/core/file-storage/useCases/UploadFile";
+import { createLogger } from "../../../../utils/logger";
 import { createOpenApiSpecV2 } from "../apiKeyAuthRouter/createOpenApiV2";
+
+const logger = createLogger(__filename);
 
 export const createTechnicalRouter = (
   deps: AppDependencies,
@@ -35,6 +38,19 @@ export const createTechnicalRouter = (
   const technicalSharedRouter = createExpressSharedRouter(
     technicalRoutes,
     technicalRouter,
+    {
+      onInputValidationError: (zodError, route) => {
+        if (route.url === technicalRoutes.inboundEmailParsing.url) {
+          logger.error({
+            message: `Inbound email parsing failed : ${route.method.toUpperCase()} ${
+              route.url
+            }`,
+            error: zodError,
+          });
+        }
+        return zodError;
+      },
+    },
   );
 
   technicalSharedRouter.inboundEmailParsing(
