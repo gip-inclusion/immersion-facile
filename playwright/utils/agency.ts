@@ -56,10 +56,11 @@ export const fillAndSubmitBasicAgencyForm = async (
   await page
     .locator(`#${domElementIds.addAgency.signatureInput}`)
     .fill("Mon équipe de ouf !");
-  await page.locator(`#${domElementIds.addAgency.submitButton}`).click();
-  return await page
+  const agencyId = await page
     .locator(`#${domElementIds.addAgency.id}`)
     .getAttribute("value");
+  await page.locator(`#${domElementIds.addAgency.submitButton}`).click();
+  return agencyId;
 };
 
 export const rejectAgencyInAdmin = async (page: Page, agencyId: AgencyId) => {
