@@ -12,6 +12,7 @@ import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
+import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardPage";
@@ -97,7 +98,7 @@ const getPageByRouteName: {
   ),
   adminUserDetail: (route) => (
     <AdminPrivateRoute route={route}>
-      <div>User detail, user id is : ${route.params.userId}</div>
+      <AdminUserDetail route={route} />
     </AdminPrivateRoute>
   ),
   agencyDashboard: (route) =>

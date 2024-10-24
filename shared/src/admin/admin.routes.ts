@@ -154,4 +154,15 @@ export const adminRoutes = defineRoutes({
       401: httpErrorSchema,
     },
   }),
+  getIcUser: defineRoute({
+    method: "get",
+    url: "/admin/inclusion-connected-users/:userId",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: inclusionConnectedUserSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
 });

@@ -79,7 +79,7 @@ export const agencyKindList = [
 
 export type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
 
-export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
+export const agencyKindToLabel: Record<AgencyKind, string> = {
   "mission-locale": "Mission Locale",
   "pole-emploi": "France Travail (anciennement Pôle emploi)",
   "cap-emploi": "Cap Emploi",
@@ -91,6 +91,7 @@ export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   cma: "Chambre des métiers de l'Artisanat",
   "chambre-agriculture": "Chambre d'agriculture",
   autre: "Autre",
+  "immersion-facile": "Immersion Facile",
 };
 
 export const allAgencyKindsAllowedToAdd = keys(agencyKindToLabel);
