@@ -13,6 +13,7 @@ import {
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
+  UserId,
   UserInList,
   UserParamsForAgency,
   WithAgencyIdAndUserId,
@@ -45,6 +46,7 @@ const simulatedAgencyDtos: AgencyRight[] = [
     isNotifiedByEmail: true,
   },
 ];
+
 export class SimulatedAdminGateway implements AdminGateway {
   public updateFeatureFlags$ = (): Observable<void> => of(undefined);
 
@@ -200,6 +202,27 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of(
       simulatedUsers.filter((user) => user.email.includes(emailContains)),
     );
+  }
+
+  public getIcUser$(
+    params: {
+      userId: UserId;
+    },
+    _token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser> {
+    const icUser = simulatedUsers.find((user) => user.id === params.userId);
+    if (!icUser) throw new Error(`User ${params.userId} not found`);
+    return of({
+      ...icUser,
+      agencyRights: [
+        {
+          agency: new AgencyDtoBuilder().build(),
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+      ],
+      dashboards: { agencies: {}, establishments: {} },
+    });
   }
 }
 

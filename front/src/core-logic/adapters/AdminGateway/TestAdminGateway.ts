@@ -52,6 +52,8 @@ export class TestAdminGateway implements AdminGateway {
 
   public listUsersResponse$ = new Subject<UserInList[]>();
 
+  public getIcUserResponse$ = new Subject<InclusionConnectedUser>();
+
   public updateFeatureFlags$ = (
     params: SetFeatureFlagParam,
     _adminToken: InclusionConnectJwt,
@@ -123,5 +125,12 @@ export class TestAdminGateway implements AdminGateway {
     _token: string,
   ): Observable<UserInList[]> {
     return this.listUsersResponse$;
+  }
+
+  public getIcUser$(
+    _params: { userId: string },
+    _token: string,
+  ): Observable<InclusionConnectedUser> {
+    return this.getIcUserResponse$;
   }
 }

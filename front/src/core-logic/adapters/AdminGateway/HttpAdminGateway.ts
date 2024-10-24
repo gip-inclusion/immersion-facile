@@ -12,6 +12,7 @@ import {
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
+  UserId,
   UserInList,
   UserParamsForAgency,
   WithAgencyIdAndUserId,
@@ -258,6 +259,22 @@ export class HttpAdminGateway implements AdminGateway {
             .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
+    );
+  }
+
+  public getIcUser$(
+    params: { userId: UserId },
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser> {
+    return from(
+      this.httpClient
+        .getIcUser({ headers: { authorization: token }, urlParams: params })
+        .then((response) => {
+          return match(response)
+            .with({ status: 200 }, ({ body }) => body ?? undefined)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow);
+        }),
     );
   }
 }

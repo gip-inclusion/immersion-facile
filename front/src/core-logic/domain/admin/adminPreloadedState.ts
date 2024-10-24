@@ -1,5 +1,6 @@
 import { agencyAdminInitialState } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { dashboardInitialState } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
+import { fetchUserInitialState } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
 import { icUsersAdminInitialState } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { listUsersInitialState } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { notificationsInitialState } from "src/core-logic/domain/admin/notifications/notificationsSlice";
@@ -17,5 +18,6 @@ export const adminPreloadedState = (
   inclusionConnectedUsersAdmin: icUsersAdminInitialState,
   apiConsumer: apiConsumerInitialState,
   listUsers: listUsersInitialState,
+  fetchUser: fetchUserInitialState,
   ...state,
 });

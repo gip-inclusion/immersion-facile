@@ -77,6 +77,17 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
+  sharedAdminRouter.getIcUser(deps.inclusionConnectAuthMiddleware, (req, res) =>
+    sendHttpResponse(req, res, () => {
+      const currentUser = req.payloads?.currentUser;
+      if (!currentUser) throw errors.user.unauthorized();
+      return deps.useCases.getInclusionConnectedUser.execute(
+        { userId: req.params.userId },
+        currentUser,
+      );
+    }),
+  );
+
   sharedAdminRouter.updateUserRoleForAgency(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
