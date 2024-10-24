@@ -1,15 +1,13 @@
 import { Locator, Page, expect } from "@playwright/test";
 import {
-  AdminTab,
-  AdminTabList,
+  AdminTabRouteName,
   EstablishmentDashboardTab,
-  EstablishmentDashboardTabList,
-  adminTabsList,
+  adminTabRouteNames,
   domElementIds,
   frontRoutes,
 } from "shared";
 
-export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
+export const goToAdminTab = async (page: Page, tabName: AdminTabRouteName) => {
   const adminButton = await page.locator("#fr-header-main-navigation-button-4");
   await expect(adminButton).toBeVisible();
   await adminButton.click();
@@ -19,7 +17,7 @@ export const goToAdminTab = async (page: Page, tabName: AdminTab) => {
   await page.waitForTimeout(500); // wait for the submenu to close (its visibility makes hard to click on tabs)
   const tabLocator = await page
     .locator(".fr-tabs__list li")
-    .nth(getTabIndexByTabName(adminTabsList, tabName))
+    .nth(getTabIndexByTabName(adminTabRouteNames, tabName))
     .locator(".fr-tabs__tab");
   await expect(tabLocator).toBeVisible();
   await tabLocator.click();
@@ -31,7 +29,7 @@ export const openEmailInAdmin = async (
   emailType: string,
   elementIndex = 0,
 ) => {
-  await goToAdminTab(page, "notifications");
+  await goToAdminTab(page, "adminNotifications");
   const emailSection = page
     .locator(`.fr-accordion:has-text("${emailType}")`)
     .nth(elementIndex);
@@ -54,8 +52,8 @@ export const getMagicLinkInEmailWrapper = (
     .getAttribute("href");
 
 export const getTabIndexByTabName = (
-  tabList: AdminTabList | EstablishmentDashboardTabList,
-  tabName: AdminTab | EstablishmentDashboardTab,
+  tabList: readonly AdminTabRouteName[] | readonly EstablishmentDashboardTab[],
+  tabName: AdminTabRouteName | EstablishmentDashboardTab,
 ) => {
   const index = tabList.findIndex((tab) => tab === tabName);
   if (index === -1) {

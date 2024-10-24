@@ -272,13 +272,13 @@ export const LayoutHeader = () => {
   if (isAdminConnected) {
     links.push({
       text: "Admin",
-      isActive: currentRoute.name === routes.admin({ tab: "conventions" }).name,
+      isActive: currentRoute.name === routes.adminConventions().name,
       menuLinks: [
         {
           text: "Backoffice",
           isActive: false,
           linkProps: {
-            ...routes.admin({ tab: "conventions" }).link,
+            ...routes.adminConventions().link,
             id: adminIds.backOffice,
           },
         },
@@ -286,7 +286,7 @@ export const LayoutHeader = () => {
           text: "Notifications",
           isActive: false,
           linkProps: {
-            ...routes.admin({ tab: "notifications" }).link,
+            ...routes.adminNotifications().link,
             id: adminIds.emails,
           },
         },

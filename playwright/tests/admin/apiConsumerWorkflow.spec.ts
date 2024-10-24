@@ -10,7 +10,7 @@ test.describe("Api Consumer Workflow", () => {
   test.use({ storageState: testConfig.adminAuthFile });
   test("Can add an api consumer", async ({ page }) => {
     await page.goto("/");
-    await goToAdminTab(page, "technical-options");
+    await goToAdminTab(page, "adminTechnicalOptions");
     await page
       .locator(
         `#${domElementIds.admin.technicalOptionsTab.addApiConsumerButton}`,
@@ -95,7 +95,7 @@ test.describe("Api Consumer Workflow", () => {
   }) => {
     await page.goto("/");
 
-    await goToAdminTab(page, "technical-options");
+    await goToAdminTab(page, "adminTechnicalOptions");
 
     const editApiConsumerButtonLocator = await page
       .locator(

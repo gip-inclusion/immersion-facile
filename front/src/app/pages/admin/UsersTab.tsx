@@ -7,6 +7,7 @@ import { domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { routes } from "src/app/routes/routes";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 
@@ -71,7 +72,7 @@ const UsersTable = () => {
     <Table
       fixed
       id={domElementIds.admin.usersTab.usersTable}
-      headers={["Utilisateur", "Nombre d'agences liées"]}
+      headers={["Utilisateur", "Nombre d'agences liées", "Actions"]}
       data={users.map((user) => [
         <NameAndEmailInTable
           firstName={user.firstName}
@@ -79,6 +80,7 @@ const UsersTable = () => {
           email={user.email}
         />,
         user.numberOfAgencies,
+        <a {...routes.adminUserDetail({ userId: user.id })}>Détails</a>,
       ])}
     />
   );

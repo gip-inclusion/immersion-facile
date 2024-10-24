@@ -7,6 +7,8 @@ import { agenciesAdminEpics } from "src/core-logic/domain/admin/agenciesAdmin/ag
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.epics";
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
+import { fetchUserEpics } from "src/core-logic/domain/admin/fetchUser/fetchUser.epic";
+import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
 import { icUsersAdminEpics } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.epics";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { listUsersEpics } from "src/core-logic/domain/admin/listUsers/listUsers.epics";
@@ -70,6 +72,7 @@ const allEpics: AppEpic<any>[] = [
   ...searchEpics,
   ...siretEpics,
   ...listUsersEpics,
+  ...fetchUserEpics,
 ];
 
 const appReducer = combineReducers({
@@ -80,6 +83,7 @@ const appReducer = combineReducers({
     [notificationsSlice.name]: notificationsSlice.reducer,
     [apiConsumerSlice.name]: apiConsumerSlice.reducer,
     [listUsersSlice.name]: listUsersSlice.reducer,
+    [fetchUserSlice.name]: fetchUserSlice.reducer,
   }),
   [agencyAdminSlice.name]: agencyAdminSlice.reducer,
   [agenciesSlice.name]: agenciesSlice.reducer,

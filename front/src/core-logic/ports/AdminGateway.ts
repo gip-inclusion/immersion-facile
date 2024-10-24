@@ -12,6 +12,7 @@ import {
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
+  UserId,
   UserInList,
   UserParamsForAgency,
   WithAgencyIdAndUserId,
@@ -73,4 +74,9 @@ export interface AdminGateway {
     params: GetUsersFilters,
     token: InclusionConnectJwt,
   ): Observable<UserInList[]>;
+
+  getIcUser$(
+    params: { userId: UserId },
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser>;
 }
