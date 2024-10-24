@@ -19,12 +19,12 @@ import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGen
 const updateAllPeAgenciesScript = async () => {
   const config = AppConfig.createFromEnv();
   const axiosInstance = axios.create({ timeout: config.externalAxiosTimeout });
-  const peAxiosHttpClient = createPeFetchSharedClient(config);
+  const peFetchHttpClient = createPeFetchSharedClient(config);
 
   const httpPeAgenciesReferential = new HttpPeAgenciesReferential(
     config.peApiUrl,
     new HttpPoleEmploiGateway(
-      peAxiosHttpClient,
+      peFetchHttpClient,
       new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
         new RealTimeGateway(),
         "expires_in",

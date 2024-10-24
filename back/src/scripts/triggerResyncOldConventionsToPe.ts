@@ -17,10 +17,10 @@ const config = AppConfig.createFromEnv();
 
 const executeUsecase = async () => {
   const timeGateway = new RealTimeGateway();
-  const peAxiosHttpClient = createPeFetchSharedClient(config);
+  const peFetchHttpClient = createPeFetchSharedClient(config);
 
   const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
-    peAxiosHttpClient,
+    peFetchHttpClient,
     new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
       timeGateway,
       "expires_in",

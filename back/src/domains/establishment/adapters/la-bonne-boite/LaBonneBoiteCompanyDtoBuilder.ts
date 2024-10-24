@@ -83,10 +83,10 @@ export class LaBonneBoiteCompanyDtoBuilder
     });
   }
 
-  public withPosition(location: GeoPositionDto) {
+  public withPosition(position: GeoPositionDto) {
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
-      location,
+      location: position,
     });
   }
 

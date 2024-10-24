@@ -8,12 +8,12 @@ import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGat
 import { HttpPeAgenciesReferential } from "./HttpPeAgenciesReferential";
 
 const config = AppConfig.createFromEnv();
-const axiosHttpClient = createPeFetchSharedClient(config);
+const fetchHttpClient = createPeFetchSharedClient(config);
 
 const referencielAgencesPE = new HttpPeAgenciesReferential(
   config.peApiUrl,
   new HttpPoleEmploiGateway(
-    axiosHttpClient,
+    fetchHttpClient,
     new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
       new RealTimeGateway(),
       "expires_in",
