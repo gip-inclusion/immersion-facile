@@ -38,13 +38,13 @@ const rawAdminTabs: Record<AdminTabRouteName, RawAdminTab> = {
     label: "Agences",
     content: <AgencyTab />,
   },
-  adminUsers: {
-    label: "Utilisateurs",
-    content: <UsersTab />,
-  },
   adminEstablishments: {
     label: "Établissements",
     content: <EstablishmentsTab />,
+  },
+  adminUsers: {
+    label: "Utilisateurs",
+    content: <UsersTab />,
   },
   adminNotifications: {
     label: "Notifications",
