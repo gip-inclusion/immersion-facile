@@ -2,7 +2,7 @@ import axios from "axios";
 import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
-import { createAxiosSharedClient } from "shared-routes/axios";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { HttpPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
 import { createPoleEmploiRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/PoleEmploiRoutes";
@@ -99,16 +99,10 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
   };
 };
 
-const configureCreateAxiosHttpClientForExternalAPIs =
-  (config: AppConfig) =>
+const configureCreateFetchHttpClientForExternalAPIs =
+  () =>
   <R extends Record<string, UnknownSharedRoute>>(routes: R) =>
-    createAxiosSharedClient(
-      routes,
-      axios.create({
-        timeout: config.externalAxiosTimeout,
-      }),
-      { skipResponseValidation: true },
-    );
+    createFetchSharedClient(routes, fetch, { skipResponseValidation: true });
 
 // prettier-ignore
 export type Gateways = ReturnType<typeof createGateways> extends Promise<
@@ -133,8 +127,8 @@ export const createGateways = async (
     },
   });
 
-  const createAxiosHttpClientForExternalAPIs =
-    configureCreateAxiosHttpClientForExternalAPIs(config);
+  const createFetchHttpClientForExternalAPIs =
+    configureCreateFetchHttpClientForExternalAPIs();
 
   const timeGateway =
     config.timeGateway === "CUSTOM"
@@ -144,7 +138,7 @@ export const createGateways = async (
   const poleEmploiGateway =
     config.poleEmploiGateway === "HTTPS"
       ? new HttpPoleEmploiGateway(
-          createAxiosHttpClientForExternalAPIs(
+          createFetchHttpClientForExternalAPIs(
             createPoleEmploiRoutes(config.peApiUrl),
           ),
           new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
@@ -161,7 +155,7 @@ export const createGateways = async (
   const peConnectGateway: PeConnectGateway =
     config.peConnectGateway === "HTTPS"
       ? new HttpPeConnectGateway(
-          createAxiosHttpClientForExternalAPIs(
+          createFetchHttpClientForExternalAPIs(
             makePeConnectExternalRoutes({
               peApiUrl: config.peApiUrl,
               peAuthCandidatUrl: config.peAuthCandidatUrl,
@@ -178,12 +172,12 @@ export const createGateways = async (
   const oAuthGateway: OAuthGateway =
     config.inclusionConnectGateway === "HTTPS"
       ? new HttpOAuthGateway(
-          createAxiosHttpClientForExternalAPIs(
+          createFetchHttpClientForExternalAPIs(
             makeInclusionConnectRoutes(
               config.inclusionConnectConfig.providerBaseUri,
             ),
           ),
-          createAxiosHttpClientForExternalAPIs(
+          createFetchHttpClientForExternalAPIs(
             makeProConnectRoutes(config.proConnectConfig.providerBaseUri),
           ),
           config.inclusionConnectConfig,
@@ -196,7 +190,7 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryEmailValidationGateway(),
       EMAILABLE: () =>
         new EmailableEmailValidationGateway(
-          createAxiosHttpClientForExternalAPIs(emailableValidationRoutes),
+          createFetchHttpClientForExternalAPIs(emailableValidationRoutes),
           config.emailableApiKey,
         ),
     })[config.emailValidationGateway]();
@@ -206,7 +200,7 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryAppellationsGateway(),
       DIAGORIENTE: () =>
         new DiagorienteAppellationsGateway(
-          createAxiosHttpClientForExternalAPIs(diagorienteAppellationsRoutes),
+          createFetchHttpClientForExternalAPIs(diagorienteAppellationsRoutes),
           new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
             timeGateway,
             diagorienteTokenScope,
@@ -222,7 +216,7 @@ export const createGateways = async (
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
       new HttpAddressGateway(
-        createAxiosHttpClientForExternalAPIs(addressesExternalRoutes),
+        createFetchHttpClientForExternalAPIs(addressesExternalRoutes),
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
       ),
@@ -237,7 +231,7 @@ export const createGateways = async (
 
     const brevoNotificationGateway = new BrevoNotificationGateway(
       {
-        httpClient: createAxiosHttpClientForExternalAPIs(
+        httpClient: createFetchHttpClientForExternalAPIs(
           brevoNotificationGatewayRoutes,
         ),
         blackListedEmailDomains: config.emailDomainBlackList,
@@ -273,7 +267,7 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemorySiretGateway(),
       ANNUAIRE_DES_ENTREPRISES: () =>
         new AnnuaireDesEntreprisesSiretGateway(
-          createAxiosHttpClientForExternalAPIs(
+          createFetchHttpClientForExternalAPIs(
             annuaireDesEntreprisesSiretRoutes,
           ),
           new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
@@ -290,7 +284,7 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryPdfGeneratorGateway(),
       SCALINGO: () =>
         new ScalingoPdfGeneratorGateway(
-          createAxiosHttpClientForExternalAPIs(
+          createFetchHttpClientForExternalAPIs(
             makeScalingoPdfGeneratorRoutes(config.pdfGenerator.baseUrl),
           ),
           config.pdfGenerator.apiKey,
@@ -313,7 +307,7 @@ export const createGateways = async (
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(
-            createAxiosHttpClientForExternalAPIs(
+            createFetchHttpClientForExternalAPIs(
               createLbbRoutes(config.peApiUrl),
             ),
             poleEmploiGateway,
@@ -342,7 +336,7 @@ export const createGateways = async (
             apiKey: config.apiKeyBrevo,
             establishmentContactListId: config.brevoEstablishmentContactListId,
             httpClient:
-              createAxiosHttpClientForExternalAPIs(brevoContactRoutes),
+              createFetchHttpClientForExternalAPIs(brevoContactRoutes),
           })
         : new InMemoryEstablishmentMarketingGateway(),
     siret: getSiretGateway(config.siretGateway, config, timeGateway),

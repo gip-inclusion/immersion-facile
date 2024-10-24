@@ -1,5 +1,5 @@
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createPeFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
 import { PoleEmploiGetAccessTokenResponse } from "../../../convention/ports/PoleEmploiGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
@@ -8,12 +8,12 @@ import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGat
 import { HttpPeAgenciesReferential } from "./HttpPeAgenciesReferential";
 
 const config = AppConfig.createFromEnv();
-const axiosHttpClient = createPeAxiosSharedClient(config);
+const fetchHttpClient = createPeFetchSharedClient(config);
 
 const referencielAgencesPE = new HttpPeAgenciesReferential(
   config.peApiUrl,
   new HttpPoleEmploiGateway(
-    axiosHttpClient,
+    fetchHttpClient,
     new InMemoryCachingGateway<PoleEmploiGetAccessTokenResponse>(
       new RealTimeGateway(),
       "expires_in",
