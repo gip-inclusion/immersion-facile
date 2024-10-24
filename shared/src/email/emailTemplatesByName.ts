@@ -1322,9 +1322,10 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         subject:
           "Immersion Facilitée - Activation de l’accès au back office de votre structure",
         greetings: `Bonjour ${firstName} ${lastName},`,
-        content: `<p>Vous pouvez désormais accéder au tableau de bord de votre structure: ${agencyName}.</p>
-        <strong>Voici le récapitulatif de votre profil utilisateur :</strong>
+        content: `
+        Vous pouvez désormais accéder au tableau de bord de votre structure&nbsp: ${agencyName}.
 
+        <strong>Voici le récapitulatif de votre profil utilisateur :</strong>
         ${generateUserInfo(
           firstName,
           lastName,
@@ -1789,15 +1790,13 @@ const generateUserInfo = (
     firstName && lastName ? `${firstName} ${lastName} - ${email}` : email;
 
   return `
-    <ul style="list-style-type: none; border: 1px solid #ddd; padding: 5px;">
-      <li><strong>${nameDisplay}</strong></li>
+    <ul style="list-style-type: none; border: 1px solid #ddd; padding: 16px;"><li><strong>${nameDisplay}</strong></li>
       ${rolesDescriptionList}
       <li>${
         isNotified
           ? "Reçoit les emails de toutes les conventions de "
           : "Ne reçoit aucun email pour "
       } ${agencyName}</li>
-      <li><a href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" target="_blank">Espace personnel</a></li>
-    </ul>
+      <li><a href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" target="_blank">Espace personnel</a></li></ul>
   `;
 };
