@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 export type TooltipProps =
   | {
@@ -14,10 +14,9 @@ export type TooltipProps =
       id?: string;
       className?: string;
     };
-const generateRandomId = () => Math.floor(Math.random() * 1000);
 
 export const Tooltip = (props: TooltipProps) => {
-  const id = props.id ?? generateRandomId().toString();
+  const id = props.id ?? `tooltip-${useId()}`;
 
   return (
     <>
@@ -27,7 +26,9 @@ export const Tooltip = (props: TooltipProps) => {
             "aria-describedby": id,
           })}
           <span
-            className={`fr-tooltip fr-placement ${props.className}`}
+            className={`fr-tooltip fr-placement ${
+              props.className ? props.className : ""
+            }`}
             id={id}
             role="tooltip"
             aria-hidden="true"
@@ -46,7 +47,9 @@ export const Tooltip = (props: TooltipProps) => {
             Plus d'information ?
           </button>
           <span
-            className={`fr-tooltip fr-placement ${props.className}`}
+            className={`fr-tooltip fr-placement ${
+              props.className ? props.className : ""
+            }`}
             id={id}
             role="tooltip"
             aria-hidden="true"

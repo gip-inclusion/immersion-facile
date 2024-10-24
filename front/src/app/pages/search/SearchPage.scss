@@ -1,3 +1,5 @@
+@import "react-design-system/src/config/responsive";
+
 .im-search-page {
   &__form {
     display: flex;
@@ -9,5 +11,10 @@
   }
   &__results-summary {
     text-align: right;
+  }
+  &__search-filters {
+    @include for-screen-min($bp-md) {
+      display: flex;
+    }
   }
 }

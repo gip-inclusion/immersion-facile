@@ -1,7 +1,7 @@
-import { FrClassName, FrIconClassName, fr } from "@codegouvfr/react-dsfr";
+import { FrIconClassName, fr } from "@codegouvfr/react-dsfr";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Tag from "@codegouvfr/react-dsfr/Tag";
-import React, { useState } from "react";
+import React, { ElementRef, useLayoutEffect, useRef, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./SearchFilter.styles";
 
@@ -13,7 +13,7 @@ export type SearchFilterProps = {
     content: React.ReactNode;
   };
   iconId: FrIconClassName;
-  className?: FrClassName;
+  className?: string;
 };
 
 export const SearchFilter = ({
@@ -26,15 +26,35 @@ export const SearchFilter = ({
   const { cx } = useStyles();
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const hasValue = values && values.length > 0;
+  const wrapperElement = useRef<ElementRef<"div">>(null);
+  useLayoutEffect(() => {
+    if (isOpened && wrapperElement.current) {
+      wrapperElement.current.querySelector("input")?.focus();
+    }
+    // close the submenu when the user clicks outside of it
+    document.body.addEventListener("click", handleClickOutside);
+  });
+  const handleClickOutside = (event: MouseEvent) => {
+    console.log("event.target", event.target);
+    console.log(wrapperElement.current.contains(event.target as Node));
+    if (
+      isOpened &&
+      wrapperElement.current &&
+      (!wrapperElement.current.contains(event.target as Node) ||
+        !wrapperElement.current.contains((event.target as Node).parentNode))
+    ) {
+      setIsOpened(false);
+    }
+  };
   return (
-    <div className={cx(Styles.root)}>
+    <div className={cx(Styles.root)} ref={wrapperElement}>
       <Tag
         iconId={iconId}
         className={className}
         nativeButtonProps={{
           onClick: (event) => {
             event.preventDefault();
-            setIsOpened((opened) => !opened);
+            setIsOpened(true);
           },
         }}
       >
@@ -59,7 +79,6 @@ export const SearchFilter = ({
               {
                 children: "Appliquer",
                 type: "submit",
-                onClick: () => setIsOpened(false),
                 className: fr.cx("fr-mb-0"),
               },
             ]}

@@ -22,7 +22,7 @@ const romeSearchMatchToProposal = ({
 });
 
 type AppellationAutocompleteProps = {
-  label: string;
+  label: React.ReactNode;
   initialValue?: AppellationAndRomeDto | undefined;
   onAppellationSelected: (p: AppellationAndRomeDto) => void;
   onInputClear?: () => void;

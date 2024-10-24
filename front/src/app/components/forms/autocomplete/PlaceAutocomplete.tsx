@@ -10,7 +10,7 @@ import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice"
 import { useStyles } from "tss-react/dsfr";
 
 export type PlaceAutocompleteProps = {
-  label: string;
+  label: React.ReactNode;
   disabled?: boolean;
   headerClassName?: string;
   styles?: React.CSSProperties;

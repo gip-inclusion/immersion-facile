@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
 import React, { ElementRef, useEffect, useRef, useState } from "react";
@@ -81,6 +82,9 @@ export const SearchPage = ({
   const { enableSearchByScore } = useAppSelector(
     featureFlagSelectors.featureFlagState,
   );
+  const [tempValue, setTempValue] = useState<Partial<SearchPageParams> | null>(
+    null,
+  );
   const initialValues: SearchPageParams = {
     place: "",
     sortedBy: enableSearchByScore ? "score" : "date",
@@ -138,7 +142,21 @@ export const SearchPage = ({
 
   const triggerSearch = (values: SearchPageParams) => {
     setSearchMade(values);
+    setTempValue(values);
     requestSearch(filterFormValues(values));
+  };
+
+  const setTempValuesAsFormValues = (values: Partial<SearchPageParams>) => {
+    keys(values).forEach((key) => {
+      setValue(key, values[key]);
+    });
+  };
+
+  const setTempValueAndKeepData = (values: Partial<SearchPageParams>) => {
+    setTempValue({
+      ...tempValue,
+      ...values,
+    });
   };
 
   useEffect(() => {
@@ -157,6 +175,21 @@ export const SearchPage = ({
       dispatch(searchSlice.actions.clearSearchStatusRequested());
     };
   }, [dispatch]);
+
+  const filteredOptions = getSortedByOptions(
+    areValidGeoParams(formValues),
+    enableSearchByScore.isActive,
+  );
+
+  const appellationInputLabel = (
+    <>
+      {useNaturalLanguageForAppellations
+        ? "Je recherche le métier ou la compétence"
+        : "Je recherche le métier..."}
+    </>
+  );
+
+  const placeInputLabel = <>...dans la ville</>;
 
   return (
     <HeaderFooterLayout>
@@ -179,9 +212,10 @@ export const SearchPage = ({
             () => (
               <>
                 <PageHeader
-                  title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
+                  title="Trouver une immersion"
                   breadcrumbs={<Breadcrumbs />}
                 >
+                  <p>Dans une entreprise ou une administration publique</p>
                   <form
                     onSubmit={handleSubmit((value) =>
                       triggerSearch(filterFormValues(value)),
@@ -195,11 +229,7 @@ export const SearchPage = ({
                   >
                     <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
                       <AppellationAutocomplete
-                        label={
-                          useNaturalLanguageForAppellations
-                            ? "Je recherche le métier ou la compétence :"
-                            : "Je recherche le métier :"
-                        }
+                        label={appellationInputLabel}
                         initialValue={
                           formValues.appellations
                             ? formValues.appellations[0]
@@ -227,7 +257,7 @@ export const SearchPage = ({
                     </div>
                     <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
                       <PlaceAutocomplete
-                        label="Je me situe dans la ville de :"
+                        label={placeInputLabel}
                         initialInputValue={formValues.place}
                         onValueChange={(lookupSearchResult) => {
                           if (!lookupSearchResult) return;
@@ -293,7 +323,7 @@ export const SearchPage = ({
                   </form>
                 </PageHeader>
 
-                <div className={fr.cx("fr-pt-10w")}>
+                <div className={fr.cx("fr-pt-6w", "fr-mt-6w", "fr-hr")}>
                   <SearchInfoSection />
                   <SectionAccordion />
                   <SectionTextEmbed
@@ -315,11 +345,13 @@ export const SearchPage = ({
               <>
                 <Breadcrumbs />
                 <form
-                  onSubmit={handleSubmit(
-                    (value) => triggerSearch(filterFormValues(value)),
-                    (error) => console.error(error),
-                  )}
-                  className={cx(fr.cx("fr-container", "fr-grid-row"))}
+                  onSubmit={handleSubmit((value) => {
+                    if (tempValue !== null) {
+                      setTempValuesAsFormValues(tempValue);
+                    }
+                    triggerSearch(filterFormValues(value));
+                  })}
+                  className={cx(fr.cx("fr-container"), Styles.searchFilters)}
                   id={domElementIds.search.searchForm}
                 >
                   <SearchFilter
@@ -337,26 +369,22 @@ export const SearchPage = ({
                       content: (
                         <>
                           <AppellationAutocomplete
-                            label={
-                              useNaturalLanguageForAppellations
-                                ? "Je recherche le métier ou la compétence :"
-                                : "Je recherche le métier :"
-                            }
+                            label={appellationInputLabel}
                             initialValue={
-                              formValues.appellations
-                                ? formValues.appellations[0]
+                              route.params.appellations
+                                ? route.params.appellations[0]
                                 : undefined
                             }
                             onAppellationSelected={(newAppellationAndRome) => {
-                              setValue("appellations", [newAppellationAndRome]);
+                              setTempValueAndKeepData({
+                                appellations: [newAppellationAndRome],
+                              });
                             }}
-                            selectedAppellations={
-                              formValues.appellations
-                                ? [formValues.appellations[0]]
-                                : undefined
-                            }
+                            selectedAppellations={undefined}
                             onInputClear={() => {
-                              setValue("appellations", undefined);
+                              setTempValueAndKeepData({
+                                appellations: undefined,
+                              });
                             }}
                             id={domElementIds.search.appellationAutocomplete}
                             placeholder={
@@ -383,39 +411,42 @@ export const SearchPage = ({
                   <SearchFilter
                     defaultValue="France entière"
                     iconId="fr-icon-map-pin-2-line"
-                    className="fr-ml-2w"
+                    className={fr.cx("fr-ml-md-2w", "fr-mt-2w", "fr-mt-md-0")}
                     values={formValues.place ? [formValues.place] : []}
                     submenu={{
                       title: "Où souhaitez-vous faire votre immersion ?",
                       content: (
                         <>
                           <PlaceAutocomplete
-                            label="...dans la ville"
+                            label={placeInputLabel}
                             initialInputValue={formValues.place}
                             onValueChange={(lookupSearchResult) => {
                               if (!lookupSearchResult) return;
-                              setValue(
-                                "latitude",
-                                lookupSearchResult.position.lat,
-                              );
-                              setValue(
-                                "longitude",
-                                lookupSearchResult.position.lon,
-                              );
-                              setValue("place", lookupSearchResult.label);
+                              setTempValueAndKeepData({
+                                place: lookupSearchResult.label,
+                                latitude: lookupSearchResult.position.lat,
+                                longitude: lookupSearchResult.position.lon,
+                              });
                               if (!formValues.distanceKm) {
-                                setValue("distanceKm", 10);
+                                setTempValueAndKeepData({
+                                  distanceKm: 10,
+                                });
                               }
                             }}
                             id={domElementIds.search.placeAutocompleteInput}
                             onInputClear={() => {
-                              setValue("latitude", initialValues.latitude);
-                              setValue("longitude", initialValues.latitude);
-                              setValue("place", initialValues.place);
+                              setTempValueAndKeepData({
+                                place: initialValues.place,
+                                latitude: initialValues.latitude,
+                                longitude: initialValues.longitude,
+                                distanceKm: initialValues.distanceKm,
+                              });
+
                               if (formValues.sortedBy === "distance") {
-                                setValue("sortedBy", "date");
+                                setTempValueAndKeepData({
+                                  sortedBy: "date",
+                                });
                               }
-                              setValue("distanceKm", initialValues.distanceKm);
                             }}
                           />
                           <Select
@@ -436,9 +467,13 @@ export const SearchPage = ({
                                 const value = parseInt(
                                   event.currentTarget.value,
                                 );
-                                setValue("distanceKm", value);
+                                setTempValueAndKeepData({
+                                  distanceKm: value,
+                                });
                                 if (!value) {
-                                  setValue("sortedBy", "date");
+                                  setTempValueAndKeepData({
+                                    distanceKm: value,
+                                  });
                                 }
                               },
                             }}
@@ -449,18 +484,33 @@ export const SearchPage = ({
                   />
                   <SearchFilter
                     defaultValue="Trier par pertinence"
-                    iconId="fr-icon-map-pin-2-line"
-                    className="fr-ml-2w"
-                    values={formValues.place ? [formValues.place] : []}
+                    iconId="fr-icon-arrow-down-line"
+                    className={fr.cx("fr-ml-md-2w", "fr-mt-2w", "fr-mt-md-0")}
+                    values={
+                      formValues.sortedBy
+                        ? [sortedByOptionsLabel[formValues.sortedBy]]
+                        : []
+                    }
                     submenu={{
                       title: "Ordre d’affichage",
                       content: (
-                        <SearchSortedBySelect
-                          searchValues={formValues}
-                          triggerSearch={triggerSearch}
-                          setSortedBy={(sortedBy: SearchSortedBy) =>
-                            setValue("sortedBy", sortedBy)
-                          }
+                        <RadioButtons
+                          options={filteredOptions.map((option) => ({
+                            ...option,
+                            nativeInputProps: {
+                              name: register("sortedBy").name,
+                              value: option.value,
+                              checked: tempValue
+                                ? option.value === tempValue.sortedBy
+                                : false,
+                              onClick: (event) => {
+                                setTempValueAndKeepData({
+                                  sortedBy: event.currentTarget
+                                    .value as SearchSortedBy,
+                                });
+                              },
+                            },
+                          }))}
                         />
                       ),
                     }}
@@ -519,7 +569,7 @@ export const SearchPage = ({
               </>
             ),
           )
-          .exhaustive()}
+          .otherwise(() => null)}
       </MainWrapper>
     </HeaderFooterLayout>
   );
@@ -555,18 +605,18 @@ const canSubmitSearch = (values: SearchPageParams) => {
   return areValidGeoParams(geoParams) || areEmptyGeoParams(geoParams);
 };
 
-const getSortedByOptions = (
+export const getSortedByOptions = (
   hasGeoParams: boolean,
   hasScoreEnabled: boolean,
 ): SelectProps.Option<SearchSortedBy>[] => [
   {
-    label: "Trier par date de publication",
+    label: sortedByOptionsLabel.date,
     value: "date" as const,
   },
   ...(hasScoreEnabled
     ? [
         {
-          label: "Trier par pertinence",
+          label: sortedByOptionsLabel.score,
           value: "score" as const,
         },
       ]
@@ -574,55 +624,15 @@ const getSortedByOptions = (
   ...(hasGeoParams
     ? [
         {
-          label: "Trier par proximité",
+          label: sortedByOptionsLabel.distance,
           value: "distance" as const,
         },
       ]
     : []),
 ];
 
-const SearchSortedBySelect = ({
-  triggerSearch,
-  searchValues,
-  setSortedBy,
-}: {
-  searchValues: SearchPageParams;
-  triggerSearch: (values: SearchPageParams) => void;
-  setSortedBy: (sortedBy: SearchSortedBy) => void;
-}) => {
-  const { sortedBy } = searchValues;
-  const { enableSearchByScore } = useAppSelector(
-    featureFlagSelectors.featureFlagState,
-  );
-  const filteredOptions = getSortedByOptions(
-    areValidGeoParams(searchValues),
-    enableSearchByScore.isActive,
-  );
-  return (
-    <Select
-      label="Trier les résultats"
-      options={filteredOptions}
-      nativeSelectProps={{
-        id: domElementIds.search.sortFilter,
-        value: sortedBy,
-        onChange: (event) => {
-          const value = event.currentTarget.value;
-          setSortedBy(value);
-          if (value === "distance") {
-            if (areValidGeoParams(searchValues)) {
-              triggerSearch({
-                ...searchValues,
-                sortedBy: value,
-              });
-            }
-            return;
-          }
-          triggerSearch({
-            ...searchValues,
-            sortedBy: value,
-          });
-        },
-      }}
-    />
-  );
+const sortedByOptionsLabel = {
+  date: "Trier par date de publication",
+  score: "Trier par pertinence",
+  distance: "Trier par proximité",
 };
