@@ -19,21 +19,22 @@ import { BasicEventCrawler } from "../../../../domains/core/events/adapters/Even
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
-const defaultAddress: AddressDto = {
-  streetNumberAndAddress: "",
-  postcode: "75002",
-  departmentCode: "75",
-  city: "Paris",
-};
-
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withIsAdmin(true)
-  .build();
-
 describe("Agency routes", () => {
+  const defaultAddress: AddressDto = {
+    streetNumberAndAddress: "",
+    postcode: "75002",
+    departmentCode: "75",
+    city: "Paris",
+  };
+
+  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+    .withIsAdmin(true)
+    .buildUser();
+
   let httpClient: HttpClient<AgencyRoutes>;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
@@ -49,10 +50,7 @@ describe("Agency routes", () => {
     httpClient = createSupertestSharedClient(agencyRoutes, deps.request);
 
     inMemoryUow.agencyRepository.setAgencies([]);
-    inMemoryUow.userRepository.setInclusionConnectedUsers([
-      backofficeAdminUser,
-    ]);
-
+    inMemoryUow.userRepository.users = [backofficeAdminUser];
     gateways.timeGateway.defaultDate = new Date();
 
     backofficeAdminToken = generateInclusionConnectJwt({
@@ -87,9 +85,12 @@ describe("Agency routes", () => {
   const agency4NeedsReview = AgencyDtoBuilder.create("test-agency-4")
     .withName("Test Agency 4")
     .withStatus("needsReview")
-    .withValidatorEmails(["emmanuelle@email.com"])
     .withAddress(defaultAddress)
     .build();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator")
+    .withEmail("validator@mail.com")
+    .buildUser();
 
   describe("Public Routes", () => {
     describe(`${displayRouteName(
@@ -98,10 +99,12 @@ describe("Agency routes", () => {
       it("Returns agency list with name and position nearby a given position", async () => {
         // Prepare
         inMemoryUow.agencyRepository.setAgencies([
-          agency1ActiveNearBy,
-          agency2ActiveNearBy,
-          agency3ActiveFarAway,
-          agency4NeedsReview,
+          toAgencyWithRights(agency1ActiveNearBy),
+          toAgencyWithRights(agency2ActiveNearBy),
+          toAgencyWithRights(agency3ActiveFarAway),
+          toAgencyWithRights(agency4NeedsReview, {
+            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          }),
         ]);
 
         const response = await httpClient.getAgencyOptionsByFilter({
@@ -131,7 +134,9 @@ describe("Agency routes", () => {
     )} to get agency public info by id`, () => {
       it("Returns agency public info", async () => {
         // Prepare
-        await inMemoryUow.agencyRepository.insert(agency1ActiveNearBy);
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agency1ActiveNearBy),
+        ];
 
         // Act and assert
         const response = await httpClient.getAgencyPublicInfoById({
@@ -163,7 +168,9 @@ describe("Agency routes", () => {
 
       it("Returns agency public info without refersToAgency", async () => {
         // Prepare
-        await inMemoryUow.agencyRepository.insert(agency1ActiveNearBy);
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agency1ActiveNearBy),
+        ];
 
         // Act and assert
         const response = await httpClient.getAgencyPublicInfoById({
@@ -233,15 +240,43 @@ describe("Agency routes", () => {
           ...parisMissionLocaleParamsWithoutRefersToAgencyId
         } = parisMissionLocaleParams;
 
+        const validator = await inMemoryUow.userRepository.findByEmail(
+          parisMissionLocaleParams.validatorEmails[0],
+        );
+        if (!validator) throw new Error("Missing validator user");
+        const counsellor = await inMemoryUow.userRepository.findByEmail(
+          parisMissionLocaleParams.counsellorEmails[0],
+        );
+        if (!counsellor) throw new Error("Missing counsellor user");
+
+        expectToEqual(inMemoryUow.userRepository.users, [
+          backofficeAdminUser,
+          validator,
+          counsellor,
+        ]);
         expectToEqual(inMemoryUow.agencyRepository.agencies, [
-          {
-            ...parisMissionLocaleParamsWithoutRefersToAgencyId,
-            questionnaireUrl: parisMissionLocaleParams.questionnaireUrl,
-            status: "needsReview",
-            refersToAgencyId: null,
-            codeSafir: null,
-            rejectionJustification: null,
-          },
+          toAgencyWithRights(
+            {
+              ...parisMissionLocaleParamsWithoutRefersToAgencyId,
+              questionnaireUrl: parisMissionLocaleParams.questionnaireUrl,
+              status: "needsReview",
+              refersToAgencyId: null,
+              codeSafir: null,
+              rejectionJustification: null,
+              counsellorEmails: [],
+              validatorEmails: [],
+            },
+            {
+              [validator.id]: {
+                isNotifiedByEmail: false,
+                roles: ["validator"],
+              },
+              [counsellor.id]: {
+                isNotifiedByEmail: false,
+                roles: ["counsellor"],
+              },
+            },
+          ),
         ]);
       });
 
@@ -288,12 +323,12 @@ describe("Agency routes", () => {
 
       it("Returns all agency dtos with a given status", async () => {
         // Prepare
-        await Promise.all(
-          [agency1ActiveNearBy, agency4NeedsReview].map(
-            async (saveAgencyParams) =>
-              inMemoryUow.agencyRepository.insert(saveAgencyParams),
-          ),
-        );
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agency1ActiveNearBy),
+          toAgencyWithRights(agency4NeedsReview, {
+            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          }),
+        ];
 
         const response = await httpClient.listAgenciesOptionsWithStatus({
           queryParams: { status: "needsReview" },
@@ -318,7 +353,12 @@ describe("Agency routes", () => {
     )} to update an agency status`, () => {
       it("Updates the agency status, sends an email to validators and returns code 200", async () => {
         // Prepare
-        await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(agency4NeedsReview, {
+            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          }),
+        ];
+        inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
 
         const response = await httpClient.updateAgencyStatus({
           headers: { authorization: backofficeAdminToken },
@@ -346,16 +386,16 @@ describe("Agency routes", () => {
       agencyRoutes.updateAgency,
     )} to update an agency data`, () => {
       it("fails if provided token is not valid", async () => {
-        const updatedAgency = new AgencyDtoBuilder()
-          .withId(agency4NeedsReview.id)
-          .withValidatorEmails(["this-is-a-new-validator@mail.com"])
-          .withCodeSafir("1234")
-          .build();
-
         const response = await httpClient.updateAgency({
           headers: { authorization: "wrong-token" },
           urlParams: { agencyId: "test-agency-4" },
-          body: updatedAgency,
+          body: {
+            ...new AgencyDtoBuilder()
+              .withId(agency4NeedsReview.id)
+              .withCodeSafir("1234")
+              .build(),
+            validatorEmails: ["this-is-a-new-validator@mail.com"],
+          },
         });
 
         expectHttpResponseToEqual(response, {
@@ -366,18 +406,22 @@ describe("Agency routes", () => {
 
       it("Updates the agency and returns code 200", async () => {
         // Prepare
-        await inMemoryUow.agencyRepository.setAgencies([agency4NeedsReview]);
-
-        const updatedAgency = new AgencyDtoBuilder()
-          .withId(agency4NeedsReview.id)
-          .withValidatorEmails(["this-is-a-new-validator@mail.com"])
-          .withCodeSafir("1234")
-          .build();
+        inMemoryUow.agencyRepository.setAgencies([
+          toAgencyWithRights(agency4NeedsReview, {
+            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          }),
+        ]);
 
         const response = await httpClient.updateAgency({
           headers: { authorization: backofficeAdminToken },
           urlParams: { agencyId: agency4NeedsReview.id },
-          body: updatedAgency,
+          body: {
+            ...new AgencyDtoBuilder()
+              .withId(agency4NeedsReview.id)
+              .withCodeSafir("1234")
+              .build(),
+            validatorEmails: ["this-is-a-new-validator@mail.com"],
+          },
         });
 
         expectHttpResponseToEqual(response, {
@@ -385,10 +429,20 @@ describe("Agency routes", () => {
           body: "",
         });
 
-        expectToEqual(
-          await inMemoryUow.agencyRepository.getByIds(["test-agency-4"]),
-          [updatedAgency],
-        );
+        expectToEqual(inMemoryUow.agencyRepository.agencies, [
+          toAgencyWithRights(
+            new AgencyDtoBuilder()
+              .withId(agency4NeedsReview.id)
+              .withCodeSafir("1234")
+              .build(),
+            {
+              [validator.id]: {
+                isNotifiedByEmail: false,
+                roles: ["validator"],
+              },
+            },
+          ),
+        ]);
 
         expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
       });
