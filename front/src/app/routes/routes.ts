@@ -1,8 +1,14 @@
-import { AuthenticatedUserQueryParams, ValueOf, frontRoutes } from "shared";
+import {
+  AdminTabRouteName,
+  AuthenticatedUserQueryParams,
+  ValueOf,
+  adminTabRouteNames,
+  adminTabs,
+  frontRoutes,
+} from "shared";
 import { icUserAgencyDashboardTabSerializer } from "src/app/routes/routeParams/agencyDashboardTabs";
 import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { ValueSerializer, createRouter, defineRoute, param } from "type-route";
-import { adminTabSerializer } from "./routeParams/adminTabs";
 import {
   appellationAndRomeDtoArraySerializer,
   appellationStringSerializer,
@@ -73,17 +79,28 @@ export const searchParams = {
 export type FrontRouteUnion = ValueOf<typeof routes>;
 export type FrontRouteKeys = keyof typeof routes;
 
+const admin = defineRoute(
+  inclusionConnectedParams,
+  () => `/${frontRoutes.admin}`,
+);
+
+const { adminConventions, ...restOfAdminRoutes } = adminTabRouteNames.reduce(
+  (acc, adminTabName) => ({
+    ...acc,
+    [adminTabName]: admin.extend(`/${adminTabs[adminTabName].slug}`),
+  }),
+  {} as Record<AdminTabRouteName, typeof admin>,
+);
+
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
-  adminRoot: defineRoute(`/${frontRoutes.admin}`),
-  admin: defineRoute(
-    {
-      ...inclusionConnectedParams,
-      tab: param.path.optional
-        .ofType(adminTabSerializer)
-        .default("conventions"),
-    },
-    ({ tab }) => `/${frontRoutes.admin}/${tab}`,
+
+  admin,
+  ...restOfAdminRoutes,
+  adminConventions,
+  adminConventionDetail: adminConventions.extend(
+    { conventionId: param.path.string },
+    ({ conventionId }) => `/${conventionId}`,
   ),
   agencyDashboard: defineRoute(
     {
@@ -232,10 +249,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   manageConvention: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.manageConvention}`,
-  ),
-  manageConventionAdmin: defineRoute(
-    { conventionId: param.query.string },
-    () => `/${frontRoutes.manageConventionAdmin}`,
   ),
   manageConventionInclusionConnected: defineRoute(
     { conventionId: param.query.string },

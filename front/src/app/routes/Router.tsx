@@ -1,16 +1,16 @@
 import React, { lazy } from "react";
 import { PageHeader } from "react-design-system";
 import {
-  AdminTab,
+  AdminTabRouteName,
   AgencyDashboardTab,
   EstablishmentDashboardTab,
-  adminTabsList,
+  adminTabRouteNames,
   agencyDashboardTabsList,
   establishmentDashboardTabsList,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { StatsPage } from "src/app/pages/StatsPage";
-import { AdminPage } from "src/app/pages/admin/AdminPage";
+import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardPage";
@@ -27,14 +27,15 @@ import { EstablishmentEditionFormPage } from "src/app/pages/establishment/Establ
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
+import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
+import { AdminConventionDetail } from "../pages/convention/AdminConventionDetail";
 import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
-import { ConventionManageAdminPage } from "../pages/convention/ConventionManageAdminPage";
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 import { DiscussionManagePage } from "../pages/discussion/DiscussionManagePage";
@@ -56,35 +57,38 @@ const OpenApiDocPage = lazy(
 
 type Routes = typeof routes;
 
+const adminRoutes: {
+  [K in AdminTabRouteName]: (route: Route<Routes[K]>) => React.ReactElement;
+} = adminTabRouteNames.reduce(
+  (acc, tabRouteName) => ({
+    ...acc,
+    [tabRouteName]: (route: Route<any>) => (
+      <AdminPrivateRoute route={route}>
+        <AdminTabs route={route} />
+      </AdminPrivateRoute>
+    ),
+  }),
+
+  {} as {
+    [K in AdminTabRouteName]: (route: Route<Routes[K]>) => React.ReactElement;
+  },
+);
+
 const getPageByRouteName: {
   [K in keyof Routes]: (route: Route<Routes[K]>) => unknown;
 } = {
   addAgency: () => <AddAgencyPage />,
-  adminRoot: () => (
-    <InclusionConnectedPrivateRoute
-      allowAdminOnly={true}
-      route={routes.admin({ tab: "conventions" })}
-      inclusionConnectConnexionPageHeader={
-        <PageHeader title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀" />
-      }
-    >
-      <AdminPage route={routes.admin({ tab: "conventions" })} />
-    </InclusionConnectedPrivateRoute>
+  admin: (route) => (
+    <AdminPrivateRoute route={routes.adminConventions(route.params)}>
+      <AdminTabs route={routes.adminConventions(route.params)} />
+    </AdminPrivateRoute>
   ),
-  admin: (route) =>
-    adminTabsList.includes(route.params.tab as AdminTab) ? (
-      <InclusionConnectedPrivateRoute
-        allowAdminOnly={true}
-        route={route}
-        inclusionConnectConnexionPageHeader={
-          <PageHeader title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀" />
-        }
-      >
-        <AdminPage route={route} />
-      </InclusionConnectedPrivateRoute>
-    ) : (
-      <ErrorPage type="httpClientNotFoundError" />
-    ),
+  ...adminRoutes,
+  adminConventionDetail: (route) => (
+    <AdminPrivateRoute route={route}>
+      <AdminConventionDetail route={route} />
+    </AdminPrivateRoute>
+  ),
   agencyDashboard: (route) =>
     agencyDashboardTabsList.includes(route.params.tab as AgencyDashboardTab) ? (
       <InclusionConnectedPrivateRoute
@@ -152,7 +156,6 @@ const getPageByRouteName: {
   searchResult: () => <SearchResultPage />,
   searchResultExternal: () => <SearchResultPage />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
-  manageConventionAdmin: (route) => <ConventionManageAdminPage route={route} />,
   manageConventionInclusionConnected: (route) => (
     <ConventionManageInclusionConnectedPage route={route} />
   ),
