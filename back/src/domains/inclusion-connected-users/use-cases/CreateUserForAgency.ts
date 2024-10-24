@@ -1,15 +1,16 @@
 import {
-  AgencyRight,
   InclusionConnectedUser,
+  User,
   UserParamsForAgency,
   errors,
   userParamsForAgencySchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
-import { DomainEvent } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
@@ -36,62 +37,58 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
         role: "validator",
       });
 
-    const provider = await makeProvider(uow);
-    const existingUser = (
-      await uow.userRepository.getIcUsersWithFilter(
-        {
-          email: inputParams.email,
-        },
-        provider,
-      )
-    ).at(0);
-
-    if (!existingUser) {
-      await uow.userRepository.save(
-        {
-          createdAt: deps.timeGateway.now().toISOString(),
-          email: inputParams.email,
-          externalId: null,
-          firstName: "",
-          id: inputParams.userId,
-          lastName: "",
-        },
-        provider,
-      );
-    }
-
-    const existingUserAgencyRights = existingUser?.agencyRights ?? [];
-    const userId = existingUser?.id ?? inputParams.userId;
-    const agencyRight: AgencyRight = {
-      roles: inputParams.roles,
-      isNotifiedByEmail: inputParams.isNotifiedByEmail,
-      agency,
-    };
-
-    const event: DomainEvent = deps.createNewEvent({
-      topic: "IcUserAgencyRightChanged",
-      payload: {
-        ...inputParams,
-        userId,
-        triggeredBy: {
-          kind: "inclusion-connected",
-          userId: currentUser.id,
-        },
-      },
-    });
+    const user = await getUserIdAndCreateIfMissing(uow, inputParams, deps);
 
     await Promise.all([
-      uow.userRepository.updateAgencyRights({
-        userId,
-        agencyRights: [...existingUserAgencyRights, agencyRight],
+      uow.agencyRepository.update({
+        id: agency.id,
+        usersRights: {
+          ...agency.usersRights,
+          [user.id]: {
+            roles: inputParams.roles,
+            isNotifiedByEmail: inputParams.isNotifiedByEmail,
+          },
+        },
       }),
-      uow.outboxRepository.save(event),
+      uow.outboxRepository.save(
+        deps.createNewEvent({
+          topic: "IcUserAgencyRightChanged",
+          payload: {
+            agencyId: agency.id,
+            userId: user.id,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: currentUser.id,
+            },
+          },
+        }),
+      ),
     ]);
 
-    const user = await uow.userRepository.getById(userId, provider);
-
-    if (!user) throw errors.user.notFound({ userId }); //should not happen
-
-    return user;
+    return getIcUserByUserId(uow, user.id);
   },
 );
+
+const getUserIdAndCreateIfMissing = async (
+  uow: UnitOfWork,
+  inputParams: UserParamsForAgency,
+  deps: { timeGateway: TimeGateway; createNewEvent: CreateNewEvent },
+): Promise<User> => {
+  const provider = await makeProvider(uow);
+  const existingUser = await uow.userRepository.findByEmail(
+    inputParams.email,
+    provider,
+  );
+  if (existingUser) return existingUser;
+
+  const newUser: User = {
+    id: inputParams.userId,
+    email: inputParams.email,
+    createdAt: deps.timeGateway.now().toISOString(),
+    firstName: "Non fourni",
+    lastName: "Non fourni",
+    externalId: null,
+  };
+  await uow.userRepository.save(newUser, provider);
+  return newUser;
+};
