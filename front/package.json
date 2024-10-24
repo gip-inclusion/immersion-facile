@@ -76,7 +76,7 @@
     "sass": "^1.55.0",
     "scss-mapper": "workspace:*",
     "shared": "workspace:*",
-    "shared-routes": "^0.8.19",
+    "shared-routes": "^0.8.23",
     "swagger-ui-react": "^5.1.0",
     "ts-pattern": "^5.0.0",
     "tss-react": "^4.5.2",
