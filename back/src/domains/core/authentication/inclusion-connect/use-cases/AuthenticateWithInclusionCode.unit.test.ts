@@ -70,7 +70,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
         uow.featureFlagRepository.update({
           flagName: "enableProConnect",
-          featureFlag: { kind: "boolean", isActive: provider === "ProConnect" },
+          featureFlag: { kind: "boolean", isActive: provider === "proConnect" },
         });
       });
 
@@ -337,10 +337,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             authenticateWithInclusionCode.execute(params),
             errors.inclusionConnect.missingOAuth({
               state: params.state,
-              identityProvider:
-                provider === "InclusionConnect"
-                  ? "inclusionConnect"
-                  : "proConnect",
+              identityProvider: provider,
             }),
           );
         });
@@ -348,8 +345,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         it("should raise a Forbidden error if the nonce does not match", async () => {
           const existingNonce = "existing-nonce";
           const initialOngoingOAuth: OngoingOAuth = {
-            provider:
-              provider === "ProConnect" ? "proConnect" : "inclusionConnect",
+            provider,
             state: "my-state",
             nonce: existingNonce,
           };
@@ -388,7 +384,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     };
     const initialOngoingOAuth: OngoingOAuth = {
       provider:
-        provider === "InclusionConnect" ? "inclusionConnect" : "proConnect",
+        provider === "inclusionConnect" ? "inclusionConnect" : "proConnect",
       state: "my-state",
       nonce: "nounce", // matches the one in the payload of the token
     };

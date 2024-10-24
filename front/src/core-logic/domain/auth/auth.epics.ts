@@ -97,6 +97,7 @@ const logoutFromInclusionConnect: AuthEpic = (
         const { idToken } = federatedIdentityWithUser;
         return inclusionConnectedGateway.getLogoutUrl$({
           idToken: state$.value.auth.federatedIdentityWithUser ? idToken : "",
+          authToken: state$.value.auth.federatedIdentityWithUser?.token ?? "",
         });
       }
       return of(undefined);

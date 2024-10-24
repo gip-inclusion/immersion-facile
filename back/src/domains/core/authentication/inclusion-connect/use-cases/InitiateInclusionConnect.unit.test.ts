@@ -33,7 +33,7 @@ describe("InitiateInclusionConnect usecase", () => {
           await uow.featureFlagRepository.update({
             flagName: "enableProConnect",
             featureFlag: {
-              isActive: provider === "ProConnect",
+              isActive: provider === "proConnect",
               kind: "boolean",
             },
           });
@@ -45,7 +45,7 @@ describe("InitiateInclusionConnect usecase", () => {
           };
           const redirectUrl = await useCase.execute(sourcePage);
           const loginEndpoint =
-            provider === "InclusionConnect"
+            provider === "inclusionConnect"
               ? "login-inclusion-connect"
               : "login-pro-connect";
 
@@ -67,7 +67,7 @@ describe("InitiateInclusionConnect usecase", () => {
               nonce,
               state,
               provider:
-                provider === "InclusionConnect"
+                provider === "inclusionConnect"
                   ? "inclusionConnect"
                   : "proConnect",
               externalId: undefined,

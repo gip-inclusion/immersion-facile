@@ -1,14 +1,10 @@
-import {
-  AbsoluteUrl,
-  OAuthGatewayProvider,
-  WithIdToken,
-  queryParamsAsString,
-} from "shared";
+import { AbsoluteUrl, OAuthGatewayProvider, queryParamsAsString } from "shared";
 import { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import {
   GetAccessTokenParams,
   GetAccessTokenResult,
   GetLoginUrlParams,
+  GetLogoutUrlParams,
   OAuthGateway,
 } from "../../port/OAuthGateway";
 
@@ -31,8 +27,8 @@ export class InMemoryOAuthGateway implements OAuthGateway {
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const loginUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
-      InclusionConnect: `${this.providerConfig.providerBaseUri}/login-inclusion-connect`,
-      ProConnect: `${this.providerConfig.providerBaseUri}/login-pro-connect`,
+      inclusionConnect: `${this.providerConfig.providerBaseUri}/login-inclusion-connect`,
+      proConnect: `${this.providerConfig.providerBaseUri}/login-pro-connect`,
     };
     return `${loginUri[provider]}?${queryParamsAsString(params)}`;
   }
@@ -46,19 +42,19 @@ export class InMemoryOAuthGateway implements OAuthGateway {
   }
 
   public async getLogoutUrl(
-    params: WithIdToken,
+    params: GetLogoutUrlParams,
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const logoutUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
-      InclusionConnect: `${this.providerConfig.providerBaseUri}/logout-inclusion-connect`,
-      ProConnect: `${this.providerConfig.providerBaseUri}/logout-pro-connect`,
+      inclusionConnect: `${this.providerConfig.providerBaseUri}/logout-inclusion-connect`,
+      proConnect: `${this.providerConfig.providerBaseUri}/logout-pro-connect`,
     };
 
     return `${logoutUri[provider]}?${queryParamsAsString({
       postLogoutRedirectUrl:
         this.providerConfig.immersionRedirectUri.afterLogout,
-      clientId: this.providerConfig.clientId,
       idToken: params.idToken,
+      state: params.state,
     })}`;
   }
 

@@ -69,7 +69,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
   describe.each(oAuthGatewayProviders)(
     "when user had never connected before with mode '%s'",
-    (mode) => {
+    (provider) => {
       beforeEach(async () => {
         await db.deleteFrom("feature_flags").execute();
         await db.deleteFrom("users_ongoing_oauths").execute();
@@ -79,14 +79,14 @@ describe("AuthenticateWithInclusionCode use case", () => {
           ...defaultFlags,
           enableProConnect: {
             kind: "boolean",
-            isActive: mode === "ProConnect",
+            isActive: provider === "proConnect",
           },
         });
       });
 
       it("saves the user as Authenticated user", async () => {
         const { accessToken, initialOngoingOAuth } =
-          await makeSuccessfulAuthenticationConditions(mode);
+          await makeSuccessfulAuthenticationConditions(provider);
 
         await authenticateWithInclusionCode.execute({
           code: "my-inclusion-code",
@@ -109,7 +109,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         expectObjectsToMatch(
           await uow.userRepository.findByExternalId(
             defaultExpectedIcIdTokenPayload.sub,
-            mode,
+            provider,
           ),
           {
             id: expectedOngoingOauth?.userId,
@@ -129,7 +129,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   ) => {
     const initialOngoingOAuth: OngoingOAuth = {
       provider:
-        provider === "InclusionConnect" ? "inclusionConnect" : "proConnect",
+        provider === "inclusionConnect" ? "inclusionConnect" : "proConnect",
       state: "da1b4d59-ff5b-4b28-a34a-2a31da76a7b7",
       nonce: "nounce", // matches the one in the payload of the token
     };

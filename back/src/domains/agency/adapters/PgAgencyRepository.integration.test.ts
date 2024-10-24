@@ -622,7 +622,7 @@ describe("PgAgencyRepository", () => {
         {
           agencyId: agencyWithTwoStepValidation.id,
         },
-        "InclusionConnect",
+        "inclusionConnect",
       );
       const counsellor = users.find(
         (user) => user.email === "counsellor@email.fr",
@@ -663,7 +663,7 @@ describe("PgAgencyRepository", () => {
         {
           agencyId: agencyWithTwoStepValidation.id,
         },
-        "InclusionConnect",
+        "inclusionConnect",
       );
       const expectedUpdatedAgency: AgencyDto = {
         ...agencyWithTwoStepValidation,

@@ -68,15 +68,20 @@ export class HttpInclusionConnectedGateway
     );
   }
 
-  public getLogoutUrl$({ idToken }: WithIdToken): Observable<AbsoluteUrl> {
+  public getLogoutUrl$({
+    idToken,
+    authToken,
+  }: WithIdToken & { authToken: string }): Observable<AbsoluteUrl> {
     return from(
       this.httpClient
         .getInclusionConnectLogoutUrl({
           queryParams: { idToken },
+          headers: { authorization: authToken },
         })
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

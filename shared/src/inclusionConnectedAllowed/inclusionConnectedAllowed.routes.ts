@@ -74,8 +74,10 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     method: "get",
     url: "/inclusion-connect-logout",
     queryParamsSchema: withIdTokenSchema,
+    ...withAuthorizationHeaders,
     responses: {
       200: absoluteUrlSchema,
+      401: httpErrorSchema,
     },
   }),
   getDiscussionByIdForEstablishment: defineRoute({

@@ -26,12 +26,6 @@ const withContentTypeUrlEncodedSchema = z.object({
   "Content-Type": z.literal("application/x-www-form-urlencoded"),
 });
 
-export type ProConnectLogoutQueryParams = {
-  post_logout_redirect_uri: AbsoluteUrl;
-  id_token_hint: string;
-  state: string;
-};
-
 export type ProConnectRoutes = ReturnType<typeof makeProConnectRoutes>;
 
 export const makeProConnectRoutes = (proConnectBaseUrl: AbsoluteUrl) =>

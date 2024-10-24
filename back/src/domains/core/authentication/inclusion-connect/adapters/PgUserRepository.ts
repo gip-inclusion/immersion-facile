@@ -52,12 +52,12 @@ export class PgUserRepository implements UserRepository {
         "last_name",
         "email",
         "created_at",
-        provider === "InclusionConnect"
+        provider === "inclusionConnect"
           ? "inclusion_connect_sub as external_id"
           : "pro_connect_sub as external_id",
       ])
       .where(
-        provider === "InclusionConnect"
+        provider === "inclusionConnect"
           ? "inclusion_connect_sub"
           : "pro_connect_sub",
         "=",
@@ -86,7 +86,7 @@ export class PgUserRepository implements UserRepository {
         "last_name",
         "email",
         "created_at",
-        provider === "InclusionConnect"
+        provider === "inclusionConnect"
           ? "inclusion_connect_sub as external_id"
           : "pro_connect_sub as external_id",
       ]);
@@ -105,7 +105,7 @@ export class PgUserRepository implements UserRepository {
           email,
           first_name: firstName,
           last_name: lastName,
-          [provider === "InclusionConnect"
+          [provider === "inclusionConnect"
             ? "inclusion_connect_sub"
             : "pro_connect_sub"]: externalId,
           created_at: createdAt,
@@ -128,7 +128,7 @@ export class PgUserRepository implements UserRepository {
         first_name: firstName,
         last_name: lastName,
         email,
-        [provider === "InclusionConnect"
+        [provider === "inclusionConnect"
           ? "inclusion_connect_sub"
           : "pro_connect_sub"]: externalId,
         updated_at: sql`now()`,
@@ -274,7 +274,7 @@ export class PgUserRepository implements UserRepository {
         'lastName', users.last_name,
         'createdAt', users.created_at,
         'externalId', users.${
-          provider === "InclusionConnect"
+          provider === "inclusionConnect"
             ? "inclusion_connect_sub"
             : "pro_connect_sub"
         },

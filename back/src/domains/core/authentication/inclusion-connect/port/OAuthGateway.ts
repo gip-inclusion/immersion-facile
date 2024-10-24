@@ -35,10 +35,14 @@ export type GetLoginUrlParams = WithSourcePage & {
   state: string;
 };
 
+export type GetLogoutUrlParams = WithIdToken & {
+  state: string;
+};
+
 export const oAuthProviderByFeatureFlags = (
   flags: FeatureFlags,
 ): OAuthGatewayProvider =>
-  flags.enableProConnect.isActive ? "ProConnect" : "InclusionConnect";
+  flags.enableProConnect.isActive ? "proConnect" : "inclusionConnect";
 
 export interface OAuthGateway {
   getLoginUrl(
@@ -50,7 +54,7 @@ export interface OAuthGateway {
     provider: OAuthGatewayProvider,
   ) => Promise<GetAccessTokenResult>;
   getLogoutUrl(
-    params: WithIdToken,
+    params: GetLogoutUrlParams,
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl>;
 }
