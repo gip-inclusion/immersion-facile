@@ -284,6 +284,8 @@ export const errors = {
       new NotFoundError(
         `Mail not found for agency with id: ${agencyId} on agency repository.`,
       ),
+    usersNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
+      new NotFoundError(`L'agence ${agencyId} n'a aucun utilisateur rattaché`),
     notEnoughCounsellors: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
         `L'agence ${agencyId} doit avoir au moins un conseiller recevant les emails.`,

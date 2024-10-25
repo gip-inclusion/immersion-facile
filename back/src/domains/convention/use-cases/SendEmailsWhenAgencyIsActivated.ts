@@ -1,11 +1,13 @@
 import {
   AgencyDto,
+  UserParamsForMail,
   agencySchema,
   errors,
   getCounsellorsAndValidatorsEmailsDeduplicated,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -29,12 +31,46 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
     { agency }: WithAgency,
     uow: UnitOfWork,
   ): Promise<void> {
-    const refersToOtherAgencyParams = agency.refersToAgencyId
-      ? {
-          refersToOtherAgency: true as const,
-          validatorEmails: agency.validatorEmails,
-        }
-      : { refersToOtherAgency: false as const };
+    const provider = oAuthProviderByFeatureFlags(
+      await uow.featureFlagRepository.getAll(),
+    );
+
+    const users = await uow.userRepository.getIcUsersWithFilter(
+      { agencyId: agency.id },
+      provider,
+    );
+
+    if (users.length === 0)
+      throw errors.agency.usersNotFound({ agencyId: agency.id });
+
+    const usersInfo: UserParamsForMail[] = users
+      .filter(
+        (user) =>
+          !agency.refersToAgencyId ||
+          user.agencyRights.some(
+            (agencyRight) =>
+              agencyRight.agency.id === agency.id &&
+              agencyRight.roles.includes("counsellor"),
+          ),
+      )
+      .map(({ firstName, lastName, agencyRights, email, id }) => {
+        const agencyRight = agencyRights.find(
+          (agencyRight) => agencyRight.agency.id === agency.id,
+        );
+        if (!agencyRight)
+          throw errors.user.noRightsOnAgency({
+            agencyId: agency.id,
+            userId: id,
+          });
+        return {
+          firstName,
+          lastName,
+          email,
+          agencyName: agencyRight.agency.name,
+          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+          roles: agencyRight.roles,
+        };
+      });
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
@@ -46,7 +82,9 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
         params: {
           agencyName: agency.name,
           agencyLogoUrl: agency.logoUrl ?? undefined,
-          ...refersToOtherAgencyParams,
+          users: usersInfo,
+          agencyReferdToName: agency.refersToAgencyName ?? undefined,
+          refersToOtherAgency: !!agency.refersToAgencyId,
         },
       },
       followedIds: {

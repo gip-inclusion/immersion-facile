@@ -33,6 +33,26 @@ const emailNotifications: EmailNotification[] = [
         agencyName: "My agency",
         agencyLogoUrl: "http://logo.com",
         refersToOtherAgency: false,
+        agencyReferdToName: undefined,
+        users: [
+          {
+            firstName: "Jean",
+            lastName: "Dupont",
+            email: "jean-dupont@gmail.com",
+            agencyName: "Agence du Grand Est",
+            isNotifiedByEmail: true,
+            roles: ["validator"],
+          },
+
+          {
+            firstName: "Jeanne",
+            lastName: "Dupont",
+            email: "jeanne-dupont@gmail.com",
+            agencyName: "Agence du Grand Est",
+            isNotifiedByEmail: true,
+            roles: ["counsellor"],
+          },
+        ],
       },
       attachments: [
         {
@@ -404,6 +424,26 @@ const createTemplatedEmailAndNotification = ({
       agencyName: "My agency",
       agencyLogoUrl: "https://my-logo.com",
       refersToOtherAgency: false,
+      agencyReferdToName: undefined,
+      users: [
+        {
+          firstName: "Jean",
+          lastName: "Dupont",
+          email: "jean-dupont@gmail.com",
+          agencyName: "Agence du Grand Est",
+          isNotifiedByEmail: true,
+          roles: ["validator"],
+        },
+
+        {
+          firstName: "Jeanne",
+          lastName: "Dupont",
+          email: "jeanne-dupont@gmail.com",
+          agencyName: "Agence du Grand Est",
+          isNotifiedByEmail: true,
+          roles: ["counsellor"],
+        },
+      ],
     },
     attachments,
   };

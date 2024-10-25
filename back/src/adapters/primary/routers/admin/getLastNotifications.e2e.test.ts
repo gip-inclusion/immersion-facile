@@ -76,6 +76,26 @@ describe(`${adminRoutes.getLastNotifications.url} route`, () => {
             agencyName: "Agence du Grand Est",
             agencyLogoUrl: "http://:)",
             refersToOtherAgency: false,
+            agencyReferdToName: undefined,
+            users: [
+              {
+                firstName: "Jean",
+                lastName: "Dupont",
+                email: "jean-dupont@gmail.com",
+                agencyName: "Agence du Grand Est",
+                isNotifiedByEmail: true,
+                roles: ["validator"],
+              },
+
+              {
+                firstName: "Jeanne",
+                lastName: "Dupont",
+                email: "jeanne-dupont@gmail.com",
+                agencyName: "Agence du Grand Est",
+                isNotifiedByEmail: true,
+                roles: ["counsellor"],
+              },
+            ],
           },
         },
       };
