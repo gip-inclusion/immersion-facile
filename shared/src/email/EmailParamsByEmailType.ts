@@ -11,6 +11,15 @@ import { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.d
 import { SiretDto } from "../siret/siret";
 import { Email } from "./email.dto";
 
+export type UserParamsForMail = {
+  agencyName: string;
+  isNotifiedByEmail: boolean;
+  roles: AgencyRole[];
+  firstName: string;
+  lastName: string;
+  email: Email;
+};
+
 export type EmailParamsByEmailType = {
   AGENCY_FIRST_REMINDER: {
     agencyMagicLinkUrl: string;
@@ -36,13 +45,10 @@ export type EmailParamsByEmailType = {
   AGENCY_WAS_ACTIVATED: {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
-  } & (
-    | { refersToOtherAgency: false }
-    | {
-        refersToOtherAgency: true;
-        validatorEmails: string[];
-      }
-  );
+    users: UserParamsForMail[];
+    agencyReferdToName: string | undefined;
+    refersToOtherAgency: boolean;
+  };
   AGENCY_DELEGATION_CONTACT_INFORMATION: {
     firstName: string;
     lastName: string;
@@ -222,14 +228,7 @@ export type EmailParamsByEmailType = {
     conventionStatusLink: string;
     internshipKind: InternshipKind;
   };
-  IC_USER_RIGHTS_HAS_CHANGED: {
-    agencyName: string;
-    isNotified: boolean;
-    roles: AgencyRole[];
-    firstName: string;
-    lastName: string;
-    email: Email;
-  };
+  IC_USER_RIGHTS_HAS_CHANGED: UserParamsForMail;
   IC_USER_REGISTRATION_TO_AGENCY_REJECTED: {
     agencyName: string;
     justification: string;

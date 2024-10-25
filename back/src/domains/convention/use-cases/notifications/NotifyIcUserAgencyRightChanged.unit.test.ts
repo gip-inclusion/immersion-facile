@@ -120,7 +120,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
             email: icUser.email,
             firstName: icUser.firstName,
             lastName: icUser.lastName,
-            isNotified: false,
+            isNotifiedByEmail: false,
             roles: ["counsellor"],
           },
           recipients: [icUser.email],

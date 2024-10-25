@@ -91,6 +91,20 @@ describe("Agency routes", () => {
     .withAddress(defaultAddress)
     .build();
 
+  const icUser = new InclusionConnectedUserBuilder()
+    .withId("ic-user-1-id")
+    .withFirstName("jean")
+    .withLastName("Dupont")
+    .withEmail("jean-dupont@mail.com")
+    .withAgencyRights([
+      {
+        agency: agency4NeedsReview,
+        isNotifiedByEmail: true,
+        roles: ["validator"],
+      },
+    ])
+    .build();
+
   describe("Public Routes", () => {
     describe(`${displayRouteName(
       agencyRoutes.getAgencyOptionsByFilter,
@@ -320,6 +334,10 @@ describe("Agency routes", () => {
       it("Updates the agency status, sends an email to validators and returns code 200", async () => {
         // Prepare
         await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
+        await inMemoryUow.userRepository.setInclusionConnectedUsers([
+          icUser,
+          backofficeAdminUser,
+        ]);
 
         const response = await httpClient.updateAgencyStatus({
           headers: { authorization: backofficeAdminToken },

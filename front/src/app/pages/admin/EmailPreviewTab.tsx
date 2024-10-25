@@ -229,7 +229,25 @@ export const defaultEmailValueByEmailKind: {
     agencyName: "AGENCY_NAME",
     agencyLogoUrl: defaultEmailPreviewUrl,
     refersToOtherAgency: true,
-    validatorEmails: ["VALIDATOR_EMAIL1", "VALIDATOR_EMAIL2"],
+    users: [
+      {
+        agencyName: "AGENCY_NAME",
+        roles: ["counsellor"],
+        isNotifiedByEmail: true,
+        email: "USER_EMAIL",
+        firstName: "USER_FIRST_NAME",
+        lastName: "USER_LAST_NAME",
+      },
+      {
+        agencyName: "AGENCY_NAME",
+        roles: ["counsellor"],
+        isNotifiedByEmail: true,
+        email: "USER_EMAIL",
+        firstName: "USER_FIRST_NAME",
+        lastName: "USER_LAST_NAME",
+      },
+    ],
+    agencyReferdToName: "AGENCY_REFERS_TO_NAME",
   },
   AGENCY_OF_TYPE_OTHER_ADDED: {
     agencyName: "AGENCY_NAME",
@@ -415,7 +433,7 @@ export const defaultEmailValueByEmailKind: {
   IC_USER_RIGHTS_HAS_CHANGED: {
     agencyName: "AGENCY_NAME",
     roles: ["validator"],
-    isNotified: true,
+    isNotifiedByEmail: true,
     email: "USER_EMAIL",
     firstName: "USER_FIRST_NAME",
     lastName: "USER_LAST_NAME",

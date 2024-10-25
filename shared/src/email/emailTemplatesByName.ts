@@ -1198,25 +1198,58 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
     AGENCY_WAS_ACTIVATED: {
       niceName: "Agence - Activée",
       tags: ["activation prescripteur"],
-      createEmailVariables: ({ agencyLogoUrl, agencyName, ...rest }) => ({
+      createEmailVariables: ({
+        agencyLogoUrl,
+        agencyName,
+        refersToOtherAgency,
+        users,
+        agencyReferdToName,
+      }) => ({
         subject: "Immersion Facilitée - Votre structure a été activée",
         greetings: "Bonjour,",
-        content: `<strong>Votre structure ${
-          rest.refersToOtherAgency ? `d'accompagnement` : "prescriptrice"
-        } est activée sur Immersion facilitée !</strong> 
+        content: `<strong>Votre ${
+          refersToOtherAgency
+            ? `structure d'accompagnement`
+            : "organisme prescripteur"
+        } ${agencyName} est activée sur Immersion facilitée !</strong> 
 
-        Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: ${agencyName}.
+        Vous pouvez dès à présent valider les conventions dématérialisées sur Immersion Facilitée.
+
+        <strong>Voici les différents utilisateurs rattachés à la structure et leur rôles :</strong>
+
+        Chaque utilisateur peut se créer un espace personnel afin de voir${
+          refersToOtherAgency
+            ? " ou pré-valider"
+            : ", pré-valider ou valider et piloter"
+        } ses conventions, en fonction de ses droits.
         ${
-          rest.refersToOtherAgency
-            ? `Les demandes de convention pour les personnes que vous accompagnez seront examinées en première étape par vous puis validées par ${rest.validatorEmails.join(
-                ", ",
-              )}.\n`
-            : ""
-        }  
-        Merci à vous !
+          refersToOtherAgency &&
+          `Les conventions devront ensuite être validées par l’un des validateurs de votre organisme prescripteur lié : ${agencyReferdToName}.`
+        }
+        ${users
+          .map(
+            ({
+              firstName,
+              lastName,
+              email,
+              agencyName,
+              isNotifiedByEmail,
+              roles,
+            }) =>
+              generateUserInfo(
+                firstName,
+                lastName,
+                email,
+                roles,
+                isNotifiedByEmail,
+                agencyName,
+              ),
+          )
+          .join("")}
+ 
 
         Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs${
-          rest.refersToOtherAgency ? ` et aux structures d'accompagnement` : ""
+          refersToOtherAgency ? ` et aux structures d'accompagnement` : ""
         }</strong> pour être accompagné par notre équipe.
 
         Au programme :
@@ -1310,7 +1343,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       tags: ["activation BO prescripteur"],
       createEmailVariables: ({
         agencyName,
-        isNotified,
+        isNotifiedByEmail,
         roles,
         firstName,
         lastName,
@@ -1328,7 +1361,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
           lastName,
           email,
           roles,
-          isNotified,
+          isNotifiedByEmail,
           agencyName,
         )}
       `,

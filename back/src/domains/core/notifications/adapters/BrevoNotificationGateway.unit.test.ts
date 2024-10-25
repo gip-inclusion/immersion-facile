@@ -111,6 +111,26 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
           agencyName: "AGENCY_NAME",
           agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
           refersToOtherAgency: false,
+          agencyReferdToName: undefined,
+          users: [
+            {
+              firstName: "Jean",
+              lastName: "Dupont",
+              email: "jean-dupont@gmail.com",
+              agencyName: "Agence du Grand Est",
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+
+            {
+              firstName: "Jeanne",
+              lastName: "Dupont",
+              email: "jeanne-dupont@gmail.com",
+              agencyName: "Agence du Grand Est",
+              isNotifiedByEmail: true,
+              roles: ["counsellor"],
+            },
+          ],
         },
       });
 
@@ -186,11 +206,30 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       width="600">
       <tr>
       <td>
-      <p><strong>Votre structure prescriptrice est activée sur Immersion facilitée !</strong> 
+      <p><strong>Votre organisme prescripteur AGENCY_NAME est activée sur Immersion facilitée !</strong> 
       <br/>
-      <br/>Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: AGENCY_NAME.
+      <br/>Vous pouvez dès à présent valider les conventions dématérialisées sur Immersion Facilitée.
       <br/>
-      <br/>Merci à vous !
+      <br/><strong>Voici les différents utilisateurs rattachés à la structure et leur rôles :</strong>
+      <br/>
+      <br/>Chaque utilisateur peut se créer un espace personnel afin de voir, pré-valider ou valider et piloter ses conventions, en fonction de ses droits.
+      <br/>false
+      <br/>
+      <br/><ul style=\"list-style-type: none; border: 1px solid #ddd; padding: 16px;\"><li><strong>Jean Dupont - jean-dupont@gmail.com</strong></li>
+      <br/><li><strong>Valideur</strong> (peut valider des conventions de l’agence et modifier leur statut)</li>
+      <br/><li>Reçoit les emails de toutes les conventions de  Agence du Grand Est</li>
+      <br/><li><a 
+      href=\"https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence\" 
+      target=\"_blank\">Espace personnel</a></li></ul>
+      <br/>
+      <br/><ul style=\"list-style-type: none; border: 1px solid #ddd; padding: 16px;\"><li><strong>Jeanne Dupont - jeanne-dupont@gmail.com</strong></li>
+      <br/><li><strong>Pré-Valideur</strong> (peut pré-valider les conventions de l’agence et modifier leur statut)</li>
+      <br/><li>Reçoit les emails de toutes les conventions de  Agence du Grand Est</li>
+      <br/><li><a 
+      href=\"https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence\" 
+      target=\"_blank\">Espace personnel</a></li></ul>
+      <br/>
+      <br/>
       <br/>
       <br/>Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs</strong> pour être accompagné par notre équipe.
       <br/>
@@ -316,6 +355,26 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
           agencyName: "AGENCY_NAME",
           agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
           refersToOtherAgency: false,
+          agencyReferdToName: undefined,
+          users: [
+            {
+              firstName: "Jean",
+              lastName: "Dupont",
+              email: "jean-dupont@gmail.com",
+              agencyName: "Agence du Grand Est",
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+
+            {
+              firstName: "Jeanne",
+              lastName: "Dupont",
+              email: "jeanne-dupont@gmail.com",
+              agencyName: "Agence du Grand Est",
+              isNotifiedByEmail: true,
+              roles: ["counsellor"],
+            },
+          ],
         },
       });
       expectToEqual(sentEmails, []);
@@ -330,6 +389,26 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
           agencyName: "AGENCY_NAME",
           agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
           refersToOtherAgency: false,
+          agencyReferdToName: undefined,
+          users: [
+            {
+              firstName: "Jean",
+              lastName: "Dupont",
+              email: "jean-dupont@gmail.com",
+              agencyName: "Agence du Grand Est",
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+
+            {
+              firstName: "Jeanne",
+              lastName: "Dupont",
+              email: "jeanne-dupont@gmail.com",
+              agencyName: "Agence du Grand Est",
+              isNotifiedByEmail: true,
+              roles: ["counsellor"],
+            },
+          ],
         },
       });
 
