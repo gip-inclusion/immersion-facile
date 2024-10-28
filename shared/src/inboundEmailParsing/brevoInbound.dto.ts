@@ -2,7 +2,6 @@ export type BrevoAttachment = {
   Name: string;
   ContentType: string;
   ContentLength: number;
-  ContentID: string;
   DownloadToken: string;
 };
 

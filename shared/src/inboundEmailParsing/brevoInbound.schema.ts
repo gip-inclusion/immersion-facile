@@ -14,7 +14,6 @@ const brevoAttachmentSchema: z.Schema<BrevoAttachment> = z.object({
   Name: z.string(),
   ContentType: z.string(),
   ContentLength: z.number(),
-  ContentID: z.string(),
   DownloadToken: z.string(),
 });
 

@@ -394,7 +394,6 @@ const correctBrevoResponse: BrevoInboundBody = {
           Name: "IMG_20230617_151239.jpg",
           ContentType: "image/jpeg",
           ContentLength: 1652571,
-          ContentID: "ii_ljff7lfo0",
           DownloadToken:
             "eyJmb2xkZXIiOiIyMDIzMDYyODA4MDcwNy41Ni4xNTQxNDI5NTQwIiwiZmlsZW5hbWUiOiJJTUdfMjAyMzA2MTdfMTUxMjM5LmpwZyJ9",
         },
