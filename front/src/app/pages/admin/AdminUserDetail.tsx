@@ -1,8 +1,11 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { Table } from "@codegouvfr/react-dsfr/Table";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { AgencyRight, agencyKindToLabel } from "shared";
+import { AgencyRight, agencyKindToLabelIncludingIF } from "shared";
+import { AgencyTag } from "src/app/components/agency/AgencyTag";
+import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { adminFetchUserSelectors } from "src/core-logic/domain/admin/fetchUser/fetchUser.selectors";
@@ -29,16 +32,24 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
   if (isFetchingUser) return <Loader />;
   if (!icUser) return <p>Aucun utilisateur trouvé</p>;
 
+  const title =
+    icUser.firstName && icUser.lastName
+      ? `${icUser.firstName} ${icUser.lastName}`
+      : icUser.email;
+
   return (
     <div>
-      <h1>Utilisateur</h1>
+      <h1>{title}</h1>
 
-      <ul>
-        <li>Id : {icUser.id}</li>
+      <p className={fr.cx("fr-text--bold")}>Informations personnelles</p>
+
+      <ul className={fr.cx("fr-text--sm")}>
+        <li>Id de l'utilisateur: {icUser.id}</li>
         <li>Email : {icUser.email}</li>
         {icUser.firstName && <li>Prénom : {icUser.firstName}</li>}
         {icUser.lastName && <li>Nom : {icUser.lastName}</li>}
       </ul>
+
       <AgenciesTable
         agencyRights={[...icUser.agencyRights].sort((a, b) =>
           a.agency.name.localeCompare(b.agency.name),
@@ -54,22 +65,31 @@ const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
 
   return (
     <>
-      <h2>Agences liées ({agencyRights.length} agences)</h2>
+      <p className={fr.cx("fr-text--bold")}>
+        Organismes rattachés au profil ({agencyRights.length} agences)
+      </p>
 
       <Table
-        fixed
         headers={[
           "Nom d'agence",
           "Type d'agence",
           "Roles",
           "Reçoit les notifications",
         ]}
-        data={agencyRights.map((agencyRight) => [
-          agencyRight.agency.name,
-          agencyKindToLabel[agencyRight.agency.kind],
-          agencyRight.roles.join(", "),
-          agencyRight.isNotifiedByEmail ? "Oui" : "Non",
-        ])}
+        data={agencyRights.map((agencyRight) => {
+          return [
+            <>
+              <AgencyTag agency={agencyRight.agency} />
+              <br />
+              <span>{agencyRight.agency.name}</span>
+            </>,
+            agencyKindToLabelIncludingIF[agencyRight.agency.kind],
+            agencyRight.roles
+              .map((role) => agencyRoleToDisplay[role].label)
+              .join(", "),
+            agencyRight.isNotifiedByEmail ? "Oui" : "Non",
+          ];
+        })}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
+import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
-import { AgencyTag } from "src/app/components/forms/agency/AgencyTag";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
@@ -24,7 +24,7 @@ export const EditAgency = () => {
       </div>
       {agency && (
         <>
-          <AgencyTag agency={agency} />
+          <AgencyTag agency={agency} className={fr.cx("fr-my-4w")} />
           <EditAgencyForm agency={agency} />
         </>
       )}

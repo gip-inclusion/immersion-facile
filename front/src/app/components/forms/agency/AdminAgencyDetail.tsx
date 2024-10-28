@@ -6,8 +6,8 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { agencyAdminSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
+import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
-import { AgencyTag } from "src/app/components/forms/agency/AgencyTag";
 import { EditAgencyForm } from "src/app/components/forms/agency/EditAgencyForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
@@ -67,7 +67,7 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
       />
       {agency && (
         <>
-          <AgencyTag agency={agency} />
+          <AgencyTag agency={agency} className={fr.cx("fr-my-2w")} />
           <EditAgencyForm agency={agency} />
         </>
       )}
