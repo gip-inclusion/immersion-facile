@@ -27,11 +27,9 @@ export type UserOnRepository = User &
   WithEstablishments;
 
 export interface UserRepository {
-  delete(id: UserId): Promise<void>;
   save(user: UserOnRepository, provider: OAuthGatewayProvider): Promise<void>;
-
-  //TODO pourquoi cette méthode alors qu'on a un save?
-  updateEmail(userId: string, email: string): Promise<void>;
+  updateEmail(userId: string, email: string): Promise<void>; //TODO pourquoi cette méthode alors qu'on a un save?
+  delete(id: UserId): Promise<void>;
 
   getById(
     userId: UserId,
@@ -42,7 +40,10 @@ export interface UserRepository {
     provider: OAuthGatewayProvider,
   ): Promise<UserOnRepository[]>;
 
-  getUsers(filters: GetUsersFilters): Promise<UserOnRepository[]>;
+  getUsers(
+    filters: GetUsersFilters,
+    provider: OAuthGatewayProvider,
+  ): Promise<UserOnRepository[]>;
   findByExternalId(
     externalId: string,
     provider: OAuthGatewayProvider,
