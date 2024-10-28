@@ -325,11 +325,13 @@ export class AppConfig {
 
   public get inseeHttpConfig(): InseeAccessTokenConfig {
     return {
-      endpoint: this.#throwIfNotDefinedOrDefault("SIRENE_ENDPOINT"),
-      clientId: this.#throwIfNotDefinedOrDefault("SIRENE_CLIENT_ID"),
-      clientSecret: this.#throwIfNotDefinedOrDefault("SIRENE_CLIENT_SECRET"),
-      username: this.#throwIfNotDefinedOrDefault("SIRENE_USERNAME"),
-      password: this.#throwIfNotDefinedOrDefault("SIRENE_PASSWORD"),
+      endpoint: this.#throwIfNotDefinedOrDefault("SIRENE_INSEE_ENDPOINT"),
+      clientId: this.#throwIfNotDefinedOrDefault("SIRENE_INSEE_CLIENT_ID"),
+      clientSecret: this.#throwIfNotDefinedOrDefault(
+        "SIRENE_INSEE_CLIENT_SECRET",
+      ),
+      username: this.#throwIfNotDefinedOrDefault("SIRENE_INSEE_USERNAME"),
+      password: this.#throwIfNotDefinedOrDefault("SIRENE_INSEE_PASSWORD"),
     };
   }
 
