@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
+  InclusionConnectedUserBuilder,
   Notification,
   TemplatedEmail,
   expectObjectsToMatch,
@@ -65,7 +66,14 @@ describe("SendEmailWithAssessmentCreationLink", () => {
 
   it("Sends an email to immersions that end yesterday", async () => {
     // Arrange
-    const expectedAgency = uow.agencyRepository.agencies[0];
+    const expectedAgency = new AgencyDtoBuilder()
+      .withLogoUrl("http://LOGO AGENCY IF URL")
+      .build();
+    const counsellor = new InclusionConnectedUserBuilder()
+      .withId("counsellor")
+      .withEmail("counsellor@mail.com")
+      .build();
+
     const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
       .withAgencyId(expectedAgency.id)
       .withDateStart("2021-05-13T10:00:00.000Z")
@@ -80,6 +88,13 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       .withDateEnd("2021-05-16T10:00:00.000Z")
       .validated()
       .build();
+
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(expectedAgency, {
+        [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+      }),
+    ];
+    uow.userRepository.users = [counsellor];
 
     await uow.conventionRepository.save(immersionApplicationEndingTomorrow);
     await uow.conventionRepository.save(immersionApplicationEndingYesterday);
@@ -100,7 +115,8 @@ describe("SendEmailWithAssessmentCreationLink", () => {
         {
           kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
           params: {
-            agencyLogoUrl: "http://LOGO AGENCY IF URL",
+            // biome-ignore lint/style/noNonNullAssertion: <explanation>
+            agencyLogoUrl: expectedAgency.logoUrl!,
             beneficiaryFirstName: "Esteban",
             beneficiaryLastName: "Ocon",
             conventionId: "immersion-ending-yesterday-id",

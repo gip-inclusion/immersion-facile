@@ -1,10 +1,11 @@
 import {
+  AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionStatus,
+  InclusionConnectedUserBuilder,
   UpdateConventionStatusRequestDto,
   conventionMagicLinkRoutes,
-  defaultValidatorEmail,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectObjectsToMatch,
@@ -14,18 +15,32 @@ import {
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { InMemoryConventionRepository } from "../../../../domains/convention/adapters/InMemoryConventionRepository";
+import { UserOnRepository } from "../../../../domains/core/authentication/inclusion-connect/port/UserRepository";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { TestAppAndDeps, buildTestApp } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid conventions in the repository, and ask for establishment edition", async () => {
+    const agency = new AgencyDtoBuilder().build();
     const validConvention = new ConventionDtoBuilder()
       .withStatus("READY_TO_SIGN")
+      .withAgencyId(agency.id)
       .build();
+    const validator = new InclusionConnectedUserBuilder()
+      .withEmail("validator@mail.com")
+      .withId("validator")
+      .buildUser();
 
     const appAndDeps = await buildTestApp();
 
+    appAndDeps.inMemoryUow.userRepository.users = [validator];
+    appAndDeps.inMemoryUow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    ];
     appAndDeps.gateways.timeGateway.defaultDate = new Date();
     appAndDeps.gateways.shortLinkGenerator.addMoreShortLinkIds([
       "shortLink1",
@@ -44,6 +59,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       await beneficiarySubmitsApplicationForTheFirstTime(
         appAndDeps,
         validConvention,
+        validator,
       );
 
     await expectEstablishmentRequiresChanges(appAndDeps, establishmentRepJwt, {
@@ -59,6 +75,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   convention: ConventionDto,
+  validator: UserOnRepository,
 ) => {
   await request
     .post(unauthenticatedConventionRoutes.createConvention.url)
@@ -79,7 +96,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   expectToEqual(
     sentEmails.map((e) => e.recipients),
     [
-      [defaultValidatorEmail],
+      [validator.email],
       [convention.signatories.beneficiary.email],
       [convention.signatories.establishmentRepresentative.email],
     ],

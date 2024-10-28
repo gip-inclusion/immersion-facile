@@ -29,11 +29,11 @@ const rejectIfAgencyHaveCounsellorsButNoOneNotified = (
   agencyRights: AgencyUsersRights,
 ): void => {
   const counsellorRights = values(agencyRights).filter((right) =>
-    right.roles.includes("counsellor"),
+    right?.roles.includes("counsellor"),
   );
   if (
     counsellorRights.length > 0 &&
-    !counsellorRights.some((right) => right.isNotifiedByEmail === true)
+    !counsellorRights.some((right) => right?.isNotifiedByEmail === true)
   )
     throw errors.agency.notEnoughCounsellors({ agencyId });
 };
@@ -45,7 +45,7 @@ const rejectIfAgencyWontHaveSomeNotifiedValidator = (
   if (
     !values(agencyRights).some(
       (right) =>
-        right.isNotifiedByEmail === true && right.roles.includes("validator"),
+        right?.isNotifiedByEmail === true && right.roles.includes("validator"),
     )
   )
     throw errors.agency.notEnoughValidators({ agencyId });
