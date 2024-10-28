@@ -174,7 +174,7 @@ describe("Broadcast to partners on updated convention", () => {
       validator1,
       validator2,
     ];
-    uow.agencyRepository.setAgencies([agency1, agency2, agencyWithRefersTo]);
+    uow.agencyRepository.agencies = [agency1, agency2, agencyWithRefersTo];
   });
 
   it("broadcast updated convention to agency only", async () => {

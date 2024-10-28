@@ -116,7 +116,7 @@ describe("NotifyConventionNeedsReview", () => {
     });
 
     it("Nominal case: Sends notification email to councellor, with 2 existing councellors", async () => {
-      uow.agencyRepository.setAgencies([agencyWithCounsellorsAndValidators]);
+      uow.agencyRepository.agencies = [agencyWithCounsellorsAndValidators];
 
       const shortLinkIds = [
         "shortlink1",
@@ -207,7 +207,7 @@ describe("NotifyConventionNeedsReview", () => {
     });
 
     it("No counsellors available: we fall back to validators: Sends notification email to those validators (using 2 of them)", async () => {
-      uow.agencyRepository.setAgencies([agencyWithValidatorsOnly]);
+      uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
 
       const shortLinkIds = [
         "shortlink1",
@@ -306,7 +306,7 @@ describe("NotifyConventionNeedsReview", () => {
     });
 
     it("sends notification to counsellors (when they exist), even if there is a peAdvisor", async () => {
-      uow.agencyRepository.setAgencies([agencyWithCounsellorsAndValidators]);
+      uow.agencyRepository.agencies = [agencyWithCounsellorsAndValidators];
 
       const conventionInReviewWithPeAdvisor = new ConventionDtoBuilder(
         defaultConvention,
@@ -394,7 +394,7 @@ describe("NotifyConventionNeedsReview", () => {
     });
 
     it("Sends notification email to peAdvisor and validators when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
-      uow.agencyRepository.setAgencies([agencyWithValidatorsOnly]);
+      uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
       const shortLinkIds = [
         "shortlink1",
         "shortlink2",
@@ -572,7 +572,7 @@ describe("NotifyConventionNeedsReview", () => {
       const shortLinkIds = ["link1", "link2", "link3", "link4"];
       shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
-      uow.agencyRepository.setAgencies([agencyWithValidatorsOnly]);
+      uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
 
       await notifyNewConventionNeedsReview.execute({
         convention: acceptedByCounsellorConvention,
@@ -664,7 +664,7 @@ describe("NotifyConventionNeedsReview", () => {
     });
 
     it("Sends notification email to peAdvisor and validators when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
-      uow.agencyRepository.setAgencies([agencyWithValidatorsOnly]);
+      uow.agencyRepository.agencies = [agencyWithValidatorsOnly];
       const shortLinkIds = [
         "shortlink1",
         "shortlink2",

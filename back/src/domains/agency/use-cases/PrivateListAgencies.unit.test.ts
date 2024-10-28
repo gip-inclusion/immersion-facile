@@ -21,7 +21,7 @@ describe("PrivateListAgencies use case", () => {
       .withName("Agency needing review")
       .withStatus("needsReview")
       .build();
-    agencyRepository.setAgencies([
+    agencyRepository.agencies = [
       toAgencyWithRights(expectedAgency),
       toAgencyWithRights(
         AgencyDtoBuilder.create("3")
@@ -29,7 +29,7 @@ describe("PrivateListAgencies use case", () => {
           .withStatus("active")
           .build(),
       ),
-    ]);
+    ];
     const fetchedAgencies = await privateListAgencies.execute({
       status: "needsReview",
     });

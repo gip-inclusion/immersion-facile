@@ -265,11 +265,11 @@ describe("convention e2e", () => {
   )} gets a convention from a magic link`, () => {
     beforeEach(() => {
       inMemoryUow.conventionRepository.setConventions([convention]);
-      inMemoryUow.agencyRepository.setAgencies([
+      inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(peAgency, {
           [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
         }),
-      ]);
+      ];
     });
 
     it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
@@ -479,11 +479,11 @@ describe("convention e2e", () => {
     const externalId = "00000000001";
 
     beforeEach(() => {
-      inMemoryUow.agencyRepository.setAgencies([
+      inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(peAgency, {
           [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
         }),
-      ]);
+      ];
       const inReviewConvention = new ConventionDtoBuilder(convention)
         .withStatus("IN_REVIEW")
         .build();
@@ -736,7 +736,7 @@ describe("convention e2e", () => {
 
       const convention = new ConventionDtoBuilder().build();
       inMemoryUow.conventionRepository.setConventions([convention]);
-      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       gateways.timeGateway.setNextDate(new Date());
 

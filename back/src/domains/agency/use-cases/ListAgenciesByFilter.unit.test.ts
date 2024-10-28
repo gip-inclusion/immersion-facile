@@ -121,7 +121,7 @@ describe("Query: List agencies by filter", () => {
     listAgencyOptionsByFilter = new ListAgencyOptionsByFilter(
       new InMemoryUowPerformer(uow),
     );
-    uow.agencyRepository.setAgencies(allAgencies);
+    uow.agencyRepository.agencies = allAgencies;
   });
 
   describe("No filters", () => {

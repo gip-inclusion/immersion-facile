@@ -168,7 +168,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         validator1,
         validator2,
       ];
-      uow.agencyRepository.setAgencies([agencyWithRight]);
+      uow.agencyRepository.agencies = [agencyWithRight];
       shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
     });
 
@@ -414,7 +414,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             })
             .build();
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
           const shortLinkIds = ["link1", "link2"];
           shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -488,7 +488,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             })
             .build();
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
           const shortLinkIds = ["link1", "link2", "link3", "link4"];
           shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -587,7 +587,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             .withEstablishmentRepresentativePhone("+33211223344")
             .build();
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
           const shortLinkIds = ["link1", "link2"];
           shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
@@ -651,7 +651,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             .withStatus(status)
             .build();
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
           //Act & Assert
           await expectPromiseToFailWithError(
@@ -693,7 +693,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             })
             .build();
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
           const shortLinkIds = ["link1", "link2"];
           shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
@@ -761,7 +761,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             })
             .build();
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
           const shortLinkIds = ["link1", "link2", "link3"];
           shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
@@ -837,7 +837,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             .withStatus(status)
             .build();
           uow.conventionRepository.setConventions([convention]);
-          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
           //Act & Assert
           await expectPromiseToFailWithError(
@@ -959,7 +959,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           .build();
 
         uow.conventionRepository.setConventions([convention]);
-        uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+        uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
         const shortLinkIds = ["link1", "link2", "link3"];
         shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);

@@ -92,13 +92,13 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
         new CustomTimeGateway(),
       ),
     );
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(defaultAgency, {
         [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
         [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
         [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
       }),
-    ]);
+    ];
     uow.userRepository.users = [counsellor1, counsellor2, validator];
   });
 
@@ -135,7 +135,7 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
   });
 
   it("doesn't send duplicated rejection emails if validator email is also in counsellor emails and establishment tutor email is the same as establishment representative", async () => {
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(agencyWithSameEmailAdressForCounsellorAndValidator, {
         [counsellor1.id]: {
           isNotifiedByEmail: false,
@@ -146,7 +146,7 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
           roles: ["counsellor", "validator"],
         },
       }),
-    ]);
+    ];
 
     await useCase.execute({
       convention: deprecatedConventionWithDuplicatedEmails,

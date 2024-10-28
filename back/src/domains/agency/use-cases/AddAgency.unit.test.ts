@@ -111,7 +111,7 @@ describe("AddAgency use case", () => {
 
   describe("right paths", () => {
     it("save the agency in repo, with the default admin mail and the status to be reviewed", async () => {
-      uow.agencyRepository.setAgencies([]);
+      uow.agencyRepository.agencies = [];
       uow.userRepository.users = [];
 
       await addAgency.execute(createParisMissionLocaleParams);
@@ -160,7 +160,7 @@ describe("AddAgency use case", () => {
     });
 
     it("do not create other users if they exist with same email but apply rights on new agency for them", async () => {
-      uow.agencyRepository.setAgencies([]);
+      uow.agencyRepository.agencies = [];
       uow.userRepository.users = [counsellor, validator];
 
       await addAgency.execute(createParisMissionLocaleParams);
@@ -211,7 +211,7 @@ describe("AddAgency use case", () => {
         ...createParisMissionLocaleParams,
       };
 
-      uow.agencyRepository.setAgencies([]);
+      uow.agencyRepository.agencies = [];
       uow.userRepository.users = [];
 
       await addAgency.execute(poleEmploiParis);
@@ -268,12 +268,12 @@ describe("AddAgency use case", () => {
         rejectionJustification: null,
       };
       uow.userRepository.users = [counsellor, validator];
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(existingMiloAgency, {
           [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
           [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
         }),
-      ]);
+      ];
 
       await addAgency.execute(createAgencyWithRefersToParams);
 
@@ -351,7 +351,7 @@ describe("AddAgency use case", () => {
     });
 
     it("fails when refered agency is missing", async () => {
-      uow.agencyRepository.setAgencies([]);
+      uow.agencyRepository.agencies = [];
 
       await expectPromiseToFailWithError(
         addAgency.execute(createAgencyWithRefersToParams),
@@ -369,7 +369,7 @@ describe("AddAgency use case", () => {
         .withAgencySiret("11110000111100")
         .build();
 
-      uow.agencyRepository.setAgencies([toAgencyWithRights(existingAgency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(existingAgency)];
 
       await expectPromiseToFailWithError(
         addAgency.execute({ ...newAgency, validatorEmails: ["mail@mail.com"] }),

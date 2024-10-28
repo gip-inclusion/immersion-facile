@@ -80,7 +80,7 @@ describe("bottleneck", () => {
   });
 
   it("fails when too many request for a same bottleneck group", async () => {
-    inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+    inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
     inMemoryUow.conventionRepository.setConventions([convention]);
 
     const response = await Promise.all([
@@ -103,7 +103,7 @@ describe("bottleneck", () => {
   });
 
   it("success when two different bottleneck groups", async () => {
-    inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+    inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
     inMemoryUow.conventionRepository.setConventions([convention]);
 
     const response = await Promise.all([

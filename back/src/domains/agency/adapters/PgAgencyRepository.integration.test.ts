@@ -105,6 +105,197 @@ describe("PgAgencyRepository", () => {
     userRepository = new PgUserRepository(makeKyselyDb(pool));
   });
 
+  describe("insert", () => {
+    let agency1: AgencyDto;
+    let agency2: AgencyDto;
+
+    beforeEach(() => {
+      agency1 = agency1builder
+        .withAgencySiret("11110000111100")
+        .withCodeSafir("123")
+        .build();
+      agency2 = agency2builder.build();
+    });
+
+    it("inserts unknown agencies", async () => {
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+
+      await agencyRepository.insert(agency1);
+      const allActiveAgencies = await agencyRepository.getAgencies({});
+      expect(allActiveAgencies).toHaveLength(1);
+      expect(allActiveAgencies[0]).toEqual(agency1);
+
+      await agencyRepository.insert(agency2);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(2);
+    });
+
+    it("save correct agency right even if user is counsellor and validator", async () => {
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+      const userEmail = "user@mail.com";
+      const agency = agency1builder
+        .withCounsellorEmails([userEmail])
+        .withValidatorEmails([userEmail])
+        .build();
+      await agencyRepository.insert(agency);
+      expectToEqual(await agencyRepository.getAgencies({}), [agency]);
+    });
+
+    it("keeps the acquisitions fields when provided", async () => {
+      const withAcquisition = {
+        acquisitionKeyword: "keyword",
+        acquisitionCampaign: "campaign",
+      } satisfies WithAcquisition;
+      const agency = agency1builder.withAcquisition(withAcquisition).build();
+      await agencyRepository.insert(agency);
+      const result = await db
+        .selectFrom("agencies")
+        .select(["acquisition_campaign", "acquisition_keyword"])
+        .execute();
+
+      expectToEqual(result, [
+        {
+          acquisition_campaign: withAcquisition.acquisitionCampaign,
+          acquisition_keyword: withAcquisition.acquisitionKeyword,
+        },
+      ]);
+    });
+  });
+
+  describe("update", () => {
+    const agency1 = agency1builder
+      .withPosition(40, 2)
+      .withStatus("active")
+      .build();
+
+    it("updates the entire entity", async () => {
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+
+      await agencyRepository.insert(agency1);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
+
+      const updatedAgency1 = agency1builder
+        .withStatus("rejected")
+        .withName("Updated agency")
+        .withPosition(41, 3)
+        .withValidatorEmails(["updated@mail.com"])
+        .withAgencySiret("11110000111100")
+        .withCodeSafir("CODE_123")
+        .withAddress({
+          streetNumberAndAddress: "My new adress",
+          postcode: "64100",
+          departmentCode: "64",
+          city: "Bayonne",
+        })
+        .withRejectionJustification("justification du rejet")
+        .build();
+
+      await agencyRepository.update(updatedAgency1);
+      const inDb = await agencyRepository.getAgencies({});
+      expect(inDb).toHaveLength(1);
+      expectToEqual(inDb[0], updatedAgency1);
+    });
+
+    it("updates the only some fields", async () => {
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+
+      await agencyRepository.insert(agency1);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
+
+      await agencyRepository.update({
+        id: agency1.id,
+        status: "rejected",
+        rejectionJustification: "justification du rejet",
+      });
+      const inDb = await agencyRepository.getAgencies({});
+      expect(inDb).toHaveLength(1);
+      expectToEqual(inDb[0], {
+        ...agency1,
+        status: "rejected",
+        rejectionJustification: "justification du rejet",
+      });
+    });
+
+    it("switch the counsellor to validator", async () => {
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+      const agencyWithTwoStepValidation = agency1builder
+        .withCounsellorEmails(["counsellor@email.fr"])
+        .withValidatorEmails(["validator@email.fr"])
+        .withStatus("active")
+        .build();
+
+      await agencyRepository.insert(agencyWithTwoStepValidation);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
+      const users = await userRepository.getIcUsersWithFilter(
+        {
+          agencyId: agencyWithTwoStepValidation.id,
+        },
+        "InclusionConnect",
+      );
+      const counsellor = users.find(
+        (user) => user.email === "counsellor@email.fr",
+      );
+      const validator = users.find(
+        (user) => user.email === "validator@email.fr",
+      );
+      expect(users).toHaveLength(2);
+      expectArraysToEqualIgnoringOrder(users, [
+        {
+          ...validator,
+          agencyRights: [
+            {
+              agency: agencyWithTwoStepValidation,
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          ],
+        },
+        {
+          ...counsellor,
+          agencyRights: [
+            {
+              agency: agencyWithTwoStepValidation,
+              roles: ["counsellor"],
+              isNotifiedByEmail: true,
+            },
+          ],
+        },
+      ]);
+
+      await agencyRepository.update({
+        id: agencyWithTwoStepValidation.id,
+        validatorEmails: ["counsellor@email.fr"], // the counsellor becomes a validator
+        counsellorEmails: [],
+      });
+      const updatedUsers = await userRepository.getIcUsersWithFilter(
+        {
+          agencyId: agencyWithTwoStepValidation.id,
+        },
+        "InclusionConnect",
+      );
+      const expectedUpdatedAgency: AgencyDto = {
+        ...agencyWithTwoStepValidation,
+        validatorEmails: ["counsellor@email.fr"],
+        counsellorEmails: [],
+      };
+      expectArraysToEqualIgnoringOrder(await agencyRepository.getAgencies({}), [
+        expectedUpdatedAgency,
+      ]);
+      expect(updatedUsers).toHaveLength(1);
+      expectArraysToEqualIgnoringOrder(updatedUsers, [
+        {
+          ...counsellor,
+          agencyRights: [
+            {
+              agency: expectedUpdatedAgency,
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          ],
+        },
+      ]);
+    });
+  });
+
   describe("getById", () => {
     it("returns undefined when no agency found", async () => {
       const retrievedAgency = await agencyRepository.getById(agency1.id);
@@ -126,6 +317,32 @@ describe("PgAgencyRepository", () => {
         agencyWithRefersTo.id,
       );
       expectToEqual(retrievedAgency, agencyWithRefersTo);
+    });
+  });
+
+  describe("getBySafir", () => {
+    it("returns undefined when no agency found", async () => {
+      const retrievedAgency = await agencyRepository.getBySafir(agency1.id);
+      expect(retrievedAgency).toBeUndefined();
+    });
+
+    it("returns existing agency", async () => {
+      await agencyRepository.insert(agency1);
+
+      const retrievedAgency = await agencyRepository.getBySafir(safirCode);
+      expectToEqual(retrievedAgency, agency1);
+    });
+
+    it("throw conflict error on multiple agencies with same safir code", async () => {
+      await agencyRepository.insert(agency1);
+      await agencyRepository.insert(agency2);
+
+      await expectPromiseToFailWithError(
+        agencyRepository.getBySafir(safirCode),
+        new ConflictError(
+          safirConflictErrorMessage(safirCode, [agency1, agency2]),
+        ),
+      );
     });
   });
 
@@ -169,39 +386,6 @@ describe("PgAgencyRepository", () => {
         agencyRepository.getByIds([agency1.id]),
         errors.agencies.notFound({ agencyIds: [agency1.id] }),
       );
-    });
-  });
-
-  describe("getBySafir", () => {
-    it("returns undefined when no agency found", async () => {
-      const retrievedAgency = await agencyRepository.getBySafir(agency1.id);
-      expect(retrievedAgency).toBeUndefined();
-    });
-
-    it("returns existing agency", async () => {
-      await agencyRepository.insert(agency1);
-
-      const retrievedAgency = await agencyRepository.getBySafir(safirCode);
-      expectToEqual(retrievedAgency, agency1);
-    });
-
-    it("throw conflict error on multiple agencies with same safir code", async () => {
-      await agencyRepository.insert(agency1);
-      await agencyRepository.insert(agency2);
-
-      await expectPromiseToFailWithError(
-        agencyRepository.getBySafir(safirCode),
-        new ConflictError(
-          safirConflictErrorMessage(safirCode, [agency1, agency2]),
-        ),
-      );
-    });
-  });
-
-  describe("getImmersionFacileIdByKind", () => {
-    it("returns undefined for missing agency", async () => {
-      const agency = await agencyRepository.getImmersionFacileAgencyId();
-      expect(agency).toBeUndefined();
     });
   });
 
@@ -377,6 +561,95 @@ describe("PgAgencyRepository", () => {
         agencyWithParisInCoveredDepartments,
       ]);
     });
+
+    describe("to get agencies near by a given location", () => {
+      const placeStanislasPosition: GeoPositionDto = {
+        lat: 48.693339,
+        lon: 6.182858,
+      };
+
+      it("returns only active agencies which are less than certain distance", async () => {
+        const nancyAgency = agency1builder
+          .withName("Nancy agency")
+          .withPosition(48.697851, 6.20157)
+          .build();
+
+        const epinalAgency = agency2builder
+          .withName("Epinal agency")
+          .withPosition(48.179552, 6.441447)
+          .build();
+
+        const dijonAgency = AgencyDtoBuilder.create(
+          "33333333-3333-3333-3333-333333333333",
+        )
+          .withName("Dijon agency")
+          .withPosition(47.365086, 5.051027)
+          .build();
+
+        await Promise.all([
+          agencyRepository.insert(nancyAgency),
+          agencyRepository.insert(epinalAgency),
+          agencyRepository.insert(dijonAgency),
+          agencyRepository.insert(inactiveAgency),
+        ]);
+
+        // Act
+        const agencies = await agencyRepository.getAgencies({
+          filters: {
+            position: {
+              position: placeStanislasPosition,
+              distance_km: 100,
+            },
+            status: activeAgencyStatuses,
+          },
+        });
+
+        // Assert
+        expect(agencies).toEqual([nancyAgency, epinalAgency]);
+      });
+    });
+
+    describe("to get agencies near by a given department", () => {
+      it("returns only agencies in department", async () => {
+        const cergyAgency = agency1builder
+          .withId("11111111-1111-1111-1111-111111111111")
+          .withName("Agency Val d'Oise")
+          .withAddress({
+            departmentCode: "95",
+            city: "Cergy",
+            postcode: "95000",
+            streetNumberAndAddress: "",
+          })
+          .build();
+
+        const parisAgency = agency1builder
+          .withId("11111111-1111-1111-1111-111211111112")
+          .withName("Agency Val d'Oise")
+          .withAddress({
+            departmentCode: "75",
+            city: "Paris",
+            postcode: "75000",
+            streetNumberAndAddress: "au fond à droite",
+          })
+          .build();
+
+        await Promise.all([
+          agencyRepository.insert(parisAgency),
+          agencyRepository.insert(cergyAgency),
+        ]);
+
+        // Act
+        const agencies = await agencyRepository.getAgencies({
+          filters: {
+            departmentCode: "95",
+          },
+        });
+
+        // Assert
+        expectToEqual(agencies, [cergyAgency]);
+      });
+    });
+
     it("should not return refered agencies when the filter is provided", async () => {
       await agencyRepository.insert(agency1);
       await agencyRepository.insert(agencyWithRefersTo);
@@ -386,6 +659,22 @@ describe("PgAgencyRepository", () => {
       });
 
       expect(sortById(agencies)).toEqual([agency1]);
+    });
+
+    it("doesn't insert entities with existing ids", async () => {
+      const agency1a = agency1builder.withName("agency1a").build();
+      const agency1b = agency1builder.withName("agency1b").build();
+
+      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
+
+      await agencyRepository.insert(agency1a);
+      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
+
+      const id1b = await agencyRepository.insert(agency1b);
+      expect(id1b).toBeUndefined();
+
+      const [storedAgency] = await agencyRepository.getByIds([agency1a.id]);
+      expect(storedAgency?.name).toEqual(agency1a.name);
     });
   });
 
@@ -410,283 +699,19 @@ describe("PgAgencyRepository", () => {
     });
   });
 
-  describe("to get agencies near by a given location", () => {
-    const placeStanislasPosition: GeoPositionDto = {
-      lat: 48.693339,
-      lon: 6.182858,
-    };
-
-    it("returns only active agencies which are less than certain distance", async () => {
-      const nancyAgency = agency1builder
-        .withName("Nancy agency")
-        .withPosition(48.697851, 6.20157)
-        .build();
-
-      const epinalAgency = agency2builder
-        .withName("Epinal agency")
-        .withPosition(48.179552, 6.441447)
-        .build();
-
-      const dijonAgency = AgencyDtoBuilder.create(
-        "33333333-3333-3333-3333-333333333333",
-      )
-        .withName("Dijon agency")
-        .withPosition(47.365086, 5.051027)
-        .build();
-
-      await Promise.all([
-        agencyRepository.insert(nancyAgency),
-        agencyRepository.insert(epinalAgency),
-        agencyRepository.insert(dijonAgency),
-        agencyRepository.insert(inactiveAgency),
-      ]);
-
-      // Act
-      const agencies = await agencyRepository.getAgencies({
-        filters: {
-          position: {
-            position: placeStanislasPosition,
-            distance_km: 100,
-          },
-          status: activeAgencyStatuses,
-        },
-      });
-
-      // Assert
-      expect(agencies).toEqual([nancyAgency, epinalAgency]);
+  describe("getImmersionFacileAgencyId", () => {
+    it("returns undefined for missing agency", async () => {
+      const agency = await agencyRepository.getImmersionFacileAgencyId();
+      expect(agency).toBeUndefined();
     });
   });
 
-  describe("to get agencies near by a given department", () => {
-    it("returns only agencies in department", async () => {
-      const cergyAgency = agency1builder
-        .withId("11111111-1111-1111-1111-111111111111")
-        .withName("Agency Val d'Oise")
-        .withAddress({
-          departmentCode: "95",
-          city: "Cergy",
-          postcode: "95000",
-          streetNumberAndAddress: "",
-        })
-        .build();
-
-      const parisAgency = agency1builder
-        .withId("11111111-1111-1111-1111-111211111112")
-        .withName("Agency Val d'Oise")
-        .withAddress({
-          departmentCode: "75",
-          city: "Paris",
-          postcode: "75000",
-          streetNumberAndAddress: "au fond à droite",
-        })
-        .build();
-
-      await Promise.all([
-        agencyRepository.insert(parisAgency),
-        agencyRepository.insert(cergyAgency),
-      ]);
-
-      // Act
-      const agencies = await agencyRepository.getAgencies({
-        filters: {
-          departmentCode: "95",
-        },
-      });
-
-      // Assert
-      expectToEqual(agencies, [cergyAgency]);
-    });
+  describe("getUserIdByFilters", () => {
+    //TODO
   });
 
-  describe("insert", () => {
-    let agency1: AgencyDto;
-    let agency2: AgencyDto;
-
-    beforeEach(() => {
-      agency1 = agency1builder
-        .withAgencySiret("11110000111100")
-        .withCodeSafir("123")
-        .build();
-      agency2 = agency2builder.build();
-    });
-
-    it("inserts unknown agencies", async () => {
-      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
-
-      await agencyRepository.insert(agency1);
-      const allActiveAgencies = await agencyRepository.getAgencies({});
-      expect(allActiveAgencies).toHaveLength(1);
-      expect(allActiveAgencies[0]).toEqual(agency1);
-
-      await agencyRepository.insert(agency2);
-      expect(await agencyRepository.getAgencies({})).toHaveLength(2);
-    });
-
-    it("save correct agency right even if user is counsellor and validator", async () => {
-      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
-      const userEmail = "user@mail.com";
-      const agency = agency1builder
-        .withCounsellorEmails([userEmail])
-        .withValidatorEmails([userEmail])
-        .build();
-      await agencyRepository.insert(agency);
-      expectToEqual(await agencyRepository.getAgencies({}), [agency]);
-    });
-
-    it("keeps the acquisitions fields when provided", async () => {
-      const withAcquisition = {
-        acquisitionKeyword: "keyword",
-        acquisitionCampaign: "campaign",
-      } satisfies WithAcquisition;
-      const agency = agency1builder.withAcquisition(withAcquisition).build();
-      await agencyRepository.insert(agency);
-      const result = await db
-        .selectFrom("agencies")
-        .select(["acquisition_campaign", "acquisition_keyword"])
-        .execute();
-
-      expectToEqual(result, [
-        {
-          acquisition_campaign: withAcquisition.acquisitionCampaign,
-          acquisition_keyword: withAcquisition.acquisitionKeyword,
-        },
-      ]);
-    });
-  });
-
-  describe("update", () => {
-    const agency1 = agency1builder
-      .withPosition(40, 2)
-      .withStatus("active")
-      .build();
-
-    it("updates the entire entity", async () => {
-      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
-
-      await agencyRepository.insert(agency1);
-      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
-
-      const updatedAgency1 = agency1builder
-        .withStatus("rejected")
-        .withName("Updated agency")
-        .withPosition(41, 3)
-        .withValidatorEmails(["updated@mail.com"])
-        .withAgencySiret("11110000111100")
-        .withCodeSafir("CODE_123")
-        .withAddress({
-          streetNumberAndAddress: "My new adress",
-          postcode: "64100",
-          departmentCode: "64",
-          city: "Bayonne",
-        })
-        .withRejectionJustification("justification du rejet")
-        .build();
-
-      await agencyRepository.update(updatedAgency1);
-      const inDb = await agencyRepository.getAgencies({});
-      expect(inDb).toHaveLength(1);
-      expectToEqual(inDb[0], updatedAgency1);
-    });
-
-    it("updates the only some fields", async () => {
-      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
-
-      await agencyRepository.insert(agency1);
-      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
-
-      await agencyRepository.update({
-        id: agency1.id,
-        status: "rejected",
-        rejectionJustification: "justification du rejet",
-      });
-      const inDb = await agencyRepository.getAgencies({});
-      expect(inDb).toHaveLength(1);
-      expectToEqual(inDb[0], {
-        ...agency1,
-        status: "rejected",
-        rejectionJustification: "justification du rejet",
-      });
-    });
-
-    it("switch the counsellor to validator", async () => {
-      expect(await agencyRepository.getAgencies({})).toHaveLength(0);
-      const agencyWithTwoStepValidation = agency1builder
-        .withCounsellorEmails(["counsellor@email.fr"])
-        .withValidatorEmails(["validator@email.fr"])
-        .withStatus("active")
-        .build();
-
-      await agencyRepository.insert(agencyWithTwoStepValidation);
-      expect(await agencyRepository.getAgencies({})).toHaveLength(1);
-      const users = await userRepository.getIcUsersWithFilter(
-        {
-          agencyId: agencyWithTwoStepValidation.id,
-        },
-        "inclusionConnect",
-      );
-      const counsellor = users.find(
-        (user) => user.email === "counsellor@email.fr",
-      );
-      const validator = users.find(
-        (user) => user.email === "validator@email.fr",
-      );
-      expect(users).toHaveLength(2);
-      expectArraysToEqualIgnoringOrder(users, [
-        {
-          ...validator,
-          agencyRights: [
-            {
-              agency: agencyWithTwoStepValidation,
-              roles: ["validator"],
-              isNotifiedByEmail: true,
-            },
-          ],
-        },
-        {
-          ...counsellor,
-          agencyRights: [
-            {
-              agency: agencyWithTwoStepValidation,
-              roles: ["counsellor"],
-              isNotifiedByEmail: true,
-            },
-          ],
-        },
-      ]);
-
-      await agencyRepository.update({
-        id: agencyWithTwoStepValidation.id,
-        validatorEmails: ["counsellor@email.fr"], // the counsellor becomes a validator
-        counsellorEmails: [],
-      });
-      const updatedUsers = await userRepository.getIcUsersWithFilter(
-        {
-          agencyId: agencyWithTwoStepValidation.id,
-        },
-        "inclusionConnect",
-      );
-      const expectedUpdatedAgency: AgencyDto = {
-        ...agencyWithTwoStepValidation,
-        validatorEmails: ["counsellor@email.fr"],
-        counsellorEmails: [],
-      };
-      expectArraysToEqualIgnoringOrder(await agencyRepository.getAgencies({}), [
-        expectedUpdatedAgency,
-      ]);
-      expect(updatedUsers).toHaveLength(1);
-      expectArraysToEqualIgnoringOrder(updatedUsers, [
-        {
-          ...counsellor,
-          agencyRights: [
-            {
-              agency: expectedUpdatedAgency,
-              roles: ["validator"],
-              isNotifiedByEmail: true,
-            },
-          ],
-        },
-      ]);
-    });
+  describe("getAgenciesRightsByUserId", () => {
+    //TODO
   });
 
   describe("alreadyHasActiveAgencyWithSameAddressAndKind", () => {
@@ -721,23 +746,159 @@ describe("PgAgencyRepository", () => {
       expect(hasAlreadySimilarAgency).toBe(true);
     });
   });
-
-  it("doesn't insert entities with existing ids", async () => {
-    const agency1a = agency1builder.withName("agency1a").build();
-    const agency1b = agency1builder.withName("agency1b").build();
-
-    expect(await agencyRepository.getAgencies({})).toHaveLength(0);
-
-    await agencyRepository.insert(agency1a);
-    expect(await agencyRepository.getAgencies({})).toHaveLength(1);
-
-    const id1b = await agencyRepository.insert(agency1b);
-    expect(id1b).toBeUndefined();
-
-    const [storedAgency] = await agencyRepository.getByIds([agency1a.id]);
-    expect(storedAgency?.name).toEqual(agency1a.name);
-  });
 });
 
 const sortById = (agencies: AgencyDto[]): AgencyDto[] =>
   [...agencies].sort((a, b) => (a.id < b.id ? -1 : 1));
+
+// describe("updateAgencyRights", () => {
+//   it("updates an element in users__agencies table", async () => {
+//     await agencyRepository.insert(agency1);
+//     await insertUser(db, user1, provider);
+//     const agencyRights: AgencyRight[] = [
+//       {
+//         roles: ["counsellor"],
+//         agency: agency1,
+//         isNotifiedByEmail: false,
+//       },
+//     ];
+//     await userRepository.updateAgencyRights({
+//       userId: user1.id,
+//       agencyRights: agencyRights,
+//     });
+//     expectToEqual(await userRepository.getById(user1.id, provider), {
+//       ...user1,
+//       establishments: [],
+//       agencyRights: agencyRights,
+//       ...withEmptyDashboards,
+//     });
+
+//     await userRepository.updateAgencyRights({
+//       userId: user1.id,
+//       agencyRights: [
+//         {
+//           roles: ["validator"],
+//           agency: agency1,
+//           isNotifiedByEmail: true,
+//         },
+//       ],
+//     });
+
+//     expectToEqual(await userRepository.getById(user1.id, provider), {
+//       ...user1,
+//       establishments: [],
+//       agencyRights: [
+//         {
+//           roles: ["validator"],
+//           agency: {
+//             ...agency1,
+//             validatorEmails: [...agency1.validatorEmails, user1.email],
+//           },
+//           isNotifiedByEmail: true,
+//         },
+//       ],
+//       ...withEmptyDashboards,
+//     });
+//   });
+//   it("adds an element in users__agencies table", async () => {
+//     await agencyRepository.insert(agency1);
+//     await insertUser(db, user1, provider);
+//     const icUserToUpdate: InclusionConnectedUser = {
+//       ...user1,
+//       establishments: [],
+//       agencyRights: [
+//         {
+//           roles: ["counsellor"],
+//           agency: agency1,
+//           isNotifiedByEmail: false,
+//         },
+//       ],
+//       ...withEmptyDashboards,
+//     };
+
+//     await userRepository.updateAgencyRights({
+//       userId: icUserToUpdate.id,
+//       agencyRights: icUserToUpdate.agencyRights,
+//     });
+
+//     const savedIcUser = await userRepository.getById(user1.id, provider);
+//     expectToEqual(savedIcUser, icUserToUpdate);
+//   });
+
+//   it("Delete an element in users__agencies table when no agency rights are provided", async () => {
+//     await agencyRepository.insert(agency1);
+//     await insertUser(db, user1, provider);
+//     const icUserToSave: InclusionConnectedUser = {
+//       ...user1,
+//       establishments: [],
+//       agencyRights: [],
+//       ...withEmptyDashboards,
+//     };
+
+//     await userRepository.updateAgencyRights({
+//       userId: icUserToSave.id,
+//       agencyRights: icUserToSave.agencyRights,
+//     });
+
+//     const savedIcUser = await userRepository.getById(user1.id, provider);
+//     expectToEqual(savedIcUser, icUserToSave);
+//   });
+
+//   it("Delete just one element in users__agencies table when two agency rights are provided", async () => {
+//     await agencyRepository.insert(agency1);
+//     await agencyRepository.insert(agency2);
+
+//     await insertUser(db, user1, provider);
+
+//     const icUserToSave: InclusionConnectedUser = {
+//       ...user1,
+//       establishments: [],
+//       agencyRights: [
+//         {
+//           agency: agency1,
+//           roles: ["validator"],
+//           isNotifiedByEmail: false,
+//         },
+//         {
+//           agency: agency2,
+//           roles: ["to-review"],
+//           isNotifiedByEmail: false,
+//         },
+//       ],
+//       ...withEmptyDashboards,
+//     };
+
+//     await userRepository.updateAgencyRights({
+//       userId: icUserToSave.id,
+//       agencyRights: icUserToSave.agencyRights,
+//     });
+
+//     const savedIcUser = await userRepository.getById(user1.id, provider);
+
+//     expectToEqual(savedIcUser, icUserToSave);
+
+//     const updatedIcUserToSave: InclusionConnectedUser = {
+//       ...user1,
+//       establishments: [],
+//       agencyRights: [
+//         {
+//           agency: agency1,
+//           roles: ["validator"],
+//           isNotifiedByEmail: false,
+//         },
+//       ],
+//       ...withEmptyDashboards,
+//     };
+
+//     await userRepository.updateAgencyRights({
+//       userId: updatedIcUserToSave.id,
+//       agencyRights: updatedIcUserToSave.agencyRights,
+//     });
+
+//     const updatedSavedIcUser = await userRepository.getById(
+//       user1.id,
+//       provider,
+//     );
+//     expectToEqual(updatedSavedIcUser, updatedIcUserToSave);
+//   });
+// });

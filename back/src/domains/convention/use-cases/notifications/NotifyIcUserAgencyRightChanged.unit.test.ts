@@ -65,7 +65,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     });
 
     it("throw error when no user found", async () => {
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       await expectPromiseToFailWithError(
         notifyIcUserAgencyRightChanged.execute({
@@ -81,7 +81,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     });
 
     it("throw error when no user has no rights on agency", async () => {
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       uow.userRepository.users = [user];
 
       await expectPromiseToFailWithError(
@@ -104,11 +104,11 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     });
 
     it("Sends an email to counsellors with agency name", async () => {
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [user.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
         }),
-      ]);
+      ];
 
       await notifyIcUserAgencyRightChanged.execute({
         agencyId: agency.id,
@@ -134,11 +134,11 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     });
 
     it("Sends an email to validators with agency name", async () => {
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
         }),
-      ]);
+      ];
 
       await notifyIcUserAgencyRightChanged.execute({
         agencyId: agency.id,
@@ -164,11 +164,11 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     });
 
     it("Should not sends an email to validators with agency name when the new role is: to review", async () => {
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [user.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
         }),
-      ]);
+      ];
 
       await notifyIcUserAgencyRightChanged.execute({
         agencyId: agency.id,

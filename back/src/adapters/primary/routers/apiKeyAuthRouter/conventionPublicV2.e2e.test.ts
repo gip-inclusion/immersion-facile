@@ -98,7 +98,7 @@ describe("Convention routes", () => {
     });
 
     it("403 when the apiConsumer has READ access to convention but no scope", async () => {
-      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const { body, status } = await sharedRequest.getConventionById({
@@ -129,7 +129,7 @@ describe("Convention routes", () => {
     });
 
     it("returns 200 with the convention", async () => {
-      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       expect(
@@ -191,7 +191,7 @@ describe("Convention routes", () => {
     });
 
     it("200 - returns the conventions matching agencyIds in scope", async () => {
-      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       expect(displayRouteName(publicApiV2ConventionRoutes.getConventions)).toBe(

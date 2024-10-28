@@ -21,7 +21,8 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
     currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser[]> {
     throwIfNotAdmin(currentUser);
-    const userIds = await uow.agencyRepository.getUserIdByFilters(filters);
+    const userIds =
+      await uow.agencyRepository.getUserIdWithAgencyRightsByFilters(filters);
     const icUsers = await Promise.all(
       userIds.map((id) => getIcUserByUserId(uow, id)),
     );

@@ -91,7 +91,7 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
     config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
     uow.conventionRepository.setConventions([convention]);
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(agency, {
         [user.id]: {
           isNotifiedByEmail: false,
@@ -106,7 +106,7 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
           roles: ["counsellor"],
         },
       }),
-    ]);
+    ];
     uow.userRepository.users = [user, validatorUser, counsellorUser];
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,

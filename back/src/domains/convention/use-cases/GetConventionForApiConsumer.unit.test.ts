@@ -57,7 +57,7 @@ describe("Get Convention for ApiConsumer", () => {
     getConventionForApiConsumer = new GetConventionForApiConsumer(
       new InMemoryUowPerformer(uow),
     );
-    uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
     uow.conventionRepository.setConventions([convention]);
   });
 

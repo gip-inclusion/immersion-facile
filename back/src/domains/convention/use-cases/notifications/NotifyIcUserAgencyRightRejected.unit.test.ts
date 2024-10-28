@@ -68,7 +68,7 @@ describe("Notify icUser agency right rejected", () => {
   });
 
   it("Throw when no icUser were found", async () => {
-    uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
     await expectPromiseToFailWithError(
       notifyIcUserAgencyRightRejected.execute({
@@ -83,7 +83,7 @@ describe("Notify icUser agency right rejected", () => {
   });
 
   it("Send an email to icUser to notify that registration to agency was rejected", async () => {
-    uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
     uow.userRepository.users = [user];
 
     await notifyIcUserAgencyRightRejected.execute({

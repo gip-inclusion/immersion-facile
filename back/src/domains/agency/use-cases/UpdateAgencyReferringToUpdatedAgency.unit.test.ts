@@ -181,7 +181,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
     });
 
     it("do nothing when there no related agencies that refers to updated agency", async () => {
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(updatedAgency, {
           [updatedUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
@@ -191,7 +191,7 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
             roles: ["validator"],
           },
         }),
-      ]);
+      ];
 
       await updateAgencyReferringToUpdatedAgency.execute({
         agencyId: updatedAgency.id,

@@ -62,7 +62,7 @@ describe("Update agency status", () => {
       "Updates an agency status in repository and publishes an event to notify if status becomes $status",
       async (testParams) => {
         // Prepare
-        uow.agencyRepository.setAgencies([toAgencyWithRights(existingAgency)]);
+        uow.agencyRepository.agencies = [toAgencyWithRights(existingAgency)];
 
         // Act
         await updateAgencyStatus.execute(
