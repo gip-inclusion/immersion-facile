@@ -18,10 +18,6 @@ import { InseeSiretGateway } from "./InseeSiretGateway";
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
 // errors.
-//
-// Requires the following environment variables to be set for the tests to pass:
-// - SIRENE_ENDPOINT
-// - SIRENE_BEARER_TOKEN
 describe("AnnuaireDesEntreprisesSiretGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
   const config = AppConfig.createFromEnv();
@@ -46,7 +42,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
     const response =
       await siretGateway.getEstablishmentBySiret("18004623700012");
     expectToEqual(response, {
-      businessAddress: "NUM 34 ET 36 34 QUAI FRANCOIS MITTERRAND 75001 PARIS 1",
+      businessAddress: "NUM 34 ET 36 34 QUAI FRANCOIS MITTERRAND 75001 PARIS",
       businessName: "ETABLISSEMENT PUBLIC DU MUSEE DU LOUVRE",
       isOpen: true,
       nafDto: {
@@ -145,17 +141,17 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
     const establishment =
       await siretGateway.getEstablishmentBySiret("77570970201646");
     expect(establishment?.businessName).toBe(
-      "MUTUELLE ASSURANCE INSTITUTEUR FRANCE",
+      "MUTUELLE ASSURANCE INSTITUTEUR FRANCE (MAIF)",
     );
     expect(establishment).toEqual({
-      businessAddress: "200 AV SALVADOR ALLENDE BP 303 79038 NIORT CEDEX",
-      businessName: "MUTUELLE ASSURANCE INSTITUTEUR FRANCE",
+      businessAddress: "200 AVENUE SALVADOR ALLENDE 79000 NIORT",
+      businessName: "MUTUELLE ASSURANCE INSTITUTEUR FRANCE (MAIF)",
       isOpen: true,
       nafDto: {
         code: "6512Z",
         nomenclature: "NAFRev2",
       },
-      numberEmployeesRange: "",
+      numberEmployeesRange: "50-99",
       siret: "77570970201646",
     });
   });
