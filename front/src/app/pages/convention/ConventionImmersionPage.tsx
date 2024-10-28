@@ -217,8 +217,8 @@ const SharedConventionMessage = ({
             "fr-link--icon-right",
           )}
         >
-          Ou continuer avec mes identifiants Pôle emploi (candidats inscrits à
-          Pôle emploi)
+          Ou continuer avec mes identifiants France Travail (candidats inscrits
+          à France Travail)
         </a>
       </p>
     </div>
