@@ -96,8 +96,6 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     .buildUser();
 
   const agency = new AgencyDtoBuilder()
-    .withCounsellorEmails([])
-    .withValidatorEmails([])
     .withName("just-activated-agency")
     .withLogoUrl("https://agency-logo.com")
     .build();
@@ -119,8 +117,6 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     })
     .withName("just-activated-agency-refering-to-other-one")
     .withLogoUrl("https://agency-refering-logo.com")
-    .withCounsellorEmails([])
-    .withValidatorEmails([])
     .build();
 
   const agencyWithRefersToWithRights = toAgencyWithRights(agencyWithRefersTo, {
