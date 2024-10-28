@@ -264,7 +264,7 @@ describe("UpdateConventionStatus", () => {
 
       const agency = new AgencyDtoBuilder().build();
 
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       const conventionBuilder = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")

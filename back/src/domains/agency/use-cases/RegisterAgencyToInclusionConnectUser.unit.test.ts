@@ -75,11 +75,11 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
 
     it("fails if user already has agency rights", async () => {
       uow.userRepository.users = [user];
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(agency1, {
           [user.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
         }),
-      ]);
+      ];
 
       await expectPromiseToFailWithError(
         registerAgencyToInclusionConnectUser.execute([agency1.id], {
@@ -93,10 +93,10 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
   describe("When User and agencies exist", () => {
     beforeEach(() => {
       uow.userRepository.users = [user];
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(agency1, {}),
         toAgencyWithRights(agency2, {}),
-      ]);
+      ];
     });
 
     it("makes the link between user and provided agency id, and saves the corresponding event", async () => {

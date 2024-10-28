@@ -61,7 +61,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
     const shortLinks = ["shortLink1", "shortLink2", "shortLink3", "shortLink4"];
 
     beforeEach(() => {
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       shortLinkGenerator.addMoreShortLinkIds(shortLinks);
     });
 
@@ -296,9 +296,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
   describe("Wrong paths", () => {
     it("Convention missing", async () => {
       const convention = new ConventionDtoBuilder().build();
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(new AgencyDtoBuilder().build()),
-      ]);
+      ];
 
       await expectPromiseToFailWithError(
         useCase.execute({ convention }),

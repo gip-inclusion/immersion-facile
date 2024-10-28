@@ -49,7 +49,7 @@ describe("Agency routes", () => {
 
     httpClient = createSupertestSharedClient(agencyRoutes, deps.request);
 
-    inMemoryUow.agencyRepository.setAgencies([]);
+    inMemoryUow.agencyRepository.agencies = [];
     inMemoryUow.userRepository.users = [backofficeAdminUser];
     gateways.timeGateway.defaultDate = new Date();
 
@@ -112,14 +112,14 @@ describe("Agency routes", () => {
     )} get agencies with name and position given filters`, () => {
       it("Returns agency list with name and position nearby a given position", async () => {
         // Prepare
-        inMemoryUow.agencyRepository.setAgencies([
+        inMemoryUow.agencyRepository.agencies = [
           toAgencyWithRights(agency1ActiveNearBy),
           toAgencyWithRights(agency2ActiveNearBy),
           toAgencyWithRights(agency3ActiveFarAway),
           toAgencyWithRights(agency4NeedsReview, {
             [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
           }),
-        ]);
+        ];
 
         const response = await httpClient.getAgencyOptionsByFilter({
           queryParams: { departmentCode: "20" },
@@ -421,11 +421,11 @@ describe("Agency routes", () => {
 
       it("Updates the agency and returns code 200", async () => {
         // Prepare
-        inMemoryUow.agencyRepository.setAgencies([
+        inMemoryUow.agencyRepository.agencies = [
           toAgencyWithRights(agency4NeedsReview, {
             [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
           }),
-        ]);
+        ];
 
         const response = await httpClient.updateAgency({
           headers: { authorization: backofficeAdminToken },

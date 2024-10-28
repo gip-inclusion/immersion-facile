@@ -127,11 +127,11 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "link8",
     ]);
 
-    appAndDeps.inMemoryUow.agencyRepository.setAgencies([
+    appAndDeps.inMemoryUow.agencyRepository.agencies = [
       toAgencyWithRights(peAgency, {
         [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
       }),
-    ]);
+    ];
     appAndDeps.inMemoryUow.userRepository.users = [validator];
 
     appAndDeps.inMemoryUow.conventionExternalIdRepository.nextExternalId =

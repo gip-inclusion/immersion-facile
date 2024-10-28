@@ -166,7 +166,7 @@ describe("SendEstablishmentLeadReminder", () => {
         establishmentLeadAccepted,
         establishmentLeadToBeReminded,
       ];
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       uow.conventionRepository.setConventions([
         oldestConvention,
         newestConvention,
@@ -273,7 +273,7 @@ describe("SendEstablishmentLeadReminder", () => {
         establishmentLeadWithOneReminderSentYesterday,
       ];
 
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       uow.conventionRepository.setConventions([
         convention1,
         convention2,

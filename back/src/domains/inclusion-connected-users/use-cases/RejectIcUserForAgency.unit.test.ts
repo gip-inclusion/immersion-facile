@@ -160,7 +160,7 @@ describe("reject IcUser for agency", () => {
     const agency1 = new AgencyDtoBuilder().withId("agency1").build();
     const agency2 = new AgencyDtoBuilder().withId("agency2").build();
 
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(agency1, {
         [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
         [notAdmin.id]: { roles: ["validator"], isNotifiedByEmail: false },
@@ -168,7 +168,7 @@ describe("reject IcUser for agency", () => {
       toAgencyWithRights(agency2, {
         [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
       }),
-    ]);
+    ];
 
     uow.userRepository.users = [admin, user];
 

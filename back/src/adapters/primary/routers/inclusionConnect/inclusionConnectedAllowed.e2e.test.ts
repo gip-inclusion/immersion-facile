@@ -181,7 +181,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inclusionConnectedAllowedRoutes.registerAgenciesToUser,
     )} 200 add an agency as registered to an Inclusion Connected user`, async () => {
       inMemoryUow.userRepository.users = [agencyUser];
-      inMemoryUow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       const response = await httpClient.registerAgenciesToUser({
         headers: {
@@ -303,12 +303,12 @@ describe("InclusionConnectedAllowedRoutes", () => {
         .withAgencyId(conventionAgency.id)
         .build();
       inMemoryUow.userRepository.users = [user];
-      inMemoryUow.agencyRepository.setAgencies([
+      inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(userAgency, {
           [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
         }),
         toAgencyWithRights(conventionAgency),
-      ]);
+      ];
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await httpClient.markPartnersErroredConventionAsHandled({
@@ -344,11 +344,11 @@ describe("InclusionConnectedAllowedRoutes", () => {
         .withAgencyId(agency.id)
         .build();
       inMemoryUow.userRepository.users = [user];
-      inMemoryUow.agencyRepository.setAgencies([
+      inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
         }),
-      ]);
+      ];
       inMemoryUow.conventionRepository.setConventions([convention]);
       await inMemoryUow.broadcastFeedbacksRepository.save({
         serviceName: broadcastToPeServiceName,

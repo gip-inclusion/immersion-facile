@@ -99,13 +99,13 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
   });
 
   it("Sends cancelation email to beneficiary, establishment tutor, and counsellors, validor, beneficiary Representativ and beneficiary current employer", async () => {
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(defaultAgency, {
         [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
         [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
         [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
       }),
-    ]);
+    ];
 
     await useCase.execute({ convention: cancelledConvention });
     const {
@@ -140,7 +140,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
   });
 
   it("doesn't send duplicated emails if validator email is also in counsellor emails and establishment tutor email is the same as establishment representative", async () => {
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(agencyWithSameEmailAdressForCounsellorAndValidator, {
         [counsellor1.id]: {
           isNotifiedByEmail: false,
@@ -151,7 +151,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
           roles: ["counsellor", "validator"],
         },
       }),
-    ]);
+    ];
 
     await useCase.execute({
       convention: cancelledConventionWithDuplicatedEmails,

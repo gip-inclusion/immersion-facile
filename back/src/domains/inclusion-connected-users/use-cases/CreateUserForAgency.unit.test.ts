@@ -64,11 +64,11 @@ describe("CreateUserForAgency", () => {
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: { timeGateway, createNewEvent },
     });
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(agencyWithCounsellor, {
         [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
       }),
-    ]);
+    ];
     uow.userRepository.users = [icBackofficeAdminUser, notAdminUser];
   });
 

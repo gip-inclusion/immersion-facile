@@ -101,7 +101,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
       },
     );
 
-    uow.agencyRepository.setAgencies([agency]);
+    uow.agencyRepository.agencies = [agency];
 
     await useCase.execute({ convention: rejectedConvention });
 
@@ -156,9 +156,9 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
         },
       );
 
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       agencyWithSameEmailAdressForCounsellorAndValidator,
-    ]);
+    ];
 
     await useCase.execute({
       convention: rejectedConventionWithDuplicatedEmails,

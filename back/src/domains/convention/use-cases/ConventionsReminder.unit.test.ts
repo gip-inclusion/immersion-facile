@@ -142,7 +142,7 @@ describe("ConventionReminder use case", () => {
         convention2,
         conventionNeedsReminder,
       ]);
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       const summary = await conventionsReminder.execute();
       expectToEqual(summary, {
@@ -173,7 +173,7 @@ describe("ConventionReminder use case", () => {
         agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -210,7 +210,7 @@ describe("ConventionReminder use case", () => {
         agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -248,7 +248,7 @@ describe("ConventionReminder use case", () => {
         agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       // Act
       const summary = await conventionsReminder.execute();
@@ -305,7 +305,7 @@ describe("ConventionReminder use case", () => {
         agencyId: agency.id,
       });
       uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       // Act
       const summary = await conventionsReminder.execute();

@@ -104,9 +104,9 @@ describe("Update agency", () => {
 
     it("Fails to update agency if geo components are 0,0", async () => {
       const initialAgencyInRepo = new AgencyDtoBuilder().build();
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(initialAgencyInRepo, {}),
-      ]);
+      ];
       const updatedAgency = new AgencyDtoBuilder()
         .withId(initialAgencyInRepo.id)
         .withName("L'agence modifié")
@@ -130,9 +130,9 @@ describe("Update agency", () => {
   });
 
   it("Updates agency without changes on user rights and create corresponding event", async () => {
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(initialAgencyInRepo, {}),
-    ]);
+    ];
 
     const updatedAgency = new AgencyDtoBuilder(initialAgencyInRepo)
       .withName("L'agence modifié")

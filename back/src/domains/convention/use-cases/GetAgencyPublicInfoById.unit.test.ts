@@ -31,10 +31,10 @@ describe("GetAgencyPublicInfoById", () => {
 
   describe("Happy path", () => {
     it("Should return agency public info for agency with referred agency", async () => {
-      uow.agencyRepository.setAgencies([
+      uow.agencyRepository.agencies = [
         toAgencyWithRights(agency),
         toAgencyWithRights(agency2),
-      ]);
+      ];
 
       const expectedAgencyPublicDisplay: AgencyPublicDisplayDto = {
         id: agency2.id,
@@ -64,7 +64,7 @@ describe("GetAgencyPublicInfoById", () => {
     });
 
     it("Should return agency public info for agency without referred agency", async () => {
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       const expectedAgencyPublicDisplay: AgencyPublicDisplayDto = {
         id: agency.id,
@@ -94,7 +94,7 @@ describe("GetAgencyPublicInfoById", () => {
     });
 
     it("Should throw if referred agency doesn't exist", async () => {
-      uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       await expectPromiseToFailWithError(
         useCase.execute({ agencyId: agency2.id }),
         errors.agency.notFound({ agencyId: agency2.id }),

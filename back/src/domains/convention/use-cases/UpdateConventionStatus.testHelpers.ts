@@ -249,10 +249,10 @@ export const setupInitialState = ({
     timeGateway,
   );
 
-  agencyRepository.setAgencies([
+  agencyRepository.agencies = [
     agencyWithCounsellorEmails,
     agencyWithoutCounsellorEmail,
-  ]);
+  ];
   conventionRepository.setConventions(values(conventionsToTest));
   uow.userRepository.users = values(makeUserIdMapInclusionConnectedUser);
 

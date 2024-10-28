@@ -40,9 +40,9 @@ describe("Broadcasts events to pole-emploi", () => {
         timeGateway,
         { resyncMode: false },
       );
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(peAgencyWithoutCounsellorsAndValidators),
-    ]);
+    ];
   });
 
   it("Skips convention if not linked to an agency of kind pole-emploi nor agencyRefersTo of kind pole-emploi", async () => {
@@ -52,7 +52,7 @@ describe("Broadcasts events to pole-emploi", () => {
         .withKind("mission-locale")
         .build(),
     );
-    await uow.agencyRepository.setAgencies([agency]);
+    uow.agencyRepository.agencies = [agency];
 
     // Act
     const convention = new ConventionDtoBuilder()
@@ -246,10 +246,10 @@ describe("Broadcasts events to pole-emploi", () => {
         .build(),
     );
 
-    await uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       toAgencyWithRights(peAgencyWithoutCounsellorsAndValidators),
       agencyWithRefersTo,
-    ]);
+    ];
 
     const immersionConventionId: ConventionId =
       "00000000-0000-0000-0000-000000000000";

@@ -131,11 +131,11 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     config = new AppConfigBuilder().build();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([
+    uow.agencyRepository.agencies = [
       agencyWithOnlyValidator,
       agencyWithConsellorsAndValidator,
       agencyPeWithCouncellors,
-    ]);
+    ];
     uow.userRepository.users = [validator, councellor1, councellor2];
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,

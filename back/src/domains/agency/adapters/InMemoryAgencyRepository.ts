@@ -30,33 +30,6 @@ type AgencyById = Partial<Record<AgencyId, AgencyWithUsersRights>>;
 export class InMemoryAgencyRepository implements AgencyRepository {
   #agencies: AgencyById = {};
 
-  constructor(agencyList: AgencyWithUsersRights[] = testAgencies) {
-    agencyList.forEach((agency) => {
-      this.#agencies[agency.id] = agency;
-    });
-  }
-
-  async getAgenciesRightsByUserId(
-    id: UserId,
-  ): Promise<AgencyRightWithAgencyWithUsersRights[]> {
-    return values(this.#agencies).reduce<
-      AgencyRightWithAgencyWithUsersRights[]
-    >((acc, agency) => {
-      const userRights = agency?.usersRights[id];
-      return [
-        ...acc,
-        ...(userRights
-          ? [
-              {
-                agency,
-                ...userRights,
-              } satisfies AgencyRightWithAgencyWithUsersRights,
-            ]
-          : []),
-      ];
-    }, []);
-  }
-
   // test purpose only
   public get agencies(): AgencyWithUsersRights[] {
     return values(this.#agencies).filter(isTruthy);
@@ -72,24 +45,62 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     );
   }
 
-  public async alreadyHasActiveAgencyWithSameAddressAndKind({
-    address,
-    kind,
-    idToIgnore,
-  }: {
-    address: AddressDto;
-    kind: AgencyKind;
-    idToIgnore: AgencyId;
-  }): Promise<boolean> {
-    return this.agencies.some(
-      (agency) =>
-        agency.kind === kind &&
-        agency.address.streetNumberAndAddress ===
-          address.streetNumberAndAddress &&
-        agency.address.city === address.city &&
-        agency.status !== "rejected" &&
-        agency.id !== idToIgnore,
+  constructor(agencyList: AgencyWithUsersRights[] = testAgencies) {
+    agencyList.forEach((agency) => {
+      this.#agencies[agency.id] = agency;
+    });
+  }
+
+  public async insert(
+    agency: AgencyWithUsersRights,
+  ): Promise<AgencyId | undefined> {
+    if (this.#agencies[agency.id]) return undefined;
+    this.#agencies[agency.id] = agency;
+    return agency.id;
+  }
+
+  public async update(agency: PartialAgencyDto) {
+    const agencyToUdpate = this.#agencies[agency.id];
+    if (!agencyToUdpate) {
+      throw new Error(`Agency ${agency.id} does not exist`);
+    }
+    this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
+  }
+
+  public async getById(
+    id: AgencyId,
+  ): Promise<AgencyWithUsersRights | undefined> {
+    return this.#agencies[id];
+  }
+
+  public async getBySafir(
+    safirCode: string,
+  ): Promise<AgencyWithUsersRights | undefined> {
+    return values(this.#agencies)
+      .filter(isTruthy)
+      .find((agency) => agency.codeSafir === safirCode);
+  }
+
+  public async getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]> {
+    const result = ids.reduce<{
+      agencies: AgencyWithUsersRights[];
+      missingIds: AgencyId[];
+    }>(
+      (prev, id) => {
+        const agency = this.#agencies[id];
+        return {
+          agencies: agency ? [...prev.agencies, agency] : prev.agencies,
+          missingIds: !agency ? [...prev.missingIds, id] : prev.missingIds,
+        };
+      },
+      {
+        agencies: [],
+        missingIds: [],
+      },
     );
+    if (result.missingIds.length)
+      throw errors.agencies.notFound({ agencyIds: result.missingIds });
+    return result.agencies;
   }
 
   public async getAgencies({
@@ -131,47 +142,13 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       .filter((agency) => agency.refersToAgencyId === id);
   }
 
-  public async getById(
-    id: AgencyId,
-  ): Promise<AgencyWithUsersRights | undefined> {
-    return this.#agencies[id];
-  }
-
-  public async getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]> {
-    const result = ids.reduce<{
-      agencies: AgencyWithUsersRights[];
-      missingIds: AgencyId[];
-    }>(
-      (prev, id) => {
-        const agency = this.#agencies[id];
-        return {
-          agencies: agency ? [...prev.agencies, agency] : prev.agencies,
-          missingIds: !agency ? [...prev.missingIds, id] : prev.missingIds,
-        };
-      },
-      {
-        agencies: [],
-        missingIds: [],
-      },
-    );
-    if (result.missingIds.length)
-      throw errors.agencies.notFound({ agencyIds: result.missingIds });
-    return result.agencies;
-  }
-
-  public async getBySafir(
-    safirCode: string,
-  ): Promise<AgencyWithUsersRights | undefined> {
-    return values(this.#agencies)
-      .filter(isTruthy)
-      .find((agency) => agency.codeSafir === safirCode);
-  }
-
   public async getImmersionFacileAgencyId(): Promise<AgencyId> {
     return "immersion-facile-agency";
   }
 
-  public async getUserIdByFilters(filters: WithUserFilters): Promise<UserId[]> {
+  public async getUserIdWithAgencyRightsByFilters(
+    filters: WithUserFilters,
+  ): Promise<UserId[]> {
     if (!isWithAgencyRole(filters)) {
       const agency = this.#agencies[filters.agencyId];
       if (!agency) throw errors.agency.notFound(filters);
@@ -190,27 +167,45 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     );
   }
 
-  public async insert(
-    agency: AgencyWithUsersRights,
-  ): Promise<AgencyId | undefined> {
-    if (this.#agencies[agency.id]) return undefined;
-    this.#agencies[agency.id] = agency;
-    return agency.id;
+  public async getAgenciesRightsByUserId(
+    id: UserId,
+  ): Promise<AgencyRightWithAgencyWithUsersRights[]> {
+    return values(this.#agencies).reduce<
+      AgencyRightWithAgencyWithUsersRights[]
+    >((acc, agency) => {
+      const userRights = agency?.usersRights[id];
+      return [
+        ...acc,
+        ...(userRights
+          ? [
+              {
+                agency,
+                ...userRights,
+              } satisfies AgencyRightWithAgencyWithUsersRights,
+            ]
+          : []),
+      ];
+    }, []);
   }
 
-  public setAgencies(agencyList: AgencyWithUsersRights[]) {
-    this.#agencies = {};
-    agencyList.forEach((agency) => {
-      this.#agencies[agency.id] = agency;
-    });
-  }
-
-  public async update(agency: PartialAgencyDto) {
-    const agencyToUdpate = this.#agencies[agency.id];
-    if (!agencyToUdpate) {
-      throw new Error(`Agency ${agency.id} does not exist`);
-    }
-    this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
+  public async alreadyHasActiveAgencyWithSameAddressAndKind({
+    address,
+    kind,
+    idToIgnore,
+  }: {
+    address: AddressDto;
+    kind: AgencyKind;
+    idToIgnore: AgencyId;
+  }): Promise<boolean> {
+    return this.agencies.some(
+      (agency) =>
+        agency.kind === kind &&
+        agency.address.streetNumberAndAddress ===
+          address.streetNumberAndAddress &&
+        agency.address.city === address.city &&
+        agency.status !== "rejected" &&
+        agency.id !== idToIgnore,
+    );
   }
 }
 

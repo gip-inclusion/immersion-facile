@@ -71,11 +71,11 @@ describe("Get Convention", () => {
         };
 
         uow.userRepository.users = [user];
-        uow.agencyRepository.setAgencies([
+        uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [user.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
           }),
-        ]);
+        ];
         uow.conventionRepository.setConventions([convention]);
 
         await expectPromiseToFailWithError(
@@ -91,7 +91,7 @@ describe("Get Convention", () => {
 
       describe("with ConventionJwtPayload", () => {
         it("When convention id in jwt token does not match provided one", async () => {
-          uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
           uow.conventionRepository.setConventions([convention]);
 
           await expectPromiseToFailWithError(
@@ -117,7 +117,7 @@ describe("Get Convention", () => {
         ] as const)(
           "When the user email for role %s is not used in the convention anymore",
           async (role: Role) => {
-            uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+            uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
             uow.conventionRepository.setConventions([convention]);
             const payload: ConventionJwtPayload = {
               role,
@@ -150,12 +150,12 @@ describe("Get Convention", () => {
             .withId("another")
             .build();
 
-          uow.agencyRepository.setAgencies([
+          uow.agencyRepository.agencies = [
             toAgencyWithRights(agency),
             toAgencyWithRights(anotherAgency, {
               [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
             }),
-          ]);
+          ];
           uow.conventionRepository.setConventions([convention]);
           uow.userRepository.users = [user];
 
@@ -193,7 +193,7 @@ describe("Get Convention", () => {
       });
 
       it("When if user is not on inclusion connected users", async () => {
-        uow.agencyRepository.setAgencies([toAgencyWithRights(agency)]);
+        uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
         uow.conventionRepository.setConventions([convention]);
         const userId = "my-user-id";
 
@@ -223,11 +223,11 @@ describe("Get Convention", () => {
         };
 
         uow.userRepository.users = [user];
-        uow.agencyRepository.setAgencies([
+        uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
           }),
-        ]);
+        ];
 
         const fetchedConvention = await getConvention.execute(
           { conventionId: convention.id },

@@ -44,26 +44,180 @@ const MAX_AGENCIES_RETURNED = 200;
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async alreadyHasActiveAgencyWithSameAddressAndKind({
-    idToIgnore,
-    kind,
-    address,
-  }: {
-    idToIgnore: AgencyId;
-    kind: AgencyKind;
-    address: AddressDto;
-  }) {
-    const alreadyExistingAgencies = await this.transaction
-      .selectFrom("agencies")
-      .selectAll()
-      .where("kind", "=", kind)
-      .where("status", "!=", "rejected")
-      .where("street_number_and_address", "=", address.streetNumberAndAddress)
-      .where("city", "=", address.city)
-      .where("id", "!=", idToIgnore)
+  public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
+    try {
+      await this.transaction
+        .insertInto("agencies")
+        .values(({ fn }) => ({
+          id: agency.id,
+          name: agency.name,
+          status: agency.status,
+          kind: agency.kind,
+          questionnaire_url: agency.questionnaireUrl,
+          email_signature: agency.signature,
+          logo_url: agency.logoUrl,
+          position: fn("ST_MakePoint", [
+            sql`${agency.position.lon}, ${agency.position.lat}`,
+          ]),
+          agency_siret: agency.agencySiret,
+          code_safir: agency.codeSafir,
+          street_number_and_address: agency.address.streetNumberAndAddress,
+          post_code: agency.address.postcode,
+          city: agency.address.city,
+          department_code: agency.address.departmentCode,
+          covered_departments: JSON.stringify(agency.coveredDepartments),
+          refers_to_agency_id: agency.refersToAgencyId,
+          acquisition_campaign: agency.acquisitionCampaign,
+          acquisition_keyword: agency.acquisitionKeyword,
+        }))
+        .execute();
+
+      await Promise.all(
+        agency.validatorEmails.map(async (email) =>
+          this.#addUserAndAgencyRights(
+            email,
+            agency.id,
+            agency.counsellorEmails.includes(email)
+              ? ["counsellor", "validator"]
+              : ["validator"],
+          ),
+        ),
+      );
+
+      await Promise.all(
+        agency.counsellorEmails.map(async (email) =>
+          this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
+        ),
+      );
+    } catch (error: any) {
+      // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
+      // See https://www.postgresql.org/docs/10/errcodes-appendix.html
+      if (error.code === "23505") {
+        logger.error({ error });
+        return undefined;
+      }
+      throw error;
+    }
+
+    return agency.id;
+  }
+
+  public async update(agency: PartialAgencyDto): Promise<void> {
+    await this.transaction
+      .updateTable("agencies")
+      .set(({ fn }) => ({
+        name: agency.name,
+        status: agency.status,
+        kind: agency.kind,
+        questionnaire_url: agency.questionnaireUrl,
+        email_signature: agency.signature,
+        logo_url: agency.logoUrl,
+        position: agency.position
+          ? fn("ST_MakePoint", [
+              sql`${agency.position.lon}, ${agency.position.lat}`,
+            ])
+          : undefined,
+        agency_siret: agency.agencySiret,
+        code_safir: agency.codeSafir,
+        street_number_and_address: agency.address?.streetNumberAndAddress,
+        post_code: agency.address?.postcode,
+        city: agency.address?.city,
+        department_code: agency.address?.departmentCode,
+        covered_departments:
+          agency.coveredDepartments &&
+          JSON.stringify(agency.coveredDepartments),
+        refers_to_agency_id: agency.refersToAgencyId,
+        updated_at: sql`NOW()`,
+        rejection_justification: agency.rejectionJustification,
+      }))
+      .where("id", "=", agency.id)
       .execute();
 
-    return alreadyExistingAgencies.length > 0;
+    if (agency.validatorEmails) {
+      await this.transaction
+        .deleteFrom("users__agencies")
+        .where(usersAgenciesRolesIncludeValidator)
+        .where("is_notified_by_email", "=", true)
+        .where("agency_id", "=", agency.id)
+        .execute();
+    }
+
+    if (agency.counsellorEmails) {
+      await this.transaction
+        .deleteFrom("users__agencies")
+        .where(usersAgenciesRolesIncludeCounsellor)
+        .where("is_notified_by_email", "=", true)
+        .where("agency_id", "=", agency.id)
+        .execute();
+    }
+
+    if (agency.validatorEmails) {
+      await Promise.all(
+        agency.validatorEmails.map(async (email) =>
+          this.#addUserAndAgencyRights(
+            email,
+            agency.id,
+            agency.counsellorEmails?.includes(email)
+              ? ["counsellor", "validator"]
+              : ["validator"],
+          ),
+        ),
+      );
+    }
+
+    if (agency.counsellorEmails) {
+      await Promise.all(
+        agency.counsellorEmails.map(async (email) =>
+          this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
+        ),
+      );
+    }
+  }
+
+  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
+    const agencyWithoutEmails = await this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("a.id", "=", id)
+      .executeTakeFirst()
+      .then((row) => row?.agency);
+
+    if (!agencyWithoutEmails) return;
+
+    return this.#addEmailsToAgency(agencyWithoutEmails);
+  }
+
+  public async getBySafir(safirCode: string): Promise<AgencyDto | undefined> {
+    const agenciesWithoutEmails =
+      await this.#getAgencyWithJsonBuiltQueryBuilder()
+        .where("a.code_safir", "=", safirCode)
+        .execute()
+        .then(map((row) => row.agency));
+
+    if (!agenciesWithoutEmails.length) return;
+
+    if (agenciesWithoutEmails.length > 1)
+      throw new ConflictError(
+        safirConflictErrorMessage(safirCode, agenciesWithoutEmails),
+      );
+
+    return this.#addEmailsToAgency(agenciesWithoutEmails[0]);
+  }
+
+  public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
+    if (ids.length === 0) return [];
+    const agenciesWithoutEmails =
+      await this.#getAgencyWithJsonBuiltQueryBuilder()
+        .where("a.id", "in", ids)
+        .orderBy("a.updated_at", "desc")
+        .execute()
+        .then(map((row) => row.agency));
+    const missingIds = ids.filter(
+      (id) => !agenciesWithoutEmails.some((agency) => agency.id === id),
+    );
+
+    if (missingIds.length)
+      throw errors.agencies.notFound({ agencyIds: missingIds });
+
+    return this.#addEmailsToAgencies(agenciesWithoutEmails);
   }
 
   public async getAgencies({
@@ -204,52 +358,6 @@ export class PgAgencyRepository implements AgencyRepository {
     return this.#addEmailsToAgencies(agenciesWithoutEmails);
   }
 
-  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
-    const agencyWithoutEmails = await this.#getAgencyWithJsonBuiltQueryBuilder()
-      .where("a.id", "=", id)
-      .executeTakeFirst()
-      .then((row) => row?.agency);
-
-    if (!agencyWithoutEmails) return;
-
-    return this.#addEmailsToAgency(agencyWithoutEmails);
-  }
-
-  public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
-    if (ids.length === 0) return [];
-    const agenciesWithoutEmails =
-      await this.#getAgencyWithJsonBuiltQueryBuilder()
-        .where("a.id", "in", ids)
-        .orderBy("a.updated_at", "desc")
-        .execute()
-        .then(map((row) => row.agency));
-    const missingIds = ids.filter(
-      (id) => !agenciesWithoutEmails.some((agency) => agency.id === id),
-    );
-
-    if (missingIds.length)
-      throw errors.agencies.notFound({ agencyIds: missingIds });
-
-    return this.#addEmailsToAgencies(agenciesWithoutEmails);
-  }
-
-  public async getBySafir(safirCode: string): Promise<AgencyDto | undefined> {
-    const agenciesWithoutEmails =
-      await this.#getAgencyWithJsonBuiltQueryBuilder()
-        .where("a.code_safir", "=", safirCode)
-        .execute()
-        .then(map((row) => row.agency));
-
-    if (!agenciesWithoutEmails.length) return;
-
-    if (agenciesWithoutEmails.length > 1)
-      throw new ConflictError(
-        safirConflictErrorMessage(safirCode, agenciesWithoutEmails),
-      );
-
-    return this.#addEmailsToAgency(agenciesWithoutEmails[0]);
-  }
-
   public async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
     return this.transaction
       .selectFrom("agencies")
@@ -259,134 +367,26 @@ export class PgAgencyRepository implements AgencyRepository {
       .then((row) => row?.id);
   }
 
-  public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
-    try {
-      await this.transaction
-        .insertInto("agencies")
-        .values(({ fn }) => ({
-          id: agency.id,
-          name: agency.name,
-          status: agency.status,
-          kind: agency.kind,
-          questionnaire_url: agency.questionnaireUrl,
-          email_signature: agency.signature,
-          logo_url: agency.logoUrl,
-          position: fn("ST_MakePoint", [
-            sql`${agency.position.lon}, ${agency.position.lat}`,
-          ]),
-          agency_siret: agency.agencySiret,
-          code_safir: agency.codeSafir,
-          street_number_and_address: agency.address.streetNumberAndAddress,
-          post_code: agency.address.postcode,
-          city: agency.address.city,
-          department_code: agency.address.departmentCode,
-          covered_departments: JSON.stringify(agency.coveredDepartments),
-          refers_to_agency_id: agency.refersToAgencyId,
-          acquisition_campaign: agency.acquisitionCampaign,
-          acquisition_keyword: agency.acquisitionKeyword,
-        }))
-        .execute();
-
-      await Promise.all(
-        agency.validatorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(
-            email,
-            agency.id,
-            agency.counsellorEmails.includes(email)
-              ? ["counsellor", "validator"]
-              : ["validator"],
-          ),
-        ),
-      );
-
-      await Promise.all(
-        agency.counsellorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
-        ),
-      );
-    } catch (error: any) {
-      // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
-      // See https://www.postgresql.org/docs/10/errcodes-appendix.html
-      if (error.code === "23505") {
-        logger.error({ error });
-        return undefined;
-      }
-      throw error;
-    }
-
-    return agency.id;
-  }
-
-  public async update(agency: PartialAgencyDto): Promise<void> {
-    await this.transaction
-      .updateTable("agencies")
-      .set(({ fn }) => ({
-        name: agency.name,
-        status: agency.status,
-        kind: agency.kind,
-        questionnaire_url: agency.questionnaireUrl,
-        email_signature: agency.signature,
-        logo_url: agency.logoUrl,
-        position: agency.position
-          ? fn("ST_MakePoint", [
-              sql`${agency.position.lon}, ${agency.position.lat}`,
-            ])
-          : undefined,
-        agency_siret: agency.agencySiret,
-        code_safir: agency.codeSafir,
-        street_number_and_address: agency.address?.streetNumberAndAddress,
-        post_code: agency.address?.postcode,
-        city: agency.address?.city,
-        department_code: agency.address?.departmentCode,
-        covered_departments:
-          agency.coveredDepartments &&
-          JSON.stringify(agency.coveredDepartments),
-        refers_to_agency_id: agency.refersToAgencyId,
-        updated_at: sql`NOW()`,
-        rejection_justification: agency.rejectionJustification,
-      }))
-      .where("id", "=", agency.id)
+  public async alreadyHasActiveAgencyWithSameAddressAndKind({
+    idToIgnore,
+    kind,
+    address,
+  }: {
+    idToIgnore: AgencyId;
+    kind: AgencyKind;
+    address: AddressDto;
+  }) {
+    const alreadyExistingAgencies = await this.transaction
+      .selectFrom("agencies")
+      .selectAll()
+      .where("kind", "=", kind)
+      .where("status", "!=", "rejected")
+      .where("street_number_and_address", "=", address.streetNumberAndAddress)
+      .where("city", "=", address.city)
+      .where("id", "!=", idToIgnore)
       .execute();
 
-    if (agency.validatorEmails) {
-      await this.transaction
-        .deleteFrom("users__agencies")
-        .where(usersAgenciesRolesIncludeValidator)
-        .where("is_notified_by_email", "=", true)
-        .where("agency_id", "=", agency.id)
-        .execute();
-    }
-
-    if (agency.counsellorEmails) {
-      await this.transaction
-        .deleteFrom("users__agencies")
-        .where(usersAgenciesRolesIncludeCounsellor)
-        .where("is_notified_by_email", "=", true)
-        .where("agency_id", "=", agency.id)
-        .execute();
-    }
-
-    if (agency.validatorEmails) {
-      await Promise.all(
-        agency.validatorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(
-            email,
-            agency.id,
-            agency.counsellorEmails?.includes(email)
-              ? ["counsellor", "validator"]
-              : ["validator"],
-          ),
-        ),
-      );
-    }
-
-    if (agency.counsellorEmails) {
-      await Promise.all(
-        agency.counsellorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
-        ),
-      );
-    }
+    return alreadyExistingAgencies.length > 0;
   }
 
   async #addUserAndAgencyRights(

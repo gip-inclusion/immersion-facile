@@ -59,26 +59,31 @@ export type AgencyWithUsersRights = OmitFromExistingKeys<
   WithAgencyUserRights;
 
 export interface AgencyRepository {
+  insert(agency: AgencyWithUsersRights): Promise<AgencyId | undefined>;
+  update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
+
+  getById(id: AgencyId): Promise<AgencyWithUsersRights | undefined>;
+  getBySafir(safirCode: string): Promise<AgencyWithUsersRights | undefined>;
+  getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]>;
+  getAgencies(props: {
+    filters?: GetAgenciesFilters;
+    limit?: number;
+  }): Promise<AgencyWithUsersRights[]>;
+
+  getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyWithUsersRights[]>;
+
+  getImmersionFacileAgencyId(): Promise<AgencyId | undefined>;
+  getUserIdWithAgencyRightsByFilters(
+    filters: WithUserFilters,
+  ): Promise<UserId[]>;
+  getAgenciesRightsByUserId(
+    id: UserId,
+  ): Promise<AgencyRightWithAgencyWithUsersRights[]>;
   alreadyHasActiveAgencyWithSameAddressAndKind(params: {
     address: AddressDto;
     kind: AgencyKind;
     idToIgnore: AgencyId;
   }): Promise<boolean>;
-  getAgencies(props: {
-    filters?: GetAgenciesFilters;
-    limit?: number;
-  }): Promise<AgencyWithUsersRights[]>;
-  getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyWithUsersRights[]>;
-  getById(id: AgencyId): Promise<AgencyWithUsersRights | undefined>;
-  getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]>;
-  getBySafir(safirCode: string): Promise<AgencyWithUsersRights | undefined>;
-  getImmersionFacileAgencyId(): Promise<AgencyId | undefined>;
-  insert(agency: AgencyWithUsersRights): Promise<AgencyId | undefined>;
-  update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
-  getAgenciesRightsByUserId(
-    id: UserId,
-  ): Promise<AgencyRightWithAgencyWithUsersRights[]>;
-  getUserIdByFilters(filters: WithUserFilters): Promise<UserId[]>;
 }
 
 export const updateAgencyRightsForUser = async (

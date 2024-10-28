@@ -74,7 +74,7 @@ describe("RenewConventionMagicLink use case", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([toAgencyWithRights(defaultAgency)]);
+    uow.agencyRepository.agencies = [toAgencyWithRights(defaultAgency)];
     uow.conventionRepository.setConventions([validConvention]);
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     useCase = new RenewConventionMagicLink(
