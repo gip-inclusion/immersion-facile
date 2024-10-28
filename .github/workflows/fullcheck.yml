@@ -13,8 +13,6 @@ on:
         required: true
       IC_USERNAME:
         required: true
-      SIRENE_BEARER_TOKEN:
-        required: true
       SIRENE_CLIENT_ID:
         required: true
       SIRENE_CLIENT_SECRET:
@@ -132,7 +130,6 @@ jobs:
       INBOUND_EMAIL_ALLOWED_IPS: ::ffff:127.0.0.1
       SIRENE_REPOSITORY: ANNUAIRE_DES_ENTREPRISES
       SIRENE_ENDPOINT: https://api.insee.fr/api-sirene/prive/3.11
-      SIRENE_BEARER_TOKEN: ${{ secrets.SIRENE_BEARER_TOKEN }}
       SIRENE_CLIENT_ID: ${{ secrets.SIRENE_CLIENT_ID }}
       SIRENE_CLIENT_SECRET: ${{ secrets.SIRENE_CLIENT_SECRET }}
       SIRENE_USERNAME: ${{ secrets.SIRENE_USERNAME }}

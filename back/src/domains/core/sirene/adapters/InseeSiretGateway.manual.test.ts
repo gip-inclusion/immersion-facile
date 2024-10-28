@@ -15,7 +15,10 @@ import { InseeSiretGateway } from "./InseeSiretGateway";
 //
 // Requires the following environment variables to be set for the tests to pass:
 // - SIRENE_ENDPOINT
-// - SIRENE_BEARER_TOKEN
+// - SIRENE_CLIENT_ID
+// - SIRENE_CLIENT_SECRET
+// - SIRENE_USERNAME
+// - SIRENE_PASSWORD
 describe("HttpSirenGateway", () => {
   let siretGateway: InseeSiretGateway;
 
