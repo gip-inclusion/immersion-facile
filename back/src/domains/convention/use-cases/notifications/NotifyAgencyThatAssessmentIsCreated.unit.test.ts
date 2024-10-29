@@ -103,7 +103,6 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,
             establishmentFeedback: assessment.establishmentFeedback,
-            agencyValidatorEmail: agency.validatorEmails[0],
             assessmentStatus: assessment.status,
             internshipKind: convention.internshipKind,
           },

@@ -100,7 +100,6 @@ const createNotification = ({
             emergencyContactInfos: "",
             agencyLogoUrl: "https://super link",
             agencyAssessmentDocumentLink: "https://super link",
-            agencyReferentEmail: "",
             magicLink: "",
             validatorName: convention.validators?.agencyValidator
               ? concatValidatorNames(convention.validators?.agencyValidator)

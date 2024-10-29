@@ -65,7 +65,6 @@ export type EmailParamsByEmailType = {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
-    agencyValidatorEmail: string;
     internshipKind: InternshipKind;
     agencyAssessmentDocumentLink: string | undefined;
   };
@@ -183,7 +182,6 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     businessName: string;
     establishmentFeedback: string;
-    agencyValidatorEmail: Email;
     assessmentStatus: AssessmentStatus;
     internshipKind: InternshipKind;
   };
@@ -390,7 +388,6 @@ export type EmailParamsByEmailType = {
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     agencyAssessmentDocumentLink: string | undefined;
     agencyLogoUrl: AbsoluteUrl | undefined;
-    agencyReferentEmail: string;
     beneficiaryBirthdate: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;

@@ -172,9 +172,6 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           isUrlValid(agency.questionnaireUrl)
             ? agency.questionnaireUrl
             : undefined,
-        agencyReferentEmail: agency.refersToAgencyId
-          ? agency.counsellorEmails[0]
-          : agency.validatorEmails[0],
         magicLink: await makeShortMagicLink(frontRoutes.conventionDocument),
         validatorName: convention.validators?.agencyValidator
           ? concatValidatorNames(convention.validators?.agencyValidator)

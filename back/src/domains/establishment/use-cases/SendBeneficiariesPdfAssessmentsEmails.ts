@@ -86,7 +86,6 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
         recipients: [convention.signatories.beneficiary.email],
         sender: immersionFacileNoReplyEmailSender,
         params: {
-          agencyValidatorEmail: agency.validatorEmails[0],
           beneficiaryFirstName: convention.signatories.beneficiary.firstName,
           beneficiaryLastName: convention.signatories.beneficiary.lastName,
           businessName: convention.businessName,

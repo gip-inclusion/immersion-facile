@@ -700,7 +700,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         magicLink,
         validatorName,
         agencyAssessmentDocumentLink,
-        agencyReferentEmail,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -743,9 +742,9 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           kind: "info",
           content: `${
             internshipKind === "immersion"
-              ? "À la fin de l'immersion, nous vous remercions de compléter la fiche bilan de l'immersion, et de l'envoyer au conseiller qui a signé la convention (France Travail, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion,"
-              : "À la fin du mini stage, nous vous remercions de compléter la fiche bilan du mini stage, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage, "
-          } puis envoyée à <a href= "mailto:${agencyReferentEmail}" target="_blank">${agencyReferentEmail}</a>.`,
+              ? "À la fin de l'immersion, nous vous remercions de compléter la fiche bilan de l'immersion, et de l'envoyer au conseiller qui a signé la convention (France Travail, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion."
+              : "À la fin du mini stage, nous vous remercions de compléter la fiche bilan du mini stage, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage."
+          }`,
         },
         subContent: `
       ${defaultSignature(internshipKind)}
@@ -1044,7 +1043,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
-        agencyValidatorEmail,
         internshipKind,
         agencyAssessmentDocumentLink,
       }) => ({
@@ -1062,7 +1060,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             : "mini-stage"
         } au sein de l'entreprise ${businessName} est bientôt finie.
         
-        Prenez quelques instants pour remplir le bilan avec votre tuteur. Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier. Renvoyez-le ensuite à votre conseiller par email à l'adresse ${agencyValidatorEmail}.
+        Prenez quelques instants pour remplir le bilan avec votre tuteur. Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier. Renvoyez-le ensuite à votre conseiller par email.
         `,
         buttons: [
           {
@@ -1136,7 +1134,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       niceName: "Convention - Notification de création du bilan à l'agence",
       tags: ["notification agence bilan de l’immersion"],
       createEmailVariables: ({
-        agencyValidatorEmail,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
@@ -1176,7 +1173,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           } : ${assessmentStatus === "FINISHED" ? "oui" : "non"}</li>
           <li>Retour de l'entreprise : ${establishmentFeedback}</li>
         </ul>
-        La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email à l'adresse : ${agencyValidatorEmail}.`,
+        La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email.`,
         subContent: defaultSignature("immersion"),
       }),
     },
