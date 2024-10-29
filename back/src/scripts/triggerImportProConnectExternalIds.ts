@@ -22,7 +22,8 @@ const executeUsecase = async (): Promise<{
     inclusion_connect_sub: string | null;
   }[];
 }> => {
-  const path = "../import_CSV_proconnect.csv";
+  const filename = "import_CSV_proconnect.csv"; // CSV file to save in immersion-facile root project folder
+  const path = `../${filename}`;
   const rawFile = await readFile(resolve(path), { encoding: "utf8" });
 
   logger.info({ message: `START - Parsing CSV on path ${path}.` });
