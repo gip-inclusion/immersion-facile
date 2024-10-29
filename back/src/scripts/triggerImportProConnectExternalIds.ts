@@ -1,10 +1,16 @@
 import { resolve } from "node:path";
 import { readFile } from "fs/promises";
 import Papa from "papaparse";
+import { splitEvery } from "ramda";
+import { UserId } from "shared";
 import { z } from "zod";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
-import { makeKyselyDb, values } from "../config/pg/kysely/kyselyUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+  values,
+} from "../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
@@ -74,15 +80,10 @@ const executeUsecase = async (): Promise<{
     };
 
   logger.info({ message: "START - Update users" });
-  const updatedUserIds = await db
-    .updateTable("users")
-    .from(values(csvValues, "mapping"))
-    .set((eb) => ({
-      pro_connect_sub: eb.ref("mapping.proConnectSub"),
-    }))
-    .whereRef("mapping.inclusionConnectSub", "=", "inclusion_connect_sub")
-    .returning("id")
-    .execute();
+  const updatedUserIds: { id: UserId }[] = [];
+  for (const chunk of splitEvery(500, csvValues)) {
+    updatedUserIds.push(...(await updateChunk(db, chunk)));
+  }
   logger.info({ message: `DONE - ${updatedUserIds.length} Updated users` });
 
   logger.info({ message: "START - Get users without ProConnect sub" });
@@ -132,3 +133,22 @@ handleCRONScript(
   },
   logger,
 );
+
+const updateChunk = async (
+  db: KyselyDb,
+  csvValues: { inclusionConnectSub: string; proConnectSub: string }[],
+): Promise<
+  {
+    id: string;
+  }[]
+> => {
+  return db
+    .updateTable("users")
+    .from(values(csvValues, "mapping"))
+    .set((eb) => ({
+      pro_connect_sub: eb.ref("mapping.proConnectSub"),
+    }))
+    .whereRef("mapping.inclusionConnectSub", "=", "inclusion_connect_sub")
+    .returning("id")
+    .execute();
+};
