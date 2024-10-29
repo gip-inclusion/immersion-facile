@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { addDays, differenceInDays } from "date-fns";
+import { addDays, differenceInCalendarDays } from "date-fns";
 import { uniq } from "ramda";
 import React from "react";
 import {
@@ -43,7 +43,7 @@ export const WeekdayPicker = ({
     day: WeekdayNumber,
     { start, end }: DateIntervalDto,
   ) => {
-    const startEndDiff = differenceInDays(end, start);
+    const startEndDiff = differenceInCalendarDays(end, start);
     if (startEndDiff > maximumCalendarDayByInternshipKind[internshipKind])
       return false;
     const uniqueWeekDaysOnInterval = uniq(
