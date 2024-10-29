@@ -1,9 +1,12 @@
-import { v4 as uuid } from "uuid";
+import { resolve } from "node:path";
+import { readFile } from "fs/promises";
+import Papa from "papaparse";
+import { z } from "zod";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeKyselyDb, values } from "../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../utils/logger";
-import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+import { handleCRONScript } from "./handleCRONScript";
 
 const logger = createLogger(__filename);
 
@@ -16,54 +19,80 @@ const executeUsecase = async (): Promise<{
   withoutProConnectIdAfterUpdate?: {
     id: string;
     email: string;
-    external_id_inclusion_connect: string | null;
+    inclusion_connect_sub: string | null;
   }[];
 }> => {
-  //
-  // MISSING CSV Import part
-  //
+  const path = "../import_CSV_proconnect.csv";
+  const rawFile = await readFile(resolve(path), { encoding: "utf8" });
 
-  const fake_CSV_Values: { icExternalId: string; pcExternalId: string }[] = [
+  logger.info({ message: `START - Parsing CSV on path ${path}.` });
+  const csv = Papa.parse(rawFile, {
+    header: true,
+    skipEmptyLines: true,
+  });
+  logger.info({ message: `DONE - Parsing CSV on path ${path}.` });
+
+  const csvSchema: z.Schema<
     {
-      icExternalId: "e9dce090-f45e-46ce-9c58-4fbbb3e494ba",
-      pcExternalId: uuid(),
-    },
-  ];
+      inclusionConnectSub: string;
+      proConnectSub: string;
+    }[]
+  > = z.array(
+    z.object({
+      inclusionConnectSub: z.string().uuid(),
+      proConnectSub: z.string().uuid(),
+    }),
+  );
+
+  const csvData = csv.data;
+  logger.info({ message: `START - Schema parse CSV data : ${csvData.length}` });
+  const csvValues = csvSchema.parse(csvData);
+  logger.info({ message: `DONE - Schema parsed values : ${csvValues.length}` });
 
   const pool = createGetPgPoolFn(config)();
   const db = makeKyselyDb(pool);
 
   const getUserToUpdateQueryBuilder = db
     .selectFrom("users")
-    .select(["id", "email", "external_id_inclusion_connect"])
-    .where("external_id_inclusion_connect", "is not", null)
-    .where("external_id_pro_connect", "is", null);
+    .select(["id", "email", "inclusion_connect_sub"])
+    .where("inclusion_connect_sub", "is not", null)
+    .where("pro_connect_sub", "is", null);
 
+  logger.info({ message: "START - Get users without ProConnect sub" });
   const withoutProConnectIdBeforeUpdate =
     await getUserToUpdateQueryBuilder.execute();
+  logger.info({
+    message: `DONE - users without ProConnect sub : ${withoutProConnectIdBeforeUpdate.length}`,
+  });
 
-  if (fake_CSV_Values.length === 0)
+  if (csvValues.length === 0)
     return {
-      inCSV: fake_CSV_Values.length,
+      inCSV: csvValues.length,
       updated: 0,
       withoutProConnectIdBeforeUpdate: withoutProConnectIdBeforeUpdate.length,
     };
 
+  logger.info({ message: "START - Update users" });
   const updatedUserIds = await db
     .updateTable("users")
-    .from(values(fake_CSV_Values, "mapping"))
+    .from(values(csvValues, "mapping"))
     .set((eb) => ({
-      external_id_pro_connect: eb.ref("mapping.pcExternalId"),
+      pro_connect_sub: eb.ref("mapping.proConnectSub"),
     }))
-    .whereRef("mapping.icExternalId", "=", "external_id_inclusion_connect")
+    .whereRef("mapping.inclusionConnectSub", "=", "inclusion_connect_sub")
     .returning("id")
     .execute();
+  logger.info({ message: `DONE - ${updatedUserIds.length} Updated users` });
 
+  logger.info({ message: "START - Get users without ProConnect sub" });
   const userWithIcExternalAndWithoutPcExternalId =
     await getUserToUpdateQueryBuilder.execute();
+  logger.info({
+    message: `DONE - users without ProConnect sub : ${userWithIcExternalAndWithoutPcExternalId.length}`,
+  });
 
   return {
-    inCSV: fake_CSV_Values.length,
+    inCSV: csvValues.length,
     withoutProConnectIdBeforeUpdate: withoutProConnectIdBeforeUpdate.length,
     updated: updatedUserIds.length,
     withoutProConnectIdAfterUpdate: userWithIcExternalAndWithoutPcExternalId,
@@ -71,7 +100,7 @@ const executeUsecase = async (): Promise<{
 };
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
-handleEndOfScriptNotification(
+handleCRONScript(
   "importProConnectExternalIds",
   config,
   executeUsecase,
@@ -92,8 +121,8 @@ handleEndOfScriptNotification(
             ${[
               "   USER ID       |     EMAIL      |       IC_EXTERNAL_ID",
               ...withoutProConnectIdAfterUpdate.map(
-                ({ id, email, external_id_inclusion_connect }) =>
-                  `- ${id} - ${email} - ${external_id_inclusion_connect}`,
+                ({ id, email, inclusion_connect_sub }) =>
+                  `- ${id} - ${email} - ${inclusion_connect_sub}`,
               ),
             ].join("\n    ")}`,
           ]
