@@ -1,7 +1,6 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 import { MetabaseView } from "src/app/components/MetabaseView";
-import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
 
 export const ConventionTab = () => {
@@ -9,11 +8,10 @@ export const ConventionTab = () => {
   return error ? (
     <Alert severity="error" title="Erreur" description={error} />
   ) : (
-    <>
-      <ManageConventionFormSection
-        routeNameToRedirectTo={"adminConventionDetail"}
-      />
-      <MetabaseView title="Consulter les conventions" url={url} />
-    </>
+    <MetabaseView
+      title="Consulter les conventions"
+      subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
+      url={url}
+    />
   );
 };

@@ -21,10 +21,12 @@ const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
 
 export const MetabaseView = ({
   title,
+  subtitle,
   url,
 }: {
   url?: AbsoluteUrl;
   title: string;
+  subtitle?: string;
 }) => {
   const { cx } = useStyles();
   const consent = useConsent();
@@ -50,6 +52,7 @@ export const MetabaseView = ({
     <div>
       <h2 className={cx(fr.cx("fr-h5", "fr-mb-2w"), "flex")}>
         {title} <TitleButton url={url} />
+        {subtitle && <p className={fr.cx("fr-hint-text")}>{subtitle}</p>}
       </h2>
       {ENV.envType === "production" ||
       url === globalStatsUrl ||

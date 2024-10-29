@@ -10,7 +10,6 @@ import { AgencyRight, InclusionConnectedUser, domElementIds } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 import { isAgencyDashboardTab } from "src/app/routes/routeParams/agencyDashboardTabs";
 import { routes } from "src/app/routes/routes";
 import { DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
@@ -46,15 +45,11 @@ export const AgencyDashboardPage = ({
             tabId: "dashboard",
             label: "Tableau de bord",
             content: (
-              <>
-                <ManageConventionFormSection
-                  routeNameToRedirectTo={"manageConventionInclusionConnected"}
-                />
-                <MetabaseView
-                  title="Tableau de bord agence"
-                  url={agencyDashboardUrl}
-                />
-              </>
+              <MetabaseView
+                title="Tableau de bord agence"
+                subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
+                url={agencyDashboardUrl}
+              />
             ),
           },
         ]
