@@ -8,7 +8,6 @@ import { Loader } from "react-design-system";
 import { EstablishmentRole, InclusionConnectedUser } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { ManageConventionFormSection } from "src/app/pages/admin/ManageConventionFormSection";
 
 import { DiscussionManageContent } from "src/app/components/admin/establishments/DiscussionManageContent";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
@@ -46,15 +45,13 @@ export const EstablishmentDashboardPage = ({
       tabId: "conventions",
       content: (
         <>
-          <ManageConventionFormSection
-            routeNameToRedirectTo={"manageConventionInclusionConnected"}
-          />
           {conventions ? (
             <MetabaseView
               title={`Tableau des conventions en cours
                 pour le ${currentUserRoleToDisplay(
                   conventions.role,
                 )} ${firstName} ${lastName}`}
+              subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
               url={conventions.url}
             />
           ) : (
