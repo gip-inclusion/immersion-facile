@@ -39,7 +39,6 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         kind: "NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION",
         recipients: [agency.validatorEmails[0]],
         params: {
-          agencyValidatorEmail: agency.validatorEmails[0],
           beneficiaryFirstName: convention.signatories.beneficiary.firstName,
           beneficiaryLastName: convention.signatories.beneficiary.lastName,
           businessName: convention.businessName,

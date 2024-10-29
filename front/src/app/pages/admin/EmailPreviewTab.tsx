@@ -253,7 +253,6 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
-    agencyValidatorEmail: "VALIDATOR_EMAIL",
     internshipKind: "immersion",
     agencyAssessmentDocumentLink: "AGENCY_ASSESSMENT_DOCUMENT_LINK",
   },
@@ -428,7 +427,6 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
   },
   NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
-    agencyValidatorEmail: "VALIDATOR_EMAIL",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
@@ -597,7 +595,6 @@ export const defaultEmailValueByEmailKind: {
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     agencyAssessmentDocumentLink: "AGENCY_ASSESSMENT_DOCUMENT_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
-    agencyReferentEmail: "AGENCY_VALIDATOR_EMAIL",
     beneficiaryBirthdate: "BENEFICIARY_BIRTHDATE",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
