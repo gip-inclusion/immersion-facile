@@ -24,7 +24,7 @@ export const SubmitConfirmationSection = ({
         <h1 className={cx(fr.cx("fr-mb-md-7w"), Styles.title)}>
           Votre demande de convention a bien été envoyée !
         </h1>
-        <p className={cx(fr.cx("fr-mb-4w", "fr-mb-md-7w"), Styles.description)}>
+        <p className={cx(fr.cx("fr-mb-md-2w"), Styles.description)}>
           Conservez précieusement l'identifiant de votre convention, il vous
           permettra de la retrouver en cas de problème :
         </p>
