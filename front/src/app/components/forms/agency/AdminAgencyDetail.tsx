@@ -36,6 +36,9 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
         agencyId: route.params.agencyId,
       }),
     );
+    return () => {
+      dispatch(agencyAdminSlice.actions.setAgency(null));
+    };
   }, [dispatch, route.params.agencyId]);
 
   const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
