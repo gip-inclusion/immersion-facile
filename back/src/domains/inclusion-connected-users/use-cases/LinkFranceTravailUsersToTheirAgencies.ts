@@ -16,7 +16,7 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
   userId: z.string(),
-  provider: z.literal("inclusionConnect"),
+  provider: z.enum(["inclusionConnect", "proConnect"]),
   codeSafir: z.string().or(z.null()),
 });
 
