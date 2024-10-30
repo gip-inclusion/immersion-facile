@@ -304,7 +304,11 @@ const ValidatorModalContent = ({
     <>
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <Input
-          label={"Nom du conseiller qui marque la demande *"}
+          label={
+            newStatus === "ACCEPTED_BY_VALIDATOR"
+              ? "Nom de la personne qui valide la demande *"
+              : "Nom de la personne qui pré-valide la demande *"
+          }
           nativeInputProps={{
             ...register("lastname"),
             required: true,
@@ -312,7 +316,11 @@ const ValidatorModalContent = ({
           }}
         />
         <Input
-          label={"Prénom du conseiller qui marque la demande *"}
+          label={
+            newStatus === "ACCEPTED_BY_VALIDATOR"
+              ? "Prénom de la personne qui valide la demande *"
+              : "Prénom de la personne qui pré-valide la demande *"
+          }
           nativeInputProps={{
             ...register("firstname"),
             required: true,
@@ -358,7 +366,7 @@ const warningMessagesByConventionStatus: Record<
   string
 > = {
   ACCEPTED_BY_COUNSELLOR:
-    'Vous n\'avez pas marqué la demande comme éligible. Pour le faire, cliquez sur "Marquer la demande comme éligible" puis sur "Terminer"',
+    'Vous n\'avez pas pré-validé la demande. Pour le faire, cliquez sur "Pré-valider la demande" puis sur "Terminer"',
   ACCEPTED_BY_VALIDATOR:
     'Vous n\'avez pas marqué la validation de la demande. Pour le faire, cliquez sur "Valider la demande" puis sur "Terminer la validation"',
 };
