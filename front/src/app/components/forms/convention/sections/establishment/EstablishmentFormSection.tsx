@@ -60,7 +60,7 @@ export const EstablishmentFormSection = ({
   const isTutorEstablishmentRepresentative = useAppSelector(
     conventionSelectors.isTutorEstablishmentRepresentative,
   );
-  const { getValues } = useFormContext<ConventionDto>();
+  const { getValues, resetField } = useFormContext<ConventionDto>();
   const t = useConventionTexts(getValues().internshipKind);
 
   const { getFormFields } = getFormContents(
@@ -69,6 +69,32 @@ export const EstablishmentFormSection = ({
   const formContents = getFormFields();
 
   const isFetchingSiret = useSelector(siretSelectors.isFetching);
+
+  const areTutorAndRepresentativeSame = () => {
+    const representative = getValues("signatories.establishmentRepresentative");
+    const tutor = getValues("establishmentTutor");
+    return (
+      representative.firstName === tutor.firstName &&
+      tutor.lastName === representative.lastName &&
+      tutor.phone === representative.phone &&
+      tutor.email === representative.email
+    );
+  };
+
+  const resetTutorFields = () => {
+    resetField("establishmentTutor.firstName", {
+      defaultValue: "",
+    });
+    resetField("establishmentTutor.lastName", {
+      defaultValue: "",
+    });
+    resetField("establishmentTutor.email", {
+      defaultValue: "",
+    });
+    resetField("establishmentTutor.phone", {
+      defaultValue: "",
+    });
+  };
 
   return (
     <>
@@ -101,6 +127,9 @@ export const EstablishmentFormSection = ({
                     option.nativeInputProps.value === 1,
                   ),
                 );
+                if (areTutorAndRepresentativeSame()) {
+                  resetTutorFields();
+                }
               },
             },
           }),
