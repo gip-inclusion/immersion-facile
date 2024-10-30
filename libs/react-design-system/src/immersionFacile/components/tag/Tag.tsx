@@ -7,10 +7,19 @@ import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./Tag.styles";
 
-type ThemeTag = "rqth" | "superEnterprise" | "lbb" | "voluntaryToImmersion";
+type ThemeTag =
+  | "rqth"
+  | "superEnterprise"
+  | "lbb"
+  | "voluntaryToImmersion"
+  | "prescripteur"
+  | "structureAccompagnement"
+  | "entreprise";
 
 type TagProps = {
   theme: ThemeTag;
+  label?: string;
+  className?: string;
 };
 
 type Themes = Record<
@@ -38,9 +47,21 @@ const themes: Themes = {
     label: "Entreprise accueillante",
     iconId: "fr-icon-team-line",
   },
+  prescripteur: {
+    iconId: "fr-icon-map-pin-user-line",
+    label: "Prescripteur",
+  },
+  structureAccompagnement: {
+    iconId: "fr-icon-parent-line",
+    label: "Prescripteur",
+  },
+  entreprise: {
+    iconId: "fr-icon-building-line",
+    label: "Entreprise",
+  },
 };
 
-export const Tag = ({ theme }: TagProps) => {
+export const Tag = ({ theme, label, className }: TagProps) => {
   const selectedTheme = themes[theme];
   const { cx } = useStyles();
   return (
@@ -49,10 +70,11 @@ export const Tag = ({ theme }: TagProps) => {
         fr.cx("fr-mx-1w", "fr-my-1v", "fr-text--xs"),
         Styles.root,
         Styles[theme],
+        className,
       )}
       iconId={selectedTheme.iconId}
     >
-      {selectedTheme.label}
+      {label ?? selectedTheme.label}
     </DsfrTag>
   );
 };

@@ -18,12 +18,12 @@ export const adminTabs = {
     slug: "agencies",
     isVisible: () => true,
   },
-  adminUsers: {
-    slug: "users",
-    isVisible: () => true,
-  },
   adminEstablishments: {
     slug: "establishments",
+    isVisible: () => true,
+  },
+  adminUsers: {
+    slug: "users",
     isVisible: () => true,
   },
   adminNotifications: {
