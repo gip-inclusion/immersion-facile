@@ -1,5 +1,5 @@
-import Tag from "@codegouvfr/react-dsfr/Tag";
 import React from "react";
+import { Tag } from "react-design-system";
 import { WithAgencyDto } from "shared";
 
 export const AgencyTag = ({
@@ -7,9 +7,11 @@ export const AgencyTag = ({
   className,
 }: WithAgencyDto & { className?: string }) =>
   agency.refersToAgencyId ? (
-    <Tag className={className}>
-      Structure d'accompagnement liée à {agency.refersToAgencyName}
-    </Tag>
+    <Tag
+      theme={"structureAccompagnement"}
+      label={`Structure d'accompagnement liée à ${agency.refersToAgencyName}`}
+      className={className}
+    />
   ) : (
-    <Tag className={className}>Prescripteur</Tag>
+    <Tag theme={"prescripteur"} className={className} />
   );

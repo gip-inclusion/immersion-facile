@@ -48,8 +48,7 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
 
   return (
     <div>
-      <h1 className={fr.cx("fr-h1")}>Détail de l'agence</h1>
-      <h2 className={fr.cx("fr-h2")}>{agency.name}</h2>
+      <h1 className={fr.cx("fr-h1")}>{agency.name}</h1>
       <div>
         Id de l'agence : <Badge severity="success">{agency.id}</Badge>{" "}
         <Button

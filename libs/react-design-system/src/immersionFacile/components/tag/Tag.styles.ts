@@ -6,4 +6,7 @@ export default {
   superEnterprise: "im-tag--super-enterprise",
   lbb: "im-tag--lbb",
   voluntaryToImmersion: "im-tag--voluntaryToImmersion",
+  prescripteur: "im-tag--prescripteur",
+  structureAccompagnement: "im-tag--structureAccompagnement",
+  entreprise: "im-tag--entreprise",
 };

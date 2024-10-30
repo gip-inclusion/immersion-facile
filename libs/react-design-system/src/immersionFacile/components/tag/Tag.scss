@@ -16,4 +16,19 @@
     background-color: var(--background-contrast-blue-cumulus);
     border: 1px solid var(--text-label-blue-cumulus);
   }
+  &--prescripteur {
+    color: var(--text-label-purple-glycine);
+    background-color: var(--background-contrast-purple-glycine);
+    border: 1px solid var(--text-label-purple-glycine);
+  }
+  &--structureAccompagnement {
+    color: var(--text-label-purple-glycine);
+    background-color: var(--background-contrast-purple-glycine);
+    border: 1px solid var(--text-label-purple-glycine);
+  }
+  &--entreprise {
+    color: var(--text-label-blue-cumulus);
+    background-color: var(--background-contrast-blue-cumulus);
+    border: 1px solid var(--text-label-blue-cumulus);
+  }
 }

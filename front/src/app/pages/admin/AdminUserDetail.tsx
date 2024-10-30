@@ -3,7 +3,11 @@ import { Table } from "@codegouvfr/react-dsfr/Table";
 import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { AgencyRight, agencyKindToLabelIncludingIF } from "shared";
+import {
+  AgencyRight,
+  addressDtoToString,
+  agencyKindToLabelIncludingIF,
+} from "shared";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -83,6 +87,10 @@ const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
               <AgencyTag agency={agencyRight.agency} />
               <br />
               <span>{agencyRight.agency.name}</span>
+              <br />
+              <span className={fr.cx("fr-hint-text")}>
+                {addressDtoToString(agencyRight.agency.address)}
+              </span>
             </>,
             agencyKindToLabelIncludingIF[agencyRight.agency.kind],
             agencyRight.roles
