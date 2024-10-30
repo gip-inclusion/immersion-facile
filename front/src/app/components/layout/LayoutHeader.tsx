@@ -5,7 +5,7 @@ import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import React from "react";
 import { ButtonWithSubMenu, MaintenanceCallout } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { domElementIds } from "shared";
+import { AbsoluteUrl, domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -14,6 +14,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { makeStyles } from "tss-react/dsfr";
 
+import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 
@@ -49,6 +50,20 @@ export const LayoutHeader = () => {
   );
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
+  const { enableProConnect } = useAppSelector(
+    featureFlagSelectors.featureFlagState,
+  );
+  const getLinkToUpdateAccountInfo = (): AbsoluteUrl => {
+    if (ENV.envType === "production") {
+      if (enableProConnect.isActive)
+        return "https://app.moncomptepro.beta.gouv.fr/personal-information";
+      return "https://connect.inclusion.beta.gouv.fr/accounts/my-account";
+    }
+    if (enableProConnect.isActive)
+      return "https://app-preprod.moncomptepro.beta.gouv.fr/personal-information";
+    return "https://recette.connect.inclusion.beta.gouv.fr/accounts/my-account";
+  };
+
   const tools: HeaderProps["quickAccessItems"] = [
     {
       text: "Remplir la demande de convention",
@@ -90,9 +105,7 @@ export const LayoutHeader = () => {
                 text: "Modifier mes informations",
                 isActive: false,
                 linkProps: {
-                  href: `https://${
-                    ENV.envType === "production" ? "" : "recette."
-                  }connect.inclusion.beta.gouv.fr/accounts/my-account`,
+                  href: getLinkToUpdateAccountInfo(),
                   target: "_blank",
                 },
               },
