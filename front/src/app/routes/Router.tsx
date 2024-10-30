@@ -9,6 +9,7 @@ import {
   establishmentDashboardTabsList,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
+import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
@@ -87,6 +88,11 @@ const getPageByRouteName: {
   adminConventionDetail: (route) => (
     <AdminPrivateRoute route={route}>
       <AdminConventionDetail route={route} />
+    </AdminPrivateRoute>
+  ),
+  adminAgencyDetail: (route) => (
+    <AdminPrivateRoute route={route}>
+      <AdminAgencyDetail route={route} />
     </AdminPrivateRoute>
   ),
   agencyDashboard: (route) =>
