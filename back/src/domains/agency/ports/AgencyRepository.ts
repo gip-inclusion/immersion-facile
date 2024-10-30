@@ -36,10 +36,9 @@ export type UsersAgencyRights = Record<UserId, AgencyRight[]>;
 export type PartialAgencyWithUsersRights = Partial<AgencyWithUsersRights> & {
   id: AgencyId;
 };
-export type AgencyRightWithAgencyWithUsersRights = OmitFromExistingKeys<
-  AgencyRight,
-  "agency"
-> & { agency: AgencyWithUsersRights };
+export type AgencyRightOfUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
+  agencyId: AgencyId;
+};
 
 export type AgencyUserRight = {
   roles: AgencyRole[];
@@ -76,9 +75,7 @@ export interface AgencyRepository {
   getUserIdWithAgencyRightsByFilters(
     filters: WithUserFilters,
   ): Promise<UserId[]>;
-  getAgenciesRightsByUserId(
-    id: UserId,
-  ): Promise<AgencyRightWithAgencyWithUsersRights[]>;
+  getAgenciesRightsByUserId(id: UserId): Promise<AgencyRightOfUser[]>;
   alreadyHasActiveAgencyWithSameAddressAndKind(params: {
     address: AddressDto;
     kind: AgencyKind;
@@ -89,12 +86,12 @@ export interface AgencyRepository {
 export const updateAgencyRightsForUser = async (
   uow: UnitOfWork,
   userId: UserId,
-  { agency, isNotifiedByEmail, roles }: AgencyRightWithAgencyWithUsersRights,
+  { agencyId, isNotifiedByEmail, roles }: AgencyRightOfUser,
 ): Promise<void> => {
-  const agencyWithRights = await uow.agencyRepository.getById(agency.id);
-  if (!agencyWithRights) throw errors.agency.notFound({ agencyId: agency.id });
+  const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+  if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
   return uow.agencyRepository.update({
-    id: agency.id,
+    id: agencyId,
     usersRights: {
       ...agencyWithRights.usersRights,
       [userId]: { isNotifiedByEmail, roles },
@@ -105,13 +102,13 @@ export const updateAgencyRightsForUser = async (
 export const removeAgencyRightsForUser = async (
   uow: UnitOfWork,
   userId: UserId,
-  { agency }: AgencyRightWithAgencyWithUsersRights,
+  { agencyId }: AgencyRightOfUser,
 ): Promise<void> => {
-  const agencyWithRights = await uow.agencyRepository.getById(agency.id);
-  if (!agencyWithRights) throw errors.agency.notFound({ agencyId: agency.id });
+  const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+  if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
   const { [userId]: _, ...rightsToKeep } = agencyWithRights.usersRights;
   return uow.agencyRepository.update({
-    id: agency.id,
+    id: agencyId,
     usersRights: rightsToKeep,
   });
 };

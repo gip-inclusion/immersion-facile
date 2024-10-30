@@ -20,7 +20,7 @@ import {
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import {
   AgencyRepository,
-  AgencyRightWithAgencyWithUsersRights,
+  AgencyRightOfUser,
   AgencyWithUsersRights,
   GetAgenciesFilters,
 } from "../ports/AgencyRepository";
@@ -169,19 +169,17 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 
   public async getAgenciesRightsByUserId(
     id: UserId,
-  ): Promise<AgencyRightWithAgencyWithUsersRights[]> {
-    return values(this.#agencies).reduce<
-      AgencyRightWithAgencyWithUsersRights[]
-    >((acc, agency) => {
+  ): Promise<AgencyRightOfUser[]> {
+    return values(this.#agencies).reduce<AgencyRightOfUser[]>((acc, agency) => {
       const userRights = agency?.usersRights[id];
       return [
         ...acc,
         ...(userRights
           ? [
               {
-                agency,
+                agencyId: agency.id,
                 ...userRights,
-              } satisfies AgencyRightWithAgencyWithUsersRights,
+              } satisfies AgencyRightOfUser,
             ]
           : []),
       ];

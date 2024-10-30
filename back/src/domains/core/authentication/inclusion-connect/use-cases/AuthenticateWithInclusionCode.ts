@@ -15,7 +15,7 @@ import {
 } from "shared";
 import { notifyDiscord } from "../../../../../utils/notifyDiscord";
 import {
-  AgencyRightWithAgencyWithUsersRights,
+  AgencyRightOfUser,
   removeAgencyRightsForUser,
   updateAgencyRightsForUser,
 } from "../../../../agency/ports/AgencyRepository";
@@ -291,14 +291,14 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   }
 
   #mergeAgencyRights(
-    oldAgencyRights: AgencyRightWithAgencyWithUsersRights[],
-    newAgencyRights: AgencyRightWithAgencyWithUsersRights[],
-  ): AgencyRightWithAgencyWithUsersRights[] {
-    return oldAgencyRights.reduce<AgencyRightWithAgencyWithUsersRights[]>(
+    oldAgencyRights: AgencyRightOfUser[],
+    newAgencyRights: AgencyRightOfUser[],
+  ): AgencyRightOfUser[] {
+    return oldAgencyRights.reduce<AgencyRightOfUser[]>(
       (acc, oldAgencyRight) => {
         const newAgencyRight = newAgencyRights.find(
           (newAgencyRight) =>
-            newAgencyRight.agency.id === oldAgencyRight.agency.id,
+            newAgencyRight.agencyId === oldAgencyRight.agencyId,
         );
         return [
           ...acc,
