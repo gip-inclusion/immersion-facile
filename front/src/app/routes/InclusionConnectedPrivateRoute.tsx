@@ -30,7 +30,8 @@ import { Route } from "type-route";
 
 export type FrontAdminRoute =
   | FrontAdminRouteTab
-  | Route<typeof routes.adminConventionDetail>;
+  | Route<typeof routes.adminConventionDetail>
+  | Route<typeof routes.adminAgencyDetail>;
 
 type InclusionConnectPrivateRoute =
   | Route<typeof routes.agencyDashboard>
