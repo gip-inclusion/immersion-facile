@@ -75,6 +75,7 @@ const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
           "Type d'agence",
           "Roles",
           "Reçoit les notifications",
+          "Actions",
         ]}
         data={agencyRights.map((agencyRight) => {
           return [
@@ -88,6 +89,11 @@ const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
               .map((role) => agencyRoleToDisplay[role].label)
               .join(", "),
             agencyRight.isNotifiedByEmail ? "Oui" : "Non",
+            <a
+              {...routes.adminAgencyDetail({ agencyId: agencyRight.agency.id })}
+            >
+              Voir l'agence
+            </a>,
           ];
         })}
       />
