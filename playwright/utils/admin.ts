@@ -3,6 +3,7 @@ import {
   AdminTabRouteName,
   EstablishmentDashboardTab,
   adminTabRouteNames,
+  adminTabs,
   domElementIds,
   frontRoutes,
 } from "shared";
@@ -21,7 +22,9 @@ export const goToAdminTab = async (page: Page, tabName: AdminTabRouteName) => {
     .locator(".fr-tabs__tab");
   await expect(tabLocator).toBeVisible();
   await tabLocator.click();
-  expect(await page.url()).toContain(`${frontRoutes.admin}/${tabName}`);
+  expect(await page.url()).toContain(
+    `${frontRoutes.admin}/${adminTabs[tabName].slug}`,
+  );
 };
 
 export const openEmailInAdmin = async (
