@@ -519,11 +519,7 @@ describe("Agency registration for authenticated users", () => {
       );
     });
     it("should refetch agency after user updates", () => {
-      const agency = new AgencyDtoBuilder()
-        .withId("1")
-        .withCounsellorEmails(["bob@mail.com"])
-        .withValidatorEmails(["validator@mail.com"])
-        .build();
+      const agency = new AgencyDtoBuilder().withId("1").build();
 
       ({ store, dependencies } = createTestStore({
         admin: adminPreloadedState({
