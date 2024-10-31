@@ -408,24 +408,21 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
 
       it("returns a correct logout url with status 200", async () => {
-        inMemoryUow.userRepository.setInclusionConnectedUsers([
-          inclusionConnectedUserWithoutRights,
-        ]);
+        inMemoryUow.userRepository.users = [agencyUser];
         const state = "fake-state";
         inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
           {
-            userId: inclusionConnectedUserWithoutRights.id,
+            userId: agencyUser.id,
             accessToken: "yolo",
             provider: "inclusionConnect",
             state,
             nonce: "fake-nonce",
-            externalId:
-              inclusionConnectedUserWithoutRights.externalId ?? undefined,
+            externalId: agencyUser.externalId ?? undefined,
           },
         ];
 
         const token = generateInclusionConnectJwt({
-          userId,
+          userId: agencyUser.id,
           version: currentJwtVersions.inclusion,
         });
         const response = await httpClient.getInclusionConnectLogoutUrl({

@@ -113,10 +113,10 @@ describe("PgAgencyRepository", () => {
   });
 
   beforeEach(async () => {
-    await userRepository.save(validator1, "InclusionConnect");
-    await userRepository.save(validator2, "InclusionConnect");
-    await userRepository.save(counsellor1, "InclusionConnect");
-    await userRepository.save(counsellor2, "InclusionConnect");
+    await userRepository.save(validator1, "inclusionConnect");
+    await userRepository.save(validator2, "inclusionConnect");
+    await userRepository.save(counsellor1, "inclusionConnect");
+    await userRepository.save(counsellor2, "inclusionConnect");
   });
 
   describe("insert()", () => {
