@@ -16,7 +16,7 @@ export type IcOAuthIdTokenPayload = ProviderTokenPayloadBase & {
 export type ProConnectOAuthIdTokenPayload = ProviderTokenPayloadBase & {
   usual_name: string;
   custom: {
-    structure_travail?: string;
+    structureTravail?: string;
   };
 };
 
@@ -37,6 +37,6 @@ export const proConnectAuthTokenPayloadSchema: z.Schema<ProConnectOAuthIdTokenPa
     usual_name: z.string(),
     email: emailSchema,
     custom: z.object({
-      structure_travail: z.string().optional(),
+      structureTravail: z.string().optional(),
     }),
   });
