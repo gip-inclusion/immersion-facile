@@ -86,11 +86,17 @@ export const getAgencyRightByUserId = async (
     await uow.agencyRepository.getAgenciesRightsByUserId(userId);
 
   return Promise.all(
-    agenciesRightsForUser.map(async ({ isNotifiedByEmail, roles, agency }) => ({
-      isNotifiedByEmail,
-      roles,
-      agency: await agencyWithRightToAgencyDto(uow, agency),
-    })),
+    agenciesRightsForUser.map(
+      async ({ isNotifiedByEmail, roles, agencyId }) => {
+        const agency = await uow.agencyRepository.getById(agencyId);
+        if (!agency) throw errors.agency.notFound({ agencyId });
+        return {
+          isNotifiedByEmail,
+          roles,
+          agency: await agencyWithRightToAgencyDto(uow, agency),
+        };
+      },
+    ),
   );
 };
 
