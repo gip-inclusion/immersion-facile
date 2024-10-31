@@ -222,11 +222,11 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
     const counsellors = await this.userRepository.getByIds(
       counsellorIds,
-      "InclusionConnect",
+      "inclusionConnect",
     );
     const validators = await this.userRepository.getByIds(
       validatorIds,
-      "InclusionConnect",
+      "inclusionConnect",
     );
 
     return {
