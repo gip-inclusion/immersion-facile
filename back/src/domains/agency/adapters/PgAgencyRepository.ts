@@ -1,5 +1,5 @@
 import { sql } from "kysely";
-import { map } from "ramda";
+import { map, toPairs } from "ramda";
 import {
   AbsoluteUrl,
   AddressDto,
@@ -10,31 +10,28 @@ import {
   AgencyStatus,
   ConflictError,
   DepartmentCode,
-  Email,
-  GeoPositionDto,
-  PartialAgencyDto,
-  agencySchema,
+  OmitFromExistingKeys,
+  UserId,
+  WithUserFilters,
   errors,
+  isTruthy,
+  isWithAgencyRole,
   pipeWithValue,
 } from "shared";
-import { z } from "zod";
-import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import {
   KyselyDb,
   cast,
   jsonBuildObject,
+  jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 import {
-  AgencyWithoutEmails,
-  addEmailsToAgency,
-  getUsersWithAgencyRole,
-  usersAgenciesRolesIncludeCounsellor,
-  usersAgenciesRolesIncludeValidator,
-} from "../../core/authentication/inclusion-connect/adapters/agencyUsers.helpers";
-import {
   AgencyRepository,
+  AgencyRightOfUser,
+  AgencyUsersRights,
+  AgencyWithUsersRights,
   GetAgenciesFilters,
+  PartialAgencyWithUsersRights,
 } from "../ports/AgencyRepository";
 
 const logger = createLogger(__filename);
@@ -44,7 +41,9 @@ const MAX_AGENCIES_RETURNED = 200;
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
+  public async insert(
+    agency: AgencyWithUsersRights,
+  ): Promise<AgencyId | undefined> {
     try {
       await this.transaction
         .insertInto("agencies")
@@ -72,23 +71,7 @@ export class PgAgencyRepository implements AgencyRepository {
         }))
         .execute();
 
-      await Promise.all(
-        agency.validatorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(
-            email,
-            agency.id,
-            agency.counsellorEmails.includes(email)
-              ? ["counsellor", "validator"]
-              : ["validator"],
-          ),
-        ),
-      );
-
-      await Promise.all(
-        agency.counsellorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
-        ),
-      );
+      await this.#saveAgencyRights(agency.id, agency.usersRights);
     } catch (error: any) {
       // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
       // See https://www.postgresql.org/docs/10/errcodes-appendix.html
@@ -102,7 +85,7 @@ export class PgAgencyRepository implements AgencyRepository {
     return agency.id;
   }
 
-  public async update(agency: PartialAgencyDto): Promise<void> {
+  public async update(agency: PartialAgencyWithUsersRights): Promise<void> {
     await this.transaction
       .updateTable("agencies")
       .set(({ fn }) => ({
@@ -133,91 +116,56 @@ export class PgAgencyRepository implements AgencyRepository {
       .where("id", "=", agency.id)
       .execute();
 
-    if (agency.validatorEmails) {
-      await this.transaction
-        .deleteFrom("users__agencies")
-        .where(usersAgenciesRolesIncludeValidator)
-        .where("is_notified_by_email", "=", true)
-        .where("agency_id", "=", agency.id)
-        .execute();
-    }
-
-    if (agency.counsellorEmails) {
-      await this.transaction
-        .deleteFrom("users__agencies")
-        .where(usersAgenciesRolesIncludeCounsellor)
-        .where("is_notified_by_email", "=", true)
-        .where("agency_id", "=", agency.id)
-        .execute();
-    }
-
-    if (agency.validatorEmails) {
-      await Promise.all(
-        agency.validatorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(
-            email,
-            agency.id,
-            agency.counsellorEmails?.includes(email)
-              ? ["counsellor", "validator"]
-              : ["validator"],
-          ),
-        ),
-      );
-    }
-
-    if (agency.counsellorEmails) {
-      await Promise.all(
-        agency.counsellorEmails.map(async (email) =>
-          this.#addUserAndAgencyRights(email, agency.id, ["counsellor"]),
-        ),
-      );
-    }
+    if (agency.usersRights)
+      await this.#saveAgencyRights(agency.id, agency.usersRights);
   }
 
-  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
-    const agencyWithoutEmails = await this.#getAgencyWithJsonBuiltQueryBuilder()
-      .where("a.id", "=", id)
-      .executeTakeFirst()
-      .then((row) => row?.agency);
+  public async getById(
+    id: AgencyId,
+  ): Promise<AgencyWithUsersRights | undefined> {
+    const result = await this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("agencies.id", "=", id)
+      .executeTakeFirst();
 
-    if (!agencyWithoutEmails) return;
-
-    return this.#addEmailsToAgency(agencyWithoutEmails);
+    return this.#pgAgencyToAgencyWithRights(result?.agency);
   }
 
-  public async getBySafir(safirCode: string): Promise<AgencyDto | undefined> {
-    const agenciesWithoutEmails =
-      await this.#getAgencyWithJsonBuiltQueryBuilder()
-        .where("a.code_safir", "=", safirCode)
-        .execute()
-        .then(map((row) => row.agency));
+  public async getBySafir(
+    safirCode: string,
+  ): Promise<AgencyWithUsersRights | undefined> {
+    const results = await this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("agencies.code_safir", "=", safirCode)
+      .execute();
 
-    if (!agenciesWithoutEmails.length) return;
-
-    if (agenciesWithoutEmails.length > 1)
+    //TODO: On ne fait pas de unique sur le code safir en base
+    if (results.length > 1)
       throw new ConflictError(
-        safirConflictErrorMessage(safirCode, agenciesWithoutEmails),
+        safirConflictErrorMessage(
+          safirCode,
+          results.map(({ agency }) => agency),
+        ),
       );
 
-    return this.#addEmailsToAgency(agenciesWithoutEmails[0]);
+    const result = results.at(0);
+    return result && this.#pgAgencyToAgencyWithRights(result.agency);
   }
 
-  public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
+  public async getByIds(ids: AgencyId[]): Promise<AgencyWithUsersRights[]> {
     if (ids.length === 0) return [];
-    const agenciesWithoutEmails =
-      await this.#getAgencyWithJsonBuiltQueryBuilder()
-        .where("a.id", "in", ids)
-        .orderBy("a.updated_at", "desc")
-        .execute()
-        .then(map((row) => row.agency));
-    const missingIds = ids.filter(
-      (id) => !agenciesWithoutEmails.some((agency) => agency.id === id),
-    );
+    const results = await this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("agencies.id", "in", ids)
+      .orderBy("agencies.updated_at", "desc")
+      .execute();
 
+    const missingIds = ids.filter(
+      (id) => !results.some((result) => result.agency.id === id),
+    );
     if (missingIds.length)
       throw errors.agencies.notFound({ agencyIds: missingIds });
 
-    return this.#addEmailsToAgencies(agenciesWithoutEmails);
+    return results
+      .map(({ agency }) => this.#pgAgencyToAgencyWithRights(agency))
+      .filter(isTruthy);
   }
 
   public async getAgencies({
@@ -226,7 +174,7 @@ export class PgAgencyRepository implements AgencyRepository {
   }: {
     filters?: GetAgenciesFilters;
     limit?: number;
-  }): Promise<AgencyDto[]> {
+  }): Promise<AgencyWithUsersRights[]> {
     const {
       departmentCode,
       kinds,
@@ -236,34 +184,9 @@ export class PgAgencyRepository implements AgencyRepository {
       siret,
       status,
     } = filters;
+
     const results = await pipeWithValue(
-      this.transaction
-        .selectFrom("agencies")
-        .leftJoin(
-          "agencies as refered_agencies",
-          "agencies.refers_to_agency_id",
-          "refered_agencies.id",
-        )
-        .select((eb) => [
-          "agencies.id",
-          "agencies.name",
-          "agencies.city",
-          "agencies.department_code",
-          "agencies.agency_siret",
-          "agencies.covered_departments",
-          "agencies.post_code",
-          "agencies.street_number_and_address",
-          "agencies.code_safir",
-          "agencies.kind",
-          "agencies.questionnaire_url",
-          "agencies.logo_url",
-          "agencies.rejection_justification",
-          "agencies.email_signature",
-          "agencies.status",
-          "refered_agencies.id as refers_to_agency_id",
-          "refered_agencies.name as refers_to_agency_name",
-          eb.fn<string>("ST_AsGeoJSON", ["agencies.position"]).as("position"),
-        ]),
+      this.#getAgencyWithJsonBuiltQueryBuilder(),
       (b) =>
         departmentCode
           ? b.where(
@@ -284,78 +207,44 @@ export class PgAgencyRepository implements AgencyRepository {
           : b,
       (b) => (siret ? b.where("agencies.agency_siret", "=", siret) : b),
       (b) =>
-        b.limit(
-          Math.min(limit ?? MAX_AGENCIES_RETURNED, MAX_AGENCIES_RETURNED),
-        ),
-      (b) =>
         position
-          ? b
-              .select(({ fn }) =>
+          ? b.where(
+              ({ fn }) =>
                 fn("ST_Distance", [
                   fn("ST_GeographyFromText", [
                     sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
                   ]),
                   "agencies.position",
-                ]).as("distance-km"),
-              )
-              .where(
-                ({ fn }) =>
-                  fn("ST_Distance", [
-                    fn("ST_GeographyFromText", [
-                      sql`${`POINT(${position.position.lon} ${position.position.lat})`}`,
-                    ]),
-                    "agencies.position",
-                  ]),
-                "<=",
-                position.distance_km * 1000,
-              )
-              .orderBy(["distance-km", "agencies.position"])
+                ]),
+              "<=",
+              position.distance_km * 1000,
+            )
           : b,
-    ).execute();
+      (b) =>
+        b.limit(
+          Math.min(limit ?? MAX_AGENCIES_RETURNED, MAX_AGENCIES_RETURNED),
+        ),
+    )
+      .orderBy("agencies.id asc")
+      .execute();
 
-    const agenciesWithoutEmails: AgencyWithoutEmails[] = results.map(
-      (result) => ({
-        coveredDepartments: result.covered_departments as DepartmentCode[],
-        address: {
-          city: result.city,
-          departmentCode: result.department_code,
-          postcode: result.post_code,
-          streetNumberAndAddress: result.street_number_and_address,
-        },
-        agencySiret: result.agency_siret,
-        codeSafir: result.code_safir,
-        id: result.id,
-        kind: result.kind as AgencyKind,
-        logoUrl: result.questionnaire_url
-          ? (result.logo_url as AbsoluteUrl)
-          : null,
-        name: result.name,
-        position: parseGeoJson(result.position),
-        questionnaireUrl: result.questionnaire_url
-          ? (result.questionnaire_url as AbsoluteUrl)
-          : null,
-        signature: result.email_signature,
-        status: result.status as AgencyStatus,
-        rejectionJustification: result.rejection_justification,
-        refersToAgencyId: result.refers_to_agency_id,
-        refersToAgencyName: result.refers_to_agency_name,
-      }),
-    );
-
-    const agencies = await this.#addEmailsToAgencies(agenciesWithoutEmails);
-
-    return validateAndParseZodSchemaV2(z.array(agencySchema), agencies, logger);
+    return results
+      .map(({ agency }) => this.#pgAgencyToAgencyWithRights(agency))
+      .filter(isTruthy);
   }
 
-  public async getAgenciesRelatedToAgency(id: AgencyId): Promise<AgencyDto[]> {
-    const agenciesWithoutEmails =
-      await this.#getAgencyWithJsonBuiltQueryBuilder()
-        .where("a.refers_to_agency_id", "=", id)
-        .orderBy("a.updated_at", "desc")
-        .execute()
-        .then(map((row) => row.agency));
+  public async getAgenciesRelatedToAgency(
+    id: AgencyId,
+  ): Promise<AgencyWithUsersRights[]> {
+    const results = await this.#getAgencyWithJsonBuiltQueryBuilder()
+      .where("agencies.refers_to_agency_id", "=", id)
+      .orderBy("agencies.updated_at", "desc")
+      .execute()
+      .then(map((row) => row.agency));
 
-    return this.#addEmailsToAgencies(agenciesWithoutEmails);
+    return results
+      .map((result) => this.#pgAgencyToAgencyWithRights(result))
+      .filter(isTruthy);
   }
 
   public async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
@@ -365,6 +254,44 @@ export class PgAgencyRepository implements AgencyRepository {
       .where("kind", "=", "immersion-facile")
       .executeTakeFirst()
       .then((row) => row?.id);
+  }
+
+  public async getUserIdWithAgencyRightsByFilters(
+    filters: WithUserFilters,
+  ): Promise<UserId[]> {
+    const results = await pipeWithValue(
+      this.transaction.selectFrom("users__agencies").select("user_id"),
+      (b) =>
+        !isWithAgencyRole(filters)
+          ? b.where("agency_id", "=", filters.agencyId)
+          : b.where("roles", "@>", `["${filters.agencyRole}"]`),
+    )
+      .orderBy("user_id asc")
+      .execute();
+    return results.map((result) => result.user_id);
+  }
+
+  public async getAgenciesRightsByUserId(
+    id: UserId,
+  ): Promise<AgencyRightOfUser[]> {
+    const results = await this.transaction
+      .selectFrom("users__agencies")
+      .select(({ ref }) => [
+        jsonBuildObject({
+          isNotifiedByEmail: ref("is_notified_by_email"),
+          roles: ref("roles").$castTo<AgencyRole[]>(),
+          agencyId: ref("agency_id"),
+        }).as("rights"),
+      ])
+      .where("user_id", "=", id)
+      .orderBy("agency_id asc")
+      .execute();
+
+    return results.map(({ rights }) => ({
+      agencyId: rights.agencyId,
+      roles: rights.roles,
+      isNotifiedByEmail: rights.isNotifiedByEmail,
+    }));
   }
 
   public async alreadyHasActiveAgencyWithSameAddressAndKind({
@@ -389,123 +316,145 @@ export class PgAgencyRepository implements AgencyRepository {
     return alreadyExistingAgencies.length > 0;
   }
 
-  async #addUserAndAgencyRights(
-    email: Email,
-    agencyId: AgencyId,
-    roles: AgencyRole[],
-  ) {
-    const result = await this.transaction
-      .insertInto("users")
-      .values({
-        id: sql`uuid_generate_v4()`,
-        email,
-        first_name: "",
-        last_name: "",
-      })
-      .onConflict((oc) => oc.doNothing())
-      .returning("id as userId")
-      .executeTakeFirst();
-
-    const userId = result
-      ? result.userId
-      : await this.transaction
-          .selectFrom("users")
-          .select("id")
-          .where("email", "=", email)
-          .executeTakeFirst()
-          .then((row) => row?.id);
-
-    if (!userId) throw new Error(`User with ${email} not created`);
-
-    await this.transaction
-      .insertInto("users__agencies")
-      .values({
-        user_id: userId,
-        agency_id: agencyId,
-        roles: JSON.stringify(roles),
-        is_notified_by_email: true,
-      })
-      .onConflict((oc) =>
-        oc
-          .columns(["user_id", "agency_id"])
-          .doUpdateSet({ is_notified_by_email: true }),
-      )
-      .execute();
-  }
-
-  async #addEmailsToAgency(
-    agencyWithoutEmail: AgencyWithoutEmails,
-  ): Promise<AgencyDto> {
-    const userRows = await getUsersWithAgencyRole(this.transaction, {
-      agencyIds: [agencyWithoutEmail.id],
-      isNotifiedByEmail: true,
-    });
-
-    return addEmailsToAgency(userRows)(agencyWithoutEmail);
-  }
-
-  async #addEmailsToAgencies(
-    agenciesWithoutEmails: AgencyWithoutEmails[],
-  ): Promise<AgencyDto[]> {
-    if (!agenciesWithoutEmails.length) return [];
-    const userRows = await getUsersWithAgencyRole(this.transaction, {
-      agencyIds: agenciesWithoutEmails.map(({ id }) => id),
-      isNotifiedByEmail: true,
-    });
-
-    return agenciesWithoutEmails.map(addEmailsToAgency(userRows));
-  }
-
-  #getAgencyWithJsonBuiltQueryBuilder = () =>
-    this.transaction
-      .selectFrom("agencies as a")
+  #getAgencyWithJsonBuiltQueryBuilder() {
+    return this.transaction
+      .selectFrom("agencies")
       .leftJoin(
         "agencies as refered_agencies",
-        "a.refers_to_agency_id",
+        "agencies.refers_to_agency_id",
         "refered_agencies.id",
       )
-      .select(({ ref }) => [
+      .leftJoin("users__agencies", "agencies.id", "users__agencies.agency_id")
+      .select(({ ref, fn }) => [
         jsonBuildObject({
-          id: cast<AgencyId>(ref("a.id")),
-          name: ref("a.name"),
-          status: cast<AgencyStatus>(ref("a.status")),
-          kind: cast<AgencyKind>(ref("a.kind")),
-          questionnaireUrl: sql<AbsoluteUrl>`${ref("a.questionnaire_url")}`,
-          logoUrl: sql<AbsoluteUrl>`${ref("a.logo_url")}`,
+          id: cast<AgencyId>(ref("agencies.id")),
+          name: ref("agencies.name"),
+          status: cast<AgencyStatus>(ref("agencies.status")),
+          kind: cast<AgencyKind>(ref("agencies.kind")),
+          questionnaireUrl: sql<AbsoluteUrl>`${ref(
+            "agencies.questionnaire_url",
+          )}`,
+          logoUrl: sql<AbsoluteUrl>`${ref("agencies.logo_url")}`,
           position: jsonBuildObject({
             lat: sql<number>`(ST_AsGeoJSON(${ref(
-              "a.position",
+              "agencies.position",
             )})::json->'coordinates'->>1)::numeric`,
             lon: sql<number>`(ST_AsGeoJSON(${ref(
-              "a.position",
+              "agencies.position",
             )})::json->'coordinates'->>0)::numeric`,
           }),
           address: jsonBuildObject({
-            streetNumberAndAddress: ref("a.street_number_and_address"),
-            postcode: ref("a.post_code"),
-            city: ref("a.city"),
-            departmentCode: ref("a.department_code"),
+            streetNumberAndAddress: ref("agencies.street_number_and_address"),
+            postcode: ref("agencies.post_code"),
+            city: ref("agencies.city"),
+            departmentCode: ref("agencies.department_code"),
           }),
           coveredDepartments: cast<DepartmentCode[]>(
-            ref("a.covered_departments"),
+            ref("agencies.covered_departments"),
           ),
-          agencySiret: ref("a.agency_siret"),
-          codeSafir: ref("a.code_safir"),
-          signature: ref("a.email_signature"),
-          refersToAgencyId: cast<AgencyId>(ref("a.refers_to_agency_id")),
+          agencySiret: ref("agencies.agency_siret"),
+          codeSafir: ref("agencies.code_safir"),
+          signature: ref("agencies.email_signature"),
+          refersToAgencyId: cast<AgencyId>(ref("agencies.refers_to_agency_id")),
           refersToAgencyName: ref("refered_agencies.name"),
-          rejectionJustification: ref("a.rejection_justification"),
+          rejectionJustification: ref("agencies.rejection_justification"),
+          acquisitionCampaign: ref("agencies.acquisition_campaign"),
+          acquisitionKeyword: ref("agencies.acquisition_keyword"),
+          usersRights: fn.coalesce(
+            fn
+              .jsonAgg(
+                jsonStripNulls(
+                  jsonBuildObject({
+                    userId: ref("users__agencies.user_id"),
+                    roles: ref("users__agencies.roles"),
+                    isNotifiedByEmail: ref(
+                      "users__agencies.is_notified_by_email",
+                    ),
+                  }),
+                ),
+              )
+              .filterWhere("users__agencies.user_id", "is not", null)
+              .$castTo<
+                {
+                  userId: string;
+                  roles: AgencyRole[];
+                  isNotifiedByEmail: boolean;
+                }[]
+              >(),
+            sql`'[]'`,
+          ),
         }).as("agency"),
-      ]);
+      ])
+      .groupBy(["agencies.id", "refered_agencies.id"]);
+  }
+
+  #pgAgencyToAgencyWithRights(
+    result:
+      | (OmitFromExistingKeys<
+          AgencyDto,
+          | "counsellorEmails"
+          | "validatorEmails"
+          | "acquisitionCampaign"
+          | "acquisitionKeyword"
+        > & {
+          acquisitionCampaign: string | null;
+          acquisitionKeyword: string | null;
+          usersRights: {
+            userId: string;
+            roles: AgencyRole[];
+            isNotifiedByEmail: boolean;
+          }[];
+        })
+      | undefined,
+  ): AgencyWithUsersRights | undefined {
+    if (!result) return;
+    const { acquisitionCampaign, acquisitionKeyword, usersRights, ...rest } =
+      result;
+
+    return {
+      ...rest,
+      ...(acquisitionCampaign ? { acquisitionCampaign } : {}),
+      ...(acquisitionKeyword ? { acquisitionKeyword } : {}),
+      usersRights: usersRights.reduce<AgencyUsersRights>(
+        (acc, { isNotifiedByEmail, roles, userId }) => ({
+          ...acc,
+          [userId]: { isNotifiedByEmail, roles },
+        }),
+        {},
+      ),
+    } satisfies AgencyWithUsersRights;
+  }
+
+  async #saveAgencyRights(
+    agencyId: AgencyId,
+    agencyUserRights: AgencyUsersRights,
+  ): Promise<void> {
+    await this.transaction
+      .deleteFrom("users__agencies")
+      .where("users__agencies.agency_id", "=", agencyId)
+      .execute();
+
+    const newRights = toPairs(agencyUserRights)
+      .map(([userId, userRights]) =>
+        userRights
+          ? {
+              agency_id: agencyId,
+              user_id: userId,
+              is_notified_by_email: userRights.isNotifiedByEmail,
+              roles: JSON.stringify(userRights.roles),
+            }
+          : undefined,
+      )
+      .filter(isTruthy);
+
+    if (newRights.length)
+      await this.transaction
+        .insertInto("users__agencies")
+        .values(newRights)
+        .execute();
+  }
 }
 
-const parseGeoJson = (raw: string): GeoPositionDto => {
-  const json = JSON.parse(raw);
-  return {
-    lat: json.coordinates[1],
-    lon: json.coordinates[0],
-  };
-};
 export const safirConflictErrorMessage = (
   safirCode: string,
   agencies: Pick<AgencyDto, "id">[],
