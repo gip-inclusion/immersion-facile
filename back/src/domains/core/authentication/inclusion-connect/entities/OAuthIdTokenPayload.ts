@@ -36,7 +36,6 @@ export const proConnectAuthTokenPayloadSchema: z.Schema<ProConnectOAuthIdTokenPa
     given_name: z.string(),
     usual_name: z.string(),
     email: emailSchema,
-    structure_pe: z.string().optional(),
     custom: z.object({
       structure_travail: z.string().optional(),
     }),
