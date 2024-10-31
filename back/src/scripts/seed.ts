@@ -51,6 +51,13 @@ const seed = async () => {
   await db.deleteFrom("establishments").execute();
   await db.deleteFrom("groups").execute();
   await db.deleteFrom("feature_flags").execute();
+  await db.deleteFrom("notifications_email_recipients").execute();
+  await db.deleteFrom("notifications_email_attachments").execute();
+  await db.deleteFrom("notifications_email").execute();
+  await db.deleteFrom("notifications_sms").execute();
+  await db.deleteFrom("outbox_failures").execute();
+  await db.deleteFrom("outbox_publications").execute();
+  await db.deleteFrom("outbox").execute();
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("Reset Db end");

@@ -122,18 +122,23 @@ export class HttpOAuthGateway implements OAuthGateway {
       });
 
     const tokenWithPayload = response.body;
-    const oAuthIdTokenPayload = validateAndParseZodSchemaV2(
-      proConnectAuthTokenPayloadSchema,
+
+    const tokenPayload =
       decodeJwtWithoutSignatureCheck<ProConnectOAuthIdTokenPayload>(
         tokenWithPayload,
-      ),
+      );
+
+    const oAuthIdTokenPayload = validateAndParseZodSchemaV2(
+      proConnectAuthTokenPayloadSchema,
+      tokenPayload,
       logger,
     );
 
     logger.info({
       message: `from ProConnect:
+       custom before parsing : ${JSON.stringify(tokenPayload.custom)},
        sub: ${oAuthIdTokenPayload.sub},
-       custom: ${JSON.stringify(oAuthIdTokenPayload.custom)}`,
+       custom after parsing: ${JSON.stringify(oAuthIdTokenPayload.custom)}`,
     });
 
     return {
