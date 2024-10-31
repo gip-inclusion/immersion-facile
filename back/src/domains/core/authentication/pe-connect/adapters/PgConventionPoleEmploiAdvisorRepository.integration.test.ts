@@ -10,6 +10,7 @@ import {
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../../../utils/agency";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "../../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
@@ -76,7 +77,9 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();
     const agencyRepository = new PgAgencyRepository(db);
-    await agencyRepository.insert(AgencyDtoBuilder.create().build());
+    await agencyRepository.insert(
+      toAgencyWithRights(AgencyDtoBuilder.create().build()),
+    );
     const conventionRepository = new PgConventionRepository(db);
     const conventionExternalIdRepository = new PgConventionExternalIdRepository(
       db,

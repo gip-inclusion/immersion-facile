@@ -15,105 +15,116 @@ import {
   ConventionStatus,
   DATE_START,
   EmailNotification,
+  InclusionConnectedUserBuilder,
   Notification,
   SiretDto,
   concatValidatorNames,
-  defaultValidatorEmail,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import { ConventionRepository } from "../ports/ConventionRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 
-const conventionIdA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-const conventionIdB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
-const agencyIdA: AgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
-const agencyIdB: AgencyId = "bbbbbbbb-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
-
-const createNotification = ({
-  id,
-  createdAt,
-  convention,
-  emailKind,
-}: {
-  id: string;
-  createdAt: Date;
-  convention: ConventionDto;
-  emailKind:
-    | "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
-    | "VALIDATED_CONVENTION_FINAL_CONFIRMATION";
-}): EmailNotification => {
-  return emailKind === "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
-    ? {
-        createdAt: createdAt.toISOString(),
-        followedIds: {
-          conventionId: convention.id,
-          establishmentSiret: convention.siret,
-          agencyId: convention.agencyId,
-        },
-        id,
-        kind: "email",
-        templatedContent: {
-          kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
-          params: {
-            internshipKind: "immersion",
-            assessmentCreationLink: "fake-link",
-            beneficiaryFirstName: "joe",
-            beneficiaryLastName: "joe",
-            conventionId: convention.id,
-            establishmentTutorName: "tuteur du joe",
-            agencyLogoUrl: "https://super link",
-          },
-          recipients: ["joe-joe@gmail.com"],
-        },
-      }
-    : {
-        createdAt: createdAt.toISOString(),
-        followedIds: {
-          conventionId: convention.id,
-          establishmentSiret: convention.siret,
-          agencyId: convention.agencyId,
-        },
-        id,
-        kind: "email",
-        templatedContent: {
-          kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-          params: {
-            conventionId: convention.id,
-            internshipKind: convention.internshipKind,
-            beneficiaryFirstName: "prénom béneficiaire",
-            beneficiaryLastName: "nom béneficiaire",
-            beneficiaryBirthdate: "1995-05-05",
-            dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
-            dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-            establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-            businessName: convention.businessName,
-            immersionAppellationLabel:
-              convention.immersionAppellation.appellationLabel,
-            emergencyContactInfos: "",
-            agencyLogoUrl: "https://super link",
-            agencyAssessmentDocumentLink: "https://super link",
-            magicLink: "",
-            validatorName: convention.validators?.agencyValidator
-              ? concatValidatorNames(convention.validators?.agencyValidator)
-              : "",
-          },
-          recipients: ["joe-joe@gmail.com"],
-        },
-      };
-};
-
 describe("Pg implementation of ConventionQueries", () => {
+  const conventionIdA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+  const conventionIdB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
+  const agencyIdA: AgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const agencyIdB: AgencyId = "bbbbbbbb-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+
+  const createNotification = ({
+    id,
+    createdAt,
+    convention,
+    emailKind,
+  }: {
+    id: string;
+    createdAt: Date;
+    convention: ConventionDto;
+    emailKind:
+      | "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
+      | "VALIDATED_CONVENTION_FINAL_CONFIRMATION";
+  }): EmailNotification => {
+    return emailKind === "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
+      ? {
+          createdAt: createdAt.toISOString(),
+          followedIds: {
+            conventionId: convention.id,
+            establishmentSiret: convention.siret,
+            agencyId: convention.agencyId,
+          },
+          id,
+          kind: "email",
+          templatedContent: {
+            kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+            params: {
+              internshipKind: "immersion",
+              assessmentCreationLink: "fake-link",
+              beneficiaryFirstName: "joe",
+              beneficiaryLastName: "joe",
+              conventionId: convention.id,
+              establishmentTutorName: "tuteur du joe",
+              agencyLogoUrl: "https://super link",
+            },
+            recipients: ["joe-joe@gmail.com"],
+          },
+        }
+      : {
+          createdAt: createdAt.toISOString(),
+          followedIds: {
+            conventionId: convention.id,
+            establishmentSiret: convention.siret,
+            agencyId: convention.agencyId,
+          },
+          id,
+          kind: "email",
+          templatedContent: {
+            kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+            params: {
+              conventionId: convention.id,
+              internshipKind: convention.internshipKind,
+              beneficiaryFirstName: "prénom béneficiaire",
+              beneficiaryLastName: "nom béneficiaire",
+              beneficiaryBirthdate: "1995-05-05",
+              dateStart: parseISO(convention.dateStart).toLocaleDateString(
+                "fr",
+              ),
+              dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+              establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+              businessName: convention.businessName,
+              immersionAppellationLabel:
+                convention.immersionAppellation.appellationLabel,
+              emergencyContactInfos: "",
+              agencyLogoUrl: "https://super link",
+              agencyAssessmentDocumentLink: "https://super link",
+              magicLink: "",
+              validatorName: convention.validators?.agencyValidator
+                ? concatValidatorNames(convention.validators?.agencyValidator)
+                : "",
+            },
+            recipients: ["joe-joe@gmail.com"],
+          },
+        };
+  };
+
+  const validator = new InclusionConnectedUserBuilder()
+    .withEmail("validator@mail.com")
+    .withId("77777777-6666-4777-7777-777777777777")
+    .buildUser();
+
   let pool: Pool;
   let conventionQueries: PgConventionQueries;
   let agencyRepo: PgAgencyRepository;
+
   let conventionRepository: PgConventionRepository;
   let db: KyselyDb;
 
@@ -136,6 +147,8 @@ describe("Pg implementation of ConventionQueries", () => {
     conventionQueries = new PgConventionQueries(db);
     agencyRepo = new PgAgencyRepository(db);
     conventionRepository = new PgConventionRepository(db);
+
+    await new PgUserRepository(db).save(validator, "inclusionConnect");
   });
 
   afterAll(async () => {
@@ -158,8 +171,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "autre",
         agencySiret: "11112222000033",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [defaultValidatorEmail],
+        validatorUser: validator,
       });
 
       // Act
@@ -177,7 +189,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withAgencySiret("55552222000055")
         .build();
 
-      await agencyRepo.insert(referringAgency);
+      await agencyRepo.insert(toAgencyWithRights(referringAgency, {}));
 
       const expectedConventionRead = await insertAgencyAndConvention({
         conventionId: conventionIdA,
@@ -187,8 +199,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyKind: "autre",
         agencySiret: "11112222000033",
         withRefersToAgency: referringAgency,
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [defaultValidatorEmail],
+        validatorUser: validator,
       });
 
       const result = await conventionQueries.getConventionById(conventionIdA);
@@ -208,10 +219,9 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "pole-emploi",
         agencySiret: "11112222000044",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [defaultValidatorEmail],
         conventionStartDate: new Date("2021-01-10").toISOString(),
         conventionStatus: "IN_REVIEW",
+        validatorUser: validator,
       });
       cciConvention = await insertAgencyAndConvention({
         conventionId: conventionIdB,
@@ -220,10 +230,9 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "cci",
         agencySiret: "11112222000055",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [defaultValidatorEmail],
         conventionStartDate: new Date("2021-01-15").toISOString(),
         conventionStatus: "DRAFT",
+        validatorUser: validator,
       });
       await insertAgencyAndConvention({
         conventionId: "cccccc99-9c0b-1bbb-bb6d-6bb9bd38bbbb",
@@ -232,10 +241,9 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "mission-locale",
         agencySiret: "11112222000066",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [defaultValidatorEmail],
         conventionStartDate: new Date("2021-01-12").toISOString(),
         conventionStatus: "IN_REVIEW",
+        validatorUser: validator,
       });
     });
 
@@ -387,7 +395,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     beforeEach(async () => {
-      await agencyRepo.insert(agency);
+      await agencyRepo.insert(toAgencyWithRights(agency));
 
       await Promise.all(
         [
@@ -638,7 +646,11 @@ describe("Pg implementation of ConventionQueries", () => {
         .withStatus("CANCELLED")
         .build();
 
-      await agencyRepo.insert(agency);
+      await agencyRepo.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
 
       await Promise.all([
         conventionRepository.save(conventionWithWrongSiret),
@@ -767,7 +779,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     beforeEach(async () => {
       const agencyRepository = new PgAgencyRepository(db);
-      await agencyRepository.insert(agency);
+      await agencyRepository.insert(toAgencyWithRights(agency));
 
       conventionRepo = new PgConventionRepository(db);
       notificationRepo = new PgNotificationRepository(db);
@@ -898,11 +910,10 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment,
     agencyKind,
     agencySiret,
-    agencyCounsellorEmails,
-    agencyValidatorEmails,
     withRefersToAgency,
     conventionStartDate = DATE_START,
     conventionStatus = "DRAFT",
+    validatorUser,
   }: {
     conventionId: ConventionId;
     agencyId: string;
@@ -910,8 +921,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment: string;
     agencyKind: AgencyKind;
     agencySiret: SiretDto;
-    agencyCounsellorEmails: string[];
-    agencyValidatorEmails: string[];
+    validatorUser: UserOnRepository;
     withRefersToAgency?: AgencyDto;
     conventionStartDate?: string;
     conventionStatus?: ConventionStatus;
@@ -987,9 +997,14 @@ describe("Pg implementation of ConventionQueries", () => {
       )
       .build();
 
-    if (withRefersToAgency) await agencyRepo.insert(withRefersToAgency);
+    if (withRefersToAgency)
+      await agencyRepo.insert(toAgencyWithRights(withRefersToAgency));
 
-    await agencyRepo.insert(agency);
+    await agencyRepo.insert(
+      toAgencyWithRights(agency, {
+        [validatorUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    );
 
     await conventionRepository.save(convention);
 
@@ -1004,8 +1019,8 @@ describe("Pg implementation of ConventionQueries", () => {
         name: withRefersToAgency.name,
         kind: withRefersToAgency.kind,
       },
-      agencyCounsellorEmails,
-      agencyValidatorEmails,
+      agencyValidatorEmails: [validatorUser.email],
+      agencyCounsellorEmails: [],
     } satisfies ConventionReadDto;
   };
 });

@@ -9,6 +9,7 @@ import {
 } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
@@ -52,7 +53,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       const { siret } = establishment.establishment;
 
       const agency = new AgencyDtoBuilder().build();
-      await pgAgencyRepository.insert(agency);
+      await pgAgencyRepository.insert(toAgencyWithRights(agency));
 
       const convention = new ConventionDtoBuilder()
         .withSiret(siret)

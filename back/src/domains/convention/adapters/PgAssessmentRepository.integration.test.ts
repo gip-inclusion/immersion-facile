@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { PgAssessmentRepository } from "./PgAssessmentRepository";
@@ -38,7 +39,9 @@ describe("PgAssessmentRepository", () => {
     await db.deleteFrom("agency_groups").execute();
     await db.deleteFrom("agencies").execute();
 
-    await new PgAgencyRepository(db).insert(AgencyDtoBuilder.create().build());
+    await new PgAgencyRepository(db).insert(
+      toAgencyWithRights(AgencyDtoBuilder.create().build()),
+    );
     await new PgConventionRepository(db).save(convention);
   });
 

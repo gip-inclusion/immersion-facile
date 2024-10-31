@@ -18,6 +18,7 @@ import {
 } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -39,7 +40,9 @@ describe("PgConventionRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
-    await new PgAgencyRepository(db).insert(AgencyDtoBuilder.create().build());
+    await new PgAgencyRepository(db).insert(
+      toAgencyWithRights(AgencyDtoBuilder.create().build()),
+    );
   });
 
   afterAll(async () => {
