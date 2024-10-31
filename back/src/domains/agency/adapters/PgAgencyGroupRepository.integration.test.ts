@@ -2,6 +2,7 @@ import { Pool } from "pg";
 import { AgencyDtoBuilder, AgencyGroup, expectToEqual } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyGroupRepository } from "./PgAgencyGroupRepository";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
@@ -70,7 +71,7 @@ describe("PgAgencyGroupRepository", () => {
     )
       throw new Error("Agency not supported in tests. tests");
 
-    await pgAgencyRepository.insert(agency);
+    await pgAgencyRepository.insert(toAgencyWithRights(agency));
 
     const [{ id: agencyGroupId }] = await db
       .insertInto("agency_groups")

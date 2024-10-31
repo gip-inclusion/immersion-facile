@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
@@ -113,7 +114,7 @@ describe("PgEstablishmentLeadQueries", () => {
     });
 
     it("get the last convention by last event kind ", async () => {
-      await agencyRepo.insert(agency);
+      await agencyRepo.insert(toAgencyWithRights(agency));
       await Promise.all([
         conventionRepository.save(convention1),
         conventionRepository.save(convention2),
@@ -142,7 +143,7 @@ describe("PgEstablishmentLeadQueries", () => {
           },
         ],
       };
-      await agencyRepo.insert(agency);
+      await agencyRepo.insert(toAgencyWithRights(agency));
       await Promise.all([
         conventionRepository.save(convention1),
         conventionRepository.save(convention2),

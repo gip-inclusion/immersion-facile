@@ -12,6 +12,7 @@ import {
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
@@ -103,7 +104,7 @@ describe("PgStatisticQueries", () => {
         .build();
 
       beforeEach(async () => {
-        await pgAgencyRepository.insert(agency);
+        await pgAgencyRepository.insert(toAgencyWithRights(agency));
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentAggregate,
         );
