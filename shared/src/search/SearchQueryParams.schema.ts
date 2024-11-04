@@ -31,6 +31,7 @@ export const searchParamsSchema: z.Schema<SearchQueryParamsDto> = z
     voluntaryToImmersion: z.undefined().or(zToBoolean.optional()),
     place: z.string().optional(),
     establishmentSearchableBy: z.enum(["students", "jobSeekers"]).optional(),
+    fitForDisabledWorkers: z.undefined().or(zToBoolean.optional()),
   })
   .and(geoParamsSchema)
   .and(withAcquisitionSchema)

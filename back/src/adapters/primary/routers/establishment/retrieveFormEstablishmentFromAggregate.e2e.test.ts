@@ -138,7 +138,6 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           jobSeekers: true,
           students: false,
         },
-        fitForDisabledWorkers: false,
       },
       status: 200,
     });
@@ -191,7 +190,6 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         businessContact: establishmentAggregate.contact!,
         searchableBy: establishmentAggregate.establishment.searchableBy,
-        fitForDisabledWorkers: false,
       },
       status: 200,
     });

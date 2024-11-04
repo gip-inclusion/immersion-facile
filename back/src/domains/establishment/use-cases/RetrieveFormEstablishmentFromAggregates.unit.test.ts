@@ -120,7 +120,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         jobSeekers: true,
         students: false,
       },
-      fitForDisabledWorkers: false,
     });
   });
 
@@ -178,7 +177,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         jobSeekers: true,
         students: true,
       },
-      fitForDisabledWorkers: false,
     });
   });
 
@@ -252,7 +250,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         jobSeekers: true,
         students: true,
       },
-      fitForDisabledWorkers: false,
     });
   });
 });

@@ -21,6 +21,7 @@ export type SearchImmersionResult = SearchResultDto & {
 
 export type SearchImmersionParams = {
   searchMade: SearchMade;
+  fitForDisabledWorkers?: boolean;
   maxResults?: number;
 };
 

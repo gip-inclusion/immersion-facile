@@ -49,6 +49,7 @@ export class SearchImmersion extends TransactionalUseCase<
       establishmentSearchableBy,
       acquisitionCampaign,
       acquisitionKeyword,
+      fitForDisabledWorkers,
     }: SearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
@@ -70,6 +71,7 @@ export class SearchImmersion extends TransactionalUseCase<
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([
       uow.establishmentAggregateRepository.searchImmersionResults({
         searchMade,
+        fitForDisabledWorkers,
         maxResults: 100,
       }),
       shouldFetchLBB(appellationCodes, voluntaryToImmersion) &&
