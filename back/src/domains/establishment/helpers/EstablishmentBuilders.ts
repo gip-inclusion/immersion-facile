@@ -107,7 +107,6 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   additionalInformation: "",
   fitForDisabledWorkers: false,
   website: "",
-  fitForDisabledWorkers: false,
   score: 10,
 };
 

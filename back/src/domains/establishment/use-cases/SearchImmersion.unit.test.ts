@@ -1068,6 +1068,80 @@ describe("SearchImmersionUseCase", () => {
       ]);
     });
   });
+
+  describe("filter FitForDisabledWorkers", () => {
+    const establishmentWithFitForDisabledWorkersFalse =
+      new EstablishmentAggregateBuilder(establishment)
+        .withEstablishmentSiret("11111111111111")
+        .withFitForDisabledWorkers(false)
+        .build();
+
+    const establishmentWithFitForDisabledWorkersTrue =
+      new EstablishmentAggregateBuilder(establishment)
+        .withEstablishmentSiret("11111111111112")
+        .withFitForDisabledWorkers(true)
+        .build();
+
+    beforeEach(() => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentWithFitForDisabledWorkersFalse,
+        establishmentWithFitForDisabledWorkersTrue,
+      ];
+    });
+
+    it("without filter all establisments", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+      });
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithFitForDisabledWorkersFalse,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithFitForDisabledWorkersFalse.establishment.score,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithFitForDisabledWorkersTrue,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithFitForDisabledWorkersTrue.establishment.score,
+        ),
+      ]);
+    });
+
+    it("with filter false establishments with fitForDisabledWorkers false", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+        fitForDisabledWorkers: false,
+      });
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithFitForDisabledWorkersFalse,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithFitForDisabledWorkersFalse.establishment.score,
+        ),
+      ]);
+    });
+
+    it("with filter true establishments with fitForDisabledWorkers true", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+        fitForDisabledWorkers: true,
+      });
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithFitForDisabledWorkersTrue,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithFitForDisabledWorkersTrue.establishment.score,
+        ),
+      ]);
+    });
+  });
 });
 
 const lbbCompanyVO = new LaBonneBoiteCompanyDtoBuilder()

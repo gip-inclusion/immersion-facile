@@ -158,6 +158,7 @@ export class InMemoryEstablishmentAggregateRepository
 
   public async searchImmersionResults({
     searchMade,
+    fitForDisabledWorkers,
     maxResults,
   }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     return this.#establishmentAggregates
@@ -167,6 +168,11 @@ export class InMemoryEstablishmentAggregateRepository
           ? aggregate.establishment.searchableBy[
               searchMade.establishmentSearchableBy
             ]
+          : true,
+      )
+      .filter((agg) =>
+        fitForDisabledWorkers !== undefined
+          ? agg.establishment.fitForDisabledWorkers === fitForDisabledWorkers
           : true,
       )
       .flatMap((aggregate) =>

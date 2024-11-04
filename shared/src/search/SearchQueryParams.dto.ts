@@ -29,6 +29,7 @@ type SearchQueryCommonParamsDto = {
   voluntaryToImmersion?: boolean;
   place?: string;
   establishmentSearchableBy?: EstablishmentSearchableByValue;
+  fitForDisabledWorkers?: boolean;
 } & WithAcquisition;
 
 type SearchQueryParamsAppellationsAndRome = {
