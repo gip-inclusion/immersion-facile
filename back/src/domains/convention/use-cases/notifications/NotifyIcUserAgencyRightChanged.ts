@@ -40,9 +40,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
 
     const agencyRight = agency.usersRights[user.id];
 
-    if (!agencyRight) throw errors.user.noRightsOnAgency(params);
-
-    if (!agencyRight.roles.includes("to-review"))
+    if (agencyRight && !agencyRight.roles.includes("to-review"))
       await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
