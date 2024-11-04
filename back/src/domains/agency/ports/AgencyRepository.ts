@@ -1,20 +1,20 @@
-import {
-  type AddressDto,
-  type AgencyDto,
-  type AgencyId,
-  type AgencyKind,
-  type AgencyPositionFilter,
-  type AgencyRight,
-  type AgencyRole,
-  type AgencyStatus,
-  type DepartmentCode,
-  type OmitFromExistingKeys,
-  type SiretDto,
-  type UserId,
-  type WithUserFilters,
-  errors,
+import type {
+  AddressDto,
+  AgencyDto,
+  AgencyId,
+  AgencyKind,
+  AgencyPositionFilter,
+  AgencyRight,
+  AgencyRole,
+  AgencyStatus,
+  DepartmentCode,
+  OmitFromExistingKeys,
+  SiretDto,
+  UserId,
+  WithUserFilters,
 } from "shared";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { errors } from "shared";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export type GetAgenciesFilters = {
   nameIncludes?: string;

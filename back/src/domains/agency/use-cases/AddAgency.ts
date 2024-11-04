@@ -24,39 +24,48 @@ import {
 export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
   protected inputSchema = createAgencySchema;
 
+  readonly #createNewEvent: CreateNewEvent;
+  readonly #siretGateway: SiretGateway;
+  readonly #timeGateway: TimeGateway;
+  readonly #uuidGenerator: UuidGenerator;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private createNewEvent: CreateNewEvent,
-    private siretGateway: SiretGateway,
-    private timeGateway: TimeGateway,
-    private uuidGenerator: UuidGenerator,
+    createNewEvent: CreateNewEvent,
+    siretGateway: SiretGateway,
+    timeGateway: TimeGateway,
+    uuidGenerator: UuidGenerator,
   ) {
     super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
+    this.#siretGateway = siretGateway;
+    this.#timeGateway = timeGateway;
+    this.#uuidGenerator = uuidGenerator;
   }
 
   protected async _execute(
     { validatorEmails, counsellorEmails, ...rest }: CreateAgencyDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const validatorUserIdForAgency = rest.refersToAgencyId
+    const validatorUserIdsForAgency = rest.refersToAgencyId
       ? await this.#getReferedAgencyValidatorUserIds(uow, rest.refersToAgencyId)
       : await Promise.all(
           validatorEmails.map((email) =>
             createOrGetUserIdByEmail(
               uow,
-              this.timeGateway,
-              this.uuidGenerator,
+              this.#timeGateway,
+              this.#uuidGenerator,
               email,
             ),
           ),
         );
 
-    const counsellorUserIdForAgency = await Promise.all(
+    const counsellorUserIdsForAgency = await Promise.all(
       counsellorEmails.map((email) =>
         createOrGetUserIdByEmail(
           uow,
-          this.timeGateway,
-          this.uuidGenerator,
+          this.#timeGateway,
+          this.#uuidGenerator,
           email,
         ),
       ),
@@ -69,8 +78,8 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
       codeSafir: null,
       rejectionJustification: null,
       usersRights: this.#makeUserRights(
-        validatorUserIdForAgency,
-        counsellorUserIdForAgency,
+        validatorUserIdsForAgency,
+        counsellorUserIdsForAgency,
       ),
     };
 
@@ -78,7 +87,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
 
     const siretEstablishmentDto =
       agency.agencySiret &&
-      (await this.siretGateway.getEstablishmentBySiret(agency.agencySiret));
+      (await this.#siretGateway.getEstablishmentBySiret(agency.agencySiret));
 
     if (!siretEstablishmentDto)
       throw errors.agency.invalidSiret({ siret: agency.agencySiret });
@@ -86,7 +95,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
     await Promise.all([
       uow.agencyRepository.insert(agency),
       uow.outboxRepository.save(
-        this.createNewEvent({
+        this.#createNewEvent({
           topic: "NewAgencyAdded",
           payload: { agencyId: agency.id, triggeredBy: null },
         }),

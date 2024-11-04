@@ -1,6 +1,5 @@
 import {
   AgencyDto,
-  Email,
   InclusionConnectedUser,
   agencySchema,
   errors,
@@ -34,12 +33,11 @@ export class UpdateAgency extends TransactionalUseCase<
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
-    const { validatorEmails, counsellorEmails, ...agencyToUpdate } = agency;
-
-    this.#handleUpdatedValidatorAndCounsellorEmails(
-      validatorEmails,
-      counsellorEmails,
-    );
+    const {
+      validatorEmails: _,
+      counsellorEmails: __,
+      ...agencyToUpdate
+    } = agency;
 
     await Promise.all([
       uow.agencyRepository.update(agencyToUpdate).catch((error) => {
@@ -60,14 +58,5 @@ export class UpdateAgency extends TransactionalUseCase<
         }),
       ),
     ]);
-  }
-
-  #handleUpdatedValidatorAndCounsellorEmails(
-    _validatorEmails: Email[],
-    _counsellorEmails: Email[],
-  ): void {
-    // Do nothing with updated emails
-    // Agency rights and user creation is
-    // no more the responsibility for agency update usecase
   }
 }

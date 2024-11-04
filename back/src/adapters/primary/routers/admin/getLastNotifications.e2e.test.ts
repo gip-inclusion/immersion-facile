@@ -8,6 +8,7 @@ import {
   SmsNotification,
   adminRoutes,
   currentJwtVersions,
+  displayRouteName,
   expectHttpResponseToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -42,7 +43,9 @@ describe("Get last notification route", () => {
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
   });
 
-  describe(`${adminRoutes.getLastNotifications.url} private route to get last email sent`, () => {
+  describe(`${displayRouteName(
+    adminRoutes.getLastNotifications,
+  )} private route to get last email sent`, () => {
     it("throws 400 if missing token", async () => {
       const response = await httpClient.getLastNotifications({
         headers: {} as { authorization: string },
