@@ -147,11 +147,11 @@ describe("AddAgency use case", () => {
           },
           {
             [newValidator.id]: {
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
               roles: ["validator"],
             },
             [newCounsellor.id]: {
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
               roles: ["counsellor"],
             },
           },
@@ -179,11 +179,11 @@ describe("AddAgency use case", () => {
           },
           {
             [validator.id]: {
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
               roles: ["validator"],
             },
             [counsellor.id]: {
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
               roles: ["counsellor"],
             },
           },
@@ -245,11 +245,11 @@ describe("AddAgency use case", () => {
           },
           {
             [newValidator.id]: {
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
               roles: ["validator"],
             },
             [newCounsellor.id]: {
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
               roles: ["counsellor"],
             },
           },
@@ -270,8 +270,8 @@ describe("AddAgency use case", () => {
       uow.userRepository.users = [counsellor, validator];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(existingMiloAgency, {
-          [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
       ];
 
@@ -296,10 +296,10 @@ describe("AddAgency use case", () => {
           { ...existingMiloAgency, counsellorEmails: [], validatorEmails: [] },
           {
             [counsellor.id]: {
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
               roles: ["counsellor"],
             },
-            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
           },
         ),
         toAgencyWithRights(
@@ -312,9 +312,9 @@ describe("AddAgency use case", () => {
             validatorEmails: [],
           },
           {
-            [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
             [newCounsellor.id]: {
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
               roles: ["counsellor"],
             },
           },

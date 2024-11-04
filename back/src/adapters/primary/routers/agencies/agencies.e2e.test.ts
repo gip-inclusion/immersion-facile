@@ -283,11 +283,11 @@ describe("Agency routes", () => {
             },
             {
               [validator.id]: {
-                isNotifiedByEmail: false,
+                isNotifiedByEmail: true,
                 roles: ["validator"],
               },
               [counsellor.id]: {
-                isNotifiedByEmail: false,
+                isNotifiedByEmail: true,
                 roles: ["counsellor"],
               },
             },

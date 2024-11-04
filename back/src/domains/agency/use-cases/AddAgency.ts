@@ -147,7 +147,7 @@ const buildAgencyUsersRights = (
       ...acc,
       [id]: {
         roles,
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
     }),
     {},
