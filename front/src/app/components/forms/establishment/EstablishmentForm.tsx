@@ -395,15 +395,17 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           {match(currentStep)
             .with(null, () => (
               <>
-                <Button
-                  onClick={() => {
-                    routes.adminEstablishments().push();
-                  }}
-                  children="Retour au pilotage des établissements"
-                  type="button"
-                  priority="secondary"
-                  className={fr.cx("fr-mb-4w")}
-                />
+                {isEstablishmentAdmin && (
+                  <Button
+                    onClick={() => {
+                      routes.adminEstablishments().push();
+                    }}
+                    children="Retour au pilotage des établissements"
+                    type="button"
+                    priority="secondary"
+                    className={fr.cx("fr-mb-4w")}
+                  />
+                )}
                 <h1>Pilotage de l'entreprise {formValues.siret}</h1>
                 <h2>{steps[1].title}</h2>
                 <AvailabilitySection
