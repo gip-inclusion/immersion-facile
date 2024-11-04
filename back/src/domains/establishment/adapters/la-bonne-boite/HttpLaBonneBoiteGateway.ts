@@ -9,7 +9,7 @@ import {
 } from "../../ports/LaBonneBoiteGateway";
 import { LaBonneBoiteRoutes } from "./LaBonneBoite.routes";
 import {
-  LaBonneBoiteApiResultProps,
+  LaBonneBoiteApiResultV2Props,
   LaBonneBoiteCompanyDto,
 } from "./LaBonneBoiteCompanyDto";
 
@@ -17,6 +17,8 @@ const MAX_PAGE_SIZE = 100;
 const MAX_DISTANCE_IN_KM = 100;
 
 const lbbMaxQueryPerSeconds = 1;
+
+const lbbV2App = "api_labonneboitev2";
 
 const logger = createLogger(__filename);
 export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
@@ -37,10 +39,12 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     lat,
     lon,
     rome,
+    romeLabel,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
     logger.warn({
       message: "searchCompanies",
       searchLBB: {
+        romeLabel,
         distanceKm,
         lat,
         lon,
@@ -48,40 +52,33 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
       },
     });
     return this.#limiter
-      .schedule(async () =>
-        this.poleEmploiGateway
-          .getAccessToken(
-            `application_${this.poleEmploiClientId} api_labonneboitev1`,
-          )
-          .then((accessToken) =>
-            this.httpClient.getCompany({
-              headers: {
-                authorization: createAuthorization(accessToken.access_token),
-              },
-              queryParams: {
-                distance: MAX_DISTANCE_IN_KM,
-                longitude: lon,
-                latitude: lat,
-                page: 1,
-                page_size: MAX_PAGE_SIZE,
-                rome_codes: rome,
-                sort: "distance",
-              },
-            }),
-          ),
-      )
-      .then(({ body }) =>
-        body.companies
-          .map(
-            (props: LaBonneBoiteApiResultProps) =>
+      .schedule(async () => {
+        const { access_token } = await this.poleEmploiGateway.getAccessToken(
+          `application_${this.poleEmploiClientId} ${lbbV2App}`,
+        );
+        return this.httpClient.getCompany({
+          headers: {
+            authorization: createAuthorization(access_token),
+          },
+          queryParams: {
+            distance: MAX_DISTANCE_IN_KM,
+            longitude: lon,
+            latitude: lat,
+            page: 1,
+            page_size: MAX_PAGE_SIZE,
+            rome: [rome],
+          },
+        });
+      })
+      .then(({ body }) => {
+        return body.items
+          ?.map(
+            (props: LaBonneBoiteApiResultV2Props) =>
               new LaBonneBoiteCompanyDto(props),
           )
-          .filter(
-            (result) =>
-              result.props.distance <= distanceKm && result.isCompanyRelevant(),
-          )
-          .map((result) => result.toSearchResult()),
-      )
+          .filter((result) => result.isCompanyRelevant())
+          .map((result) => result.toSearchResult(romeLabel));
+      })
       .catch((error) => {
         logger.error({
           error: castError(error),
@@ -91,6 +88,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
             lat,
             lon,
             rome,
+            romeLabel,
           },
         });
         throw error;

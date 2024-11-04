@@ -12,18 +12,14 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
     public nbOfCalls = 0,
   ) {}
 
-  public async searchCompanies(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { distanceKm }: LaBonneBoiteRequestParams,
-  ): Promise<SearchResultDto[]> {
+  public async searchCompanies({
+    romeLabel,
+  }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
     this.nbOfCalls = this.nbOfCalls + 1;
     if (this._error) throw this._error;
     return this._results
-      .filter(
-        (result) =>
-          result.props.distance <= distanceKm && result.isCompanyRelevant(),
-      )
-      .map((result) => result.toSearchResult());
+      .filter((result) => result.isCompanyRelevant())
+      .map((result) => result.toSearchResult(romeLabel));
   }
 
   public setError(error: Error | null) {
