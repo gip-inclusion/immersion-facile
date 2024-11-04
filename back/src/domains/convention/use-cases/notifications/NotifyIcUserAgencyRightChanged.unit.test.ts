@@ -80,17 +80,14 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       });
     });
 
-    it("throw error when no user has no rights on agency", async () => {
+    it("does nothing when user has no rights on agency", async () => {
       uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       uow.userRepository.users = [user];
 
-      await expectPromiseToFailWithError(
-        notifyIcUserAgencyRightChanged.execute({
-          agencyId: agency.id,
-          userId: user.id,
-        }),
-        errors.user.noRightsOnAgency({ userId: user.id, agencyId: agency.id }),
-      );
+      await notifyIcUserAgencyRightChanged.execute({
+        agencyId: agency.id,
+        userId: user.id,
+      });
 
       expectSavedNotificationsAndEvents({
         emails: [],

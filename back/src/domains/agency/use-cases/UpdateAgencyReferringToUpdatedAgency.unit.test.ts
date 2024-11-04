@@ -180,6 +180,92 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
       ]);
     });
 
+    it("Remove the validator from agencies that refers to when it's role change from validator to an other one", async () => {
+      uuidGenerator.setNextUuids(["event1", "event2"]);
+      uow.userRepository.users = [updatedUser, notUpdatedUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(notImpactedAgency, {
+          [updatedUser.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+        toAgencyWithRights(updatedAgency, {
+          [updatedUser.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+          [notUpdatedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+        toAgencyWithRights(agency2RefersToUpdatedAgency, {
+          [updatedUser.id]: { roles: ["validator"], isNotifiedByEmail: false },
+          [notUpdatedUser.id]: {
+            roles: ["counsellor", "validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+        toAgencyWithRights(agency3RefersToUpdatedAgency, {
+          [notUpdatedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+
+      await updateAgencyReferringToUpdatedAgency.execute({
+        agencyId: updatedAgency.id,
+      });
+
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(notImpactedAgency, {
+          [updatedUser.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+        toAgencyWithRights(updatedAgency, {
+          [updatedUser.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+          [notUpdatedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+        toAgencyWithRights(agency2RefersToUpdatedAgency, {
+          [notUpdatedUser.id]: {
+            roles: ["counsellor", "validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+        toAgencyWithRights(agency3RefersToUpdatedAgency, {
+          [notUpdatedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ]);
+
+      expectToEqual(uow.outboxRepository.events, [
+        {
+          ...createNewEvent({
+            topic: "AgencyUpdated",
+            payload: {
+              agencyId: agency2RefersToUpdatedAgency.id,
+              triggeredBy: {
+                kind: "crawler",
+              },
+            },
+          }),
+          id: "event1",
+        },
+        {
+          ...createNewEvent({
+            topic: "AgencyUpdated",
+            payload: {
+              agencyId: agency3RefersToUpdatedAgency.id,
+              triggeredBy: {
+                kind: "crawler",
+              },
+            },
+          }),
+          id: "event2",
+        },
+      ]);
+    });
+
     it("do nothing when there no related agencies that refers to updated agency", async () => {
       uow.agencyRepository.agencies = [
         toAgencyWithRights(updatedAgency, {

@@ -79,6 +79,13 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
     const idsToAdd = validatorsOfUpdatedAgency.filter(
       ({ id }) => !keys(rightsOfRelatedAgency).includes(id),
     );
+    const idsToRemove = toPairs(rightsOfRelatedAgency)
+      .filter(
+        ([id, rights]) =>
+          rights?.roles.includes("validator") &&
+          !validatorsOfUpdatedAgency.some((validator) => validator.id === id),
+      )
+      .map(([id]) => id);
 
     return {
       ...toPairs(rightsOfRelatedAgency).reduce<AgencyUsersRights>(
@@ -86,16 +93,21 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
           const idToUpdate = idsToUpdate.find(
             (idToUpdate) => idToUpdate.id === id,
           );
-          return {
-            ...acc,
-            [id]:
-              right && idToUpdate
-                ? {
-                    isNotifiedByEmail: idToUpdate.isNotifiedByEmail,
-                    roles: uniq([...right.roles, "validator"]),
-                  }
-                : right,
-          };
+          const isIdToRemove = idsToRemove.find(
+            (idToRemove) => idToRemove === id,
+          );
+          return isIdToRemove
+            ? acc
+            : {
+                ...acc,
+                [id]:
+                  right && idToUpdate
+                    ? {
+                        isNotifiedByEmail: idToUpdate.isNotifiedByEmail,
+                        roles: uniq([...right.roles, "validator"]),
+                      }
+                    : right,
+              };
         },
         {},
       ),
