@@ -5,7 +5,6 @@ import {
   SearchQueryParamsDto,
   SearchQueryParamsWithGeoParams,
   SearchResultDto,
-  addressStringToDto,
   expectToEqual,
 } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -318,7 +317,7 @@ describe("SearchImmersionUseCase", () => {
         boulangerOffer.romeCode,
         606885,
       ),
-      lbbToSearchResult(lbbCompanyVO),
+      lbbToSearchResult(lbbCompanyVO, secretariatOffer.romeLabel),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -355,7 +354,7 @@ describe("SearchImmersionUseCase", () => {
         secretariatOffer.romeCode,
         606885,
       ),
-      lbbToSearchResult(lbbCompanyVO),
+      lbbToSearchResult(lbbCompanyVO, secretariatOffer.romeLabel),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -427,39 +426,28 @@ describe("SearchImmersionUseCase", () => {
     expectToEqual(response, []);
   });
 
-  it("gets only the closest LBB results if voluntaryToImmersion is false, and do not query results from DB", async () => {
+  it("gets only LBB results if voluntaryToImmersion is false, and do not query results from DB", async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishment,
     ];
 
     const range = 10;
-    const companyInRange = new LaBonneBoiteCompanyDtoBuilder()
-      .withSiret("22220000000022")
-      .withRome(secretariatOffer.romeCode)
-      .withDistanceKm(range - 5)
-      .build();
-    const companyJustInRange = new LaBonneBoiteCompanyDtoBuilder()
-      .withSiret("33330000000033")
-      .withRome(secretariatOffer.romeCode)
-      .withDistanceKm(range)
-      .build();
-    const companyJustOutOfRange = new LaBonneBoiteCompanyDtoBuilder()
-      .withSiret("44440000000044")
-      .withRome(secretariatOffer.romeCode)
-      .withDistanceKm(range + 1)
-      .build();
-    const companyFarAway = new LaBonneBoiteCompanyDtoBuilder()
-      .withSiret("55550000000055")
-      .withRome(secretariatOffer.romeCode)
-      .withDistanceKm(range + 80)
-      .build();
+    const companiesInRangeFromLbb = [
+      new LaBonneBoiteCompanyDtoBuilder()
+        .withSiret("22220000000022")
+        .withRome(secretariatOffer.romeCode)
+        .build(),
+      new LaBonneBoiteCompanyDtoBuilder()
+        .withSiret("33330000000033")
+        .withRome(secretariatOffer.romeCode)
+        .build(),
+      new LaBonneBoiteCompanyDtoBuilder()
+        .withSiret("44440000000044")
+        .withRome(secretariatOffer.romeCode)
+        .build(),
+    ];
 
-    laBonneBoiteGateway.setNextResults([
-      companyInRange,
-      companyJustInRange,
-      companyJustOutOfRange,
-      companyFarAway,
-    ]);
+    laBonneBoiteGateway.setNextResults(companiesInRangeFromLbb);
 
     const response = await searchImmersionUseCase.execute({
       ...searchInMetzParams,
@@ -469,10 +457,12 @@ describe("SearchImmersionUseCase", () => {
       distanceKm: range,
     });
 
-    expectToEqual(response, [
-      lbbToSearchResult(companyInRange),
-      lbbToSearchResult(companyJustInRange),
-    ]);
+    expectToEqual(
+      response,
+      companiesInRangeFromLbb.map((result) =>
+        lbbToSearchResult(result, secretariatOffer.romeLabel),
+      ),
+    );
 
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -483,7 +473,7 @@ describe("SearchImmersionUseCase", () => {
         distanceKm: range,
         needsToBeSearched: true,
         sortedBy: "distance",
-        numberOfResults: 2,
+        numberOfResults: 3,
         voluntaryToImmersion: false,
       },
     ]);
@@ -538,12 +528,10 @@ describe("SearchImmersionUseCase", () => {
       new LaBonneBoiteCompanyDtoBuilder()
         .withSiret("33330000000033")
         .withRome(secretariatOffer.romeCode)
-        .withDistanceKm(5)
         .build(),
       new LaBonneBoiteCompanyDtoBuilder()
         .withSiret("33330000000022")
         .withRome(secretariatOffer.romeCode)
-        .withDistanceKm(5)
         .build(),
     ]);
 
@@ -924,7 +912,6 @@ describe("SearchImmersionUseCase", () => {
         new LaBonneBoiteCompanyDtoBuilder()
           .withSiret(establishmentWithNextAvailabilityDate.establishment.siret)
           .withRome(secretariatOffer.romeCode)
-          .withDistanceKm(1)
           .build(),
       ]);
     });
@@ -1086,7 +1073,6 @@ describe("SearchImmersionUseCase", () => {
 const lbbCompanyVO = new LaBonneBoiteCompanyDtoBuilder()
   .withSiret("11114444222233")
   .withRome(secretariatOffer.romeCode)
-  .withDistanceKm(1)
   .build();
 
 const searchWithMinimalParams: SearchQueryParamsDto = {
@@ -1138,24 +1124,31 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
   },
 };
 
-const lbbToSearchResult = (lbb: LaBonneBoiteCompanyDto): SearchResultDto => ({
+const lbbToSearchResult = (
+  lbb: LaBonneBoiteCompanyDto,
+  romeLabel: string,
+): SearchResultDto => ({
   additionalInformation: "",
   establishmentScore: 0,
-  address: addressStringToDto(lbb.props.address),
+  address: {
+    city: lbb.props.city,
+    postcode: lbb.props.postcode,
+    streetNumberAndAddress: "",
+    departmentCode: lbb.props.department_number,
+  },
   appellations: [],
   customizedName: "",
-  distance_m: lbb.props.distance * 1000,
+  distance_m: undefined,
   fitForDisabledWorkers: false,
   naf: lbb.props.naf,
-  nafLabel: "",
-  name: lbb.props.name,
-  numberOfEmployeeRange: "",
-  position: { lat: lbb.props.lat, lon: lbb.props.lon },
-  rome: lbb.props.matched_rome_code,
-  romeLabel: lbb.props.matched_rome_label,
+  nafLabel: lbb.props.naf_label,
+  name: lbb.props.company_name,
+  numberOfEmployeeRange: `${lbb.props.headcount_min}-${lbb.props.headcount_max}`,
+  position: lbb.props.location,
+  rome: lbb.props.rome,
+  romeLabel,
   siret: lbb.siret,
-  urlOfPartner: "",
   voluntaryToImmersion: false,
-  website: "",
   locationId: null,
+  website: "",
 });
