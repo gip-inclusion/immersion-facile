@@ -10,7 +10,11 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
 } from "shared";
-import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
+import { DomainEvent } from "../../../core/events/events";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../../core/events/ports/EventBus";
 import {
   BroadcastFeedback,
   broadcastToPeServiceName,
@@ -51,13 +55,14 @@ describe("BroadcastConventionAgain", () => {
   let broadcastConventionAgain: BroadcastConventionAgain;
   let uow: InMemoryUnitOfWork;
   let timeGateway: TimeGateway;
+  let createNewEvent: CreateNewEvent;
 
   beforeEach(async () => {
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
     const uuidGenerator = new TestUuidGenerator();
     timeGateway = new CustomTimeGateway();
-    const createNewEvent = makeCreateNewEvent({
+    createNewEvent = makeCreateNewEvent({
       uuidGenerator,
       timeGateway,
     });
@@ -197,6 +202,26 @@ describe("BroadcastConventionAgain", () => {
           lastBroadcastDate,
           formattedWaitingTime: "3 heures 12 minutes",
         }),
+      );
+    });
+
+    it("throws requestAlreadyInProcess when user request broadcast again before last broadcast request was published", async () => {
+      const lastUnpublishedBroadcastRequestEventDate = subHours(
+        addMinutes(timeGateway.now(), 12),
+        1,
+      ).toISOString();
+      const lastUnpublishedBroadcastRequestEvent: DomainEvent = createNewEvent({
+        topic: "ConventionBroadcastRequested",
+        occurredAt: lastUnpublishedBroadcastRequestEventDate,
+        status: "in-process",
+        payload: { convention, triggeredBy: null },
+      });
+
+      uow.outboxRepository.save(lastUnpublishedBroadcastRequestEvent);
+
+      await expectPromiseToFailWithError(
+        broadcastConventionAgain.execute({ conventionId }, adminUser),
+        errors.broadcastFeedback.requestAlreadyInProcess(),
       );
     });
   });

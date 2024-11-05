@@ -3,6 +3,7 @@ import {
   formatDuration,
   intervalToDuration,
   isBefore,
+  subMinutes,
 } from "date-fns";
 import fr from "date-fns/locale/fr";
 import {
@@ -55,6 +56,17 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
         ),
       now: deps.timeGateway.now(),
     });
+
+    const lastUnpublishedBroadcastRequest =
+      await uow.outboxRepository.getLastUnpublishedConventionBroadcastRequestedEventByConventionId(
+        conventionId,
+      );
+    if (
+      lastUnpublishedBroadcastRequest &&
+      new Date(lastUnpublishedBroadcastRequest?.occurredAt) <=
+        subMinutes(deps.timeGateway.now(), 30)
+    )
+      throw errors.broadcastFeedback.requestAlreadyInProcess();
 
     const broadcastConventionAgainEvent = deps.createNewEvent({
       topic: "ConventionBroadcastRequested",

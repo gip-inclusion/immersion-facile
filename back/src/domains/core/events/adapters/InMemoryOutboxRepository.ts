@@ -1,4 +1,5 @@
 import { values } from "ramda";
+import { ConventionId } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { DomainEvent, EventStatus } from "../events";
 import { OutboxRepository } from "../ports/OutboxRepository";
@@ -34,5 +35,23 @@ export class InMemoryOutboxRepository implements OutboxRepository {
         status: "in-process",
       };
     });
+  }
+
+  public async getLastUnpublishedConventionBroadcastRequestedEventByConventionId(
+    conventionId: ConventionId,
+  ): Promise<DomainEvent | undefined> {
+    const filteredEvents = values(this._events).filter(
+      (event) =>
+        event.topic === "ConventionBroadcastRequested" &&
+        event.status !== "published" &&
+        event.payload.convention.id === conventionId,
+    );
+
+    const sortedEvents = filteredEvents.sort(
+      (a, b) =>
+        new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime(),
+    );
+
+    return sortedEvents[0] || undefined;
   }
 }

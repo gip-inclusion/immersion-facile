@@ -384,6 +384,10 @@ export const errors = {
           showGMT: true,
         })}. Merci d'essayer à nouveau dans ${params.formattedWaitingTime}.`,
       ),
+    requestAlreadyInProcess: () =>
+      new TooManyRequestApiError(
+        "Il y a déjà une synchronisation en cours. Cela peut prendre quelques instants. Merci de réessayer plus tard.",
+      ),
   },
   discussion: {
     badSiretFilter: () =>
