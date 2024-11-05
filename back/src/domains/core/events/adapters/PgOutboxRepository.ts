@@ -1,5 +1,6 @@
+import { sql } from "kysely";
 import { differenceWith, propEq } from "ramda";
-import { DateString, replaceArrayElement } from "shared";
+import { ConventionId, DateString, replaceArrayElement } from "shared";
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
@@ -39,6 +40,24 @@ export class PgOutboxRepository implements OutboxRepository {
       .executeTakeFirst()) as { total: string };
 
     return parseInt(result.total);
+  }
+
+  public async getLastUnpublishedConventionBroadcastRequestedEventByConventionId(
+    conventionId: ConventionId,
+  ): Promise<DomainEvent | undefined> {
+    const results = await this.transaction
+      .selectFrom("outbox")
+      .selectAll()
+      .where("topic", "=", "ConventionBroadcastRequested")
+      .where("status", "!=", "published")
+      .where(sql`outbox.payload -> 'convention' ->> 'id'`, "=", conventionId)
+      .orderBy("occurred_at", "desc")
+      .limit(1)
+      .execute();
+
+    return !results.length
+      ? undefined
+      : storedEventRowsToDomainEvent(results as StoredEventRow[]);
   }
 
   public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {

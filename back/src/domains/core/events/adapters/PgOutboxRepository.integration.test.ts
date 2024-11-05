@@ -1,3 +1,4 @@
+import { subHours } from "date-fns";
 import { CompiledQuery } from "kysely";
 import { Pool } from "pg";
 import {
@@ -234,6 +235,49 @@ describe("PgOutboxRepository", () => {
       const storedEventRows = await getAllEventsStored();
       expect(storedEventRows).toHaveLength(2);
       expectStoredRowsToMatchEvent(storedEventRows, quarantinedConvention);
+    });
+  });
+
+  describe("getLastConventionBroadcastRequestedEventByConventionId", () => {
+    const now = timeGateway.now();
+    it("get the last unpublished convention broadcastrequested event by conventionId", async () => {
+      const convention = new ConventionDtoBuilder().build();
+      uuidGenerator.setNextUuids([
+        "aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa",
+        "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb",
+        "cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc",
+      ]);
+      const eventAlreadyPublished = createNewEvent({
+        topic: "ConventionBroadcastRequested",
+        occurredAt: subHours(now, 1).toISOString(),
+        status: "published",
+        payload: { convention, triggeredBy: null },
+      });
+      const latestEventInProcess = createNewEvent({
+        topic: "ConventionBroadcastRequested",
+        occurredAt: subHours(now, 1).toISOString(),
+        status: "in-process",
+        payload: { convention, triggeredBy: null },
+      });
+      const olderEventInProcess = createNewEvent({
+        topic: "ConventionBroadcastRequested",
+        occurredAt: subHours(now, 2).toISOString(),
+        status: "in-process",
+        payload: { convention, triggeredBy: null },
+      });
+
+      await storeInOutbox([
+        eventAlreadyPublished,
+        latestEventInProcess,
+        olderEventInProcess,
+      ]);
+
+      expectToEqual(
+        await outboxRepository.getLastUnpublishedConventionBroadcastRequestedEventByConventionId(
+          convention.id,
+        ),
+        latestEventInProcess,
+      );
     });
   });
 
