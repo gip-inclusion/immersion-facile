@@ -30,10 +30,11 @@ import {
   EstablishmentEntity,
 } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
-import { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
+import { GeoParams } from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
+  SearchImmersionParams,
   SearchImmersionResult,
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
@@ -301,10 +302,8 @@ export class PgEstablishmentAggregateRepository
   public async searchImmersionResults({
     searchMade,
     maxResults,
-  }: {
-    searchMade: SearchMade;
-    maxResults?: number;
-  }): Promise<SearchImmersionResult[]> {
+    fitForDisabledWorkers,
+  }: SearchImmersionParams): Promise<SearchImmersionResult[]> {
     const around =
       "lat" in searchMade
         ? pick(["lat", "lon", "distanceKm"], searchMade)
@@ -318,6 +317,7 @@ export class PgEstablishmentAggregateRepository
       filters: {
         geoParams: around,
         searchableBy: searchMade.establishmentSearchableBy,
+        fitForDisabledWorkers,
         romeCodes: searchMade.romeCode
           ? [searchMade.romeCode]
           : await this.#getRomeCodeFromAppellationCodes(
@@ -859,6 +859,7 @@ const searchImmersionResultsQuery = (
   }: {
     limit: number;
     filters?: {
+      fitForDisabledWorkers?: boolean;
       searchableBy?: EstablishmentSearchableByValue;
       romeCodes?: RomeCode[];
       geoParams?: GeoParams;
@@ -868,6 +869,7 @@ const searchImmersionResultsQuery = (
 ) => {
   const geoParams = filters?.geoParams;
   const searchableBy = filters?.searchableBy;
+  const fitForDisabledWorkers = filters?.fitForDisabledWorkers;
 
   const query = transaction
     .with("filtered_results", (qb) =>
@@ -879,6 +881,14 @@ const searchImmersionResultsQuery = (
                 .selectFrom("establishments")
                 .select(["siret", "score", "update_date"])
                 .where("is_open", "=", true),
+              (qb) =>
+                fitForDisabledWorkers === undefined
+                  ? qb
+                  : qb.where(
+                      "establishments.fit_for_disabled_workers",
+                      fitForDisabledWorkers ? "is" : "is not",
+                      true,
+                    ),
               (qb) => {
                 if (searchableBy === "jobSeekers")
                   return qb.whereRef(

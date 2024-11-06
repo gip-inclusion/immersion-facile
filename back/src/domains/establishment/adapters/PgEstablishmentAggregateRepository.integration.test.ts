@@ -399,6 +399,116 @@ describe("PgEstablishmentAggregateRepository", () => {
         });
       });
 
+      describe("fitForDisabledWorkers param", () => {
+        const offer = new OfferEntityBuilder().build();
+
+        const notFitForDisabledWorkers = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("00000000000001")
+          .withFitForDisabledWorkers(false)
+          .withContactId(uuid())
+          .withLocationId(uuid())
+          .withOffers([offer])
+          .build();
+
+        const fitForDisabledWorkers = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("00000000000002")
+          .withFitForDisabledWorkers(true)
+          .withContactId(uuid())
+          .withLocationId(uuid())
+          .withOffers([offer])
+          .build();
+
+        beforeEach(async () => {
+          await Promise.all(
+            [notFitForDisabledWorkers, fitForDisabledWorkers].map(
+              (establishment) =>
+                pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                  establishment,
+                ),
+            ),
+          );
+        });
+
+        it("without param", async () => {
+          const results =
+            await pgEstablishmentAggregateRepository.searchImmersionResults({
+              searchMade: {
+                distanceKm: 10,
+                lat: fitForDisabledWorkers.establishment.locations[0].position
+                  .lat,
+                lon: fitForDisabledWorkers.establishment.locations[0].position
+                  .lon,
+              },
+            });
+          expectToEqual(results, [
+            makeExpectedSearchResult({
+              establishment: notFitForDisabledWorkers,
+              withOffers: [offer],
+              withLocationAndDistance: {
+                ...notFitForDisabledWorkers.establishment.locations[0],
+                distance: 0,
+              },
+            }),
+            makeExpectedSearchResult({
+              establishment: fitForDisabledWorkers,
+              withOffers: [offer],
+              withLocationAndDistance: {
+                ...fitForDisabledWorkers.establishment.locations[0],
+                distance: 0,
+              },
+            }),
+          ]);
+        });
+
+        it("with param false", async () => {
+          const results =
+            await pgEstablishmentAggregateRepository.searchImmersionResults({
+              searchMade: {
+                distanceKm: 10,
+                lat: fitForDisabledWorkers.establishment.locations[0].position
+                  .lat,
+                lon: fitForDisabledWorkers.establishment.locations[0].position
+                  .lon,
+              },
+              fitForDisabledWorkers: false,
+            });
+          expectToEqual(results, [
+            makeExpectedSearchResult({
+              establishment: notFitForDisabledWorkers,
+              withOffers: [offer],
+              withLocationAndDistance: {
+                ...notFitForDisabledWorkers.establishment.locations[0],
+                distance: 0,
+              },
+            }),
+          ]);
+        });
+
+        it("with param true", async () => {
+          const results =
+            await pgEstablishmentAggregateRepository.searchImmersionResults({
+              searchMade: {
+                distanceKm: 10,
+                lat: fitForDisabledWorkers.establishment.locations[0].position
+                  .lat,
+                lon: fitForDisabledWorkers.establishment.locations[0].position
+                  .lon,
+              },
+              fitForDisabledWorkers: true,
+            });
+          expectToEqual(results, [
+            makeExpectedSearchResult({
+              establishment: fitForDisabledWorkers,
+              withOffers: [offer],
+              withLocationAndDistance: {
+                ...fitForDisabledWorkers.establishment.locations[0],
+                distance: 0,
+              },
+            }),
+          ]);
+        });
+      });
+
       it("returns empty list when repo is empty", async () => {
         expectToEqual(
           await pgEstablishmentAggregateRepository.searchImmersionResults({
@@ -1791,6 +1901,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentIsNotSearchableAndMaxContactPerMonth2,
             )
               .withIsSearchable(true)
+              .withFitForDisabledWorkers(false)
               .build(),
           ],
         );
@@ -1815,6 +1926,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentIsNotSearchableAndMaxContactPerMonth2,
             )
               .withIsSearchable(true)
+              .withFitForDisabledWorkers(false)
               .build(),
           ],
         );
@@ -1840,6 +1952,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentIsNotSearchableAndMaxContactPerMonth1,
             )
               .withIsSearchable(true)
+              .withFitForDisabledWorkers(false)
               .build(),
           ],
         );
