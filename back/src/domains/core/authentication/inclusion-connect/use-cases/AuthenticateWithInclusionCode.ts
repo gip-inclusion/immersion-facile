@@ -97,7 +97,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     { code, page }: WithSourcePage & { code: OAuthCode },
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
-    const { accessToken, expire, payload, idToken } =
+    const { accessToken, payload, idToken } =
       await this.#inclusionConnectGateway.getAccessToken(
         {
           code,
@@ -170,12 +170,14 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       }),
     );
 
+    const twelveHoursInSeconds = 12 * 60 * 60;
+
     const token = this.#generateAuthenticatedUserJwt(
       {
         userId: newOrUpdatedAuthenticatedUser.id,
         version: currentJwtVersions.inclusion,
       },
-      expire * 60,
+      twelveHoursInSeconds,
     );
 
     return `${this.#immersionFacileBaseUrl}/${
