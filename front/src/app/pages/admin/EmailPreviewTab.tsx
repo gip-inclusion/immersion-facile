@@ -240,7 +240,7 @@ export const defaultEmailValueByEmailKind: {
       },
       {
         agencyName: "AGENCY_NAME",
-        roles: ["counsellor"],
+        roles: ["validator"],
         isNotifiedByEmail: true,
         email: "USER_EMAIL",
         firstName: "USER_FIRST_NAME",

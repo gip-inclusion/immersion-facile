@@ -1195,6 +1195,33 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         subContent: defaultSignature("immersion"),
       }),
     },
+    AGENCY_DELEGATION_CONTACT_INFORMATION: {
+      niceName: "Délégation - Information de contact DR",
+      tags: [
+        "Transmision des informations de contact des DR aux agences sans délégation",
+      ],
+      createEmailVariables: ({
+        firstName,
+        lastName,
+        agencyName,
+        agencyProvince,
+        delegationProviderMail,
+      }) => ({
+        subject:
+          "Envoyez la demande de délégation à votre Direction régionale France Travail !",
+        greetings: `Bonjour ${firstName} ${lastName},`,
+        content: `
+        Vous recevez cet email suite à votre demande de référencement sur le site Immersion Facilitée.
+        Afin de référencer votre structure ${agencyName} située dans la région ${agencyProvince}, vous devez demander une convention de délégation par email au prescripteur de droit dont votre structure dépend.
+        Votre structure dépend de la DR ${agencyProvince}, contactez-les par email  : <a href= "mailto:${delegationProviderMail}" target="_blank">${delegationProviderMail}</a>
+      `,
+        highlight: {
+          content:
+            "Pour formuler votre demande, nous vous invitons à la motiver en précisant le type de public que vous accompagnez, la raison pour laquelle vous souhaitez mobiliser l'immersion professionnelle et le territoire sur lequel vous agissez (régional, départemental).",
+        },
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     AGENCY_WAS_ACTIVATED: {
       niceName: "Agence - Activée",
       tags: ["activation prescripteur"],
@@ -1267,33 +1294,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls: [
           "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo prescripteur-Role-des-prescripteurs-et-couverture-des risques-immersionfacilitee2024.pdf",
         ],
-      }),
-    },
-    AGENCY_DELEGATION_CONTACT_INFORMATION: {
-      niceName: "Délégation - Information de contact DR",
-      tags: [
-        "Transmision des informations de contact des DR aux agences sans délégation",
-      ],
-      createEmailVariables: ({
-        firstName,
-        lastName,
-        agencyName,
-        agencyProvince,
-        delegationProviderMail,
-      }) => ({
-        subject:
-          "Envoyez la demande de délégation à votre Direction régionale France Travail !",
-        greetings: `Bonjour ${firstName} ${lastName},`,
-        content: `
-        Vous recevez cet email suite à votre demande de référencement sur le site Immersion Facilitée.
-        Afin de référencer votre structure ${agencyName} située dans la région ${agencyProvince}, vous devez demander une convention de délégation par email au prescripteur de droit dont votre structure dépend.
-        Votre structure dépend de la DR ${agencyProvince}, contactez-les par email  : <a href= "mailto:${delegationProviderMail}" target="_blank">${delegationProviderMail}</a>
-      `,
-        highlight: {
-          content:
-            "Pour formuler votre demande, nous vous invitons à la motiver en précisant le type de public que vous accompagnez, la raison pour laquelle vous souhaitez mobiliser l'immersion professionnelle et le territoire sur lequel vous agissez (régional, départemental).",
-        },
-        subContent: defaultSignature("immersion"),
       }),
     },
     AGENCY_WITH_REFERS_TO_ACTIVATED: {
