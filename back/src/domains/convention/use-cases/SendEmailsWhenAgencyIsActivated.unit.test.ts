@@ -23,38 +23,11 @@ const icUser1Email = "jean-dupont@mail.com";
 const icUser2Email = "pierre-durand@mail.com";
 const icUser3Email = "jeanne-ferrand@mail.com";
 
-const agency = new AgencyDtoBuilder()
-  .withCounsellorEmails([icUser2Email])
-  .withValidatorEmails([icUser1Email])
-  .withName("just-activated-agency")
-  .withLogoUrl("https://agency-logo.com")
-  .build();
-
-const agencyWithRefersTo = new AgencyDtoBuilder()
-  .withCounsellorEmails([icUser3Email])
-  .withValidatorEmails([icUser1Email])
-  .withId("id-of-agency-refering-to-other")
-  .withRefersToAgencyInfo({
-    refersToAgencyId: agency.id,
-    refersToAgencyName: agency.name,
-  })
-  .withName("just-activated-agency-refering-to-other-one")
-  .withLogoUrl("https://agency-refering-logo.com")
-  .build();
-
 const icUser1 = new InclusionConnectedUserBuilder()
   .withId("ic-user-1-id")
   .withFirstName("jean")
   .withLastName("Dupont")
   .withEmail(icUser1Email)
-  .withAgencyRights([
-    { agency: agency, isNotifiedByEmail: true, roles: ["validator"] },
-    {
-      agency: agencyWithRefersTo,
-      isNotifiedByEmail: true,
-      roles: ["validator"],
-    },
-  ])
   .build();
 
 const icUser2 = new InclusionConnectedUserBuilder()
@@ -62,9 +35,6 @@ const icUser2 = new InclusionConnectedUserBuilder()
   .withFirstName("Pierre")
   .withLastName("Durand")
   .withEmail(icUser2Email)
-  .withAgencyRights([
-    { agency: agency, isNotifiedByEmail: true, roles: ["counsellor"] },
-  ])
   .build();
 
 const icUser3 = new InclusionConnectedUserBuilder()
@@ -72,41 +42,17 @@ const icUser3 = new InclusionConnectedUserBuilder()
   .withFirstName("Jeanne")
   .withLastName("Ferrand")
   .withEmail(icUser3Email)
-  .withAgencyRights([
-    {
-      agency: agencyWithRefersTo,
-      isNotifiedByEmail: true,
-      roles: ["counsellor"],
-    },
-  ])
-  .build();
+  .buildUser();
 
 describe("SendEmailWhenAgencyIsActivated", () => {
-  const counsellor = new InclusionConnectedUserBuilder()
-    .withEmail("counsellor@mail.com")
-    .withId("counsellor-id")
-    .buildUser();
-  const validator = new InclusionConnectedUserBuilder()
-    .withEmail("validator@mail.com")
-    .withId("validator-id")
-    .buildUser();
-  const userWithBothRoles = new InclusionConnectedUserBuilder()
-    .withEmail("both-roles@mail.com")
-    .withId("user-with-both-roles-id")
-    .buildUser();
-
   const agency = new AgencyDtoBuilder()
     .withName("just-activated-agency")
     .withLogoUrl("https://agency-logo.com")
     .build();
 
   const agencyWithRights = toAgencyWithRights(agency, {
-    [counsellor.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
-    [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
-    [userWithBothRoles.id]: {
-      roles: ["counsellor", "validator"],
-      isNotifiedByEmail: false,
-    },
+    [icUser1.id]: { roles: ["validator"], isNotifiedByEmail: true },
+    [icUser2.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
   });
 
   const agencyWithRefersTo = new AgencyDtoBuilder()
@@ -120,22 +66,18 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     .build();
 
   const agencyWithRefersToWithRights = toAgencyWithRights(agencyWithRefersTo, {
-    [counsellor.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
-    [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
-    [userWithBothRoles.id]: {
-      roles: ["validator"],
-      isNotifiedByEmail: false,
-    },
+    [icUser3.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+    [icUser1.id]: { roles: ["validator"], isNotifiedByEmail: true },
   });
 
   let uow: InMemoryUnitOfWork;
-  let sendEmailsWhenAencyActivated: SendEmailsWhenAgencyIsActivated;
+  let sendEmailsWhenAgencyActivated: SendEmailsWhenAgencyIsActivated;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: TimeGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uow.userRepository.users = [counsellor, validator, userWithBothRoles];
+    uow.userRepository.users = [icUser1, icUser2, icUser3];
     uow.agencyRepository.agencies = [agencyWithRights];
     const uowPerformer = new InMemoryUowPerformer(uow);
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
@@ -148,17 +90,16 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       uuidGenerator,
       timeGateway,
     );
-    sendEmailsWhenAencyActivated = new SendEmailsWhenAgencyIsActivated(
+    sendEmailsWhenAgencyActivated = new SendEmailsWhenAgencyIsActivated(
       uowPerformer,
       saveNotificationAndRelatedEvent,
     );
   });
 
   it("Sends activation email to counsellors and validators when agency without refers to id got activated", async () => {
-    uow.userRepository.setInclusionConnectedUsers([icUser1, icUser2]);
-    uow.agencyRepository.agencies = [agency];
+    uow.agencyRepository.agencies = [agencyWithRights];
     // Act
-    await sendEmailsWhenAencyActivated.execute({ agencyId: agency.id });
+    await sendEmailsWhenAgencyActivated.execute({ agencyId: agency.id });
 
     // Assert
     expectSavedNotificationsAndEvents({
@@ -166,11 +107,6 @@ describe("SendEmailWhenAgencyIsActivated", () => {
         {
           kind: "AGENCY_WAS_ACTIVATED",
           recipients: [icUser1.email, icUser2.email],
-          recipients: [
-            validator.email,
-            userWithBothRoles.email,
-            counsellor.email,
-          ],
           params: {
             agencyName: "just-activated-agency",
             agencyLogoUrl: "https://agency-logo.com",
@@ -201,24 +137,22 @@ describe("SendEmailWhenAgencyIsActivated", () => {
   });
 
   it("throw not found error if no agency were found with agency refers to id when agency refering to other activated", async () => {
-    uow.userRepository.setInclusionConnectedUsers([icUser1, icUser3]);
-    uow.agencyRepository.agencies = [agencyWithRefersTo];
     uow.agencyRepository.agencies = [agencyWithRefersToWithRights];
     await expectPromiseToFailWithError(
-      sendEmailsWhenAencyActivated.execute({ agencyId: agencyWithRefersTo.id }),
+      sendEmailsWhenAgencyActivated.execute({
+        agencyId: agencyWithRefersTo.id,
+      }),
       errors.agency.notFound({ agencyId: agency.id }),
     );
   });
 
   it("send a notification email to validating agency when agency refering to other was activated and one activation email to the counsellors of the agency refering to other", async () => {
-    uow.userRepository.setInclusionConnectedUsers([icUser1, icUser2, icUser3]);
-    uow.agencyRepository.agencies = [agency, agencyWithRefersTo];
     uow.agencyRepository.agencies = [
       agencyWithRights,
       agencyWithRefersToWithRights,
     ];
 
-    await sendEmailsWhenAencyActivated.execute({
+    await sendEmailsWhenAgencyActivated.execute({
       agencyId: agencyWithRefersTo.id,
     });
 
@@ -226,7 +160,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       emails: [
         {
           kind: "AGENCY_WAS_ACTIVATED",
-          recipients: [counsellor.email],
+          recipients: [icUser3.email],
           params: {
             agencyName: agencyWithRefersTo.name,
             agencyLogoUrl: "https://agency-refering-logo.com",
@@ -242,17 +176,16 @@ describe("SendEmailWhenAgencyIsActivated", () => {
                 roles: ["counsellor"],
               },
             ],
-            validatorEmails: [validator.email, userWithBothRoles.email],
           },
         },
         {
           kind: "AGENCY_WITH_REFERS_TO_ACTIVATED",
-          recipients: [validator.email, userWithBothRoles.email],
+          recipients: [icUser1.email],
           params: {
             agencyLogoUrl: "https://agency-logo.com",
             nameOfAgencyRefering: agencyWithRefersTo.name,
             refersToAgencyName: agency.name,
-            validatorEmails: [validator.email, userWithBothRoles.email],
+            validatorEmails: [icUser1.email],
           },
         },
       ],

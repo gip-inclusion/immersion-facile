@@ -92,20 +92,6 @@ describe("Agency routes", () => {
     .withEmail("validator@mail.com")
     .buildUser();
 
-  const icUser = new InclusionConnectedUserBuilder()
-    .withId("ic-user-1-id")
-    .withFirstName("jean")
-    .withLastName("Dupont")
-    .withEmail("jean-dupont@mail.com")
-    .withAgencyRights([
-      {
-        agency: agency4NeedsReview,
-        isNotifiedByEmail: true,
-        roles: ["validator"],
-      },
-    ])
-    .build();
-
   describe("Public Routes", () => {
     describe(`${displayRouteName(
       agencyRoutes.getAgencyOptionsByFilter,
