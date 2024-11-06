@@ -70,7 +70,7 @@ export const EstablishmentFormSection = ({
 
   const isFetchingSiret = useSelector(siretSelectors.isFetching);
 
-  const areTutorAndRepresentativeSame = () => {
+  const shouldResetTutorFields = () => {
     const representative = getValues("signatories.establishmentRepresentative");
     const tutor = getValues("establishmentTutor");
     return (
@@ -127,7 +127,7 @@ export const EstablishmentFormSection = ({
                     option.nativeInputProps.value === 1,
                   ),
                 );
-                if (areTutorAndRepresentativeSame()) {
+                if (shouldResetTutorFields()) {
                   resetTutorFields();
                 }
               },
