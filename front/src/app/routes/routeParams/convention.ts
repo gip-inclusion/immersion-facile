@@ -1,5 +1,6 @@
 import { addDays, startOfToday } from "date-fns";
 import {
+  AgencyKind,
   AppellationAndRomeDto,
   AppellationCode,
   BeneficiaryCurrentEmployer,
@@ -287,6 +288,7 @@ export const conventionValuesFromUrl = {
   isRqth: param.query.optional.boolean,
   birthdate: param.query.optional.string,
   agencyDepartment: param.query.optional.string,
+  agencyKind: param.query.optional.string,
 
   brEmail: param.query.optional.string,
   brFirstName: param.query.optional.string,
@@ -409,6 +411,7 @@ const conventionPresentationFromParams = (
   // Agency
   agencyId: params.agencyId ?? undefined,
   agencyDepartment: params.agencyDepartment ?? "",
+  agencyKind: params.agencyKind as AgencyKind | undefined,
 
   //Actors
   establishmentTutor: {
