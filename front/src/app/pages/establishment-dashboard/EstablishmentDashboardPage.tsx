@@ -7,6 +7,7 @@ import React from "react";
 import { Loader } from "react-design-system";
 import { EstablishmentRole, InclusionConnectedUser } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
+import { SelectConventionFromIdForm } from "src/app/components/SelectConventionFromIdForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 
 import { DiscussionManageContent } from "src/app/components/admin/establishments/DiscussionManageContent";
@@ -45,6 +46,7 @@ export const EstablishmentDashboardPage = ({
       tabId: "conventions",
       content: (
         <>
+          <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionInclusionConnected" />
           {conventions ? (
             <MetabaseView
               title={`Tableau des conventions en cours
