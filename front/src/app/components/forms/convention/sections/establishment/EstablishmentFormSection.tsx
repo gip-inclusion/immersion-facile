@@ -60,7 +60,7 @@ export const EstablishmentFormSection = ({
   const isTutorEstablishmentRepresentative = useAppSelector(
     conventionSelectors.isTutorEstablishmentRepresentative,
   );
-  const { getValues, resetField } = useFormContext<ConventionDto>();
+  const { getValues, setValue } = useFormContext<ConventionDto>();
   const t = useConventionTexts(getValues().internshipKind);
 
   const { getFormFields } = getFormContents(
@@ -82,18 +82,10 @@ export const EstablishmentFormSection = ({
   };
 
   const resetTutorFields = () => {
-    resetField("establishmentTutor.firstName", {
-      defaultValue: "",
-    });
-    resetField("establishmentTutor.lastName", {
-      defaultValue: "",
-    });
-    resetField("establishmentTutor.email", {
-      defaultValue: "",
-    });
-    resetField("establishmentTutor.phone", {
-      defaultValue: "",
-    });
+    setValue("establishmentTutor.firstName", "");
+    setValue("establishmentTutor.lastName", "");
+    setValue("establishmentTutor.email", "");
+    setValue("establishmentTutor.phone", "");
   };
 
   return (
