@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AgencyKindFilter,
   Beneficiary,
-  ConventionInternshipKindSpecific,
+  ConventionDto,
   ConventionReadDto,
   DepartmentCode,
   FederatedIdentity,
@@ -207,21 +207,15 @@ export const ConventionForm = ({
 
   const isImmersionConvention = (
     convention: ConventionPresentation,
-  ): convention is Required<ConventionPresentation> & {
-    internshipKind: "immersion";
-  } => convention.internshipKind === "immersion";
+  ): convention is Extract<ConventionDto, { internshipKind: "immersion" }> =>
+    convention.internshipKind === "immersion";
 
   const isMiniStage = (
     convention: ConventionPresentation,
-  ): convention is Required<ConventionPresentation> & {
-    signatories: ConventionInternshipKindSpecific<"mini-stage-cci">["signatories"];
-    internshipKind: "mini-stage-cci";
-  } => {
-    return (
-      convention.internshipKind === "mini-stage-cci" &&
-      "levelOfEducation" in convention.signatories.beneficiary
-    );
-  };
+  ): convention is Extract<
+    ConventionDto,
+    { internshipKind: "mini-stage-cci" }
+  > => convention.internshipKind === "mini-stage-cci";
 
   const onSubmit: SubmitHandler<Required<ConventionPresentation>> = (
     convention,
@@ -434,12 +428,10 @@ export const ConventionForm = ({
               data-matomo-name={domElementIds.conventionImmersionRoute.form({
                 mode,
               })}
-              onSubmit={(e) =>
-                handleSubmit(onSubmit, (errors) => {
-                  validateSteps("doNotClear");
-                  console.error(conventionValues, errors);
-                })(e)
-              }
+              onSubmit={handleSubmit(onSubmit, (errors) => {
+                validateSteps("doNotClear");
+                console.error(conventionValues, errors);
+              })}
             >
               <>
                 <>
