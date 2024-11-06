@@ -1,7 +1,7 @@
+import { toPairs } from "ramda";
 import {
-  AgencyDto,
+  UserId,
   UserParamsForMail,
-  agencySchema,
   WithAgencyId,
   errors,
   getCounsellorsAndValidatorsEmailsDeduplicated,
@@ -35,10 +35,16 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
       await uow.featureFlagRepository.getAll(),
     );
 
-    const users = await uow.userRepository.getIcUsersWithFilter(
-      { agencyId: agency.id },
-      provider,
+    const agency = await uow.agencyRepository.getById(agencyId);
+    if (!agency) throw errors.agency.notFound({ agencyId });
+
+    const agencyDto = await agencyWithRightToAgencyDto(uow, agency);
+
+    const userIds: UserId[] = toPairs(agency.usersRights).map(
+      (userIdAndRights) => userIdAndRights[0],
     );
+
+    const users = await uow.userRepository.getByIds(userIds, provider);
 
     if (users.length === 0)
       throw errors.agency.usersNotFound({ agencyId: agency.id });
@@ -47,16 +53,11 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
       .filter(
         (user) =>
           !agency.refersToAgencyId ||
-          user.agencyRights.some(
-            (agencyRight) =>
-              agencyRight.agency.id === agency.id &&
-              agencyRight.roles.includes("counsellor"),
-          ),
+          agency.usersRights[user.id]?.roles.includes("counsellor"),
       )
-      .map(({ firstName, lastName, agencyRights, email, id }) => {
-        const agencyRight = agencyRights.find(
-          (agencyRight) => agencyRight.agency.id === agency.id,
-        );
+      .map(({ firstName, lastName, email, id }) => {
+        const agencyRight = agency.usersRights[id];
+
         if (!agencyRight)
           throw errors.user.noRightsOnAgency({
             agencyId: agency.id,
@@ -66,22 +67,11 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
           firstName,
           lastName,
           email,
-          agencyName: agencyRight.agency.name,
+          agencyName: agency.name,
           isNotifiedByEmail: agencyRight.isNotifiedByEmail,
           roles: agencyRight.roles,
         };
       });
-    const agency = await uow.agencyRepository.getById(agencyId);
-    if (!agency) throw errors.agency.notFound({ agencyId });
-
-    const agencyDto = await agencyWithRightToAgencyDto(uow, agency);
-
-    const refersToOtherAgencyParams = agency.refersToAgencyId
-      ? {
-          refersToOtherAgency: true as const,
-          validatorEmails: agencyDto.validatorEmails,
-        }
-      : { refersToOtherAgency: false as const };
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
