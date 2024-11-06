@@ -98,6 +98,11 @@ export const AgencySelector = ({
     [agencyDepartmentField.name],
   );
 
+  const agencyKindFieldName = useMemo(
+    () => agencyKindField.name as keyof SupportedFormsDto,
+    [agencyKindField.name],
+  );
+
   const agencyDepartment = useWatch({
     name: agencyDepartmentFieldName,
     control,
@@ -187,6 +192,7 @@ export const AgencySelector = ({
           disabled={agencyKindOptions.length === 0 || shouldLockToPeAgencies}
           nativeSelectProps={{
             ...agencyKindField,
+            ...register(agencyKindFieldName),
             onChange: (event) =>
               setAllowedAgencyKinds(
                 event.currentTarget.value === "all"

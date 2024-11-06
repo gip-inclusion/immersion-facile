@@ -1,11 +1,15 @@
 import {
-  ConventionDto,
-  DepartmentCode,
+  ConventionReadDto,
   EstablishmentTutor,
   InternshipKind,
   OmitFromExistingKeys,
   Signatories,
+  agencyKindSchema,
+  conventionSchema,
+  refersToAgencyIdSchema,
+  zStringMinLength1,
 } from "shared";
+import { z } from "zod";
 
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;
@@ -20,10 +24,6 @@ type WithEstablishmentTutor = {
   establishmentTutor: EstablishmentTutor;
 };
 
-type WithAgencyDepartment = {
-  agencyDepartment: DepartmentCode;
-};
-
 type WithIntershipKind = {
   internshipKind: InternshipKind;
 };
@@ -33,11 +33,28 @@ type WithFromPeConnectedUser = {
 };
 
 export type ConventionPresentation = OmitFromExistingKeys<
-  Partial<ConventionDto>,
-  "statusJustification"
+  Partial<ConventionReadDto>,
+  | "agencyName"
+  | "agencyCounsellorEmails"
+  | "agencyValidatorEmails"
+  | "agencySiret"
 > &
   WithSignatures &
   WithEstablishmentTutor &
   WithIntershipKind &
-  WithAgencyDepartment &
   WithFromPeConnectedUser;
+
+export const conventionPresentationSchema: z.Schema<ConventionPresentation> =
+  conventionSchema.and(
+    z.object({
+      agencyDepartment: z.string(),
+      agencyKind: agencyKindSchema,
+      agencyRefersTo: z
+        .object({
+          id: refersToAgencyIdSchema,
+          name: zStringMinLength1,
+          kind: agencyKindSchema,
+        })
+        .optional(),
+    }),
+  );

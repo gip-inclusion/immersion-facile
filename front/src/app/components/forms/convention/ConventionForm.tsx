@@ -23,12 +23,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AgencyKindFilter,
   Beneficiary,
+  ConventionInternshipKindSpecific,
   ConventionReadDto,
   DepartmentCode,
   FederatedIdentity,
   InternshipKind,
   addressDtoToString,
-  conventionSchema,
   domElementIds,
   hasBeneficiaryCurrentEmployer,
   isBeneficiaryMinor,
@@ -62,6 +62,7 @@ import {
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import {
   ConventionPresentation,
+  conventionPresentationSchema,
   undefinedIfEmptyString,
 } from "src/app/components/forms/convention/conventionHelpers";
 
@@ -163,9 +164,10 @@ export const ConventionForm = ({
     useWaitForReduxFormUiReadyBeforeInitialisation(initialValues);
   const defaultValues =
     mode === "create" ? initialValues : fetchedConvention || initialValues;
-  const methods = useForm<ConventionReadDto>({
+
+  const methods = useForm<Required<ConventionPresentation>>({
     defaultValues,
-    resolver: zodResolver(conventionSchema),
+    resolver: zodResolver(conventionPresentationSchema),
     mode: "onTouched",
   });
 
@@ -203,21 +205,69 @@ export const ConventionForm = ({
     conventionValues.internshipKind ?? "immersion",
   );
 
-  const onSubmit: SubmitHandler<ConventionReadDto> = (convention) => {
-    const conventionToSave: ConventionReadDto = {
-      ...convention,
-      workConditions: undefinedIfEmptyString(convention.workConditions),
-      establishmentNumberEmployeesRange:
-        establishmentNumberEmployeesRange === ""
-          ? undefined
-          : establishmentNumberEmployeesRange,
-    };
-    dispatch(
-      conventionSlice.actions.showSummaryChangeRequested({
-        showSummary: true,
-        convention: conventionToSave,
-      }),
+  const isImmersionConvention = (
+    convention: ConventionPresentation,
+  ): convention is Required<ConventionPresentation> & {
+    internshipKind: "immersion";
+  } => convention.internshipKind === "immersion";
+
+  const isMiniStage = (
+    convention: ConventionPresentation,
+  ): convention is Required<ConventionPresentation> & {
+    signatories: ConventionInternshipKindSpecific<"mini-stage-cci">["signatories"];
+    internshipKind: "mini-stage-cci";
+  } => {
+    return (
+      convention.internshipKind === "mini-stage-cci" &&
+      "levelOfEducation" in convention.signatories.beneficiary
     );
+  };
+
+  const onSubmit: SubmitHandler<Required<ConventionPresentation>> = (
+    convention,
+  ) => {
+    if (isMiniStage(convention)) {
+      const conventionToSave: ConventionReadDto = {
+        ...convention,
+        internshipKind: convention.internshipKind,
+        workConditions: undefinedIfEmptyString(convention.workConditions),
+        establishmentNumberEmployeesRange:
+          establishmentNumberEmployeesRange === ""
+            ? undefined
+            : establishmentNumberEmployeesRange,
+        agencySiret: "",
+        agencyName: "",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: [],
+      };
+
+      dispatch(
+        conventionSlice.actions.showSummaryChangeRequested({
+          showSummary: true,
+          convention: conventionToSave,
+        }),
+      );
+    } else if (isImmersionConvention(convention)) {
+      const conventionToSave: ConventionReadDto = {
+        ...convention,
+        workConditions: undefinedIfEmptyString(convention.workConditions),
+        establishmentNumberEmployeesRange:
+          establishmentNumberEmployeesRange === ""
+            ? undefined
+            : establishmentNumberEmployeesRange,
+        agencySiret: "",
+        agencyName: "",
+        agencyCounsellorEmails: [],
+        agencyValidatorEmails: [],
+      };
+
+      dispatch(
+        conventionSlice.actions.showSummaryChangeRequested({
+          showSummary: true,
+          convention: conventionToSave,
+        }),
+      );
+    }
   };
 
   const accordionsRef = useRef<Array<ElementRef<"div">>>([]);
@@ -301,7 +351,7 @@ export const ConventionForm = ({
   ): Promise<Record<number, StepSeverity>> => {
     const stepFields = formUiSections[step - 1];
     const validatedFields = stepFields.map(async (field) => ({
-      [field]: await trigger(field as keyof ConventionReadDto),
+      [field]: await trigger(field as keyof ConventionPresentation),
     }));
     const validatedFieldsValue = await Promise.all(validatedFields);
     const getStepStatus = () => {
@@ -312,7 +362,7 @@ export const ConventionForm = ({
       ).length;
       const stepIsTouched = stepFields.filter(
         (stepField) =>
-          getFieldState(stepField as keyof ConventionReadDto).isTouched,
+          getFieldState(stepField as keyof ConventionPresentation).isTouched,
       ).length;
       if (validatedFieldsValue.every((field) => Object.values(field)[0])) {
         return "success";
@@ -384,6 +434,12 @@ export const ConventionForm = ({
               data-matomo-name={domElementIds.conventionImmersionRoute.form({
                 mode,
               })}
+              onSubmit={(e) =>
+                handleSubmit(onSubmit, (errors) => {
+                  validateSteps("doNotClear");
+                  console.error(conventionValues, errors);
+                })(e)
+              }
             >
               <>
                 <>
@@ -545,16 +601,10 @@ export const ConventionForm = ({
                   disabled={shouldSubmitButtonBeDisabled}
                   iconId="fr-icon-checkbox-circle-line"
                   iconPosition="left"
-                  type="button"
+                  type="submit"
                   nativeButtonProps={{
                     id: domElementIds.conventionImmersionRoute.submitFormButton,
                   }}
-                  onClick={(e) =>
-                    handleSubmit(onSubmit, (errors) => {
-                      validateSteps("doNotClear");
-                      console.error(conventionValues, errors);
-                    })(e)
-                  }
                 >
                   Vérifier la demande
                 </Button>
@@ -583,12 +633,6 @@ export const ConventionForm = ({
                 <ShareConventionLink />
                 <Button
                   type="submit"
-                  onClick={(e) =>
-                    handleSubmit(onSubmit, (errors) => {
-                      validateSteps("doNotClear");
-                      console.error(conventionValues, errors);
-                    })(e)
-                  }
                   id={
                     domElementIds.conventionImmersionRoute
                       .submitFormButtonMobile
