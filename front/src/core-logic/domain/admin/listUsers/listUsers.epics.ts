@@ -34,7 +34,7 @@ const triggerFetchOnQueryChangeEpic: ListUserActionEpic = (
     distinctUntilChanged(),
     map((action) =>
       listUsersSlice.actions.fetchUsersRequested({
-        emailContains: action.payload,
+        emailContains: action.payload.trim(),
       }),
     ),
   );

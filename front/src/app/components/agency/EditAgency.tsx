@@ -24,7 +24,10 @@ export const EditAgency = () => {
       </div>
       {agency && (
         <>
-          <AgencyTag agency={agency} className={fr.cx("fr-my-4w")} />
+          <AgencyTag
+            refersToAgencyName={agency.refersToAgencyName}
+            className={fr.cx("fr-my-4w")}
+          />
           <EditAgencyForm agency={agency} />
         </>
       )}

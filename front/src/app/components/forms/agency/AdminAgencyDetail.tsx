@@ -66,7 +66,10 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
       />
       {agency && (
         <>
-          <AgencyTag agency={agency} className={fr.cx("fr-my-2w")} />
+          <AgencyTag
+            refersToAgencyName={agency.refersToAgencyName}
+            className={fr.cx("fr-my-2w")}
+          />
           <EditAgencyForm agency={agency} />
         </>
       )}

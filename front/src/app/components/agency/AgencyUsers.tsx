@@ -1,11 +1,10 @@
 import { FrClassName, fr } from "@codegouvfr/react-dsfr";
-import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { Table } from "@codegouvfr/react-dsfr/Table";
-import { values } from "ramda";
+import { partition, values } from "ramda";
 import React, { useState } from "react";
+import { Tag } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -14,12 +13,15 @@ import {
   UserParamsForAgency,
   domElementIds,
 } from "shared";
-import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
+import { AgencyUsersTable } from "src/app/components/agency/AgencyUsersTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import {
+  NormalizedInclusionConnectedUser,
+  icUsersAdminSlice,
+} from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
@@ -85,7 +87,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
   const { enableProConnect } = useAppSelector(
     featureFlagSelectors.featureFlagState,
   );
-  const agencyUsers = useAppSelector(icUsersAdminSelectors.agencyUsers);
+  const agencyUsersById = useAppSelector(icUsersAdminSelectors.agencyUsers);
   const dispatch = useDispatch();
 
   const [selectedUserData, setSelectedUserData] = useState<
@@ -95,6 +97,42 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
   const [mode, setMode] = useState<UserFormMode | null>(null);
 
   const provider = enableProConnect ? "ProConnect" : "Inclusion Connect";
+
+  const onModifyClicked = (agencyUser: NormalizedInclusionConnectedUser) => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    setMode("update");
+    setSelectedUserData({
+      agencyId: agency.id,
+      userId: agencyUser.id,
+      roles: agencyUser.agencyRights[agency.id].roles,
+      email: agencyUser.email,
+      isNotifiedByEmail: agencyUser.agencyRights[agency.id].isNotifiedByEmail,
+      isIcUser: !!agencyUser.externalId,
+    });
+    manageUserModal.open();
+  };
+
+  const onDeleteClicked = (agencyUser: NormalizedInclusionConnectedUser) => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    setSelectedUserData({
+      agencyId: agency.id,
+      userId: agencyUser.id,
+      roles: agencyUser.agencyRights[agency.id].roles,
+      email: agencyUser.email,
+      isNotifiedByEmail: agencyUser.agencyRights[agency.id].isNotifiedByEmail,
+      isIcUser: !!agencyUser.externalId,
+    });
+    removeUserModal.open();
+  };
+
+  const agencyRefersToOtherAgency = agency.refersToAgencyId !== null;
+
+  const [agencyUsers, agencyUsersInOtherAgency] = agencyRefersToOtherAgency
+    ? partition(
+        (user) => !user.agencyRights[agency.id].roles.includes("validator"),
+        values(agencyUsersById),
+      )
+    : [values(agencyUsersById), []];
 
   return (
     <>
@@ -122,85 +160,42 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
         Ajouter un utilisateur
       </Button>
 
-      <Table
-        fixed
-        id={domElementIds.admin.agencyTab.agencyUsersTable}
-        headers={[
-          "Utilisateurs",
-          "Préférence de communication",
-          "Rôles",
-          "Actions",
-        ]}
-        data={values(agencyUsers).map((agencyUser, index) => [
-          <NameAndEmailInTable
-            firstName={agencyUser.firstName}
-            lastName={agencyUser.lastName}
-            email={agencyUser.email}
-          />,
-          agencyUser.agencyRights[agency.id].isNotifiedByEmail
-            ? "Reçoit les notifications"
-            : "Ne reçoit pas les notifications",
-          agencyUser.agencyRights[agency.id].roles.map((role) => {
-            return (
-              <Badge small className={agencyRoleToDisplay[role].className}>
-                {agencyRoleToDisplay[role].label}
-              </Badge>
-            );
-          }),
-          <ButtonsGroup
-            inlineLayoutWhen={"always"}
-            buttons={[
-              {
-                children: "Modifier",
-                priority: "secondary",
-                disabled:
-                  agency.refersToAgencyId !== null &&
-                  agencyUser.agencyRights[agency.id].roles.includes(
-                    "validator",
-                  ),
-                id: `${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`,
-                onClick: () => {
-                  dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-                  setMode("update");
-                  setSelectedUserData({
-                    agencyId: agency.id,
-                    userId: agencyUser.id,
-                    roles: agencyUser.agencyRights[agency.id].roles,
-                    email: agencyUser.email,
-                    isNotifiedByEmail:
-                      agencyUser.agencyRights[agency.id].isNotifiedByEmail,
-                    isIcUser: !!agencyUser.externalId,
-                  });
-                  manageUserModal.open();
-                },
-              },
-              {
-                children: "Supprimer",
-                priority: "secondary",
-                disabled:
-                  agency.refersToAgencyId !== null &&
-                  agencyUser.agencyRights[agency.id].roles.includes(
-                    "validator",
-                  ),
-                id: `${domElementIds.admin.agencyTab.editAgencyRemoveUserButton}-${agency.id}-${index}`,
-                onClick: () => {
-                  dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-                  setSelectedUserData({
-                    agencyId: agency.id,
-                    userId: agencyUser.id,
-                    roles: agencyUser.agencyRights[agency.id].roles,
-                    email: agencyUser.email,
-                    isNotifiedByEmail:
-                      agencyUser.agencyRights[agency.id].isNotifiedByEmail,
-                    isIcUser: !!agencyUser.externalId,
-                  });
-                  removeUserModal.open();
-                },
-              },
-            ]}
-          />,
-        ])}
+      <div className={fr.cx("fr-mb-1v", "fr-mt-4w")}>
+        <span className={fr.cx("fr-h6")}>Utilisateurs de : </span>
+        {agency.refersToAgencyName ? (
+          <Tag
+            theme={"structureAccompagnement"}
+            label={`Structure d'accompagnement : ${agency.name}`}
+          />
+        ) : (
+          <Tag theme={"prescripteur"} label={`Prescripteur : ${agency.name}`} />
+        )}
+      </div>
+
+      <AgencyUsersTable
+        agencyUsers={agencyUsers}
+        agency={agency}
+        onModifyClicked={onModifyClicked}
+        onDeleteClicked={onDeleteClicked}
       />
+
+      {agency.refersToAgencyName && (
+        <>
+          <div className={fr.cx("fr-mb-1v", "fr-mt-4w")}>
+            <span className={fr.cx("fr-h6")}>Utilisateurs de : </span>
+            <Tag
+              theme={"prescripteur"}
+              label={`Prescripteur : ${agency.refersToAgencyName}`}
+            />
+          </div>
+          <AgencyUsersTable
+            agencyUsers={agencyUsersInOtherAgency}
+            agency={agency}
+            onModifyClicked={onModifyClicked}
+            onDeleteClicked={onDeleteClicked}
+          />
+        </>
+      )}
 
       {createPortal(
         <manageUserModal.Component

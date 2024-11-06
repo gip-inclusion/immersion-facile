@@ -84,7 +84,9 @@ const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
         data={agencyRights.map((agencyRight) => {
           return [
             <>
-              <AgencyTag agency={agencyRight.agency} />
+              <AgencyTag
+                refersToAgencyName={agencyRight.agency.refersToAgencyName}
+              />
               <br />
               <span>{agencyRight.agency.name}</span>
               <br />
