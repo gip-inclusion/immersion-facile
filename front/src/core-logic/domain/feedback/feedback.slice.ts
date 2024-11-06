@@ -85,6 +85,12 @@ export const feedbackMapping: Record<
       message:
         "La convention a bien été rediffusée au partenaire. Vous pouvez vous rapprocher du partenaire pour le vérifier.",
     },
+    "create.info": {
+      action: conventionSlice.actions.broadcastConventionToPartnerRequested,
+      title: "La convention est en cours de rediffusion",
+      message:
+        "La convention est en cours de rediffusion au partenaire. Cela peut prendre une quinzaine de secondes.",
+    },
     "create.error": {
       action: conventionSlice.actions.broadcastConventionToPartnerFailed,
       title: "Problème rencontré lors de la rediffusion au partenaire",
