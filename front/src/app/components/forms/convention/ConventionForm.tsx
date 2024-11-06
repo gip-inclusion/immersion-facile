@@ -283,6 +283,8 @@ export const ConventionForm = ({
     )
   );
 
+  const conventionIsLoading = isLoading || !reduxFormUiReady;
+
   const validateSteps = async (type: "clearAllErrors" | "doNotClear") => {
     const stepsDataValue = await Promise.all(
       formUiSections.map((_, step) => getStepData(step + 1)),
@@ -354,10 +356,9 @@ export const ConventionForm = ({
     }
   }, [fetchedConvention, methods.reset]);
 
-  return !reduxFormUiReady ? (
-    <Loader />
-  ) : (
+  return (
     <FormProvider {...methods}>
+      {conventionIsLoading && <Loader />}
       <ConventionFormLayout
         form={
           <>
