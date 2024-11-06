@@ -1,4 +1,4 @@
-import { concatMap, filter, map, switchMap } from "rxjs";
+import { concatMap, delay, filter, map, switchMap } from "rxjs";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -172,10 +172,12 @@ const renewConventionEpic: ConventionEpic = (
     ),
   );
 
+const minimumDelayBeforeItIsPossibleToBroadcastAgainMs = 10_000;
+
 const broadcastConventionAgainEpic: ConventionEpic = (
   action$,
   state$,
-  { conventionGateway },
+  { conventionGateway, scheduler },
 ) =>
   action$.pipe(
     filter(conventionSlice.actions.broadcastConventionToPartnerRequested.match),
@@ -186,6 +188,7 @@ const broadcastConventionAgainEpic: ConventionEpic = (
           getAdminToken(state$.value),
         )
         .pipe(
+          delay(minimumDelayBeforeItIsPossibleToBroadcastAgainMs, scheduler),
           map(() =>
             conventionSlice.actions.broadcastConventionToPartnerSucceeded({
               feedbackTopic: payload.feedbackTopic,

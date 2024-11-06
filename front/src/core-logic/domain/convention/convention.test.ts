@@ -887,7 +887,7 @@ describe("Convention slice", () => {
   });
 
   describe("Broadcast convention to partner", () => {
-    it("successfully trigger the broadcast", () => {
+    it("successfully trigger the broadcast, than needs to wait for a delay before broadcast is considered successfull", () => {
       store.dispatch(
         conventionSlice.actions.broadcastConventionToPartnerRequested({
           conventionId: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
@@ -903,8 +903,15 @@ describe("Convention slice", () => {
       );
 
       expectConventionState({
+        isBroadcasting: true,
+      });
+
+      fastForwardObservables();
+
+      expectConventionState({
         isBroadcasting: false,
       });
+
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "broadcast-convention-again": {
           on: "create",
@@ -1322,16 +1329,21 @@ describe("Convention slice", () => {
   const expectIsMinorToBe = (expected: boolean) => {
     expectToEqual(conventionSelectors.isMinor(store.getState()), expected);
   };
+
   const expectIsLoadingToBe = (expected: boolean) => {
     expectToEqual(conventionSelectors.isLoading(store.getState()), expected);
   };
+
   const expectIsTutorEstablishmentRepresentativeToBe = (expected: boolean) => {
     expectToEqual(
       conventionSelectors.isTutorEstablishmentRepresentative(store.getState()),
       expected,
     );
   };
+
   const expectFeedbackToBe = (expected: ConventionSubmitFeedback) => {
     expectToEqual(conventionSelectors.feedback(store.getState()), expected);
   };
+
+  const fastForwardObservables = () => dependencies.scheduler.flush();
 });
