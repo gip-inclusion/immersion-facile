@@ -1,15 +1,14 @@
 import React from "react";
 import { Tag } from "react-design-system";
-import { WithAgencyDto } from "shared";
 
 export const AgencyTag = ({
-  agency,
+  refersToAgencyName,
   className,
-}: WithAgencyDto & { className?: string }) =>
-  agency.refersToAgencyId ? (
+}: { refersToAgencyName: string | null } & { className?: string }) =>
+  refersToAgencyName ? (
     <Tag
       theme={"structureAccompagnement"}
-      label={`Structure d'accompagnement liée à ${agency.refersToAgencyName}`}
+      label={`Structure d'accompagnement liée à ${refersToAgencyName}`}
       className={className}
     />
   ) : (
