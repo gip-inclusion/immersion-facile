@@ -84,7 +84,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
       )
       .min(1),
     isEngagedEnterprise: zBoolean.optional(),
-    fitForDisabledWorkers: zBoolean.optional(),
+    fitForDisabledWorkers: zBoolean,
     naf: nafSchema.optional(),
     appellations: z
       .array(appellationDtoSchema)

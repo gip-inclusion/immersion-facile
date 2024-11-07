@@ -120,6 +120,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           }),
         ),
         naf: establishmentAggregate.establishment?.nafDto,
+        fitForDisabledWorkers:
+          establishmentAggregate.establishment.fitForDisabledWorkers,
         appellations: [
           {
             appellationCode: establishmentAggregate.offers[0].appellationCode,
@@ -182,6 +184,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             romeLabel: establishmentAggregate.offers[0].romeLabel,
           },
         ],
+        fitForDisabledWorkers:
+          establishmentAggregate.establishment.fitForDisabledWorkers,
         maxContactsPerMonth:
           establishmentAggregate.establishment.maxContactsPerMonth,
         // biome-ignore lint/style/noNonNullAssertion: <explanation>

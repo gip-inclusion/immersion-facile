@@ -36,6 +36,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
   isEngagedEnterprise: false,
+  fitForDisabledWorkers: false,
   siret: "01234567890123",
   website: "www@super.com/jobs",
   additionalInformation: "",
@@ -142,6 +143,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   appellations: [],
   website: "",
   additionalInformation: "",
+  fitForDisabledWorkers: false,
   maxContactsPerMonth: defaultMaxContactsPerMonth,
   searchableBy: {
     jobSeekers: true,

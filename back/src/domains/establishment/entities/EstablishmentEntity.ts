@@ -18,7 +18,7 @@ export type EstablishmentEntity = {
   additionalInformation?: string;
   createdAt: Date;
   customizedName?: string;
-  fitForDisabledWorkers?: boolean;
+  fitForDisabledWorkers: boolean;
   isCommited?: boolean;
   isOpen: boolean;
   isSearchable: boolean;

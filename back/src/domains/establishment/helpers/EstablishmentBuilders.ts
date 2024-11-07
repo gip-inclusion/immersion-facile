@@ -105,6 +105,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
     students: true,
   },
   additionalInformation: "",
+  fitForDisabledWorkers: false,
   website: "",
   fitForDisabledWorkers: false,
   score: 10,
@@ -136,7 +137,7 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, customizedName });
   }
 
-  public withFitForDisabledWorkers(fitForDisabledWorkers?: boolean) {
+  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       fitForDisabledWorkers,
