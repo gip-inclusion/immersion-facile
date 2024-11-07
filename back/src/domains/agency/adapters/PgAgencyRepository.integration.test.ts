@@ -400,7 +400,10 @@ describe("PgAgencyRepository", () => {
           agency3.id,
           notExistingAgencyId,
         ]),
-        errors.agencies.notFound({ agencyIds: [notExistingAgencyId] }),
+        errors.agencies.notFound({
+          missingAgencyIds: [notExistingAgencyId],
+          presentAgencyIds: [agency1.id, agency2.id, agency3.id],
+        }),
       );
     });
   });

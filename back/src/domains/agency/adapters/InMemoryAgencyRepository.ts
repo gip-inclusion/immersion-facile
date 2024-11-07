@@ -99,7 +99,10 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       },
     );
     if (result.missingIds.length)
-      throw errors.agencies.notFound({ agencyIds: result.missingIds });
+      throw errors.agencies.notFound({
+        missingAgencyIds: result.missingIds,
+        presentAgencyIds: result.agencies.map((agency) => agency.id),
+      });
     return result.agencies;
   }
 

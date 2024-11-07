@@ -32,7 +32,7 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
     if (!user) throw errors.user.notFound({ userId });
 
     const agency = await uow.agencyRepository.getById(agencyId);
-    if (!agency) throw errors.agencies.notFound({ agencyIds: [agencyId] });
+    if (!agency) throw errors.agency.notFound({ agencyId });
 
     const userRight = agency.usersRights[userId];
     if (!userRight)

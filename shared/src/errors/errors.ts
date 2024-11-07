@@ -259,14 +259,17 @@ export const errors = {
       ),
   },
   agencies: {
-    notFound: ({ agencyIds }: { agencyIds: AgencyId[] }) =>
+    notFound: ({
+      missingAgencyIds,
+      presentAgencyIds = [],
+    }: { missingAgencyIds: AgencyId[]; presentAgencyIds?: AgencyId[] }) =>
       new NotFoundError(
         [
-          `Nous n'avons pas trouvé les agences avec les identifiants suivants : ${agencyIds.join(
+          `Nous n'avons pas trouvé les agences avec les identifiants suivants : ${missingAgencyIds.join(
             ", ",
-          )}.`,
-          agencyIds.length
-            ? `Nous avons seulement trouvé : ${agencyIds.join(", ")}.`
+          )}. `,
+          presentAgencyIds.length
+            ? `Nous avons seulement trouvé : ${presentAgencyIds.join(", ")}.`
             : "Aucune agence trouvée.",
         ].join(""),
       ),

@@ -54,11 +54,6 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     }
 
     const agencies = await uow.agencyRepository.getByIds(agencyIds);
-    if (agencies.length !== agencyIds.length) {
-      throw errors.agencies.notFound({
-        agencyIds: agencies.map((agency) => agency.id),
-      });
-    }
 
     await Promise.all([
       ...agencies.map(({ id, usersRights }) =>

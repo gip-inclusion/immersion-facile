@@ -69,7 +69,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
         registerAgencyToInclusionConnectUser.execute([agency1.id], {
           userId: user.id,
         }),
-        errors.agencies.notFound({ agencyIds: [agency1.id] }),
+        errors.agencies.notFound({ missingAgencyIds: [agency1.id] }),
       );
     });
 

@@ -232,7 +232,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        errors.agencies.notFound({ agencyIds: [storedUnknownId] }),
+        errors.agencies.notFound({ missingAgencyIds: [storedUnknownId] }),
       );
     });
 

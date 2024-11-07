@@ -1,5 +1,5 @@
 import { sql } from "kysely";
-import { map, toPairs } from "ramda";
+import { map, partition, toPairs } from "ramda";
 import {
   AbsoluteUrl,
   AddressDto,
@@ -157,11 +157,13 @@ export class PgAgencyRepository implements AgencyRepository {
       .orderBy("agencies.updated_at", "desc")
       .execute();
 
-    const missingIds = ids.filter(
-      (id) => !results.some((result) => result.agency.id === id),
+    const [presentAgencyIds, missingAgencyIds] = partition(
+      (id) => results.some((result) => result.agency.id === id),
+      ids,
     );
-    if (missingIds.length)
-      throw errors.agencies.notFound({ agencyIds: missingIds });
+
+    if (missingAgencyIds.length)
+      throw errors.agencies.notFound({ missingAgencyIds, presentAgencyIds });
 
     return results
       .map(({ agency }) => this.#pgAgencyToAgencyWithRights(agency))
