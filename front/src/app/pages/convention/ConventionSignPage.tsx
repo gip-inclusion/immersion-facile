@@ -11,8 +11,9 @@ import {
   errors,
   isSignatory,
 } from "shared";
+import { ConventionValidationSection } from "src/app/components/admin/conventions/ConventionValidationDetails";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
-import { ConventionSummary } from "src/app/components/forms/convention/ConventionSummary";
+import { sections } from "src/app/contents/admin/conventionValidation";
 import { P, match } from "ts-pattern";
 import { Route } from "type-route";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
@@ -50,17 +51,7 @@ export const ConventionSignPage = ({ route }: ConventionSignPageProperties) => {
     throw errors.user.notConventionSignatory();
   return (
     <HeaderFooterLayout>
-      <div
-        className={fr.cx(
-          "fr-grid-row",
-          "fr-grid-row--center",
-          "fr-grid-row--gutters",
-        )}
-      >
-        <div className={fr.cx("fr-col-lg-8", "fr-p-2w")}>
-          <ConventionSignPageContent jwt={route.params.jwt} />
-        </div>
-      </div>
+      <ConventionSignPageContent jwt={route.params.jwt} />
     </HeaderFooterLayout>
   );
 };
@@ -129,7 +120,16 @@ const ConventionSignPageContent = ({
               }, vous la recevrez par email.`}
               className={fr.cx("fr-mb-5v")}
             />
-            <ConventionSummary />
+            {convention &&
+              sections.map((list, index) => (
+                <ConventionValidationSection
+                  // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
+                  key={index}
+                  convention={convention}
+                  list={list}
+                  index={index}
+                />
+              ))}
           </MainWrapper>
         ))
         .with({ hasConvention: false }, () => (

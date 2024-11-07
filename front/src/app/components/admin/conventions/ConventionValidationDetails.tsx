@@ -62,7 +62,7 @@ export const ConventionValidationDetails = ({
   );
 };
 
-const ConventionValidationSection = ({
+export const ConventionValidationSection = ({
   convention,
   list,
   index,

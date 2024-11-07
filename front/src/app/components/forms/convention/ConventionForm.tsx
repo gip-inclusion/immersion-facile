@@ -208,6 +208,13 @@ export const ConventionForm = ({
   const onSubmit: SubmitHandler<Required<ConventionPresentation>> = (
     convention,
   ) => {
+    const selectedAgency = agencyOptions.find(
+      (agencyOption) => agencyOption.id === convention.agencyId,
+    );
+    if (!selectedAgency)
+      throw new Error(
+        "should not happen: agency convention.agencyId not found",
+      );
     const conventionToSave: ConventionReadDto = {
       ...conventionSchema.parse(convention),
       agencyKind: convention.agencyKind,
@@ -218,7 +225,7 @@ export const ConventionForm = ({
           ? undefined
           : establishmentNumberEmployeesRange,
       agencySiret: "",
-      agencyName: "",
+      agencyName: selectedAgency.name,
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
     };
@@ -389,19 +396,19 @@ export const ConventionForm = ({
               Tous les champs marqués d'une astérisque (*) sont obligatoires.
             </p>
 
-            <form
-              id={domElementIds.conventionImmersionRoute.form({ mode })}
-              data-matomo-name={domElementIds.conventionImmersionRoute.form({
-                mode,
-              })}
-              onSubmit={handleSubmit(onSubmit, (errors) => {
-                validateSteps("doNotClear");
-                console.error(conventionValues, errors);
-              })}
-            >
-              <>
+              <form
+                id={domElementIds.conventionImmersionRoute.form({ mode })}
+                data-matomo-name={domElementIds.conventionImmersionRoute.form({
+                  mode,
+                })}
+                onSubmit={handleSubmit(onSubmit, (errors) => {
+                  validateSteps("doNotClear");
+                  console.error(conventionValues, errors);
+                })}
+              >
                 <>
-                  <input
+                  <>
+                    <input
                     type="hidden"
                     {...formContents[
                       "signatories.beneficiary.federatedIdentity"
@@ -555,55 +562,58 @@ export const ConventionForm = ({
                 </>
               </>
               <div className={fr.cx("fr-mt-4w", "fr-hidden", "fr-unhidden-lg")}>
-                <Button
-                  disabled={shouldSubmitButtonBeDisabled}
-                  iconId="fr-icon-checkbox-circle-line"
-                  iconPosition="left"
-                  type="submit"
-                  nativeButtonProps={{
-                    id: domElementIds.conventionImmersionRoute.submitFormButton,
-                  }}
+
+                  <Button
+                    disabled={shouldSubmitButtonBeDisabled}
+                    iconId="fr-icon-checkbox-circle-line"
+                    iconPosition="left"
+                    type="submit"
+                    nativeButtonProps={{
+                      id: domElementIds.conventionImmersionRoute
+                        .submitFormButton,
+                    }}
+                  >
+                    Vérifier la demande
+                  </Button>
+                </div>
+                <ConventionFeedbackNotification
+                  submitFeedback={submitFeedback}
+                  signatories={conventionValues.signatories}
+                />
+              </form>
+            </>
+          }
+          sidebar={
+            <ConventionFormSidebar
+              currentStep={currentStep}
+              sidebarContent={sidebarContent}
+              sidebarFooter={
+                <div
+                  className={fr.cx(
+                    "fr-btns-group",
+                    "fr-btns-group--center",
+                    "fr-btns-group--inline",
+                    "fr-btns-group--sm",
+                    "fr-btns-group--icon-left",
+                  )}
                 >
-                  Vérifier la demande
-                </Button>
-              </div>
-              <ConventionFeedbackNotification
-                submitFeedback={submitFeedback}
-                signatories={conventionValues.signatories}
-              />
-            </form>
-          </>
-        }
-        sidebar={
-          <ConventionFormSidebar
-            currentStep={currentStep}
-            sidebarContent={sidebarContent}
-            sidebarFooter={
-              <div
-                className={fr.cx(
-                  "fr-btns-group",
-                  "fr-btns-group--center",
-                  "fr-btns-group--inline",
-                  "fr-btns-group--sm",
-                  "fr-btns-group--icon-left",
-                )}
-              >
-                <ShareConventionLink />
-                <Button
-                  type="submit"
-                  id={
-                    domElementIds.conventionImmersionRoute
-                      .submitFormButtonMobile
-                  }
-                >
-                  Vérifier la demande
-                </Button>
-              </div>
-            }
-          />
-        }
-      />
-    </FormProvider>
+                  <ShareConventionLink />
+                  <Button
+                    type="submit"
+                    id={
+                      domElementIds.conventionImmersionRoute
+                        .submitFormButtonMobile
+                    }
+                  >
+                    Vérifier la demande
+                  </Button>
+                </div>
+              }
+            />
+          }
+        />
+      </FormProvider>
+
   );
 };
 
