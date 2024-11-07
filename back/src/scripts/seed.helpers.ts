@@ -1,4 +1,11 @@
-import { AddressDto, AgencyDtoBuilder, AgencyId, AgencyKind } from "shared";
+import {
+  AddressDto,
+  AgencyDtoBuilder,
+  AgencyId,
+  AgencyKind,
+  UserId,
+} from "shared";
+import { AgencyUsersRights } from "../domains/agency/ports/AgencyRepository";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { toAgencyWithRights } from "../utils/agency";
@@ -30,7 +37,12 @@ export const getRandomAgencyId = ({ kind }: { kind: AgencyKind }) => {
 export const insertAgencySeed = async ({
   uow,
   kind,
-}: { uow: UnitOfWork; kind: AgencyKind }): Promise<void> => {
+  userId,
+}: {
+  uow: UnitOfWork;
+  kind: AgencyKind;
+  userId: UserId;
+}): Promise<void> => {
   const address = getRandomAddress();
   const agencyName = `Agence ${kind} ${address.city}`;
   const agencyId = new UuidV4Generator().new();
@@ -44,7 +56,16 @@ export const insertAgencySeed = async ({
     .withAddress(address)
     .build();
 
-  await uow.agencyRepository.insert(toAgencyWithRights(agency, {}));
+  const connectedValidator: AgencyUsersRights = {
+    [userId]: {
+      isNotifiedByEmail: true,
+      roles: ["validator"],
+    },
+  };
+
+  await uow.agencyRepository.insert(
+    toAgencyWithRights(agency, connectedValidator),
+  );
 
   agencyIds = {
     ...agencyIds,
@@ -52,7 +73,10 @@ export const insertAgencySeed = async ({
   };
 };
 
-export const insertAgencies = async ({ uow }: { uow: UnitOfWork }) => {
+export const insertAgencies = async ({
+  uow,
+  userId,
+}: { uow: UnitOfWork; userId: UserId }) => {
   const peAgency = new AgencyDtoBuilder()
     .withId("40400c99-9c0b-bbbb-bb6d-6bb9bd300404")
     .withName("PE Paris")
@@ -93,11 +117,24 @@ export const insertAgencies = async ({ uow }: { uow: UnitOfWork }) => {
     .withAddress(seedAddresses[3])
     .build();
 
-  await uow.agencyRepository.insert(toAgencyWithRights(peAgency, {}));
-  await uow.agencyRepository.insert(toAgencyWithRights(cciAgency, {}));
-  await uow.agencyRepository.insert(toAgencyWithRights(capEmploiAgency, {}));
+  const connectedValidator: AgencyUsersRights = {
+    [userId]: {
+      isNotifiedByEmail: true,
+      roles: ["validator"],
+    },
+  };
+
   await uow.agencyRepository.insert(
-    toAgencyWithRights(missionLocaleAgency, {}),
+    toAgencyWithRights(peAgency, connectedValidator),
+  );
+  await uow.agencyRepository.insert(
+    toAgencyWithRights(cciAgency, connectedValidator),
+  );
+  await uow.agencyRepository.insert(
+    toAgencyWithRights(capEmploiAgency, connectedValidator),
+  );
+  await uow.agencyRepository.insert(
+    toAgencyWithRights(missionLocaleAgency, connectedValidator),
   );
 
   agencyIds = {

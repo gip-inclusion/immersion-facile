@@ -27,7 +27,8 @@ import {
   insertAgencySeed,
 } from "./seed.helpers";
 
-/* eslint-disable no-console */
+const adminUserId = "7f5cfde7-80b3-4ea1-bf3e-1711d0876161";
+
 const seed = async () => {
   const config = AppConfig.createFromEnv();
   const deps = await createAppDependencies(config);
@@ -91,8 +92,8 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
     .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
     .withFirstName("Prénom Admin")
     .withLastName("Nom Admin")
-    .withId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
-    .withExternalId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
+    .withId(adminUserId)
+    .withExternalId(adminUserId)
     .build();
 
   await db
@@ -151,19 +152,30 @@ const agencySeed = async (uow: UnitOfWork) => {
 
   const insertQueries = [...Array(agenciesCountByKind).keys()].flatMap(() => {
     return [
-      insertAgencySeed({ uow, kind: "pole-emploi" }),
-      insertAgencySeed({ uow, kind: "cci" }),
-      insertAgencySeed({ uow, kind: "mission-locale" }),
-      insertAgencySeed({ uow, kind: "cap-emploi" }),
-      insertAgencySeed({ uow, kind: "conseil-departemental" }),
-      insertAgencySeed({ uow, kind: "prepa-apprentissage" }),
-      insertAgencySeed({ uow, kind: "structure-IAE" }),
-      insertAgencySeed({ uow, kind: "autre" }),
-      insertAgencySeed({ uow, kind: "operateur-cep" }),
+      insertAgencySeed({ uow, kind: "pole-emploi", userId: adminUserId }),
+      insertAgencySeed({ uow, kind: "cci", userId: adminUserId }),
+      insertAgencySeed({ uow, kind: "mission-locale", userId: adminUserId }),
+      insertAgencySeed({ uow, kind: "cap-emploi", userId: adminUserId }),
+      insertAgencySeed({
+        uow,
+        kind: "conseil-departemental",
+        userId: adminUserId,
+      }),
+      insertAgencySeed({
+        uow,
+        kind: "prepa-apprentissage",
+        userId: adminUserId,
+      }),
+      insertAgencySeed({ uow, kind: "structure-IAE", userId: adminUserId }),
+      insertAgencySeed({ uow, kind: "autre", userId: adminUserId }),
+      insertAgencySeed({ uow, kind: "operateur-cep", userId: adminUserId }),
     ];
   });
 
-  await Promise.all([...insertQueries, insertAgencies({ uow })]);
+  await Promise.all([
+    ...insertQueries,
+    insertAgencies({ uow, userId: adminUserId }),
+  ]);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
