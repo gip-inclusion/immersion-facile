@@ -120,6 +120,7 @@ describe("PgFormEstablishmentRepository", () => {
         maxContactsPerMonth: formEstablishment.maxContactsPerMonth,
         source: formEstablishment.source,
         searchableBy: formEstablishment.searchableBy,
+        fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
       };
       await formEstablishmentRepository.update(minimalFormEstablishment);
       expectToEqual(await formEstablishmentRepository.getAll(), [

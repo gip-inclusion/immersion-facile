@@ -60,7 +60,7 @@ export type FormEstablishmentDto = {
   businessContact: BusinessContactDto;
   businessName: string;
   businessNameCustomized?: string;
-  fitForDisabledWorkers?: boolean;
+  fitForDisabledWorkers: boolean;
   isEngagedEnterprise?: boolean;
   maxContactsPerMonth: number;
   naf?: NafDto; // { code: string, nomenclature: string }

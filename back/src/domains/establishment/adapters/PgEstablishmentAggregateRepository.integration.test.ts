@@ -1465,7 +1465,6 @@ describe("PgEstablishmentAggregateRepository", () => {
               )
                 .withAdditionalInformation("")
                 .withCustomizedName(undefined)
-                .withFitForDisabledWorkers(undefined)
                 .withIsCommited(undefined)
                 .withLastInseeCheck(undefined)
                 .withNextAvailabilityDate(undefined)
