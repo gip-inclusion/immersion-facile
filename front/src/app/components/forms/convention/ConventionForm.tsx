@@ -23,12 +23,12 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   AgencyKindFilter,
   Beneficiary,
-  ConventionDto,
   ConventionReadDto,
   DepartmentCode,
   FederatedIdentity,
   InternshipKind,
   addressDtoToString,
+  conventionSchema,
   domElementIds,
   hasBeneficiaryCurrentEmployer,
   isBeneficiaryMinor,
@@ -205,63 +205,29 @@ export const ConventionForm = ({
     conventionValues.internshipKind ?? "immersion",
   );
 
-  const isImmersionConvention = (
-    convention: ConventionPresentation,
-  ): convention is Extract<ConventionDto, { internshipKind: "immersion" }> =>
-    convention.internshipKind === "immersion";
-
-  const isMiniStage = (
-    convention: ConventionPresentation,
-  ): convention is Extract<
-    ConventionDto,
-    { internshipKind: "mini-stage-cci" }
-  > => convention.internshipKind === "mini-stage-cci";
-
   const onSubmit: SubmitHandler<Required<ConventionPresentation>> = (
     convention,
   ) => {
-    if (isMiniStage(convention)) {
-      const conventionToSave: ConventionReadDto = {
-        ...convention,
-        internshipKind: convention.internshipKind,
-        workConditions: undefinedIfEmptyString(convention.workConditions),
-        establishmentNumberEmployeesRange:
-          establishmentNumberEmployeesRange === ""
-            ? undefined
-            : establishmentNumberEmployeesRange,
-        agencySiret: "",
-        agencyName: "",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [],
-      };
-
-      dispatch(
-        conventionSlice.actions.showSummaryChangeRequested({
-          showSummary: true,
-          convention: conventionToSave,
-        }),
-      );
-    } else if (isImmersionConvention(convention)) {
-      const conventionToSave: ConventionReadDto = {
-        ...convention,
-        workConditions: undefinedIfEmptyString(convention.workConditions),
-        establishmentNumberEmployeesRange:
-          establishmentNumberEmployeesRange === ""
-            ? undefined
-            : establishmentNumberEmployeesRange,
-        agencySiret: "",
-        agencyName: "",
-        agencyCounsellorEmails: [],
-        agencyValidatorEmails: [],
-      };
-
-      dispatch(
-        conventionSlice.actions.showSummaryChangeRequested({
-          showSummary: true,
-          convention: conventionToSave,
-        }),
-      );
-    }
+    const conventionToSave: ConventionReadDto = {
+      ...conventionSchema.parse(convention),
+      agencyKind: convention.agencyKind,
+      agencyDepartment: convention.agencyDepartment,
+      workConditions: undefinedIfEmptyString(convention.workConditions),
+      establishmentNumberEmployeesRange:
+        establishmentNumberEmployeesRange === ""
+          ? undefined
+          : establishmentNumberEmployeesRange,
+      agencySiret: "",
+      agencyName: "",
+      agencyCounsellorEmails: [],
+      agencyValidatorEmails: [],
+    };
+    dispatch(
+      conventionSlice.actions.showSummaryChangeRequested({
+        showSummary: true,
+        convention: conventionToSave,
+      }),
+    );
   };
 
   const accordionsRef = useRef<Array<ElementRef<"div">>>([]);
