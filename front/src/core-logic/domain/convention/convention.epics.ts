@@ -144,18 +144,6 @@ const getConventionStatusDashboardUrl: ConventionEpic = (
     ),
   );
 
-const getPreselectAgencyId: ConventionEpic = (action$, _, { agencyGateway }) =>
-  action$.pipe(
-    filter(conventionSlice.actions.preselectedAgencyIdRequested.match),
-    switchMap(() => agencyGateway.getImmersionFacileAgencyId$()),
-    map((agencyId) =>
-      conventionSlice.actions.preselectedAgencyIdSucceeded(agencyId || null),
-    ),
-    catchEpicError((error: Error) =>
-      conventionSlice.actions.preselectedAgencyIdFailed(error.message),
-    ),
-  );
-
 const renewConventionEpic: ConventionEpic = (
   action$,
   _,
@@ -214,7 +202,6 @@ export const conventionEpics = [
   conventionStatusChangeEpic,
   reflectFetchedConventionOnFormUi,
   getConventionStatusDashboardUrl,
-  getPreselectAgencyId,
   renewConventionEpic,
   getSimilarConventionsEpic,
   broadcastConventionAgainEpic,

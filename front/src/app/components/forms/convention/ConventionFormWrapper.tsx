@@ -19,7 +19,6 @@ import { ConventionForm } from "src/app/components/forms/convention/ConventionFo
 import { sections } from "src/app/contents/admin/conventionValidation";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { type ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
 import { type ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { type ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import { type ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
@@ -49,7 +48,6 @@ type ConventionFormWrapperProps = {
 export type SupportedConventionRoutes =
   | ConventionImmersionPageRoute
   | ConventionMiniStagePageRoute
-  | ConventionCustomAgencyPageRoute
   | ConventionImmersionForExternalsRoute;
 
 export const ConventionFormWrapper = ({

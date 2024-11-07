@@ -107,10 +107,6 @@ export const defaultPageMetaContents: Partial<
     description:
       "Démarrer une demande de convention pour un mini-stage, stage de 3ème ou stage de seconde.",
   },
-  conventionCustomAgency: {
-    title: "Demande de convention d'immersion",
-    description: "Faciliter la réalisation des immersions professionnelles.",
-  },
   manageConvention: {
     title: "Vérification de convention d'immersion",
     description: "Faciliter la réalisation des immersions professionnelles.",

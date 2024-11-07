@@ -74,11 +74,6 @@ const conventionStatusDashboardUrl = createSelector(
   ({ conventionStatusDashboardUrl }) => conventionStatusDashboardUrl,
 );
 
-const preselectedAgencyId = createSelector(
-  conventionState,
-  ({ formUi }) => formUi.preselectedAgencyId,
-);
-
 const currentStep = createSelector(
   conventionState,
   ({ formUi }) => formUi.currentStep,
@@ -94,7 +89,6 @@ export const conventionSelectors = {
   isTutorEstablishmentRepresentative,
   hasCurrentEmployer,
   conventionStatusDashboardUrl,
-  preselectedAgencyId,
   currentStep,
   showSummary,
   agencyDepartment,

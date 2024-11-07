@@ -20,7 +20,6 @@ export interface AgencyGateway {
   getAgencyPublicInfoById$(
     agencyId: WithAgencyId,
   ): Observable<AgencyPublicDisplayDto>;
-  getImmersionFacileAgencyId$(): Observable<AgencyId | undefined>;
   listAgencyOptionsByFilter$(
     filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]>;
