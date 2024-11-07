@@ -28,7 +28,7 @@ import { toAgencyWithRights } from "../../../../utils/agency";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {
-  const agency = new AgencyDtoBuilder().build();
+  const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
   const agencyUser: User = {
     id: "123",
     email: "joe@mail.com",

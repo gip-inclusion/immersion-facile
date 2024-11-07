@@ -79,7 +79,9 @@ describe("GetUserAgencyDashboardUrl", () => {
       it.each(agencyRolesAllowedToGetDashboard)(
         "when role is '%s'",
         async (agencyUserRole) => {
-          const agency = agencyWithoutCounsellorAndValidatorBuilder.build();
+          const agency = agencyWithoutCounsellorAndValidatorBuilder
+            .withKind("pole-emploi")
+            .build();
 
           uow.userRepository.users = [notAdmin];
           uow.agencyRepository.agencies = [
@@ -154,6 +156,37 @@ describe("GetUserAgencyDashboardUrl", () => {
           });
         },
       );
+    });
+
+    it("returns the erroredConventionsDashboardUrl to undefined when agency is not of kind with synchronisation enabled", async () => {
+      const agency = new AgencyDtoBuilder().withKind("autre").build();
+
+      uow.userRepository.users = [icNotAdmin];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notAdmin.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+      const url = await getInclusionConnectedUser.execute({}, icNotAdmin);
+
+      expectToEqual(url, {
+        ...icNotAdmin,
+        agencyRights: [
+          { agency, roles: ["validator"], isNotifiedByEmail: false },
+        ],
+        dashboards: {
+          agencies: {
+            agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+              icNotAdmin.id
+            }/${timeGateway.now()}`,
+            erroredConventionsDashboardUrl: undefined,
+          },
+          establishments: {},
+        },
+      });
     });
 
     it("the dashboard url should not include the agency ids where role is 'to-review'", async () => {
