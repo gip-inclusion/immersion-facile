@@ -1,7 +1,5 @@
 import { addDays } from "date-fns";
 import {
-  AgencyDtoBuilder,
-  AgencyId,
   Beneficiary,
   ConventionDtoBuilder,
   ConventionReadDto,
@@ -343,43 +341,6 @@ describe("Convention slice", () => {
     });
 
     describe("Convention formUi update based on convention data", () => {
-      describe("Getting custom agency id for convention form", () => {
-        it("changes loading state when fetches custom agency id", () => {
-          store.dispatch(
-            conventionSlice.actions.preselectedAgencyIdRequested(),
-          );
-          expectIsLoadingToBe(true);
-        });
-
-        it("fetches agency id successfully", () => {
-          const agency = new AgencyDtoBuilder().build();
-          store.dispatch(
-            conventionSlice.actions.preselectedAgencyIdRequested(),
-          );
-          dependencies.agencyGateway.customAgencyId$.next(agency.id);
-          expectIsLoadingToBe(false);
-          expectPreselectedAgencyIdToBe(agency.id);
-          expectFeedbackToBe({
-            kind: "idle",
-          });
-        });
-
-        it("returns an error if fetches fail", () => {
-          store.dispatch(
-            conventionSlice.actions.preselectedAgencyIdRequested(),
-          );
-          dependencies.agencyGateway.customAgencyId$.error(
-            new Error("Failed fetch preselectedAgencyId"),
-          );
-          expectIsLoadingToBe(false);
-          expectPreselectedAgencyIdToBe(null);
-          expectFeedbackToBe({
-            kind: "errored",
-            errorMessage: "Failed fetch preselectedAgencyId",
-          });
-        });
-      });
-
       describe("isTutorEstablishmentRepresentative", () => {
         it("reflects formUi when get convention with tutor different from establishment representative", () => {
           const convention = new ConventionDtoBuilder()
@@ -1247,13 +1208,6 @@ describe("Convention slice", () => {
 
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
     expectObjectsToMatch(store.getState().convention, conventionState);
-  };
-
-  const expectPreselectedAgencyIdToBe = (expected: AgencyId | null) => {
-    expectToEqual(
-      conventionSelectors.preselectedAgencyId(store.getState()),
-      expected,
-    );
   };
 
   const feedGatewayWithAddConventionSuccess = () => {

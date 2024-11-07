@@ -126,9 +126,6 @@ export const ConventionForm = ({
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
-  const preselectedAgencyId = useAppSelector(
-    conventionSelectors.preselectedAgencyId,
-  );
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
 
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
@@ -360,12 +357,6 @@ export const ConventionForm = ({
     }
   }, [conventionValues.id]);
 
-  useEffect(() => {
-    if (route.name === "conventionCustomAgency" && preselectedAgencyId) {
-      setValue("agencyId", preselectedAgencyId);
-    }
-  }, [preselectedAgencyId]);
-
   //TODO: à placer dans ConventionFormFields ????
   useEffect(() => {
     if (fetchedConvention) {
@@ -415,41 +406,39 @@ export const ConventionForm = ({
                     ]}
                   />
                   <div className={fr.cx("fr-accordions-group")}>
-                    {route.name !== "conventionCustomAgency" && (
-                      <Accordion
-                        label={
-                          <RenderSectionTitle
-                            title={t.agencySection.title}
-                            step={1}
-                            currentStep={currentStep}
-                            stepsStatus={stepsStatus}
-                          />
-                        }
-                        {...makeAccordionProps(1)}
-                      >
-                        <AgencySelector
-                          fields={{
-                            agencyDepartmentField,
-                            agencyIdField,
-                            agencyKindField,
-                          }}
-                          shouldLockToPeAgencies={shouldLockToPeAgencies}
-                          shouldFilterDelegationPrescriptionAgencyKind={false}
-                          shouldShowAgencyKindField={
-                            conventionValues?.internshipKind === "immersion"
-                          }
-                          agencyDepartmentOptions={departmentOptions}
-                          onDepartmentCodeChangedMemoized={
-                            onDepartmentCodeChangedMemoized
-                          }
-                          agencyOptions={agencyOptions}
-                          isLoading={isAgenciesLoading}
-                          isFetchAgencyOptionsError={
-                            agenciesFeedback.kind === "errored"
-                          }
+                    <Accordion
+                      label={
+                        <RenderSectionTitle
+                          title={t.agencySection.title}
+                          step={1}
+                          currentStep={currentStep}
+                          stepsStatus={stepsStatus}
                         />
-                      </Accordion>
-                    )}
+                      }
+                      {...makeAccordionProps(1)}
+                    >
+                      <AgencySelector
+                        fields={{
+                          agencyDepartmentField,
+                          agencyIdField,
+                          agencyKindField,
+                        }}
+                        shouldLockToPeAgencies={shouldLockToPeAgencies}
+                        shouldFilterDelegationPrescriptionAgencyKind={false}
+                        shouldShowAgencyKindField={
+                          conventionValues?.internshipKind === "immersion"
+                        }
+                        agencyDepartmentOptions={departmentOptions}
+                        onDepartmentCodeChangedMemoized={
+                          onDepartmentCodeChangedMemoized
+                        }
+                        agencyOptions={agencyOptions}
+                        isLoading={isAgenciesLoading}
+                        isFetchAgencyOptionsError={
+                          agenciesFeedback.kind === "errored"
+                        }
+                      />
+                    </Accordion>
 
                     <Accordion
                       label={

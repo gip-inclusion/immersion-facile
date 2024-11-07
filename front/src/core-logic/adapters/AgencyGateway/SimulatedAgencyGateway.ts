@@ -120,10 +120,6 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     throw errors.agency.notFound({ agencyId });
   }
 
-  public getImmersionFacileAgencyId$(): Observable<AgencyId> {
-    return of("agency-id-with-immersion-facile-kind");
-  }
-
   public listAgencyOptionsByFilter$(
     _filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]> {

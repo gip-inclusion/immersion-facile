@@ -251,17 +251,6 @@ export const conventionSlice = createSlice({
       state.currentSignatoryRole = action.payload;
     },
 
-    preselectedAgencyIdRequested: (state) => {
-      state.isLoading = true;
-    },
-    preselectedAgencyIdSucceeded: (
-      state,
-      { payload }: PayloadAction<AgencyId | null>,
-    ) => {
-      state.isLoading = false;
-      state.formUi.preselectedAgencyId = payload;
-    },
-    preselectedAgencyIdFailed: setFeedbackAsErrored,
     setCurrentStep: (state, { payload }: PayloadAction<NumberOfSteps>) => {
       state.formUi.currentStep = payload;
     },

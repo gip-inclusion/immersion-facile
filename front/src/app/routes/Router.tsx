@@ -36,7 +36,6 @@ import { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
 import { AdminConventionDetail } from "../pages/convention/AdminConventionDetail";
-import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
@@ -138,7 +137,6 @@ const getPageByRouteName: {
   // ),
 
   beneficiaryDashboard: () => <BeneficiaryDashboardPage />,
-  conventionCustomAgency: () => <ConventionCustomAgencyPage />,
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
   conventionConfirmation: (route) => (

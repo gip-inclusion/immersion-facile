@@ -133,13 +133,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   // ),
   myProfile: defineRoute(inclusionConnectedParams, () => "/mon-profil"),
   beneficiaryDashboard: defineRoute(`/${frontRoutes.beneficiaryDashboard}`),
-  conventionCustomAgency: defineRoute(
-    {
-      jwt: param.query.optional.string,
-      ...conventionParams,
-    },
-    () => `/${frontRoutes.conventionImmersionRoute}-agence-immersion-facilitee`,
-  ),
   conventionConfirmation: defineRoute(
     {
       conventionId: param.path.string,

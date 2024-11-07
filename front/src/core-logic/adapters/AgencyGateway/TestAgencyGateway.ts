@@ -45,10 +45,6 @@ export class TestAgencyGateway implements AgencyGateway {
     return this.agencyInfo$;
   }
 
-  public getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
-    return this.customAgencyId$;
-  }
-
   public listAgencyOptionsByFilter$(
     _filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]> {

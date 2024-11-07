@@ -22,7 +22,6 @@ import {
   toDateString,
 } from "shared";
 import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
-import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
@@ -35,7 +34,6 @@ import { v4 as uuidV4 } from "uuid";
 type ConventionRoutes =
   | ConventionMiniStagePageRoute
   | ConventionImmersionPageRoute
-  | ConventionCustomAgencyPageRoute
   | ConventionImmersionForExternalsRoute;
 
 export const getConventionInitialValuesFromUrl = ({
