@@ -12,7 +12,9 @@ import {
   domElementIds,
   isConventionRenewed,
 } from "shared";
+import { ConventionValidationSection } from "src/app/components/admin/conventions/ConventionValidationDetails";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import { sections } from "src/app/contents/admin/conventionValidation";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
@@ -24,7 +26,6 @@ import {
   ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
-import { ConventionSummary } from "./ConventionSummary";
 import { SignatureActions } from "./SignatureActions";
 
 type ConventionSignFormProperties = {
@@ -102,7 +103,15 @@ export const ConventionSignForm = ({
           severity="success"
           className={fr.cx("fr-mb-5v")}
         />
-        <ConventionSummary />
+        {sections.map((list, index) => (
+          <ConventionValidationSection
+            // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
+            key={index}
+            convention={convention}
+            list={list}
+            index={index}
+          />
+        ))}
       </>
     );
   }
@@ -118,7 +127,17 @@ export const ConventionSignForm = ({
       )}
       <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
       <form id={domElementIds.conventionToSign.form}>
-        {currentSignatory && <ConventionSummary />}
+        {currentSignatory &&
+          convention &&
+          sections.map((list, index) => (
+            <ConventionValidationSection
+              // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
+              key={index}
+              convention={convention}
+              list={list}
+              index={index}
+            />
+          ))}
 
         <ConventionFeedbackNotification
           submitFeedback={submitFeedback}

@@ -13,8 +13,10 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
 } from "shared";
+import { ConventionValidationSection } from "src/app/components/admin/conventions/ConventionValidationDetails";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
+import { sections } from "src/app/contents/admin/conventionValidation";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { type ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
@@ -27,7 +29,6 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { match } from "ts-pattern";
 import { Route } from "type-route";
-import { ConventionSummary } from "./ConventionSummary";
 
 const {
   Component: ConfirmDuplicateConventionModal,
@@ -203,7 +204,16 @@ const ConventionSummarySection = () => {
         //TODO il y a déjà un LOADER dans le composant parent. Nécéssaire?
         isLoading && <Loader />
       }
-      <ConventionSummary />
+      {convention &&
+        sections.map((list, index) => (
+          <ConventionValidationSection
+            // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
+            key={index}
+            convention={convention}
+            list={list}
+            index={index}
+          />
+        ))}
       {convention && (
         <ConventionFeedbackNotification
           submitFeedback={submitFeedback}
