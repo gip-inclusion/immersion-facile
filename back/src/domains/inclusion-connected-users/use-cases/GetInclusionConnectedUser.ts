@@ -8,6 +8,7 @@ import {
   WithEstablismentsSiretAndName,
   WithOptionalUserId,
   agencyRoleIsNotToReview,
+  allowedAgencyKindToSynch,
   errors,
   withOptionalUserIdSchema,
 } from "shared";
@@ -173,6 +174,11 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
       .filter(({ roles }) => agencyRoleIsNotToReview(roles))
       .map(({ agency }) => agency.id);
 
+    const isSynchronisationEnableForAgency = user.agencyRights.some(
+      (agencyRights) =>
+        allowedAgencyKindToSynch.includes(agencyRights.agency.kind),
+    );
+
     return {
       ...(agencyIdsWithEnoughPrivileges.length > 0
         ? {
@@ -184,11 +190,12 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
         : {}),
       ...(agencyIdsWithEnoughPrivileges.length > 0
         ? {
-            erroredConventionsDashboardUrl:
-              await this.#dashboardGateway.getErroredConventionsDashboardUrl(
-                user.id,
-                this.#timeGateway.now(),
-              ),
+            erroredConventionsDashboardUrl: isSynchronisationEnableForAgency
+              ? await this.#dashboardGateway.getErroredConventionsDashboardUrl(
+                  user.id,
+                  this.#timeGateway.now(),
+                )
+              : undefined,
           }
         : {}),
     };
