@@ -74,24 +74,24 @@ describe("Send email when agency of type other added ", () => {
     uow.userRepository.users = [counsellor, validator, counsellorAndValidator];
     uow.agencyRepository.agencies = [
       toAgencyWithRights(agency, {
-        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         [counsellorAndValidator.id]: {
-          isNotifiedByEmail: false,
+          isNotifiedByEmail: true,
           roles: ["counsellor", "validator"],
         },
       }),
       toAgencyWithRights(peAgency, {
-        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         [counsellorAndValidator.id]: {
-          isNotifiedByEmail: false,
+          isNotifiedByEmail: true,
           roles: ["counsellor", "validator"],
         },
       }),
       toAgencyWithRights(agencyWithRefersTo, {
-        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     ];
   });

@@ -54,7 +54,7 @@ describe("SendEmailWhenAgencyIsRejected", () => {
     // Prepare
     uow.agencyRepository.agencies = [
       toAgencyWithRights(agency, {
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     ];
     uow.userRepository.users = [validator];
@@ -101,7 +101,7 @@ describe("SendEmailWhenAgencyIsRejected", () => {
       toAgencyWithRights(
         new AgencyDtoBuilder(agency).withRejectionJustification(null).build(),
         {
-          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         },
       ),
     ];

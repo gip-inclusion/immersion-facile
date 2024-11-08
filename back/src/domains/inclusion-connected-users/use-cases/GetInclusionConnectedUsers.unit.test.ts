@@ -59,22 +59,22 @@ const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
 const agency1WithRights = toAgencyWithRights(agency1, {
   [johnUser.id]: {
     roles: ["to-review"],
-    isNotifiedByEmail: false,
+    isNotifiedByEmail: true,
   },
   [paulUser.id]: {
     roles: ["counsellor"],
-    isNotifiedByEmail: false,
+    isNotifiedByEmail: true,
   },
 });
 
 const agency2WithRights = toAgencyWithRights(agency2, {
   [johnUser.id]: {
     roles: ["validator"],
-    isNotifiedByEmail: false,
+    isNotifiedByEmail: true,
   },
   [paulUser.id]: {
     roles: ["validator"],
-    isNotifiedByEmail: false,
+    isNotifiedByEmail: true,
   },
 });
 
@@ -124,7 +124,7 @@ describe("GetInclusionConnectedUsers", () => {
         agencyRights: [
           {
             agency: { ...agency1, counsellorEmails: [paulUser.email] },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
@@ -132,7 +132,7 @@ describe("GetInclusionConnectedUsers", () => {
               ...agency2,
               validatorEmails: [johnUser.email, paulUser.email],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["validator"],
           },
         ],
@@ -155,7 +155,7 @@ describe("GetInclusionConnectedUsers", () => {
         agencyRights: [
           {
             agency: { ...agency1, counsellorEmails: [paulUser.email] },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
@@ -163,7 +163,7 @@ describe("GetInclusionConnectedUsers", () => {
               ...agency2,
               validatorEmails: [johnUser.email, paulUser.email],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["validator"],
           },
         ],
@@ -173,7 +173,7 @@ describe("GetInclusionConnectedUsers", () => {
         agencyRights: [
           {
             agency: { ...agency1, counsellorEmails: [paulUser.email] },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
@@ -181,7 +181,7 @@ describe("GetInclusionConnectedUsers", () => {
               ...agency2,
               validatorEmails: [johnUser.email, paulUser.email],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["validator"],
           },
         ],
@@ -203,30 +203,30 @@ describe("GetInclusionConnectedUsers", () => {
     const agency1WithRights = toAgencyWithRights(agency1, {
       [johnUser.id]: {
         roles: ["to-review"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
       [paulUser.id]: {
         roles: ["counsellor"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
       [genericUser.id]: {
         roles: ["counsellor"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
     });
 
     const agency2WithRights = toAgencyWithRights(agency2, {
       [johnUser.id]: {
         roles: ["validator"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
       [paulUser.id]: {
         roles: ["validator"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
       [genericUser.id]: {
         roles: ["validator"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
     });
 
@@ -252,7 +252,7 @@ describe("GetInclusionConnectedUsers", () => {
               ...agency1,
               counsellorEmails: [paulUser.email, genericUser.email],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
@@ -264,7 +264,7 @@ describe("GetInclusionConnectedUsers", () => {
                 genericUser.email,
               ],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["validator"],
           },
         ],
@@ -277,7 +277,7 @@ describe("GetInclusionConnectedUsers", () => {
               ...agency1,
               counsellorEmails: [paulUser.email, genericUser.email],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
@@ -289,7 +289,7 @@ describe("GetInclusionConnectedUsers", () => {
                 genericUser.email,
               ],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["validator"],
           },
         ],
@@ -302,7 +302,7 @@ describe("GetInclusionConnectedUsers", () => {
               ...agency1,
               counsellorEmails: [paulUser.email, genericUser.email],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
@@ -314,7 +314,7 @@ describe("GetInclusionConnectedUsers", () => {
                 genericUser.email,
               ],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["validator"],
           },
         ],

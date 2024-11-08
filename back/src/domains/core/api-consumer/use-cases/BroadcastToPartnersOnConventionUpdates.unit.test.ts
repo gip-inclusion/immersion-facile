@@ -47,15 +47,15 @@ describe("Broadcast to partners on updated convention", () => {
   const agency1 = toAgencyWithRights(
     new AgencyDtoBuilder().withId("agency-1").build(),
     {
-      [counsellor1.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
-      [validator1.id]: { roles: ["validator"], isNotifiedByEmail: false },
+      [counsellor1.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+      [validator1.id]: { roles: ["validator"], isNotifiedByEmail: true },
     },
   );
   const agency2 = toAgencyWithRights(
     new AgencyDtoBuilder().withId("agency-2").build(),
     {
-      [counsellor2.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
-      [validator2.id]: { roles: ["validator"], isNotifiedByEmail: false },
+      [counsellor2.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+      [validator2.id]: { roles: ["validator"], isNotifiedByEmail: true },
     },
   );
 
@@ -69,8 +69,8 @@ describe("Broadcast to partners on updated convention", () => {
       })
       .build(),
     {
-      [counsellor3.id]: { roles: ["counsellor"], isNotifiedByEmail: false },
-      [validator1.id]: { roles: ["validator"], isNotifiedByEmail: false },
+      [counsellor3.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+      [validator1.id]: { roles: ["validator"], isNotifiedByEmail: true },
     },
   );
 

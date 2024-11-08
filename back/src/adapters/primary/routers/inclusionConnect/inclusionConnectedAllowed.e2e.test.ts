@@ -75,7 +75,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         toAgencyWithRights(agency, {
           [agencyUser.id]: {
             roles: ["validator"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         }),
       ];
@@ -115,7 +115,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
             {
               agency: { ...agency, validatorEmails: [agencyUser.email] },
               roles: ["validator"],
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
             },
           ],
         },
@@ -305,7 +305,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inMemoryUow.userRepository.users = [user];
       inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(userAgency, {
-          [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          [user.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
         toAgencyWithRights(conventionAgency),
       ];
@@ -346,7 +346,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inMemoryUow.userRepository.users = [user];
       inMemoryUow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
-          [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          [user.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         }),
       ];
       inMemoryUow.conventionRepository.setConventions([convention]);

@@ -148,15 +148,15 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       new AgencyDtoBuilder().withId("agencyId").build(),
       {
         [councellor1.id]: {
-          isNotifiedByEmail: false,
+          isNotifiedByEmail: true,
           roles: ["counsellor"],
         },
         [councellor2.id]: {
-          isNotifiedByEmail: false,
+          isNotifiedByEmail: true,
           roles: ["counsellor"],
         },
-        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
-        [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       },
     );
     const shortLinkIds = ["link1", "link2", "link3", "link4"];

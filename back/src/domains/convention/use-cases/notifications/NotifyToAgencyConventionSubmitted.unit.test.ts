@@ -64,7 +64,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     {
       [validator.id]: {
         roles: ["validator"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
     },
   );
@@ -77,15 +77,15 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     {
       [validator.id]: {
         roles: ["validator"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
       [councellor1.id]: {
         roles: ["counsellor"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
       [councellor2.id]: {
         roles: ["counsellor"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
     },
   );
@@ -98,11 +98,11 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     {
       [councellor1.id]: {
         roles: ["counsellor"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
       [councellor2.id]: {
         roles: ["counsellor"],
-        isNotifiedByEmail: false,
+        isNotifiedByEmail: true,
       },
     },
   );

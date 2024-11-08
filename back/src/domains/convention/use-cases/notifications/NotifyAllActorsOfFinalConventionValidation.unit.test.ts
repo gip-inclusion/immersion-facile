@@ -98,8 +98,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
 
     uow.agencyRepository.agencies = [
       toAgencyWithRights(defaultAgency, {
-        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     ];
     uow.userRepository.users = [counsellor, validator];

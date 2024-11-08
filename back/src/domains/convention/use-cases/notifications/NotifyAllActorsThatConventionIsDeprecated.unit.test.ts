@@ -94,9 +94,9 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
     );
     uow.agencyRepository.agencies = [
       toAgencyWithRights(defaultAgency, {
-        [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [counsellor1.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [counsellor2.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     ];
     uow.userRepository.users = [counsellor1, counsellor2, validator];
@@ -138,11 +138,11 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
     uow.agencyRepository.agencies = [
       toAgencyWithRights(agencyWithSameEmailAdressForCounsellorAndValidator, {
         [counsellor1.id]: {
-          isNotifiedByEmail: false,
+          isNotifiedByEmail: true,
           roles: ["counsellor", "validator"],
         },
         [counsellor2.id]: {
-          isNotifiedByEmail: false,
+          isNotifiedByEmail: true,
           roles: ["counsellor", "validator"],
         },
       }),

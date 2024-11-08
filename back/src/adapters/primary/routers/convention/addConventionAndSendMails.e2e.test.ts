@@ -60,7 +60,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       toAgencyWithRights(
         new AgencyDtoBuilder().withId(validConvention.agencyId).build(),
         {
-          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         },
       ),
     ];
@@ -129,7 +129,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     appAndDeps.inMemoryUow.agencyRepository.agencies = [
       toAgencyWithRights(peAgency, {
-        [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        [validator.id]: { roles: ["validator"], isNotifiedByEmail: true },
       }),
     ];
     appAndDeps.inMemoryUow.userRepository.users = [validator];
