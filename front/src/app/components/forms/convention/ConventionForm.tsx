@@ -67,6 +67,7 @@ import {
 } from "src/app/components/forms/convention/conventionHelpers";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { errors as errorMessage } from "shared";
 import {
   ConventionFormMode,
   SupportedConventionRoutes,
@@ -209,9 +210,7 @@ export const ConventionForm = ({
       (agencyOption) => agencyOption.id === convention.agencyId,
     );
     if (!selectedAgency)
-      throw new Error(
-        "should not happen: agency convention.agencyId not found",
-      );
+      throw errorMessage.agency.notFound({ agencyId: convention.agencyId });
     const conventionToSave: ConventionReadDto = {
       ...conventionSchema.parse(convention),
       agencyKind: convention.agencyKind,
@@ -387,222 +386,215 @@ export const ConventionForm = ({
               Tous les champs marqués d'une astérisque (*) sont obligatoires.
             </p>
 
-              <form
-                id={domElementIds.conventionImmersionRoute.form({ mode })}
-                data-matomo-name={domElementIds.conventionImmersionRoute.form({
-                  mode,
-                })}
-                onSubmit={handleSubmit(onSubmit, (errors) => {
-                  validateSteps("doNotClear");
-                  console.error(conventionValues, errors);
-                })}
-              >
-                <>
-                  <>
-                    <input
-                    type="hidden"
-                    {...formContents[
-                      "signatories.beneficiary.federatedIdentity"
-                    ]}
-                  />
-                  <div className={fr.cx("fr-accordions-group")}>
-                    <Accordion
-                      label={
-                        <RenderSectionTitle
-                          title={t.agencySection.title}
-                          step={1}
-                          currentStep={currentStep}
-                          stepsStatus={stepsStatus}
-                        />
-                      }
-                      {...makeAccordionProps(1)}
-                    >
-                      <AgencySelector
-                        fields={{
-                          agencyDepartmentField,
-                          agencyIdField,
-                          agencyKindField,
-                        }}
-                        shouldLockToPeAgencies={shouldLockToPeAgencies}
-                        shouldFilterDelegationPrescriptionAgencyKind={false}
-                        shouldShowAgencyKindField={
-                          conventionValues?.internshipKind === "immersion"
-                        }
-                        agencyDepartmentOptions={departmentOptions}
-                        onDepartmentCodeChangedMemoized={
-                          onDepartmentCodeChangedMemoized
-                        }
-                        agencyOptions={agencyOptions}
-                        isLoading={isAgenciesLoading}
-                        isFetchAgencyOptionsError={
-                          agenciesFeedback.kind === "errored"
-                        }
+            <form
+              id={domElementIds.conventionImmersionRoute.form({ mode })}
+              data-matomo-name={domElementIds.conventionImmersionRoute.form({
+                mode,
+              })}
+              onSubmit={handleSubmit(onSubmit, (errors) => {
+                validateSteps("doNotClear");
+                console.error(conventionValues, errors);
+              })}
+            >
+              <>
+                <input
+                  type="hidden"
+                  {...formContents["signatories.beneficiary.federatedIdentity"]}
+                />
+                <div className={fr.cx("fr-accordions-group")}>
+                  <Accordion
+                    label={
+                      <RenderSectionTitle
+                        title={t.agencySection.title}
+                        step={1}
+                        currentStep={currentStep}
+                        stepsStatus={stepsStatus}
                       />
-                    </Accordion>
-
-                    <Accordion
-                      label={
-                        <RenderSectionTitle
-                          title={t.beneficiarySection.title}
-                          step={2}
-                          currentStep={currentStep}
-                          stepsStatus={stepsStatus}
-                        />
-                      }
-                      {...makeAccordionProps(2)}
-                    >
-                      <BeneficiaryFormSection
-                        internshipKind={conventionValues.internshipKind}
-                        emailValidationErrors={emailValidationErrors}
-                        setEmailValidationErrors={setEmailValidationErrors}
-                        fromPeConnectedUser={route.params.fromPeConnectedUser}
-                      />
-                    </Accordion>
-                    <Accordion
-                      label={
-                        <RenderSectionTitle
-                          title={t.establishmentSection.title}
-                          step={3}
-                          currentStep={currentStep}
-                          stepsStatus={stepsStatus}
-                        />
-                      }
-                      {...makeAccordionProps(3)}
-                    >
-                      <EstablishmentFormSection
-                        emailValidationErrors={emailValidationErrors}
-                        setEmailValidationErrors={setEmailValidationErrors}
-                      />
-                    </Accordion>
-                    <Accordion
-                      label={
-                        <RenderSectionTitle
-                          title={t.immersionHourLocationSection.title}
-                          step={4}
-                          currentStep={currentStep}
-                          stepsStatus={stepsStatus}
-                        />
-                      }
-                      {...makeAccordionProps(4)}
-                    >
-                      <ScheduleSection />
-                      <AddressAutocomplete
-                        {...formContents.immersionAddress}
-                        initialSearchTerm={
-                          conventionValues.immersionAddress ??
-                          establishmentInfos?.businessAddress
-                        }
-                        setFormValue={({ address }) =>
-                          setValue(
-                            "immersionAddress",
-                            addressDtoToString(address),
-                          )
-                        }
-                        disabled={isFetchingSiret}
-                        {...getFieldError("immersionAddress")}
-                      />
-                    </Accordion>
-                    <Accordion
-                      label={
-                        <RenderSectionTitle
-                          title={t.immersionDetailsSection.title}
-                          step={5}
-                          currentStep={currentStep}
-                          stepsStatus={stepsStatus}
-                        />
-                      }
-                      {...makeAccordionProps(5)}
-                    >
-                      <ImmersionDetailsSection />
-                    </Accordion>
-                  </div>
-
-                  <ErrorNotifications
-                    errorsWithLabels={toErrorsWithLabels({
-                      errors: displayReadableError(errors),
-                      labels: getFormErrors(),
-                    })}
-                    visible={
-                      submitCount !== 0 && Object.values(errors).length > 0
                     }
-                  />
-                  {keys(emailValidationErrors).length > 0 && (
-                    <Alert
-                      severity="error"
-                      className={fr.cx("fr-my-2w")}
-                      title="Certains emails ne sont pas valides"
-                      description={
-                        <>
-                          <p>
-                            Notre vérificateur d'email a détecté des emails non
-                            valides dans votre convention.
-                          </p>
-                          <ul>
-                            {keys(emailValidationErrors).map((key) => (
-                              <li>
-                                {key} : {emailValidationErrors[key]}
-                              </li>
-                            ))}
-                          </ul>
-                        </>
+                    {...makeAccordionProps(1)}
+                  >
+                    <AgencySelector
+                      fields={{
+                        agencyDepartmentField,
+                        agencyIdField,
+                        agencyKindField,
+                      }}
+                      shouldLockToPeAgencies={shouldLockToPeAgencies}
+                      shouldFilterDelegationPrescriptionAgencyKind={false}
+                      shouldShowAgencyKindField={
+                        conventionValues?.internshipKind === "immersion"
+                      }
+                      agencyDepartmentOptions={departmentOptions}
+                      onDepartmentCodeChangedMemoized={
+                        onDepartmentCodeChangedMemoized
+                      }
+                      agencyOptions={agencyOptions}
+                      isLoading={isAgenciesLoading}
+                      isFetchAgencyOptionsError={
+                        agenciesFeedback.kind === "errored"
                       }
                     />
-                  )}
-                </>
+                  </Accordion>
+
+                  <Accordion
+                    label={
+                      <RenderSectionTitle
+                        title={t.beneficiarySection.title}
+                        step={2}
+                        currentStep={currentStep}
+                        stepsStatus={stepsStatus}
+                      />
+                    }
+                    {...makeAccordionProps(2)}
+                  >
+                    <BeneficiaryFormSection
+                      internshipKind={conventionValues.internshipKind}
+                      emailValidationErrors={emailValidationErrors}
+                      setEmailValidationErrors={setEmailValidationErrors}
+                      fromPeConnectedUser={route.params.fromPeConnectedUser}
+                    />
+                  </Accordion>
+                  <Accordion
+                    label={
+                      <RenderSectionTitle
+                        title={t.establishmentSection.title}
+                        step={3}
+                        currentStep={currentStep}
+                        stepsStatus={stepsStatus}
+                      />
+                    }
+                    {...makeAccordionProps(3)}
+                  >
+                    <EstablishmentFormSection
+                      emailValidationErrors={emailValidationErrors}
+                      setEmailValidationErrors={setEmailValidationErrors}
+                    />
+                  </Accordion>
+                  <Accordion
+                    label={
+                      <RenderSectionTitle
+                        title={t.immersionHourLocationSection.title}
+                        step={4}
+                        currentStep={currentStep}
+                        stepsStatus={stepsStatus}
+                      />
+                    }
+                    {...makeAccordionProps(4)}
+                  >
+                    <ScheduleSection />
+                    <AddressAutocomplete
+                      {...formContents.immersionAddress}
+                      initialSearchTerm={
+                        conventionValues.immersionAddress ??
+                        establishmentInfos?.businessAddress
+                      }
+                      setFormValue={({ address }) =>
+                        setValue(
+                          "immersionAddress",
+                          addressDtoToString(address),
+                        )
+                      }
+                      disabled={isFetchingSiret}
+                      {...getFieldError("immersionAddress")}
+                    />
+                  </Accordion>
+                  <Accordion
+                    label={
+                      <RenderSectionTitle
+                        title={t.immersionDetailsSection.title}
+                        step={5}
+                        currentStep={currentStep}
+                        stepsStatus={stepsStatus}
+                      />
+                    }
+                    {...makeAccordionProps(5)}
+                  >
+                    <ImmersionDetailsSection />
+                  </Accordion>
+                </div>
+
+                <ErrorNotifications
+                  errorsWithLabels={toErrorsWithLabels({
+                    errors: displayReadableError(errors),
+                    labels: getFormErrors(),
+                  })}
+                  visible={
+                    submitCount !== 0 && Object.values(errors).length > 0
+                  }
+                />
+                {keys(emailValidationErrors).length > 0 && (
+                  <Alert
+                    severity="error"
+                    className={fr.cx("fr-my-2w")}
+                    title="Certains emails ne sont pas valides"
+                    description={
+                      <>
+                        <p>
+                          Notre vérificateur d'email a détecté des emails non
+                          valides dans votre convention.
+                        </p>
+                        <ul>
+                          {keys(emailValidationErrors).map((key) => (
+                            <li>
+                              {key} : {emailValidationErrors[key]}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    }
+                  />
+                )}
               </>
               <div className={fr.cx("fr-mt-4w", "fr-hidden", "fr-unhidden-lg")}>
-
-                  <Button
-                    disabled={shouldSubmitButtonBeDisabled}
-                    iconId="fr-icon-checkbox-circle-line"
-                    iconPosition="left"
-                    type="submit"
-                    nativeButtonProps={{
-                      id: domElementIds.conventionImmersionRoute
-                        .submitFormButton,
-                    }}
-                  >
-                    Vérifier la demande
-                  </Button>
-                </div>
-                <ConventionFeedbackNotification
-                  submitFeedback={submitFeedback}
-                  signatories={conventionValues.signatories}
-                />
-              </form>
-            </>
-          }
-          sidebar={
-            <ConventionFormSidebar
-              currentStep={currentStep}
-              sidebarContent={sidebarContent}
-              sidebarFooter={
-                <div
-                  className={fr.cx(
-                    "fr-btns-group",
-                    "fr-btns-group--center",
-                    "fr-btns-group--inline",
-                    "fr-btns-group--sm",
-                    "fr-btns-group--icon-left",
-                  )}
+                <Button
+                  disabled={shouldSubmitButtonBeDisabled}
+                  iconId="fr-icon-checkbox-circle-line"
+                  iconPosition="left"
+                  type="submit"
+                  nativeButtonProps={{
+                    id: domElementIds.conventionImmersionRoute.submitFormButton,
+                  }}
                 >
-                  <ShareConventionLink />
-                  <Button
-                    type="submit"
-                    id={
-                      domElementIds.conventionImmersionRoute
-                        .submitFormButtonMobile
-                    }
-                  >
-                    Vérifier la demande
-                  </Button>
-                </div>
-              }
-            />
-          }
-        />
-      </FormProvider>
-
+                  Vérifier la demande
+                </Button>
+              </div>
+              <ConventionFeedbackNotification
+                submitFeedback={submitFeedback}
+                signatories={conventionValues.signatories}
+              />
+            </form>
+          </>
+        }
+        sidebar={
+          <ConventionFormSidebar
+            currentStep={currentStep}
+            sidebarContent={sidebarContent}
+            sidebarFooter={
+              <div
+                className={fr.cx(
+                  "fr-btns-group",
+                  "fr-btns-group--center",
+                  "fr-btns-group--inline",
+                  "fr-btns-group--sm",
+                  "fr-btns-group--icon-left",
+                )}
+              >
+                <ShareConventionLink />
+                <Button
+                  type="submit"
+                  id={
+                    domElementIds.conventionImmersionRoute
+                      .submitFormButtonMobile
+                  }
+                >
+                  Vérifier la demande
+                </Button>
+              </div>
+            }
+          />
+        }
+      />
+    </FormProvider>
   );
 };
 

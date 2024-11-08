@@ -58,6 +58,12 @@ type DatesOfImmersion = {
   dateEnd: string;
 };
 
+type WeeklySchedule = {
+  schedule: string[];
+  period: DateIntervalDto;
+  weeklyHours: number;
+}[];
+
 export const calculateTotalImmersionHoursFromComplexSchedule = (
   complexSchedule: DailyScheduleDto[],
 ): number => {
@@ -80,6 +86,32 @@ export const prettyPrintSchedule = (
     .map((week, weekIndex, weeks) => removeEmptyDays(weekIndex, weeks, week))
     .flatMap((week) => makeWeeklyPrettyPrint(week, displayFreeDays, interval))
     .join("\n");
+
+export const makeWeeklySchedule = (
+  schedule: ScheduleDto,
+  interval: DateIntervalDto,
+): WeeklySchedule =>
+  makeImmersionTimetable(schedule.complexSchedule, interval)
+    .filter((weekSchedule) => !!weekSchedule)
+    .map((weekSchedule) => {
+      const weekStart = weekSchedule.at(0)?.date;
+      const weekEnd = weekSchedule.at(weekSchedule.length - 1)?.date;
+      if (!weekStart || !weekEnd)
+        throw new Error("Error: schedule should have a weekStart and weekEnd");
+      return {
+        weeklyHours: calculateWeeklyHours(weekSchedule),
+        period: {
+          start: new Date(weekStart),
+          end: new Date(weekEnd),
+        },
+        schedule: weekSchedule.map(
+          (daySchedule) =>
+            `${
+              frenchDayMapping(daySchedule.date).frenchDayName
+            } : ${prettyPrintDaySchedule(daySchedule.timePeriods)}`,
+        ),
+      };
+    });
 
 const reasonableTimePeriods: TimePeriodsDto = [
   {

@@ -7,7 +7,7 @@ export const expectElementToBeVisible = async (
   page: Page,
   selector: string,
 ) => {
-  const confirmation = await page.locator(selector);
+  const confirmation = await page.locator(selector).first();
   await confirmation.waitFor();
   await expect(confirmation).toBeVisible();
 };

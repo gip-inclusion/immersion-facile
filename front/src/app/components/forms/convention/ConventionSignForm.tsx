@@ -2,7 +2,10 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { mergeDeepRight } from "ramda";
 import React, { useState } from "react";
-import { ConventionRenewedInformations } from "react-design-system";
+import {
+  ConventionRenewedInformations,
+  ConventionSummary,
+} from "react-design-system";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -11,10 +14,10 @@ import {
   UpdateConventionStatusRequestDto,
   domElementIds,
   isConventionRenewed,
+  toDisplayedDate,
 } from "shared";
-import { ConventionValidationSection } from "src/app/components/admin/conventions/ConventionValidationDetails";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
-import { sections } from "src/app/contents/admin/conventionValidation";
+import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
@@ -26,6 +29,7 @@ import {
   ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
+import { useStyles } from "tss-react/dsfr";
 import { SignatureActions } from "./SignatureActions";
 
 type ConventionSignFormProperties = {
@@ -39,6 +43,7 @@ export const ConventionSignForm = ({
   submitFeedback,
   convention,
 }: ConventionSignFormProperties): JSX.Element => {
+  const { cx } = useStyles();
   const dispatch = useDispatch();
   const { signatory: currentSignatory } = useAppSelector(
     conventionSelectors.signatoryData,
@@ -103,15 +108,13 @@ export const ConventionSignForm = ({
           severity="success"
           className={fr.cx("fr-mb-5v")}
         />
-        {sections.map((list, index) => (
-          <ConventionValidationSection
-            // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
-            key={index}
-            convention={convention}
-            list={list}
-            index={index}
-          />
-        ))}
+        <ConventionSummary
+          submittedAt={toDisplayedDate({
+            date: new Date(convention.dateSubmission),
+          })}
+          summary={makeConventionSections(convention, cx)}
+          conventionId={convention.id}
+        />
       </>
     );
   }
@@ -127,17 +130,15 @@ export const ConventionSignForm = ({
       )}
       <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
       <form id={domElementIds.conventionToSign.form}>
-        {currentSignatory &&
-          convention &&
-          sections.map((list, index) => (
-            <ConventionValidationSection
-              // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
-              key={index}
-              convention={convention}
-              list={list}
-              index={index}
-            />
-          ))}
+        {currentSignatory && (
+          <ConventionSummary
+            submittedAt={toDisplayedDate({
+              date: new Date(convention.dateSubmission),
+            })}
+            summary={makeConventionSections(convention, cx)}
+            conventionId={convention.id}
+          />
+        )}
 
         <ConventionFeedbackNotification
           submitFeedback={submitFeedback}

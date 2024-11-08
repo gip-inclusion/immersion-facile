@@ -14,7 +14,12 @@ export const ConventionMiniStagePage = () => {
   return (
     <MainWrapper
       layout={"default"}
-      pageHeader={<PageHeader title={t.intro.conventionTitle} />}
+      vSpacing={3}
+      pageHeader={
+        <PageHeader title={t.intro.conventionTitle}>
+          {t.intro.conventionSummaryDescription}
+        </PageHeader>
+      }
     >
       <ConventionFormWrapper internshipKind="mini-stage-cci" mode="create" />
     </MainWrapper>

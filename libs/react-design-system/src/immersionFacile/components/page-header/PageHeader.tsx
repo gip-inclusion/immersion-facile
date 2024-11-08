@@ -9,6 +9,7 @@ export type PageHeaderProps = {
   children?: React.ReactNode;
   classes?: Partial<Record<"root" | "inner" | "title", string>>;
   breadcrumbs?: React.ReactNode;
+  badge?: React.ReactNode;
 };
 
 export const PageHeader = ({
@@ -17,6 +18,7 @@ export const PageHeader = ({
   children,
   classes = {},
   breadcrumbs,
+  badge,
 }: PageHeaderProps) => {
   const { cx } = useStyles();
   return (
@@ -34,6 +36,7 @@ export const PageHeader = ({
         <div className={cx(Styles.breadcrumbsWrapper)}>{breadcrumbs}</div>
       )}
       <div className={cx(fr.cx("fr-container", "fr-mt-8w"), classes.inner)}>
+        {badge}
         <h1 className={cx(children ? "" : "fr-my-auto", classes.title)}>
           {title}
         </h1>
