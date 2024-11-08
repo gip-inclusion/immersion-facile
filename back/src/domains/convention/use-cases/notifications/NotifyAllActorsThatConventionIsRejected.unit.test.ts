@@ -95,9 +95,9 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
         .withSignature(signature)
         .build(),
       {
-        [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [counsellor1.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [counsellor2.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       },
     );
 
@@ -145,14 +145,14 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
           .build(),
         {
           [counsellor1.id]: {
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["counsellor", "validator"],
           },
           [counsellor2.id]: {
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["counsellor", "validator"],
           },
-          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
         },
       );
 

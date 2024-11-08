@@ -86,7 +86,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     uow.userRepository.users = [validator];
     await uow.agencyRepository.insert(
       toAgencyWithRights(agency, {
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     );
     await uow.conventionRepository.save(convention);

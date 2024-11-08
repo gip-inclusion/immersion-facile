@@ -86,7 +86,7 @@ describe("GetUserAgencyDashboardUrl", () => {
             toAgencyWithRights(agency, {
               [notAdmin.id]: {
                 roles: [agencyUserRole],
-                isNotifiedByEmail: false,
+                isNotifiedByEmail: true,
               },
             }),
           ];
@@ -107,7 +107,7 @@ describe("GetUserAgencyDashboardUrl", () => {
                     : {}),
                 },
                 roles: [agencyUserRole],
-                isNotifiedByEmail: false,
+                isNotifiedByEmail: true,
               },
             ],
             dashboards: {
@@ -137,7 +137,7 @@ describe("GetUserAgencyDashboardUrl", () => {
             toAgencyWithRights(agency, {
               [notAdmin.id]: {
                 roles: [agencyUserRole],
-                isNotifiedByEmail: false,
+                isNotifiedByEmail: true,
               },
             }),
           ];
@@ -148,7 +148,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           expectToEqual(inclusionConnectedUser, {
             ...notAdmin,
             agencyRights: [
-              { agency, roles: [agencyUserRole], isNotifiedByEmail: false },
+              { agency, roles: [agencyUserRole], isNotifiedByEmail: true },
             ],
             dashboards: { agencies: {}, establishments: {} },
           });
@@ -172,25 +172,25 @@ describe("GetUserAgencyDashboardUrl", () => {
         toAgencyWithRights(agency1, {
           [notAdmin.id]: {
             roles: ["counsellor"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         }),
         toAgencyWithRights(agency2, {
           [notAdmin.id]: {
             roles: ["validator"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         }),
         toAgencyWithRights(agency3, {
           [notAdmin.id]: {
             roles: ["to-review"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         }),
         toAgencyWithRights(agency4, {
           [notAdmin.id]: {
             roles: ["agency-admin"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         }),
       ];
@@ -202,7 +202,7 @@ describe("GetUserAgencyDashboardUrl", () => {
         agencyRights: [
           {
             agency: { ...agency1, counsellorEmails: [notAdmin.email] },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
@@ -210,14 +210,14 @@ describe("GetUserAgencyDashboardUrl", () => {
               ...agency2,
               validatorEmails: [notAdmin.email],
             },
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
             roles: ["validator"],
           },
-          { agency: agency3, roles: ["to-review"], isNotifiedByEmail: false },
+          { agency: agency3, roles: ["to-review"], isNotifiedByEmail: true },
           {
             agency: agency4,
             roles: ["agency-admin"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         ],
         dashboards: {

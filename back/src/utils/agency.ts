@@ -53,11 +53,17 @@ export const agencyWithRightToAgencyDto = async (
       return {
         counsellorIds: [
           ...acc.counsellorIds,
-          ...(userRights?.roles.includes("counsellor") ? [userId] : []),
+          ...(userRights?.roles.includes("counsellor") &&
+          userRights?.isNotifiedByEmail
+            ? [userId]
+            : []),
         ],
         validatorIds: [
           ...acc.validatorIds,
-          ...(userRights?.roles.includes("validator") ? [userId] : []),
+          ...(userRights?.roles.includes("validator") &&
+          userRights?.isNotifiedByEmail
+            ? [userId]
+            : []),
         ],
       };
     },

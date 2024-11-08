@@ -56,17 +56,17 @@ describe("NotifyConventionNeedsReview", () => {
   const agencyWithValidatorsOnly = toAgencyWithRights(
     agencyWithoutCouncellorsAndValidators,
     {
-      [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
-      [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
     },
   );
   const agencyWithCounsellorsAndValidators = toAgencyWithRights(
     agencyWithoutCouncellorsAndValidators,
     {
       [councellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-      [councellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+      [councellor2.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
       [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
-      [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
     },
   );
 
@@ -118,12 +118,7 @@ describe("NotifyConventionNeedsReview", () => {
     it("Nominal case: Sends notification email to councellor, with 2 existing councellors", async () => {
       uow.agencyRepository.agencies = [agencyWithCounsellorsAndValidators];
 
-      const shortLinkIds = [
-        "shortlink1",
-        "shortlink2",
-        "shortlink3",
-        "shortlink4",
-      ];
+      const shortLinkIds = ["shortlink1", "shortlink2"];
       shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
       await notifyNewConventionNeedsReview.execute({
@@ -133,26 +128,12 @@ describe("NotifyConventionNeedsReview", () => {
       expectToEqual(uow.shortLinkQuery.getShortLinks(), {
         [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReview.id,
-          email: councellor1.email,
-          now: timeGateway.now(),
-          role: "counsellor",
-          targetRoute: frontRoutes.conventionStatusDashboard,
-        }),
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionInReview.id,
           email: councellor2.email,
           now: timeGateway.now(),
           role: "counsellor",
           targetRoute: frontRoutes.conventionStatusDashboard,
         }),
-        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-          id: conventionInReview.id,
-          email: councellor1.email,
-          now: timeGateway.now(),
-          role: "counsellor",
-          targetRoute: frontRoutes.manageConvention,
-        }),
-        [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
           id: conventionInReview.id,
           email: councellor2.email,
           now: timeGateway.now(),
@@ -164,26 +145,6 @@ describe("NotifyConventionNeedsReview", () => {
         emails: [
           {
             kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-            recipients: [councellor1.email],
-            params: {
-              conventionId: conventionInReview.id,
-              internshipKind: conventionInReview.internshipKind,
-              beneficiaryFirstName:
-                conventionInReview.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionInReview.signatories.beneficiary.lastName,
-              businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
-              possibleRoleAction: "en vérifier l'éligibilité",
-              agencyLogoUrl:
-                agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
-              validatorName: "",
-              peAdvisor: undefined,
-            },
-          },
-          {
-            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [councellor2.email],
             params: {
               conventionId: conventionInReview.id,
@@ -193,8 +154,8 @@ describe("NotifyConventionNeedsReview", () => {
               beneficiaryLastName:
                 conventionInReview.signatories.beneficiary.lastName,
               businessName: conventionInReview.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -347,28 +308,6 @@ describe("NotifyConventionNeedsReview", () => {
         emails: [
           {
             kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-            recipients: [councellor1.email],
-            params: {
-              conventionId: conventionInReviewWithPeAdvisor.id,
-              internshipKind: conventionInReviewWithPeAdvisor.internshipKind,
-              beneficiaryFirstName:
-                conventionInReviewWithPeAdvisor.signatories.beneficiary
-                  .firstName,
-              beneficiaryLastName:
-                conventionInReviewWithPeAdvisor.signatories.beneficiary
-                  .lastName,
-              businessName: conventionInReviewWithPeAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
-              possibleRoleAction: "en vérifier l'éligibilité",
-              agencyLogoUrl:
-                agencyWithCounsellorsAndValidators.logoUrl ?? undefined,
-              validatorName: "",
-              peAdvisor: undefined,
-            },
-          },
-          {
-            kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
             recipients: [councellor2.email],
             params: {
               conventionId: conventionInReviewWithPeAdvisor.id,
@@ -380,8 +319,8 @@ describe("NotifyConventionNeedsReview", () => {
                 conventionInReviewWithPeAdvisor.signatories.beneficiary
                   .lastName,
               businessName: conventionInReviewWithPeAdvisor.businessName,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl:
                 agencyWithCounsellorsAndValidators.logoUrl ?? undefined,

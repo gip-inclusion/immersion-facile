@@ -101,9 +101,9 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
   it("Sends cancelation email to beneficiary, establishment tutor, and counsellors, validor, beneficiary Representativ and beneficiary current employer", async () => {
     uow.agencyRepository.agencies = [
       toAgencyWithRights(defaultAgency, {
-        [counsellor1.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [counsellor2.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        [counsellor1.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [counsellor2.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     ];
 
@@ -143,11 +143,11 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
     uow.agencyRepository.agencies = [
       toAgencyWithRights(agencyWithSameEmailAdressForCounsellorAndValidator, {
         [counsellor1.id]: {
-          isNotifiedByEmail: false,
+          isNotifiedByEmail: true,
           roles: ["counsellor", "validator"],
         },
         [counsellor2.id]: {
-          isNotifiedByEmail: false,
+          isNotifiedByEmail: true,
           roles: ["counsellor", "validator"],
         },
       }),
