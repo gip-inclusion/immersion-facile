@@ -73,6 +73,7 @@ import {
   AppConfig,
   makeEmailAllowListPredicate,
 } from "./appConfig";
+import { logPartnerResponses } from "./logPartnerResponses";
 
 const logger = createLogger(__filename);
 
@@ -105,19 +106,34 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
 
 const configureCreateAxiosHttpClientForExternalAPIs =
   (config: AppConfig) =>
-  <R extends Record<string, UnknownSharedRoute>>(routes: R) =>
+  <R extends Record<string, UnknownSharedRoute>>({
+    routes,
+    partnerName,
+  }: { routes: R; partnerName: string }) =>
     createAxiosSharedClient(
       routes,
       axios.create({
         timeout: config.externalAxiosTimeout,
       }),
-      { skipResponseValidation: true },
+      {
+        skipResponseValidation: true,
+        onResponseSideEffect: logPartnerResponses(partnerName),
+      },
     );
 
 const configureCreateFetchHttpClientForExternalAPIs =
   () =>
-  <R extends Record<string, UnknownSharedRoute>>(routes: R) =>
-    createFetchSharedClient(routes, fetch, { skipResponseValidation: true });
+  <R extends Record<string, UnknownSharedRoute>>({
+    routes,
+    partnerName,
+  }: {
+    routes: R;
+    partnerName: string;
+  }) =>
+    createFetchSharedClient(routes, fetch, {
+      skipResponseValidation: true,
+      onResponseSideEffect: logPartnerResponses(partnerName),
+    });
 
 // prettier-ignore
 export type Gateways = ReturnType<typeof createGateways> extends Promise<
@@ -156,9 +172,10 @@ export const createGateways = async (
   const poleEmploiGateway =
     config.poleEmploiGateway === "HTTPS"
       ? new HttpPoleEmploiGateway(
-          createLegacyAxiosHttpClientForExternalAPIs(
-            createPoleEmploiRoutes(config.peApiUrl),
-          ),
+          createLegacyAxiosHttpClientForExternalAPIs({
+            partnerName: "France Travail - API",
+            routes: createPoleEmploiRoutes(config.peApiUrl),
+          }),
           new InMemoryCachingGateway<AccessTokenResponse>(
             timeGateway,
             "expires_in",
@@ -173,12 +190,13 @@ export const createGateways = async (
   const peConnectGateway: PeConnectGateway =
     config.peConnectGateway === "HTTPS"
       ? new HttpPeConnectGateway(
-          createLegacyAxiosHttpClientForExternalAPIs(
-            makePeConnectExternalRoutes({
+          createLegacyAxiosHttpClientForExternalAPIs({
+            partnerName: "France Travail - FT Connect",
+            routes: makePeConnectExternalRoutes({
               peApiUrl: config.peApiUrl,
               peAuthCandidatUrl: config.peAuthCandidatUrl,
             }),
-          ),
+          }),
           {
             immersionFacileBaseUrl: config.immersionFacileBaseUrl,
             poleEmploiClientId: config.poleEmploiClientId,
@@ -190,14 +208,18 @@ export const createGateways = async (
   const oAuthGateway: OAuthGateway =
     config.inclusionConnectGateway === "HTTPS"
       ? new HttpOAuthGateway(
-          createLegacyAxiosHttpClientForExternalAPIs(
-            makeInclusionConnectRoutes(
+          createLegacyAxiosHttpClientForExternalAPIs({
+            partnerName: "Inclusion Connect",
+            routes: makeInclusionConnectRoutes(
               config.inclusionConnectConfig.providerBaseUri,
             ),
-          ),
-          createLegacyAxiosHttpClientForExternalAPIs(
-            makeProConnectRoutes(config.proConnectConfig.providerBaseUri),
-          ),
+          }),
+          createLegacyAxiosHttpClientForExternalAPIs({
+            partnerName: "Pro Connect",
+            routes: makeProConnectRoutes(
+              config.proConnectConfig.providerBaseUri,
+            ),
+          }),
           config.inclusionConnectConfig,
           config.proConnectConfig,
         )
@@ -208,7 +230,10 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryEmailValidationGateway(),
       EMAILABLE: () =>
         new EmailableEmailValidationGateway(
-          createLegacyAxiosHttpClientForExternalAPIs(emailableValidationRoutes),
+          createLegacyAxiosHttpClientForExternalAPIs({
+            partnerName: "Emailable",
+            routes: emailableValidationRoutes,
+          }),
           config.emailableApiKey,
         ),
     })[config.emailValidationGateway]();
@@ -218,9 +243,10 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryAppellationsGateway(),
       DIAGORIENTE: () =>
         new DiagorienteAppellationsGateway(
-          createLegacyAxiosHttpClientForExternalAPIs(
-            diagorienteAppellationsRoutes,
-          ),
+          createLegacyAxiosHttpClientForExternalAPIs({
+            partnerName: "Diagoriente",
+            routes: diagorienteAppellationsRoutes,
+          }),
           new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
             timeGateway,
             diagorienteTokenScope,
@@ -236,7 +262,10 @@ export const createGateways = async (
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
       new HttpAddressGateway(
-        createLegacyAxiosHttpClientForExternalAPIs(addressesExternalRoutes),
+        createLegacyAxiosHttpClientForExternalAPIs({
+          partnerName: "OpenCageData",
+          routes: addressesExternalRoutes,
+        }),
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
       ),
@@ -251,9 +280,10 @@ export const createGateways = async (
 
     const brevoNotificationGateway = new BrevoNotificationGateway(
       {
-        httpClient: createLegacyAxiosHttpClientForExternalAPIs(
-          brevoNotificationGatewayRoutes,
-        ),
+        httpClient: createLegacyAxiosHttpClientForExternalAPIs({
+          partnerName: "Brevo Notifications",
+          routes: brevoNotificationGatewayRoutes,
+        }),
         blackListedEmailDomains: config.emailDomainBlackList,
         defaultSender: immersionFacileNoReplyEmailSender,
         emailAllowListPredicate: makeEmailAllowListPredicate({
@@ -303,9 +333,10 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemorySiretGateway(),
       ANNUAIRE_DES_ENTREPRISES: () =>
         new AnnuaireDesEntreprisesSiretGateway(
-          createLegacyAxiosHttpClientForExternalAPIs(
-            annuaireDesEntreprisesSiretRoutes,
-          ),
+          createLegacyAxiosHttpClientForExternalAPIs({
+            partnerName: "Annuaire des entreprises",
+            routes: annuaireDesEntreprisesSiretRoutes,
+          }),
           new InseeSiretGateway(
             config.inseeHttpConfig,
             timeGateway,
@@ -328,9 +359,10 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryPdfGeneratorGateway(),
       SCALINGO: () =>
         new ScalingoPdfGeneratorGateway(
-          createLegacyAxiosHttpClientForExternalAPIs(
-            makeScalingoPdfGeneratorRoutes(config.pdfGenerator.baseUrl),
-          ),
+          createLegacyAxiosHttpClientForExternalAPIs({
+            partnerName: "Pdf Generator App",
+            routes: makeScalingoPdfGeneratorRoutes(config.pdfGenerator.baseUrl),
+          }),
           config.pdfGenerator.apiKey,
           uuidGenerator,
         ),
@@ -351,9 +383,10 @@ export const createGateways = async (
     laBonneBoiteGateway:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteGateway(
-            createFetchHttpClientForExternalAPIs(
-              createLbbRoutes(config.peApiUrl),
-            ),
+            createFetchHttpClientForExternalAPIs({
+              partnerName: "La Bonne Boite",
+              routes: createLbbRoutes(config.peApiUrl),
+            }),
             poleEmploiGateway,
             config.poleEmploiClientId,
           )
@@ -379,8 +412,10 @@ export const createGateways = async (
         ? new BrevoEstablishmentMarketingGateway({
             apiKey: config.apiKeyBrevo,
             establishmentContactListId: config.brevoEstablishmentContactListId,
-            httpClient:
-              createLegacyAxiosHttpClientForExternalAPIs(brevoContactRoutes),
+            httpClient: createLegacyAxiosHttpClientForExternalAPIs({
+              partnerName: "Brevo Establishment Marketing",
+              routes: brevoContactRoutes,
+            }),
           })
         : new InMemoryEstablishmentMarketingGateway(),
     siret: getSiretGateway(config.siretGateway, config, timeGateway),

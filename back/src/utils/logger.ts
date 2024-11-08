@@ -54,7 +54,32 @@ type SQLError = {
   error: Error;
 };
 
+type PartnerApiCall = {
+  partnerName: string;
+  route: {
+    method: string;
+    url: string;
+  };
+  durationInMs: number;
+  response:
+    | {
+        kind: "success";
+        status: number;
+      }
+    | {
+        kind: "failure";
+        status: number;
+        body: Record<string, unknown>;
+        input?: {
+          body?: unknown;
+          queryParams?: unknown;
+          urlParams?: unknown;
+        };
+      };
+};
+
 type LoggerParams = Partial<{
+  partnerApiCall: PartnerApiCall;
   adapters: {
     repositories: "IN_MEMORY" | "PG";
     notificationGateway: "IN_MEMORY" | "BREVO";
@@ -135,6 +160,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
   const makeLogFunction =
     (method: LogMethod): LoggerFunction =>
     ({
+      partnerApiCall,
       adapters,
       agencyId,
       conventionId,
@@ -194,6 +220,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         topic,
         useCaseName,
         searchParams,
+        partnerApiCall,
       };
 
       const opacifiedWithoutNullOrUndefined = pickBy(
