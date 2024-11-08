@@ -57,9 +57,8 @@ export const keys = <T extends string | number | symbol>(
 type Falsy = false | 0 | "" | null | undefined;
 export const filterNotFalsy = <T>(arg: T | Falsy): arg is T => !!arg;
 
-export const removeUndefinedElements = <T>(
-  unfilteredList: (T | undefined)[],
-): T[] => unfilteredList.filter(filterNotFalsy);
+export const removeEmptyValue = <T>(unfilteredList: (T | null)[]): T[] =>
+  unfilteredList.flatMap((element) => (element ? [element] : []));
 
 export const replaceArrayElement = <T>(
   original: Array<T>,

@@ -19,6 +19,8 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Vérifier la demande de convention"
         : "S’informer sur les métiers, découvrir l’entreprise",
+    conventionSummaryDescription:
+      "Merci d’avoir complété la convention. Veuillez vérifier attentivement les informations ci-dessous avant d’envoyer votre demande de signature.",
     conventionSignTitle:
       internshipKind === "immersion"
         ? "Signer la convention d'immersion"

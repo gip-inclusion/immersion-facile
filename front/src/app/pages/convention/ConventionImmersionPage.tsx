@@ -90,12 +90,17 @@ export const ConventionImmersionPage = ({
     <HeaderFooterLayout>
       <MainWrapper
         layout={"default"}
+        vSpacing={3}
         pageHeader={
           !displaySharedConventionMessage && (
             <PageHeader
               title={getPageHeaderTitle(jwt, showSummary)}
               breadcrumbs={<Breadcrumbs />}
-            />
+            >
+              <p className={fr.cx("fr-m-0")}>
+                {t.intro.conventionSummaryDescription}
+              </p>
+            </PageHeader>
           )
         }
       >

@@ -3,7 +3,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import React, { useEffect } from "react";
-import { Loader } from "react-design-system";
+import { ConventionSummary, Loader } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -12,11 +12,11 @@ import {
   InternshipKind,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  toDisplayedDate,
 } from "shared";
-import { ConventionValidationSection } from "src/app/components/admin/conventions/ConventionValidationDetails";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
-import { sections } from "src/app/contents/admin/conventionValidation";
+import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { type ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
@@ -27,6 +27,7 @@ import { routes, useRoute } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { match } from "ts-pattern";
+import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
 
 const {
@@ -156,6 +157,7 @@ export const ConventionFormWrapper = ({
 };
 
 const ConventionSummarySection = () => {
+  const { cx } = useStyles();
   const dispatch = useDispatch();
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const convention = useAppSelector(conventionSelectors.convention);
@@ -197,26 +199,24 @@ const ConventionSummarySection = () => {
   };
 
   return (
-    <section>
+    <article>
       {
         //TODO il y a déjà un LOADER dans le composant parent. Nécéssaire?
         isLoading && <Loader />
       }
-      {convention &&
-        sections.map((list, index) => (
-          <ConventionValidationSection
-            // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
-            key={index}
-            convention={convention}
-            list={list}
-            index={index}
-          />
-        ))}
       {convention && (
-        <ConventionFeedbackNotification
-          submitFeedback={submitFeedback}
-          signatories={convention.signatories}
-        />
+        <>
+          <ConventionSummary
+            submittedAt={toDisplayedDate({
+              date: new Date(convention.dateSubmission),
+            })}
+            summary={makeConventionSections(convention, cx)}
+          />
+          <ConventionFeedbackNotification
+            submitFeedback={submitFeedback}
+            signatories={convention.signatories}
+          />
+        </>
       )}
       {convention?.internshipKind === "mini-stage-cci" && (
         <Alert
@@ -289,7 +289,7 @@ const ConventionSummarySection = () => {
         </ConfirmDuplicateConventionModal>,
         document.body,
       )}
-    </section>
+    </article>
   );
 };
 

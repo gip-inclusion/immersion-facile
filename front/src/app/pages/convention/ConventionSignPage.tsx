@@ -1,7 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import React, { useEffect } from "react";
-import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import {
+  ConventionSummary,
+  Loader,
+  MainWrapper,
+  PageHeader,
+} from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionJwtPayload,
@@ -10,11 +16,13 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   errors,
   isSignatory,
+  toDisplayedDate,
 } from "shared";
-import { ConventionValidationSection } from "src/app/components/admin/conventions/ConventionValidationDetails";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
-import { sections } from "src/app/contents/admin/conventionValidation";
+import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
+import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { P, match } from "ts-pattern";
+import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
@@ -63,6 +71,7 @@ type ConventionSignPageContentProperties = {
 const ConventionSignPageContent = ({
   jwt,
 }: ConventionSignPageContentProperties): JSX.Element => {
+  const { cx } = useStyles();
   const dispatch = useDispatch();
   const { applicationId: conventionId } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
@@ -120,16 +129,15 @@ const ConventionSignPageContent = ({
               }, vous la recevrez par email.`}
               className={fr.cx("fr-mb-5v")}
             />
-            {convention &&
-              sections.map((list, index) => (
-                <ConventionValidationSection
-                  // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
-                  key={index}
-                  convention={convention}
-                  list={list}
-                  index={index}
-                />
-              ))}
+            {convention && (
+              <ConventionSummary
+                submittedAt={toDisplayedDate({
+                  date: new Date(convention.dateSubmission),
+                })}
+                summary={makeConventionSections(convention, cx)}
+                conventionId={convention.id}
+              />
+            )}
           </MainWrapper>
         ))
         .with({ hasConvention: false }, () => (
@@ -146,7 +154,24 @@ const ConventionSignPageContent = ({
           () => (
             <MainWrapper
               layout={"default"}
-              pageHeader={<PageHeader title={t.intro.conventionSignTitle} />}
+              vSpacing={0}
+              pageHeader={
+                <PageHeader
+                  title={t.intro.conventionSignTitle}
+                  badge={
+                    convention && (
+                      <Badge
+                        className={cx(
+                          fr.cx("fr-mb-3w"),
+                          labelAndSeverityByStatus[convention.status].color,
+                        )}
+                      >
+                        {labelAndSeverityByStatus[convention.status].label}
+                      </Badge>
+                    )
+                  }
+                />
+              }
             >
               {convention && (
                 <>

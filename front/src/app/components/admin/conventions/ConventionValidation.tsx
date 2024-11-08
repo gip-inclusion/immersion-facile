@@ -1,8 +1,20 @@
+import { fr } from "@codegouvfr/react-dsfr";
+import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { formatDistance } from "date-fns";
-import { fr } from "date-fns/locale";
+import { fr as french } from "date-fns/locale";
 import React from "react";
-import type { ConventionReadDto, ConventionStatus } from "shared";
-import { ConventionValidationDetails } from "./ConventionValidationDetails";
+import {
+  ConventionRenewedInformations,
+  ConventionSummary,
+} from "react-design-system";
+import {
+  ConventionReadDto,
+  isConventionRenewed,
+  toDisplayedDate,
+} from "shared";
+import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
+import { useStyles } from "tss-react/dsfr";
+import { makeConventionSections } from "../../../contents/convention/conventionSummary.helpers";
 
 const beforeAfterString = (date: string) => {
   const eventDate = new Date(date);
@@ -10,20 +22,8 @@ const beforeAfterString = (date: string) => {
 
   return formatDistance(eventDate, currentDate, {
     addSuffix: true,
-    locale: fr,
+    locale: french,
   });
-};
-
-const labelByStatus: Record<ConventionStatus, string> = {
-  ACCEPTED_BY_COUNSELLOR: "[📗 DEMANDE ÉLIGIBLE]",
-  ACCEPTED_BY_VALIDATOR: "[✅ DEMANDE VALIDÉE]",
-  CANCELLED: "[🗑️ CONVENTION ANNULÉE]",
-  DRAFT: "[📕 BROUILLON]",
-  IN_REVIEW: "[📙 DEMANDE À ETUDIER]",
-  PARTIALLY_SIGNED: "[✍️ Partiellement signée]",
-  READY_TO_SIGN: "[📄 En cours de signature]",
-  REJECTED: "[❌ DEMANDE REJETÉE]",
-  DEPRECATED: "[❌ DEMANDE OBSOLÈTE]",
 };
 
 export interface ConventionValidationProps {
@@ -33,6 +33,8 @@ export interface ConventionValidationProps {
 export const ConventionValidation = ({
   convention,
 }: ConventionValidationProps) => {
+  const { cx } = useStyles();
+
   const {
     status,
     signatories: { beneficiary },
@@ -41,20 +43,34 @@ export const ConventionValidation = ({
     dateEnd: _,
   } = convention;
 
-  const title =
-    `${labelByStatus[status]} ` +
-    `${beneficiary.lastName.toUpperCase()} ${
-      beneficiary.firstName
-    } chez ${businessName} ` +
-    `${beforeAfterString(dateStart)}`;
+  const title = `${beneficiary.lastName.toUpperCase()} ${
+    beneficiary.firstName
+  } chez ${businessName} ${beforeAfterString(dateStart)}`;
 
   return (
     <>
+      <Badge
+        className={cx(
+          fr.cx("fr-mb-3w"),
+          labelAndSeverityByStatus[status].color,
+        )}
+      >
+        {labelAndSeverityByStatus[status].label}
+      </Badge>
       <h3>{title}</h3>
       {convention.statusJustification && (
         <p>Justification : {convention.statusJustification}</p>
       )}
-      <ConventionValidationDetails convention={convention} />
+      {isConventionRenewed(convention) && (
+        <ConventionRenewedInformations renewed={convention.renewed} />
+      )}
+      <ConventionSummary
+        submittedAt={toDisplayedDate({
+          date: new Date(convention.dateSubmission),
+        })}
+        summary={makeConventionSections(convention, cx)}
+        conventionId={convention.id}
+      />
     </>
   );
 };

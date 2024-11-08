@@ -320,18 +320,19 @@ export const submitEditConventionForm = async (
     .locator(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
     .click();
   await expect(page.locator(".fr-alert--error")).not.toBeVisible();
-  await expectElementToBeVisible(page, ".im-convention-summary");
-  await expect(
-    await page.locator(".im-convention-summary__signatory-section").all(),
-  ).toHaveLength(4);
+  await expectElementToBeVisible(page, ".im-convention-summary__section");
   await expect(
     await page
-      .locator(".im-convention-summary__signatory-section")
-      .getByText("Représentant du bénéficiaire"),
+      .locator(".im-convention-summary__section", {
+        has: page.getByText("Signataires de la convention"),
+      })
+      .getByText("Employeur actuel du bénéficiaire"),
   ).toBeVisible();
   await expect(
     await page
-      .locator(".im-convention-summary__signatory-section")
+      .locator(".im-convention-summary__section", {
+        has: page.getByText("Signataires de la convention"),
+      })
       .getByText("Employeur actuel"),
   ).toBeVisible();
 
@@ -356,11 +357,21 @@ export const confirmCreateConventionFormSubmit = async (page: Page) => {
   await page.click(
     `#${domElementIds.conventionImmersionRoute.submitFormButton}`,
   );
-  await expectElementToBeVisible(page, ".im-convention-summary");
-  await expect(page.locator(".im-convention-summary")).toBeVisible();
+  await expectElementToBeVisible(page, ".im-convention-summary__section");
   await expect(
-    await page.locator(".im-convention-summary__signatory-section").all(),
-  ).toHaveLength(2);
+    await page
+      .locator(".im-convention-summary__section", {
+        has: page.getByText("Signataires de la convention"),
+      })
+      .getByText("Bénéficiaire", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    await page
+      .locator(".im-convention-summary__section", {
+        has: page.getByText("Signataires de la convention"),
+      })
+      .getByText("Représentant de l'entreprise"),
+  ).toBeVisible();
   await page.click(
     `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
   );
