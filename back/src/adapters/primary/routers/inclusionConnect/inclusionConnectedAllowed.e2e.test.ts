@@ -29,6 +29,11 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {
   const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
+  const {
+    counsellorEmails: _,
+    validatorEmails: __,
+    ...agencyWithoutEmails
+  } = agency;
   const agencyUser: User = {
     id: "123",
     email: "joe@mail.com",
@@ -113,7 +118,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           },
           agencyRights: [
             {
-              agency: { ...agency, validatorEmails: [agencyUser.email] },
+              agency: agencyWithoutEmails,
               roles: ["validator"],
               isNotifiedByEmail: true,
             },
