@@ -6,7 +6,7 @@ import { Email } from "../email/email.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
-import { ExtractFromExisting } from "../utils";
+import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
 
 export type CodeSafir = Flavor<string, "CodeSafir">;
 export type AgencyStatus = (typeof allAgencyStatuses)[number];
@@ -47,6 +47,11 @@ export type WithAgencyDto = {
 export type AgencyDto = CreateAgencyDto & AgencyDtoSensitiveFields;
 
 export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
+
+export type AgencyDtoWithoutEmails = OmitFromExistingKeys<
+  AgencyDto,
+  "counsellorEmails" | "validatorEmails"
+>;
 
 export type AgencyId = Flavor<string, "AgencyId">;
 export type AgencyIdResponse = AgencyId | undefined;

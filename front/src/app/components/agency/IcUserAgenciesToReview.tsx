@@ -8,7 +8,7 @@ import { createPortal } from "react-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyDto,
+  AgencyDtoWithoutEmails,
   AgencyId,
   AgencyRight,
   ExtractFromExisting,
@@ -21,6 +21,7 @@ import {
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { UserFormMode } from "src/app/components/agency/AgencyUsers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { routes } from "src/app/routes/routes";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 
 type IcUserAgenciesToReviewProps = {
@@ -38,9 +39,9 @@ function AgencyReviewForm({
   selectedUser,
   setModalProps,
 }: {
-  agency: AgencyDto;
+  agency: AgencyDtoWithoutEmails;
   selectedUser: User;
-  setSelectedAgency: (agency: AgencyDto) => void;
+  setSelectedAgency: (agency: AgencyDtoWithoutEmails) => void;
   setModalProps: (modalProps: IcUserAgenciesToReviewModalProps) => void;
 }) {
   return (
@@ -54,14 +55,12 @@ function AgencyReviewForm({
               {agency.address.city}
             </p>
             <p className={fr.cx("fr-card__desc")}>
-              <DisplayEmailList
-                emailKind={"conseillers"}
-                emails={agency.counsellorEmails}
-              />
-              <DisplayEmailList
-                emailKind={"validateurs"}
-                emails={agency.validatorEmails}
-              />
+              <a
+                {...routes.adminAgencyDetail({ agencyId: agency.id }).link}
+                target="_blank"
+              >
+                Voir les détails de l'agence
+              </a>
             </p>
           </div>
           <div className={fr.cx("fr-card__footer")}>
@@ -110,7 +109,8 @@ export const IcUserAgenciesToReview = ({
   agenciesNeedingReviewForUser,
   selectedUser,
 }: IcUserAgenciesToReviewProps) => {
-  const [selectedAgency, setSelectedAgency] = useState<AgencyDto>();
+  const [selectedAgency, setSelectedAgency] =
+    useState<AgencyDtoWithoutEmails>();
   const [modalProps, setModalProps] =
     useState<IcUserAgenciesToReviewModalProps | null>(null);
 
@@ -156,25 +156,6 @@ export const IcUserAgenciesToReview = ({
         document.body,
       )}
     </div>
-  );
-};
-
-const DisplayEmailList = ({
-  emails,
-  emailKind,
-}: {
-  emailKind: string;
-  emails: string[];
-}) => {
-  if (emails.length === 0) return null;
-
-  return (
-    <ul>
-      <strong>Email {emailKind} :</strong>
-      {emails.map((email) => (
-        <li key={email}>{email}</li>
-      ))}
-    </ul>
   );
 };
 
