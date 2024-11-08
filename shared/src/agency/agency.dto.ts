@@ -62,8 +62,6 @@ export const miniStageAgencyKinds: AgencyKind[] = [
 
 export type AgencyKind = (typeof agencyKindList)[number];
 
-export const allowedAgencyKindToSynch = ["mission-locale", "pole-emploi"];
-
 export const agencyKindList = [
   "pole-emploi", // TODO: remplacer l'agency kind PE par FT
   "mission-locale",
