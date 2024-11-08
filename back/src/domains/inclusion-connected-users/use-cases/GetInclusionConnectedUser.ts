@@ -8,7 +8,6 @@ import {
   WithEstablismentsSiretAndName,
   WithOptionalUserId,
   agencyRoleIsNotToReview,
-  allowedAgencyKindToSynch,
   errors,
   withOptionalUserIdSchema,
 } from "shared";
@@ -77,7 +76,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   ): Promise<WithDashboards> {
     return {
       dashboards: {
-        agencies: await this.makeAgencyDashboards(user),
+        agencies: await this.makeAgencyDashboards(user, uow),
         establishments: await this.#makeEstablishmentDashboard(user, uow),
       },
     };
@@ -169,14 +168,26 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
 
   private async makeAgencyDashboards(
     user: InclusionConnectedUser,
+    uow: UnitOfWork,
   ): Promise<AgencyDashboards> {
+    const apiConsumers = await uow.apiConsumerRepository.getAll();
+
     const agencyIdsWithEnoughPrivileges = user.agencyRights
       .filter(({ roles }) => agencyRoleIsNotToReview(roles))
       .map(({ agency }) => agency.id);
 
     const isSynchronisationEnableForAgency = user.agencyRights.some(
-      (agencyRights) =>
-        allowedAgencyKindToSynch.includes(agencyRights.agency.kind),
+      (agencyRight) =>
+        agencyRight.agency.kind === "pole-emploi" ||
+        apiConsumers.some(
+          (apiconsumer) =>
+            apiconsumer.rights.convention.scope.agencyIds?.includes(
+              agencyRight.agency.id,
+            ) ||
+            apiconsumer.rights.convention.scope.agencyKinds?.includes(
+              agencyRight.agency.kind,
+            ),
+        ),
     );
 
     return {
