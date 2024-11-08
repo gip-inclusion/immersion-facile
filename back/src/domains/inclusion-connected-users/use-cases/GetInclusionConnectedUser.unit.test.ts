@@ -75,6 +75,13 @@ describe("GetUserAgencyDashboardUrl", () => {
       "agency-viewer",
     ]);
 
+    const agency = agencyWithoutCounsellorAndValidatorBuilder.build();
+    const {
+      validatorEmails: _,
+      counsellorEmails: __,
+      ...agencyWithoutEmails
+    } = agency;
+
     describe("returns the dashboard url", () => {
       it.each(agencyRolesAllowedToGetDashboard)(
         "when role is '%s'",
@@ -82,6 +89,11 @@ describe("GetUserAgencyDashboardUrl", () => {
           const agency = agencyWithoutCounsellorAndValidatorBuilder
             .withKind("pole-emploi")
             .build();
+          const {
+            validatorEmails: _,
+            counsellorEmails: __,
+            ...agencyWithoutEmails
+          } = agency;
 
           uow.userRepository.users = [notAdmin];
           uow.agencyRepository.agencies = [
@@ -99,15 +111,7 @@ describe("GetUserAgencyDashboardUrl", () => {
             ...icNotAdmin,
             agencyRights: [
               {
-                agency: {
-                  ...agency,
-                  ...(agencyUserRole === "counsellor"
-                    ? { counsellorEmails: [notAdmin.email] }
-                    : {}),
-                  ...(agencyUserRole === "validator"
-                    ? { validatorEmails: [notAdmin.email] }
-                    : {}),
-                },
+                agency: agencyWithoutEmails,
                 roles: [agencyUserRole],
                 isNotifiedByEmail: true,
               },
@@ -132,8 +136,6 @@ describe("GetUserAgencyDashboardUrl", () => {
       it.each(agencyRolesForbiddenToGetDashboard)(
         "for role '%s'",
         async (agencyUserRole) => {
-          const agency = agencyWithoutCounsellorAndValidatorBuilder.build();
-
           uow.userRepository.users = [notAdmin];
           uow.agencyRepository.agencies = [
             toAgencyWithRights(agency, {
@@ -150,7 +152,11 @@ describe("GetUserAgencyDashboardUrl", () => {
           expectToEqual(inclusionConnectedUser, {
             ...notAdmin,
             agencyRights: [
-              { agency, roles: [agencyUserRole], isNotifiedByEmail: true },
+              {
+                agency: agencyWithoutEmails,
+                roles: [agencyUserRole],
+                isNotifiedByEmail: true,
+              },
             ],
             dashboards: { agencies: {}, establishments: {} },
           });
@@ -175,7 +181,11 @@ describe("GetUserAgencyDashboardUrl", () => {
       expectToEqual(url, {
         ...icNotAdmin,
         agencyRights: [
-          { agency, roles: ["validator"], isNotifiedByEmail: false },
+          {
+            agency: agencyWithoutEmails,
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
         ],
         dashboards: {
           agencies: {
@@ -199,6 +209,27 @@ describe("GetUserAgencyDashboardUrl", () => {
       const agency2 = agencyBuilder.withId("2222").build();
       const agency3 = agencyBuilder.withId("3333").build();
       const agency4 = agencyBuilder.withId("4444").build();
+
+      const {
+        validatorEmails: _,
+        counsellorEmails: __,
+        ...agency1WithoutEmails
+      } = agency1;
+      const {
+        validatorEmails: ___,
+        counsellorEmails: ____,
+        ...agency2WithoutEmails
+      } = agency2;
+      const {
+        validatorEmails: _____,
+        counsellorEmails: ______,
+        ...agency3WithoutEmails
+      } = agency3;
+      const {
+        validatorEmails: _______,
+        counsellorEmails: ________,
+        ...agency4WithoutEmails
+      } = agency4;
 
       uow.userRepository.users = [notAdmin];
       uow.agencyRepository.agencies = [
@@ -234,21 +265,22 @@ describe("GetUserAgencyDashboardUrl", () => {
         ...notAdmin,
         agencyRights: [
           {
-            agency: { ...agency1, counsellorEmails: [notAdmin.email] },
+            agency: agency1WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
-            agency: {
-              ...agency2,
-              validatorEmails: [notAdmin.email],
-            },
+            agency: agency2WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
-          { agency: agency3, roles: ["to-review"], isNotifiedByEmail: true },
           {
-            agency: agency4,
+            agency: agency3WithoutEmails,
+            roles: ["to-review"],
+            isNotifiedByEmail: true,
+          },
+          {
+            agency: agency4WithoutEmails,
             roles: ["agency-admin"],
             isNotifiedByEmail: true,
           },
