@@ -17,6 +17,8 @@ export const createOrGetUserIdByEmail = async (
     : createUser(uow, provider, uuidGenerator.new(), email, timeGateway.now());
 };
 
+export const emptyName = "";
+
 const createUser = async (
   uow: UnitOfWork,
   provider: OAuthGatewayProvider,
@@ -30,8 +32,8 @@ const createUser = async (
       email,
       createdAt: createdAt.toISOString(),
       externalId: null,
-      firstName: "Non fourni",
-      lastName: "Non fourni",
+      firstName: emptyName,
+      lastName: emptyName,
     },
     provider,
   );
