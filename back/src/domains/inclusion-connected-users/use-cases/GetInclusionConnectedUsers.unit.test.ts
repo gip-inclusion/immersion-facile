@@ -55,6 +55,16 @@ const icNotBackOffice = notBackOfficeUserBuilder.build();
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
+const {
+  validatorEmails: _,
+  counsellorEmails: __,
+  ...agency1WithoutEmails
+} = agency1;
+const {
+  validatorEmails: ___,
+  counsellorEmails: ____,
+  ...agency2WithoutEmails
+} = agency2;
 
 const agency1WithRights = toAgencyWithRights(agency1, {
   [johnUser.id]: {
@@ -123,15 +133,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icJohn,
         agencyRights: [
           {
-            agency: { ...agency1, counsellorEmails: [paulUser.email] },
+            agency: agency1WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
-            agency: {
-              ...agency2,
-              validatorEmails: [johnUser.email, paulUser.email],
-            },
+            agency: agency2WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -154,15 +161,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icJohn,
         agencyRights: [
           {
-            agency: { ...agency1, counsellorEmails: [paulUser.email] },
+            agency: agency1WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
-            agency: {
-              ...agency2,
-              validatorEmails: [johnUser.email, paulUser.email],
-            },
+            agency: agency2WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -172,15 +176,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icPaul,
         agencyRights: [
           {
-            agency: { ...agency1, counsellorEmails: [paulUser.email] },
+            agency: agency1WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
-            agency: {
-              ...agency2,
-              validatorEmails: [johnUser.email, paulUser.email],
-            },
+            agency: agency2WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -248,22 +249,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icGenericUser,
         agencyRights: [
           {
-            agency: {
-              ...agency1,
-              counsellorEmails: [paulUser.email, genericUser.email],
-            },
+            agency: agency1WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
-            agency: {
-              ...agency2,
-              validatorEmails: [
-                johnUser.email,
-                paulUser.email,
-                genericUser.email,
-              ],
-            },
+            agency: agency2WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -273,22 +264,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icJohn,
         agencyRights: [
           {
-            agency: {
-              ...agency1,
-              counsellorEmails: [paulUser.email, genericUser.email],
-            },
+            agency: agency1WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
-            agency: {
-              ...agency2,
-              validatorEmails: [
-                johnUser.email,
-                paulUser.email,
-                genericUser.email,
-              ],
-            },
+            agency: agency2WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -298,22 +279,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icPaul,
         agencyRights: [
           {
-            agency: {
-              ...agency1,
-              counsellorEmails: [paulUser.email, genericUser.email],
-            },
+            agency: agency1WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
-            agency: {
-              ...agency2,
-              validatorEmails: [
-                johnUser.email,
-                paulUser.email,
-                genericUser.email,
-              ],
-            },
+            agency: agency2WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
