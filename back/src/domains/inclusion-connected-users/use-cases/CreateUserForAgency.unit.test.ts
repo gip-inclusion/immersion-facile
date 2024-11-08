@@ -8,6 +8,7 @@ import {
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -168,8 +169,8 @@ describe("CreateUserForAgency", () => {
         id: icUserForAgency.userId,
         email: icUserForAgency.email,
         createdAt: timeGateway.now().toISOString(),
-        firstName: "Non fourni",
-        lastName: "Non fourni",
+        firstName: emptyName,
+        lastName: emptyName,
         externalId: null,
       },
     ]);

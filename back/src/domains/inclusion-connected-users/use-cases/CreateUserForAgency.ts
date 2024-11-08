@@ -6,6 +6,7 @@ import {
   userParamsForAgencySchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -85,8 +86,8 @@ const getUserIdAndCreateIfMissing = async (
     id: inputParams.userId,
     email: inputParams.email,
     createdAt: deps.timeGateway.now().toISOString(),
-    firstName: "Non fourni",
-    lastName: "Non fourni",
+    firstName: emptyName,
+    lastName: emptyName,
     externalId: null,
   };
   await uow.userRepository.save(newUser, provider);

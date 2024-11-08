@@ -12,6 +12,7 @@ import {
 } from "shared";
 import { ConflictError } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -120,16 +121,16 @@ describe("AddAgency use case", () => {
         id: uuids[0],
         email: createParisMissionLocaleParams.validatorEmails[0],
         createdAt: timeGateway.now().toISOString(),
-        firstName: "Non fourni",
-        lastName: "Non fourni",
+        firstName: emptyName,
+        lastName: emptyName,
         externalId: null,
       };
       const newCounsellor: User = {
         id: uuids[1],
         email: createParisMissionLocaleParams.counsellorEmails[0],
         createdAt: timeGateway.now().toISOString(),
-        firstName: "Non fourni",
-        lastName: "Non fourni",
+        firstName: emptyName,
+        lastName: emptyName,
         externalId: null,
       };
 
@@ -220,16 +221,16 @@ describe("AddAgency use case", () => {
         id: uuids[0],
         email: createParisMissionLocaleParams.validatorEmails[0],
         createdAt: timeGateway.now().toISOString(),
-        firstName: "Non fourni",
-        lastName: "Non fourni",
+        firstName: emptyName,
+        lastName: emptyName,
         externalId: null,
       };
       const newCounsellor: User = {
         id: uuids[1],
         email: createParisMissionLocaleParams.counsellorEmails[0],
         createdAt: timeGateway.now().toISOString(),
-        firstName: "Non fourni",
-        lastName: "Non fourni",
+        firstName: emptyName,
+        lastName: emptyName,
         externalId: null,
       };
       expectToEqual(uow.userRepository.users, [newValidator, newCounsellor]);
@@ -281,8 +282,8 @@ describe("AddAgency use case", () => {
         id: uuids[0],
         email: createAgencyWithRefersToParams.counsellorEmails[0],
         createdAt: timeGateway.now().toISOString(),
-        firstName: "Non fourni",
-        lastName: "Non fourni",
+        firstName: emptyName,
+        lastName: emptyName,
         externalId: null,
       };
 
