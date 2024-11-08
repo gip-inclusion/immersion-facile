@@ -8,7 +8,7 @@ import { keys } from "react-design-system";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyDto,
+  AgencyDtoWithoutEmails,
   UserParamsForAgency,
   domElementIds,
   userParamsForAgencySchema,
@@ -31,7 +31,7 @@ export const AgencyUserModificationForm = ({
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
   mode: UserFormMode;
-  agency: AgencyDto;
+  agency: AgencyDtoWithoutEmails;
 }) => {
   const dispatch = useDispatch();
 

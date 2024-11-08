@@ -96,10 +96,11 @@ export const getAgencyRightByUserId = async (
       async ({ isNotifiedByEmail, roles, agencyId }) => {
         const agency = await uow.agencyRepository.getById(agencyId);
         if (!agency) throw errors.agency.notFound({ agencyId });
+        const { usersRights: _, ...rest } = agency;
         return {
           isNotifiedByEmail,
           roles,
-          agency: await agencyWithRightToAgencyDto(uow, agency),
+          agency: rest,
         };
       },
     ),
