@@ -243,7 +243,7 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryAppellationsGateway(),
       DIAGORIENTE: () =>
         new DiagorienteAppellationsGateway(
-          createLegacyAxiosHttpClientForExternalAPIs({
+          createFetchHttpClientForExternalAPIs({
             partnerName: "Diagoriente",
             routes: diagorienteAppellationsRoutes,
           }),
@@ -262,7 +262,7 @@ export const createGateways = async (
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
       new HttpAddressGateway(
-        createLegacyAxiosHttpClientForExternalAPIs({
+        createFetchHttpClientForExternalAPIs({
           partnerName: "OpenCageData",
           routes: addressesExternalRoutes,
         }),
@@ -333,7 +333,7 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemorySiretGateway(),
       ANNUAIRE_DES_ENTREPRISES: () =>
         new AnnuaireDesEntreprisesSiretGateway(
-          createLegacyAxiosHttpClientForExternalAPIs({
+          createFetchHttpClientForExternalAPIs({
             partnerName: "Annuaire des entreprises",
             routes: annuaireDesEntreprisesSiretRoutes,
           }),

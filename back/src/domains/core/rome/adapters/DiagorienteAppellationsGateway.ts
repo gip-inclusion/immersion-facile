@@ -1,7 +1,6 @@
 import Bottleneck from "bottleneck";
 import { AppellationDto, appellationCodeSchema } from "shared";
 import { HttpClient } from "shared-routes";
-import { createLogger } from "../../../../utils/logger";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { AppellationsGateway } from "../ports/AppellationsGateway";
 import {
@@ -18,8 +17,6 @@ const diagorienteMaxCallRatePerSeconds = 25;
 export const requestMinTime = Math.floor(
   ONE_SECOND_MS / diagorienteMaxCallRatePerSeconds,
 );
-
-const logger = createLogger(__filename);
 
 export class DiagorienteAppellationsGateway implements AppellationsGateway {
   #limiter = new Bottleneck({
@@ -40,32 +37,24 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
   ) {}
 
   async searchAppellations(query: string): Promise<AppellationDto[]> {
-    logger.info({ message: "searchAppellations - start" });
     const tokenData = await this.getAccessToken();
-    return this.#limiter.schedule(() => {
-      logger.info({ message: "searchAppellations - call" });
-      return this.httpClient
+    return this.#limiter.schedule(() =>
+      this.httpClient
         .searchAppellations({
           queryParams: { query, nb_results: maxResults * 10, tags: ["ROME4"] },
           headers: {
             Authorization: `Bearer ${tokenData.access_token}`,
           },
         })
-        .then(({ body }) => {
-          logger.info({ message: "searchAppellations - success" });
-          return diagorienteRawResponseToAppellationDto(body);
-        })
-        .catch((error) => {
-          logger.error({ message: "searchAppellations - error", error });
-          throw error;
-        });
-    });
+        .then(({ status, body }) =>
+          status === 200 ? diagorienteRawResponseToAppellationDto(body) : [],
+        ),
+    );
   }
 
   public getAccessToken(): Promise<DiagorienteAccessTokenResponse> {
-    return this.caching.caching(diagorienteTokenScope, () => {
-      logger.info({ message: "getAccessToken - start" });
-      return this.#limiter.schedule(() =>
+    return this.caching.caching(diagorienteTokenScope, () =>
+      this.#limiter.schedule(() =>
         this.httpClient
           .getAccessToken({
             headers: {
@@ -77,16 +66,16 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
               grant_type: "client_credentials",
             },
           })
-          .then(({ body }) => {
-            logger.info({ message: "getAccessToken - success" });
+          .then(({ status, body }) => {
+            if (status !== 200) {
+              throw new Error(
+                `Unexpected status code ${status} for getAccessToken, calling Diagoriente API`,
+              );
+            }
             return body;
-          })
-          .catch((error) => {
-            logger.error({ error, message: "getAccessToken - error" });
-            throw error;
           }),
-      );
-    });
+      ),
+    );
   }
 }
 
