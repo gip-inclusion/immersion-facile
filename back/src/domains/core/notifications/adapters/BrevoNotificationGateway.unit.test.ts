@@ -1,6 +1,6 @@
 import { ignoreTabs } from "html-templates";
 import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
-import { HttpClient } from "shared-routes";
+import { HttpClient, HttpResponse } from "shared-routes";
 import { makeEmailAllowListPredicate } from "../../../../config/bootstrap/appConfig";
 import { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
@@ -9,7 +9,7 @@ import { SendTransactEmailRequestBody } from "./BrevoNotificationGateway.schemas
 
 const sender = { name: "bob", email: "Machin@mail.com" };
 
-describe("SendingBlueHtmlNotificationGateway unit", () => {
+describe("BrevoNotificationGateway unit", () => {
   describe("sendEmail with skipEmailAllowList false", () => {
     let fakeHttpClient: HttpClient<BrevoNotificationGatewayRoutes>;
     let allowListPredicate: (email: string) => boolean;
@@ -23,8 +23,13 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       sentEmails = [];
 
       fakeHttpClient = {
-        sendTransactEmail(email: any) {
+        sendTransactEmail(email: any): HttpResponse<201, any> {
           sentEmails.push(email);
+          return {
+            status: 201,
+            body: "success",
+            headers: {},
+          };
         },
       } as unknown as HttpClient<BrevoNotificationGatewayRoutes>;
 
@@ -62,7 +67,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
 
       await expectPromiseToFailWithError(
         triggerSendEmail(),
-        errors.notification.missingRecipient(),
+        errors.notification.missingRecipient({ notificationId: undefined }),
       );
     });
 
@@ -325,8 +330,13 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       sentEmails = [];
 
       fakeHttpClient = {
-        sendTransactEmail(email: any) {
+        sendTransactEmail(email: any): HttpResponse<201, any> {
           sentEmails.push(email);
+          return {
+            status: 201,
+            body: "success",
+            headers: {},
+          };
         },
       } as unknown as HttpClient<BrevoNotificationGatewayRoutes>;
 

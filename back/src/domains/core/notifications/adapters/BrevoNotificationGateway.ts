@@ -11,7 +11,6 @@ import {
   NotificationId,
   type TemplatedEmail,
   type TemplatedSms,
-  castError,
   emailTemplatesByName,
   errors,
   smsTemplatesByName,
@@ -24,7 +23,6 @@ import {
   counterSendTransactEmailTotal,
 } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
-import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import { NotificationGateway } from "../ports/NotificationGateway";
 import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import {
@@ -85,6 +83,14 @@ export class BrevoNotificationGateway implements NotificationGateway {
         "api-key": this.#brevoHeaders["api-key"],
       },
     });
+    if (response.status !== 200)
+      throw new Error(
+        `Unexpected status code ${response.status}. Body: ${JSON.stringify(
+          response.body,
+          null,
+          2,
+        )}`,
+      );
     return response.body;
   }
 
@@ -93,11 +99,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
     notificationId?: NotificationId,
   ) {
     if (email.recipients.length === 0) {
-      logger.error({
-        notificationId,
-        message: "No recipient for provided email",
-      });
-      throw errors.notification.missingRecipient();
+      throw errors.notification.missingRecipient({ notificationId });
     }
     const cc = this.#filterAllowListAndConvertToRecipients(email.cc);
 
@@ -167,36 +169,42 @@ export class BrevoNotificationGateway implements NotificationGateway {
         }),
       )
       .catch((error) => {
-        const castedError = castError(error);
         logger.error({
           notificationId,
-          error: castedError,
           message: "sendTransactSmsError",
-        });
-        notifyObjectDiscord({
-          _message: "Error send sms",
-          ...castedError,
         });
         throw error;
       });
   }
 
   async #sendTransacEmail(body: SendTransactEmailRequestBody) {
-    return this.#emailLimiter.schedule(() =>
-      this.config.httpClient.sendTransactEmail({
+    return this.#emailLimiter.schedule(async () => {
+      const response = await this.config.httpClient.sendTransactEmail({
         headers: this.#brevoHeaders,
         body,
-      }),
-    );
+      });
+      if (response.status !== 201) {
+        throw new Error(
+          `Unexpected status code ${response.status}, when sending email to Brevo. You can view details on datadog.`,
+        );
+      }
+      return response;
+    });
   }
 
   #sendTransacSms(body: SendTransactSmsRequestBody) {
-    return this.#smslimiter.schedule(() =>
-      this.config.httpClient.sendTransactSms({
+    return this.#smslimiter.schedule(async () => {
+      const response = await this.config.httpClient.sendTransactSms({
         headers: this.#brevoHeaders,
         body,
-      }),
-    );
+      });
+      if (response.status !== 201) {
+        throw new Error(
+          `Unexpected status code ${response.status}, when sending SMS to Brevo. You can view details on datadog.`,
+        );
+      }
+      return response;
+    });
   }
 
   #filterAllowListAndConvertToRecipients(

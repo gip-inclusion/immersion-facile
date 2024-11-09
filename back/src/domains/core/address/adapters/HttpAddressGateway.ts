@@ -10,8 +10,6 @@ import {
   OpenCageGeoSearchKey,
   Postcode,
   StreetNumberAndAddress,
-  calculateDurationInSecondsFrom,
-  castError,
   errors,
   filterNotFalsy,
   getDepartmentCodeFromDepartmentNameOrCity,
@@ -20,7 +18,6 @@ import {
   lookupStreetAddressSpecialCharsRegex,
 } from "shared";
 import { HttpClient } from "shared-routes";
-import { createLogger } from "../../../../utils/logger";
 import { AddressGateway } from "../ports/AddressGateway";
 import {
   OpenCageDataAddressComponents,
@@ -28,8 +25,6 @@ import {
   OpenCageDataSearchResultCollection,
 } from "./HttpAddressGateway.dto";
 import { AddressesRoutes } from "./HttpAddressGateway.routes";
-
-const logger = createLogger(__filename);
 
 const openCageDateMaxRequestsPerSeconds = 15;
 
@@ -49,7 +44,7 @@ export class HttpAddressGateway implements AddressGateway {
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
-    const { body } = await this.#limiter.schedule(() =>
+    const { status, body } = await this.#limiter.schedule(() =>
       this.httpClient.geocoding({
         queryParams: {
           countrycode: franceAndAttachedTerritoryCountryCodes,
@@ -61,6 +56,8 @@ export class HttpAddressGateway implements AddressGateway {
       }),
     );
 
+    if (status !== 200) return;
+
     const addresses: AddressDto[] = body.features
       .map(this.#featureToAddress)
       .filter(filterNotFalsy);
@@ -71,7 +68,6 @@ export class HttpAddressGateway implements AddressGateway {
   public async lookupLocationName(
     query: string,
   ): Promise<LookupSearchResult[]> {
-    const startDate = new Date();
     const queryMinLength = 3;
 
     return this.#limiter
@@ -96,31 +92,16 @@ export class HttpAddressGateway implements AddressGateway {
         });
       })
       .then((response) => {
-        const lookupSearchResult = lookupSearchResultsSchema.parse(
+        if (response.status !== 200) return [];
+        return lookupSearchResultsSchema.parse(
           toLookupSearchResults(response.body),
         );
-        logger.info({
-          message: "HttpAddressGateway.lookupLocationName",
-          sharedRouteResponse: response,
-          durationInSeconds: calculateDurationInSecondsFrom(startDate),
-        });
-        return lookupSearchResult;
-      })
-      .catch((error: unknown) => {
-        logger.error({
-          message: "HttpAddressGateway.lookupLocationName",
-          error: castError(error),
-          durationInSeconds: calculateDurationInSecondsFrom(startDate),
-        });
-        throw error;
       });
   }
 
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressAndPosition[]> {
-    const startDate = new Date();
-
     return this.#limiter
       .schedule(() => {
         if (
@@ -141,25 +122,10 @@ export class HttpAddressGateway implements AddressGateway {
         });
       })
       .then((response) => {
-        const features = response.body.features
+        if (response.status !== 200) return [];
+        return response.body.features
           .map((feature) => this.#toAddressAndPosition(feature))
           .filter(filterNotFalsy);
-
-        logger.info({
-          message: "HttpAddressGateway.lookupStreetAddress",
-          sharedRouteResponse: response,
-          durationInSeconds: calculateDurationInSecondsFrom(startDate),
-        });
-
-        return features;
-      })
-      .catch((error: unknown) => {
-        logger.error({
-          message: "HttpAddressGateway.lookupStreetAddress",
-          error: castError(error),
-          durationInSeconds: calculateDurationInSecondsFrom(startDate),
-        });
-        throw error;
       });
   }
 

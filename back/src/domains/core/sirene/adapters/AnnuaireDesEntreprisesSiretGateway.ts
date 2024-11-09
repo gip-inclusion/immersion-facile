@@ -41,6 +41,7 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
         },
       }),
     );
+    if (response.status !== 200) return;
 
     const result = response.body.results[0];
     if (!result) return;

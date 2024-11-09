@@ -23,7 +23,10 @@ import {
   AgencyRole,
   UserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { NotificationKind } from "../notifications/notifications.dto";
+import {
+  NotificationId,
+  NotificationKind,
+} from "../notifications/notifications.dto";
 import { Role } from "../role/role.dto";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ShortLinkId } from "../shortLink/shortLink.dto";
@@ -483,12 +486,18 @@ export const errors = {
       new NotFoundError(`Le lien court '${shortLinkId}' n'existe pas.`),
   },
   notification: {
-    notFound: ({ id, kind }: { id: string; kind: NotificationKind }) =>
+    notFound: ({ id, kind }: { id: NotificationId; kind: NotificationKind }) =>
       new NotFoundError(
         `La notification avec l'identifiant '${id}' et le type '${kind}' n'existe pas.`,
       ),
-    missingRecipient: () =>
-      new BadRequestError("Il n'y a pas de destinataire fourni pour l'email."),
+    missingRecipient: (params: { notificationId?: NotificationId }) =>
+      new BadRequestError(
+        `Il n'y a pas de destinataire fourni pour l'email. ${
+          params?.notificationId
+            ? `Identifiant de la notification : ${params.notificationId}`
+            : ""
+        }`,
+      ),
   },
   dashboard: {
     establishmentConventionForbidden: () =>
