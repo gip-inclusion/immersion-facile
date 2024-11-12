@@ -154,11 +154,11 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           Pour rappel, cette demande concerne : 
              - Le bénéficiaire ${beneficiaryName}${
                beneficiaryRepresentativeName
-                 ? `\n- ${beneficiaryRepresentativeName}`
+                 ? `\n- Le représentant légal du bénéficiaire ${beneficiaryRepresentativeName}`
                  : ""
              }${
                beneficiaryCurrentEmployerName
-                 ? `\n- L'employeur actuel du bénéficiare ${beneficiaryCurrentEmployerName}`
+                 ? `\n- L'employeur actuel du bénéficiaire ${beneficiaryCurrentEmployerName}`
                  : ""
              }
              - L'entreprise ${businessName} représentée par ${establishmentRepresentativeName}
