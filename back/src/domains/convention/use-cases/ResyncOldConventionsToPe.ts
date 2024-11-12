@@ -6,7 +6,7 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { PoleEmploiGateway } from "../ports/PoleEmploiGateway";
-import { BroadcastToPoleEmploiOnConventionUpdates } from "./broadcast/BroadcastToPoleEmploiOnConventionUpdates";
+import { BroadcastToFranceTravailOnConventionUpdates } from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
 
 type ResyncOldConventionToPeReport = {
   success: number;
@@ -20,7 +20,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
 > {
   protected override inputSchema = z.void();
 
-  readonly #broadcastToPeUsecase: BroadcastToPoleEmploiOnConventionUpdates;
+  readonly #broadcastToPeUsecase: BroadcastToFranceTravailOnConventionUpdates;
 
   #report: ResyncOldConventionToPeReport = {
     errors: {},
@@ -39,12 +39,13 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
     limit: number,
   ) {
     super(uowPerform);
-    this.#broadcastToPeUsecase = new BroadcastToPoleEmploiOnConventionUpdates(
-      uowPerform,
-      poleEmploiGateway,
-      timeGateway,
-      { resyncMode: true },
-    );
+    this.#broadcastToPeUsecase =
+      new BroadcastToFranceTravailOnConventionUpdates(
+        uowPerform,
+        poleEmploiGateway,
+        timeGateway,
+        { resyncMode: true },
+      );
 
     this.#timeGateway = timeGateway;
     this.#limit = limit;

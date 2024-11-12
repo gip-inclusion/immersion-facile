@@ -16,9 +16,9 @@ import {
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryPoleEmploiGateway } from "../../adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
-import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
+import { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 
-describe("Broadcasts events to pole-emploi", () => {
+describe("Broadcasts events to France Travail", () => {
   const peAgencyWithoutCounsellorsAndValidators = new AgencyDtoBuilder()
     .withId("some-pe-agency")
     .withKind("pole-emploi")
@@ -27,14 +27,14 @@ describe("Broadcasts events to pole-emploi", () => {
   let poleEmploiGateWay: InMemoryPoleEmploiGateway;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
-  let broadcastToPoleEmploiOnConventionUpdates: BroadcastToPoleEmploiOnConventionUpdates;
+  let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     poleEmploiGateWay = new InMemoryPoleEmploiGateway();
     timeGateway = new CustomTimeGateway();
-    broadcastToPoleEmploiOnConventionUpdates =
-      new BroadcastToPoleEmploiOnConventionUpdates(
+    broadcastToFranceTravailOnConventionUpdates =
+      new BroadcastToFranceTravailOnConventionUpdates(
         new InMemoryUowPerformer(uow),
         poleEmploiGateWay,
         timeGateway,
@@ -60,7 +60,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
       .build();
 
-    await broadcastToPoleEmploiOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
@@ -84,7 +84,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withoutFederatedIdentity()
       .build();
 
-    await broadcastToPoleEmploiOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
@@ -110,7 +110,7 @@ describe("Broadcasts events to pole-emploi", () => {
     timeGateway.setNextDate(now);
 
     // Act
-    await broadcastToPoleEmploiOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
@@ -148,7 +148,7 @@ describe("Broadcasts events to pole-emploi", () => {
     timeGateway.setNextDate(now);
 
     // Act
-    await broadcastToPoleEmploiOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
 
     // Assert
     expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
@@ -201,7 +201,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .build();
 
     // Act
-    await broadcastToPoleEmploiOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
@@ -227,7 +227,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .build();
 
     await expectPromiseToFailWithError(
-      broadcastToPoleEmploiOnConventionUpdates.execute({ convention }),
+      broadcastToFranceTravailOnConventionUpdates.execute({ convention }),
       new Error("fake axios error"),
     );
   });
@@ -278,7 +278,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .build();
 
     // Act
-    await broadcastToPoleEmploiOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
