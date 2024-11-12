@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
@@ -109,17 +109,12 @@ const configureCreateAxiosHttpClientForExternalAPIs =
   <R extends Record<string, UnknownSharedRoute>>({
     routes,
     partnerName,
-  }: { routes: R; partnerName: string }) =>
-    createAxiosSharedClient(
-      routes,
-      axios.create({
-        timeout: config.externalAxiosTimeout,
-      }),
-      {
-        skipResponseValidation: true,
-        onResponseSideEffect: logPartnerResponses(partnerName),
-      },
-    );
+    axiosInstance = axios.create({ timeout: config.externalAxiosTimeout }),
+  }: { routes: R; partnerName: string; axiosInstance?: AxiosInstance }) =>
+    createAxiosSharedClient(routes, axiosInstance, {
+      skipResponseValidation: true,
+      onResponseSideEffect: logPartnerResponses(partnerName),
+    });
 
 const configureCreateFetchHttpClientForExternalAPIs =
   () =>
@@ -243,9 +238,13 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryAppellationsGateway(),
       DIAGORIENTE: () =>
         new DiagorienteAppellationsGateway(
-          createFetchHttpClientForExternalAPIs({
+          createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: "Diagoriente",
             routes: diagorienteAppellationsRoutes,
+            axiosInstance: axios.create({
+              timeout: config.externalAxiosTimeout,
+              validateStatus: () => true,
+            }),
           }),
           new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
             timeGateway,
