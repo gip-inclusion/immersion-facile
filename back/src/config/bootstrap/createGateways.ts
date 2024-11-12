@@ -215,7 +215,7 @@ export const createGateways = async (
             ),
           }),
           createLegacyAxiosHttpClientForExternalAPIs({
-            partnerName: "Pro Connect",
+            partnerName: "ProConnect",
             routes: makeProConnectRoutes(
               config.proConnectConfig.providerBaseUri,
             ),
