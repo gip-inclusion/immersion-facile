@@ -28,7 +28,7 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Initier une démarche de recrutement": 3,
 };
 
-export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<WithConventionDto> {
+export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;
 
   constructor(

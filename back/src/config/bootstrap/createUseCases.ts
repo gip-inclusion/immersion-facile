@@ -33,7 +33,7 @@ import { SignConvention } from "../../domains/convention/use-cases/SignConventio
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
-import { BroadcastToPoleEmploiOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
+import { BroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../domains/convention/use-cases/notifications/NotifyActorThatConventionNeedsModifications";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
@@ -544,7 +544,7 @@ export const createUseCases = (
         saveNotificationAndRelatedEvent,
       ),
       broadcastToPoleEmploiOnConventionUpdates:
-        new BroadcastToPoleEmploiOnConventionUpdates(
+        new BroadcastToFranceTravailOnConventionUpdates(
           uowPerformer,
           gateways.poleEmploiGateway,
           gateways.timeGateway,
