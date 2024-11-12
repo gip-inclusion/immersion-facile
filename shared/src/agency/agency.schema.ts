@@ -18,6 +18,7 @@ import {
 } from "../zodUtils";
 import {
   AgencyDto,
+  AgencyDtoWithoutEmails,
   AgencyId,
   AgencyIdResponse,
   AgencyKind,
@@ -71,6 +72,13 @@ export const listAgencyOptionsRequestSchema: z.ZodSchema<ListAgencyOptionsReques
     siret: z.string().optional(),
   });
 
+const withEmails = {
+  counsellorEmails: z.array(emailSchema),
+  validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
+    message: localization.atLeastOneEmail,
+  }),
+};
+
 const commonAgencyShape = {
   id: agencyIdSchema,
   name: stringWithMaxLength255,
@@ -78,10 +86,6 @@ const commonAgencyShape = {
   coveredDepartments: z.array(zStringMinLength1).min(1),
   address: addressSchema,
   position: geoPositionSchema,
-  counsellorEmails: z.array(emailSchema),
-  validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
-    message: localization.atLeastOneEmail,
-  }),
   questionnaireUrl: absoluteUrlSchema.or(z.null()),
   signature: stringWithMaxLength255,
   logoUrl: absoluteUrlSchema.or(z.null()),
@@ -89,7 +93,7 @@ const commonAgencyShape = {
 };
 
 export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
-  .object(commonAgencyShape)
+  .object({ ...commonAgencyShape, ...withEmails })
   .and(
     z.object({
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
@@ -114,7 +118,7 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
 const agencyStatusSchema = z.enum(allAgencyStatuses);
 
 export const editAgencySchema: z.ZodSchema<AgencyDto> = z
-  .object(commonAgencyShape)
+  .object({ ...commonAgencyShape, ...withEmails })
   .and(
     z.object({
       questionnaireUrl: absoluteUrlSchema.or(z.null()),
@@ -127,8 +131,23 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
   )
   .and(withAcquisitionSchema);
 
-export const agencySchema: z.ZodSchema<AgencyDto> = z
+export const agencyWithoutEmailSchema: z.Schema<AgencyDtoWithoutEmails> = z
   .object(commonAgencyShape)
+  .merge(
+    z.object({
+      agencySiret: siretSchema,
+      questionnaireUrl: absoluteUrlSchema.or(z.null()),
+      status: agencyStatusSchema,
+      codeSafir: zStringMinLength1.or(z.null()),
+      refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+      refersToAgencyName: zStringMinLength1.or(z.null()),
+      rejectionJustification: z.string().or(z.null()),
+    }),
+  )
+  .and(withAcquisitionSchema);
+
+export const agencySchema: z.ZodSchema<AgencyDto> = z
+  .object({ ...commonAgencyShape, ...withEmails })
   .merge(
     z.object({
       agencySiret: siretSchema,

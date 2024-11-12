@@ -42,6 +42,7 @@ const seed = async () => {
   await db.deleteFrom("api_consumers").execute();
   await db.deleteFrom("users_ongoing_oauths").execute();
   await db.deleteFrom("users").execute();
+  await db.deleteFrom("users_admins").execute();
   await db.deleteFrom("conventions").execute();
   await db.deleteFrom("agency_groups__agencies").execute();
   await db.deleteFrom("agency_groups").execute();
