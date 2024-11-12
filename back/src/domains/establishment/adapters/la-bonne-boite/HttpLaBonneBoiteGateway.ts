@@ -71,13 +71,16 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
         });
       })
       .then(({ body }) => {
-        return body.items
-          ?.map(
-            (props: LaBonneBoiteApiResultV2Props) =>
-              new LaBonneBoiteCompanyDto(props),
-          )
-          .filter((result) => result.isCompanyRelevant())
-          .map((result) => result.toSearchResult(romeLabel));
+        const items = body?.items;
+        return items
+          ? items
+              .map(
+                (props: LaBonneBoiteApiResultV2Props) =>
+                  new LaBonneBoiteCompanyDto(props),
+              )
+              .filter((result) => result.isCompanyRelevant())
+              .map((result) => result.toSearchResult(romeLabel))
+          : [];
       })
       .catch((error) => {
         logger.error({

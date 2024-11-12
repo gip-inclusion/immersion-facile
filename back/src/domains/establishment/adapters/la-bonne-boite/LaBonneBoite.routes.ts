@@ -27,14 +27,18 @@ type HttpGetLaBonneBoiteCompanyParamsV2 = {
   sort_direction?: "asc" | "desc"; // Sens du tri
 };
 
-type HttpGetLaBonneBoiteCompanyResponseV2 = {
-  items: LaBonneBoiteApiResultV2Props[];
-};
+type HttpGetLaBonneBoiteCompanyResponseV2 =
+  | {
+      items?: LaBonneBoiteApiResultV2Props[];
+    }
+  | undefined;
 
 export type LaBonneBoiteRoutes = ReturnType<typeof createLbbRoutes>;
 
 const lbbQueryParamsSchema: z.Schema<HttpGetLaBonneBoiteCompanyParamsV2> =
   z.any();
+
+// TODO: define LBBv2 schema if more production typing mismatch issues from response body
 const lbbResponseSchema: z.Schema<HttpGetLaBonneBoiteCompanyResponseV2> =
   z.any();
 
