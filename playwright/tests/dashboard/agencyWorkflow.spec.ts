@@ -83,6 +83,12 @@ test.describe("Agency dashboard workflow", () => {
       await page.goto("/");
       await goToAdminTab(page, "adminAgencies");
       await page
+        .locator(
+          `#${domElementIds.admin.agencyTab.selectIcUserToReview} option:nth-child(2)`,
+        )
+        .waitFor({ state: "attached" });
+
+      await page
         .locator(`#${domElementIds.admin.agencyTab.selectIcUserToReview}`)
         .selectOption({
           index: 1,
