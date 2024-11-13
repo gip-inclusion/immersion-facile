@@ -1,4 +1,4 @@
-import { values } from "ramda";
+import { keys, values } from "ramda";
 import {
   Email,
   GetUsersFilters,
@@ -70,10 +70,14 @@ export class InMemoryUserRepository implements UserRepository {
 
   public set users(users: UserOnRepository[]) {
     this.#usersById = users.reduce<Record<UserId, UserOnRepository>>(
-      (acc, user) => ({
-        ...acc,
-        [user.id]: user,
-      }),
+      (acc, user) => {
+        if (keys(acc).includes(user.id))
+          throw errors.user.conflictById({ userId: user.id });
+        return {
+          ...acc,
+          [user.id]: user,
+        };
+      },
       {},
     );
   }
