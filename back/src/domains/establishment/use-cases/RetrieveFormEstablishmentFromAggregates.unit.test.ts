@@ -1,8 +1,8 @@
 import {
   EstablishmentJwtPayload,
   InclusionConnectJwtPayload,
-  InclusionConnectedUser,
   InclusionConnectedUserBuilder,
+  UserBuilder,
   addressDtoToString,
   errors,
   expectPromiseToFailWithError,
@@ -14,7 +14,10 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import {
-  ContactEntityBuilder,
+  EstablishmentAdminRight,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentEntity";
+import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -32,6 +35,29 @@ const backofficeAdminJwtPayload = {
 } as InclusionConnectJwtPayload;
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
+  const establishmentAdmin = new UserBuilder()
+    .withId("admin-id")
+    .withEmail("admin@mail.com")
+    .build();
+  const establishmentContact = new UserBuilder()
+    .withId("contact-id")
+    .withEmail("contact@email.com")
+    .build();
+
+  const establishmentAdminRight: EstablishmentAdminRight = {
+    userId: establishmentAdmin.id,
+    role: "establishment-admin",
+    job: "Chef",
+    phone: "+33600000000",
+  };
+  const userRights: EstablishmentUserRight[] = [
+    establishmentAdminRight,
+    {
+      userId: establishmentContact.id,
+      role: "establishment-contact",
+    },
+  ];
+
   const siret = "12345678901234";
   const establishmentJwtPayload: EstablishmentJwtPayload = {
     siret,
@@ -72,7 +98,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         students: false,
       })
       .build();
-    const contact = new ContactEntityBuilder().build();
+    // const contact = new ContactEntityBuilder().build();
     const offer = new OfferEntityBuilder()
       .withRomeCode("A1101")
       .withAppellationCode("11987")
@@ -81,10 +107,11 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
-        .withContact(contact)
+        .withUserRights(userRights)
         .withOffers([offer])
         .build(),
     );
+    uow.userRepository.users = [establishmentAdmin, establishmentContact];
     // Act
     const retrievedForm = await useCase.execute(
       establishmentJwtPayload.siret,
@@ -111,7 +138,15 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           appellationLabel: offer.appellationLabel,
         },
       ],
-      businessContact: contact,
+      businessContact: {
+        contactMethod: establishment.contactMethod,
+        copyEmails: [establishmentContact.email],
+        email: establishmentAdmin.email,
+        firstName: establishmentAdmin.firstName,
+        lastName: establishmentAdmin.lastName,
+        job: establishmentAdminRight.job,
+        phone: establishmentAdminRight.phone,
+      },
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
       maxContactsPerMonth: establishment.maxContactsPerMonth,
@@ -127,7 +162,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
-    const contact = new ContactEntityBuilder().build();
+
     const offer = new OfferEntityBuilder()
       .withRomeCode("A1101")
       .withAppellationCode("11987")
@@ -136,12 +171,17 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
-        .withContact(contact)
+        .withUserRights(userRights)
         .withOffers([offer])
         .build(),
     );
 
-    uow.userRepository.users = [adminUser];
+    uow.userRepository.users = [
+      establishmentAdmin,
+      establishmentContact,
+      adminUser,
+    ];
+
     // Act
     const retrievedForm = await useCase.execute(
       siret,
@@ -168,7 +208,15 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           appellationLabel: offer.appellationLabel,
         },
       ],
-      businessContact: contact,
+      businessContact: {
+        contactMethod: establishment.contactMethod,
+        copyEmails: [establishmentContact.email],
+        email: establishmentAdmin.email,
+        firstName: establishmentAdmin.firstName,
+        lastName: establishmentAdmin.lastName,
+        job: establishmentAdminRight.job,
+        phone: establishmentAdminRight.phone,
+      },
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
       maxContactsPerMonth: establishment.maxContactsPerMonth,
@@ -184,7 +232,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
-    const contact = new ContactEntityBuilder().build();
     const offer = new OfferEntityBuilder()
       .withRomeCode("A1101")
       .withAppellationCode("11987")
@@ -193,32 +240,16 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       new EstablishmentAggregateBuilder()
         .withEstablishment(establishment)
-        .withContact(contact)
+        .withUserRights(userRights)
         .withOffers([offer])
         .build(),
     );
 
-    const userWithEstablishmentRights: InclusionConnectedUser = {
-      ...icAdmin,
-      isBackofficeAdmin: false,
-      id: "not-backoffice-user-id",
-      establishments: [
-        {
-          siret: establishment.siret,
-          businessName: establishment.name,
-        },
-      ],
-    };
-
-    uow.userRepository.users = [
-      new InclusionConnectedUserBuilder(
-        userWithEstablishmentRights,
-      ).buildUser(),
-    ];
+    uow.userRepository.users = [establishmentAdmin, establishmentContact];
 
     // Act
     const retrievedForm = await useCase.execute(siret, {
-      userId: userWithEstablishmentRights.id,
+      userId: establishmentContact.id,
     } as InclusionConnectJwtPayload);
 
     // Assert
@@ -241,7 +272,15 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
           appellationLabel: offer.appellationLabel,
         },
       ],
-      businessContact: contact,
+      businessContact: {
+        contactMethod: establishment.contactMethod,
+        copyEmails: [establishmentContact.email],
+        email: establishmentAdmin.email,
+        firstName: establishmentAdmin.firstName,
+        lastName: establishmentAdmin.lastName,
+        job: establishmentAdminRight.job,
+        phone: establishmentAdminRight.phone,
+      },
       fitForDisabledWorkers: false,
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
