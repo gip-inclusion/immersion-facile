@@ -60,7 +60,7 @@ Vous disposez des droits suivants concernant vos données à caractère personne
 • Droit à la limitation du traitement de vos données.
 
 
-Pour les exercer, faites-nous parvenir une demande en précisant la date et l’heure précise de la requête – ces éléments sont indispensables pour nous permettre de retrouver votre recherche – par voie électronique à l’adresse suivante : <a href="mailto:dpo@numericite.eu">dpo@numericite.eu</a>
+Pour les exercer, faites-nous parvenir une demande en précisant la date et l’heure précise de la requête – ces éléments sont indispensables pour nous permettre de retrouver votre recherche – par voie électronique à l’adresse suivante : <a href="mailto:rgpd@inclusion.gouv.fr">rgpd@inclusion.gouv.fr</a>
 
 Par voie postale :
 
