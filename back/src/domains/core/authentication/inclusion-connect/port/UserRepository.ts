@@ -7,7 +7,6 @@ import {
   User,
   UserId,
   WithAgencyRole,
-  WithEstablishments,
   WithIsBackOfficeAdmin,
 } from "shared";
 
@@ -22,9 +21,7 @@ export type InclusionConnectedUserWithoutRights = Omit<
   "agencyRights"
 >;
 
-export type UserOnRepository = User &
-  WithIsBackOfficeAdmin &
-  WithEstablishments;
+export type UserOnRepository = User & WithIsBackOfficeAdmin;
 
 export interface UserRepository {
   save(user: UserOnRepository, provider: OAuthGatewayProvider): Promise<void>;
