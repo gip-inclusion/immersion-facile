@@ -1,5 +1,6 @@
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
+import { Email } from "../email/email.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import {
@@ -20,18 +21,20 @@ export const defaultFormEstablishmentAddress = {
   rawAddress: "1 Rue du Moulin, 12345 Quelque Part",
 };
 
+const defaultBusinessContactDto: BusinessContactDto = {
+  email: "amil@mail.com",
+  firstName: "Esteban",
+  lastName: "Ocon",
+  phone: "+33612345678",
+  job: "a job",
+  contactMethod: "EMAIL",
+  copyEmails: ["copy1@mail.com", "copy2@mail.com"],
+};
+
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddresses: [defaultFormEstablishmentAddress],
-  businessContact: {
-    email: "amil@mail.com",
-    firstName: "Esteban",
-    lastName: "Ocon",
-    phone: "+33612345678",
-    job: "a job",
-    contactMethod: "EMAIL",
-    copyEmails: ["copy1@mail.com", "copy2@mail.com"],
-  },
+  businessContact: defaultBusinessContactDto,
   naf: { code: "A", nomenclature: "nomenclature code A" },
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
@@ -197,10 +200,17 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({ ...this.#dto, businessContact });
   }
 
-  public withBusinessContactEmail(email: string) {
+  public withBusinessContactEmail(email: Email) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       businessContact: { ...this.#dto.businessContact, email },
+    });
+  }
+
+  public withBusinessContactCopyEmails(copyEmails: Email[]) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      businessContact: { ...this.#dto.businessContact, copyEmails },
     });
   }
 
@@ -277,3 +287,31 @@ const formEstablishmentToEstablishmentCsvRow = (
   searchableByStudents: establishment.searchableBy.students ? "1" : "0",
   searchableByJobSeekers: establishment.searchableBy.jobSeekers ? "1" : "0",
 });
+
+export class BusinessContactDtoBuilder implements Builder<BusinessContactDto> {
+  #dto: BusinessContactDto;
+
+  constructor(dto: BusinessContactDto = defaultBusinessContactDto) {
+    this.#dto = dto;
+  }
+
+  public withFirstName(firstName: string) {
+    return new BusinessContactDtoBuilder({ ...this.#dto, firstName });
+  }
+
+  public withLastName(lastName: string) {
+    return new BusinessContactDtoBuilder({ ...this.#dto, lastName });
+  }
+
+  public withEmail(email: Email) {
+    return new BusinessContactDtoBuilder({ ...this.#dto, email });
+  }
+
+  public withCopyEmails(copyEmails: Email[]) {
+    return new BusinessContactDtoBuilder({ ...this.#dto, copyEmails });
+  }
+
+  public build() {
+    return this.#dto;
+  }
+}
