@@ -8,7 +8,7 @@ export type AutocompleteInputProps = {
   headerClassName: string | undefined;
   id: string | undefined;
   inputStyle: React.CSSProperties | undefined;
-  label: string;
+  label: React.ReactNode;
   params: AutocompleteRenderInputParams;
   placeholder: string | undefined;
   state?: InputProps["state"];

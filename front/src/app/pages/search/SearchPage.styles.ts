@@ -5,4 +5,5 @@ export default {
   form: "im-search-page__form",
   formV2: "im-search-page__form--v2",
   resultsSummary: "im-search-page__results-summary",
+  searchFilters: "im-search-page__search-filters",
 };

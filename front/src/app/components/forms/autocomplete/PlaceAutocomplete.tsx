@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AutocompleteInput } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { LookupSearchResult } from "shared";
@@ -10,17 +10,18 @@ import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice"
 import { useStyles } from "tss-react/dsfr";
 
 export type PlaceAutocompleteProps = {
-  label: string;
+  label: React.ReactNode;
   disabled?: boolean;
   headerClassName?: string;
   styles?: React.CSSProperties;
   placeholder?: string;
   description?: string;
   id?: string;
-  inputValue?: string;
   initialInputValue?: string;
   onValueChange: (value: LookupSearchResult | null) => void;
   onInputClear: () => void;
+  shouldClearInput?: boolean;
+  onAfterClearInput?: () => void;
 };
 
 export const PlaceAutocomplete = ({
@@ -34,6 +35,8 @@ export const PlaceAutocomplete = ({
   onInputClear,
   initialInputValue,
   id = "im-place-autocomplete",
+  shouldClearInput,
+  onAfterClearInput,
 }: PlaceAutocompleteProps) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
@@ -66,6 +69,15 @@ export const PlaceAutocomplete = ({
     if (isPlaceSelected) return selectedPlace.label;
     return searchTerm;
   };
+
+  useEffect(() => {
+    if (shouldClearInput && onAfterClearInput) {
+      setSearchTerm("");
+      dispatch(geosearchSlice.actions.queryWasEmptied());
+      onAfterClearInput();
+    }
+  }, [shouldClearInput, dispatch, onAfterClearInput]);
+
   return (
     <div className={fr.cx("fr-input-group")}>
       <Autocomplete

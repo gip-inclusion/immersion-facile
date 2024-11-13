@@ -166,6 +166,9 @@ export const domElementIds = {
       "im-contact-establishment__contact-email-cancel-button",
     contactByPhoneButton: "im-contact-establishment__contact-phone-button",
     contactInPersonButton: "im-contact-establishment__contact-in-person-button",
+    appellationFilterTag: "im-search-page__appellation-filter-tag",
+    locationFilterTag: "im-search-page__location-filter-tag",
+    sortFilterTag: "im-search-page__sort-filter-tag",
   },
   addAgency: {
     form: "im-form-add-agency",
