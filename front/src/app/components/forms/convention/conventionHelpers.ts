@@ -48,7 +48,6 @@ export const conventionPresentationSchema: z.Schema<ConventionPresentation> =
   conventionSchema.and(
     z.object({
       agencyDepartment: z.string(),
-      agencyKind: agencyKindSchema,
       agencyRefersTo: z
         .object({
           id: refersToAgencyIdSchema,
