@@ -165,6 +165,10 @@ export const errors = {
       new ConflictError(
         `Il n'est pas possible de créer l'établissement avec le siret '${siret}'. Erreur: '${error}'.`,
       ),
+    noUserRights: ({ siret }: { siret: SiretDto }) =>
+      new BadRequestError(
+        `L'établissement avec le siret ${siret}, n'a aucun utilisateur.`,
+      ),
     missingOrClosed: ({ siret }: { siret: SiretDto }) =>
       new BadRequestError(
         `Ce SIRET (${siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
@@ -172,6 +176,10 @@ export const errors = {
     notFound: ({ siret }: { siret: SiretDto }) =>
       new NotFoundError(
         `Aucune entreprise trouvée avec le siret : ${siret}. Êtes-vous sûr d'avoir bien tapé votre siret ?`,
+      ),
+    adminNotFound: ({ siret }: { siret: SiretDto }) =>
+      new NotFoundError(
+        `Aucune administrateur trouvé pour l'établissement avec le siret : ${siret}.`,
       ),
     siretMismatch: () =>
       new ForbiddenError(
@@ -381,6 +389,8 @@ export const errors = {
       new ConflictError(
         `L'utilisateur ayant le mail ${userEmail} existe déjà.`,
       ),
+    conflictById: ({ userId }: { userId: UserId }) =>
+      new ConflictError(`L'utilisateur ayant l'Id ${userId} existe déjà.`),
     conflictByExternalId: ({ externalId }: { externalId: string }) =>
       new ConflictError(
         `L'utilisateur ayant l'externalId ${externalId} existe déjà.`,
