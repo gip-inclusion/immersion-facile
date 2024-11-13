@@ -20,6 +20,9 @@ const defaultFlagsInFront: FeatureFlags = {
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
   enableProConnect: makeBooleanFeatureFlag(false), // si tu veux check le rendu proconnect en in-memory
+  enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+  enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+  enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
 };
 
 export const makeStubFeatureFlags = (

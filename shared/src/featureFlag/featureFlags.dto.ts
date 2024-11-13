@@ -6,13 +6,19 @@ const featureFlagSeverities = ["warning", "error", "success", "info"] as const;
 
 export type FeatureFlagName = keyof FeatureFlags;
 
-export const featureFlagNames: [FeatureFlagName, ...FeatureFlagName[]] = [
-  // used in z.enum() shouldn't be empty
+export const featureFlagNames = [
   "enableTemporaryOperation",
   "enableMaintenance",
   "enableSearchByScore",
   "enableProConnect",
+  "enableBroadcastOfMissionLocaleToFT",
+  "enableBroadcastOfConseilDepartementalToFT",
+  "enableBroadcastOfCapEmploiToFT",
 ] as const;
+
+const _insureAllFeatureFlagsAreInList = (
+  featureFlagName: FeatureFlagName,
+): (typeof featureFlagNames)[number] => featureFlagName;
 
 type FeatureFlagKind = (typeof featureFlagKinds)[number];
 
@@ -61,6 +67,9 @@ export type FeatureFlags = {
   enableTemporaryOperation: FeatureFlagTextImageAndRedirect;
   enableSearchByScore: FeatureFlagBoolean;
   enableProConnect: FeatureFlagBoolean;
+  enableBroadcastOfMissionLocaleToFT: FeatureFlagBoolean;
+  enableBroadcastOfConseilDepartementalToFT: FeatureFlagBoolean;
+  enableBroadcastOfCapEmploiToFT: FeatureFlagBoolean;
 };
 
 export type SetFeatureFlagParam = {

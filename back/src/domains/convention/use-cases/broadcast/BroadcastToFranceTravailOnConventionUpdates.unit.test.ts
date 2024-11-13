@@ -280,4 +280,35 @@ describe("Broadcasts events to France Travail", () => {
       codeAppellation: "011111",
     });
   });
+
+  describe("sends also other type of Convention when corresponding feature flag is activated", () => {
+    const agencyMissionLocal = toAgencyWithRights(
+      new AgencyDtoBuilder()
+        .withId("mission-local")
+        .withKind("mission-locale")
+        .build(),
+    );
+
+    const conventionLinkedToMissionLocal = new ConventionDtoBuilder()
+      .withId("33333333-3333-4000-3333-333333333333")
+      .withAgencyId(agencyMissionLocal.id)
+      .build();
+
+    it("sends notification to france travail, even for mission-local when corresponding feature flag is activated", async () => {
+      uow.agencyRepository.agencies = [agencyMissionLocal];
+      uow.featureFlagRepository.featureFlags = {
+        enableBroadcastOfMissionLocaleToFT: { kind: "boolean", isActive: true },
+        enableBroadcastOfCapEmploiToFT: { kind: "boolean", isActive: false },
+        enableBroadcastOfConseilDepartementalToFT: {
+          kind: "boolean",
+          isActive: false,
+        },
+      };
+      await broadcastToFranceTravailOnConventionUpdates.execute({
+        convention: conventionLinkedToMissionLocal,
+      });
+
+      expect(poleEmploiGateWay.notifications).toHaveLength(1);
+    });
+  });
 });

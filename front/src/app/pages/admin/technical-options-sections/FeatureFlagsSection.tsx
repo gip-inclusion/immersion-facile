@@ -44,7 +44,9 @@ export const FeatureFlagsSection = () => {
                 key={featureFlagName}
                 className={fr.cx(index > 0 && "fr-mt-4w")}
               >
-                <h5>{labelsByFeatureFlag[featureFlagName].title}</h5>
+                {labelsByFeatureFlag[featureFlagName].title && (
+                  <h5>{labelsByFeatureFlag[featureFlagName].title}</h5>
+                )}
                 <ToggleSwitch
                   label={labelsByFeatureFlag[featureFlagName].enableLabel}
                   checked={featureFlags[featureFlagName].isActive}
@@ -107,7 +109,7 @@ const FeatureFlagListWrapper = ({ children }: { children: ReactNode }) => (
 const labelsByFeatureFlag: Record<
   FeatureFlagName,
   {
-    title: string;
+    title: string | null;
     enableLabel: string;
   }
 > = {
@@ -124,8 +126,20 @@ const labelsByFeatureFlag: Record<
     enableLabel: "Activer la recherche par pertinence (scoring)",
   },
   enableProConnect: {
-    enableLabel: "Activer le mode Pro Connect",
     title: "Passer de Inclusion Connect à Pro Connect",
+    enableLabel: "Activer le mode Pro Connect",
+  },
+  enableBroadcastOfMissionLocaleToFT: {
+    title: "Diffusion des conventions à France Travail",
+    enableLabel: "Activer les Missions Locales",
+  },
+  enableBroadcastOfConseilDepartementalToFT: {
+    title: null,
+    enableLabel: "Activer les Conseils Départementaux",
+  },
+  enableBroadcastOfCapEmploiToFT: {
+    title: null,
+    enableLabel: "Activer les Cap-Emploi",
   },
 };
 
