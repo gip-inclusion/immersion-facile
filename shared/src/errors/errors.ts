@@ -295,6 +295,10 @@ export const errors = {
       new NotFoundError(
         `Mail not found for agency with id: ${agencyId} on agency repository.`,
       ),
+    userAlreadyExist: () =>
+      new BadRequestError(
+        "L'utilisateur est déjà rattaché à cette agence. Vous pouvez le modifier depuis la liste des utilisateurs de l'agence.",
+      ),
     usersNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
       new NotFoundError(`L'agence ${agencyId} n'a aucun utilisateur rattaché`),
     notEnoughCounsellors: ({ agencyId }: { agencyId: AgencyId }) =>
