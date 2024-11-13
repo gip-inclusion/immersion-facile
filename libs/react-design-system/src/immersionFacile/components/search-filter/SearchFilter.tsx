@@ -73,12 +73,14 @@ export const SearchFilter = ({
       priority: "tertiary",
       onClick: () => setIsOpened(false),
       className: fr.cx("fr-mb-0"),
+      id: `${id}-cancel-button`,
     },
     {
       children: "Appliquer",
       type: "submit",
       onClick: () => setIsOpened(false),
       className: fr.cx("fr-mb-0"),
+      id: `${id}-submit-button`,
     },
   ];
   if (onReset) {
@@ -92,6 +94,7 @@ export const SearchFilter = ({
       },
       className: fr.cx("fr-mb-0"),
       disabled: !hasValue,
+      id: `${id}-reset-button`,
     });
   }
 

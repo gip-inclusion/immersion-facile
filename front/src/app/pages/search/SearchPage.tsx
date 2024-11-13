@@ -516,6 +516,7 @@ export const SearchPage = ({
                   title: "Ordre d’affichage",
                   content: (
                     <RadioButtons
+                      id={domElementIds.search.sortRadioButtons}
                       options={filteredOptions.map((option) => ({
                         ...option,
                         nativeInputProps: {
