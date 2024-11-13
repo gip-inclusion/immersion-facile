@@ -7,6 +7,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -70,26 +71,37 @@ export class DeleteEstablishment extends TransactionalUseCase<
       }),
     ]);
 
-    if (establishmentAggregate.contact)
-      await this.saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: {
-          kind: "ESTABLISHMENT_DELETED",
-          recipients: [establishmentAggregate.contact.email],
-          cc: establishmentAggregate.contact.copyEmails,
-          params: {
-            businessAddresses:
-              establishmentAggregate.establishment.locations.map(
-                (addressAndPosition) =>
-                  addressDtoToString(addressAndPosition.address),
-              ),
-            businessName: establishmentAggregate.establishment.name,
-            siret: establishmentAggregate.establishment.siret,
-          },
+    const adminIds = establishmentAggregate.userRights
+      .filter(({ role }) => role === "establishment-admin")
+      .map(({ userId }) => userId);
+    const contactIds = establishmentAggregate.userRights
+      .filter(({ role }) => role === "establishment-contact")
+      .map(({ userId }) => userId);
+
+    const provider = await makeProvider(uow);
+
+    await this.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "ESTABLISHMENT_DELETED",
+        recipients: (await uow.userRepository.getByIds(adminIds, provider)).map(
+          ({ email }) => email,
+        ),
+        cc: (await uow.userRepository.getByIds(contactIds, provider)).map(
+          ({ email }) => email,
+        ),
+        params: {
+          businessAddresses: establishmentAggregate.establishment.locations.map(
+            (addressAndPosition) =>
+              addressDtoToString(addressAndPosition.address),
+          ),
+          businessName: establishmentAggregate.establishment.name,
+          siret: establishmentAggregate.establishment.siret,
         },
-        followedIds: {
-          establishmentSiret: establishmentAggregate.establishment.siret,
-        },
-      });
+      },
+      followedIds: {
+        establishmentSiret: establishmentAggregate.establishment.siret,
+      },
+    });
   }
 }

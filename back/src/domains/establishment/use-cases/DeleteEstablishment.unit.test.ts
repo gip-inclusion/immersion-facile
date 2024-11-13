@@ -2,6 +2,7 @@ import {
   FormEstablishmentDtoBuilder,
   GroupOptions,
   InclusionConnectedUserBuilder,
+  UserBuilder,
   addressDtoToString,
   errors,
   expectPromiseToFailWithError,
@@ -20,42 +21,55 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ContactEntity } from "../entities/ContactEntity";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { DeleteEstablishment } from "./DeleteEstablishment";
 
-const backofficeAdminBuilder = new InclusionConnectedUserBuilder().withIsAdmin(
-  true,
-);
-const icBackofficeAdminUser = backofficeAdminBuilder.build();
-const backofficeAdminUser = backofficeAdminBuilder.buildUser();
-
-const groupOptions: GroupOptions = {
-  heroHeader: {
-    title: "My hero header title",
-    description: "My hero header description",
-    logoUrl: "https://my-logo-url.com",
-    backgroundColor: "blue",
-  },
-  tintColor: "red",
-};
-
 describe("Delete Establishment", () => {
-  const contact: ContactEntity = {
-    copyEmails: ["billy1@mail.com", "billy2@mail.com"],
-    contactMethod: "EMAIL",
-    email: "boss@mail.com",
-    firstName: "",
-    id: "",
-    job: "",
-    lastName: "",
-    phone: "",
+  const backofficeAdminBuilder =
+    new InclusionConnectedUserBuilder().withIsAdmin(true);
+  const icBackofficeAdminUser = backofficeAdminBuilder.build();
+  const backofficeAdminUser = backofficeAdminBuilder.buildUser();
+
+  const groupOptions: GroupOptions = {
+    heroHeader: {
+      title: "My hero header title",
+      description: "My hero header description",
+      logoUrl: "https://my-logo-url.com",
+      backgroundColor: "blue",
+    },
+    tintColor: "red",
   };
-  const establishmentAggregate = new EstablishmentAggregateBuilder()
-    .withContact(contact)
+
+  const establishmentAdmin = new UserBuilder()
+    .withId("boss")
+    .withEmail("boss@mail.com")
     .build();
-  const formEstablishment = FormEstablishmentDtoBuilder.valid()
-    .withSiret(establishmentAggregate.establishment.siret)
+  const establishmentContact1 = new UserBuilder()
+    .withId("billy1")
+    .withEmail("billy1@mail.com")
+    .build();
+  const establishmentContact2 = new UserBuilder()
+    .withId("billy2")
+    .withEmail("billy2@mail.com")
+    .build();
+
+  const establishmentAggregate = new EstablishmentAggregateBuilder()
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "boss",
+        phone: "+33655447788",
+        userId: establishmentAdmin.id,
+      },
+      {
+        role: "establishment-contact",
+        userId: establishmentContact1.id,
+      },
+      {
+        role: "establishment-contact",
+        userId: establishmentContact2.id,
+      },
+    ])
     .build();
 
   let deleteEstablishment: DeleteEstablishment;
@@ -71,7 +85,12 @@ describe("Delete Establishment", () => {
       timeGateway,
       makeSaveNotificationAndRelatedEvent(new TestUuidGenerator(), timeGateway),
     );
-    uow.userRepository.users = [backofficeAdminUser];
+    uow.userRepository.users = [
+      backofficeAdminUser,
+      establishmentAdmin,
+      establishmentContact1,
+      establishmentContact2,
+    ];
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -109,12 +128,12 @@ describe("Delete Establishment", () => {
       await expectPromiseToFailWithError(
         deleteEstablishment.execute(
           {
-            siret: formEstablishment.siret,
+            siret: establishmentAggregate.establishment.siret,
           },
           icBackofficeAdminUser,
         ),
         errors.establishment.notFound({
-          siret: formEstablishment.siret,
+          siret: establishmentAggregate.establishment.siret,
         }),
       );
     });
@@ -126,12 +145,14 @@ describe("Delete Establishment", () => {
         establishmentAggregate,
       ];
       uow.formEstablishmentRepository.setFormEstablishments([
-        formEstablishment,
+        FormEstablishmentDtoBuilder.valid()
+          .withSiret(establishmentAggregate.establishment.siret)
+          .build(),
       ]);
       uow.groupRepository.groupEntities = [
         {
           name: "group",
-          sirets: [formEstablishment.siret, "siret2"],
+          sirets: [establishmentAggregate.establishment.siret, "siret2"],
           slug: "group",
           options: groupOptions,
         },
@@ -168,7 +189,7 @@ describe("Delete Establishment", () => {
         emails: [
           {
             kind: "ESTABLISHMENT_DELETED",
-            recipients: [contact.email],
+            recipients: [establishmentAdmin.email],
             params: {
               businessName: establishmentAggregate.establishment.name,
               siret: establishmentAggregate.establishment.siret,
@@ -178,7 +199,7 @@ describe("Delete Establishment", () => {
                     addressDtoToString(addressAndPosition.address),
                 ),
             },
-            cc: contact.copyEmails,
+            cc: [establishmentContact1.email, establishmentContact2.email],
           },
         ],
       });
