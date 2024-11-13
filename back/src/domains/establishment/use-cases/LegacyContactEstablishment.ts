@@ -1,5 +1,6 @@
 import subDays from "date-fns/subDays";
 import {
+  BusinessContactDto,
   DiscussionDto,
   LegacyContactEstablishmentRequestDto,
   errors,
@@ -8,16 +9,17 @@ import {
 } from "shared";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { ContactEntity } from "../entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
 } from "../entities/EstablishmentEntity";
+import { businessContactFromEstablishmentAggregateAndUsers } from "../helpers/businessContact.helpers";
 
 export class LegacyContactEstablishment extends TransactionalUseCase<LegacyContactEstablishmentRequestDto> {
   protected inputSchema = legacyContactEstablishmentRequestSchema;
@@ -59,12 +61,12 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       );
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
-    if (contactMode !== establishmentAggregate.contact.contactMethod)
+    if (contactMode !== establishmentAggregate.establishment.contactMethod)
       throw errors.establishment.contactRequestContactModeMismatch({
         siret,
         contactMethods: {
           inParams: contactMode,
-          inRepo: establishmentAggregate.contact.contactMethod,
+          inRepo: establishmentAggregate.establishment.contactMethod,
         },
       });
 
@@ -117,7 +119,11 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
 
     const discussion = this.#createDiscussion({
       contactRequest,
-      contact: establishmentAggregate.contact,
+      contact: await businessContactFromEstablishmentAggregateAndUsers(
+        uow,
+        await makeProvider(uow),
+        establishmentAggregate,
+      ),
       establishment: establishmentAggregate.establishment,
       now,
     });
@@ -150,7 +156,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
     now,
   }: {
     contactRequest: LegacyContactEstablishmentRequestDto;
-    contact: ContactEntity;
+    contact: BusinessContactDto;
     establishment: EstablishmentEntity;
     now: Date;
   }): DiscussionDto {
@@ -187,15 +193,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
             ? contactRequest.potentialBeneficiaryResumeLink
             : undefined,
       },
-      establishmentContact: {
-        contactMethod: contactRequest.contactMode,
-        email: contact.email,
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-        phone: contact.phone,
-        job: contact.job,
-        copyEmails: contact.copyEmails,
-      },
+      establishmentContact: contact,
       exchanges:
         contactRequest.contactMode === "EMAIL"
           ? [
