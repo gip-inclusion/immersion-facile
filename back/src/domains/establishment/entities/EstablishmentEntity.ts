@@ -1,14 +1,16 @@
 import {
+  ContactMethod,
   DateTimeIsoString,
   EstablishmentSearchableBy,
   FormEstablishmentSource,
   Location,
   NafDto,
   NumberEmployeesRange,
+  Phone,
   SiretDto,
+  UserId,
   WithAcquisition,
 } from "shared";
-import { ContactEntity } from "./ContactEntity";
 import { OfferEntity } from "./OfferEntity";
 
 type ApiSource = "api_labonneboite";
@@ -36,14 +38,37 @@ export type EstablishmentEntity = {
   voluntaryToImmersion: boolean;
   website?: string;
   score: number;
+  contactMethod: ContactMethod;
 } & WithAcquisition;
 
 export type EstablishmentAggregate = {
   establishment: EstablishmentEntity;
   offers: OfferEntity[];
-  contact: ContactEntity;
+  userRights: EstablishmentUserRight[];
 };
 
 export type WithEstablishmentAggregate = {
   establishmentAggregate: EstablishmentAggregate;
 };
+
+type EstablishmentRole = "establishment-admin" | "establishment-contact";
+type GenericEstablishmentUserRight<Role extends EstablishmentRole> = {
+  userId: UserId;
+  role: Role;
+};
+
+type WithJobAndPhone = {
+  job: string;
+  phone: Phone;
+};
+
+export type EstablishmentAdminRight =
+  GenericEstablishmentUserRight<"establishment-admin"> & WithJobAndPhone;
+
+export type EstablishmentContactRight =
+  GenericEstablishmentUserRight<"establishment-contact"> &
+    Partial<WithJobAndPhone>;
+
+export type EstablishmentUserRight =
+  | EstablishmentAdminRight
+  | EstablishmentContactRight;

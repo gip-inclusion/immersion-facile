@@ -2,15 +2,18 @@ import { FormEstablishmentDto, Location, noContactPerMonth } from "shared";
 import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+import {
+  EstablishmentAggregate,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentEntity";
 
 export const makeEstablishmentAggregate = ({
-  uuidGenerator,
   timeGateway,
   formEstablishment,
   nafAndNumberOfEmployee,
   addressesAndPosition,
   score = 0,
+  userRights,
 }: {
   uuidGenerator: UuidGenerator;
   timeGateway: TimeGateway;
@@ -18,6 +21,7 @@ export const makeEstablishmentAggregate = ({
   addressesAndPosition: Location[];
   nafAndNumberOfEmployee: NafAndNumberOfEmpolyee;
   score?: number;
+  userRights: EstablishmentUserRight[];
 }): EstablishmentAggregate => ({
   establishment: {
     acquisitionCampaign: formEstablishment.acquisitionCampaign,
@@ -41,11 +45,9 @@ export const makeEstablishmentAggregate = ({
     nextAvailabilityDate: formEstablishment.nextAvailabilityDate,
     searchableBy: formEstablishment.searchableBy,
     score,
+    contactMethod: formEstablishment.businessContact.contactMethod,
   },
-  contact: {
-    id: uuidGenerator.new(),
-    ...formEstablishment.businessContact,
-  },
+  userRights: userRights,
   offers: formEstablishment.appellations.map(
     ({ appellationCode, appellationLabel, romeCode, romeLabel }) => ({
       romeCode,

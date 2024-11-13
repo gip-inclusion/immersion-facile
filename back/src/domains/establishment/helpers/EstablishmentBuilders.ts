@@ -1,7 +1,6 @@
 import {
   Builder,
   ContactMethod,
-  Email,
   EstablishmentSearchableBy,
   FormEstablishmentSource,
   Location,
@@ -10,13 +9,13 @@ import {
   RomeCode,
   WithAcquisition,
   defaultMaxContactsPerMonth,
+  errors,
 } from "shared";
 import { avenueChampsElyseesDto } from "../../core/address/adapters/InMemoryAddressGateway";
-import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { ContactEntity } from "../entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
+  EstablishmentUserRight,
 } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
 
@@ -27,53 +26,6 @@ export const TEST_LOCATION: Location = {
   address: avenueChampsElyseesDto,
   position: { lat: 43.8666, lon: 8.3333 },
 };
-
-export const validContactEntityV2: ContactEntity = {
-  id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
-  lastName: "Prost",
-  firstName: "Alain",
-  email: "alain.prost@email.fr",
-  job: "le big boss",
-  phone: "+33612345678",
-  contactMethod: "EMAIL",
-  copyEmails: [],
-};
-
-export class ContactEntityBuilder implements Builder<ContactEntity> {
-  constructor(private readonly entity: ContactEntity = validContactEntityV2) {}
-
-  public build() {
-    return this.entity;
-  }
-
-  public withContactMethod(contactMethod: ContactMethod) {
-    return new ContactEntityBuilder({ ...this.entity, contactMethod });
-  }
-
-  public withCopyEmails(copyEmails: string[]) {
-    return new ContactEntityBuilder({ ...this.entity, copyEmails });
-  }
-
-  public withEmail(email: string) {
-    return new ContactEntityBuilder({ ...this.entity, email });
-  }
-
-  public withGeneratedContactId() {
-    return this.withId(new UuidV4Generator().new());
-  }
-
-  public withId(id: string) {
-    return new ContactEntityBuilder({ ...this.entity, id });
-  }
-
-  public withLastName(lastName: string) {
-    return new ContactEntityBuilder({ ...this.entity, lastName });
-  }
-
-  public withPhone(phone: string) {
-    return new ContactEntityBuilder({ ...this.entity, phone });
-  }
-}
 
 export const defaultNafCode = "7820Z";
 export const defaultLocation: Location = {
@@ -97,6 +49,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
   updatedAt: new Date("2024-08-10"),
+  contactMethod: "EMAIL",
   isOpen: true,
   isSearchable: true,
   maxContactsPerMonth: defaultMaxContactsPerMonth,
@@ -130,6 +83,10 @@ export class EstablishmentEntityBuilder
 
   public withCreatedAt(createdAt: Date) {
     return new EstablishmentEntityBuilder({ ...this.entity, createdAt });
+  }
+
+  public withContactMethod(contactMethod: ContactMethod) {
+    return new EstablishmentEntityBuilder({ ...this.entity, contactMethod });
   }
 
   public withCustomizedName(customizedName?: string) {
@@ -259,18 +216,22 @@ export class EstablishmentAggregateBuilder
     private readonly aggregate: EstablishmentAggregate = {
       establishment: new EstablishmentEntityBuilder().build(),
       offers: [new OfferEntityBuilder().build()],
-      contact: new ContactEntityBuilder().build(),
+      userRights: [],
     },
   ) {}
 
   public build() {
+    if (!this.aggregate.userRights.length)
+      throw errors.establishment.noUserRights({
+        siret: this.aggregate.establishment.siret,
+      });
     return this.aggregate;
   }
 
-  public withContact(contact: ContactEntity) {
+  public withUserRights(userRights: EstablishmentUserRight[]) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
-      contact,
+      userRights,
     });
   }
 
@@ -285,17 +246,14 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withContactEmail(email: Email) {
-    return new EstablishmentAggregateBuilder().withContact({
-      ...this.aggregate.contact,
-      email,
-    });
-  }
-
-  public withContactId(id: string) {
+  public withContactMethod(contactMethod: ContactMethod) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
-      contact: new ContactEntityBuilder().withId(id).build(),
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withContactMethod(contactMethod)
+        .build(),
     });
   }
 
@@ -416,10 +374,6 @@ export class EstablishmentAggregateBuilder
         .withFitForDisabledWorkers(fitForDisabledWorkers)
         .build(),
     });
-  }
-
-  public withGeneratedContactId() {
-    return this.withContactId(new UuidV4Generator().new());
   }
 
   public withIsSearchable(isSearchable: boolean) {
