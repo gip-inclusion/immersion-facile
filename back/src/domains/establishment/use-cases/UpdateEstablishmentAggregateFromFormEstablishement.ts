@@ -6,6 +6,7 @@ import {
 import { rawAddressToLocation } from "../../../utils/address";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
+import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import {
   WithTriggeredBy,
   withTriggeredBySchema,
@@ -15,6 +16,7 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
+import { EstablishmentUserRight } from "../entities/EstablishmentEntity";
 import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregate";
 
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
@@ -65,6 +67,40 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
         siret: formEstablishment.siret,
       });
 
+    const adminUserId = await createOrGetUserIdByEmail(
+      uow,
+      this.#timeGateway,
+      this.#uuidGenerator,
+      {
+        email: formEstablishment.businessContact.email,
+        firstName: formEstablishment.businessContact.firstName,
+        lastName: formEstablishment.businessContact.lastName,
+      },
+    );
+
+    const contactUserIds = await Promise.all(
+      formEstablishment.businessContact.copyEmails.map((email) =>
+        createOrGetUserIdByEmail(uow, this.#timeGateway, this.#uuidGenerator, {
+          email,
+        }),
+      ),
+    );
+
+    const updatedUserRights: EstablishmentUserRight[] = [
+      {
+        role: "establishment-admin",
+        job: formEstablishment.businessContact.job,
+        phone: formEstablishment.businessContact.phone,
+        userId: adminUserId,
+      },
+      ...contactUserIds.map(
+        (userId): EstablishmentUserRight => ({
+          role: "establishment-contact",
+          userId,
+        }),
+      ),
+    ];
+
     const establishmentAggregate = makeEstablishmentAggregate({
       uuidGenerator: this.#uuidGenerator,
       timeGateway: this.#timeGateway,
@@ -84,6 +120,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       ),
       formEstablishment,
       score: initialEstablishmentAggregate.establishment.score,
+      userRights: updatedUserRights,
     });
 
     await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
