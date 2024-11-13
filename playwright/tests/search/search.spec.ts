@@ -34,8 +34,15 @@ test.describe("Search", () => {
   });
 
   test("can search with location fields and clear it", async ({ page }) => {
+    const defaultPlaceAutocompleteValue = "France entière";
+    const defaultAppellationsAutocompleteValue = "Tous les métiers";
     await page.goto(frontRoutes.search);
     await expectSearchSubmitButtonToBeEnabled(page);
+    await fillAutocomplete({
+      page,
+      locator: `#${domElementIds.search.appellationAutocomplete}`,
+      value: "Boulanger",
+    });
     await fillAutocomplete({
       page,
       locator: `#${domElementIds.search.placeAutocompleteInput}`,
@@ -43,19 +50,30 @@ test.describe("Search", () => {
     });
     await page.click(`#${domElementIds.search.searchSubmitButton}`);
     await expectSortFiltersToBe(page, [
-      "Sélectionner une option",
-      "Trier par date de publication",
       "Trier par pertinence",
+      "Trier par date de publication",
       "Trier par proximité",
     ]);
-    await expectSearchToHaveResults(page);
-    await page.fill(`#${domElementIds.search.placeAutocompleteInput}`, "");
-    await page.click(`#${domElementIds.search.searchSubmitButton}`);
-    await expectSortFiltersToBe(page, [
-      "Sélectionner une option",
-      "Trier par date de publication",
-      "Trier par pertinence",
-    ]);
+    await expect(
+      page.locator(`#${domElementIds.search.locationFilterTag}`),
+    ).not.toHaveText(defaultPlaceAutocompleteValue);
+    await expect(
+      page.locator(`#${domElementIds.search.appellationFilterTag}`),
+    ).not.toHaveText(defaultAppellationsAutocompleteValue);
+    await page.locator(`#${domElementIds.search.locationFilterTag}`).click();
+    await page
+      .locator(`#${domElementIds.search.locationFilterTag}-reset-button`)
+      .click();
+    await page.locator(`#${domElementIds.search.appellationFilterTag}`).click();
+    await page
+      .locator(`#${domElementIds.search.appellationFilterTag}-reset-button`)
+      .click();
+    await expect(
+      page.locator(`#${domElementIds.search.locationFilterTag}`),
+    ).toHaveText(defaultPlaceAutocompleteValue);
+    await expect(
+      page.locator(`#${domElementIds.search.appellationFilterTag}`),
+    ).toHaveText(defaultAppellationsAutocompleteValue);
     await expectSearchToHaveResults(page);
   });
 });
@@ -63,7 +81,7 @@ test.describe("Search", () => {
 test.skip("checks that share URL have the correct params values", async () => {});
 
 const expectSearchToHaveResults = async (page: Page) => {
-  const searchResultsSelector = `[id^=${domElementIds.search.searchResultButton}]`;
+  const searchResultsSelector = "[id^=im-search-result]";
   await page.waitForSelector(searchResultsSelector);
   await expect(
     await page.locator(searchResultsSelector).count(),
@@ -78,10 +96,9 @@ const expectSearchSubmitButtonToBeEnabled = async (page: Page) => {
 };
 
 const expectSortFiltersToBe = async (page: Page, filters: string[]) => {
-  const selector = `#${domElementIds.search.sortFilter}`;
-  page.waitForSelector(selector);
+  await page.locator(`#${domElementIds.search.sortFilterTag}`).click();
   const sortFiltersOptions = (
-    await page.locator(`${selector}`).innerText()
+    await page.locator(`#${domElementIds.search.sortRadioButtons}`).innerText()
   ).split("\n");
   await expect(await sortFiltersOptions).toEqual(filters);
 };

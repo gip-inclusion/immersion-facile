@@ -169,6 +169,7 @@ export const domElementIds = {
     appellationFilterTag: "im-search-page__appellation-filter-tag",
     locationFilterTag: "im-search-page__location-filter-tag",
     sortFilterTag: "im-search-page__sort-filter-tag",
+    sortRadioButtons: "im-search-page__sort-radio-buttons",
   },
   addAgency: {
     form: "im-form-add-agency",
