@@ -82,11 +82,16 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     });
   });
 
-  it("Send an email to first validator", async () => {
-    uow.userRepository.users = [validator];
+  it("Send an email to validators ", async () => {
+    const validator2 = new InclusionConnectedUserBuilder()
+      .withEmail("validator2@email.com")
+      .withId("validator2")
+      .buildUser();
+    uow.userRepository.users = [validator, validator2];
     await uow.agencyRepository.insert(
       toAgencyWithRights(agency, {
         [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     );
     await uow.conventionRepository.save(convention);
@@ -112,7 +117,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             assessmentStatus: assessment.status,
             internshipKind: convention.internshipKind,
           },
-          recipients: [validator.email],
+          recipients: [validator.email, validator2.email],
         },
       ],
     });
