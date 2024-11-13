@@ -4,26 +4,19 @@ import {
   withFormEstablishmentSchema,
 } from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
-import { createLogger } from "../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
+import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SiretGateway } from "../../core/sirene/ports/SirenGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
+import { EstablishmentUserRight } from "../entities/EstablishmentEntity";
 import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregate";
-
-const logger = createLogger(__filename);
-
-// prettier-ignore
-const makeLog = (siret: string) => (message: string) =>
-  logger.info({
-    message: `${new Date().toISOString()} - InsertEstablishmentAggregateFromForm - ${siret} - ${message}`,
-  });
 
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   WithFormEstablishmentDto,
@@ -46,10 +39,6 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     { formEstablishment }: WithFormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const log = makeLog(formEstablishment.siret);
-
-    log("Start");
-
     const establishment =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         formEstablishment.siret,
@@ -59,6 +48,42 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       throw errors.establishment.conflictError({
         siret: formEstablishment.siret,
       });
+
+    const { businessContact } = formEstablishment;
+
+    const establishmentAdminId = await createOrGetUserIdByEmail(
+      uow,
+      this.timeGateway,
+      this.uuidGenerator,
+      {
+        email: businessContact.email,
+        firstName: businessContact.firstName,
+        lastName: businessContact.lastName,
+      },
+    );
+
+    const establishmentContactIds = await Promise.all(
+      businessContact.copyEmails.map((email) =>
+        createOrGetUserIdByEmail(uow, this.timeGateway, this.uuidGenerator, {
+          email,
+        }),
+      ),
+    );
+
+    const userRights: EstablishmentUserRight[] = [
+      {
+        role: "establishment-admin",
+        userId: establishmentAdminId,
+        job: businessContact.job,
+        phone: businessContact.phone,
+      },
+      ...establishmentContactIds.map(
+        (userId): EstablishmentUserRight => ({
+          role: "establishment-contact",
+          userId,
+        }),
+      ),
+    ];
 
     const establishmentAggregate = await makeEstablishmentAggregate({
       uuidGenerator: this.uuidGenerator,
@@ -78,10 +103,8 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         ),
       ),
       formEstablishment,
+      userRights,
     });
-
-    log("Aggregate Ready");
-    log(`About to save : ${JSON.stringify(establishmentAggregate, null, 2)}`);
 
     await uow.establishmentAggregateRepository
       .insertEstablishmentAggregate(establishmentAggregate)
@@ -93,14 +116,11 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         );
       });
 
-    log("Saved");
-
     const event = this.createNewEvent({
       topic: "NewEstablishmentAggregateInsertedFromForm",
       payload: { establishmentAggregate, triggeredBy: null },
     });
-    log(`About to save event ${event.id}`);
+
     await uow.outboxRepository.save(event);
-    log("Event saved");
   }
 }
