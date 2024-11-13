@@ -6,6 +6,7 @@ import {
   DiscussionBuilder,
   LegacyContactEstablishmentRequestDto,
   Location,
+  UserBuilder,
   errors,
   expectArraysToEqual,
   expectPromiseToFailWithError,
@@ -22,7 +23,10 @@ import {
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  ContactEntityBuilder,
+  EstablishmentAdminRight,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentEntity";
+import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -30,7 +34,6 @@ import {
 import { LegacyContactEstablishment } from "./LegacyContactEstablishment";
 
 const siret = "11112222333344";
-const contactId = "theContactId";
 
 const location: Location = {
   id: "11111111-1111-4444-1111-111111111111",
@@ -77,20 +80,38 @@ const validEmailRequest: LegacyContactEstablishmentRequestDto = {
   potentialBeneficiaryPhone: "+33654783402",
 };
 
+const establishmentAdmin = new UserBuilder()
+  .withId("establishment.admin")
+  .withEmail("admin@establishment.com")
+  .build();
+const establishmentContact = new UserBuilder()
+  .withId("establishment.contact")
+  .withEmail("contact@establishment.com")
+  .build();
+
+const establishmentAdminRight: EstablishmentAdminRight = {
+  role: "establishment-admin",
+  job: "Boss",
+  phone: "+33877995544",
+  userId: establishmentAdmin.id,
+};
+const establishmentRights: EstablishmentUserRight[] = [
+  establishmentAdminRight,
+  {
+    role: "establishment-contact",
+    userId: establishmentContact.id,
+  },
+];
 const establishmentAggregateWithEmailContact =
   new EstablishmentAggregateBuilder()
     .withEstablishment(
       new EstablishmentEntityBuilder()
         .withSiret(siret)
         .withLocations([location])
-        .build(),
-    )
-    .withContact(
-      new ContactEntityBuilder()
-        .withId(contactId)
         .withContactMethod("EMAIL")
         .build(),
     )
+    .withUserRights(establishmentRights)
     .withOffers([immersionOffer]);
 
 const minimumNumberOfDaysBetweenSimilarContactRequests = 3;
@@ -120,6 +141,8 @@ describe("LegacyContactEstablishment", () => {
       timeGateway,
       minimumNumberOfDaysBetweenSimilarContactRequests,
     );
+
+    uow.userRepository.users = [establishmentAdmin, establishmentContact];
   });
 
   it("schedules event for valid EMAIL contact request", async () => {
@@ -160,14 +183,10 @@ describe("LegacyContactEstablishment", () => {
         new EstablishmentEntityBuilder()
           .withSiret(siret)
           .withLocations([location])
-          .build(),
-      )
-      .withContact(
-        new ContactEntityBuilder()
-          .withId(contactId)
           .withContactMethod("PHONE")
           .build(),
       )
+      .withUserRights(establishmentRights)
       .withOffers([immersionOffer])
       .build();
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
@@ -211,14 +230,10 @@ describe("LegacyContactEstablishment", () => {
           new EstablishmentEntityBuilder()
             .withSiret(siret)
             .withLocations([location])
-            .build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withId(contactId)
             .withContactMethod("IN_PERSON")
             .build(),
         )
+        .withUserRights(establishmentRights)
         .withOffers([immersionOffer])
         .build(),
     );
@@ -261,8 +276,6 @@ describe("LegacyContactEstablishment", () => {
       establishmentAggregate,
     );
     const establishment = establishmentAggregate.establishment;
-    // biome-ignore lint/style/noNonNullAssertion: we know the contact is defined
-    const establishmentContact = establishmentAggregate.contact!;
 
     const connectionDate = new Date("2022-01-01T12:00:00.000");
     const connectionDateStr = connectionDate.toISOString();
@@ -290,12 +303,12 @@ describe("LegacyContactEstablishment", () => {
         },
         establishmentContact: {
           contactMethod: "EMAIL",
-          email: establishmentContact.email,
-          firstName: establishmentContact.firstName,
-          lastName: establishmentContact.lastName,
-          phone: establishmentContact.phone,
-          job: establishmentContact.job,
-          copyEmails: establishmentContact.copyEmails,
+          email: establishmentAdmin.email,
+          firstName: establishmentAdmin.firstName,
+          lastName: establishmentAdmin.lastName,
+          phone: establishmentAdminRight.phone,
+          job: establishmentAdminRight.job,
+          copyEmails: [establishmentContact.email],
         },
         createdAt: connectionDateStr,
         immersionObjective: "Confirmer un projet professionnel",
@@ -325,8 +338,6 @@ describe("LegacyContactEstablishment", () => {
       establishmentAggregate,
     );
     const establishment = establishmentAggregate.establishment;
-    // biome-ignore lint/style/noNonNullAssertion: we know the contact is defined
-    const establishmentContact = establishmentAggregate.contact!;
 
     const connectionDate = new Date("2022-01-10T12:00:00.000");
     timeGateway.setNextDate(connectionDate);
@@ -352,12 +363,12 @@ describe("LegacyContactEstablishment", () => {
         },
         establishmentContact: {
           contactMethod: "EMAIL",
-          email: establishmentContact.email,
-          firstName: establishmentContact.firstName,
-          lastName: establishmentContact.lastName,
-          phone: establishmentContact.phone,
-          job: establishmentContact.job,
-          copyEmails: establishmentContact.copyEmails,
+          email: establishmentAdmin.email,
+          firstName: establishmentAdmin.firstName,
+          lastName: establishmentAdmin.lastName,
+          phone: establishmentAdminRight.phone,
+          job: establishmentAdminRight.job,
+          copyEmails: [establishmentContact.email],
         },
         createdAt: discussionToOldDate,
         exchanges: [
@@ -388,12 +399,12 @@ describe("LegacyContactEstablishment", () => {
         },
         establishmentContact: {
           contactMethod: "EMAIL",
-          email: establishmentContact.email,
-          firstName: establishmentContact.firstName,
-          lastName: establishmentContact.lastName,
-          phone: establishmentContact.phone,
-          job: establishmentContact.job,
-          copyEmails: establishmentContact.copyEmails,
+          email: establishmentAdmin.email,
+          firstName: establishmentAdmin.firstName,
+          lastName: establishmentAdmin.lastName,
+          phone: establishmentAdminRight.phone,
+          job: establishmentAdminRight.job,
+          copyEmails: [establishmentContact.email],
         },
         exchanges: [
           {
@@ -474,14 +485,12 @@ describe("LegacyContactEstablishment", () => {
     it("throws BadRequestError for contact mode mismatch", async () => {
       const establishment = new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityBuilder().withSiret(siret).build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withId("wrong_contact_id")
+          new EstablishmentEntityBuilder()
+            .withSiret(siret)
             .withContactMethod("EMAIL")
             .build(),
         )
+        .withUserRights(establishmentRights)
         .withOffers([immersionOffer])
         .build();
       await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
@@ -497,7 +506,7 @@ describe("LegacyContactEstablishment", () => {
           siret: establishment.establishment.siret,
           contactMethods: {
             inParams: "IN_PERSON",
-            inRepo: establishment.contact.contactMethod,
+            inRepo: establishment.establishment.contactMethod,
           },
         }),
       );
@@ -517,14 +526,12 @@ describe("LegacyContactEstablishment", () => {
       await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityBuilder().withSiret(siret).build(),
-          )
-          .withContact(
-            new ContactEntityBuilder()
-              .withId("wrong_contact_id")
+            new EstablishmentEntityBuilder()
+              .withSiret(siret)
               .withContactMethod("PHONE")
               .build(),
           )
+          .withUserRights(establishmentRights)
           .withOffers([
             new OfferEntityBuilder().withAppellationCode("wrong").build(),
           ])
