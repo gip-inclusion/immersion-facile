@@ -55,19 +55,16 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
               uow,
               this.#timeGateway,
               this.#uuidGenerator,
-              email,
+              { email },
             ),
           ),
         );
 
     const counsellorUserIdsForAgency = await Promise.all(
       counsellorEmails.map((email) =>
-        createOrGetUserIdByEmail(
-          uow,
-          this.#timeGateway,
-          this.#uuidGenerator,
+        createOrGetUserIdByEmail(uow, this.#timeGateway, this.#uuidGenerator, {
           email,
-        ),
+        }),
       ),
     );
 
