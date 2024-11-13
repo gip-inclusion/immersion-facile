@@ -5,6 +5,7 @@ import {
   LocationId,
   SearchResultDto,
   SiretDto,
+  UserId,
 } from "shared";
 import {
   EstablishmentAggregate,
@@ -25,7 +26,7 @@ export type SearchImmersionParams = {
   maxResults?: number;
 };
 
-export type EstablishmentAggregateFilters = { contactEmail: string };
+export type EstablishmentAggregateFilters = { userId: UserId };
 
 export interface EstablishmentAggregateRepository {
   //Establishment aggregate
@@ -40,9 +41,9 @@ export interface EstablishmentAggregateRepository {
   getEstablishmentAggregateBySiret(
     siret: string,
   ): Promise<EstablishmentAggregate | undefined>;
-  getEstablishmentAggregatesByFilters({
-    contactEmail,
-  }: EstablishmentAggregateFilters): Promise<EstablishmentAggregate[]>;
+  getEstablishmentAggregatesByFilters(
+    params: EstablishmentAggregateFilters,
+  ): Promise<EstablishmentAggregate[]>;
   hasEstablishmentAggregateWithSiret(siret: string): Promise<boolean>;
   updateEstablishmentsWithInseeData(
     inseeCheckDate: Date,

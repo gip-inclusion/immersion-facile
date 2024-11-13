@@ -16,6 +16,7 @@ import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetwe
 import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";
 import {
+  EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
   SearchImmersionParams,
   SearchImmersionResult,
@@ -56,11 +57,12 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   public async getEstablishmentAggregatesByFilters({
-    contactEmail,
-  }: { contactEmail: string }): Promise<EstablishmentAggregate[]> {
-    return this.#establishmentAggregates.filter(
-      (establishmentAggregate) =>
-        establishmentAggregate.contact?.email === contactEmail,
+    userId,
+  }: EstablishmentAggregateFilters): Promise<EstablishmentAggregate[]> {
+    return this.#establishmentAggregates.filter((establishmentAggregate) =>
+      establishmentAggregate.userRights.some(
+        (userRight) => userRight.userId === userId,
+      ),
     );
   }
 
@@ -271,7 +273,7 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation
         })),
       siret: establishmentAgg.establishment.siret,
       voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
-      contactMode: establishmentAgg.contact?.contactMethod,
+      contactMode: establishmentAgg.establishment.contactMethod,
       numberOfEmployeeRange:
         establishmentAgg.establishment.numberEmployeesRange,
       website: establishmentAgg.establishment?.website,
@@ -315,7 +317,7 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
   position: establishmentAggregate.establishment.locations[0].position,
   address: establishmentAggregate.establishment.locations[0].address,
   locationId: establishmentAggregate.establishment.locations[0].id,
-  contactMode: establishmentAggregate.contact?.contactMethod,
+  contactMode: establishmentAggregate.establishment.contactMethod,
   distance_m,
   romeLabel: TEST_ROME_LABEL,
   website: establishmentAggregate.establishment.website,
