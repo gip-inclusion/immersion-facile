@@ -29,6 +29,24 @@ describe("Broadcasts events to France Travail", () => {
   let timeGateway: CustomTimeGateway;
   let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
 
+  const agencySIAE = toAgencyWithRights(
+    new AgencyDtoBuilder(peAgencyWithoutCounsellorsAndValidators)
+      .withKind("structure-IAE")
+      .build(),
+  );
+
+  const conventionLinkedToSIAE = new ConventionDtoBuilder()
+    .withId("11110000-0000-4000-0000-000000000001")
+    .withAgencyId(agencySIAE.id)
+    .build();
+
+  const conventionLinkedToFTWithoutFederatedIdentity =
+    new ConventionDtoBuilder()
+      .withId("00000000-0000-4000-0000-000000000000")
+      .withAgencyId(peAgencyWithoutCounsellorsAndValidators.id)
+      .withoutFederatedIdentity()
+      .build();
+
   beforeEach(() => {
     uow = createInMemoryUow();
     poleEmploiGateWay = new InMemoryPoleEmploiGateway();
@@ -46,61 +64,34 @@ describe("Broadcasts events to France Travail", () => {
   });
 
   it("Skips convention if not linked to an agency of kind pole-emploi nor agencyRefersTo of kind pole-emploi", async () => {
-    // Prepare
-    const agency = toAgencyWithRights(
-      new AgencyDtoBuilder(peAgencyWithoutCounsellorsAndValidators)
-        .withKind("mission-locale")
-        .build(),
-    );
-    uow.agencyRepository.agencies = [agency];
+    uow.agencyRepository.agencies = [agencySIAE];
 
-    // Act
-    const convention = new ConventionDtoBuilder()
-      .withAgencyId(agency.id)
-      .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
-      .build();
+    await broadcastToFranceTravailOnConventionUpdates.execute({
+      convention: conventionLinkedToSIAE,
+    });
 
-    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
-
-    // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
   });
 
   it("Conventions without federated id are still sent, with their externalId", async () => {
-    // Prepare
-
-    const immersionConventionId: ConventionId =
-      "00000000-0000-4000-0000-000000000000";
     const externalId = "00000000001";
-
     uow.conventionExternalIdRepository.externalIdsByConventionId = {
-      [immersionConventionId]: externalId,
+      [conventionLinkedToFTWithoutFederatedIdentity.id]: externalId,
     };
 
-    // Act
-    const convention = new ConventionDtoBuilder()
-      .withId(immersionConventionId)
-      .withAgencyId(peAgencyWithoutCounsellorsAndValidators.id)
-      .withoutFederatedIdentity()
-      .build();
-
-    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({
+      convention: conventionLinkedToFTWithoutFederatedIdentity,
+    });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
     expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
-      originalId: immersionConventionId,
+      originalId: conventionLinkedToFTWithoutFederatedIdentity.id,
       id: externalId,
     });
   });
 
   it("If Pe returns a 404 error, we store the error in a repo", async () => {
-    // Prepare
-    const convention = new ConventionDtoBuilder()
-      .withAgencyId(peAgencyWithoutCounsellorsAndValidators.id)
-      .withoutFederatedIdentity()
-      .build();
-
     poleEmploiGateWay.setNextResponse({
       status: 404,
       subscriberErrorFeedback: { message: "Ops, something is bad" },
@@ -110,7 +101,9 @@ describe("Broadcasts events to France Travail", () => {
     timeGateway.setNextDate(now);
 
     // Act
-    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({
+      convention: conventionLinkedToFTWithoutFederatedIdentity,
+    });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
@@ -120,8 +113,8 @@ describe("Broadcasts events to France Travail", () => {
         consumerName: "France Travail",
         serviceName: broadcastToPeServiceName,
         requestParams: {
-          conventionId: convention.id,
-          conventionStatus: convention.status,
+          conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
+          conventionStatus: conventionLinkedToFTWithoutFederatedIdentity.status,
         },
         response: { httpStatus: 404, body: "not found" },
         subscriberErrorFeedback: {
@@ -134,12 +127,6 @@ describe("Broadcasts events to France Travail", () => {
   });
 
   it("store the broadcast feetback success in a repo", async () => {
-    // Prepare
-    const convention = new ConventionDtoBuilder()
-      .withAgencyId(peAgencyWithoutCounsellorsAndValidators.id)
-      .withoutFederatedIdentity()
-      .build();
-
     poleEmploiGateWay.setNextResponse({
       status: 200,
       body: { success: true },
@@ -148,7 +135,9 @@ describe("Broadcasts events to France Travail", () => {
     timeGateway.setNextDate(now);
 
     // Act
-    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
+    await broadcastToFranceTravailOnConventionUpdates.execute({
+      convention: conventionLinkedToFTWithoutFederatedIdentity,
+    });
 
     // Assert
     expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
@@ -157,8 +146,8 @@ describe("Broadcasts events to France Travail", () => {
         consumerName: "France Travail",
         serviceName: broadcastToPeServiceName,
         requestParams: {
-          conventionId: convention.id,
-          conventionStatus: convention.status,
+          conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
+          conventionStatus: conventionLinkedToFTWithoutFederatedIdentity.status,
         },
         response: {
           httpStatus: 200,
@@ -246,21 +235,8 @@ describe("Broadcasts events to France Travail", () => {
         .build(),
     );
 
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(peAgencyWithoutCounsellorsAndValidators),
-      agencyWithRefersTo,
-    ];
-
-    const immersionConventionId: ConventionId =
-      "00000000-0000-0000-0000-000000000000";
-
-    const externalId = "00000000001";
-    uow.conventionExternalIdRepository.externalIdsByConventionId = {
-      [immersionConventionId]: externalId,
-    };
-
-    const convention = new ConventionDtoBuilder()
-      .withId(immersionConventionId)
+    const conventionLinkedToAgencyReferingToOther = new ConventionDtoBuilder()
+      .withId("22222222-2222-4000-2222-222222222222")
       .withAgencyId(agencyWithRefersTo.id)
       .withImmersionAppellation({
         appellationCode: "11111",
@@ -270,22 +246,31 @@ describe("Broadcasts events to France Travail", () => {
       })
       .withBeneficiaryBirthdate("2000-10-05")
       .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
       .withDateStart("2021-05-12")
       .withDateEnd("2021-05-14T00:30:00.000Z") //
       .withSchedule(reasonableSchedule)
       .withImmersionObjective("Initier une démarche de recrutement")
       .build();
 
-    // Act
-    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(peAgencyWithoutCounsellorsAndValidators),
+      agencyWithRefersTo,
+    ];
+
+    const externalId = "00000000001";
+    uow.conventionExternalIdRepository.externalIdsByConventionId = {
+      [conventionLinkedToAgencyReferingToOther.id]: externalId,
+    };
+
+    await broadcastToFranceTravailOnConventionUpdates.execute({
+      convention: conventionLinkedToAgencyReferingToOther,
+    });
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
     expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
       id: externalId,
-      peConnectId: "some-id",
-      originalId: immersionConventionId,
+      originalId: conventionLinkedToAgencyReferingToOther.id,
       objectifDeImmersion: 3,
       dureeImmersion: 21,
       dateDebut: "2021-05-12T00:00:00.000Z",
