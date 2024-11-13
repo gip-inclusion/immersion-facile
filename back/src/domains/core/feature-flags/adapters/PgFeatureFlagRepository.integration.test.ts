@@ -49,6 +49,9 @@ describe("PG getFeatureFlags", () => {
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
       enableProConnect: makeBooleanFeatureFlag(false),
+      enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(expectedFeatureFlags);
@@ -68,6 +71,9 @@ describe("PG getFeatureFlags", () => {
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
       enableProConnect: makeBooleanFeatureFlag(false),
+      enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
     });
   });
 
@@ -87,6 +93,9 @@ describe("PG getFeatureFlags", () => {
       }),
       enableSearchByScore: makeBooleanFeatureFlag(false),
       enableProConnect: makeBooleanFeatureFlag(false),
+      enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(initialFeatureFlags);
@@ -125,6 +134,9 @@ describe("PG getFeatureFlags", () => {
       }),
       enableSearchByScore: makeBooleanFeatureFlag(true),
       enableProConnect: makeBooleanFeatureFlag(false),
+      enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+      enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
     });
   });
 });

@@ -22,6 +22,9 @@ export const defaultFlags: FeatureFlags = {
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
   enableProConnect: makeBooleanFeatureFlag(false),
+  enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+  enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+  enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
@@ -44,5 +47,9 @@ export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
       ...this.#featureFlags[params.flagName],
       ...(params.featureFlag as any),
     };
+  }
+
+  set featureFlags(featureFlags: Partial<FeatureFlags>) {
+    this.#featureFlags = { ...defaultFlags, ...featureFlags };
   }
 }

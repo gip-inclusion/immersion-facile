@@ -31,6 +31,9 @@ const defaultFeatureFlags: FeatureFlags = {
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
   enableProConnect: makeBooleanFeatureFlag(false),
+  enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+  enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+  enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -48,6 +51,9 @@ const flagsFromApi: FeatureFlags = {
   }),
   enableSearchByScore: makeBooleanFeatureFlag(true),
   enableProConnect: makeBooleanFeatureFlag(true),
+  enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+  enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+  enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
 };
 
 describe("feature flag slice", () => {

@@ -139,6 +139,9 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
     }),
     enableSearchByScore: makeBooleanFeatureFlag(true),
     enableProConnect: makeBooleanFeatureFlag(false),
+    enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
+    enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
+    enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   };
 
   await uow.featureFlagRepository.insertAll(featureFlags);
