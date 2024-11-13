@@ -1,5 +1,10 @@
 import { addHours, addSeconds } from "date-fns";
-import { EstablishmentJwtPayload, TemplatedEmail } from "shared";
+import {
+  EstablishmentJwtPayload,
+  SiretDto,
+  TemplatedEmail,
+  UserBuilder,
+} from "shared";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -13,53 +18,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "./RequestEditFormEstablishment";
-
-const siret = "12345678912345";
-const contactEmail = "jerome@gmail.com";
-const copyEmails = ["copy@gmail.com"];
-
-const setMethodGetContactEmailFromSiret = (
-  establishmentAggregateRepo: EstablishmentAggregateRepository,
-) => {
-  establishmentAggregateRepo.getEstablishmentAggregateBySiret =
-    //eslint-disable-next-line @typescript-eslint/require-await
-    async (_siret: string) =>
-      new EstablishmentAggregateBuilder()
-        .withContact(
-          new ContactEntityBuilder()
-            .withEmail(contactEmail)
-            .withCopyEmails(copyEmails)
-            .build(),
-        )
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret("34493368400021")
-            .withName("SAS FRANCE MERGUEZ DISTRIBUTION")
-            .withLocations([
-              {
-                address: {
-                  streetNumberAndAddress: "24 rue des bouchers",
-                  city: "Strasbourg",
-                  postcode: "67000",
-                  departmentCode: "67",
-                },
-                position: {
-                  lat: 48.584614,
-                  lon: 7.750712,
-                },
-                id: "1",
-              },
-            ])
-            .build(),
-        )
-        .build();
-};
 
 describe("RequestUpdateFormEstablishment", () => {
   let requestEditFormEstablishment: RequestEditFormEstablishment;
@@ -67,31 +29,71 @@ describe("RequestUpdateFormEstablishment", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
 
+  const makeFakeEditEstablishmentUrl = (siret: SiretDto) =>
+    `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${siret}]`;
+
+  const establishmentAdmin = new UserBuilder()
+    .withId("admin")
+    .withEmail("admin@mail.com")
+    .build();
+  const establishmentContact = new UserBuilder()
+    .withId("contact")
+    .withEmail("contact@mail.com")
+    .build();
+
+  const establishmentAggregate = new EstablishmentAggregateBuilder()
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "Boos",
+        phone: "+33655887744",
+        userId: establishmentAdmin.id,
+      },
+      {
+        role: "establishment-contact",
+        userId: establishmentContact.id,
+      },
+    ])
+    .withEstablishment(
+      new EstablishmentEntityBuilder()
+        .withSiret("34493368400021")
+        .withName("SAS FRANCE MERGUEZ DISTRIBUTION")
+        .withLocations([
+          {
+            address: {
+              streetNumberAndAddress: "24 rue des bouchers",
+              city: "Strasbourg",
+              postcode: "67000",
+              departmentCode: "67",
+            },
+            position: {
+              lat: 48.584614,
+              lon: 7.750712,
+            },
+            id: "1",
+          },
+        ])
+        .build(),
+    )
+    .build();
+
   beforeEach(() => {
     uow = createInMemoryUow();
-    const establishmentAggregateRepository =
-      uow.establishmentAggregateRepository;
 
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    setMethodGetContactEmailFromSiret(establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
 
     timeGateway = new CustomTimeGateway();
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
 
     const generateEditFormEstablishmentUrl = (
       payload: EstablishmentJwtPayload,
-    ) => `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
+    ) => makeFakeEditEstablishmentUrl(payload.siret);
 
     requestEditFormEstablishment = new RequestEditFormEstablishment(
       new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
+      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
       timeGateway,
       generateEditFormEstablishmentUrl,
     );
@@ -99,18 +101,26 @@ describe("RequestUpdateFormEstablishment", () => {
 
   describe("If no email has been sent yet.", () => {
     it("Sends an email to the contact of the establishment with eventually email in CC", async () => {
-      // Act
-      await requestEditFormEstablishment.execute(siret);
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+      uow.userRepository.users = [establishmentAdmin, establishmentContact];
+
+      await requestEditFormEstablishment.execute(
+        establishmentAggregate.establishment.siret,
+      );
 
       // Assert
       expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "EDIT_FORM_ESTABLISHMENT_LINK",
-            recipients: [contactEmail],
-            cc: copyEmails,
+            recipients: [establishmentAdmin.email],
+            cc: [establishmentContact.email],
             params: {
-              editFrontUrl: `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${siret}]`,
+              editFrontUrl: makeFakeEditEstablishmentUrl(
+                establishmentAggregate.establishment.siret,
+              ),
               businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
               businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
             },
@@ -120,113 +130,128 @@ describe("RequestUpdateFormEstablishment", () => {
     });
   });
 
-  it("should resend a request establishment link successfully", async () => {
-    // Prepare
-    const initialMailDate = new Date("2021-01-01T13:00:00.000");
+  describe("if email has been sent", () => {
+    it("should resend a request establishment link successfully", async () => {
+      const initialMailDate = new Date("2021-01-01T13:00:00.000");
 
-    uow.notificationRepository.notifications = [
-      {
-        kind: "email",
-        id: "111111111111-1111-4000-1111-111111111111",
-        createdAt: initialMailDate.toISOString(),
-        followedIds: {},
-        templatedContent: {
-          kind: "EDIT_FORM_ESTABLISHMENT_LINK",
-          recipients: [contactEmail],
-          params: {
-            editFrontUrl: "my-edit-link.com",
-            businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
-            businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+      uow.notificationRepository.notifications = [
+        {
+          kind: "email",
+          id: "111111111111-1111-4000-1111-111111111111",
+          createdAt: initialMailDate.toISOString(),
+          followedIds: {},
+          templatedContent: {
+            kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+            recipients: [establishmentAdmin.email],
+            params: {
+              editFrontUrl: "my-edit-link.com",
+              businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
+              businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+            },
           },
         },
-      },
-    ];
+      ];
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+      uow.userRepository.users = [establishmentAdmin, establishmentContact];
 
-    const newModificationAskedDateLessThan24hAfterInitial = addHours(
-      initialMailDate,
-      23,
-    );
+      const newModificationAskedDateLessThan24hAfterInitial = addHours(
+        initialMailDate,
+        23,
+      );
 
-    timeGateway.setNextDate(newModificationAskedDateLessThan24hAfterInitial);
+      timeGateway.setNextDate(newModificationAskedDateLessThan24hAfterInitial);
 
-    const response = await requestEditFormEstablishment.execute(siret);
+      const response = await requestEditFormEstablishment.execute(
+        establishmentAggregate.establishment.siret,
+      );
 
-    // Act and assert
-    expect(() => response).not.toThrow();
-  });
+      // Act and assert
+      expect(() => response).not.toThrow();
+    });
 
-  it("Sends a new email if the edit link in last email has expired", async () => {
-    // Prepare
-    const initialMailDate = new Date("2021-01-01T13:00:00.000");
+    it("Sends a new email if the edit link in last email has expired", async () => {
+      // Prepare
+      const initialMailDate = new Date("2021-01-01T13:00:00.000");
 
-    const alreadySentEmail: TemplatedEmail = {
-      kind: "EDIT_FORM_ESTABLISHMENT_LINK",
-      recipients: [contactEmail],
-      params: {
-        editFrontUrl: "my-edit-link.com",
-        businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
-        businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
-      },
-    };
+      const alreadySentEmail: TemplatedEmail = {
+        kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+        recipients: [establishmentAdmin.email],
+        params: {
+          editFrontUrl: "my-edit-link.com",
+          businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
+          businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+        },
+      };
 
-    const alreadySentNotification = {
-      kind: "email",
-      id: "111111111111-1111-4000-1111-111111111111",
-      createdAt: initialMailDate.toISOString(),
-      followedIds: {},
-      templatedContent: alreadySentEmail,
-    };
-
-    uow.notificationRepository.notifications = [
-      {
+      const alreadySentNotification = {
         kind: "email",
         id: "111111111111-1111-4000-1111-111111111111",
         createdAt: initialMailDate.toISOString(),
         followedIds: {},
         templatedContent: alreadySentEmail,
-      },
-    ];
-    await uow.outboxRepository.save({
-      id: "123",
-      topic: "NotificationAdded",
-      occurredAt: initialMailDate.toISOString(),
-      status: "published",
-      publications: [
+      };
+
+      uow.notificationRepository.notifications = [
         {
-          publishedAt: addSeconds(initialMailDate, 1).toISOString(),
-          failures: [],
+          kind: "email",
+          id: "111111111111-1111-4000-1111-111111111111",
+          createdAt: initialMailDate.toISOString(),
+          followedIds: {},
+          templatedContent: alreadySentEmail,
         },
-      ],
-      payload: { id: alreadySentNotification.id, kind: "email" },
-      wasQuarantined: false,
-    });
+      ];
+      uow.userRepository.users = [establishmentAdmin, establishmentContact];
 
-    const newModificationAskedDateMoreThan24hAfterInitial = addHours(
-      initialMailDate,
-      25,
-    );
-
-    timeGateway.setNextDate(newModificationAskedDateMoreThan24hAfterInitial);
-
-    // Act
-    await requestEditFormEstablishment.execute(siret);
-
-    // Assert
-    expectSavedNotificationsAndEvents({
-      emails: [
-        alreadySentEmail,
-        {
-          kind: "EDIT_FORM_ESTABLISHMENT_LINK",
-          recipients: ["jerome@gmail.com"],
-          cc: ["copy@gmail.com"],
-          params: {
-            editFrontUrl:
-              "www.immersion-facile.fr/edit?jwt=jwtOfSiret[12345678912345]",
-            businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
-            businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+      await uow.outboxRepository.save({
+        id: "123",
+        topic: "NotificationAdded",
+        occurredAt: initialMailDate.toISOString(),
+        status: "published",
+        publications: [
+          {
+            publishedAt: addSeconds(initialMailDate, 1).toISOString(),
+            failures: [],
           },
-        },
-      ],
+        ],
+        payload: { id: alreadySentNotification.id, kind: "email" },
+        wasQuarantined: false,
+      });
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+
+      const newModificationAskedDateMoreThan24hAfterInitial = addHours(
+        initialMailDate,
+        25,
+      );
+
+      timeGateway.setNextDate(newModificationAskedDateMoreThan24hAfterInitial);
+
+      // Act
+      await requestEditFormEstablishment.execute(
+        establishmentAggregate.establishment.siret,
+      );
+
+      // Assert
+      expectSavedNotificationsAndEvents({
+        emails: [
+          alreadySentEmail,
+          {
+            kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+            recipients: [establishmentAdmin.email],
+            cc: [establishmentContact.email],
+            params: {
+              editFrontUrl: makeFakeEditEstablishmentUrl(
+                establishmentAggregate.establishment.siret,
+              ),
+              businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
+              businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+            },
+          },
+        ],
+      });
     });
   });
 });

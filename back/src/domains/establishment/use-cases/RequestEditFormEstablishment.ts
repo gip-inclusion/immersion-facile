@@ -5,6 +5,7 @@ import {
   siretSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -41,28 +42,38 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     if (!establishmentAggregate) throw Error("Etablissement introuvable.");
 
-    const { contact, establishment } = establishmentAggregate;
+    const { userRights, establishment } = establishmentAggregate;
 
-    if (!contact) throw Error("Email du contact introuvable.");
+    const provider = await makeProvider(uow);
 
-    const now = this.#timeGateway.now();
+    const establishmentAdmins = await uow.userRepository.getByIds(
+      userRights
+        .filter((right) => right.role === "establishment-admin")
+        .map((right) => right.userId),
+      provider,
+    );
 
-    const payload = createEstablishmentJwtPayload({
-      siret,
-      now,
-      durationDays: 1,
-    });
-
-    const editFrontUrl = this.#generateEditFormEstablishmentUrl(payload);
+    const establishmentContacts = await uow.userRepository.getByIds(
+      userRights
+        .filter((right) => right.role === "establishment-contact")
+        .map((right) => right.userId),
+      provider,
+    );
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "EDIT_FORM_ESTABLISHMENT_LINK",
-        recipients: [contact.email],
-        cc: contact.copyEmails,
+        recipients: establishmentAdmins.map(({ email }) => email),
+        cc: establishmentContacts.map(({ email }) => email),
         params: {
-          editFrontUrl,
+          editFrontUrl: this.#generateEditFormEstablishmentUrl(
+            createEstablishmentJwtPayload({
+              siret,
+              now: this.#timeGateway.now(),
+              durationDays: 1,
+            }),
+          ),
           businessName: establishment.customizedName ?? establishment.name,
           businessAddresses: establishment.locations.map((addressAndPosition) =>
             addressDtoToString(addressAndPosition.address),
