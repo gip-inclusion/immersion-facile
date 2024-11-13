@@ -2,11 +2,13 @@ import {
   SiretDto,
   addressDtoToString,
   createEstablishmentJwtPayload,
+  errors,
   immersionFacileNoReplyEmailSender,
   siretSchema,
 } from "shared";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -40,45 +42,46 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         siret,
       );
-    if (!establishmentAggregate) throw Error("Etablissement introuvable.");
+    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
-    const { contact, establishment } = establishmentAggregate;
+    const { userRights, establishment } = establishmentAggregate;
+    const adminIds = userRights
+      .filter((userRight) => userRight.role === "establishment-admin")
+      .map((right) => right.userId);
+    const contactIds = userRights
+      .filter((userRight) => userRight.role === "establishment-contact")
+      .map((right) => right.userId);
 
-    if (!contact)
-      throw Error(`Email du contact introuvable, pour le siret : ${siret}`);
+    const provider = await makeProvider(uow);
 
-    const now = this.#timeGateway.now();
-
-    const payload = createEstablishmentJwtPayload({
-      siret,
-      now,
-      durationDays: 2,
-    });
-    const editFrontUrl = this.#generateEditFormEstablishmentUrl(payload);
-
-    try {
-      await this.#saveNotificationAndRelatedEvent(uow, {
-        kind: "email",
-        templatedContent: {
-          kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
-          sender: immersionFacileNoReplyEmailSender,
-          recipients: [contact.email],
-          cc: contact.copyEmails,
-          params: {
-            editFrontUrl,
-            businessName: establishment.customizedName ?? establishment.name,
-            businessAddresses: establishment.locations.map(
-              (addressAndPosition) =>
-                addressDtoToString(addressAndPosition.address),
-            ),
-          },
+    await this.#saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+        sender: immersionFacileNoReplyEmailSender,
+        recipients: (await uow.userRepository.getByIds(adminIds, provider)).map(
+          ({ email }) => email,
+        ),
+        cc: (await uow.userRepository.getByIds(contactIds, provider)).map(
+          ({ email }) => email,
+        ),
+        params: {
+          editFrontUrl: this.#generateEditFormEstablishmentUrl(
+            createEstablishmentJwtPayload({
+              siret,
+              now: this.#timeGateway.now(),
+              durationDays: 2,
+            }),
+          ),
+          businessName: establishment.customizedName ?? establishment.name,
+          businessAddresses: establishment.locations.map((addressAndPosition) =>
+            addressDtoToString(addressAndPosition.address),
+          ),
         },
-        followedIds: {
-          establishmentSiret: siret,
-        },
-      });
-    } catch (error) {
-      notifyObjectDiscord(error);
-    }
+      },
+      followedIds: {
+        establishmentSiret: siret,
+      },
+    }).catch((error) => notifyObjectDiscord(error));
   }
 }

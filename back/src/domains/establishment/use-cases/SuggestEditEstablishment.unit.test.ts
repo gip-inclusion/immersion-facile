@@ -1,7 +1,10 @@
 import {
   EstablishmentJwtPayload,
+  SiretDto,
+  UserBuilder,
   immersionFacileNoReplyEmailSender,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -15,102 +18,106 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 import { SuggestEditEstablishment } from "./SuggestEditEstablishment";
-
-const siret = "12345678912345";
-const contactEmail = "jerome@gmail.com";
-const copyEmails = ["copy@gmail.com"];
-const setMethodGetContactEmailFromSiret = (
-  establishmentAggregateRepository: EstablishmentAggregateRepository,
-) => {
-  establishmentAggregateRepository.getEstablishmentAggregateBySiret =
-    //eslint-disable-next-line @typescript-eslint/require-await
-    async (_siret: string) =>
-      new EstablishmentAggregateBuilder()
-        .withContact(
-          new ContactEntityBuilder()
-            .withEmail(contactEmail)
-            .withCopyEmails(copyEmails)
-            .build(),
-        )
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret("34493368400021")
-            .withName("SAS FRANCE MERGUEZ DISTRIBUTION")
-            .withLocations([
-              {
-                address: {
-                  streetNumberAndAddress: "24 rue des bouchers",
-                  city: "Strasbourg",
-                  postcode: "67000",
-                  departmentCode: "67",
-                },
-                position: {
-                  lat: 48.584614,
-                  lon: 7.750712,
-                },
-                id: "11111111-1111-4444-1111-111111111111",
-              },
-            ])
-            .build(),
-        )
-        .build();
-};
 
 describe("SuggestEditEstablishment", () => {
   let suggestEditEstablishment: SuggestEditEstablishment;
   let uow: InMemoryUnitOfWork;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
+  const makeFakeEditUrl = (siret: SiretDto) =>
+    `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${siret}]`;
+
   beforeEach(() => {
     uow = createInMemoryUow();
+
+    const generateEditFormEstablishmentUrl = (
+      payload: EstablishmentJwtPayload,
+    ) => makeFakeEditUrl(payload.siret);
+
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
     );
-    setMethodGetContactEmailFromSiret(uow.establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
 
     const timeGateway = new CustomTimeGateway();
-    const uuidGenerator = new UuidV4Generator();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
-
-    const uowPerformer = new InMemoryUowPerformer(uow);
-
-    const generateEditFormEstablishmentUrl = (
-      payload: EstablishmentJwtPayload,
-    ) => `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
-
     suggestEditEstablishment = new SuggestEditEstablishment(
-      uowPerformer,
-      saveNotificationAndRelatedEvent,
+      new InMemoryUowPerformer(uow),
+      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
       timeGateway,
       generateEditFormEstablishmentUrl,
     );
   });
 
   it("Sends an email to contact and people in copy", async () => {
-    // Act
-    await suggestEditEstablishment.execute(siret);
+    const admin = new UserBuilder()
+      .withId(uuid())
+      .withEmail("jerome@gmail.com")
+      .build();
+    const contact = new UserBuilder()
+      .withId(uuid())
+      .withEmail("copy@gmail.com")
+      .build();
 
-    // Assert
+    const establishmentAggregate = new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withSiret("12345678912345")
+          .withName("SAS FRANCE MERGUEZ DISTRIBUTION")
+          .withLocations([
+            {
+              address: {
+                streetNumberAndAddress: "24 rue des bouchers",
+                city: "Strasbourg",
+                postcode: "67000",
+                departmentCode: "67",
+              },
+              position: {
+                lat: 48.584614,
+                lon: 7.750712,
+              },
+              id: "11111111-1111-4444-1111-111111111111",
+            },
+          ])
+          .build(),
+      )
+      .withUserRights([
+        {
+          userId: admin.id,
+          role: "establishment-admin",
+          job: "Boss",
+          phone: "+33688779955",
+        },
+        {
+          userId: contact.id,
+          role: "establishment-contact",
+        },
+      ])
+      .build();
+
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishmentAggregate,
+    ];
+    uow.userRepository.users = [admin, contact];
+
+    await suggestEditEstablishment.execute(
+      establishmentAggregate.establishment.siret,
+    );
+
     expectSavedNotificationsAndEvents({
       emails: [
         {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
-          recipients: [contactEmail],
+          recipients: [admin.email],
           sender: immersionFacileNoReplyEmailSender,
-          cc: copyEmails,
+          cc: [contact.email],
           params: {
-            editFrontUrl:
-              "www.immersion-facile.fr/edit?jwt=jwtOfSiret[12345678912345]",
+            editFrontUrl: makeFakeEditUrl(
+              establishmentAggregate.establishment.siret,
+            ),
             businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
