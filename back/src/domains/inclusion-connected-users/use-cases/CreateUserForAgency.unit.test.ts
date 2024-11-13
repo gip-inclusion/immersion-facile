@@ -254,4 +254,36 @@ describe("CreateUserForAgency", () => {
       }),
     ]);
   });
+
+  it("throw if user already exist in agency", async () => {
+    const validator: User = {
+      id: "validator",
+      email: "user@email.fr",
+      firstName: "John",
+      lastName: "Doe",
+      externalId: null,
+      createdAt: timeGateway.now().toISOString(),
+    };
+    uow.userRepository.users = [validator, counsellor];
+
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agencyWithCounsellor, {
+        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    ];
+
+    const icUserForAgency: UserParamsForAgency = {
+      userId: validator.id,
+      agencyId: agencyWithCounsellor.id,
+      roles: ["counsellor"],
+      isNotifiedByEmail: false,
+      email: validator.email,
+    };
+
+    await expectPromiseToFailWithError(
+      createUserForAgency.execute(icUserForAgency, icBackofficeAdminUser),
+      errors.agency.userAlreadyExist(),
+    );
+  });
 });
