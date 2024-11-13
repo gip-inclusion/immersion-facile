@@ -1,3 +1,5 @@
+@import "react-design-system/src/config/responsive";
+
 .im-search-page {
   &__form {
     display: flex;
@@ -5,9 +7,19 @@
     &--v2 {
       max-width: 100% !important;
     }
-
   }
   &__results-summary {
     text-align: right;
+  }
+  &__search-filters {
+    display: flex;
+    gap: .8rem;
+    flex-direction: column;
+    @include for-screen-min($bp-sm) {
+     flex-direction: row; 
+    }
+    button {
+      width: 100%;
+    }
   }
 }

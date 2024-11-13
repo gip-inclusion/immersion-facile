@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
 import React, { ElementRef, useEffect, useRef, useState } from "react";
@@ -13,7 +14,13 @@ import {
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { LatLonDistance, SearchSortedBy, ValueOf, domElementIds } from "shared";
+import {
+  LatLonDistance,
+  SearchSortedBy,
+  ValueOf,
+  domElementIds,
+  searchSortedByOptions,
+} from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
@@ -34,7 +41,6 @@ import {
   initialState,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
-import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
 import "./SearchPage.scss";
@@ -81,6 +87,9 @@ export const SearchPage = ({
   const { enableSearchByScore } = useAppSelector(
     featureFlagSelectors.featureFlagState,
   );
+  const [shouldClearPlaceInput, setShouldClearPlaceInput] = useState(false);
+  const [shouldClearAppellationsInput, setShouldClearAppellationsInput] =
+    useState(false);
   const initialValues: SearchPageParams = {
     place: "",
     sortedBy: enableSearchByScore ? "score" : "date",
@@ -90,7 +99,7 @@ export const SearchPage = ({
     longitude: undefined,
     ...acquisitionParams,
   };
-
+  const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
   const filterFormValues = (values: SearchPageParams) =>
     keys(values).reduce(
       (acc, key) => ({
@@ -116,9 +125,9 @@ export const SearchPage = ({
   });
   const { handleSubmit, setValue, register, control, getValues } = methods;
   const formValues = getValues();
-  const [lat, lon, distanceKm] = useWatch({
+  const [lat, lon, distanceKm, place] = useWatch({
     control,
-    name: ["latitude", "longitude", "distanceKm"],
+    name: ["latitude", "longitude", "distanceKm", "place"],
   });
 
   const availableForInitialSearchRequest =
@@ -136,85 +145,234 @@ export const SearchPage = ({
     );
   };
 
-  const triggerSearch = (values: SearchPageParams) => {
-    setSearchMade(values);
-    requestSearch(filterFormValues(values));
+  const setTempValuesAsFormValues = (values: Partial<SearchPageParams>) => {
+    keys(values).forEach((key) => {
+      setValue(key, values[key]);
+    });
+  };
+
+  const onSearchFormSubmit = (updatedValues: SearchPageParams) => {
+    setTempValue(updatedValues);
+    setTempValuesAsFormValues(updatedValues);
+    setSearchMade(updatedValues);
+    requestSearch(filterFormValues(updatedValues));
   };
 
   useEffect(() => {
     if (availableForInitialSearchRequest) {
-      triggerSearch(filterFormValues(formValues));
+      onSearchFormSubmit(filterFormValues(formValues));
     }
   }, [
     availableForInitialSearchRequest,
-    triggerSearch,
+    onSearchFormSubmit,
     filterFormValues,
     formValues,
   ]);
 
   useEffect(() => {
     return () => {
-      dispatch(searchSlice.actions.clearSearchStatusRequested());
+      dispatch(searchSlice.actions.clearSearchRequested());
     };
   }, [dispatch]);
+
+  const filteredOptions = getSortedByOptions(
+    areValidGeoParams(formValues),
+    enableSearchByScore.isActive,
+  );
+
+  const appellationInputLabel = (
+    <>
+      {useNaturalLanguageForAppellations
+        ? "Je recherche le métier ou la compétence"
+        : "Je recherche le métier..."}
+    </>
+  );
+
+  const placeInputLabel = <>...dans la ville</>;
+  const shouldShowInitialScreen = searchStatus === "noSearchMade";
 
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
-        {match({
-          isLoading,
-          searchStatus,
-        })
-          .with(
-            {
-              isLoading: true,
-            },
-            () => <Loader />,
-          )
-          .with(
-            {
-              isLoading: false,
-              searchStatus: "noSearchMade",
-            },
-            () => (
-              <>
-                <PageHeader
-                  title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
-                  breadcrumbs={<Breadcrumbs />}
-                >
-                  <form
-                    onSubmit={handleSubmit((value) =>
-                      triggerSearch(filterFormValues(value)),
-                    )}
-                    className={cx(
-                      fr.cx("fr-grid-row", "fr-grid-row--gutters"),
-                      Styles.form,
-                      Styles.formV2,
-                    )}
-                    id={domElementIds.search.searchForm}
-                  >
-                    <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
-                      <AppellationAutocomplete
-                        label={
-                          useNaturalLanguageForAppellations
-                            ? "Je recherche le métier ou la compétence :"
-                            : "Je recherche le métier :"
+        {shouldShowInitialScreen ? (
+          <>
+            <PageHeader
+              title="Trouver une immersion"
+              breadcrumbs={<Breadcrumbs />}
+            >
+              <p>Dans une entreprise ou une administration publique</p>
+              <form
+                onSubmit={handleSubmit((value) =>
+                  onSearchFormSubmit(filterFormValues(value)),
+                )}
+                className={cx(
+                  fr.cx("fr-grid-row", "fr-grid-row--gutters"),
+                  Styles.form,
+                  Styles.formV2,
+                )}
+                id={domElementIds.search.searchForm}
+              >
+                <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
+                  <AppellationAutocomplete
+                    label={appellationInputLabel}
+                    initialValue={
+                      formValues.appellations
+                        ? formValues.appellations[0]
+                        : undefined
+                    }
+                    onAppellationSelected={(newAppellationAndRome) => {
+                      setValue("appellations", [newAppellationAndRome]);
+                    }}
+                    selectedAppellations={
+                      formValues.appellations
+                        ? [formValues.appellations[0]]
+                        : undefined
+                    }
+                    onInputClear={() => {
+                      setValue("appellations", undefined);
+                    }}
+                    id={domElementIds.search.appellationAutocomplete}
+                    placeholder={
+                      useNaturalLanguageForAppellations
+                        ? "Ex: boulanger, faire du pain, etc"
+                        : "Ex: boulanger, styliste, etc"
+                    }
+                    useNaturalLanguage={useNaturalLanguageForAppellations}
+                  />
+                </div>
+                <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
+                  <PlaceAutocomplete
+                    label={placeInputLabel}
+                    initialInputValue={place}
+                    onValueChange={(lookupSearchResult) => {
+                      if (!lookupSearchResult) return;
+                      setValue("latitude", lookupSearchResult.position.lat);
+                      setValue("longitude", lookupSearchResult.position.lon);
+                      setValue("place", lookupSearchResult.label);
+                      if (!formValues.distanceKm) {
+                        setValue("distanceKm", 10);
+                      }
+                    }}
+                    id={domElementIds.search.placeAutocompleteInput}
+                    onInputClear={() => {
+                      setValue("latitude", initialValues.latitude);
+                      setValue("longitude", initialValues.latitude);
+                      setValue("place", initialValues.place);
+                      if (formValues.sortedBy === "distance") {
+                        setValue("sortedBy", "date");
+                      }
+                      setValue("distanceKm", initialValues.distanceKm);
+                    }}
+                  />
+                </div>
+                <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
+                  <Select
+                    label="Distance maximum"
+                    options={radiusOptions}
+                    disabled={!lat || !lon}
+                    nativeSelectProps={{
+                      ...register("distanceKm"),
+                      title:
+                        !lat || !lon
+                          ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
+                          : undefined,
+                      id: domElementIds.search.distanceSelect,
+                      value: `${distanceKm === undefined ? "" : distanceKm}`,
+                      onChange: (event) => {
+                        const value = parseInt(event.currentTarget.value);
+                        setValue("distanceKm", value);
+                        if (!value) {
+                          setValue("sortedBy", "date");
                         }
+                      },
+                    }}
+                  />
+                </div>
+
+                <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
+                  <Button
+                    type="submit"
+                    nativeButtonProps={{
+                      id: domElementIds.search.searchSubmitButton,
+                    }}
+                    disabled={!canSubmitSearch(formValues)}
+                  >
+                    Rechercher
+                  </Button>
+                </div>
+              </form>
+            </PageHeader>
+
+            <div className={fr.cx("fr-pt-6w", "fr-mt-6w", "fr-hr")}>
+              <SearchInfoSection />
+              <SectionAccordion />
+              <SectionTextEmbed
+                videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
+                videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
+                videoDescription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.vtt"
+                videoTranscription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.txt"
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            {isLoading && <Loader />}
+            <Breadcrumbs />
+            <form
+              onSubmit={handleSubmit((value) => {
+                if (tempValue !== null) {
+                  const updatedValues: SearchPageParams = {
+                    ...value,
+                    ...tempValue,
+                  };
+                  onSearchFormSubmit(updatedValues);
+                }
+              })}
+              className={cx(fr.cx("fr-container"), Styles.searchFilters)}
+              id={domElementIds.search.searchForm}
+            >
+              <SearchFilter
+                defaultValue="Tous les métiers"
+                iconId="fr-icon-suitcase-2-line"
+                id={domElementIds.search.appellationFilterTag}
+                values={
+                  formValues.appellations
+                    ? formValues.appellations.map(
+                        (appellation) => appellation.appellationLabel,
+                      )
+                    : []
+                }
+                onReset={() => {
+                  const updatedValues = {
+                    ...tempValue,
+                    appellations: undefined,
+                  };
+                  onSearchFormSubmit(updatedValues);
+                  setShouldClearAppellationsInput(true);
+                }}
+                submenu={{
+                  title: "Quel métier souhaitez-vous découvrir ?",
+                  content: (
+                    <>
+                      <AppellationAutocomplete
+                        label={appellationInputLabel}
                         initialValue={
-                          formValues.appellations
-                            ? formValues.appellations[0]
+                          route.params.appellations
+                            ? route.params.appellations[0]
                             : undefined
                         }
                         onAppellationSelected={(newAppellationAndRome) => {
-                          setValue("appellations", [newAppellationAndRome]);
+                          setTempValue({
+                            ...tempValue,
+                            appellations: [newAppellationAndRome],
+                          });
                         }}
-                        selectedAppellations={
-                          formValues.appellations
-                            ? [formValues.appellations[0]]
-                            : undefined
-                        }
+                        selectedAppellations={undefined}
                         onInputClear={() => {
-                          setValue("appellations", undefined);
+                          setTempValue({
+                            ...tempValue,
+                            appellations: undefined,
+                          });
                         }}
                         id={domElementIds.search.appellationAutocomplete}
                         placeholder={
@@ -223,244 +381,225 @@ export const SearchPage = ({
                             : "Ex: boulanger, styliste, etc"
                         }
                         useNaturalLanguage={useNaturalLanguageForAppellations}
+                        shouldClearInput={shouldClearAppellationsInput}
+                        onAfterClearInput={() => {
+                          setShouldClearAppellationsInput(false);
+                        }}
                       />
-                    </div>
-                    <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
+                      <p className={fr.cx("fr-hint-text", "fr-mt-2w")}>
+                        Les résultats sont étendus aux autres métiers de la
+                        Réalisation de contenus multimédias, c’est pour cela que
+                        vous pourrez voir des métiers proches mais ne
+                        correspondant pas précisément à votre recherche dans les
+                        résultats.
+                      </p>
+                    </>
+                  ),
+                }}
+              />
+              <SearchFilter
+                defaultValue="France entière"
+                id={domElementIds.search.locationFilterTag}
+                iconId="fr-icon-map-pin-2-line"
+                values={place ? [place] : []}
+                onReset={() => {
+                  const updatedValues: SearchPageParams =
+                    tempValue.sortedBy === "distance"
+                      ? {
+                          ...tempValue,
+                          place: initialValues.place,
+                          latitude: 0,
+                          longitude: 0,
+                          distanceKm: 0,
+                        }
+                      : {
+                          ...tempValue,
+                          place: initialValues.place,
+                          latitude: initialValues.latitude,
+                          longitude: initialValues.longitude,
+                        };
+                  onSearchFormSubmit(updatedValues);
+                  setShouldClearPlaceInput(true);
+                }}
+                submenu={{
+                  title: "Où souhaitez-vous faire votre immersion ?",
+                  content: (
+                    <>
                       <PlaceAutocomplete
-                        label="Je me situe dans la ville de :"
-                        initialInputValue={formValues.place}
+                        label={placeInputLabel}
+                        initialInputValue={place}
+                        shouldClearInput={shouldClearPlaceInput}
+                        onAfterClearInput={() => {
+                          setShouldClearPlaceInput(false);
+                        }}
                         onValueChange={(lookupSearchResult) => {
                           if (!lookupSearchResult) return;
-                          setValue("latitude", lookupSearchResult.position.lat);
-                          setValue(
-                            "longitude",
-                            lookupSearchResult.position.lon,
-                          );
-                          setValue("place", lookupSearchResult.label);
-                          if (!formValues.distanceKm) {
-                            setValue("distanceKm", 10);
-                          }
+                          const newValues = {
+                            place: lookupSearchResult.label,
+                            latitude: lookupSearchResult.position.lat,
+                            longitude: lookupSearchResult.position.lon,
+                          };
+                          setTempValue({
+                            ...tempValue,
+                            ...newValues,
+                            distanceKm: tempValue.distanceKm || 10,
+                          });
                         }}
                         id={domElementIds.search.placeAutocompleteInput}
                         onInputClear={() => {
-                          setValue("latitude", initialValues.latitude);
-                          setValue("longitude", initialValues.latitude);
-                          setValue("place", initialValues.place);
+                          const updatedInitialValues: SearchPageParams =
+                            tempValue.sortedBy === "distance"
+                              ? {
+                                  ...tempValue,
+                                  place: initialValues.place,
+                                  latitude: 0,
+                                  longitude: 0,
+                                  distanceKm: 0,
+                                }
+                              : {
+                                  ...tempValue,
+                                  place: initialValues.place,
+                                  latitude: initialValues.latitude,
+                                  longitude: initialValues.longitude,
+                                };
+                          setTempValue(updatedInitialValues);
+
                           if (formValues.sortedBy === "distance") {
-                            setValue("sortedBy", "date");
+                            setTempValue({
+                              ...tempValue,
+                              sortedBy: "date",
+                            });
                           }
-                          setValue("distanceKm", initialValues.distanceKm);
                         }}
                       />
-                    </div>
-                    <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
                       <Select
-                        label="Distance maximum"
+                        label="Dans un rayon de :"
                         options={radiusOptions}
-                        disabled={!lat || !lon}
+                        disabled={!tempValue.latitude || !tempValue.longitude}
                         nativeSelectProps={{
                           ...register("distanceKm"),
                           title:
-                            !lat || !lon
+                            !tempValue.latitude || !tempValue.longitude
                               ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
                               : undefined,
                           id: domElementIds.search.distanceSelect,
-                          value: `${
-                            distanceKm === undefined ? "" : distanceKm
-                          }`,
+                          value: `${tempValue.distanceKm || ""}`,
                           onChange: (event) => {
                             const value = parseInt(event.currentTarget.value);
-                            setValue("distanceKm", value);
+                            setTempValue({
+                              ...tempValue,
+                              distanceKm: value,
+                            });
                             if (!value) {
-                              setValue("sortedBy", "date");
+                              setTempValue({
+                                ...tempValue,
+                                distanceKm: value,
+                              });
                             }
                           },
                         }}
                       />
-                    </div>
+                    </>
+                  ),
+                }}
+              />
+              <SearchFilter
+                defaultValue="Trier par pertinence"
+                iconId="fr-icon-arrow-down-line"
+                id={domElementIds.search.sortFilterTag}
+                values={
+                  formValues.sortedBy
+                    ? [sortedByOptionsLabel[formValues.sortedBy]]
+                    : []
+                }
+                submenu={{
+                  title: "Ordre d’affichage",
+                  content: (
+                    <RadioButtons
+                      options={filteredOptions.map((option) => ({
+                        ...option,
+                        nativeInputProps: {
+                          name: register("sortedBy").name,
+                          value: option.value,
+                          disabled: option.disabled,
+                          checked: tempValue
+                            ? option.value === tempValue.sortedBy
+                            : false,
+                          onClick: (event) => {
+                            const updatedSortedBy = isSearchSortedBy(
+                              event.currentTarget.value,
+                            )
+                              ? event.currentTarget.value
+                              : "score";
+                            if (
+                              updatedSortedBy === "distance" &&
+                              areValidGeoParams(tempValue)
+                            ) {
+                              setTempValue({
+                                ...tempValue,
+                                sortedBy: "distance",
+                              });
+                            }
+                            if (updatedSortedBy !== "distance") {
+                              setTempValue({
+                                ...tempValue,
+                                sortedBy: updatedSortedBy,
+                              });
+                            }
+                          },
+                        },
+                      }))}
+                    />
+                  ),
+                }}
+              />
+            </form>
 
-                    <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
-                      <Button
-                        type="submit"
-                        nativeButtonProps={{
-                          id: domElementIds.search.searchSubmitButton,
-                        }}
-                        disabled={!canSubmitSearch(formValues)}
-                      >
-                        Rechercher
-                      </Button>
-                    </div>
-                  </form>
-                </PageHeader>
-
-                <div className={fr.cx("fr-pt-10w")}>
-                  <SearchInfoSection />
-                  <SectionAccordion />
-                  <SectionTextEmbed
-                    videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
-                    videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
-                    videoDescription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.vtt"
-                    videoTranscription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.txt"
-                  />
-                </div>
-              </>
-            ),
-          )
-          .with(
-            {
-              isLoading: false,
-              searchStatus: "ok",
-            },
-            () => (
-              <>
-                <Breadcrumbs />
-                <form
-                  onSubmit={handleSubmit(
-                    (value) => triggerSearch(filterFormValues(value)),
-                    (error) => console.error(error),
-                  )}
-                  className={cx(fr.cx("fr-container"))}
-                  id={domElementIds.search.searchForm}
+            <div ref={searchResultsWrapper}>
+              {searchMade !== null && (
+                <div
+                  ref={innerSearchResultWrapper}
+                  className={fr.cx("fr-pt-6w", "fr-pb-1w")}
                 >
-                  <SearchFilter
-                    defaultValue="Tous les métiers"
-                    values={
-                      formValues.appellations
-                        ? formValues.appellations.map(
-                            (appellation) => appellation.appellationLabel,
-                          )
-                        : []
-                    }
-                    submenu={{
-                      title: "Quel métier souhaitez-vous découvrir ?",
-                      content: (
-                        <>
-                          <AppellationAutocomplete
-                            label={
-                              useNaturalLanguageForAppellations
-                                ? "Je recherche le métier ou la compétence :"
-                                : "Je recherche le métier :"
-                            }
-                            initialValue={
-                              formValues.appellations
-                                ? formValues.appellations[0]
-                                : undefined
-                            }
-                            onAppellationSelected={(newAppellationAndRome) => {
-                              setValue("appellations", [newAppellationAndRome]);
-                            }}
-                            selectedAppellations={
-                              formValues.appellations
-                                ? [formValues.appellations[0]]
-                                : undefined
-                            }
-                            onInputClear={() => {
-                              setValue("appellations", undefined);
-                            }}
-                            id={domElementIds.search.appellationAutocomplete}
-                            placeholder={
-                              useNaturalLanguageForAppellations
-                                ? "Ex: boulanger, faire du pain, etc"
-                                : "Ex: boulanger, styliste, etc"
-                            }
-                            useNaturalLanguage={
-                              useNaturalLanguageForAppellations
-                            }
-                          />
-                          <p className={fr.cx("fr-hint-text")}>
-                            Les résultats sont étendus aux autres métiers de la
-                            Réalisation de contenus multimédias, c’est pour cela
-                            que vous pourrez voir des métiers proches mais ne
-                            correspondant pas précisément à votre recherche dans
-                            les résultats.
-                          </p>
-                        </>
-                      ),
-                    }}
-                  />
-                </form>
-
-                <div ref={searchResultsWrapper}>
-                  {searchStatus === "ok" && searchMade !== null && (
+                  <div className={fr.cx("fr-container")}>
                     <div
-                      ref={innerSearchResultWrapper}
-                      className={fr.cx("fr-pt-6w", "fr-pb-1w")}
+                      className={cx(fr.cx("fr-mb-4w"), Styles.resultsSummary)}
                     >
-                      <div className={fr.cx("fr-container")}>
-                        <div
-                          className={fr.cx(
-                            "fr-grid-row",
-                            "fr-grid-row--gutters",
-                            "fr-grid-row--middle",
-                            "fr-mb-4w",
-                          )}
-                        >
-                          <div className={fr.cx("fr-col-12", "fr-col-md-3")}>
-                            <SearchSortedBySelect
-                              searchValues={formValues}
-                              triggerSearch={triggerSearch}
-                              setSortedBy={(sortedBy: SearchSortedBy) =>
-                                setValue("sortedBy", sortedBy)
-                              }
-                            />
-                          </div>
-                          <div
-                            className={cx(
-                              fr.cx(
-                                "fr-col-12",
-                                "fr-col-md-5",
-                                "fr-grid-row",
-                                "fr-grid-row--right",
-                                "fr-ml-auto",
-                              ),
-                              Styles.resultsSummary,
+                      {searchStatus === "ok" && (
+                        <>
+                          <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
+                            {getSearchResultsSummary(searchResults.length)}
+                          </h2>
+                          {routeParams.appellations &&
+                            routeParams.appellations.length > 0 && (
+                              <span className={cx(fr.cx("fr-text--xs"))}>
+                                pour la recherche{" "}
+                                <strong className={fr.cx("fr-text--bold")}>
+                                  {routeParams.appellations[0].appellationLabel}
+                                </strong>
+                                , étendue au secteur{" "}
+                                <a
+                                  href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
+                                  target="_blank"
+                                  className={fr.cx("fr-text--bold")}
+                                  rel="noreferrer"
+                                >
+                                  {routeParams.appellations[0].romeLabel}
+                                </a>
+                              </span>
                             )}
-                          >
-                            {searchStatus === "ok" && (
-                              <>
-                                <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
-                                  {getSearchResultsSummary(
-                                    searchResults.length,
-                                  )}
-                                </h2>
-                                {routeParams.appellations &&
-                                  routeParams.appellations.length > 0 && (
-                                    <span className={cx(fr.cx("fr-text--xs"))}>
-                                      pour la recherche{" "}
-                                      <strong
-                                        className={fr.cx("fr-text--bold")}
-                                      >
-                                        {
-                                          routeParams.appellations[0]
-                                            .appellationLabel
-                                        }
-                                      </strong>
-                                      , étendue au secteur{" "}
-                                      <a
-                                        href={`https://candidat.francetravail.fr/metierscope/fiche-metier/${routeParams.appellations[0].romeCode}`}
-                                        target="_blank"
-                                        className={fr.cx("fr-text--bold")}
-                                        rel="noreferrer"
-                                      >
-                                        {routeParams.appellations[0].romeLabel}
-                                      </a>
-                                    </span>
-                                  )}
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <SearchListResults
-                        showDistance={areValidGeoParams(searchMade)}
-                      />
+                        </>
+                      )}
                     </div>
-                  )}
+                  </div>
+                  <SearchListResults
+                    showDistance={areValidGeoParams(searchMade)}
+                  />
                 </div>
-              </>
-            ),
-          )
-          .exhaustive()}
+              )}
+            </div>
+          </>
+        )}
       </MainWrapper>
     </HeaderFooterLayout>
   );
@@ -496,74 +635,34 @@ const canSubmitSearch = (values: SearchPageParams) => {
   return areValidGeoParams(geoParams) || areEmptyGeoParams(geoParams);
 };
 
-const getSortedByOptions = (
+export const getSortedByOptions = (
   hasGeoParams: boolean,
   hasScoreEnabled: boolean,
 ): SelectProps.Option<SearchSortedBy>[] => [
-  {
-    label: "Trier par date de publication",
-    value: "date" as const,
-  },
   ...(hasScoreEnabled
     ? [
         {
-          label: "Trier par pertinence",
+          label: sortedByOptionsLabel.score,
           value: "score" as const,
         },
       ]
     : []),
-  ...(hasGeoParams
-    ? [
-        {
-          label: "Trier par proximité",
-          value: "distance" as const,
-        },
-      ]
-    : []),
+  {
+    label: sortedByOptionsLabel.date,
+    value: "date" as const,
+  },
+  {
+    label: sortedByOptionsLabel.distance,
+    value: "distance" as const,
+    disabled: !hasGeoParams,
+  },
 ];
 
-const SearchSortedBySelect = ({
-  triggerSearch,
-  searchValues,
-  setSortedBy,
-}: {
-  searchValues: SearchPageParams;
-  triggerSearch: (values: SearchPageParams) => void;
-  setSortedBy: (sortedBy: SearchSortedBy) => void;
-}) => {
-  const { sortedBy } = searchValues;
-  const { enableSearchByScore } = useAppSelector(
-    featureFlagSelectors.featureFlagState,
-  );
-  const filteredOptions = getSortedByOptions(
-    areValidGeoParams(searchValues),
-    enableSearchByScore.isActive,
-  );
-  return (
-    <Select
-      label="Trier les résultats"
-      options={filteredOptions}
-      nativeSelectProps={{
-        id: domElementIds.search.sortFilter,
-        value: sortedBy,
-        onChange: (event) => {
-          const value = event.currentTarget.value;
-          setSortedBy(value);
-          if (value === "distance") {
-            if (areValidGeoParams(searchValues)) {
-              triggerSearch({
-                ...searchValues,
-                sortedBy: value,
-              });
-            }
-            return;
-          }
-          triggerSearch({
-            ...searchValues,
-            sortedBy: value,
-          });
-        },
-      }}
-    />
-  );
+const sortedByOptionsLabel = {
+  date: "Trier par date de publication",
+  score: "Trier par pertinence",
+  distance: "Trier par proximité",
 };
+
+const isSearchSortedBy = (value: string): value is SearchSortedBy =>
+  searchSortedByOptions.includes(value as SearchSortedBy);

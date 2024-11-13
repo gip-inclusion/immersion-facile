@@ -1,9 +1,20 @@
+@import "../../../config/responsive";
+
 .im-search-filter {
   position: relative;
   &__submenu {
     position: absolute;
     background: var(--background-overlap-grey);
     box-shadow: var(--overlap-shadow);
-    z-index: calc(var(--ground) + 1000);
+    z-index: calc(var(--ground) + 2000);
+    width: 100%;
+    max-width: 30rem;
+    top: 120%;
+    left: 0;
+    @include for-screen-min($bp-md) {
+      width: 50vw;
+      max-width: 30rem;
+    }
   }
+  
 }

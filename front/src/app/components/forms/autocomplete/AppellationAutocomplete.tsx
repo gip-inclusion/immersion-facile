@@ -22,7 +22,7 @@ const romeSearchMatchToProposal = ({
 });
 
 type AppellationAutocompleteProps = {
-  label: string;
+  label: React.ReactNode;
   initialValue?: AppellationAndRomeDto | undefined;
   onAppellationSelected: (p: AppellationAndRomeDto) => void;
   onInputClear?: () => void;
@@ -33,6 +33,8 @@ type AppellationAutocompleteProps = {
   id?: string;
   disabled?: boolean;
   useNaturalLanguage?: boolean;
+  shouldClearInput?: boolean;
+  onAfterClearInput?: () => void;
 };
 
 type Option = Proposal<AppellationAndRomeDto>;
@@ -49,6 +51,8 @@ export const AppellationAutocomplete = ({
   id = "im-appellation-autocomplete",
   disabled = false,
   useNaturalLanguage = false,
+  shouldClearInput,
+  onAfterClearInput,
 }: AppellationAutocompleteProps) => {
   const initialOption: Option | null = useMemo(
     () =>
@@ -115,6 +119,13 @@ export const AppellationAutocomplete = ({
     })();
   }, [debounceSearchTerm]);
 
+  useEffect(() => {
+    if (shouldClearInput && onAfterClearInput) {
+      setSearchTerm("");
+      onAfterClearInput();
+    }
+  }, [shouldClearInput, onAfterClearInput]);
+
   const noOptionText = ({
     isSearching,
     debounceSearchTerm,
@@ -150,9 +161,7 @@ export const AppellationAutocomplete = ({
             : "Saisissez un métier"
         }
         getOptionLabel={(option: Option | undefined) =>
-          option
-            ? option.value.appellationLabel
-            : "missing option.value.appellationLabel"
+          option?.value.appellationLabel || ""
         }
         id={id}
         renderOption={(props, option) => (
