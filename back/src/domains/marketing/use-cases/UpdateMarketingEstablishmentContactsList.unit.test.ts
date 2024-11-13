@@ -2,6 +2,9 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
+  UserBuilder,
+  errors,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -12,6 +15,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { EstablishmentUserRight } from "../../establishment/entities/EstablishmentEntity";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { InMemoryEstablishmentMarketingGateway } from "../adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { MarketingContact } from "../entities/MarketingContact";
@@ -29,8 +33,20 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
   let updateMarketingEstablishmentContactList: UpdateMarketingEstablishmentContactList;
   const now = new Date();
 
+  const userMarketingContact = new UserBuilder()
+    .withFirstName("Other first name")
+    .build();
+
+  const establishmentRight: EstablishmentUserRight = {
+    userId: userMarketingContact.id,
+    job: "Marketing Contact",
+    phone: "",
+    role: "establishment-admin",
+  };
+
   const establishment = new EstablishmentAggregateBuilder()
     .withSearchableBy({ jobSeekers: true, students: false })
+    .withUserRights([establishmentRight])
     .build();
 
   const firstConventionValidationDate = new Date("2024-05-25");
@@ -61,13 +77,6 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
     .withDateEnd("2024-07-09T08:00:00.000Z")
     .build();
 
-  const marketingContact: MarketingContact = {
-    firstName: establishment.contact.firstName,
-    lastName: establishment.contact.lastName,
-    email: establishment.contact.email,
-    createdAt: now,
-  };
-
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway(now);
@@ -78,13 +87,14 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
         deps: { establishmentMarketingGateway: marketingGateway, timeGateway },
       });
     uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+    uow.userRepository.users = [userMarketingContact];
   });
 
   describe("With Establishment in repo", () => {
     const establishmentMarketingGatewayDto: EstablishmentMarketingGatewayDto = {
-      email: establishment.contact.email,
-      firstName: establishment.contact.firstName,
-      lastName: establishment.contact.lastName,
+      email: userMarketingContact.email,
+      firstName: userMarketingContact.firstName,
+      lastName: userMarketingContact.lastName,
       conventions: { numberOfValidatedConvention: 0 },
       departmentCode:
         establishment.establishment.locations[0].address.departmentCode,
@@ -104,9 +114,16 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
       romes: establishment.offers.map(({ romeCode }) => romeCode),
     };
 
+    const marketingContact: MarketingContact = {
+      createdAt: now,
+      email: userMarketingContact.email,
+      firstName: userMarketingContact.firstName,
+      lastName: userMarketingContact.lastName,
+    };
+
     const establishmentMarketingContactEntity: EstablishmentMarketingContactEntity =
       {
-        contactEmail: establishment.contact.email,
+        contactEmail: userMarketingContact.email,
         siret: establishment.establishment.siret,
         emailContactHistory: [marketingContact],
       };
@@ -261,14 +278,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
 
     it("Update has ic user property when establishment in repo", async () => {
       uow.userRepository.users = [
-        {
-          id: "fake-id",
-          externalId: "fake-external-id",
-          createdAt: new Date().toISOString(),
-          firstName: establishment.contact.firstName,
-          lastName: establishment.contact.lastName,
-          email: establishment.contact.email,
-        },
+        new UserBuilder(userMarketingContact).withExternalId("id").build(),
       ];
 
       await updateMarketingEstablishmentContactList.execute({
@@ -351,6 +361,42 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           numberOfDiscussionsReceived: 2,
         },
       ]);
+    });
+
+    it("on missing user in repo", () => {
+      uow.userRepository.users = [];
+
+      expectPromiseToFailWithError(
+        updateMarketingEstablishmentContactList.execute({
+          siret: establishment.establishment.siret,
+        }),
+        errors.user.notFound({ userId: establishmentRight.userId }),
+      );
+    });
+
+    it("on missing establishment admin right", () => {
+      const establishmentWithoutAdminRights = new EstablishmentAggregateBuilder(
+        establishment,
+      )
+        .withUserRights([
+          {
+            role: "establishment-contact",
+            userId: userMarketingContact.id,
+          },
+        ])
+        .build();
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentWithoutAdminRights,
+      ];
+
+      expectPromiseToFailWithError(
+        updateMarketingEstablishmentContactList.execute({
+          siret: establishment.establishment.siret,
+        }),
+        errors.establishment.adminNotFound({
+          siret: establishmentWithoutAdminRights.establishment.siret,
+        }),
+      );
     });
   });
 

@@ -126,22 +126,37 @@ const onEstablishment = async (
   uow: UnitOfWork,
   marketingGateway: EstablishmentMarketingGateway,
   timeGateway: TimeGateway,
-  establishment: EstablishmentAggregate,
+  establishmentAggregate: EstablishmentAggregate,
   validatedConventions: ConventionDto[],
 ): Promise<void> => {
-  const firstLocation = establishment.establishment.locations.at(0);
+  const firstLocation = establishmentAggregate.establishment.locations.at(0);
   if (!firstLocation) throw new Error("Establishement has no location.");
 
+  const establishmentAdmin = establishmentAggregate.userRights.find((user) =>
+    user.role.includes("establishment-admin"),
+  );
+  if (!establishmentAdmin)
+    throw errors.establishment.adminNotFound({
+      siret: establishmentAggregate.establishment.siret,
+    });
+
+  const userMarketingContact = await uow.userRepository.getById(
+    establishmentAdmin.userId,
+    await makeProvider(uow),
+  );
+
+  if (!userMarketingContact)
+    throw errors.user.notFound({ userId: establishmentAdmin.userId });
   const marketingContact: MarketingContact = {
     createdAt: timeGateway.now(),
-    email: establishment.contact.email,
-    firstName: establishment.contact.firstName,
-    lastName: establishment.contact.lastName,
+    email: userMarketingContact.email,
+    firstName: userMarketingContact.firstName,
+    lastName: userMarketingContact.lastName,
   };
 
   await saveMarketingContactEntity(
     uow,
-    establishment.establishment.siret,
+    establishmentAggregate.establishment.siret,
     marketingContact,
   );
   const provider = await makeProvider(uow);
@@ -156,7 +171,7 @@ const onEstablishment = async (
   const lastValidatedConvention = validatedConventions.at(-1);
 
   const discussions = await uow.discussionRepository.getDiscussions({
-    filters: { sirets: [establishment.establishment.siret] },
+    filters: { sirets: [establishmentAggregate.establishment.siret] },
     limit: 500,
   });
 
@@ -178,18 +193,22 @@ const onEstablishment = async (
     departmentCode: firstLocation.address.departmentCode,
     hasIcAccount,
     isRegistered: true,
-    maxContactsPerMonth: establishment.establishment.maxContactsPerMonth,
-    nafCode: establishment.establishment.nafDto.code,
+    maxContactsPerMonth:
+      establishmentAggregate.establishment.maxContactsPerMonth,
+    nafCode: establishmentAggregate.establishment.nafDto.code,
     numberOfDiscussionsAnswered,
     numberOfDiscussionsReceived: discussions.length,
-    searchableBy: makeEstablishmentMarketingSearchableBy(establishment),
-    siret: establishment.establishment.siret,
-    isCommited: establishment.establishment.isCommited,
+    searchableBy: makeEstablishmentMarketingSearchableBy(
+      establishmentAggregate,
+    ),
+    siret: establishmentAggregate.establishment.siret,
+    isCommited: establishmentAggregate.establishment.isCommited,
     nextAvailabilityDate:
-      establishment.establishment.nextAvailabilityDate &&
-      new Date(establishment.establishment.nextAvailabilityDate),
-    numberEmployeesRange: establishment.establishment.numberEmployeesRange,
-    romes: establishment.offers.map(({ romeCode }) => romeCode),
+      establishmentAggregate.establishment.nextAvailabilityDate &&
+      new Date(establishmentAggregate.establishment.nextAvailabilityDate),
+    numberEmployeesRange:
+      establishmentAggregate.establishment.numberEmployeesRange,
+    romes: establishmentAggregate.offers.map(({ romeCode }) => romeCode),
   });
 };
 
