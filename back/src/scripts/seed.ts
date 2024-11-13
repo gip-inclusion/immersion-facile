@@ -3,6 +3,7 @@ import {
   DiscussionBuilder,
   FeatureFlags,
   InclusionConnectedUserBuilder,
+  UserBuilder,
   conventionSchema,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
@@ -15,7 +16,6 @@ import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -28,6 +28,16 @@ import {
 } from "./seed.helpers";
 
 const adminUserId = "7f5cfde7-80b3-4ea1-bf3e-1711d0876161";
+
+const franceMerguezUser = new UserBuilder()
+  .withId("11111111-2222-4000-2222-111111111111")
+  .withEmail("recette+merguez@immersion-facile.beta.gouv.fr")
+  .build();
+
+const decathlonUser = new UserBuilder()
+  .withId("cccccccc-cccc-4000-cccc-cccccccccccc")
+  .withEmail("decathlon@mail.com")
+  .build();
 
 const seed = async () => {
   const config = AppConfig.createFromEnv();
@@ -48,7 +58,7 @@ const seed = async () => {
   await db.deleteFrom("agency_groups").execute();
   await db.deleteFrom("agencies").execute();
   await db.deleteFrom("discussions").execute();
-  await db.deleteFrom("establishments_contacts").execute();
+  await db.deleteFrom("establishments__users").execute();
   await db.deleteFrom("form_establishments").execute();
   await db.deleteFrom("establishments").execute();
   await db.deleteFrom("groups").execute();
@@ -100,7 +110,7 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
   await db
     .insertInto("users")
     .values(
-      [adminUser, icUser].map((user) => ({
+      [adminUser, icUser, franceMerguezUser, decathlonUser].map((user) => ({
         id: user.id,
         email: user.email,
         first_name: user.firstName,
@@ -188,6 +198,7 @@ const agencySeed = async (uow: UnitOfWork) => {
 const establishmentSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding establishments ...");
+
   const franceMerguez = new EstablishmentAggregateBuilder()
     .withEstablishment(
       new EstablishmentEntityBuilder()
@@ -224,11 +235,14 @@ const establishmentSeed = async (uow: UnitOfWork) => {
         .withRomeCode("D1101")
         .build(),
     ])
-    .withContact(
-      new ContactEntityBuilder()
-        .withEmail("recette+merguez@immersion-facile.beta.gouv.fr")
-        .build(),
-    )
+    .withUserRights([
+      {
+        userId: franceMerguezUser.id,
+        role: "establishment-admin",
+        phone: "+33600110011",
+        job: "Le Boss des merguez",
+      },
+    ])
     .build();
 
   const decathlon = new EstablishmentAggregateBuilder()
@@ -245,11 +259,14 @@ const establishmentSeed = async (uow: UnitOfWork) => {
         .withRomeCode("D1211")
         .build(),
     ])
-    .withContact(
-      new ContactEntityBuilder()
-        .withId("cccccccc-cccc-caaa-cccc-cccccccccccc")
-        .build(),
-    )
+    .withUserRights([
+      {
+        userId: decathlonUser.id,
+        role: "establishment-admin",
+        phone: "+33600110011",
+        job: "The Big Boss @Decathlon",
+      },
+    ])
     .build();
 
   await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
@@ -311,9 +328,10 @@ const establishmentSeed = async (uow: UnitOfWork) => {
           establishmentAggregate.establishment.siret,
         );
       await uow.formEstablishmentRepository.create(
-        establishmentAggregateToFormEstablishement(
+        await establishmentAggregateToFormEstablishement(
           establishmentAggregate,
           offersAsAppellationDto,
+          uow,
         ),
       );
     }),
