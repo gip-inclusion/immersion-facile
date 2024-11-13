@@ -89,7 +89,7 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     const establishmentAggregates =
       await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
         {
-          contactEmail: user.email,
+          userId: user.id,
         },
       );
 
