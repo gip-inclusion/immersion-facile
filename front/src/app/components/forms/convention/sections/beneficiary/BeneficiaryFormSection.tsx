@@ -55,8 +55,7 @@ export const BeneficiaryFormSection = ({
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
   );
-  const isSuccessfullyPeConnected =
-    useAppSelector(authSelectors.isPeConnected) || fromPeConnectedUser;
+  const isSuccessfullyPeConnected = useAppSelector(authSelectors.isPeConnected);
   const connectedUser = useAppSelector(authSelectors.connectedUser);
   const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
   const { register, getValues, setValue, formState } =
@@ -139,9 +138,11 @@ export const BeneficiaryFormSection = ({
         nativeInputProps={{
           ...formContents["signatories.beneficiary.firstName"],
           ...register("signatories.beneficiary.firstName"),
-          ...(userFieldsAreFilled ? { value: connectedUser.firstName } : {}),
+          ...(userFieldsAreFilled
+            ? { value: values.signatories.beneficiary.firstName }
+            : {}),
         }}
-        disabled={userFieldsAreFilled}
+        disabled={fromPeConnectedUser}
         {...getFieldError("signatories.beneficiary.firstName")}
       />
       <Input
@@ -150,9 +151,11 @@ export const BeneficiaryFormSection = ({
         nativeInputProps={{
           ...formContents["signatories.beneficiary.lastName"],
           ...register("signatories.beneficiary.lastName"),
-          ...(userFieldsAreFilled ? { value: connectedUser.lastName } : {}),
+          ...(userFieldsAreFilled
+            ? { value: values.signatories.beneficiary.lastName }
+            : {}),
         }}
-        disabled={userFieldsAreFilled}
+        disabled={fromPeConnectedUser}
         {...getFieldError("signatories.beneficiary.lastName")}
       />
 
@@ -174,8 +177,8 @@ export const BeneficiaryFormSection = ({
         hintText={formContents["signatories.beneficiary.email"].hintText}
         label={formContents["signatories.beneficiary.email"].label}
         disabled={
-          userFieldsAreFilled &&
-          emailSchema.safeParse(connectedUser.email).success
+          fromPeConnectedUser &&
+          emailSchema.safeParse(values.signatories.beneficiary.email).success
         }
         nativeInputProps={{
           ...formContents["signatories.beneficiary.email"],
