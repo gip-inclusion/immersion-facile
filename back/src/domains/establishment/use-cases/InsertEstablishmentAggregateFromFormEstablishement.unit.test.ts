@@ -1,10 +1,12 @@
 import {
   AppellationAndRomeDto,
+  BusinessContactDtoBuilder,
   FormEstablishmentDtoBuilder,
   GeoPositionDto,
   NafDto,
   NumberEmployeesRange,
   SiretEstablishmentDto,
+  UserBuilder,
   WithAcquisition,
   errors,
   expectPromiseToFailWithError,
@@ -28,44 +30,56 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
-const fakeSiret = "90040893100013";
-const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
-const fakeAddress = avenueChampsElyseesDto;
-const fakeLocation = {
-  position: fakePosition,
-  address: fakeAddress,
-  id: "11111111-2222-4444-3333-111111111111",
-};
-const fakeBusinessContact = new ContactEntityBuilder().build();
-const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
-const numberEmployeesRanges: NumberEmployeesRange = "6-9";
-
-const prepareSirenGateway = (
-  siretGateway: InMemorySiretGateway,
-  siret: string,
-  numberEmployeesRange: NumberEmployeesRange = "",
-) => {
-  const siretEstablishmentFromAPI: SiretEstablishmentDto = {
-    ...TEST_OPEN_ESTABLISHMENT_1,
-    siret,
-    nafDto: {
-      code: "8559A",
-      nomenclature: "nomencl",
-    },
-    numberEmployeesRange,
+describe("Insert Establishment aggregate from form data", () => {
+  const fakeSiret = "90040893100013";
+  const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
+  const fakeAddress = avenueChampsElyseesDto;
+  const fakeLocation = {
+    position: fakePosition,
+    address: fakeAddress,
+    id: "11111111-2222-4444-3333-111111111111",
   };
 
-  siretGateway.setSirenEstablishment(siretEstablishmentFromAPI);
-};
+  const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
+  const numberEmployeesRanges: NumberEmployeesRange = "6-9";
 
-describe("Insert Establishment aggregate from form data", () => {
+  const prepareSirenGateway = (
+    siretGateway: InMemorySiretGateway,
+    siret: string,
+    numberEmployeesRange: NumberEmployeesRange = "",
+  ) => {
+    const siretEstablishmentFromAPI: SiretEstablishmentDto = {
+      ...TEST_OPEN_ESTABLISHMENT_1,
+      siret,
+      nafDto: {
+        code: "8559A",
+        nomenclature: "nomencl",
+      },
+      numberEmployeesRange,
+    };
+
+    siretGateway.setSirenEstablishment(siretEstablishmentFromAPI);
+  };
+
+  const establishmentAdmin = new UserBuilder()
+    .withFirstName("El patron")
+    .withLastName("De la vega!")
+    .withEmail("admin@estab.com")
+    .withId("estab.admin")
+    .build();
+  const establishmentContact = new UserBuilder()
+    .withFirstName("El contacto")
+    .withLastName("De otro lugar")
+    .withEmail("contact@estab.com")
+    .withId("estab.contact")
+    .build();
+
   let siretGateway: InMemorySiretGateway;
   let addressAPI: InMemoryAddressGateway;
   let uuidGenerator: TestUuidGenerator;
@@ -90,7 +104,6 @@ describe("Insert Establishment aggregate from form data", () => {
         makeCreateNewEvent({ timeGateway, uuidGenerator }),
       );
 
-    uuidGenerator.setNextUuid(fakeBusinessContact.id);
     addressAPI.setAddressAndPosition([
       {
         address: fakeAddress,
@@ -99,82 +112,215 @@ describe("Insert Establishment aggregate from form data", () => {
     ]);
   });
 
-  it("Converts Form Establishment in Aggregate", async () => {
-    // Prepare
-    const withAcquisition = {
-      acquisitionKeyword: "yolo",
-      acquisitionCampaign: "my campaign",
-    } satisfies WithAcquisition;
-    const professions: AppellationAndRomeDto[] = [
-      {
-        romeCode: "A1101",
-        appellationCode: "11717",
-        romeLabel: "métier A",
-        appellationLabel: "métier A.1",
-      },
-      {
-        romeCode: "A1102",
-        appellationCode: "11717",
-        romeLabel: "métier B",
-        appellationLabel: "métier B.1",
-      },
-    ];
-    const nextAvailabilityDate = new Date();
-    const formEstablishment = FormEstablishmentDtoBuilder.valid()
-      .withFitForDisabledWorkers(true)
-      .withSiret(fakeSiret)
-      .withAppellations(professions)
-      .withBusinessContact(fakeBusinessContact)
-      .withNextAvailabilityDate(nextAvailabilityDate)
-      .withAcquisition(withAcquisition)
-      .withBusinessAddresses([
+  describe("Converts Form Establishment in Aggregate", () => {
+    it("And create user that doesn't exist by email", async () => {
+      // Prepare
+      const withAcquisition: WithAcquisition = {
+        acquisitionKeyword: "yolo",
+        acquisitionCampaign: "my campaign",
+      };
+      const professions: AppellationAndRomeDto[] = [
         {
-          id: fakeLocation.id,
-          rawAddress: "102 rue du fake, 75001 Paris",
+          romeCode: "A1101",
+          appellationCode: "11717",
+          romeLabel: "métier A",
+          appellationLabel: "métier A.1",
         },
-      ])
-      .build();
+        {
+          romeCode: "A1102",
+          appellationCode: "11717",
+          romeLabel: "métier B",
+          appellationLabel: "métier B.1",
+        },
+      ];
+      const nextAvailabilityDate = new Date();
+      const businessContact = new BusinessContactDtoBuilder()
+        .withEmail(establishmentAdmin.email)
+        .withCopyEmails([establishmentContact.email])
+        .build();
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withFitForDisabledWorkers(true)
+        .withSiret(fakeSiret)
+        .withAppellations(professions)
+        .withNextAvailabilityDate(nextAvailabilityDate)
+        .withAcquisition(withAcquisition)
+        .withBusinessAddresses([
+          {
+            id: fakeLocation.id,
+            rawAddress: "102 rue du fake, 75001 Paris",
+          },
+        ])
+        .withBusinessContact(businessContact)
+        .build();
 
-    prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
+      prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
+      uuidGenerator.setNextUuids([
+        establishmentAdmin.id,
+        establishmentContact.id,
+      ]);
 
-    // Act
-    await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+      // Act
+      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
 
-    // Assert
-    expectToEqual(
-      uow.establishmentAggregateRepository.establishmentAggregates,
-      [
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withSiret(formEstablishment.siret)
-              .withCustomizedName(formEstablishment.businessNameCustomized)
-              .withNafDto(expectedNafDto)
-              .withCreatedAt(timeGateway.now())
-              .withUpdatedAt(timeGateway.now())
-              .withIsCommited(false)
-              .withName(formEstablishment.businessName)
-              .withNumberOfEmployeeRange(numberEmployeesRanges)
-              .withLocations([fakeLocation])
-              .withWebsite(formEstablishment.website)
-              .withNextAvailabilityDate(nextAvailabilityDate)
-              .withAcquisition(withAcquisition)
-              .withScore(0)
-              .build(),
-          )
-          .withFitForDisabledWorkers(true)
-          .withOffers(
-            professions.map((prof) =>
-              new OfferEntityBuilder({
-                ...prof,
-                createdAt: timeGateway.now(),
-              }).build(),
-            ),
-          )
-          .withContact(fakeBusinessContact)
+      // Assert
+      expectToEqual(uow.userRepository.users, [
+        new UserBuilder(establishmentAdmin)
+          .withFirstName(businessContact.firstName)
+          .withLastName(businessContact.lastName)
+          .withCreatedAt(timeGateway.now())
           .build(),
-      ],
-    );
+        new UserBuilder(establishmentContact)
+          .withFirstName("")
+          .withLastName("")
+          .withCreatedAt(timeGateway.now())
+          .build(),
+      ]);
+      expectToEqual(
+        uow.establishmentAggregateRepository.establishmentAggregates,
+        [
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(formEstablishment.siret)
+                .withCustomizedName(formEstablishment.businessNameCustomized)
+                .withNafDto(expectedNafDto)
+                .withCreatedAt(timeGateway.now())
+                .withUpdatedAt(timeGateway.now())
+                .withIsCommited(false)
+                .withName(formEstablishment.businessName)
+                .withNumberOfEmployeeRange(numberEmployeesRanges)
+                .withLocations([fakeLocation])
+                .withWebsite(formEstablishment.website)
+                .withNextAvailabilityDate(nextAvailabilityDate)
+                .withAcquisition(withAcquisition)
+                .withScore(0)
+                .build(),
+            )
+            .withFitForDisabledWorkers(true)
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: businessContact.job,
+                phone: businessContact.phone,
+                userId: establishmentAdmin.id,
+              },
+              {
+                role: "establishment-contact",
+                userId: establishmentContact.id,
+              },
+            ])
+            .withOffers(
+              professions.map((prof) =>
+                new OfferEntityBuilder({
+                  ...prof,
+                  createdAt: timeGateway.now(),
+                }).build(),
+              ),
+            )
+            .build(),
+        ],
+      );
+    });
+
+    it("And doesn't modify user that aldready exist by email", async () => {
+      // Prepare
+      const withAcquisition: WithAcquisition = {
+        acquisitionKeyword: "yolo",
+        acquisitionCampaign: "my campaign",
+      };
+      const professions: AppellationAndRomeDto[] = [
+        {
+          romeCode: "A1101",
+          appellationCode: "11717",
+          romeLabel: "métier A",
+          appellationLabel: "métier A.1",
+        },
+        {
+          romeCode: "A1102",
+          appellationCode: "11717",
+          romeLabel: "métier B",
+          appellationLabel: "métier B.1",
+        },
+      ];
+      const nextAvailabilityDate = new Date();
+      const businessContact = new BusinessContactDtoBuilder()
+        .withEmail(establishmentAdmin.email)
+        .withCopyEmails([establishmentContact.email])
+        .withFirstName("TOTO")
+        .withLastName("KIKI")
+        .build();
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withFitForDisabledWorkers(true)
+        .withSiret(fakeSiret)
+        .withAppellations(professions)
+        .withNextAvailabilityDate(nextAvailabilityDate)
+        .withAcquisition(withAcquisition)
+        .withBusinessAddresses([
+          {
+            id: fakeLocation.id,
+            rawAddress: "102 rue du fake, 75001 Paris",
+          },
+        ])
+        .withBusinessContact(businessContact)
+        .build();
+
+      prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
+      uow.userRepository.users = [establishmentAdmin, establishmentContact];
+
+      // Act
+      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+
+      // Assert
+      expectToEqual(uow.userRepository.users, [
+        establishmentAdmin,
+        establishmentContact,
+      ]);
+      expectToEqual(
+        uow.establishmentAggregateRepository.establishmentAggregates,
+        [
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(formEstablishment.siret)
+                .withCustomizedName(formEstablishment.businessNameCustomized)
+                .withNafDto(expectedNafDto)
+                .withCreatedAt(timeGateway.now())
+                .withUpdatedAt(timeGateway.now())
+                .withIsCommited(false)
+                .withName(formEstablishment.businessName)
+                .withNumberOfEmployeeRange(numberEmployeesRanges)
+                .withLocations([fakeLocation])
+                .withWebsite(formEstablishment.website)
+                .withNextAvailabilityDate(nextAvailabilityDate)
+                .withAcquisition(withAcquisition)
+                .withScore(0)
+                .build(),
+            )
+            .withFitForDisabledWorkers(true)
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: businessContact.job,
+                phone: businessContact.phone,
+                userId: establishmentAdmin.id,
+              },
+              {
+                role: "establishment-contact",
+                userId: establishmentContact.id,
+              },
+            ])
+            .withOffers(
+              professions.map((prof) =>
+                new OfferEntityBuilder({
+                  ...prof,
+                  createdAt: timeGateway.now(),
+                }).build(),
+              ),
+            )
+            .build(),
+        ],
+      );
+    });
   });
 
   it("Correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
@@ -198,9 +344,6 @@ describe("Insert Establishment aggregate from form data", () => {
   it("Throws if establishment and offers with same siret already exists", async () => {
     const siret = "12345678911234";
     // Prepare : insert an establishment aggregate from LBB with siret
-    const previousContact = new ContactEntityBuilder()
-      .withEmail("previous.contact@gmail.com")
-      .build();
     const previousEstablishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .withName("Previous name")
@@ -212,7 +355,14 @@ describe("Insert Establishment aggregate from form data", () => {
         new OfferEntityBuilder().build(),
         new OfferEntityBuilder().build(),
       ])
-      .withContact(previousContact)
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "",
+          phone: "",
+          userId: establishmentAdmin.id,
+        },
+      ])
       .build();
 
     uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -237,7 +387,9 @@ describe("Insert Establishment aggregate from form data", () => {
         },
       ])
       .withBusinessContact(
-        new ContactEntityBuilder().withEmail("new.contact@gmail.com").build(),
+        new BusinessContactDtoBuilder()
+          .withEmail("new.contact@gmail.com")
+          .build(),
       )
       .build();
 
