@@ -19,8 +19,8 @@ import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../a
 import { InMemoryLaBonneBoiteGateway } from "../adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDto } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDto";
 import { LaBonneBoiteCompanyDtoBuilder } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDtoBuilder";
+import { EstablishmentUserRight } from "../entities/EstablishmentEntity";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   TEST_LOCATION,
@@ -39,6 +39,15 @@ const secretariatAppellationAndRome: AppellationAndRomeDto = {
 
 const establishmentScore = 12;
 
+const userRights: EstablishmentUserRight[] = [
+  {
+    userId: "osef",
+    role: "establishment-admin",
+    job: "Chef",
+    phone: "+33600000000",
+  },
+];
+
 const establishment = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
@@ -48,12 +57,13 @@ const establishment = new EstablishmentAggregateBuilder()
         code: "naf code",
         nomenclature: "naf nomenclature",
       })
+      .withContactMethod("EMAIL")
       .withNumberOfEmployeeRange("20-49")
       .withWebsite("www.website.com")
       .build(),
   )
   .withScore(establishmentScore)
-  .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
+  .withUserRights(userRights)
   .withOffers([secretariatOffer, boulangerOffer, boulangerAssistantOffer])
   .build();
 
@@ -66,13 +76,14 @@ const establishmentAcceptingOnlyStudent = new EstablishmentAggregateBuilder()
         code: "naf code",
         nomenclature: "naf nomenclature",
       })
+      .withContactMethod("EMAIL")
       .withNumberOfEmployeeRange("20-49")
       .withWebsite("www.website.com")
       .withSearchableBy({ students: true, jobSeekers: false })
       .build(),
   )
-  .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
   .withOffers([secretariatOffer, boulangerOffer])
+  .withUserRights(userRights)
   .build();
 
 const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
@@ -84,12 +95,13 @@ const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
         code: "naf code",
         nomenclature: "naf nomenclature",
       })
+      .withContactMethod("EMAIL")
       .withNumberOfEmployeeRange("20-49")
       .withWebsite("www.website.com")
       .withSearchableBy({ students: false, jobSeekers: true })
       .build(),
   )
-  .withContact(new ContactEntityBuilder().withContactMethod("EMAIL").build())
+  .withUserRights(userRights)
   .withOffers([secretariatOffer, boulangerOffer])
   .build();
 
