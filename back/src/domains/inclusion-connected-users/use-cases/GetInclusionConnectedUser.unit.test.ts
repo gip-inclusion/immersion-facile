@@ -17,10 +17,8 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import {
-  ContactEntityBuilder,
-  EstablishmentAggregateBuilder,
-} from "../../establishment/helpers/EstablishmentBuilders";
+import { EstablishmentUserRight } from "../../establishment/entities/EstablishmentEntity";
+import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 
 describe("GetUserAgencyDashboardUrl", () => {
@@ -465,18 +463,23 @@ describe("GetUserAgencyDashboardUrl", () => {
         it("retrieve establishments when IC user is establishement rep in at least one establishment", async () => {
           uow.userRepository.users = [notAdmin];
 
-          const fakeBusinessContact = new ContactEntityBuilder()
-            .withEmail(notAdmin.email)
-            .build();
+          const establishmentUserRights: EstablishmentUserRight[] = [
+            {
+              job: "Chef",
+              role: "establishment-admin",
+              userId: notAdmin.id,
+              phone: "+33600000000",
+            },
+          ];
 
           const establishmentAggregate1 = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("89114285300012")
-            .withContact(fakeBusinessContact)
+            .withUserRights(establishmentUserRights)
             .build();
 
           const establishmentAggregate2 = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("89114285300013")
-            .withContact(fakeBusinessContact)
+            .withUserRights(establishmentUserRights)
             .build();
 
           uow.establishmentAggregateRepository.establishmentAggregates = [
