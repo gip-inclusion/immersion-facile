@@ -11,7 +11,10 @@ import {
 import { TransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+import {
+  EstablishmentAdminRight,
+  EstablishmentAggregate,
+} from "../entities/EstablishmentEntity";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
@@ -50,8 +53,8 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         throw errors.user.notFound({ userId: jwtPayload.userId });
 
       if (
-        currentUser.establishments?.some(
-          ({ siret }) => siret === establishmentAggregate.establishment.siret,
+        establishmentAggregate.userRights.some(
+          (right) => right.userId === currentUser.id,
         ) ||
         currentUser.isBackofficeAdmin
       )
@@ -70,15 +73,43 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       await uow.establishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
         establishmentAggregate.establishment.siret,
       ),
+      uow,
     );
   }
 }
 
-export const establishmentAggregateToFormEstablishement = (
+export const establishmentAggregateToFormEstablishement = async (
   establishmentAggregate: EstablishmentAggregate,
   appellations: AppellationAndRomeDto[],
-): FormEstablishmentDto =>
-  ({
+  uow: UnitOfWork,
+): Promise<FormEstablishmentDto> => {
+  const provider = await makeProvider(uow);
+  const firstAdminRight = establishmentAggregate.userRights.find(
+    (right): right is EstablishmentAdminRight =>
+      right.role === "establishment-admin",
+  );
+
+  if (!firstAdminRight)
+    throw errors.establishment.adminNotFound({
+      siret: establishmentAggregate.establishment.siret,
+    });
+
+  const firstEstablishmentAdmin = await uow.userRepository.getById(
+    firstAdminRight.userId,
+    provider,
+  );
+
+  if (!firstEstablishmentAdmin)
+    throw errors.user.notFound({ userId: firstAdminRight.userId });
+
+  const establishmentContacts = await uow.userRepository.getByIds(
+    establishmentAggregate.userRights
+      .filter(({ role }) => role === "establishment-contact")
+      .map(({ userId }) => userId),
+    provider,
+  );
+
+  return {
     siret: establishmentAggregate.establishment.siret,
     source: "immersion-facile",
     website: establishmentAggregate.establishment.website,
@@ -97,10 +128,19 @@ export const establishmentAggregateToFormEstablishement = (
       establishmentAggregate.establishment.fitForDisabledWorkers,
     naf: establishmentAggregate.establishment?.nafDto,
     appellations,
-    businessContact: establishmentAggregate.contact,
+    businessContact: {
+      contactMethod: establishmentAggregate.establishment.contactMethod,
+      firstName: firstEstablishmentAdmin.firstName,
+      lastName: firstEstablishmentAdmin.lastName,
+      email: firstEstablishmentAdmin.email,
+      job: firstAdminRight.job,
+      phone: firstAdminRight.phone,
+      copyEmails: establishmentContacts.map(({ email }) => email),
+    },
     maxContactsPerMonth:
       establishmentAggregate.establishment.maxContactsPerMonth,
     nextAvailabilityDate:
       establishmentAggregate.establishment.nextAvailabilityDate,
     searchableBy: establishmentAggregate.establishment.searchableBy,
-  }) satisfies FormEstablishmentDto;
+  } satisfies FormEstablishmentDto;
+};
