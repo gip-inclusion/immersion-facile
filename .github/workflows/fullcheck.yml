@@ -97,6 +97,7 @@ jobs:
 
   playwright-tests:
     name: "Playwright tests"
+    if: github.ref != 'refs/heads/main'  # Skip this job on main branch
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
