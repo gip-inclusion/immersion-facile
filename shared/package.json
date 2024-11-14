@@ -29,7 +29,7 @@
     "libphonenumber-js": "^1.11.1",
     "pino": "^7.9.1",
     "ramda": "^0.30.1",
-    "shared-routes": "^0.8.27",
+    "shared-routes": "^0.8.28",
     "typescript": "^5.6.2",
     "zod": "3.22.3"
   },
