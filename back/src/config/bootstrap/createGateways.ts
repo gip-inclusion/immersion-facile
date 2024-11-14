@@ -357,6 +357,10 @@ export const createGateways = async (
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: "Pdf Generator App",
             routes: makeScalingoPdfGeneratorRoutes(config.pdfGenerator.baseUrl),
+            axiosInstance: axios.create({
+              timeout: config.externalAxiosTimeout,
+              validateStatus: () => true,
+            }),
           }),
           config.pdfGenerator.apiKey,
           uuidGenerator,
