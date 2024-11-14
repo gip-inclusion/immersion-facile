@@ -411,7 +411,7 @@ export const createGateways = async (
         ? new BrevoEstablishmentMarketingGateway({
             apiKey: config.apiKeyBrevo,
             establishmentContactListId: config.brevoEstablishmentContactListId,
-            httpClient: createLegacyAxiosHttpClientForExternalAPIs({
+            httpClient: createFetchHttpClientForExternalAPIs({
               partnerName: "Brevo Establishment Marketing",
               routes: brevoContactRoutes,
             }),

@@ -14,7 +14,7 @@ const applicationOctetStreamSchema = z.literal("application/octet-stream");
 
 export type BrevoHeaders = {
   accept: ApplicationJsonType;
-  "content-type": ApplicationJsonType;
+  "Content-Type": ApplicationJsonType;
   "api-key": ApiKey;
 };
 
@@ -25,7 +25,7 @@ type BrevoBinaryContentHeaders = {
 
 export const brevoHeaderSchema: z.Schema<BrevoHeaders> = z.object({
   accept: applicationJsonSchema,
-  "content-type": applicationJsonSchema,
+  "Content-Type": applicationJsonSchema,
   "api-key": apiKeySchema,
 });
 
