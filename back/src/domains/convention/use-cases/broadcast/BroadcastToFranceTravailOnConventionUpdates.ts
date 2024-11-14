@@ -1,6 +1,8 @@
 import {
   AgencyDto,
+  AgencyKind,
   ConventionDto,
+  FeatureFlags,
   ImmersionObjective,
   WithConventionDto,
   errors,
@@ -45,10 +47,14 @@ export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUs
     uow: UnitOfWork,
   ): Promise<void> {
     const { agency, refersToAgency } = await getLinkedAgencies(uow, convention);
+    const featureFlags = await uow.featureFlagRepository.getAll();
 
     if (
-      (!refersToAgency && agency.kind !== "pole-emploi") ||
-      (refersToAgency && refersToAgency.kind !== "pole-emploi")
+      !shouldBroadcastToFranceTravail({
+        agency: agency,
+        refersToAgency: refersToAgency,
+        featureFlags,
+      })
     )
       return this.options.resyncMode
         ? uow.conventionsToSyncRepository.save({
@@ -167,4 +173,42 @@ const getLinkedAgencies = async (
     agency,
     refersToAgency: await agencyWithRightToAgencyDto(uow, refersToAgency),
   };
+};
+
+const shouldBroadcastToFranceTravail = ({
+  agency,
+  refersToAgency,
+  featureFlags,
+}: {
+  agency: AgencyDto;
+  refersToAgency: AgencyDto | null;
+  featureFlags: FeatureFlags;
+}): boolean => {
+  const isBroadcastToFranceTravailAllowedForKind = (agencyKind: AgencyKind) => {
+    if (agency.kind === agencyKind) return true;
+    if (refersToAgency && refersToAgency.kind === agencyKind) return true;
+    return false;
+  };
+
+  if (isBroadcastToFranceTravailAllowedForKind("pole-emploi")) return true;
+
+  if (
+    featureFlags.enableBroadcastOfMissionLocaleToFT.isActive &&
+    isBroadcastToFranceTravailAllowedForKind("mission-locale")
+  )
+    return true;
+
+  if (
+    featureFlags.enableBroadcastOfConseilDepartementalToFT.isActive &&
+    isBroadcastToFranceTravailAllowedForKind("structure-IAE")
+  )
+    return true;
+
+  if (
+    featureFlags.enableBroadcastOfConseilDepartementalToFT.isActive &&
+    isBroadcastToFranceTravailAllowedForKind("conseil-departemental")
+  )
+    return true;
+
+  return false;
 };

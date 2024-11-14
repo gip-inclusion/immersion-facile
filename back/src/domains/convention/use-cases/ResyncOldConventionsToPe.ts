@@ -20,7 +20,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
 > {
   protected override inputSchema = z.void();
 
-  readonly #broadcastToPeUsecase: BroadcastToFranceTravailOnConventionUpdates;
+  readonly #broadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
 
   #report: ResyncOldConventionToPeReport = {
     errors: {},
@@ -39,7 +39,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
     limit: number,
   ) {
     super(uowPerform);
-    this.#broadcastToPeUsecase =
+    this.#broadcastToFTUsecase =
       new BroadcastToFranceTravailOnConventionUpdates(
         uowPerform,
         poleEmploiGateway,
@@ -124,6 +124,6 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
       throw errors.convention.notFound({
         conventionId: conventionToSyncId,
       });
-    return this.#broadcastToPeUsecase.execute({ convention });
+    return this.#broadcastToFTUsecase.execute({ convention });
   }
 }
