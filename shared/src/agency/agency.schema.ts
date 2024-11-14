@@ -53,17 +53,17 @@ export const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
   agencyKindList,
   "Ce type de structure n'est pas supporté",
 );
+const agencyStatusSchema = z.enum(allAgencyStatuses);
 
-export const agencyIdAndNameSchema: z.ZodSchema<AgencyOption> = z.object({
+export const agencyOptionSchema: z.ZodSchema<AgencyOption> = z.object({
   id: agencyIdSchema,
   name: z.string(),
   kind: agencyKindSchema,
+  status: agencyStatusSchema,
 });
 
-export const agenciesIdAndNameSchema: z.ZodSchema<AgencyOption[]> = z.array(
-  agencyIdAndNameSchema,
-);
-const agencyStatusSchema = z.enum(allAgencyStatuses);
+export const agencyOptionsSchema: z.ZodSchema<AgencyOption[]> =
+  z.array(agencyOptionSchema);
 
 export const listAgencyOptionsRequestSchema: z.ZodSchema<ListAgencyOptionsRequestDto> =
   z.object({

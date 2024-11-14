@@ -79,6 +79,7 @@ describe("Agencies in store", () => {
           id: "0",
           name: "Agence de Bougoin",
           kind: "autre",
+          status: "active",
         },
       ];
 

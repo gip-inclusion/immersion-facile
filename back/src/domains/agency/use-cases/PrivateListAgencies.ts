@@ -21,6 +21,15 @@ export class PrivateListAgencies extends TransactionalUseCase<
       .getAgencies({
         filters: { status: status && [status] },
       })
-      .then(map(({ id, name, kind }): AgencyOption => ({ id, name, kind })));
+      .then(
+        map(
+          ({ id, name, kind, status }): AgencyOption => ({
+            id,
+            name,
+            kind,
+            status,
+          }),
+        ),
+      );
   }
 }

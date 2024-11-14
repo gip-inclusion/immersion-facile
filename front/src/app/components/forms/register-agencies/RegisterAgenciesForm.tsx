@@ -6,7 +6,7 @@ import React from "react";
 import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { AgencyOption, agencyIdAndNameSchema, domElementIds } from "shared";
+import { AgencyOption, agencyOptionSchema, domElementIds } from "shared";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
   displayReadableError,
@@ -22,7 +22,7 @@ type WithAgenciesOptions = {
 };
 
 const registerAgenciesFormSchema: z.Schema<WithAgenciesOptions> = z.object({
-  agencies: z.array(agencyIdAndNameSchema).nonempty(),
+  agencies: z.array(agencyOptionSchema).nonempty(),
 });
 
 export const RegisterAgenciesForm = () => {

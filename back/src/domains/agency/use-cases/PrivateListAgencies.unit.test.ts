@@ -38,6 +38,7 @@ describe("PrivateListAgencies use case", () => {
         id: expectedAgency.id,
         kind: expectedAgency.kind,
         name: expectedAgency.name,
+        status: expectedAgency.status,
       },
     ]);
   });

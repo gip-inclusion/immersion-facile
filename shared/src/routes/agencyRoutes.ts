@@ -1,7 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import {
-  agenciesIdAndNameSchema,
   agencyIdResponseSchema,
+  agencyOptionsSchema,
   agencySchema,
   createAgencySchema,
   listAgencyOptionsRequestSchema,
@@ -51,7 +51,7 @@ export const agencyRoutes = defineRoutes({
     queryParamsSchema: withAgencyStatusSchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: agenciesIdAndNameSchema,
+      200: agencyOptionsSchema,
       401: httpErrorSchema,
     },
   }),
@@ -59,7 +59,7 @@ export const agencyRoutes = defineRoutes({
     method: "get",
     url: "/agencies",
     queryParamsSchema: listAgencyOptionsRequestSchema,
-    responses: { 200: agenciesIdAndNameSchema },
+    responses: { 200: agencyOptionsSchema },
   }),
   addAgency: defineRoute({
     method: "post",

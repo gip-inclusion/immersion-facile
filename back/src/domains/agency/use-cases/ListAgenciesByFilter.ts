@@ -5,7 +5,6 @@ import {
   ListAgencyOptionsRequestDto,
   activeAgencyStatuses,
   agencyKindList,
-  agencyStatusToLabel,
   listAgencyOptionsRequestSchema,
   miniStageAgencyKinds,
   removeSpaces,
@@ -82,11 +81,8 @@ export const toAgencyOption = (
   id: agency.id,
   name: toAgencyOptionName(agency),
   kind: agency.kind,
+  status: agency.status,
 });
 
 const toAgencyOptionName = (agency: AgencyWithUsersRights): string =>
-  `${agency.name} (${agency.address.city})${
-    activeAgencyStatuses.includes(agency.status)
-      ? ""
-      : ` [${agencyStatusToLabel[agency.status]}]`
-  }`;
+  `${agency.name} (${agency.address.city})`;

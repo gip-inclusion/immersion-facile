@@ -140,6 +140,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
           id: agency.id,
           name: agency.name,
           kind: agency.kind,
+          status: agency.status,
         })),
     );
   }
