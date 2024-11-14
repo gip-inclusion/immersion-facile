@@ -1,4 +1,9 @@
-import { AddressDto, AgencyDtoBuilder, expectToEqual } from "shared";
+import {
+  AddressDto,
+  AgencyDtoBuilder,
+  activeAgencyStatuses,
+  expectToEqual,
+} from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
@@ -102,6 +107,23 @@ describe("Query: List agencies by filter", () => {
       .build(),
   );
 
+  const closedAgency = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("9")
+      .withName("Agence Fermée")
+      .withKind("mission-locale")
+      .withStatus("closed")
+      .build(),
+  );
+  const inReviewAgency = toAgencyWithRights(
+    new AgencyDtoBuilder()
+      .withId("10")
+      .withName("Agence en revue")
+      .withKind("cci")
+      .withStatus("needsReview")
+      .build(),
+  );
+
   const allAgencies = [
     otherAgencyInParis,
     cciAgency1InCergy,
@@ -112,6 +134,8 @@ describe("Query: List agencies by filter", () => {
     agencyWithSiret,
     agencyChambreAgriculture,
     agencyCma,
+    closedAgency,
+    inReviewAgency,
   ];
 
   let listAgencyOptionsByFilter: ListAgencyOptionsByFilter;
@@ -125,9 +149,14 @@ describe("Query: List agencies by filter", () => {
   });
 
   describe("No filters", () => {
-    it("List all agencies", async () => {
+    it("List all agencies with active statuses", async () => {
       const result = await listAgencyOptionsByFilter.execute({}, undefined);
-      expectToEqual(result, allAgencies.map(toAgencyOption));
+      expectToEqual(
+        result,
+        allAgencies
+          .filter((agency) => activeAgencyStatuses.includes(agency.status))
+          .map(toAgencyOption),
+      );
     });
   });
 
@@ -180,7 +209,11 @@ describe("Query: List agencies by filter", () => {
           undefined,
         ),
         allAgencies
-          .filter((agency) => agency.refersToAgencyId === null)
+          .filter(
+            (agency) =>
+              agency.refersToAgencyId === null &&
+              activeAgencyStatuses.includes(agency.status),
+          )
           .map(toAgencyOption),
       );
     });
@@ -251,7 +284,11 @@ describe("Query: List agencies by filter", () => {
           undefined,
         ),
         allAgencies
-          .filter((agency) => agency.id !== agencyCma.id)
+          .filter(
+            (agency) =>
+              agency.id !== agencyCma.id &&
+              activeAgencyStatuses.includes(agency.status),
+          )
           .map(toAgencyOption),
       );
     });
@@ -263,6 +300,46 @@ describe("Query: List agencies by filter", () => {
           undefined,
         ),
         [].map(toAgencyOption),
+      );
+    });
+  });
+
+  describe("With Agency status filter", () => {
+    it("List agencies with status 'closed'", async () => {
+      expectToEqual(
+        await listAgencyOptionsByFilter.execute(
+          { status: ["closed"] },
+          undefined,
+        ),
+        [closedAgency].map(toAgencyOption),
+      );
+    });
+
+    it("List agencies with status 'toReview'", async () => {
+      expectToEqual(
+        await listAgencyOptionsByFilter.execute(
+          { status: ["needsReview"] },
+          undefined,
+        ),
+        [inReviewAgency].map(toAgencyOption),
+      );
+    });
+
+    it("List agencies with all the statuses", async () => {
+      expectToEqual(
+        await listAgencyOptionsByFilter.execute(
+          {
+            status: [
+              "closed",
+              "active",
+              "from-api-PE",
+              "needsReview",
+              "rejected",
+            ],
+          },
+          undefined,
+        ),
+        allAgencies.map(toAgencyOption),
       );
     });
   });
