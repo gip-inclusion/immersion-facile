@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Table } from "@codegouvfr/react-dsfr/Table";
+import Tag from "@codegouvfr/react-dsfr/Tag";
 import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -7,6 +8,7 @@ import {
   AgencyRight,
   addressDtoToString,
   agencyKindToLabelIncludingIF,
+  agencyStatusToLabel,
 } from "shared";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
@@ -87,6 +89,7 @@ const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
               <AgencyTag
                 refersToAgencyName={agencyRight.agency.refersToAgencyName}
               />
+              <Tag>{agencyStatusToLabel[agencyRight.agency.status]}</Tag>
               <br />
               <span>{agencyRight.agency.name}</span>
               <br />
