@@ -9,8 +9,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   AgencyDto,
-  AgencyStatus,
   agencyKindToLabel,
+  agencyStatusToLabel,
   allAgencyStatuses,
   domElementIds,
   editAgencySchema,
@@ -33,14 +33,6 @@ import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agen
 
 type EditAgencyFormProperties = {
   agency: AgencyDto;
-};
-
-const agencyStatusToLabel: Record<AgencyStatus, string> = {
-  active: "Active",
-  closed: "Fermée",
-  rejected: "Rejetée",
-  needsReview: "En attende d'activation",
-  "from-api-PE": "Import Api",
 };
 
 const kindOptions = Object.entries(agencyKindToLabel).map(([value, label]) => ({

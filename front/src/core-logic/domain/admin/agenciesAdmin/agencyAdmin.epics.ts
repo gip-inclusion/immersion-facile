@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { type AgencyId, looksLikeSiret } from "shared";
+import { type AgencyId, allAgencyStatuses, looksLikeSiret } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -27,6 +27,7 @@ const agencyAdminGetByNameEpic: AgencyEpic = (
     distinctUntilChanged(),
     switchMap((action: PayloadAction<string>) =>
       agencyGateway.listAgencyOptionsByFilter$({
+        status: [...allAgencyStatuses],
         [looksLikeSiret(action.payload) ? "siret" : "nameIncludes"]:
           action.payload,
       }),

@@ -63,6 +63,7 @@ export const agencyIdAndNameSchema: z.ZodSchema<AgencyOption> = z.object({
 export const agenciesIdAndNameSchema: z.ZodSchema<AgencyOption[]> = z.array(
   agencyIdAndNameSchema,
 );
+const agencyStatusSchema = z.enum(allAgencyStatuses);
 
 export const listAgencyOptionsRequestSchema: z.ZodSchema<ListAgencyOptionsRequestDto> =
   z.object({
@@ -70,6 +71,7 @@ export const listAgencyOptionsRequestSchema: z.ZodSchema<ListAgencyOptionsReques
     nameIncludes: z.string().optional(),
     filterKind: z.enum(agencyKindFilters).optional(),
     siret: z.string().optional(),
+    status: z.array(agencyStatusSchema).optional(),
   });
 
 const withEmails = {
@@ -114,8 +116,6 @@ export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
       });
     }
   });
-
-const agencyStatusSchema = z.enum(allAgencyStatuses);
 
 export const editAgencySchema: z.ZodSchema<AgencyDto> = z
   .object({ ...commonAgencyShape, ...withEmails })

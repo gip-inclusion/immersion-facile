@@ -5,6 +5,7 @@ import {
   ListAgencyOptionsRequestDto,
   activeAgencyStatuses,
   agencyKindList,
+  agencyStatusToLabel,
   listAgencyOptionsRequestSchema,
   miniStageAgencyKinds,
   removeSpaces,
@@ -28,6 +29,7 @@ export class ListAgencyOptionsByFilter extends TransactionalUseCase<
       nameIncludes,
       filterKind,
       siret,
+      status,
     }: ListAgencyOptionsRequestDto,
     uow: UnitOfWork,
   ): Promise<AgencyOption[]> {
@@ -36,7 +38,7 @@ export class ListAgencyOptionsByFilter extends TransactionalUseCase<
       filters: {
         nameIncludes,
         departmentCode,
-        status: activeAgencyStatuses,
+        status: status ? status : activeAgencyStatuses,
         siret: siret ? removeSpaces(siret) : undefined,
         ...extraFilters,
       },
@@ -83,4 +85,8 @@ export const toAgencyOption = (
 });
 
 const toAgencyOptionName = (agency: AgencyWithUsersRights): string =>
-  `${agency.name} (${agency.address.city})`;
+  `${agency.name} (${agency.address.city})${
+    activeAgencyStatuses.includes(agency.status)
+      ? ""
+      : ` [${agencyStatusToLabel[agency.status]}]`
+  }`;
