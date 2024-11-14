@@ -1,4 +1,3 @@
-import { isAxiosError } from "axios";
 import Bottleneck from "bottleneck";
 import { Email, numberOfEmployeesRangeSchema } from "shared";
 import { HttpClient } from "shared-routes";
@@ -40,7 +39,7 @@ export class BrevoEstablishmentMarketingGateway
     this.#httpClient = httpClient;
     this.#brevoHeaders = {
       accept: "application/json",
-      "content-type": "application/json",
+      "Content-Type": "application/json",
       "api-key": apiKey,
     };
     this.#establishmentContactListId = establishmentContactListId;
@@ -163,6 +162,7 @@ export class BrevoEstablishmentMarketingGateway
             );
           throw new Error("Should not occurs.");
         }
+
         throw new Error(
           `Bad response with status '${response.status}' and body '${response.body}'`,
         );
@@ -180,14 +180,7 @@ export class BrevoEstablishmentMarketingGateway
       .then((response) => {
         if (response.status === 200)
           return this.#makeContactFromGetContactResponse(response.body);
-        throw new Error(
-          `Bad response with status '${response.status}' and body '${response.body}'`,
-        );
-      })
-      .catch((error) => {
-        if (isAxiosError(error) && error.response?.status === 404)
-          return undefined;
-        throw error;
+        if (response.status === 404) return;
       });
   }
 

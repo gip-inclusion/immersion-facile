@@ -1,6 +1,5 @@
-import axios from "axios";
 import { Email, expectToEqual } from "shared";
-import { createAxiosSharedClient } from "shared-routes/axios";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { EstablishmentMarketingGatewayDto } from "../../ports/EstablishmentMarketingGateway";
 import { brevoContactRoutes } from "./BrevoContact.routes";
@@ -15,7 +14,7 @@ type Mode = (typeof mode)[number];
 describe("BrevoEstablishmentMarketingGateway", () => {
   const config = AppConfig.createFromEnv();
   const gateway = new BrevoEstablishmentMarketingGateway({
-    httpClient: createAxiosSharedClient(brevoContactRoutes, axios),
+    httpClient: createFetchSharedClient(brevoContactRoutes, fetch),
     apiKey: config.apiKeyBrevo,
     establishmentContactListId: config.brevoEstablishmentContactListId,
   });
