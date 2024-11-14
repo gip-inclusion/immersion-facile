@@ -5,6 +5,7 @@ import {
   ContactEstablishmentRequestDto,
   DiscussionBuilder,
   Location,
+  UserBuilder,
   errors,
   expectArraysToEqual,
   expectPromiseToFailWithError,
@@ -17,87 +18,106 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  ContactEntityBuilder,
+  EstablishmentAdminRight,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentEntity";
+import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
 import { ContactEstablishment } from "./ContactEstablishment";
 
-const siret = "11112222333344";
-const contactId = "theContactId";
-
-const location: Location = {
-  id: "11111111-1111-4444-1111-111111111111",
-  address: {
-    streetNumberAndAddress: "24 rue des bouchers",
-    city: "Strasbourg",
-    postcode: "67000",
-    departmentCode: "67",
-  },
-  position: {
-    lat: 48.584614,
-    lon: 7.750712,
-  },
-};
-
-const validRequest: ContactEstablishmentRequestDto = {
-  appellationCode: "12898",
-  siret,
-  contactMode: "PHONE",
-  potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
-  potentialBeneficiaryLastName: "potential_beneficiary_last_name",
-  potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
-  locationId: location.id,
-};
-
-const appellationAndRome: AppellationAndRomeDto = {
-  appellationCode: validRequest.appellationCode,
-  appellationLabel: "My appellation label",
-  romeCode: "A0000",
-  romeLabel: "Rome de test",
-};
-
-const immersionOffer = new OfferEntityBuilder()
-  .withRomeCode(appellationAndRome.romeCode)
-  .withAppellationCode(validRequest.appellationCode)
-  .withAppellationLabel(appellationAndRome.appellationLabel)
-  .build();
-
-const validEmailRequest: ContactEstablishmentRequestDto = {
-  ...validRequest,
-  contactMode: "EMAIL",
-  datePreferences: "fake date preferences",
-  hasWorkingExperience: true,
-  experienceAdditionalInformation: "fake experience additional information",
-  immersionObjective: "Confirmer un projet professionnel",
-  potentialBeneficiaryPhone: "+33654783402",
-};
-
-const establishmentAggregateWithEmailContact =
-  new EstablishmentAggregateBuilder()
-    .withEstablishment(
-      new EstablishmentEntityBuilder()
-        .withSiret(siret)
-        .withLocations([location])
-        .build(),
-    )
-    .withContact(
-      new ContactEntityBuilder()
-        .withId(contactId)
-        .withContactMethod("EMAIL")
-        .build(),
-    )
-    .withOffers([immersionOffer]);
-
-const minimumNumberOfDaysBetweenSimilarContactRequests = 3;
-
 describe("ContactEstablishment", () => {
+  const siret = "11112222333344";
+
+  const location: Location = {
+    id: "11111111-1111-4444-1111-111111111111",
+    address: {
+      streetNumberAndAddress: "24 rue des bouchers",
+      city: "Strasbourg",
+      postcode: "67000",
+      departmentCode: "67",
+    },
+    position: {
+      lat: 48.584614,
+      lon: 7.750712,
+    },
+  };
+
+  const validRequest: ContactEstablishmentRequestDto = {
+    appellationCode: "12898",
+    siret,
+    contactMode: "PHONE",
+    potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
+    potentialBeneficiaryLastName: "potential_beneficiary_last_name",
+    potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
+    locationId: location.id,
+  };
+
+  const appellationAndRome: AppellationAndRomeDto = {
+    appellationCode: validRequest.appellationCode,
+    appellationLabel: "My appellation label",
+    romeCode: "A0000",
+    romeLabel: "Rome de test",
+  };
+
+  const immersionOffer = new OfferEntityBuilder()
+    .withRomeCode(appellationAndRome.romeCode)
+    .withAppellationCode(validRequest.appellationCode)
+    .withAppellationLabel(appellationAndRome.appellationLabel)
+    .build();
+
+  const validEmailRequest: ContactEstablishmentRequestDto = {
+    ...validRequest,
+    contactMode: "EMAIL",
+    datePreferences: "fake date preferences",
+    hasWorkingExperience: true,
+    experienceAdditionalInformation: "fake experience additional information",
+    immersionObjective: "Confirmer un projet professionnel",
+    potentialBeneficiaryPhone: "+33654783402",
+  };
+
+  const establishmentAdmin = new UserBuilder()
+    .withId("establishment.admin")
+    .withEmail("admin@establishment.com")
+    .build();
+  const establishmentContact = new UserBuilder()
+    .withId("establishment.contact")
+    .withEmail("contact@establishment.com")
+    .build();
+
+  const establishmentAdminRight: EstablishmentAdminRight = {
+    role: "establishment-admin",
+    userId: establishmentAdmin.id,
+    job: "",
+    phone: "",
+  };
+  const userRights: EstablishmentUserRight[] = [
+    establishmentAdminRight,
+    {
+      role: "establishment-contact",
+      userId: establishmentContact.id,
+    },
+  ];
+
+  const establishmentAggregateWithEmailContact =
+    new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withSiret(siret)
+          .withContactMethod("EMAIL")
+          .withLocations([location])
+          .build(),
+      )
+      .withOffers([immersionOffer])
+      .withUserRights(userRights);
+
+  const minimumNumberOfDaysBetweenSimilarContactRequests = 3;
+
   let contactEstablishment: ContactEstablishment;
-  let uowPerformer: UnitOfWorkPerformer;
   let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
   let uow: InMemoryUnitOfWork;
@@ -105,215 +125,205 @@ describe("ContactEstablishment", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uowPerformer = new InMemoryUowPerformer(uow);
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    uow.romeRepository.appellations = [appellationAndRome];
-    const createNewEvent = makeCreateNewEvent({
-      timeGateway,
-      uuidGenerator,
-    });
-
     contactEstablishment = new ContactEstablishment(
-      uowPerformer,
-      createNewEvent,
+      new InMemoryUowPerformer(uow),
+      makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator,
+      }),
       uuidGenerator,
       timeGateway,
       minimumNumberOfDaysBetweenSimilarContactRequests,
       domain,
     );
+
+    uow.romeRepository.appellations = [appellationAndRome];
+    uow.userRepository.users = [establishmentAdmin, establishmentContact];
   });
 
-  it("schedules event for valid EMAIL contact request", async () => {
-    const establishment = establishmentAggregateWithEmailContact.build();
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      establishment,
-    );
+  describe("Right paths", () => {
+    it("schedules event for valid EMAIL contact request", async () => {
+      const establishment = establishmentAggregateWithEmailContact.build();
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        establishment,
+      );
 
-    const discussionId = "discussion_id";
-    const eventId = "contact_event_id";
-    uuidGenerator.setNextUuids([discussionId, eventId]);
+      const discussionId = "discussion_id";
+      const eventId = "contact_event_id";
+      uuidGenerator.setNextUuids([discussionId, eventId]);
 
-    const now = new Date("2021-12-08T15:00");
-    timeGateway.setNextDates([now, now]);
+      const now = new Date("2021-12-08T15:00");
+      timeGateway.setNextDates([now, now]);
 
-    await contactEstablishment.execute(validEmailRequest);
+      await contactEstablishment.execute(validEmailRequest);
 
-    expectArraysToEqual(uow.outboxRepository.events, [
-      {
-        id: eventId,
-        occurredAt: now.toISOString(),
-        topic: "ContactRequestedByBeneficiary",
-        payload: {
-          siret: establishment.establishment.siret,
-          discussionId,
-          triggeredBy: null,
-          isLegacy: false,
+      expectArraysToEqual(uow.outboxRepository.events, [
+        {
+          id: eventId,
+          occurredAt: now.toISOString(),
+          topic: "ContactRequestedByBeneficiary",
+          payload: {
+            siret: establishment.establishment.siret,
+            discussionId,
+            triggeredBy: null,
+            isLegacy: false,
+          },
+          status: "never-published",
+          publications: [],
+          wasQuarantined: false,
         },
-        status: "never-published",
-        publications: [],
-        wasQuarantined: false,
-      },
-    ]);
-  });
+      ]);
+    });
 
-  it("schedules event for valid PHONE contact request", async () => {
-    const establishment = new EstablishmentAggregateBuilder()
-      .withEstablishment(
-        new EstablishmentEntityBuilder()
-          .withSiret(siret)
-          .withLocations([location])
-          .build(),
-      )
-      .withContact(
-        new ContactEntityBuilder()
-          .withId(contactId)
-          .withContactMethod("PHONE")
-          .build(),
-      )
-      .withOffers([immersionOffer])
-      .build();
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      establishment,
-    );
-
-    const discussionId = "discussion_id";
-    const eventId = "contact_event_id";
-    uuidGenerator.setNextUuids([discussionId, eventId]);
-
-    const now = new Date("2021-12-08T15:00");
-    timeGateway.setNextDates([now, now]);
-
-    const validPhoneRequest: ContactEstablishmentRequestDto = {
-      ...validRequest,
-      contactMode: "PHONE",
-    };
-    await contactEstablishment.execute(validPhoneRequest);
-
-    expectArraysToEqual(uow.outboxRepository.events, [
-      {
-        id: eventId,
-        occurredAt: now.toISOString(),
-        topic: "ContactRequestedByBeneficiary",
-        payload: {
-          siret,
-          discussionId,
-          triggeredBy: null,
-          isLegacy: false,
-        },
-        publications: [],
-        status: "never-published",
-        wasQuarantined: false,
-      },
-    ]);
-  });
-
-  it("schedules event for valid IN_PERSON contact requests", async () => {
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      new EstablishmentAggregateBuilder()
+    it("schedules event for valid PHONE contact request", async () => {
+      const establishment = new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(siret)
+            .withContactMethod("PHONE")
             .withLocations([location])
             .build(),
         )
-        .withContact(
-          new ContactEntityBuilder()
-            .withId(contactId)
-            .withContactMethod("IN_PERSON")
-            .build(),
-        )
         .withOffers([immersionOffer])
-        .build(),
-    );
+        .withUserRights(userRights)
+        .build();
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        establishment,
+      );
 
-    const discussionId = "discussion_id";
-    const eventId = "contact_event_id";
-    uuidGenerator.setNextUuids([discussionId, eventId]);
+      const discussionId = "discussion_id";
+      const eventId = "contact_event_id";
+      uuidGenerator.setNextUuids([discussionId, eventId]);
 
-    const now = new Date("2021-12-08T15:00");
-    timeGateway.setNextDates([now, now]);
+      const now = new Date("2021-12-08T15:00");
+      timeGateway.setNextDates([now, now]);
 
-    const validInPersonRequest: ContactEstablishmentRequestDto = {
-      ...validRequest,
-      contactMode: "IN_PERSON",
-    };
-    await contactEstablishment.execute(validInPersonRequest);
+      const validPhoneRequest: ContactEstablishmentRequestDto = {
+        ...validRequest,
+        contactMode: "PHONE",
+      };
+      await contactEstablishment.execute(validPhoneRequest);
 
-    expectArraysToEqual(uow.outboxRepository.events, [
-      {
-        id: eventId,
-        occurredAt: now.toISOString(),
-        topic: "ContactRequestedByBeneficiary",
-        payload: {
-          siret,
-          discussionId,
-          triggeredBy: null,
-          isLegacy: false,
+      expectArraysToEqual(uow.outboxRepository.events, [
+        {
+          id: eventId,
+          occurredAt: now.toISOString(),
+          topic: "ContactRequestedByBeneficiary",
+          payload: {
+            siret,
+            discussionId,
+            triggeredBy: null,
+            isLegacy: false,
+          },
+          publications: [],
+          status: "never-published",
+          wasQuarantined: false,
         },
-        publications: [],
-        status: "never-published",
-        wasQuarantined: false,
-      },
-    ]);
-  });
+      ]);
+    });
 
-  it("creates a Discussion Aggregate and adds in to repo", async () => {
-    // Prepare
-    const establishmentAggregate =
-      establishmentAggregateWithEmailContact.build();
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      establishmentAggregate,
-    );
-    const establishment = establishmentAggregate.establishment;
-    // biome-ignore lint/style/noNonNullAssertion: we know the contact is defined
-    const establishmentContact = establishmentAggregate.contact!;
+    it("schedules event for valid IN_PERSON contact requests", async () => {
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityBuilder()
+              .withSiret(siret)
+              .withContactMethod("IN_PERSON")
+              .withLocations([location])
+              .build(),
+          )
+          .withOffers([immersionOffer])
+          .withUserRights(userRights)
+          .build(),
+      );
 
-    const connectionDate = new Date("2022-01-01T12:00:00.000");
-    const connectionDateStr = connectionDate.toISOString();
-    timeGateway.setNextDate(connectionDate);
+      const discussionId = "discussion_id";
+      const eventId = "contact_event_id";
+      uuidGenerator.setNextUuids([discussionId, eventId]);
 
-    const discussionId = "someDiscussionUuid";
-    uuidGenerator.setNextUuid(discussionId);
+      const now = new Date("2021-12-08T15:00");
+      timeGateway.setNextDates([now, now]);
 
-    await contactEstablishment.execute(validEmailRequest);
+      const validInPersonRequest: ContactEstablishmentRequestDto = {
+        ...validRequest,
+        contactMode: "IN_PERSON",
+      };
+      await contactEstablishment.execute(validInPersonRequest);
 
-    // Assert
-    expectToEqual(uow.discussionRepository.discussions, [
-      {
-        id: discussionId,
-        appellationCode: "12898",
-        siret: validEmailRequest.siret,
-        businessName: "Company inside repository",
-        address: establishment.locations[0].address,
-        potentialBeneficiary: {
-          firstName: validEmailRequest.potentialBeneficiaryFirstName,
-          lastName: validEmailRequest.potentialBeneficiaryLastName,
-          email: validEmailRequest.potentialBeneficiaryEmail,
-          phone: validEmailRequest.potentialBeneficiaryPhone,
-          resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
-          experienceAdditionalInformation:
-            validEmailRequest.experienceAdditionalInformation,
-          hasWorkingExperience: validEmailRequest.hasWorkingExperience,
-          datePreferences: validEmailRequest.datePreferences,
+      expectArraysToEqual(uow.outboxRepository.events, [
+        {
+          id: eventId,
+          occurredAt: now.toISOString(),
+          topic: "ContactRequestedByBeneficiary",
+          payload: {
+            siret,
+            discussionId,
+            triggeredBy: null,
+            isLegacy: false,
+          },
+          publications: [],
+          status: "never-published",
+          wasQuarantined: false,
         },
-        establishmentContact: {
-          contactMethod: "EMAIL",
-          email: establishmentContact.email,
-          firstName: establishmentContact.firstName,
-          lastName: establishmentContact.lastName,
-          phone: establishmentContact.phone,
-          job: establishmentContact.job,
-          copyEmails: establishmentContact.copyEmails,
-        },
-        createdAt: connectionDateStr,
-        immersionObjective: "Confirmer un projet professionnel",
-        exchanges: [
-          {
-            subject:
-              "potential_beneficiary_first_name potential_beneficiary_last_name vous contacte pour une demande d'immersion sur le métier de My appellation label",
-            sentAt: connectionDateStr,
-            message: `<p>Bonjour Alain Prost,</p>
+      ]);
+    });
+
+    it("creates a Discussion Aggregate and adds in to repo", async () => {
+      // Prepare
+      const establishmentAggregate =
+        establishmentAggregateWithEmailContact.build();
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate,
+      );
+      const establishment = establishmentAggregate.establishment;
+
+      const connectionDate = new Date("2022-01-01T12:00:00.000");
+      const connectionDateStr = connectionDate.toISOString();
+      timeGateway.setNextDate(connectionDate);
+
+      const discussionId = "someDiscussionUuid";
+      uuidGenerator.setNextUuid(discussionId);
+
+      await contactEstablishment.execute(validEmailRequest);
+
+      // Assert
+      expectToEqual(uow.discussionRepository.discussions, [
+        {
+          id: discussionId,
+          appellationCode: "12898",
+          siret: validEmailRequest.siret,
+          businessName: "Company inside repository",
+          address: establishment.locations[0].address,
+          potentialBeneficiary: {
+            firstName: validEmailRequest.potentialBeneficiaryFirstName,
+            lastName: validEmailRequest.potentialBeneficiaryLastName,
+            email: validEmailRequest.potentialBeneficiaryEmail,
+            phone: validEmailRequest.potentialBeneficiaryPhone,
+            resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
+            experienceAdditionalInformation:
+              validEmailRequest.experienceAdditionalInformation,
+            hasWorkingExperience: validEmailRequest.hasWorkingExperience,
+            datePreferences: validEmailRequest.datePreferences,
+          },
+          establishmentContact: {
+            contactMethod: "EMAIL",
+            email: establishmentAdmin.email,
+            firstName: establishmentAdmin.firstName,
+            lastName: establishmentAdmin.lastName,
+            phone: establishmentAdminRight.phone,
+            job: establishmentAdminRight.job,
+            copyEmails: [establishmentContact.email],
+          },
+          createdAt: connectionDateStr,
+          immersionObjective: "Confirmer un projet professionnel",
+          exchanges: [
+            {
+              subject:
+                "potential_beneficiary_first_name potential_beneficiary_last_name vous contacte pour une demande d'immersion sur le métier de My appellation label",
+              sentAt: connectionDateStr,
+              message: `<p>Bonjour ${establishmentAdmin.firstName} ${establishmentAdmin.lastName},</p>
                   
   <table width="600">
     <tr>
@@ -332,137 +342,137 @@ describe("ContactEstablishment", () => {
     </tr>
   </table>
 `,
-            recipient: "establishment",
-            sender: "potentialBeneficiary",
-            attachments: [],
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
+              attachments: [],
+            },
+          ],
+          status: "PENDING",
+        },
+      ]);
+    });
+
+    it("switches establishment is searchable to false when the max contacts per week is reached", async () => {
+      // préparation
+      const establishmentAggregate = establishmentAggregateWithEmailContact
+        .withIsSearchable(true)
+        .withMaxContactsPerMonth(2)
+        .withOffers([immersionOffer])
+        .build();
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate,
+      );
+      const establishment = establishmentAggregate.establishment;
+
+      const connectionDate = new Date("2022-01-10T12:00:00.000");
+      timeGateway.setNextDate(connectionDate);
+
+      const discussion1Date = new Date("2022-01-09T12:00:00.000").toISOString();
+      const discussionToOldDate = new Date(
+        "2022-01-02T12:00:00.000",
+      ).toISOString();
+      uow.discussionRepository.discussions = [
+        {
+          id: "discussionToOld",
+          appellationCode: appellationAndRome.appellationCode,
+          siret,
+          businessName: "Entreprise 1",
+          address: establishment.locations[0].address,
+          immersionObjective: "Confirmer un projet professionnel",
+          potentialBeneficiary: {
+            firstName: "Antoine",
+            lastName: "Tourasse",
+            email: "antoine.tourasse@email.com",
+            phone: "+33654783402",
+            resumeLink: "http://fakelink.com",
           },
-        ],
-        status: "PENDING",
-      },
-    ]);
-  });
+          establishmentContact: {
+            contactMethod: "EMAIL",
+            email: establishmentContact.email,
+            firstName: establishmentContact.firstName,
+            lastName: establishmentContact.lastName,
+            phone: establishmentAdminRight.phone,
+            job: establishmentAdminRight.job,
+            copyEmails: [establishmentContact.email],
+          },
+          createdAt: discussionToOldDate,
+          exchanges: [
+            {
+              subject: "Demande de contact initiée par le bénéficiaire",
+              message: "Bonjour, c'est une vieille disucssion",
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
+              sentAt: discussionToOldDate,
+              attachments: [],
+            },
+          ],
+          status: "PENDING",
+        },
+        {
+          id: "discussion1",
+          appellationCode: appellationAndRome.appellationCode,
+          createdAt: discussion1Date,
+          siret,
+          businessName: "Entreprise 2",
+          address: establishment.locations[0].address,
+          potentialBeneficiary: {
+            firstName: "Antoine",
+            lastName: "Tourasse",
+            email: "antoine.tourasse@email.com",
+            phone: "+33654783402",
+            resumeLink: "http://fakelink.com",
+          },
+          establishmentContact: {
+            contactMethod: "EMAIL",
+            email: establishmentContact.email,
+            firstName: establishmentContact.firstName,
+            lastName: establishmentContact.lastName,
+            phone: establishmentAdminRight.phone,
+            job: establishmentAdminRight.job,
+            copyEmails: [establishmentContact.email],
+          },
+          exchanges: [
+            {
+              subject: "Demande de contact initiée par le bénéficiaire",
+              message:
+                "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
+              sentAt: discussion1Date,
+              attachments: [],
+            },
+          ],
+          immersionObjective: "Confirmer un projet professionnel",
+          status: "PENDING",
+        },
+      ];
 
-  it("switches establishment is searchable to false when the max contacts per week is reached", async () => {
-    // préparation
-    const establishmentAggregate = establishmentAggregateWithEmailContact
-      .withIsSearchable(true)
-      .withMaxContactsPerMonth(2)
-      .withOffers([immersionOffer])
-      .build();
-    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-      establishmentAggregate,
-    );
-    const establishment = establishmentAggregate.establishment;
-    // biome-ignore lint/style/noNonNullAssertion: we know the contact is defined
-    const establishmentContact = establishmentAggregate.contact!;
-
-    const connectionDate = new Date("2022-01-10T12:00:00.000");
-    timeGateway.setNextDate(connectionDate);
-
-    const discussion1Date = new Date("2022-01-09T12:00:00.000").toISOString();
-    const discussionToOldDate = new Date(
-      "2022-01-02T12:00:00.000",
-    ).toISOString();
-    uow.discussionRepository.discussions = [
-      {
-        id: "discussionToOld",
+      uuidGenerator.setNextUuid("discussion2");
+      const secondContactRequestDto: ContactEstablishmentRequestDto = {
         appellationCode: appellationAndRome.appellationCode,
         siret,
-        businessName: "Entreprise 1",
-        address: establishment.locations[0].address,
+        potentialBeneficiaryFirstName: "Bob",
+        potentialBeneficiaryLastName: "Marley",
+        potentialBeneficiaryEmail: "bob.marley@email.com",
+        contactMode: "EMAIL",
         immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiary: {
-          firstName: "Antoine",
-          lastName: "Tourasse",
-          email: "antoine.tourasse@email.com",
-          phone: "+33654783402",
-          resumeLink: "http://fakelink.com",
-        },
-        establishmentContact: {
-          contactMethod: "EMAIL",
-          email: establishmentContact.email,
-          firstName: establishmentContact.firstName,
-          lastName: establishmentContact.lastName,
-          phone: establishmentContact.phone,
-          job: establishmentContact.job,
-          copyEmails: establishmentContact.copyEmails,
-        },
-        createdAt: discussionToOldDate,
-        exchanges: [
-          {
-            subject: "Demande de contact initiée par le bénéficiaire",
-            message: "Bonjour, c'est une vieille disucssion",
-            recipient: "establishment",
-            sender: "potentialBeneficiary",
-            sentAt: discussionToOldDate,
-            attachments: [],
-          },
-        ],
-        status: "PENDING",
-      },
-      {
-        id: "discussion1",
-        appellationCode: appellationAndRome.appellationCode,
-        createdAt: discussion1Date,
-        siret,
-        businessName: "Entreprise 2",
-        address: establishment.locations[0].address,
-        potentialBeneficiary: {
-          firstName: "Antoine",
-          lastName: "Tourasse",
-          email: "antoine.tourasse@email.com",
-          phone: "+33654783402",
-          resumeLink: "http://fakelink.com",
-        },
-        establishmentContact: {
-          contactMethod: "EMAIL",
-          email: establishmentContact.email,
-          firstName: establishmentContact.firstName,
-          lastName: establishmentContact.lastName,
-          phone: establishmentContact.phone,
-          job: establishmentContact.job,
-          copyEmails: establishmentContact.copyEmails,
-        },
-        exchanges: [
-          {
-            subject: "Demande de contact initiée par le bénéficiaire",
-            message:
-              "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
-            recipient: "establishment",
-            sender: "potentialBeneficiary",
-            sentAt: discussion1Date,
-            attachments: [],
-          },
-        ],
-        immersionObjective: "Confirmer un projet professionnel",
-        status: "PENDING",
-      },
-    ];
+        potentialBeneficiaryPhone: "+33654783402",
+        locationId: establishment.locations[0].id,
+        datePreferences: "fake date preferences",
+        hasWorkingExperience: true,
+        experienceAdditionalInformation:
+          "fake experience additional information",
+      };
+      await contactEstablishment.execute(secondContactRequestDto);
 
-    uuidGenerator.setNextUuid("discussion2");
-    const secondContactRequestDto: ContactEstablishmentRequestDto = {
-      appellationCode: appellationAndRome.appellationCode,
-      siret,
-      potentialBeneficiaryFirstName: "Bob",
-      potentialBeneficiaryLastName: "Marley",
-      potentialBeneficiaryEmail: "bob.marley@email.com",
-      contactMode: "EMAIL",
-      immersionObjective: "Confirmer un projet professionnel",
-      potentialBeneficiaryPhone: "+33654783402",
-      locationId: establishment.locations[0].id,
-      datePreferences: "fake date preferences",
-      hasWorkingExperience: true,
-      experienceAdditionalInformation: "fake experience additional information",
-    };
-    await contactEstablishment.execute(secondContactRequestDto);
+      const establishmentAggregateAfterSecondContact =
+        uow.establishmentAggregateRepository.establishmentAggregates[0];
 
-    const establishmentAggregateAfterSecondContact =
-      uow.establishmentAggregateRepository.establishmentAggregates[0];
-
-    expect(uow.discussionRepository.discussions).toHaveLength(3);
-    expect(
-      establishmentAggregateAfterSecondContact.establishment.isSearchable,
-    ).toBe(false);
+      expect(uow.discussionRepository.discussions).toHaveLength(3);
+      expect(
+        establishmentAggregateAfterSecondContact.establishment.isSearchable,
+      ).toBe(false);
+    });
   });
 
   describe("Wrong paths", () => {
@@ -504,15 +514,13 @@ describe("ContactEstablishment", () => {
     it("throws BadRequestError for contact mode mismatch", async () => {
       const establishment = new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityBuilder().withSiret(siret).build(),
-        )
-        .withContact(
-          new ContactEntityBuilder()
-            .withId("wrong_contact_id")
+          new EstablishmentEntityBuilder()
+            .withSiret(siret)
             .withContactMethod("EMAIL")
             .build(),
         )
         .withOffers([immersionOffer])
+        .withUserRights(userRights)
         .build();
       await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
         establishment,
@@ -528,7 +536,7 @@ describe("ContactEstablishment", () => {
           siret: params.siret,
           contactMethods: {
             inParams: params.contactMode,
-            inRepo: establishment.contact.contactMethod,
+            inRepo: establishment.establishment.contactMethod,
           },
         }),
       );
@@ -548,14 +556,12 @@ describe("ContactEstablishment", () => {
       await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityBuilder().withSiret(siret).build(),
-          )
-          .withContact(
-            new ContactEntityBuilder()
-              .withId("wrong_contact_id")
+            new EstablishmentEntityBuilder()
               .withContactMethod("PHONE")
+              .withSiret(siret)
               .build(),
           )
+          .withUserRights(userRights)
           .withOffers([
             new OfferEntityBuilder().withAppellationCode("wrong").build(),
           ])
