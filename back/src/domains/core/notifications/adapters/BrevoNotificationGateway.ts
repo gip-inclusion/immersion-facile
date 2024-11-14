@@ -70,7 +70,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
   ) {
     this.#brevoHeaders = {
       accept: "application/json",
-      "content-type": "application/json",
+      "Content-Type": "application/json",
       "api-key": apiKey,
     };
   }
