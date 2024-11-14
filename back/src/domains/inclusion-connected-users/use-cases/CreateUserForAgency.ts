@@ -1,4 +1,4 @@
-import { toPairs } from "ramda";
+import { keys } from "ramda";
 import {
   InclusionConnectedUser,
   User,
@@ -41,8 +41,8 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
 
     const user = await getUserIdAndCreateIfMissing(uow, inputParams, deps);
 
-    const isUserAlreadyLinkedToAgency = toPairs(agency.usersRights).some(
-      ([id]) => id === user.id,
+    const isUserAlreadyLinkedToAgency = keys(agency.usersRights).some(
+      (id) => id === user.id,
     );
     if (isUserAlreadyLinkedToAgency) throw errors.agency.userAlreadyExist();
 
