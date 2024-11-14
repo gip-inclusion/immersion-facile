@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import { z } from "zod";
 import {
   emailableEmailValidationStatusSchema,
   emailableValidationTargetsQueryParamsSchema,
@@ -13,6 +14,11 @@ export const emailableValidationRoutes = defineRoutes({
     queryParamsSchema: emailableValidationTargetsQueryParamsSchema,
     responses: {
       200: emailableEmailValidationStatusSchema,
+      403: z
+        .object({
+          message: z.string().optional(),
+        })
+        .passthrough(),
     },
   }),
 });

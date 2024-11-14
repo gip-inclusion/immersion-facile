@@ -31,15 +31,24 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
             api_key: this.emailableApiKey,
           },
         })
-        .then(({ body: { reason, did_you_mean } }) => ({
-          status: reason ?? "unexpected_error",
-          proposal: did_you_mean ?? null,
-        }))
-        .catch((error) => {
+        .then((response): ValidateEmailFeedback => {
+          if (response.status === 200)
+            return {
+              status: response.body.reason ?? "unexpected_error",
+              proposal: response.body.did_you_mean ?? null,
+            };
+
+          return {
+            status: "service_unavailable",
+            proposal: null,
+          };
+        })
+        .catch((error): ValidateEmailFeedback => {
           logger.error({
             error,
-            message: "validateEmail => Error while calling emailable API ",
+            message: `validateEmail => Error while calling emailable API : ${error.message}`,
           });
+
           return {
             status: "service_unavailable",
             proposal: null,

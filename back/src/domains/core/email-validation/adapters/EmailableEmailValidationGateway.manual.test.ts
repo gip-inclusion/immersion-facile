@@ -1,6 +1,5 @@
-import axios from "axios";
 import { ValidateEmailFeedback, expectToEqual } from "shared";
-import { createAxiosSharedClient } from "shared-routes/axios";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 import { EmailableEmailValidationGateway } from "./EmailableEmailValidationGateway";
@@ -11,7 +10,9 @@ describe("EmailableEmailValidationGateway", () => {
 
   beforeEach(() => {
     emailableEmailValidationGateway = new EmailableEmailValidationGateway(
-      createAxiosSharedClient(emailableValidationRoutes, axios),
+      createFetchSharedClient(emailableValidationRoutes, fetch, {
+        onResponseSideEffect: console.log,
+      }),
       AppConfig.createFromEnv().emailableApiKey,
     );
   });

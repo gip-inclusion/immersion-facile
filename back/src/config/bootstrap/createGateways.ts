@@ -225,7 +225,7 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryEmailValidationGateway(),
       EMAILABLE: () =>
         new EmailableEmailValidationGateway(
-          createLegacyAxiosHttpClientForExternalAPIs({
+          createFetchHttpClientForExternalAPIs({
             partnerName: "Emailable",
             routes: emailableValidationRoutes,
           }),
