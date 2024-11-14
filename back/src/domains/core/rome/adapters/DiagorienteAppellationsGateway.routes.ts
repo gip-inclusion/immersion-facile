@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import { z } from "zod";
 import {
   diagorienteAccessTokenQueryParamsSchema,
   diagorienteAccessTokenResponseSchema,
@@ -9,6 +10,11 @@ import {
 export type DiagorienteAppellationsRoutes =
   typeof diagorienteAppellationsRoutes;
 
+const diagorienteErrorResponseBodySchema = z.object({
+  error: z.string(),
+  error_description: z.string().optional(),
+});
+
 export const diagorienteAppellationsRoutes = defineRoutes({
   searchAppellations: defineRoute({
     method: "get",
@@ -16,6 +22,8 @@ export const diagorienteAppellationsRoutes = defineRoutes({
     queryParamsSchema: diagorienteQueryParamsSchema,
     responses: {
       200: diagorienteRawResponseSchema,
+      400: diagorienteErrorResponseBodySchema,
+      401: diagorienteErrorResponseBodySchema,
     },
   }),
   getAccessToken: defineRoute({
@@ -24,6 +32,8 @@ export const diagorienteAppellationsRoutes = defineRoutes({
     requestBodySchema: diagorienteAccessTokenQueryParamsSchema,
     responses: {
       200: diagorienteAccessTokenResponseSchema,
+      400: diagorienteErrorResponseBodySchema,
+      401: diagorienteErrorResponseBodySchema,
     },
   }),
 });

@@ -1,8 +1,6 @@
 import { expectObjectsToMatch } from "shared";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-
-import axios from "axios";
-import { createAxiosSharedClient } from "shared-routes/axios";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import {
@@ -27,7 +25,7 @@ describe("DiagorienteAppellationsGateway", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     appellationsGateway = new DiagorienteAppellationsGateway(
-      createAxiosSharedClient(diagorienteAppellationsRoutes, axios),
+      createFetchSharedClient(diagorienteAppellationsRoutes, fetch),
       cachingGateway,
       {
         clientId: config.diagorienteApiClientId,

@@ -238,13 +238,9 @@ export const createGateways = async (
       IN_MEMORY: () => new InMemoryAppellationsGateway(),
       DIAGORIENTE: () =>
         new DiagorienteAppellationsGateway(
-          createLegacyAxiosHttpClientForExternalAPIs({
+          createFetchHttpClientForExternalAPIs({
             partnerName: "Diagoriente",
             routes: diagorienteAppellationsRoutes,
-            axiosInstance: axios.create({
-              timeout: config.externalAxiosTimeout,
-              validateStatus: () => true,
-            }),
           }),
           new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
             timeGateway,
