@@ -37,13 +37,8 @@ export const LayoutHeader = () => {
   const immersionFacileLogo = darkModeState.isDark
     ? immersionFacileDarkLogo
     : immersionFacileLightLogo;
-  const {
-    candidate: candidateIds,
-    establishment: establishmentIds,
-    agency: agencyIds,
-    admin: adminIds,
-    quickAccess: quickAccessIds,
-  } = domElementIds.header.navLinks;
+  const { admin: adminIds, quickAccess: quickAccessIds } =
+    domElementIds.header.navLinks;
 
   const isInclusionConnected = useAppSelector(
     authSelectors.isInclusionConnected,
@@ -141,146 +136,7 @@ export const LayoutHeader = () => {
     });
   }
 
-  const isCandidateRoute =
-    currentRoute.name === routes.search().name ||
-    currentRoute.name === routes.homeCandidates().name ||
-    currentRoute.name === routes.beneficiaryDashboard().name;
-  const isEstablishmentRoute =
-    currentRoute.name === routes.formEstablishment().name ||
-    currentRoute.name === routes.homeEstablishments().name ||
-    currentRoute.name === routes.establishmentDashboard().name;
-  const isAgencyRoute =
-    currentRoute.name === routes.addAgency().name ||
-    currentRoute.name === routes.homeAgencies().name ||
-    currentRoute.name === routes.agencyDashboard().name;
-  const links: MainNavigationProps.Item[] = [
-    {
-      text: "Accueil",
-      linkProps: {
-        ...routes.home().link,
-        id: domElementIds.header.navLinks.home,
-      },
-      isActive: currentRoute.name === routes.home().name,
-    },
-    {
-      text: "Candidats",
-      isActive: isCandidateRoute,
-      menuLinks: [
-        {
-          text: "Accueil candidat",
-          isActive: currentRoute.name === routes.homeCandidates().name,
-          linkProps: {
-            ...routes.homeCandidates().link,
-            id: candidateIds.home,
-          },
-        },
-        {
-          text: "Trouver une entreprise accueillante",
-          isActive: currentRoute.name === routes.search().name,
-          linkProps: {
-            ...routes.search().link,
-            id: candidateIds.search,
-          },
-        },
-        {
-          text: "Remplir la demande de convention",
-          isActive: false,
-          linkProps: {
-            ...routes.initiateConvention({
-              skipFirstStep: true,
-            }).link,
-            id: candidateIds.formConvention,
-          },
-        },
-        {
-          text: "Mon espace",
-          isActive: currentRoute.name === routes.beneficiaryDashboard().name,
-          linkProps: {
-            ...routes.beneficiaryDashboard().link,
-            id: candidateIds.dashboard,
-          },
-        },
-      ],
-    },
-    {
-      text: "Entreprises",
-      isActive: isEstablishmentRoute,
-      menuLinks: [
-        {
-          text: "Accueil entreprise",
-          isActive: currentRoute.name === routes.homeEstablishments().name,
-          linkProps: {
-            ...routes.homeEstablishments().link,
-            id: establishmentIds.home,
-          },
-        },
-        {
-          text: "Proposer une immersion",
-          isActive: currentRoute.name === routes.formEstablishment().name,
-          linkProps: {
-            ...routes.formEstablishment().link,
-            id: establishmentIds.addEstablishmentForm,
-          },
-        },
-        {
-          text: "Remplir la demande de convention",
-          isActive: false,
-          linkProps: {
-            ...routes.conventionImmersion().link,
-            id: establishmentIds.formConvention,
-          },
-        },
-        {
-          text: "Mon espace",
-          isActive:
-            currentRoute.name ===
-            routes.establishmentDashboard({ tab: "conventions" }).name,
-          linkProps: {
-            ...routes.establishmentDashboard({ tab: "conventions" }).link,
-            id: establishmentIds.dashboard,
-          },
-        },
-      ],
-    },
-    {
-      text: "Prescripteurs",
-      isActive: isAgencyRoute,
-      menuLinks: [
-        {
-          text: "Accueil prescripteurs",
-          isActive: currentRoute.name === routes.homeAgencies().name,
-          linkProps: {
-            ...routes.homeAgencies().link,
-            id: agencyIds.home,
-          },
-        },
-        {
-          text: "Inscrire mon organisme",
-          isActive: currentRoute.name === routes.addAgency().name,
-          linkProps: {
-            ...routes.addAgency().link,
-            id: agencyIds.addAgencyForm,
-          },
-        },
-        {
-          text: "Remplir la demande de convention",
-          isActive: false,
-          linkProps: {
-            ...routes.conventionImmersion().link,
-            id: agencyIds.formConvention,
-          },
-        },
-        {
-          text: "Mon espace",
-          isActive: false,
-          linkProps: {
-            ...routes.agencyDashboard().link,
-            id: agencyIds.dashboard,
-          },
-        },
-      ],
-    },
-  ];
+  const links: MainNavigationProps.Item[] = [];
 
   if (isAdminConnected) {
     links.push({
