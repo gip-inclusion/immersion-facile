@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
+import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -28,6 +29,7 @@ export const EditAgency = () => {
             refersToAgencyName={agency.refersToAgencyName}
             className={fr.cx("fr-my-4w")}
           />
+          <AgencyStatusBadge status={agency.status} />
           <EditAgencyForm agency={agency} />
         </>
       )}

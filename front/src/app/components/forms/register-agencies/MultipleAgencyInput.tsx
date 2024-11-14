@@ -24,6 +24,7 @@ const placeholderOption: AgencyOption = {
   id: "",
   name: "",
   kind: "autre",
+  status: "active",
 };
 
 export const MultipleAgencyInput = ({

@@ -113,6 +113,7 @@ export type AgencyOption = {
   id: AgencyId;
   name: string;
   kind: AgencyKind;
+  status: AgencyStatus;
 };
 
 export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];

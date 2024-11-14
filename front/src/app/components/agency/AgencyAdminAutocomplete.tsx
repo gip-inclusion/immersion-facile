@@ -5,7 +5,14 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { prop, propEq } from "ramda";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { AgencyId, AgencyOption, domElementIds } from "shared";
+import {
+  AgencyId,
+  AgencyOption,
+  activeAgencyStatuses,
+  agencyStatusToLabel,
+  domElementIds,
+} from "shared";
+import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
@@ -60,9 +67,32 @@ export const AgencyAdminAutocomplete = ({
   const noOptionText =
     isSearching || !agencySearchText ? "..." : "Aucune agence trouvée";
 
-  const getNameFromAgencyId = (agencyId?: AgencyId) => {
+  const getNameFromAgencyIdAsReactElement = (agencyId?: AgencyId) => {
     if (!agencyId) return;
-    return agencyOptions.find(propEq(agencyId, "id"))?.name;
+    const agencyOption = agencyOptions.find(propEq(agencyId, "id"));
+    if (!agencyOption) return;
+
+    return (
+      <>
+        {agencyOption.name}&nbsp;
+        {!activeAgencyStatuses.includes(agencyOption.status) && (
+          <AgencyStatusBadge status={agencyOption.status} />
+        )}
+      </>
+    );
+  };
+
+  const getNameFromAgencyIdAsString = (
+    agencyId?: AgencyId,
+  ): string | undefined => {
+    if (!agencyId) return;
+    const agencyOption = agencyOptions.find(propEq(agencyId, "id"));
+    if (!agencyOption) return;
+
+    const status = !activeAgencyStatuses.includes(agencyOption.status)
+      ? agencyStatusToLabel[agencyOption.status]
+      : "";
+    return `${agencyOption.name}${status ? ` [${status}]` : ""}`;
   };
 
   return (
@@ -80,7 +110,7 @@ export const AgencyAdminAutocomplete = ({
         }
         getOptionLabel={(option: AgencyId) => option}
         renderOption={(props, option) => (
-          <li {...props}>{getNameFromAgencyId(option)}</li>
+          <li {...props}>{getNameFromAgencyIdAsReactElement(option)}</li>
         )}
         onChange={(_, selectedAgencyId: AgencyId | null) => {
           if (!selectedAgencyId) return;
@@ -113,7 +143,9 @@ export const AgencyAdminAutocomplete = ({
             </label>
             <input
               {...params.inputProps}
-              value={getNameFromAgencyId(params.inputProps.value?.toString())}
+              value={getNameFromAgencyIdAsString(
+                params.inputProps.value?.toString(),
+              )}
               className={fr.cx("fr-input")}
               placeholder={placeholder}
               type="text"
