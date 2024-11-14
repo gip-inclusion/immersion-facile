@@ -142,7 +142,7 @@ describe("BrevoNotificationGateway unit", () => {
       expectToEqual(sentEmails[0], {
         headers: {
           "api-key": "fake-api-key",
-          "content-type": "application/json",
+          "Content-Type": "application/json",
           accept: "application/json",
         },
         body: {

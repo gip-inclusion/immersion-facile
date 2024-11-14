@@ -275,7 +275,7 @@ export const createGateways = async (
 
     const brevoNotificationGateway = new BrevoNotificationGateway(
       {
-        httpClient: createLegacyAxiosHttpClientForExternalAPIs({
+        httpClient: createFetchHttpClientForExternalAPIs({
           partnerName: "Brevo Notifications",
           routes: brevoNotificationGatewayRoutes,
         }),

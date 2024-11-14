@@ -13,7 +13,7 @@ describe("BrevoNotificationGateway manual", () => {
       {
         httpClient: createAxiosSharedClient(
           brevoNotificationGatewayRoutes,
-          axios,
+          axios.create({ validateStatus: () => true }),
         ),
         emailAllowListPredicate: () => true,
         defaultSender: { email: "bob@fake.mail", name: "Immersion Facilitée" },
