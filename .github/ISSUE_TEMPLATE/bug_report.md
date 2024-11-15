@@ -2,7 +2,9 @@
 name: Rapport d'anomalie
 about: Modèle de rapport d'anomalie
 title: ETQ 'qui?', un titre court svp
-type: bug
+labels: ''
+assignees: ''
+
 ---
 
 ### :bug: Le problème

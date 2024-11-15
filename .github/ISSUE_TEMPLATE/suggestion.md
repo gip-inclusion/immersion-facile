@@ -1,8 +1,11 @@
 ---
 name: Suggestion
-about: Une suggestion pour améliorer le produit, qui a pu être remontée par un utilisateur ou un membre de l'équipe.
+about: Une suggestion pour améliorer le produit, qui a pu être remontée par un utilisateur
+  ou un membre de l'équipe.
 title: ETQ 'qui?', un titre court svp
 labels: suggestion
+assignees: ''
+
 ---
 
 ### :thinking: Contexte et problématique (et par qui est-ce remonté ?)
