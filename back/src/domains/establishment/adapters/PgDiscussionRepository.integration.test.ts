@@ -778,7 +778,14 @@ describe("PgDiscussionRepository", () => {
       await establishmentAggregateRepo.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret)
-          .withContactId("12345678-1111-2222-3333-444444444455")
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: "osef",
+              job: "",
+              phone: "",
+            },
+          ])
           .withOffers([offer])
           .build(),
       );
@@ -858,7 +865,14 @@ describe("PgDiscussionRepository", () => {
       await establishmentAggregateRepo.insertEstablishmentAggregate(
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret)
-          .withContactId("12345678-1111-2222-3333-444444444444")
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: "osef",
+              job: "",
+              phone: "",
+            },
+          ])
           .withOffers([offer])
           .build(),
       );
