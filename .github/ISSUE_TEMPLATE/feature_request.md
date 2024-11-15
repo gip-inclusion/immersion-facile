@@ -2,9 +2,7 @@
 name: Fonctionnalité
 about: Un nouveau use case ou fonctionnalité.
 title: ETQ 'qui?', un titre court svp
-labels: ''
-assignees: ''
-
+type: feature
 ---
 
 ### :construction: Epic
