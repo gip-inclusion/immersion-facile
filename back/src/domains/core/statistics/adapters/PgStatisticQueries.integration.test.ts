@@ -74,12 +74,27 @@ describe("PgStatisticQueries", () => {
       const agency = new AgencyDtoBuilder().build();
       const establishmentAggregate = new EstablishmentAggregateBuilder()
         .withEstablishmentSiret("33330000333300")
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            userId: "osef",
+            job: "",
+            phone: "",
+          },
+        ])
         .build();
       const establishmentAggregateLinkedToNoConvention =
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("88880000888800")
           .withLocationId("11111111-1111-4111-1111-111111111111")
-          .withContactId("11111111-1111-4111-1111-111111111111")
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: "osef",
+              job: "",
+              phone: "",
+            },
+          ])
           .build();
       const conventionSiret1A = new ConventionDtoBuilder()
         .withId(crypto.randomUUID())
