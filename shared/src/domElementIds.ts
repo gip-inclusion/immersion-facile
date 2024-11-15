@@ -699,6 +699,9 @@ export const domElementIds = {
       submitButton: "im-manage-establishment__manage-discussion-submit-button",
       discussionIdInput: "im-manage-establishment__manage-discussion-id-input",
     },
+    manageEstablishments: {
+      selectEstablishmentInput: "im-manage-establishment__establishment-select",
+    },
   },
   searchDiagoriente: {},
   initiateConvention: {

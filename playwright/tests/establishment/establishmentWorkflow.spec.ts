@@ -16,7 +16,20 @@ import {
 } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
-const providedSiret = "41433740200039";
+const establishments = [
+  {
+    siret: "41433740200039",
+    expectedAddress: "Avenue des Grands Crus 26600 Tain-l'Hermitage",
+  },
+  {
+    siret: "21590350100017",
+    expectedAddress: "Place Augustin Laurent 59000 Lille",
+  },
+  {
+    siret: "21310555400017",
+    expectedAddress: "1 Place du Capitole 31000 Toulouse",
+  },
+];
 
 test.describe("Establishment creation and modification workflow", () => {
   const updatedInformations = {
@@ -50,8 +63,8 @@ test.describe("Establishment creation and modification workflow", () => {
     fitForDisabledWorkers: true,
     isEngagedEnterprise: true,
   } satisfies Partial<FormEstablishmentDto>;
-  test("creates a new establishment", async ({ page }) => {
-    await fillEstablishmentFormFirstStep(page, providedSiret);
+  test("creates a new establishment", async ({ page }, { retry }) => {
+    await fillEstablishmentFormFirstStep(page, establishments[retry].siret);
 
     await page
       .locator(`#${domElementIds.establishment.create.availabilityButton}`)
@@ -94,7 +107,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
     await expect(
       page.locator(`#${domElementIds.establishment.create.siret}`),
-    ).toHaveValue(providedSiret);
+    ).toHaveValue(establishments[retry].siret);
 
     await expect(
       page.locator(`#${domElementIds.establishment.create.businessName}`),
@@ -108,7 +121,7 @@ test.describe("Establishment creation and modification workflow", () => {
       page.locator(
         `#${domElementIds.establishment.create.businessAddresses}-0`,
       ),
-    ).toHaveValue("Avenue des Grands Crus 26600 Tain-l'Hermitage");
+    ).toHaveValue(establishments[retry].expectedAddress);
     await page.click(
       `#${domElementIds.establishment.create.appellations}-add-option-button`,
     );
@@ -134,14 +147,14 @@ test.describe("Establishment creation and modification workflow", () => {
     });
 
     await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
-    await expect(page.url()).toContain(`siret=${providedSiret}`);
+    await expect(page.url()).toContain(`siret=${establishments[retry].siret}`);
     await expect(page.locator(".fr-alert--success")).toBeVisible();
     await page.waitForTimeout(testConfig.timeForEventCrawler);
   });
 
   test.describe("Establishment admin get notifications magic links", () => {
     test.use({ storageState: testConfig.adminAuthFile });
-    test("modifies an existing establishment", async ({ page }) => {
+    test("modifies an existing establishment", async ({ page }, { retry }) => {
       // Get edit link
       await page.goto("/");
       await page.click(`#${domElementIds.home.heroHeader.establishment}`);
@@ -150,7 +163,7 @@ test.describe("Establishment creation and modification workflow", () => {
       );
       await page.fill(
         `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
-        providedSiret,
+        establishments[retry].siret,
       );
 
       await expectLocatorToBeVisibleAndEnabled(
@@ -242,7 +255,7 @@ test.describe("Establishment creation and modification workflow", () => {
       ).toBeDisabled();
       await expect(
         page.locator(`#${domElementIds.establishment.edit.siret} input`),
-      ).toHaveValue(providedSiret);
+      ).toHaveValue(establishments[retry].siret);
 
       await page.fill(
         `#${domElementIds.establishment.edit.businessNameCustomized}`,
@@ -298,13 +311,15 @@ test.describe("Establishment creation and modification workflow", () => {
       await expect(page.locator(".fr-alert--success")).toBeVisible();
       await page.waitForTimeout(testConfig.timeForEventCrawler);
     });
-    test("check that establishment has been updated", async ({ page }) => {
+    test("check that establishment has been updated", async ({ page }, {
+      retry,
+    }) => {
       // Check if the establishment has been updated
       await page.goto("/");
       await goToAdminTab(page, "adminEstablishments");
       await page.fill(
         `#${domElementIds.admin.manageEstablishment.siretInput}`,
-        providedSiret,
+        establishments[retry].siret,
       );
       await page.click(
         `#${domElementIds.admin.manageEstablishment.searchButton}`,
@@ -436,7 +451,9 @@ test.describe("Establishment creation and modification workflow", () => {
     });
   });
 
-  test("searches for non available establishment", async ({ page }) => {
+  test("searches for non available establishment", async ({ page }, {
+    retry,
+  }) => {
     await page.goto(frontRoutes.search);
     await page.fill(
       `#${domElementIds.search.placeAutocompleteInput}`,
@@ -449,18 +466,18 @@ test.describe("Establishment creation and modification workflow", () => {
       .first()
       .click();
     await page.getByRole("button", { name: "Rechercher" }).click();
-    const resultsSelector = `.im-search-result[data-establishment-siret="${providedSiret}"]`;
+    const resultsSelector = `.im-search-result[data-establishment-siret="${establishments[retry].siret}"]`;
     await expect(await page.locator(resultsSelector)).toHaveCount(0);
   });
 
   test.describe("Admin makes the establishment available", () => {
     test.use({ storageState: testConfig.adminAuthFile });
-    test("make the establishment available", async ({ page }) => {
+    test("make the establishment available", async ({ page }, { retry }) => {
       await page.goto("/");
       await goToAdminTab(page, "adminEstablishments");
       await page.fill(
         `#${domElementIds.admin.manageEstablishment.siretInput}`,
-        providedSiret,
+        establishments[retry].siret,
       );
       await page.click(
         `#${domElementIds.admin.manageEstablishment.searchButton}`,
@@ -476,7 +493,7 @@ test.describe("Establishment creation and modification workflow", () => {
     });
   });
 
-  test("searches for available establishment", async ({ page }) => {
+  test("searches for available establishment", async ({ page }, { retry }) => {
     await page.goto(frontRoutes.search);
     await page.fill(
       `#${domElementIds.search.placeAutocompleteInput}`,
@@ -489,19 +506,19 @@ test.describe("Establishment creation and modification workflow", () => {
       .first()
       .click();
     await page.getByRole("button", { name: "Rechercher" }).click();
-    const resultsSelector = `#${domElementIds.search.searchResultButton}-${providedSiret}`;
+    const resultsSelector = `#${domElementIds.search.searchResultButton}-${establishments[retry].siret}`;
     await expect(await page.locator(resultsSelector)).toHaveCount(1);
   });
 
   test.describe("Check displayed availability", () => {
     test.use({ storageState: testConfig.adminAuthFile });
 
-    test("in admin manage establishment", async ({ page }) => {
+    test("in admin manage establishment", async ({ page }, { retry }) => {
       await page.goto("/");
       await goToAdminTab(page, "adminEstablishments");
       await page.fill(
         `#${domElementIds.admin.manageEstablishment.siretInput}`,
-        providedSiret,
+        establishments[retry].siret,
       );
       await page
         .locator(`#${domElementIds.admin.manageEstablishment.searchButton}`)
@@ -519,20 +536,28 @@ test.describe("Establishment creation and modification workflow", () => {
       await expect(initialRadioButton.getByText("Non")).not.toBeChecked();
     });
 
-    test("in establishment dashboard", async ({ page }) => {
+    test("in establishment dashboard", async ({ page }, { retry }) => {
       await page.goto("/");
       await page.locator("#fr-header-main-navigation-button-2").click();
       await page
         .locator(`#${domElementIds.header.navLinks.establishment.dashboard}`)
         .click();
       await page.locator(".fr-tabs").getByText("Fiche établissement").click();
+      const establishmentSelector = await page.locator(
+        `#${domElementIds.establishmentDashboard.manageEstablishments.selectEstablishmentInput}`,
+      );
+      if ((await establishmentSelector.count()) > 0) {
+        await establishmentSelector.selectOption({
+          value: establishments[retry].siret,
+        });
+      }
       await checkAvailibilityButtons(page, "edit");
     });
   });
 
   test.describe("Admin deletes an establishment", () => {
     test.use({ storageState: testConfig.adminAuthFile });
-    test("deletes an establishment", async ({ page }) => {
+    test("deletes an establishment", async ({ page }, { retry }) => {
       page.on("dialog", (dialog) => dialog.accept());
       await page.goto("/");
       await goToAdminTab(page, "adminEstablishments");
@@ -540,7 +565,7 @@ test.describe("Establishment creation and modification workflow", () => {
         `#${domElementIds.admin.manageEstablishment.siretInput}`,
       );
       await siretInputLocator.waitFor();
-      await siretInputLocator.fill(providedSiret);
+      await siretInputLocator.fill(establishments[retry].siret);
       await page.focus(
         `#${domElementIds.admin.manageEstablishment.searchButton}`,
       );

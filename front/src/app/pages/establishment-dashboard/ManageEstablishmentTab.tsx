@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import React from "react";
-import { WithEstablismentsSiretAndName } from "shared";
+import { WithEstablismentsSiretAndName, domElementIds } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
@@ -43,6 +43,8 @@ export const ManageEstablishmentsTab = ({
             nativeSelectProps={{
               defaultValue: "",
               value: route.params.siret,
+              id: domElementIds.establishmentDashboard.manageEstablishments
+                .selectEstablishmentInput,
               onChange: (event) => {
                 routes
                   .establishmentDashboard({
