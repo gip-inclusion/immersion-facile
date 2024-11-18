@@ -19,6 +19,7 @@ export const SubmitFeedbackNotification = <T extends string>({
   messageByKind,
 }: SubmitFeedbackProps<T>) => {
   if (submitFeedback.kind === "idle") return null;
+  if (submitFeedback.kind === "agencyOptionsFetched") return null;
 
   return (
     <div className={fr.cx("fr-my-2w")}>
