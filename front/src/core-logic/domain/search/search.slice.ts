@@ -15,6 +15,7 @@ type SearchFeedback = SubmitFeedBack<"success">;
 
 export type SearchPageParams = SearchQueryBaseWithoutAppellationsAndRomeDto & {
   appellations?: AppellationAndRomeDto[];
+  fitForDisabledWorkers?: boolean | undefined;
 } & WithAcquisition;
 
 export type SearchStatus =
@@ -48,6 +49,7 @@ export const initialState: SearchState = {
     latitude: 0,
     longitude: 0,
     sortedBy: "score",
+    fitForDisabledWorkers: undefined,
   },
 };
 

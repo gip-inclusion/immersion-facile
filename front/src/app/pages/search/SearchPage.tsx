@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
@@ -97,6 +98,7 @@ export const SearchPage = ({
     distanceKm: undefined,
     latitude: undefined,
     longitude: undefined,
+    fitForDisabledWorkers: undefined,
     ...acquisitionParams,
   };
   const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
@@ -175,7 +177,7 @@ export const SearchPage = ({
     };
   }, [dispatch]);
 
-  const filteredOptions = getSortedByOptions(
+  const filteredSortOptions = getSortedByOptions(
     areValidGeoParams(formValues),
     enableSearchByScore.isActive,
   );
@@ -504,6 +506,49 @@ export const SearchPage = ({
                 }}
               />
               <SearchFilter
+                defaultValue="Toutes les entreprises"
+                iconId="fr-icon-equalizer-fill"
+                id={domElementIds.search.fitForDisableWorkersFilterTag}
+                values={
+                  formValues.fitForDisabledWorkers
+                    ? ["Acceptant les personnes en situation de handicap"]
+                    : []
+                }
+                onReset={() => {
+                  const updatedValues = {
+                    ...tempValue,
+                    fitForDisabledWorkers: undefined,
+                  };
+                  onSearchFormSubmit(updatedValues);
+                }}
+                submenu={{
+                  title: "Plus de critères",
+                  content: (
+                    <>
+                      <p>Afficher uniquement les entreprises :</p>
+                      <Checkbox
+                        options={[
+                          {
+                            label:
+                              "Personnes en situation de handicap bienvenues",
+                            nativeInputProps: {
+                              checked: tempValue.fitForDisabledWorkers,
+                              onChange: (event) => {
+                                setTempValue({
+                                  ...tempValue,
+                                  fitForDisabledWorkers:
+                                    event.currentTarget.checked ?? undefined,
+                                });
+                              },
+                            },
+                          },
+                        ]}
+                      />
+                    </>
+                  ),
+                }}
+              />
+              <SearchFilter
                 defaultValue="Trier par pertinence"
                 iconId="fr-icon-arrow-down-line"
                 id={domElementIds.search.sortFilterTag}
@@ -517,7 +562,7 @@ export const SearchPage = ({
                   content: (
                     <RadioButtons
                       id={domElementIds.search.sortRadioButtons}
-                      options={filteredOptions.map((option) => ({
+                      options={filteredSortOptions.map((option) => ({
                         ...option,
                         nativeInputProps: {
                           name: register("sortedBy").name,

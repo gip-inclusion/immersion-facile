@@ -95,6 +95,7 @@ describe("search epic", () => {
         appellationCodes: ["11000"],
         sortedBy: "distance",
         place: "23 rue lunaire, 44000 Nantes",
+        fitForDisabledWorkers: undefined,
       };
       store.dispatch(searchSlice.actions.searchRequested(searchParams));
       expectIsLoading(true);
@@ -123,6 +124,7 @@ describe("search epic", () => {
           appellationCodes: ["11000"],
           sortedBy: "distance",
           place: "4 rue dessange, 44000 Nantes",
+          fitForDisabledWorkers: undefined,
         }),
       );
       expectStatus("initialFetch");
@@ -144,6 +146,7 @@ describe("search epic", () => {
           appellationCodes: ["11000"],
           sortedBy: "distance",
           place: "9 rue pruneaux, 44000 Nantes",
+          fitForDisabledWorkers: undefined,
         }),
       );
 
@@ -218,6 +221,7 @@ describe("search epic", () => {
         distanceKm: 10,
         latitude: immersionOffer.position.lat,
         longitude: immersionOffer.position.lon,
+        fitForDisabledWorkers: undefined,
       }),
     );
     feedWithSearchResults([]);
