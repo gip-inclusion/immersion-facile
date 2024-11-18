@@ -357,6 +357,7 @@ export const SearchPage = ({
                   content: (
                     <>
                       <AppellationAutocomplete
+                        className={fr.cx("fr-mb-2w")}
                         label={appellationInputLabel}
                         initialValue={
                           route.params.appellations
@@ -388,13 +389,17 @@ export const SearchPage = ({
                           setShouldClearAppellationsInput(false);
                         }}
                       />
-                      <p className={fr.cx("fr-hint-text", "fr-mt-2w")}>
-                        Les résultats sont étendus aux autres métiers de la
-                        Réalisation de contenus multimédias, c’est pour cela que
-                        vous pourrez voir des métiers proches mais ne
-                        correspondant pas précisément à votre recherche dans les
-                        résultats.
-                      </p>
+                      {tempValue.appellations?.length && (
+                        <p className={fr.cx("fr-hint-text", "fr-mt-2w")}>
+                          <strong>
+                            Les résultats seront étendus aux autres métiers du
+                            secteur "{tempValue.appellations[0].romeLabel}"
+                          </strong>
+                          , c’est pour cela que vous pourrez voir des métiers
+                          proches mais ne correspondant pas précisément à votre
+                          recherche dans les résultats.
+                        </p>
+                      )}
                     </>
                   ),
                 }}
@@ -525,7 +530,7 @@ export const SearchPage = ({
                   title: "Plus de critères",
                   content: (
                     <>
-                      <p>Afficher uniquement les entreprises :</p>
+                      <p>Afficher uniquement les entreprises&nbsp;:</p>
                       <Checkbox
                         options={[
                           {
