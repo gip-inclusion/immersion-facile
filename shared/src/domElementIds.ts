@@ -168,6 +168,8 @@ export const domElementIds = {
     contactInPersonButton: "im-contact-establishment__contact-in-person-button",
     appellationFilterTag: "im-search-page__appellation-filter-tag",
     locationFilterTag: "im-search-page__location-filter-tag",
+    fitForDisableWorkersFilterTag:
+      "im-search-page__fit-for-disabled-workers-filter-tag",
     sortFilterTag: "im-search-page__sort-filter-tag",
     sortRadioButtons: "im-search-page__sort-radio-buttons",
   },

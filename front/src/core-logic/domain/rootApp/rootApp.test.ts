@@ -34,6 +34,7 @@ describe("rootApp epic", () => {
         appellationCodes: ["11000"],
         sortedBy: "distance",
         place: "23 rue lunaire, 44000 Nantes",
+        fitForDisabledWorkers: undefined,
       }),
     );
     expect(store.getState()).not.toEqual(afterReadyStoreState);
