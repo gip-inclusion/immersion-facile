@@ -349,10 +349,13 @@ const AgencyForm = ({
                   {...methods.register("id")}
                   type="hidden"
                 />
-                <SubmitFeedbackNotification
-                  submitFeedback={submitFeedback}
-                  messageByKind={agenciesSubmitMessageByKind}
-                />
+                {submitFeedback.kind !== "agencyOptionsFetched" && (
+                  <SubmitFeedbackNotification
+                    submitFeedback={submitFeedback}
+                    messageByKind={agenciesSubmitMessageByKind}
+                  />
+                )}
+
                 <div className={fr.cx("fr-mt-4w")}>
                   <Button
                     type="submit"
