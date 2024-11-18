@@ -91,7 +91,10 @@ export class BrevoNotificationGateway implements NotificationGateway {
           2,
         )}`,
       );
-    return response.body;
+
+    return response.body instanceof Buffer
+      ? response.body
+      : Buffer.from(response.body);
   }
 
   public async sendEmail(
