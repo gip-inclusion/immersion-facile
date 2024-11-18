@@ -411,9 +411,13 @@ export const createGateways = async (
         ? new BrevoEstablishmentMarketingGateway({
             apiKey: config.apiKeyBrevo,
             establishmentContactListId: config.brevoEstablishmentContactListId,
-            httpClient: createFetchHttpClientForExternalAPIs({
+            httpClient: createLegacyAxiosHttpClientForExternalAPIs({
               partnerName: "Brevo Establishment Marketing",
               routes: brevoContactRoutes,
+              axiosInstance: axios.create({
+                timeout: config.externalAxiosTimeout,
+                validateStatus: () => true,
+              }),
             }),
           })
         : new InMemoryEstablishmentMarketingGateway(),
