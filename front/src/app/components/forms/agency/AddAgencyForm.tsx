@@ -406,7 +406,7 @@ const agencyErrorMessage = (
   <span>
     Attention, toutes les agences France Travail ont déjà été ajoutées par notre
     équipe sur Immersion Facilitée.{" "}
-    <LinkHome {...routes.agencyDashboard().link}>
+    <LinkHome {...routes.agencyDashboardMain().link}>
       Accéder à votre espace prescripteur.
     </LinkHome>
   </span>

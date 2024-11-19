@@ -142,7 +142,7 @@ export const defaultPageMetaContents: Partial<
     description:
       "Utilisez notre moteur de recherche pour trouver une entreprise accueillante d'Immersions Professionnelles ou PMSMP",
   },
-  agencyDashboard: {
+  agencyDashboardMain: {
     title: "Tableau de bord agence",
     description: "Retrouvez vos conventions en cours et passées",
   },

@@ -172,7 +172,7 @@ describe("inclusion connection flow", () => {
         queryParams: {
           code: authCode,
           state,
-          page: "agencyDashboard",
+          page: "agencyDashboardMain",
         },
       });
 

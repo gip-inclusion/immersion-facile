@@ -1,5 +1,5 @@
 import { TabsProps } from "@codegouvfr/react-dsfr/Tabs";
-import { AgencyDashboardTab, EstablishmentDashboardTab } from "shared";
+import { EstablishmentDashboardTab } from "shared";
 
 export type DashboardTab = TabsProps.Controlled["tabs"][number] & {
   content: React.ReactNode;
@@ -7,7 +7,7 @@ export type DashboardTab = TabsProps.Controlled["tabs"][number] & {
 
 export const getDashboardTabs = (
   rawTabs: DashboardTab[],
-  currentTab: EstablishmentDashboardTab | AgencyDashboardTab,
+  currentTab: EstablishmentDashboardTab,
 ) =>
   rawTabs.map((tab) => ({
     ...tab,

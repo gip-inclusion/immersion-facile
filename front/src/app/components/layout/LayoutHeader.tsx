@@ -14,6 +14,10 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { makeStyles } from "tss-react/dsfr";
 
+import {
+  AgencyDashboardRouteName,
+  agencyDashboardRoutes,
+} from "src/app/routes/InclusionConnectedPrivateRoute";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
@@ -95,7 +99,7 @@ export const LayoutHeader = () => {
           text: "Je suis un prescripteur",
           isActive: false,
           linkProps: {
-            ...routes.agencyDashboard().link,
+            ...routes.agencyDashboardMain().link,
             id: quickAccessIds.agency,
           },
         },
@@ -152,7 +156,9 @@ export const LayoutHeader = () => {
   const isAgencyRoute =
     currentRoute.name === routes.addAgency().name ||
     currentRoute.name === routes.homeAgencies().name ||
-    currentRoute.name === routes.agencyDashboard().name;
+    agencyDashboardRoutes.includes(
+      currentRoute.name as AgencyDashboardRouteName,
+    );
   const links: MainNavigationProps.Item[] = [
     {
       text: "Accueil",
@@ -274,7 +280,7 @@ export const LayoutHeader = () => {
           text: "Mon espace",
           isActive: false,
           linkProps: {
-            ...routes.agencyDashboard().link,
+            ...routes.agencyDashboardMain().link,
             id: agencyIds.dashboard,
           },
         },

@@ -34,8 +34,33 @@ export type FrontAdminRoute =
   | Route<typeof routes.adminConventionDetail>
   | Route<typeof routes.adminAgencyDetail>;
 
+export const agencyDashboardTabsList = [
+  "agencyDashboardMain",
+  "agencyDashboardSynchronisedConventions",
+  // "agencyDashboardAgencies",
+] satisfies AgencyDashboardRouteName[];
+
+export type AgencyTabRoute = (typeof agencyDashboardTabsList)[number];
+
+export const agencyDashboardRoutes = [
+  "agencyDashboardMain",
+  "agencyDashboardSynchronisedConventions",
+  // "agencyDashboardAgencies",
+  // "agencyDashboardAgencyDetails",
+  "agencyDashboardOnboarding",
+] satisfies AgencyDashboardRouteName[];
+
+export type AgencyDashboardRouteName = FrontAgencyDashboardRoute["name"];
+
+export type FrontAgencyDashboardRoute =
+  | Route<typeof routes.agencyDashboardMain>
+  | Route<typeof routes.agencyDashboardOnboarding>
+  | Route<typeof routes.agencyDashboardSynchronisedConventions>;
+// | Route<typeof routes.agencyDashboardAgencies>
+// | Route<typeof routes.agencyDashboardAgencyDetails>;
+
 type InclusionConnectPrivateRoute =
-  | Route<typeof routes.agencyDashboard>
+  | FrontAgencyDashboardRoute
   | Route<typeof routes.establishmentDashboard>
   | FrontAdminRoute;
 
@@ -93,7 +118,8 @@ export const InclusionConnectedPrivateRoute = ({
   );
 
   const page: AllowedStartInclusionConnectLoginPage =
-    route.name === "establishmentDashboard" || route.name === "agencyDashboard"
+    route.name === "establishmentDashboard" ||
+    route.name === "agencyDashboardMain"
       ? route.name
       : "admin";
 

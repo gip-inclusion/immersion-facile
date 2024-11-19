@@ -6,7 +6,6 @@ import {
   adminTabs,
   frontRoutes,
 } from "shared";
-import { icUserAgencyDashboardTabSerializer } from "src/app/routes/routeParams/agencyDashboardTabs";
 import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { ValueSerializer, createRouter, defineRoute, param } from "type-route";
 import {
@@ -85,6 +84,13 @@ const admin = defineRoute(
   () => `/${frontRoutes.admin}`,
 );
 
+const agencyDashboard = defineRoute(inclusionConnectedParams, () => [
+  `/${frontRoutes.agencyDashboardMain}`,
+  "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
+]);
+
+// const agencyDashboardAgencies = agencyDashboard.extend("/agences");
+
 const { adminConventions, adminAgencies, adminUsers, ...restOfAdminRoutes } =
   adminTabRouteNames.reduce(
     (acc, adminTabName) => ({
@@ -114,18 +120,17 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { agencyId: param.path.string },
     ({ agencyId }) => `/${agencyId}`,
   ),
-  agencyDashboard: defineRoute(
-    {
-      ...inclusionConnectedParams,
-      tab: param.path.optional
-        .ofType(icUserAgencyDashboardTabSerializer)
-        .default("dashboard"),
-    },
-    ({ tab }) => [
-      `/${frontRoutes.agencyDashboard}/${tab}`,
-      `/agence-dashboard/${tab}`, //legacy route redirect to frontRoutes.agencyDashboard
-    ],
+  agencyDashboard,
+  agencyDashboardMain: agencyDashboard.extend("/dashboard"),
+  agencyDashboardOnboarding: agencyDashboard.extend("/onboarding"),
+  agencyDashboardSynchronisedConventions: agencyDashboard.extend(
+    "/conventions-synchronisees",
   ),
+  // agencyDashboardAgencies: agencyDashboardAgencies,
+  // agencyDashboardAgencyDetails: agencyDashboardAgencies.extend(
+  //   { agencyId: param.path.string },
+  //   ({ agencyId }) => `/${agencyId}`,
+  // ),
   beneficiaryDashboard: defineRoute(`/${frontRoutes.beneficiaryDashboard}`),
   conventionCustomAgency: defineRoute(
     {

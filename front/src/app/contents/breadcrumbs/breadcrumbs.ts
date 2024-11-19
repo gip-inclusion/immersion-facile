@@ -29,9 +29,9 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
         label: "Inscrire mon organisme",
         route: routes.addAgency(),
       },
-      agencyDashboard: {
+      agencyDashboardMain: {
         label: "Tableau de bord",
-        route: routes.agencyDashboard(),
+        route: routes.agencyDashboardMain(),
       },
     },
   },

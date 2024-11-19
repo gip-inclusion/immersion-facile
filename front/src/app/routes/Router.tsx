@@ -2,10 +2,8 @@ import React, { lazy } from "react";
 import { PageHeader } from "react-design-system";
 import {
   AdminTabRouteName,
-  AgencyDashboardTab,
   EstablishmentDashboardTab,
   adminTabRouteNames,
-  agencyDashboardTabsList,
   establishmentDashboardTabsList,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
@@ -30,6 +28,7 @@ import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/E
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
+import { AgencyDashboardPrivateRoute } from "src/app/routes/AgencyDashboardPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { Route } from "type-route";
@@ -101,22 +100,39 @@ const getPageByRouteName: {
       <AdminUserDetail route={route} />
     </AdminPrivateRoute>
   ),
-  agencyDashboard: (route) =>
-    agencyDashboardTabsList.includes(route.params.tab as AgencyDashboardTab) ? (
-      <InclusionConnectedPrivateRoute
-        route={route}
-        inclusionConnectConnexionPageHeader={
-          <PageHeader
-            title="Retrouvez vos conventions en tant que prescripteur"
-            breadcrumbs={<Breadcrumbs />}
-          />
-        }
-      >
-        <AgencyDashboardPage route={route} />
-      </InclusionConnectedPrivateRoute>
-    ) : (
-      <ErrorPage type="httpClientNotFoundError" />
-    ),
+  agencyDashboard: (route) => {
+    console.log("About to redirect");
+    console.log(route.params);
+    routes.agencyDashboardMain({ token: route.params.token }).replace();
+    console.log("What the heck ?");
+    return <p>ceci est rendu</p>;
+  },
+  agencyDashboardMain: (route) => (
+    <AgencyDashboardPrivateRoute route={route}>
+      <AgencyDashboardPage route={route} />
+    </AgencyDashboardPrivateRoute>
+  ),
+  agencyDashboardOnboarding: (route) => (
+    <AgencyDashboardPrivateRoute route={route}>
+      <AgencyDashboardPage route={route} />
+    </AgencyDashboardPrivateRoute>
+  ),
+  agencyDashboardSynchronisedConventions: (route) => (
+    <AgencyDashboardPrivateRoute route={route}>
+      <AgencyDashboardPage route={route} />
+    </AgencyDashboardPrivateRoute>
+  ),
+  // agencyDashboardAgencies: (route) => (
+  //   <AgencyDashboardPrivateRoute route={route}>
+  //     <AgencyDashboardPage route={route} />
+  //   </AgencyDashboardPrivateRoute>
+  // ),
+  // agencyDashboardAgencyDetails: (route) => (
+  //   <AgencyDashboardPrivateRoute route={route}>
+  //     <AgencyDashboardPage route={route} />
+  //   </AgencyDashboardPrivateRoute>
+  // ),
+
   beneficiaryDashboard: () => <BeneficiaryDashboardPage />,
   conventionCustomAgency: () => <ConventionCustomAgencyPage />,
   initiateConvention: () => <InitiateConventionPage />,
