@@ -330,7 +330,10 @@ export const SearchPage = ({
                   onSearchFormSubmit(updatedValues);
                 }
               })}
-              className={cx(fr.cx("fr-container"), Styles.searchFilters)}
+              className={cx(
+                fr.cx("fr-container", "fr-mb-6w"),
+                Styles.searchFilters,
+              )}
               id={domElementIds.search.searchForm}
             >
               <SearchFilter
@@ -610,7 +613,7 @@ export const SearchPage = ({
               {searchMade !== null && (
                 <div
                   ref={innerSearchResultWrapper}
-                  className={fr.cx("fr-pt-6w", "fr-pb-1w")}
+                  className={fr.cx("fr-pb-1w")}
                 >
                   <div className={fr.cx("fr-container")}>
                     <div
