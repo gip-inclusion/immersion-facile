@@ -57,17 +57,17 @@ test.describe("Agency dashboard workflow", () => {
       await goToDashboard(page, "agency");
       await expect(
         await page.locator(
-          `#${domElementIds.agencyDashboard.registerAgencies.form}`,
+          `#${domElementIds.agencyDashboardMain.registerAgencies.form}`,
         ),
       ).toBeVisible();
       await fillAutocomplete({
         page,
-        locator: `#${domElementIds.agencyDashboard.registerAgencies.agencyAutocomplete}--0`,
+        locator: `#${domElementIds.agencyDashboardMain.registerAgencies.agencyAutocomplete}--0`,
         value: "Cap emploi",
       });
       await page
         .locator(
-          `#${domElementIds.agencyDashboard.registerAgencies.submitButton}`,
+          `#${domElementIds.agencyDashboardMain.registerAgencies.submitButton}`,
         )
         .click();
 
@@ -127,7 +127,7 @@ test.describe("Agency dashboard workflow", () => {
       await goToDashboard(page, "agency");
       await expect(
         await page.locator(
-          `#${domElementIds.agencyDashboard.dashboard.tabContainer}`,
+          `#${domElementIds.agencyDashboardMain.dashboard.tabContainer}`,
         ),
       ).toBeVisible();
     });

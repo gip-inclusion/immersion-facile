@@ -21,10 +21,10 @@ setup("authenticate as IC user establishment", async ({ page }) => {
 
 setup("authenticate as IC user agency", async ({ page }) => {
   await page.goto("/");
-  await loginWithInclusionConnect(page, "agencyDashboard");
+  await loginWithInclusionConnect(page, "agencyDashboardMain");
   await expect(
     page.locator(
-      `#${domElementIds.agencyDashboard.registerAgencies.submitButton}`,
+      `#${domElementIds.agencyDashboardMain.registerAgencies.submitButton}`,
     ),
   ).toBeVisible();
   await page.context().storageState({ path: agencyAuthFile });
@@ -32,7 +32,7 @@ setup("authenticate as IC user agency", async ({ page }) => {
 
 const loginWithInclusionConnect = async (
   page: Page,
-  routeName: "agencyDashboard" | "establishmentDashboard" | "admin",
+  routeName: "agencyDashboardMain" | "establishmentDashboard" | "admin",
 ) => {
   const { loginButtonId, navLink, username, password, headerNavLink } =
     buttonByRouteName[routeName];
@@ -67,7 +67,7 @@ const loginWithInclusionConnect = async (
 };
 
 type InclusionConnectRoute =
-  | "agencyDashboard"
+  | "agencyDashboardMain"
   | "establishmentDashboard"
   | "admin";
 
@@ -81,8 +81,9 @@ const buttonByRouteName: Record<
     headerNavLink?: string;
   }
 > = {
-  agencyDashboard: {
-    loginButtonId: domElementIds.agencyDashboard.login.inclusionConnectButton,
+  agencyDashboardMain: {
+    loginButtonId:
+      domElementIds.agencyDashboardMain.login.inclusionConnectButton,
     navLink: domElementIds.header.navLinks.agency.dashboard,
     username: testConfig.inclusionConnect.username,
     password: testConfig.inclusionConnect.password,

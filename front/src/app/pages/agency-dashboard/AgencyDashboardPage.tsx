@@ -11,20 +11,25 @@ import { MetabaseView } from "src/app/components/MetabaseView";
 import { SelectConventionFromIdForm } from "src/app/components/SelectConventionFromIdForm";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { isAgencyDashboardTab } from "src/app/routes/routeParams/agencyDashboardTabs";
+
+import {
+  AgencyDashboardRouteName,
+  AgencyTabRoute,
+  FrontAgencyDashboardRoute,
+  agencyDashboardTabsList,
+} from "src/app/routes/InclusionConnectedPrivateRoute";
 import { routes } from "src/app/routes/routes";
-import { DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
+import { DashboardTab } from "src/app/utils/dashboard";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
-import { Route } from "type-route";
 import { RegisterAgenciesForm } from "../../components/forms/register-agencies/RegisterAgenciesForm";
 import { MarkPartnersErroredConventionAsHandledFormSection } from "./MarkPartnersErroredConventionAsHandledFormSection";
 
 export const AgencyDashboardPage = ({
   route,
 }: {
-  route: Route<typeof routes.agencyDashboard>;
+  route: FrontAgencyDashboardRoute;
 }) => {
   // the Layout (Header, Footer...) is given by InclusionConnectedPrivateRoute (higher order component)
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
@@ -43,7 +48,7 @@ export const AgencyDashboardPage = ({
     ...(agencyDashboardUrl
       ? [
           {
-            tabId: "dashboard",
+            tabId: "agencyDashboardMain" satisfies AgencyDashboardRouteName,
             label: "Tableau de bord",
             content: (
               <>
@@ -61,7 +66,8 @@ export const AgencyDashboardPage = ({
     ...(erroredConventionsDashboardUrl
       ? [
           {
-            tabId: "conventions-synchronisees",
+            tabId:
+              "agencyDashboardSynchronisedConventions" satisfies AgencyDashboardRouteName,
             label: "Conventions synchronisées",
             content: (
               <>
@@ -132,7 +138,7 @@ export const AgencyDashboardPage = ({
       : []),
   ];
 
-  const currentTab = route.params.tab;
+  const currentTab = route.name;
 
   return (
     <>
@@ -205,19 +211,11 @@ export const AgencyDashboardPage = ({
           },
           ({ currentUser }) => (
             <Tabs
-              tabs={getDashboardTabs(
-                rawAgencyDashboardTabs(currentUser),
-                currentTab,
-              )}
-              id={domElementIds.agencyDashboard.dashboard.tabContainer}
+              tabs={rawAgencyDashboardTabs(currentUser)}
+              id={domElementIds.agencyDashboardMain.dashboard.tabContainer}
               selectedTabId={currentTab}
               onTabChange={(tab) => {
-                if (isAgencyDashboardTab(tab))
-                  routes
-                    .agencyDashboard({
-                      tab,
-                    })
-                    .push();
+                if (isAgencyDashboardTabRoute(tab)) routes[tab]().push();
               }}
             >
               {
@@ -250,3 +248,6 @@ export const AgencyDashboardPage = ({
 
 const isPeUser = (agencyRights: AgencyRight[]) =>
   agencyRights.some((agencyRight) => agencyRight.agency.kind === "pole-emploi");
+
+const isAgencyDashboardTabRoute = (input: string): input is AgencyTabRoute =>
+  agencyDashboardTabsList.includes(input as AgencyTabRoute);

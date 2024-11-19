@@ -183,7 +183,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-admin-line",
         type: "agency",
         id: domElementIds.homeAgencies.heroHeader.agencyDashboard,
-        link: routes.agencyDashboard().link,
+        link: routes.agencyDashboardMain().link,
         alternateTitle:
           "Mon espace : espace personnel nominatif où retrouver mes conventions et statistiques.",
       },

@@ -50,12 +50,15 @@ export const RegisterAgenciesForm = () => {
             }),
           ),
         )}
-        id={domElementIds.agencyDashboard.registerAgencies.form}
+        id={domElementIds.agencyDashboardMain.registerAgencies.form}
       >
         <MultipleAgencyInput
           initialAgencies={watch("agencies")}
           label="Organisme(s) au(x)quel(s) vous êtes rattaché(s)"
-          id={domElementIds.agencyDashboard.registerAgencies.agencyAutocomplete}
+          id={
+            domElementIds.agencyDashboardMain.registerAgencies
+              .agencyAutocomplete
+          }
           onAgencyAdd={(agency) => {
             setValue("agencies", [...getValues("agencies"), agency]);
           }}
@@ -77,7 +80,7 @@ export const RegisterAgenciesForm = () => {
         />
         <div className={fr.cx("fr-mt-2w")}>
           <Button
-            id={domElementIds.agencyDashboard.registerAgencies.submitButton}
+            id={domElementIds.agencyDashboardMain.registerAgencies.submitButton}
           >
             Demander à être relié à ces structures
           </Button>

@@ -33,7 +33,6 @@ export * from "./convention/conventionStatusTransitions";
 export * from "./dashboard/dashboard.dto";
 export * from "./dashboard/dashboard.schema";
 export * from "./dashboard/establishmentDashboardTabs";
-export * from "./dashboard/agencyDashboardTabs";
 export * from "./discussion/discussion.dto";
 export * from "./discussion/discussion.schema";
 export * from "./discussion/discussion.content";
