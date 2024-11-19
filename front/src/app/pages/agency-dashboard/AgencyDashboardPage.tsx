@@ -211,7 +211,10 @@ export const AgencyDashboardPage = ({
           },
           ({ currentUser }) => (
             <Tabs
-              tabs={rawAgencyDashboardTabs(currentUser)}
+              tabs={rawAgencyDashboardTabs(currentUser).map((tab) => ({
+                ...tab,
+                isDefault: currentTab === tab.tabId,
+              }))}
               id={domElementIds.agencyDashboardMain.dashboard.tabContainer}
               selectedTabId={currentTab}
               onTabChange={(tab) => {

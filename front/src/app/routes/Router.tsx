@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import React, { lazy, useEffect } from "react";
 import { PageHeader } from "react-design-system";
 import {
   AdminTabRouteName,
@@ -75,6 +75,13 @@ const adminRoutes: {
   },
 );
 
+const RedirectTo = ({ route }: { route: Route<typeof routes> }) => {
+  useEffect(() => {
+    route.push();
+  }, []);
+  return null;
+};
+
 const getPageByRouteName: {
   [K in keyof Routes]: (route: Route<Routes[K]>) => unknown;
 } = {
@@ -100,13 +107,9 @@ const getPageByRouteName: {
       <AdminUserDetail route={route} />
     </AdminPrivateRoute>
   ),
-  agencyDashboard: (route) => {
-    console.log("About to redirect");
-    console.log(route.params);
-    routes.agencyDashboardMain({ token: route.params.token }).replace();
-    console.log("What the heck ?");
-    return <p>ceci est rendu</p>;
-  },
+  agencyDashboard: (route) => (
+    <RedirectTo route={routes.agencyDashboardMain(route.params)} />
+  ),
   agencyDashboardMain: (route) => (
     <AgencyDashboardPrivateRoute route={route}>
       <AgencyDashboardPage route={route} />

@@ -16,7 +16,6 @@ export const AgencyDashboardPrivateRoute = ({
   children,
 }: AgencyDashboardPrivateRouteProps) => (
   <InclusionConnectedPrivateRoute
-    allowAdminOnly={true}
     route={route}
     inclusionConnectConnexionPageHeader={
       <PageHeader
