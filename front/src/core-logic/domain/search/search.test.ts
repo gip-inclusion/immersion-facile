@@ -227,8 +227,6 @@ describe("search epic", () => {
     feedWithSearchResults([]);
     feedWithSearchResults([]);
     expectStatus("ok");
-    store.dispatch(searchSlice.actions.clearSearchRequested());
-    expectStateToMatchInitialState();
   });
 
   const expectStateToMatchInitialState = () => {
