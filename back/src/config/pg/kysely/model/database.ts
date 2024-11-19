@@ -26,7 +26,7 @@ export interface Database {
   delegation_contacts: DelegationContacts;
   discussions: Discussions;
   establishment_lead_events: EstablishmentLeadEvents;
-  establishments_contacts: EstablishmentsContacts;
+  establishments__users: EstablishmentsUsers;
   establishments_deleted: EstablishmentsDeleted;
   establishments_location_infos: EstablishmentsLocationInfos;
   establishments_location_positions: EstablishmentsLocationPositions;
@@ -389,6 +389,7 @@ interface Establishments extends WithAcquisition {
   max_contacts_per_month: number;
   naf_code: string | null;
   naf_nomenclature: string | null;
+  contact_mode: ContactMode;
   name: string | null;
   next_availability_date: Timestamp | null;
   number_employees: string | null;
@@ -442,16 +443,12 @@ interface ImmersionOffers {
 
 type ContactMode = "EMAIL" | "IN_PERSON" | "PHONE";
 
-interface EstablishmentsContacts {
-  uuid: string;
-  lastname: string;
-  firstname: string;
-  email: string;
-  job: string;
-  phone: string | null;
-  contact_mode: ContactMode;
-  copy_emails: Generated<Json>;
+interface EstablishmentsUsers {
   siret: string;
+  user_id: string;
+  role: string;
+  job: string | null;
+  phone: string | null;
 }
 
 type AgencyGroupKind = "france-travail";
