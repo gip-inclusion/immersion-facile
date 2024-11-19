@@ -82,7 +82,8 @@ Le responsable de traitement s’engage à ce que les données à caractères pe
 Les organismes prescripteurs ont accès aux seules données de leurs dossiers lorsqu’ils utilisent « Immersion Facilitée ».
 
 Ces derniers sont :
-• France Travail (anciennement Pôle emploi) ;
+• Ces derniers sont :
+• France Travail (anciennement Pôle emploi),pour recevoir les données relatives aux prescriptions d’immersion professionnelle réalisées sur Immersion Facilitée pour toutes les personnes inscrites à France Travail, comme par exemple les bénéficiaires du RSA" ;
 • Les missions locales ;
 • Les Cap Emploi ;
 • Les structures d’insertion par l’activité économique (SIAE), à l’exception des ETTI ;
@@ -92,6 +93,7 @@ Ces derniers sont :
 • Des prescripteurs mandatés à cet effet par un prescripteur de plein droit : organismes employant ou accompagnant des personnes éligibles aux PMSMP et liés soit à France Travail (anciennement Pôle emploi), soit à une mission locale, soit à un Cap Emploi, par une convention les autorisant à prescrire des PMSMP sur un périmètre donné ;
 • La Mission interministérielle pour l’apprentissage ;
 • Le Groupement d’intérêt public « Les Entreprises s’engagent ».
+
 
 <strong>Quelles mesures de sécurité mettons-nous en place ?</strong>
 
@@ -129,11 +131,6 @@ Certaines des données sont envoyées à des sous-traitants pour réaliser certa
   Pays destinataire : Union Européenne et non-UE
   Traitement réalisé : Envoi de mails
   Garanties : <a href="https://www.brevo.com/fr/legal/privacypolicy/" target="_blank">https://www.brevo.com/fr/legal/privacypolicy/</a>
-
-  Partenaire : Airtable
-  Pays destinataire : États-Unis
-  Traitement réalisé : Base de données No Code
-  Garanties : <a href="https://www.airtable.com/privacy" target="_blank">https://www.airtable.com/privacy</a>
 
   Partenaire : Metabase
   Pays destinataire : Union Européenne
