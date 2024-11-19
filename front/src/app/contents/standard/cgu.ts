@@ -53,7 +53,8 @@ export default {
   Il est rappelé que toute personne procédant à une fausse déclaration pour elle-même ou pour autrui s’expose, notamment, aux sanctions prévues à l’article 441-1 du code pénal, prévoyant des peines pouvant aller jusqu’à trois ans d’emprisonnement et 45 000 euros d’amende.
   Le prescripteur s'engage à ne pas mettre en ligne de contenus ou informations contraires aux dispositions légales et réglementaires en vigueur. En particulier, le prescripteur s’engage à ne pas publier de message racistes, sexistes, injurieux, insultants ou contraires à l’ordre public.  
   De tels propos peuvent être supprimés, s’ils contreviennent à une disposition des présentes CGU, s’ils sont contraires à des dispositions légales ou pour n’importe quelle raison jugée opportune par l’équipe de la plateforme, et ce, sans préavis.
-
+  
+  Conformément à la convention de financement pour la mise en oeuvre d’une expérimentation relative à l’accompagnement rénové des bénéficiaires du RSA, notamment son article 3.4, les données relatives aux prescriptions d’immersions professionnelle réalisées sur la Plateforme par les Prescripteurs pour les bénéficiaires du RSA, sont transmises à France Travail.
   Enfin, toute donnée ou information illégalement transférée fera l’objet d’une exclusion du service.
 
   
