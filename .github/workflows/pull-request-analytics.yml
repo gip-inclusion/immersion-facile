@@ -14,8 +14,8 @@ jobs:
       - name: "Run script for analytics"
         uses: AlexSim93/pull-request-analytics-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-          GITHUB_REPO_FOR_ISSUE: gip-inclusion/immersion-facile
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO_FOR_ISSUE: immersion-facile
           GITHUB_OWNER_FOR_ISSUE: gip-inclusion
           GITHUB_OWNERS_REPOS: gip-inclusion/immersion-facile
           CORE_HOURS_START: "9:15"
