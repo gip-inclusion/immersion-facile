@@ -106,6 +106,8 @@ export const searchSlice = createSlice({
         errorMessage: action.payload,
       };
     },
-    clearSearchRequested: () => initialState,
+    clearSearchRequested: (state) => {
+      state.searchStatus = initialState.searchStatus;
+    },
   },
 });
