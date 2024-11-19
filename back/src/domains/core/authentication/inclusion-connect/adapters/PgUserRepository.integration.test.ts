@@ -14,11 +14,6 @@ import {
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
-import { PgEstablishmentAggregateRepository } from "../../../../establishment/adapters/PgEstablishmentAggregateRepository";
-import {
-  ContactEntityBuilder,
-  EstablishmentAggregateBuilder,
-} from "../../../../establishment/helpers/EstablishmentBuilders";
 import { PgUserRepository } from "./PgUserRepository";
 
 describe("PgAuthenticatedUserRepository", () => {
@@ -62,15 +57,9 @@ describe("PgAuthenticatedUserRepository", () => {
 
   beforeEach(async () => {
     userRepository = new PgUserRepository(db);
-
     await db.deleteFrom("users_ongoing_oauths").execute();
     await db.deleteFrom("users").execute();
     await db.deleteFrom("users_admins").execute();
-    await db.deleteFrom("users__agencies").execute();
-    await db.deleteFrom("conventions").execute();
-    await db.deleteFrom("establishments").execute();
-    await db.deleteFrom("establishments_contacts").execute();
-    await db.deleteFrom("immersion_offers").execute();
   });
 
   afterAll(async () => {
@@ -185,65 +174,10 @@ describe("PgAuthenticatedUserRepository", () => {
             isBackofficeAdmin: true,
           });
         });
-
-        it("gets the user with the connected establishments when they exist", async () => {
-          const establishment1 = new EstablishmentAggregateBuilder()
-            .withEstablishmentCustomizedName("My awsome name")
-            .withContact(
-              new ContactEntityBuilder().withEmail(user1.email).build(),
-            )
-            .build();
-
-          const establishment2 = new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret("12345678901234")
-            .withLocationId("11111111-1111-4111-1111-111111111111")
-            .withEstablishmentCustomizedName("")
-            .withEstablishmentName("Establishment 2")
-            .withContact(
-              new ContactEntityBuilder()
-                .withId("22222222-2222-4bbb-2222-222222222222")
-                .withEmail(user1.email)
-                .build(),
-            )
-            .build();
-
-          const establishmentRepository =
-            new PgEstablishmentAggregateRepository(db);
-
-          await establishmentRepository.insertEstablishmentAggregate(
-            establishment1,
-          );
-          await establishmentRepository.insertEstablishmentAggregate(
-            establishment2,
-          );
-          await insertUser(db, user1, provider);
-          await db
-            .insertInto("users_admins")
-            .values({ user_id: user1.id })
-            .execute();
-
-          expectToEqual(await userRepository.getById(user1.id, provider), {
-            ...user1,
-            isBackofficeAdmin: true,
-            establishments: [
-              {
-                siret: establishment2.establishment.siret,
-                businessName: establishment2.establishment.name,
-              },
-              {
-                siret: establishment1.establishment.siret,
-                // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                businessName: establishment1.establishment.customizedName!,
-              },
-            ],
-          });
-        });
       });
 
       describe("getByIds()", () => {
         it("success nothing", async () => {
-          // await insertUser(db, user1, provider);
-
           expectToEqual(await userRepository.getByIds([], provider), []);
         });
 

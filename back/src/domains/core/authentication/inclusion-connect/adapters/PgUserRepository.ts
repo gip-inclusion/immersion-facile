@@ -3,7 +3,6 @@ import {
   Email,
   GetUsersFilters,
   OAuthGatewayProvider,
-  SiretDto,
   User,
   UserId,
   errors,
@@ -20,7 +19,6 @@ type PersistenceAuthenticatedUser = {
   external_id: string | null;
   created_at: string;
   isBackofficeAdmin: SqlBool;
-  establishments: { siret: string; businessName: string }[];
 };
 
 export class PgUserRepository implements UserRepository {
@@ -188,28 +186,8 @@ export class PgUserRepository implements UserRepository {
   }
 
   #getUserQueryBuilder(provider: OAuthGatewayProvider) {
-    // `establishments`, COALESCE(JSONB_AGG(
-    //     JSON_BUILD_OBJECT(
-    //       'siret', establishments.siret,
-    //       'businessName', COALESCE(NULLIF(establishments.customized_name, ''), establishments.name)
-    //     )
-    //     ORDER BY establishments.siret
-    // ) FILTER (WHERE establishments.siret IS NOT NULL), '[]'),
-    // LEFT JOIN establishments_contacts ec ON users.email = ec.email
-    // LEFT JOIN establishments ON ec.siret = establishments.siret
-
     return this.transaction
       .selectFrom("users")
-      .leftJoin(
-        "establishments_contacts",
-        "users.email",
-        "establishments_contacts.email",
-      )
-      .leftJoin(
-        "establishments",
-        "establishments_contacts.siret",
-        "establishments.siret",
-      )
       .leftJoin("users_admins", "users.id", "users_admins.user_id")
       .select([
         "users.id as id",
@@ -231,16 +209,6 @@ export class PgUserRepository implements UserRepository {
         sql<SqlBool>`BOOL_OR(users_admins.user_id IS NOT NULL)`.as(
           "isBackofficeAdmin",
         ),
-        sql<{ siret: SiretDto; businessName: string }[]>`COALESCE(
-          JSONB_AGG(
-            JSON_BUILD_OBJECT(
-              'siret', establishments.siret,
-              'businessName', COALESCE(NULLIF(establishments.customized_name, ''), establishments.name)
-            )
-            ORDER BY establishments.siret
-          ) FILTER (WHERE establishments.siret IS NOT NULL)
-          , '[]'
-        )`.as("establishments"),
       ])
       .groupBy("users.id")
       .orderBy("users.email");
@@ -257,9 +225,6 @@ export class PgUserRepository implements UserRepository {
         lastName: raw.last_name,
         externalId: raw.external_id,
         ...(raw.isBackofficeAdmin === true ? { isBackofficeAdmin: true } : {}),
-        ...(raw.establishments.length
-          ? { establishments: raw.establishments }
-          : {}),
         createdAt: new Date(raw.created_at).toISOString(),
       }
     );
