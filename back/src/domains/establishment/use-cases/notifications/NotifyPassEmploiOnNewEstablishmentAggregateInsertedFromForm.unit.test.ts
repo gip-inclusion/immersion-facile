@@ -55,6 +55,14 @@ describe("Notify pass-emploi", () => {
         new OfferEntityBuilder().withRomeCode("A1111").build(),
         new OfferEntityBuilder().withRomeCode("B1111").build(),
       ])
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "",
+          phone: "",
+          userId: "osef",
+        },
+      ])
       .build();
 
     await useCase.execute({ establishmentAggregate: newAggregate });
