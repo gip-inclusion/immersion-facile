@@ -141,6 +141,14 @@ describe("Update establishments from Sirene API", () => {
 
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "",
+                phone: "",
+                userId: "osef",
+              },
+            ])
             .build();
 
         uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -201,6 +209,14 @@ describe("Update establishments from Sirene API", () => {
 
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "",
+                phone: "",
+                userId: "osef",
+              },
+            ])
             .build();
 
         const establishmentSiret2 = "22220000222200";
@@ -218,6 +234,14 @@ describe("Update establishments from Sirene API", () => {
 
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "",
+                phone: "",
+                userId: "osef",
+              },
+            ])
             .build();
 
         const establishmentSiret3 = "33330000333300";
@@ -235,6 +259,14 @@ describe("Update establishments from Sirene API", () => {
 
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "",
+                phone: "",
+                userId: "osef",
+              },
+            ])
             .build();
 
         uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -316,4 +348,12 @@ const makeEstablishmentWithLastInseeCheck = (
         .withLastInseeCheck(lastInseeCheck)
         .build(),
     )
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "",
+        phone: "",
+        userId: "osef",
+      },
+    ])
     .build();
