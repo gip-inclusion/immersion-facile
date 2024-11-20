@@ -1,9 +1,11 @@
 import {
+  AppellationAndRomeDto,
   Group,
   SearchQueryParamsWithGeoParams,
   SearchResultDto,
   SearchRoutes,
   SiretDto,
+  displayRouteName,
   errors,
   expectHttpResponseToEqual,
   searchImmersionRoutes,
@@ -13,6 +15,8 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../../../../domains/establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../../domains/establishment/adapters/InMemoryGroupRepository";
+import { LaBonneBoiteCompanyDto } from "../../../../domains/establishment/adapters/la-bonne-boite/LaBonneBoiteCompanyDto";
+import { LaBonneBoiteCompanyDtoBuilder } from "../../../../domains/establishment/adapters/la-bonne-boite/LaBonneBoiteCompanyDtoBuilder";
 import { EstablishmentEntity } from "../../../../domains/establishment/entities/EstablishmentEntity";
 import { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
 import { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
@@ -24,7 +28,7 @@ import {
   defaultLocation,
   defaultNafCode,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
-import { buildTestApp } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
 const siret1 = "12345678901234";
 const siret2 = "11111111111111";
@@ -127,6 +131,7 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
 describe("search-immersion route", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<SearchRoutes>;
+  let gateways: InMemoryGateways;
 
   beforeEach(async () => {
     const testAppAndDeps = await buildTestApp();
@@ -135,6 +140,7 @@ describe("search-immersion route", () => {
       searchImmersionRoutes,
       testAppAndDeps.request,
     );
+    gateways = testAppAndDeps.gateways;
   });
 
   describe("from front - /immersion-offers", () => {
@@ -676,6 +682,56 @@ describe("search-immersion route", () => {
             appellationCode: requestedOffer.appellationCode,
             mode: "not found",
           }).message,
+        },
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    searchImmersionRoutes.getExternalSearchResult,
+  )}`, () => {
+    it("404 - when siret not found", async () => {
+      const response = await httpClient.getExternalSearchResult({
+        queryParams: {
+          siret: "11112222000044",
+          appellationCode: "12694",
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          status: 404,
+          message:
+            "Aucune entreprise trouvée avec le siret : 11112222000044. Êtes-vous sûr d'avoir bien tapé votre siret ?",
+        },
+      });
+    });
+
+    it("200 - route with mandatory params", async () => {
+      const styliste: AppellationAndRomeDto = {
+        romeCode: "B1805",
+        appellationLabel: "Styliste",
+        appellationCode: "19540",
+        romeLabel: "Stylisme",
+      };
+      const lbbResult: LaBonneBoiteCompanyDto =
+        new LaBonneBoiteCompanyDtoBuilder().build();
+      gateways.laBonneBoiteGateway.setNextResults([lbbResult]);
+
+      const response = await httpClient.getExternalSearchResult({
+        queryParams: {
+          siret: lbbResult.siret,
+          appellationCode: styliste.appellationCode,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: {
+          ...lbbResult.toSearchResult(styliste),
+          romeLabel: styliste.romeLabel,
+          rome: styliste.romeCode,
         },
       });
     });

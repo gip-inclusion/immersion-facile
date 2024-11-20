@@ -2,6 +2,7 @@ import { addDays } from "date-fns";
 import {
   ApiConsumer,
   AppellationAndRomeDto,
+  RomeDto,
   SearchQueryParamsDto,
   SearchQueryParamsWithGeoParams,
   SearchResultDto,
@@ -317,7 +318,10 @@ describe("SearchImmersionUseCase", () => {
         boulangerOffer.romeCode,
         606885,
       ),
-      lbbToSearchResult(lbbCompanyVO, secretariatOffer.romeLabel),
+      lbbToSearchResult(lbbCompanyVO, {
+        romeCode: secretariatOffer.romeCode,
+        romeLabel: secretariatOffer.romeLabel,
+      }),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -354,7 +358,10 @@ describe("SearchImmersionUseCase", () => {
         secretariatOffer.romeCode,
         606885,
       ),
-      lbbToSearchResult(lbbCompanyVO, secretariatOffer.romeLabel),
+      lbbToSearchResult(lbbCompanyVO, {
+        romeCode: secretariatOffer.romeCode,
+        romeLabel: secretariatOffer.romeLabel,
+      }),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -460,7 +467,10 @@ describe("SearchImmersionUseCase", () => {
     expectToEqual(
       response,
       companiesInRangeFromLbb.map((result) =>
-        lbbToSearchResult(result, secretariatOffer.romeLabel),
+        lbbToSearchResult(result, {
+          romeCode: secretariatOffer.romeCode,
+          romeLabel: secretariatOffer.romeLabel,
+        }),
       ),
     );
 
@@ -1200,7 +1210,7 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
 
 const lbbToSearchResult = (
   lbb: LaBonneBoiteCompanyDto,
-  romeLabel: string,
+  romeDto: RomeDto,
 ): SearchResultDto => ({
   additionalInformation: "",
   establishmentScore: 0,
@@ -1219,10 +1229,11 @@ const lbbToSearchResult = (
   name: lbb.props.company_name,
   numberOfEmployeeRange: `${lbb.props.headcount_min}-${lbb.props.headcount_max}`,
   position: lbb.props.location,
-  rome: lbb.props.rome,
-  romeLabel,
+  rome: romeDto.romeCode,
+  romeLabel: romeDto.romeLabel,
   siret: lbb.siret,
   voluntaryToImmersion: false,
   locationId: null,
   website: "",
+  urlOfPartner: `https://labonneboite.francetravail.fr/entreprise/${lbb.siret}`,
 });

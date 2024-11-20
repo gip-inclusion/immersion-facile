@@ -254,6 +254,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   searchResultExternal: defineRoute(
     {
       siret: param.query.string,
+      appellationCode: param.query.ofType(appellationStringSerializer),
     },
     () => `/${frontRoutes.offerExternal}`,
   ),

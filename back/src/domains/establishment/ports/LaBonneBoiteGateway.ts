@@ -1,4 +1,4 @@
-import { SearchResultDto } from "shared";
+import { RomeDto, SearchResultDto, SiretDto } from "shared";
 
 export type LaBonneBoiteRequestParams = {
   rome: string;
@@ -11,4 +11,8 @@ export interface LaBonneBoiteGateway {
   searchCompanies(
     requestParams: LaBonneBoiteRequestParams,
   ): Promise<SearchResultDto[]>;
+  fetchCompanyBySiret(
+    id: SiretDto,
+    romeDto: RomeDto,
+  ): Promise<SearchResultDto | null>;
 }

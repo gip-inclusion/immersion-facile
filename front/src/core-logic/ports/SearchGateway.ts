@@ -17,4 +17,7 @@ export interface SearchGateway {
   ) => Promise<void | ContactErrorKind>;
   getGroupBySlug(groupSlug: GroupSlug): Promise<GroupWithResults>;
   getSearchResult$(params: SiretAndAppellationDto): Observable<SearchResultDto>;
+  getExternalSearchResult$(
+    params: SiretAndAppellationDto,
+  ): Observable<SearchResultDto>;
 }

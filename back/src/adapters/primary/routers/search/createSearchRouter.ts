@@ -36,5 +36,11 @@ export const createSearchRouter = (deps: AppDependencies) => {
     ),
   );
 
+  expressSharedRouter.getExternalSearchResult(async (req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getExternalSearchResult.execute(req.query),
+    ),
+  );
+
   return searchImmersionRouter;
 };

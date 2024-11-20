@@ -37,4 +37,10 @@ export class TestSearchGateway implements SearchGateway {
   public search$(_params: SearchQueryParamsDto): Observable<SearchResultDto[]> {
     return this.searchResults$;
   }
+
+  public getExternalSearchResult$(
+    _params: SiretAndAppellationDto,
+  ): Observable<SearchResultDto> {
+    return this.currentSearchResult$;
+  }
 }

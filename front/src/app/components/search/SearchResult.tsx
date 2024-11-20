@@ -11,12 +11,12 @@ import {
   domElementIds,
   frenchEstablishmentKinds,
 } from "shared";
-import { routes } from "src/app/routes/routes";
+import { Link } from "type-route";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {
   establishment: SearchResultDto;
-  onButtonClick?: () => void;
+  linkProps: Link;
   illustration?: React.ReactNode;
   disableButton?: boolean;
   preview?: boolean;
@@ -36,10 +36,9 @@ const getLastDate = (
 };
 
 const SearchResultComponent = ({
-  onButtonClick,
+  linkProps,
   establishment,
   illustration,
-  preview,
 }: EnterpriseSearchResultProps) => {
   const {
     siret,
@@ -51,9 +50,7 @@ const SearchResultComponent = ({
     voluntaryToImmersion,
     createdAt,
     updatedAt,
-    locationId,
   } = establishment;
-
   const isCustomizedNameValidToDisplay =
     customizedName &&
     customizedName.length > 0 &&
@@ -75,28 +72,12 @@ const SearchResultComponent = ({
   ].join("");
 
   const dateJobCreatedAt = getLastDate(createdAt, updatedAt);
-
   return (
     <Card
       title={jobTitle}
       desc={establishmentName}
       linkProps={{
-        ...routes.searchResult({
-          appellationCode:
-            preview || appellations.length === 0
-              ? ""
-              : appellations[0].appellationCode,
-          siret,
-          ...(locationId ? { location: locationId } : {}),
-        }).link,
-        onClick: preview
-          ? () => {}
-          : (event) => {
-              event.preventDefault();
-              if (onButtonClick) {
-                onButtonClick();
-              }
-            },
+        ...linkProps,
         id: voluntaryToImmersion
           ? `${domElementIds.search.searchResultButton}-${siret}`
           : `${domElementIds.search.lbbSearchResultButton}-${siret}`,

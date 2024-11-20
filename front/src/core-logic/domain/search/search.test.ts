@@ -229,6 +229,39 @@ describe("search epic", () => {
     expectStatus("ok");
   });
 
+  describe("get a single search result", () => {
+    it("should retrieve a search result and populate our store", () => {
+      expectStateToMatchInitialState();
+      store.dispatch(
+        searchSlice.actions.externalSearchResultRequested({
+          appellationCode: "11000",
+          siret: lbbSearchResult.siret,
+        }),
+      );
+      expectIsLoading(true);
+      dependencies.searchGateway.currentSearchResult$.next(lbbSearchResult);
+      expectToEqual(
+        searchSelectors.currentSearchResult(store.getState()),
+        lbbSearchResult,
+      );
+      expectIsLoading(false);
+    });
+    // it("should throw if the gateway returns an error", () => {
+    //   expectStateToMatchInitialState();
+    //   store.dispatch(searchSlice.actions.externalSearchResultRequested({
+    //     appellationCode: lbbSearchResult.appellations[0].appellationCode,
+    //     siret: lbbSearchResult.siret,
+    //   }));
+    //   expectIsLoading(true);
+    //   dependencies.searchGateway.currentSearchResult$.error(new Error("error"));
+    //   expectIsLoading(false);
+    //   expectToEqual(searchSelectors.feedback(store.getState()), {
+    //     kind: "errored",
+    //     errorMessage: "error",
+    //   });
+    // })
+  });
+
   const expectStateToMatchInitialState = () => {
     expectToEqual(store.getState().search, initialState);
   };

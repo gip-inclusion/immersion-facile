@@ -85,7 +85,11 @@ const getMetaForSearchResult = (
   };
 };
 
-export const SearchResultPage = () => {
+export const SearchResultPage = ({
+  isExternal,
+}: {
+  isExternal?: boolean;
+}) => {
   const route = useRoute() as Route<
     typeof routes.searchResult | typeof routes.searchResultExternal
   >;
@@ -96,24 +100,43 @@ export const SearchResultPage = () => {
   const feedback = useAppSelector(searchSelectors.feedback);
   const isLoading = useAppSelector(searchSelectors.isLoading);
   const formContactRef = useRef<ElementRef<"div">>(null);
-  const [shouldShowError, setShouldShowError] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const [shouldShowError, setShouldShowError] = useState<boolean>(false);
   const [showConfirmationMessage, setShowConfirmationMessage] = useState<
     string | null
   >(null);
 
   useEffect(() => {
     const params = route.params;
-    "appellationCode" in params && "location" in params && params.location
-      ? dispatch(
-          searchSlice.actions.fetchSearchResultRequested({
-            siret: params.siret,
-            appellationCode: params.appellationCode,
-            locationId: params.location,
-          }),
-        )
-      : setShouldShowError(true);
-  }, [route.params, dispatch]);
+
+    if (!("appellationCode" in params && "siret" in params)) {
+      setShouldShowError(true);
+      return;
+    }
+
+    if (!isExternal) {
+      if (!("location" in params && params.location)) {
+        setShouldShowError(true);
+        return;
+      }
+
+      dispatch(
+        searchSlice.actions.fetchSearchResultRequested({
+          siret: params.siret,
+          appellationCode: params.appellationCode,
+          locationId: params.location,
+        }),
+      );
+    }
+    if (isExternal) {
+      dispatch(
+        searchSlice.actions.externalSearchResultRequested({
+          appellationCode: params.appellationCode,
+          siret: params.siret,
+        }),
+      );
+    }
+  }, [route.params, dispatch, isExternal]);
 
   const pluralFromAppellations = (appellations: AppellationDto[] | undefined) =>
     appellations && appellations.length > 1 ? "s" : "";
@@ -155,7 +178,11 @@ export const SearchResultPage = () => {
               <>
                 <Alert
                   title="Oups !"
-                  description="L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
+                  description={
+                    feedback.kind === "errored"
+                      ? feedback.errorMessage
+                      : "L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
+                  }
                   severity="error"
                   className={fr.cx("fr-my-4w")}
                 />

@@ -8,16 +8,12 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import { useDispatch } from "react-redux";
 import { SearchResultDto } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import {
-  SearchPageParams,
-  searchSlice,
-} from "src/core-logic/domain/search/search.slice";
+import { SearchPageParams } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
 import "./SearchMiniMap.scss";
 
@@ -94,7 +90,6 @@ export const SearchMiniMap = ({
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const searchParams = useAppSelector(searchSelectors.searchParams);
   const mapRef = useRef<L.Map | null>(null);
-  const dispatch = useDispatch();
   const { cx } = useStyles();
 
   const { latitude, longitude } = {
@@ -139,6 +134,13 @@ export const SearchMiniMap = ({
               const key = searchResult.locationId
                 ? `${searchResult.locationId}-${index}`
                 : `lbb-${index}`;
+              const appellations = searchResult.appellations;
+              const searchResultAppellationCode = appellations?.length
+                ? appellations[0].appellationCode
+                : null;
+              const appellationCode =
+                searchResultAppellationCode ||
+                searchParams.appellationCodes?.[0];
               return (
                 <Marker
                   key={key}
@@ -159,32 +161,20 @@ export const SearchMiniMap = ({
                     <SearchResult
                       key={`${searchResult.siret}-${searchResult.rome}`} // Should be unique !
                       establishment={searchResult}
-                      onButtonClick={() => {
-                        const appellations = searchResult.appellations;
-                        const appellationCode = appellations?.length
-                          ? appellations[0].appellationCode
-                          : null;
-                        if (appellationCode && searchResult.locationId) {
-                          routes
-                            .searchResult({
+                      linkProps={
+                        searchResult.voluntaryToImmersion
+                          ? routes.searchResult({
+                              appellationCode: appellationCode ?? "",
                               siret: searchResult.siret,
-                              appellationCode,
-                              location: searchResult.locationId,
-                            })
-                            .push();
-                          return;
-                        }
-                        dispatch(
-                          searchSlice.actions.fetchSearchResultRequested(
-                            searchResult,
-                          ),
-                        );
-                        routes
-                          .searchResultExternal({
-                            siret: searchResult.siret,
-                          })
-                          .push();
-                      }}
+                              ...(searchResult.locationId
+                                ? { location: searchResult.locationId }
+                                : {}),
+                            }).link
+                          : routes.searchResultExternal({
+                              siret: searchResult.siret,
+                              appellationCode: appellationCode ?? "",
+                            }).link
+                      }
                     />
                   </Popup>
                 </Marker>
