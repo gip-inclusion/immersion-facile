@@ -33,6 +33,14 @@ describe("GetSiretIfNotAlreadySaved", () => {
     establishmentAggregateRepo.establishmentAggregates = [
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(siretAlreadyInDb)
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "osef",
+          },
+        ])
         .build(),
     ];
 
