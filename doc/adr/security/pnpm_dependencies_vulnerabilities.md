@@ -31,7 +31,7 @@ Mettre en place une procédure en cas de vulnérabilité constatée afin de ne p
 
 - Avant de prendre une décision il est important de mesurer le risque dans le contexte IF au delà du niveau de criticité.
 
-  > Exemple: une vulnérabilité liée à une dependance principale qui s'occupe des tests n'est pas pertinente. Par contre une vulnérabilité liée au runtime front/back est plus prioritaire.
+  > Exemple : une vulnérabilité liée à une dependance principale qui s'occupe des tests n'est pas pertinente. Par contre une vulnérabilité liée au runtime front/back est plus prioritaire.
 
   > En cas de doutes voir avec le RSSI de la plateforme de l'inclusion.
 
