@@ -8,7 +8,6 @@ import { keys } from "react-design-system";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyDtoWithoutEmails,
   UserParamsForAgency,
   domElementIds,
   toLowerCaseWithoutDiacritics,
@@ -27,12 +26,14 @@ export const AgencyUserModificationForm = ({
   agencyUser,
   closeModal,
   mode,
-  agency,
+  agencyHasRefersTo,
+  isEmailDisabled,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
   mode: UserFormMode;
-  agency: AgencyDtoWithoutEmails;
+  agencyHasRefersTo: boolean;
+  isEmailDisabled?: boolean;
 }) => {
   const dispatch = useDispatch();
 
@@ -111,7 +112,7 @@ export const AgencyUserModificationForm = ({
   });
 
   const checkboxOptionsWithFilter = () => {
-    if (agency && agency.refersToAgencyId !== null)
+    if (agencyHasRefersTo)
       return checkboxOptions.filter((option) => option.label !== "Validateur");
     return checkboxOptions;
   };
@@ -139,7 +140,7 @@ export const AgencyUserModificationForm = ({
             },
           }}
           {...getFieldError("email")}
-          disabled={agencyUser.isIcUser}
+          disabled={isEmailDisabled ?? agencyUser.isIcUser}
           onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
             setInvalidEmailMessage(
               state === "error" ? stateRelatedMessage : null,

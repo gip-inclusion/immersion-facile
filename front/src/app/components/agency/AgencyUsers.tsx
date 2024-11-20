@@ -221,7 +221,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
                 agencyUser={selectedUserData}
                 closeModal={() => manageUserModal.close()}
                 mode={mode}
-                agency={agency}
+                agencyHasRefersTo={!!agency.refersToAgencyId}
               />
             </>
           )}
