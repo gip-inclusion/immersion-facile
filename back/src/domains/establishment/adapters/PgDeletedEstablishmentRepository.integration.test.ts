@@ -26,7 +26,16 @@ describe("PgDeletedEstablishmentRepository", () => {
   });
 
   it("save", async () => {
-    const establishment = new EstablishmentAggregateBuilder().build();
+    const establishment = new EstablishmentAggregateBuilder()
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "osef",
+          phone: "3615-TABASSER-LES-BALOCHES",
+          userId: "osef",
+        },
+      ])
+      .build();
     const deletedEstablishment: DeletedEstablishmentDto = {
       siret: establishment.establishment.siret,
       createdAt: new Date(),
