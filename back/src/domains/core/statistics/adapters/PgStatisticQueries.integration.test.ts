@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
+  UserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -16,7 +17,10 @@ import { toAgencyWithRights } from "../../../../utils/agency";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
+import { EstablishmentUserRight } from "../../../establishment/entities/EstablishmentEntity";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
+import { PgUserRepository } from "../../authentication/inclusion-connect/adapters/PgUserRepository";
+import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgStatisticQueries } from "./PgStatisticQueries";
 
 describe("PgStatisticQueries", () => {
@@ -43,6 +47,7 @@ describe("PgStatisticQueries", () => {
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("establishments").execute();
+    await db.deleteFrom("users").execute();
   });
 
   afterAll(async () => {
@@ -72,29 +77,24 @@ describe("PgStatisticQueries", () => {
 
     describe("when there are conventions", () => {
       const agency = new AgencyDtoBuilder().build();
+      const user = new UserBuilder()
+        .withId(new UuidV4Generator().new())
+        .build();
+      const userRight: EstablishmentUserRight = {
+        role: "establishment-admin",
+        userId: user.id,
+        job: "",
+        phone: "",
+      };
       const establishmentAggregate = new EstablishmentAggregateBuilder()
         .withEstablishmentSiret("33330000333300")
-        .withUserRights([
-          {
-            role: "establishment-admin",
-            userId: "osef",
-            job: "",
-            phone: "",
-          },
-        ])
+        .withUserRights([userRight])
         .build();
       const establishmentAggregateLinkedToNoConvention =
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("88880000888800")
           .withLocationId("11111111-1111-4111-1111-111111111111")
-          .withUserRights([
-            {
-              role: "establishment-admin",
-              userId: "osef",
-              job: "",
-              phone: "",
-            },
-          ])
+          .withUserRights([userRight])
           .build();
       const conventionSiret1A = new ConventionDtoBuilder()
         .withId(crypto.randomUUID())
@@ -119,6 +119,7 @@ describe("PgStatisticQueries", () => {
         .build();
 
       beforeEach(async () => {
+        await new PgUserRepository(db).save(user, "proConnect");
         await pgAgencyRepository.insert(toAgencyWithRights(agency));
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentAggregate,
