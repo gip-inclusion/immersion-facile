@@ -352,7 +352,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       fieldsToValidate.map((key) => trigger(key)),
     );
     if (validatedFields.every((validatedField) => validatedField)) {
-      if (currentStep === 1 && availableForImmersion === undefined) return;
+      if (
+        currentStep === 1 &&
+        availableForImmersion === undefined &&
+        mode === "create"
+      )
+        return;
       setCurrentStep(step);
     }
   };
