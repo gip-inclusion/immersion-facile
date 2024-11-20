@@ -60,9 +60,10 @@ export type FrontAgencyDashboardRoute =
 // | Route<typeof routes.agencyDashboardAgencyDetails>;
 
 type InclusionConnectPrivateRoute =
+  | FrontAdminRoute
   | FrontAgencyDashboardRoute
   | Route<typeof routes.establishmentDashboard>
-  | FrontAdminRoute;
+  | Route<typeof routes.myProfile>;
 
 type InclusionConnectedPrivateRouteProps = {
   route: InclusionConnectPrivateRoute;

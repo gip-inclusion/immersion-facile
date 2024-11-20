@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
+import { MyProfile } from "src/app/pages/MyProfile";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
@@ -191,6 +192,16 @@ const getPageByRouteName: {
     <ConventionManageInclusionConnectedPage route={route} />
   ),
   manageDiscussion: (route) => <DiscussionManagePage route={route} />,
+  myProfile: (route) => (
+    <InclusionConnectedPrivateRoute
+      route={route}
+      inclusionConnectConnexionPageHeader={
+        <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
+      }
+    >
+      <MyProfile route={route} />
+    </InclusionConnectedPrivateRoute>
+  ),
   openApiDoc: () => <OpenApiDocPage />,
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,

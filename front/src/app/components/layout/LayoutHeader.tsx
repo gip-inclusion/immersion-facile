@@ -5,22 +5,21 @@ import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import React from "react";
 import { ButtonWithSubMenu, MaintenanceCallout } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { AbsoluteUrl, domElementIds } from "shared";
+import { domElementIds } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { routes, useRoute } from "src/app/routes/routes";
-import { ENV } from "src/config/environmentVariables";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { makeStyles } from "tss-react/dsfr";
+import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
+import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 
 import {
   AgencyDashboardRouteName,
   agencyDashboardRoutes,
 } from "src/app/routes/InclusionConnectedPrivateRoute";
-import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
-import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
-import immersionFacileLightLogo from "/assets/img/logo-if.svg";
+import { routes, useRoute } from "src/app/routes/routes";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { makeStyles } from "tss-react/dsfr";
 
 export const LayoutHeader = () => {
   const dispatch = useDispatch();
@@ -52,21 +51,9 @@ export const LayoutHeader = () => {
   const isInclusionConnected = useAppSelector(
     authSelectors.isInclusionConnected,
   );
+  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
-  const { enableProConnect } = useAppSelector(
-    featureFlagSelectors.featureFlagState,
-  );
-  const getLinkToUpdateAccountInfo = (): AbsoluteUrl => {
-    if (ENV.envType === "production") {
-      if (enableProConnect.isActive)
-        return "https://app.moncomptepro.beta.gouv.fr/personal-information";
-      return "https://connect.inclusion.beta.gouv.fr/accounts/my-account";
-    }
-    if (enableProConnect.isActive)
-      return "https://app-preprod.moncomptepro.beta.gouv.fr/personal-information";
-    return "https://recette.connect.inclusion.beta.gouv.fr/accounts/my-account";
-  };
 
   const tools: HeaderProps["quickAccessItems"] = [
     {
@@ -106,18 +93,21 @@ export const LayoutHeader = () => {
         ...(isInclusionConnected
           ? [
               {
-                text: "Modifier mes informations",
+                text: "Mon profil",
                 isActive: false,
-                linkProps: {
-                  href: getLinkToUpdateAccountInfo(),
-                  target: "_blank",
-                },
+                linkProps: routes.myProfile().link,
               },
             ]
           : []),
       ]}
       id={quickAccessIds.myAccount}
-      buttonLabel={"Mon espace"}
+      buttonLabel={
+        currentUser
+          ? currentUser.firstName && currentUser.lastName
+            ? `${currentUser.firstName} ${currentUser.lastName}`
+            : currentUser.email
+          : "Mon espace"
+      }
     />,
   ];
 
