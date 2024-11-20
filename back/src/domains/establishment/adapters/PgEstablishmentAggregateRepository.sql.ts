@@ -1,47 +1,9 @@
 import { sql } from "kysely";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-
-const uniqueEstablishmentContacts = (
-  mode: "siret" | "contactEmail" | "all",
-) => `
-SELECT 
-  DISTINCT ON (siret) siret, 
-  uuid 
-FROM 
-  establishments_contacts
-${mode === "contactEmail" ? "WHERE establishments_contacts.email = $1" : ""}
-`;
-
-const filteredImmersionOffertSubQuery = (
-  mode: "siret" | "contactEmail" | "all",
-) => `
-SELECT
-  immersion_offers.siret as siret, 
-  JSON_AGG(
-    JSON_BUILD_OBJECT(
-      'romeCode', rome_code, 
-      'romeLabel', libelle_rome, 
-      'appellationCode', appellation_code::text, 
-      'appellationLabel', pad.libelle_appellation_long::text,
-      'createdAt', 
-      to_char(
-        created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-      )
-    )
-    ORDER BY appellation_code
-  ) as immersionOffers 
-FROM immersion_offers
-LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_offers.appellation_code
-LEFT JOIN public_romes_data AS prd ON prd.code_rome = immersion_offers.rome_code
-${
-  mode === "contactEmail"
-    ? "RIGHT JOIN unique_establishments_contacts as uec ON uec.siret = immersion_offers.siret"
-    : ""
-}
-${mode === "siret" ? "WHERE siret = $1 " : ""}
-GROUP BY immersion_offers.siret
-
-`;
+import { jsonArrayFrom, jsonBuildObject } from "kysely/helpers/postgres";
+import {
+  KyselyDb,
+  jsonStripNulls,
+} from "../../../config/pg/kysely/kyselyUtils";
 
 export const withEstablishmentLocationsSubQuery = `
 SELECT
@@ -62,73 +24,119 @@ FROM establishments_location_infos
 GROUP BY establishment_siret
 `;
 
-const selectJsonAggregate = `
-SELECT 
-  JSON_STRIP_NULLS(
-    JSON_BUILD_OBJECT(
-      'establishment', JSON_BUILD_OBJECT(
-        'acquisitionCampaign', e.acquisition_campaign,
-        'acquisitionKeyword' , e.acquisition_keyword,
-        'score', e.score,
-        'siret', e.siret, 
-        'name', e.name, 
-        'customizedName', e.customized_name, 
-        'website', e.website, 
-        'additionalInformation', e.additional_information,
-        'locations', ela.locations,  
-        'sourceProvider', e.source_provider,  
-        'nafDto', JSON_BUILD_OBJECT(
-          'code', e.naf_code, 
-          'nomenclature', e.naf_nomenclature
-        ), 
-        'numberEmployeesRange', e.number_employees, 
-        'updatedAt', to_char(
-          e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-        ), 
-        'createdAt', to_char(
-          e.created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-        ), 
-        'lastInseeCheckDate', to_char(
-          e.last_insee_check_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
-        ), 
-        'isOpen', e.is_open, 
-        'isSearchable', e.is_searchable, 
-        'isCommited', e.is_commited,
-        'fitForDisabledWorkers', e.fit_for_disabled_workers,
-        'maxContactsPerMonth', e.max_contacts_per_month,
-        'nextAvailabilityDate', date_to_iso(e.next_availability_date),
-        'searchableBy', JSON_BUILD_OBJECT(
-          'jobSeekers', e.searchable_by_job_seekers,
-          'students', e.searchable_by_students
-        )
-      ), 
-      'immersionOffers', io.immersionOffers, 
-      'contact', JSON_BUILD_OBJECT(
-        'id', ec.uuid, 'firstName', ec.firstname, 
-        'lastName', ec.lastname, 'job', ec.job, 
-        'contactMethod', ec.contact_mode, 
-        'phone', ec.phone, 'email', ec.email, 
-        'copyEmails', ec.copy_emails
-      )
+export const establishmentByFilters = (db: KyselyDb) =>
+  db
+    .selectFrom("establishments as e")
+    .select(({ ref, eb }) =>
+      jsonStripNulls(
+        jsonBuildObject({
+          establishment: jsonBuildObject({
+            acquisitionCampaign: ref("e.acquisition_campaign"),
+            acquisitionKeyword: ref("e.acquisition_keyword"),
+            score: ref("e.score"),
+            siret: ref("e.siret"),
+            name: ref("e.name"),
+            customizedName: ref("e.customized_name"),
+            contactMethod: ref("e.contact_mode"),
+            website: ref("e.website"),
+            additionalInformation: ref("e.additional_information"),
+            locations: jsonArrayFrom(
+              eb
+                .selectFrom("establishments_location_infos as loc")
+                .whereRef("loc.establishment_siret", "=", "e.siret")
+                .select(({ ref }) =>
+                  jsonBuildObject({
+                    id: ref("loc.id"),
+                    position: jsonBuildObject({
+                      lon: ref("loc.lon"),
+                      lat: ref("loc.lat"),
+                    }),
+                    address: jsonBuildObject({
+                      streetNumberAndAddress: ref(
+                        "loc.street_number_and_address",
+                      ),
+                      postcode: ref("loc.post_code"),
+                      city: ref("loc.city"),
+                      departmentCode: ref("department_code"),
+                    }),
+                  }).as("location"),
+                ),
+            ),
+            sourceProvider: ref("e.source_provider"),
+            numberEmployeesRange: ref("e.number_employees"),
+            updatedAt: sql<string>`TO_CHAR( ${ref(
+              "e.update_date",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+            createdAt: sql<string>`TO_CHAR( ${ref(
+              "e.created_at",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+            lastInseeCheckDate: sql<string>`TO_CHAR( ${ref(
+              "e.last_insee_check_date",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+            isOpen: ref("e.is_open"),
+            isSearchable: ref("e.is_searchable"),
+            isCommited: ref("e.is_commited"),
+            fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
+            maxContactsPerMonth: ref("e.max_contacts_per_month"),
+            nextAvailabilityDate: sql<string>`date_to_iso(${ref(
+              "e.next_availability_date",
+            )})`,
+            searchableBy: jsonBuildObject({
+              jobSeekers: ref("e.searchable_by_job_seekers"),
+              students: ref("e.searchable_by_students"),
+            }),
+            nafDto: jsonBuildObject({
+              code: ref("e.naf_code"),
+              nomenclature: ref("e.naf_nomenclature"),
+            }),
+          }),
+          immersionOffers: jsonArrayFrom(
+            eb
+              .selectFrom("immersion_offers as io")
+              .leftJoin(
+                "public_appellations_data as pad",
+                "pad.ogr_appellation",
+                "io.appellation_code",
+              )
+              .leftJoin(
+                "public_romes_data as prd",
+                "prd.code_rome",
+                "io.rome_code",
+              )
+              .whereRef("io.siret", "=", "e.siret")
+              .select(({ ref }) =>
+                jsonBuildObject({
+                  romeCode: ref("io.rome_code"),
+                  romeLabel: ref("prd.libelle_rome"),
+                  appellationCode: sql<string>`${ref(
+                    "io.appellation_code",
+                  )}::text`,
+                  appellationLabel: ref("pad.libelle_appellation_long"),
+                  createdAt: sql<string>`TO_CHAR( ${ref(
+                    "io.created_at",
+                  )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+                }).as("offer"),
+              )
+              .orderBy("io.appellation_code asc"),
+          ),
+          userRights: jsonArrayFrom(
+            eb
+              .selectFrom("establishments__users as eu")
+              .whereRef("eu.siret", "=", "e.siret")
+              .select(({ ref }) =>
+                jsonBuildObject({
+                  userId: ref("eu.user_id"),
+                  role: ref("eu.role"),
+                  job: ref("eu.job"),
+                  phone: ref("eu.phone"),
+                }).as("userRight"),
+              ),
+          ),
+        }),
+      ).as("aggregate"),
     )
-  ) AS aggregate 
-`;
-
-export const establishmentByFilters = (
-  mode: "siret" | "contactEmail" | "all",
-) => `
-WITH 
-  unique_establishments_contacts AS (${uniqueEstablishmentContacts(mode)}), 
-  filtered_immersion_offers AS (${filteredImmersionOffertSubQuery(mode)}),
-  establishment_locations_agg AS (${withEstablishmentLocationsSubQuery})
-${selectJsonAggregate}
-FROM filtered_immersion_offers AS io 
-LEFT JOIN establishments AS e ON e.siret = io.siret 
-LEFT JOIN unique_establishments_contacts AS uec ON e.siret = uec.siret 
-LEFT JOIN establishments_contacts AS ec ON uec.uuid = ec.uuid
-LEFT JOIN establishment_locations_agg AS ela ON e.siret = ela.establishment_siret
-ORDER BY e.siret
-`;
+    .groupBy("e.siret")
+    .orderBy("e.siret asc");
 
 export const updateAllEstablishmentScoresQuery = async (
   db: KyselyDb,

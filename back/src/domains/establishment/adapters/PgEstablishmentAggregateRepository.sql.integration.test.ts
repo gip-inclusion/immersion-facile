@@ -5,6 +5,7 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   Exchange,
+  UserBuilder,
   expectToEqual,
 } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
@@ -12,6 +13,8 @@ import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -32,6 +35,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();
+    await db.deleteFrom("users").execute();
   });
 
   afterAll(async () => {
@@ -47,12 +51,24 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       const pgConventionRepository = new PgConventionRepository(db);
       const pgAgencyRepository = new PgAgencyRepository(db);
 
+      const user = new UserBuilder()
+        .withId(new UuidV4Generator().new())
+        .build();
       const establishment = new EstablishmentAggregateBuilder()
         .withScore(0)
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: user.id,
+          },
+        ])
         .build();
       const { siret } = establishment.establishment;
 
       const agency = new AgencyDtoBuilder().build();
+      await new PgUserRepository(db).save(user, "proConnect");
       await pgAgencyRepository.insert(toAgencyWithRights(agency));
 
       const convention = new ConventionDtoBuilder()

@@ -24,7 +24,7 @@ export const makeExpectedSearchResult = ({
       appellationLabel,
     })),
     establishmentScore: establishment.establishment.score,
-    contactMode: establishment.contact?.contactMethod,
+    contactMode: establishment.establishment.contactMethod,
     customizedName: establishment.establishment.customizedName,
     distance_m: withLocationAndDistance.distance,
     fitForDisabledWorkers: establishment.establishment.fitForDisabledWorkers,
