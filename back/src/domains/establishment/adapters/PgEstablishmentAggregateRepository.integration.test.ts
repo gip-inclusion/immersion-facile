@@ -2,11 +2,11 @@ import { addMilliseconds, subDays } from "date-fns";
 import { Pool } from "pg";
 import {
   DiscussionBuilder,
-  Email,
   GeoPositionDto,
   Location,
   LocationBuilder,
   SearchResultDto,
+  UserBuilder,
   WithAcquisition,
   errors,
   expectArraysToEqualIgnoringOrder,
@@ -22,10 +22,13 @@ import {
   rueGuillaumeTellDto,
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
-import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import {
+  EstablishmentAggregate,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -37,11 +40,20 @@ import {
   sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
+const osefUser = new UserBuilder().withId(uuid()).build();
+const osefUserRight: EstablishmentUserRight = {
+  role: "establishment-admin",
+  job: "osef",
+  phone: "3615-OSEF",
+  userId: osefUser.id,
+};
+
 describe("PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let kyselyDb: KyselyDb;
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
   let pgDiscussionRepository: PgDiscussionRepository;
+  let pgUserRepository: PgUserRepository;
 
   beforeAll(() => {
     pool = getTestPgPool();
@@ -49,17 +61,21 @@ describe("PgEstablishmentAggregateRepository", () => {
   });
 
   beforeEach(async () => {
-    await kyselyDb.deleteFrom("establishments_contacts").execute();
+    await kyselyDb.deleteFrom("establishments__users").execute();
     await kyselyDb.deleteFrom("immersion_offers").execute();
     await kyselyDb.deleteFrom("discussions").execute();
     await kyselyDb.deleteFrom("establishments_location_infos").execute();
     await kyselyDb.deleteFrom("establishments_location_positions").execute();
     await kyselyDb.deleteFrom("establishments").execute();
+    await kyselyDb.deleteFrom("users").execute();
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       kyselyDb,
     );
     pgDiscussionRepository = new PgDiscussionRepository(kyselyDb);
+    pgUserRepository = new PgUserRepository(kyselyDb);
+
+    await pgUserRepository.save(osefUser, "proConnect");
   });
 
   afterAll(async () => {
@@ -304,18 +320,17 @@ describe("PgEstablishmentAggregateRepository", () => {
             const establishmentAggregateAtSaintesAndVeaux =
               new EstablishmentAggregateBuilder()
                 .withEstablishmentSiret("78000403200029")
-                .withContactId(uuid())
                 .withOffers([cuvisteOffer, artisteCirqueOffer])
                 .withLocations([
                   bassompierreSaintesLocation,
                   veauxLocation, // outside geographical area
                 ])
+                .withUserRights([osefUserRight])
                 .build();
 
             const establishmentAggregateAtChaniersAndLaRochelle =
               new EstablishmentAggregateBuilder()
                 .withEstablishmentSiret("78000403200030")
-                .withContactId(uuid())
                 .withOffers([
                   cartographeImmersionOffer,
                   cuvisteOffer,
@@ -325,6 +340,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   portHubleChaniersLocation,
                   tourDeLaChaineLaRochelleLocation,
                 ])
+                .withUserRights([osefUserRight])
                 .build();
 
             // Prepare
@@ -405,17 +421,17 @@ describe("PgEstablishmentAggregateRepository", () => {
         const notFitForDisabledWorkers = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("00000000000001")
           .withFitForDisabledWorkers(false)
-          .withContactId(uuid())
           .withLocationId(uuid())
           .withOffers([offer])
+          .withUserRights([osefUserRight])
           .build();
 
         const fitForDisabledWorkers = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("00000000000002")
           .withFitForDisabledWorkers(true)
-          .withContactId(uuid())
           .withLocationId(uuid())
           .withOffers([offer])
+          .withUserRights([osefUserRight])
           .build();
 
         beforeEach(async () => {
@@ -558,12 +574,13 @@ describe("PgEstablishmentAggregateRepository", () => {
           .withOffers([cartographeImmersionOffer])
           .withLocations([locationOfSearchPosition])
           .withEstablishmentOpen(true)
+          .withUserRights([osefUserRight])
           .build();
         const closedEstablishment = new EstablishmentAggregateBuilder()
           .withOffers([cartographeImmersionOffer])
           .withLocations([locationOfCloseSearchPosition])
-          .withContactId(uuid())
           .withEstablishmentOpen(false)
+          .withUserRights([osefUserRight])
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -596,6 +613,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           .withOffers([cartographeImmersionOffer])
           .withLocations([locationOfSearchPosition])
           .withIsSearchable(false)
+          .withUserRights([osefUserRight])
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -622,32 +640,31 @@ describe("PgEstablishmentAggregateRepository", () => {
       it("returns one search DTO by establishment, with offers matching rome and geographical area", async () => {
         const establishmentAtRangeWithRome = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("00000000000001")
-          .withContactId(uuid())
           .withOffers([
             analysteEnGeomatiqueImmersionOffer,
             cartographeImmersionOffer,
           ])
           .withLocations([locationOfSearchPosition])
+          .withUserRights([osefUserRight])
           .build();
 
         const establishmentAtRangeWithOtherRome =
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("00000000000002")
-            .withContactId(uuid())
             .withOffers([artisteCirqueOffer])
             .withLocations([locationOfCloseSearchPosition])
+            .withUserRights([osefUserRight])
             .build();
 
         const establishmentOutOfRangeWithRome =
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("00000000000003")
-            .withContactId(uuid())
             .withOffers([
               cartographeImmersionOffer,
               analysteEnGeomatiqueImmersionOffer,
             ])
             .withLocations([locationOfFarFromSearchedPosition])
-
+            .withUserRights([osefUserRight])
             .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -746,18 +763,17 @@ describe("PgEstablishmentAggregateRepository", () => {
           const closeEstablishment = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("00000000000001")
             .withOffers([cartographeImmersionOffer])
-            .withContactId(uuid())
             .withLocations([
               new LocationBuilder(locationOfSearchPosition)
                 .withId(uuid())
                 .build(),
             ])
+            .withUserRights([osefUserRight])
             .build();
 
           const farEstablishment = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("00000000000002")
             .withOffers([cartographeImmersionOffer])
-            .withContactId(uuid())
             .withLocations([
               new LocationBuilder(locationOfSearchPosition)
 
@@ -768,6 +784,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withId(uuid())
                 .build(),
             ])
+            .withUserRights([osefUserRight])
             .build();
 
           await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -796,7 +813,6 @@ describe("PgEstablishmentAggregateRepository", () => {
         it("if sorted=date, returns latest offers in first", async () => {
           const recentOfferEstablishment = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("00000000000001")
-            .withContactId(uuid())
             .withOffers([
               new OfferEntityBuilder(cartographeImmersionOffer)
                 .withCreatedAt(new Date("2022-05-05"))
@@ -807,11 +823,11 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withId(uuid())
                 .build(),
             ])
+            .withUserRights([osefUserRight])
             .build();
 
           const olderOfferEstablishment = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("00000000000002")
-            .withContactId(uuid())
             .withOffers([
               new OfferEntityBuilder(cartographeImmersionOffer)
                 .withCreatedAt(new Date("2022-05-02"))
@@ -822,6 +838,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withId(uuid())
                 .build(),
             ])
+            .withUserRights([osefUserRight])
             .build();
 
           await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -851,7 +868,6 @@ describe("PgEstablishmentAggregateRepository", () => {
           const establishmentWithHighAndLowScore =
             new EstablishmentAggregateBuilder()
               .withEstablishmentSiret("00000000000001")
-              .withContactId(uuid())
               .withScore(10)
               .withLocations([
                 {
@@ -871,13 +887,13 @@ describe("PgEstablishmentAggregateRepository", () => {
                   analysteEnGeomatiqueImmersionOffer,
                 ).build(),
               ])
+              .withUserRights([osefUserRight])
               .build();
 
           const establishmentWithMediumScores =
             new EstablishmentAggregateBuilder()
               .withEstablishmentSiret("00000000000002")
               .withScore(6)
-              .withContactId(uuid())
               .withLocations([
                 {
                   id: uuid(),
@@ -896,6 +912,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   analysteEnGeomatiqueImmersionOffer,
                 ).build(),
               ])
+              .withUserRights([osefUserRight])
               .build();
 
           await Promise.all([
@@ -939,7 +956,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withId(uuid())
                 .build(),
             ])
-            .withContactId(uuid())
+            .withUserRights([osefUserRight])
             .build();
 
         const olderDate = new Date("2022-05-02");
@@ -957,7 +974,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withId(uuid())
                 .build(),
             ])
-            .withContactId(uuid())
+            .withUserRights([osefUserRight])
             .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1003,6 +1020,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           ])
           .withEstablishmentNextAvailabilityDate(new Date())
           .withEstablishmentUpdatedAt(recentDate)
+          .withUserRights([osefUserRight])
           .build();
 
         const olderDate = new Date("2023-12-01");
@@ -1017,9 +1035,9 @@ describe("PgEstablishmentAggregateRepository", () => {
               new OfferEntityBuilder().withCreatedAt(olderDate).build(),
             ])
             .withEstablishmentSiret("12341234123412")
-            .withContactId(uuid())
             .withEstablishmentNextAvailabilityDate(undefined)
             .withEstablishmentUpdatedAt(olderDate)
+            .withUserRights([osefUserRight])
             .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1076,9 +1094,9 @@ describe("PgEstablishmentAggregateRepository", () => {
       it("should return immersion offers even without lat/lon/distanceKm search", async () => {
         const establishmentAggregate = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("78000403200029")
-          .withContactId("11111111-1111-4444-1111-111111110001")
           .withOffers([cuvisteOffer, artisteCirqueOffer])
           .withLocations([bassompierreSaintesLocation, veauxLocation])
+          .withUserRights([osefUserRight])
           .build();
 
         // Prepare
@@ -1312,7 +1330,8 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentWithOfferA1101_AtPosition.establishment
                 .numberEmployeesRange,
             contactMode:
-              establishmentWithOfferA1101_AtPosition.contact.contactMethod,
+              establishmentWithOfferA1101_AtPosition.establishment
+                .contactMethod,
             distance_m: undefined,
             address:
               establishmentWithOfferA1101_AtPosition.establishment.locations[0]
@@ -1336,7 +1355,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       it("no establishment", async () => {
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [],
         );
       });
@@ -1349,6 +1368,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               .withLastInseeCheck(new Date("2020-04-14T12:00:00.000"))
               .build(),
           )
+          .withUserRights([osefUserRight])
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1356,7 +1376,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishment],
         );
       });
@@ -1373,6 +1393,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             acquisitionKeyword: "acquisition-keyword",
             acquisitionCampaign: "acquisition-campaign",
           })
+          .withUserRights([osefUserRight])
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1380,7 +1401,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishment],
         );
       });
@@ -1401,11 +1422,12 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .build(),
             )
             .withOffers([new OfferEntityBuilder().build()])
+            .withUserRights([osefUserRight])
             .build(),
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret2)
             .withOffers([new OfferEntityBuilder().build()])
-            .withGeneratedContactId()
+            .withUserRights([osefUserRight])
             .build(),
         ];
 
@@ -1416,7 +1438,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         }
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           establishments,
         );
       });
@@ -1424,12 +1446,8 @@ describe("PgEstablishmentAggregateRepository", () => {
       it("adds a new row in contact table with contact referencing the establishment siret", async () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret1)
-          .withContact(
-            new ContactEntityBuilder()
-              .withId("3ca6e619-d654-4d0d-8fa6-2febefbe953d")
-              .withContactMethod("EMAIL")
-              .build(),
-          )
+          .withContactMethod("EMAIL")
+          .withUserRights([osefUserRight])
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1437,7 +1455,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishment],
         );
       });
@@ -1460,7 +1478,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               .withAppellationLabel("Styliste chaussure")
               .build(),
           ])
-          .withContactId("3ca6e619-d654-4d0d-8fa6-2febefbe953d")
+          .withUserRights([osefUserRight])
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1468,37 +1486,53 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishment],
         );
       });
     });
 
     describe("updateEstablishmentAggregate", () => {
-      const contactEntity = new ContactEntityBuilder().build();
+      const user = new UserBuilder()
+        .withId(uuid())
+        .withEmail("email@mail.com")
+        .build();
       const updatedAt = new Date();
       const aquisition: WithAcquisition = {
         acquisitionCampaign: "my-campaign",
         acquisitionKeyword: "my-keyword",
       };
 
+      beforeEach(async () => {
+        await pgUserRepository.save(user, "proConnect");
+      });
+
       it.each([
         {
           originalEstablishment: new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("78000403200029")
             .withEstablishmentCreatedAt(new Date("2021-01-15"))
-            .withContact(contactEntity)
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "aaaaaaaaaaaaa",
+                phone: "+33600000000",
+                userId: user.id,
+              },
+            ])
             .build(),
           updatedEstablishment: new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("78000403200029")
             .withEstablishmentCreatedAt(new Date("2021-01-15"))
             .withEstablishmentUpdatedAt(updatedAt)
-            .withContact(
-              new ContactEntityBuilder(contactEntity)
-                .withLastName("new-last-name")
-                .withPhone("+33600000000")
-                .build(),
-            )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "sdlm!fjsdlfkjsdmlfj",
+                phone: "+33666887744",
+                userId: user.id,
+              },
+            ])
             .withLocations([
               {
                 id: "22222222-ee70-4c90-b3f4-668d492f7395",
@@ -1522,23 +1556,24 @@ describe("PgEstablishmentAggregateRepository", () => {
         {
           originalEstablishment: new EstablishmentAggregateBuilder()
             .withEstablishmentCustomizedName("TOTO")
+            .withUserRights([osefUserRight])
             .build(),
           updatedEstablishment: new EstablishmentAggregateBuilder()
             .withEstablishmentCustomizedName(undefined)
+            .withUserRights([osefUserRight])
             .withEstablishmentUpdatedAt(updatedAt)
             .build(),
           title: "removes customized name",
         },
         {
           originalEstablishment: new EstablishmentAggregateBuilder()
-            .withContact(
-              new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-            )
+            .withContactMethod("EMAIL")
+            .withUserRights([osefUserRight])
             .build(),
           updatedEstablishment: new EstablishmentAggregateBuilder()
-            .withContact(
-              new ContactEntityBuilder().withContactMethod("IN_PERSON").build(),
-            )
+            .withContactMethod("IN_PERSON")
+            .withUserRights([osefUserRight])
+            .withEstablishmentUpdatedAt(updatedAt)
             .build(),
           title: "updates an establishment existing contact",
         },
@@ -1548,6 +1583,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               new EstablishmentEntityBuilder()
                 .withAdditionalInformation("my additionnal info")
                 .withCustomizedName("my customize name")
+                .withContactMethod("EMAIL")
                 .withFitForDisabledWorkers(true)
                 .withIsCommited(true)
                 .withLastInseeCheck(new Date())
@@ -1557,6 +1593,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withAcquisition(aquisition)
                 .build(),
             )
+            .withUserRights([osefUserRight])
             .build(),
           updatedEstablishment: new EstablishmentAggregateBuilder()
             .withEstablishment(
@@ -1566,6 +1603,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   .withCustomizedName("my customize name")
                   .withFitForDisabledWorkers(true)
                   .withIsCommited(true)
+                  .withContactMethod("IN_PERSON")
                   .withLastInseeCheck(new Date())
                   .withNextAvailabilityDate(new Date())
                   .withUpdatedAt(new Date())
@@ -1583,6 +1621,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withAcquisition(aquisition)
                 .build(),
             )
+            .withUserRights([osefUserRight])
             .build(),
           title: "remove optional values",
         },
@@ -1599,7 +1638,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           );
 
           expectToEqual(
-            await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+            await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
             [originalEstablishment],
           );
 
@@ -1609,7 +1648,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           );
 
           expectToEqual(
-            await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+            await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
             [updatedEstablishment],
           );
         },
@@ -1651,15 +1690,15 @@ describe("PgEstablishmentAggregateRepository", () => {
           .withOffers([
             new OfferEntityBuilder().withRomeCode(matchingRomeCode).build(),
           ])
-          .withContactId(uuid())
           .withLocationId(uuid())
+          .withUserRights([osefUserRight])
           .build();
       const establishmentWithoutCodeOfferMatching =
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("22222222222222")
           .withOffers([new OfferEntityBuilder().withRomeCode("A1201").build()])
-          .withContactId(uuid())
           .withLocationId(uuid())
+          .withUserRights([osefUserRight])
           .build();
 
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1695,6 +1734,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           students: false,
           jobSeekers: false,
         })
+        .withUserRights([osefUserRight])
         .build();
 
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1702,7 +1742,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       );
 
       expectToEqual(
-        await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+        await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
         [establishmentAggregate],
       );
 
@@ -1711,7 +1751,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       );
 
       expectToEqual(
-        await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+        await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
         [],
       );
     });
@@ -1736,7 +1776,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
         ])
         .withLocationId(uuid())
-        .withContactId(uuid())
+        .withUserRights([osefUserRight])
         .build();
       const establishmentToKeep = new EstablishmentAggregateBuilder()
         .withEstablishmentSiret("22222222222222")
@@ -1749,7 +1789,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             .build(),
         ])
         .withLocationId(uuid())
-        .withContactId(uuid())
+        .withUserRights([osefUserRight])
         .build();
 
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1760,7 +1800,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       );
 
       expectToEqual(
-        await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+        await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
         [establishmentToRemove, establishmentToKeep],
       );
 
@@ -1770,52 +1810,73 @@ describe("PgEstablishmentAggregateRepository", () => {
       );
 
       expectToEqual(
-        await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+        await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
         [establishmentToKeep],
       );
     });
   });
 
   describe("getEstablishmentAggregates", () => {
-    const email: Email = "existing@email-in-repo.fr";
+    const user1 = new UserBuilder()
+      .withId(uuid())
+      .withEmail("existing@email-in-repo.fr")
+      .build();
+    const user2 = new UserBuilder()
+      .withId(uuid())
+      .withEmail("another@email-in-repo.fr")
+      .build();
 
     const establishmentWithoutEmail = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret("00000000000001")
       .withEstablishmentCreatedAt(new Date())
       .withLocationId(uuid())
-      .withContact(
-        new ContactEntityBuilder()
-          .withId(uuid())
-          .withEmail("another@email-in-repo.fr")
-          .build(),
-      )
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "doing stuff",
+          phone: "+336887875544",
+          userId: user1.id,
+        },
+      ])
       .build();
 
-    const establishmentWithEmail1 = new EstablishmentAggregateBuilder()
+    const establishmentWithUserId1 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret("00000000000002")
       .withLocationId(uuid())
-      .withContact(
-        new ContactEntityBuilder().withId(uuid()).withEmail(email).build(),
-      )
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "doing other stuff",
+          phone: "+33688445577",
+          userId: user2.id,
+        },
+      ])
       .build();
 
-    const establishmentWithEmail2 = new EstablishmentAggregateBuilder()
+    const establishmentWithUserId2 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret("00000000000003")
       .withLocationId(uuid())
-      .withContact(
-        new ContactEntityBuilder().withId(uuid()).withEmail(email).build(),
-      )
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "doing other stuffffffffffffff",
+          phone: "+33688445566",
+          userId: user2.id,
+        },
+      ])
       .build();
 
     beforeEach(async () => {
+      await pgUserRepository.save(user1, "proConnect");
+      await pgUserRepository.save(user2, "proConnect");
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         establishmentWithoutEmail,
       );
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-        establishmentWithEmail1,
+        establishmentWithUserId1,
       );
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-        establishmentWithEmail2,
+        establishmentWithUserId2,
       );
     });
 
@@ -1823,7 +1884,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       expectToEqual(
         await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
           {
-            contactEmail: "not-existing@email-in-repo.fr",
+            userId: uuid(),
           },
         ),
         [],
@@ -1834,10 +1895,10 @@ describe("PgEstablishmentAggregateRepository", () => {
       expectToEqual(
         await pgEstablishmentAggregateRepository.getEstablishmentAggregatesByFilters(
           {
-            contactEmail: email,
+            userId: user2.id,
           },
         ),
-        [establishmentWithEmail1, establishmentWithEmail2],
+        [establishmentWithUserId1, establishmentWithUserId2],
       );
     });
   });
@@ -1847,21 +1908,25 @@ describe("PgEstablishmentAggregateRepository", () => {
 
     const establishmentNotSearchable = new EstablishmentAggregateBuilder()
       .withIsSearchable(false)
+      .withUserRights([osefUserRight])
       .build();
 
     const establishmentIsNotSearchableAndMaxContactPerMonth0 =
       new EstablishmentAggregateBuilder(establishmentNotSearchable)
         .withMaxContactsPerMonth(0)
+        .withUserRights([osefUserRight])
         .build();
 
     const establishmentIsNotSearchableAndMaxContactPerMonth1 =
       new EstablishmentAggregateBuilder(establishmentNotSearchable)
         .withMaxContactsPerMonth(1)
+        .withUserRights([osefUserRight])
         .build();
 
     const establishmentIsNotSearchableAndMaxContactPerMonth2 =
       new EstablishmentAggregateBuilder(establishmentNotSearchable)
         .withMaxContactsPerMonth(2)
+        .withUserRights([osefUserRight])
         .build();
 
     const discussionAfterSinceDate = new DiscussionBuilder()
@@ -1895,7 +1960,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth2,
@@ -1920,7 +1985,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth2,
@@ -1946,7 +2011,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth1,
@@ -1973,7 +2038,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishmentIsNotSearchableAndMaxContactPerMonth0],
         );
       });
@@ -1992,7 +2057,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishmentIsNotSearchableAndMaxContactPerMonth0],
         );
       });
@@ -2011,7 +2076,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregates(),
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishmentIsNotSearchableAndMaxContactPerMonth1],
         );
       });
@@ -2175,21 +2240,21 @@ const establishmentWithOfferA1101_AtPosition =
     .withEstablishmentSiret("00000000000001")
     .withLocations([locationOfSearchPosition])
     .withOffers([offer_A1101_11987])
-    .withContactId(uuid())
+    .withUserRights([osefUserRight])
     .build();
 
 const establishmentWithOfferA1101_close = new EstablishmentAggregateBuilder()
   .withEstablishmentSiret("00000000000002")
   .withLocations([locationOfCloseSearchPosition])
   .withOffers([offer_A1101_11987])
-  .withContactId(uuid())
+  .withUserRights([osefUserRight])
   .build();
 
 const establishmentWithOfferA1101_far = new EstablishmentAggregateBuilder()
   .withEstablishmentSiret("00000000000003")
   .withLocations([locationOfFarFromSearchedPosition])
   .withOffers([offer_A1101_11987])
-  .withContactId(uuid())
+  .withUserRights([osefUserRight])
   .build();
 
 const searchableByAllEstablishment = new EstablishmentAggregateBuilder()
@@ -2199,7 +2264,7 @@ const searchableByAllEstablishment = new EstablishmentAggregateBuilder()
   .withLocations([
     new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
   ])
-  .withContactId(uuid())
+  .withUserRights([osefUserRight])
   .build();
 const searchableByStudentsEstablishment = new EstablishmentAggregateBuilder()
   .withEstablishmentSiret("00000000000002")
@@ -2208,7 +2273,7 @@ const searchableByStudentsEstablishment = new EstablishmentAggregateBuilder()
   .withLocations([
     new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
   ])
-  .withContactId(uuid())
+  .withUserRights([osefUserRight])
   .build();
 const searchableByJobSeekerEstablishment = new EstablishmentAggregateBuilder()
   .withEstablishmentSiret("00000000000003")
@@ -2217,13 +2282,12 @@ const searchableByJobSeekerEstablishment = new EstablishmentAggregateBuilder()
   .withLocations([
     new LocationBuilder(locationOfSearchPosition).withId(uuid()).build(),
   ])
-  .withContactId(uuid())
+  .withUserRights([osefUserRight])
   .build();
 
 const establishmentCuvisteAtSaintesAndVeaux =
   new EstablishmentAggregateBuilder()
     .withEstablishmentSiret("78000403200029")
-    .withContactId("11111111-1111-4444-1111-111111110001")
     .withOffers([
       new OfferEntityBuilder(cuvisteOffer).withCreatedAt(new Date()).build(),
     ])
@@ -2231,12 +2295,12 @@ const establishmentCuvisteAtSaintesAndVeaux =
       bassompierreSaintesLocation,
       veauxLocation, // outside geographical area
     ])
+    .withUserRights([osefUserRight])
     .build();
 
 const establishmentCuvisteAtChaniersAndLaRochelle =
   new EstablishmentAggregateBuilder()
     .withEstablishmentSiret("78000403200030")
-    .withContactId("11111111-1111-4444-1111-111111110002")
     .withOffers([
       new OfferEntityBuilder(cuvisteOffer)
         .withCreatedAt(subDays(new Date(), 1))
@@ -2246,4 +2310,5 @@ const establishmentCuvisteAtChaniersAndLaRochelle =
       portHubleChaniersLocation,
       tourDeLaChaineLaRochelleLocation, // outside geographical area (52km)
     ])
+    .withUserRights([osefUserRight])
     .build();
