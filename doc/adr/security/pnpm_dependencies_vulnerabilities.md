@@ -42,6 +42,6 @@ Mettre en place une procédure en cas de vulnérabilité constatée afin de ne p
   3. Remplacer la dep principale par une autre dep qui fait le même besoin et voir si la vulnérabilité disparait.
   4. Faire un **overrides** pnpm sur la sous dépendance pour forcer la version minimum qui résoud la vulnérabilité.
 
-  > Attention la dep pourrait ne plus fonctionner correctement. Il vaut mieux appliquer la version qui reste avec la même version majeure (ex: 3.0.3 > 3.2.1 au lieu de choisir 4.0.1) car en règle de versionning on reste normalement retropcompatible.
+  > Attention la dep pourrait ne plus fonctionner correctement. Il vaut mieux appliquer la version qui reste avec la même version majeure (ex : 3.0.3 > 3.2.1 au lieu de choisir 4.0.1) car en règle de versioning on reste normalement retrocompatible.
 
   > En cas de déclaration d'overrides, il faut lancer `pnpm i` pour mettre à jour le `pnpm.lock` .
