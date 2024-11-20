@@ -5,13 +5,19 @@ import {
   GroupOptions,
   Location,
   SearchResultDto,
+  UserBuilder,
   expectObjectInArrayToMatch,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import {
+  EstablishmentEntity,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentEntity";
 import { GroupEntity } from "../entities/GroupEntity";
 import {
   EstablishmentAggregateBuilder,
@@ -21,36 +27,44 @@ import {
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgGroupRepository } from "./PgGroupRepository";
 
-const groupOptions: GroupOptions = {
-  heroHeader: {
-    title: "My hero header title",
-    description: "My hero header description",
-    logoUrl: "https://my-logo-url.com",
-  },
-  tintColor: "red",
-};
-
-const siret1 = "11112222111122";
-const siret2 = "33334444333344";
-
-const carrefourGroup: Group = {
-  slug: "carrefour",
-  name: "Carrefour",
-  options: groupOptions,
-};
-const carrefourGroupEntity: GroupEntity = {
-  ...carrefourGroup,
-  sirets: [siret1, siret2],
-};
-
-const laMieCalineGroup: GroupEntity = {
-  slug: "l-amie-caline",
-  name: "L'amie caline",
-  sirets: [],
-  options: groupOptions,
-};
-
 describe("PgEstablishmentGroupRepository", () => {
+  const groupOptions: GroupOptions = {
+    heroHeader: {
+      title: "My hero header title",
+      description: "My hero header description",
+      logoUrl: "https://my-logo-url.com",
+    },
+    tintColor: "red",
+  };
+
+  const siret1 = "11112222111122";
+  const siret2 = "33334444333344";
+
+  const carrefourGroup: Group = {
+    slug: "carrefour",
+    name: "Carrefour",
+    options: groupOptions,
+  };
+  const carrefourGroupEntity: GroupEntity = {
+    ...carrefourGroup,
+    sirets: [siret1, siret2],
+  };
+
+  const laMieCalineGroup: GroupEntity = {
+    slug: "l-amie-caline",
+    name: "L'amie caline",
+    sirets: [],
+    options: groupOptions,
+  };
+
+  const user = new UserBuilder().withId(uuid()).build();
+  const userRight: EstablishmentUserRight = {
+    role: "establishment-admin",
+    userId: user.id,
+    job: "",
+    phone: "",
+  };
+
   let pool: Pool;
   let db: KyselyDb;
   let pgEstablishmentGroupRepository: PgGroupRepository;
@@ -68,11 +82,14 @@ describe("PgEstablishmentGroupRepository", () => {
   beforeEach(async () => {
     await db.deleteFrom("groups__sirets").execute();
     await db.deleteFrom("groups").execute();
-    await db.deleteFrom("establishments_contacts").execute();
+    await db.deleteFrom("establishments__users").execute();
     await db.deleteFrom("establishments_location_infos").execute();
     await db.deleteFrom("establishments_location_positions").execute();
     await db.deleteFrom("establishments").execute();
     await db.deleteFrom("discussions").execute();
+    await db.deleteFrom("users").execute();
+
+    await new PgUserRepository(db).save(user, "proConnect");
   });
 
   afterAll(async () => {
@@ -137,14 +154,13 @@ describe("PgEstablishmentGroupRepository", () => {
     const establishmentAggregate1 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(carrefourGroupEntity.sirets[0])
       .withScore(15)
-      .withContactId("11111111-1111-4444-1111-111111111111")
       .withLocationId("aaaaaaaa-aaaa-4444-bbbb-bbbbbbbbbbbb")
       .withOffers([offerBoulanger, offerAideBoulanger, offerBoucher])
+      .withUserRights([userRight])
       .build();
 
     const establishmentAggregate2 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(carrefourGroupEntity.sirets[1])
-      .withContactId("22222222-2222-4444-2222-222222222222")
       .withLocations([
         defaultLocation,
         {
@@ -162,6 +178,7 @@ describe("PgEstablishmentGroupRepository", () => {
         },
       ])
       .withOffers([offerVendeurEnAlimentationGenerale])
+      .withUserRights([userRight])
       .build();
 
     await pgEstablishmentGroupRepository.save(carrefourGroupEntity);
