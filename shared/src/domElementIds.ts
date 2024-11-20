@@ -647,7 +647,7 @@ export const domElementIds = {
   editFormEstablishmentRoute: {},
   error: {},
   conventionMiniStageRoute: {},
-  agencyDashboardMain: {
+  agencyDashboard: {
     login: {
       inclusionConnectButton: "im-login-form__inclusion-connect-button--agency",
     },

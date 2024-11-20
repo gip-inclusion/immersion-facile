@@ -85,7 +85,7 @@ const admin = defineRoute(
 );
 
 const agencyDashboard = defineRoute(inclusionConnectedParams, () => [
-  `/${frontRoutes.agencyDashboardMain}`,
+  `/${frontRoutes.agencyDashboard}`,
   "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
 ]);
 

@@ -84,7 +84,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             await authenticateWithInclusionCode.execute({
               code: "my-inclusion-code",
               state: initialOngoingOAuth.state,
-              page: "agencyDashboardMain",
+              page: "agencyDashboard",
             });
 
             expectObjectInArrayToMatch(uow.userRepository.users, [
@@ -105,7 +105,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             await authenticateWithInclusionCode.execute({
               code: "my-inclusion-code",
               state: initialOngoingOAuth.state,
-              page: "agencyDashboardMain",
+              page: "agencyDashboard",
             });
 
             expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
@@ -125,7 +125,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             await authenticateWithInclusionCode.execute({
               code: "my-inclusion-code",
               state: initialOngoingOAuth.state,
-              page: "agencyDashboardMain",
+              page: "agencyDashboard",
             });
 
             expectObjectInArrayToMatch(uow.outboxRepository.events, [
@@ -165,7 +165,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             await authenticateWithInclusionCode.execute({
               code: "my-inclusion-code",
               state: initialOngoingOAuth.state,
-              page: "agencyDashboardMain",
+              page: "agencyDashboard",
             });
 
             expectObjectInArrayToMatch(uow.userRepository.users, [
@@ -201,7 +201,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             await authenticateWithInclusionCode.execute({
               code: "my-inclusion-code",
               state: initialOngoingOAuth.state,
-              page: "agencyDashboardMain",
+              page: "agencyDashboard",
             });
 
             expectObjectInArrayToMatch(uow.userRepository.users, [
@@ -283,7 +283,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
                 lastName: updatedUser.lastName,
                 sub: externalId,
               }).initialOngoingOAuth.state,
-              page: "agencyDashboardMain",
+              page: "agencyDashboard",
             });
 
             expectToEqual(uow.userRepository.users, [updatedUser]);
@@ -338,7 +338,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           const params: AuthenticateWithOAuthCodeParams = {
             code: "my-inclusion-code",
             state: "my-state",
-            page: "agencyDashboardMain",
+            page: "agencyDashboard",
           };
           await expectPromiseToFailWithError(
             authenticateWithInclusionCode.execute(params),
@@ -372,7 +372,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             authenticateWithInclusionCode.execute({
               code: "my-inclusion-code",
               state: "my-state",
-              page: "agencyDashboardMain",
+              page: "agencyDashboard",
             }),
             errors.inclusionConnect.nonceMismatch(),
           );

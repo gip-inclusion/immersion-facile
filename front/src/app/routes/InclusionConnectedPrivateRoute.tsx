@@ -94,6 +94,14 @@ const providers: Record<
   },
 };
 
+const getPage = (
+  route: InclusionConnectPrivateRoute,
+): AllowedStartInclusionConnectLoginPage => {
+  if (route.name === "establishmentDashboard") return "establishmentDashboard";
+  if (route.name === "agencyDashboardMain") return "agencyDashboard";
+  return "admin";
+};
+
 export const InclusionConnectedPrivateRoute = ({
   route,
   children,
@@ -117,12 +125,6 @@ export const InclusionConnectedPrivateRoute = ({
   const afterLoginRedirectionUrl = useAppSelector(
     authSelectors.afterLoginRedirectionUrl,
   );
-
-  const page: AllowedStartInclusionConnectLoginPage =
-    route.name === "establishmentDashboard" ||
-    route.name === "agencyDashboardMain"
-      ? route.name
-      : "admin";
 
   useEffect(() => {
     const {
@@ -159,6 +161,8 @@ export const InclusionConnectedPrivateRoute = ({
     if (!authIsLoading && isInclusionConnected && afterLoginRedirectionUrl)
       dispatch(authSlice.actions.redirectAndClearUrlAfterLoginRequested());
   }, [authIsLoading, isInclusionConnected, afterLoginRedirectionUrl, dispatch]);
+
+  const page = getPage(route);
 
   if (!isInclusionConnected) {
     return (

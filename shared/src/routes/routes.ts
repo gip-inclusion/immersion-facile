@@ -1,7 +1,7 @@
 export type AllowedStartInclusionConnectLoginPage =
   (typeof allowedStartInclusionConnectLoginPages)[number];
 export const allowedStartInclusionConnectLoginPages = [
-  "agencyDashboardMain",
+  "agencyDashboard",
   "establishmentDashboard",
   "admin",
 ] as const;
