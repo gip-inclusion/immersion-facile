@@ -1,9 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import React from "react";
 import {
   AgencyRight,
   InclusionConnectedUser,
+  activeAgencyStatuses,
   addressDtoToString,
   agencyKindToLabelIncludingIF,
 } from "shared";
@@ -15,16 +17,21 @@ import { routes } from "src/app/routes/routes";
 type UserDetailProps = {
   title: string;
   userWithRights: InclusionConnectedUser;
+  editInformationsLink?: string;
 };
 
-export const UserDetail = ({ title, userWithRights }: UserDetailProps) => {
+export const UserDetail = ({
+  title,
+  userWithRights,
+  editInformationsLink,
+}: UserDetailProps) => {
   return (
     <div>
       <h1>{title}</h1>
 
-      <p className={fr.cx("fr-text--bold")}>Informations personnelles</p>
+      <h2 className={fr.cx("fr-h4")}>Informations personnelles</h2>
 
-      <ul className={fr.cx("fr-text--sm")}>
+      <ul className={fr.cx("fr-text--sm", "fr-mb-2w")}>
         <li>Id de l'utilisateur: {userWithRights.id}</li>
         <li>Email : {userWithRights.email}</li>
         {userWithRights.firstName && (
@@ -32,6 +39,19 @@ export const UserDetail = ({ title, userWithRights }: UserDetailProps) => {
         )}
         {userWithRights.lastName && <li>Nom : {userWithRights.lastName}</li>}
       </ul>
+
+      {editInformationsLink && (
+        <Button
+          className={fr.cx("fr-mb-4w")}
+          priority="secondary"
+          linkProps={{
+            href: editInformationsLink,
+            target: "_blank",
+          }}
+        >
+          Modifier mes informations
+        </Button>
+      )}
 
       <AgenciesTable
         agencyRights={[...userWithRights.agencyRights].sort((a, b) =>
@@ -48,42 +68,64 @@ const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
 
   return (
     <>
-      <p className={fr.cx("fr-text--bold")}>
+      <h2 className={fr.cx("fr-h4")}>
         Organismes rattachés au profil ({agencyRights.length} agences)
-      </p>
+      </h2>
 
       <Table
         headers={[
           "Nom d'agence",
-          "Type d'agence",
+          "Carractéristiques de l'agence",
           "Roles",
           "Reçoit les notifications",
           "Actions",
         ]}
         data={agencyRights.map((agencyRight) => {
+          const viewAgencyProps = !agencyRight.roles.includes("agency-admin")
+            ? {
+                disabled: true,
+                title:
+                  "Vous n'êtes pas administrateur de cette agence. Seuls les administrateurs de l'agence peuvent voir le détail.",
+              }
+            : {
+                linkProps: routes.adminAgencyDetail({
+                  agencyId: agencyRight.agency.id,
+                }).link,
+              };
+
           return [
             <>
-              <AgencyTag
-                refersToAgencyName={agencyRight.agency.refersToAgencyName}
-              />
-              <AgencyStatusBadge status={agencyRight.agency.status} />
-              <br />
-              <span>{agencyRight.agency.name}</span>
-              <br />
+              {agencyRight.agency.name}
               <span className={fr.cx("fr-hint-text")}>
                 {addressDtoToString(agencyRight.agency.address)}
               </span>
             </>,
-            agencyKindToLabelIncludingIF[agencyRight.agency.kind],
+            <ul className={fr.cx("fr-raw-list")}>
+              <li>
+                <AgencyTag
+                  refersToAgencyName={agencyRight.agency.refersToAgencyName}
+                />
+              </li>
+              {!activeAgencyStatuses.includes(agencyRight.agency.status) && (
+                <li>
+                  <AgencyStatusBadge status={agencyRight.agency.status} />
+                </li>
+              )}
+              <li>
+                Type : {agencyKindToLabelIncludingIF[agencyRight.agency.kind]}
+              </li>
+            </ul>,
             agencyRight.roles
               .map((role) => agencyRoleToDisplay[role].label)
               .join(", "),
             agencyRight.isNotifiedByEmail ? "Oui" : "Non",
-            <a
-              {...routes.adminAgencyDetail({ agencyId: agencyRight.agency.id })}
+            <Button
+              priority="tertiary no outline"
+              size="small"
+              {...viewAgencyProps}
             >
               Voir l'agence
-            </a>,
+            </Button>,
           ];
         })}
       />

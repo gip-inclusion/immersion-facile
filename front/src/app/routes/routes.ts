@@ -131,6 +131,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   //   { agencyId: param.path.string },
   //   ({ agencyId }) => `/${agencyId}`,
   // ),
+  myProfile: defineRoute(inclusionConnectedParams, () => "/mon-profil"),
   beneficiaryDashboard: defineRoute(`/${frontRoutes.beneficiaryDashboard}`),
   conventionCustomAgency: defineRoute(
     {
