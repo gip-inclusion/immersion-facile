@@ -5,6 +5,7 @@ import {
   DiscussionBuilder,
   DiscussionDto,
   Exchange,
+  UserBuilder,
   WithAcquisition,
   errors,
   expectPromiseToFailWithError,
@@ -13,6 +14,8 @@ import {
 import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
@@ -42,18 +45,23 @@ describe("PgDiscussionRepository", () => {
   let establishmentAggregateRepo: PgEstablishmentAggregateRepository;
   let db: KyselyDb;
 
+  const user = new UserBuilder().withId(new UuidV4Generator().new()).build();
+
   beforeAll(async () => {
     pool = getTestPgPool();
   });
 
   beforeEach(async () => {
     db = makeKyselyDb(pool);
-    await db.deleteFrom("establishments_contacts").execute();
+    await db.deleteFrom("establishments__users").execute();
     await db.deleteFrom("establishments").execute();
     await db.deleteFrom("discussions").execute();
     await db.deleteFrom("exchanges").execute();
+    await db.deleteFrom("users").execute();
     pgDiscussionRepository = new PgDiscussionRepository(db);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
+
+    await new PgUserRepository(db).save(user, "proConnect");
   });
 
   afterAll(async () => {
@@ -781,7 +789,7 @@ describe("PgDiscussionRepository", () => {
           .withUserRights([
             {
               role: "establishment-admin",
-              userId: "osef",
+              userId: user.id,
               job: "",
               phone: "",
             },
@@ -868,7 +876,7 @@ describe("PgDiscussionRepository", () => {
           .withUserRights([
             {
               role: "establishment-admin",
-              userId: "osef",
+              userId: user.id,
               job: "",
               phone: "",
             },
