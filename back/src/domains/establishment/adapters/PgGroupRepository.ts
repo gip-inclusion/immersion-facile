@@ -48,7 +48,6 @@ export class PgGroupRepository implements GroupRepository {
       .leftJoin("groups as g", "g.slug", "gs.group_slug")
       .leftJoin("establishments as e", "e.siret", "gs.siret")
       .leftJoin("immersion_offers as io", "io.siret", "e.siret")
-      .leftJoin("establishments_contacts as ec", "ec.siret", "e.siret")
       .leftJoin(
         "public_appellations_data as ap",
         "ap.ogr_appellation",
@@ -75,7 +74,7 @@ export class PgGroupRepository implements GroupRepository {
         "io.rome_code",
         "r.libelle_rome",
         "naf.class_label",
-        "ec.contact_mode",
+        "e.contact_mode",
         "loc.id",
       ])
       .select(({ ref }) =>
@@ -108,7 +107,7 @@ export class PgGroupRepository implements GroupRepository {
               city: ref("loc.city"),
               departmentCode: ref("loc.department_code"),
             }),
-            contactMode: ref("ec.contact_mode"),
+            contactMode: ref("e.contact_mode"),
             numberOfEmployeeRange: ref("e.number_employees"),
             locationId: ref("loc.id"),
             createdAt: sql<DateTimeIsoString>`date_to_iso(e.created_at)`,
