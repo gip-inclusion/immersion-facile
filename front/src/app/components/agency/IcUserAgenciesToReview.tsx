@@ -146,7 +146,7 @@ export const IcUserAgenciesToReview = ({
                 }}
                 closeModal={closeIcUserRegistrationToAgencyModal}
                 mode={modalProps.mode}
-                agency={selectedAgency}
+                agencyHasRefersTo={!!selectedAgency.refersToAgencyId}
               />
             )
           ) : (
