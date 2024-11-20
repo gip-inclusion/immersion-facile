@@ -215,7 +215,7 @@ export const AgencyDashboardPage = ({
                 ...tab,
                 isDefault: currentTab === tab.tabId,
               }))}
-              id={domElementIds.agencyDashboardMain.dashboard.tabContainer}
+              id={domElementIds.agencyDashboard.dashboard.tabContainer}
               selectedTabId={currentTab}
               onTabChange={(tab) => {
                 if (isAgencyDashboardTabRoute(tab)) routes[tab]().push();

@@ -91,7 +91,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         await authenticateWithInclusionCode.execute({
           code: "my-inclusion-code",
           state: initialOngoingOAuth.state,
-          page: "agencyDashboardMain",
+          page: "agencyDashboard",
         });
 
         const expectedOngoingOauth =
