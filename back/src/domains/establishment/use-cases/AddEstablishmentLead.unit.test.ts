@@ -89,7 +89,17 @@ describe("Add EstablishmentLead", () => {
     const siret = convention.siret;
 
     const establishmentAggregate: EstablishmentAggregate =
-      new EstablishmentAggregateBuilder().withEstablishmentSiret(siret).build();
+      new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret(siret)
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "osef",
+          },
+        ])
+        .build();
 
     await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate,
