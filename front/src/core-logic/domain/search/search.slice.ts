@@ -5,6 +5,7 @@ import {
   SearchQueryParamsDto,
   SearchResultDto,
   SearchResultQuery,
+  SiretAndAppellationDto,
   WithAcquisition,
 } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
@@ -106,8 +107,28 @@ export const searchSlice = createSlice({
         errorMessage: action.payload,
       };
     },
-    clearSearchRequested: (state) => {
+    clearSearchStatusRequested: (state) => {
       state.searchStatus = initialState.searchStatus;
+    },
+    externalSearchResultRequested: (
+      state,
+      _action: PayloadAction<SiretAndAppellationDto>,
+    ) => {
+      state.isLoading = true;
+    },
+    externalSearchResultSucceeded: (
+      state,
+      action: PayloadAction<SearchResultDto>,
+    ) => {
+      state.currentSearchResult = action.payload;
+      state.isLoading = false;
+    },
+    externalSearchResultFailed: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.feedback = {
+        kind: "errored",
+        errorMessage: action.payload,
+      };
     },
   },
 });

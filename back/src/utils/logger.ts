@@ -14,6 +14,7 @@ import {
   ConventionId,
   PeExternalId,
   SearchQueryParamsDto,
+  SiretDto,
 } from "shared";
 import { HttpResponse } from "shared-routes";
 import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
@@ -116,6 +117,8 @@ type LoggerParams = Partial<{
   searchLBB: LaBonneBoiteRequestParams;
   searchMade: SearchMadeEntity;
   searchParams: SearchQueryParamsDto | undefined;
+  siret: SiretDto;
+  romeLabel: string;
   franceTravailGatewayStatus: "success" | "total" | "error";
   logStatus: LogStatus;
   authorisationStatus: AuthorisationStatus;
@@ -188,6 +191,8 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       topic,
       useCaseName,
       searchParams,
+      siret,
+      romeLabel,
       ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
@@ -221,6 +226,8 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         useCaseName,
         searchParams,
         partnerApiCall,
+        siret,
+        romeLabel,
       };
 
       const opacifiedWithoutNullOrUndefined = pickBy(

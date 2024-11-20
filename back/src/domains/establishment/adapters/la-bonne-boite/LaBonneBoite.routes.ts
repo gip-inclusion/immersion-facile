@@ -1,4 +1,9 @@
-import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import {
+  AbsoluteUrl,
+  WithSiretDto,
+  siretSchema,
+  withAuthorizationHeaders,
+} from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import { LaBonneBoiteApiResultV2Props } from "./LaBonneBoiteCompanyDto";
@@ -38,16 +43,29 @@ export type LaBonneBoiteRoutes = ReturnType<typeof createLbbRoutes>;
 const lbbQueryParamsSchema: z.Schema<HttpGetLaBonneBoiteCompanyParamsV2> =
   z.any();
 
+const lbbQueryGetCompanyParamsSchema: z.Schema<WithSiretDto> = z.object({
+  siret: siretSchema,
+});
+
 // TODO: define LBBv2 schema if more production typing mismatch issues from response body
 const lbbResponseSchema: z.Schema<HttpGetLaBonneBoiteCompanyResponseV2> =
   z.any();
 
 export const createLbbRoutes = (peApiUrl: AbsoluteUrl) =>
   defineRoutes({
-    getCompany: defineRoute({
+    getCompanies: defineRoute({
       method: "get",
       url: `${peApiUrl}/partenaire/labonneboite/v2/recherche`,
       queryParamsSchema: lbbQueryParamsSchema,
+      ...withAuthorizationHeaders,
+      responses: {
+        200: lbbResponseSchema,
+      },
+    }),
+    getCompany: defineRoute({
+      method: "get",
+      url: `${peApiUrl}/partenaire/labonneboite/v2/potentielEmbauche`,
+      queryParamsSchema: lbbQueryGetCompanyParamsSchema,
       ...withAuthorizationHeaders,
       responses: {
         200: lbbResponseSchema,

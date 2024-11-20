@@ -1,7 +1,7 @@
-import { SearchResultDto, SiretDto } from "shared";
+import { RomeDto, SearchResultDto, SiretDto } from "shared";
 
 export type LaBonneBoiteApiResultV2Props = {
-  rome: string;
+  rome: string | undefined;
   id: number;
   siret: SiretDto;
   email: string;
@@ -36,13 +36,16 @@ export class LaBonneBoiteCompanyDto {
     const isNafInterim = companyNaf === "7820Z";
 
     const isNafAutreServiceWithRomeElevageOrToilettage =
-      companyNaf.startsWith("9609") && ["A1503", "A1408"].includes(rome);
+      rome &&
+      companyNaf.startsWith("9609") &&
+      ["A1503", "A1408"].includes(rome);
 
     const isNafRestaurationRapideWithRomeBoulangerie =
       companyNaf === "5610C" && rome === "D1102";
 
     const isRomeIgnoredForPublicAdministration =
       companyNaf.startsWith("8411") &&
+      rome &&
       [
         "D1202",
         "G1404",
@@ -70,7 +73,7 @@ export class LaBonneBoiteCompanyDto {
     return this.props.siret;
   }
 
-  public toSearchResult(romeLabel: string): SearchResultDto {
+  public toSearchResult(romeDto: RomeDto): SearchResultDto {
     return {
       siret: this.props.siret,
       establishmentScore: 0,
@@ -93,11 +96,12 @@ export class LaBonneBoiteCompanyDto {
         lat: this.props.location.lat,
         lon: this.props.location.lon,
       },
-      rome: this.props.rome,
-      romeLabel,
+      rome: romeDto.romeCode,
+      romeLabel: romeDto.romeLabel,
       voluntaryToImmersion: false,
       website: "",
       locationId: null,
+      urlOfPartner: `https://labonneboite.francetravail.fr/entreprise/${this.props.siret}`,
     };
   }
 }

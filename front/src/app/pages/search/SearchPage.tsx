@@ -173,7 +173,7 @@ export const SearchPage = ({
 
   useEffect(() => {
     return () => {
-      dispatch(searchSlice.actions.clearSearchRequested());
+      dispatch(searchSlice.actions.clearSearchStatusRequested());
     };
   }, [dispatch]);
 

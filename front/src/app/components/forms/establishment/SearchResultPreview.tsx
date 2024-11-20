@@ -79,6 +79,10 @@ export const SearchResultPreview = ({
                 </div>
               </SearchResultIllustration>
             }
+            linkProps={{
+              href: "#",
+              onClick: () => {},
+            }}
             establishment={establishmentToSearchResultPreview(establishment)}
             preview
           />

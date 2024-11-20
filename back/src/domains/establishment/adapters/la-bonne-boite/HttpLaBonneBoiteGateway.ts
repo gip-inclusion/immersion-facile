@@ -1,5 +1,5 @@
 import Bottleneck from "bottleneck";
-import { SearchResultDto, castError } from "shared";
+import { RomeDto, SearchResultDto, SiretDto, castError } from "shared";
 import { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
 import { PoleEmploiGateway } from "../../../convention/ports/PoleEmploiGateway";
@@ -41,22 +41,12 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     rome,
     romeLabel,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
-    logger.warn({
-      message: "searchCompanies",
-      searchLBB: {
-        romeLabel,
-        distanceKm,
-        lat,
-        lon,
-        rome,
-      },
-    });
     return this.#limiter
       .schedule(async () => {
         const { access_token } = await this.poleEmploiGateway.getAccessToken(
           `application_${this.poleEmploiClientId} ${lbbV2App}`,
         );
-        return this.httpClient.getCompany({
+        return this.httpClient.getCompanies({
           headers: {
             authorization: createAuthorization(access_token),
           },
@@ -79,7 +69,9 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
                   new LaBonneBoiteCompanyDto(props),
               )
               .filter((result) => result.isCompanyRelevant())
-              .map((result) => result.toSearchResult(romeLabel))
+              .map((result) =>
+                result.toSearchResult({ romeCode: rome, romeLabel }),
+              )
           : [];
       })
       .catch((error) => {
@@ -97,6 +89,47 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
         throw error;
       });
   }
+  public async fetchCompanyBySiret(
+    siret: SiretDto,
+    romeDto: RomeDto,
+  ): Promise<SearchResultDto | null> {
+    return this.#limiter
+      .schedule(async () => {
+        const { access_token } = await this.poleEmploiGateway.getAccessToken(
+          `application_${this.poleEmploiClientId} ${lbbV2App}`,
+        );
+        return this.httpClient.getCompany({
+          headers: {
+            authorization: createAuthorization(access_token),
+          },
+          queryParams: {
+            siret,
+          },
+        });
+      })
+      .then(({ body }) => {
+        const items = body?.items;
+        const item = items
+          ? items
+              .map(
+                (props: LaBonneBoiteApiResultV2Props) =>
+                  new LaBonneBoiteCompanyDto(props),
+              )
+              .filter((result) => result.isCompanyRelevant())
+              .map((result) => result.toSearchResult(romeDto))
+              .at(0)
+          : null;
+        return item ?? null;
+      })
+      .catch((error) => {
+        logger.error({
+          error: castError(error),
+          message: "searchCompanies_error",
+          siret,
+          romeLabel: romeDto.romeLabel,
+        });
+        throw error;
+      });
+  }
 }
-
 const createAuthorization = (accessToken: string) => `Bearer ${accessToken}`;

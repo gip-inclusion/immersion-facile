@@ -95,7 +95,10 @@ export const LayoutHeader = () => {
               {
                 text: "Mon profil",
                 isActive: false,
-                linkProps: routes.myProfile().link,
+                linkProps: {
+                  ...routes.myProfile().link,
+                  id: quickAccessIds.myAccount,
+                },
               },
             ]
           : []),

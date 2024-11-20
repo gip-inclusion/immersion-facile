@@ -94,6 +94,12 @@ export class SimulatedSearchGateway implements SearchGateway {
     return this.#simulateSearch(searchParams);
   }
 
+  public getExternalSearchResult$(
+    _params: SiretAndAppellationDto,
+  ): Observable<SearchResultDto> {
+    return of(this.#simulatedResponse).pipe(delay(this.#simulatedLatency));
+  }
+
   #simulateSearch(searchParams: SearchQueryParamsDto) {
     const results$ = of(this.#seedResults ?? seedSearchResults);
     if (searchParams.voluntaryToImmersion === undefined) return results$;

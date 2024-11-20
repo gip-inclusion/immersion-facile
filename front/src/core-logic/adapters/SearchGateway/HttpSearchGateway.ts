@@ -7,6 +7,7 @@ import {
   SearchResultDto,
   SearchResultQuery,
   SearchRoutes,
+  SiretAndAppellationDto,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -93,6 +94,26 @@ export class HttpSearchGateway implements SearchGateway {
           match(result)
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getExternalSearchResult$(
+    params: SiretAndAppellationDto,
+  ): Observable<SearchResultDto> {
+    return from(
+      this.httpClient
+        .getExternalSearchResult({
+          queryParams: params,
+        })
+        .then((result) =>
+          match(result)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 404 }, ({ body }) => {
+              throw new Error(body.message);
+            })
             .otherwise(otherwiseThrow),
         ),
     );

@@ -16,7 +16,7 @@ const validEstablishmentFromLaBonneBoite: LaBonneBoiteApiResultV2Props = {
     lat: 49.3225,
     lon: 6.08067,
   },
-  rome: "M1607",
+  rome: undefined,
   naf: "8810C",
   company_name: "BLANCHISSERIE LA FENSCH",
   siret: "77561959600155",
@@ -54,6 +54,7 @@ export class LaBonneBoiteCompanyDtoBuilder
       city: address.city,
       postcode: address.postcode,
       department: address.departmentCode,
+      department_number: address.departmentCode,
     });
   }
 
@@ -94,6 +95,13 @@ export class LaBonneBoiteCompanyDtoBuilder
     return new LaBonneBoiteCompanyDtoBuilder({
       ...this.props,
       rome,
+    });
+  }
+
+  public withoutRome(): LaBonneBoiteCompanyDtoBuilder {
+    return new LaBonneBoiteCompanyDtoBuilder({
+      ...this.props,
+      rome: undefined,
     });
   }
 

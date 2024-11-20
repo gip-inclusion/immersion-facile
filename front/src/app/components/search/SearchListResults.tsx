@@ -7,14 +7,12 @@ import {
   Tag as ImTag,
   useStyleUtils,
 } from "react-design-system";
-import { useDispatch } from "react-redux";
 import { SearchResultDto, domElementIds } from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { SearchResult } from "./SearchResult";
 
 type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
@@ -32,13 +30,13 @@ export const SearchListResults = ({
   showDistance: boolean;
 }) => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
+  const searchParams = useAppSelector(searchSelectors.searchParams);
   const [displayedResults, setDisplayedResults] =
     useState<SearchResultDto[]>(searchResults);
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
   const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
-  const dispatch = useDispatch();
   const { cx, classes } = useStyleUtils();
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const resultsPerPageValue = parseInt(resultsPerPage);
@@ -92,67 +90,64 @@ export const SearchListResults = ({
               </div>
             )}
             {hasResults &&
-              displayedResults.map((searchResult, index) => (
-                <div
-                  className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-6")}
-                >
-                  <SearchResult
-                    key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
-                    establishment={searchResult}
-                    illustration={
-                      <SearchResultIllustration
-                        illustration={
-                          searchIllustrations[
-                            index % searchIllustrations.length
-                          ]
-                        }
-                      >
-                        <div className={fr.cx("fr-p-1v")}>
-                          {searchResult.establishmentScore > 50 && (
-                            <ImTag theme="superEnterprise" />
-                          )}
-                          {searchResult.fitForDisabledWorkers && (
-                            <ImTag theme="rqth" />
-                          )}
-                          {!searchResult.voluntaryToImmersion && (
-                            <ImTag theme="lbb" />
-                          )}
-                          {searchResult.voluntaryToImmersion && (
-                            <ImTag theme="voluntaryToImmersion" />
-                          )}
-                        </div>
-                      </SearchResultIllustration>
-                    }
-                    showDistance={showDistance}
-                    onButtonClick={() => {
-                      const appellations = searchResult.appellations;
-                      const appellationCode = appellations?.length
-                        ? appellations[0].appellationCode
-                        : null;
-                      if (appellationCode && searchResult.locationId) {
-                        routes
-                          .searchResult({
-                            siret: searchResult.siret,
-                            appellationCode,
-                            location: searchResult.locationId,
-                          })
-                          .push();
-                        return;
+              displayedResults.map((searchResult, index) => {
+                const appellations = searchResult.appellations;
+                const searchResultAppellationCode = appellations?.length
+                  ? appellations[0].appellationCode
+                  : null;
+                const appellationCode =
+                  searchResultAppellationCode ||
+                  searchParams.appellationCodes?.[0];
+                return (
+                  <div
+                    className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-6")}
+                  >
+                    <SearchResult
+                      key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
+                      establishment={searchResult}
+                      illustration={
+                        <SearchResultIllustration
+                          illustration={
+                            searchIllustrations[
+                              index % searchIllustrations.length
+                            ]
+                          }
+                        >
+                          <div className={fr.cx("fr-p-1v")}>
+                            {searchResult.establishmentScore > 50 && (
+                              <ImTag theme="superEnterprise" />
+                            )}
+                            {searchResult.fitForDisabledWorkers && (
+                              <ImTag theme="rqth" />
+                            )}
+                            {!searchResult.voluntaryToImmersion && (
+                              <ImTag theme="lbb" />
+                            )}
+                            {searchResult.voluntaryToImmersion && (
+                              <ImTag theme="voluntaryToImmersion" />
+                            )}
+                          </div>
+                        </SearchResultIllustration>
                       }
-                      dispatch(
-                        searchSlice.actions.fetchSearchResultRequested(
-                          searchResult,
-                        ),
-                      );
-                      routes
-                        .searchResultExternal({
-                          siret: searchResult.siret,
-                        })
-                        .push();
-                    }}
-                  />
-                </div>
-              ))}
+                      showDistance={showDistance}
+                      linkProps={
+                        searchResult.voluntaryToImmersion
+                          ? routes.searchResult({
+                              appellationCode: appellationCode ?? "",
+                              siret: searchResult.siret,
+                              ...(searchResult.locationId
+                                ? { location: searchResult.locationId }
+                                : {}),
+                            }).link
+                          : routes.searchResultExternal({
+                              siret: searchResult.siret,
+                              appellationCode: appellationCode ?? "",
+                            }).link
+                      }
+                    />
+                  </div>
+                );
+              })}
           </div>
         </div>
         <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>

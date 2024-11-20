@@ -1,4 +1,4 @@
-import { SearchResultDto } from "shared";
+import { RomeDto, SearchResultDto, SiretDto } from "shared";
 import {
   LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
@@ -13,13 +13,23 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
   ) {}
 
   public async searchCompanies({
+    rome,
     romeLabel,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
     this.nbOfCalls = this.nbOfCalls + 1;
     if (this._error) throw this._error;
     return this._results
       .filter((result) => result.isCompanyRelevant())
-      .map((result) => result.toSearchResult(romeLabel));
+      .map((result) => result.toSearchResult({ romeCode: rome, romeLabel }));
+  }
+
+  public async fetchCompanyBySiret(
+    siret: SiretDto,
+    romeDto: RomeDto,
+  ): Promise<SearchResultDto | null> {
+    if (this._error) throw this._error;
+    const result = this._results.find((result) => result.siret === siret);
+    return result ? result.toSearchResult(romeDto) : null;
   }
 
   public setError(error: Error | null) {

@@ -81,8 +81,24 @@ const fetchSearchResultEpic: SearchEpic = (
       searchSlice.actions.fetchSearchResultFailed(error.message),
     ),
   );
+
+const searchResultExternalProvidedEpic: SearchEpic = (
+  action$,
+  _state$,
+  { searchGateway },
+) =>
+  action$.pipe(
+    filter(searchSlice.actions.externalSearchResultRequested.match),
+    switchMap(({ payload }) => searchGateway.getExternalSearchResult$(payload)),
+    map(searchSlice.actions.externalSearchResultSucceeded),
+    catchEpicError((error) =>
+      searchSlice.actions.externalSearchResultFailed(error.message),
+    ),
+  );
+
 export const searchEpics = [
   initialSearchEpic,
   extraFetchEpic,
   fetchSearchResultEpic,
+  searchResultExternalProvidedEpic,
 ];
