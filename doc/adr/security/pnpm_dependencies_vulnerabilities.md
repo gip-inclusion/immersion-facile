@@ -1,6 +1,6 @@
 # Gestion des vulnérabilités des dépendances PNPM
 
-Piste pour assurer des versions minimum sur les sous dépendances.
+Piste pour assurer des versions minimums sur les sous-dépendances.
 
 ```
 {
