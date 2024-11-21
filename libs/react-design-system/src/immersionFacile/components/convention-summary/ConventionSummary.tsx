@@ -184,7 +184,7 @@ const SubSection = ({
                       key={field.key}
                       className={fr.cx("fr-col-12", "fr-mb-2w")}
                     >
-                      <Badge severity={field.badgeSeverity}>
+                      <Badge small severity={field.badgeSeverity}>
                         {field.badgeSeverity === "success" ? (
                           <>{field.value}</>
                         ) : (
