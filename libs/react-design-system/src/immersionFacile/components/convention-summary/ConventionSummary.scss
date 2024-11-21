@@ -4,6 +4,10 @@
   &__section {
     border: 1px solid var(--grey-900-175);
 
+    .fr-text--xs {
+      color: var(--grey-425-625);
+    }
+
     a[href] {
       text-underline-offset: 4px;
       word-break: break-word;

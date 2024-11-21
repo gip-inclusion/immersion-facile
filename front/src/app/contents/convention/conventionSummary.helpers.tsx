@@ -672,7 +672,10 @@ const printWeekSchedule = (convention: ConventionReadDto, cx: Cx) => {
             {week.schedule.map((daySchedule) => (
               <li
                 key={daySchedule}
-                className={cx(conventionSummaryStyles.subsectionScheduleDay)}
+                className={cx(
+                  fr.cx("fr-text--sm"),
+                  conventionSummaryStyles.subsectionScheduleDay,
+                )}
               >
                 {daySchedule}
               </li>
