@@ -641,6 +641,7 @@ const printWeekSchedule = (convention: ConventionReadDto, cx: Cx) => {
             "fr-col-md-6",
             "fr-col-lg-4",
             "fr-col-xl-3",
+            "fr-my-3v",
           )}
           key={week.period.start.toISOString()}
         >
@@ -661,7 +662,7 @@ const printWeekSchedule = (convention: ConventionReadDto, cx: Cx) => {
           <div aria-hidden="true" className={fr.cx("fr-text--xs", "fr-m-0")}>
             --
           </div>
-          <p className={fr.cx("fr-text--xs")}>
+          <p className={fr.cx("fr-text--xs", "fr-mb-3v")}>
             {week.weeklyHours} heures de travail hebdomadaires
           </p>
           <ul

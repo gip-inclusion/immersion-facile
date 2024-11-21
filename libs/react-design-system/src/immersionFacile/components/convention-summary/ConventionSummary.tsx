@@ -227,15 +227,10 @@ const SubSection = ({
 };
 
 const Schedule = ({ fields }: { fields: ConventionSummaryField[] }) => {
-  return (
-    <>
-      {fields
-        .filter((field) => !!field)
-        .map((field) => {
-          return <span key={field.key}>{field.value}</span>;
-        })}
-    </>
-  );
+  const schedule = fields.at(0);
+
+  if (!schedule) return <></>;
+  return <>{schedule.value}</>;
 };
 
 const shouldDisplayHorizontalSeparator = (
