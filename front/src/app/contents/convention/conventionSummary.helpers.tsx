@@ -190,7 +190,7 @@ const makeSignatoriesSubsections = (
         },
         {
           key: "establishmentRepSiret",
-          label: "Siret",
+          label: "SIRET",
           value: renderSiret(convention.siret),
         },
       ]),
@@ -258,7 +258,7 @@ const makeSignatoriesSubsections = (
             },
             {
               key: "beneficiaryCurrentEmployerSiret",
-              label: "Siret",
+              label: "SIRET",
               value: renderSiret(
                 convention.signatories.beneficiaryCurrentEmployer.businessSiret,
               ),
@@ -428,7 +428,7 @@ const makeEstablishmentSubSections = (
         },
         {
           key: "siret",
-          label: "Siret",
+          label: "SIRET",
           value: renderSiret(convention.siret),
         },
       ],
