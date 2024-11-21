@@ -14,6 +14,7 @@ import {
   IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS,
   RenewConventionParams,
 } from "../convention/convention.dto";
+import { isConventionOld } from "../convention/convention.schema";
 import { arrayFromNumber } from "../utils";
 import { DateString } from "../utils/date";
 import {
@@ -221,11 +222,13 @@ export const validateSchedule = ({
   dateStart,
   id,
 }: Omit<RenewConventionParams, "renewed">): string | undefined => {
+  if (isConventionOld(dateEnd)) return;
   const conventionIdPrefix = `Convention ${id} - `;
   const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule, {
     start: new Date(dateStart),
     end: new Date(dateEnd),
   });
+
   for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
     if (totalHours > IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS)
       return `${conventionIdPrefix}Veuillez saisir moins de ${IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS}h pour la semaine ${

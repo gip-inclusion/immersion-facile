@@ -58,6 +58,7 @@ import {
   ConventionReadDto,
   ConventionValidatorInputName,
   ConventionValidatorInputNames,
+  DATE_CONSIDERED_OLD,
   EstablishmentRepresentative,
   EstablishmentTutor,
   FindSimilarConventionsParams,
@@ -328,6 +329,7 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
         addIssue,
         convention.id,
         convention.schedule.complexSchedule,
+        convention.dateEnd,
       );
       addIssueIfAgeLessThanMinimumAge(
         addIssue,
@@ -502,10 +504,14 @@ export const markPartnersErroredConventionAsHandledRequestSchema: z.Schema<MarkP
     conventionId: conventionIdSchema,
   });
 
+export const isConventionOld = (dateEnd: DateString) =>
+  new Date(dateEnd).getTime() <= DATE_CONSIDERED_OLD.getTime();
+
 const addIssuesIfDuplicateSignatoriesEmails = (
   convention: ConventionDto,
   addIssue: (message: string, path: string) => void,
 ) => {
+  if (isConventionOld(convention.dateEnd)) return;
   const signatoriesWithEmail = Object.entries(convention.signatories)
     .filter(([_, value]) => !!value)
     .map(([key, value]) => ({
@@ -610,7 +616,9 @@ const addIssueIfSundayIsInSchedule = (
   addIssue: (message: string, path: string) => void,
   conventionId: ConventionId,
   complexSchedule: DailyScheduleDto[],
+  dateEnd: DateString,
 ) => {
+  if (isConventionOld(dateEnd)) return;
   if (isSundayInSchedule(complexSchedule)) {
     addIssue(
       `[${conventionId}] Le mini-stage ne peut pas se dérouler un dimanche`,
