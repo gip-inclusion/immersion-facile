@@ -111,12 +111,12 @@ export const CreationSiretRelatedInputs = () => {
             updateSiret(event.target.value);
             setValue("siret", event.target.value);
           },
+          readOnly: isFetchingSiret,
         }}
         state={siretErrorToDisplay && touchedFields.siret ? "error" : "default"}
         stateRelatedMessage={
           touchedFields.siret && siretErrorToDisplay ? siretErrorToDisplay : ""
         }
-        disabled={isFetchingSiret}
       />
       {siretRawError === "Establishment with this siret is already in our DB" &&
         establishmentFeedback.kind !== "sendModificationLinkSuccess" && (
@@ -156,16 +156,7 @@ export const CreationSiretRelatedInputs = () => {
           className={fr.cx("fr-mb-4w")}
         />
       )}
-      {siretRawError !== null &&
-        siretRawError !==
-          "Establishment with this siret is already in our DB" && (
-          <Alert
-            severity="error"
-            title="La vérification du SIRET a échoué"
-            description={siretErrorToDisplay}
-            className={fr.cx("fr-mb-4w")}
-          />
-        )}
+
       <Input
         label={formContents.businessName.label}
         hintText={formContents.businessName.hintText}
