@@ -30,9 +30,9 @@ const makeSignatoriesSubsections = (
               key: "beneficiarySignedAt",
               value:
                 convention.signatories.beneficiary.signedAt &&
-                toDisplayedDate({
+                `Signée - Le ${toDisplayedDate({
                   date: new Date(convention.signatories.beneficiary.signedAt),
-                }),
+                })}`,
               badgeSeverity: convention.signatories.beneficiary.signedAt
                 ? "success"
                 : "warning",
@@ -83,12 +83,12 @@ const makeSignatoriesSubsections = (
                   key: "beneficiaryRepSignedAt",
                   value:
                     convention.signatories.beneficiaryRepresentative.signedAt &&
-                    toDisplayedDate({
+                    `Signée - Le ${toDisplayedDate({
                       date: new Date(
                         convention.signatories.beneficiaryRepresentative
                           .signedAt,
                       ),
-                    }),
+                    })}`,
                   badgeSeverity: convention.signatories
                     .beneficiaryRepresentative.signedAt
                     ? "success"
@@ -142,11 +142,11 @@ const makeSignatoriesSubsections = (
               key: "establishmentRepSignedAt",
               value:
                 convention.signatories.establishmentRepresentative.signedAt &&
-                toDisplayedDate({
+                `Signée - Le ${toDisplayedDate({
                   date: new Date(
                     convention.signatories.establishmentRepresentative.signedAt,
                   ),
-                }),
+                })}`,
               badgeSeverity: convention.signatories.establishmentRepresentative
                 .signedAt
                 ? "success"
@@ -206,12 +206,12 @@ const makeSignatoriesSubsections = (
                   value:
                     convention.signatories.beneficiaryCurrentEmployer
                       .signedAt &&
-                    toDisplayedDate({
+                    `Signée - Le ${toDisplayedDate({
                       date: new Date(
                         convention.signatories.beneficiaryCurrentEmployer
                           .signedAt,
                       ),
-                    }),
+                    })}`,
                   badgeSeverity: convention.signatories
                     .beneficiaryCurrentEmployer.signedAt
                     ? "success"
@@ -282,9 +282,9 @@ const makeSignatoriesSubsections = (
               key: "dateApproval",
               value:
                 convention.dateApproval &&
-                toDisplayedDate({
+                `Pré-validée - Le ${toDisplayedDate({
                   date: new Date(convention.dateApproval),
-                }),
+                })}`,
               badgeSeverity: convention.dateApproval ? "success" : "warning",
             } satisfies ConventionSummaryField)
           : null,
@@ -306,9 +306,9 @@ const makeSignatoriesSubsections = (
               key: "dateValidation",
               value:
                 convention.dateValidation &&
-                toDisplayedDate({
+                `Validée - Le ${toDisplayedDate({
                   date: new Date(convention.dateValidation),
-                }),
+                })}`,
               badgeSeverity: convention.dateValidation ? "success" : "warning",
             } satisfies ConventionSummaryField)
           : null,
