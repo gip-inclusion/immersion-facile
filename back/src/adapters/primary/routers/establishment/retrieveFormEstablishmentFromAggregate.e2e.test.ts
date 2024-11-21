@@ -3,6 +3,7 @@ import {
   EstablishmentRoutes,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
+  UserBuilder,
   addressDtoToString,
   createEstablishmentJwtPayload,
   currentJwtVersions,
@@ -22,25 +23,39 @@ import {
 } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentEntity";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
-const backofficeAdminUser = new InclusionConnectedUserBuilder()
-  .withId("backoffice-admin-user")
-  .withIsAdmin(true)
-  .buildUser();
-
-const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-  version: currentJwtVersions.inclusion,
-  iat: new Date().getTime(),
-  exp: addDays(new Date(), 30).getTime(),
-  userId: backofficeAdminUser.id,
-};
-
 describe("Route to retrieve form establishment given an establishment JWT", () => {
+  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+    .withId("backoffice-admin-user")
+    .withIsAdmin(true)
+    .buildUser();
+
+  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+    version: currentJwtVersions.inclusion,
+    iat: new Date().getTime(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: backofficeAdminUser.id,
+  };
+  const establishmentAdmin = new UserBuilder()
+    .withEmail("boss@mail.com")
+    .withId("estab.admin")
+    .build();
+  const establishmentContact = new UserBuilder()
+    .withEmail("contact@mail.com")
+    .withId("estab.contact")
+    .build();
+  const establishmentAdminRight: EstablishmentAdminRight = {
+    role: "establishment-admin",
+    userId: establishmentAdmin.id,
+    job: "job",
+    phone: "+3366887744",
+  };
   const establishmentAggregate = new EstablishmentAggregateBuilder()
     .withEstablishment(
       new EstablishmentEntityBuilder()
@@ -61,6 +76,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ])
         .build(),
     )
+    .withUserRights([
+      establishmentAdminRight,
+      {
+        role: "establishment-contact",
+        userId: establishmentContact.id,
+      },
+    ])
     .build();
 
   let httpClient: HttpClient<EstablishmentRoutes>;
@@ -78,7 +100,11 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       generateInclusionConnectJwt,
       generateEditEstablishmentJwt,
     } = await buildTestApp());
-    inMemoryUow.userRepository.users = [backofficeAdminUser];
+    inMemoryUow.userRepository.users = [
+      backofficeAdminUser,
+      establishmentAdmin,
+      establishmentContact,
+    ];
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
   });
 
@@ -132,8 +158,15 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         maxContactsPerMonth:
           establishmentAggregate.establishment.maxContactsPerMonth,
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        businessContact: establishmentAggregate.contact!,
+        businessContact: {
+          contactMethod: establishmentAggregate.establishment.contactMethod,
+          firstName: establishmentAdmin.firstName,
+          lastName: establishmentAdmin.lastName,
+          job: establishmentAdminRight.job,
+          phone: establishmentAdminRight.phone,
+          email: establishmentAdmin.email,
+          copyEmails: [establishmentContact.email],
+        },
         searchableBy: {
           jobSeekers: true,
           students: false,
@@ -187,8 +220,15 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           establishmentAggregate.establishment.fitForDisabledWorkers,
         maxContactsPerMonth:
           establishmentAggregate.establishment.maxContactsPerMonth,
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        businessContact: establishmentAggregate.contact!,
+        businessContact: {
+          contactMethod: establishmentAggregate.establishment.contactMethod,
+          firstName: establishmentAdmin.firstName,
+          lastName: establishmentAdmin.lastName,
+          job: establishmentAdminRight.job,
+          phone: establishmentAdminRight.phone,
+          email: establishmentAdmin.email,
+          copyEmails: [establishmentContact.email],
+        },
         searchableBy: establishmentAggregate.establishment.searchableBy,
       },
       status: 200,

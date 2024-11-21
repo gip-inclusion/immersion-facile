@@ -1,13 +1,13 @@
 import {
   AddressDto,
   AppellationDto,
+  ContactMethod,
   GeoPositionDto,
   LocationId,
   RomeCode,
   SearchResultDto,
   SiretDto,
 } from "shared";
-import { ContactMethod } from "../../../../../../domains/establishment/entities/ContactEntity";
 
 export type SearchImmersionResultPublicV2 = {
   rome: RomeCode;

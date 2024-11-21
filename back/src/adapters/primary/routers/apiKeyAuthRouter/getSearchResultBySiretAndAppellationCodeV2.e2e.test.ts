@@ -15,7 +15,6 @@ import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { TEST_ROME_LABEL } from "../../../../domains/establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -71,12 +70,13 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
             .withSiret(immersionOfferSiret)
             .withScore(15)
             .withLocations([TEST_LOCATION])
+            .withContactMethod("EMAIL")
             .withNumberOfEmployeeRange("10-19")
             .build(),
         )
-        .withContact(
-          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-        )
+        .withUserRights([
+          { role: "establishment-admin", userId: "osef", job: "", phone: "" },
+        ])
         .withOffers([
           new OfferEntityBuilder()
             .withRomeCode(styliste.romeCode)

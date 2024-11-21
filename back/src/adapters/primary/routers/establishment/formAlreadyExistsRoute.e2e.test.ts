@@ -40,6 +40,14 @@ describe("route to check if a form's siret already exists", () => {
         .withEstablishment(
           new EstablishmentEntityBuilder().withSiret(siret).build(),
         )
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "osef",
+          },
+        ])
         .build(),
     );
 
