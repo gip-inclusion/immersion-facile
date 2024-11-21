@@ -576,14 +576,22 @@ const makeAdditionalInformationSubSections = (
           key: "individualProtection",
           label: "Protection individuelle",
           value: convention.individualProtection
-            ? `Oui: ${convention.individualProtectionDescription}`
+            ? `Oui${
+                convention.individualProtectionDescription
+                  ? ` : ${convention.individualProtectionDescription}`
+                  : ""
+              }`
             : "Non",
         },
         {
           key: "sanitaryPreventionDescription",
           label: "Mesures de prévention sanitaire",
           value: convention.sanitaryPrevention
-            ? `Oui: ${convention.sanitaryPreventionDescription}`
+            ? `Oui${
+                convention.sanitaryPreventionDescription
+                  ? ` : ${convention.sanitaryPreventionDescription}`
+                  : ""
+              }`
             : "Non",
         },
       ],
