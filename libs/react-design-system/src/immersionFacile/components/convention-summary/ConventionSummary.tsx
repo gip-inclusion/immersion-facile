@@ -186,7 +186,7 @@ const SubSection = ({
                     >
                       <Badge severity={field.badgeSeverity}>
                         {field.badgeSeverity === "success" ? (
-                          <>field.value</>
+                          <>{field.value}</>
                         ) : (
                           "Signature en attente"
                         )}
