@@ -35,10 +35,10 @@ export const VALID_EMAILS = [
   "establishment@example.com",
   "validator@mail.com",
 ];
-export const DATE_SUBMISSION = new Date("2021-01-04").toISOString();
-export const DATE_START = new Date("2021-01-06").toISOString();
-export const DATE_END = new Date("2021-01-15").toISOString();
-export const DATE_SIGNATURE = new Date("2021-01-04").toISOString();
+export const DATE_SUBMISSION = new Date("2024-10-04").toISOString();
+export const DATE_START = new Date("2024-10-08").toISOString();
+export const DATE_END = new Date("2024-10-17").toISOString();
+export const DATE_SIGNATURE = new Date("2024-10-04").toISOString();
 
 export const VALID_PHONES = [
   "+33123456780",

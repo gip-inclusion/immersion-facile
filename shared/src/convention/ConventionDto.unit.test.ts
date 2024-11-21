@@ -3,6 +3,7 @@ import { keys } from "ramda";
 import { ZodError, z } from "zod";
 import {
   CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
+  DATE_CONSIDERED_OLD,
   DailyScheduleDto,
   DateIntervalDto,
   Weekday,
@@ -50,10 +51,10 @@ const currentEmployer: BeneficiaryCurrentEmployer = {
 };
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",
-  firstName: "",
-  lastName: "",
-  phone: "",
-  email: "demandeur@mail.fr",
+  firstName: "Benef",
+  lastName: "Representative",
+  phone: "0600110011",
+  email: "benef.representative@mail.fr",
 };
 
 describe("conventionDtoSchema", () => {
@@ -125,12 +126,12 @@ describe("conventionDtoSchema", () => {
         conventionSchema,
         new ConventionDtoBuilder()
           .withBeneficiaryEmail("demandeur@mail.fr")
-          .withBeneficiaryRepresentative(beneficiaryRepresentative)
+          .withBeneficiaryRepresentative({
+            ...beneficiaryRepresentative,
+            email: "demandeur@mail.fr",
+          })
           .build(),
         [
-          "Obligatoire",
-          "Obligatoire",
-          "Obligatoire",
           "Les emails des signataires doivent être différents.",
           "Les emails des signataires doivent être différents.",
         ],
@@ -145,9 +146,6 @@ describe("conventionDtoSchema", () => {
           .withBeneficiaryRepresentative(beneficiaryRepresentative)
           .build(),
         [
-          "Obligatoire",
-          "Obligatoire",
-          "Obligatoire",
           "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
         ],
       );
@@ -246,9 +244,6 @@ describe("conventionDtoSchema", () => {
         conventionReadSchema,
         invalidConventionRead,
         [
-          "Obligatoire",
-          "Obligatoire",
-          "Obligatoire",
           "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
         ],
       );
@@ -328,6 +323,7 @@ describe("conventionDtoSchema", () => {
         "Le format de la date de début est invalide",
         "La date de fin doit être après la date de début.",
         "La durée maximale calendaire d'une immersion est de 30 jours.",
+        "Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait NaN ans au démarrage de la convention.",
         "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez remplir les horaires.",
       ]);
     });
@@ -347,8 +343,8 @@ describe("conventionDtoSchema", () => {
 
     it("rejects start dates that are after the end date", () => {
       const convention = new ConventionDtoBuilder()
-        .withDateStart("2021-01-10")
-        .withDateEnd("2021-01-03")
+        .withDateStart("2024-10-10")
+        .withDateEnd("2024-10-03")
         .withSchedule(reasonableSchedule)
         .build();
 
@@ -510,7 +506,7 @@ describe("conventionDtoSchema", () => {
       }));
 
       it.each(calendarDayAndInternShips)(
-        "for $intershipKind rejects when it is more than $maxCalendarDays",
+        "for $internshipKind rejects when it is more than $maxCalendarDays",
         ({ internshipKind, maxCalendarDays }) => {
           const convention = new ConventionDtoBuilder()
             .withInternshipKind(internshipKind)
@@ -555,89 +551,104 @@ describe("conventionDtoSchema", () => {
       );
     });
 
-    it("when max hours per week is exceeded", () => {
-      const complexSchedule: DailyScheduleDto[] = [
-        {
-          date: "2024-02-05T00:00:00.000Z",
-          timePeriods: [
-            { start: "09:00", end: "12:00" },
-            { start: "13:00", end: "18:00" },
-          ],
-        },
-        {
-          date: "2024-02-06T00:00:00.000Z",
-          timePeriods: [
-            { start: "09:00", end: "12:00" },
-            { start: "13:00", end: "18:00" },
-          ],
-        },
-        {
-          date: "2024-02-07T00:00:00.000Z",
-          timePeriods: [
-            { start: "09:00", end: "12:00" },
-            { start: "13:00", end: "18:00" },
-          ],
-        },
-        {
-          date: "2024-02-08T00:00:00.000Z",
-          timePeriods: [
-            { start: "09:00", end: "12:00" },
-            { start: "13:00", end: "18:00" },
-          ],
-        },
-        {
-          date: "2024-02-09T00:00:00.000Z",
-          timePeriods: [
-            { start: "09:00", end: "12:00" },
-            { start: "13:00", end: "18:00" },
-          ],
-        },
-        {
-          date: "2024-02-10T00:00:00.000Z",
-          timePeriods: [
-            { start: "09:00", end: "12:00" },
-            { start: "13:00", end: "18:00" },
-          ],
-        },
-        {
-          date: "2024-02-11T00:00:00.000Z",
-          timePeriods: [
-            { start: "09:00", end: "12:00" },
-            { start: "13:00", end: "18:00" },
-          ],
-        },
-      ];
-      const convention = new ConventionDtoBuilder()
-        .withInternshipKind("immersion")
-        .withDateStart(new Date("2024-02-05").toISOString())
-        .withDateEnd(addDays(new Date("2024-02-05"), 7).toISOString())
-        .withSchedule(
-          (_interval: DateIntervalDto, _excludedDays?: Weekday[]) => ({
-            totalHours:
-              calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
-            isSimple: false,
-            complexSchedule,
-            workedDays: calculateNumberOfWorkedDays(complexSchedule),
-          }),
-        )
-        .build();
+    describe("when max hours per week is exceeded", () => {
+      type Month = "2024-07" | "2024-09";
 
-      expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-        "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez saisir moins de 48h pour la semaine 1.",
-      ]);
+      const createConvention = (month: Month) => {
+        const complexSchedule = [
+          {
+            date: `${month}-02T00:00:00.000Z`,
+            timePeriods: [
+              { start: "08:00", end: "12:30" },
+              { start: "13:00", end: "19:00" },
+            ],
+          },
+          {
+            date: `${month}-03T00:00:00.000Z`,
+            timePeriods: [
+              { start: "08:00", end: "12:30" },
+              { start: "13:00", end: "18:00" },
+            ],
+          },
+          {
+            date: `${month}-04T00:00:00.000Z`,
+            timePeriods: [
+              { start: "08:00", end: "12:30" },
+              { start: "13:00", end: "19:30" },
+            ],
+          },
+          {
+            date: `${month}-05T00:00:00.000Z`,
+            timePeriods: [
+              { start: "08:00", end: "12:30" },
+              { start: "13:00", end: "19:30" },
+            ],
+          },
+          {
+            date: `${month}-06T00:00:00.000Z`,
+            timePeriods: [
+              { start: "08:00", end: "12:30" },
+              { start: "13:00", end: "19:30" },
+            ],
+          },
+          {
+            date: `${month}-06T00:00:00.000Z`,
+            timePeriods: [
+              { start: "08:00", end: "12:30" },
+              { start: "13:00", end: "19:30" },
+            ],
+          },
+          {
+            date: `${month}-11T00:00:00.000Z`,
+            timePeriods: [
+              { start: "08:00", end: "12:30" },
+              { start: "13:00", end: "19:30" },
+            ],
+          },
+        ];
+
+        return new ConventionDtoBuilder()
+          .withInternshipKind("immersion")
+          .withDateStart(new Date(`${month}-05`).toISOString())
+          .withDateEnd(addDays(new Date(`${month}-05`), 7).toISOString())
+          .withSchedule(
+            (_interval: DateIntervalDto, _excludedDays?: Weekday[]) => ({
+              totalHours:
+                calculateTotalImmersionHoursFromComplexSchedule(
+                  complexSchedule,
+                ),
+              isSimple: false,
+              complexSchedule,
+              workedDays: calculateNumberOfWorkedDays(complexSchedule),
+            }),
+          )
+          .build();
+      };
+
+      it(`check max per week when endDate is after ${DATE_CONSIDERED_OLD}`, () => {
+        const convention = createConvention("2024-09");
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+          "Convention a99eaca1-ee70-4c90-b3f4-668d492f7392 - Veuillez saisir moins de 48h pour la semaine 1.",
+        ]);
+      });
+
+      it(`does NOT check max per week when endDate is before ${DATE_CONSIDERED_OLD}`, () => {
+        const convention = createConvention("2024-07");
+        expectConventionDtoToBeValid(convention);
+      });
     });
 
     describe("CCI specific, minor under 15yo", () => {
       it("max week hours depends on beneficiary age", () => {
-        const dateStart = new Date("2021-01-04").toISOString();
-        const dateEnd = addDays(new Date(DATE_START), 3).toISOString();
+        const dateStart = new Date("2024-10-07").toISOString();
+        const dateEnd = addDays(new Date(dateStart), 5).toISOString();
         const convention = new ConventionDtoBuilder()
           .withInternshipKind("mini-stage-cci")
           .withDateStart(dateStart)
           .withDateEnd(dateEnd)
           .withSchedule(reasonableSchedule)
           .withBeneficiary({
-            birthdate: new Date("2006-05-26").toISOString(),
+            birthdate: new Date("2010-05-26").toISOString(),
             firstName: "Jean",
             lastName: "Bono",
             role: "beneficiary",
@@ -646,8 +657,15 @@ describe("conventionDtoSchema", () => {
             schoolName: "lycée Jean Moulin",
             schoolPostcode: "06500",
             phone: "0836656565",
+            address: {
+              city: "Paris",
+              postcode: "75001",
+              streetNumberAndAddress: "1 rue de Rivoli",
+              departmentCode: "75",
+            },
             isRqth: false,
           })
+          .withBeneficiaryRepresentative(beneficiaryRepresentative)
           .build();
         expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
           "La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de 15 ans est de 30h",
@@ -856,6 +874,7 @@ describe("conventionDtoSchema", () => {
         .withDateEnd(new Date("2022-01-02").toISOString())
         .withSchedule(reasonableSchedule)
         .withBeneficiary(beneficiary)
+        .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
@@ -874,6 +893,12 @@ describe("conventionDtoSchema", () => {
         phone: "0656435789",
         role: "beneficiary",
         schoolName: "École du quartier ouest",
+        address: {
+          city: "Paris",
+          postcode: "75001",
+          streetNumberAndAddress: "1 rue de Rivoli",
+          departmentCode: "75",
+        },
         schoolPostcode: "87000",
       };
 
@@ -883,6 +908,7 @@ describe("conventionDtoSchema", () => {
         .withDateEnd(new Date("2022-01-02").toISOString())
         .withSchedule(reasonableSchedule, ["dimanche"])
         .withBeneficiary(beneficiary)
+        .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
 
       expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
@@ -918,7 +944,7 @@ describe("conventionDtoSchema", () => {
           .build();
 
         expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
-          "Merci de vérifier votre date de naissance: avez-vous 299 ans ?",
+          "Merci de vérifier votre date de naissance: avez-vous 302 ans ?",
         ]);
       });
     });
@@ -975,9 +1001,9 @@ describe("conventionDtoSchema", () => {
   });
 
   describe("when sunday is in schedule", () => {
-    const saturdayOfWeek1 = new Date("2023-07-22").toISOString();
-    const sundayOfWeek1 = new Date("2023-07-23").toISOString();
-    const mondayOfWeek2 = new Date("2023-07-24").toISOString();
+    const saturdayOfWeek1 = new Date("2024-09-07").toISOString();
+    const sundayOfWeek1 = new Date("2024-09-08").toISOString();
+    const mondayOfWeek2 = new Date("2024-09-09").toISOString();
     const conventionBuilder = new ConventionDtoBuilder()
       .withDateStart(saturdayOfWeek1)
       .withDateEnd(mondayOfWeek2);

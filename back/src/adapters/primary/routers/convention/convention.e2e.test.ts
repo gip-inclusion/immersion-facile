@@ -550,10 +550,12 @@ describe("convention e2e", () => {
             codeRome: convention.immersionAppellation.romeCode,
             competencesObservees:
               "Utilisation des pneus optimale, gestion de carburant",
-            dateDebut: "2021-01-06T00:00:00.000Z",
-            dateDemande: "2021-01-04T00:00:00.000Z",
-            dateFin: "2021-01-15T00:00:00.000Z",
-            dateNaissance: "2002-10-05T00:00:00.000Z",
+            dateDebut: convention.dateStart,
+            dateDemande: convention.dateSubmission,
+            dateFin: convention.dateEnd,
+            dateNaissance: new Date(
+              convention.signatories.beneficiary.birthdate,
+            ).toISOString(),
             descriptionPreventionSanitaire: "fourniture de gel",
             dureeImmersion: 70,
             email: "beneficiary@email.fr",
