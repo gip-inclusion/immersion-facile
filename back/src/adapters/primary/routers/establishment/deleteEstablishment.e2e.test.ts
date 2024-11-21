@@ -4,6 +4,7 @@ import {
   FormEstablishmentDtoBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
+  UserBuilder,
   currentJwtVersions,
   displayRouteName,
   errors,
@@ -36,7 +37,18 @@ describe("Delete form establishment", () => {
     userId: backofficeAdminUser.id,
   };
 
-  const establishmentAggregate = new EstablishmentAggregateBuilder().build();
+  const user = new UserBuilder().build();
+
+  const establishmentAggregate = new EstablishmentAggregateBuilder()
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "fsd",
+        phone: "+66",
+        userId: user.id,
+      },
+    ])
+    .build();
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(establishmentAggregate.establishment.siret)
     .build();
@@ -57,7 +69,7 @@ describe("Delete form establishment", () => {
     const request = testAppAndDeps.request;
     timeGateway = testAppAndDeps.gateways.timeGateway;
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
-    uow.userRepository.users = [backofficeAdminUser];
+    uow.userRepository.users = [backofficeAdminUser, user];
   });
 
   it(`${displayRouteName(

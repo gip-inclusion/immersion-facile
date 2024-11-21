@@ -1,5 +1,6 @@
 import {
   SiretDto,
+  UserBuilder,
   cartographeAppellationAndRome,
   expectHttpResponseToEqual,
 } from "shared";
@@ -105,6 +106,7 @@ describe("search route", () => {
           .withRomeCode("M1808")
           .withAppellationCode("11705")
           .build();
+        const user = new UserBuilder().build();
 
         // Prepare
         await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
@@ -126,6 +128,14 @@ describe("search route", () => {
                 .withWebsite("www.jobs.fr")
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "",
+                phone: "",
+                userId: user.id,
+              },
+            ])
             .build(),
         );
 
@@ -286,6 +296,8 @@ describe("search route", () => {
           .build();
 
         beforeEach(async () => {
+          const user = new UserBuilder().build();
+          inMemoryUow.userRepository.users = [user];
           inMemoryUow.establishmentAggregateRepository.establishmentAggregates =
             [
               new EstablishmentAggregateBuilder()
@@ -308,6 +320,14 @@ describe("search route", () => {
                     .withWebsite("www.jobs.fr")
                     .build(),
                 )
+                .withUserRights([
+                  {
+                    role: "establishment-admin",
+                    job: "",
+                    phone: "",
+                    userId: user.id,
+                  },
+                ])
                 .build(),
               new EstablishmentAggregateBuilder()
                 .withEstablishmentSiret(siret2)
@@ -330,6 +350,14 @@ describe("search route", () => {
                     .withSearchableBy({ students: true, jobSeekers: false })
                     .build(),
                 )
+                .withUserRights([
+                  {
+                    role: "establishment-admin",
+                    job: "",
+                    phone: "",
+                    userId: user.id,
+                  },
+                ])
                 .build(),
               new EstablishmentAggregateBuilder()
                 .withEstablishmentSiret(siret3)
@@ -352,6 +380,14 @@ describe("search route", () => {
                     .withSearchableBy({ students: false, jobSeekers: true })
                     .build(),
                 )
+                .withUserRights([
+                  {
+                    role: "establishment-admin",
+                    job: "",
+                    phone: "",
+                    userId: user.id,
+                  },
+                ])
                 .build(),
             ];
         });

@@ -104,8 +104,11 @@ describe("formCompletion Routes", () => {
     formCompletionRoutes.getSiretInfoIfNotAlreadySaved,
   )}`, () => {
     it("409 - Conflict for siret already in db", async () => {
-      const establishmentAggregate =
-        new EstablishmentAggregateBuilder().build();
+      const establishmentAggregate = new EstablishmentAggregateBuilder()
+        .withUserRights([
+          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+        ])
+        .build();
       inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
         establishmentAggregate,
       ];

@@ -21,7 +21,6 @@ import { EstablishmentEntity } from "../../../../domains/establishment/entities/
 import { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
 import { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -82,6 +81,7 @@ const offer2 = new OfferEntityBuilder()
   .build();
 
 const score20 = 20;
+
 const establishment = new EstablishmentEntityBuilder()
   .withScore(score20)
   .build();
@@ -91,15 +91,18 @@ const establishmentAggregate1 = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
       .withSiret("11112222333344")
+      .withContactMethod("EMAIL")
       .withScore(score20)
       .build(),
   )
-  .withContact(
-    new ContactEntityBuilder()
-      .withId("theContactId")
-      .withContactMethod("EMAIL")
-      .build(),
-  )
+  .withUserRights([
+    {
+      role: "establishment-admin",
+      userId: "osef",
+      job: "",
+      phone: "",
+    },
+  ])
   .withOffers([immersionOffer])
   .build();
 
@@ -126,6 +129,14 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
       .withScore(score20)
       .build(),
   )
+  .withUserRights([
+    {
+      role: "establishment-admin",
+      userId: "osef",
+      job: "",
+      phone: "",
+    },
+  ])
   .build();
 
 describe("search-immersion route", () => {
@@ -264,6 +275,14 @@ describe("search-immersion route", () => {
                 .withWebsite("www.jobs.fr")
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "osef",
+                job: "",
+                phone: "",
+              },
+            ])
             .build(),
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret2)
@@ -276,6 +295,14 @@ describe("search-immersion route", () => {
                 .withSearchableBy({ students: true, jobSeekers: false })
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "osef",
+                job: "",
+                phone: "",
+              },
+            ])
             .build(),
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret3)
@@ -288,6 +315,14 @@ describe("search-immersion route", () => {
                 .withSearchableBy({ students: false, jobSeekers: true })
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "osef",
+                job: "",
+                phone: "",
+              },
+            ])
             .build(),
         ];
       });
@@ -398,6 +433,14 @@ describe("search-immersion route", () => {
                 .withWebsite("www.jobs.fr")
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "osef",
+                job: "",
+                phone: "",
+              },
+            ])
             .build(),
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret2)
@@ -410,6 +453,14 @@ describe("search-immersion route", () => {
                 .withSearchableBy({ students: true, jobSeekers: false })
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "osef",
+                job: "",
+                phone: "",
+              },
+            ])
             .build(),
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(siret3)
@@ -422,6 +473,14 @@ describe("search-immersion route", () => {
                 .withSearchableBy({ students: false, jobSeekers: true })
                 .build(),
             )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "osef",
+                job: "",
+                phone: "",
+              },
+            ])
             .build(),
         ];
       });

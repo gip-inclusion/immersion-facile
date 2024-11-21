@@ -1,4 +1,9 @@
-import { errors, expectObjectsToMatch, expectToEqual } from "shared";
+import {
+  UserBuilder,
+  errors,
+  expectObjectsToMatch,
+  expectToEqual,
+} from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
@@ -9,7 +14,6 @@ import {
 import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import {
-  ContactEntityBuilder,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
@@ -23,20 +27,21 @@ import {
   publicApiV2SearchEstablishmentRoutes,
 } from "./publicApiV2.routes";
 
-const contactEstablishment: ContactEstablishmentPublicV2Dto = {
-  contactMode: "EMAIL",
-  message: "Salut !",
-  siret: "11112222333344",
-  appellationCode: "11111",
-  potentialBeneficiaryEmail: "john.doe@mail.com",
-  potentialBeneficiaryFirstName: "John",
-  potentialBeneficiaryLastName: "Doe",
-  immersionObjective: "Confirmer un projet professionnel",
-  potentialBeneficiaryPhone: "0654334567",
-  locationId: TEST_LOCATION.id,
-};
-
 describe("POST contact-establishment public V2 route", () => {
+  const user = new UserBuilder().build();
+  const contactEstablishment: ContactEstablishmentPublicV2Dto = {
+    contactMode: "EMAIL",
+    message: "Salut !",
+    siret: "11112222333344",
+    appellationCode: "11111",
+    potentialBeneficiaryEmail: "john.doe@mail.com",
+    potentialBeneficiaryFirstName: "John",
+    potentialBeneficiaryLastName: "Doe",
+    immersionObjective: "Confirmer un projet professionnel",
+    potentialBeneficiaryPhone: "0654334567",
+    locationId: TEST_LOCATION.id,
+  };
+
   let request: SuperTest<Test>;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
   let sharedRequest: HttpClient<PublicApiV2SearchEstablishmentRoutes>;
@@ -54,6 +59,7 @@ describe("POST contact-establishment public V2 route", () => {
       authorizedUnJeuneUneSolutionApiConsumer,
       unauthorizedApiConsumer,
     ];
+    inMemoryUow.userRepository.users = [user];
     authToken = generateApiConsumerJwt({
       id: authorizedUnJeuneUneSolutionApiConsumer.id,
     });
@@ -134,15 +140,19 @@ describe("POST contact-establishment public V2 route", () => {
       .withEstablishment(
         new EstablishmentEntityBuilder()
           .withSiret(contactEstablishment.siret)
+          .withContactMethod(testEstablishmentContactMethod)
           .withLocations([TEST_LOCATION])
           .withNumberOfEmployeeRange("10-19")
           .build(),
       )
-      .withContact(
-        new ContactEntityBuilder()
-          .withContactMethod(testEstablishmentContactMethod)
-          .build(),
-      )
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          userId: user.id,
+          job: "",
+          phone: "",
+        },
+      ])
       .withOffers([
         new OfferEntityBuilder()
           .withAppellationCode(contactEstablishment.appellationCode)
@@ -165,7 +175,7 @@ describe("POST contact-establishment public V2 route", () => {
       message: errors.establishment.contactRequestContactModeMismatch({
         contactMethods: {
           inParams: contactEstablishment.contactMode,
-          inRepo: establishment.contact.contactMethod,
+          inRepo: establishment.establishment.contactMethod,
         },
         siret: contactEstablishment.siret,
       }).message,
@@ -180,13 +190,19 @@ describe("POST contact-establishment public V2 route", () => {
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(contactEstablishment.siret)
+            .withContactMethod("EMAIL")
             .withLocations([TEST_LOCATION])
             .withNumberOfEmployeeRange("10-19")
             .build(),
         )
-        .withContact(
-          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-        )
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            userId: user.id,
+            job: "",
+            phone: "",
+          },
+        ])
         .withOffers([
           new OfferEntityBuilder()
             .withAppellationCode(testEstablishmentAppellationCode)
@@ -219,13 +235,19 @@ describe("POST contact-establishment public V2 route", () => {
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(contactEstablishment.siret)
+            .withContactMethod("EMAIL")
             .withLocations([TEST_LOCATION])
             .withNumberOfEmployeeRange("10-19")
             .build(),
         )
-        .withContact(
-          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-        )
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            userId: user.id,
+            job: "",
+            phone: "",
+          },
+        ])
         .withOffers([
           new OfferEntityBuilder()
             .withAppellationCode(contactEstablishment.appellationCode)
@@ -261,13 +283,19 @@ describe("POST contact-establishment public V2 route", () => {
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(contactEstablishment.siret)
+            .withContactMethod("EMAIL")
             .withLocations([TEST_LOCATION])
             .withNumberOfEmployeeRange("10-19")
             .build(),
         )
-        .withContact(
-          new ContactEntityBuilder().withContactMethod("EMAIL").build(),
-        )
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            userId: user.id,
+            job: "",
+            phone: "",
+          },
+        ])
         .withOffers([
           new OfferEntityBuilder()
             .withAppellationCode(contactEstablishment.appellationCode)
