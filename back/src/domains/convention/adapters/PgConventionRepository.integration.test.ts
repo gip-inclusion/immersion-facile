@@ -2,6 +2,7 @@ import { addDays, subDays } from "date-fns";
 import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
+  AppellationAndRomeDto,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
@@ -22,17 +23,27 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 
-const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "beneficiary-representative",
-  email: "legal@representative.com",
-  firstName: "The",
-  lastName: "Representative",
-  phone: "+33112233445",
-};
-
-const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-
 describe("PgConventionRepository", () => {
+  const beneficiaryRepresentative: BeneficiaryRepresentative = {
+    role: "beneficiary-representative",
+    email: "legal@representative.com",
+    firstName: "The",
+    lastName: "Representative",
+    phone: "+33112233445",
+  };
+
+  const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+
+  const styliste: AppellationAndRomeDto = {
+    romeCode: "B1805",
+    romeLabel: "Stylisme",
+    appellationCode: "19540",
+    appellationLabel: "Styliste",
+  };
+
+  const conventionStylisteBuilder =
+    new ConventionDtoBuilder().withImmersionAppellation(styliste);
+
   let pool: Pool;
   let conventionRepository: PgConventionRepository;
   let db: KyselyDb;
@@ -60,7 +71,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Adds a new convention", async () => {
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
@@ -93,7 +104,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Adds/Update a new CCI convention", async () => {
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withInternshipKind("mini-stage-cci")
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .withDateStart(new Date("2023-01-02").toISOString())
@@ -120,7 +131,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Adds a new convention with field workConditions undefined and no signatories", async () => {
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withoutWorkCondition()
       .notSigned()
       .build();
@@ -138,6 +149,7 @@ describe("PgConventionRepository", () => {
     };
 
     const convention = new ConventionDtoBuilder()
+      .withImmersionAppellation(styliste)
       .withoutWorkCondition()
       .withAcquisition(withAcquisition)
       .notSigned()
@@ -159,7 +171,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Adds a convention renewed from another one", async () => {
-    const existingConvention = new ConventionDtoBuilder()
+    const existingConvention = conventionStylisteBuilder
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withId("11111111-1111-4111-1111-111111111111")
       .withEstablishmentNumberOfEmployeesRange("20-49")
@@ -167,7 +179,7 @@ describe("PgConventionRepository", () => {
 
     await conventionRepository.save(existingConvention);
 
-    const renewedConvention = new ConventionDtoBuilder()
+    const renewedConvention = conventionStylisteBuilder
       .withId("22222222-2222-4222-2222-222222222222")
       .withStatus("READY_TO_SIGN")
       .withRenewed({
@@ -572,20 +584,21 @@ describe("PgConventionRepository", () => {
 
   it("Update convention with validator", async () => {
     const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withId(conventionId)
       .withStatus("ACCEPTED_BY_COUNSELLOR")
       .build();
     await conventionRepository.save(convention);
 
-    const updatedConvention = new ConventionDtoBuilder()
+    const updatedConvention = conventionStylisteBuilder
       .withId(conventionId)
       .withStatus("ACCEPTED_BY_COUNSELLOR")
       .withValidator({ firstname: "John", lastname: "Doe" })
       .withCounsellor({ firstname: "Billy", lastname: "Idol" })
       .withBeneficiaryEmail("some.updated@email.com")
       .withStatusJustification("some justification")
-      .withDateEnd(new Date("2021-01-20").toISOString())
+      .withDateStart(new Date("2024-10-20").toISOString())
+      .withDateEnd(new Date("2024-10-24").toISOString())
       .build();
 
     await conventionRepository.update(updatedConvention);
@@ -597,17 +610,18 @@ describe("PgConventionRepository", () => {
 
   it("update convention with dateApproval", async () => {
     const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withId(conventionId)
       .withStatus("IN_REVIEW")
       .build();
     await conventionRepository.save(convention);
 
-    const updatedConvention = new ConventionDtoBuilder()
+    const updatedConvention = conventionStylisteBuilder
       .withId(conventionId)
       .withStatus("ACCEPTED_BY_COUNSELLOR")
-      .withDateApproval(new Date("2021-01-05").toISOString())
-      .withDateEnd(new Date("2021-01-20").toISOString())
+      .withDateStart(new Date("2024-10-20").toISOString())
+      .withDateEnd(new Date("2024-10-24").toISOString())
+      .withDateApproval(new Date("2024-10-15").toISOString())
       .build();
 
     await conventionRepository.update(updatedConvention);
@@ -619,7 +633,7 @@ describe("PgConventionRepository", () => {
 
   it("Retrieves federated identity if exists", async () => {
     const peConnectId: PeConnectToken = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withFederatedIdentity({
         provider: "peConnect",
         token: peConnectId,
@@ -656,19 +670,20 @@ describe("PgConventionRepository", () => {
 
   it("Updates an already saved immersion", async () => {
     const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withId(idA)
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withEstablishmentNumberOfEmployeesRange("20-49")
       .build();
     await conventionRepository.save(convention);
 
-    const updatedConvention = new ConventionDtoBuilder()
+    const updatedConvention = conventionStylisteBuilder
       .withId(idA)
       .withStatus("CANCELLED")
       .withBeneficiaryEmail("some.updated@email.com")
       .withStatusJustification("some justification")
-      .withDateEnd(new Date("2021-01-20").toISOString())
+      .withDateStart(new Date("2024-10-20").toISOString())
+      .withDateEnd(new Date("2024-10-24").toISOString())
       .withEstablishmentNumberOfEmployeesRange("200-249")
       .build();
 
@@ -678,7 +693,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Adds a new convention with a beneficiary representative", async () => {
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
@@ -692,13 +707,13 @@ describe("PgConventionRepository", () => {
 
   it("Updates an already saved immersion with a beneficiary representative", async () => {
     const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withId(idA)
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
     await conventionRepository.save(convention);
 
-    const updatedConvention = new ConventionDtoBuilder()
+    const updatedConvention = conventionStylisteBuilder
       .withId(idA)
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withBeneficiaryEmail("some.updated@email.com")
@@ -709,7 +724,8 @@ describe("PgConventionRepository", () => {
       .signedByBeneficiary(new Date().toISOString())
       .signedByEstablishmentRepresentative(new Date().toISOString())
       .signedByBeneficiaryRepresentative(new Date().toISOString())
-      .withDateEnd(new Date("2021-01-20").toISOString())
+      .withDateStart(new Date("2024-10-20").toISOString())
+      .withDateEnd(new Date("2024-10-24").toISOString())
       .build();
 
     await conventionRepository.update(updatedConvention);
@@ -719,13 +735,13 @@ describe("PgConventionRepository", () => {
 
   it("Updates an already saved immersion if the beneficiary representative is removed", async () => {
     const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = new ConventionDtoBuilder()
+    const convention = conventionStylisteBuilder
       .withId(idA)
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
     await conventionRepository.save(convention);
 
-    const updatedConvention = new ConventionDtoBuilder()
+    const updatedConvention = conventionStylisteBuilder
       .withId(idA)
       .withBeneficiaryRepresentative(undefined)
       .build();
@@ -737,10 +753,10 @@ describe("PgConventionRepository", () => {
 
   it("Updates an already saved immersion without beneficiary representative with a beneficiary representative", async () => {
     const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = new ConventionDtoBuilder().withId(idA).build();
+    const convention = conventionStylisteBuilder.withId(idA).build();
     await conventionRepository.save(convention);
 
-    const updatedConvention = new ConventionDtoBuilder()
+    const updatedConvention = conventionStylisteBuilder
       .withId(idA)
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
@@ -754,7 +770,7 @@ describe("PgConventionRepository", () => {
     it("changes status of convention with date end before given date to deprecated with justification", async () => {
       const dateSince = new Date("2023-08-30");
 
-      const conventionBuilderWithDateInRange = new ConventionDtoBuilder()
+      const conventionBuilderWithDateInRange = conventionStylisteBuilder
         .withDateStart(subDays(dateSince, 3).toISOString())
         .withDateEnd(subDays(dateSince, 1).toISOString())
         .withSchedule(reasonableSchedule);
@@ -764,7 +780,7 @@ describe("PgConventionRepository", () => {
         .withStatus("PARTIALLY_SIGNED")
         .build();
 
-      const convention2ToKeepAsIs = new ConventionDtoBuilder()
+      const convention2ToKeepAsIs = conventionStylisteBuilder
         .withId("22221111-1111-4111-1111-111111112222")
         .withDateStart(subDays(dateSince, 2).toISOString())
         .withDateEnd(addDays(dateSince, 1).toISOString())

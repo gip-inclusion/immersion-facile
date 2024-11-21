@@ -974,6 +974,7 @@ describe("Pg implementation of ConventionQueries", () => {
         signedAt: new Date().toISOString(),
       })
       .withDateStart(conventionStartDate)
+      .withDateEnd(addDays(new Date(conventionStartDate), 5).toISOString())
       .build();
 
     const agency = AgencyDtoBuilder.create()
