@@ -1,6 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { SearchResultIllustration, Tag as ImTag } from "react-design-system";
-import { FormEstablishmentDto, SearchResultDto } from "shared";
+import {
+  FormEstablishmentDto,
+  SearchResultDto,
+  addressStringToDto,
+} from "shared";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import { useStyles } from "tss-react/dsfr";
 import { SearchResult } from "../../search/SearchResult";
@@ -29,12 +33,7 @@ const establishmentToSearchResultPreview = ({
     lat: 0,
     lon: 0,
   },
-  address: {
-    streetNumberAndAddress: businessAddresses[0]?.rawAddress ?? "",
-    city: "",
-    departmentCode: "",
-    postcode: "",
-  },
+  address: addressStringToDto(businessAddresses[0]?.rawAddress),
   siret,
   website,
   fitForDisabledWorkers,
