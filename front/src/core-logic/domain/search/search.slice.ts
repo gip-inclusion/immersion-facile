@@ -33,6 +33,7 @@ interface SearchState {
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
   searchParams: SearchQueryParamsDto;
+  currentPage: number;
 }
 
 export const initialState: SearchState = {
@@ -52,6 +53,7 @@ export const initialState: SearchState = {
     sortedBy: "score",
     fitForDisabledWorkers: undefined,
   },
+  currentPage: 1,
 };
 
 export const searchSlice = createSlice({
