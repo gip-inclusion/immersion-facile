@@ -4,6 +4,13 @@
   &__section {
     border: 1px solid var(--grey-900-175);
 
+    a[href] {
+      text-underline-offset: 4px;
+      word-break: break-word;
+      text-decoration: underline;
+      background-image: none;
+    }
+
     h2 {
       @include for-screen-min($bp-md) {
         margin-bottom: 0 !important;
