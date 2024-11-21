@@ -33,7 +33,7 @@ export interface Database {
   establishments: Establishments;
   exchanges: Exchanges;
   feature_flags: FeatureFlags;
-  form_establishments: PgFormEstablishments;
+  form_establishments: FormEstablishments;
   groups__sirets: GroupsSirets;
   groups: Groups;
   immersion_assessments: ImmersionAssessments;
@@ -292,14 +292,14 @@ interface ViewAppellationsDto {
   rome_label: string | null;
 }
 
-interface PgFormEstablishments extends WithAcquisition {
+interface FormEstablishments extends WithAcquisition {
   additional_information: Generated<string | null>;
   business_addresses: Json;
   business_contact: Generated<Json>;
   business_name_customized: string | null;
   business_name: string;
   created_at: Generated<Timestamp | null>;
-  fit_for_disabled_workers: Generated<boolean | null>;
+  fit_for_disabled_workers: boolean;
   is_engaged_enterprise: boolean | null;
   max_contacts_per_month: number;
   naf: Json | null;
@@ -375,11 +375,12 @@ interface OngoingOauths {
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
 }
+
 interface Establishments extends WithAcquisition {
   additional_information: Generated<string | null>;
   created_at: Timestamp;
   customized_name: string | null;
-  fit_for_disabled_workers: Generated<boolean | null>;
+  fit_for_disabled_workers: boolean;
   is_commited: boolean | null;
   is_open: Generated<boolean>;
   is_searchable: Generated<boolean>;
@@ -395,9 +396,9 @@ interface Establishments extends WithAcquisition {
   searchable_by_students: boolean;
   siret: string;
   source_provider: string;
-  update_date: Timestamp | null;
+  update_date: Timestamp;
   website: Generated<string | null>;
-  score: number;
+  score: Generated<number>;
 }
 
 interface PublicAppellationsData {
