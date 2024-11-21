@@ -19,6 +19,29 @@ const boulangerRomeData = {
   rome: "D1102",
   romeLabel: "Boulangerie - viennoiserie",
 };
+const searchResult = new LaBonneBoiteCompanyDtoBuilder()
+  .withName("L'ENTREMETS GOURMAND")
+  .withSiret("83906399700028")
+  .withEmployeeRange(0, 0)
+  .withNaf({
+    code: "1071C",
+    nomenclature: "Boulangerie et boulangerie-pâtisserie",
+  })
+  .withPosition({
+    lat: 47.8734,
+    lon: -4.12565,
+  })
+  .withRome(boulangerRomeData.rome)
+  .withAddress({
+    city: "Combrit",
+    postcode: "29120",
+    departmentCode: "29",
+  })
+  .build()
+  .toSearchResult({
+    romeCode: boulangerRomeData.rome,
+    romeLabel: boulangerRomeData.romeLabel,
+  });
 
 describe("HttpLaBonneBoiteGateway", () => {
   let laBonneBoiteGateway: HttpLaBonneBoiteGateway;
@@ -60,31 +83,7 @@ describe("HttpLaBonneBoiteGateway", () => {
       ...boulangerRomeData,
     });
 
-    expectToEqual(actualSearchedCompanies, [
-      new LaBonneBoiteCompanyDtoBuilder()
-        .withName("L'ENTREMETS GOURMAND")
-        .withSiret("83906399700028")
-        .withEmployeeRange(0, 0)
-        .withNaf({
-          code: "1071C",
-          nomenclature: "Boulangerie et boulangerie-pâtisserie",
-        })
-        .withPosition({
-          lat: 47.8734,
-          lon: -4.12564,
-        })
-        .withRome(boulangerRomeData.rome)
-        .withAddress({
-          city: "COMBRIT",
-          postcode: "29120",
-          departmentCode: "29",
-        })
-        .build()
-        .toSearchResult({
-          romeCode: boulangerRomeData.rome,
-          romeLabel: boulangerRomeData.romeLabel,
-        }),
-    ]);
+    expectToEqual(actualSearchedCompanies, [searchResult]);
   });
 
   it("Should support several of parallel calls, and queue the calls if over accepted rate", async () => {
@@ -192,30 +191,6 @@ describe("HttpLaBonneBoiteGateway", () => {
       romeCode: boulangerRomeData.rome,
       romeLabel: boulangerRomeData.romeLabel,
     });
-    expect(result).toEqual(
-      new LaBonneBoiteCompanyDtoBuilder()
-        .withName("L'ENTREMETS GOURMAND")
-        .withSiret(siret)
-        .withEmployeeRange(0, 0)
-        .withNaf({
-          code: "1071C",
-          nomenclature: "Boulangerie et boulangerie-pâtisserie",
-        })
-        .withPosition({
-          lat: 47.8734,
-          lon: -4.12565,
-        })
-        .withAddress({
-          city: "Combrit",
-          postcode: "29120",
-          departmentCode: "29",
-        })
-        .withoutRome()
-        .build()
-        .toSearchResult({
-          romeCode: boulangerRomeData.rome,
-          romeLabel: boulangerRomeData.romeLabel,
-        }),
-    );
+    expectToEqual(result, searchResult);
   });
 });
