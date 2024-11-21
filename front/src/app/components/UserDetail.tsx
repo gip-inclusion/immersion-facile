@@ -57,12 +57,19 @@ export const UserDetail = ({
         agencyRights={[...userWithRights.agencyRights].sort((a, b) =>
           a.agency.name.localeCompare(b.agency.name),
         )}
+        isAdmin={userWithRights.isBackofficeAdmin}
       />
     </div>
   );
 };
 
-const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
+const AgenciesTable = ({
+  agencyRights,
+  isAdmin,
+}: {
+  agencyRights: AgencyRight[];
+  isAdmin?: boolean;
+}) => {
   if (!agencyRights.length)
     return <p>Cet utilisateur n'est lié à aucune agence</p>;
 
@@ -78,56 +85,67 @@ const AgenciesTable = ({ agencyRights }: { agencyRights: AgencyRight[] }) => {
           "Carractéristiques de l'agence",
           "Roles",
           "Reçoit les notifications",
-          "Actions",
+          ...(isAdmin ? ["Actions"] : []),
         ]}
-        data={agencyRights.map((agencyRight) => {
-          const viewAgencyProps = !agencyRight.roles.includes("agency-admin")
-            ? {
-                disabled: true,
-                title:
-                  "Vous n'êtes pas administrateur de cette agence. Seuls les administrateurs de l'agence peuvent voir le détail.",
-              }
-            : {
-                linkProps: routes.adminAgencyDetail({
-                  agencyId: agencyRight.agency.id,
-                }).link,
-              };
+        data={agencyRights.map((agencyRight) => [
+          <>
+            {agencyRight.agency.name}
+            <span className={fr.cx("fr-hint-text")}>
+              {addressDtoToString(agencyRight.agency.address)}
+            </span>
 
-          return [
-            <>
-              {agencyRight.agency.name}
-              <span className={fr.cx("fr-hint-text")}>
-                {addressDtoToString(agencyRight.agency.address)}
-              </span>
-            </>,
-            <ul className={fr.cx("fr-raw-list")}>
+            {agencyRight.roles.includes("agency-admin") && isAdmin && (
+              <a
+                className={fr.cx(
+                  "fr-link",
+                  "fr-text--sm",
+                  "fr-icon-arrow-right-line",
+                  "fr-link--icon-right",
+                )}
+                {...routes.adminAgencyDetail({
+                  // this should be changed to agencyDashboardAgency/:agencyId, when it is ready
+                  agencyId: agencyRight.agency.id,
+                }).link}
+              >
+                Voir l'agence
+              </a>
+            )}
+          </>,
+          <ul className={fr.cx("fr-raw-list")}>
+            <li>
+              <AgencyTag
+                refersToAgencyName={agencyRight.agency.refersToAgencyName}
+              />
+            </li>
+            {!activeAgencyStatuses.includes(agencyRight.agency.status) && (
               <li>
-                <AgencyTag
-                  refersToAgencyName={agencyRight.agency.refersToAgencyName}
-                />
+                <AgencyStatusBadge status={agencyRight.agency.status} />
               </li>
-              {!activeAgencyStatuses.includes(agencyRight.agency.status) && (
-                <li>
-                  <AgencyStatusBadge status={agencyRight.agency.status} />
-                </li>
-              )}
-              <li>
-                Type : {agencyKindToLabelIncludingIF[agencyRight.agency.kind]}
-              </li>
-            </ul>,
-            agencyRight.roles
-              .map((role) => agencyRoleToDisplay[role].label)
-              .join(", "),
-            agencyRight.isNotifiedByEmail ? "Oui" : "Non",
-            <Button
-              priority="tertiary no outline"
-              size="small"
-              {...viewAgencyProps}
-            >
-              Voir l'agence
-            </Button>,
-          ];
-        })}
+            )}
+            <li>
+              Type : {agencyKindToLabelIncludingIF[agencyRight.agency.kind]}
+            </li>
+          </ul>,
+          agencyRight.roles
+            .map((role) => agencyRoleToDisplay[role].label)
+            .join(", "),
+          agencyRight.isNotifiedByEmail ? "Oui" : "Non",
+          ...(isAdmin
+            ? [
+                <Button
+                  priority="tertiary no outline"
+                  size="small"
+                  linkProps={
+                    routes.adminAgencyDetail({
+                      agencyId: agencyRight.agency.id,
+                    }).link
+                  }
+                >
+                  Voir l'agence comme admin IF
+                </Button>,
+              ]
+            : []),
+        ])}
       />
     </>
   );
