@@ -6,6 +6,7 @@ import Styles from "./CopyButton.styles";
 export type CopyButtonProperties = {
   textToCopy: string;
   withBorder?: boolean;
+  className?: string;
 } & ({ label: string; withIcon: boolean } | { withIcon: true });
 
 export const CopyButton = (props: CopyButtonProperties) => {
@@ -45,6 +46,7 @@ export const CopyButton = (props: CopyButtonProperties) => {
           props.withIcon && "fr-btn--icon-left",
         ),
         props.withBorder && Styles.copyButtonBorder,
+        props.className,
       )}
       type="button"
     >
