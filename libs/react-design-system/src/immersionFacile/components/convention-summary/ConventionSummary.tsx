@@ -185,9 +185,11 @@ const SubSection = ({
                       className={fr.cx("fr-col-12", "fr-mb-2w")}
                     >
                       <Badge severity={field.badgeSeverity}>
-                        {field.badgeSeverity === "success"
-                          ? `Signée - Le ${field.value}`
-                          : "Signature en attente"}
+                        {field.badgeSeverity === "success" ? (
+                          <>field.value</>
+                        ) : (
+                          "Signature en attente"
+                        )}
                       </Badge>
                     </div>
                   );
