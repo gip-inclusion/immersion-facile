@@ -503,7 +503,11 @@ const makeImmersionSubSections = (
       fields: [
         {
           key: "immersionObjective",
-          label: "Objectif",
+          label: `Objectif ${
+            convention.internshipKind === "immersion"
+              ? "de l'immersion"
+              : "du mini-stage"
+          }`,
           value: convention.immersionObjective,
         },
         {
