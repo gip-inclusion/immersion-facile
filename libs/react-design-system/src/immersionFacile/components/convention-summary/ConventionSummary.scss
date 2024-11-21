@@ -22,12 +22,24 @@
     }
 
     img {
-      width: 100px;
+      max-width: 100px;
+      height: fit-content;
+
+      @include for-screen-min($bp-md) {
+        max-width: 100%;
+      }
     }
 
-    &--fluid {
-      justify-content: space-between;
+    &__header {
       align-items: center;
+
+      &__main {
+        @include for-screen-min($bp-md) {
+          padding-left: 20px;
+          justify-content: space-between;
+          align-items: center;
+        }
+      }
     }
 
     &__id {

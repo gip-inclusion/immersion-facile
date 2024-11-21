@@ -63,16 +63,21 @@ export const ConventionSummary = ({
           className={cx(
             fr.cx("fr-grid-row", "fr-mb-3w", "fr-p-2w"),
             conventionSummaryStyles.section,
-            conventionSummaryStyles.sectionFluid,
+            conventionSummaryStyles.sectionHeader,
           )}
         >
-          <div className={fr.cx("fr-grid-row")}>
-            <img
-              src="https://immersion.cellar-c2.services.clever-cloud.com/document_administratif"
-              alt=""
-              className={fr.cx("fr-mr-3v")}
-            />
-            <div>
+          <img
+            src="https://immersion.cellar-c2.services.clever-cloud.com/document_administratif"
+            alt=""
+            className={fr.cx("fr-col-12", "fr-col-md-1")}
+          />
+          <div
+            className={cx(
+              fr.cx("fr-col-12", "fr-col-md-11", "fr-grid-row"),
+              conventionSummaryStyles.sectionHeaderMain,
+            )}
+          >
+            <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
               <h4 className={fr.cx("fr-mb-0")}>Convention</h4>
               <div className={fr.cx("fr-text--xs", "fr-mb-2v")}>
                 Date de soumission : {submittedAt}
@@ -84,13 +89,14 @@ export const ConventionSummary = ({
                 {conventionId}
               </div>
             </div>
+            <CopyButton
+              label="Copier l'ID de convention"
+              textToCopy={conventionId}
+              withIcon={true}
+              withBorder={true}
+              className={fr.cx("fr-my-2v")}
+            />
           </div>
-          <CopyButton
-            label="Copier l'ID de convention"
-            textToCopy={conventionId}
-            withIcon={true}
-            withBorder={true}
-          />
         </section>
       )}
       {summary.map((section) => (
