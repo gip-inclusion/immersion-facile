@@ -200,12 +200,13 @@ const SubSection = ({
                     key={field.key}
                   >
                     {"label" in field && (
-                      <div className={fr.cx("fr-text--xs", "fr-m-0")}>
+                      <div>
                         <div className={fr.cx("fr-text--xs", "fr-m-0")}>
                           {field.label}
                         </div>
                         <div
                           className={cx(
+                            fr.cx("fr-text--sm", "fr-m-0"),
                             conventionSummaryStyles.subsectionValue,
                           )}
                         >
