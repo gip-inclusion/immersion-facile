@@ -28,15 +28,15 @@ export type ConventionSummarySubSection = {
 export type ConventionSummaryField = { key: string } & (
   | {
       label: string;
-      value: string | ReactNode;
+      value: string | NonNullable<ReactNode>;
       copyButton?: string | ReactNode;
       hasBackgroundColor?: boolean;
     }
   | {
-      value: string | ReactNode;
+      value: string | NonNullable<ReactNode>;
       badgeSeverity: "success" | "warning";
     }
-  | { value: ReactNode }
+  | { value: NonNullable<ReactNode> }
 );
 
 export const ConventionSummary = ({
@@ -188,14 +188,16 @@ const SubSection = ({
                   return (
                     <div
                       key={field.key}
-                      className={fr.cx("fr-col-12", "fr-mb-2w")}
+                      className={cx(
+                        fr.cx("fr-col-12"),
+                        field.key !== "dateApproval" &&
+                          field.key !== "dateValidation"
+                          ? "fr-mb-2w"
+                          : "",
+                      )}
                     >
                       <Badge small severity={field.badgeSeverity}>
-                        {field.badgeSeverity === "success" ? (
-                          <>{field.value}</>
-                        ) : (
-                          "Signature en attente"
-                        )}
+                        {field.value}
                       </Badge>
                     </div>
                   );

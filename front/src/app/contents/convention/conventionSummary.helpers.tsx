@@ -20,6 +20,44 @@ import { Cx } from "tss-react";
 const makeSignatoriesSubsections = (
   convention: ConventionReadDto,
 ): ConventionSummarySubSection[] => {
+  const shouldDisplayDefaultSignatoryBadge =
+    convention.status === "READY_TO_SIGN" ||
+    convention.status === "PARTIALLY_SIGNED";
+  const shouldDisplayDefaultAgencyBadge =
+    convention.status === "IN_REVIEW" ||
+    convention.status === "ACCEPTED_BY_COUNSELLOR";
+  const defaultSignatoryBadgeValue = (
+    key: string,
+  ): ConventionSummaryField | null =>
+    shouldDisplayDefaultSignatoryBadge
+      ? ({
+          key,
+          value: "Signature en attente",
+          badgeSeverity: "warning",
+        } satisfies ConventionSummaryField)
+      : null;
+
+  const defaultAgencyBadgeValue = (
+    hasAgencyWithRefersTo: boolean,
+    key: "dateApproval" | "dateValidation",
+    value: string,
+  ): ConventionSummaryField | null => {
+    if (!shouldDisplayDefaultAgencyBadge) {
+      return null;
+    }
+    if (
+      key === "dateValidation" ||
+      (key === "dateApproval" && hasAgencyWithRefersTo)
+    ) {
+      return {
+        key,
+        value,
+        badgeSeverity: "warning",
+      } satisfies ConventionSummaryField;
+    }
+    return null;
+  };
+
   return removeEmptyValue([
     {
       key: "beneficiary",
@@ -33,11 +71,9 @@ const makeSignatoriesSubsections = (
                 `Signée - Le ${toDisplayedDate({
                   date: new Date(convention.signatories.beneficiary.signedAt),
                 })}`,
-              badgeSeverity: convention.signatories.beneficiary.signedAt
-                ? "success"
-                : "warning",
+              badgeSeverity: "success",
             } satisfies ConventionSummaryField)
-          : null,
+          : defaultSignatoryBadgeValue("beneficiarySignedAt"),
         {
           key: "beneficiaryFirstname",
           label: "Prénom",
@@ -79,7 +115,7 @@ const makeSignatoriesSubsections = (
           title: "Représentant légal du bénéficiaire",
           fields: removeEmptyValue([
             convention.signatories.beneficiaryRepresentative.signedAt
-              ? {
+              ? ({
                   key: "beneficiaryRepSignedAt",
                   value:
                     convention.signatories.beneficiaryRepresentative.signedAt &&
@@ -89,12 +125,9 @@ const makeSignatoriesSubsections = (
                           .signedAt,
                       ),
                     })}`,
-                  badgeSeverity: convention.signatories
-                    .beneficiaryRepresentative.signedAt
-                    ? "success"
-                    : "warning",
-                }
-              : null,
+                  badgeSeverity: "success",
+                } satisfies ConventionSummaryField)
+              : defaultSignatoryBadgeValue("beneficiaryRepSignedAt"),
             {
               key: "beneficiaryRepFirstname",
               label: "Prénom",
@@ -147,12 +180,9 @@ const makeSignatoriesSubsections = (
                     convention.signatories.establishmentRepresentative.signedAt,
                   ),
                 })}`,
-              badgeSeverity: convention.signatories.establishmentRepresentative
-                .signedAt
-                ? "success"
-                : "warning",
+              badgeSeverity: "success",
             } satisfies ConventionSummaryField)
-          : null,
+          : defaultSignatoryBadgeValue("establishmentRepSignedAt"),
         {
           key: "establishmentRepFirstname",
           label: "Prénom",
@@ -212,12 +242,11 @@ const makeSignatoriesSubsections = (
                           .signedAt,
                       ),
                     })}`,
-                  badgeSeverity: convention.signatories
-                    .beneficiaryCurrentEmployer.signedAt
-                    ? "success"
-                    : "warning",
+                  badgeSeverity: "success",
                 } satisfies ConventionSummaryField)
-              : null,
+              : defaultSignatoryBadgeValue(
+                  "beneficiaryCurrentEmployerSignedAt",
+                ),
             {
               key: "beneficiaryCurrentEmployerFirstname",
               label: "Prénom",
@@ -285,9 +314,13 @@ const makeSignatoriesSubsections = (
                 `Pré-validée - Le ${toDisplayedDate({
                   date: new Date(convention.dateApproval),
                 })}`,
-              badgeSeverity: convention.dateApproval ? "success" : "warning",
+              badgeSeverity: "success",
             } satisfies ConventionSummaryField)
-          : null,
+          : defaultAgencyBadgeValue(
+              !!convention.agencyRefersTo,
+              "dateApproval",
+              "Pré-validation en attente",
+            ),
         convention.agencyRefersTo
           ? {
               key: "agencyWithRefersTo",
@@ -309,9 +342,13 @@ const makeSignatoriesSubsections = (
                 `Validée - Le ${toDisplayedDate({
                   date: new Date(convention.dateValidation),
                 })}`,
-              badgeSeverity: convention.dateValidation ? "success" : "warning",
+              badgeSeverity: "success",
             } satisfies ConventionSummaryField)
-          : null,
+          : defaultAgencyBadgeValue(
+              false,
+              "dateValidation",
+              "Validation en attente",
+            ),
         {
           key: "agencyName",
           label: `Prescripteur ${convention.agencyRefersTo ? "lié" : ""}`,
