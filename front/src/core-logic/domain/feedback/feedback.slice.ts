@@ -4,6 +4,7 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { keys } from "shared";
+import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
@@ -23,6 +24,7 @@ const topics = [
   "dashboard-agency-register-user",
   "auth-global",
   "establishments-batch",
+  "user",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -212,6 +214,19 @@ export const feedbackMapping: Record<
       action: establishmentBatchSlice.actions.addEstablishmentBatchSucceeded,
       title: "Le groupe d'entreprises a bien été créé",
       message: "L'import en masse a réussi, voici le détail :",
+    },
+  },
+  user: {
+    "update.success": {
+      action: updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
+      title: "L'utilisateur a été mis à jour",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "update.error": {
+      action: updateUserOnAgencySlice.actions.updateUserAgencyRightFailed,
+      title: "Problème lors de la mise à jour de l'utilisateur",
+      message:
+        "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
   },
 };

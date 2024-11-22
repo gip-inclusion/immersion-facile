@@ -9,6 +9,7 @@ import {
   InclusionConnectJwt,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
+  UserParamsForAgency,
   WithAgencyId,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -126,6 +127,30 @@ export class HttpAgencyGateway implements AgencyGateway {
             .with({ status: 200 }, () => undefined)
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 409 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public updateUserAgencyRight$(
+    params: UserParamsForAgency,
+    token: InclusionConnectJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .updateUserRoleForAgency({
+          headers: { authorization: token },
+          urlParams: {
+            agencyId: params.agencyId,
+          },
+          body: params,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, logBodyAndThrow)
+            .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

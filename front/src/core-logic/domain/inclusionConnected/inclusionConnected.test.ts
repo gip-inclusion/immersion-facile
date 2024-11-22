@@ -1,13 +1,16 @@
 import {
   AgencyDtoBuilder,
+  AgencyRight,
   ConventionDtoBuilder,
   ConventionReadDto,
   InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   WithAgencyIds,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   inclusionConnectTokenExpiredMessage,
 } from "shared";
+import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -313,6 +316,49 @@ describe("InclusionConnected", () => {
         ),
         ["back-office", "agency-admin", "validator"],
       );
+    });
+  });
+
+  it("update the user rights successfully", () => {
+    const agency = new AgencyDtoBuilder().build();
+    const agencyRight: AgencyRight = {
+      agency,
+      roles: ["validator"],
+      isNotifiedByEmail: false,
+    };
+    const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+      .withId("user-id")
+      .withIsAdmin(false)
+      .withAgencyRights([agencyRight])
+      .build();
+
+    ({ store, dependencies } = createTestStore({
+      inclusionConnected: {
+        currentUser: user,
+        agenciesToReview: [],
+        isLoading: false,
+      },
+    }));
+
+    store.dispatch(
+      updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
+        userId: user.id,
+        agencyId: agency.id,
+        email: user.email,
+        roles: [...agencyRight.roles, "counsellor"],
+        isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+        feedbackTopic: "user",
+      }),
+    );
+
+    expectToEqual(inclusionConnectedSelectors.currentUser(store.getState()), {
+      ...user,
+      agencyRights: [
+        {
+          ...agencyRight,
+          roles: [...agencyRight.roles, "counsellor"],
+        },
+      ],
     });
   });
 

@@ -1,5 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { AgencyDto, InclusionConnectedUser, WithAgencyIds } from "shared";
+import { updateUserAgencyRights } from "src/core-logic/domain/agencies/agencies.helpers";
+import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -59,5 +61,17 @@ export const inclusionConnectedSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(
+      updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
+      (state, action) => {
+        if (!state.currentUser) return;
+        state.currentUser = updateUserAgencyRights(
+          state.currentUser,
+          action.payload,
+        );
+      },
+    );
   },
 });

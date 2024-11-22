@@ -8,6 +8,7 @@ import {
   InclusionConnectJwt,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
+  UserParamsForAgency,
   WithAgencyId,
 } from "shared";
 
@@ -29,6 +30,10 @@ export interface AgencyGateway {
   updateAgency$(
     agencyDto: AgencyDto,
     adminToken: InclusionConnectJwt,
+  ): Observable<void>;
+  updateUserAgencyRight$(
+    params: UserParamsForAgency,
+    token: InclusionConnectJwt,
   ): Observable<void>;
   validateOrRejectAgency$(
     adminToken: InclusionConnectJwt,
