@@ -11,15 +11,14 @@ import {
   AgencyDtoWithoutEmails,
   AgencyId,
   AgencyRight,
-  ExtractFromExisting,
   RejectIcUserRoleForAgencyParams,
   User,
   UserId,
+  UserParamsForAgency,
   domElementIds,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
-import { UserFormMode } from "src/app/components/agency/AgencyUsers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes } from "src/app/routes/routes";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -30,7 +29,7 @@ type IcUserAgenciesToReviewProps = {
 };
 type IcUserAgenciesToReviewModalProps = {
   title: string;
-  mode: ExtractFromExisting<UserFormMode, "register"> | "reject";
+  mode: "register" | "reject";
 };
 
 function AgencyReviewForm({
@@ -109,10 +108,21 @@ export const IcUserAgenciesToReview = ({
   agenciesNeedingReviewForUser,
   selectedUser,
 }: IcUserAgenciesToReviewProps) => {
+  const dispatch = useDispatch();
   const [selectedAgency, setSelectedAgency] =
     useState<AgencyDtoWithoutEmails>();
   const [modalProps, setModalProps] =
     useState<IcUserAgenciesToReviewModalProps | null>(null);
+
+  const onUserRegistrationSubmitted = (
+    userParamsForAgency: UserParamsForAgency,
+  ) => {
+    dispatch(
+      icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested(
+        userParamsForAgency,
+      ),
+    );
+  };
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -145,7 +155,7 @@ export const IcUserAgenciesToReview = ({
                   isNotifiedByEmail: true,
                 }}
                 closeModal={closeIcUserRegistrationToAgencyModal}
-                mode={modalProps.mode}
+                onSubmit={onUserRegistrationSubmitted}
                 agencyHasRefersTo={!!selectedAgency.refersToAgencyId}
               />
             )

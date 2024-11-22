@@ -71,8 +71,6 @@ export const agencyRoleToDisplay: Record<
   },
 };
 
-export type UserFormMode = "add" | "update" | "register";
-
 const manageUserModal = createModal({
   isOpenedByDefault: false,
   id: domElementIds.admin.agencyTab.editAgencyManageUserModal,
@@ -94,7 +92,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
     (UserParamsForAgency & { isIcUser: boolean }) | null
   >(null);
 
-  const [mode, setMode] = useState<UserFormMode | null>(null);
+  const [mode, setMode] = useState<"add" | "update" | null>(null);
 
   const provider = enableProConnect ? "ProConnect" : "Inclusion Connect";
 
@@ -133,6 +131,26 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
         values(agencyUsersById),
       )
     : [values(agencyUsersById), []];
+
+  const onUserUpdateSubmitted = (userParamsForAgency: UserParamsForAgency) => {
+    dispatch(
+      icUsersAdminSlice.actions.updateUserOnAgencyRequested({
+        ...userParamsForAgency,
+        feedbackTopic: "agency-user",
+      }),
+    );
+  };
+
+  const onUserCreationSubmitted = (
+    userParamsForAgency: UserParamsForAgency,
+  ) => {
+    dispatch(
+      icUsersAdminSlice.actions.createUserOnAgencyRequested({
+        ...userParamsForAgency,
+        feedbackTopic: "agency-user",
+      }),
+    );
+  };
 
   return (
     <>
@@ -220,8 +238,12 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
               <AgencyUserModificationForm
                 agencyUser={selectedUserData}
                 closeModal={() => manageUserModal.close()}
-                mode={mode}
                 agencyHasRefersTo={!!agency.refersToAgencyId}
+                onSubmit={
+                  mode === "add"
+                    ? onUserCreationSubmitted
+                    : onUserUpdateSubmitted
+                }
               />
             </>
           )}
