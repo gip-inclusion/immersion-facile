@@ -1,5 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { InclusionConnectedUser, UserId } from "shared";
+import { updateUserAgencyRights } from "src/core-logic/domain/agencies/agencies.helpers";
+import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 
 type FetchUserState = {
   user: InclusionConnectedUser | null;
@@ -25,5 +27,14 @@ export const fetchUserSlice = createSlice({
       state.user = action.payload;
       state.isFetching = false;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(
+      updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
+      (state, action) => {
+        if (!state.user) return;
+        state.user = updateUserAgencyRights(state.user, action.payload);
+      },
+    );
   },
 });

@@ -21,12 +21,14 @@ export const AgencyUserModificationForm = ({
   closeModal,
   agencyHasRefersTo,
   isEmailDisabled,
+  areRolesDisabled,
   onSubmit,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
   agencyHasRefersTo: boolean;
   isEmailDisabled?: boolean;
+  areRolesDisabled?: boolean;
   onSubmit: (userParamsForAgency: UserParamsForAgency) => void;
 }) => {
   const methods = useForm<UserParamsForAgency>({
@@ -120,6 +122,7 @@ export const AgencyUserModificationForm = ({
           legend="Rôles :"
           {...getFieldError("roles")}
           options={checkboxOptionsWithFilter()}
+          disabled={!!areRolesDisabled}
         />
 
         <ToggleSwitch

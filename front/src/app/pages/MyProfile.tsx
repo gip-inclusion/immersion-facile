@@ -1,9 +1,16 @@
-import { AbsoluteUrl } from "shared";
+import React, { useEffect } from "react";
+import { Loader } from "react-design-system";
+import { useDispatch } from "react-redux";
+import { AbsoluteUrl, UserParamsForAgency } from "shared";
 import { UserDetail } from "src/app/components/UserDetail";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
+import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
+import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { Route } from "type-route";
 
@@ -24,26 +31,53 @@ const getLinkToUpdateAccountInfo = (isProConnect: boolean): AbsoluteUrl => {
 };
 
 export const MyProfile = (_: MyProfileProps) => {
+  const dispatch = useDispatch();
   const { enableProConnect } = useAppSelector(
     featureFlagSelectors.featureFlagState,
   );
 
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
 
-  if (!currentUser) return <p>Vous n'êtes pas connecté...</p>;
+  const userConnectedJwt = useAppSelector(authSelectors.inclusionConnectToken);
+
+  const isLoading = useAppSelector(updateUserOnAgencySelectors.isLoading);
+
+  useEffect(() => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+  }, [dispatch]);
+
+  if (!currentUser || !userConnectedJwt)
+    return <p>Vous n'êtes pas connecté...</p>;
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   const userDisplayed =
     currentUser.firstName && currentUser.lastName
       ? `${currentUser.firstName} ${currentUser.lastName}`
       : currentUser.email;
 
+  const onUserUpdateRequested = (userParamsForAgency: UserParamsForAgency) => {
+    dispatch(
+      updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+        user: userParamsForAgency,
+        jwt: userConnectedJwt,
+        feedbackTopic: "user",
+      }),
+    );
+  };
+
   return (
-    <UserDetail
-      title={`Mon profil : ${userDisplayed}`}
-      userWithRights={currentUser}
-      editInformationsLink={getLinkToUpdateAccountInfo(
-        enableProConnect.isActive,
-      )}
-    />
+    <>
+      <UserDetail
+        title={`Mon profil : ${userDisplayed}`}
+        userWithRights={currentUser}
+        editInformationsLink={getLinkToUpdateAccountInfo(
+          enableProConnect.isActive,
+        )}
+        onUserUpdateRequested={onUserUpdateRequested}
+      />
+    </>
   );
 };

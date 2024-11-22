@@ -28,6 +28,8 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
+  public updateUserAgencyRightResponse$ = new Subject<undefined>();
+
   public addAgencyResponse$ = new Subject<undefined>();
 
   #agencies: Record<string, AgencyDto> = {};
@@ -62,6 +64,10 @@ export class TestAgencyGateway implements AgencyGateway {
     _adminToken: InclusionConnectJwt,
   ): Observable<void> {
     return this.updateAgencyResponse$;
+  }
+
+  public updateUserAgencyRight$(): Observable<void> {
+    return this.updateUserAgencyRightResponse$;
   }
 
   public validateOrRejectAgency$(
