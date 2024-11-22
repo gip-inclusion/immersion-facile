@@ -6,37 +6,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import { keys } from "react-design-system";
 import { FormProvider, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import {
   UserParamsForAgency,
   domElementIds,
   toLowerCaseWithoutDiacritics,
   userParamsForAgencySchema,
 } from "shared";
-import {
-  UserFormMode,
-  agencyRoleToDisplay,
-} from "src/app/components/agency/AgencyUsers";
+import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { match } from "ts-pattern";
 
 export const AgencyUserModificationForm = ({
   agencyUser,
   closeModal,
-  mode,
   agencyHasRefersTo,
   isEmailDisabled,
+  onSubmit,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
-  mode: UserFormMode;
   agencyHasRefersTo: boolean;
   isEmailDisabled?: boolean;
+  onSubmit: (userParamsForAgency: UserParamsForAgency) => void;
 }) => {
-  const dispatch = useDispatch();
-
   const methods = useForm<UserParamsForAgency>({
     resolver: zodResolver(userParamsForAgencySchema),
     mode: "onTouched",
@@ -53,35 +45,10 @@ export const AgencyUserModificationForm = ({
     const validatedUserRoles = values.roles.filter(
       (role) => role !== "to-review",
     );
-    match(mode)
-      .with("add", () => {
-        dispatch(
-          icUsersAdminSlice.actions.createUserOnAgencyRequested({
-            ...values,
-            roles: validatedUserRoles,
-            feedbackTopic: "agency-user",
-          }),
-        );
-      })
-      .with("update", () => {
-        dispatch(
-          icUsersAdminSlice.actions.updateUserOnAgencyRequested({
-            ...values,
-            roles: validatedUserRoles,
-            feedbackTopic: "agency-user",
-          }),
-        );
-      })
-      .with("register", () => {
-        dispatch(
-          icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested({
-            ...values,
-            roles: validatedUserRoles,
-          }),
-        );
-      })
-      .exhaustive();
-
+    onSubmit({
+      ...values,
+      roles: validatedUserRoles,
+    });
     closeModal();
   };
 
