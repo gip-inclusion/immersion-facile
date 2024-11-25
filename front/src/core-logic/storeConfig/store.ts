@@ -23,6 +23,8 @@ import { assessmentEpics } from "src/core-logic/domain/assessment/assessment.epi
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishment/establishment.epics";
+import { agenciesDashboardEpics } from "src/core-logic/domain/dashboards/agencyDashboard/agencyDashboard.epic";
+import { agencyDashboardSlice } from "src/core-logic/domain/dashboards/agencyDashboard/agencyDashboard.slice";
 import { establishmentLeadEpics } from "src/core-logic/domain/establishmentLead/establishmentLead.epics";
 import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
@@ -76,6 +78,7 @@ const allEpics: AppEpic<any>[] = [
   ...listUsersEpics,
   ...fetchUserEpics,
   ...updateUserOnAgencyEpics,
+  ...agenciesDashboardEpics,
 ];
 
 const appReducer = combineReducers({
@@ -90,6 +93,9 @@ const appReducer = combineReducers({
   }),
   agency: combineReducers({
     [updateUserOnAgencySlice.name]: updateUserOnAgencySlice.reducer,
+  }),
+  dashboards: combineReducers({
+    [agencyDashboardSlice.name]: agencyDashboardSlice.reducer,
   }),
   [agencyAdminSlice.name]: agencyAdminSlice.reducer,
   [agenciesSlice.name]: agenciesSlice.reducer,

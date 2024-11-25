@@ -222,7 +222,7 @@ const fetchInclusionConnectedUserOnAgencyUpdateEpic: AppEpic<
     ),
   );
 
-const normalizeUsers = (
+export const normalizeUsers = (
   users: InclusionConnectedUser[],
 ): NormalizedIcUserById =>
   users.reduce(
