@@ -15,7 +15,7 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { EstablishmentUserRight } from "../entities/EstablishmentEntity";
+import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregate";
 
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<

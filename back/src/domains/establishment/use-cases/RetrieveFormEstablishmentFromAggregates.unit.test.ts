@@ -16,7 +16,7 @@ import {
 import {
   EstablishmentAdminRight,
   EstablishmentUserRight,
-} from "../entities/EstablishmentEntity";
+} from "../entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

@@ -17,7 +17,7 @@ import { toAgencyWithRights } from "../../../../utils/agency";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
-import { EstablishmentUserRight } from "../../../establishment/entities/EstablishmentEntity";
+import { EstablishmentUserRight } from "../../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { PgUserRepository } from "../../authentication/inclusion-connect/adapters/PgUserRepository";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";

@@ -17,10 +17,8 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import {
-  EstablishmentAggregate,
-  EstablishmentEntity,
-} from "../entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { businessContactFromEstablishmentAggregateAndUsers } from "../helpers/businessContact.helpers";
 
 export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {

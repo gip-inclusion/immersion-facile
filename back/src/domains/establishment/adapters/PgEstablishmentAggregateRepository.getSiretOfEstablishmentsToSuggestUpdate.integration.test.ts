@@ -7,7 +7,7 @@ import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { EstablishmentUserRight } from "../entities/EstablishmentEntity";
+import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 

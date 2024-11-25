@@ -14,10 +14,8 @@ import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
-import {
-  EstablishmentEntity,
-  EstablishmentUserRight,
-} from "../entities/EstablishmentEntity";
+import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { GroupEntity } from "../entities/GroupEntity";
 import {
   EstablishmentAggregateBuilder,

@@ -7,10 +7,8 @@ import {
   SiretDto,
   UserId,
 } from "shared";
-import {
-  EstablishmentAggregate,
-  EstablishmentEntity,
-} from "../entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
 

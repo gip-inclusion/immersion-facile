@@ -13,7 +13,7 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryEstablishmentLeadRepository } from "../adapters/InMemoryEstablishmentLeadRepository";
-import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { AddEstablishmentLead } from "./AddEstablishmentLead";

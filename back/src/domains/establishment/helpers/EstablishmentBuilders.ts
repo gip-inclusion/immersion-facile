@@ -14,9 +14,9 @@ import {
 import { avenueChampsElyseesDto } from "../../core/address/adapters/InMemoryAddressGateway";
 import {
   EstablishmentAggregate,
-  EstablishmentEntity,
   EstablishmentUserRight,
-} from "../entities/EstablishmentEntity";
+} from "../entities/EstablishmentAggregate";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
 
 export const TEST_APPELLATION_LABEL = "test_appellation_label";

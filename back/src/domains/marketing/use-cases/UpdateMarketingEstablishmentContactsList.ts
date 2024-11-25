@@ -10,7 +10,7 @@ import { createTransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { EstablishmentAggregate } from "../../establishment/entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import { MarketingContact } from "../entities/MarketingContact";
 import {
   ConventionInfos,
