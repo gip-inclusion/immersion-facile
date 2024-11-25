@@ -63,9 +63,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussion
     const attachments = await Promise.all(
       lastExchange.attachments.map(async ({ name, link }) => ({
         name,
-        content: (
-          await this.#notificationGateway.getAttachmentContent(link)
-        ).toString("base64"),
+        content: await this.#notificationGateway.getAttachmentContent(link),
       })),
     );
 

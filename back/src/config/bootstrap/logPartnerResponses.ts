@@ -36,6 +36,7 @@ export const logPartnerResponses: LogPartnerResponses =
             kind: "failure",
             status: response.status,
             input,
+            headers: response.headers,
             body: response.body,
           },
         },

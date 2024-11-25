@@ -2,12 +2,12 @@ import { prop } from "ramda";
 import { DateString, TemplatedEmail, TemplatedSms } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { NotificationGateway } from "../ports/NotificationGateway";
+import { Base64, NotificationGateway } from "../ports/NotificationGateway";
 
 export const sendSmsErrorPhoneNumber = "0699999999";
 export class InMemoryNotificationGateway implements NotificationGateway {
-  public attachmentsByLinks: Partial<Record<string, Buffer>> = {
-    default: Buffer.from(""),
+  public attachmentsByLinks: Partial<Record<string, Base64>> = {
+    default: "",
   };
 
   readonly #sentEmails: {
@@ -22,7 +22,7 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     private readonly numberOfEmailToKeep: number | null = null,
   ) {}
 
-  public async getAttachmentContent(link: string): Promise<Buffer> {
+  public async getAttachmentContent(link: string): Promise<Base64> {
     const attachment = this.attachmentsByLinks[link];
     if (!attachment) throw new Error(`No attachment found by link ${link}.`);
     return attachment;

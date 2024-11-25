@@ -71,6 +71,7 @@ type PartnerApiCall = {
         kind: "failure";
         status: number;
         body: Record<string, unknown>;
+        headers?: unknown;
         input?: {
           body?: unknown;
           queryParams?: unknown;
