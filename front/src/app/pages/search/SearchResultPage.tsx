@@ -99,7 +99,6 @@ export const SearchResultPage = ({
   const defaultMetaContents = defaultPageMetaContents.searchResult;
   const feedback = useAppSelector(searchSelectors.feedback);
   const isLoading = useAppSelector(searchSelectors.isLoading);
-  const searchParams = useAppSelector(searchSelectors.searchParams);
   const formContactRef = useRef<ElementRef<"div">>(null);
   const dispatch = useDispatch();
   const [shouldShowError, setShouldShowError] = useState<boolean>(false);
@@ -154,7 +153,9 @@ export const SearchResultPage = ({
       behavior: "smooth",
     });
   };
-  const onGoBackClick = () => routes.search(searchParams).push();
+  const onGoBackClick = () => {
+    window.history.length > 2 ? window.history.back() : routes.search().push();
+  };
 
   const miniMapMarkerKey = "single-result-mini-map-marker";
 

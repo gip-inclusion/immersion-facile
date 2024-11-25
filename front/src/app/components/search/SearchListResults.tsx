@@ -19,15 +19,18 @@ type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
 
 const resultsPerPageOptions = ["6", "12", "24", "48"] as const;
 const defaultResultsPerPage: ResultsPerPageOptions = "12";
-const initialPage = 0;
 
 const isResultPerPageOption = (value: string): value is ResultsPerPageOptions =>
   resultsPerPageOptions.includes(value as ResultsPerPageOptions);
 
 export const SearchListResults = ({
   showDistance,
+  currentPage,
+  setCurrentPageValue,
 }: {
   showDistance: boolean;
+  currentPage: number;
+  setCurrentPageValue: (newPageValue: number) => void;
 }) => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const searchParams = useAppSelector(searchSelectors.searchParams);
@@ -38,18 +41,25 @@ export const SearchListResults = ({
   );
   const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
   const { cx, classes } = useStyleUtils();
-  const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const resultsPerPageValue = parseInt(resultsPerPage);
   const totalPages = Math.ceil(searchResults.length / resultsPerPageValue);
   const hasResults = displayedResults.length > 0;
 
   const getSearchResultsForPage = useCallback(
     (currentPage: number) => {
-      const start = currentPage * resultsPerPageValue;
+      const currentPageIndex = currentPage - 1;
+      const start = currentPageIndex * resultsPerPageValue;
       const end = start + resultsPerPageValue;
       return searchResults.slice(start, end);
     },
     [searchResults, resultsPerPageValue],
+  );
+
+  const onCurrentPageChange = useCallback(
+    (newPage: number) => {
+      setCurrentPageValue(newPage);
+    },
+    [setCurrentPageValue],
   );
 
   useEffect(() => {
@@ -165,12 +175,12 @@ export const SearchListResults = ({
               <Pagination
                 showFirstLast
                 count={totalPages}
-                defaultPage={currentPage + 1}
+                defaultPage={currentPage}
                 getPageLinkProps={(pageNumber) => ({
                   title: `Résultats de recherche, page : ${pageNumber}`,
                   onClick: (event) => {
                     event.preventDefault();
-                    setCurrentPage(pageNumber - 1);
+                    onCurrentPageChange(pageNumber);
                   },
                   href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
                   key: `pagination-link-${pageNumber}`,

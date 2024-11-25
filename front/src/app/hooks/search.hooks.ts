@@ -20,40 +20,65 @@ export const encodedSearchUriParams = [
   "place",
 ] satisfies (keyof SearchPageParams)[];
 
-export const useSearchUseCase = ({
-  name,
-}: Route<typeof routes.search | typeof routes.searchDiagoriente>) => {
-  const dispatch = useDispatch();
-  return (values: SearchPageParams) => {
-    const urlParams = getUrlParameters(window.location);
-    const appellationCodes = values.appellations?.map(
-      (appellation) => appellation.appellationCode,
-    );
-    dispatch(
-      searchSlice.actions.searchRequested({ ...values, appellationCodes }),
-    );
+type SearchRoute = Route<
+  typeof routes.search | typeof routes.searchDiagoriente
+>;
 
-    const updatedUrlParams = filterParamsForRoute<Partial<SearchPageParams>>({
-      urlParams: {
-        ...Object.fromEntries(
-          Object.entries(urlParams).filter(([key]) =>
-            keys(acquisitionParams).includes(key as keyof AcquisitionParams),
-          ),
+const filterUrlsParamsAndUpdateUrl = ({
+  values,
+  urlParams,
+  routeName,
+}: {
+  values: SearchPageParams;
+  urlParams: Record<string, string>;
+  routeName: SearchRoute["name"];
+}) => {
+  const filteredUrlParams = filterParamsForRoute<Partial<SearchPageParams>>({
+    urlParams: {
+      ...Object.fromEntries(
+        Object.entries(urlParams).filter(([key]) =>
+          keys(acquisitionParams).includes(key as keyof AcquisitionParams),
         ),
-        ...values,
-      },
-      matchingParams: searchParams,
-    });
-    const updatedUrlParamsWithEncodedUriValues = {
-      ...updatedUrlParams,
-      ...encodedSearchUriParams.reduce((acc, currentKey) => {
-        const value = values[currentKey];
-        if (value) {
-          acc[currentKey] = encodeURIComponent(value);
-        }
-        return acc;
-      }, updatedUrlParams),
-    };
-    routes[name](updatedUrlParamsWithEncodedUriValues).replace();
+      ),
+      ...values,
+    },
+    matchingParams: searchParams,
+  });
+  const encodedUrlParams = {
+    ...filteredUrlParams,
+    ...encodedSearchUriParams.reduce((acc, currentKey) => {
+      const value = values[currentKey];
+      if (value) {
+        acc[currentKey] = encodeURIComponent(value);
+      }
+      return acc;
+    }, filteredUrlParams),
+  };
+  routes[routeName](encodedUrlParams).replace();
+};
+
+export const useSearch = ({ name }: SearchRoute) => {
+  const dispatch = useDispatch();
+  return {
+    triggerSearch: (values: SearchPageParams) => {
+      const appellationCodes = values.appellations?.map(
+        (appellation) => appellation.appellationCode,
+      );
+      dispatch(
+        searchSlice.actions.searchRequested({ ...values, appellationCodes }),
+      );
+      filterUrlsParamsAndUpdateUrl({
+        values,
+        urlParams: getUrlParameters(window.location),
+        routeName: name,
+      });
+    },
+    changeCurrentPage: (values: SearchPageParams) => {
+      filterUrlsParamsAndUpdateUrl({
+        values,
+        urlParams: getUrlParameters(window.location),
+        routeName: name,
+      });
+    },
   };
 };
