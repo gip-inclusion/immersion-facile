@@ -554,7 +554,7 @@ describe("Agency registration for authenticated users", () => {
         validatorEmails: ["bob@mail.com", "validator@mail.com"],
         counsellorEmails: [],
       };
-      dependencies.agencyGateway.fetchedAgency$.next(expectedAgency);
+      dependencies.agencyGateway.fetchedAgencyForAdmin$.next(expectedAgency);
       expectToEqual(
         agencyAdminSelectors.agency(store.getState()),
         expectedAgency,
