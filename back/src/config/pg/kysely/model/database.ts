@@ -378,12 +378,12 @@ interface OngoingOauths {
 
 interface Establishments extends WithAcquisition {
   additional_information: Generated<string | null>;
+  is_monthly_discussion_limit_reached: Generated<boolean>;
   created_at: Timestamp;
   customized_name: string | null;
   fit_for_disabled_workers: boolean;
   is_commited: boolean | null;
   is_open: Generated<boolean>;
-  is_searchable: Generated<boolean>;
   last_insee_check_date: Timestamp | null;
   legacy_address: string | null;
   max_contacts_per_month: number;

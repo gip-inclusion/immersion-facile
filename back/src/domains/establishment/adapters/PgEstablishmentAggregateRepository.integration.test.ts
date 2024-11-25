@@ -612,8 +612,8 @@ describe("PgEstablishmentAggregateRepository", () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withOffers([cartographeImmersionOffer])
           .withLocations([locationOfSearchPosition])
-          .withIsSearchable(false)
           .withUserRights([osefUserRight])
+          .withIsMonthlyDiscussionLimitReached(true)
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1907,8 +1907,8 @@ describe("PgEstablishmentAggregateRepository", () => {
     const since = subDays(new Date(), 7);
 
     const establishmentNotSearchable = new EstablishmentAggregateBuilder()
-      .withIsSearchable(false)
       .withUserRights([osefUserRight])
+      .withIsMonthlyDiscussionLimitReached(true)
       .build();
 
     const establishmentIsNotSearchableAndMaxContactPerMonth0 =
@@ -1965,7 +1965,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth2,
             )
-              .withIsSearchable(true)
+              .withIsMonthlyDiscussionLimitReached(false)
               .withFitForDisabledWorkers(false)
               .build(),
           ],
@@ -1990,7 +1990,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth2,
             )
-              .withIsSearchable(true)
+              .withIsMonthlyDiscussionLimitReached(false)
               .withFitForDisabledWorkers(false)
               .build(),
           ],
@@ -2016,7 +2016,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth1,
             )
-              .withIsSearchable(true)
+              .withIsMonthlyDiscussionLimitReached(false)
               .withFitForDisabledWorkers(false)
               .build(),
           ],

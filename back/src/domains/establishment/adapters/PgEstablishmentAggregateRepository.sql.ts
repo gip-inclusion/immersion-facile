@@ -74,7 +74,9 @@ export const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
               "e.last_insee_check_date",
             )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
             isOpen: ref("e.is_open"),
-            isSearchable: ref("e.is_searchable"),
+            isMonthlyDiscussionLimitReached: ref(
+              "e.is_monthly_discussion_limit_reached",
+            ),
             isCommited: ref("e.is_commited"),
             fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
             maxContactsPerMonth: ref("e.max_contacts_per_month"),
