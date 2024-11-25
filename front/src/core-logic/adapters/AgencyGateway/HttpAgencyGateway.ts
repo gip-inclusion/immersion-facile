@@ -7,6 +7,7 @@ import {
   AgencyRoutes,
   CreateAgencyDto,
   InclusionConnectJwt,
+  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
@@ -44,6 +45,41 @@ export class HttpAgencyGateway implements AgencyGateway {
         .getAgencyAdminById({
           urlParams: { agencyId },
           headers: { authorization: adminToken },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  getAgencyForDashboardById$(
+    agencyId: AgencyId,
+    token: InclusionConnectJwt,
+  ): Observable<AgencyDto> {
+    return from(
+      this.httpClient
+        .getAgencyByIdForDashboard({
+          urlParams: { agencyId },
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+  getAgencyUsers$(
+    agencyId: AgencyId,
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser[]> {
+    return from(
+      this.httpClient
+        .getAgencyUsersByAgencyIdForDashboard({
+          urlParams: { agencyId },
+          headers: { authorization: token },
         })
         .then((response) =>
           match(response)
