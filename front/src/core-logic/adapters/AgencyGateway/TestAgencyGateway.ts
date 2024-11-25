@@ -7,6 +7,7 @@ import {
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   InclusionConnectJwt,
+  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   WithAgencyId,
@@ -24,7 +25,11 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public customAgencyId$ = new Subject<AgencyId | undefined>();
 
-  public fetchedAgency$ = new Subject<AgencyDto | undefined>();
+  public fetchedAgencyForAdmin$ = new Subject<AgencyDto | undefined>();
+
+  public fetchedAgencyForDashboard$ = new Subject<AgencyDto>();
+
+  public fetchedAgencyUsers$ = new Subject<InclusionConnectedUser[]>();
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
@@ -38,7 +43,21 @@ export class TestAgencyGateway implements AgencyGateway {
     _agencyId: AgencyId,
     _adminToken: InclusionConnectJwt,
   ): Observable<AgencyDto | undefined> {
-    return this.fetchedAgency$;
+    return this.fetchedAgencyForAdmin$;
+  }
+
+  public getAgencyForDashboardById$(
+    _agencyId: AgencyId,
+    _token: InclusionConnectJwt,
+  ): Observable<AgencyDto> {
+    return this.fetchedAgencyForDashboard$;
+  }
+
+  public getAgencyUsers$(
+    _agencyId: AgencyId,
+    _token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser[]> {
+    return this.fetchedAgencyUsers$;
   }
 
   public getAgencyPublicInfoById$(
