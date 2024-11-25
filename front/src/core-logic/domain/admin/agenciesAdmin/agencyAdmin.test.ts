@@ -384,7 +384,7 @@ describe("agencyAdmin", () => {
   };
 
   const feedWithFetchedAgency = (agencyDto: AgencyDto) => {
-    dependencies.agencyGateway.fetchedAgency$.next(agencyDto);
+    dependencies.agencyGateway.fetchedAgencyForAdmin$.next(agencyDto);
   };
 
   const feedWithUpdateResponse = () => {

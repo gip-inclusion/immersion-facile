@@ -9,6 +9,7 @@ import {
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   InclusionConnectJwt,
+  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   WithAgencyId,
@@ -72,6 +73,56 @@ export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .withStatus("needsReview")
   .build();
 
+const simulatedUsers: InclusionConnectedUser[] = [
+  {
+    id: "fake-user-id-1",
+    email: "jbon8745@wanadoo.fr",
+    firstName: "Jean",
+    lastName: "Bon",
+    agencyRights: [
+      {
+        agency: MISSION_LOCAL_AGENCY_ACTIVE,
+        isNotifiedByEmail: true,
+        roles: ["agency-admin"],
+      },
+      {
+        agency: PE_AGENCY_ACTIVE,
+        isNotifiedByEmail: true,
+        roles: ["validator"],
+      },
+    ],
+    dashboards: { agencies: {}, establishments: {} },
+    externalId: "fake-user-external-id-1",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "fake-user-id-2",
+    email: "remi@sanfamille.fr",
+    firstName: "Rémi",
+    lastName: "Sanfamille",
+    agencyRights: [],
+    dashboards: { agencies: {}, establishments: {} },
+    externalId: "fake-user-external-id-2",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "user-in-error",
+    email: "fake-user-email-4@test.fr",
+    firstName: "Jean-Michel",
+    lastName: "Jeplante",
+    agencyRights: [
+      {
+        agency: PE_AGENCY_ACTIVE,
+        isNotifiedByEmail: true,
+        roles: ["agency-admin"],
+      },
+    ],
+    dashboards: { agencies: {}, establishments: {} },
+    externalId: "fake-user-in-error-external-id",
+    createdAt: new Date().toISOString(),
+  },
+];
+
 export class SimulatedAgencyGateway implements AgencyGateway {
   addAgency$(_agency: CreateAgencyDto): Observable<void> {
     return of(undefined);
@@ -104,6 +155,13 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     return of(this.#agencies[agencyId]);
   }
 
+  public getAgencyForDashboardById$(
+    agencyId: AgencyId,
+    _token: InclusionConnectJwt,
+  ): Observable<AgencyDto> {
+    return of(this.#agencies[agencyId]);
+  }
+
   public getAgencyPublicInfoById$({
     agencyId,
   }: WithAgencyId): Observable<AgencyPublicDisplayDto> {
@@ -118,6 +176,23 @@ export class SimulatedAgencyGateway implements AgencyGateway {
       );
     }
     throw errors.agency.notFound({ agencyId });
+  }
+
+  getAgencyUsers$(
+    agencyId: AgencyId,
+    _token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser[]> {
+    return of(
+      simulatedUsers.filter((user) =>
+        user.agencyRights.some(
+          (agencyRight) => agencyRight.agency.id === agencyId,
+        ),
+      ),
+    );
+  }
+
+  public getImmersionFacileAgencyId$(): Observable<AgencyId> {
+    return of("agency-id-with-immersion-facile-kind");
   }
 
   public listAgencyOptionsByFilter$(
