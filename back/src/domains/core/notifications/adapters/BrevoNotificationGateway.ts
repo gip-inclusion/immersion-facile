@@ -23,7 +23,7 @@ import {
   counterSendTransactEmailTotal,
 } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
-import { NotificationGateway } from "../ports/NotificationGateway";
+import { Base64, NotificationGateway } from "../ports/NotificationGateway";
 import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import {
   RecipientOrSender,
@@ -75,7 +75,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
     };
   }
 
-  public async getAttachmentContent(downloadToken: string): Promise<Buffer> {
+  public async getAttachmentContent(downloadToken: string): Promise<Base64> {
     const response = await this.config.httpClient.getAttachmentContent({
       urlParams: { downloadToken },
       headers: {
@@ -92,9 +92,8 @@ export class BrevoNotificationGateway implements NotificationGateway {
         )}`,
       );
 
-    return response.body instanceof Buffer
-      ? response.body
-      : Buffer.from(response.body);
+    const blob: Blob = response.body;
+    return Buffer.from(await blob.arrayBuffer()).toString("base64");
   }
 
   public async sendEmail(

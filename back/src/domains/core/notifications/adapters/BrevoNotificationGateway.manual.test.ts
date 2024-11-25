@@ -1,5 +1,4 @@
-import axios from "axios";
-import { createAxiosSharedClient } from "shared-routes/axios";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
 import { brevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
@@ -11,9 +10,9 @@ describe("BrevoNotificationGateway manual", () => {
     const config = AppConfig.createFromEnv();
     notificationGateway = new BrevoNotificationGateway(
       {
-        httpClient: createAxiosSharedClient(
+        httpClient: createFetchSharedClient(
           brevoNotificationGatewayRoutes,
-          axios.create({ validateStatus: () => true }),
+          fetch,
           { onResponseSideEffect: console.log },
         ),
         emailAllowListPredicate: () => true,
@@ -87,9 +86,9 @@ describe("BrevoNotificationGateway manual", () => {
   it("should retrieve attachment content correctly", async () => {
     const downloadToken =
       "eyJmb2xkZXIiOiIyMDIzMDcxMzEyMTcxNS45Mi40Mjg0MDQyMiIsImZpbGVuYW1lIjoiaWYtbG9nby1wZS1pby5wbmcifQ";
-    const content =
+    const base64 =
       await notificationGateway.getAttachmentContent(downloadToken);
-    expect(content.toString("base64")).toBe(ifLogoInBase64);
+    expect(base64).toBe(ifLogoInBase64);
   });
 
   it("should send email with attachment correctly", async () => {

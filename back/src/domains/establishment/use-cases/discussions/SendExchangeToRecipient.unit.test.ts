@@ -49,11 +49,13 @@ describe("SendExchangeToRecipient", () => {
   });
 
   describe("right paths", () => {
-    const bufferRawContent = Buffer.from("my-attachment-content");
+    const base64RawContent = Buffer.from("my-attachment-content").toString(
+      "base64",
+    );
     const link = "pdf";
 
     beforeEach(() => {
-      notificationGateway.attachmentsByLinks = { [link]: bufferRawContent };
+      notificationGateway.attachmentsByLinks = { [link]: base64RawContent };
     });
 
     it("sends the email to the right recipient (response from establishment to potential beneficiary)", async () => {
@@ -113,7 +115,7 @@ describe("SendExchangeToRecipient", () => {
             attachments: [
               {
                 name: lastExchange.attachments[0].name,
-                content: bufferRawContent.toString("base64"),
+                content: base64RawContent,
               },
             ],
           },
@@ -178,7 +180,7 @@ describe("SendExchangeToRecipient", () => {
             attachments: [
               {
                 name: lastExchange.attachments[0].name,
-                content: bufferRawContent.toString("base64"),
+                content: base64RawContent,
               },
             ],
           },

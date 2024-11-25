@@ -37,7 +37,6 @@ export const brevoNotificationGatewayRoutes = defineRoutes({
   getAttachmentContent: defineRoute({
     method: "get",
     url: `${apiBrevoUrl}/inbound/attachments/:downloadToken`,
-    responseType: "arrayBuffer",
     headersSchema: brevoHeaderBinaryContentSchema,
     responses: { 200: z.any() },
   }),
