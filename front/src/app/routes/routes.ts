@@ -90,7 +90,7 @@ const agencyDashboard = defineRoute(inclusionConnectedParams, () => [
   "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
 ]);
 
-// const agencyDashboardAgencies = agencyDashboard.extend("/agences");
+const agencyDashboardAgencies = agencyDashboard.extend("/agences");
 
 const { adminConventions, adminAgencies, adminUsers, ...restOfAdminRoutes } =
   adminTabRouteNames.reduce(
@@ -127,12 +127,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   agencyDashboardSynchronisedConventions: agencyDashboard.extend(
     "/conventions-synchronisees",
   ),
-  // agencyDashboardAgencies: agencyDashboardAgencies,
-  // agencyDashboardAgencyDetails: agencyDashboardAgencies.extend(
-  //   { agencyId: param.path.string },
-  //   ({ agencyId }) => `/${agencyId}`,
-  // ),
   myProfile: defineRoute(inclusionConnectedParams, () => "/mon-profil"),
+  agencyDashboardAgencies: agencyDashboardAgencies,
+  agencyDashboardAgencyDetails: agencyDashboardAgencies.extend(
+    { agencyId: param.path.string },
+    ({ agencyId }) => `/${agencyId}`,
+  ),
   beneficiaryDashboard: defineRoute(`/${frontRoutes.beneficiaryDashboard}`),
   conventionConfirmation: defineRoute(
     {
