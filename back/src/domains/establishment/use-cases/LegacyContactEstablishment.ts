@@ -232,11 +232,11 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       );
 
     if (maxContactsPerWeekForEstablishment <= numberOfDiscussionsOfPastMonth) {
-      const updatedEstablishment = {
+      const updatedEstablishment: EstablishmentAggregate = {
         ...establishmentAggregate,
         establishment: {
           ...establishmentAggregate.establishment,
-          isSearchable: false,
+          isMonthlyDiscussionLimitReached: true,
         },
       };
 

@@ -793,7 +793,7 @@ describe("SearchImmersionUseCase", () => {
     const notSearchableEstablishment = new EstablishmentAggregateBuilder(
       establishment,
     )
-      .withIsSearchable(false)
+      .withIsMonthlyDiscussionLimitReached(true)
       .build();
 
     beforeEach(() => {
@@ -863,7 +863,7 @@ describe("SearchImmersionUseCase", () => {
     const notSearchableEstablishment = new EstablishmentAggregateBuilder(
       establishment,
     )
-      .withIsSearchable(false)
+      .withIsMonthlyDiscussionLimitReached(true)
       .build();
 
     beforeEach(() => {
@@ -919,7 +919,7 @@ describe("SearchImmersionUseCase", () => {
       new EstablishmentAggregateBuilder(establishment)
         .withEstablishmentNextAvailabilityDate(addDays(now, 1))
         .withMaxContactsPerMonth(10)
-        .withIsSearchable(true)
+        .withIsMonthlyDiscussionLimitReached(false)
         .build();
 
     beforeEach(() => {

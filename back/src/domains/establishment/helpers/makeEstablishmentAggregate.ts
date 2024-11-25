@@ -33,7 +33,8 @@ export const makeEstablishmentAggregate = ({
     fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
     isCommited: formEstablishment.isEngagedEnterprise,
     isOpen: true,
-    isSearchable: formEstablishment.maxContactsPerMonth > noContactPerMonth,
+    isMonthlyDiscussionLimitReached:
+      formEstablishment.maxContactsPerMonth <= noContactPerMonth,
     maxContactsPerMonth: formEstablishment.maxContactsPerMonth,
     ...nafAndNumberOfEmployee,
     name: formEstablishment.businessName,

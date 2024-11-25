@@ -330,7 +330,7 @@ describe("LegacyContactEstablishment", () => {
   it("switches establishment is searchable to false when the max contacts per week is reached", async () => {
     // préparation
     const establishmentAggregate = establishmentAggregateWithEmailContact
-      .withIsSearchable(true)
+      .withIsMonthlyDiscussionLimitReached(false)
       .withMaxContactsPerMonth(2)
       .withOffers([immersionOffer])
       .build();
@@ -442,8 +442,9 @@ describe("LegacyContactEstablishment", () => {
 
     expect(uow.discussionRepository.discussions).toHaveLength(3);
     expect(
-      establishmentAggregateAfterSecondContact.establishment.isSearchable,
-    ).toBe(false);
+      establishmentAggregateAfterSecondContact.establishment
+        .isMonthlyDiscussionLimitReached,
+    ).toBe(true);
   });
 
   describe("Wrong paths", () => {
@@ -553,7 +554,7 @@ describe("LegacyContactEstablishment", () => {
 
     it("throws ForbidenError when establishment is not currently available", async () => {
       const establishmentAggregate = establishmentAggregateWithEmailContact
-        .withIsSearchable(true)
+        .withIsMonthlyDiscussionLimitReached(false)
         .withMaxContactsPerMonth(2)
         .withEstablishmentNextAvailabilityDate(addHours(timeGateway.now(), 1))
         .withOffers([immersionOffer])
