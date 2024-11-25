@@ -15,7 +15,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentUserRight } from "../../establishment/entities/EstablishmentEntity";
+import { EstablishmentUserRight } from "../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { InMemoryEstablishmentMarketingGateway } from "../adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { MarketingContact } from "../entities/MarketingContact";

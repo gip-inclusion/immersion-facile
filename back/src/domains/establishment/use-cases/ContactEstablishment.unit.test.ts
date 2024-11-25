@@ -22,7 +22,7 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import {
   EstablishmentAdminRight,
   EstablishmentUserRight,
-} from "../entities/EstablishmentEntity";
+} from "../entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

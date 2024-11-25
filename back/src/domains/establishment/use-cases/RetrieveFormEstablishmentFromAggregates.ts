@@ -14,7 +14,7 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
   EstablishmentAdminRight,
   EstablishmentAggregate,
-} from "../entities/EstablishmentEntity";
+} from "../entities/EstablishmentAggregate";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,

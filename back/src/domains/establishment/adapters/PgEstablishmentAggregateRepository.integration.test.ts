@@ -26,7 +26,7 @@ import { PgUserRepository } from "../../core/authentication/inclusion-connect/ad
 import {
   EstablishmentAggregate,
   EstablishmentUserRight,
-} from "../entities/EstablishmentEntity";
+} from "../entities/EstablishmentAggregate";
 import { SearchMade } from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateBuilder,

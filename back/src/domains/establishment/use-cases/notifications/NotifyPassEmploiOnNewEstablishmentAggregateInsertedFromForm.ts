@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { UseCase } from "../../../core/UseCase";
-import { WithEstablishmentAggregate } from "../../entities/EstablishmentEntity";
+import { WithEstablishmentAggregate } from "../../entities/EstablishmentAggregate";
 import {
   PassEmploiGateway,
   PassEmploiNotificationParams,

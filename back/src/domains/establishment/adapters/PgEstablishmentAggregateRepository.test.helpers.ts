@@ -1,5 +1,5 @@
 import { Location, SearchResultDto } from "shared";
-import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { OfferEntity } from "../entities/OfferEntity";
 
 export const makeExpectedSearchResult = ({

@@ -24,7 +24,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
-import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentEntity";
+import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import {
   ConventionReminderPayload,

@@ -13,7 +13,7 @@ import {
   replaceArrayElement,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
-import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateFilters,

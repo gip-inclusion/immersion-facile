@@ -24,10 +24,8 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { optional } from "../../../config/pg/pgUtils";
 import { createLogger } from "../../../utils/logger";
-import {
-  EstablishmentAggregate,
-  EstablishmentEntity,
-} from "../entities/EstablishmentEntity";
+import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
 import { GeoParams } from "../entities/SearchMadeEntity";
 import {

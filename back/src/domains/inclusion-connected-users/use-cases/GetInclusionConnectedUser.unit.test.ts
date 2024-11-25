@@ -17,7 +17,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentUserRight } from "../../establishment/entities/EstablishmentEntity";
+import { EstablishmentUserRight } from "../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 

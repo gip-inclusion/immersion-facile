@@ -5,7 +5,7 @@ import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import {
   EstablishmentAggregate,
   EstablishmentUserRight,
-} from "../entities/EstablishmentEntity";
+} from "../entities/EstablishmentAggregate";
 
 export const makeEstablishmentAggregate = ({
   timeGateway,

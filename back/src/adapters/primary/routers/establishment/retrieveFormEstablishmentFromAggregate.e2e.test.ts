@@ -23,7 +23,7 @@ import {
 } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentEntity";
+import { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

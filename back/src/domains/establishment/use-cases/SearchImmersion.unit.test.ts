@@ -19,7 +19,7 @@ import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../a
 import { InMemoryLaBonneBoiteGateway } from "../adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDto } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDto";
 import { LaBonneBoiteCompanyDtoBuilder } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDtoBuilder";
-import { EstablishmentUserRight } from "../entities/EstablishmentEntity";
+import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
