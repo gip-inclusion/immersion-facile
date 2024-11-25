@@ -6,6 +6,7 @@ import {
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   InclusionConnectJwt,
+  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
@@ -18,6 +19,14 @@ export interface AgencyGateway {
     agencyId: AgencyId,
     adminToken: InclusionConnectJwt,
   ): Observable<AgencyDto | undefined>;
+  getAgencyForDashboardById$(
+    agencyId: AgencyId,
+    token: InclusionConnectJwt,
+  ): Observable<AgencyDto>;
+  getAgencyUsers$(
+    agencyId: AgencyId,
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser[]>;
   getAgencyPublicInfoById$(
     agencyId: WithAgencyId,
   ): Observable<AgencyPublicDisplayDto>;
