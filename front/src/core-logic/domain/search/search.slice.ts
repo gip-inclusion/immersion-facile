@@ -17,6 +17,7 @@ type SearchFeedback = SubmitFeedBack<"success">;
 export type SearchPageParams = SearchQueryBaseWithoutAppellationsAndRomeDto & {
   appellations?: AppellationAndRomeDto[];
   fitForDisabledWorkers?: boolean | undefined;
+  currentPage: number;
 } & WithAcquisition;
 
 export type SearchStatus =
@@ -33,7 +34,6 @@ interface SearchState {
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
   searchParams: SearchQueryParamsDto;
-  currentPage: number;
 }
 
 export const initialState: SearchState = {
@@ -53,7 +53,6 @@ export const initialState: SearchState = {
     sortedBy: "score",
     fitForDisabledWorkers: undefined,
   },
-  currentPage: 1,
 };
 
 export const searchSlice = createSlice({

@@ -73,6 +73,7 @@ export const searchParams = {
   sortedBy: param.query.optional.string,
   place: param.query.optional.string,
   fitForDisabledWorkers: param.query.optional.boolean,
+  currentPage: param.query.optional.number,
   ...acquisitionParams,
 };
 

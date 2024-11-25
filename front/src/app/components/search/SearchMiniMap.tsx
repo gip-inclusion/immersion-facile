@@ -70,14 +70,12 @@ export const getIconMarker = (
 
 const getDefaultZoomLevel = (
   kind: SearchMiniMapProps["kind"],
-  searchParams: SearchPageParams,
+  distanceKm: SearchPageParams["distanceKm"],
 ) => {
   if (kind === "single") {
     return 17;
   }
-  return searchParams.distanceKm
-    ? distanceToZoomOptions[searchParams.distanceKm]
-    : 10;
+  return distanceKm ? distanceToZoomOptions[distanceKm] : 10;
 };
 
 export const SearchMiniMap = ({
@@ -98,7 +96,7 @@ export const SearchMiniMap = ({
   };
 
   const zoom = useMemo(
-    () => getDefaultZoomLevel(kind, searchParams),
+    () => getDefaultZoomLevel(kind, searchParams.distanceKm),
     [kind, searchParams],
   );
 

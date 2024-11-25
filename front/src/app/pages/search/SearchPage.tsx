@@ -30,10 +30,8 @@ import { SearchInfoSection } from "src/app/components/search/SearchInfoSection";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import {
-  encodedSearchUriParams,
-  useSearchUseCase,
-} from "src/app/hooks/search.hooks";
+import { encodedSearchUriParams, useSearch } from "src/app/hooks/search.hooks";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -80,7 +78,7 @@ export const SearchPage = ({
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const isLoading = useAppSelector(searchSelectors.isLoading);
-  const requestSearch = useSearchUseCase(route);
+  const { triggerSearch, changeCurrentPage } = useSearch(route);
   const [searchMade, setSearchMade] = useState<SearchPageParams | null>(null);
   const searchResultsWrapper = useRef<ElementRef<"div">>(null);
   const innerSearchResultWrapper = useRef<ElementRef<"div">>(null);
@@ -99,6 +97,7 @@ export const SearchPage = ({
     latitude: undefined,
     longitude: undefined,
     fitForDisabledWorkers: undefined,
+    currentPage: 1,
     ...acquisitionParams,
   };
   const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
@@ -157,8 +156,10 @@ export const SearchPage = ({
     setTempValue(updatedValues);
     setTempValuesAsFormValues(updatedValues);
     setSearchMade(updatedValues);
-    requestSearch(filterFormValues(updatedValues));
+    triggerSearch(filterFormValues(updatedValues));
   };
+
+  useScrollToTop(formValues.currentPage);
 
   useEffect(() => {
     if (availableForInitialSearchRequest) {
@@ -647,7 +648,15 @@ export const SearchPage = ({
                     </div>
                   </div>
                   <SearchListResults
+                    currentPage={formValues.currentPage}
                     showDistance={areValidGeoParams(searchMade)}
+                    setCurrentPageValue={(newPageValue: number) => {
+                      setValue("currentPage", newPageValue);
+                      changeCurrentPage({
+                        ...formValues,
+                        currentPage: newPageValue,
+                      });
+                    }}
                   />
                 </div>
               )}
