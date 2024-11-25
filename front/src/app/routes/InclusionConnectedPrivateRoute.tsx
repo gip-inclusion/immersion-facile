@@ -37,7 +37,7 @@ export type FrontAdminRoute =
 export const agencyDashboardTabsList = [
   "agencyDashboardMain",
   "agencyDashboardSynchronisedConventions",
-  // "agencyDashboardAgencies",
+  "agencyDashboardAgencies",
 ] satisfies AgencyDashboardRouteName[];
 
 export type AgencyTabRoute = (typeof agencyDashboardTabsList)[number];
@@ -45,8 +45,8 @@ export type AgencyTabRoute = (typeof agencyDashboardTabsList)[number];
 export const agencyDashboardRoutes = [
   "agencyDashboardMain",
   "agencyDashboardSynchronisedConventions",
-  // "agencyDashboardAgencies",
-  // "agencyDashboardAgencyDetails",
+  "agencyDashboardAgencies",
+  "agencyDashboardAgencyDetails",
   "agencyDashboardOnboarding",
 ] satisfies AgencyDashboardRouteName[];
 
@@ -55,9 +55,9 @@ export type AgencyDashboardRouteName = FrontAgencyDashboardRoute["name"];
 export type FrontAgencyDashboardRoute =
   | Route<typeof routes.agencyDashboardMain>
   | Route<typeof routes.agencyDashboardOnboarding>
-  | Route<typeof routes.agencyDashboardSynchronisedConventions>;
-// | Route<typeof routes.agencyDashboardAgencies>
-// | Route<typeof routes.agencyDashboardAgencyDetails>;
+  | Route<typeof routes.agencyDashboardSynchronisedConventions>
+  | Route<typeof routes.agencyDashboardAgencies>
+  | Route<typeof routes.agencyDashboardAgencyDetails>;
 
 type InclusionConnectPrivateRoute =
   | FrontAdminRoute
