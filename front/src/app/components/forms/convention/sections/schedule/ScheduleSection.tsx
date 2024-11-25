@@ -38,12 +38,12 @@ export const ScheduleSection = () => {
 
   const formContents = getFormFields();
 
-  const [dateMax, setDateMax] = useState(
-    addDays(
-      isStringDate(values.dateStart) ? new Date(values.dateStart) : new Date(),
-      maximumCalendarDayByInternshipKind[values.internshipKind],
-    ).toISOString(),
-  );
+  const computeDatePickerMaxDate = addDays(
+    isStringDate(values.dateStart) ? new Date(values.dateStart) : new Date(),
+    maximumCalendarDayByInternshipKind[values.internshipKind],
+  ).toISOString();
+
+  const [dateMax, setDateMax] = useState<string>(computeDatePickerMaxDate);
 
   const excludedDays =
     values.internshipKind === "mini-stage-cci"
@@ -135,7 +135,8 @@ export const ScheduleSection = () => {
         convertLocaleDateToUtcTimezoneDate(new Date(values.dateEnd)),
       ),
     );
-  }, [values.dateStart, values.dateEnd]);
+    setDateMax(computeDatePickerMaxDate);
+  }, [values.dateStart, values.dateEnd, computeDatePickerMaxDate]);
 
   return (
     <>
