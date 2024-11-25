@@ -184,11 +184,6 @@ back$ LOG_LEVEL=debug pnpm run test:unit
 back$ LOGGER_MULTI_LINE=yes pnpm run test:all
 ```
 
-### Adding new metrics (aka prometheus counters)
-
-We use the [prom-client](https://github.com/siimon/prom-client) library for metric exports. See [their documentation](https://github.com/siimon/prom-client#readme) for thev different metric types (counters, histograms, etc.)
-
-Adding new counters is very simple, just follow the example in [merge request 327](!327).
 
 # Working with `AppConfig`
 

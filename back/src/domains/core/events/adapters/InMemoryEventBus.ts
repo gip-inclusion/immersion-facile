@@ -1,11 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
 import { DateString, errorToString } from "shared";
-import {
-  counterPublishedEventsError,
-  counterPublishedEventsSuccess,
-  counterPublishedEventsTotal,
-} from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
 import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
@@ -80,11 +75,8 @@ export class InMemoryEventBus implements EventBus {
   ): Promise<DomainEvent> {
     // the publication happens here, an event is expected in return,
     // with the publication added to the event
-    logger.info({ events: [event], message: "publish" });
-
     const topic = event.topic;
-    counterPublishedEventsTotal.inc({ topic });
-    logger.info({ topic, message: "publishedEventsTotal" });
+    logger.info({ topic, message: "publishedEventsTotal", events: [event] });
 
     const callbacksById: SubscriptionsForTopic | undefined =
       this.subscriptions[topic];
@@ -112,7 +104,6 @@ export class InMemoryEventBus implements EventBus {
     ];
 
     if (failures.length === 0) {
-      counterPublishedEventsSuccess.inc({ topic });
       logger.info({ topic, message: "publishedEventsSuccess" });
       return {
         ...event,
@@ -208,10 +199,6 @@ const monitorAbsenceOfCallback = (event: DomainEvent) => {
 
 const monitorErrorInCallback = (error: any, event: DomainEvent) => {
   Sentry.captureException(error);
-  counterPublishedEventsError.inc({
-    topic: event.topic,
-    errorType: "callback_failed",
-  });
   logger.error({
     topic: event.topic,
     events: [event],

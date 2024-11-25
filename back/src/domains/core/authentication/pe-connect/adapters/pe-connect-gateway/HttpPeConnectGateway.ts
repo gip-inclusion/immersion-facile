@@ -5,13 +5,6 @@ import { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
 import {
-  CounterType,
-  exchangeCodeForAccessTokenCounter,
-  getAdvisorsInfoCounter,
-  getUserInfoCounter,
-  getUserStatutInfoCounter,
-} from "../../../../../../utils/counters";
-import {
   LoggerParamsWithMessage,
   OpacifiedLogger,
   createLogger,
@@ -43,6 +36,12 @@ import {
 } from "./peConnectApi.schema";
 
 const logger = createLogger(__filename);
+
+type CounterType =
+  | "getUserStatutInfo"
+  | "getAdvisorsInfo"
+  | "getUserInfo"
+  | "exchangeCodeForAccessToken";
 
 const counterApiKind = "peConnect";
 const makePeConnectLogger = (
@@ -105,10 +104,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   public async getAccessToken(
     authorizationCode: string,
   ): Promise<AccessTokenDto | undefined> {
-    const counter = exchangeCodeForAccessTokenCounter;
     const log = exchangeCodeForAccessTokenLogger;
     try {
-      counter.total.inc();
       log.total({});
       const response = await this.#limiter.schedule(() =>
         this.httpClient.exchangeCodeForAccessToken({
@@ -125,9 +122,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         }),
       );
       if (response.status !== 200) {
-        counter.error.inc({
-          errorType: `Bad response status code ${response.status}`,
-        });
         log.error({
           sharedRouteResponse: response,
           message: "exchangeCodeForAccessToken - Response status is not 200.",
@@ -139,16 +133,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         response.body,
         logger,
       );
-      counter.success.inc();
       log.success({});
       return toAccessToken(externalAccessToken);
     } catch (error) {
       errorChecker(
         error,
         (error) => {
-          counter.error.inc({
-            errorType: error.message,
-          });
           log.error({ error });
         },
         (payload) => notifyDiscordOnNotError(payload),
@@ -193,10 +183,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     headers: PeConnectHeaders,
     peExternalId: string | undefined,
   ): Promise<boolean> {
-    const counter = getUserStatutInfoCounter;
     const log = getUserStatutInfoLogger;
     try {
-      counter.total.inc();
       log.total({ peConnect: { peExternalId } });
       const response = await this.#limiter.schedule(() =>
         this.httpClient.getUserStatutInfo({
@@ -204,9 +192,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         }),
       );
       if (response.status !== 200) {
-        counter.error.inc({
-          errorType: `Bad response status code ${response.status}`,
-        });
         log.error({
           sharedRouteResponse: response,
           peConnect: { peExternalId },
@@ -222,14 +207,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       const isJobSeeker = isJobSeekerFromStatus(
         externalPeConnectStatut.codeStatutIndividu,
       );
-      counter.success.inc();
       log.success({ peConnect: { peExternalId, isJobSeeker } });
       return isJobSeeker;
     } catch (error) {
       errorChecker(
         error,
         (error) => {
-          counter.error.inc({ errorType: error.message });
           log.error({ error });
         },
         (payload) => notifyDiscordOnNotError(payload),
@@ -245,10 +228,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   async #getUserInfo(
     headers: PeConnectHeaders,
   ): Promise<ExternalPeConnectUser | undefined> {
-    const counter = getUserInfoCounter;
     const log = getUserInfoLogger;
     try {
-      counter.total.inc();
       log.total({});
       const response = await this.#limiter.schedule(() =>
         this.httpClient.getUserInfo({
@@ -256,9 +237,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         }),
       );
       if (response.status !== 200) {
-        counter.error.inc({
-          errorType: `Bad response status code ${response.status}`,
-        });
         log.error({
           sharedRouteResponse: response,
           message: "getUserInfo -Response status is not 200.",
@@ -270,14 +248,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         response.body,
         logger,
       );
-      counter.success.inc();
       log.success({});
       return externalPeConnectUser;
     } catch (error) {
       errorChecker(
         error,
         (error) => {
-          counter.error.inc({ errorType: error.message });
           log.error({ error });
         },
         (payload) => notifyDiscordOnNotError(payload),
@@ -292,10 +268,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   async #getAdvisorsInfo(
     headers: PeConnectHeaders,
   ): Promise<ExternalPeConnectAdvisor[]> {
-    const counter = getAdvisorsInfoCounter;
     const log = getAdvisorsInfoLogger;
     try {
-      counter.total.inc();
       log.total({});
       const response = await this.#limiter.schedule(() =>
         this.httpClient.getAdvisorsInfo({
@@ -303,9 +277,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         }),
       );
       if (response.status !== 200) {
-        counter.error.inc({
-          errorType: `Bad response status code ${response.status}`,
-        });
         log.error({
           sharedRouteResponse: response,
           message: "getAdvisorsInfo - Response status is not 200.",
@@ -318,14 +289,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           response.body,
           logger,
         );
-      counter.success.inc();
       log.success({});
       return externalPeConnectAdvisors;
     } catch (error) {
       errorChecker(
         error,
         (error) => {
-          counter.error.inc({ errorType: error.message });
           log.error({ error });
         },
         (payload) => notifyDiscordOnNotError(payload),
