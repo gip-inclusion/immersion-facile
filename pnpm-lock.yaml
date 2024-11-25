@@ -86,9 +86,6 @@ importers:
       express-ipfilter:
         specifier: ^1.3.1
         version: 1.3.1
-      express-prometheus-middleware:
-        specifier: ^1.2.0
-        version: 1.2.0(express@4.21.0)(prom-client@14.1.1)
       html-templates:
         specifier: workspace:*
         version: link:../libs/html-templates
@@ -125,9 +122,6 @@ importers:
       pino-pretty:
         specifier: ^7.5.4
         version: 7.6.1
-      prom-client:
-        specifier: ^14.0.1
-        version: 14.1.1
       querystring:
         specifier: ^0.2.1
         version: 0.2.1
@@ -174,9 +168,6 @@ importers:
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.17
-      '@types/express-prometheus-middleware':
-        specifier: ^1.2.1
-        version: 1.2.1
       '@types/http-errors':
         specifier: ^2.0.4
         version: 2.0.4
@@ -3824,9 +3815,6 @@ packages:
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
-  '@types/express-prometheus-middleware@1.2.1':
-    resolution: {integrity: sha512-5bAqiUHo+UlGsWmVr9oV9eiFd7SnkIgU53RSp/txd8KMDU73Yrdva7WezIJazbW+CldGJu0zF3DPqk8KSJVYDQ==}
-
   '@types/express-serve-static-core@4.17.35':
     resolution: {integrity: sha512-wALWQwrgiB2AWTT91CB62b6Yt0sNHpznUXeZEcnPU3DRdlDIz74x8Qg1UUYKSVFi+va5vKOLYRBI1bRKiLLKIg==}
 
@@ -4551,9 +4539,6 @@ packages:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
 
-  bintrees@1.0.2:
-    resolution: {integrity: sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==}
-
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
 
@@ -5042,10 +5027,6 @@ packages:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
 
-  depd@1.1.2:
-    resolution: {integrity: sha512-7emPTl6Dpo6JRXOXjLRxck+FlLRX5847cLKEn00PLAgc3g2hTZZgr+e4c2v6QpSmLeFP3n5yUo7ft6avBK/5jQ==}
-    engines: {node: '>= 0.6'}
-
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
@@ -5426,12 +5407,6 @@ packages:
     resolution: {integrity: sha512-9WZC8wGkI6I6ygZNzuZ2MbFJiGoDXs1dM+E8LKtSP13pdgqrnkonWlgvvbxG3YZpa7Haz7Ndum9/J6qkj52OqA==}
     engines: {node: '>=8.9.0'}
 
-  express-prometheus-middleware@1.2.0:
-    resolution: {integrity: sha512-efSwft67rdtiW40D0im1f7Rz1TCGHGzPj6lfK0MxZDcPj6z4f/Ab5VNkWPYZEjvLqZiZ7fbS00CYzpigO8tS+g==}
-    peerDependencies:
-      express: 4.x
-      prom-client: '>= 10.x <= 13.x'
-
   express@4.21.0:
     resolution: {integrity: sha512-VqcNGcj/Id5ZT1LZ/cfihi3ttTn+NJmkli2eZADigjq29qTlWi/hAQ43t/VLPq8+UX06FCEx3ByOYet6ZFblng==}
     engines: {node: '>= 0.10.0'}
@@ -5647,13 +5622,6 @@ packages:
 
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
-
-  gc-stats@1.4.0:
-    resolution: {integrity: sha512-4FcCj9e8j8rCjvLkqRpGZBLgTC/xr9XEf5By3x77cDucWWB3pJK6FEwXZCTCbb4z8xdaOoi4owBNrvn3ciDdxA==}
-    engines: {node: '>=6'}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
-    bundledDependencies:
-      - node-pre-gyp
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -7124,9 +7092,6 @@ packages:
   openapi-types@12.1.3:
     resolution: {integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==}
 
-  optional@0.1.4:
-    resolution: {integrity: sha512-gtvrrCfkE08wKcgXaVwQVgwEQ8vel2dc5DDBn9RLQZ3YtmtkBss6A2HY6BnJH4N/4Ku97Ri/SF8sNWE2225WJw==}
-
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
@@ -7489,16 +7454,6 @@ packages:
   progress@2.0.3:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
-
-  prom-client@14.1.1:
-    resolution: {integrity: sha512-hFU32q7UZQ59bVJQGUtm3I2PrJ3gWvoCkilX9sF165ks1qflhugVCeK+S1JjJYHvyt3o5kj68+q3bchormjnzw==}
-    engines: {node: '>=10'}
-
-  prometheus-gc-stats@0.6.5:
-    resolution: {integrity: sha512-VsmpEGHt9mMZqlhL+96gz2LsaXEgu2SXQ/tiEqIBLPoUTyPORDNsEiH9DPPZHChdkTTBw3GRV1wGvqdIg4EktQ==}
-    engines: {node: '>=6'}
-    peerDependencies:
-      prom-client: '>= 10 <= 14'
 
   prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
@@ -7968,10 +7923,6 @@ packages:
   resolve@2.0.0-next.4:
     resolution: {integrity: sha512-iMDbmAWtfU+MHpxt/I5iWI7cY6YVEZUQ3MBgPQ++XD1PELuJHIl82xBmObyP2KyQmkNB2dsqF7seoQQiAn5yDQ==}
     hasBin: true
-
-  response-time@2.3.2:
-    resolution: {integrity: sha512-MUIDaDQf+CVqflfTdQ5yam+aYCkXj1PY8fjlPDQ6ppxJlmgZb864pHtA750mayywNg8tx4rS7qH9JXd/OF+3gw==}
-    engines: {node: '>= 0.8.0'}
 
   restore-cursor@3.1.0:
     resolution: {integrity: sha512-l+sSefzHpj5qimhFSE5a8nufZYAM3sBSVMAPtYkmC+4EH2anSGaEMXSD0izRQbu9nfyQ9y5JrVmp7E8oZrUjvA==}
@@ -8443,9 +8394,6 @@ packages:
     resolution: {integrity: sha512-jdIBIN6LTIe2jqzay/2vtYLlBHa3JF42ot3h1dW8Q0PaAG4v8rm0cvpVePtau5C6OKXGGcgO9q2AMNSWxiLqKw==}
     engines: {node: '>=10'}
 
-  tdigest@0.1.2:
-    resolution: {integrity: sha512-+G0LLgjjo9BZX2MfdvPfH+MKLCrxlXSYec5DaPYP1fe6Iyhf0/fSmJ0bFiZ1F8BT6cGXl2LpltQptzjXKWEkKA==}
-
   telejson@7.2.0:
     resolution: {integrity: sha512-1QTEcJkJEhc8OnStBx/ILRu5J2p0GjvWsBx56bmZRqnrkdBMUe+nX92jxV+p3dB4CP6PZCdJMQJwCggkNBMzkQ==}
 
@@ -8903,10 +8851,6 @@ packages:
 
   url-parse@1.5.10:
     resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
-
-  url-value-parser@2.2.0:
-    resolution: {integrity: sha512-yIQdxJpgkPamPPAPuGdS7Q548rLhny42tg8d4vyTNzFqvOnwqrgHXvgehT09U7fwrzxi3RxCiXjoNUNnNOlQ8A==}
-    engines: {node: '>=6.0.0'}
 
   url@0.10.3:
     resolution: {integrity: sha512-hzSUW2q06EqL1gKM/a+obYHLIO6ct2hwPuviqTTOcfFVc61UbfJ2Q32+uGL/HCPxKqrdGB5QUwIe7UqlDgwsOQ==}
@@ -13447,10 +13391,6 @@ snapshots:
 
   '@types/estree@1.0.6': {}
 
-  '@types/express-prometheus-middleware@1.2.1':
-    dependencies:
-      '@types/express': 4.17.17
-
   '@types/express-serve-static-core@4.17.35':
     dependencies:
       '@types/node': 20.15.0
@@ -14333,8 +14273,6 @@ snapshots:
 
   binary-extensions@2.2.0: {}
 
-  bintrees@1.0.2: {}
-
   bl@4.1.0:
     dependencies:
       buffer: 5.7.1
@@ -14827,8 +14765,6 @@ snapshots:
       slash: 3.0.0
 
   delayed-stream@1.0.0: {}
-
-  depd@1.1.2: {}
 
   depd@2.0.0: {}
 
@@ -15349,15 +15285,6 @@ snapshots:
       proxy-addr: 2.0.7
       range_check: 2.0.4
 
-  express-prometheus-middleware@1.2.0(express@4.21.0)(prom-client@14.1.1):
-    dependencies:
-      express: 4.21.0
-      prom-client: 14.1.1
-      response-time: 2.3.2
-      url-value-parser: 2.2.0
-    optionalDependencies:
-      prometheus-gc-stats: 0.6.5(prom-client@14.1.1)
-
   express@4.21.0:
     dependencies:
       accepts: 1.3.8
@@ -15630,11 +15557,6 @@ snapshots:
       functions-have-names: 1.2.3
 
   functions-have-names@1.2.3: {}
-
-  gc-stats@1.4.0:
-    dependencies:
-      nan: 2.17.0
-    optional: true
 
   gensync@1.0.0-beta.2: {}
 
@@ -17376,9 +17298,6 @@ snapshots:
 
   openapi-types@12.1.3: {}
 
-  optional@0.1.4:
-    optional: true
-
   optionator@0.9.4:
     dependencies:
       deep-is: 0.1.4
@@ -17748,18 +17667,6 @@ snapshots:
   process@0.11.10: {}
 
   progress@2.0.3: {}
-
-  prom-client@14.1.1:
-    dependencies:
-      tdigest: 0.1.2
-
-  prometheus-gc-stats@0.6.5(prom-client@14.1.1):
-    dependencies:
-      optional: 0.1.4
-      prom-client: 14.1.1
-    optionalDependencies:
-      gc-stats: 1.4.0
-    optional: true
 
   prompts@2.4.2:
     dependencies:
@@ -18303,11 +18210,6 @@ snapshots:
       is-core-module: 2.12.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
-
-  response-time@2.3.2:
-    dependencies:
-      depd: 1.1.2
-      on-headers: 1.0.2
 
   restore-cursor@3.1.0:
     dependencies:
@@ -18920,10 +18822,6 @@ snapshots:
       mkdirp: 1.0.4
       yallist: 4.0.0
 
-  tdigest@0.1.2:
-    dependencies:
-      bintrees: 1.0.2
-
   telejson@7.2.0:
     dependencies:
       memoizerific: 1.11.3
@@ -19398,8 +19296,6 @@ snapshots:
     dependencies:
       querystringify: 2.2.0
       requires-port: 1.0.0
-
-  url-value-parser@2.2.0: {}
 
   url@0.10.3:
     dependencies:

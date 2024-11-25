@@ -1,4 +1,3 @@
-import { getAdvisorsInfoCounter } from "../../../../../utils/counters";
 import { createLogger } from "../../../../../utils/logger";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
@@ -41,7 +40,6 @@ export const chooseValidAdvisor = (
 
   const preferredAdvisor = sortedValidAdvisors.at(0);
   if (!preferredAdvisor) {
-    getAdvisorsInfoCounter.error.inc({ errorType: "peConnectNoValidAdvisor" });
     logger.error({
       peConnect: {
         peExternalId,

@@ -17,11 +17,6 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";
-import {
-  counterSendTransactEmailError,
-  counterSendTransactEmailSuccess,
-  counterSendTransactEmailTotal,
-} from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
 import { Base64, NotificationGateway } from "../ports/NotificationGateway";
 import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
@@ -125,29 +120,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
 
     if (emailData.to.length === 0) return;
 
-    const emailType = email.kind;
-    counterSendTransactEmailTotal.inc({ emailType });
-    logger.info({
-      notificationId,
-      message: "sendTransactEmailTotal",
-    });
-
-    return this.#sendTransacEmail(emailData)
-      .then((_response) => {
-        counterSendTransactEmailSuccess.inc({ emailType });
-        logger.info({
-          notificationId,
-          message: "sendTransactEmailSuccess",
-        });
-      })
-      .catch((error) => {
-        counterSendTransactEmailError.inc({ emailType });
-        logger.error({
-          notificationId,
-          message: "sendTransactEmailError",
-        });
-        throw error;
-      });
+    await this.#sendTransacEmail(emailData);
   }
 
   public sendSms(

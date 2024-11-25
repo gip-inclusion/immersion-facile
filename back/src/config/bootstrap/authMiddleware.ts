@@ -12,7 +12,6 @@ import {
 import { GetApiConsumerById } from "../../domains/core/api-consumer/ports/ApiConsumerRepository";
 import { JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
-import { apiKeyAuthMiddlewareRequestsTotal } from "../../utils/counters";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./appConfig";
 
@@ -39,13 +38,6 @@ const createIncTotalCountForRequest =
   (req: Request) =>
   ({ consumerName, authorisationStatus }: TotalCountProps) => {
     const route = convertRouteToLog(req.originalUrl);
-    // TODO : remove prometheus counters
-    apiKeyAuthMiddlewareRequestsTotal.inc({
-      route,
-      method: req.method,
-      consumerName,
-      authorisationStatus,
-    });
     logger.info({
       request: {
         method: req.method,

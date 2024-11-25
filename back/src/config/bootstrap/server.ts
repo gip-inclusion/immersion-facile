@@ -1,6 +1,5 @@
 import bodyParser from "body-parser";
 import express, { Express } from "express";
-import expressPrometheusMiddleware from "express-prometheus-middleware";
 import type { HttpError } from "http-errors";
 import PinoHttp from "pino-http";
 import { createAddressRouter } from "../../adapters/primary/routers/address/createAddressRouter";
@@ -35,12 +34,6 @@ import { startCrawler } from "./startCrawler";
 
 const logger = legacyCreateLogger(__filename);
 
-const metricsPageUrl = "__metrics";
-const metrics = expressPrometheusMiddleware({
-  metricsPath: `/${metricsPageUrl}`,
-  collectDefaultMetrics: true,
-});
-
 type CreateAppProperties = {
   app: Express;
   gateways: Gateways;
@@ -60,12 +53,8 @@ export const createApp = async (
   app.use(
     PinoHttp({
       logger,
-      autoLogging: {
-        ignore: (req) => req.url?.includes(metricsPageUrl) ?? false,
-      },
     }),
   );
-  app.use(metrics);
   app.use((req, res, next) => {
     bodyParser.json({ limit: "800kb" })(req, res, (httpError?: HttpError) => {
       if (httpError) {

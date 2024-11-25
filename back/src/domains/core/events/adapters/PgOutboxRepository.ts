@@ -1,7 +1,6 @@
 import { differenceWith, propEq } from "ramda";
 import { DateString, replaceArrayElement } from "shared";
 import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import { counterEventsSavedBeforePublish } from "../../../../utils/counters";
 import { createLogger } from "../../../../utils/logger";
 import type {
   DomainEvent,
@@ -73,10 +72,6 @@ export class PgOutboxRepository implements OutboxRepository {
     );
 
     if (event.publications.length === 0) {
-      counterEventsSavedBeforePublish.inc({
-        topic: event.topic,
-        wasQuarantined: event.wasQuarantined.toString(),
-      });
       logger.info({
         topic: event.topic,
         events: [event],
