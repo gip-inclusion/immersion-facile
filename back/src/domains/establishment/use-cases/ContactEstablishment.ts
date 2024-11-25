@@ -320,11 +320,11 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       );
 
     if (maxContactsPerMonthForEstablishment <= numberOfDiscussionsOfPastMonth) {
-      const updatedEstablishment = {
+      const updatedEstablishment: EstablishmentAggregate = {
         ...establishmentAggregate,
         establishment: {
           ...establishmentAggregate.establishment,
-          isSearchable: false,
+          isMonthlyDiscussionLimitReached: true,
         },
       };
 

@@ -51,7 +51,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   updatedAt: new Date("2024-08-10"),
   contactMethod: "EMAIL",
   isOpen: true,
-  isSearchable: true,
+  isMonthlyDiscussionLimitReached: false,
   maxContactsPerMonth: defaultMaxContactsPerMonth,
   searchableBy: {
     jobSeekers: true,
@@ -114,10 +114,12 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  public withIsSearchable(isSearchable: boolean) {
+  public withIsMonthlyDiscussionLimitReached(
+    isMonthlyDiscussionLimitReached: boolean,
+  ) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      isSearchable,
+      isMonthlyDiscussionLimitReached,
     });
   }
 
@@ -376,13 +378,17 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withIsSearchable(isSearchable: boolean) {
+  public withIsMonthlyDiscussionLimitReached(
+    withIsMonthlyDiscussionLimitReached: boolean,
+  ) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(
         this.aggregate.establishment,
       )
-        .withIsSearchable(isSearchable)
+        .withIsMonthlyDiscussionLimitReached(
+          withIsMonthlyDiscussionLimitReached,
+        )
         .build(),
     });
   }
