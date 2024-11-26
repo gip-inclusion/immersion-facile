@@ -78,7 +78,7 @@ export const EditAgencyForm = ({
           />
 
           <Select
-            label={"!Type de structure!"}
+            label={"⚠️Type de structure ⚠️"}
             options={kindOptions}
             nativeSelectProps={{
               ...register("kind"),
@@ -87,7 +87,7 @@ export const EditAgencyForm = ({
           />
 
           <Select
-            label="!Statut de l'agence !"
+            label="⚠️Statut de l'agence ⚠️"
             options={statusListOfOptions}
             placeholder="Sélectionner un statut"
             nativeSelectProps={{
@@ -97,7 +97,7 @@ export const EditAgencyForm = ({
           />
 
           <Input
-            label="!Code Safir de l'agence !"
+            label="⚠️Code Safir de l'agence ⚠️"
             nativeInputProps={{
               ...register("codeSafir"),
               placeholder: "Code Safir ",
