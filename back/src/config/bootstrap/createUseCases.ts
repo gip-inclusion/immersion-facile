@@ -9,6 +9,7 @@ import {
   SiretDto,
 } from "shared";
 import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
+import { makeGetAgencyByIdForDashboard } from "../../domains/agency/use-cases/GetAgencyByIdForDashboard";
 import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
 import { RegisterAgencyToInclusionConnectUser } from "../../domains/agency/use-cases/RegisterAgencyToInclusionConnectUser";
@@ -635,6 +636,10 @@ export const createUseCases = (
           similarConventionIds:
             await uow.conventionQueries.findSimilarConventions(params),
         })),
+    }),
+
+    getAgencyByIdForDashboard: makeGetAgencyByIdForDashboard({
+      uowPerformer,
     }),
     inclusionConnectLogout: makeGetInclusionConnectLogoutUrl({
       uowPerformer,
