@@ -370,6 +370,13 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur qui a l'identifiant "${userId}" n'a pas le droit d'accéder à cette ressource.`,
       ),
+    notAdminOnAgency: ({
+      userId,
+      agencyId,
+    }: { userId: UserId; agencyId: AgencyId }) =>
+      new ForbiddenError(
+        `L'utilisateur qui a l'identifiant "${userId}" n'est pas administrateur de l'agence qui a l'identifiant "${agencyId}".`,
+      ),
     alreadyHaveAgencyRights: ({ userId }: { userId: UserId }) =>
       new BadRequestError(
         `L'utilisateur qui a l'identifiant "${userId}" a déjà les droits pour cette agence.`,
