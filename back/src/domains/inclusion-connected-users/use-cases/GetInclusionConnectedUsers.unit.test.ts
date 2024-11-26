@@ -47,6 +47,18 @@ const backOfficeUserBuilder = new InclusionConnectedUserBuilder()
 const backOfficeUser = backOfficeUserBuilder.buildUser();
 const icbackOffice = backOfficeUserBuilder.build();
 
+const agencyAdminUserBuilder = new InclusionConnectedUserBuilder()
+  .withId("backoffice-admin")
+  .withFirstName("Jack")
+  .withLastName("The Admin")
+  .withEmail("jack.admin@mail.com")
+  .withCreatedAt(new Date())
+  .withExternalId("jack-admin-external-id")
+  .withIsAdmin(true);
+
+const agencyAdminUser = agencyAdminUserBuilder.buildUser();
+const icAgencyAdmin = agencyAdminUserBuilder.build();
+
 const notBackOfficeUserBuilder = new InclusionConnectedUserBuilder(icbackOffice)
   .withExternalId("not-backoffice-admin")
   .withIsAdmin(false);
@@ -55,6 +67,13 @@ const icNotBackOffice = notBackOfficeUserBuilder.build();
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
+const agencyWithRefersTo = new AgencyDtoBuilder()
+  .withId("agency-with-refers-to")
+  .withRefersToAgencyInfo({
+    refersToAgencyId: agency2.id,
+    refersToAgencyName: agency2.name,
+  })
+  .build();
 const {
   validatorEmails: _,
   counsellorEmails: __,
@@ -65,6 +84,12 @@ const {
   counsellorEmails: ____,
   ...agency2WithoutEmails
 } = agency2;
+
+const {
+  validatorEmails: _____,
+  counsellorEmails: ______,
+  ...agencyWithRefersToWithoutEmails
+} = agencyWithRefersTo;
 
 const agency1WithRights = toAgencyWithRights(agency1, {
   [johnUser.id]: {
@@ -84,6 +109,13 @@ const agency2WithRights = toAgencyWithRights(agency2, {
   },
   [paulUser.id]: {
     roles: ["validator"],
+    isNotifiedByEmail: true,
+  },
+});
+
+const agencyWithRefersToWithRights = toAgencyWithRights(agencyWithRefersTo, {
+  [agencyAdminUser.id]: {
+    roles: ["agency-admin"],
     isNotifiedByEmail: true,
   },
 });
@@ -116,6 +148,15 @@ describe("GetInclusionConnectedUsers", () => {
         icNotBackOffice,
       ),
       errors.user.forbidden({ userId: notBackOfficeUser.id }),
+    );
+  });
+
+  it("throws Forbidden if filter has agency id and token payload is not backoffice token neither agency Admin ", async () => {
+    uow.userRepository.users = [icPaul];
+
+    await expectPromiseToFailWithError(
+      getInclusionConnectedUsers.execute({ agencyId: agency2.id }, icPaul),
+      errors.user.forbidden({ userId: icPaul.id }),
     );
   });
 
@@ -184,6 +225,38 @@ describe("GetInclusionConnectedUsers", () => {
             agency: agency2WithoutEmails,
             isNotifiedByEmail: true,
             roles: ["validator"],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("gets the users by agencyId when agency admin request it", async () => {
+    uow.userRepository.users = [
+      johnUser,
+      paulUser,
+      backOfficeUser,
+      agencyAdminUser,
+    ];
+    uow.agencyRepository.agencies = [
+      agency1WithRights,
+      agency2WithRights,
+      agencyWithRefersToWithRights,
+    ];
+
+    const users = await getInclusionConnectedUsers.execute(
+      { agencyId: agencyWithRefersToWithRights.id },
+      icAgencyAdmin,
+    );
+
+    expectToEqual(users, [
+      {
+        ...icAgencyAdmin,
+        agencyRights: [
+          {
+            agency: agencyWithRefersToWithoutEmails,
+            isNotifiedByEmail: true,
+            roles: ["agency-admin"],
           },
         ],
       },
