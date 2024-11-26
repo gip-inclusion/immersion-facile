@@ -1,5 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { userParamsForAgencySchema } from "../admin/admin.schema";
+import { z } from "zod";
 import {
   agencyIdResponseSchema,
   agencyOptionsSchema,
@@ -13,6 +14,7 @@ import {
 import { agencyPublicDisplaySchema } from "../agency/publicAgency.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 
 const agencyWithIdForAdminUrl = "/admin/agencies/:agencyId" as const;
@@ -24,6 +26,18 @@ export const agencyRoutes = defineRoutes({
     url: agencyWithIdForAdminUrl,
     ...withAuthorizationHeaders,
     responses: { 200: agencySchema },
+  }),
+  getAgencyByIdForDashboard: defineRoute({
+    method: "get",
+    url: "/dashboard/agencies/:agencyId",
+    ...withAuthorizationHeaders,
+    responses: { 200: agencySchema },
+  }),
+  getAgencyUsersByAgencyIdForDashboard: defineRoute({
+    method: "get",
+    url: "/dashboard/agencies/:agencyId/users",
+    ...withAuthorizationHeaders,
+    responses: { 200: z.array(inclusionConnectedUserSchema) },
   }),
   updateAgencyStatus: defineRoute({
     method: "patch",
