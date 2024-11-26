@@ -2,7 +2,7 @@ import Bottleneck from "bottleneck";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
-  ApiConsumerName,
+  ApiConsumer,
   ExtractFromExisting,
   PayloadKey,
   castError,
@@ -29,22 +29,25 @@ export type AuthorisationStatus =
   | "tooManyRequests"
   | "unauthenticated";
 
-type TotalCountProps = {
-  consumerName?: ApiConsumerName;
+type LogApiConsumerParams = {
+  apiConsumer: ApiConsumer | null;
   authorisationStatus: AuthorisationStatus;
 };
 
-const createIncTotalCountForRequest =
+const createApiConsumerLogger =
   (req: Request) =>
-  ({ consumerName, authorisationStatus }: TotalCountProps) => {
+  ({ apiConsumer, authorisationStatus }: LogApiConsumerParams) => {
     const route = convertRouteToLog(req.originalUrl);
     logger.info({
-      request: {
-        method: req.method,
-        path: route,
+      apiConsumerCall: {
+        consumerName: apiConsumer?.name,
+        consumerId: apiConsumer?.id,
+        route: {
+          method: req.method,
+          url: route,
+        },
+        authorisationStatus,
       },
-      authorisationStatus,
-      message: `apiKeyAuthMiddlewareRequestsTotal for ${consumerName}`,
     });
   };
 
@@ -162,9 +165,9 @@ export const makeConsumerMiddleware = (
     res: Response,
     next: NextFunction,
   ) => {
-    const incTotalCountForRequest = createIncTotalCountForRequest(req);
+    const log = createApiConsumerLogger(req);
     if (!req.headers.authorization) {
-      incTotalCountForRequest({ authorisationStatus: "unauthenticated" });
+      log({ apiConsumer: null, authorisationStatus: "unauthenticated" });
       return responseErrorForV2(res, "unauthenticated", 401);
     }
 
@@ -174,23 +177,24 @@ export const makeConsumerMiddleware = (
       const apiConsumer = await getApiConsumerById(id);
 
       if (!apiConsumer) {
-        incTotalCountForRequest({
+        log({
+          apiConsumer: null,
           authorisationStatus: "consumerNotFound",
         });
         return responseErrorForV2(res, "consumer not found", 401);
       }
 
       if (new Date(apiConsumer.expirationDate) < timeGateway.now()) {
-        incTotalCountForRequest({
+        log({
+          apiConsumer,
           authorisationStatus: "expiredToken",
-          consumerName: apiConsumer.name,
         });
         return responseErrorForV2(res, "expired token", 401);
       }
 
       // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
-      incTotalCountForRequest({
-        consumerName: apiConsumer.name,
+      log({
+        apiConsumer,
         authorisationStatus: "authorised",
       });
 
@@ -205,7 +209,8 @@ export const makeConsumerMiddleware = (
           logger.error({
             error,
           });
-          incTotalCountForRequest({
+          log({
+            apiConsumer,
             authorisationStatus: "tooManyRequests",
           });
           return responseErrorForV2(
@@ -220,7 +225,8 @@ export const makeConsumerMiddleware = (
         error: castedError,
         message: `makeApiKeyAuthMiddlewareV2 : ${castedError.message}`,
       });
-      incTotalCountForRequest({
+      log({
+        apiConsumer: null,
         authorisationStatus: "incorrectJwt",
       });
       return responseErrorForV2(res, "incorrect Jwt", 401);
