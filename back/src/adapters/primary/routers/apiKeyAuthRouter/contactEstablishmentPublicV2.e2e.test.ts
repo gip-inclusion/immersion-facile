@@ -136,7 +136,7 @@ describe("POST contact-establishment public V2 route", () => {
 
   it("rejects invalid requests with mismatching contact Mode with error code 400", async () => {
     const testEstablishmentContactMethod = "PHONE";
-    const establishment = new EstablishmentAggregateBuilder()
+    const establishmentAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
         new EstablishmentEntityBuilder()
           .withSiret(contactEstablishment.siret)
@@ -160,7 +160,7 @@ describe("POST contact-establishment public V2 route", () => {
       ])
       .build();
     inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
-      establishment,
+      establishmentAggregate,
     ];
 
     const { body, status } = await sharedRequest.contactEstablishment({
@@ -175,7 +175,7 @@ describe("POST contact-establishment public V2 route", () => {
       message: errors.establishment.contactRequestContactModeMismatch({
         contactMethods: {
           inParams: contactEstablishment.contactMode,
-          inRepo: establishment.establishment.contactMethod,
+          inRepo: establishmentAggregate.establishment.contactMethod,
         },
         siret: contactEstablishment.siret,
       }).message,

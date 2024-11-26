@@ -31,7 +31,7 @@ describe("PgDeletedEstablishmentRepository", () => {
         {
           role: "establishment-admin",
           job: "osef",
-          phone: "3615-TABASSER-LES-BALOCHES",
+          phone: "0600000000",
           userId: "osef",
         },
       ])

@@ -98,7 +98,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         students: false,
       })
       .build();
-    // const contact = new ContactEntityBuilder().build();
     const offer = new OfferEntityBuilder()
       .withRomeCode("A1101")
       .withAppellationCode("11987")

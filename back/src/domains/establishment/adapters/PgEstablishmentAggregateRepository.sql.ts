@@ -24,7 +24,7 @@ FROM establishments_location_infos
 GROUP BY establishment_siret
 `;
 
-export const establishmentByFilters = (db: KyselyDb) =>
+export const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
   db
     .selectFrom("establishments as e")
     .select(({ ref, eb }) =>

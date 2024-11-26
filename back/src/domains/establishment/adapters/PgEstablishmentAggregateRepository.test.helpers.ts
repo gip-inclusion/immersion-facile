@@ -3,7 +3,7 @@ import { EstablishmentAggregate } from "../entities/EstablishmentEntity";
 import { OfferEntity } from "../entities/OfferEntity";
 
 export const makeExpectedSearchResult = ({
-  establishment,
+  establishment: establishmentAggregate,
   withOffers,
   withLocationAndDistance,
 }: {
@@ -17,31 +17,35 @@ export const makeExpectedSearchResult = ({
       "At least one offer is required to make an expected SearchResult",
     );
   return {
-    additionalInformation: establishment.establishment.additionalInformation,
+    additionalInformation:
+      establishmentAggregate.establishment.additionalInformation,
     address: withLocationAndDistance.address,
     appellations: withOffers.map(({ appellationCode, appellationLabel }) => ({
       appellationCode,
       appellationLabel,
     })),
-    establishmentScore: establishment.establishment.score,
-    contactMode: establishment.establishment.contactMethod,
-    customizedName: establishment.establishment.customizedName,
+    establishmentScore: establishmentAggregate.establishment.score,
+    contactMode: establishmentAggregate.establishment.contactMethod,
+    customizedName: establishmentAggregate.establishment.customizedName,
     distance_m: withLocationAndDistance.distance,
-    fitForDisabledWorkers: establishment.establishment.fitForDisabledWorkers,
+    fitForDisabledWorkers:
+      establishmentAggregate.establishment.fitForDisabledWorkers,
     locationId: withLocationAndDistance.id,
-    naf: establishment.establishment.nafDto.code,
+    naf: establishmentAggregate.establishment.nafDto.code,
     nafLabel: "Activités des agences de travail temporaire",
-    name: establishment.establishment.name,
-    numberOfEmployeeRange: establishment.establishment.numberEmployeesRange,
+    name: establishmentAggregate.establishment.name,
+    numberOfEmployeeRange:
+      establishmentAggregate.establishment.numberEmployeesRange,
     position: withLocationAndDistance.position,
     rome: firstOffer.romeCode,
     romeLabel: firstOffer.romeLabel,
-    siret: establishment.establishment.siret,
-    voluntaryToImmersion: establishment.establishment.voluntaryToImmersion,
-    website: establishment.establishment.website,
-    isSearchable: establishment.establishment.isSearchable, // <<<<< Donnée renvoyée actuellement alors que pas spécifié dans le DTO?!
-    updatedAt: establishment.establishment.updatedAt?.toISOString(),
-    createdAt: establishment.establishment.createdAt.toISOString(),
+    siret: establishmentAggregate.establishment.siret,
+    voluntaryToImmersion:
+      establishmentAggregate.establishment.voluntaryToImmersion,
+    website: establishmentAggregate.establishment.website,
+    isSearchable: establishmentAggregate.establishment.isSearchable, // <<<<< Donnée renvoyée actuellement alors que pas spécifié dans le DTO?!
+    updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
+    createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
   } as SearchResultDto; // d'où le as
 };
 
