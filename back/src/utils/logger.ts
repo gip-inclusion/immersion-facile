@@ -17,7 +17,7 @@ import {
   SiretDto,
 } from "shared";
 import { HttpResponse } from "shared-routes";
-import { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
+import type { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
 import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
 import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
 import { DomainEvent, DomainTopic } from "../domains/core/events/events";
@@ -55,12 +55,14 @@ type SQLError = {
   error: Error;
 };
 
+type RouteMethodAndUrl = {
+  method: string;
+  url: string;
+};
+
 type PartnerApiCall = {
   partnerName: string;
-  route: {
-    method: string;
-    url: string;
-  };
+  route: RouteMethodAndUrl;
   durationInMs: number;
   response:
     | {
@@ -80,8 +82,16 @@ type PartnerApiCall = {
       };
 };
 
+type ApiConsumerCall = {
+  consumerName?: string;
+  consumerId?: string;
+  route: RouteMethodAndUrl;
+  authorisationStatus: AuthorisationStatus;
+};
+
 type LoggerParams = Partial<{
   partnerApiCall: PartnerApiCall;
+  apiConsumerCall: ApiConsumerCall;
   adapters: {
     repositories: "IN_MEMORY" | "PG";
     notificationGateway: "IN_MEMORY" | "BREVO";
@@ -194,6 +204,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       searchParams,
       siret,
       romeLabel,
+      apiConsumerCall,
       ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
@@ -201,6 +212,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
 
       const opacifiedLogContent = {
         adapters,
+        apiConsumerCall,
         agencyId,
         conventionId,
         crawlerInfo,
