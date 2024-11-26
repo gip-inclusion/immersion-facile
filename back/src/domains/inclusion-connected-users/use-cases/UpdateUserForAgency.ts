@@ -54,7 +54,8 @@ export class UpdateUserForAgency extends TransactionalUseCase<
         agencyId: agency.id,
         userId: userToUpdate.id,
       });
-    rejectIfEditionOfValidatorsOfAgencyWithRefersTo(params, agency);
+
+    rejectIfEditionOfValidatorsOfAgencyWithRefersTo(agency, params.roles);
     rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 
     const updatedRights: AgencyUsersRights = {

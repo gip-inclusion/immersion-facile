@@ -8,10 +8,9 @@ import { createTransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import {
-  throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications,
-  throwIfAgencyDontHaveOtherValidatorsReceivingNotifications,
-  throwIfAgencyRefersToAndUserIsValidator,
-} from "../helpers/throwIfAgencyWontHaveEnoughCounsellorsOrValidators";
+  rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
+  validateAgencyRights,
+} from "../helpers/agencyRights.helper";
 import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export type RemoveUserFromAgency = ReturnType<typeof makeRemoveUserFromAgency>;
@@ -41,14 +40,11 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
         userId: user.id,
       });
 
-    throwIfAgencyRefersToAndUserIsValidator(agency, user.id);
-    throwIfAgencyDontHaveOtherValidatorsReceivingNotifications(agency, user.id);
-    throwIfAgencyDontHaveOtherCounsellorsReceivingNotifications(
-      agency,
-      user.id,
-    );
+    rejectIfEditionOfValidatorsOfAgencyWithRefersTo(agency, userRight.roles);
 
     const { [user.id]: _, ...usersRights } = agency.usersRights;
+
+    validateAgencyRights(agency.id, usersRights);
 
     await Promise.all([
       uow.agencyRepository.update({
