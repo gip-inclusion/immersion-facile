@@ -4,7 +4,7 @@ import {
   RadioButtons,
   RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { UseFormRegisterReturn, useFormContext } from "react-hook-form";
 import { DotNestedKeys, FormEstablishmentDto, emailSchema } from "shared";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
@@ -45,11 +45,9 @@ const preferredContactMethodOptions = (
 ];
 
 export const BusinessContact = ({
-  readOnly,
   mode,
   setInvalidEmailMessage,
 }: {
-  readOnly?: boolean;
   mode: Mode;
   setInvalidEmailMessage: Dispatch<SetStateAction<React.ReactNode | null>>;
 }) => {
@@ -60,33 +58,41 @@ export const BusinessContact = ({
   const { setValue, register, watch, getValues, formState } =
     useFormContext<FormEstablishmentDto>();
   const getFieldError = makeFieldError(formState);
+  const [emailModified, setEmailModified] = useState(false);
+
+  const areNamesFieldReadOnly = mode !== "create" && !emailModified;
+  const readOnlyFieldMessage = areNamesFieldReadOnly
+    ? "Les noms et prénoms sont associés à l'email, si vous souhaitez en changer, veuillez modifier l'email de contact"
+    : undefined;
+
   return (
     <div className={fr.cx("fr-input-group")}>
       <h2 className={fr.cx("fr-text--lead")}>
         Qui répondra aux demandes des candidats ?
       </h2>
       <Input
-        disabled={readOnly}
         label={formContents["businessContact.firstName"].label}
         hintText={formContents["businessContact.firstName"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.firstName"],
           ...register("businessContact.firstName"),
+          readOnly: areNamesFieldReadOnly,
+          title: readOnlyFieldMessage,
         }}
         {...getFieldError("businessContact.firstName")}
       />
       <Input
-        disabled={readOnly}
         label={formContents["businessContact.lastName"].label}
         hintText={formContents["businessContact.lastName"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.lastName"],
           ...register("businessContact.lastName"),
+          readOnly: areNamesFieldReadOnly,
+          title: readOnlyFieldMessage,
         }}
         {...getFieldError("businessContact.lastName")}
       />
       <Input
-        disabled={readOnly}
         label={formContents["businessContact.job"].label}
         hintText={formContents["businessContact.job"].hintText}
         nativeInputProps={{
@@ -96,7 +102,6 @@ export const BusinessContact = ({
         {...getFieldError("businessContact.job")}
       />
       <Input
-        disabled={readOnly}
         label={formContents["businessContact.phone"].label}
         hintText={formContents["businessContact.phone"].hintText}
         nativeInputProps={{
@@ -106,12 +111,15 @@ export const BusinessContact = ({
         {...getFieldError("businessContact.phone")}
       />
       <EmailValidationInput
-        disabled={readOnly}
         label={formContents["businessContact.email"].label}
         hintText={formContents["businessContact.email"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.email"],
           ...register("businessContact.email"),
+          onChange: (event) => {
+            setEmailModified(true);
+            setValue("businessContact.email", event.currentTarget.value);
+          },
         }}
         {...getFieldError(
           "businessContact.email" as DotNestedKeys<FormEstablishmentDto>,
@@ -121,7 +129,6 @@ export const BusinessContact = ({
         }
       />
       <MultipleEmailsInput
-        disabled={readOnly}
         {...formContents["businessContact.copyEmails"]}
         valuesInList={watch().businessContact.copyEmails}
         initialValue={getValues().businessContact.copyEmails.join(", ")}
@@ -131,7 +138,6 @@ export const BusinessContact = ({
         validationSchema={emailSchema}
       />
       <RadioButtons
-        disabled={readOnly}
         {...formContents["businessContact.contactMethod"]}
         legend={formContents["businessContact.contactMethod"].label}
         hintText={formContents["businessContact.contactMethod"].hintText}
