@@ -34,6 +34,7 @@ import { encodedSearchUriParams, useSearch } from "src/app/hooks/search.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
+import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchPageParams,
@@ -175,6 +176,7 @@ export const SearchPage = ({
   useEffect(() => {
     return () => {
       dispatch(searchSlice.actions.clearSearchStatusRequested());
+      dispatch(geosearchSlice.actions.queryWasEmptied());
     };
   }, [dispatch]);
 
