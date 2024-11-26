@@ -8,12 +8,12 @@ const contactModeColumnName = "contact_mode";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   A_copyContactModeInEstablishmentTable(pgm, "up");
-  B_createMissingContactCopyEmailUsers(pgm);
-  C_createMissingContactAdminUsers(pgm);
+  B_insertMissingContactCopyEmailUsers(pgm);
+  C_insertMissingContactAdminUsers(pgm);
   D_updateExistingContactAdminUsersWithoutFirstNameAndLastName(pgm);
   E_createEstablishmentUserTable(pgm, "up");
-  F_createCopyContactRights(pgm);
-  G_createAdminContactRights(pgm);
+  F_insertCopyContactRights(pgm);
+  G_insertAdminContactRights(pgm);
   H_updateViewEstablishments(pgm, "up");
   I_renameEstablishmentContactTable(pgm, "up");
 }
@@ -51,7 +51,7 @@ const A_copyContactModeInEstablishmentTable = (
   }
 };
 
-const B_createMissingContactCopyEmailUsers = (pgm: MigrationBuilder) => {
+const B_insertMissingContactCopyEmailUsers = (pgm: MigrationBuilder) => {
   pgm.sql(`
     INSERT INTO users 
       (id,email,first_name,last_name)
@@ -68,7 +68,7 @@ const B_createMissingContactCopyEmailUsers = (pgm: MigrationBuilder) => {
   `);
 };
 
-const C_createMissingContactAdminUsers = (pgm: MigrationBuilder) => {
+const C_insertMissingContactAdminUsers = (pgm: MigrationBuilder) => {
   pgm.sql(`
     INSERT INTO users 
       (id, email, first_name, last_name)
@@ -149,7 +149,7 @@ const E_createEstablishmentUserTable = (
   }
 };
 
-const F_createCopyContactRights = (pgm: MigrationBuilder) => {
+const F_insertCopyContactRights = (pgm: MigrationBuilder) => {
   pgm.sql(`
     INSERT INTO ${establishmentsUsersTableName} 
       (siret, user_id, role)
@@ -166,7 +166,7 @@ const F_createCopyContactRights = (pgm: MigrationBuilder) => {
   `);
 };
 
-const G_createAdminContactRights = (pgm: MigrationBuilder) => {
+const G_insertAdminContactRights = (pgm: MigrationBuilder) => {
   pgm.sql(`
     INSERT INTO ${establishmentsUsersTableName} 
       (siret, user_id, job, phone, role)

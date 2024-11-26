@@ -41,8 +41,8 @@ test.describe("Establishment creation and modification workflow", () => {
       phone: faker.helpers.fromRegExp(phoneRegexp),
       email: "admin+playwright@immersion-facile.beta.gouv.fr",
       contactMethod: "PHONE",
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
+      firstName: "Prénom Admin",
+      lastName: "Nom Admin",
       copyEmails: [
         "recette+copy-updated-establishment@immersion-facile.beta.gouv.fr",
       ],

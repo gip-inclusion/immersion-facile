@@ -130,7 +130,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         await makeProvider(uow),
         establishmentAggregate,
       ),
-      //establishmentAggregate.contact,
       establishment: establishmentAggregate.establishment,
       now,
       uow,

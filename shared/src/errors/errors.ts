@@ -179,11 +179,11 @@ export const errors = {
       ),
     adminNotFound: ({ siret }: { siret: SiretDto }) =>
       new NotFoundError(
-        `Aucune administrateur trouvé pour l'établissement avec le siret : ${siret}.`,
+        `Aucun administrateur trouvé pour l'établissement avec le siret : ${siret}.`,
       ),
     siretMismatch: () =>
       new ForbiddenError(
-        "Il y a un problème de cohérance de Siret entre les données techniques (JWT et formulaire).",
+        "Il y a un problème de cohérence de Siret entre les données techniques (JWT et formulaire).",
       ),
     conflictError: ({ siret }: { siret: SiretDto }) =>
       new ConflictError(
@@ -390,7 +390,9 @@ export const errors = {
         `L'utilisateur ayant le mail ${userEmail} existe déjà.`,
       ),
     conflictById: ({ userId }: { userId: UserId }) =>
-      new ConflictError(`L'utilisateur ayant l'Id ${userId} existe déjà.`),
+      new ConflictError(
+        `L'utilisateur ayant l'identifiant ${userId} existe déjà.`,
+      ),
     conflictByExternalId: ({ externalId }: { externalId: string }) =>
       new ConflictError(
         `L'utilisateur ayant l'externalId ${externalId} existe déjà.`,

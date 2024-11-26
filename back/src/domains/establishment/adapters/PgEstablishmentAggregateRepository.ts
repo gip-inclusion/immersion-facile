@@ -40,7 +40,7 @@ import {
 } from "../ports/EstablishmentAggregateRepository";
 import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
 import {
-  establishmentByFilters as establishmentByFiltersQueryBuilder,
+  establishmentByFiltersQueryBuilder,
   withEstablishmentLocationsSubQuery,
 } from "./PgEstablishmentAggregateRepository.sql";
 

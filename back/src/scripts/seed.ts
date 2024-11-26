@@ -27,7 +27,25 @@ import {
   insertAgencySeed,
 } from "./seed.helpers";
 
-const adminUserId = "7f5cfde7-80b3-4ea1-bf3e-1711d0876161";
+const icUser = new InclusionConnectedUserBuilder()
+  .withIsAdmin(false)
+  .withCreatedAt(new Date("2024-04-29"))
+  .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
+  .withFirstName("Prénom IcUser")
+  .withLastName("Nom IcUser")
+  .withId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
+  .withExternalId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
+  .build();
+
+const adminUser = new InclusionConnectedUserBuilder()
+  .withIsAdmin(true)
+  .withCreatedAt(new Date("2024-04-30"))
+  .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
+  .withFirstName("Prénom Admin")
+  .withLastName("Nom Admin")
+  .withId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
+  .withExternalId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
+  .build();
 
 const franceMerguezUser = new UserBuilder()
   .withId("11111111-2222-4000-2222-111111111111")
@@ -87,26 +105,6 @@ const seed = async () => {
 };
 
 const inclusionConnectUserSeed = async (db: KyselyDb) => {
-  const icUser = new InclusionConnectedUserBuilder()
-    .withIsAdmin(false)
-    .withCreatedAt(new Date("2024-04-29"))
-    .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
-    .withFirstName("Prénom IcUser")
-    .withLastName("Nom IcUser")
-    .withId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
-    .withExternalId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
-    .build();
-
-  const adminUser = new InclusionConnectedUserBuilder()
-    .withIsAdmin(true)
-    .withCreatedAt(new Date("2024-04-30"))
-    .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
-    .withFirstName("Prénom Admin")
-    .withLastName("Nom Admin")
-    .withId(adminUserId)
-    .withExternalId(adminUserId)
-    .build();
-
   await db
     .insertInto("users")
     .values(
@@ -166,29 +164,29 @@ const agencySeed = async (uow: UnitOfWork) => {
 
   const insertQueries = [...Array(agenciesCountByKind).keys()].flatMap(() => {
     return [
-      insertAgencySeed({ uow, kind: "pole-emploi", userId: adminUserId }),
-      insertAgencySeed({ uow, kind: "cci", userId: adminUserId }),
-      insertAgencySeed({ uow, kind: "mission-locale", userId: adminUserId }),
-      insertAgencySeed({ uow, kind: "cap-emploi", userId: adminUserId }),
+      insertAgencySeed({ uow, kind: "pole-emploi", userId: adminUser.id }),
+      insertAgencySeed({ uow, kind: "cci", userId: adminUser.id }),
+      insertAgencySeed({ uow, kind: "mission-locale", userId: adminUser.id }),
+      insertAgencySeed({ uow, kind: "cap-emploi", userId: adminUser.id }),
       insertAgencySeed({
         uow,
         kind: "conseil-departemental",
-        userId: adminUserId,
+        userId: adminUser.id,
       }),
       insertAgencySeed({
         uow,
         kind: "prepa-apprentissage",
-        userId: adminUserId,
+        userId: adminUser.id,
       }),
-      insertAgencySeed({ uow, kind: "structure-IAE", userId: adminUserId }),
-      insertAgencySeed({ uow, kind: "autre", userId: adminUserId }),
-      insertAgencySeed({ uow, kind: "operateur-cep", userId: adminUserId }),
+      insertAgencySeed({ uow, kind: "structure-IAE", userId: adminUser.id }),
+      insertAgencySeed({ uow, kind: "autre", userId: adminUser.id }),
+      insertAgencySeed({ uow, kind: "operateur-cep", userId: adminUser.id }),
     ];
   });
 
   await Promise.all([
     ...insertQueries,
-    insertAgencies({ uow, userId: adminUserId }),
+    insertAgencies({ uow, userId: adminUser.id }),
   ]);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
