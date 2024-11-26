@@ -149,6 +149,47 @@ describe("RemoveUserFromAgency", () => {
       );
     });
 
+    it("throws forbidden if user to delete is the last pre-validator receiving notifications, and agency has other pre-validators", async () => {
+      const counsellorNotReceivingNotif: User = {
+        ...notAdminUser,
+        id: "counsellor-not-receiving-notif-id",
+        email: "counsellorNotReceivingNotif@email.com",
+      };
+      const counsellorReceivingNotif: User = {
+        ...notAdminUser,
+        id: "counsellor-receiving-notif-id",
+        email: "counsellorReceivingNotif@email.com",
+      };
+      uow.userRepository.users = [
+        counsellorNotReceivingNotif,
+        counsellorReceivingNotif,
+        notAdminUser,
+      ];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notAdminUser.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [counsellorNotReceivingNotif.id]: {
+            roles: ["counsellor"],
+            isNotifiedByEmail: false,
+          },
+          [counsellorReceivingNotif.id]: {
+            roles: ["counsellor"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+
+      const inputParams: WithAgencyIdAndUserId = {
+        agencyId: agency.id,
+        userId: counsellorReceivingNotif.id,
+      };
+
+      await expectPromiseToFailWithError(
+        removeUserFromAgency.execute(inputParams, icAdmin),
+        errors.agency.notEnoughCounsellors(inputParams),
+      );
+    });
+
     it("throws forbidden if user to delete is the last counsellor receiving notifications on agency with refers to another agency", async () => {
       const agencyWithRefersTo: AgencyDto = new AgencyDtoBuilder()
         .withRefersToAgencyInfo({

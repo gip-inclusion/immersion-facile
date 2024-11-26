@@ -1,15 +1,15 @@
 import { values } from "ramda";
-import { AgencyId, UserParamsForAgency, errors } from "shared";
+import { AgencyId, AgencyRole, errors } from "shared";
 import {
   AgencyUsersRights,
   AgencyWithUsersRights,
 } from "../../agency/ports/AgencyRepository";
 
 export const rejectIfEditionOfValidatorsOfAgencyWithRefersTo = (
-  params: UserParamsForAgency,
   agency: AgencyWithUsersRights,
+  roles: AgencyRole[],
 ) => {
-  if (params.roles.includes("validator") && agency.refersToAgencyId) {
+  if (agency.refersToAgencyId && roles.includes("validator")) {
     throw errors.agency.invalidValidatorEditionWhenAgencyWithRefersTo(
       agency.id,
     );
