@@ -124,7 +124,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
       .catch((error) => {
         logger.error({
           error: castError(error),
-          message: "searchCompanies_error",
+          message: "fetchCompanyBySiret_error",
           siret,
           romeLabel: romeDto.romeLabel,
         });
