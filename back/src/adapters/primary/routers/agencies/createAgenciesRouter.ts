@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { agencyRoutes } from "shared";
+import { agencyRoutes, errors } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
@@ -43,6 +43,31 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
           req.payloads?.currentUser,
         ),
       ),
+  );
+  sharedAgencyRouter.getAgencyByIdForDashboard(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        return deps.useCases.getAgencyByIdForDashboard.execute(
+          req.params.agencyId,
+          currentUser,
+        );
+      }),
+  );
+
+  sharedAgencyRouter.getAgencyUsersByAgencyIdForDashboard(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        return deps.useCases.getIcUsers.execute(
+          { agencyId: req.params.agencyId },
+          currentUser,
+        );
+      }),
   );
 
   return expressRouter;
