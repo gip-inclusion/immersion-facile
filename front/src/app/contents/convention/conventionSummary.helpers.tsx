@@ -375,7 +375,9 @@ const makeBeneficiarySubSections = (
         {
           key: "beneficiaryBirthdate",
           label: "Date de naissance",
-          value: convention.signatories.beneficiary.birthdate,
+          value: toDisplayedDate({
+            date: new Date(convention.signatories.beneficiary.birthdate),
+          }),
         },
         {
           key: "beneficiaryRqth",
