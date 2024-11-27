@@ -20,6 +20,7 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { UpdateAgency } from "./UpdateAgency";
 
 describe("Update agency", () => {
+  const initialAgencyInRepo = new AgencyDtoBuilder().build();
   const adminBuilder = new InclusionConnectedUserBuilder()
     .withId("backoffice-admin-id")
     .withIsAdmin(true);
@@ -33,7 +34,20 @@ describe("Update agency", () => {
   const notAdmin = notAdminBuilder.buildUser();
   const icNotAdmin = notAdminBuilder.build();
 
-  const initialAgencyInRepo = new AgencyDtoBuilder().build();
+  const agencyAdminBuilder = new InclusionConnectedUserBuilder()
+    .withId("agency-admin-id")
+    .withIsAdmin(false);
+  const agencyAdmin = agencyAdminBuilder.buildUser();
+  const icAgencyAdmin = agencyAdminBuilder
+    .withAgencyRights([
+      {
+        agency: initialAgencyInRepo,
+        roles: ["agency-admin"],
+        isNotifiedByEmail: true,
+      },
+    ])
+    .build();
+
   let uow: InMemoryUnitOfWork;
   let updateAgency: UpdateAgency;
 
@@ -58,7 +72,7 @@ describe("Update agency", () => {
       );
     });
 
-    it("throws Forbidden if current user is not admin", async () => {
+    it("throws Forbidden if current user is not admin nore agency admin on agency", async () => {
       const agency = new AgencyDtoBuilder().build();
       await expectPromiseToFailWithError(
         updateAgency.execute(
@@ -160,6 +174,49 @@ describe("Update agency", () => {
           triggeredBy: {
             kind: "inclusion-connected",
             userId: admin.id,
+          },
+        },
+      },
+    ]);
+  });
+
+  it("Updates agency without changes on user rights and create corresponding event when user that trigger the update is agency admin on agency", async () => {
+    uow.userRepository.users = [agencyAdmin];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(initialAgencyInRepo, {
+        [icAgencyAdmin.id]: {
+          roles: ["agency-admin"],
+          isNotifiedByEmail: true,
+        },
+      }),
+    ];
+
+    const updatedAgency = new AgencyDtoBuilder(initialAgencyInRepo)
+      .withName("L'agence modifié")
+      .build();
+
+    await updateAgency.execute(
+      { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
+      icAgencyAdmin,
+    );
+
+    expectToEqual(uow.agencyRepository.agencies, [
+      toAgencyWithRights(updatedAgency, {
+        [icAgencyAdmin.id]: {
+          roles: ["agency-admin"],
+          isNotifiedByEmail: true,
+        },
+      }),
+    ]);
+    expectToEqual(uow.userRepository.users, [agencyAdmin]);
+    expectArraysToMatch(uow.outboxRepository.events, [
+      {
+        topic: "AgencyUpdated",
+        payload: {
+          agencyId: updatedAgency.id,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: icAgencyAdmin.id,
           },
         },
       },
