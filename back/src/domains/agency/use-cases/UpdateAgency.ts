@@ -1,5 +1,6 @@
 import {
   AgencyDto,
+  AgencyId,
   InclusionConnectedUser,
   agencySchema,
   errors,
@@ -8,7 +9,6 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class UpdateAgency extends TransactionalUseCase<
   AgencyDto,
@@ -32,7 +32,7 @@ export class UpdateAgency extends TransactionalUseCase<
     uow: UnitOfWork,
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
-    throwIfNotAdmin(currentUser);
+    throwIfNotAgencyAdminOrBackofficeAdmin(agency.id, currentUser);
     const {
       validatorEmails: _,
       counsellorEmails: __,
@@ -60,3 +60,21 @@ export class UpdateAgency extends TransactionalUseCase<
     ]);
   }
 }
+
+const throwIfNotAgencyAdminOrBackofficeAdmin = (
+  agencyId: AgencyId,
+  currentUser?: InclusionConnectedUser,
+): void => {
+  if (!currentUser) throw errors.user.unauthorized();
+  if (currentUser.isBackofficeAdmin) return;
+
+  const hasPermission = currentUser.agencyRights.some(
+    (agencyRight) =>
+      agencyRight.agency.id === agencyId &&
+      agencyRight.roles.includes("agency-admin"),
+  );
+
+  if (!hasPermission) {
+    throw errors.user.forbidden({ userId: currentUser.id });
+  }
+};
