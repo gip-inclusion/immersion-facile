@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
-import { ManagedErrorKind } from "shared";
+import { ManagedErrorKind, domElementIds } from "shared";
 import {
   contentsMapper,
   unexpectedErrorContent,
@@ -11,27 +11,41 @@ import {
   HTTPFrontErrorContents,
 } from "src/app/contents/error/types";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
-import { useStyles } from "tss-react/dsfr";
 
 import ovoidSprite from "@codegouvfr/react-dsfr/dsfr/artwork/background/ovoid.svg";
 import technicalErrorSprite from "@codegouvfr/react-dsfr/dsfr/artwork/pictograms/system/technical-error.svg";
+import { RenewEstablishmentMagicLinkButton } from "src/app/pages/establishment/RenewEstablishmentMagicLinkButton";
+import { routes, useRoute } from "src/app/routes/routes";
+import { getJwtPayload } from "src/app/utils/jwt";
+import { Route } from "type-route";
 
 type ErrorPageContentProps = {
   type?: ManagedErrorKind;
   title?: string;
   message?: string;
+  shouldShowRefreshEditEstablishmentLink: boolean;
+};
+
+const routeContainsJwt = (
+  route: Route<typeof routes>,
+): route is Route<typeof routes.editFormEstablishment> => {
+  return "jwt" in route.params;
 };
 
 export const ErrorPageContent = ({
   type,
   title,
   message,
+  shouldShowRefreshEditEstablishmentLink,
 }: ErrorPageContentProps): React.ReactElement => {
-  const { cx } = useStyles();
+  const route = useRoute() as Route<typeof routes>;
   const redirectAction = useRedirectToConventionWithoutIdentityProvider();
   const content: HTTPFrontErrorContents = type
     ? contentsMapper(redirectAction, message, title)[type]
     : unexpectedErrorContent(title ?? "", message ?? "");
+  const siret = routeContainsJwt(route)
+    ? getJwtPayload(route.params.jwt)?.siret
+    : null;
   return (
     <div
       className={fr.cx(
@@ -49,9 +63,17 @@ export const ErrorPageContent = ({
         <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>{content.title}</p>
         <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>{content.subtitle}</p>
         <p
-          className={fr.cx("fr-text--sm", "fr-mb-5w")}
+          className={fr.cx("fr-text--sm", "fr-mb-3w")}
           dangerouslySetInnerHTML={{ __html: content.description }}
         />
+        {shouldShowRefreshEditEstablishmentLink && siret && (
+          <p className={fr.cx("fr-text--sm", "fr-mb-5w")}>
+            <RenewEstablishmentMagicLinkButton
+              id={domElementIds.establishment.edit.refreshEditLink}
+              siret={siret}
+            />
+          </p>
+        )}
         <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
           {content.buttons.map((button: ErrorButton, index) => {
             const buttonProps: ErrorButtonProps =
@@ -66,9 +88,10 @@ export const ErrorPageContent = ({
               <li key={`${buttonProps.kind}-${index}`}>
                 {buttonProps.onClick ? (
                   <button
-                    className={cx(
-                      fr.cx("fr-btn"),
-                      `fr-btn--${buttonProps.kind}`,
+                    className={fr.cx(
+                      "fr-btn",
+                      buttonProps.kind !== "primary" &&
+                        `fr-btn--${buttonProps.kind}`,
                     )}
                     onClick={buttonProps.onClick}
                     type="button"
@@ -77,9 +100,10 @@ export const ErrorPageContent = ({
                   </button>
                 ) : (
                   <a
-                    className={cx(
-                      fr.cx("fr-btn"),
-                      `fr-btn--${buttonProps.kind}`,
+                    className={fr.cx(
+                      "fr-btn",
+                      buttonProps.kind !== "primary" &&
+                        `fr-btn--${buttonProps.kind}`,
                     )}
                     href={buttonProps.href}
                     target={buttonProps.target}
@@ -104,7 +128,7 @@ export const ErrorPageContent = ({
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className={cx(fr.cx("fr-responsive-img"), "fr-artwork")}
+          className={fr.cx("fr-responsive-img", "fr-artwork")}
           aria-hidden="true"
           width="160"
           height="200"

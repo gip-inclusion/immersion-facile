@@ -2,6 +2,7 @@ import {
   SiretDto,
   addressDtoToString,
   createEstablishmentJwtPayload,
+  errors,
   siretSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -40,7 +41,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
         siret,
       );
 
-    if (!establishmentAggregate) throw Error("Etablissement introuvable.");
+    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
     const { userRights, establishment } = establishmentAggregate;
 

@@ -1,9 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import { ImmersionTextField } from "react-design-system";
 import { domElementIds } from "shared";
 import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
+import { RenewEstablishmentMagicLinkButton } from "src/app/pages/establishment/RenewEstablishmentMagicLinkButton";
 
 type SiretFetcherInputProps = {
   placeholder: string;
@@ -21,7 +21,6 @@ export const SiretFetcherInput = ({
     updateSiret,
     modifyLinkWasSent,
     sendModifyLinkFeedback,
-    sendModifyEstablishmentLink,
   } = useEstablishmentSiret();
 
   const shouldShowInputError = !isSiretAlreadySaved && currentSiret !== "";
@@ -40,20 +39,16 @@ export const SiretFetcherInput = ({
         <>
           <p className={fr.cx("fr-valid-text", "fr-mb-2w")}>
             Nous avons bien trouvé votre établissement dans notre base de
-            donnée.
+            données.
           </p>
           <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
-            <Button
-              type="button"
-              onClick={() => sendModifyEstablishmentLink(currentSiret)}
-              priority="secondary"
-              nativeButtonProps={{
-                id: domElementIds.homeEstablishments.siretModal
-                  .editEstablishmentButton,
-              }}
-            >
-              Recevoir le mail de modification
-            </Button>
+            <RenewEstablishmentMagicLinkButton
+              id={
+                domElementIds.homeEstablishments.siretModal
+                  .editEstablishmentButton
+              }
+              siret={currentSiret}
+            />
           </div>
         </>
       )}

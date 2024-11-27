@@ -14,6 +14,7 @@ import {
   FormEstablishmentDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  errors,
   expiredMagicLinkErrorMessage,
   formEstablishmentSchema,
   safeTryJsonParse,
@@ -150,7 +151,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     (feedback: EstablishmentFeedback, jwt: string) => {
       if (feedback.kind === "errored") {
         if (!feedback.errorMessage.includes(expiredMagicLinkErrorMessage)) {
-          throw new Error(feedback.errorMessage);
+          throw errors.user.expiredJwt();
         }
         routes
           .renewConventionMagicLink({
@@ -192,7 +193,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
         () => {
-          throw new Error("Accès interdit sans être connecté en admin.");
+          throw errors.user.notBackOfficeAdmin();
         },
       )
       .with(
@@ -227,14 +228,17 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           inclusionConnectedJwt: P.nullish,
         },
         () => {
-          throw new Error("Accès interdit sans être inclusion connecté.");
+          throw errors.user.unauthorized();
         },
       )
       .exhaustive();
+  }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute]);
+
+  useEffect(() => {
     return () => {
       dispatch(establishmentSlice.actions.establishmentClearRequested());
     };
-  }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute]);
+  }, [dispatch]);
 
   useEffect(() => {
     reset({
