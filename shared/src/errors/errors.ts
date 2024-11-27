@@ -212,7 +212,7 @@ export const errors = {
       contactMethods: { inParams: ContactMethod; inRepo: ContactMethod };
     }) =>
       new BadRequestError(
-        `Incohérance sur le mode de mise en contact. '${contactMethods.inParams}' dans les params. '${contactMethods.inRepo}' dans le contact d'entreprise '${siret}'.`,
+        `Incohérence sur le mode de mise en contact. '${contactMethods.inParams}' dans les params. '${contactMethods.inRepo}' dans le contact d'entreprise '${siret}'.`,
       ),
     offerMissing: ({
       siret,
@@ -351,6 +351,8 @@ export const errors = {
     unauthorized: () => new UnauthorizedError(),
     noJwtProvided: () =>
       new ForbiddenError("Aucun jeton d'authentification (JWT) fourni."),
+    expiredJwt: () =>
+      new ForbiddenError("Le jeton d'authentification (JWT) fourni a expiré."),
     notFound: ({ userId }: { userId: UserId }) =>
       new NotFoundError(
         `Aucun utilisateur trouvé avec l'identifiant : ${userId}.`,
@@ -377,9 +379,9 @@ export const errors = {
       new ForbiddenError(
         `L'utilisateur qui a l'identifiant "${userId}" n'a pas de droits sur l'agence "${agencyId}".`,
       ),
-    notBackOfficeAdmin: ({ userId }: { userId: UserId }) =>
+    notBackOfficeAdmin: (params?: { userId: UserId }) =>
       new ForbiddenError(
-        `L'utilisateur '${userId}' n'est pas administrateur Immersion Facilitée.`,
+        `L'utilisateur '${params?.userId} 'n'est pas administrateur Immersion Facilitée.`,
       ),
     notConventionSignatory: () =>
       new ForbiddenError(

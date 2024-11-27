@@ -442,6 +442,7 @@ export const domElementIds = {
       nextButtonFromStepAndMode: ({ currentStep }) =>
         `im-form-edit-establishment__next-button--step-${currentStep}`,
       searchableBy: "im-form-edit-establishment__searchable-by",
+      refreshEditLink: "im-form-edit-establishment__refresh-link",
     },
     admin: {
       form: "im-form-manage-establishment-admin",
