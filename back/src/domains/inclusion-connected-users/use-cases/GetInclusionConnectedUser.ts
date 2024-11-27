@@ -17,8 +17,8 @@ import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { throwIfNotAdmin } from "../helpers/authorization.helper";
 import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class GetInclusionConnectedUser extends TransactionalUseCase<
   WithOptionalUserId,

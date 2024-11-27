@@ -9,7 +9,7 @@ import { makeProvider } from "../../core/authentication/inclusion-connect/port/O
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAdmin } from "../helpers/authorization.helper";
 
 export class RejectIcUserForAgency extends TransactionalUseCase<
   RejectIcUserRoleForAgencyParams,

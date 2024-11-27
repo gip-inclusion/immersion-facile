@@ -1,12 +1,15 @@
 import {
   InclusionConnectedUser,
   WithUserFilters,
-  errors,
   isWithAgencyId,
   withUserFiltersSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import {
+  throwIfNotAdmin,
+  throwIfNotAgencyAdminOrBackofficeAdmin,
+} from "../helpers/authorization.helper";
 import { getIcUsersByUserIds } from "../helpers/inclusionConnectedUser.helper";
 
 export class GetInclusionConnectedUsers extends TransactionalUseCase<
@@ -21,7 +24,9 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
     uow: UnitOfWork,
     currentUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser[]> {
-    throwIfNotAgencyAdminOrBackofficeAdmin(filters, currentUser);
+    isWithAgencyId(filters)
+      ? throwIfNotAgencyAdminOrBackofficeAdmin(filters.agencyId, currentUser)
+      : throwIfNotAdmin(currentUser);
 
     const userIds =
       await uow.agencyRepository.getUserIdWithAgencyRightsByFilters(filters);
@@ -33,23 +38,3 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
     );
   }
 }
-
-const throwIfNotAgencyAdminOrBackofficeAdmin = (
-  filters: WithUserFilters,
-  currentUser?: InclusionConnectedUser,
-): void => {
-  if (!currentUser) throw errors.user.unauthorized();
-  if (currentUser.isBackofficeAdmin) return;
-  if (!isWithAgencyId(filters))
-    throw errors.user.forbidden({ userId: currentUser.id });
-
-  const hasPermission = currentUser.agencyRights.some(
-    (agencyRight) =>
-      agencyRight.agency.id === filters.agencyId &&
-      agencyRight.roles.includes("agency-admin"),
-  );
-
-  if (!hasPermission) {
-    throw errors.user.forbidden({ userId: currentUser.id });
-  }
-};
