@@ -193,10 +193,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.updateAgencyAdmin.execute(
-          req.body,
-          req.payloads?.currentUser,
-        ),
+        deps.useCases.updateAgency.execute(req.body, req.payloads?.currentUser),
       ),
   );
 
