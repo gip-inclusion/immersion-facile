@@ -70,5 +70,13 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       }),
   );
 
+  sharedAgencyRouter.updateAgencyFromDashboard(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.updateAgency.execute(req.body, req.payloads?.currentUser),
+      ),
+  );
+
   return expressRouter;
 };

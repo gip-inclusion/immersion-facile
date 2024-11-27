@@ -584,7 +584,7 @@ export const createUseCases = (
         uuidGenerator,
       ),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
-      updateAgencyAdmin: new UpdateAgency(uowPerformer, createNewEvent),
+      updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
       saveApiConsumer: new SaveApiConsumer(
         uowPerformer,
