@@ -57,4 +57,29 @@ const getAgencyUsersEpic: AgencyDashboardEpic = (
     ),
   );
 
-export const agenciesDashboardEpics = [getAgencyEpic, getAgencyUsersEpic];
+const updateAgencyEpic: AgencyDashboardEpic = (
+  action$,
+  state$,
+  { agencyGateway },
+) =>
+  action$.pipe(
+    filter(agencyDashboardSlice.actions.updateAgencyRequested.match),
+    switchMap(({ payload }) =>
+      agencyGateway
+        .updateAgencyFromDashboard$(payload, getAdminToken(state$.value))
+        .pipe(
+          map(() =>
+            agencyDashboardSlice.actions.updateAgencySucceeded(payload),
+          ),
+        ),
+    ),
+    catchEpicError((error: Error) =>
+      agencyDashboardSlice.actions.updateAgencyFailed(error.message),
+    ),
+  );
+
+export const agenciesDashboardEpics = [
+  getAgencyEpic,
+  getAgencyUsersEpic,
+  updateAgencyEpic,
+];
