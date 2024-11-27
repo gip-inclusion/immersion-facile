@@ -107,6 +107,7 @@ export const AvailabilitySection = ({
           nativeInputProps={{
             id: formContents.nextAvailabilityDate.id,
             defaultValue: currentValueFormatted,
+            required: true,
             onBlur: (event) => {
               setValue(
                 "nextAvailabilityDate",
