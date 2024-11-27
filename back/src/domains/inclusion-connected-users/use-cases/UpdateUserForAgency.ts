@@ -16,7 +16,6 @@ import {
   validateAgencyRights,
 } from "../helpers/agencyRights.helper";
 import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export class UpdateUserForAgency extends TransactionalUseCase<
   UserParamsForAgency,
@@ -41,7 +40,10 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     uow: UnitOfWork,
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
-    throwIfNotAdmin(currentUser);
+    const { isBackOfficeOrAgencyAdmin } = throwIfUserHasNoRightOnAgency(
+      currentUser,
+      params,
+    );
     const userToUpdate = await getIcUserByUserId(uow, params.userId);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
@@ -61,7 +63,9 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     const updatedRights: AgencyUsersRights = {
       ...agency.usersRights,
       [userToUpdate.id]: {
-        roles: params.roles,
+        roles: isBackOfficeOrAgencyAdmin
+          ? params.roles
+          : agencyRightToUpdate.roles,
         isNotifiedByEmail: params.isNotifiedByEmail,
       },
     };
@@ -107,4 +111,29 @@ const updateIfUserEmailChanged = async (
 ): Promise<void> => {
   if (user.email === newEmail || user.externalId) return;
   await userRepository.updateEmail(user.id, newEmail);
+};
+
+const throwIfUserHasNoRightOnAgency = (
+  currentUser: InclusionConnectedUser,
+  userParamsForAgency: UserParamsForAgency,
+): { isBackOfficeOrAgencyAdmin: boolean } => {
+  if (!currentUser) throw errors.user.unauthorized();
+  if (currentUser.isBackofficeAdmin) return { isBackOfficeOrAgencyAdmin: true };
+
+  const userAgencyRight = currentUser.agencyRights.find(
+    (agencyRight) => agencyRight.agency.id === userParamsForAgency.agencyId,
+  );
+  if (!userAgencyRight) throw errors.user.forbidden({ userId: currentUser.id });
+
+  const isAgencyAdmin = userAgencyRight.roles.includes("agency-admin");
+
+  const areRolesUpdated =
+    userAgencyRight.roles.sort().join() !==
+    userParamsForAgency.roles.sort().join();
+  if (!isAgencyAdmin && areRolesUpdated)
+    throw errors.user.forbidden({ userId: currentUser.id });
+
+  return {
+    isBackOfficeOrAgencyAdmin: currentUser.isBackofficeAdmin || isAgencyAdmin,
+  };
 };
