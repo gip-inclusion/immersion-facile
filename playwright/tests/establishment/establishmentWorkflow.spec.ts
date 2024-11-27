@@ -23,50 +23,50 @@ import {
 import { searchEstablishment } from "./searchEstablishment";
 
 test.describe.configure({ mode: "serial" });
-const establishmentRetries: EstablishmentsRetries = [
-  {
-    siret: "41433740200039",
-    expectedAddress: "Avenue des Grands Crus 26600 Tain-l'Hermitage",
-  },
-  {
-    siret: "21590350100017",
-    expectedAddress: "Place Augustin Laurent 59000 Lille",
-  },
-  {
-    siret: "21310555400017",
-    expectedAddress: "1 Place du Capitole 31000 Toulouse",
-  },
-];
 
 test.describe("Establishment creation and modification workflow", () => {
-  const initialEstablishmentInformations = {
+  const establishmentRetries: EstablishmentsRetries = [
+    {
+      siret: "41433740200039",
+      expectedAddress: "Avenue des Grands Crus 26600 Tain-l'Hermitage",
+    },
+    {
+      siret: "21590350100017",
+      expectedAddress: "Place Augustin Laurent 59000 Lille",
+    },
+    {
+      siret: "21310555400017",
+      expectedAddress: "1 Place du Capitole 31000 Toulouse",
+    },
+  ];
+  const adminEmail = "admin+playwright@immersion-facile.beta.gouv.fr";
+  const copyEmail =
+    "recette+copy-updated-establishment@immersion-facile.beta.gouv.fr";
+
+  const initialEstablishmentInformations: Partial<FormEstablishmentDto> = {
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "admin+playwright@immersion-facile.beta.gouv.fr",
+      email: adminEmail,
       contactMethod: "PHONE",
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
-      copyEmails: [
-        "recette+copy-updated-establishment@immersion-facile.beta.gouv.fr",
-      ],
+      copyEmails: [copyEmail],
     },
-  } satisfies Partial<FormEstablishmentDto>;
+  };
 
-  const updatedInformations = {
+  const updatedInformations: Partial<FormEstablishmentDto> = {
     businessNameCustomized: faker.company.name(),
     additionalInformation: faker.lorem.sentence(),
     maxContactsPerMonth: faker.number.int({ min: 1, max: 10 }),
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "admin+playwright@immersion-facile.beta.gouv.fr",
+      email: adminEmail,
       contactMethod: "PHONE",
       firstName: "Prénom Admin",
       lastName: "Nom Admin",
-      copyEmails: [
-        "recette+copy-updated-establishment@immersion-facile.beta.gouv.fr",
-      ],
+      copyEmails: [copyEmail],
     },
     searchableBy: {
       students: false,
@@ -83,7 +83,7 @@ test.describe("Establishment creation and modification workflow", () => {
     website: faker.internet.domainName(),
     fitForDisabledWorkers: true,
     isEngagedEnterprise: true,
-  } satisfies Partial<FormEstablishmentDto>;
+  };
 
   test(
     "creates a new establishment",
@@ -109,7 +109,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
   test(
     "searches for non available establishment",
-    searchEstablishment(establishmentRetries, false),
+    searchEstablishment(establishmentRetries, 0),
   );
 
   test.describe("Admin makes the establishment available", () => {
@@ -122,7 +122,7 @@ test.describe("Establishment creation and modification workflow", () => {
 
   test(
     "searches for available establishment",
-    searchEstablishment(establishmentRetries, true),
+    searchEstablishment(establishmentRetries, 1),
   );
 
   test.describe("Check displayed availability", () => {

@@ -9,6 +9,7 @@ import {
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import {
+  expectLocatorToBeReadOnly,
   expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
 } from "../../utils/utils";
@@ -34,7 +35,7 @@ export const modifyEstablishmentMagicLink =
       establishmentRetries,
     );
   };
-//updateEstablishmentBackOfficeAdmin
+
 export const updateEstablishmentBackOfficeAdmin =
   (establishmentRetries: EstablishmentsRetries) =>
   async ({ page }: PlaywrightTestArgs, { retry }: TestInfo): Promise<void> => {
@@ -223,18 +224,18 @@ async function step4AImmersionOffer(
   });
 }
 
-async function step3BusinessContact(
+const step3BusinessContact = async (
   page: Page,
   businessContact: BusinessContactDto,
-) {
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.firstName}`,
-    businessContact.firstName,
+): Promise<void> => {
+  await expectLocatorToBeReadOnly(
+    page,
+    domElementIds.establishment.edit.businessContact.firstName,
   );
 
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.lastName}`,
-    businessContact.lastName,
+  await expectLocatorToBeReadOnly(
+    page,
+    domElementIds.establishment.edit.businessContact.lastName,
   );
 
   await page.fill(
@@ -259,7 +260,7 @@ async function step3BusinessContact(
     .click();
 
   await goToNextStep(page, 3, "edit");
-}
+};
 
 async function step2SearchableBy(page: Page) {
   await page

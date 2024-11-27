@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import { domElementIds } from "shared";
 import { goToAdminTab } from "../../utils/admin";
 import { EstablishmentsRetries } from "./establishmentForm.utils";
