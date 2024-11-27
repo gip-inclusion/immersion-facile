@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import { userParamsForAgencySchema } from "../admin/admin.schema";
 import {
   agencyIdResponseSchema,
   agencyOptionsSchema,
@@ -81,5 +82,17 @@ export const agencyRoutes = defineRoutes({
     url: "/agency-public-info-by-id",
     queryParamsSchema: withAgencyIdSchema,
     responses: { 200: agencyPublicDisplaySchema },
+  }),
+  updateUserRoleForAgency: defineRoute({
+    method: "patch",
+    url: "/agencies/:agencyId/users",
+    requestBodySchema: userParamsForAgencySchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      404: httpErrorSchema,
+    },
   }),
 });
