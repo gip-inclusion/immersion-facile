@@ -74,7 +74,6 @@ describe("agencyDashboard", () => {
 
       expectAgencyDashboardStateToMatch({
         isFetchingAgency: false,
-        feedback: { kind: "agencyFetchSuccess" },
         agency: agencyDto,
       });
     });
@@ -110,7 +109,6 @@ describe("agencyDashboard", () => {
 
       expectAgencyDashboardStateToMatch({
         isFetchingAgencyUsers: false,
-        feedback: { kind: "agencyUsersFetchSuccess" },
         agencyUsers: fakeAgencyUsers,
       });
     });
@@ -151,7 +149,6 @@ describe("agencyDashboard", () => {
       expectAgencyDashboardStateToMatch({
         agency: agencyDto,
         agencyUsers: fakeAgencyUsers,
-        feedback: { kind: "agencyFetchSuccess" },
       });
 
       store.dispatch(agencyDashboardSlice.actions.clearAgencyAndUsers());
@@ -160,6 +157,70 @@ describe("agencyDashboard", () => {
         agency: null,
         agencyUsers: {},
         feedback: { kind: "idle" },
+      });
+    });
+  });
+
+  describe("updateAgency", () => {
+    const agencyDto = new AgencyDtoBuilder().build();
+
+    it("shows when update is ongoing", () => {
+      store.dispatch(
+        agencyDashboardSlice.actions.updateAgencyRequested(agencyDto),
+      );
+      expectAgencyDashboardStateToMatch({
+        isUpdating: true,
+      });
+    });
+
+    it("reset feedback to idle when updating an agency", () => {
+      ({ store, dependencies } = createTestStore({
+        dashboards: {
+          agencyDashboard: {
+            ...agencyDashboardInitialState,
+            feedback: { kind: "errored", errorMessage: "something wrong" },
+          },
+        },
+      }));
+      store.dispatch(
+        agencyDashboardSlice.actions.updateAgencyRequested(agencyDto),
+      );
+      expectAgencyDashboardStateToMatch({
+        isUpdating: true,
+        feedback: { kind: "idle" },
+      });
+    });
+
+    it("send request to update agency, shows feedback and stor the updating agency", () => {
+      const updatedAgency: AgencyDto = {
+        ...agencyDto,
+        validatorEmails: ["a@b.com", "c@d.com"],
+      };
+      store.dispatch(
+        agencyDashboardSlice.actions.updateAgencyRequested(updatedAgency),
+      );
+
+      dependencies.agencyGateway.updateAgencyFromDashboardResponse$.next(
+        undefined,
+      );
+
+      expectAgencyDashboardStateToMatch({
+        isUpdating: false,
+        feedback: { kind: "agencyUpdated" },
+      });
+    });
+
+    it("when something goes wrong, shows error", () => {
+      store.dispatch(
+        agencyDashboardSlice.actions.updateAgencyRequested(agencyDto),
+      );
+
+      dependencies.agencyGateway.updateAgencyFromDashboardResponse$.error(
+        new Error("Something went wrong !"),
+      );
+      expectAgencyDashboardStateToMatch({
+        isUpdating: false,
+        feedback: { kind: "errored", errorMessage: "Something went wrong !" },
       });
     });
   });
