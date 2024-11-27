@@ -341,7 +341,7 @@ export const SearchPage = ({
             >
               <SearchFilter
                 defaultValue="Tous les métiers"
-                iconId="fr-icon-suitcase-2-line"
+                iconId="fr-icon-briefcase-fill"
                 id={domElementIds.search.appellationFilterTag}
                 values={
                   formValues.appellations
@@ -413,7 +413,7 @@ export const SearchPage = ({
               <SearchFilter
                 defaultValue="France entière"
                 id={domElementIds.search.locationFilterTag}
-                iconId="fr-icon-map-pin-2-line"
+                iconId="fr-icon-map-pin-2-fill"
                 values={place ? [place] : []}
                 onReset={() => {
                   const updatedValues: SearchPageParams =
