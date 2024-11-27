@@ -34,6 +34,7 @@ export class TestAgencyGateway implements AgencyGateway {
   public updateAgencyResponse$ = new Subject<undefined>();
 
   public updateUserAgencyRightResponse$ = new Subject<undefined>();
+  public updateAgencyFromDashboardResponse$ = new Subject<undefined>();
 
   public addAgencyResponse$ = new Subject<undefined>();
 
@@ -87,6 +88,13 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public updateUserAgencyRight$(): Observable<void> {
     return this.updateUserAgencyRightResponse$;
+  }
+
+  public updateAgencyFromDashboard$(
+    _agencyDto: AgencyDto,
+    _adminToken: InclusionConnectJwt,
+  ): Observable<void> {
+    return this.updateAgencyFromDashboardResponse$;
   }
 
   public validateOrRejectAgency$(

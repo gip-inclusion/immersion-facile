@@ -224,6 +224,10 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     return of(undefined);
   }
 
+  public updateAgencyFromDashboard$(): Observable<void> {
+    return of(undefined);
+  }
+
   public validateOrRejectAgency$(
     adminToken: InclusionConnectJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,

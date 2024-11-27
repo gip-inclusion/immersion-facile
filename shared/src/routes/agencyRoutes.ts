@@ -20,6 +20,7 @@ import { expressEmptyResponseBody } from "../zodUtils";
 const agencyWithIdForAdminUrl = "/admin/agencies/:agencyId" as const;
 
 export type AgencyRoutes = typeof agencyRoutes;
+const agencyWithIdForDashboardUrl = "/dashboard/agencies/:agencyId";
 export const agencyRoutes = defineRoutes({
   getAgencyAdminById: defineRoute({
     method: "get",
@@ -29,13 +30,13 @@ export const agencyRoutes = defineRoutes({
   }),
   getAgencyByIdForDashboard: defineRoute({
     method: "get",
-    url: "/dashboard/agencies/:agencyId",
+    url: agencyWithIdForDashboardUrl,
     ...withAuthorizationHeaders,
     responses: { 200: agencySchema },
   }),
   getAgencyUsersByAgencyIdForDashboard: defineRoute({
     method: "get",
-    url: "/dashboard/agencies/:agencyId/users",
+    url: `${agencyWithIdForDashboardUrl}/users`,
     ...withAuthorizationHeaders,
     responses: { 200: z.array(inclusionConnectedUserSchema) },
   }),
@@ -52,6 +53,17 @@ export const agencyRoutes = defineRoutes({
   updateAgency: defineRoute({
     method: "put",
     url: agencyWithIdForAdminUrl,
+    requestBodySchema: agencySchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      401: httpErrorSchema,
+      409: httpErrorSchema,
+    },
+  }),
+  updateAgencyFromDashboard: defineRoute({
+    method: "put",
+    url: agencyWithIdForDashboardUrl,
     requestBodySchema: agencySchema,
     ...withAuthorizationHeaders,
     responses: {
