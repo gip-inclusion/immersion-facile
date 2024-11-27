@@ -42,6 +42,11 @@ const A_copyContactModeInEstablishmentTable = (
       FROM ${establishmentContactsTableName}
       WHERE ${establishmentTableName}.siret = ${establishmentContactsTableName}.siret;
     `);
+    pgm.sql(`
+      UPDATE ${establishmentTableName}
+      SET ${contactModeColumnName} = 'EMAIL'
+      WHERE ${establishmentTableName}.${contactModeColumnName} IS NULL;
+    `);
     pgm.alterColumn(establishmentTableName, contactModeColumnName, {
       notNull: true,
     });
