@@ -3,10 +3,7 @@ import type { AgencyDto, AgencyId } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 
-export type AgencyDashboardSuccessFeedbackKind =
-  | "agencyUpdated"
-  | "agencyUsersFetchSuccess"
-  | "agencyFetchSuccess";
+export type AgencyDashboardSuccessFeedbackKind = "agencyUpdated";
 
 export type AgencyDashboardSubmitFeedback =
   SubmitFeedBack<AgencyDashboardSuccessFeedbackKind>;
@@ -43,7 +40,6 @@ export const agencyDashboardSlice = createSlice({
     fetchAgencySucceeded: (state, action: PayloadAction<AgencyDto>) => {
       state.isFetchingAgency = false;
       state.agency = action.payload;
-      state.feedback.kind = "agencyFetchSuccess";
     },
 
     fetchAgencyFailed: (state, action: PayloadAction<string>) => {
@@ -61,26 +57,25 @@ export const agencyDashboardSlice = createSlice({
     ) => {
       state.isFetchingAgencyUsers = false;
       state.agencyUsers = action.payload;
-      state.feedback.kind = "agencyUsersFetchSuccess";
     },
     fetchAgencyUsersFailed: (state, action: PayloadAction<string>) => {
       state.isFetchingAgencyUsers = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
-    // updateAgencyRequested: (state, _action: PayloadAction<AgencyDto>) => {
-    //   state.isUpdating = true;
-    //   state.feedback = { kind: "idle" };
-    // },
-    // updateAgencySucceeded: (state, _action: PayloadAction<AgencyDto>) => {
-    //   state.isUpdating = false;
-    //   state.feedback = { kind: "agencyUpdated" };
-    // },
+    updateAgencyRequested: (state, _action: PayloadAction<AgencyDto>) => {
+      state.isUpdating = true;
+      state.feedback = { kind: "idle" };
+    },
+    updateAgencySucceeded: (state, _action: PayloadAction<AgencyDto>) => {
+      state.isUpdating = false;
+      state.feedback = { kind: "agencyUpdated" };
+    },
 
-    // updateAgencyFailed: (state, action: PayloadAction<string>) => {
-    //   state.isUpdating = false;
-    //   state.feedback = { kind: "errored", errorMessage: action.payload };
-    // },
+    updateAgencyFailed: (state, action: PayloadAction<string>) => {
+      state.isUpdating = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
 
     clearAgencyAndUsers: (state) => {
       state.agency = null;
