@@ -2,9 +2,20 @@ import { ReactNode } from "react";
 import { immersionFacileDelegationEmail } from "shared";
 import { AgencyAdminSuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { AgenciesFeedbackKind } from "src/core-logic/domain/agencies/agencies.slice";
+import { AgencyDashboardSuccessFeedbackKind } from "src/core-logic/domain/dashboards/agencyDashboard/agencyDashboard.slice";
 
 export const agencyAdminSubmitMessageByKind: Record<
   AgencyAdminSuccessFeedbackKind,
+  { title: string; message: NonNullable<ReactNode> }
+> = {
+  agencyUpdated: {
+    title: "Succès",
+    message: "Agence éditée avec succès",
+  },
+};
+
+export const agencyDashboardSubmitMessageByKind: Record<
+  AgencyDashboardSuccessFeedbackKind,
   { title: string; message: NonNullable<ReactNode> }
 > = {
   agencyUpdated: {
