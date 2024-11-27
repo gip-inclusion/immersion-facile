@@ -70,7 +70,18 @@ export const logHttpResponse = ({
   });
 };
 
-export const expectLocatorToBeVisibleAndEnabled = async (locator: Locator) => {
+export const expectLocatorToBeVisibleAndEnabled = async (
+  locator: Locator,
+): Promise<void> => {
   await expect(locator).toBeVisible();
   await expect(locator).toBeEnabled();
+};
+
+export const expectLocatorToBeReadOnly = async (
+  page: Page,
+  elementId: string,
+): Promise<void> => {
+  const locator = page.locator(`#${elementId}`);
+  await expect(locator).toBeVisible();
+  await expect(locator).not.toBeEditable();
 };
