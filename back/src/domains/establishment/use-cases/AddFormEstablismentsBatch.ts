@@ -9,7 +9,7 @@ import {
 } from "shared";
 import { UseCase } from "../../core/UseCase";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 import { GroupEntity } from "../entities/GroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 
