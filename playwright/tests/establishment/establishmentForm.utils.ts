@@ -2,7 +2,7 @@ import { Page, expect } from "@playwright/test";
 import { SiretDto, domElementIds } from "shared";
 import { expectLocatorToBeVisibleAndEnabled } from "../../utils/utils";
 
-export type EstablishmentsRetries = {
+export type TestEstablishments = {
   siret: SiretDto;
   expectedAddress: string;
 }[];
