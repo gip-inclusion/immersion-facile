@@ -1,5 +1,16 @@
-import { Locator, Page, expect } from "@playwright/test";
+import {
+  Locator,
+  Page,
+  PlaywrightTestArgs,
+  TestInfo,
+  expect,
+} from "@playwright/test";
 import { testConfig } from "../custom.config";
+
+export type PlaywrightTestCallback = (
+  args: PlaywrightTestArgs,
+  info: TestInfo,
+) => Promise<void>;
 
 export const phoneRegexp = new RegExp(/[0][1-9][0-9]{8}/);
 
@@ -78,10 +89,8 @@ export const expectLocatorToBeVisibleAndEnabled = async (
 };
 
 export const expectLocatorToBeReadOnly = async (
-  page: Page,
-  elementId: string,
+  locator: Locator,
 ): Promise<void> => {
-  const locator = page.locator(`#${elementId}`);
   await expect(locator).toBeVisible();
   await expect(locator).not.toBeEditable();
 };
