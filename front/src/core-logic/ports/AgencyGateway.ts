@@ -44,6 +44,10 @@ export interface AgencyGateway {
     params: UserParamsForAgency,
     token: InclusionConnectJwt,
   ): Observable<void>;
+  updateAgencyFromDashboard$(
+    agencyDto: AgencyDto,
+    adminToken: InclusionConnectJwt,
+  ): Observable<void>;
   validateOrRejectAgency$(
     adminToken: InclusionConnectJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,
