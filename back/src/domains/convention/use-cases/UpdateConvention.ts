@@ -13,7 +13,7 @@ import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfIcUserNotBackofficeAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfIcUserNotBackofficeAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 export class UpdateConvention extends TransactionalUseCase<
   UpdateConventionRequestDto,

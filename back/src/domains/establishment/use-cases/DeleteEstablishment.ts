@@ -12,7 +12,7 @@ import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helper
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 type DeleteEstablishmentPayload = {
   siret: SiretDto;
