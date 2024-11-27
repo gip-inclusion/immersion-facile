@@ -1,7 +1,8 @@
-import { Page, PlaywrightTestArgs, TestInfo, expect } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import { FormEstablishmentDto, domElementIds, toDisplayedDate } from "shared";
+import { PlaywrightTestCallback } from "../../utils/utils";
 import {
-  EstablishmentsRetries,
+  TestEstablishments,
   checkAvailibilityButtons,
 } from "./establishmentForm.utils";
 import {
@@ -9,37 +10,29 @@ import {
   goToManageEtablishmentBySiretInAdmin,
 } from "./establishmentNavigation.utils";
 
-export const checkEstablishmentInAdmin =
+export const checkEstablishmentUpdatedThroughBackOfficeAdmin =
   (
     updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
-    establishmentRetries: EstablishmentsRetries,
-  ) =>
-  async ({ page }: PlaywrightTestArgs, { retry }: TestInfo): Promise<void> => {
-    await goToManageEtablishmentBySiretInAdmin(
-      page,
-      retry,
-      establishmentRetries,
-    );
+    testEstablishments: TestEstablishments,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    await goToManageEtablishmentBySiretInAdmin(page, retry, testEstablishments);
     await checkEstablishment(page, updatedEstablishmentInfos);
   };
 
 export const checkAvailabilityThoughBackOfficeAdmin =
-  (establishmentRetries: EstablishmentsRetries) =>
-  async ({ page }: PlaywrightTestArgs, { retry }: TestInfo): Promise<void> => {
-    await goToManageEtablishmentBySiretInAdmin(
-      page,
-      retry,
-      establishmentRetries,
-    );
+  (testEstablishments: TestEstablishments): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    await goToManageEtablishmentBySiretInAdmin(page, retry, testEstablishments);
     await checkAvailibilityButtons(page, "admin");
   };
 
 export const checkAvailabilityThoughEstablishmentDashboard =
-  (establishmentRetries: EstablishmentsRetries) =>
-  async ({ page }: PlaywrightTestArgs, { retry }: TestInfo): Promise<void> => {
+  (testEstablishments: TestEstablishments): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
     await goToManageEstablishmentThroughEstablishmentDashboard(
       page,
-      establishmentRetries,
+      testEstablishments,
       retry,
     );
     await checkAvailibilityButtons(page, "edit");

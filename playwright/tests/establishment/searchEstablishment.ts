@@ -1,10 +1,14 @@
-import { PlaywrightTestArgs, TestInfo, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
-import { EstablishmentsRetries } from "./establishmentForm.utils";
+import { PlaywrightTestCallback } from "../../utils/utils";
+import { TestEstablishments } from "./establishmentForm.utils";
 
-export const searchEstablishment =
-  (establishmentRetries: EstablishmentsRetries, expectedResultsQty: number) =>
-  async ({ page }: PlaywrightTestArgs, { retry }: TestInfo): Promise<void> => {
+export const searchEstablishmentAndExpectResultToHaveLength =
+  (
+    testEstablishments: TestEstablishments,
+    expectedResultsQty: number,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
     await page.goto(frontRoutes.search);
     await page.fill(
       `#${domElementIds.search.placeAutocompleteInput}`,
@@ -17,7 +21,7 @@ export const searchEstablishment =
       .first()
       .click();
     await page.getByRole("button", { name: "Rechercher" }).click();
-    const resultsSelector = `#${domElementIds.search.searchResultButton}-${establishmentRetries[retry].siret}`;
+    const resultsSelector = `#${domElementIds.search.searchResultButton}-${testEstablishments[retry].siret}`;
     await expect(await page.locator(resultsSelector)).toHaveCount(
       expectedResultsQty,
     );

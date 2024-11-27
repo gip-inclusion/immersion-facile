@@ -6,26 +6,26 @@ import { testConfig } from "../../custom.config";
 import { phoneRegexp } from "../../utils/utils";
 import { createNewEstablishment } from "./createNewEstablishment";
 import {
-  EstablishmentsRetries,
+  TestEstablishments,
   fillEstablishmentFormFirstStep,
 } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin as goToManageEtablishmentInBackOfficeAdmin } from "./establishmentNavigation.utils";
 import {
   checkAvailabilityThoughBackOfficeAdmin,
   checkAvailabilityThoughEstablishmentDashboard,
-  checkEstablishmentInAdmin,
+  checkEstablishmentUpdatedThroughBackOfficeAdmin,
   deleteEstablishmentInBackOfficeAdmin,
 } from "./manageEstablishment";
 import {
-  modifyEstablishmentMagicLink,
-  updateEstablishmentBackOfficeAdmin,
+  updateEstablishmentAvailabilityThroughBackOfficeAdmin,
+  updateEstablishmentThroughMagicLink,
 } from "./modifyEstablishment";
-import { searchEstablishment } from "./searchEstablishment";
+import { searchEstablishmentAndExpectResultToHaveLength } from "./searchEstablishment";
 
 test.describe.configure({ mode: "serial" });
 
 test.describe("Establishment creation and modification workflow", () => {
-  const establishmentRetries: EstablishmentsRetries = [
+  const testEstablishments: TestEstablishments = [
     {
       siret: "41433740200039",
       expectedAddress: "Avenue des Grands Crus 26600 Tain-l'Hermitage",
@@ -39,19 +39,18 @@ test.describe("Establishment creation and modification workflow", () => {
       expectedAddress: "1 Place du Capitole 31000 Toulouse",
     },
   ];
-  const adminEmail = "admin+playwright@immersion-facile.beta.gouv.fr";
-  const copyEmail =
-    "recette+copy-updated-establishment@immersion-facile.beta.gouv.fr";
 
   const initialEstablishmentInformations: Partial<FormEstablishmentDto> = {
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: adminEmail,
+      email: "recette+initial-establishment@immersion-facile.beta.gouv.fr",
       contactMethod: "PHONE",
       firstName: faker.person.firstName(),
       lastName: faker.person.lastName(),
-      copyEmails: [copyEmail],
+      copyEmails: [
+        "recette+copy-updated-establishment1@immersion-facile.beta.gouv.fr",
+      ],
     },
   };
 
@@ -62,11 +61,13 @@ test.describe("Establishment creation and modification workflow", () => {
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: adminEmail,
+      email: "admin+playwright@immersion-facile.beta.gouv.fr", //admin email required due to connexion to Establishment Dashboard
       contactMethod: "PHONE",
       firstName: "Prénom Admin",
       lastName: "Nom Admin",
-      copyEmails: [copyEmail],
+      copyEmails: [
+        "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
+      ],
     },
     searchableBy: {
       students: false,
@@ -89,40 +90,46 @@ test.describe("Establishment creation and modification workflow", () => {
     "creates a new establishment",
     createNewEstablishment(
       initialEstablishmentInformations,
-      establishmentRetries,
+      testEstablishments,
     ),
   );
 
-  test.describe("Establishment admin", () => {
+  test.describe("Update establishment through magic link", () => {
     test.use({ storageState: testConfig.adminAuthFile });
 
     test(
       "modifies an existing establishment through magic link",
-      modifyEstablishmentMagicLink(updatedInformations, establishmentRetries),
+      updateEstablishmentThroughMagicLink(
+        updatedInformations,
+        testEstablishments,
+      ),
     );
 
     test(
-      "check that establishment has been updated through admin",
-      checkEstablishmentInAdmin(updatedInformations, establishmentRetries),
+      "check that establishment has been updated through backoffice admin",
+      checkEstablishmentUpdatedThroughBackOfficeAdmin(
+        updatedInformations,
+        testEstablishments,
+      ),
     );
   });
 
   test(
     "searches for non available establishment",
-    searchEstablishment(establishmentRetries, 0),
+    searchEstablishmentAndExpectResultToHaveLength(testEstablishments, 0),
   );
 
   test.describe("Admin makes the establishment available", () => {
     test.use({ storageState: testConfig.adminAuthFile });
     test(
       "make the establishment available",
-      updateEstablishmentBackOfficeAdmin(establishmentRetries),
+      updateEstablishmentAvailabilityThroughBackOfficeAdmin(testEstablishments),
     );
   });
 
   test(
     "searches for available establishment",
-    searchEstablishment(establishmentRetries, 1),
+    searchEstablishmentAndExpectResultToHaveLength(testEstablishments, 1),
   );
 
   test.describe("Check displayed availability", () => {
@@ -139,13 +146,13 @@ test.describe("Establishment creation and modification workflow", () => {
     });
 
     test(
-      "in admin manage establishment",
-      checkAvailabilityThoughBackOfficeAdmin(establishmentRetries),
+      "in backoffice admin manage establishment",
+      checkAvailabilityThoughBackOfficeAdmin(testEstablishments),
     );
 
     test(
       "in establishment dashboard",
-      checkAvailabilityThoughEstablishmentDashboard(establishmentRetries),
+      checkAvailabilityThoughEstablishmentDashboard(testEstablishments),
     );
   });
 
@@ -156,7 +163,7 @@ test.describe("Establishment creation and modification workflow", () => {
       await goToManageEtablishmentInBackOfficeAdmin(
         page,
         retry,
-        establishmentRetries,
+        testEstablishments,
       );
       await deleteEstablishmentInBackOfficeAdmin(page);
     });

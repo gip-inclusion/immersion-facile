@@ -1,11 +1,11 @@
 import { Page, expect } from "@playwright/test";
 import { domElementIds } from "shared";
 import { goToAdminTab } from "../../utils/admin";
-import { EstablishmentsRetries } from "./establishmentForm.utils";
+import { TestEstablishments } from "./establishmentForm.utils";
 
 export const goToManageEstablishmentThroughEstablishmentDashboard = async (
   page: Page,
-  establishmentRetries: EstablishmentsRetries,
+  testEstablishments: TestEstablishments,
   retry: number,
 ) => {
   await page.goto("/");
@@ -19,7 +19,7 @@ export const goToManageEstablishmentThroughEstablishmentDashboard = async (
   );
   if ((await establishmentSelector.count()) > 0) {
     await establishmentSelector.selectOption({
-      value: establishmentRetries[retry].siret,
+      value: testEstablishments[retry].siret,
     });
   }
 };
@@ -27,7 +27,7 @@ export const goToManageEstablishmentThroughEstablishmentDashboard = async (
 export const goToManageEtablishmentBySiretInAdmin = async (
   page: Page,
   retry: number,
-  establishmentRetries: EstablishmentsRetries,
+  testEstablishments: TestEstablishments,
 ) => {
   await page.goto("/");
   await goToAdminTab(page, "adminEstablishments");
@@ -35,7 +35,7 @@ export const goToManageEtablishmentBySiretInAdmin = async (
     `#${domElementIds.admin.manageEstablishment.siretInput}`,
   );
   await siretInputLocator.waitFor();
-  await siretInputLocator.fill(establishmentRetries[retry].siret);
+  await siretInputLocator.fill(testEstablishments[retry].siret);
   // await page.focus(
   //   `#${domElementIds.admin.manageEstablishment.searchButton}`,
   // );

@@ -1,4 +1,4 @@
-import { Page, PlaywrightTestArgs, TestInfo, expect } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import {
   BusinessContactDto,
   DateTimeIsoString,
@@ -9,41 +9,38 @@ import {
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import {
+  PlaywrightTestCallback,
   expectLocatorToBeReadOnly,
   expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
 } from "../../utils/utils";
 import {
-  EstablishmentsRetries,
+  TestEstablishments,
   closeModal,
   goToNextStep,
 } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin } from "./establishmentNavigation.utils";
 
-export const modifyEstablishmentMagicLink =
+export const updateEstablishmentThroughMagicLink =
   (
     updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
-    establishmentRetries: EstablishmentsRetries,
-  ) =>
-  async ({ page }: PlaywrightTestArgs, { retry }: TestInfo): Promise<void> => {
-    await getEditLinkThroughAdmin(page, retry, establishmentRetries);
+    testEstablishments: TestEstablishments,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    await getEditLinkThroughBackOfficeAdmin(page, retry, testEstablishments);
 
     await editEstablishmentWithStepForm(
       page,
       retry,
       updatedEstablishmentInfos,
-      establishmentRetries,
+      testEstablishments,
     );
   };
 
-export const updateEstablishmentBackOfficeAdmin =
-  (establishmentRetries: EstablishmentsRetries) =>
-  async ({ page }: PlaywrightTestArgs, { retry }: TestInfo): Promise<void> => {
-    await goToManageEtablishmentBySiretInAdmin(
-      page,
-      retry,
-      establishmentRetries,
-    );
+export const updateEstablishmentAvailabilityThroughBackOfficeAdmin =
+  (testEstablishments: TestEstablishments): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    await goToManageEtablishmentBySiretInAdmin(page, retry, testEstablishments);
 
     await page
       .locator(`#${domElementIds.establishment.admin.availabilityButton}`)
@@ -53,10 +50,10 @@ export const updateEstablishmentBackOfficeAdmin =
     await expect(page.locator(".fr-alert--success")).toBeVisible();
   };
 
-const getEditLinkThroughAdmin = async (
+const getEditLinkThroughBackOfficeAdmin = async (
   page: Page,
   retry: number,
-  establishmentRetries: EstablishmentsRetries,
+  testEstablishments: TestEstablishments,
 ): Promise<void> => {
   await page.goto("/");
   await page.click(`#${domElementIds.home.heroHeader.establishment}`);
@@ -65,7 +62,7 @@ const getEditLinkThroughAdmin = async (
   );
   await page.fill(
     `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
-    establishmentRetries[retry].siret,
+    testEstablishments[retry].siret,
   );
 
   await expectLocatorToBeVisibleAndEnabled(
@@ -94,7 +91,7 @@ const editEstablishmentWithStepForm = async (
   page: Page,
   retry: number,
   updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
-  establishmentRetries: EstablishmentsRetries,
+  testEstablishments: TestEstablishments,
 ): Promise<void> => {
   const businessContact = updatedEstablishmentInfos.businessContact;
   if (!businessContact)
@@ -141,7 +138,7 @@ const editEstablishmentWithStepForm = async (
   await step3BusinessContact(page, businessContact);
   await step4AImmersionOffer(
     page,
-    establishmentRetries,
+    testEstablishments,
     retry,
     businessNameCustomized,
     updatedEstablishmentInfos,
@@ -152,28 +149,28 @@ const editEstablishmentWithStepForm = async (
   await step4BConfirm(page);
 };
 
-async function step4BConfirm(page: Page) {
+const step4BConfirm = async (page: Page) => {
   await page.click(`#${domElementIds.establishment.edit.submitFormButton}`);
   await expect(page.locator(".fr-alert--success")).toBeVisible();
   await page.waitForTimeout(testConfig.timeForEventCrawler);
-}
+};
 
-async function step4AImmersionOffer(
+const step4AImmersionOffer = async (
   page: Page,
-  establishmentRetries: EstablishmentsRetries,
+  testEstablishments: TestEstablishments,
   retry: number,
   businessNameCustomized: string,
   updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
   additionalInformation: string,
   website: string,
   businessAddress: FormEstablishmentAddress,
-) {
+) => {
   await expect(
     page.locator(`#${domElementIds.establishment.edit.siret} input`),
   ).toBeDisabled();
   await expect(
     page.locator(`#${domElementIds.establishment.edit.siret} input`),
-  ).toHaveValue(establishmentRetries[retry].siret);
+  ).toHaveValue(testEstablishments[retry].siret);
 
   await page.fill(
     `#${domElementIds.establishment.edit.businessNameCustomized}`,
@@ -222,20 +219,35 @@ async function step4AImmersionOffer(
     locator: `#${domElementIds.establishment.edit.businessAddresses}-0`,
     value: businessAddress.rawAddress,
   });
-}
+};
 
 const step3BusinessContact = async (
   page: Page,
   businessContact: BusinessContactDto,
 ): Promise<void> => {
-  await expectLocatorToBeReadOnly(
-    page,
-    domElementIds.establishment.edit.businessContact.firstName,
+  const firstNameLocator = page.locator(
+    `#${domElementIds.establishment.edit.businessContact.firstName}`,
+  );
+  await expectLocatorToBeReadOnly(firstNameLocator);
+  const lastNameLocator = page.locator(
+    `#${domElementIds.establishment.edit.businessContact.lastName}`,
+  );
+  await expectLocatorToBeReadOnly(lastNameLocator);
+
+  // Update email first in order to unlock firstname & lastname fields
+  await page.fill(
+    `#${domElementIds.establishment.edit.businessContact.email}`,
+    businessContact.email,
   );
 
-  await expectLocatorToBeReadOnly(
-    page,
-    domElementIds.establishment.edit.businessContact.lastName,
+  await page.fill(
+    `#${domElementIds.establishment.edit.businessContact.firstName}`,
+    businessContact.firstName,
+  );
+
+  await page.fill(
+    `#${domElementIds.establishment.edit.businessContact.lastName}`,
+    businessContact.lastName,
   );
 
   await page.fill(
@@ -248,11 +260,6 @@ const step3BusinessContact = async (
     businessContact.phone,
   );
 
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.email}`,
-    businessContact.email,
-  );
-
   await page
     .locator(
       `[for='${domElementIds.establishment.edit.businessContact.contactMethod}-1']`,
@@ -262,18 +269,18 @@ const step3BusinessContact = async (
   await goToNextStep(page, 3, "edit");
 };
 
-async function step2SearchableBy(page: Page) {
+const step2SearchableBy = async (page: Page) => {
   await page
     .locator(`[for="${domElementIds.establishment.edit.searchableBy}-1"]`)
     .click();
   await goToNextStep(page, 2, "edit");
-}
+};
 
-async function step1Availability(
+const step1Availability = async (
   page: Page,
   nextAvailabilityDate: DateTimeIsoString,
   maxContactsPerMonth: number,
-) {
+) => {
   await page
     .locator(`#${domElementIds.establishment.edit.availabilityButton}`)
     .getByText("Non")
@@ -289,13 +296,13 @@ async function step1Availability(
   );
 
   await goToNextStep(page, 1, "edit");
-}
+};
 
-async function start(page: Page) {
+const start = async (page: Page) => {
   const startFormButtonLocator = await page.locator(
     `#${domElementIds.establishment.edit.startFormButton}`,
   );
   await expectLocatorToBeVisibleAndEnabled(startFormButtonLocator);
 
   await startFormButtonLocator.click();
-}
+};

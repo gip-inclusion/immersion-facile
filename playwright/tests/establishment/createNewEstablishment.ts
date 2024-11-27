@@ -1,10 +1,14 @@
 import { faker } from "@faker-js/faker";
-import { PlaywrightTestArgs, TestInfo, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { FormEstablishmentDto, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
-import { fillAutocomplete, phoneRegexp } from "../../utils/utils";
 import {
-  EstablishmentsRetries,
+  PlaywrightTestCallback,
+  fillAutocomplete,
+  phoneRegexp,
+} from "../../utils/utils";
+import {
+  TestEstablishments,
   fillEstablishmentFormFirstStep,
   goToNextStep,
 } from "./establishmentForm.utils";
@@ -12,9 +16,9 @@ import {
 export const createNewEstablishment =
   (
     establishment: Partial<FormEstablishmentDto>,
-    establishments: EstablishmentsRetries,
-  ) =>
-  async ({ page }: PlaywrightTestArgs, { retry }: TestInfo): Promise<void> => {
+    establishments: TestEstablishments,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
     const businessContact = establishment.businessContact;
     if (!businessContact)
       throw new Error("Missing business contact for createNewEstablishment");
