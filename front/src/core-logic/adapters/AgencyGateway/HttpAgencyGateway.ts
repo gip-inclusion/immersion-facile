@@ -168,6 +168,28 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
+  public updateAgencyFromDashboard$(
+    agencyDto: AgencyDto,
+    adminToken: InclusionConnectJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .updateAgencyFromDashboard({
+          body: agencyDto,
+          headers: { authorization: adminToken },
+          urlParams: { agencyId: agencyDto.id },
+  
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 409 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
   public updateUserAgencyRight$(
     params: UserParamsForAgency,
     token: InclusionConnectJwt,
@@ -212,3 +234,5 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 }
+
+
