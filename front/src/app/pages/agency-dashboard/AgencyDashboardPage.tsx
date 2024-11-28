@@ -9,9 +9,9 @@ import { Loader } from "react-design-system";
 import { AgencyRight, InclusionConnectedUser, domElementIds } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SelectConventionFromIdForm } from "src/app/components/SelectConventionFromIdForm";
-import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 
+import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import {
   AgencyDashboardRouteName,
   AgencyTabRoute,
@@ -33,7 +33,6 @@ export const AgencyDashboardPage = ({
 }) => {
   // the Layout (Header, Footer...) is given by InclusionConnectedPrivateRoute (higher order component)
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const feedback = useAppSelector(inclusionConnectedSelectors.feedback);
   const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
@@ -146,105 +145,72 @@ export const AgencyDashboardPage = ({
         <h1>Bienvenue</h1>
       </div>
       {isLoading && <Loader />}
-      {match({ currentUser, feedback })
-        .with(
-          {
-            feedback: {
-              kind: "idle",
-            },
-          },
-          () => <Loader />,
-        )
-        .with(
-          {
-            feedback: {
-              kind: "agencyRegistrationSuccess",
-            },
-          },
-          () => (
-            <Alert
-              severity="success"
-              title="Bravo !"
-              description="Votre demande de première connexion a bien été reçue. Vous recevrez un email de confirmation dès qu'elle aura  été acceptée par nos équipes (2-7 jours ouvrés)."
-            />
-          ),
-        )
-        .with(
-          {
-            currentUser: {
-              agencyRights: [],
-            },
-          },
-          ({ currentUser }) => {
-            if (new Date(currentUser.createdAt) > subMinutes(new Date(), 1))
-              return (
-                <Alert
-                  severity="warning"
-                  title="Rattachement à vos agences en cours"
-                  description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des agences rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
-                />
-              );
-            return <RegisterAgenciesForm />;
-          },
-        )
-        .with(
-          {
-            currentUser: {
-              agencyRights: P.when(
-                all((agencyRight: AgencyRight) =>
-                  agencyRight.roles.includes("to-review"),
-                ),
-              ),
-            },
-          },
-          () => (
-            <Alert
-              severity="info"
-              title="En attente de validation"
-              description="Votre demande d'accès à l'outil est en cours de validation par l'administration. Vous recevrez un email dès que votre accès sera validé."
-            />
-          ),
-        )
-        .with(
-          {
-            currentUser: P.not(null),
-          },
-          ({ currentUser }) => (
-            <Tabs
-              tabs={rawAgencyDashboardTabs(currentUser).map((tab) => ({
-                ...tab,
-                isDefault: currentTab === tab.tabId,
-              }))}
-              id={domElementIds.agencyDashboard.dashboard.tabContainer}
-              selectedTabId={currentTab}
-              onTabChange={(tab) => {
-                if (isAgencyDashboardTabRoute(tab)) routes[tab]().push();
-              }}
-            >
+      <WithFeedbackReplacer topic="dashboard-agency-register-user">
+        <>
+          {match({ currentUser })
+            .with(
               {
-                rawAgencyDashboardTabs(currentUser).find(
-                  (tab) => tab.tabId === currentTab,
-                )?.content
-              }
-            </Tabs>
-          ),
-        )
-        .with(
-          { feedback: { kind: "errored", errorMessage: P.select() } },
-          (errorMessage) => (
-            <Alert severity="error" title="Erreur" description={errorMessage} />
-          ),
-        )
-        .otherwise(() => null)}
-
-      {feedback.kind === "errored" && (
-        <SubmitFeedbackNotification
-          submitFeedback={feedback}
-          messageByKind={{
-            errored: { title: "Erreur", message: "pas utilisé" },
-          }}
-        />
-      )}
+                currentUser: {
+                  agencyRights: [],
+                },
+              },
+              ({ currentUser }) => {
+                if (new Date(currentUser.createdAt) > subMinutes(new Date(), 1))
+                  return (
+                    <Alert
+                      severity="warning"
+                      title="Rattachement à vos agences en cours"
+                      description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des agences rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
+                    />
+                  );
+                return <RegisterAgenciesForm />;
+              },
+            )
+            .with(
+              {
+                currentUser: {
+                  agencyRights: P.when(
+                    all((agencyRight: AgencyRight) =>
+                      agencyRight.roles.includes("to-review"),
+                    ),
+                  ),
+                },
+              },
+              () => (
+                <Alert
+                  severity="info"
+                  title="En attente de validation"
+                  description="Votre demande d'accès à l'outil est en cours de validation par l'administration. Vous recevrez un email dès que votre accès sera validé."
+                />
+              ),
+            )
+            .with(
+              {
+                currentUser: P.not(null),
+              },
+              ({ currentUser }) => (
+                <Tabs
+                  tabs={rawAgencyDashboardTabs(currentUser).map((tab) => ({
+                    ...tab,
+                    isDefault: currentTab === tab.tabId,
+                  }))}
+                  id={domElementIds.agencyDashboard.dashboard.tabContainer}
+                  selectedTabId={currentTab}
+                  onTabChange={(tab) => {
+                    if (isAgencyDashboardTabRoute(tab)) routes[tab]().push();
+                  }}
+                >
+                  {
+                    rawAgencyDashboardTabs(currentUser).find(
+                      (tab) => tab.tabId === currentTab,
+                    )?.content
+                  }
+                </Tabs>
+              ),
+            )
+            .otherwise(() => null)}
+        </>
+      </WithFeedbackReplacer>
     </>
   );
 };

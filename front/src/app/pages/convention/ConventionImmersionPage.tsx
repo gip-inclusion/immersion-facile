@@ -165,13 +165,16 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
       } = initialRouteParams;
       dispatch(
         authSlice.actions.federatedIdentityProvided({
-          provider:
-            initialRouteParams.fedIdProvider as FederatedIdentityProvider,
-          token: initialRouteParams.fedId,
-          email: initialRouteParams.email,
-          firstName: initialRouteParams.firstName,
-          lastName: initialRouteParams.lastName,
-          idToken: "should-not-need-for-pe-connect",
+          federatedIdentityWithUser: {
+            provider:
+              initialRouteParams.fedIdProvider as FederatedIdentityProvider,
+            token: initialRouteParams.fedId,
+            email: initialRouteParams.email,
+            firstName: initialRouteParams.firstName,
+            lastName: initialRouteParams.lastName,
+            idToken: "should-not-need-for-pe-connect",
+          },
+          feedbackTopic: "auth-global",
         }),
       );
       routes

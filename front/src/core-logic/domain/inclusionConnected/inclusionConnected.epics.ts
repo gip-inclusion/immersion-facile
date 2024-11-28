@@ -15,8 +15,16 @@ type InclusionConnectedEpic = AppEpic<InclusionConnectedAction | AuthAction>;
 const federatedIdentityFoundInDeviceEpic: InclusionConnectedEpic = (action$) =>
   action$.pipe(
     filter(authSlice.actions.federatedIdentityFoundInDevice.match),
-    filter((action) => action.payload?.provider === "inclusionConnect"),
-    map(() => inclusionConnectedSlice.actions.currentUserFetchRequested()),
+    filter(
+      (action) =>
+        action.payload?.federatedIdentityWithUser?.provider ===
+        "inclusionConnect",
+    ),
+    map((action) =>
+      inclusionConnectedSlice.actions.currentUserFetchRequested({
+        feedbackTopic: action.payload?.feedbackTopic,
+      }),
+    ),
   );
 
 const federatedIdentityFromStoreToDeviceStorageSucceededEpic: InclusionConnectedEpic =
@@ -26,8 +34,16 @@ const federatedIdentityFromStoreToDeviceStorageSucceededEpic: InclusionConnected
         authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded
           .match,
       ),
-      filter((action) => action.payload?.provider === "inclusionConnect"),
-      map(() => inclusionConnectedSlice.actions.currentUserFetchRequested()),
+      filter(
+        (action) =>
+          action.payload?.federatedIdentityWithUser.provider ===
+          "inclusionConnect",
+      ),
+      map((action) =>
+        inclusionConnectedSlice.actions.currentUserFetchRequested({
+          feedbackTopic: action.payload?.feedbackTopic,
+        }),
+      ),
     );
 
 const getCurrentUserEpic: InclusionConnectedEpic = (
@@ -37,20 +53,24 @@ const getCurrentUserEpic: InclusionConnectedEpic = (
 ) =>
   action$.pipe(
     filter(inclusionConnectedSlice.actions.currentUserFetchRequested.match),
-    switchMap(() =>
-      inclusionConnectedGateway.getCurrentUser$(
-        state$.value.auth.federatedIdentityWithUser?.token ?? "",
-      ),
-    ),
-    map(inclusionConnectedSlice.actions.currentUserFetchSucceeded),
-    catchEpicError((error) =>
-      error?.message.includes(inclusionConnectTokenExpiredMessage)
-        ? authSlice.actions.federatedIdentityDeletionTriggered({
-            mode: "device-only",
-          })
-        : inclusionConnectedSlice.actions.currentUserFetchFailed(
-            error?.message,
+    switchMap(({ payload }) =>
+      inclusionConnectedGateway
+        .getCurrentUser$(
+          state$.value.auth.federatedIdentityWithUser?.token ?? "",
+        )
+        .pipe(
+          map(inclusionConnectedSlice.actions.currentUserFetchSucceeded),
+          catchEpicError((error) =>
+            error?.message.includes(inclusionConnectTokenExpiredMessage)
+              ? authSlice.actions.federatedIdentityDeletionTriggered({
+                  mode: "device-only",
+                })
+              : inclusionConnectedSlice.actions.currentUserFetchFailed({
+                  errorMessage: error?.message,
+                  feedbackTopic: payload.feedbackTopic,
+                }),
           ),
+        ),
     ),
   );
 
@@ -62,14 +82,25 @@ const registerAgenciesEpic: InclusionConnectedEpic = (
   action$.pipe(
     filter(inclusionConnectedSlice.actions.registerAgenciesRequested.match),
     switchMap((action) =>
-      inclusionConnectedGateway.registerAgenciesToCurrentUser$(
-        action.payload.agencies,
-        state$.value.auth.federatedIdentityWithUser?.token ?? "",
-      ),
-    ),
-    map(inclusionConnectedSlice.actions.registerAgenciesSucceeded),
-    catchEpicError((error) =>
-      inclusionConnectedSlice.actions.registerAgenciesFailed(error?.message),
+      inclusionConnectedGateway
+        .registerAgenciesToCurrentUser$(
+          action.payload.agencies,
+          state$.value.auth.federatedIdentityWithUser?.token ?? "",
+        )
+        .pipe(
+          map(() =>
+            inclusionConnectedSlice.actions.registerAgenciesSucceeded({
+              feedbackTopic: action.payload.feedbackTopic,
+              agencies: action.payload.agencies,
+            }),
+          ),
+          catchEpicError((error) =>
+            inclusionConnectedSlice.actions.registerAgenciesFailed({
+              feedbackTopic: action.payload.feedbackTopic,
+              errorMessage: error?.message,
+            }),
+          ),
+        ),
     ),
   );
 

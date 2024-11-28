@@ -59,11 +59,16 @@ const storeFederatedIdentityInDevice: AuthEpic = (
         );
       return state$.value.auth.federatedIdentityWithUser;
     }),
-    map(({ payload }) =>
-      authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded(
-        payload,
-      ),
-    ),
+    map(({ payload }) => {
+      if (!payload.federatedIdentityWithUser)
+        return authSlice.actions.federatedIdentityNotFoundInDevice();
+      return authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded(
+        {
+          federatedIdentityWithUser: payload.federatedIdentityWithUser,
+          feedbackTopic: "auth-global",
+        },
+      );
+    }),
   );
 
 const deleteFederatedIdentityFromDevice: AuthEpic = (
@@ -123,7 +128,10 @@ const checkConnectedWithFederatedIdentity: AuthEpic = (
         "federatedIdentityWithUser",
       );
       return federatedIdentity
-        ? authSlice.actions.federatedIdentityFoundInDevice(federatedIdentity)
+        ? authSlice.actions.federatedIdentityFoundInDevice({
+            federatedIdentityWithUser: federatedIdentity,
+            feedbackTopic: "auth-global",
+          })
         : authSlice.actions.federatedIdentityNotFoundInDevice();
     }),
   );

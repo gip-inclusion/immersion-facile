@@ -17,11 +17,6 @@ const currentUser = createSelector(
   (state) => state.currentUser,
 );
 
-const feedback = createSelector(
-  inclusionConnectedState,
-  (state) => state.feedback,
-);
-
 const userRolesForFetchedConvention = createSelector(
   currentUser,
   conventionSelectors.convention,
@@ -34,6 +29,5 @@ const userRolesForFetchedConvention = createSelector(
 export const inclusionConnectedSelectors = {
   isLoading,
   currentUser,
-  feedback,
   userRolesForFetchedConvention,
 };

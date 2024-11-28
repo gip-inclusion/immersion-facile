@@ -137,7 +137,12 @@ export const heroHeaderNavCards: (
           href: "",
           onClick: (event) => {
             event.preventDefault();
-            storeDispatch(authSlice.actions.federatedIdentityProvided(null));
+            storeDispatch(
+              authSlice.actions.federatedIdentityProvided({
+                federatedIdentityWithUser: null,
+                feedbackTopic: "auth-global",
+              }),
+            );
             routes.conventionImmersion().push();
           },
         },
@@ -171,7 +176,12 @@ export const heroHeaderNavCards: (
           href: "",
           onClick: (event) => {
             event.preventDefault();
-            storeDispatch(authSlice.actions.federatedIdentityProvided(null));
+            storeDispatch(
+              authSlice.actions.federatedIdentityProvided({
+                federatedIdentityWithUser: null,
+                feedbackTopic: "auth-global",
+              }),
+            );
             routes.conventionImmersion().push();
           },
         },
