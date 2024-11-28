@@ -10,14 +10,16 @@ import {
   InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
+  UserParamsForAgency,
   WithAgencyId,
+  WithAgencyIdAndUserId,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
-  addAgency$(_agency: CreateAgencyDto): Observable<void> {
-    return this.addAgencyResponse$;
-  }
+  public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
+
+  public addAgencyResponse$ = new Subject<undefined>();
 
   public agencyOptions$ = new Subject<AgencyOption[]>();
 
@@ -36,9 +38,22 @@ export class TestAgencyGateway implements AgencyGateway {
   public updateUserAgencyRightResponse$ = new Subject<undefined>();
   public updateAgencyFromDashboardResponse$ = new Subject<undefined>();
 
-  public addAgencyResponse$ = new Subject<undefined>();
+  public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
+
+  public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
   #agencies: Record<string, AgencyDto> = {};
+
+  addAgency$(_agency: CreateAgencyDto): Observable<void> {
+    return this.addAgencyResponse$;
+  }
+
+  public createUserForAgency$(
+    _params: UserParamsForAgency,
+    _token: string,
+  ): Observable<InclusionConnectedUser> {
+    return this.createUserForAgencyResponse$;
+  }
 
   public getAgencyAdminById$(
     _agencyId: AgencyId,
@@ -95,6 +110,20 @@ export class TestAgencyGateway implements AgencyGateway {
     _adminToken: InclusionConnectJwt,
   ): Observable<void> {
     return this.updateAgencyFromDashboardResponse$;
+  }
+
+  public updateUserRoleForAgency$(
+    _params: UserParamsForAgency,
+    _token: string,
+  ): Observable<void> {
+    return this.updateAgencyRoleForUserResponse$;
+  }
+
+  public removeUserFromAgency$(
+    _params: WithAgencyIdAndUserId,
+    _token: string,
+  ): Observable<void> {
+    return this.removeUserFromAgencyResponse$;
   }
 
   public validateOrRejectAgency$(
