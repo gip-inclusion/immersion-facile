@@ -608,6 +608,39 @@ describe("PgConventionRepository", () => {
     );
   });
 
+  it("clear convention signatories signedAt", async () => {
+    const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+    const conventionBuilder = conventionStylisteBuilder
+      .withId(conventionId)
+      .withBeneficiaryRepresentative({
+        phone: "+33611221122",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john@email.com",
+        role: "beneficiary-representative",
+        signedAt: new Date().toISOString(),
+      })
+      .withStatus("PARTIALLY_SIGNED")
+      .signedByBeneficiary("2024-02-02")
+      .signedByEstablishmentRepresentative("2024-02-03");
+
+    await conventionRepository.save(conventionBuilder.build());
+
+    const updatedConvention = conventionBuilder.withStatus("DRAFT").notSigned();
+
+    await conventionRepository.update(updatedConvention.build());
+
+    const conventionInDB = await conventionRepository.getById(conventionId);
+
+    expect(conventionInDB?.signatories.beneficiary.signedAt).toBeUndefined();
+    expect(
+      conventionInDB?.signatories.beneficiaryRepresentative?.signedAt,
+    ).toBeUndefined();
+    expect(
+      conventionInDB?.signatories.establishmentRepresentative.signedAt,
+    ).toBeUndefined();
+  });
+
   it("update convention with dateApproval", async () => {
     const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
     const convention = conventionStylisteBuilder
