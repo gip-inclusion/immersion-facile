@@ -11,10 +11,15 @@ import {
   UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
+  WithAgencyIdAndUserId,
 } from "shared";
 
 export interface AgencyGateway {
   addAgency$(agency: CreateAgencyDto): Observable<void>;
+  createUserForAgency$(
+    params: UserParamsForAgency,
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser>;
   getAgencyAdminById$(
     agencyId: AgencyId,
     adminToken: InclusionConnectJwt,
@@ -47,6 +52,15 @@ export interface AgencyGateway {
   updateAgencyFromDashboard$(
     agencyDto: AgencyDto,
     adminToken: InclusionConnectJwt,
+  ): Observable<void>;
+  updateUserRoleForAgency$(
+    params: UserParamsForAgency,
+    token: InclusionConnectJwt,
+  ): Observable<void>;
+
+  removeUserFromAgency$(
+    params: WithAgencyIdAndUserId,
+    token: InclusionConnectJwt,
   ): Observable<void>;
   validateOrRejectAgency$(
     adminToken: InclusionConnectJwt,
