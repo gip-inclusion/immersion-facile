@@ -11,9 +11,4 @@ export const agencyDashboardSelectors = {
     agencyDashboardState,
     ({ agencyUsers }) => agencyUsers,
   ),
-  feedback: createSelector(agencyDashboardState, ({ feedback }) => feedback),
-  isUpdatingIcUserAgency: createSelector(
-    agencyDashboardState,
-    ({ isUpdatingIcUserAgency }) => isUpdatingIcUserAgency,
-  ),
 };
