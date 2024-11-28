@@ -42,6 +42,11 @@ describe("RemoveUserFromAgency", () => {
   const icNotAdmin = notAdminBuilder.build();
   const notAdminUser = notAdminBuilder.buildUser();
 
+  const icNotAgencyAdminUserBuilder = new InclusionConnectedUserBuilder()
+    .withId("not-agency-admin-id")
+    .withIsAdmin(false);
+  const icNotAgencyAdminUser = icNotAgencyAdminUserBuilder.build();
+
   let uow: InMemoryUnitOfWork;
   let createNewEvent: CreateNewEvent;
   let removeUserFromAgency: RemoveUserFromAgency;
@@ -70,6 +75,19 @@ describe("RemoveUserFromAgency", () => {
           icNotAdmin,
         ),
         errors.user.forbidden({ userId: icNotAdmin.id }),
+      );
+    });
+
+    it("throws forbidden when token payload is not backoffice token", async () => {
+      await expectPromiseToFailWithError(
+        removeUserFromAgency.execute(
+          {
+            agencyId: "agency-id",
+            userId: "user-id",
+          },
+          icNotAgencyAdminUser,
+        ),
+        errors.user.forbidden({ userId: icNotAgencyAdminUser.id }),
       );
     });
 

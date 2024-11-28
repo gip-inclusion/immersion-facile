@@ -7,11 +7,12 @@ import {
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
 import {
   rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
   validateAgencyRights,
 } from "../helpers/agencyRights.helper";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
+
 
 export type RemoveUserFromAgency = ReturnType<typeof makeRemoveUserFromAgency>;
 
@@ -23,7 +24,8 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
 >(
   { name: "RemoveUserFromAgency", inputSchema: withAgencyIdAndUserIdSchema },
   async ({ currentUser, uow, inputParams: { agencyId, userId }, deps }) => {
-    throwIfNotAdmin(currentUser);
+    throwIfNotAgencyAdminOrBackofficeAdmin(agencyId, currentUser);
+
     const user = await uow.userRepository.getById(
       userId,
       await makeProvider(uow),
