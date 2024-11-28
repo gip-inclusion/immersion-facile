@@ -694,6 +694,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     };
     return new ConventionDtoBuilder(this.dto);
   }
+
   public withEstablishmentNumberOfEmployeesRange(
     establishmentNumberEmployeesRange: NumberEmployeesRange | undefined,
   ): ConventionDtoBuilder {
