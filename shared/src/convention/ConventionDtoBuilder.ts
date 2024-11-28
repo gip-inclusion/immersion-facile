@@ -356,6 +356,47 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     );
   }
 
+  public withBeneficiaryRepresentativeSignedAt(
+    date: Date | undefined,
+  ): ConventionDtoBuilder {
+    if (!this.dto.signatories.beneficiaryRepresentative) {
+      throw new Error("beneficiaryRepresentative does not exist");
+    }
+    if (
+      this.dto.internshipKind === "immersion" &&
+      isBeneficiary(this.dto.signatories.beneficiary)
+    ) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryRepresentative: {
+            ...this.dto.signatories.beneficiaryRepresentative,
+            signedAt: date ? date.toISOString() : undefined,
+          },
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(this.dto.signatories.beneficiary)
+    ) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryRepresentative: {
+            ...this.dto.signatories.beneficiaryRepresentative,
+            signedAt: date ? date.toISOString() : undefined,
+          },
+        },
+      });
+    }
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
+  }
+
   public withBeneficiaryRepresentativeEmail(email: string) {
     const beneficiaryRepresentative =
       this.dto.signatories.beneficiaryRepresentative;

@@ -129,6 +129,92 @@ describe("UpdateConventionStatus", () => {
       ],
     });
 
+    it("Accept from role establishment-representative when convention is requested to be modified for the second time", async () => {
+      const uow = createInMemoryUow();
+      const timeGateway = new CustomTimeGateway();
+      const createNewEvent = makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new TestUuidGenerator(),
+      });
+
+      const agency = toAgencyWithRights(new AgencyDtoBuilder().build(), {});
+
+      const initialConvention = new ConventionDtoBuilder()
+        .withId(conventionWithAgencyOneStepValidationId)
+        .withStatus("READY_TO_SIGN")
+        .withEstablishmentRepresentativeEmail("establishmentrep@email.com")
+        .withAgencyId(agency.id)
+        .withInternshipKind("mini-stage-cci")
+        // .withBeneficiarySignedAt(new Date())
+        .withBeneficiaryRepresentative({
+          role: "beneficiary-representative",
+          email: "benef-representative@mail.com",
+          firstName: "Bruce",
+          lastName: "Wayne",
+          phone: "#33112233445",
+          // signedAt: new Date().toISOString(),
+          signedAt: undefined,
+        })
+        .build();
+
+      const establishmentRepresentativeJwtPayload =
+        createConventionMagicLinkPayload({
+          id: conventionWithAgencyOneStepValidationId,
+          role: "establishment-representative",
+          email: "establishment-representative@mail.com",
+          now: new Date(),
+        });
+
+      await uow.agencyRepository.insert(agency);
+      await uow.conventionRepository.save(initialConvention);
+
+      const updateConventionStatusUseCase = new UpdateConventionStatus(
+        new InMemoryUowPerformer(uow),
+        createNewEvent,
+        timeGateway,
+      );
+
+      await updateConventionStatusUseCase.execute(
+        {
+          status: "DRAFT",
+          statusJustification: "first modification",
+          modifierRole: "establishment-representative",
+          conventionId: conventionWithAgencyOneStepValidationId,
+        },
+        establishmentRepresentativeJwtPayload,
+      );
+
+      const updatedConventionAfterFirstModificationRequest =
+        await uow.conventionRepository.getById(initialConvention.id);
+
+      const signedConvention = new ConventionDtoBuilder(
+        updatedConventionAfterFirstModificationRequest,
+      )
+        .withBeneficiarySignedAt(new Date())
+        .withBeneficiaryRepresentativeSignedAt(new Date())
+        .withStatus("PARTIALLY_SIGNED")
+        .build();
+      await uow.conventionRepository.update(signedConvention);
+
+      await updateConventionStatusUseCase.execute(
+        {
+          status: "DRAFT",
+          statusJustification: "second modification",
+          modifierRole: "establishment-representative",
+          conventionId: conventionWithAgencyOneStepValidationId,
+        },
+        establishmentRepresentativeJwtPayload,
+      );
+
+      const updatedConventionAfterSecondModificationRequest =
+        await uow.conventionRepository.getById(initialConvention.id);
+
+      expect(
+        updatedConventionAfterSecondModificationRequest.signatories.beneficiary
+          .signedAt,
+      ).toBeUndefined();
+    });
+
     it("ConventionRequiresModification event only has the role of the user that requested the change", async () => {
       const uow = createInMemoryUow();
 
