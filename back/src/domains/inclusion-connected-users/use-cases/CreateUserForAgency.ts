@@ -12,8 +12,8 @@ import { makeProvider } from "../../core/authentication/inclusion-connect/port/O
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
 import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
 
 export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
 
@@ -28,7 +28,8 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
     inputSchema: userParamsForAgencySchema,
   },
   async ({ inputParams, uow, currentUser, deps }) => {
-    throwIfNotAdmin(currentUser);
+    throwIfNotAgencyAdminOrBackofficeAdmin(inputParams.agencyId, currentUser);
+
     const agency = await uow.agencyRepository.getById(inputParams.agencyId);
     if (!agency)
       throw errors.agency.notFound({ agencyId: inputParams.agencyId });
