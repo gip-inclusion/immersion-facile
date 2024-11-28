@@ -6,7 +6,13 @@ const renamedEstablishmentContactsTableName = "__old_establishments_contacts";
 const establishmentsUsersTableName = "establishments__users";
 const contactModeColumnName = "contact_mode";
 
+const establishmentRoleType = "establishment_role";
+
 export async function up(pgm: MigrationBuilder): Promise<void> {
+  pgm.createType(establishmentRoleType, [
+    "establishment-admin",
+    "establishment-contact",
+  ]);
   A_copyContactModeInEstablishmentTable(pgm, "up");
   B_insertMissingContactCopyEmailUsers(pgm);
   C_insertMissingContactAdminUsers(pgm);
@@ -133,7 +139,7 @@ const E_createEstablishmentUserTable = (
         onDelete: "CASCADE",
       },
       role: {
-        type: "varchar(255)",
+        type: establishmentRoleType,
         notNull: true,
       },
       job: {
@@ -159,7 +165,7 @@ const G_insertCopyContactRights = (pgm: MigrationBuilder) => {
     INSERT INTO ${establishmentsUsersTableName} 
       (siret, user_id, role)
     SELECT 
-      siret, user_id, 'establishment_contact'
+      siret, user_id, 'establishment-contact'
     FROM (
       SELECT contacts_with_siret.siret, users.id as user_id
       FROM (
@@ -177,7 +183,7 @@ const F_insertAdminContactRights = (pgm: MigrationBuilder) => {
     INSERT INTO ${establishmentsUsersTableName} 
       (siret, user_id, job, phone, role)
     SELECT 
-      siret, user_id, job, phone, 'establishment_admin'
+      siret, user_id, job, phone, 'establishment-admin'
     FROM (
       SELECT admins_with_siret.siret, users.id as user_id, admins_with_siret.job, admins_with_siret.phone
       FROM (
