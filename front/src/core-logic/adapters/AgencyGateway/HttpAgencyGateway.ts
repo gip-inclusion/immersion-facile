@@ -12,14 +12,16 @@ import {
   UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
+  WithAgencyIdAndUserId,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyRoutes>) {}
@@ -33,6 +35,26 @@ export class HttpAgencyGateway implements AgencyGateway {
           .with({ status: 409 }, logBodyAndThrow)
           .otherwise(otherwiseThrow),
       ),
+    );
+  }
+
+  public createUserForAgency$(
+    params: UserParamsForAgency,
+    token: string,
+  ): Observable<InclusionConnectedUser> {
+    return from(
+      this.httpClient
+        .createUserForAgency({
+          body: params,
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 
@@ -189,7 +211,6 @@ export class HttpAgencyGateway implements AgencyGateway {
         ),
     );
   }
-
   public updateUserAgencyRight$(
     params: UserParamsForAgency,
     token: InclusionConnectJwt,
@@ -209,6 +230,47 @@ export class HttpAgencyGateway implements AgencyGateway {
             .with({ status: 400 }, logBodyAndThrow)
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 404 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+          ),
+      );
+    }
+
+
+  public updateUserRoleForAgency$(
+    params: UserParamsForAgency,
+    token: string,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .updateUserRoleForAgency({
+          body: params,
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 201 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public removeUserFromAgency$(
+    params: WithAgencyIdAndUserId,
+    token: string,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .removeUserFromAgency({
+          headers: { authorization: token },
+          urlParams: params,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

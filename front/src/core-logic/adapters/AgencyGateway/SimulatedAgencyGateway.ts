@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { Observable, Subject, from, of } from "rxjs";
+import { Observable, Subject, from, of, throwError } from "rxjs";
 import {
   AgencyDto,
   AgencyDtoBuilder,
@@ -12,7 +12,9 @@ import {
   InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
+  UserParamsForAgency,
   WithAgencyId,
+  WithAgencyIdAndUserId,
   errors,
   toAgencyPublicDisplayDto,
 } from "shared";
@@ -148,6 +150,24 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     };
   }
 
+  public createUserForAgency$(
+    { agencyId }: UserParamsForAgency,
+    _token: string,
+  ): Observable<InclusionConnectedUser> {
+    return agencyId === "non-existing-agency-id"
+      ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
+      : of({
+          id: "fake-user-id-2",
+          email: "remi@sanfamille.fr",
+          firstName: "Rémi",
+          lastName: "Sanfamille",
+          agencyRights: [],
+          dashboards: { agencies: {}, establishments: {} },
+          externalId: "fake-user-external-id-2",
+          createdAt: new Date().toISOString(),
+        });
+  }
+
   public getAgencyAdminById$(
     agencyId: AgencyId,
     _adminToken: InclusionConnectJwt,
@@ -225,6 +245,22 @@ export class SimulatedAgencyGateway implements AgencyGateway {
   }
 
   public updateAgencyFromDashboard$(): Observable<void> {
+    return of(undefined);
+  }
+
+  public updateUserRoleForAgency$(
+    { agencyId }: UserParamsForAgency,
+    _token: string,
+  ): Observable<void> {
+    return agencyId === "non-existing-agency-id"
+      ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
+      : of(undefined);
+  }
+
+  public removeUserFromAgency$(
+    _params: WithAgencyIdAndUserId,
+    _token: string,
+  ): Observable<void> {
     return of(undefined);
   }
 
