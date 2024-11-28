@@ -7,6 +7,7 @@ import { keys } from "shared";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { agencyDashboardSlice } from "src/core-logic/domain/dashboards/agencyDashboard/agencyDashboard.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -27,6 +28,7 @@ const topics = [
   "auth-global",
   "establishments-batch",
   "user",
+  "agency-user-for-dashboard",
   "search-result",
   "establishment-modification-link",
   "form-establishment",
@@ -213,6 +215,41 @@ export const feedbackMapping: Record<
       action: inclusionConnectedSlice.actions.registerAgenciesFailed,
       title: "Erreur lors de la demande de rattachement à une agence",
       message: "Une erreur est survenue lors du rattachement de l'utilisateur",
+    },
+  },
+  "agency-user-for-dashboard": {
+    "update.success": {
+      action: agencyDashboardSlice.actions.updateUserOnAgencySucceeded,
+      title: "L'utilisateur a été mis à jour",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "update.error": {
+      action: agencyDashboardSlice.actions.updateUserOnAgencyFailed,
+      title: "Problème lors de la mise à jour de l'utilisateur",
+      message:
+        "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+    },
+    "create.success": {
+      action: agencyDashboardSlice.actions.createUserOnAgencySucceeded,
+      title: "L'utilisateur a été créé",
+      message: "L'utilisateur a été créé et associé à cette agence.",
+    },
+    "create.error": {
+      action: agencyDashboardSlice.actions.createUserOnAgencyFailed,
+      title: "Problème lors de la création de l'utilisateur",
+      message: "Une erreur est survenue lors de la création de l'utilisateur",
+    },
+    "delete.success": {
+      action: agencyDashboardSlice.actions.removeUserFromAgencySucceeded,
+      title: "L'utilisateur n'est plus rattaché à cette agence",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "delete.error": {
+      action: agencyDashboardSlice.actions.removeUserFromAgencyFailed,
+      title:
+        "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
+      message:
+        "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur.",
     },
   },
   "establishments-batch": {
