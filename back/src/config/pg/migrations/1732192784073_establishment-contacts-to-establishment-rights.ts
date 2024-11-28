@@ -12,8 +12,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   C_insertMissingContactAdminUsers(pgm);
   D_updateExistingContactAdminUsersWithoutFirstNameAndLastName(pgm);
   E_createEstablishmentUserTable(pgm, "up");
-  F_insertCopyContactRights(pgm);
-  G_insertAdminContactRights(pgm);
+  F_insertAdminContactRights(pgm);
+  G_insertCopyContactRights(pgm);
   H_updateViewEstablishments(pgm, "up");
   I_renameEstablishmentContactTable(pgm, "up");
 }
@@ -154,7 +154,7 @@ const E_createEstablishmentUserTable = (
   }
 };
 
-const F_insertCopyContactRights = (pgm: MigrationBuilder) => {
+const G_insertCopyContactRights = (pgm: MigrationBuilder) => {
   pgm.sql(`
     INSERT INTO ${establishmentsUsersTableName} 
       (siret, user_id, role)
@@ -168,10 +168,11 @@ const F_insertCopyContactRights = (pgm: MigrationBuilder) => {
       ) as contacts_with_siret
       JOIN users ON contacts_with_siret.email = users.email
     ) contact_users
+    ON CONFLICT DO NOTHING
   `);
 };
 
-const G_insertAdminContactRights = (pgm: MigrationBuilder) => {
+const F_insertAdminContactRights = (pgm: MigrationBuilder) => {
   pgm.sql(`
     INSERT INTO ${establishmentsUsersTableName} 
       (siret, user_id, job, phone, role)
