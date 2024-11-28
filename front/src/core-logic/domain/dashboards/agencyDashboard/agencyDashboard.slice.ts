@@ -2,22 +2,15 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { filter } from "ramda";
 import type {
   AgencyDto,
-  AgencyId,
   UserParamsForAgency,
   WithAgencyId,
   WithAgencyIdAndUserId,
 } from "shared";
-import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import {
   NormalizedIcUserById,
   NormalizedInclusionConnectedUser,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
-
-export type AgencyDashboardSuccessFeedbackKind = "agencyUpdated";
-
-export type AgencyDashboardSubmitFeedback =
-  SubmitFeedBack<AgencyDashboardSuccessFeedbackKind>;
 
 export interface AgencyDashboardState {
   agency: AgencyDto | null;
@@ -25,9 +18,7 @@ export interface AgencyDashboardState {
   isFetchingAgencyUsers: boolean;
   isFetchingAgency: boolean;
   isUpdating: boolean;
-  isUpdatingIcUserAgency: boolean;
   error: string | null;
-  feedback: AgencyDashboardSubmitFeedback;
 }
 
 export const agencyDashboardInitialState: AgencyDashboardState = {
@@ -36,8 +27,6 @@ export const agencyDashboardInitialState: AgencyDashboardState = {
   isFetchingAgencyUsers: false,
   isFetchingAgency: false,
   isUpdating: false,
-  isUpdatingIcUserAgency: false,
-  feedback: { kind: "idle" },
   error: null,
 };
 
@@ -45,8 +34,10 @@ export const agencyDashboardSlice = createSlice({
   name: "agencyDashboard",
   initialState: agencyDashboardInitialState,
   reducers: {
-    fetchAgencyRequested: (state, _action: PayloadAction<AgencyId>) => {
-      state.feedback = { kind: "idle" };
+    fetchAgencyRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<WithAgencyId>,
+    ) => {
       state.agency = null;
     },
 
@@ -55,12 +46,17 @@ export const agencyDashboardSlice = createSlice({
       state.agency = action.payload;
     },
 
-    fetchAgencyFailed: (state, action: PayloadAction<string>) => {
+    fetchAgencyFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
       state.isFetchingAgency = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
-    fetchAgencyUsersRequested: (state, _action: PayloadAction<AgencyId>) => {
+    fetchAgencyUsersRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<WithAgencyId>,
+    ) => {
       state.isFetchingAgencyUsers = true;
     },
 
@@ -71,30 +67,38 @@ export const agencyDashboardSlice = createSlice({
       state.isFetchingAgencyUsers = false;
       state.agencyUsers = action.payload;
     },
-    fetchAgencyUsersFailed: (state, action: PayloadAction<string>) => {
+    fetchAgencyUsersFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
       state.isFetchingAgencyUsers = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
-    updateAgencyRequested: (state, _action: PayloadAction<AgencyDto>) => {
+    updateAgencyRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<AgencyDto>,
+    ) => {
       state.isUpdating = true;
-      state.feedback = { kind: "idle" };
     },
-    updateAgencySucceeded: (state, _action: PayloadAction<AgencyDto>) => {
+    updateAgencySucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<AgencyDto>,
+    ) => {
       state.isUpdating = false;
-      state.feedback = { kind: "agencyUpdated" };
     },
 
-    updateAgencyFailed: (state, action: PayloadAction<string>) => {
+    updateAgencyFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    ) => {
       state.isUpdating = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
     createUserOnAgencyRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
     ) => {
-      state.isUpdatingIcUserAgency = true;
+      state.isUpdating = true;
     },
 
     createUserOnAgencySucceeded: (
@@ -105,7 +109,7 @@ export const agencyDashboardSlice = createSlice({
         } & WithAgencyId
       >,
     ) => {
-      state.isUpdatingIcUserAgency = false;
+      state.isUpdating = false;
       const { id } = action.payload.icUser;
 
       state.agencyUsers[id] = action.payload.icUser;
@@ -115,21 +119,21 @@ export const agencyDashboardSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
     ) => {
-      state.isUpdatingIcUserAgency = false;
+      state.isUpdating = false;
     },
 
     updateUserOnAgencyRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
     ) => {
-      state.isUpdatingIcUserAgency = true;
+      state.isUpdating = true;
     },
 
     updateUserOnAgencySucceeded: (
       state,
       action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
     ) => {
-      state.isUpdatingIcUserAgency = false;
+      state.isUpdating = false;
       const {
         userId,
         agencyId,
@@ -148,21 +152,21 @@ export const agencyDashboardSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
     ) => {
-      state.isUpdatingIcUserAgency = false;
+      state.isUpdating = false;
     },
 
     removeUserFromAgencyRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<WithAgencyIdAndUserId>,
     ) => {
-      state.isUpdatingIcUserAgency = true;
+      state.isUpdating = true;
     },
 
     removeUserFromAgencySucceeded: (
       state,
       action: PayloadActionWithFeedbackTopic<WithAgencyIdAndUserId>,
     ) => {
-      state.isUpdatingIcUserAgency = false;
+      state.isUpdating = false;
       state.agencyUsers = filter(
         (agencyUser) => agencyUser.id !== action.payload.userId,
         state.agencyUsers,
@@ -173,13 +177,12 @@ export const agencyDashboardSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
     ) => {
-      state.isUpdatingIcUserAgency = false;
+      state.isUpdating = false;
     },
 
     clearAgencyAndUsers: (state) => {
       state.agency = null;
       state.agencyUsers = {};
-      state.feedback = { kind: "idle" };
     },
   },
 });

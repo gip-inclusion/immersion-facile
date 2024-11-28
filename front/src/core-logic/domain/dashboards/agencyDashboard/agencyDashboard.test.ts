@@ -79,7 +79,10 @@ describe("agencyDashboard", () => {
         expectAgencyDashboardStateToMatch(agencyDashboardInitialState);
 
         store.dispatch(
-          agencyDashboardSlice.actions.fetchAgencyRequested(agencyDto.id),
+          agencyDashboardSlice.actions.fetchAgencyRequested({
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-for-dashboard",
+          }),
         );
 
         feedWithFetchedAgency(agencyDto);
@@ -94,18 +97,36 @@ describe("agencyDashboard", () => {
         expectAgencyDashboardStateToMatch(agencyDashboardInitialState);
 
         store.dispatch(
-          agencyDashboardSlice.actions.fetchAgencyRequested(agencyDto.id),
+          agencyDashboardSlice.actions.fetchAgencyRequested({
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-for-dashboard",
+          }),
         );
 
         dependencies.agencyGateway.fetchedAgencyForDashboard$.error(
-          new Error("some-error"),
+          new Error(
+            "Une erreur est survenue lors de la récupération des données de cette agence",
+          ),
         );
 
         expectAgencyDashboardStateToMatch({
           isFetchingAgency: false,
-          feedback: { kind: "errored", errorMessage: "some-error" },
           agency: null,
         });
+
+        expectToEqual(
+          feedbacksSelectors.feedbacks(store.getState())[
+            "agency-for-dashboard"
+          ],
+          {
+            level: "error",
+            message:
+              "Une erreur est survenue lors de la récupération des données de cette agence",
+            on: "fetch",
+            title:
+              "Problème rencontré lors de la récupération des données de l'agence",
+          },
+        );
       });
     });
 
@@ -114,7 +135,10 @@ describe("agencyDashboard", () => {
         expectAgencyDashboardStateToMatch(agencyDashboardInitialState);
 
         store.dispatch(
-          agencyDashboardSlice.actions.fetchAgencyUsersRequested(agencyDto.id),
+          agencyDashboardSlice.actions.fetchAgencyUsersRequested({
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
         );
 
         feedWithFetchedAgencyUsers(fakeAgencyUsers);
@@ -129,18 +153,36 @@ describe("agencyDashboard", () => {
         expectAgencyDashboardStateToMatch(agencyDashboardInitialState);
 
         store.dispatch(
-          agencyDashboardSlice.actions.fetchAgencyUsersRequested(agencyDto.id),
+          agencyDashboardSlice.actions.fetchAgencyUsersRequested({
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
         );
 
         dependencies.agencyGateway.fetchedAgencyUsers$.error(
-          new Error("some-error"),
+          new Error(
+            "Une erreur est survenue lors de la récupération de la liste des utilisateurs de cette agence",
+          ),
         );
 
         expectAgencyDashboardStateToMatch({
           isFetchingAgencyUsers: false,
-          feedback: { kind: "errored", errorMessage: "some-error" },
           agencyUsers: {},
         });
+
+        expectToEqual(
+          feedbacksSelectors.feedbacks(store.getState())[
+            "agency-user-for-dashboard"
+          ],
+          {
+            level: "error",
+            message:
+              "Une erreur est survenue lors de la récupération de la liste des utilisateurs de cette agence",
+            on: "fetch",
+            title:
+              "Problème rencontré lors de la récupération de la liste des utilisateurs",
+          },
+        );
       });
     });
 
@@ -149,10 +191,16 @@ describe("agencyDashboard", () => {
         expectAgencyDashboardStateToMatch(agencyDashboardInitialState);
 
         store.dispatch(
-          agencyDashboardSlice.actions.fetchAgencyRequested(agencyDto.id),
+          agencyDashboardSlice.actions.fetchAgencyRequested({
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-for-dashboard",
+          }),
         );
         store.dispatch(
-          agencyDashboardSlice.actions.fetchAgencyUsersRequested(agencyDto.id),
+          agencyDashboardSlice.actions.fetchAgencyUsersRequested({
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
         );
 
         feedWithFetchedAgencyUsers(fakeAgencyUsers);
@@ -168,7 +216,6 @@ describe("agencyDashboard", () => {
         expectAgencyDashboardStateToMatch({
           agency: null,
           agencyUsers: {},
-          feedback: { kind: "idle" },
         });
       });
     });
@@ -178,38 +225,26 @@ describe("agencyDashboard", () => {
 
       it("shows when update is ongoing", () => {
         store.dispatch(
-          agencyDashboardSlice.actions.updateAgencyRequested(agencyDto),
+          agencyDashboardSlice.actions.updateAgencyRequested({
+            ...agencyDto,
+            feedbackTopic: "agency-for-dashboard",
+          }),
         );
         expectAgencyDashboardStateToMatch({
           isUpdating: true,
         });
       });
 
-      it("reset feedback to idle when updating an agency", () => {
-        ({ store, dependencies } = createTestStore({
-          dashboards: {
-            agencyDashboard: {
-              ...agencyDashboardInitialState,
-              feedback: { kind: "errored", errorMessage: "something wrong" },
-            },
-          },
-        }));
-        store.dispatch(
-          agencyDashboardSlice.actions.updateAgencyRequested(agencyDto),
-        );
-        expectAgencyDashboardStateToMatch({
-          isUpdating: true,
-          feedback: { kind: "idle" },
-        });
-      });
-
-      it("send request to update agency, shows feedback and stor the updating agency", () => {
+      it("send request to update agency, shows feedback and stors the updating agency", () => {
         const updatedAgency: AgencyDto = {
           ...agencyDto,
           validatorEmails: ["a@b.com", "c@d.com"],
         };
         store.dispatch(
-          agencyDashboardSlice.actions.updateAgencyRequested(updatedAgency),
+          agencyDashboardSlice.actions.updateAgencyRequested({
+            ...updatedAgency,
+            feedbackTopic: "agency-for-dashboard",
+          }),
         );
 
         dependencies.agencyGateway.updateAgencyFromDashboardResponse$.next(
@@ -218,22 +253,50 @@ describe("agencyDashboard", () => {
 
         expectAgencyDashboardStateToMatch({
           isUpdating: false,
-          feedback: { kind: "agencyUpdated" },
         });
+
+        expectToEqual(
+          feedbacksSelectors.feedbacks(store.getState())[
+            "agency-for-dashboard"
+          ],
+          {
+            level: "success",
+            message: "Les données de l'agence ont été mises à jour.",
+            on: "update",
+            title: "L'agence a été mis à jour",
+          },
+        );
       });
 
       it("when something goes wrong, shows error", () => {
         store.dispatch(
-          agencyDashboardSlice.actions.updateAgencyRequested(agencyDto),
+          agencyDashboardSlice.actions.updateAgencyRequested({
+            ...agencyDto,
+            feedbackTopic: "agency-for-dashboard",
+          }),
         );
 
         dependencies.agencyGateway.updateAgencyFromDashboardResponse$.error(
-          new Error("Something went wrong !"),
+          new Error(
+            "Une erreur est survenue lors de la mise à jour de l'agence",
+          ),
         );
         expectAgencyDashboardStateToMatch({
           isUpdating: false,
-          feedback: { kind: "errored", errorMessage: "Something went wrong !" },
         });
+
+        expectToEqual(
+          feedbacksSelectors.feedbacks(store.getState())[
+            "agency-for-dashboard"
+          ],
+          {
+            level: "error",
+            message:
+              "Une erreur est survenue lors de la mise à jour de l'agence",
+            on: "update",
+            title: "Problème lors de la mise à jour de l'agence",
+          },
+        );
       });
     });
   });
@@ -321,7 +384,11 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        expectIsUpdatingUserAgencyToBe(true);
+        expectAgencyDashboardStateToMatch({
+          ...agencyDashboardInitialState,
+          agencyUsers: testUserSet,
+          isUpdating: true,
+        });
 
         const icUser: InclusionConnectedUser = {
           ...userToCreate,
@@ -334,8 +401,6 @@ describe("agencyDashboard", () => {
           ],
         };
         dependencies.agencyGateway.createUserForAgencyResponse$.next(icUser);
-
-        expectIsUpdatingUserAgencyToBe(false);
 
         expectAgencyDashboardStateToMatch({
           agencyUsers: {
@@ -351,6 +416,7 @@ describe("agencyDashboard", () => {
               },
             },
           },
+          isUpdating: false,
         });
 
         expectToEqual(
@@ -383,17 +449,20 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        expectIsUpdatingUserAgencyToBe(true);
+        expectAgencyDashboardStateToMatch({
+          ...agencyDashboardInitialState,
+          agencyUsers: testUserSet,
+          isUpdating: true,
+        });
 
         dependencies.agencyGateway.createUserForAgencyResponse$.error(
           errors.agency.notFound({ agencyId: agencyDto.id }),
         );
 
-        expectIsUpdatingUserAgencyToBe(false);
-
         expectAgencyDashboardStateToMatch({
           ...agencyDashboardInitialState,
           agencyUsers: testUserSet,
+          isUpdating: false,
         });
 
         expectToEqual(
@@ -443,15 +512,19 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        expectIsUpdatingUserAgencyToBe(true);
+        expectAgencyDashboardStateToMatch({
+          ...agencyDashboardInitialState,
+          agencyUsers: testUserSet,
+          isUpdating: true,
+        });
+
         dependencies.agencyGateway.updateAgencyRoleForUserResponse$.next(
           undefined,
         );
 
-        expectIsUpdatingUserAgencyToBe(false);
-
         expectAgencyDashboardStateToMatch({
           agencyUsers: { ...testUserSet, [originalUser.id]: updatedUser },
+          isUpdating: false,
         });
         expectToEqual(
           feedbacksSelectors.feedbacks(store.getState())[
@@ -487,15 +560,18 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        expectIsUpdatingUserAgencyToBe(true);
-        dependencies.agencyGateway.updateAgencyRoleForUserResponse$.error(
-          new Error(errorMessage),
-        );
-        expectIsUpdatingUserAgencyToBe(false);
-
         expectAgencyDashboardStateToMatch({
           ...agencyDashboardInitialState,
           agencyUsers: testUserSet,
+          isUpdating: true,
+        });
+        dependencies.agencyGateway.updateAgencyRoleForUserResponse$.error(
+          new Error(errorMessage),
+        );
+        expectAgencyDashboardStateToMatch({
+          ...agencyDashboardInitialState,
+          agencyUsers: testUserSet,
+          isUpdating: false,
         });
 
         expectToEqual(
@@ -530,15 +606,18 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        expectIsUpdatingUserAgencyToBe(true);
+        expectAgencyDashboardStateToMatch({
+          ...agencyDashboardInitialState,
+          agencyUsers: testUserSet,
+          isUpdating: true,
+        });
         dependencies.agencyGateway.removeUserFromAgencyResponse$.next(
           undefined,
         );
 
-        expectIsUpdatingUserAgencyToBe(false);
-
         expectAgencyDashboardStateToMatch({
           agencyUsers: { [user1.id]: testUserSet[user1.id] },
+          isUpdating: false,
         });
         expectToEqual(
           feedbacksSelectors.feedbacks(store.getState())[
@@ -572,15 +651,19 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        expectIsUpdatingUserAgencyToBe(true);
+        expectAgencyDashboardStateToMatch({
+          ...agencyDashboardInitialState,
+          agencyUsers: testUserSet,
+          isUpdating: true,
+        });
         dependencies.agencyGateway.removeUserFromAgencyResponse$.error(
           new Error(errorMessage),
         );
-        expectIsUpdatingUserAgencyToBe(false);
 
         expectAgencyDashboardStateToMatch({
           ...agencyDashboardInitialState,
           agencyUsers: testUserSet,
+          isUpdating: false,
         });
 
         expectToEqual(
@@ -621,11 +704,5 @@ describe("agencyDashboard", () => {
         agencyRights: values(agencyUser.agencyRights),
       })),
     );
-  };
-
-  const expectIsUpdatingUserAgencyToBe = (expected: boolean) => {
-    expect(
-      agencyDashboardSelectors.isUpdatingIcUserAgency(store.getState()),
-    ).toBe(expected);
   };
 });
