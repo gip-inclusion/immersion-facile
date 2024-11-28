@@ -1,10 +1,5 @@
 import path from "path";
-import {
-  AxiosError,
-  AxiosRequestConfig,
-  AxiosResponse,
-  isAxiosError,
-} from "axios";
+import { AxiosResponse } from "axios";
 import { Request } from "express";
 import { QueryResult } from "kysely";
 import pino, { Logger, LoggerOptions } from "pino";
@@ -48,6 +43,10 @@ const rootLogger = pino({
 // Example use: const logger = createLogger(__filename);
 export const legacyCreateLogger = (filename: string): Logger =>
   rootLogger.child({ name: path.basename(filename) });
+
+export type LoggedAxiosResponse = Partial<
+  Pick<AxiosResponse, "status" | "headers" | "data">
+>;
 
 type SQLError = {
   query: string;
@@ -108,7 +107,7 @@ type LoggerParams = Partial<{
     retrieveEventsDurationInSeconds?: number;
   };
   durationInSeconds: number;
-  error: Error | Partial<SQLError> | AxiosError;
+  error: Error | Partial<SQLError>;
   events: DomainEvent[];
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
@@ -122,7 +121,7 @@ type LoggerParams = Partial<{
   request: Pick<Request, "path" | "method">;
   requestId: string;
   sharedRouteResponse: HttpResponse<any, any>;
-  axiosResponse: AxiosResponse;
+  axiosResponse: LoggedAxiosResponse;
   subscriberResponse: SubscriberResponse;
   schemaParsingInput: unknown;
   searchLBB: LaBonneBoiteRequestParams;
@@ -217,7 +216,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         conventionId,
         crawlerInfo,
         durationInSeconds,
-        error: sanitizeError(error),
+        error,
         events: sanitizeEvents(events),
         nodeProcessReport,
         notificationId,
@@ -227,7 +226,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         requestId,
         sharedRouteResponse: sanitizeSharedRouteResponse(sharedRouteResponse),
         subscriberResponse,
-        axiosResponse: sanitizeAxiosResponse(axiosResponse),
+        axiosResponse,
         schemaParsingInput,
         searchMade,
         searchLBB,
@@ -263,74 +262,20 @@ export const createLogger = (filename: string): OpacifiedLogger => {
   };
 };
 
-const sanitize =
-  <T>(cb: (t: T) => Partial<T>) =>
-  (params: T | undefined) => {
-    if (!params) return;
-    return cb(params);
-  };
-
-const sanitizeError = sanitize<
-  Error | Partial<SQLError> | AxiosError<unknown, any>
->((error) => {
-  if (isAxiosError(error))
-    return {
-      message: `Axios error : ${error.message}`,
-      response: sanitizeAxiosResponse(error.response),
-    };
-
-  return error;
-});
-
-const sanitizeAxiosResponse = sanitize<AxiosResponse>((response) => {
-  const req = response.config ?? response.request;
-
-  if (response.status >= 200 && response.status < 400) {
+const sanitizeSharedRouteResponse = (
+  response: HttpResponse<any, any> | undefined,
+) => {
+  if (!response) return;
+  if (response.status >= 200 && response.status < 400)
     return {
       status: response.status,
-      method: req.method,
-      url: req.url,
     };
-  }
 
   return {
     status: response.status,
-    statusText: response.statusText,
-    data: response.data as unknown,
-    request: extractPartialRequest(req),
+    body: response.body,
   };
-});
-
-const sanitizeSharedRouteResponse = sanitize<HttpResponse<any, any>>(
-  (response) => {
-    if (response.status >= 200 && response.status < 400) {
-      return {
-        status: response.status,
-      };
-    }
-
-    return {
-      status: response.status,
-      body: response.body,
-    };
-  },
-);
-
-export type PartialRequest = {
-  method: string | undefined;
-  url: string | undefined;
-  params: unknown;
-  timeout: number | undefined;
 };
-
-const extractPartialRequest = (
-  request: AxiosRequestConfig,
-): PartialRequest => ({
-  method: request.method,
-  url: request.url,
-  params: request.params as unknown,
-  timeout: request.timeout,
-});
 
 const sanitizeEvents = (events: DomainEvent[] | undefined) => {
   if (!events) return;

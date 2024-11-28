@@ -1,5 +1,5 @@
 import querystring from "querystring";
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
 import { AbsoluteUrl, castError } from "shared";
@@ -222,11 +222,13 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           ? "missing message"
           : JSON.stringify(error.response.data?.message);
 
+        const axiosResponse = stripAxiosResponse(error);
+
         if (error.response.status === 404) {
           logger.error({
             message: `PeBroadcast - notFoundOrMismatch - ${message}`,
             franceTravailGatewayStatus: "error",
-            axiosResponse: error.response,
+            axiosResponse,
             peConnect: {
               peId: poleEmploiConvention.id,
               originalId: poleEmploiConvention.originalId,
@@ -246,7 +248,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           message: "PeBroadcast",
           franceTravailGatewayStatus: "error",
           error,
-          axiosResponse: error.response,
+          axiosResponse,
           peConnect: {
             peId: poleEmploiConvention.id,
             originalId: poleEmploiConvention.originalId,
@@ -281,3 +283,11 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     );
   }
 }
+
+const stripAxiosResponse = (
+  error: AxiosError,
+): Partial<Pick<AxiosResponse, "status" | "headers" | "data">> => ({
+  status: error.response?.status,
+  headers: error.response?.headers,
+  data: error.response?.data,
+});
