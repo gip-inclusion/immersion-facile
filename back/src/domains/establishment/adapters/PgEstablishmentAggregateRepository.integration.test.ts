@@ -613,7 +613,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           .withOffers([cartographeImmersionOffer])
           .withLocations([locationOfSearchPosition])
           .withUserRights([osefUserRight])
-          .withIsMonthlyDiscussionLimitReached(true)
+          .withIsMaxDiscussionsForPeriodReached(true)
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
@@ -1908,7 +1908,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
     const establishmentNotSearchable = new EstablishmentAggregateBuilder()
       .withUserRights([osefUserRight])
-      .withIsMonthlyDiscussionLimitReached(true)
+      .withIsMaxDiscussionsForPeriodReached(true)
       .build();
 
     const establishmentIsNotSearchableAndMaxContactPerMonth0 =
@@ -1965,7 +1965,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth2,
             )
-              .withIsMonthlyDiscussionLimitReached(false)
+              .withIsMaxDiscussionsForPeriodReached(false)
               .withFitForDisabledWorkers(false)
               .build(),
           ],
@@ -1990,7 +1990,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth2,
             )
-              .withIsMonthlyDiscussionLimitReached(false)
+              .withIsMaxDiscussionsForPeriodReached(false)
               .withFitForDisabledWorkers(false)
               .build(),
           ],
@@ -2016,7 +2016,7 @@ describe("PgEstablishmentAggregateRepository", () => {
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth1,
             )
-              .withIsMonthlyDiscussionLimitReached(false)
+              .withIsMaxDiscussionsForPeriodReached(false)
               .withFitForDisabledWorkers(false)
               .build(),
           ],

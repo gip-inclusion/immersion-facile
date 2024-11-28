@@ -20,7 +20,7 @@ export type EstablishmentEntity = {
   fitForDisabledWorkers: boolean;
   isCommited?: boolean;
   isOpen: boolean;
-  isMonthlyDiscussionLimitReached: boolean;
+  isMaxDiscussionsForPeriodReached: boolean;
   lastInseeCheckDate?: Date;
   locations: Location[];
   maxContactsPerMonth: number;

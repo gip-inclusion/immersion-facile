@@ -236,7 +236,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
         ...establishmentAggregate,
         establishment: {
           ...establishmentAggregate.establishment,
-          isMonthlyDiscussionLimitReached: true,
+          isMaxDiscussionsForPeriodReached: true,
         },
       };
 

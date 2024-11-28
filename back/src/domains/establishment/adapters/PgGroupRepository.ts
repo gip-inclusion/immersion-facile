@@ -68,7 +68,7 @@ export class PgGroupRepository implements GroupRepository {
       )
       .where("gs.group_slug", "=", slug)
       .where("e.is_open", "=", true)
-      .where("e.is_monthly_discussion_limit_reached", "=", false)
+      .where("e.is_max_discussions_for_period_reached", "=", false)
       .groupBy([
         "e.siret",
         "io.rome_code",

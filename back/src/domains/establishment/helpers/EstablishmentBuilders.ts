@@ -51,7 +51,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   updatedAt: new Date("2024-08-10"),
   contactMethod: "EMAIL",
   isOpen: true,
-  isMonthlyDiscussionLimitReached: false,
+  isMaxDiscussionsForPeriodReached: false,
   maxContactsPerMonth: defaultMaxContactsPerMonth,
   searchableBy: {
     jobSeekers: true,
@@ -114,12 +114,12 @@ export class EstablishmentEntityBuilder
     });
   }
 
-  public withIsMonthlyDiscussionLimitReached(
-    isMonthlyDiscussionLimitReached: boolean,
+  public withIsMaxDiscussionsForPeriodReached(
+    isMaxDiscussionsForPeriodReached: boolean,
   ) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
-      isMonthlyDiscussionLimitReached,
+      isMaxDiscussionsForPeriodReached,
     });
   }
 
@@ -378,17 +378,15 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withIsMonthlyDiscussionLimitReached(
-    withIsMonthlyDiscussionLimitReached: boolean,
+  public withIsMaxDiscussionsForPeriodReached(
+    isMaxDiscussionsForPeriodReached: boolean,
   ) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(
         this.aggregate.establishment,
       )
-        .withIsMonthlyDiscussionLimitReached(
-          withIsMonthlyDiscussionLimitReached,
-        )
+        .withIsMaxDiscussionsForPeriodReached(isMaxDiscussionsForPeriodReached)
         .build(),
     });
   }
