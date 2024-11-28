@@ -1,4 +1,3 @@
-import { PayloadAction } from "@reduxjs/toolkit";
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
@@ -10,8 +9,9 @@ import {
 
 import { agencyDashboardSlice } from "src/core-logic/domain/dashboards/agencyDashboard/agencyDashboard.slice";
 
-import { AgencyId, AgencyRight } from "shared";
+import { AgencyId, AgencyRight, WithAgencyId } from "shared";
 import { normalizeUsers } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.epics";
+import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type AgencyDashboardAction = ActionOfSlice<typeof agencyDashboardSlice>;
 
@@ -22,17 +22,23 @@ type AgencyDashboardEpic = AppEpic<
 const getAgencyEpic: AgencyDashboardEpic = (action$, state$, dependencies) =>
   action$.pipe(
     filter(agencyDashboardSlice.actions.fetchAgencyRequested.match),
-    switchMap((action: PayloadAction<AgencyId>) =>
+    switchMap((action: PayloadActionWithFeedbackTopic<WithAgencyId>) =>
       dependencies.agencyGateway
-        .getAgencyForDashboardById$(action.payload, getAdminToken(state$.value))
+        .getAgencyForDashboardById$(
+          action.payload.agencyId,
+          getAdminToken(state$.value),
+        )
         .pipe(
           map((agency) =>
             agencyDashboardSlice.actions.fetchAgencySucceeded(agency),
           ),
+          catchEpicError((error: Error) =>
+            agencyDashboardSlice.actions.fetchAgencyFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
         ),
-    ),
-    catchEpicError((error: Error) =>
-      agencyDashboardSlice.actions.fetchAgencyFailed(error.message),
     ),
   );
 
@@ -43,17 +49,21 @@ const getAgencyUsersEpic: AgencyDashboardEpic = (
 ) =>
   action$.pipe(
     filter(agencyDashboardSlice.actions.fetchAgencyUsersRequested.match),
-    switchMap((action: PayloadAction<AgencyId>) =>
+    switchMap((action: PayloadActionWithFeedbackTopic<WithAgencyId>) =>
       dependencies.agencyGateway
-        .getAgencyUsers$(action.payload, getAdminToken(state$.value))
-        .pipe(),
-    ),
-    map(normalizeUsers),
-    map((users) =>
-      agencyDashboardSlice.actions.fetchAgencyUsersSucceeded(users),
-    ),
-    catchEpicError((error: Error) =>
-      agencyDashboardSlice.actions.fetchAgencyUsersFailed(error.message),
+        .getAgencyUsers$(action.payload.agencyId, getAdminToken(state$.value))
+        .pipe(
+          map(normalizeUsers),
+          map((users) =>
+            agencyDashboardSlice.actions.fetchAgencyUsersSucceeded(users),
+          ),
+          catchEpicError((error: Error) =>
+            agencyDashboardSlice.actions.fetchAgencyUsersFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
     ),
   );
 
@@ -64,17 +74,20 @@ const updateAgencyEpic: AgencyDashboardEpic = (
 ) =>
   action$.pipe(
     filter(agencyDashboardSlice.actions.updateAgencyRequested.match),
-    switchMap(({ payload }) =>
+    switchMap((action) =>
       agencyGateway
-        .updateAgencyFromDashboard$(payload, getAdminToken(state$.value))
+        .updateAgencyFromDashboard$(action.payload, getAdminToken(state$.value))
         .pipe(
           map(() =>
-            agencyDashboardSlice.actions.updateAgencySucceeded(payload),
+            agencyDashboardSlice.actions.updateAgencySucceeded(action.payload),
+          ),
+          catchEpicError((error: Error) =>
+            agencyDashboardSlice.actions.updateAgencyFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
           ),
         ),
-    ),
-    catchEpicError((error: Error) =>
-      agencyDashboardSlice.actions.updateAgencyFailed(error.message),
     ),
   );
 
