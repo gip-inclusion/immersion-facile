@@ -378,7 +378,7 @@ interface OngoingOauths {
 
 interface Establishments extends WithAcquisition {
   additional_information: Generated<string | null>;
-  is_monthly_discussion_limit_reached: Generated<boolean>;
+  is_max_discussions_for_period_reached: Generated<boolean>;
   created_at: Timestamp;
   customized_name: string | null;
   fit_for_disabled_workers: boolean;

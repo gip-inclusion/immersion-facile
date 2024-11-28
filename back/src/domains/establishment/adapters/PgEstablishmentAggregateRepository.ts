@@ -276,15 +276,15 @@ export class PgEstablishmentAggregateRepository
   ): Promise<number> {
     const result = await this.transaction
       .updateTable("establishments")
-      .set({ is_monthly_discussion_limit_reached: false })
-      .where("is_monthly_discussion_limit_reached", "=", true)
+      .set({ is_max_discussions_for_period_reached: false })
+      .where("is_max_discussions_for_period_reached", "=", true)
       .where("max_contacts_per_month", ">", 0)
       .where("siret", "not in", (eb) =>
         eb
           .selectFrom("establishments")
           .select("establishments.siret")
           .leftJoin("discussions", "establishments.siret", "discussions.siret")
-          .where("is_monthly_discussion_limit_reached", "=", true)
+          .where("is_max_discussions_for_period_reached", "=", true)
           .where("max_contacts_per_month", ">", 0)
           .where("discussions.created_at", ">", since)
           .groupBy("establishments.siret")
@@ -361,7 +361,7 @@ export class PgEstablishmentAggregateRepository
           loc_pos.position,
           e.score,
           e.naf_code,
-          e.is_monthly_discussion_limit_reached	,
+          e.is_max_discussions_for_period_reached	,
           date_to_iso(e.next_availability_date) as next_availability_date,
           e.name,
           e.website,
@@ -377,8 +377,8 @@ export class PgEstablishmentAggregateRepository
         LEFT JOIN establishments_location_infos AS loc_inf ON loc_inf.establishment_siret = io.siret
         LEFT JOIN establishments_location_positions AS loc_pos ON loc_inf.id = loc_pos.id
         WHERE io.siret = $1 AND io.appellation_code = $2 AND loc_inf.id = $3
-        GROUP BY (io.siret, io.rome_code, prd.libelle_rome, e.naf_code, e.is_monthly_discussion_limit_reached	, e.next_availability_date, e.name, e.website,
-          e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees, e.score,
+        GROUP BY (io.siret, io.rome_code, prd.libelle_rome, e.naf_code, e.is_max_discussions_for_period_reached	, e.next_availability_date, e.name, e.website,
+          e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees, e.score, e.contact_mode, 
           loc_pos.id, loc_inf.id )`,
         [siret, appellationCode, locationId],
       );
@@ -468,8 +468,8 @@ export class PgEstablishmentAggregateRepository
         fit_for_disabled_workers: establishment.fitForDisabledWorkers ?? null,
         is_commited: establishment.isCommited ?? null,
         is_open: establishment.isOpen,
-        is_monthly_discussion_limit_reached:
-          establishment.isMonthlyDiscussionLimitReached,
+        is_max_discussions_for_period_reached:
+          establishment.isMaxDiscussionsForPeriodReached,
         last_insee_check_date: establishment.lastInseeCheckDate ?? null,
         max_contacts_per_month: establishment.maxContactsPerMonth,
         naf_code: establishment.nafDto.code,
@@ -524,7 +524,7 @@ export class PgEstablishmentAggregateRepository
           'siret', io.siret,
           'establishmentScore', io.score,
           ${shouldSetDistance ? `'distance_m', io.distance_m,` : ""}
-          'isSearchable', NOT io.is_monthly_discussion_limit_reached	,
+          'isSearchable', NOT io.is_max_discussions_for_period_reached	,
           'nextAvailabilityDate', io.next_availability_date,
           'name', io.name,
           'website', io.website,
@@ -591,8 +591,8 @@ export class PgEstablishmentAggregateRepository
         source_provider: aggregate.establishment.sourceProvider,
         update_date: aggregate.establishment.updatedAt,
         is_open: aggregate.establishment.isOpen,
-        is_monthly_discussion_limit_reached:
-          aggregate.establishment.isMonthlyDiscussionLimitReached,
+        is_max_discussions_for_period_reached:
+          aggregate.establishment.isMaxDiscussionsForPeriodReached,
         is_commited: aggregate.establishment.isCommited,
         fit_for_disabled_workers: aggregate.establishment.fitForDisabledWorkers,
         max_contacts_per_month: aggregate.establishment.maxContactsPerMonth,
@@ -992,7 +992,7 @@ const searchImmersionResultsQuery = (
           siret: ref("e.siret"),
           establishmentScore: ref("r.score"),
           isSearchable: sql`NOT ${ref(
-            "e.is_monthly_discussion_limit_reached",
+            "e.is_max_discussions_for_period_reached",
           )}`,
           nextAvailabilityDate: ref("e.next_availability_date"),
           name: ref("e.name"),

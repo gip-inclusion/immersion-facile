@@ -1,6 +1,6 @@
 import { MigrationBuilder } from "node-pg-migrate";
 
-const newColumnName = "is_monthly_discussion_limit_reached";
+const newColumnName = "is_max_discussions_for_period_reached";
 const oldColumnName = "is_searchable";
 const establishmentTableName = "establishments";
 

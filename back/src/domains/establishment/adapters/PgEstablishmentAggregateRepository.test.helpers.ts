@@ -44,7 +44,7 @@ export const makeExpectedSearchResult = ({
       establishmentAggregate.establishment.voluntaryToImmersion,
     website: establishmentAggregate.establishment.website,
     isSearchable:
-      !establishmentAggregate.establishment.isMonthlyDiscussionLimitReached, // <<<<< Donnée renvoyée actuellement alors que pas spécifié dans le DTO?!
+      !establishmentAggregate.establishment.isMaxDiscussionsForPeriodReached, // <<<<< Donnée renvoyée actuellement alors que pas spécifié dans le DTO?!
     updatedAt: establishmentAggregate.establishment.updatedAt?.toISOString(),
     createdAt: establishmentAggregate.establishment.createdAt.toISOString(),
   } as SearchResultDto; // d'où le as

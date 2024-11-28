@@ -324,7 +324,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         ...establishmentAggregate,
         establishment: {
           ...establishmentAggregate.establishment,
-          isMonthlyDiscussionLimitReached: true,
+          isMaxDiscussionsForPeriodReached: true,
         },
       };
 

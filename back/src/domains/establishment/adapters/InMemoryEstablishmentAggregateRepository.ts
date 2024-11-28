@@ -289,7 +289,7 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation
         : undefined,
       position: establishmentAgg.establishment.locations[0].position,
       isSearchable:
-        !establishmentAgg.establishment.isMonthlyDiscussionLimitReached,
+        !establishmentAgg.establishment.isMaxDiscussionsForPeriodReached,
       nextAvailabilityDate: establishmentAgg.establishment.nextAvailabilityDate,
       locationId: establishmentAgg.establishment.locations[0].id,
       updatedAt: establishmentAgg.establishment.updatedAt?.toISOString(),

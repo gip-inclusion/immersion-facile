@@ -355,7 +355,7 @@ describe("ContactEstablishment", () => {
     it("switches establishment is searchable to false when the max contacts per week is reached", async () => {
       // préparation
       const establishmentAggregate = establishmentAggregateWithEmailContact
-        .withIsMonthlyDiscussionLimitReached(false)
+        .withIsMaxDiscussionsForPeriodReached(false)
         .withMaxContactsPerMonth(2)
         .withOffers([immersionOffer])
         .build();
@@ -471,7 +471,7 @@ describe("ContactEstablishment", () => {
       expect(uow.discussionRepository.discussions).toHaveLength(3);
       expect(
         establishmentAggregateAfterSecondContact.establishment
-          .isMonthlyDiscussionLimitReached,
+          .isMaxDiscussionsForPeriodReached,
       ).toBe(true);
     });
   });
@@ -584,7 +584,7 @@ describe("ContactEstablishment", () => {
 
     it("throws ForbidenError when establishment is not currently available", async () => {
       const establishmentAggregate = establishmentAggregateWithEmailContact
-        .withIsMonthlyDiscussionLimitReached(false)
+        .withIsMaxDiscussionsForPeriodReached(false)
         .withMaxContactsPerMonth(2)
         .withEstablishmentNextAvailabilityDate(addHours(timeGateway.now(), 1))
         .withOffers([immersionOffer])
