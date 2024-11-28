@@ -45,7 +45,10 @@ describe("Auth slice", () => {
   it("stores the federated identity when someones connects (in store and in device)", () => {
     expectFederatedIdentityToEqual(null);
     store.dispatch(
-      authSlice.actions.federatedIdentityProvided(peConnectedFederatedIdentity),
+      authSlice.actions.federatedIdentityProvided({
+        federatedIdentityWithUser: peConnectedFederatedIdentity,
+        feedbackTopic: "auth-global",
+      }),
     );
     expectFederatedIdentityToEqual(peConnectedFederatedIdentity);
     expectFederatedIdentityInDevice(peConnectedFederatedIdentity);

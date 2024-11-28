@@ -7,6 +7,7 @@ import { keys } from "shared";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
+import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { icUsersAdminSlice } from "../admin/icUsersAdmin/icUsersAdmin.slice";
 import { partnersErroredConventionSlice } from "../partnersErroredConvention/partnersErroredConvention.slice";
 
@@ -18,6 +19,8 @@ const topics = [
   "partner-conventions",
   "agency-user",
   "api-consumer-names",
+  "dashboard-agency-register-user",
+  "auth-global",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -54,10 +57,14 @@ export type PayloadActionWithFeedbackTopic<
   P extends Record<string, unknown> = {},
 > = PayloadAction<P & PayloadWithFeedbackTopic>;
 
+export type PayloadActionWithFeedbackTopicError =
+  PayloadActionWithFeedbackTopic<{ errorMessage: string }>;
+
 export const feedbackMapping: Record<
   FeedbackTopic,
   Partial<Partial<Record<ActionKindAndLevel, FeedbackWithActionName>>>
 > = {
+  "auth-global": {},
   "api-consumer-global": {
     "create.success": {
       action: apiConsumerSlice.actions.saveApiConsumerSucceeded,
@@ -178,6 +185,24 @@ export const feedbackMapping: Record<
         "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
       message:
         "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur.",
+    },
+  },
+  "dashboard-agency-register-user": {
+    "fetch.error": {
+      action: inclusionConnectedSlice.actions.currentUserFetchFailed,
+      title: "Erreur",
+      message: "Erreur lors de la récupération des infos de l'utilisateur",
+    },
+    "create.success": {
+      action: inclusionConnectedSlice.actions.registerAgenciesSucceeded,
+      title: "Demande de rattachement effectuée",
+      message:
+        "Votre demande de première connexion a bien été reçue. Vous recevrez un email de confirmation dès qu'elle aura  été acceptée par nos équipes (2-7 jours ouvrés).",
+    },
+    "create.error": {
+      action: inclusionConnectedSlice.actions.registerAgenciesFailed,
+      title: "Erreur lors de la demande de rattachement à une agence",
+      message: "Une erreur est survenue lors du rattachement de l'utilisateur",
     },
   },
 };

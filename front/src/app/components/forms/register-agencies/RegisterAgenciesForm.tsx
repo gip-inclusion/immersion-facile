@@ -37,16 +37,16 @@ export const RegisterAgenciesForm = () => {
   const dispatch = useDispatch();
   return (
     <>
-      <p>
-        C'est votre première connexion sur Immersion Facilitée avec votre compte
-        Inclusion Connect, choisissez la structure à laquelle nous devons vous
-        associer.
+      <p className={fr.cx("fr-mt-4w")}>
+        C'est votre première connexion sur Immersion Facilitée, choisissez la
+        structure à laquelle nous devons vous associer.
       </p>
       <form
         onSubmit={handleSubmit((values) =>
           dispatch(
             inclusionConnectedSlice.actions.registerAgenciesRequested({
               agencies: values.agencies.map((agency) => agency.id),
+              feedbackTopic: "dashboard-agency-register-user",
             }),
           ),
         )}

@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { AbsoluteUrl, FederatedIdentity } from "shared";
+import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type FederatedIdentityWithUser = FederatedIdentity & {
   email: string;
@@ -25,10 +26,12 @@ const initialState: AuthState = {
 
 const onFederatedIdentityReceived = (
   state: AuthState,
-  action: PayloadAction<FederatedIdentityWithUser | null>,
+  action: PayloadActionWithFeedbackTopic<{
+    federatedIdentityWithUser: FederatedIdentityWithUser | null;
+  }>,
 ) => {
   state.isLoading = false;
-  state.federatedIdentityWithUser = action.payload;
+  state.federatedIdentityWithUser = action.payload.federatedIdentityWithUser;
 };
 
 export const authSlice = createSlice({
@@ -63,7 +66,9 @@ export const authSlice = createSlice({
     federatedIdentityFoundInDevice: onFederatedIdentityReceived,
     federatedIdentityFromStoreToDeviceStorageSucceeded: (
       state,
-      _action: PayloadAction<FederatedIdentityWithUser | null>,
+      _action: PayloadActionWithFeedbackTopic<{
+        federatedIdentityWithUser: FederatedIdentityWithUser;
+      }>,
     ) => state,
     federatedIdentityNotFoundInDevice: (state) => {
       state.isLoading = false;

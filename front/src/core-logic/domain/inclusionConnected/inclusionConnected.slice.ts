@@ -1,22 +1,19 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { AgencyDto, InclusionConnectedUser, WithAgencyIds } from "shared";
-import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
-
-export type InclusionConnectedFeedback = SubmitFeedBack<
-  "success" | "agencyRegistrationSuccess" | "agenciesToReviewFetchSuccess"
->;
+import {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithFeedbackTopicError,
+} from "src/core-logic/domain/feedback/feedback.slice";
 
 type InclusionConnectedState = {
   currentUser: InclusionConnectedUser | null;
   isLoading: boolean;
-  feedback: InclusionConnectedFeedback;
   agenciesToReview: AgencyDto[];
 };
 
 const initialState: InclusionConnectedState = {
   currentUser: null,
   isLoading: false,
-  feedback: { kind: "idle" },
   agenciesToReview: [],
 };
 
@@ -24,7 +21,10 @@ export const inclusionConnectedSlice = createSlice({
   name: "inclusionConnected",
   initialState,
   reducers: {
-    currentUserFetchRequested: (state) => {
+    currentUserFetchRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
       state.isLoading = true;
     },
     currentUserFetchSucceeded: (
@@ -33,25 +33,33 @@ export const inclusionConnectedSlice = createSlice({
     ) => {
       state.isLoading = false;
       state.currentUser = action.payload;
-      state.feedback = { kind: "success" };
+      //state.feedback = { kind: "success" };
     },
-    currentUserFetchFailed: (state, action: PayloadAction<string>) => {
+    currentUserFetchFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
     registerAgenciesRequested: (
       state,
-      _payload: PayloadAction<WithAgencyIds>,
+      _payload: PayloadActionWithFeedbackTopic<WithAgencyIds>,
     ) => {
       state.isLoading = true;
     },
-    registerAgenciesSucceeded: (state) => {
+    registerAgenciesSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<WithAgencyIds>,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "agencyRegistrationSuccess" };
+      //state.feedback = { kind: "agencyRegistrationSuccess" };
     },
-    registerAgenciesFailed: (state, action: PayloadAction<string>) => {
+    registerAgenciesFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
+      //state.feedback = { kind: "errored", errorMessage: action.payload };
     },
   },
 });

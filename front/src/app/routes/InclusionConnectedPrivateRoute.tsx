@@ -138,12 +138,15 @@ export const InclusionConnectedPrivateRoute = ({
     if (token) {
       dispatch(
         authSlice.actions.federatedIdentityProvided({
-          provider: "inclusionConnect",
-          token,
-          email,
-          lastName,
-          firstName,
-          idToken,
+          federatedIdentityWithUser: {
+            provider: "inclusionConnect",
+            token,
+            email,
+            lastName,
+            firstName,
+            idToken,
+          },
+          feedbackTopic: "auth-global",
         }),
       );
     }

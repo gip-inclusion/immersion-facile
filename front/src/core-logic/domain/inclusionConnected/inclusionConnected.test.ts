@@ -9,11 +9,9 @@ import {
   inclusionConnectTokenExpiredMessage,
 } from "shared";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import {
-  InclusionConnectedFeedback,
-  inclusionConnectedSlice,
-} from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
+import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import {
   TestDependencies,
   createTestStore,
@@ -72,12 +70,11 @@ describe("InclusionConnected", () => {
     it("fetches the current IC user when inclusion connect federated identity is found in device", () => {
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "idle" });
-
       store.dispatch(
-        authSlice.actions.federatedIdentityFoundInDevice(
-          inclusionConnectedFederatedIdentity,
-        ),
+        authSlice.actions.federatedIdentityFoundInDevice({
+          federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+          feedbackTopic: "auth-global",
+        }),
       );
 
       expectIsLoadingToBe(true);
@@ -88,23 +85,21 @@ describe("InclusionConnected", () => {
 
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(inclusionConnectedUser);
-      expectFeedbackToEqual({ kind: "success" });
     });
 
     it("do nothing when other federated identity is found in device", () => {
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "idle" });
 
       store.dispatch(
-        authSlice.actions.federatedIdentityFoundInDevice(
-          peConnectFederatedIdentity,
-        ),
+        authSlice.actions.federatedIdentityFoundInDevice({
+          federatedIdentityWithUser: peConnectFederatedIdentity,
+          feedbackTopic: "auth-global",
+        }),
       );
 
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "idle" });
     });
   });
 
@@ -112,12 +107,12 @@ describe("InclusionConnected", () => {
     it("fetches the current IC user when inclusion connect federated identity is successfully stored in device", () => {
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "idle" });
 
       store.dispatch(
-        authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded(
-          inclusionConnectedFederatedIdentity,
-        ),
+        authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded({
+          federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+          feedbackTopic: "auth-global",
+        }),
       );
 
       expectIsLoadingToBe(true);
@@ -128,23 +123,21 @@ describe("InclusionConnected", () => {
 
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(inclusionConnectedUser);
-      expectFeedbackToEqual({ kind: "success" });
     });
 
     it("do nothing when other federated identity is successfully stored in device", () => {
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "idle" });
 
       store.dispatch(
-        authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded(
-          peConnectFederatedIdentity,
-        ),
+        authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded({
+          federatedIdentityWithUser: peConnectFederatedIdentity,
+          feedbackTopic: "auth-global",
+        }),
       );
 
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "idle" });
     });
   });
 
@@ -152,10 +145,11 @@ describe("InclusionConnected", () => {
     it("fetches the current IC user", () => {
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "idle" });
 
       store.dispatch(
-        inclusionConnectedSlice.actions.currentUserFetchRequested(),
+        inclusionConnectedSlice.actions.currentUserFetchRequested({
+          feedbackTopic: "dashboard-agency-register-user",
+        }),
       );
 
       expectIsLoadingToBe(true);
@@ -166,7 +160,6 @@ describe("InclusionConnected", () => {
 
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(inclusionConnectedUser);
-      expectFeedbackToEqual({ kind: "success" });
     });
 
     it("disconnects the users if the response includes : 'jwt expired'", () => {
@@ -185,7 +178,9 @@ describe("InclusionConnected", () => {
         },
       }));
       store.dispatch(
-        inclusionConnectedSlice.actions.currentUserFetchRequested(),
+        inclusionConnectedSlice.actions.currentUserFetchRequested({
+          feedbackTopic: "auth-global",
+        }),
       );
       expectIsLoadingToBe(true);
 
@@ -194,14 +189,15 @@ describe("InclusionConnected", () => {
         new Error(errorMessage),
       );
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "idle" });
     });
 
     it("stores error on failure when trying to fetch current IC user", () => {
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
       store.dispatch(
-        inclusionConnectedSlice.actions.currentUserFetchRequested(),
+        inclusionConnectedSlice.actions.currentUserFetchRequested({
+          feedbackTopic: "dashboard-agency-register-user",
+        }),
       );
       expectIsLoadingToBe(true);
 
@@ -211,7 +207,14 @@ describe("InclusionConnected", () => {
       );
       expectIsLoadingToBe(false);
       expectCurrentUserToBe(null);
-      expectFeedbackToEqual({ kind: "errored", errorMessage });
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "dashboard-agency-register-user": {
+          on: "fetch",
+          level: "error",
+          title: "Erreur",
+          message: errorMessage,
+        },
+      });
     });
   });
 
@@ -223,14 +226,25 @@ describe("InclusionConnected", () => {
       };
 
       store.dispatch(
-        inclusionConnectedSlice.actions.registerAgenciesRequested(payload),
+        inclusionConnectedSlice.actions.registerAgenciesRequested({
+          ...payload,
+          feedbackTopic: "dashboard-agency-register-user",
+        }),
       );
       expectIsLoadingToBe(true);
       dependencies.inclusionConnectedGateway.registerAgenciesToCurrentUserResponse$.next(
         undefined,
       );
       expectIsLoadingToBe(false);
-      expectFeedbackToEqual({ kind: "agencyRegistrationSuccess" });
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "dashboard-agency-register-user": {
+          on: "create",
+          level: "success",
+          title: "Demande de rattachement effectuée",
+          message:
+            "Votre demande de première connexion a bien été reçue. Vous recevrez un email de confirmation dès qu'elle aura  été acceptée par nos équipes (2-7 jours ouvrés).",
+        },
+      });
     });
 
     it("request agencies registration on the current user to throw on error", () => {
@@ -239,13 +253,23 @@ describe("InclusionConnected", () => {
       };
       const errorMessage = "Error registering user to agencies to review";
       store.dispatch(
-        inclusionConnectedSlice.actions.registerAgenciesRequested(payload),
+        inclusionConnectedSlice.actions.registerAgenciesRequested({
+          ...payload,
+          feedbackTopic: "dashboard-agency-register-user",
+        }),
       );
       expectIsLoadingToBe(true);
       dependencies.inclusionConnectedGateway.registerAgenciesToCurrentUserResponse$.error(
         new Error(errorMessage),
       );
-      expectFeedbackToEqual({ kind: "errored", errorMessage });
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "dashboard-agency-register-user": {
+          on: "create",
+          level: "error",
+          title: "Erreur lors de la demande de rattachement à une agence",
+          message: errorMessage,
+        },
+      });
       expectIsLoadingToBe(false);
     });
   });
@@ -294,13 +318,6 @@ describe("InclusionConnected", () => {
 
   const expectIsLoadingToBe = (expected: boolean) => {
     expect(inclusionConnectedSelectors.isLoading(store.getState())).toBe(
-      expected,
-    );
-  };
-
-  const expectFeedbackToEqual = (expected: InclusionConnectedFeedback) => {
-    expectToEqual(
-      inclusionConnectedSelectors.feedback(store.getState()),
       expected,
     );
   };
