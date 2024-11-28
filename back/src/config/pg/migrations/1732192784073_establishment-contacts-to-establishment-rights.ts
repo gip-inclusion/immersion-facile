@@ -80,7 +80,7 @@ const C_insertMissingContactAdminUsers = (pgm: MigrationBuilder) => {
     SELECT 
       gen_random_uuid(), email, firstname, lastname
     FROM (
-      SELECT DISTINCT contact_admins.email, contact_admins.firstname, contact_admins.lastname
+      SELECT DISTINCT ON (contact_admins.email) contact_admins.email, contact_admins.firstname, contact_admins.lastname
       FROM (
         SELECT email, siret, firstname, lastname
         FROM establishments_contacts
