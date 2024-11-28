@@ -7,6 +7,7 @@ import { keys } from "shared";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
+import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { icUsersAdminSlice } from "../admin/icUsersAdmin/icUsersAdmin.slice";
 import { partnersErroredConventionSlice } from "../partnersErroredConvention/partnersErroredConvention.slice";
@@ -21,6 +22,7 @@ const topics = [
   "api-consumer-names",
   "dashboard-agency-register-user",
   "auth-global",
+  "establishments-batch",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -203,6 +205,13 @@ export const feedbackMapping: Record<
       action: inclusionConnectedSlice.actions.registerAgenciesFailed,
       title: "Erreur lors de la demande de rattachement à une agence",
       message: "Une erreur est survenue lors du rattachement de l'utilisateur",
+    },
+  },
+  "establishments-batch": {
+    "create.success": {
+      action: establishmentBatchSlice.actions.addEstablishmentBatchSucceeded,
+      title: "Le groupe d'entreprises a bien été créé",
+      message: "L'import en masse a réussi, voici le détail :",
     },
   },
 };

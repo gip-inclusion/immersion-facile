@@ -48,20 +48,25 @@ const addEstablishmentBatchEpic: AppEpic<EstablishmentBatchAction> = (
       establishmentBatchSlice.actions.addEstablishmentBatchRequested.match,
     ),
     switchMap((action) =>
-      adminGateway.addEstablishmentBatch$(
-        action.payload,
-        getAdminToken(state$.value),
-      ),
-    ),
-    map((batchResponse) =>
-      establishmentBatchSlice.actions.addEstablishmentBatchSucceeded(
-        batchResponse,
-      ),
-    ),
-    catchEpicError((error) =>
-      establishmentBatchSlice.actions.addEstablishmentBatchErrored(
-        error.message,
-      ),
+      adminGateway
+        .addEstablishmentBatch$(
+          action.payload.formEstablishmentBatch,
+          getAdminToken(state$.value),
+        )
+        .pipe(
+          map((batchResponse) =>
+            establishmentBatchSlice.actions.addEstablishmentBatchSucceeded({
+              establishmentBatchReport: batchResponse,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error) =>
+            establishmentBatchSlice.actions.addEstablishmentBatchErrored({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
     ),
   );
 
