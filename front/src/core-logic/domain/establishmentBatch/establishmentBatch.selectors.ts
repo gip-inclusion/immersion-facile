@@ -1,10 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-const feedback = createRootSelector(
-  (state) => state.establishmentBatch.feedback,
-);
-
 const candidateEstablishments = createRootSelector(
   (state) => state.establishmentBatch.candidateEstablishments,
 );
@@ -34,7 +30,6 @@ const numberOfInvalidCandidateEstablishments = createSelector(
 );
 
 export const establishmentBatchSelectors = {
-  feedback,
   candidateEstablishments,
   numberOfValidCandidateEstablishments,
   numberOfInvalidCandidateEstablishments,

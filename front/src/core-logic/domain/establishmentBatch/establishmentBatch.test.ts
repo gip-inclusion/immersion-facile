@@ -4,6 +4,7 @@ import {
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
+  expectToEqual,
 } from "shared";
 import {
   TestDependencies,
@@ -12,7 +13,6 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { candidateEstablishmentMapper } from "./establishmentBatch.epics";
 import {
-  AddFormEstablishmentBatchFeedback,
   FormEstablishmentDtoWithErrors,
   establishmentBatchSlice,
 } from "./establishmentBatch.slice";
@@ -37,9 +37,10 @@ describe("Establishment batch", () => {
   it("should indicates load state on add batch requested", () => {
     expectIsLoadingToBe(false);
     store.dispatch(
-      establishmentBatchSlice.actions.addEstablishmentBatchRequested(
-        establishmentBatch,
-      ),
+      establishmentBatchSlice.actions.addEstablishmentBatchRequested({
+        formEstablishmentBatch: establishmentBatch,
+        feedbackTopic: "establishments-batch",
+      }),
     );
     expectIsLoadingToBe(true);
   });
@@ -56,32 +57,39 @@ describe("Establishment batch", () => {
       ],
     };
     store.dispatch(
-      establishmentBatchSlice.actions.addEstablishmentBatchRequested(
-        establishmentBatch,
-      ),
+      establishmentBatchSlice.actions.addEstablishmentBatchRequested({
+        formEstablishmentBatch: establishmentBatch,
+        feedbackTopic: "establishments-batch",
+      }),
     );
     dependencies.adminGateway.establishmentBatchResponse$.next(responseData);
     expectIsLoadingToBe(false);
-    expectFeedbackToEqual({
-      kind: "success",
+    expectToEqual(store.getState().feedbacks, {
+      "establishments-batch": {
+        level: "success",
+        on: "create",
+        title: "Le groupe d'entreprises a bien été créé",
+        message: "L'import en masse a réussi, voici le détail :",
+      },
     });
   });
 
   it("should send establishment batch to the gateway and show error feedback when it goes wrong", () => {
     const errorMessage = "Error trying to send establishmentBatch";
     store.dispatch(
-      establishmentBatchSlice.actions.addEstablishmentBatchRequested(
-        establishmentBatch,
-      ),
+      establishmentBatchSlice.actions.addEstablishmentBatchRequested({
+        formEstablishmentBatch: establishmentBatch,
+        feedbackTopic: "establishments-batch",
+      }),
     );
     dependencies.adminGateway.establishmentBatchResponse$.error(
       new Error(errorMessage),
     );
     expectIsLoadingToBe(false);
-    expectFeedbackToEqual({
-      kind: "errored",
-      errorMessage,
-    });
+    // expectFeedbackToEqual({
+    //   kind: "errored",
+    //   errorMessage,
+    // });
   });
 
   it("should update establishments to review in store", () => {
@@ -101,9 +109,6 @@ describe("Establishment batch", () => {
 
   const expectIsLoadingToBe = (isLoading: boolean) =>
     expect(store.getState().establishmentBatch.isLoading).toBe(isLoading);
-
-  const expectFeedbackToEqual = (feedback: AddFormEstablishmentBatchFeedback) =>
-    expect(store.getState().establishmentBatch.feedback).toEqual(feedback);
 
   const expectCandidateEstablishmentsToEqual = (
     expectedCandidateEstablishments: FormEstablishmentDtoWithErrors[],

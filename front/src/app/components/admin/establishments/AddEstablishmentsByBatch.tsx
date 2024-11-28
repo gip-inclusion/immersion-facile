@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Papa from "papaparse";
@@ -12,7 +13,7 @@ import {
   FormEstablishmentDto,
   domElementIds,
 } from "shared";
-import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentBatchSelectors } from "src/core-logic/domain/establishmentBatch/establishmentBatch.selectors";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -33,7 +34,6 @@ export const AddEstablishmentsByBatch = () => {
     reset,
     formState: { errors, touchedFields },
   } = useForm<AddEstablishmentByBatchTabForm>();
-  const feedback = useAppSelector(establishmentBatchSelectors.feedback);
   const isLoading = useAppSelector(establishmentBatchSelectors.isLoading);
   const addBatchResponse = useAppSelector(
     establishmentBatchSelectors.addBatchResponse,
@@ -151,20 +151,25 @@ export const AddEstablishmentsByBatch = () => {
     const values = getValues();
     dispatch(
       establishmentBatchSlice.actions.addEstablishmentBatchRequested({
-        groupName: values.groupName,
-        title: values.title,
-        description: values.description,
-        formEstablishments:
-          candidateEstablishments
-            .filter((establishment) => establishment.zodErrors.length === 0)
-            .map(
-              (candidateEstablishment) =>
-                candidateEstablishment.formEstablishment,
-            )
-            .filter(
-              (formEstablishment): formEstablishment is FormEstablishmentDto =>
-                formEstablishment !== null,
-            ) ?? [],
+        formEstablishmentBatch: {
+          groupName: values.groupName,
+          title: values.title,
+          description: values.description,
+          formEstablishments:
+            candidateEstablishments
+              .filter((establishment) => establishment.zodErrors.length === 0)
+              .map(
+                (candidateEstablishment) =>
+                  candidateEstablishment.formEstablishment,
+              )
+              .filter(
+                (
+                  formEstablishment,
+                ): formEstablishment is FormEstablishmentDto =>
+                  formEstablishment !== null,
+              ) ?? [],
+        },
+        feedbackTopic: "establishments-batch",
       }),
     );
   };
@@ -291,15 +296,18 @@ export const AddEstablishmentsByBatch = () => {
                 Importer ces succursales
               </Button>
             </div>
-            <SubmitFeedbackNotification
-              submitFeedback={feedback}
-              messageByKind={{
-                success: {
-                  title: "Succès",
-                  message: getBatchSuccessMessage(),
-                },
-              }}
+            <Feedback
+              topic="establishments-batch"
+              render={({ level }) => (
+                <Alert
+                  severity={level}
+                  className={fr.cx("fr-mt-2w")}
+                  title="Succès"
+                  description={getBatchSuccessMessage()}
+                />
+              )}
             />
+
             <table className={cx(fr.cx("fr-mt-2w"), classes.table)}>
               {candidateEstablishments[0].formEstablishment && (
                 <thead>

@@ -4,10 +4,12 @@ import {
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
 } from "shared";
-import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
+import {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithFeedbackTopicError,
+} from "src/core-logic/domain/feedback/feedback.slice";
 import { z } from "zod";
 
-export type AddFormEstablishmentBatchFeedback = SubmitFeedBack<"success">;
 export type FormEstablishmentDtoWithErrors = {
   formEstablishment: FormEstablishmentDto | null;
   zodErrors: z.ZodIssue[];
@@ -15,15 +17,11 @@ export type FormEstablishmentDtoWithErrors = {
 export type EstablishmentBatchState = {
   isLoading: boolean;
   candidateEstablishments: FormEstablishmentDtoWithErrors[];
-  feedback: AddFormEstablishmentBatchFeedback;
   addBatchResponse: EstablishmentBatchReport | null;
 };
 
 const initialState: EstablishmentBatchState = {
   isLoading: false,
-  feedback: {
-    kind: "idle",
-  },
   candidateEstablishments: [],
   addBatchResponse: null,
 };
@@ -44,26 +42,26 @@ export const establishmentBatchSlice = createSlice({
     },
     addEstablishmentBatchRequested: (
       state,
-      _action: PayloadAction<FormEstablishmentBatchDto>,
+      _action: PayloadActionWithFeedbackTopic<{
+        formEstablishmentBatch: FormEstablishmentBatchDto;
+      }>,
     ) => {
       state.isLoading = true;
     },
     addEstablishmentBatchSucceeded: (
       state,
-      action: PayloadAction<EstablishmentBatchReport>,
+      action: PayloadActionWithFeedbackTopic<{
+        establishmentBatchReport: EstablishmentBatchReport;
+      }>,
     ) => {
       state.isLoading = false;
-      state.feedback = {
-        kind: "success",
-      };
-      state.addBatchResponse = action.payload;
+      state.addBatchResponse = action.payload.establishmentBatchReport;
     },
-    addEstablishmentBatchErrored: (state, action: PayloadAction<string>) => {
+    addEstablishmentBatchErrored: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = {
-        kind: "errored",
-        errorMessage: action.payload,
-      };
     },
   },
 });
