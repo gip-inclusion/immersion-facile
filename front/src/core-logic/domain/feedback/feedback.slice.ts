@@ -33,6 +33,7 @@ const topics = [
   "establishment-modification-link",
   "form-establishment",
   "siret-input",
+  "agency-for-dashboard",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -218,6 +219,13 @@ export const feedbackMapping: Record<
     },
   },
   "agency-user-for-dashboard": {
+    "fetch.error": {
+      action: agencyDashboardSlice.actions.fetchAgencyUsersFailed,
+      title:
+        "Problème rencontré lors de la récupération de la liste des utilisateurs",
+      message:
+        "Une erreur est survenue lors de la récupération de la liste des utilisateurs de cette agence",
+    },
     "update.success": {
       action: agencyDashboardSlice.actions.updateUserOnAgencySucceeded,
       title: "L'utilisateur a été mis à jour",
@@ -250,6 +258,25 @@ export const feedbackMapping: Record<
         "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
       message:
         "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur.",
+    },
+  },
+  "agency-for-dashboard": {
+    "fetch.error": {
+      action: agencyDashboardSlice.actions.fetchAgencyFailed,
+      title:
+        "Problème rencontré lors de la récupération des données de l'agence",
+      message:
+        "Une erreur est survenue lors de la récupération des données de cette agence",
+    },
+    "update.success": {
+      action: agencyDashboardSlice.actions.updateAgencySucceeded,
+      title: "L'agence a été mis à jour",
+      message: "Les données de l'agence ont été mises à jour.",
+    },
+    "update.error": {
+      action: agencyDashboardSlice.actions.updateAgencyFailed,
+      title: "Problème lors de la mise à jour de l'agence",
+      message: "Une erreur est survenue lors de la mise à jour de l'agence",
     },
   },
   "establishments-batch": {
