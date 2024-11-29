@@ -193,7 +193,6 @@ export class PgConventionRepository implements ConventionRepository {
   public async update(
     convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
-    // prettier-ignore
     const {
       signatories: {
         beneficiary,

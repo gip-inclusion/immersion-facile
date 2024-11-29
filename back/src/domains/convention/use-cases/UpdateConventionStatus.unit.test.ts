@@ -145,14 +145,12 @@ describe("UpdateConventionStatus", () => {
         .withEstablishmentRepresentativeEmail("establishmentrep@email.com")
         .withAgencyId(agency.id)
         .withInternshipKind("mini-stage-cci")
-        // .withBeneficiarySignedAt(new Date())
         .withBeneficiaryRepresentative({
           role: "beneficiary-representative",
           email: "benef-representative@mail.com",
           firstName: "Bruce",
           lastName: "Wayne",
           phone: "#33112233445",
-          // signedAt: new Date().toISOString(),
           signedAt: undefined,
         })
         .build();

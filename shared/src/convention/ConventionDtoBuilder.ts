@@ -124,7 +124,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       this.dto.internshipKind === "immersion" &&
       isBeneficiary(this.dto.signatories.beneficiary)
     ) {
-      this.dto = {
+      return new ConventionDtoBuilder({
         ...this.dto,
         signatories: {
           beneficiary: {
@@ -144,14 +144,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
             signedAt: undefined,
           },
         },
-      };
-      return new ConventionDtoBuilder(this.dto);
+      });
     }
     if (
       this.dto.internshipKind === "mini-stage-cci" &&
       isBeneficiaryStudent(this.dto.signatories.beneficiary)
     ) {
-      this.dto = {
+      return new ConventionDtoBuilder({
         ...this.dto,
         signatories: {
           beneficiary: {
@@ -171,8 +170,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
             signedAt: undefined,
           },
         },
-      };
-      return new ConventionDtoBuilder(this.dto);
+      });
     }
     throw new Error(
       `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
@@ -713,27 +711,25 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withValidator(
     agencyValidator: ConventionValidatorInputName,
   ): ConventionDtoBuilder {
-    this.dto = {
+    return new ConventionDtoBuilder({
       ...this.dto,
       validators: {
         ...this.dto.validators,
         agencyValidator,
       },
-    };
-    return new ConventionDtoBuilder(this.dto);
+    });
   }
 
   public withCounsellor(
     agencyCounsellor: ConventionValidatorInputName,
   ): ConventionDtoBuilder {
-    this.dto = {
+    return new ConventionDtoBuilder({
       ...this.dto,
       validators: {
         ...this.dto.validators,
         agencyCounsellor,
       },
-    };
-    return new ConventionDtoBuilder(this.dto);
+    });
   }
 
   public withEstablishmentNumberOfEmployeesRange(
