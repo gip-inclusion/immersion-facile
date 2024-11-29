@@ -1,12 +1,13 @@
 import {
   AgencyId,
   ConventionDto,
-  ConventionDtoBuilder,
+  ConventionReadDto,
   ConventionRelatedJwtPayload,
   ConventionStatus,
   Email,
   InclusionConnectedUser,
   Role,
+  Signatories,
   UpdateConventionStatusRequestDto,
   UserId,
   WithConventionIdLegacy,
@@ -49,6 +50,29 @@ const domainTopicByTargetStatusMap: Record<
 };
 
 type UpdateConventionStatusSupportedJwtPayload = ConventionRelatedJwtPayload;
+
+const clearSignatories = (convention: ConventionReadDto): Signatories => {
+  return {
+    beneficiary: {
+      ...convention.signatories.beneficiary,
+      signedAt: undefined,
+    },
+    beneficiaryCurrentEmployer: convention.signatories
+      .beneficiaryCurrentEmployer && {
+      ...convention.signatories.beneficiaryCurrentEmployer,
+      signedAt: undefined,
+    },
+    establishmentRepresentative: {
+      ...convention.signatories.establishmentRepresentative,
+      signedAt: undefined,
+    },
+    beneficiaryRepresentative: convention.signatories
+      .beneficiaryRepresentative && {
+      ...convention.signatories.beneficiaryRepresentative,
+      signedAt: undefined,
+    },
+  };
+};
 
 export class UpdateConventionStatus extends TransactionalUseCase<
   UpdateConventionStatusRequestDto,
@@ -110,42 +134,50 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         ? params.statusJustification
         : undefined;
 
-    const conventionBuilder = new ConventionDtoBuilder(conventionRead)
-      .withStatus(params.status)
-      .withDateValidation(
-        validatedConventionStatuses.includes(params.status)
-          ? conventionUpdatedAt
-          : undefined,
-      )
-      .withDateApproval(
-        reviewedConventionStatuses.includes(params.status)
-          ? conventionUpdatedAt
-          : undefined,
-      )
-      .withStatusJustification(statusJustification);
-
     const hasCounsellor =
       params.status === "ACCEPTED_BY_COUNSELLOR" &&
       (params.lastname || params.firstname);
-    if (hasCounsellor) {
-      conventionBuilder.withCounsellor({
-        firstname: params.firstname,
-        lastname: params.lastname,
-      });
-    }
 
     const hasValidator =
       params.status === "ACCEPTED_BY_VALIDATOR" &&
       (params.lastname || params.firstname);
-    if (hasValidator)
-      conventionBuilder.withValidator({
-        firstname: params.firstname,
-        lastname: params.lastname,
-      });
 
-    if (params.status === "DRAFT") conventionBuilder.notSigned();
-
-    const updatedConvention: ConventionDto = conventionBuilder.build();
+    const updatedConvention: ConventionDto = {
+      ...conventionRead,
+      status: params.status,
+      dateValidation: validatedConventionStatuses.includes(params.status)
+        ? conventionUpdatedAt
+        : undefined,
+      dateApproval: reviewedConventionStatuses.includes(params.status)
+        ? conventionUpdatedAt
+        : undefined,
+      statusJustification,
+      ...(hasCounsellor
+        ? {
+            validators: {
+              ...conventionRead.validators,
+              agencyCounsellor: {
+                firstname: params.firstname,
+                lastname: params.lastname,
+              },
+            },
+          }
+        : {}),
+      ...(hasValidator
+        ? {
+            validators: {
+              ...conventionRead.validators,
+              agencyValidator: {
+                firstname: params.firstname,
+                lastname: params.lastname,
+              },
+            },
+          }
+        : {}),
+      ...(params.status === "DRAFT"
+        ? { signatories: clearSignatories(conventionRead) }
+        : {}),
+    };
 
     const updatedId = await uow.conventionRepository.update(updatedConvention);
     if (!updatedId)
