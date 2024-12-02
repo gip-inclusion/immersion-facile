@@ -16,6 +16,7 @@ import {
   conventionObjectiveOptions,
   domElementIds,
   labelsForImmersionObjective,
+  toLowerCaseWithoutDiacritics,
 } from "shared";
 import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
@@ -190,7 +191,15 @@ export const ContactByEmail = ({
           <EmailValidationInput
             label={inputsLabelsByKey.potentialBeneficiaryEmail}
             nativeInputProps={{
-              ...register("potentialBeneficiaryEmail"),
+              ...register("potentialBeneficiaryEmail", {
+                setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
+              }),
+              onBlur: (event) => {
+                setValue(
+                  "potentialBeneficiaryEmail",
+                  toLowerCaseWithoutDiacritics(event.currentTarget.value),
+                );
+              },
             }}
             {...getFieldError("potentialBeneficiaryEmail")}
             onEmailValidationFeedback={({ state, stateRelatedMessage }) =>

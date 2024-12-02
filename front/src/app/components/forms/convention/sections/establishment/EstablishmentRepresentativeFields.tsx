@@ -3,7 +3,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { ConventionReadDto } from "shared";
+import { ConventionReadDto, toLowerCaseWithoutDiacritics } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import {
   EmailValidationErrorsState,
@@ -24,7 +24,7 @@ export const EstablishmentRepresentativeFields = ({
   setEmailValidationErrors: SetEmailValidationErrorsState;
   emailValidationErrors: EmailValidationErrorsState;
 }): JSX.Element => {
-  const { getValues, register, formState } =
+  const { getValues, register, formState, setValue } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
   const { getFormFields } = getFormContents(
@@ -91,7 +91,15 @@ export const EstablishmentRepresentativeFields = ({
         }
         nativeInputProps={{
           ...formContents["signatories.establishmentRepresentative.email"],
-          ...register("signatories.establishmentRepresentative.email"),
+          ...register("signatories.establishmentRepresentative.email", {
+            setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
+          }),
+          onBlur: (event) => {
+            setValue(
+              "signatories.establishmentRepresentative.email",
+              toLowerCaseWithoutDiacritics(event.currentTarget.value),
+            );
+          },
         }}
         disabled={isFetchingSiret}
         onEmailValidationFeedback={({ state, stateRelatedMessage }) => {

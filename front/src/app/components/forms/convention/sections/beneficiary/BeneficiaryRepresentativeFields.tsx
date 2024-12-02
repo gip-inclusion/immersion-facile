@@ -1,7 +1,11 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
-import { ConventionReadDto, filterNotFalsy } from "shared";
+import {
+  ConventionReadDto,
+  filterNotFalsy,
+  toLowerCaseWithoutDiacritics,
+} from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import {
   EmailValidationErrorsState,
@@ -111,7 +115,15 @@ export const BeneficiaryRepresentativeFields = ({
         }
         nativeInputProps={{
           ...formContents["signatories.beneficiaryRepresentative.email"],
-          ...register("signatories.beneficiaryRepresentative.email"),
+          ...register("signatories.beneficiaryRepresentative.email", {
+            setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
+          }),
+          onBlur: (event) => {
+            setValue(
+              "signatories.beneficiaryRepresentative.email",
+              toLowerCaseWithoutDiacritics(event.currentTarget.value),
+            );
+          },
         }}
         {...getFieldError("signatories.beneficiaryRepresentative.email")}
         onEmailValidationFeedback={({ state, stateRelatedMessage }) => {

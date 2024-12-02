@@ -15,6 +15,7 @@ import {
   emailSchema,
   isBeneficiaryStudent,
   levelsOfEducation,
+  toLowerCaseWithoutDiacritics,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
@@ -182,8 +183,16 @@ export const BeneficiaryFormSection = ({
         }
         nativeInputProps={{
           ...formContents["signatories.beneficiary.email"],
-          ...register("signatories.beneficiary.email"),
+          ...register("signatories.beneficiary.email", {
+            setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
+          }),
           ...(userFieldsAreFilled ? { value: connectedUser.email } : {}),
+          onBlur: (event) => {
+            setValue(
+              "signatories.beneficiary.email",
+              toLowerCaseWithoutDiacritics(event.currentTarget.value),
+            );
+          },
         }}
         {...getFieldError("signatories.beneficiary.email")}
         onEmailValidationFeedback={({ state, stateRelatedMessage }) => {
