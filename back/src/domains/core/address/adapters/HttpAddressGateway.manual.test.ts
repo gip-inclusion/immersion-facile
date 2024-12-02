@@ -11,6 +11,7 @@ import {
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { withNoCache } from "../../caching-gateway/adapters/makeNotCachedWithCache";
 import { AddressGateway } from "../ports/AddressGateway";
 import { HttpAddressGateway } from "./HttpAddressGateway";
 import { addressesExternalRoutes } from "./HttpAddressGateway.routes";
@@ -55,6 +56,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
       createAxiosSharedClient(addressesExternalRoutes, axios),
       geocodingApiKey,
       geosearchApiKey,
+      withNoCache,
     );
   });
 

@@ -131,6 +131,14 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("BACKOFFICE_USERNAME");
   }
 
+  public get cache() {
+    return this.#throwIfNotInArray({
+      variableName: "CACHE",
+      authorizedValues: ["IN_MEMORY", "REDIS", "NONE"],
+      defaultValue: "NONE",
+    });
+  }
+
   public get cellarS3Params(): S3Params | undefined {
     if (this.documentGateway === "S3") {
       return {
