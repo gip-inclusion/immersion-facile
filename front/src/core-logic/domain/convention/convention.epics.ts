@@ -183,7 +183,7 @@ const broadcastConventionAgainEpic: ConventionEpic = (
             }),
           ),
           catchEpicError((error: Error) => {
-            const isJsonError = error.message.at(0) === "{";
+            const isJsonError = error.message[0] === "{";
             return conventionSlice.actions.broadcastConventionToPartnerFailed({
               errorMessage: isJsonError
                 ? JSON.parse(error.message).message
