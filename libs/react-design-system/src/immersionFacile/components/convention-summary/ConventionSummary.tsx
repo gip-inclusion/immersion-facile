@@ -50,7 +50,7 @@ export const ConventionSummary = ({
     subsections: ConventionSummarySubSection[],
     index: number,
   ): boolean => {
-    const nextSubsection = subsections.at(index + 1);
+    const nextSubsection = subsections[index + 1];
 
     if (!nextSubsection) return false;
     return !!nextSubsection.isFullWidthDisplay;
@@ -235,7 +235,7 @@ const SubSection = ({
 };
 
 const Schedule = ({ fields }: { fields: ConventionSummaryField[] }) => {
-  const schedule = fields.at(0);
+  const schedule = fields[0];
 
   if (!schedule) return <></>;
   return <>{schedule.value}</>;

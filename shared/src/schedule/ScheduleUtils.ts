@@ -95,8 +95,8 @@ export const makeWeeklySchedule = (
   makeImmersionTimetable(schedule.complexSchedule, interval)
     .filter((weekSchedule) => !!weekSchedule)
     .map((weekSchedule) => {
-      const weekStart = weekSchedule.at(0)?.date;
-      const weekEnd = weekSchedule.at(weekSchedule.length - 1)?.date;
+      const weekStart = weekSchedule[0]?.date;
+      const weekEnd = weekSchedule[weekSchedule.length - 1]?.date;
       if (!weekStart || !weekEnd)
         throw new Error("Error: schedule should have a weekStart and weekEnd");
       return {
