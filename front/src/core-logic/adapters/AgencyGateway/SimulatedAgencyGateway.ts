@@ -168,14 +168,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
         });
   }
 
-  public getAgencyAdminById$(
-    agencyId: AgencyId,
-    _adminToken: InclusionConnectJwt,
-  ): Observable<AgencyDto> {
-    return of(this.#agencies[agencyId]);
-  }
-
-  public getAgencyForDashboardById$(
+  public getAgencyById$(
     agencyId: AgencyId,
     _token: InclusionConnectJwt,
   ): Observable<AgencyDto> {

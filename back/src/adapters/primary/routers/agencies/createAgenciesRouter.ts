@@ -63,7 +63,20 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () => {
         const currentUser = req.payloads?.currentUser;
         if (!currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getAgencyByIdForDashboard.execute(
+        return deps.useCases.getAgencyById.execute(
+          req.params.agencyId,
+          currentUser,
+        );
+      }),
+  );
+
+  sharedAgencyRouter.getAgencyById(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        return deps.useCases.getAgencyById.execute(
           req.params.agencyId,
           currentUser,
         );
@@ -83,7 +96,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       }),
   );
 
-  sharedAgencyRouter.updateAgencyFromDashboard(
+  sharedAgencyRouter.updateAgency(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>

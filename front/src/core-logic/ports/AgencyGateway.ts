@@ -20,11 +20,7 @@ export interface AgencyGateway {
     params: UserParamsForAgency,
     token: InclusionConnectJwt,
   ): Observable<InclusionConnectedUser>;
-  getAgencyAdminById$(
-    agencyId: AgencyId,
-    adminToken: InclusionConnectJwt,
-  ): Observable<AgencyDto | undefined>;
-  getAgencyForDashboardById$(
+  getAgencyById$(
     agencyId: AgencyId,
     token: InclusionConnectJwt,
   ): Observable<AgencyDto>;

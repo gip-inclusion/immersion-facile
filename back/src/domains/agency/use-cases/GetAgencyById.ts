@@ -7,17 +7,16 @@ import {
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
-export type GetAgencyByIdForDashboard = ReturnType<
-  typeof makeGetAgencyByIdForDashboard
->;
-export const makeGetAgencyByIdForDashboard = createTransactionalUseCase<
+export type GetAgencyById = ReturnType<typeof makeGetAgencyById>;
+export const makeGetAgencyById = createTransactionalUseCase<
   AgencyId,
   AgencyDto,
   InclusionConnectedUser
 >(
   {
-    name: "GetAgencyByIdForDashboard",
+    name: "GetAgencyById",
     inputSchema: agencyIdSchema,
   },
   async ({ uow, currentUser, inputParams }) => {
@@ -25,16 +24,7 @@ export const makeGetAgencyByIdForDashboard = createTransactionalUseCase<
 
     if (!agency) throw errors.agency.notFound({ agencyId: inputParams });
 
-    const isUserAdminOnAgency = currentUser.agencyRights.some(
-      (agencyRight) =>
-        agencyRight.agency.id === inputParams &&
-        agencyRight.roles.includes("agency-admin"),
-    );
-    if (!isUserAdminOnAgency)
-      throw errors.user.notAdminOnAgency({
-        userId: currentUser.id,
-        agencyId: inputParams,
-      });
+    throwIfNotAgencyAdminOrBackofficeAdmin(agency.id, currentUser);
 
     return agencyWithRightToAgencyDto(uow, agency);
   },
