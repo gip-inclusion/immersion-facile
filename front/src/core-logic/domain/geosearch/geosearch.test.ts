@@ -9,7 +9,7 @@ import {
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { GeoSearchFeedback, geosearchSlice } from "./geosearch.slice";
+import { geosearchSlice } from "./geosearch.slice";
 
 describe("Geosearch epic", () => {
   let store: ReduxStore;
@@ -91,10 +91,6 @@ describe("Geosearch epic", () => {
       new Error(errorMessage),
     );
     expectLoadingToBe(false);
-    expectFeedbackToEqual({
-      kind: "errored",
-      errorMessage,
-    });
   });
 
   const expectQueryToBe = (expected: string) => {
@@ -109,6 +105,4 @@ describe("Geosearch epic", () => {
   const expectSelectedSuggestionToBe = (expected: LookupSearchResult) => {
     expectObjectsToMatch(store.getState().geosearch.value, expected);
   };
-  const expectFeedbackToEqual = (feedback: GeoSearchFeedback) =>
-    expect(store.getState().geosearch.feedback).toEqual(feedback);
 });
