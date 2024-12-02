@@ -18,10 +18,8 @@ import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 
-const agencyWithIdForAdminUrl = "/admin/agencies/:agencyId" as const;
-
 export type AgencyRoutes = typeof agencyRoutes;
-const agencyWithIdForDashboardUrl = "/dashboard/agencies/:agencyId";
+
 export const agencyRoutes = defineRoutes({
   addAgency: defineRoute({
     method: "post",
@@ -46,15 +44,9 @@ export const agencyRoutes = defineRoutes({
     },
   }),
 
-  getAgencyAdminById: defineRoute({
+  getAgencyById: defineRoute({
     method: "get",
-    url: agencyWithIdForAdminUrl,
-    ...withAuthorizationHeaders,
-    responses: { 200: agencySchema },
-  }),
-  getAgencyByIdForDashboard: defineRoute({
-    method: "get",
-    url: agencyWithIdForDashboardUrl,
+    url: "/agencies/:agencyId",
     ...withAuthorizationHeaders,
     responses: { 200: agencySchema },
   }),
@@ -72,7 +64,7 @@ export const agencyRoutes = defineRoutes({
   }),
   getAgencyUsersByAgencyIdForDashboard: defineRoute({
     method: "get",
-    url: `${agencyWithIdForDashboardUrl}/users`,
+    url: "/dashboard/agencies/:agencyId/users",
     ...withAuthorizationHeaders,
     responses: { 200: z.array(inclusionConnectedUserSchema) },
   }),
@@ -93,7 +85,7 @@ export const agencyRoutes = defineRoutes({
   }),
   updateAgency: defineRoute({
     method: "put",
-    url: agencyWithIdForAdminUrl,
+    url: "/agencies/:agencyId",
     requestBodySchema: agencySchema,
     ...withAuthorizationHeaders,
     responses: {
@@ -102,20 +94,10 @@ export const agencyRoutes = defineRoutes({
       409: httpErrorSchema,
     },
   }),
-  updateAgencyFromDashboard: defineRoute({
-    method: "put",
-    url: agencyWithIdForDashboardUrl,
-    requestBodySchema: agencySchema,
-    ...withAuthorizationHeaders,
-    responses: {
-      200: expressEmptyResponseBody,
-      401: httpErrorSchema,
-      409: httpErrorSchema,
-    },
-  }),
+
   updateAgencyStatus: defineRoute({
     method: "patch",
-    url: agencyWithIdForAdminUrl,
+    url: "/admin/agencies/:agencyId",
     requestBodySchema: updateAgencyStatusParamsWithoutIdSchema,
     ...withAuthorizationHeaders,
     responses: {
@@ -137,7 +119,7 @@ export const agencyRoutes = defineRoutes({
   }),
   removeUserFromAgency: defineRoute({
     method: "delete",
-    url: `${agencyWithIdForDashboardUrl}/users/:userId`,
+    url: "/dashboard/agencies/:agencyId/users/:userId",
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

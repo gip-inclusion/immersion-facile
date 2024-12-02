@@ -25,6 +25,12 @@ import { P, match } from "ts-pattern";
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyRoutes>) {}
+  getAgencyById$(
+    agencyId: AgencyId,
+    token: InclusionConnectJwt,
+  ): Observable<AgencyDto> {
+    throw new Error("Method not implemented.");
+  }
 
   public addAgency$(agency: CreateAgencyDto): Observable<void> {
     return from(
@@ -200,7 +206,6 @@ export class HttpAgencyGateway implements AgencyGateway {
           body: agencyDto,
           headers: { authorization: adminToken },
           urlParams: { agencyId: agencyDto.id },
-  
         })
         .then((response) =>
           match(response)
@@ -231,10 +236,9 @@ export class HttpAgencyGateway implements AgencyGateway {
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
-          ),
-      );
-    }
-
+        ),
+    );
+  }
 
   public updateUserRoleForAgency$(
     params: UserParamsForAgency,
@@ -243,12 +247,15 @@ export class HttpAgencyGateway implements AgencyGateway {
     return from(
       this.httpClient
         .updateUserRoleForAgency({
-          body: params,
           headers: { authorization: token },
+          urlParams: {
+            agencyId: params.agencyId,
+          },
+          body: params,
         })
         .then((response) =>
           match(response)
-            .with({ status: 201 }, () => undefined)
+            .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
@@ -296,5 +303,3 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 }
-
-

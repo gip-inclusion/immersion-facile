@@ -24,10 +24,7 @@ const getAgencyEpic: AgencyDashboardEpic = (action$, state$, dependencies) =>
     filter(agencyDashboardSlice.actions.fetchAgencyRequested.match),
     switchMap((action: PayloadActionWithFeedbackTopic<WithAgencyId>) =>
       dependencies.agencyGateway
-        .getAgencyForDashboardById$(
-          action.payload.agencyId,
-          getAdminToken(state$.value),
-        )
+        .getAgencyById$(action.payload.agencyId, getAdminToken(state$.value))
         .pipe(
           map((agency) =>
             agencyDashboardSlice.actions.fetchAgencySucceeded(agency),
@@ -76,7 +73,7 @@ const updateAgencyEpic: AgencyDashboardEpic = (
     filter(agencyDashboardSlice.actions.updateAgencyRequested.match),
     switchMap((action) =>
       agencyGateway
-        .updateAgencyFromDashboard$(action.payload, getAdminToken(state$.value))
+        .updateAgency$(action.payload, getAdminToken(state$.value))
         .pipe(
           map(() =>
             agencyDashboardSlice.actions.updateAgencySucceeded(action.payload),

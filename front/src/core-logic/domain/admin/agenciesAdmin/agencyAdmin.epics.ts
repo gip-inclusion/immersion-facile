@@ -61,7 +61,7 @@ const agencyAdminGetDetailsForStatusEpic: AgencyEpic = (
   action$.pipe(
     filter(agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId.match),
     switchMap((action: PayloadAction<AgencyId>) =>
-      dependencies.agencyGateway.getAgencyAdminById$(
+      dependencies.agencyGateway.getAgencyById$(
         action.payload,
         getAdminToken(state$.value),
       ),
@@ -84,7 +84,7 @@ const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (
   action$.pipe(
     filter(agencyAdminSlice.actions.setSelectedAgencyId.match),
     switchMap((action: PayloadAction<AgencyId>) =>
-      dependencies.agencyGateway.getAgencyAdminById$(
+      dependencies.agencyGateway.getAgencyById$(
         action.payload,
         getAdminToken(state$.value),
       ),
