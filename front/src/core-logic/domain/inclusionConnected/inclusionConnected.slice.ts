@@ -33,7 +33,6 @@ export const inclusionConnectedSlice = createSlice({
     ) => {
       state.isLoading = false;
       state.currentUser = action.payload;
-      //state.feedback = { kind: "success" };
     },
     currentUserFetchFailed: (
       state,
@@ -59,7 +58,6 @@ export const inclusionConnectedSlice = createSlice({
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isLoading = false;
-      //state.feedback = { kind: "errored", errorMessage: action.payload };
     },
   },
 });

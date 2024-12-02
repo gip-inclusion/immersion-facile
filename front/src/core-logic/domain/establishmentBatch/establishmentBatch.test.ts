@@ -86,10 +86,6 @@ describe("Establishment batch", () => {
       new Error(errorMessage),
     );
     expectIsLoadingToBe(false);
-    // expectFeedbackToEqual({
-    //   kind: "errored",
-    //   errorMessage,
-    // });
   });
 
   it("should update establishments to review in store", () => {
