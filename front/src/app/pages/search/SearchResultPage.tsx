@@ -15,6 +15,7 @@ import {
   makeNafClassInformationUrl,
   makeSiretDescriptionLink,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { ContactByEmail } from "src/app/components/immersion-offer/ContactByEmail";
 import { ContactByPhone } from "src/app/components/immersion-offer/ContactByPhone";
 import { ContactInPerson } from "src/app/components/immersion-offer/ContactInPerson";
@@ -97,46 +98,46 @@ export const SearchResultPage = ({
     searchSelectors.currentSearchResult,
   );
   const defaultMetaContents = defaultPageMetaContents.searchResult;
-  const feedback = useAppSelector(searchSelectors.feedback);
   const isLoading = useAppSelector(searchSelectors.isLoading);
   const formContactRef = useRef<ElementRef<"div">>(null);
   const dispatch = useDispatch();
-  const [shouldShowError, setShouldShowError] = useState<boolean>(false);
+  const params = route.params;
+
+  const isLocationMissing =
+    !isExternal && !("location" in params && params.location);
+  const shouldShowError =
+    isLocationMissing ||
+    !("appellationCode" in params && "siret" in params) ||
+    (!isLoading && !currentSearchResult);
   const [showConfirmationMessage, setShowConfirmationMessage] = useState<
     string | null
   >(null);
 
   useEffect(() => {
-    const params = route.params;
-
-    if (!("appellationCode" in params && "siret" in params)) {
-      setShouldShowError(true);
-      return;
-    }
-
-    if (!isExternal) {
-      if (!("location" in params && params.location)) {
-        setShouldShowError(true);
-        return;
-      }
-
+    if (!isExternal && "location" in params && params.location) {
       dispatch(
         searchSlice.actions.fetchSearchResultRequested({
-          siret: params.siret,
-          appellationCode: params.appellationCode,
-          locationId: params.location,
+          searchResult: {
+            siret: params.siret,
+            appellationCode: params.appellationCode,
+            locationId: params.location,
+          },
+          feedbackTopic: "search-result-page",
         }),
       );
     }
     if (isExternal) {
       dispatch(
         searchSlice.actions.externalSearchResultRequested({
-          appellationCode: params.appellationCode,
-          siret: params.siret,
+          siretAndAppellation: {
+            appellationCode: params.appellationCode,
+            siret: params.siret,
+          },
+          feedbackTopic: "search-result-page",
         }),
       );
     }
-  }, [route.params, dispatch, isExternal]);
+  }, [dispatch, isExternal, params]);
 
   const pluralFromAppellations = (appellations: AppellationDto[] | undefined) =>
     appellations && appellations.length > 1 ? "s" : "";
@@ -174,31 +175,31 @@ export const SearchResultPage = ({
       <MainWrapper layout="default">
         <>
           {isLoading && <Loader />}
-          {!currentSearchResult &&
-            (feedback.kind === "errored" || shouldShowError) && (
-              <>
+          {shouldShowError && (
+            <>
+              {isLocationMissing && (
                 <Alert
                   title="Oups !"
                   description={
-                    feedback.kind === "errored"
-                      ? feedback.errorMessage
-                      : "L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
+                    "L'offre ne peut plus être affichée (paramètre de localisation invalide), veuillez relancer une recherche d'offre d'immersion pour retrouver une offre."
                   }
                   severity="error"
                   className={fr.cx("fr-my-4w")}
                 />
-                <Button
-                  type="button"
-                  onClick={onGoBackClick}
-                  priority="tertiary"
-                  iconId="fr-icon-arrow-left-line"
-                  iconPosition="left"
-                  className={fr.cx("fr-mt-1w")}
-                >
-                  Retour à la recherche
-                </Button>
-              </>
-            )}
+              )}
+              <Feedback topic="search-result-page" />
+              <Button
+                type="button"
+                onClick={onGoBackClick}
+                priority="tertiary"
+                iconId="fr-icon-arrow-left-line"
+                iconPosition="left"
+                className={fr.cx("fr-mt-4w")}
+              >
+                Retour à la recherche
+              </Button>
+            </>
+          )}
           {currentSearchResult && showConfirmationMessage === null && (
             <>
               <div className={fr.cx("fr-mb-4w")}>

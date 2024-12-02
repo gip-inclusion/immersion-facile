@@ -10,6 +10,7 @@ import { conventionSlice } from "src/core-logic/domain/convention/convention.sli
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { icUsersAdminSlice } from "../admin/icUsersAdmin/icUsersAdmin.slice";
 import { partnersErroredConventionSlice } from "../partnersErroredConvention/partnersErroredConvention.slice";
 
@@ -25,6 +26,7 @@ const topics = [
   "auth-global",
   "establishments-batch",
   "user",
+  "search-result-page",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -229,6 +231,14 @@ export const feedbackMapping: Record<
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
   },
+  "search-result-page": {
+    "fetch.error": {
+      action: searchSlice.actions.fetchSearchResultFailed,
+      title: "Oups !",
+      message:
+        "L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre.",
+    },
+  },
 };
 
 export const feedbackSlice = createSlice({
@@ -268,7 +278,7 @@ export const feedbackSlice = createSlice({
                 if (!actionKindAndLevel) return;
                 const feedbackForActionTopic =
                   feedbackMapping[action.payload.feedbackTopic][
-                    actionKindAndLevel
+                  actionKindAndLevel
                   ];
                 if (!feedbackForActionTopic) return;
                 const { level, actionKind } =
@@ -295,12 +305,12 @@ export const feedbackSlice = createSlice({
 
 const isActionWithFeedbackTopic =
   <T extends Record<string, any>>(actionType: string) =>
-  (action: PayloadAction<T>): action is PayloadActionWithFeedbackTopic<T> =>
-    "payload" in action &&
-    typeof action.payload === "object" &&
-    action.payload &&
-    "feedbackTopic" in action.payload &&
-    action.type === actionType;
+    (action: PayloadAction<T>): action is PayloadActionWithFeedbackTopic<T> =>
+      "payload" in action &&
+      typeof action.payload === "object" &&
+      action.payload &&
+      "feedbackTopic" in action.payload &&
+      action.type === actionType;
 
 export const getLevelAndActionKindFromActionKindAndLevel = (
   actionKindAndLevel: ActionKindAndLevel,

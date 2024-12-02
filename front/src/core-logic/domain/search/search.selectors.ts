@@ -29,8 +29,6 @@ const currentSearchResult = createSelector(
   (state) => state.currentSearchResult,
 );
 
-const feedback = createSelector(searchState, (state) => state.feedback);
-
 const searchParams = createSelector(searchState, (state) => state.searchParams);
 
 export const searchSelectors = {
@@ -39,6 +37,5 @@ export const searchSelectors = {
   searchInfo,
   isLoading,
   currentSearchResult,
-  feedback,
   searchParams,
 };
