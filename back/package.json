@@ -78,6 +78,7 @@
     "pino-pretty": "^7.5.4",
     "querystring": "^0.2.1",
     "ramda": "^0.30.1",
+    "redis": "^4.7.0",
     "shared": "workspace:*",
     "shared-routes": "^0.8.29",
     "ts-node": "^10.9.1",

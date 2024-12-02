@@ -18,6 +18,7 @@ import {
   lookupStreetAddressSpecialCharsRegex,
 } from "shared";
 import { HttpClient } from "shared-routes";
+import { WithCache } from "../../caching-gateway/port/WithCache";
 import { AddressGateway } from "../ports/AddressGateway";
 import {
   OpenCageDataAddressComponents,
@@ -35,11 +36,16 @@ export class HttpAddressGateway implements AddressGateway {
     reservoirRefreshAmount: openCageDateMaxRequestsPerSeconds,
   });
 
+  #withCache: WithCache;
+
   constructor(
     private readonly httpClient: HttpClient<AddressesRoutes>,
     private geocodingApiKey: string,
     private geosearchApiKey: OpenCageGeoSearchKey,
-  ) {}
+    withCache: WithCache,
+  ) {
+    this.#withCache = withCache;
+  }
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
@@ -70,33 +76,38 @@ export class HttpAddressGateway implements AddressGateway {
   ): Promise<LookupSearchResult[]> {
     const queryMinLength = 3;
 
-    return this.#limiter
-      .schedule(() => {
-        if (query.length < queryMinLength)
-          throw errors.address.queryToShort({
-            minLength: queryMinLength,
-          });
-
-        return this.httpClient.geosearch({
-          headers: {
-            "OpenCage-Geosearch-Key": this.geosearchApiKey,
-            Origin: "https://immersion-facile.beta.gouv.fr", // OC Geosearch needs an Origin that fits to API key domain (with https://)
-          },
-          mode: "cors",
-          queryParams: {
-            countrycode: "fr",
-            language,
-            limit: "10",
-            q: query,
-          },
-        });
-      })
-      .then((response) => {
-        if (response.status !== 200) return [];
-        return lookupSearchResultsSchema.parse(
-          toLookupSearchResults(response.body),
-        );
+    if (query.length < queryMinLength)
+      throw errors.address.queryToShort({
+        minLength: queryMinLength,
       });
+
+    return this.#withCache({
+      overrideCacheDurationInHours: 24,
+      getCacheKey: (query) => query,
+      cb: (cachedQuery: string) =>
+        this.#limiter
+          .schedule(() => {
+            return this.httpClient.geosearch({
+              headers: {
+                "OpenCage-Geosearch-Key": this.geosearchApiKey,
+                Origin: "https://immersion-facile.beta.gouv.fr", // OC Geosearch needs an Origin that fits to API key domain (with https://)
+              },
+              mode: "cors",
+              queryParams: {
+                countrycode: "fr",
+                language,
+                limit: "10",
+                q: cachedQuery,
+              },
+            });
+          })
+          .then((response) => {
+            if (response.status !== 200) return [];
+            return lookupSearchResultsSchema.parse(
+              toLookupSearchResults(response.body),
+            );
+          }),
+    })(query);
   }
 
   public async lookupStreetAddress(
@@ -237,3 +248,5 @@ const makeStreetNumberAndAddress = (
 const franceAndAttachedTerritoryCountryCodes =
   "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
 const language = "fr";
+
+// https://api.opencagedata.com/geocode/v1/json?q=47.99603%2C-4.10248&key=a80af7a94fb34eb3ab0262483b63ff79
