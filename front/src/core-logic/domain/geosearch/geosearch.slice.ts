@@ -1,11 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { LookupLocationInput, LookupSearchResult } from "shared";
-import { SubmitFeedBack } from "../SubmitFeedback";
-
-export type GeoSearchFeedback = SubmitFeedBack<"success">;
 
 type GeoSearchState = {
-  feedback: GeoSearchFeedback;
   suggestions: LookupSearchResult[];
   value: LookupSearchResult | null;
   query: string;
@@ -17,9 +13,6 @@ const initialState: GeoSearchState = {
   query: "",
   value: null,
   isLoading: false,
-  feedback: {
-    kind: "idle",
-  },
 };
 
 export const geosearchSlice = createSlice({
@@ -46,9 +39,8 @@ export const geosearchSlice = createSlice({
       state.suggestions = action.payload;
       state.isLoading = false;
     },
-    suggestionsFailed: (state, action) => {
+    suggestionsFailed: (state, _action) => {
       state.isLoading = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
     suggestionHasBeenSelected: (state, action) => {
       state.value = action.payload;
