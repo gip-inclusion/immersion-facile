@@ -71,15 +71,20 @@ const fetchSearchResultEpic: SearchEpic = (
 ) =>
   action$.pipe(
     filter(searchSlice.actions.fetchSearchResultRequested.match),
-    switchMap(({ payload }) =>
-      isSearchResultDto(payload)
-        ? of(payload)
-        : searchGateway.getSearchResult$(payload),
-    ),
-    map(searchSlice.actions.fetchSearchResultSucceeded),
-    catchEpicError((error) =>
-      searchSlice.actions.fetchSearchResultFailed(error.message),
-    ),
+    switchMap(({ payload }) => {
+      const searchResult$ = isSearchResultDto(payload.searchResult)
+        ? of(payload.searchResult)
+        : searchGateway.getSearchResult$(payload.searchResult);
+      return searchResult$.pipe(
+        map(searchSlice.actions.fetchSearchResultSucceeded),
+        catchEpicError((error) =>
+          searchSlice.actions.fetchSearchResultFailed({
+            errorMessage: error.message,
+            feedbackTopic: payload.feedbackTopic,
+          }),
+        ),
+      );
+    }),
   );
 
 const searchResultExternalProvidedEpic: SearchEpic = (
@@ -89,10 +94,16 @@ const searchResultExternalProvidedEpic: SearchEpic = (
 ) =>
   action$.pipe(
     filter(searchSlice.actions.externalSearchResultRequested.match),
-    switchMap(({ payload }) => searchGateway.getExternalSearchResult$(payload)),
-    map(searchSlice.actions.externalSearchResultSucceeded),
-    catchEpicError((error) =>
-      searchSlice.actions.externalSearchResultFailed(error.message),
+    switchMap(({ payload }) =>
+      searchGateway.getExternalSearchResult$(payload.siretAndAppellation).pipe(
+        map(searchSlice.actions.fetchSearchResultSucceeded),
+        catchEpicError((error) =>
+          searchSlice.actions.fetchSearchResultFailed({
+            errorMessage: error.message,
+            feedbackTopic: payload.feedbackTopic,
+          }),
+        ),
+      ),
     ),
   );
 
