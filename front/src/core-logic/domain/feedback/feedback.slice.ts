@@ -9,6 +9,7 @@ import { conventionSlice } from "src/core-logic/domain/convention/convention.sli
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
+import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { icUsersAdminSlice } from "../admin/icUsersAdmin/icUsersAdmin.slice";
 import { partnersErroredConventionSlice } from "../partnersErroredConvention/partnersErroredConvention.slice";
 
@@ -23,6 +24,7 @@ const topics = [
   "dashboard-agency-register-user",
   "auth-global",
   "establishments-batch",
+  "search-result-page",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -212,6 +214,14 @@ export const feedbackMapping: Record<
       action: establishmentBatchSlice.actions.addEstablishmentBatchSucceeded,
       title: "Le groupe d'entreprises a bien été créé",
       message: "L'import en masse a réussi, voici le détail :",
+    },
+  },
+  "search-result-page": {
+    "fetch.error": {
+      action: searchSlice.actions.fetchSearchResultFailed,
+      title: "Oups !",
+      message:
+        "L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre.",
     },
   },
 };
