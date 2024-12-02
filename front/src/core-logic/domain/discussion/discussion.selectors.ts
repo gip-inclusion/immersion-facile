@@ -6,5 +6,4 @@ const discussionState = (state: RootState) => state.discussion;
 export const discussionSelectors = {
   isLoading: createSelector(discussionState, ({ isLoading }) => isLoading),
   discussion: createSelector(discussionState, ({ discussion }) => discussion),
-  fetchError: createSelector(discussionState, ({ fetchError }) => fetchError),
 };
