@@ -11,10 +11,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import {
-  GetAgencyByIdForDashboard,
-  makeGetAgencyByIdForDashboard,
-} from "./GetAgencyByIdForDashboard";
+import { GetAgencyById, makeGetAgencyById } from "./GetAgencyById";
 
 describe("getAgencyByIdForDashboard", () => {
   const peAgency = new AgencyDtoBuilder()
@@ -67,12 +64,12 @@ describe("getAgencyByIdForDashboard", () => {
     .build();
 
   let uow: InMemoryUnitOfWork;
-  let getAgencyByIdForDashboard: GetAgencyByIdForDashboard;
+  let getAgencyByIdForDashboard: GetAgencyById;
 
   beforeEach(() => {
     uow = createInMemoryUow();
 
-    getAgencyByIdForDashboard = makeGetAgencyByIdForDashboard({
+    getAgencyByIdForDashboard = makeGetAgencyById({
       uowPerformer: new InMemoryUowPerformer(uow),
     });
   });
@@ -150,9 +147,8 @@ describe("getAgencyByIdForDashboard", () => {
           agencyWithRefersTo.id,
           notAgencyAdminUser,
         ),
-        errors.user.notAdminOnAgency({
+        errors.user.forbidden({
           userId: notAgencyAdminUser.id,
-          agencyId: agencyWithRefersTo.id,
         }),
       );
     });

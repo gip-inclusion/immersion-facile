@@ -103,7 +103,7 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        dependencies.agencyGateway.fetchedAgencyForDashboard$.error(
+        dependencies.agencyGateway.fetchedAgency$.error(
           new Error(
             "Une erreur est survenue lors de la récupération des données de cette agence",
           ),
@@ -247,9 +247,7 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        dependencies.agencyGateway.updateAgencyFromDashboardResponse$.next(
-          undefined,
-        );
+        dependencies.agencyGateway.updateAgencyResponse$.next(undefined);
 
         expectAgencyDashboardStateToMatch({
           isUpdating: false,
@@ -276,7 +274,7 @@ describe("agencyDashboard", () => {
           }),
         );
 
-        dependencies.agencyGateway.updateAgencyFromDashboardResponse$.error(
+        dependencies.agencyGateway.updateAgencyResponse$.error(
           new Error(
             "Une erreur est survenue lors de la mise à jour de l'agence",
           ),
@@ -695,7 +693,7 @@ describe("agencyDashboard", () => {
   };
 
   const feedWithFetchedAgency = (agencyDto: AgencyDto) => {
-    dependencies.agencyGateway.fetchedAgencyForDashboard$.next(agencyDto);
+    dependencies.agencyGateway.fetchedAgency$.next(agencyDto);
   };
   const feedWithFetchedAgencyUsers = (agencyUsers: NormalizedIcUserById) => {
     dependencies.agencyGateway.fetchedAgencyUsers$.next(
