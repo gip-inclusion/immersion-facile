@@ -2,7 +2,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { ConventionReadDto } from "shared";
+import { ConventionReadDto, toLowerCaseWithoutDiacritics } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import {
   EmailValidationErrorsState,
@@ -25,7 +25,7 @@ export const EstablishementTutorFields = ({
   emailValidationErrors: EmailValidationErrorsState;
   isTutorEstablishmentRepresentative: boolean;
 }): JSX.Element => {
-  const { register, getValues, formState } =
+  const { register, getValues, formState, setValue } =
     useFormContext<ConventionReadDto>();
   const values = getValues();
   const getFieldError = makeFieldError(formState);
@@ -73,7 +73,15 @@ export const EstablishementTutorFields = ({
             hintText={formContents["establishmentTutor.email"].hintText}
             nativeInputProps={{
               ...formContents["establishmentTutor.email"],
-              ...register("establishmentTutor.email"),
+              ...register("establishmentTutor.email", {
+                setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
+              }),
+              onBlur: (event) => {
+                setValue(
+                  "establishmentTutor.email",
+                  toLowerCaseWithoutDiacritics(event.currentTarget.value),
+                );
+              },
             }}
             {...getFieldError("establishmentTutor.email")}
             onEmailValidationFeedback={({ state, stateRelatedMessage }) => {

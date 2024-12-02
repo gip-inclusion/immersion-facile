@@ -6,7 +6,12 @@ import {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { UseFormRegisterReturn, useFormContext } from "react-hook-form";
-import { DotNestedKeys, FormEstablishmentDto, emailSchema } from "shared";
+import {
+  DotNestedKeys,
+  FormEstablishmentDto,
+  emailSchema,
+  toLowerCaseWithoutDiacritics,
+} from "shared";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
@@ -115,10 +120,18 @@ export const BusinessContact = ({
         hintText={formContents["businessContact.email"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.email"],
-          ...register("businessContact.email"),
+          ...register("businessContact.email", {
+            setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
+          }),
           onChange: (event) => {
             setEmailModified(true);
             setValue("businessContact.email", event.currentTarget.value);
+          },
+          onBlur: (event) => {
+            setValue(
+              "businessContact.email",
+              toLowerCaseWithoutDiacritics(event.currentTarget.value),
+            );
           },
         }}
         {...getFieldError(

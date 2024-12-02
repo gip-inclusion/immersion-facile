@@ -3,7 +3,11 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { ConventionDto, addressDtoToString } from "shared";
+import {
+  ConventionDto,
+  addressDtoToString,
+  toLowerCaseWithoutDiacritics,
+} from "shared";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import {
   EmailValidationErrorsState,
@@ -164,7 +168,15 @@ export const BeneficiaryCurrentEmployerFields = ({
         label={formFields["signatories.beneficiaryCurrentEmployer.email"].label}
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.email"],
-          ...register("signatories.beneficiaryCurrentEmployer.email"),
+          ...register("signatories.beneficiaryCurrentEmployer.email", {
+            setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
+          }),
+          onBlur: (event) => {
+            setValue(
+              "signatories.beneficiaryCurrentEmployer.email",
+              toLowerCaseWithoutDiacritics(event.currentTarget.value),
+            );
+          },
         }}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.email")}
         onEmailValidationFeedback={({ state, stateRelatedMessage }) => {

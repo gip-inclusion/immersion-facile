@@ -11,6 +11,7 @@ import {
   AgencyDtoWithoutEmails,
   UserParamsForAgency,
   domElementIds,
+  toLowerCaseWithoutDiacritics,
   userParamsForAgencySchema,
 } from "shared";
 import {
@@ -126,8 +127,16 @@ export const AgencyUserModificationForm = ({
         <EmailValidationInput
           label="Email"
           nativeInputProps={{
-            ...register("email"),
+            ...register("email", {
+              setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
+            }),
             id: domElementIds.admin.agencyTab.editAgencyUserEmail,
+            onBlur: (event) => {
+              setValue(
+                "email",
+                toLowerCaseWithoutDiacritics(event.currentTarget.value),
+              );
+            },
           }}
           {...getFieldError("email")}
           disabled={agencyUser.isIcUser}

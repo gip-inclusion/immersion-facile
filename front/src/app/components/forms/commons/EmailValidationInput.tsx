@@ -29,7 +29,10 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
     stateRelatedMessage,
   });
 
-  const onBlur = async (): Promise<void> =>
+  const onBlur = async (
+    event: React.FocusEvent<HTMLInputElement, Element>,
+  ): Promise<void> => {
+    const { currentTarget } = event;
     trigger(props.nativeInputProps?.name)
       .then((isFieldValid) =>
         currentInputValue && isFieldValid
@@ -43,6 +46,10 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
           const feedback = makeStateRelated(emailValidationStatus);
           props.onEmailValidationFeedback?.(feedback);
           setStateRelated(feedback);
+          props.nativeInputProps?.onBlur?.({
+            ...event,
+            currentTarget,
+          });
         }
       })
       .catch((error) => {
@@ -54,6 +61,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
         props.onEmailValidationFeedback?.(feedback);
         setStateRelated(feedback);
       });
+  };
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentInputValue(event.target.value);
