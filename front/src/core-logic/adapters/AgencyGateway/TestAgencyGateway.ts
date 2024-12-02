@@ -27,9 +27,7 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public customAgencyId$ = new Subject<AgencyId | undefined>();
 
-  public fetchedAgencyForAdmin$ = new Subject<AgencyDto | undefined>();
-
-  public fetchedAgencyForDashboard$ = new Subject<AgencyDto>();
+  public fetchedAgency$ = new Subject<AgencyDto>();
 
   public fetchedAgencyUsers$ = new Subject<InclusionConnectedUser[]>();
 
@@ -55,18 +53,11 @@ export class TestAgencyGateway implements AgencyGateway {
     return this.createUserForAgencyResponse$;
   }
 
-  public getAgencyAdminById$(
-    _agencyId: AgencyId,
-    _adminToken: InclusionConnectJwt,
-  ): Observable<AgencyDto | undefined> {
-    return this.fetchedAgencyForAdmin$;
-  }
-
-  public getAgencyForDashboardById$(
+  public getAgencyById$(
     _agencyId: AgencyId,
     _token: InclusionConnectJwt,
   ): Observable<AgencyDto> {
-    return this.fetchedAgencyForDashboard$;
+    return this.fetchedAgency$;
   }
 
   public getAgencyUsers$(
