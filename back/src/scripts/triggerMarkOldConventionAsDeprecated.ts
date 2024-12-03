@@ -19,7 +19,7 @@ const triggerMarkOldConventionAsDeprecated = async () => {
 
   const conventionRepository = new PgConventionRepository(makeKyselyDb(pool));
 
-  const deprecateSince = subMonths(new Date(), 2);
+  const deprecateSince = subMonths(new Date(), 1);
 
   const numberOfUpdatedConventions =
     await conventionRepository.deprecateConventionsWithoutDefinitiveStatusEndedSince(
