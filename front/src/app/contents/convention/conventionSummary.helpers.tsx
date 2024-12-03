@@ -325,11 +325,11 @@ const makeSignatoriesSubsections = (
           ? {
               key: "agencyWithRefersTo",
               label: "Structure d'accompagnement",
-              value: convention.agencyRefersTo.name,
+              value: convention.agencyName,
               copyButton: (
                 <CopyButton
                   withIcon={true}
-                  textToCopy={convention.agencyRefersTo.name}
+                  textToCopy={convention.agencyName}
                 />
               ),
             }
@@ -352,9 +352,18 @@ const makeSignatoriesSubsections = (
         {
           key: "agencyName",
           label: `Prescripteur ${convention.agencyRefersTo ? "lié" : ""}`,
-          value: convention.agencyName,
+          value: convention.agencyRefersTo
+            ? convention.agencyRefersTo.name
+            : convention.agencyName,
           copyButton: (
-            <CopyButton withIcon={true} textToCopy={convention.agencyName} />
+            <CopyButton
+              withIcon={true}
+              textToCopy={
+                convention.agencyRefersTo
+                  ? convention.agencyRefersTo.name
+                  : convention.agencyName
+              }
+            />
           ),
         },
       ]),
