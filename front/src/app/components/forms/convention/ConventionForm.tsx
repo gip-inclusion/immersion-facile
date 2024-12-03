@@ -391,10 +391,6 @@ export const ConventionForm = ({
               data-matomo-name={domElementIds.conventionImmersionRoute.form({
                 mode,
               })}
-              onSubmit={handleSubmit(onSubmit, (errors) => {
-                validateSteps("doNotClear");
-                console.error(conventionValues, errors);
-              })}
             >
               <>
                 <input
@@ -550,10 +546,14 @@ export const ConventionForm = ({
                   disabled={shouldSubmitButtonBeDisabled}
                   iconId="fr-icon-checkbox-circle-line"
                   iconPosition="left"
-                  type="submit"
+                  type="button"
                   nativeButtonProps={{
                     id: domElementIds.conventionImmersionRoute.submitFormButton,
                   }}
+                  onClick={handleSubmit(onSubmit, (errors) => {
+                    validateSteps("doNotClear");
+                    console.error(conventionValues, errors);
+                  })}
                 >
                   Vérifier la demande
                 </Button>
@@ -581,11 +581,15 @@ export const ConventionForm = ({
               >
                 <ShareConventionLink />
                 <Button
-                  type="submit"
+                  type="button"
                   id={
                     domElementIds.conventionImmersionRoute
                       .submitFormButtonMobile
                   }
+                  onClick={handleSubmit(onSubmit, (errors) => {
+                    validateSteps("doNotClear");
+                    console.error(conventionValues, errors);
+                  })}
                 >
                   Vérifier la demande
                 </Button>
