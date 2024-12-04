@@ -49,6 +49,7 @@ export interface Database {
   outbox: Outbox;
   partners_pe_connect: PartnersPeConnect;
   public_appellations_data: PublicAppellationsData;
+  public_department_region: PublicDepartmentRegion;
   public_naf_classes_2008: PublicNafClasses2008;
   public_romes_data: PublicRomesData;
   searches_made__appellation_code: SearchesMadeAppellationCode;
@@ -508,21 +509,23 @@ interface SearchesMadeAppellationCode {
 }
 
 type SortedBy = "date" | "distance" | "score";
+type SearchableBy = "jobSeekers" | "students";
 interface SearchesMade extends WithAcquisition {
-  id: string;
-  rome: string | null;
-  needstobesearched: boolean | null;
-  update_date: Generated<Timestamp | null>;
-  voluntary_to_immersion: boolean | null;
-  api_consumer_name: string | null;
-  sorted_by: Generated<SortedBy | null>;
   address: string | null;
-  number_of_results: number | null;
-  lat: number | null;
-  lon: number | null;
+  api_consumer_name: string | null;
+  department_code: string | null;
   distance: number | null;
   gps: string | null;
-  searchable_by: "jobSeekers" | "students" | null;
+  id: string;
+  lat: number | null;
+  lon: number | null;
+  needstobesearched: boolean | null;
+  number_of_results: number | null;
+  rome: string | null;
+  searchable_by: SearchableBy | null;
+  sorted_by: Generated<SortedBy | null>;
+  update_date: Generated<Timestamp | null>;
+  voluntary_to_immersion: boolean | null;
 }
 
 interface UsersAgencies {
@@ -610,6 +613,14 @@ interface PublicNafClasses2008 {
   division_label: string;
   section_id: string;
   section_label: string;
+}
+
+interface PublicDepartmentRegion {
+  department_code: Generated<string>;
+  department_name: Generated<string>;
+  region_name: Generated<string>;
+  shape_backup: string | null;
+  shape: string | null;
 }
 
 interface EstablishmentsDeleted {
