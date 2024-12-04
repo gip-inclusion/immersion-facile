@@ -321,6 +321,206 @@ describe("Insert Establishment aggregate from form data", () => {
         ],
       );
     });
+
+    it("Avoid making same establishment right mapping when same email is used in admin and copy contacts", async () => {
+      // Prepare
+      const withAcquisition: WithAcquisition = {
+        acquisitionKeyword: "yolo",
+        acquisitionCampaign: "my campaign",
+      };
+      const professions: AppellationAndRomeDto[] = [
+        {
+          romeCode: "A1101",
+          appellationCode: "11717",
+          romeLabel: "métier A",
+          appellationLabel: "métier A.1",
+        },
+        {
+          romeCode: "A1102",
+          appellationCode: "11717",
+          romeLabel: "métier B",
+          appellationLabel: "métier B.1",
+        },
+      ];
+      const nextAvailabilityDate = new Date();
+      const businessContact = new BusinessContactDtoBuilder()
+        .withEmail(establishmentAdmin.email)
+        .withCopyEmails([establishmentAdmin.email, establishmentAdmin.email])
+        .build();
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withFitForDisabledWorkers(true)
+        .withSiret(fakeSiret)
+        .withAppellations(professions)
+        .withNextAvailabilityDate(nextAvailabilityDate)
+        .withAcquisition(withAcquisition)
+        .withBusinessAddresses([
+          {
+            id: fakeLocation.id,
+            rawAddress: "102 rue du fake, 75001 Paris",
+          },
+        ])
+        .withBusinessContact(businessContact)
+        .build();
+
+      prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
+      uuidGenerator.setNextUuids([establishmentAdmin.id]);
+
+      // Act
+      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+
+      // Assert
+      expectToEqual(uow.userRepository.users, [
+        new UserBuilder(establishmentAdmin)
+          .withFirstName(businessContact.firstName)
+          .withLastName(businessContact.lastName)
+          .withCreatedAt(timeGateway.now())
+          .build(),
+      ]);
+      expectToEqual(
+        uow.establishmentAggregateRepository.establishmentAggregates,
+        [
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(formEstablishment.siret)
+                .withCustomizedName(formEstablishment.businessNameCustomized)
+                .withNafDto(expectedNafDto)
+                .withCreatedAt(timeGateway.now())
+                .withUpdatedAt(timeGateway.now())
+                .withIsCommited(false)
+                .withName(formEstablishment.businessName)
+                .withNumberOfEmployeeRange(numberEmployeesRanges)
+                .withLocations([fakeLocation])
+                .withWebsite(formEstablishment.website)
+                .withNextAvailabilityDate(nextAvailabilityDate)
+                .withAcquisition(withAcquisition)
+                .withScore(0)
+                .build(),
+            )
+            .withFitForDisabledWorkers(true)
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: businessContact.job,
+                phone: businessContact.phone,
+                userId: establishmentAdmin.id,
+              },
+            ])
+            .withOffers(
+              professions.map((prof) =>
+                new OfferEntityBuilder({
+                  ...prof,
+                  createdAt: timeGateway.now(),
+                }).build(),
+              ),
+            )
+            .build(),
+        ],
+      );
+    });
+
+    it("Avoid making same establishment right mapping when same email is used in copy contacts", async () => {
+      // Prepare
+      const withAcquisition: WithAcquisition = {
+        acquisitionKeyword: "yolo",
+        acquisitionCampaign: "my campaign",
+      };
+      const professions: AppellationAndRomeDto[] = [
+        {
+          romeCode: "A1101",
+          appellationCode: "11717",
+          romeLabel: "métier A",
+          appellationLabel: "métier A.1",
+        },
+        {
+          romeCode: "A1102",
+          appellationCode: "11717",
+          romeLabel: "métier B",
+          appellationLabel: "métier B.1",
+        },
+      ];
+      const nextAvailabilityDate = new Date();
+      const businessContact = new BusinessContactDtoBuilder()
+        .withEmail(establishmentAdmin.email)
+        .withCopyEmails([
+          establishmentContact.email,
+          establishmentContact.email,
+        ])
+        .withFirstName("TOTO")
+        .withLastName("KIKI")
+        .build();
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withFitForDisabledWorkers(true)
+        .withSiret(fakeSiret)
+        .withAppellations(professions)
+        .withNextAvailabilityDate(nextAvailabilityDate)
+        .withAcquisition(withAcquisition)
+        .withBusinessAddresses([
+          {
+            id: fakeLocation.id,
+            rawAddress: "102 rue du fake, 75001 Paris",
+          },
+        ])
+        .withBusinessContact(businessContact)
+        .build();
+
+      prepareSirenGateway(siretGateway, fakeSiret, numberEmployeesRanges);
+      uow.userRepository.users = [establishmentAdmin, establishmentContact];
+
+      // Act
+      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+
+      // Assert
+      expectToEqual(uow.userRepository.users, [
+        establishmentAdmin,
+        establishmentContact,
+      ]);
+      expectToEqual(
+        uow.establishmentAggregateRepository.establishmentAggregates,
+        [
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(formEstablishment.siret)
+                .withCustomizedName(formEstablishment.businessNameCustomized)
+                .withNafDto(expectedNafDto)
+                .withCreatedAt(timeGateway.now())
+                .withUpdatedAt(timeGateway.now())
+                .withIsCommited(false)
+                .withName(formEstablishment.businessName)
+                .withNumberOfEmployeeRange(numberEmployeesRanges)
+                .withLocations([fakeLocation])
+                .withWebsite(formEstablishment.website)
+                .withNextAvailabilityDate(nextAvailabilityDate)
+                .withAcquisition(withAcquisition)
+                .withScore(0)
+                .build(),
+            )
+            .withFitForDisabledWorkers(true)
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: businessContact.job,
+                phone: businessContact.phone,
+                userId: establishmentAdmin.id,
+              },
+              {
+                role: "establishment-contact",
+                userId: establishmentContact.id,
+              },
+            ])
+            .withOffers(
+              professions.map((prof) =>
+                new OfferEntityBuilder({
+                  ...prof,
+                  createdAt: timeGateway.now(),
+                }).build(),
+              ),
+            )
+            .build(),
+        ],
+      );
+    });
   });
 
   it("Correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {

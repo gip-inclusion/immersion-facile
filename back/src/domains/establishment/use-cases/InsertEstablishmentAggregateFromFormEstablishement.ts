@@ -1,3 +1,4 @@
+import { prop, uniqBy } from "ramda";
 import {
   WithFormEstablishmentDto,
   errors,
@@ -70,7 +71,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
       ),
     );
 
-    const userRights: EstablishmentUserRight[] = [
+    const userRights: EstablishmentUserRight[] = uniqBy(prop("userId"), [
       {
         role: "establishment-admin",
         userId: establishmentAdminId,
@@ -83,7 +84,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
           userId,
         }),
       ),
-    ];
+    ]);
 
     const establishmentAggregate = await makeEstablishmentAggregate({
       uuidGenerator: this.uuidGenerator,
