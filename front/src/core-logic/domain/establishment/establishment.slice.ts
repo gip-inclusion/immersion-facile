@@ -7,18 +7,10 @@ import {
   defaultMaxContactsPerMonth,
 } from "shared";
 import { emptyAppellationAndRome } from "shared";
-import { SubmitFeedBack } from "../SubmitFeedback"; // type EstablishmentUiStatus =
-
-export type EstablishmentFeedback = SubmitFeedBack<
-  | "success"
-  | "readyForLinkRequestOrRedirection"
-  | "submitSuccess"
-  | "submitErrored"
-  | "sendModificationLinkSuccess"
-  | "sendModificationLinkErrored"
-  | "deleteSuccess"
-  | "deleteErrored"
->;
+import {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithFeedbackTopicError,
+} from "src/core-logic/domain/feedback/feedback.slice";
 
 export type EstablishmentUpdatePayload = {
   formEstablishment: FormEstablishmentDto;
@@ -30,12 +22,14 @@ export type EstablishmentDeletePayload = {
   jwt: InclusionConnectJwt;
 };
 
+export type SiretAndJwtPayload = {
+  siret: SiretDto;
+  jwt: EstablishmentJwt | InclusionConnectJwt;
+};
+
 export type EstablishmentRequestedPayload =
   | Partial<FormEstablishmentDto>
-  | {
-      siret: SiretDto;
-      jwt: EstablishmentJwt | InclusionConnectJwt;
-    };
+  | SiretAndJwtPayload;
 
 export const defaultFormEstablishmentValue = (
   siret?: SiretDto,
@@ -69,15 +63,13 @@ export const defaultFormEstablishmentValue = (
 
 export type EstablishmentState = {
   isLoading: boolean;
-  feedback: EstablishmentFeedback;
+  isReadyForRedirection: boolean;
   formEstablishment: FormEstablishmentDto;
 };
 
 const initialState: EstablishmentState = {
   isLoading: false,
-  feedback: {
-    kind: "idle",
-  },
+  isReadyForRedirection: false,
   formEstablishment: defaultFormEstablishmentValue(),
 };
 
@@ -86,105 +78,123 @@ export const establishmentSlice = createSlice({
   initialState,
   reducers: {
     gotReady: (state) => {
-      state.feedback = {
-        kind: "readyForLinkRequestOrRedirection",
-      };
+      state.isReadyForRedirection = true;
     },
     backToIdle: (state) => {
-      state.feedback = {
-        kind: "idle",
-      };
+      state.isReadyForRedirection = false;
     },
-    establishmentRequested: (
+    fetchEstablishmentRequested: (
       state,
-      _action: PayloadAction<EstablishmentRequestedPayload>,
+      _action: PayloadActionWithFeedbackTopic<{
+        establishmentRequested: EstablishmentRequestedPayload;
+      }>,
     ) => {
       state.isLoading = true;
     },
-    establishmentProvided: (
+    fetchEstablishmentSucceeded: (
       state,
       action: PayloadAction<FormEstablishmentDto>,
     ) => {
       state.formEstablishment = action.payload;
       state.isLoading = false;
-      state.feedback = { kind: "success" };
     },
-    establishmentProvideFailed: (state, action: PayloadAction<string>) => {
+    fetchEstablishmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = {
-        kind: "errored",
-        errorMessage: action.payload,
-      };
     },
 
-    establishmentCreationRequested: (
+    createEstablishmentRequested: (
       state,
-      _action: PayloadAction<FormEstablishmentDto>,
+      _action: PayloadActionWithFeedbackTopic<{
+        formEstablishment: FormEstablishmentDto;
+      }>,
     ) => {
       state.isLoading = true;
     },
-    establishmentCreationSucceeded: (state) => {
+    createEstablishmentSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "submitSuccess" };
     },
-    establishmentCreationFailed: (state, _action: PayloadAction<string>) => {
+    createEstablishmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = {
-        kind: "submitErrored",
-      };
     },
 
-    establishmentEditionRequested: (
+    updateEstablishmentRequested: (
       state,
-      _action: PayloadAction<EstablishmentUpdatePayload>,
+      _action: PayloadActionWithFeedbackTopic<{
+        establishmentUpdate: EstablishmentUpdatePayload;
+      }>,
     ) => {
       state.isLoading = true;
     },
-    establishmentEditionSucceeded: (state) => {
+    updateEstablishmentSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "submitSuccess" };
     },
-    establishmentEditionFailed: (state, _action: PayloadAction<string>) => {
+    updateEstablishmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = {
-        kind: "submitErrored",
-      };
     },
 
-    establishmentDeletionRequested: (
+    deleteEstablishmentRequested: (
       state,
-      _action: PayloadAction<EstablishmentDeletePayload>,
+      _action: PayloadActionWithFeedbackTopic<{
+        establishmentDelete: EstablishmentDeletePayload;
+      }>,
     ) => {
       state.isLoading = true;
     },
-    establishmentDeletionSucceeded: (state) => {
+    deleteEstablishmentSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "deleteSuccess" };
+      // state.feedback = { kind: "deleteSuccess" };
     },
-    establishmentDeletionFailed: (state, _action: PayloadAction<string>) => {
+    deleteEstablishmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = {
-        kind: "deleteErrored",
-      };
+      // state.feedback = {
+      //   kind: "deleteErrored",
+      // };
     },
 
-    establishmentClearRequested: () => initialState,
+    clearEstablishmentRequested: () => initialState,
 
     sendModificationLinkRequested: (
       state,
-      _action: PayloadAction<SiretDto>,
+      _action: PayloadActionWithFeedbackTopic<{
+        siret: SiretDto;
+      }>,
     ) => {
       state.isLoading = true;
     },
-    sendModificationLinkSucceeded: (state) => {
+    sendModificationLinkSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        siret: SiretDto;
+      }>,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "sendModificationLinkSuccess" };
     },
-    sendModificationLinkFailed: (state) => {
+    sendModificationLinkFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = {
-        kind: "sendModificationLinkErrored",
-      };
     },
   },
 });

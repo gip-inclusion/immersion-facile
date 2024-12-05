@@ -14,7 +14,10 @@ const toggleShouldFetchEvenIfAlreadySaved: SiretEpic = (action$, state$) =>
   action$.pipe(
     filter(siretSlice.actions.setShouldFetchEvenIfAlreadySaved.match),
     map(() =>
-      siretSlice.actions.siretModified(state$.value.siret.currentSiret),
+      siretSlice.actions.siretModified({
+        siret: state$.value.siret.currentSiret,
+        feedbackTopic: "siret-input",
+      }),
     ),
   );
 
@@ -23,7 +26,7 @@ const triggerSiretFetchEpic: SiretEpic = (action$) =>
     filter(siretSlice.actions.siretModified.match),
     switchMap((action) =>
       iif(
-        () => siretSchema.safeParse(action.payload).success,
+        () => siretSchema.safeParse(action.payload.siret).success,
         of(siretSlice.actions.siretInfoRequested(action.payload)),
         of(siretSlice.actions.siretWasNotValid()),
       ),
@@ -35,30 +38,34 @@ const getSiretEpic: SiretEpic = (
   state$,
   { formCompletionGateway },
 ) => {
-  const getSiret = makeGetSiret(formCompletionGateway);
+  const getSiret$ = makeGetSiret(formCompletionGateway);
 
   return action$.pipe(
     filter(siretSlice.actions.siretInfoRequested.match),
     switchMap((action) =>
-      getSiret({
+      getSiret$({
         shouldFetchEvenIfAlreadySaved:
           state$.value.siret.shouldFetchEvenIfAlreadySaved,
-        siret: action.payload,
-      }),
-    ),
-    // the condition on siretResult type should not be handled here but in the gateway
-    // (with an errored observable, caught here with catchEpicError())
-    map<GetSiretInfo | null, SiretAction>((siretResult) => {
-      if (siretResult === null)
-        return siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound({
-          siret: state$.value.siret.currentSiret,
-        });
-      return typeof siretResult === "string"
-        ? siretSlice.actions.siretInfoFailed(siretResult)
-        : siretSlice.actions.siretInfoSucceeded(siretResult);
-    }),
-    catchEpicError((error) =>
-      siretSlice.actions.siretInfoFailed(error.message as GetSiretInfoError),
+        siret: action.payload.siret,
+      }).pipe(
+        map((siretResult) => {
+          if (siretResult === null)
+            return siretSlice.actions.siretInfoDisabledAndNoMatchInDbFound({
+              siret: state$.value.siret.currentSiret,
+            });
+          return typeof siretResult === "string"
+            ? siretSlice.actions.siretInfoFailed(siretResult)
+            : siretSlice.actions.siretInfoSucceeded({
+                siretEstablishment: siretResult,
+                feedbackTopic: action.payload.feedbackTopic,
+              });
+        }),
+        catchEpicError((error) =>
+          siretSlice.actions.siretInfoFailed(
+            error.message as GetSiretInfoError,
+          ),
+        ),
+      ),
     ),
   );
 };

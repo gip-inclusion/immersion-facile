@@ -18,6 +18,7 @@ import {
   emptyAppellationAndRome,
   removeAtIndex,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
 import { MultipleAddressInput } from "src/app/components/forms/establishment/MultipleAddressInput";
@@ -30,9 +31,7 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { P, match } from "ts-pattern";
 import { Mode, OnStepChange, Step } from "../EstablishmentForm";
 import { MultipleAppellationInput } from "../MultipleAppellationInput";
@@ -62,7 +61,6 @@ export const DetailsSection = ({
   } = methods;
   const formValues = watch();
   const getFieldError = makeFieldError(methods.formState);
-  const feedback = useAppSelector(establishmentSelectors.feedback);
   const formErrors = getFormContents(
     formEstablishmentFieldsLabels(mode),
   ).getFormErrors();
@@ -77,9 +75,12 @@ export const DetailsSection = ({
     );
     if (confirmed && adminJwt)
       dispatch(
-        establishmentSlice.actions.establishmentDeletionRequested({
-          siret: formValues.siret,
-          jwt: adminJwt,
+        establishmentSlice.actions.deleteEstablishmentRequested({
+          establishmentDelete: {
+            siret: formValues.siret,
+            jwt: adminJwt,
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
     if (confirmed && !adminJwt) alert("Vous n'êtes pas admin.");
@@ -256,23 +257,8 @@ export const DetailsSection = ({
         })}
         visible={submitCount !== 0 && Object.values(errors).length > 0}
       />
-      {feedback.kind === "submitErrored" && (
-        <Alert
-          severity="error"
-          title="Erreur lors de l'envoi du formulaire de référencement d'entreprise"
-          description={
-            "Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations."
-          }
-        />
-      )}
-      {feedback.kind === "deleteErrored" && (
-        <Alert
-          severity="error"
-          title="Erreur lors de la suppression"
-          className={fr.cx("fr-mb-2w")}
-          description="Veuillez nous excuser. Un problème est survenu lors de la suppression de l'entreprise."
-        />
-      )}
+
+      <Feedback topic="form-establishment" />
 
       {invalidEmailMessage !== null && (
         <Alert

@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { SiretDto, SiretEstablishmentDto } from "shared";
 import { useSendModifyEstablishmentLink } from "src/app/hooks/establishment.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
+import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
@@ -80,7 +80,12 @@ export const useSiretFetcher = ({
     siretErrorToDisplay: siretErrorToDisplay ?? undefined,
     siretRawError,
     updateSiret: (newSiret: string) => {
-      dispatch(siretSlice.actions.siretModified(newSiret));
+      dispatch(
+        siretSlice.actions.siretModified({
+          feedbackTopic: "siret-input",
+          siret: newSiret,
+        }),
+      );
     },
   };
 };
@@ -91,7 +96,12 @@ export const useInitialSiret = (siret?: string) => {
 
   useEffect(() => {
     if (siret && siret !== currentSiret) {
-      dispatch(siretSlice.actions.siretModified(siret));
+      dispatch(
+        siretSlice.actions.siretModified({
+          siret,
+          feedbackTopic: "siret-input",
+        }),
+      );
     }
   }, [siret, currentSiret, dispatch]);
 };
@@ -101,7 +111,12 @@ export const useExistingSiret = (siret?: SiretDto | null) => {
 
   useEffect(() => {
     if (siret) {
-      dispatch(siretSlice.actions.siretModified(siret));
+      dispatch(
+        siretSlice.actions.siretModified({
+          feedbackTopic: "siret-input",
+          siret: siret,
+        }),
+      );
     }
   }, [siret, dispatch]);
 };
@@ -114,17 +129,17 @@ export const useEstablishmentSiret = () => {
     siretSelectors.isSiretAlreadySaved,
   );
   const isReadyForRequestOrRedirection = useAppSelector(
-    establishmentSelectors.isReadyForLinkRequestOrRedirection,
+    establishmentSelectors.isReadyForRedirection,
   );
   const clearSiret = () => updateSiret("");
   const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
 
-  const modifyLinkWasSent = useAppSelector(
-    establishmentSelectors.sendModifyLinkSucceeded,
-  );
-  const sendModifyLinkFeedback = useAppSelector(
-    establishmentSelectors.feedback,
-  );
+  // const modifyLinkWasSent = useAppSelector(
+  //   establishmentSelectors.sendModifyLinkSucceeded,
+  // );
+  // const sendModifyLinkFeedback = useAppSelector(
+  //   establishmentSelectors.feedback,
+  // );
   return {
     currentSiret,
     siretErrorToDisplay,
@@ -133,7 +148,5 @@ export const useEstablishmentSiret = () => {
     clearSiret,
     updateSiret,
     sendModifyEstablishmentLink,
-    modifyLinkWasSent,
-    sendModifyLinkFeedback,
   };
 };

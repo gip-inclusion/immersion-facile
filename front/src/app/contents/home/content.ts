@@ -4,7 +4,7 @@ import { domElementIds } from "shared";
 import type { UserType } from "src/app/pages/home/HomePage";
 import { routes } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
 import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
@@ -68,7 +68,12 @@ export const heroHeaderNavCards: (
     event.preventDefault();
     openSiretModal();
     storeDispatch(establishmentSlice.actions.gotReady());
-    storeDispatch(siretSlice.actions.siretModified(""));
+    storeDispatch(
+      siretSlice.actions.siretModified({
+        siret: "",
+        feedbackTopic: "siret-input",
+      }),
+    );
   };
   return {
     default: [
