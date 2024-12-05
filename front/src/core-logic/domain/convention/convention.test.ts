@@ -7,6 +7,7 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   ScheduleDtoBuilder,
+  Signatories,
   SignatoryRole,
   expectObjectsToMatch,
   expectToEqual,
@@ -722,8 +723,10 @@ describe("Convention slice", () => {
   describe("Convention signature", () => {
     it("signs the conventions with role from jwt", () => {
       const jwt = "some-correct-jwt";
-      const convention =
-        new ConventionDtoBuilder().build() as ConventionReadDto;
+      const convention = new ConventionDtoBuilder()
+        // .notSigned()
+        .signedByEstablishmentRepresentative(new Date().toISOString())
+        .build() as ConventionReadDto;
       ({ store, dependencies } = createTestStore({
         convention: {
           ...initialConventionState,
@@ -732,10 +735,12 @@ describe("Convention slice", () => {
       }));
       store.dispatch(
         conventionSlice.actions.signConventionRequested({
+          signatoryRole: "establishment-representative",
           conventionId: convention.id,
           jwt,
         }),
       );
+
       expectConventionState({
         isLoading: true,
       });
@@ -743,7 +748,16 @@ describe("Convention slice", () => {
       expectConventionState({
         isLoading: false,
         feedback: { kind: "signedSuccessfully" },
-        convention,
+        convention: {
+          ...convention,
+          signatories: {
+            ...convention.signatories,
+            establishmentRepresentative: {
+              ...convention.signatories.establishmentRepresentative,
+              signedAt: expect.any(String),
+            },
+          } as Signatories,
+        },
       });
     });
 
@@ -751,6 +765,7 @@ describe("Convention slice", () => {
       const jwt = "some-correct-jwt";
       store.dispatch(
         conventionSlice.actions.signConventionRequested({
+          signatoryRole: "beneficiary",
           conventionId: "id",
           jwt,
         }),

@@ -20,6 +20,7 @@ import {
   InclusionConnectJwt,
   RenewConventionParams,
   Role,
+  SignatoryRole,
   UpdateConventionStatusRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
@@ -117,11 +118,24 @@ export const ConventionManageActions = ({
     "READY_TO_SIGN",
     "PARTIALLY_SIGNED",
   ];
-  const shouldShowSignatureAction =
-    icUserRoles.includes("establishment-representative") &&
-    !convention.signatories.establishmentRepresentative.signedAt &&
-    jwtParams.kind !== "backoffice" &&
-    allowedToSignStatuses.includes(convention.status);
+  const getSignatoryInfo = (): {
+    shouldShowSignatureAction: boolean;
+    signatoryRole: SignatoryRole;
+  } => {
+    const signatoryRole = "establishment-representative";
+    const shouldShowSignatureAction =
+      icUserRoles.includes(signatoryRole) &&
+      !convention.signatories.establishmentRepresentative.signedAt &&
+      jwtParams.kind !== "backoffice" &&
+      allowedToSignStatuses.includes(convention.status);
+
+    return {
+      shouldShowSignatureAction,
+      signatoryRole,
+    };
+  };
+
+  const { signatoryRole, shouldShowSignatureAction } = getSignatoryInfo();
 
   const requesterRoles = roles.filter(
     (role): role is ExcludeFromExisting<Role, "agency-admin"> =>
@@ -342,6 +356,7 @@ export const ConventionManageActions = ({
                 conventionSlice.actions.signConventionRequested({
                   jwt: jwtParams.jwt,
                   conventionId: convention.id,
+                  signatoryRole,
                 }),
               );
             }}

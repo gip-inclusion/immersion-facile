@@ -1,6 +1,6 @@
 import { keys, mapObjIndexed, values } from "ramda";
 import { Role, SignatoryRole, allSignatoryRoles } from "../role/role.dto";
-import { DotNestedKeys, ExtractFromExisting } from "../utils";
+import { DotNestedKeys } from "../utils";
 import {
   ConventionDto,
   ConventionRenewed,
@@ -93,11 +93,12 @@ export type ConventionField = DotNestedKeys<ConventionDto>;
 
 export const getConventionFieldName = (name: ConventionField) => name;
 
-type SignatoryField = ExtractFromExisting<keyof ConventionDto, "signatories">;
-
-export const getSignatoryKey = (
-  v: `${SignatoryField}.${keyof ConventionDto["signatories"]}`,
-) => v;
+export const signatoryKeyByRole: Record<SignatoryRole, keyof Signatories> = {
+  beneficiary: "beneficiary",
+  "beneficiary-representative": "beneficiaryRepresentative",
+  "beneficiary-current-employer": "beneficiaryCurrentEmployer",
+  "establishment-representative": "establishmentRepresentative",
+};
 
 export const isEstablishmentTutorIsEstablishmentRepresentative = (
   convention: Pick<ConventionDto, "signatories" | "establishmentTutor">,
