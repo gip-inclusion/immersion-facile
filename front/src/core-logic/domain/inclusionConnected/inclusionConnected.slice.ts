@@ -66,7 +66,11 @@ export const inclusionConnectedSlice = createSlice({
     builder.addCase(
       updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
       (state, action) => {
-        if (!state.currentUser) return;
+        if (
+          !state.currentUser ||
+          state.currentUser.id !== action.payload.userId
+        )
+          return;
         state.currentUser = updateUserAgencyRights(
           state.currentUser,
           action.payload,
