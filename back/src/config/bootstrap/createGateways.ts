@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { Pool } from "pg";
+import { createClient as createRedisClient } from "redis";
 import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
@@ -22,6 +23,10 @@ import { InMemoryPeConnectGateway } from "../../domains/core/authentication/pe-c
 import { makePeConnectExternalRoutes } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
 import { PeConnectGateway } from "../../domains/core/authentication/pe-connect/port/PeConnectGateway";
 import { InMemoryCachingGateway } from "../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
+import { makeInMemoryWithCache } from "../../domains/core/caching-gateway/adapters/makeInMemoryWithCache";
+import { withNoCache } from "../../domains/core/caching-gateway/adapters/makeNotCachedWithCache";
+import { makeRedisWithCache } from "../../domains/core/caching-gateway/adapters/makeRedisWithCache";
+import { WithCache } from "../../domains/core/caching-gateway/port/WithCache";
 import { MetabaseDashboardGateway } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../domains/core/dashboard/adapters/StubDashboardGateway";
 import { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
@@ -182,6 +187,25 @@ export const createGateways = async (
         )
       : new InMemoryPoleEmploiGateway();
 
+  const withCache: WithCache = (() => {
+    const defaultCacheDurationInHours = 24;
+    if (config.cache === "NONE") return withNoCache;
+    if (config.cache === "IN_MEMORY") {
+      return makeInMemoryWithCache({
+        defaultCacheDurationInHours,
+        timeGateway,
+      });
+    }
+    if (config.cache === "REDIS") {
+      return makeRedisWithCache({
+        defaultCacheDurationInHours,
+        redisClient: createRedisClient({ url: "redis_url" }),
+      });
+    }
+    const _exhaustiveCheck: never = config.cache;
+    return _exhaustiveCheck;
+  })();
+
   const peConnectGateway: PeConnectGateway =
     config.peConnectGateway === "HTTPS"
       ? new HttpPeConnectGateway(
@@ -263,6 +287,7 @@ export const createGateways = async (
         }),
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
+        withCache,
       ),
   }[config.apiAddress]();
 
