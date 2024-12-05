@@ -20,6 +20,7 @@ export const conventionReadPublicV2Schema: z.Schema<ConventionReadPublicV2Dto> =
         .object({
           id: z.string(),
           name: z.string(),
+          kind: z.string(),
         })
         .optional(),
     }),
