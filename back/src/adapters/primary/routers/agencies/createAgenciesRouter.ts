@@ -37,7 +37,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   sharedAgencyRouter.updateUserRoleForAgency(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res.status(200), () =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.updateUserForAgency.execute(
           req.body,
           req.payloads?.currentUser,

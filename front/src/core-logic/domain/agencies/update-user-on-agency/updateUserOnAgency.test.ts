@@ -8,6 +8,7 @@ import {
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   TestDependencies,
   createTestStore,
@@ -57,7 +58,7 @@ describe("UpdateUserOnAgency slice", () => {
           roles: [...agencyRight.roles, "counsellor"],
           isNotifiedByEmail: agencyRight.isNotifiedByEmail,
         },
-        jwt: "coonected-user-jwt",
+        jwt: "connected-user-jwt",
         feedbackTopic: "user",
       }),
     );
@@ -73,5 +74,48 @@ describe("UpdateUserOnAgency slice", () => {
       updateUserOnAgencySelectors.isLoading(store.getState()),
       false,
     );
+    expectToEqual(feedbacksSelectors.feedbacks(store.getState()).user, {
+      level: "success",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+      on: "update",
+      title: "L'utilisateur a été mis à jour",
+    });
+  });
+
+  it("not update the user rights if error", () => {
+    store.dispatch(
+      updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+        user: {
+          userId: "userId",
+          agencyId: "agencyId",
+          email: "user@email.fr",
+          roles: ["counsellor"],
+          isNotifiedByEmail: true,
+        },
+        jwt: "connected-user-jwt",
+        feedbackTopic: "user",
+      }),
+    );
+
+    expectToEqual(
+      updateUserOnAgencySelectors.isLoading(store.getState()),
+      true,
+    );
+
+    dependencies.agencyGateway.updateUserAgencyRightResponse$.error(
+      "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+    );
+
+    expectToEqual(
+      updateUserOnAgencySelectors.isLoading(store.getState()),
+      false,
+    );
+    expectToEqual(feedbacksSelectors.feedbacks(store.getState()).user, {
+      level: "error",
+      message:
+        "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+      on: "update",
+      title: "Problème lors de la mise à jour de l'utilisateur",
+    });
   });
 });

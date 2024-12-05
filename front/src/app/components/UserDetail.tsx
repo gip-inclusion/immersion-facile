@@ -159,6 +159,7 @@ const AgenciesTable = ({
               {addressDtoToString(agencyRight.agency.address)}
             </span>
 
+            {/* TODO: agency-admin will be able to go to agency page event if not backOfficeAdmin */}
             {agencyRight.roles.includes("agency-admin") &&
               isBackofficeAdmin && (
                 <a
