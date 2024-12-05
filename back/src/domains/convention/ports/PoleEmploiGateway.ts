@@ -33,7 +33,9 @@ type ConventionStatusToPeStatus = typeof conventionStatusToPoleEmploiStatus;
 type PeConventionStatus =
   ConventionStatusToPeStatus[keyof ConventionStatusToPeStatus];
 
-type AgencyKindForPe = Exclude<AgencyKind, "pole-emploi"> | "france-travail";
+export type AgencyKindForPe =
+  | Exclude<AgencyKind, "pole-emploi">
+  | "france-travail";
 
 export type PoleEmploiConvention = {
   id: string; // id numérique sur 11 caractères
