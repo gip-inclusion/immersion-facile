@@ -233,15 +233,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     return of(undefined);
   }
 
-  public updateUserAgencyRight$(): Observable<void> {
-    return of(undefined);
-  }
-
-  public updateAgencyFromDashboard$(): Observable<void> {
-    return of(undefined);
-  }
-
-  public updateUserRoleForAgency$(
+  public updateUserAgencyRight$(
     { agencyId }: UserParamsForAgency,
     _token: string,
   ): Observable<void> {

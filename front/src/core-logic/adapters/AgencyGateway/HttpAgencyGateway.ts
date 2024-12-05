@@ -25,12 +25,6 @@ import { P, match } from "ts-pattern";
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyRoutes>) {}
-  getAgencyById$(
-    agencyId: AgencyId,
-    token: InclusionConnectJwt,
-  ): Observable<AgencyDto> {
-    throw new Error("Method not implemented.");
-  }
 
   public addAgency$(agency: CreateAgencyDto): Observable<void> {
     return from(
@@ -70,7 +64,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   ): Observable<AgencyDto> {
     return from(
       this.httpClient
-        .getAgencyAdminById({
+        .getAgencyById({
           urlParams: { agencyId },
           headers: { authorization: adminToken },
         })
@@ -82,13 +76,13 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
-  getAgencyForDashboardById$(
+  getAgencyById$(
     agencyId: AgencyId,
     token: InclusionConnectJwt,
   ): Observable<AgencyDto> {
     return from(
       this.httpClient
-        .getAgencyByIdForDashboard({
+        .getAgencyById({
           urlParams: { agencyId },
           headers: { authorization: token },
         })
@@ -105,7 +99,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   ): Observable<InclusionConnectedUser[]> {
     return from(
       this.httpClient
-        .getAgencyUsersByAgencyIdForDashboard({
+        .getAgencyUsersByAgencyId({
           urlParams: { agencyId },
           headers: { authorization: token },
         })
@@ -196,53 +190,9 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
-  public updateAgencyFromDashboard$(
-    agencyDto: AgencyDto,
-    adminToken: InclusionConnectJwt,
-  ): Observable<void> {
-    return from(
-      this.httpClient
-        .updateAgencyFromDashboard({
-          body: agencyDto,
-          headers: { authorization: adminToken },
-          urlParams: { agencyId: agencyDto.id },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, () => undefined)
-            .with({ status: 401 }, logBodyAndThrow)
-            .with({ status: 409 }, logBodyAndThrow)
-            .otherwise(otherwiseThrow),
-        ),
-    );
-  }
   public updateUserAgencyRight$(
     params: UserParamsForAgency,
     token: InclusionConnectJwt,
-  ): Observable<void> {
-    return from(
-      this.httpClient
-        .updateUserRoleForAgency({
-          headers: { authorization: token },
-          urlParams: {
-            agencyId: params.agencyId,
-          },
-          body: params,
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 200 }, () => undefined)
-            .with({ status: 400 }, logBodyAndThrow)
-            .with({ status: 401 }, logBodyAndThrow)
-            .with({ status: 404 }, logBodyAndThrow)
-            .otherwise(otherwiseThrow),
-        ),
-    );
-  }
-
-  public updateUserRoleForAgency$(
-    params: UserParamsForAgency,
-    token: string,
   ): Observable<void> {
     return from(
       this.httpClient
