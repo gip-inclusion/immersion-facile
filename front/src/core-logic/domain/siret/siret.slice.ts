@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { GetSiretInfoError, SiretDto, SiretEstablishmentDto } from "shared";
+import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
 
 export type InvalidSiretError = "SIRET must be 14 digits";
@@ -30,23 +31,31 @@ export const siretSlice = createSlice({
     ) => {
       state.shouldFetchEvenIfAlreadySaved = action.payload;
     },
-    siretModified: (state, action: PayloadAction<string>) => {
-      state.currentSiret = action.payload;
+    siretModified: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{ siret: string }>,
+    ) => {
+      state.currentSiret = action.payload.siret;
       state.establishment = null;
       state.error = null;
     },
     siretWasNotValid: (state) => {
       state.error = "SIRET must be 14 digits";
     },
-    siretInfoRequested: (state, _action: PayloadAction<string>) => {
+    siretInfoRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{ siret: string }>,
+    ) => {
       state.isSearching = true;
     },
     siretInfoSucceeded: (
       state,
-      action: PayloadAction<SiretEstablishmentDto>,
+      action: PayloadActionWithFeedbackTopic<{
+        siretEstablishment: SiretEstablishmentDto;
+      }>,
     ) => {
       state.isSearching = false;
-      state.establishment = action.payload;
+      state.establishment = action.payload.siretEstablishment;
     },
     siretInfoDisabledAndNoMatchInDbFound: (
       state,
@@ -62,6 +71,7 @@ export const siretSlice = createSlice({
       state.error = action.payload;
     },
     siretInfoClearRequested: () => initialState,
+    siretToEstablishmentRedirectionRequested: (state) => state,
   },
 });
 

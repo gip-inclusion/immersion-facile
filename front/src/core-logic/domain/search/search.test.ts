@@ -4,6 +4,7 @@ import {
   SearchResultDto,
   expectToEqual,
 } from "shared";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchStatus,
@@ -168,9 +169,12 @@ describe("search epic", () => {
 
     store.dispatch(
       searchSlice.actions.fetchSearchResultRequested({
-        appellationCode: immersionOffer.appellations[0].appellationCode,
-        siret: immersionOffer.siret,
-        locationId: locationId,
+        searchResult: {
+          appellationCode: immersionOffer.appellations[0].appellationCode,
+          siret: immersionOffer.siret,
+          locationId: locationId,
+        },
+        feedbackTopic: "search-result-page",
       }),
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);
@@ -179,9 +183,6 @@ describe("search epic", () => {
 
     expect(searchSelectors.isLoading(store.getState())).toBe(false);
 
-    expectToEqual(searchSelectors.feedback(store.getState()), {
-      kind: "success",
-    });
     expectToEqual(
       searchSelectors.currentSearchResult(store.getState()),
       immersionOffer,
@@ -194,9 +195,12 @@ describe("search epic", () => {
 
     store.dispatch(
       searchSlice.actions.fetchSearchResultRequested({
-        appellationCode: immersionOffer.appellations[0].appellationCode,
-        siret: immersionOffer.siret,
-        locationId: locationId,
+        searchResult: {
+          appellationCode: immersionOffer.appellations[0].appellationCode,
+          siret: immersionOffer.siret,
+          locationId: locationId,
+        },
+        feedbackTopic: "search-result-page",
       }),
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);
@@ -207,9 +211,13 @@ describe("search epic", () => {
 
     expect(searchSelectors.isLoading(store.getState())).toBe(false);
 
-    expectToEqual(searchSelectors.feedback(store.getState()), {
-      kind: "errored",
-      errorMessage,
+    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+      "search-result-page": {
+        on: "fetch",
+        level: "error",
+        title: "Oups !",
+        message: errorMessage,
+      },
     });
   });
 
@@ -234,8 +242,11 @@ describe("search epic", () => {
       expectStateToMatchInitialState();
       store.dispatch(
         searchSlice.actions.externalSearchResultRequested({
-          appellationCode: "11000",
-          siret: lbbSearchResult.siret,
+          siretAndAppellation: {
+            appellationCode: "11000",
+            siret: lbbSearchResult.siret,
+          },
+          feedbackTopic: "search-result-page",
         }),
       );
       expectIsLoading(true);
@@ -250,8 +261,11 @@ describe("search epic", () => {
       expectStateToMatchInitialState();
       store.dispatch(
         searchSlice.actions.externalSearchResultRequested({
-          appellationCode: "11000",
-          siret: lbbSearchResult.siret,
+          siretAndAppellation: {
+            appellationCode: "11000",
+            siret: lbbSearchResult.siret,
+          },
+          feedbackTopic: "search-result-page",
         }),
       );
       expectIsLoading(true);

@@ -87,6 +87,7 @@ describe("Siret validation and fetching", () => {
       feedSirenGatewayThroughBackWith(establishmentFetched);
       expectEstablishmentToEqual(establishmentFetched);
       expectOnly_getSirenInfoIfNotAlreadySaved_toHaveBeenCalled();
+      expectCurrentSiretToBe("11110000111100");
     });
 
     it("fetches correctly and keeps the returned error", () => {
@@ -148,7 +149,12 @@ describe("Siret validation and fetching", () => {
   });
 
   const dispatchSiretModified = (siret: string) =>
-    store.dispatch(siretSlice.actions.siretModified(siret));
+    store.dispatch(
+      siretSlice.actions.siretModified({
+        siret,
+        feedbackTopic: "siret-input",
+      }),
+    );
 
   const expectShouldFetchEvenIfAlreadySavedToBe = (expected: boolean) => {
     expect(siretSelectors.shouldFetchEvenIfAlreadySaved(store.getState())).toBe(
