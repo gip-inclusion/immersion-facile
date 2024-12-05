@@ -45,10 +45,6 @@ export const createConventionFeedbackMessageByKind = (
     title: "Succès",
     message: "Vous avez renvoyé la demande pour modification.",
   },
-  signedSuccessfully: {
-    title: "Succès",
-    message: "Votre accord a été enregistré.",
-  },
   rejected: {
     title: "Succès",
     message:

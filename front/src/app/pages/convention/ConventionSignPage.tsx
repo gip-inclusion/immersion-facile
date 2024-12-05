@@ -2,12 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import React, { useEffect } from "react";
-import {
-  ConventionSummary,
-  Loader,
-  MainWrapper,
-  PageHeader,
-} from "react-design-system";
+import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionJwtPayload,
@@ -16,10 +11,8 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   errors,
   isSignatory,
-  toDisplayedDate,
 } from "shared";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
-import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { P, match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
@@ -48,7 +41,7 @@ const useClearConventionOnUnmount = () => {
 
 export const ConventionSignPage = ({ route }: ConventionSignPageProperties) => {
   useClearConventionOnUnmount();
-  if (!route.params.jwt) throw errors.routeParams.missingJwt();
+  if (!route.params?.jwt) throw errors.routeParams.missingJwt();
   if (
     !isSignatory(
       decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
@@ -116,30 +109,6 @@ const ConventionSignPageContent = ({
             />
           ),
         )
-        .with({ submitFeedback: { kind: "signedSuccessfully" } }, () => (
-          <MainWrapper layout="default">
-            <Alert
-              severity="success"
-              {...t.conventionAlreadySigned}
-              title="Convention signée"
-              description={`Votre convention (${conventionId}) a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée par ${
-                convention?.agencyRefersTo
-                  ? convention?.agencyRefersTo.name
-                  : convention?.agencyName
-              }, vous la recevrez par email.`}
-              className={fr.cx("fr-mb-5v")}
-            />
-            {convention && (
-              <ConventionSummary
-                submittedAt={toDisplayedDate({
-                  date: new Date(convention.dateSubmission),
-                })}
-                summary={makeConventionSections(convention, cx)}
-                conventionId={convention.id}
-              />
-            )}
-          </MainWrapper>
-        ))
         .with({ hasConvention: false }, () => (
           <Alert
             severity="error"
