@@ -12,12 +12,6 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     expressRouter,
   );
 
-  sharedAgencyRouter.getAgencyOptionsByFilter((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.listAgencyOptionsByFilter.execute(req.query),
-    ),
-  );
-
   sharedAgencyRouter.addAgency((req, res) =>
     sendHttpResponse(req, res, () => deps.useCases.addAgency.execute(req.body)),
   );
@@ -30,41 +24,6 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
         if (!currentUser) throw errors.user.unauthorized();
         return await deps.useCases.createUserForAgency.execute(
           req.body,
-          currentUser,
-        );
-      }),
-  );
-
-  sharedAgencyRouter.getImmersionFacileAgencyId((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.getImmersionFacileAgencyIdByKind.execute(),
-    ),
-  );
-
-  sharedAgencyRouter.getAgencyPublicInfoById((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.getAgencyPublicInfoById.execute(req.query),
-    ),
-  );
-
-  sharedAgencyRouter.updateUserRoleForAgency(
-    deps.inclusionConnectAuthMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.updateUserForAgency.execute(
-          req.body,
-          req.payloads?.currentUser,
-        ),
-      ),
-  );
-  sharedAgencyRouter.getAgencyByIdForDashboard(
-    deps.inclusionConnectAuthMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getAgencyById.execute(
-          req.params.agencyId,
           currentUser,
         );
       }),
@@ -83,7 +42,19 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       }),
   );
 
-  sharedAgencyRouter.getAgencyUsersByAgencyIdForDashboard(
+  sharedAgencyRouter.getAgencyOptionsByFilter((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.listAgencyOptionsByFilter.execute(req.query),
+    ),
+  );
+
+  sharedAgencyRouter.getAgencyPublicInfoById((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getAgencyPublicInfoById.execute(req.query),
+    ),
+  );
+
+  sharedAgencyRouter.getAgencyUsersByAgencyId(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
@@ -94,6 +65,12 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
           currentUser,
         );
       }),
+  );
+
+  sharedAgencyRouter.getImmersionFacileAgencyId((req, res) =>
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getImmersionFacileAgencyIdByKind.execute(),
+    ),
   );
 
   sharedAgencyRouter.updateAgency(

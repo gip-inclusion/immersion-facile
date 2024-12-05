@@ -1,5 +1,4 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { userParamsForAgencySchema } from "../admin/admin.schema";
 import { z } from "zod";
 import { userParamsForAgencySchema } from "../admin/admin.schema";
 import {
@@ -33,7 +32,7 @@ export const agencyRoutes = defineRoutes({
   }),
   createUserForAgency: defineRoute({
     method: "post",
-    url: "/dashboard/agency/users",
+    url: "/agency/users",
     requestBodySchema: userParamsForAgencySchema,
     ...withAuthorizationHeaders,
     responses: {
@@ -62,9 +61,10 @@ export const agencyRoutes = defineRoutes({
     queryParamsSchema: withAgencyIdSchema,
     responses: { 200: agencyPublicDisplaySchema },
   }),
-  getAgencyUsersByAgencyIdForDashboard: defineRoute({
+  getAgencyUsersByAgencyId: defineRoute({
     method: "get",
-    url: "/dashboard/agencies/:agencyId/users",
+    url: "/agencies/:agencyId/users",
+
     ...withAuthorizationHeaders,
     responses: { 200: z.array(inclusionConnectedUserSchema) },
   }),
@@ -105,21 +105,11 @@ export const agencyRoutes = defineRoutes({
       409: httpErrorSchema,
     },
   }),
+
   updateUserRoleForAgency: defineRoute({
     method: "patch",
-    url: "/dashboard/agency/users",
+    url: "/agencies/:agencyId/users",
     requestBodySchema: userParamsForAgencySchema,
-    ...withAuthorizationHeaders,
-    responses: {
-      201: expressEmptyResponseBody,
-      400: httpErrorSchema,
-      401: httpErrorSchema,
-      404: httpErrorSchema,
-    },
-  }),
-  removeUserFromAgency: defineRoute({
-    method: "delete",
-    url: "/dashboard/agencies/:agencyId/users/:userId",
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
@@ -128,10 +118,10 @@ export const agencyRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  updateUserRoleForAgency: defineRoute({
-    method: "patch",
-    url: "/agencies/:agencyId/users",
-    requestBodySchema: userParamsForAgencySchema,
+
+  removeUserFromAgency: defineRoute({
+    method: "delete",
+    url: "/dashboard/agencies/:agencyId/users/:userId",
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
