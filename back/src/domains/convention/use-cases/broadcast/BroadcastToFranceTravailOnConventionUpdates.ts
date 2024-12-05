@@ -200,13 +200,13 @@ const shouldBroadcastToFranceTravail = ({
 
   if (
     featureFlags.enableBroadcastOfConseilDepartementalToFT.isActive &&
-    isBroadcastToFranceTravailAllowedForKind("structure-IAE")
+    isBroadcastToFranceTravailAllowedForKind("conseil-departemental")
   )
     return true;
 
   if (
-    featureFlags.enableBroadcastOfConseilDepartementalToFT.isActive &&
-    isBroadcastToFranceTravailAllowedForKind("conseil-departemental")
+    featureFlags.enableBroadcastOfCapEmploiToFT.isActive &&
+    isBroadcastToFranceTravailAllowedForKind("cap-emploi")
   )
     return true;
 
