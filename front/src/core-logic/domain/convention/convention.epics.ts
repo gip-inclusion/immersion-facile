@@ -54,7 +54,11 @@ const getConventionEpic: ConventionEpic = (
   { conventionGateway },
 ) =>
   action$.pipe(
-    filter(conventionSlice.actions.fetchConventionRequested.match),
+    filter(
+      (action) =>
+        conventionSlice.actions.fetchConventionRequested.match(action) ||
+        conventionSlice.actions.signConventionSucceeded.match(action),
+    ),
     switchMap(({ payload }) => conventionGateway.retrieveFromToken$(payload)),
     map(conventionSlice.actions.fetchConventionSucceeded),
     catchEpicError((error: Error) =>
@@ -91,10 +95,13 @@ const signConventionEpic: ConventionEpic = (
 ) =>
   action$.pipe(
     filter(conventionSlice.actions.signConventionRequested.match),
-    switchMap(({ payload: { jwt, conventionId } }) =>
-      conventionGateway.signConvention$(conventionId, jwt),
+    switchMap(({ payload }) =>
+      conventionGateway
+        .signConvention$(payload.conventionId, payload.jwt)
+        .pipe(
+          map(() => conventionSlice.actions.signConventionSucceeded(payload)),
+        ),
     ),
-    map(conventionSlice.actions.signConventionSucceeded),
     catchEpicError((error: Error) =>
       conventionSlice.actions.signConventionFailed(error.message),
     ),

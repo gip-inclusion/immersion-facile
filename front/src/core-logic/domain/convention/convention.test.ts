@@ -722,8 +722,20 @@ describe("Convention slice", () => {
   describe("Convention signature", () => {
     it("signs the conventions with role from jwt", () => {
       const jwt = "some-correct-jwt";
-      const convention =
-        new ConventionDtoBuilder().build() as ConventionReadDto;
+      const agencyFields = {
+        agencyCounsellorEmails: [],
+        agencyDepartment: "75",
+        agencyKind: "mission-locale" as const,
+        agencyName: "Agence Mission Locale",
+        agencyRefersTo: undefined,
+        agencySiret: "11110000111155",
+        agencyValidatorEmails: [],
+      };
+      const convention: ConventionReadDto = {
+        ...agencyFields,
+        ...new ConventionDtoBuilder().notSigned().build(),
+      };
+
       ({ store, dependencies } = createTestStore({
         convention: {
           ...initialConventionState,
@@ -736,14 +748,28 @@ describe("Convention slice", () => {
           jwt,
         }),
       );
+
       expectConventionState({
         isLoading: true,
       });
       feedGatewayWithSignSuccess();
       expectConventionState({
         isLoading: false,
-        feedback: { kind: "signedSuccessfully" },
         convention,
+      });
+
+      const signedConvention: ConventionReadDto = {
+        ...agencyFields,
+        ...new ConventionDtoBuilder(convention)
+          .signedByEstablishmentRepresentative(new Date().toISOString())
+          .build(),
+      };
+
+      feedGatewayWithConvention(signedConvention);
+
+      expectConventionState({
+        isLoading: false,
+        convention: signedConvention,
       });
     });
 

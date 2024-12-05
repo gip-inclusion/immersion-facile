@@ -28,7 +28,6 @@ type ConventionValidationFeedbackKind =
 
 type ConventionSignatoryFeedbackKind =
   | "justSubmitted"
-  | "signedSuccessfully"
   | "modificationsAskedFromSignatory";
 
 export type ConventionFeedbackKind =
@@ -175,9 +174,14 @@ export const conventionSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
-    signConventionSucceeded: (state) => {
+    signConventionSucceeded: (
+      state,
+      _action: PayloadAction<{
+        conventionId: ConventionId;
+        jwt: ConventionJwt | InclusionConnectJwt;
+      }>,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "signedSuccessfully" };
     },
     signConventionFailed: setFeedbackAsErrored,
 
