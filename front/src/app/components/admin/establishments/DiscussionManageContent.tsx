@@ -186,7 +186,13 @@ const DiscussionDetails = ({
       <header>
         <Button
           type="button"
-          onClick={() => window.history.back()}
+          onClick={() =>
+            routes
+              .establishmentDashboard({
+                tab: "discussions",
+              })
+              .push()
+          }
           priority="tertiary"
           iconId="fr-icon-arrow-left-line"
           iconPosition="left"
