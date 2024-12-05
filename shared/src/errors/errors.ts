@@ -403,6 +403,14 @@ export const errors = {
       new ForbiddenError(
         "Il n'est pas possible de modifier un mail d'un utilisateur inclusion connecté.",
       ),
+    forbiddenNotificationsPreferencesUpdate: () =>
+      new ForbiddenError(
+        "Vous n'avez pas les droits nécessaires pour modifier ces préférences de notifications.",
+      ),
+    forbiddenRolesUpdate: () =>
+      new ForbiddenError(
+        "Vous n'avez pas les droits nécessaires pour modifier ces rôles.",
+      ),
   },
   broadcastFeedback: {
     notFound: ({
