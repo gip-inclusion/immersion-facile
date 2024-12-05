@@ -177,8 +177,8 @@ const getLinkedAgencies = async (
 
 const shouldBroadcastToFranceTravail = ({
   agency,
-  refersToAgency,
   featureFlags,
+  refersToAgency: _, // TODO not used anymore, until France Travail is ready to accept those
 }: {
   agency: AgencyDto;
   refersToAgency: AgencyDto | null;
@@ -186,7 +186,8 @@ const shouldBroadcastToFranceTravail = ({
 }): boolean => {
   const isBroadcastToFranceTravailAllowedForKind = (agencyKind: AgencyKind) => {
     if (agency.kind === agencyKind) return true;
-    if (refersToAgency && refersToAgency.kind === agencyKind) return true;
+    // TODO: uncomment when France Travail is ready to accept those
+    // if (refersToAgency && refersToAgency.kind === agencyKind) return true;
     return false;
   };
 
