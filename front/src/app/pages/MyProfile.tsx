@@ -72,6 +72,7 @@ export const MyProfile = (_: MyProfileProps) => {
     <>
       <UserDetail
         title={`Mon profil : ${userDisplayed}`}
+        currentUser={currentUser}
         userWithRights={currentUser}
         editInformationsLink={getLinkToUpdateAccountInfo(
           enableProConnect.isActive,

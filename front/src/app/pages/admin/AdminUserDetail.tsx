@@ -11,6 +11,7 @@ import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/upda
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { Route } from "type-route";
 
 type AdminUserDetailProps = {
@@ -18,6 +19,7 @@ type AdminUserDetailProps = {
 };
 
 export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
+  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const icUser = useAppSelector(adminFetchUserSelectors.fetchedUser);
   const isFetchingUser = useAppSelector(adminFetchUserSelectors.isFetching);
   const isUpdatingUser = useAppSelector(updateUserOnAgencySelectors.isLoading);
@@ -50,6 +52,7 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
   }, [dispatch]);
 
+  if (!currentUser) return <p>Vous n'êtes pas connecté...</p>;
   if (isFetchingUser || isUpdatingUser) return <Loader />;
   if (!icUser) return <p>Aucun utilisateur trouvé</p>;
 
@@ -61,6 +64,7 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
   return (
     <UserDetail
       title={title}
+      currentUser={currentUser}
       userWithRights={icUser}
       onUserUpdateRequested={onUserUpdateRequested}
     />
