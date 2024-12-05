@@ -45,14 +45,6 @@ export interface AgencyGateway {
     params: UserParamsForAgency,
     token: InclusionConnectJwt,
   ): Observable<void>;
-  updateAgencyFromDashboard$(
-    agencyDto: AgencyDto,
-    adminToken: InclusionConnectJwt,
-  ): Observable<void>;
-  updateUserRoleForAgency$(
-    params: UserParamsForAgency,
-    token: InclusionConnectJwt,
-  ): Observable<void>;
 
   removeUserFromAgency$(
     params: WithAgencyIdAndUserId,
