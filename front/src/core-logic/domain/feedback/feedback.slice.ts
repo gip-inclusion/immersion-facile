@@ -4,6 +4,8 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { keys } from "shared";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -220,7 +222,7 @@ export const feedbackMapping: Record<
   },
   "agency-user-for-dashboard": {
     "fetch.error": {
-      action: agencyDashboardSlice.actions.fetchAgencyUsersFailed,
+      action: fetchAgencySlice.actions.fetchAgencyUsersFailed,
       title:
         "Problème rencontré lors de la récupération de la liste des utilisateurs",
       message:
@@ -262,19 +264,19 @@ export const feedbackMapping: Record<
   },
   "agency-for-dashboard": {
     "fetch.error": {
-      action: agencyDashboardSlice.actions.fetchAgencyFailed,
+      action: fetchAgencySlice.actions.fetchAgencyFailed,
       title:
         "Problème rencontré lors de la récupération des données de l'agence",
       message:
         "Une erreur est survenue lors de la récupération des données de cette agence",
     },
     "update.success": {
-      action: agencyDashboardSlice.actions.updateAgencySucceeded,
+      action: updateAgencySlice.actions.updateAgencySucceeded,
       title: "L'agence a été mis à jour",
       message: "Les données de l'agence ont été mises à jour.",
     },
     "update.error": {
-      action: agencyDashboardSlice.actions.updateAgencyFailed,
+      action: updateAgencySlice.actions.updateAgencyFailed,
       title: "Problème lors de la mise à jour de l'agence",
       message: "Une erreur est survenue lors de la mise à jour de l'agence",
     },

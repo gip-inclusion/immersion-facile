@@ -6,13 +6,13 @@ type UpdateUserOnAgencyState = {
   isLoading: boolean;
 };
 
-const initialState: UpdateUserOnAgencyState = {
+export const updateUserOnAgencyInitialState: UpdateUserOnAgencyState = {
   isLoading: false,
 };
 
 export const updateUserOnAgencySlice = createSlice({
   name: "updateUserOnAgency",
-  initialState,
+  initialState: updateUserOnAgencyInitialState,
   reducers: {
     updateUserAgencyRightRequested: (
       state,
