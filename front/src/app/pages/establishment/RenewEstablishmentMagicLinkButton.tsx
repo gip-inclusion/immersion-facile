@@ -3,9 +3,10 @@ import React from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { SiretDto } from "shared";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 
 export const RenewEstablishmentMagicLinkButton = ({
   siret,
@@ -16,7 +17,10 @@ export const RenewEstablishmentMagicLinkButton = ({
 }) => {
   const dispatch = useDispatch();
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
-  const feedback = useAppSelector(establishmentSelectors.feedback);
+  const establishmentFeedback = useFeedbackTopic(
+    "establishment-modification-link",
+  );
+  const linkSuccessfullySent = establishmentFeedback?.level === "success";
   return (
     <>
       {isLoading && <Loader />}
@@ -26,12 +30,15 @@ export const RenewEstablishmentMagicLinkButton = ({
         id={id}
         onClick={() => {
           dispatch(
-            establishmentSlice.actions.sendModificationLinkRequested(siret),
+            establishmentSlice.actions.sendModificationLinkRequested({
+              siret,
+              feedbackTopic: "establishment-modification-link",
+            }),
           );
         }}
-        disabled={feedback.kind === "sendModificationLinkSuccess"}
+        disabled={linkSuccessfullySent}
       >
-        {feedback.kind === "sendModificationLinkSuccess"
+        {linkSuccessfullySent
           ? "Un nouveau lien vient d'être envoyé par email au responsable de cette entreprise"
           : "Renvoyer le lien de modification de cette entreprise"}
       </Button>

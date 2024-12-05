@@ -8,6 +8,7 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
@@ -27,11 +28,14 @@ const topics = [
   "establishments-batch",
   "user",
   "search-result-page",
+  "establishment-modification-link",
+  "form-establishment",
+  "siret-input",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
 
-type Feedback = {
+export type Feedback = {
   on: ActionKind;
   level: FeedbackLevel;
   message: string;
@@ -239,6 +243,59 @@ export const feedbackMapping: Record<
         "L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre.",
     },
   },
+  "establishment-modification-link": {
+    "create.error": {
+      action: establishmentSlice.actions.sendModificationLinkFailed,
+      title: "Lien non envoyé",
+      message:
+        "Il y a eu un problème lors de l'envoi du lien de modification de l'entreprise.",
+    },
+    "create.success": {
+      action: establishmentSlice.actions.sendModificationLinkSucceeded,
+      title: "Lien envoyé",
+      message:
+        "Le lien de modification de l'entreprise a bien été envoyé par email.",
+    },
+  },
+  "form-establishment": {
+    "fetch.error": {
+      action: establishmentSlice.actions.fetchEstablishmentFailed,
+      title: "Problème lors de la recuperation des données de l'entreprise",
+      message:
+        "Une erreur est survenue lors de la recuperation des données de l'entreprise",
+    },
+    "create.success": {
+      action: establishmentSlice.actions.createEstablishmentSucceeded,
+      title: "L'entreprise a bien été créée",
+      message: "L'entreprise a bien été ajoutée à notre annuaire.",
+    },
+    "create.error": {
+      action: establishmentSlice.actions.createEstablishmentFailed,
+      title: "Problème lors de la création de l'entreprise",
+      message: "Une erreur est survenue lors de la création de l'entreprise",
+    },
+    "update.error": {
+      action: establishmentSlice.actions.updateEstablishmentFailed,
+      title: "Problème lors de la mise à jour de l'entreprise",
+      message: "Une erreur est survenue lors de la mise à jour de l'entreprise",
+    },
+    "update.success": {
+      action: establishmentSlice.actions.updateEstablishmentSucceeded,
+      title: "L'entreprise a bien été mise à jour",
+      message: "L'entreprise a bien été mise à jour",
+    },
+    "delete.error": {
+      action: establishmentSlice.actions.deleteEstablishmentFailed,
+      title: "Problème lors de la suppression de l'entreprise",
+      message: "Une erreur est survenue lors de la suppression de l'entreprise",
+    },
+    "delete.success": {
+      action: establishmentSlice.actions.deleteEstablishmentSucceeded,
+      title: "L'entreprise a bien été supprimée",
+      message: "L'entreprise a bien été supprimée",
+    },
+  },
+  "siret-input": {},
 };
 
 export const feedbackSlice = createSlice({

@@ -7,7 +7,8 @@ import {
   expectToEqual,
 } from "shared";
 import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
-import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
+import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import {
   TestDependencies,
@@ -50,31 +51,37 @@ describe("Establishment", () => {
   it("reflects when user wants to input siret", () => {
     store.dispatch(establishmentSlice.actions.gotReady());
 
-    expect(
-      establishmentSelectors.isReadyForLinkRequestOrRedirection(
-        store.getState(),
-      ),
-    ).toBe(true);
+    expect(establishmentSelectors.isReadyForRedirection(store.getState())).toBe(
+      true,
+    );
   });
 
-  it("does not trigger navigation when siret is requested if status is not 'READY_FOR_LINK_REQUEST_OR_REDIRECTION'", () => {
+  it("does not trigger navigation when siret is requested if establishment is not ready for redirection", () => {
     store.dispatch(
       siretSlice.actions.siretInfoSucceeded({
-        siret: "123",
-      } as SiretEstablishmentDto),
+        siretEstablishment: {
+          siret: "123",
+        } as SiretEstablishmentDto,
+        feedbackTopic: "siret-input",
+      }),
     );
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered(null);
   });
 
-  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION' without address provided", () => {
+  it("triggers navigation when siret is requested if establishment is ready for redirection but has no address provided", () => {
     ({ store, dependencies } = createTestStore({
       establishment: {
         isLoading: false,
-        feedback: { kind: "readyForLinkRequestOrRedirection" },
+        isReadyForRedirection: true,
         formEstablishment: defaultFormEstablishmentValue(),
       },
     }));
-    store.dispatch(siretSlice.actions.siretModified("10002000300040"));
+    store.dispatch(
+      siretSlice.actions.siretModified({
+        siret: "10002000300040",
+        feedbackTopic: "siret-input",
+      }),
+    );
     dependencies.formCompletionGateway.siretInfo$.next(
       establishmentWithoutAddressFromSiretFetched,
     );
@@ -84,15 +91,20 @@ describe("Establishment", () => {
     });
   });
 
-  it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION' with address provided", () => {
+  it("triggers navigation when siret is requested if establishment is ready for redirection with address provided", () => {
     ({ store, dependencies } = createTestStore({
       establishment: {
         isLoading: false,
-        feedback: { kind: "readyForLinkRequestOrRedirection" },
+        isReadyForRedirection: true,
         formEstablishment: defaultFormEstablishmentValue(),
       },
     }));
-    store.dispatch(siretSlice.actions.siretModified("10002000300040"));
+    store.dispatch(
+      siretSlice.actions.siretModified({
+        siret: "10002000300040",
+        feedbackTopic: "siret-input",
+      }),
+    );
     dependencies.formCompletionGateway.siretInfo$.next(
       establishmentWithAddressFromSiretFetched,
     );
@@ -106,10 +118,12 @@ describe("Establishment", () => {
   it("send modification link", () => {
     expectEstablishmentStateToMatch({
       isLoading: false,
-      feedback: { kind: "idle" },
     });
     store.dispatch(
-      establishmentSlice.actions.sendModificationLinkRequested("siret-123"),
+      establishmentSlice.actions.sendModificationLinkRequested({
+        siret: "siret-123",
+        feedbackTopic: "establishment-modification-link",
+      }),
     );
     expectEstablishmentStateToMatch({ isLoading: true });
     dependencies.establishmentGateway.establishmentModificationResponse$.next(
@@ -117,43 +131,55 @@ describe("Establishment", () => {
     );
     expectEstablishmentStateToMatch({
       isLoading: false,
-      feedback: { kind: "sendModificationLinkSuccess" },
     });
-    expect(
-      establishmentSelectors.sendModifyLinkSucceeded(store.getState()),
-    ).toBe(true);
+    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+      "establishment-modification-link": {
+        on: "create",
+        level: "success",
+        message:
+          "Le lien de modification de l'entreprise a bien été envoyé par email.",
+        title: "Lien envoyé",
+      },
+    });
   });
 
   it("handle send modification link error", () => {
+    const errorMessage =
+      "Il y a eu un problème lors de l'envoi du lien de modification de l'entreprise.";
     expectEstablishmentStateToMatch({
       isLoading: false,
-      feedback: { kind: "idle" },
     });
     store.dispatch(
-      establishmentSlice.actions.sendModificationLinkRequested("siret-123"),
+      establishmentSlice.actions.sendModificationLinkRequested({
+        siret: "siret-123",
+        feedbackTopic: "establishment-modification-link",
+      }),
     );
     expect(establishmentSelectors.isLoading(store.getState())).toBe(true);
     dependencies.establishmentGateway.establishmentModificationResponse$.error(
-      new Error("whatever message"),
+      new Error(errorMessage),
     );
     expect(establishmentSelectors.isLoading(store.getState())).toBe(false);
-    expect(establishmentSelectors.feedback(store.getState())).toEqual({
-      kind: "sendModificationLinkErrored",
+    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+      "establishment-modification-link": {
+        on: "create",
+        level: "error",
+        message: errorMessage,
+        title: "Lien non envoyé",
+      },
     });
-    expect(
-      establishmentSelectors.sendModifyLinkSucceeded(store.getState()),
-    ).toBe(false);
   });
 
   describe("establishment fetch", () => {
     it("fetches establishment on establishment creation (empty params)", () => {
       expectStoreToMatchInitialState();
-      store.dispatch(establishmentSlice.actions.establishmentRequested({}));
-
+      store.dispatch(
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: {},
+          feedbackTopic: "form-establishment",
+        }),
+      );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "success",
-      });
       expectToEqual(
         establishmentSelectors.formEstablishment(store.getState()),
         defaultFormEstablishmentValue(),
@@ -172,13 +198,13 @@ describe("Establishment", () => {
         fitForDisabledWorkers: testedQueryParams.fitForDisabledWorkers,
       };
       store.dispatch(
-        establishmentSlice.actions.establishmentRequested(testedQueryParams),
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: testedQueryParams,
+          feedbackTopic: "form-establishment",
+        }),
       );
 
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "success",
-      });
       expectToEqual(
         establishmentSelectors.formEstablishment(store.getState()),
         expectedFormEstablishment,
@@ -192,7 +218,10 @@ describe("Establishment", () => {
         siret: "12345678901234",
       };
       store.dispatch(
-        establishmentSlice.actions.establishmentRequested(testedQueryParams),
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: testedQueryParams,
+          feedbackTopic: "form-establishment",
+        }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
       dependencies.establishmentGateway.formEstablishment$.next(
@@ -200,9 +229,6 @@ describe("Establishment", () => {
       );
 
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "success",
-      });
       expectToEqual(
         establishmentSelectors.formEstablishment(store.getState()),
         formEstablishment,
@@ -216,7 +242,10 @@ describe("Establishment", () => {
         siret: "12345678901234",
       };
       store.dispatch(
-        establishmentSlice.actions.establishmentRequested(testedQueryParams),
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: testedQueryParams,
+          feedbackTopic: "form-establishment",
+        }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
       dependencies.establishmentGateway.formEstablishment$.error(
@@ -224,9 +253,13 @@ describe("Establishment", () => {
       );
 
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "errored",
-        errorMessage: "some-error",
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "form-establishment": {
+          on: "fetch",
+          level: "error",
+          message: "some-error",
+          title: "Problème lors de la recuperation des données de l'entreprise",
+        },
       });
       expectToEqual(
         establishmentSelectors.formEstablishment(store.getState()),
@@ -237,19 +270,17 @@ describe("Establishment", () => {
     it("should clear establishment", () => {
       const initialEstablishmentState: EstablishmentState = {
         isLoading: true,
-        feedback: { kind: "success" },
+        isReadyForRedirection: false,
         formEstablishment,
       };
       ({ store, dependencies } = createTestStore({
         establishment: initialEstablishmentState,
       }));
       expectEstablishmentStateToMatch(initialEstablishmentState);
-      store.dispatch(establishmentSlice.actions.establishmentClearRequested());
+      store.dispatch(establishmentSlice.actions.clearEstablishmentRequested());
 
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "idle",
-      });
+
       expectToEqual(
         establishmentSelectors.formEstablishment(store.getState()),
         defaultFormEstablishmentValue(),
@@ -261,34 +292,47 @@ describe("Establishment", () => {
     it("should create establishment", () => {
       expectStoreToMatchInitialState();
       store.dispatch(
-        establishmentSlice.actions.establishmentCreationRequested(
-          formEstablishment,
-        ),
+        establishmentSlice.actions.createEstablishmentRequested({
+          formEstablishment: formEstablishment,
+          feedbackTopic: "form-establishment",
+        }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
       dependencies.establishmentGateway.addFormEstablishmentResult$.next(
         undefined,
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "submitSuccess",
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "form-establishment": {
+          on: "create",
+          level: "success",
+          message: "L'entreprise a bien été ajoutée à notre annuaire.",
+          title: "L'entreprise a bien été créée",
+        },
       });
     });
 
     it("should fail when creating establishment on gateway error", () => {
+      const errorMessageFromGateway = "Submit error message not used in slice";
       expectStoreToMatchInitialState();
       store.dispatch(
-        establishmentSlice.actions.establishmentCreationRequested(
-          formEstablishment,
-        ),
+        establishmentSlice.actions.createEstablishmentRequested({
+          formEstablishment: formEstablishment,
+          feedbackTopic: "form-establishment",
+        }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
       dependencies.establishmentGateway.addFormEstablishmentResult$.error(
-        new Error("Submit error message not used in slice"),
+        new Error(errorMessageFromGateway),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "submitErrored",
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "form-establishment": {
+          on: "create",
+          level: "error",
+          message: errorMessageFromGateway,
+          title: "Problème lors de la création de l'entreprise",
+        },
       });
     });
   });
@@ -297,16 +341,18 @@ describe("Establishment", () => {
     it("should edit requested establishment", () => {
       expectStoreToMatchInitialState();
       store.dispatch(
-        establishmentSlice.actions.establishmentRequested({
-          jwt: "previously-saved-jwt",
-          siret: "12345678901234",
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: {
+            jwt: "previously-saved-jwt",
+            siret: "12345678901234",
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
       dependencies.establishmentGateway.formEstablishment$.next(
         formEstablishment,
       );
       expectEstablishmentStateToMatch({
-        feedback: { kind: "success" },
         formEstablishment,
         isLoading: false,
       });
@@ -322,9 +368,12 @@ describe("Establishment", () => {
         businessNameCustomized: "My custom name",
       };
       store.dispatch(
-        establishmentSlice.actions.establishmentEditionRequested({
-          formEstablishment: editedEstablishment,
-          jwt: "previously-saved-jwt",
+        establishmentSlice.actions.updateEstablishmentRequested({
+          establishmentUpdate: {
+            formEstablishment: editedEstablishment,
+            jwt: "previously-saved-jwt",
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
@@ -332,24 +381,32 @@ describe("Establishment", () => {
         undefined,
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "submitSuccess",
+
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "form-establishment": {
+          on: "update",
+          level: "success",
+          message: "L'entreprise a bien été mise à jour",
+          title: "L'entreprise a bien été mise à jour",
+        },
       });
     });
 
     it("should fail when editing establishment on gateway error", () => {
       expectStoreToMatchInitialState();
       store.dispatch(
-        establishmentSlice.actions.establishmentRequested({
-          jwt: "previously-saved-jwt",
-          siret: "12345678901234",
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: {
+            jwt: "previously-saved-jwt",
+            siret: "12345678901234",
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
       dependencies.establishmentGateway.formEstablishment$.next(
         formEstablishment,
       );
       expectEstablishmentStateToMatch({
-        feedback: { kind: "success" },
         formEstablishment,
         isLoading: false,
       });
@@ -365,9 +422,12 @@ describe("Establishment", () => {
         businessNameCustomized: "My custom name",
       };
       store.dispatch(
-        establishmentSlice.actions.establishmentEditionRequested({
-          formEstablishment: editedEstablishment,
-          jwt: "previously-saved-jwt",
+        establishmentSlice.actions.updateEstablishmentRequested({
+          establishmentUpdate: {
+            formEstablishment: editedEstablishment,
+            jwt: "previously-saved-jwt",
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
@@ -375,8 +435,14 @@ describe("Establishment", () => {
         new Error("Submit error message not used in slice"),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "submitErrored",
+
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "form-establishment": {
+          on: "update",
+          level: "error",
+          message: "Submit error message not used in slice",
+          title: "Problème lors de la mise à jour de l'entreprise",
+        },
       });
     });
   });
@@ -388,24 +454,29 @@ describe("Establishment", () => {
       expectStoreToMatchInitialState();
 
       store.dispatch(
-        establishmentSlice.actions.establishmentRequested({
-          jwt: backOfficeJwt,
-          siret: "12345678901234",
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: {
+            jwt: backOfficeJwt,
+            siret: "12345678901234",
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
       dependencies.establishmentGateway.formEstablishment$.next(
         formEstablishment,
       );
       expectEstablishmentStateToMatch({
-        feedback: { kind: "success" },
         formEstablishment,
         isLoading: false,
       });
 
       store.dispatch(
-        establishmentSlice.actions.establishmentDeletionRequested({
-          siret: formEstablishment.siret,
-          jwt: backOfficeJwt,
+        establishmentSlice.actions.deleteEstablishmentRequested({
+          establishmentDelete: {
+            siret: formEstablishment.siret,
+            jwt: backOfficeJwt,
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
@@ -413,31 +484,42 @@ describe("Establishment", () => {
         undefined,
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "deleteSuccess",
+
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "form-establishment": {
+          on: "delete",
+          level: "success",
+          message: "L'entreprise a bien été supprimée",
+          title: "L'entreprise a bien été supprimée",
+        },
       });
     });
 
     it("should fail when editing establishment on gateway error", () => {
       expectStoreToMatchInitialState();
       store.dispatch(
-        establishmentSlice.actions.establishmentRequested({
-          jwt: backOfficeJwt,
-          siret: "12345678901234",
+        establishmentSlice.actions.fetchEstablishmentRequested({
+          establishmentRequested: {
+            jwt: backOfficeJwt,
+            siret: "12345678901234",
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
       dependencies.establishmentGateway.formEstablishment$.next(
         formEstablishment,
       );
       expectEstablishmentStateToMatch({
-        feedback: { kind: "success" },
         formEstablishment,
         isLoading: false,
       });
       store.dispatch(
-        establishmentSlice.actions.establishmentDeletionRequested({
-          siret: formEstablishment.siret,
-          jwt: backOfficeJwt,
+        establishmentSlice.actions.deleteEstablishmentRequested({
+          establishmentDelete: {
+            siret: formEstablishment.siret,
+            jwt: backOfficeJwt,
+          },
+          feedbackTopic: "form-establishment",
         }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
@@ -445,8 +527,13 @@ describe("Establishment", () => {
         new Error("Deletion error message not used in slice"),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-      expectToEqual(establishmentSelectors.feedback(store.getState()), {
-        kind: "deleteErrored",
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        "form-establishment": {
+          on: "delete",
+          level: "error",
+          message: "Deletion error message not used in slice",
+          title: "Problème lors de la suppression de l'entreprise",
+        },
       });
     });
   });
@@ -454,7 +541,6 @@ describe("Establishment", () => {
   const expectStoreToMatchInitialState = () =>
     expectEstablishmentStateToMatch({
       isLoading: false,
-      feedback: { kind: "idle" },
       formEstablishment: defaultFormEstablishmentValue(),
     });
   const expectEstablishmentStateToMatch = (

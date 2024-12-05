@@ -3,7 +3,7 @@ import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEst
 
 export interface NavigationGateway {
   navigateToEstablishmentForm(
-    formEstablishmentParamsInUrl: FormEstablishmentParamsInUrl,
+    formEstablishmentParamsInUrl: FormEstablishmentParamsInUrl | null,
   ): void;
   goToUrl(url: AbsoluteUrl): void;
 }
