@@ -85,6 +85,7 @@ export const ConventionSignForm = ({
       conventionSlice.actions.signConventionRequested({
         conventionId: convention.id,
         jwt,
+        signatoryRole: currentSignatory.role,
       }),
     );
   };
