@@ -44,47 +44,88 @@ describe("Admin Users slice", () => {
     );
   });
 
-  it("update the user rights successfully", () => {
-    const agency = new AgencyDtoBuilder().build();
-    const agencyRight: AgencyRight = {
-      agency,
-      roles: ["validator"],
-      isNotifiedByEmail: false,
-    };
-    const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
-      .withId("user-id")
-      .withIsAdmin(false)
-      .withAgencyRights([agencyRight])
-      .build();
+  describe("on updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded", () => {
+    it("if it is user in slice, update the user rights successfully", () => {
+      const agency = new AgencyDtoBuilder().build();
+      const agencyRight: AgencyRight = {
+        agency,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      };
+      const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+        .withId("user-id")
+        .withIsAdmin(false)
+        .withAgencyRights([agencyRight])
+        .build();
 
-    ({ store, dependencies } = createTestStore({
-      admin: adminPreloadedState({
-        fetchUser: {
-          user,
-          isFetching: false,
-        },
-      }),
-    }));
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          fetchUser: {
+            user,
+            isFetching: false,
+          },
+        }),
+      }));
 
-    store.dispatch(
-      updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
-        userId: user.id,
-        agencyId: agency.id,
-        email: user.email,
-        roles: [...agencyRight.roles, "counsellor"],
-        isNotifiedByEmail: agencyRight.isNotifiedByEmail,
-        feedbackTopic: "user",
-      }),
-    );
-
-    expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), {
-      ...user,
-      agencyRights: [
-        {
-          ...agencyRight,
+      store.dispatch(
+        updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
+          userId: user.id,
+          agencyId: agency.id,
+          email: user.email,
           roles: [...agencyRight.roles, "counsellor"],
-        },
-      ],
+          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+          feedbackTopic: "user",
+        }),
+      );
+
+      expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), {
+        ...user,
+        agencyRights: [
+          {
+            ...agencyRight,
+            roles: [...agencyRight.roles, "counsellor"],
+          },
+        ],
+      });
+    });
+
+    it("if it is not user in slice, do nothing", () => {
+      const agency = new AgencyDtoBuilder().build();
+      const agencyRight: AgencyRight = {
+        agency,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      };
+      const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+        .withId("user-id")
+        .withIsAdmin(false)
+        .withAgencyRights([agencyRight])
+        .build();
+
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          fetchUser: {
+            user,
+            isFetching: false,
+          },
+        }),
+      }));
+
+      store.dispatch(
+        updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
+          userId: "another-user-id",
+          agencyId: agency.id,
+          email: "another-user-id@email.com",
+          roles: [...agencyRight.roles, "counsellor"],
+          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+          feedbackTopic: "user",
+        }),
+      );
+
+      expectToEqual(
+        adminFetchUserSelectors.fetchedUser(store.getState()),
+        user,
+      );
     });
   });
 
