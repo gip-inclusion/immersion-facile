@@ -3,21 +3,9 @@ import { RootState } from "src/core-logic/storeConfig/store";
 
 const establishmentState = (state: RootState) => state.establishment;
 
-const sendModifyLinkSucceeded = createSelector(
+const isReadyForRedirection = createSelector(
   establishmentState,
-  (establishment) =>
-    establishment.feedback.kind === "sendModificationLinkSuccess",
-);
-
-const isReadyForLinkRequestOrRedirection = createSelector(
-  establishmentState,
-  (establishment) =>
-    establishment.feedback.kind === "readyForLinkRequestOrRedirection",
-);
-
-const feedback = createSelector(
-  establishmentState,
-  (establishment) => establishment.feedback,
+  (establishment) => establishment.isReadyForRedirection,
 );
 
 const isLoading = createSelector(
@@ -31,9 +19,7 @@ const formEstablishment = createSelector(
 );
 
 export const establishmentSelectors = {
-  sendModifyLinkSucceeded,
   formEstablishment,
-  feedback,
   isLoading,
-  isReadyForLinkRequestOrRedirection,
+  isReadyForRedirection,
 };

@@ -16,6 +16,7 @@ describe("Discussion slice", () => {
   const defaultStartingDiscussionState: DiscussionState = {
     isLoading: false,
     discussion: null,
+    fetchError: null,
   };
   const jwt = "my-jwt";
   const discussion: DiscussionReadDto = new DiscussionBuilder().buildRead();
@@ -45,6 +46,7 @@ describe("Discussion slice", () => {
     expectDiscussionSelector({
       isLoading: false,
       discussion: null,
+      fetchError: null,
     });
   });
 
@@ -221,8 +223,10 @@ describe("Discussion slice", () => {
   const expectDiscussionSelector = ({
     isLoading,
     discussion,
+    fetchError,
   }: DiscussionState) => {
     expectToEqual(discussionSelectors.isLoading(store.getState()), isLoading);
     expectToEqual(discussionSelectors.discussion(store.getState()), discussion);
+    expectToEqual(discussionSelectors.fetchError(store.getState()), fetchError);
   };
 });
