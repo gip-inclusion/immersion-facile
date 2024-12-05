@@ -15,6 +15,10 @@ import { listUsersEpics } from "src/core-logic/domain/admin/listUsers/listUsers.
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { notificationsEpics } from "src/core-logic/domain/admin/notifications/notifications.epics";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
+import { fetchAgencyEpics } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.epics";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { updateAgencyEpics } from "src/core-logic/domain/agencies/update-agency/updateAgency.epics";
+import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencyEpics } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.epic";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerEpics } from "src/core-logic/domain/apiConsumer/apiConsumer.epics";
@@ -79,6 +83,8 @@ const allEpics: AppEpic<any>[] = [
   ...fetchUserEpics,
   ...updateUserOnAgencyEpics,
   ...agenciesDashboardEpics,
+  ...fetchAgencyEpics,
+  ...updateAgencyEpics,
 ];
 
 const appReducer = combineReducers({
@@ -93,6 +99,8 @@ const appReducer = combineReducers({
   }),
   agency: combineReducers({
     [updateUserOnAgencySlice.name]: updateUserOnAgencySlice.reducer,
+    [fetchAgencySlice.name]: fetchAgencySlice.reducer,
+    [updateAgencySlice.name]: updateAgencySlice.reducer,
   }),
   dashboards: combineReducers({
     [agencyDashboardSlice.name]: agencyDashboardSlice.reducer,
