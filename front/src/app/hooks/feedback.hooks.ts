@@ -11,8 +11,7 @@ export const useFeebackEventCallback = (
   event: ActionKindAndLevel,
   callback: () => void,
 ) => {
-  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
-  const feedback = feedbacks[topic];
+  const feedback = useFeedbackTopic(topic);
   const memoizedCallback = useCallback(callback, []);
   useEffect(() => {
     if (!feedback) return;
@@ -20,4 +19,9 @@ export const useFeebackEventCallback = (
       memoizedCallback();
     }
   }, [feedback, memoizedCallback, event]);
+};
+
+export const useFeedbackTopic = (topic: FeedbackTopic) => {
+  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
+  return feedbacks[topic];
 };

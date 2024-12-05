@@ -20,11 +20,13 @@ export type RejectDiscussionRequestedPayload = {
 export type DiscussionState = {
   discussion: DiscussionReadDto | null;
   isLoading: boolean;
+  fetchError: string | null;
 };
 
 const initialDiscussionState: DiscussionState = {
   discussion: null,
   isLoading: false,
+  fetchError: null,
 };
 
 export const discussionSlice = createSlice({

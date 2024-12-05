@@ -14,16 +14,18 @@ import {
   defaultMaxContactsPerMonth,
   domElementIds,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
-import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 
 const maxContactPerWeekByNumberEmployees: Record<NumberEmployeesRange, number> =
   {
@@ -54,7 +56,6 @@ export const CreationSiretRelatedInputs = () => {
     siretRawError,
     updateSiret,
   } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
-  const establishmentFeedback = useAppSelector(establishmentSelectors.feedback);
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
   const {
     setValue,
@@ -67,6 +68,10 @@ export const CreationSiretRelatedInputs = () => {
   const formContents = getFormFields();
   const getFieldError = makeFieldError(
     useFormContext<FormEstablishmentDto>().formState,
+  );
+
+  const establishmentFeedback = useFeedbackTopic(
+    "establishment-modification-link",
   );
 
   useEffect(() => {
@@ -119,16 +124,18 @@ export const CreationSiretRelatedInputs = () => {
         }
       />
       {siretRawError === "Establishment with this siret is already in our DB" &&
-        establishmentFeedback.kind !== "sendModificationLinkSuccess" && (
+        establishmentFeedback &&
+        establishmentFeedback.level !== "success" && (
           <div className={fr.cx("fr-mb-4w")}>
             Cette entreprise a déjà été référencée.
             <Button
               className={fr.cx("fr-mt-2w")}
               onClick={() => {
                 dispatch(
-                  establishmentSlice.actions.sendModificationLinkRequested(
-                    currentSiret,
-                  ),
+                  establishmentSlice.actions.sendModificationLinkRequested({
+                    siret: currentSiret,
+                    feedbackTopic: "establishment-modification-link",
+                  }),
                 );
               }}
               nativeButtonProps={{
@@ -140,22 +147,30 @@ export const CreationSiretRelatedInputs = () => {
             >
               Demande de modification du formulaire de référencement
             </Button>
-            {establishmentFeedback.kind === "sendModificationLinkErrored" && (
-              <p className={fr.cx("fr-error-text")}>
-                Un email contenant un lien de modification a déjà été envoyé
-              </p>
-            )}
+            <Feedback
+              topic="establishment-modification-link"
+              render={({ level }) => (
+                <>
+                  {level === "error" && (
+                    <p className={fr.cx("fr-error-text")}>
+                      Un email contenant un lien de modification a déjà été
+                      envoyé
+                    </p>
+                  )}
+                  {level === "success" && (
+                    <Alert
+                      severity="success"
+                      title="Succès de la demande"
+                      description="Succès. Un mail a été envoyé au référent de cet établissement avec un
+        lien permettant la mise à jour des informations."
+                      className={fr.cx("fr-mb-4w")}
+                    />
+                  )}
+                </>
+              )}
+            />
           </div>
         )}
-      {establishmentFeedback.kind === "sendModificationLinkSuccess" && (
-        <Alert
-          severity="success"
-          title="Succès de la demande"
-          description="Succès. Un mail a été envoyé au référent de cet établissement avec un
-        lien permettant la mise à jour des informations."
-          className={fr.cx("fr-mb-4w")}
-        />
-      )}
 
       <Input
         label={formContents.businessName.label}

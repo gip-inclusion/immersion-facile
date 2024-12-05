@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,14 +16,15 @@ import {
   errors,
   expiredMagicLinkErrorMessage,
   formEstablishmentSchema,
-  safeTryJsonParse,
 } from "shared";
+import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { AvailabilitySection } from "src/app/components/forms/establishment/sections/AvailabilitySection";
 import { BusinessContactSection } from "src/app/components/forms/establishment/sections/BusinessContactSection";
 import { DetailsSection } from "src/app/components/forms/establishment/sections/DetailsSection";
 import { IntroSection } from "src/app/components/forms/establishment/sections/IntroSection";
 import { SearchableBySection } from "src/app/components/forms/establishment/sections/SearchableBySection";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
@@ -40,11 +40,9 @@ import {
   getUrlParameters,
 } from "src/app/utils/url.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import {
-  EstablishmentFeedback,
-  establishmentSlice,
-} from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { Feedback } from "src/core-logic/domain/feedback/feedback.slice";
 import { P, match } from "ts-pattern";
 import { Route } from "type-route";
 
@@ -107,8 +105,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
-
-  const feedback = useAppSelector(establishmentSelectors.feedback);
+  const establishmentFeedback = useFeedbackTopic("form-establishment");
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
   const initialFormEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
@@ -134,7 +131,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     mode: "onTouched",
   });
   const { handleSubmit, getValues, reset, trigger } = methods;
-
   const formValues = getValues();
   const currentRoute = isEstablishmentDashboard ? route : useRef(route).current;
 
@@ -145,13 +141,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       ? route.params.siret
       : "",
   );
-  useScrollToTop(feedback.kind === "submitSuccess" || currentStep);
+  useScrollToTop(establishmentFeedback?.level === "success" || currentStep);
 
   const redirectToErrorOnFeedback = useCallback(
-    (feedback: EstablishmentFeedback, jwt: string) => {
-      if (feedback.kind === "errored") {
-        if (!feedback.errorMessage.includes(expiredMagicLinkErrorMessage)) {
-          throw errors.user.expiredJwt();
+    (feedback: Feedback, jwt: string) => {
+      if (feedback.level === "error") {
+        if (!feedback.message.includes(expiredMagicLinkErrorMessage)) {
+          throw new Error(feedback.message);
         }
         routes
           .renewConventionMagicLink({
@@ -174,19 +170,26 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
         ({ route }) =>
           dispatch(
-            establishmentSlice.actions.establishmentRequested(
-              formEstablishmentQueryParamsToFormEstablishmentDto(route.params),
-            ),
+            establishmentSlice.actions.fetchEstablishmentRequested({
+              establishmentRequested:
+                formEstablishmentQueryParamsToFormEstablishmentDto(
+                  route.params,
+                ),
+              feedbackTopic: "form-establishment",
+            }),
           ),
       )
       .with({ route: { name: "editFormEstablishment" } }, ({ route }) =>
         dispatch(
-          establishmentSlice.actions.establishmentRequested({
-            siret:
-              decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
-                route.params.jwt,
-              ).siret,
-            jwt: route.params.jwt,
+          establishmentSlice.actions.fetchEstablishmentRequested({
+            establishmentRequested: {
+              siret:
+                decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
+                  route.params.jwt,
+                ).siret,
+              jwt: route.params.jwt,
+            },
+            feedbackTopic: "form-establishment",
           }),
         ),
       )
@@ -203,9 +206,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
         ({ route, adminJwt }) =>
           dispatch(
-            establishmentSlice.actions.establishmentRequested({
-              siret: route.params.siret,
-              jwt: adminJwt,
+            establishmentSlice.actions.fetchEstablishmentRequested({
+              establishmentRequested: {
+                siret: route.params.siret,
+                jwt: adminJwt,
+              },
+              feedbackTopic: "form-establishment",
             }),
           ),
       )
@@ -216,9 +222,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
         ({ route, inclusionConnectedJwt }) =>
           dispatch(
-            establishmentSlice.actions.establishmentRequested({
-              siret: route.params.siret,
-              jwt: inclusionConnectedJwt,
+            establishmentSlice.actions.fetchEstablishmentRequested({
+              establishmentRequested: {
+                siret: route.params.siret,
+                jwt: inclusionConnectedJwt,
+              },
+              feedbackTopic: "form-establishment",
             }),
           ),
       )
@@ -236,7 +245,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   useEffect(() => {
     return () => {
-      dispatch(establishmentSlice.actions.establishmentClearRequested());
+      dispatch(establishmentSlice.actions.clearEstablishmentRequested());
     };
   }, [dispatch]);
 
@@ -269,10 +278,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   }, [debouncedFormValues, isEstablishmentCreation]);
 
   useEffect(() => {
-    if (route.name === "editFormEstablishment") {
-      redirectToErrorOnFeedback(feedback, route.params.jwt);
+    if (route.name === "editFormEstablishment" && establishmentFeedback) {
+      redirectToErrorOnFeedback(establishmentFeedback, route.params.jwt);
     }
-  }, [feedback, redirectToErrorOnFeedback, route]);
+  }, [establishmentFeedback, redirectToErrorOnFeedback, route]);
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
     match({ route, adminJwt, inclusionConnectedJwt })
@@ -284,16 +293,20 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
         () =>
           dispatch(
-            establishmentSlice.actions.establishmentCreationRequested(
+            establishmentSlice.actions.createEstablishmentRequested({
               formEstablishment,
-            ),
+              feedbackTopic: "form-establishment",
+            }),
           ),
       )
       .with({ route: { name: "editFormEstablishment" } }, ({ route }) =>
         dispatch(
-          establishmentSlice.actions.establishmentEditionRequested({
-            formEstablishment,
-            jwt: route.params.jwt,
+          establishmentSlice.actions.updateEstablishmentRequested({
+            establishmentUpdate: {
+              formEstablishment,
+              jwt: route.params.jwt,
+            },
+            feedbackTopic: "form-establishment",
           }),
         ),
       )
@@ -304,9 +317,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
         ({ adminJwt }) =>
           dispatch(
-            establishmentSlice.actions.establishmentEditionRequested({
-              formEstablishment,
-              jwt: adminJwt,
+            establishmentSlice.actions.updateEstablishmentRequested({
+              establishmentUpdate: {
+                formEstablishment,
+                jwt: adminJwt,
+              },
+              feedbackTopic: "form-establishment",
             }),
           ),
       )
@@ -326,9 +342,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
         ({ inclusionConnectedJwt }) =>
           dispatch(
-            establishmentSlice.actions.establishmentEditionRequested({
-              formEstablishment,
-              jwt: inclusionConnectedJwt,
+            establishmentSlice.actions.updateEstablishmentRequested({
+              establishmentUpdate: {
+                formEstablishment,
+                jwt: inclusionConnectedJwt,
+              },
+              feedbackTopic: "form-establishment",
             }),
           ),
       )
@@ -365,36 +384,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       setCurrentStep(step);
     }
   };
-  return match(feedback)
-    .with({ kind: "errored" }, (feedback) => {
-      if (feedback.errorMessage === expiredMagicLinkErrorMessage) {
-        throw new Error(feedback.errorMessage);
-      }
-      const errorMessage = safeTryJsonParse(feedback.errorMessage);
-      throw new Error(
-        `Entreprise non trouvée : ${
-          typeof errorMessage === "string"
-            ? errorMessage
-            : errorMessage.payload.errors
-        }`,
-      );
-    })
-    .with({ kind: "deleteSuccess" }, () => (
-      <Alert
-        severity="success"
-        title="Succès de la suppression"
-        description="Succès. Nous avons bien supprimé les informations concernant l'entreprise."
-      />
-    ))
-    .with({ kind: "submitSuccess" }, () => (
-      <Alert
-        severity="success"
-        title="Succès de l'envoi"
-        description="Succès. Nous avons bien enregistré les informations concernant
-        votre entreprise."
-      />
-    ))
-    .otherwise(() => (
+
+  return (
+    <WithFeedbackReplacer topic="form-establishment">
       <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -501,5 +493,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             ))}
         </form>
       </FormProvider>
-    ));
+    </WithFeedbackReplacer>
+  );
 };
