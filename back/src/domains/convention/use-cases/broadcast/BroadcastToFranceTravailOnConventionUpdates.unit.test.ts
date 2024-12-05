@@ -225,7 +225,8 @@ describe("Broadcasts events to France Travail", () => {
     );
   });
 
-  it("broadcast to pole-emploi when convention is from an agency RefersTo", async () => {
+  // TODO: uncomment when France Travail is ready to accept those
+  it.skip("broadcast to pole-emploi when convention is from an agency RefersTo", async () => {
     // Prepare
 
     const agencyWithRefersTo = toAgencyWithRights(
@@ -362,7 +363,8 @@ describe("Broadcasts events to France Travail", () => {
           });
         });
 
-        it(`broadcast to france travail when convention is from an agency RefersTo (and the refered agency is ${agencyKind})`, async () => {
+        // TODO: uncomment when France Travail is ready to accept those
+        it.skip(`broadcast to france travail when convention is from an agency RefersTo (and the refered agency is ${agencyKind})`, async () => {
           uow.featureFlagRepository.featureFlags = featureFlag;
 
           const agencyWithRefersTo = toAgencyWithRights(
