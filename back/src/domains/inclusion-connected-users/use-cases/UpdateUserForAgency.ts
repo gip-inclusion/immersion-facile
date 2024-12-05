@@ -12,6 +12,8 @@ import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
+  rejectIfEditionOfNotificationPreferencesWhenNotAdminNorOwnPreferences,
+  rejectIfEditionOfRolesWhenNotBackofficeAdminNorAgencyAdmin,
   rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
   validateAgencyRights,
 } from "../helpers/agencyRights.helper";
@@ -57,6 +59,16 @@ export class UpdateUserForAgency extends TransactionalUseCase<
         userId: userToUpdate.id,
       });
 
+    rejectIfEditionOfRolesWhenNotBackofficeAdminNorAgencyAdmin(
+      agencyRightToUpdate.roles,
+      params.roles,
+      isBackOfficeOrAgencyAdmin,
+    );
+    rejectIfEditionOfNotificationPreferencesWhenNotAdminNorOwnPreferences(
+      currentUser.id === userToUpdate.id,
+      agencyRightToUpdate.isNotifiedByEmail !== params.isNotifiedByEmail,
+      isBackOfficeOrAgencyAdmin,
+    );
     rejectIfEditionOfValidatorsOfAgencyWithRefersTo(agency, params.roles);
     rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 
@@ -120,18 +132,13 @@ const throwIfUserHasNoRightOnAgency = (
   if (!currentUser) throw errors.user.unauthorized();
   if (currentUser.isBackofficeAdmin) return { isBackOfficeOrAgencyAdmin: true };
 
-  const userAgencyRight = currentUser.agencyRights.find(
+  const currentUserAgencyRight = currentUser.agencyRights.find(
     (agencyRight) => agencyRight.agency.id === userParamsForAgency.agencyId,
   );
-  if (!userAgencyRight) throw errors.user.forbidden({ userId: currentUser.id });
-
-  const isAgencyAdmin = userAgencyRight.roles.includes("agency-admin");
-
-  const areRolesUpdated =
-    userAgencyRight.roles.sort().join() !==
-    userParamsForAgency.roles.sort().join();
-  if (!isAgencyAdmin && areRolesUpdated)
+  if (!currentUserAgencyRight)
     throw errors.user.forbidden({ userId: currentUser.id });
+
+  const isAgencyAdmin = currentUserAgencyRight.roles.includes("agency-admin");
 
   return {
     isBackOfficeOrAgencyAdmin: currentUser.isBackofficeAdmin || isAgencyAdmin,

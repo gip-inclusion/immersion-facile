@@ -16,6 +16,32 @@ export const rejectIfEditionOfValidatorsOfAgencyWithRefersTo = (
   }
 };
 
+export const rejectIfEditionOfRolesWhenNotBackofficeAdminNorAgencyAdmin = (
+  initialRoles: AgencyRole[],
+  requestedRole: AgencyRole[],
+  isBackofficeAdminNorAgencyAdmin: boolean,
+) => {
+  const areRolesUpdated =
+    initialRoles.sort().join() !== requestedRole.sort().join();
+
+  if (!isBackofficeAdminNorAgencyAdmin && areRolesUpdated)
+    throw errors.user.forbiddenRolesUpdate();
+};
+
+export const rejectIfEditionOfNotificationPreferencesWhenNotAdminNorOwnPreferences =
+  (
+    isOwnPreferences: boolean,
+    areNotificationPreferencesUpdated: boolean,
+    isBackofficeAdminNorAgencyAdmin: boolean,
+  ) => {
+    if (
+      !isBackofficeAdminNorAgencyAdmin &&
+      !isOwnPreferences &&
+      areNotificationPreferencesUpdated
+    )
+      throw errors.user.forbiddenNotificationsPreferencesUpdate();
+  };
+
 export function validateAgencyRights(
   agencyId: AgencyId,
   agencyRights: AgencyUsersRights,
