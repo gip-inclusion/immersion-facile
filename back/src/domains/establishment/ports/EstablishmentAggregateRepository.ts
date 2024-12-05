@@ -50,6 +50,7 @@ export interface EstablishmentAggregateRepository {
   markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
     fromDate: Date,
   ): Promise<number>;
+  updateAllEstablishmentScores(): Promise<void>;
 
   //Offers
   getOffersAsAppellationAndRomeDtosBySiret(
@@ -57,7 +58,7 @@ export interface EstablishmentAggregateRepository {
   ): Promise<AppellationAndRomeDto[]>;
 
   //SearchResult & SearchImmersionResults
-  getSearchImmersionResultDtoBySearchQuery(
+  getSearchResultBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
     locationId: LocationId,
