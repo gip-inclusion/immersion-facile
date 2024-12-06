@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type { AgencyDto, WithAgencyId } from "shared";
 import { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
@@ -73,6 +74,14 @@ export const fetchAgencySlice = createSlice({
         if (!state.agency) return;
         const { feedbackTopic: _, ...agency } = action.payload;
         state.agency = agency;
+      },
+    );
+    builder.addCase(
+      createUserOnAgencySlice.actions.createUserOnAgencySucceeded,
+      (state, action) => {
+        if (!state.agencyUsers) return;
+        const { id } = action.payload.icUser;
+        state.agencyUsers[id] = action.payload.icUser;
       },
     );
     builder.addCase(
