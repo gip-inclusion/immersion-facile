@@ -8,6 +8,7 @@ import {
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { adminFetchUserSelectors } from "src/core-logic/domain/admin/fetchUser/fetchUser.selectors";
 import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
+import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import {
   TestDependencies,
@@ -44,8 +45,8 @@ describe("Admin Users slice", () => {
     );
   });
 
-  describe("on updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded", () => {
-    it("if it is user in slice, update the user rights successfully", () => {
+  describe("when current user has successfully requested an update of another user", () => {
+    it("if this other user is in the state, update this user rights successfully", () => {
       const agency = new AgencyDtoBuilder().build();
       const agencyRight: AgencyRight = {
         agency,
@@ -68,16 +69,28 @@ describe("Admin Users slice", () => {
       }));
 
       store.dispatch(
-        updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
-          userId: user.id,
-          agencyId: agency.id,
-          email: user.email,
-          roles: [...agencyRight.roles, "counsellor"],
-          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+        updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+          user: {
+            userId: user.id,
+            agencyId: agency.id,
+            email: user.email,
+            roles: [...agencyRight.roles, "counsellor"],
+            isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+          },
+          jwt: "connected-user-jwt",
           feedbackTopic: "user",
         }),
       );
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        true,
+      );
+      dependencies.agencyGateway.updateUserAgencyRightResponse$.next(undefined);
 
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        false,
+      );
       expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), {
         ...user,
         agencyRights: [
@@ -89,7 +102,7 @@ describe("Admin Users slice", () => {
       });
     });
 
-    it("if it is not user in slice, do nothing", () => {
+    it("if it is not user in state, do nothing", () => {
       const agency = new AgencyDtoBuilder().build();
       const agencyRight: AgencyRight = {
         agency,
@@ -112,16 +125,28 @@ describe("Admin Users slice", () => {
       }));
 
       store.dispatch(
-        updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
-          userId: "another-user-id",
-          agencyId: agency.id,
-          email: "another-user-id@email.com",
-          roles: [...agencyRight.roles, "counsellor"],
-          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+        updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+          user: {
+            userId: "another-user-id",
+            agencyId: agency.id,
+            email: "another-user-id@email.com",
+            roles: [...agencyRight.roles, "counsellor"],
+            isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+          },
+          jwt: "connected-user-jwt",
           feedbackTopic: "user",
         }),
       );
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        true,
+      );
+      dependencies.agencyGateway.updateUserAgencyRightResponse$.next(undefined);
 
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        false,
+      );
       expectToEqual(
         adminFetchUserSelectors.fetchedUser(store.getState()),
         user,
