@@ -23,6 +23,7 @@ import { routes } from "src/app/routes/routes";
 
 type UserDetailProps = {
   title: string;
+  currentUser: InclusionConnectedUser;
   userWithRights: InclusionConnectedUser;
   editInformationsLink?: string;
   onUserUpdateRequested: (userParamsForAgency: UserParamsForAgency) => void;
@@ -35,6 +36,7 @@ const manageUserModal = createModal({
 
 export const UserDetail = ({
   title,
+  currentUser,
   userWithRights,
   editInformationsLink,
   onUserUpdateRequested,
@@ -72,7 +74,7 @@ export const UserDetail = ({
         agencyRights={[...userWithRights.agencyRights].sort((a, b) =>
           a.agency.name.localeCompare(b.agency.name),
         )}
-        isBackofficeAdmin={userWithRights.isBackofficeAdmin}
+        isBackofficeAdmin={currentUser.isBackofficeAdmin}
         onUserUpdateRequested={onUserUpdateRequested}
       />
     </div>
