@@ -1,10 +1,17 @@
 import { values } from "ramda";
-import { AgencyDto, AgencyDtoBuilder, expectToEqual } from "shared";
+import {
+  AgencyDto,
+  AgencyDtoBuilder,
+  AgencyRight,
+  InclusionConnectedUser,
+  expectToEqual,
+} from "shared";
 import {
   NormalizedIcUserById,
   NormalizedInclusionConnectedUser,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
+import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 import {
   FetchAgencyState,
@@ -223,6 +230,71 @@ describe("fetchAgency", () => {
       );
 
       expectFetchAgencyStateToMatch({ agency: updatedAgency });
+    });
+
+    it("should create user successfully", () => {
+      ({ store, dependencies } = createTestStore({
+        agency: agenciesPreloadedState({
+          fetchAgency: {
+            ...fetchAgencyInitialState,
+            agency: agencyDto,
+            agencyUsers: fakeAgencyUsers,
+          },
+        }),
+      }));
+      expectFetchAgencyStateToMatch({
+        agency: agencyDto,
+        agencyUsers: fakeAgencyUsers,
+      });
+
+      const agencyRight: AgencyRight = {
+        agency: agencyDto,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      };
+
+      const userToCreate: NormalizedInclusionConnectedUser = {
+        id: "fake-id",
+        email: "fake-email@mail.com",
+        firstName: "fake-first-name",
+        lastName: "fake-last-name",
+        externalId: null,
+        createdAt: new Date().toISOString(),
+        agencyRights: {
+          [agencyDto.id]: agencyRight,
+        },
+        dashboards: { agencies: {}, establishments: {} },
+      };
+
+      const icUser: InclusionConnectedUser = {
+        ...userToCreate,
+        agencyRights: [agencyRight],
+      };
+
+      store.dispatch(
+        createUserOnAgencySlice.actions.createUserOnAgencySucceeded({
+          agencyId: agencyDto.id,
+          icUser: userToCreate,
+          feedbackTopic: "agency-user-for-dashboard",
+        }),
+      );
+
+      expectFetchAgencyStateToMatch({
+        agency: agencyDto,
+        agencyUsers: {
+          ...fakeAgencyUsers,
+          [userToCreate.id]: {
+            ...icUser,
+            agencyRights: {
+              [agencyDto.id]: {
+                agency: agencyDto,
+                roles: ["validator"],
+                isNotifiedByEmail: false,
+              },
+            },
+          },
+        },
+      });
     });
 
     it("should update user successfully", () => {
