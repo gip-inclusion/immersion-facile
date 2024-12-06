@@ -434,7 +434,6 @@ type EstablishmentsLocationInfos = {
 };
 
 interface ImmersionOffers {
-  rome_code: string;
   siret: string;
   created_at: Generated<Timestamp>;
   update_date: Generated<Timestamp>;
@@ -521,7 +520,6 @@ interface SearchesMade extends WithAcquisition {
   lon: number | null;
   needstobesearched: boolean | null;
   number_of_results: number | null;
-  rome: string | null;
   searchable_by: SearchableBy | null;
   sorted_by: Generated<SortedBy | null>;
   update_date: Generated<Timestamp | null>;
