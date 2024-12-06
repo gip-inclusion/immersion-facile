@@ -4,6 +4,7 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { keys } from "shared";
+import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
@@ -240,12 +241,12 @@ export const feedbackMapping: Record<
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
     "create.success": {
-      action: agencyDashboardSlice.actions.createUserOnAgencySucceeded,
+      action: createUserOnAgencySlice.actions.createUserOnAgencySucceeded,
       title: "L'utilisateur a été créé",
       message: "L'utilisateur a été créé et associé à cette agence.",
     },
     "create.error": {
-      action: agencyDashboardSlice.actions.createUserOnAgencyFailed,
+      action: createUserOnAgencySlice.actions.createUserOnAgencyFailed,
       title: "Problème lors de la création de l'utilisateur",
       message: "Une erreur est survenue lors de la création de l'utilisateur",
     },
