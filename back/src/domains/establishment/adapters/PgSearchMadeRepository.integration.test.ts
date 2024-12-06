@@ -180,7 +180,6 @@ const getSearchMadeById = async (
       acquisitionCampaign: optional(searchMadeResult.acquisition_campaign),
       acquisitionKeyword: optional(searchMadeResult.acquisition_keyword),
       establishmentSearchableBy: optional(searchMadeResult.searchable_by),
-      romeCode: optional(searchMadeResult.rome),
     }
   );
 };
