@@ -25,7 +25,7 @@ const updateUserAgencyRightEpic: UpdateUserOnAgencyEpic = (
           map(() =>
             updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
               ...action.payload.user,
-              feedbackTopic: "user",
+              feedbackTopic: action.payload.feedbackTopic,
             }),
           ),
           catchEpicError((error) =>
