@@ -7,12 +7,11 @@ import {
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
 import {
   rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
   validateAgencyRights,
 } from "../helpers/agencyRights.helper";
-
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
 
 export type RemoveUserFromAgency = ReturnType<typeof makeRemoveUserFromAgency>;
 
