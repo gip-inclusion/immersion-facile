@@ -205,7 +205,7 @@ export class HttpAgencyGateway implements AgencyGateway {
         })
         .then((response) =>
           match(response)
-            .with({ status: 200 }, () => undefined)
+            .with({ status: 201 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),

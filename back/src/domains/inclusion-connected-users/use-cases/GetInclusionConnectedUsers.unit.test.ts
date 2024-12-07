@@ -48,9 +48,9 @@ const backOfficeUser = backOfficeUserBuilder.buildUser();
 const icbackOffice = backOfficeUserBuilder.build();
 
 const agencyAdminUserBuilder = new InclusionConnectedUserBuilder()
-  .withId("backoffice-admin")
+  .withId("agency-admin")
   .withFirstName("Jack")
-  .withLastName("The Admin")
+  .withLastName("The agency Admin")
   .withEmail("jack.admin@mail.com")
   .withCreatedAt(new Date())
   .withExternalId("jack-admin-external-id")
