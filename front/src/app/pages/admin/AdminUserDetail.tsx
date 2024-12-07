@@ -33,8 +33,7 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
   const onUserUpdateRequested = (userParamsForAgency: UserParamsForAgency) => {
     dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: userParamsForAgency,
-        jwt: userConnectedJwt,
+        ...userParamsForAgency,
         feedbackTopic: "user",
       }),
     );

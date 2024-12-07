@@ -73,7 +73,7 @@ export const fetchAgencySlice = createSlice({
     builder.addCase(
       updateAgencySlice.actions.updateAgencySucceeded,
       (state, action) => {
-        if (!state.agency) return;
+        if (!state.agency || state.agency.id !== action.payload.id) return;
         const { feedbackTopic: _, ...agency } = action.payload;
         state.agency = agency;
       },
@@ -82,6 +82,8 @@ export const fetchAgencySlice = createSlice({
       createUserOnAgencySlice.actions.createUserOnAgencySucceeded,
       (state, action) => {
         if (!state.agencyUsers) return;
+        if (!state.agencyUsers || state.agency?.id !== action.payload.agencyId)
+          return;
         const { id } = action.payload.icUser;
         state.agencyUsers[id] = action.payload.icUser;
       },
@@ -89,7 +91,8 @@ export const fetchAgencySlice = createSlice({
     builder.addCase(
       removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded,
       (state, action) => {
-        if (!state.agencyUsers) return;
+        if (!state.agencyUsers || !state.agencyUsers[action.payload.userId])
+          return;
         state.agencyUsers = filter(
           (agencyUser) => agencyUser.id !== action.payload.userId,
           state.agencyUsers,
@@ -99,7 +102,9 @@ export const fetchAgencySlice = createSlice({
     builder.addCase(
       updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
       (state, action) => {
-        if (!state.agencyUsers) return;
+        if (!state.agencyUsers || !state.agencyUsers[action.payload.userId])
+          return;
+
         const {
           userId,
           agencyId,

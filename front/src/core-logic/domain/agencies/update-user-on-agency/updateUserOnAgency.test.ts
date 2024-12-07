@@ -74,8 +74,7 @@ describe("UpdateUserOnAgency slice", () => {
   it("update the user rights successfully and store the feedback in user feedbacks", () => {
     store.dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: userParams,
-        jwt: "connected-user-jwt",
+        ...userParams,
         feedbackTopic: "user",
       }),
     );
@@ -102,8 +101,7 @@ describe("UpdateUserOnAgency slice", () => {
   it("update the user rights successfully and store the feedback in agency-user-for-dashboard feedbacks", () => {
     store.dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: userParams,
-        jwt: "connected-user-jwt",
+        ...userParams,
         feedbackTopic: "agency-user-for-dashboard",
       }),
     );
@@ -136,8 +134,7 @@ describe("UpdateUserOnAgency slice", () => {
   it("not update the user rights if error, and store the feedback in user feedbacks", () => {
     store.dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: userParams,
-        jwt: "connected-user-jwt",
+        ...userParams,
         feedbackTopic: "user",
       }),
     );
@@ -167,8 +164,7 @@ describe("UpdateUserOnAgency slice", () => {
   it("not update the user rights if error and store the feedback in agency-user-for-dashboard feedbacks", () => {
     store.dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: userParams,
-        jwt: "connected-user-jwt",
+        ...userParams,
         feedbackTopic: "agency-user-for-dashboard",
       }),
     );
