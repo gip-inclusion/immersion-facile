@@ -344,14 +344,12 @@ describe("InclusionConnected", () => {
 
       store.dispatch(
         updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-          user: {
-            userId: user.id,
-            agencyId: agency.id,
-            email: user.email,
-            roles: [...agencyRight.roles, "counsellor"],
-            isNotifiedByEmail: agencyRight.isNotifiedByEmail,
-          },
-          jwt: "connected-user-jwt",
+          userId: user.id,
+          agencyId: agency.id,
+          email: user.email,
+          roles: [...agencyRight.roles, "counsellor"],
+          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+
           feedbackTopic: "user",
         }),
       );
@@ -399,14 +397,11 @@ describe("InclusionConnected", () => {
 
       store.dispatch(
         updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-          user: {
-            userId: "another-user-id",
-            agencyId: agency.id,
-            email: "another-user-id@email.com",
-            roles: [...agencyRight.roles, "counsellor"],
-            isNotifiedByEmail: agencyRight.isNotifiedByEmail,
-          },
-          jwt: "connected-user-jwt",
+          userId: "another-user-id",
+          agencyId: agency.id,
+          email: "another-user-id@email.com",
+          roles: [...agencyRight.roles, "counsellor"],
+          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
           feedbackTopic: "user",
         }),
       );
