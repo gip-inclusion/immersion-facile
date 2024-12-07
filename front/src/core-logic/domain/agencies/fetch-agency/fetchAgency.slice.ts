@@ -1,7 +1,9 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { filter } from "ramda";
 import type { AgencyDto, WithAgencyId } from "shared";
 import { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
+import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
@@ -82,6 +84,16 @@ export const fetchAgencySlice = createSlice({
         if (!state.agencyUsers) return;
         const { id } = action.payload.icUser;
         state.agencyUsers[id] = action.payload.icUser;
+      },
+    );
+    builder.addCase(
+      removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded,
+      (state, action) => {
+        if (!state.agencyUsers) return;
+        state.agencyUsers = filter(
+          (agencyUser) => agencyUser.id !== action.payload.userId,
+          state.agencyUsers,
+        );
       },
     );
     builder.addCase(
