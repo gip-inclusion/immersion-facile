@@ -18,6 +18,7 @@ import {
   fetchAgencyInitialState,
   fetchAgencySlice,
 } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 
@@ -294,6 +295,34 @@ describe("fetchAgency", () => {
             },
           },
         },
+      });
+    });
+
+    it("should remove user successfully", () => {
+      ({ store, dependencies } = createTestStore({
+        agency: agenciesPreloadedState({
+          fetchAgency: {
+            ...fetchAgencyInitialState,
+            agencyUsers: fakeAgencyUsers,
+          },
+        }),
+      }));
+      const userToRemove = fakeAgencyUsers[user2.id];
+
+      expectFetchAgencyStateToMatch({
+        agencyUsers: fakeAgencyUsers,
+      });
+
+      store.dispatch(
+        removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded({
+          userId: userToRemove.id,
+          agencyId: agencyDto.id,
+          feedbackTopic: "agency-user-for-dashboard",
+        }),
+      );
+
+      expectFetchAgencyStateToMatch({
+        agencyUsers: { [user1.id]: fakeAgencyUsers[user1.id] },
       });
     });
 
