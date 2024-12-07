@@ -6,6 +6,7 @@ import {
 import { keys } from "shared";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
@@ -251,12 +252,12 @@ export const feedbackMapping: Record<
       message: "Une erreur est survenue lors de la création de l'utilisateur",
     },
     "delete.success": {
-      action: agencyDashboardSlice.actions.removeUserFromAgencySucceeded,
+      action: removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded,
       title: "L'utilisateur n'est plus rattaché à cette agence",
       message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
     },
     "delete.error": {
-      action: agencyDashboardSlice.actions.removeUserFromAgencyFailed,
+      action: removeUserFromAgencySlice.actions.removeUserFromAgencyFailed,
       title:
         "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
       message:
