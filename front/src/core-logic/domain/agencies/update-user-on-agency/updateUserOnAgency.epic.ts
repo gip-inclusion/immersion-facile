@@ -1,4 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
+import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -11,7 +12,7 @@ type UpdateUserOnAgencyEpic = AppEpic<UpdateUserOnAgencyAction>;
 
 const updateUserAgencyRightEpic: UpdateUserOnAgencyEpic = (
   action$,
-  _state$,
+  state$,
   { agencyGateway },
 ) =>
   action$.pipe(
@@ -20,11 +21,11 @@ const updateUserAgencyRightEpic: UpdateUserOnAgencyEpic = (
     ),
     switchMap((action) =>
       agencyGateway
-        .updateUserAgencyRight$(action.payload.user, action.payload.jwt)
+        .updateUserAgencyRight$(action.payload, getAdminToken(state$.value))
         .pipe(
           map(() =>
             updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
-              ...action.payload.user,
+              ...action.payload,
               feedbackTopic: action.payload.feedbackTopic,
             }),
           ),
