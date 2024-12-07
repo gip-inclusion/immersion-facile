@@ -11,7 +11,7 @@ import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { agencyDashboardSlice } from "src/core-logic/domain/dashboards/agencyDashboard/agencyDashboard.slice";
+
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -231,12 +231,12 @@ export const feedbackMapping: Record<
         "Une erreur est survenue lors de la récupération de la liste des utilisateurs de cette agence",
     },
     "update.success": {
-      action: agencyDashboardSlice.actions.updateUserOnAgencySucceeded,
+      action: updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
       title: "L'utilisateur a été mis à jour",
       message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
     },
     "update.error": {
-      action: agencyDashboardSlice.actions.updateUserOnAgencyFailed,
+      action: updateUserOnAgencySlice.actions.updateUserAgencyRightFailed,
       title: "Problème lors de la mise à jour de l'utilisateur",
       message:
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
