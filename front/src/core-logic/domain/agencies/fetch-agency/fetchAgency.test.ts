@@ -212,162 +212,317 @@ describe("fetchAgency", () => {
   });
 
   describe("extra reducers", () => {
-    it("update the agency successfully", () => {
-      ({ store, dependencies } = createTestStore({
-        agency: agenciesPreloadedState({
-          fetchAgency: { ...fetchAgencyInitialState, agency: agencyDto },
-        }),
-      }));
+    describe("updateAgency", () => {
+      it("should update agency successfully", () => {
+        ({ store, dependencies } = createTestStore({
+          agency: agenciesPreloadedState({
+            fetchAgency: { ...fetchAgencyInitialState, agency: agencyDto },
+          }),
+        }));
 
-      const updatedAgency = new AgencyDtoBuilder(agencyDto)
-        .withName("updated-Name")
-        .build();
+        const updatedAgency = new AgencyDtoBuilder(agencyDto)
+          .withName("updated-Name")
+          .build();
 
-      store.dispatch(
-        updateAgencySlice.actions.updateAgencySucceeded({
-          ...updatedAgency,
-          feedbackTopic: "agency-for-dashboard",
-        }),
-      );
+        store.dispatch(
+          updateAgencySlice.actions.updateAgencyRequested({
+            ...updatedAgency,
+            feedbackTopic: "agency-for-dashboard",
+          }),
+        );
 
-      expectFetchAgencyStateToMatch({ agency: updatedAgency });
-    });
+        dependencies.agencyGateway.updateAgencyResponse$.next(undefined);
 
-    it("should create user successfully", () => {
-      ({ store, dependencies } = createTestStore({
-        agency: agenciesPreloadedState({
-          fetchAgency: {
-            ...fetchAgencyInitialState,
-            agency: agencyDto,
-            agencyUsers: fakeAgencyUsers,
-          },
-        }),
-      }));
-      expectFetchAgencyStateToMatch({
-        agency: agencyDto,
-        agencyUsers: fakeAgencyUsers,
+        expectFetchAgencyStateToMatch({ agency: updatedAgency });
       });
 
-      const agencyRight: AgencyRight = {
-        agency: agencyDto,
-        roles: ["validator"],
-        isNotifiedByEmail: false,
-      };
+      it("if it is not agency in state, do nothing", () => {
+        ({ store, dependencies } = createTestStore({
+          agency: agenciesPreloadedState({
+            fetchAgency: { ...fetchAgencyInitialState },
+          }),
+        }));
 
-      const userToCreate: NormalizedInclusionConnectedUser = {
-        id: "fake-id",
-        email: "fake-email@mail.com",
-        firstName: "fake-first-name",
-        lastName: "fake-last-name",
-        externalId: null,
-        createdAt: new Date().toISOString(),
-        agencyRights: {
-          [agencyDto.id]: agencyRight,
-        },
-        dashboards: { agencies: {}, establishments: {} },
-      };
+        const updatedAgency = new AgencyDtoBuilder(agencyDto)
+          .withName("updated-Name")
+          .build();
 
-      const icUser: InclusionConnectedUser = {
-        ...userToCreate,
-        agencyRights: [agencyRight],
-      };
+        store.dispatch(
+          updateAgencySlice.actions.updateAgencyRequested({
+            ...updatedAgency,
+            feedbackTopic: "agency-for-dashboard",
+          }),
+        );
 
-      store.dispatch(
-        createUserOnAgencySlice.actions.createUserOnAgencySucceeded({
-          agencyId: agencyDto.id,
-          icUser: userToCreate,
-          feedbackTopic: "agency-user-for-dashboard",
-        }),
-      );
+        dependencies.agencyGateway.updateAgencyResponse$.next(undefined);
 
-      expectFetchAgencyStateToMatch({
-        agency: agencyDto,
-        agencyUsers: {
-          ...fakeAgencyUsers,
-          [userToCreate.id]: {
-            ...icUser,
-            agencyRights: {
-              [agencyDto.id]: {
-                agency: agencyDto,
-                roles: ["validator"],
-                isNotifiedByEmail: false,
+        expectFetchAgencyStateToMatch({ ...fetchAgencyInitialState });
+      });
+    });
+
+    describe("createUser", () => {
+      it("should create user successfully", () => {
+        ({ store, dependencies } = createTestStore({
+          agency: agenciesPreloadedState({
+            fetchAgency: {
+              ...fetchAgencyInitialState,
+              agency: agencyDto,
+              agencyUsers: fakeAgencyUsers,
+            },
+          }),
+        }));
+        expectFetchAgencyStateToMatch({
+          agency: agencyDto,
+          agencyUsers: fakeAgencyUsers,
+        });
+
+        const agencyRight: AgencyRight = {
+          agency: agencyDto,
+          roles: ["validator"],
+          isNotifiedByEmail: false,
+        };
+
+        const userToCreate: NormalizedInclusionConnectedUser = {
+          id: "fake-id",
+          email: "fake-email@mail.com",
+          firstName: "fake-first-name",
+          lastName: "fake-last-name",
+          externalId: null,
+          createdAt: new Date().toISOString(),
+          agencyRights: {
+            [agencyDto.id]: agencyRight,
+          },
+          dashboards: { agencies: {}, establishments: {} },
+        };
+
+        const icUser: InclusionConnectedUser = {
+          ...userToCreate,
+          agencyRights: [agencyRight],
+        };
+
+        store.dispatch(
+          createUserOnAgencySlice.actions.createUserOnAgencyRequested({
+            agencyId: agencyDto.id,
+            userId: userToCreate.id,
+            isNotifiedByEmail:
+              userToCreate.agencyRights[agencyDto.id].isNotifiedByEmail,
+            email: userToCreate.email,
+            roles: userToCreate.agencyRights[agencyDto.id].roles,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
+        );
+
+        dependencies.agencyGateway.createUserForAgencyResponse$.next(icUser);
+
+        expectFetchAgencyStateToMatch({
+          agency: agencyDto,
+          agencyUsers: {
+            ...fakeAgencyUsers,
+            [userToCreate.id]: {
+              ...icUser,
+              agencyRights: {
+                [agencyDto.id]: {
+                  agency: agencyDto,
+                  roles: ["validator"],
+                  isNotifiedByEmail: false,
+                },
               },
             },
           },
-        },
-      });
-    });
-
-    it("should remove user successfully", () => {
-      ({ store, dependencies } = createTestStore({
-        agency: agenciesPreloadedState({
-          fetchAgency: {
-            ...fetchAgencyInitialState,
-            agencyUsers: fakeAgencyUsers,
-          },
-        }),
-      }));
-      const userToRemove = fakeAgencyUsers[user2.id];
-
-      expectFetchAgencyStateToMatch({
-        agencyUsers: fakeAgencyUsers,
+        });
       });
 
-      store.dispatch(
-        removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded({
-          userId: userToRemove.id,
-          agencyId: agencyDto.id,
-          feedbackTopic: "agency-user-for-dashboard",
-        }),
-      );
+      it("if  no agency in state, do nothing", () => {
+        ({ store, dependencies } = createTestStore({
+          agency: agenciesPreloadedState({
+            fetchAgency: fetchAgencyInitialState,
+          }),
+        }));
+        expectFetchAgencyStateToMatch(fetchAgencyInitialState);
 
-      expectFetchAgencyStateToMatch({
-        agencyUsers: { [user1.id]: fakeAgencyUsers[user1.id] },
-      });
-    });
-
-    it("should update user successfully", () => {
-      ({ store, dependencies } = createTestStore({
-        agency: agenciesPreloadedState({
-          fetchAgency: {
-            ...fetchAgencyInitialState,
-            agencyUsers: fakeAgencyUsers,
-          },
-        }),
-      }));
-
-      const originalUser = fakeAgencyUsers[user1.id];
-
-      const updatedUser: NormalizedInclusionConnectedUser = {
-        ...originalUser,
-        email: "updated-email@email.fr",
-        agencyRights: {
-          ...originalUser.agencyRights,
-          [agencyDto.id]: {
-            ...originalUser.agencyRights[agencyDto.id],
-            roles: ["agency-admin", "validator"],
-            isNotifiedByEmail: false,
-          },
-        },
-      };
-
-      expectFetchAgencyStateToMatch({
-        agencyUsers: fakeAgencyUsers,
-      });
-
-      store.dispatch(
-        updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
-          userId: originalUser.id,
-          agencyId: agencyDto.id,
-          roles: updatedUser.agencyRights[agencyDto.id].roles,
-          feedbackTopic: "agency-user-for-dashboard",
+        const agencyRight: AgencyRight = {
+          agency: agencyDto,
+          roles: ["validator"],
           isNotifiedByEmail: false,
-          email: updatedUser.email,
-        }),
-      );
+        };
 
-      expectFetchAgencyStateToMatch({
-        agencyUsers: { ...fakeAgencyUsers, [originalUser.id]: updatedUser },
+        const userToCreate: NormalizedInclusionConnectedUser = {
+          id: "fake-id",
+          email: "fake-email@mail.com",
+          firstName: "fake-first-name",
+          lastName: "fake-last-name",
+          externalId: null,
+          createdAt: new Date().toISOString(),
+          agencyRights: {
+            [agencyDto.id]: agencyRight,
+          },
+          dashboards: { agencies: {}, establishments: {} },
+        };
+
+        const icUser: InclusionConnectedUser = {
+          ...userToCreate,
+          agencyRights: [agencyRight],
+        };
+
+        store.dispatch(
+          createUserOnAgencySlice.actions.createUserOnAgencyRequested({
+            agencyId: agencyDto.id,
+            userId: userToCreate.id,
+            isNotifiedByEmail:
+              userToCreate.agencyRights[agencyDto.id].isNotifiedByEmail,
+            email: userToCreate.email,
+            roles: userToCreate.agencyRights[agencyDto.id].roles,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
+        );
+
+        dependencies.agencyGateway.createUserForAgencyResponse$.next(icUser);
+
+        expectFetchAgencyStateToMatch(fetchAgencyInitialState);
+      });
+    });
+
+    describe("removeUser", () => {
+      it("should remove user successfully", () => {
+        ({ store, dependencies } = createTestStore({
+          agency: agenciesPreloadedState({
+            fetchAgency: {
+              ...fetchAgencyInitialState,
+              agencyUsers: fakeAgencyUsers,
+            },
+          }),
+        }));
+        const userToRemove = fakeAgencyUsers[user2.id];
+
+        expectFetchAgencyStateToMatch({
+          agencyUsers: fakeAgencyUsers,
+        });
+
+        store.dispatch(
+          removeUserFromAgencySlice.actions.removeUserFromAgencyRequested({
+            userId: userToRemove.id,
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
+        );
+
+        dependencies.agencyGateway.removeUserFromAgencyResponse$.next(
+          undefined,
+        );
+
+        expectFetchAgencyStateToMatch({
+          agencyUsers: { [user1.id]: fakeAgencyUsers[user1.id] },
+        });
+      });
+
+      it("if  no agency in state, do nothing", () => {
+        ({ store, dependencies } = createTestStore({
+          agency: agenciesPreloadedState({
+            fetchAgency: fetchAgencyInitialState,
+          }),
+        }));
+        const userToRemove = fakeAgencyUsers[user2.id];
+
+        expectFetchAgencyStateToMatch(fetchAgencyInitialState);
+
+        store.dispatch(
+          removeUserFromAgencySlice.actions.removeUserFromAgencyRequested({
+            userId: userToRemove.id,
+            agencyId: agencyDto.id,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
+        );
+
+        dependencies.agencyGateway.removeUserFromAgencyResponse$.next(
+          undefined,
+        );
+
+        expectFetchAgencyStateToMatch(fetchAgencyInitialState);
+      });
+    });
+
+    describe("updateUser", () => {
+      it("should update user successfully", () => {
+        ({ store, dependencies } = createTestStore({
+          agency: agenciesPreloadedState({
+            fetchAgency: {
+              ...fetchAgencyInitialState,
+              agencyUsers: fakeAgencyUsers,
+            },
+          }),
+        }));
+
+        const originalUser = fakeAgencyUsers[user1.id];
+
+        const updatedUser: NormalizedInclusionConnectedUser = {
+          ...originalUser,
+          email: "updated-email@email.fr",
+          agencyRights: {
+            ...originalUser.agencyRights,
+            [agencyDto.id]: {
+              ...originalUser.agencyRights[agencyDto.id],
+              roles: ["agency-admin", "validator"],
+              isNotifiedByEmail: false,
+            },
+          },
+        };
+
+        expectFetchAgencyStateToMatch({
+          agencyUsers: fakeAgencyUsers,
+        });
+
+        store.dispatch(
+          updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+            userId: originalUser.id,
+            agencyId: agencyDto.id,
+            roles: updatedUser.agencyRights[agencyDto.id].roles,
+            feedbackTopic: "agency-user-for-dashboard",
+            isNotifiedByEmail: false,
+            email: updatedUser.email,
+          }),
+        );
+
+        dependencies.agencyGateway.updateUserAgencyRightResponse$.next(
+          undefined,
+        );
+
+        expectFetchAgencyStateToMatch({
+          agencyUsers: { ...fakeAgencyUsers, [originalUser.id]: updatedUser },
+        });
+      });
+
+      it("if it is not user in state, do nothing", () => {
+        ({ store, dependencies } = createTestStore({
+          agency: agenciesPreloadedState({
+            fetchAgency: {
+              ...fetchAgencyInitialState,
+              agencyUsers: fakeAgencyUsers,
+            },
+          }),
+        }));
+
+        expectFetchAgencyStateToMatch({
+          agencyUsers: fakeAgencyUsers,
+        });
+
+        store.dispatch(
+          updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+            userId: "fake",
+            agencyId: "fake-agency-id",
+            roles: ["counsellor"],
+            feedbackTopic: "agency-user-for-dashboard",
+            isNotifiedByEmail: false,
+            email: "fake-mail",
+          }),
+        );
+
+        dependencies.agencyGateway.updateUserAgencyRightResponse$.next(
+          undefined,
+        );
+
+        expectFetchAgencyStateToMatch({
+          agencyUsers: { ...fakeAgencyUsers },
+        });
       });
     });
   });
