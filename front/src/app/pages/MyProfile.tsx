@@ -61,8 +61,7 @@ export const MyProfile = (_: MyProfileProps) => {
   const onUserUpdateRequested = (userParamsForAgency: UserParamsForAgency) => {
     dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: userParamsForAgency,
-        jwt: userConnectedJwt,
+        ...userParamsForAgency,
         feedbackTopic: "user",
       }),
     );
@@ -72,6 +71,7 @@ export const MyProfile = (_: MyProfileProps) => {
     <>
       <UserDetail
         title={`Mon profil : ${userDisplayed}`}
+        currentUser={currentUser}
         userWithRights={currentUser}
         editInformationsLink={getLinkToUpdateAccountInfo(
           enableProConnect.isActive,

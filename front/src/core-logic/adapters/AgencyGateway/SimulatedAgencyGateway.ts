@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { Observable, Subject, from, of } from "rxjs";
+import { Observable, Subject, from, of, throwError } from "rxjs";
 import {
   AgencyDto,
   AgencyDtoBuilder,
@@ -9,9 +9,12 @@ import {
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   InclusionConnectJwt,
+  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
+  UserParamsForAgency,
   WithAgencyId,
+  WithAgencyIdAndUserId,
   errors,
   toAgencyPublicDisplayDto,
 } from "shared";
@@ -72,6 +75,56 @@ export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .withStatus("needsReview")
   .build();
 
+const simulatedUsers: InclusionConnectedUser[] = [
+  {
+    id: "fake-user-id-1",
+    email: "jbon8745@wanadoo.fr",
+    firstName: "Jean",
+    lastName: "Bon",
+    agencyRights: [
+      {
+        agency: MISSION_LOCAL_AGENCY_ACTIVE,
+        isNotifiedByEmail: true,
+        roles: ["agency-admin"],
+      },
+      {
+        agency: PE_AGENCY_ACTIVE,
+        isNotifiedByEmail: true,
+        roles: ["validator"],
+      },
+    ],
+    dashboards: { agencies: {}, establishments: {} },
+    externalId: "fake-user-external-id-1",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "fake-user-id-2",
+    email: "remi@sanfamille.fr",
+    firstName: "Rémi",
+    lastName: "Sanfamille",
+    agencyRights: [],
+    dashboards: { agencies: {}, establishments: {} },
+    externalId: "fake-user-external-id-2",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "user-in-error",
+    email: "fake-user-email-4@test.fr",
+    firstName: "Jean-Michel",
+    lastName: "Jeplante",
+    agencyRights: [
+      {
+        agency: PE_AGENCY_ACTIVE,
+        isNotifiedByEmail: true,
+        roles: ["agency-admin"],
+      },
+    ],
+    dashboards: { agencies: {}, establishments: {} },
+    externalId: "fake-user-in-error-external-id",
+    createdAt: new Date().toISOString(),
+  },
+];
+
 export class SimulatedAgencyGateway implements AgencyGateway {
   addAgency$(_agency: CreateAgencyDto): Observable<void> {
     return of(undefined);
@@ -97,9 +150,27 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     };
   }
 
-  public getAgencyAdminById$(
+  public createUserForAgency$(
+    { agencyId }: UserParamsForAgency,
+    _token: string,
+  ): Observable<InclusionConnectedUser> {
+    return agencyId === "non-existing-agency-id"
+      ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
+      : of({
+          id: "fake-user-id-2",
+          email: "remi@sanfamille.fr",
+          firstName: "Rémi",
+          lastName: "Sanfamille",
+          agencyRights: [],
+          dashboards: { agencies: {}, establishments: {} },
+          externalId: "fake-user-external-id-2",
+          createdAt: new Date().toISOString(),
+        });
+  }
+
+  public getAgencyById$(
     agencyId: AgencyId,
-    _adminToken: InclusionConnectJwt,
+    _token: InclusionConnectJwt,
   ): Observable<AgencyDto> {
     return of(this.#agencies[agencyId]);
   }
@@ -118,6 +189,23 @@ export class SimulatedAgencyGateway implements AgencyGateway {
       );
     }
     throw errors.agency.notFound({ agencyId });
+  }
+
+  getAgencyUsers$(
+    agencyId: AgencyId,
+    _token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser[]> {
+    return of(
+      simulatedUsers.filter((user) =>
+        user.agencyRights.some(
+          (agencyRight) => agencyRight.agency.id === agencyId,
+        ),
+      ),
+    );
+  }
+
+  public getImmersionFacileAgencyId$(): Observable<AgencyId> {
+    return of("agency-id-with-immersion-facile-kind");
   }
 
   public listAgencyOptionsByFilter$(
@@ -145,7 +233,19 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     return of(undefined);
   }
 
-  public updateUserAgencyRight$(): Observable<void> {
+  public updateUserAgencyRight$(
+    { agencyId }: UserParamsForAgency,
+    _token: string,
+  ): Observable<void> {
+    return agencyId === "non-existing-agency-id"
+      ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
+      : of(undefined);
+  }
+
+  public removeUserFromAgency$(
+    _params: WithAgencyIdAndUserId,
+    _token: string,
+  ): Observable<void> {
     return of(undefined);
   }
 

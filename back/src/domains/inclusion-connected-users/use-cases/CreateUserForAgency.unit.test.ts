@@ -40,6 +40,11 @@ describe("CreateUserForAgency", () => {
   const icNotAdminUser = icNotAdminUserBuilder.build();
   const notAdminUser = icNotAdminUserBuilder.buildUser();
 
+  const icNotAgencyAdminUserBuilder = new InclusionConnectedUserBuilder()
+    .withId("not-agency-admin-id")
+    .withIsAdmin(false);
+  const icNotAgencyAdminUser = icNotAgencyAdminUserBuilder.build();
+
   const counsellor = new InclusionConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@mail.com")
@@ -86,6 +91,22 @@ describe("CreateUserForAgency", () => {
         icNotAdminUser,
       ),
       errors.user.forbidden({ userId: icNotAdminUser.id }),
+    );
+  });
+
+  it("throws Forbidden if token payload is not admin on agency", async () => {
+    await expectPromiseToFailWithError(
+      createUserForAgency.execute(
+        {
+          userId: uuidGenerator.new(),
+          roles: ["counsellor"],
+          agencyId: "agency-1",
+          isNotifiedByEmail: true,
+          email: "any@email.fr",
+        },
+        icNotAgencyAdminUser,
+      ),
+      errors.user.forbidden({ userId: icNotAgencyAdminUser.id }),
     );
   });
 

@@ -13,6 +13,7 @@ import {
   userParamsForAgencySchema,
 } from "shared";
 import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
+import { AgencyOverviewLocation } from "src/app/components/forms/agency/AgencyOverview";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
@@ -23,6 +24,7 @@ export const AgencyUserModificationForm = ({
   isEmailDisabled,
   areRolesDisabled,
   onSubmit,
+  location,
 }: {
   agencyUser: UserParamsForAgency & { isIcUser: boolean };
   closeModal: () => void;
@@ -30,6 +32,7 @@ export const AgencyUserModificationForm = ({
   isEmailDisabled?: boolean;
   areRolesDisabled?: boolean;
   onSubmit: (userParamsForAgency: UserParamsForAgency) => void;
+  location: AgencyOverviewLocation | "profile";
 }) => {
   const methods = useForm<UserParamsForAgency>({
     resolver: zodResolver(userParamsForAgencySchema),
@@ -100,7 +103,7 @@ export const AgencyUserModificationForm = ({
             ...register("email", {
               setValueAs: (value) => toLowerCaseWithoutDiacritics(value),
             }),
-            id: domElementIds.admin.agencyTab.editAgencyUserEmail,
+            id: agencyUserModificationFormIds(location)?.emailFieldId,
             onBlur: (event) => {
               setValue(
                 "email",
@@ -118,7 +121,7 @@ export const AgencyUserModificationForm = ({
         />
 
         <Checkbox
-          id={domElementIds.admin.agencyTab.editAgencyManageUserCheckbox}
+          id={agencyUserModificationFormIds(location)?.rolesCheckBoxId}
           legend="Rôles :"
           {...getFieldError("roles")}
           options={checkboxOptionsWithFilter()}
@@ -126,7 +129,7 @@ export const AgencyUserModificationForm = ({
         />
 
         <ToggleSwitch
-          id={domElementIds.admin.agencyTab.editAgencyUserIsNotifiedByEmail}
+          id={agencyUserModificationFormIds(location)?.notificationToggleId}
           label="Recevoir les notifications pour toutes les conventions de cette structure"
           checked={values.isNotifiedByEmail}
           onChange={() =>
@@ -138,7 +141,7 @@ export const AgencyUserModificationForm = ({
 
         {invalidEmailMessage}
         <Button
-          id={domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton}
+          id={agencyUserModificationFormIds(location)?.submitButtonId}
           className={fr.cx("fr-mt-2w")}
           disabled={invalidEmailMessage != null}
         >
@@ -147,4 +150,44 @@ export const AgencyUserModificationForm = ({
       </form>
     </FormProvider>
   );
+};
+
+const agencyUserModificationFormIds = (
+  location: AgencyOverviewLocation | "profile",
+) => {
+  if (location === "admin")
+    return {
+      submitButtonId:
+        domElementIds.admin.agencyTab.editAgencyUserRoleSubmitButton,
+      notificationToggleId:
+        domElementIds.admin.agencyTab.editAgencyUserIsNotifiedByEmail,
+      emailFieldId: domElementIds.admin.agencyTab.editAgencyUserEmail,
+      rolesCheckBoxId:
+        domElementIds.admin.agencyTab.editAgencyManageUserCheckbox,
+    };
+
+  if (location === "agency-dashboard") {
+    return {
+      submitButtonId:
+        domElementIds.agencyDashboard.agencyDetails
+          .editAgencyUserRoleSubmitButton,
+      notificationToggleId:
+        domElementIds.agencyDashboard.agencyDetails
+          .editAgencyUserIsNotifiedByEmail,
+      emailFieldId:
+        domElementIds.agencyDashboard.agencyDetails.editAgencyUserEmail,
+      rolesCheckBoxId:
+        domElementIds.agencyDashboard.agencyDetails
+          .editAgencyManageUserCheckbox,
+    };
+  }
+  if (location === "profile") {
+    return {
+      submitButtonId: domElementIds.profile.editAgencyUserRoleSubmitButton,
+      notificationToggleId:
+        domElementIds.profile.editAgencyUserIsNotifiedByEmail,
+      emailFieldId: domElementIds.profile.editAgencyUserEmail,
+      rolesCheckBoxId: domElementIds.profile.editAgencyManageUserCheckbox,
+    };
+  }
 };

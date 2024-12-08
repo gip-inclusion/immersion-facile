@@ -32,7 +32,7 @@ export const fetchUserSlice = createSlice({
     builder.addCase(
       updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
       (state, action) => {
-        if (!state.user) return;
+        if (!state.user || state.user.id !== action.payload.userId) return;
         state.user = updateUserAgencyRights(state.user, action.payload);
       },
     );

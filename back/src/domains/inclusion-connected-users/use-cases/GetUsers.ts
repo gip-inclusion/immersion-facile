@@ -8,7 +8,7 @@ import {
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAdmin } from "../helpers/authorization.helper";
 
 export type GetUsers = ReturnType<typeof makeGetUsers>;
 export const makeGetUsers = createTransactionalUseCase<

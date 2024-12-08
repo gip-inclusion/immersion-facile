@@ -46,6 +46,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
       currentUser,
       params,
     );
+
     const userToUpdate = await getIcUserByUserId(uow, params.userId);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 

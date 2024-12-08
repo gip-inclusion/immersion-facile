@@ -10,6 +10,7 @@ import {
   expectToEqual,
   inclusionConnectTokenExpiredMessage,
 } from "shared";
+import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
@@ -319,46 +320,105 @@ describe("InclusionConnected", () => {
     });
   });
 
-  it("update the user rights successfully", () => {
-    const agency = new AgencyDtoBuilder().build();
-    const agencyRight: AgencyRight = {
-      agency,
-      roles: ["validator"],
-      isNotifiedByEmail: false,
-    };
-    const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
-      .withId("user-id")
-      .withIsAdmin(false)
-      .withAgencyRights([agencyRight])
-      .build();
+  describe("when current user has successfully requested an update of another user", () => {
+    it("if it is himself, update the user rights successfully", () => {
+      const agency = new AgencyDtoBuilder().build();
+      const agencyRight: AgencyRight = {
+        agency,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      };
+      const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+        .withId("user-id")
+        .withIsAdmin(false)
+        .withAgencyRights([agencyRight])
+        .build();
 
-    ({ store, dependencies } = createTestStore({
-      inclusionConnected: {
-        currentUser: user,
-        agenciesToReview: [],
-        isLoading: false,
-      },
-    }));
-
-    store.dispatch(
-      updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
-        userId: user.id,
-        agencyId: agency.id,
-        email: user.email,
-        roles: [...agencyRight.roles, "counsellor"],
-        isNotifiedByEmail: agencyRight.isNotifiedByEmail,
-        feedbackTopic: "user",
-      }),
-    );
-
-    expectToEqual(inclusionConnectedSelectors.currentUser(store.getState()), {
-      ...user,
-      agencyRights: [
-        {
-          ...agencyRight,
-          roles: [...agencyRight.roles, "counsellor"],
+      ({ store, dependencies } = createTestStore({
+        inclusionConnected: {
+          currentUser: user,
+          agenciesToReview: [],
+          isLoading: false,
         },
-      ],
+      }));
+
+      store.dispatch(
+        updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+          userId: user.id,
+          agencyId: agency.id,
+          email: user.email,
+          roles: [...agencyRight.roles, "counsellor"],
+          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+
+          feedbackTopic: "user",
+        }),
+      );
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        true,
+      );
+      dependencies.agencyGateway.updateUserAgencyRightResponse$.next(undefined);
+
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        false,
+      );
+      expectToEqual(inclusionConnectedSelectors.currentUser(store.getState()), {
+        ...user,
+        agencyRights: [
+          {
+            ...agencyRight,
+            roles: [...agencyRight.roles, "counsellor"],
+          },
+        ],
+      });
+    });
+
+    it("if it is not himself, do nothing", () => {
+      const agency = new AgencyDtoBuilder().build();
+      const agencyRight: AgencyRight = {
+        agency,
+        roles: ["validator"],
+        isNotifiedByEmail: false,
+      };
+      const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+        .withId("user-id")
+        .withIsAdmin(false)
+        .withAgencyRights([agencyRight])
+        .build();
+
+      ({ store, dependencies } = createTestStore({
+        inclusionConnected: {
+          currentUser: user,
+          agenciesToReview: [],
+          isLoading: false,
+        },
+      }));
+
+      store.dispatch(
+        updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+          userId: "another-user-id",
+          agencyId: agency.id,
+          email: "another-user-id@email.com",
+          roles: [...agencyRight.roles, "counsellor"],
+          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
+          feedbackTopic: "user",
+        }),
+      );
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        true,
+      );
+      dependencies.agencyGateway.updateUserAgencyRightResponse$.next(undefined);
+
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        false,
+      );
+      expectToEqual(
+        inclusionConnectedSelectors.currentUser(store.getState()),
+        user,
+      );
     });
   });
 

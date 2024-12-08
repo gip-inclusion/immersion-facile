@@ -3,9 +3,13 @@ import {
   AgencyRight,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
+  UserParamsForAgency,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
+import { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+
+import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
@@ -18,23 +22,33 @@ import { ReduxStore } from "src/core-logic/storeConfig/store";
 describe("UpdateUserOnAgency slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
+  const agency = new AgencyDtoBuilder().build();
+
+  const agencyRight: AgencyRight = {
+    agency,
+    roles: ["validator"],
+    isNotifiedByEmail: false,
+  };
+  const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+    .withId("user-id")
+    .withIsAdmin(false)
+    .withAgencyRights([agencyRight])
+    .build();
+
+  const userParams: UserParamsForAgency = {
+    userId: user.id,
+    agencyId: agency.id,
+    email: "user@email.fr",
+    roles: ["counsellor"],
+    isNotifiedByEmail: true,
+  };
+
+  const normalizedUser: NormalizedInclusionConnectedUser = {
+    ...user,
+    agencyRights: { [agency.id]: agencyRight },
+  };
 
   beforeEach(() => {
-    ({ store, dependencies } = createTestStore());
-  });
-
-  it("update the user rights successfully", () => {
-    const agency = new AgencyDtoBuilder().build();
-    const agencyRight: AgencyRight = {
-      agency,
-      roles: ["validator"],
-      isNotifiedByEmail: false,
-    };
-    const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
-      .withId("user-id")
-      .withIsAdmin(false)
-      .withAgencyRights([agencyRight])
-      .build();
     ({ store, dependencies } = createTestStore({
       admin: adminPreloadedState({
         fetchUser: {
@@ -43,22 +57,24 @@ describe("UpdateUserOnAgency slice", () => {
         },
       }),
       agency: {
-        updateUserOnAgency: {
-          isLoading: false,
-        },
+        ...agenciesPreloadedState({
+          fetchAgency: {
+            agency,
+            agencyUsers: { [user.id]: normalizedUser },
+            isLoading: false,
+          },
+          updateUserOnAgency: {
+            isLoading: false,
+          },
+        }),
       },
     }));
+  });
 
+  it("update the user rights successfully and store the feedback in user feedbacks", () => {
     store.dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: {
-          userId: user.id,
-          agencyId: agency.id,
-          email: user.email,
-          roles: [...agencyRight.roles, "counsellor"],
-          isNotifiedByEmail: agencyRight.isNotifiedByEmail,
-        },
-        jwt: "connected-user-jwt",
+        ...userParams,
         feedbackTopic: "user",
       }),
     );
@@ -82,17 +98,43 @@ describe("UpdateUserOnAgency slice", () => {
     });
   });
 
-  it("not update the user rights if error", () => {
+  it("update the user rights successfully and store the feedback in agency-user-for-dashboard feedbacks", () => {
     store.dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: {
-          userId: "userId",
-          agencyId: "agencyId",
-          email: "user@email.fr",
-          roles: ["counsellor"],
-          isNotifiedByEmail: true,
-        },
-        jwt: "connected-user-jwt",
+        ...userParams,
+        feedbackTopic: "agency-user-for-dashboard",
+      }),
+    );
+
+    expectToEqual(
+      updateUserOnAgencySelectors.isLoading(store.getState()),
+      true,
+    );
+
+    dependencies.agencyGateway.updateUserAgencyRightResponse$.next(undefined);
+
+    expectToEqual(
+      updateUserOnAgencySelectors.isLoading(store.getState()),
+      false,
+    );
+
+    expectToEqual(
+      feedbacksSelectors.feedbacks(store.getState())[
+        "agency-user-for-dashboard"
+      ],
+      {
+        level: "success",
+        message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+        on: "update",
+        title: "L'utilisateur a été mis à jour",
+      },
+    );
+  });
+
+  it("not update the user rights if error, and store the feedback in user feedbacks", () => {
+    store.dispatch(
+      updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+        ...userParams,
         feedbackTopic: "user",
       }),
     );
@@ -117,5 +159,41 @@ describe("UpdateUserOnAgency slice", () => {
       on: "update",
       title: "Problème lors de la mise à jour de l'utilisateur",
     });
+  });
+
+  it("not update the user rights if error and store the feedback in agency-user-for-dashboard feedbacks", () => {
+    store.dispatch(
+      updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+        ...userParams,
+        feedbackTopic: "agency-user-for-dashboard",
+      }),
+    );
+
+    expectToEqual(
+      updateUserOnAgencySelectors.isLoading(store.getState()),
+      true,
+    );
+
+    dependencies.agencyGateway.updateUserAgencyRightResponse$.error(
+      "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+    );
+
+    expectToEqual(
+      updateUserOnAgencySelectors.isLoading(store.getState()),
+      false,
+    );
+
+    expectToEqual(
+      feedbacksSelectors.feedbacks(store.getState())[
+        "agency-user-for-dashboard"
+      ],
+      {
+        level: "error",
+        message:
+          "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+        on: "update",
+        title: "Problème lors de la mise à jour de l'utilisateur",
+      },
+    );
   });
 });

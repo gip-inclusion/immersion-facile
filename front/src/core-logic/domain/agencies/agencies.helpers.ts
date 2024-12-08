@@ -8,7 +8,7 @@ export const updateUserAgencyRights = (
     (agencyRight) => agencyRight.agency.id !== requestedUpdate.agencyId,
   );
   const updatedAgencyRight = user.agencyRights.find(
-    (agencyight) => agencyight.agency.id === requestedUpdate.agencyId,
+    (agencyRight) => agencyRight.agency.id === requestedUpdate.agencyId,
   );
   if (!updatedAgencyRight)
     throw errors.agency.notFound({ agencyId: requestedUpdate.agencyId });

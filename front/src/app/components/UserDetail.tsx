@@ -23,6 +23,7 @@ import { routes } from "src/app/routes/routes";
 
 type UserDetailProps = {
   title: string;
+  currentUser: InclusionConnectedUser;
   userWithRights: InclusionConnectedUser;
   editInformationsLink?: string;
   onUserUpdateRequested: (userParamsForAgency: UserParamsForAgency) => void;
@@ -35,6 +36,7 @@ const manageUserModal = createModal({
 
 export const UserDetail = ({
   title,
+  currentUser,
   userWithRights,
   editInformationsLink,
   onUserUpdateRequested,
@@ -72,7 +74,7 @@ export const UserDetail = ({
         agencyRights={[...userWithRights.agencyRights].sort((a, b) =>
           a.agency.name.localeCompare(b.agency.name),
         )}
-        isBackofficeAdmin={userWithRights.isBackofficeAdmin}
+        isBackofficeAdmin={currentUser.isBackofficeAdmin}
         onUserUpdateRequested={onUserUpdateRequested}
       />
     </div>
@@ -159,24 +161,21 @@ const AgenciesTable = ({
               {addressDtoToString(agencyRight.agency.address)}
             </span>
 
-            {/* TODO: agency-admin will be able to go to agency page event if not backOfficeAdmin */}
-            {agencyRight.roles.includes("agency-admin") &&
-              isBackofficeAdmin && (
-                <a
-                  className={fr.cx(
-                    "fr-link",
-                    "fr-text--sm",
-                    "fr-icon-arrow-right-line",
-                    "fr-link--icon-right",
-                  )}
-                  {...routes.adminAgencyDetail({
-                    // this should be changed to agencyDashboardAgency/:agencyId, when it is ready
-                    agencyId: agencyRight.agency.id,
-                  }).link}
-                >
-                  Voir l'agence
-                </a>
-              )}
+            {agencyRight.roles.includes("agency-admin") && (
+              <a
+                className={fr.cx(
+                  "fr-link",
+                  "fr-text--sm",
+                  "fr-icon-arrow-right-line",
+                  "fr-link--icon-right",
+                )}
+                {...routes.agencyDashboardAgencyDetails({
+                  agencyId: agencyRight.agency.id,
+                }).link}
+              >
+                Voir l'agence
+              </a>
+            )}
           </>,
           <ul className={fr.cx("fr-raw-list")}>
             <li>
@@ -220,6 +219,7 @@ const AgenciesTable = ({
                 !selectedAgencyRight.roles.includes("agency-admin")
               }
               onSubmit={onUserUpdateRequested}
+              location="profile"
             />
           )}
         </manageUserModal.Component>,
