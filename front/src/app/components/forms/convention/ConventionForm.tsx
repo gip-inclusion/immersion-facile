@@ -347,7 +347,7 @@ export const ConventionForm = ({
       "partialConventionInUrl",
     );
     dispatch(conventionSlice.actions.setCurrentStep(1));
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (mode !== "create") {
@@ -361,7 +361,7 @@ export const ConventionForm = ({
     if (fetchedConvention) {
       reset(fetchedConvention);
     }
-  }, [fetchedConvention, methods.reset]);
+  }, [fetchedConvention, reset]);
 
   return (
     <FormProvider {...methods}>
