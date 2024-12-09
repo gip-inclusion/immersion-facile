@@ -6,20 +6,10 @@ import {
   AppellationMatchDto,
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
 } from "shared";
-import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { useStyles } from "tss-react/dsfr";
-
-const romeSearchMatchToProposal = ({
-  matchRanges,
-  appellation,
-}: AppellationMatchDto): Option => ({
-  value: appellation,
-  description: appellation.appellationLabel,
-  matchRanges,
-});
 
 type AppellationAutocompleteProps = {
   label: React.ReactNode;
@@ -37,8 +27,6 @@ type AppellationAutocompleteProps = {
   onAfterClearInput?: () => void;
 };
 
-type Option = Proposal<AppellationAndRomeDto>;
-
 export const AppellationAutocomplete = ({
   initialValue,
   onAppellationSelected,
@@ -54,26 +42,24 @@ export const AppellationAutocomplete = ({
   shouldClearInput,
   onAfterClearInput,
 }: AppellationAutocompleteProps) => {
-  const initialOption: Option | null = useMemo(
+  const initialOption: AppellationMatchDto | null = useMemo(
     () =>
       initialValue
         ? {
-            value: initialValue,
-            description: initialValue?.appellationLabel ?? "",
+            appellation: initialValue,
             matchRanges: [],
           }
         : null,
     [initialValue],
   );
 
-  const [selectedOption, setSelectedOption] = useState<Option | null>(
-    initialOption,
-  );
+  const [selectedOption, setSelectedOption] =
+    useState<AppellationMatchDto | null>(initialOption);
   const [searchTerm, setSearchTerm] = useState<string>(
     initialValue?.appellationLabel ?? "",
   );
   const { cx } = useStyles();
-  const [options, setOptions] = useState<Option[]>([]);
+  const [options, setOptions] = useState<AppellationMatchDto[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [inputHasChanged, setInputHasChanged] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm);
@@ -101,14 +87,12 @@ export const AppellationAutocomplete = ({
             useNaturalLanguage,
           );
         setOptions(
-          appellationOptions
-            .filter(
-              (appellationOption) =>
-                !selectedAppellations
-                  .map((selected) => selected.appellationCode)
-                  .includes(appellationOption.appellation.appellationCode),
-            )
-            .map(romeSearchMatchToProposal),
+          appellationOptions.filter(
+            (appellationOption) =>
+              !selectedAppellations
+                .map((selected) => selected.appellationCode)
+                .includes(appellationOption.appellation.appellationCode),
+          ),
         );
       } catch (e: any) {
         // biome-ignore lint/suspicious/noConsoleLog: <explanation>
@@ -142,74 +126,74 @@ export const AppellationAutocomplete = ({
     return "Aucun métier trouvé";
   };
   return (
-    <>
-      <Autocomplete
-        disablePortal
-        disabled={disabled}
-        filterOptions={(x) => x}
-        options={options}
-        value={selectedOption}
-        defaultValue={initialOption}
-        inputValue={inputHasChanged ? searchTerm : initialOption?.description}
-        noOptionsText={
-          searchTerm
-            ? noOptionText({
-                isSearching,
-                debounceSearchTerm,
-                searchTerm,
-              })
-            : "Saisissez un métier"
+    <Autocomplete
+      disablePortal
+      disabled={disabled}
+      filterOptions={(x) => x}
+      options={options}
+      value={selectedOption}
+      defaultValue={initialOption}
+      inputValue={
+        inputHasChanged
+          ? searchTerm
+          : initialOption?.appellation.appellationLabel
+      }
+      noOptionsText={
+        searchTerm
+          ? noOptionText({
+              isSearching,
+              debounceSearchTerm,
+              searchTerm,
+            })
+          : "Saisissez un métier"
+      }
+      getOptionLabel={(option) => option.appellation.appellationLabel ?? ""}
+      id={id}
+      renderOption={(props, option) => (
+        <li {...props}>
+          <StringWithHighlights
+            description={option.appellation.appellationLabel}
+            matchRanges={option.matchRanges}
+          />
+        </li>
+      )}
+      onChange={(_, appellationMatch: AppellationMatchDto | null) => {
+        if (appellationMatch) {
+          setSelectedOption(appellationMatch);
+          setSearchTerm(appellationMatch.appellation.appellationLabel);
+          onAppellationSelected(appellationMatch.appellation);
         }
-        getOptionLabel={(option: Option | undefined) =>
-          option?.value.appellationLabel || ""
+      }}
+      onInputChange={(_, newSearchTerm, reason) => {
+        if (searchTerm !== newSearchTerm && reason === "input") {
+          if (newSearchTerm === "") {
+            onInputClear?.();
+          }
+          setSearchTerm(newSearchTerm);
+          setInputHasChanged(true);
         }
-        id={id}
-        renderOption={(props, option) => (
-          <li {...props}>
-            <StringWithHighlights
-              description={option.description}
-              matchRanges={option.matchRanges}
-            />
-          </li>
-        )}
-        onChange={(_, selectedOption: Option | null) => {
-          if (selectedOption) {
-            setSelectedOption(selectedOption);
-            setSearchTerm(selectedOption.description);
-            onAppellationSelected(selectedOption.value);
-          }
-        }}
-        onInputChange={(_, newSearchTerm, reason) => {
-          if (searchTerm !== newSearchTerm && reason === "input") {
-            if (newSearchTerm === "") {
-              onInputClear?.();
-            }
-            setSearchTerm(newSearchTerm);
-            setInputHasChanged(true);
-          }
-        }}
-        renderInput={(params) => {
-          const { id } = params;
+      }}
+      renderInput={(params) => {
+        const { id } = params;
 
-          return (
-            <div ref={params.InputProps.ref}>
-              <label className={cx(fr.cx("fr-label"), className)} htmlFor={id}>
-                {label}
-              </label>
-              {hintText && (
-                <span className={fr.cx("fr-hint-text")}>{hintText}</span>
-              )}
-              <input
-                {...params.inputProps}
-                value={searchTerm}
-                id={id}
-                className={fr.cx("fr-input")}
-                placeholder={placeholder}
-              />
-            </div>
-          );
-        }}
-      />
-    </>
+        return (
+          <div ref={params.InputProps.ref}>
+            <label className={cx(fr.cx("fr-label"), className)} htmlFor={id}>
+              {label}
+            </label>
+            {hintText && (
+              <span className={fr.cx("fr-hint-text")}>{hintText}</span>
+            )}
+            <input
+              {...params.inputProps}
+              value={searchTerm}
+              id={id}
+              className={fr.cx("fr-input")}
+              placeholder={placeholder}
+            />
+          </div>
+        );
+      }}
+    />
   );
 };
