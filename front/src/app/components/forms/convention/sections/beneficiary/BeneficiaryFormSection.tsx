@@ -3,7 +3,7 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { differenceInYears } from "date-fns";
 import { keys } from "ramda";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -68,26 +68,33 @@ export const BeneficiaryFormSection = ({
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
-  const initialBeneficiaryRepresentative = useRef(
-    values.signatories.beneficiaryRepresentative,
-  ).current;
 
   useEffect(() => {
-    if (hasBeneficiaryRepresentativeData(initialBeneficiaryRepresentative)) {
+    if (
+      hasBeneficiaryRepresentativeData(
+        values.signatories.beneficiaryRepresentative,
+      ) &&
+      !isMinorOrProtected
+    ) {
       dispatch(conventionSlice.actions.isMinorChanged(true));
     }
-  }, [initialBeneficiaryRepresentative]);
+  }, [
+    dispatch,
+    values.signatories.beneficiaryRepresentative,
+    isMinorOrProtected,
+  ]);
 
   useEffect(() => {
     if (userFieldsAreFilled) {
+      const { firstName, lastName, email } = connectedUser;
       const valuesToUpdate = {
-        "signatories.beneficiary.firstName": connectedUser.firstName,
-        "signatories.beneficiary.lastName": connectedUser.lastName,
-        "signatories.beneficiary.email": connectedUser.email,
+        "signatories.beneficiary.firstName": firstName,
+        "signatories.beneficiary.lastName": lastName,
+        "signatories.beneficiary.email": email,
       };
       keys(valuesToUpdate).forEach((key) => setValue(key, valuesToUpdate[key]));
     }
-  }, [userFieldsAreFilled]);
+  }, [userFieldsAreFilled, connectedUser, setValue]);
 
   useEffect(() => {
     const initialValues = values.signatories.beneficiaryCurrentEmployer;
@@ -100,7 +107,11 @@ export const BeneficiaryFormSection = ({
           }
         : undefined,
     );
-  }, [hasCurrentEmployer]);
+  }, [
+    hasCurrentEmployer,
+    setValue,
+    values.signatories.beneficiaryCurrentEmployer,
+  ]);
 
   const levelsOfEducationToSelectOption = levelsOfEducation.map(
     (level: string) => ({ label: level, value: level }),
@@ -113,16 +124,18 @@ export const BeneficiaryFormSection = ({
         new Date(value),
       );
       const newIsMinor = age < 18;
-      newIsMinor
-        ? setValue(
-            "signatories.beneficiaryRepresentative.role",
-            "beneficiary-representative",
-          )
-        : setValue("signatories.beneficiaryRepresentative", undefined);
+      if (newIsMinor) {
+        setValue(
+          "signatories.beneficiaryRepresentative.role",
+          "beneficiary-representative",
+        );
+      } else if (!isMinorOrProtected) {
+        setValue("signatories.beneficiaryRepresentative", undefined);
+      }
       setIsMinorAccordingToAge(newIsMinor);
       dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
     },
-    [dispatch, values.dateStart],
+    [dispatch, values.dateStart, setValue, getValues],
   );
 
   useEffect(() => {
