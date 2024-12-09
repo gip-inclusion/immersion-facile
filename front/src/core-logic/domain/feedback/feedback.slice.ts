@@ -27,7 +27,7 @@ const topics = [
   "auth-global",
   "establishments-batch",
   "user",
-  "search-result-page",
+  "search-result",
   "establishment-modification-link",
   "form-establishment",
   "siret-input",
@@ -235,7 +235,7 @@ export const feedbackMapping: Record<
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
   },
-  "search-result-page": {
+  "search-result": {
     "fetch.error": {
       action: searchSlice.actions.fetchSearchResultFailed,
       title: "Oups !",
@@ -335,7 +335,7 @@ export const feedbackSlice = createSlice({
                 if (!actionKindAndLevel) return;
                 const feedbackForActionTopic =
                   feedbackMapping[action.payload.feedbackTopic][
-                  actionKindAndLevel
+                    actionKindAndLevel
                   ];
                 if (!feedbackForActionTopic) return;
                 const { level, actionKind } =
@@ -362,12 +362,12 @@ export const feedbackSlice = createSlice({
 
 const isActionWithFeedbackTopic =
   <T extends Record<string, any>>(actionType: string) =>
-    (action: PayloadAction<T>): action is PayloadActionWithFeedbackTopic<T> =>
-      "payload" in action &&
-      typeof action.payload === "object" &&
-      action.payload &&
-      "feedbackTopic" in action.payload &&
-      action.type === actionType;
+  (action: PayloadAction<T>): action is PayloadActionWithFeedbackTopic<T> =>
+    "payload" in action &&
+    typeof action.payload === "object" &&
+    action.payload &&
+    "feedbackTopic" in action.payload &&
+    action.type === actionType;
 
 export const getLevelAndActionKindFromActionKindAndLevel = (
   actionKindAndLevel: ActionKindAndLevel,

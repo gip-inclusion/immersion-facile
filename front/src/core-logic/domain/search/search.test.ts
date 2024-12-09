@@ -174,7 +174,7 @@ describe("search epic", () => {
           siret: immersionOffer.siret,
           locationId: locationId,
         },
-        feedbackTopic: "search-result-page",
+        feedbackTopic: "search-result",
       }),
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);
@@ -200,7 +200,7 @@ describe("search epic", () => {
           siret: immersionOffer.siret,
           locationId: locationId,
         },
-        feedbackTopic: "search-result-page",
+        feedbackTopic: "search-result",
       }),
     );
     expect(searchSelectors.isLoading(store.getState())).toBe(true);
@@ -212,7 +212,7 @@ describe("search epic", () => {
     expect(searchSelectors.isLoading(store.getState())).toBe(false);
 
     expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-      "search-result-page": {
+      "search-result": {
         on: "fetch",
         level: "error",
         title: "Oups !",
@@ -246,7 +246,7 @@ describe("search epic", () => {
             appellationCode: "11000",
             siret: lbbSearchResult.siret,
           },
-          feedbackTopic: "search-result-page",
+          feedbackTopic: "search-result",
         }),
       );
       expectIsLoading(true);
@@ -265,7 +265,7 @@ describe("search epic", () => {
             appellationCode: "11000",
             siret: lbbSearchResult.siret,
           },
-          feedbackTopic: "search-result-page",
+          feedbackTopic: "search-result",
         }),
       );
       expectIsLoading(true);

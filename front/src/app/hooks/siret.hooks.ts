@@ -133,13 +133,6 @@ export const useEstablishmentSiret = () => {
   );
   const clearSiret = () => updateSiret("");
   const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
-
-  // const modifyLinkWasSent = useAppSelector(
-  //   establishmentSelectors.sendModifyLinkSucceeded,
-  // );
-  // const sendModifyLinkFeedback = useAppSelector(
-  //   establishmentSelectors.feedback,
-  // );
   return {
     currentSiret,
     siretErrorToDisplay,
