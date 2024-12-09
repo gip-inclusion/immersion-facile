@@ -8,11 +8,12 @@ import {
   SiretAndAppellationDto,
   WithAcquisition,
 } from "shared";
-import { SubmitFeedBack } from "../SubmitFeedback";
+import {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithFeedbackTopicError,
+} from "src/core-logic/domain/feedback/feedback.slice";
 
 export type SearchResultPayload = SearchResultQuery | SearchResultDto;
-
-type SearchFeedback = SubmitFeedBack<"success">;
 
 export type SearchPageParams = SearchQueryBaseWithoutAppellationsAndRomeDto & {
   appellations?: AppellationAndRomeDto[];
@@ -30,7 +31,6 @@ export type SearchStatus =
 interface SearchState {
   searchStatus: SearchStatus;
   searchResults: SearchResultDto[];
-  feedback: SearchFeedback;
   currentSearchResult: SearchResultDto | null;
   isLoading: boolean;
   searchParams: SearchQueryParamsDto;
@@ -41,9 +41,6 @@ export const initialState: SearchState = {
   searchResults: [],
   currentSearchResult: null,
   isLoading: false,
-  feedback: {
-    kind: "idle",
-  },
   searchParams: {
     appellationCodes: [],
     rome: "",
@@ -87,7 +84,17 @@ export const searchSlice = createSlice({
     },
     fetchSearchResultRequested: (
       state,
-      _action: PayloadAction<SearchResultPayload>,
+      _action: PayloadActionWithFeedbackTopic<{
+        searchResult: SearchResultPayload;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    externalSearchResultRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        siretAndAppellation: SiretAndAppellationDto;
+      }>,
     ) => {
       state.isLoading = true;
     },
@@ -96,40 +103,16 @@ export const searchSlice = createSlice({
       action: PayloadAction<SearchResultDto>,
     ) => {
       state.currentSearchResult = action.payload;
-      state.feedback = {
-        kind: "success",
-      };
       state.isLoading = false;
     },
-    fetchSearchResultFailed: (state, action: PayloadAction<string>) => {
+    fetchSearchResultFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
       state.isLoading = false;
-      state.feedback = {
-        kind: "errored",
-        errorMessage: action.payload,
-      };
     },
     clearSearchStatusRequested: (state) => {
       state.searchStatus = initialState.searchStatus;
-    },
-    externalSearchResultRequested: (
-      state,
-      _action: PayloadAction<SiretAndAppellationDto>,
-    ) => {
-      state.isLoading = true;
-    },
-    externalSearchResultSucceeded: (
-      state,
-      action: PayloadAction<SearchResultDto>,
-    ) => {
-      state.currentSearchResult = action.payload;
-      state.isLoading = false;
-    },
-    externalSearchResultFailed: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.feedback = {
-        kind: "errored",
-        errorMessage: action.payload,
-      };
     },
   },
 });
