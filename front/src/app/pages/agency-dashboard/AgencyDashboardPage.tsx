@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import Table from "@codegouvfr/react-dsfr/Table";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { subMinutes } from "date-fns";
 import { all } from "ramda";
@@ -15,12 +16,10 @@ import {
 } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SelectConventionFromIdForm } from "src/app/components/SelectConventionFromIdForm";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-
-import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
-import Table from "@codegouvfr/react-dsfr/Table";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
+import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   AgencyDashboardRouteName,
   AgencyTabRoute,

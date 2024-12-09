@@ -61,8 +61,7 @@ export const MyProfile = (_: MyProfileProps) => {
   const onUserUpdateRequested = (userParamsForAgency: UserParamsForAgency) => {
     dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        user: userParamsForAgency,
-        jwt: userConnectedJwt,
+        ...userParamsForAgency,
         feedbackTopic: "user",
       }),
     );

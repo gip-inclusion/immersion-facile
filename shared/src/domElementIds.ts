@@ -627,7 +627,15 @@ export const domElementIds = {
       formLoginSubmitButton: "im-login__submit-button",
     },
   },
-
+  profile: {
+    editAgencyUserEmail: "im-profile-edit-agency-user__email",
+    editAgencyManageUserCheckbox:
+      "im-profile-form-edit-agency__manage-user-checkbox",
+    editAgencyUserIsNotifiedByEmail:
+      "im-profile-edit-agency-user__is-notified-by-email-toggle",
+    editAgencyUserRoleSubmitButton:
+      "im-profile-form-edit-agency__users-submit-button",
+  },
   conventionStatusDashboard: {},
   group: {},
   conventionDocument: {
@@ -648,6 +656,7 @@ export const domElementIds = {
   editFormEstablishmentRoute: {},
   error: {},
   conventionMiniStageRoute: {},
+
   agencyDashboard: {
     login: {
       inclusionConnectButton: "im-login-form__inclusion-connect-button--agency",
@@ -659,6 +668,29 @@ export const domElementIds = {
     },
     dashboard: {
       tabContainer: "im-agency-dashboard__tab-container",
+    },
+    agencyDetails: {
+      editAgencyForm: "im-agency-dashboard-form-edit-agency",
+      editAgencyFormEditSubmitButton:
+        "im-agency-dashboard-form-edit-agency__submit-button",
+      editAgencyUserEmail: "im-agency-dashboard-edit-agency-user__email",
+      editAgencyManageUserCheckbox:
+        "im-agency-dashboard-form-edit-agency__manage-user-checkbox",
+      editAgencyUserIsNotifiedByEmail:
+        "im-agency-dashboard-edit-agency-user__is-notified-by-email-toggle",
+      editAgencyUserRoleSubmitButton:
+        "im-agency-dashboard-form-edit-agency__users-submit-button",
+      editAgencyManageUserModal:
+        "im-agency-dashboard-form-edit-agency__manage-user-modal",
+      editAgencyRemoveUserModal:
+        "im-agency-dashboard-form-edit-agency__remove-user-modal",
+      openManageUserModalButton:
+        "im-agency-dashboard-form-edit-agency__add-user-to-agency-button",
+      agencyUsersTable: "im-agency-dashboard-form-edit-agency__users-table",
+      editAgencyUserRoleButton:
+        "im--agency-dashboard-form-edit-agency__users-table-edit-button",
+      editAgencyRemoveUserButton:
+        "im-agency-dashboard-form-edit-agency__remove-user-button",
     },
   },
   manageConventionInclusionConnected: {

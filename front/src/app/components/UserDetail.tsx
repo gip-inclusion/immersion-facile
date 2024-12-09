@@ -161,24 +161,21 @@ const AgenciesTable = ({
               {addressDtoToString(agencyRight.agency.address)}
             </span>
 
-            {/* TODO: agency-admin will be able to go to agency page event if not backOfficeAdmin */}
-            {agencyRight.roles.includes("agency-admin") &&
-              isBackofficeAdmin && (
-                <a
-                  className={fr.cx(
-                    "fr-link",
-                    "fr-text--sm",
-                    "fr-icon-arrow-right-line",
-                    "fr-link--icon-right",
-                  )}
-                  {...routes.adminAgencyDetail({
-                    // this should be changed to agencyDashboardAgency/:agencyId, when it is ready
-                    agencyId: agencyRight.agency.id,
-                  }).link}
-                >
-                  Voir l'agence
-                </a>
-              )}
+            {agencyRight.roles.includes("agency-admin") && (
+              <a
+                className={fr.cx(
+                  "fr-link",
+                  "fr-text--sm",
+                  "fr-icon-arrow-right-line",
+                  "fr-link--icon-right",
+                )}
+                {...routes.agencyDashboardAgencyDetails({
+                  agencyId: agencyRight.agency.id,
+                }).link}
+              >
+                Voir l'agence
+              </a>
+            )}
           </>,
           <ul className={fr.cx("fr-raw-list")}>
             <li>
@@ -222,6 +219,7 @@ const AgenciesTable = ({
                 !selectedAgencyRight.roles.includes("agency-admin")
               }
               onSubmit={onUserUpdateRequested}
+              routeName="myProfile"
             />
           )}
         </manageUserModal.Component>,
