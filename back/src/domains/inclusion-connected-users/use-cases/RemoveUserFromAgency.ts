@@ -11,7 +11,7 @@ import {
   rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
   validateAgencyRights,
 } from "../helpers/agencyRights.helper";
-import { throwIfNotAdmin } from "../helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
 
 export type RemoveUserFromAgency = ReturnType<typeof makeRemoveUserFromAgency>;
 
@@ -23,7 +23,8 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
 >(
   { name: "RemoveUserFromAgency", inputSchema: withAgencyIdAndUserIdSchema },
   async ({ currentUser, uow, inputParams: { agencyId, userId }, deps }) => {
-    throwIfNotAdmin(currentUser);
+    throwIfNotAgencyAdminOrBackofficeAdmin(agencyId, currentUser);
+
     const user = await uow.userRepository.getById(
       userId,
       await makeProvider(uow),

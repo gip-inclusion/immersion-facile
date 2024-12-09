@@ -43,6 +43,10 @@ describe("UpdateUserForAgency", () => {
     .withIsAdmin(false);
   const icAgencyAdmin = agencyAdminBuilder.build();
   const agencyAdminUser = agencyAdminBuilder.buildUser();
+  const icNotAgencyAdminUserBuilder = new InclusionConnectedUserBuilder()
+    .withId("not-agency-admin-id")
+    .withIsAdmin(false);
+  const icNotAgencyAdminUser = icNotAgencyAdminUserBuilder.build();
 
   const counsellor = new InclusionConnectedUserBuilder()
     .withId("counsellor")
@@ -95,6 +99,22 @@ describe("UpdateUserForAgency", () => {
           icNotAdmin,
         ),
         errors.user.forbidden({ userId: icNotAdmin.id }),
+      );
+    });
+
+    it("throws Forbidden if token payload is not admin on agency", async () => {
+      await expectPromiseToFailWithError(
+        updateIcUserRoleForAgency.execute(
+          {
+            roles: ["counsellor"],
+            agencyId: "agency-1",
+            userId: "john-123",
+            isNotifiedByEmail: true,
+            email: "any@email.fr",
+          },
+          icNotAgencyAdminUser,
+        ),
+        errors.user.forbidden({ userId: icNotAgencyAdminUser.id }),
       );
     });
 

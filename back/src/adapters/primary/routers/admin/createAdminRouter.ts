@@ -167,12 +167,17 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     }),
   );
 
-  sharedAgencyRouter.getAgencyAdminById(
+  sharedAgencyRouter.getAgencyById(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.getAgencyById.execute(req.params.agencyId),
-      ),
+      sendHttpResponse(req, res, async () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        return deps.useCases.getAgencyById.execute(
+          req.params.agencyId,
+          currentUser,
+        );
+      }),
   );
 
   sharedAgencyRouter.updateAgencyStatus(
@@ -193,10 +198,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.updateAgencyAdmin.execute(
-          req.body,
-          req.payloads?.currentUser,
-        ),
+        deps.useCases.updateAgency.execute(req.body, req.payloads?.currentUser),
       ),
   );
 

@@ -16,12 +16,16 @@ import {
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { AgencyUsersTable } from "src/app/components/agency/AgencyUsersTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
+import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import {
+  NormalizedIcUserById,
   NormalizedInclusionConnectedUser,
   icUsersAdminSlice,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
+import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
+import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
@@ -29,6 +33,8 @@ import { Feedback } from "../feedback/Feedback";
 
 type AgencyUsersProperties = {
   agency: AgencyDto;
+  agencyUsersById: NormalizedIcUserById;
+  routeName: AgencyOverviewRouteName;
 };
 
 type AgencyDisplayedRoleAndClass = {
@@ -71,21 +77,40 @@ export const agencyRoleToDisplay: Record<
   },
 };
 
-const manageUserModal = createModal({
-  isOpenedByDefault: false,
-  id: domElementIds.admin.agencyTab.editAgencyManageUserModal,
-});
-
-const removeUserModal = createModal({
-  isOpenedByDefault: false,
-  id: domElementIds.admin.agencyTab.editAgencyRemoveUserModal,
-});
-
-export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
+export const AgencyUsers = ({
+  agency,
+  agencyUsersById,
+  routeName,
+}: AgencyUsersProperties) => {
+  const isLocationAdmin =
+    routeName === "adminAgencies" || routeName === "adminAgencyDetail";
   const { enableProConnect } = useAppSelector(
     featureFlagSelectors.featureFlagState,
   );
-  const agencyUsersById = useAppSelector(icUsersAdminSelectors.agencyUsers);
+
+  const manageUserModal = React.useMemo(
+    () =>
+      createModal({
+        isOpenedByDefault: false,
+        id: isLocationAdmin
+          ? domElementIds.admin.agencyTab.editAgencyManageUserModal
+          : domElementIds.agencyDashboard.agencyDetails
+              .editAgencyManageUserModal,
+      }),
+    [isLocationAdmin],
+  );
+
+  const removeUserModal = React.useMemo(
+    () =>
+      createModal({
+        isOpenedByDefault: false,
+        id: isLocationAdmin
+          ? domElementIds.admin.agencyTab.editAgencyRemoveUserModal
+          : domElementIds.agencyDashboard.agencyDetails
+              .editAgencyRemoveUserModal,
+      }),
+    [isLocationAdmin],
+  );
   const dispatch = useDispatch();
 
   const [selectedUserData, setSelectedUserData] = useState<
@@ -133,30 +158,68 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
     : [values(agencyUsersById), []];
 
   const onUserUpdateSubmitted = (userParamsForAgency: UserParamsForAgency) => {
-    dispatch(
-      icUsersAdminSlice.actions.updateUserOnAgencyRequested({
-        ...userParamsForAgency,
-        feedbackTopic: "agency-user",
-      }),
-    );
+    isLocationAdmin
+      ? dispatch(
+          icUsersAdminSlice.actions.updateUserOnAgencyRequested({
+            ...userParamsForAgency,
+            feedbackTopic: "agency-user",
+          }),
+        )
+      : dispatch(
+          updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+            ...userParamsForAgency,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
+        );
   };
 
   const onUserCreationSubmitted = (
     userParamsForAgency: UserParamsForAgency,
   ) => {
-    dispatch(
-      icUsersAdminSlice.actions.createUserOnAgencyRequested({
-        ...userParamsForAgency,
-        feedbackTopic: "agency-user",
-      }),
-    );
+    isLocationAdmin
+      ? dispatch(
+          icUsersAdminSlice.actions.createUserOnAgencyRequested({
+            ...userParamsForAgency,
+            feedbackTopic: "agency-user",
+          }),
+        )
+      : dispatch(
+          createUserOnAgencySlice.actions.createUserOnAgencyRequested({
+            ...userParamsForAgency,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
+        );
+  };
+
+  const onUserRemoveSubmitted = () => {
+    if (!selectedUserData) return;
+
+    isLocationAdmin
+      ? dispatch(
+          icUsersAdminSlice.actions.removeUserFromAgencyRequested({
+            userId: selectedUserData.userId,
+            agencyId: agency.id,
+            feedbackTopic: "agency-user",
+          }),
+        )
+      : dispatch(
+          removeUserFromAgencySlice.actions.removeUserFromAgencyRequested({
+            userId: selectedUserData.userId,
+            agencyId: agency.id,
+            feedbackTopic: "agency-user-for-dashboard",
+          }),
+        );
+
+    removeUserModal.close();
   };
 
   return (
     <>
       <h5 className={fr.cx("fr-h5", "fr-mb-1v", "fr-mt-4w")}>Utilisateurs</h5>
       <UsersWithoutNameHint />
-      <Feedback topic="agency-user" />
+      <Feedback
+        topic={isLocationAdmin ? "agency-user" : "agency-user-for-dashboard"}
+      />
       <Button
         iconId="fr-icon-file-add-line"
         className={fr.cx("fr-m-1w", "fr-grid-row--right")}
@@ -173,7 +236,12 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
           });
           manageUserModal.open();
         }}
-        id={domElementIds.admin.agencyTab.openManageUserModalButton}
+        id={
+          isLocationAdmin
+            ? domElementIds.admin.agencyTab.openManageUserModalButton
+            : domElementIds.agencyDashboard.agencyDetails
+                .openManageUserModalButton
+        }
       >
         Ajouter un utilisateur
       </Button>
@@ -195,6 +263,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
         agency={agency}
         onModifyClicked={onModifyClicked}
         onDeleteClicked={onDeleteClicked}
+        routeName={routeName}
       />
 
       {agency.refersToAgencyName && (
@@ -211,6 +280,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
             agency={agency}
             onModifyClicked={onModifyClicked}
             onDeleteClicked={onDeleteClicked}
+            routeName={routeName}
           />
         </>
       )}
@@ -244,6 +314,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
                     ? onUserCreationSubmitted
                     : onUserUpdateSubmitted
                 }
+                routeName={routeName}
               />
             </>
           )}
@@ -271,17 +342,7 @@ export const AgencyUsers = ({ agency }: AgencyUsersProperties) => {
               {
                 priority: "primary",
                 children: "Supprimer le rattachement",
-                onClick: () => {
-                  if (!selectedUserData) return;
-                  dispatch(
-                    icUsersAdminSlice.actions.removeUserFromAgencyRequested({
-                      userId: selectedUserData.userId,
-                      agencyId: agency.id,
-                      feedbackTopic: "agency-user",
-                    }),
-                  );
-                  removeUserModal.close();
-                },
+                onClick: () => onUserRemoveSubmitted(),
               },
             ]}
           />
