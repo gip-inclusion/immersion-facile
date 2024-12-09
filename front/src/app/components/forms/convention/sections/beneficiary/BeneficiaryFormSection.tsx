@@ -3,7 +3,7 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { differenceInYears } from "date-fns";
 import { keys } from "ramda";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -68,15 +68,21 @@ export const BeneficiaryFormSection = ({
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
-  const initialBeneficiaryRepresentative = useRef(
-    values.signatories.beneficiaryRepresentative,
-  ).current;
 
   useEffect(() => {
-    if (hasBeneficiaryRepresentativeData(initialBeneficiaryRepresentative)) {
+    if (
+      hasBeneficiaryRepresentativeData(
+        values.signatories.beneficiaryRepresentative,
+      ) &&
+      !isMinorOrProtected
+    ) {
       dispatch(conventionSlice.actions.isMinorChanged(true));
     }
-  }, [dispatch, initialBeneficiaryRepresentative]);
+  }, [
+    dispatch,
+    values.signatories.beneficiaryRepresentative,
+    isMinorOrProtected,
+  ]);
 
   useEffect(() => {
     if (userFieldsAreFilled) {
@@ -118,12 +124,15 @@ export const BeneficiaryFormSection = ({
         new Date(value),
       );
       const newIsMinor = age < 18;
-      newIsMinor
-        ? setValue(
-            "signatories.beneficiaryRepresentative.role",
-            "beneficiary-representative",
-          )
-        : setValue("signatories.beneficiaryRepresentative", undefined);
+      if (newIsMinor) {
+        setValue(
+          "signatories.beneficiaryRepresentative.role",
+          "beneficiary-representative",
+        );
+      }
+      if (!newIsMinor && !isMinorOrProtected) {
+        setValue("signatories.beneficiaryRepresentative", undefined);
+      }
       setIsMinorAccordingToAge(newIsMinor);
       dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
     },
