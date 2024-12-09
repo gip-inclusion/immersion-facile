@@ -44,7 +44,7 @@ export const siretSlice = createSlice({
     },
     siretInfoRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{ siret: string }>,
+      _action: PayloadActionWithFeedbackTopic<{ siret: SiretDto }>,
     ) => {
       state.isSearching = true;
     },

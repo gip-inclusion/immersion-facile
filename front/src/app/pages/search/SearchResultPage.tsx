@@ -122,7 +122,7 @@ export const SearchResultPage = ({
             appellationCode: params.appellationCode,
             locationId: params.location,
           },
-          feedbackTopic: "search-result-page",
+          feedbackTopic: "search-result",
         }),
       );
     }
@@ -133,7 +133,7 @@ export const SearchResultPage = ({
             appellationCode: params.appellationCode,
             siret: params.siret,
           },
-          feedbackTopic: "search-result-page",
+          feedbackTopic: "search-result",
         }),
       );
     }
@@ -187,7 +187,7 @@ export const SearchResultPage = ({
                   className={fr.cx("fr-my-4w")}
                 />
               )}
-              <Feedback topic="search-result-page" />
+              <Feedback topic="search-result" />
               <Button
                 type="button"
                 onClick={onGoBackClick}

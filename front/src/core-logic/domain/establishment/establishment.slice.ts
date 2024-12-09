@@ -160,16 +160,12 @@ export const establishmentSlice = createSlice({
       _action: PayloadActionWithFeedbackTopic,
     ) => {
       state.isLoading = false;
-      // state.feedback = { kind: "deleteSuccess" };
     },
     deleteEstablishmentFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isLoading = false;
-      // state.feedback = {
-      //   kind: "deleteErrored",
-      // };
     },
 
     clearEstablishmentRequested: () => initialState,
