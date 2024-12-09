@@ -103,7 +103,7 @@ export const AgencyDashboardPage = ({
                     <Alert
                       severity="error"
                       title="Non autorisé"
-                      description="Cette page est reservée aux utilisateurs connectés avec Inclusion Connect, et dont l'agence est responsable de cette convention."
+                      description="Cette page est reservée aux utilisateurs connectés avec Inclusion Connect, et dont l'organisme est responsable de cette convention."
                     />
                   )}
                   <MetabaseView
@@ -152,16 +152,20 @@ export const AgencyDashboardPage = ({
             {
               tabId:
                 "agencyDashboardAgencies" satisfies AgencyDashboardRouteName,
-              label: "Mes Agences",
+              label: "Mes Organismes",
               content: (
                 <>
                   <p className={fr.cx("fr-text--bold")}>
                     Organismes sur lesquels vous êtes administrateur (
-                    {agenciesUserIsAdminOn.length} agences)
+                    {agenciesUserIsAdminOn.length} organismes)
                   </p>
 
                   <Table
-                    headers={["Nom d'agence", "Type d'agence", "Actions"]}
+                    headers={[
+                      "Nom de l'organisme",
+                      "Type d'organisme",
+                      "Actions",
+                    ]}
                     data={agenciesUserIsAdminOn.map((agency) => {
                       return [
                         <>
@@ -183,7 +187,7 @@ export const AgencyDashboardPage = ({
                             agencyId: agency.id,
                           })}
                         >
-                          Voir l'agence
+                          Voir l'organisme
                         </a>,
                       ];
                     })}
@@ -218,8 +222,8 @@ export const AgencyDashboardPage = ({
                   return (
                     <Alert
                       severity="warning"
-                      title="Rattachement à vos agences en cours"
-                      description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des agences rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
+                      title="Rattachement à vos organismes en cours"
+                      description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
                     />
                   );
                 return <RegisterAgenciesForm />;
