@@ -127,7 +127,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   agencyDashboardSynchronisedConventions: agencyDashboard.extend(
     "/conventions-synchronisees",
   ),
-  myProfile: defineRoute(inclusionConnectedParams, () => "/mon-profil"),
+  myProfile: defineRoute(
+    inclusionConnectedParams,
+    () => `/${frontRoutes.profile}`,
+  ),
   agencyDashboardAgencies: agencyDashboardAgencies,
   agencyDashboardAgencyDetails: agencyDashboardAgencies.extend(
     { agencyId: param.path.string },
