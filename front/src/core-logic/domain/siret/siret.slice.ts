@@ -33,7 +33,7 @@ export const siretSlice = createSlice({
     },
     siretModified: (
       state,
-      action: PayloadActionWithFeedbackTopic<{ siret: string }>,
+      action: PayloadActionWithFeedbackTopic<{ siret: SiretDto }>,
     ) => {
       state.currentSiret = action.payload.siret;
       state.establishment = null;
@@ -44,7 +44,7 @@ export const siretSlice = createSlice({
     },
     siretInfoRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{ siret: string }>,
+      _action: PayloadActionWithFeedbackTopic<{ siret: SiretDto }>,
     ) => {
       state.isSearching = true;
     },

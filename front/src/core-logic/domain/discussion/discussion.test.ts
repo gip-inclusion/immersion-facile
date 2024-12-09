@@ -223,10 +223,8 @@ describe("Discussion slice", () => {
   const expectDiscussionSelector = ({
     isLoading,
     discussion,
-    fetchError,
   }: DiscussionState) => {
     expectToEqual(discussionSelectors.isLoading(store.getState()), isLoading);
     expectToEqual(discussionSelectors.discussion(store.getState()), discussion);
-    expectToEqual(discussionSelectors.fetchError(store.getState()), fetchError);
   };
 });
