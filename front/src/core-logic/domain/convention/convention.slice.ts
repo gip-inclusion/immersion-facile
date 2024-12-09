@@ -10,9 +10,11 @@ import {
   FindSimilarConventionsParams,
   InclusionConnectJwt,
   RenewConventionParams,
+  Signatories,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
   WithConventionId,
+  signatoryKeyByRole,
 } from "shared";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import { SubmitFeedBack } from "../SubmitFeedback";
@@ -169,15 +171,36 @@ export const conventionSlice = createSlice({
     signConventionRequested: (
       state,
       _action: PayloadAction<{
+        signatoryRole: SignatoryRole;
         conventionId: ConventionId;
         jwt: ConventionJwt | InclusionConnectJwt;
       }>,
     ) => {
       state.isLoading = true;
     },
-    signConventionSucceeded: (state) => {
-      state.isLoading = false;
-      state.feedback = { kind: "signedSuccessfully" };
+    signConventionSucceeded: (
+      state,
+      action: PayloadAction<{ signatoryRole: SignatoryRole }>,
+    ) => {
+      const signatoryKey = signatoryKeyByRole[action.payload.signatoryRole];
+
+      return {
+        ...state,
+        isLoading: false,
+        feedback: { kind: "signedSuccessfully" },
+        convention: state.convention
+          ? {
+              ...state.convention,
+              signatories: {
+                ...state.convention.signatories,
+                [signatoryKey]: {
+                  ...state.convention.signatories[signatoryKey],
+                  signedAt: new Date().toISOString(),
+                },
+              } as Signatories,
+            }
+          : null,
+      };
     },
     signConventionFailed: setFeedbackAsErrored,
 
