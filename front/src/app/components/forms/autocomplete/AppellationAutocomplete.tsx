@@ -147,7 +147,10 @@ export const AppellationAutocomplete = ({
             })
           : "Saisissez un métier"
       }
-      getOptionLabel={(option) => option.appellation.appellationLabel ?? ""}
+      getOptionLabel={(option: AppellationMatchDto | undefined) => {
+        if (!option || !option.appellation) return "";
+        return option.appellation.appellationLabel;
+      }}
       id={id}
       renderOption={(props, option) => (
         <li {...props}>
