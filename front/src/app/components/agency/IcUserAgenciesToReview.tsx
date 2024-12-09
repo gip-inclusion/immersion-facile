@@ -157,6 +157,7 @@ export const IcUserAgenciesToReview = ({
                 closeModal={closeIcUserRegistrationToAgencyModal}
                 onSubmit={onUserRegistrationSubmitted}
                 agencyHasRefersTo={!!selectedAgency.refersToAgencyId}
+                routeName="adminAgencies"
               />
             )
           ) : (
