@@ -76,18 +76,19 @@ export const BeneficiaryFormSection = ({
     if (hasBeneficiaryRepresentativeData(initialBeneficiaryRepresentative)) {
       dispatch(conventionSlice.actions.isMinorChanged(true));
     }
-  }, [initialBeneficiaryRepresentative]);
+  }, [dispatch, initialBeneficiaryRepresentative]);
 
   useEffect(() => {
     if (userFieldsAreFilled) {
+      const { firstName, lastName, email } = connectedUser;
       const valuesToUpdate = {
-        "signatories.beneficiary.firstName": connectedUser.firstName,
-        "signatories.beneficiary.lastName": connectedUser.lastName,
-        "signatories.beneficiary.email": connectedUser.email,
+        "signatories.beneficiary.firstName": firstName,
+        "signatories.beneficiary.lastName": lastName,
+        "signatories.beneficiary.email": email,
       };
       keys(valuesToUpdate).forEach((key) => setValue(key, valuesToUpdate[key]));
     }
-  }, [userFieldsAreFilled]);
+  }, [userFieldsAreFilled, connectedUser, setValue]);
 
   useEffect(() => {
     const initialValues = values.signatories.beneficiaryCurrentEmployer;
@@ -100,7 +101,11 @@ export const BeneficiaryFormSection = ({
           }
         : undefined,
     );
-  }, [hasCurrentEmployer]);
+  }, [
+    hasCurrentEmployer,
+    setValue,
+    values.signatories.beneficiaryCurrentEmployer,
+  ]);
 
   const levelsOfEducationToSelectOption = levelsOfEducation.map(
     (level: string) => ({ label: level, value: level }),
@@ -122,7 +127,7 @@ export const BeneficiaryFormSection = ({
       setIsMinorAccordingToAge(newIsMinor);
       dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
     },
-    [dispatch, values.dateStart],
+    [dispatch, values.dateStart, setValue, getValues],
   );
 
   useEffect(() => {
