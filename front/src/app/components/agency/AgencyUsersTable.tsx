@@ -6,6 +6,7 @@ import React from "react";
 import { AgencyDto, domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
+import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 
 type AgencyUsersTableProps = {
@@ -13,6 +14,7 @@ type AgencyUsersTableProps = {
   agency: AgencyDto;
   onModifyClicked: (user: NormalizedInclusionConnectedUser) => void;
   onDeleteClicked: (user: NormalizedInclusionConnectedUser) => void;
+  routeName: AgencyOverviewRouteName;
 };
 
 export const AgencyUsersTable = ({
@@ -20,10 +22,15 @@ export const AgencyUsersTable = ({
   agencyUsers,
   onModifyClicked,
   onDeleteClicked,
+  routeName,
 }: AgencyUsersTableProps) => (
   <Table
     fixed
-    id={domElementIds.admin.agencyTab.agencyUsersTable}
+    id={
+      routeName === "adminAgencies" || routeName === "adminAgencyDetail"
+        ? domElementIds.admin.agencyTab.agencyUsersTable
+        : domElementIds.agencyDashboard.agencyDetails.agencyUsersTable
+    }
     headers={[
       "Utilisateurs",
       "Préférence de communication",
@@ -58,7 +65,12 @@ export const AgencyUsersTable = ({
             disabled:
               agency.refersToAgencyId !== null &&
               agencyUser.agencyRights[agency.id].roles.includes("validator"),
-            id: `${domElementIds.admin.agencyTab.editAgencyUserRoleButton}-${agency.id}-${index}`,
+            id: `${
+              routeName === "adminAgencies" || routeName === "adminAgencyDetail"
+                ? domElementIds.admin.agencyTab.editAgencyUserRoleButton
+                : domElementIds.agencyDashboard.agencyDetails
+                    .editAgencyUserRoleButton
+            }-${agency.id}-${index}`,
             onClick: () => onModifyClicked(agencyUser),
           },
           {
@@ -67,7 +79,12 @@ export const AgencyUsersTable = ({
             disabled:
               agency.refersToAgencyId !== null &&
               agencyUser.agencyRights[agency.id].roles.includes("validator"),
-            id: `${domElementIds.admin.agencyTab.editAgencyRemoveUserButton}-${agency.id}-${index}`,
+            id: `${
+              routeName === "adminAgencies" || routeName === "adminAgencyDetail"
+                ? domElementIds.admin.agencyTab.editAgencyRemoveUserButton
+                : domElementIds.agencyDashboard.agencyDetails
+                    .editAgencyRemoveUserButton
+            }-${agency.id}-${index}`,
             onClick: () => onDeleteClicked(agencyUser),
           },
         ]}

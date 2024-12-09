@@ -112,7 +112,7 @@ export const agencyRoutes = defineRoutes({
     requestBodySchema: userParamsForAgencySchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: expressEmptyResponseBody,
+      201: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,
