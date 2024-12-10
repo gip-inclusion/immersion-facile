@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import { jsonArrayFrom } from "kysely/helpers/postgres";
 import { equals, pick } from "ramda";
 import {
   AppellationAndRomeDto,
@@ -37,10 +38,6 @@ import {
   UpdateEstablishmentsWithInseeDataParams,
 } from "../ports/EstablishmentAggregateRepository";
 import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
-import {
-  establishmentByFiltersQueryBuilder,
-  withEstablishmentLocationsSubQuery,
-} from "./PgEstablishmentAggregateRepository.sql";
 
 const logger = createLogger(__filename);
 const MAX_RESULTS_HARD_LIMIT = 100;
@@ -339,48 +336,16 @@ export class PgEstablishmentAggregateRepository
     );
   }
 
-  public async getSearchImmersionResultDtoBySearchQuery(
+  public async getSearchResultBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
     locationId: LocationId,
   ): Promise<SearchResultDto | undefined> {
     const immersionSearchResultDtos =
-      await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-        `SELECT 
-          io.siret,
-          io.rome_code,
-          prd.libelle_rome as rome_label,
-          (JSON_AGG (JSON_BUILD_OBJECT(
-            'appellationCode', ogr_appellation::text,
-            'appellationLabel', libelle_appellation_long
-          ) ORDER BY ogr_appellation)) AS appellations,
-          null AS distance_m,
-          1 AS row_number,
-          loc_inf.*,
-          loc_inf.id AS location_id,
-          loc_pos.position,
-          e.score,
-          e.naf_code,
-          e.is_max_discussions_for_period_reached	,
-          date_to_iso(e.next_availability_date) as next_availability_date,
-          e.name,
-          e.website,
-          e.additional_information,
-          e.customized_name,
-          e.fit_for_disabled_workers,
-          e.number_employees,
-          e.contact_mode
-        FROM immersion_offers AS io
-        LEFT JOIN establishments e ON io.siret = e.siret
-        LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
-        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
-        LEFT JOIN establishments_location_infos AS loc_inf ON loc_inf.establishment_siret = io.siret
-        LEFT JOIN establishments_location_positions AS loc_pos ON loc_inf.id = loc_pos.id
-        WHERE io.siret = $1 AND io.appellation_code = $2 AND loc_inf.id = $3
-        GROUP BY (io.siret, io.rome_code, prd.libelle_rome, e.naf_code, e.is_max_discussions_for_period_reached	, e.next_availability_date, e.name, e.website,
-          e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees, e.score, e.contact_mode, 
-          loc_pos.id, loc_inf.id )`,
-        [siret, appellationCode, locationId],
+      await this.#selectImmersionSearchResultDto(
+        siret,
+        appellationCode,
+        locationId,
       );
     const immersionSearchResultDto = immersionSearchResultDtos.at(0);
     if (!immersionSearchResultDto) return;
@@ -496,13 +461,15 @@ export class PgEstablishmentAggregateRepository
     await this.#insertLocations(establishment);
   }
 
-  async #selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
-    selectedOffersSubQuery: string,
-    selectedOffersSubQueryParams: any[],
-    shouldSetDistance = true,
+  async #selectImmersionSearchResultDto(
+    siret: SiretDto,
+    appellationCode: AppellationCode,
+    locationId: LocationId,
   ): Promise<SearchImmersionResult[]> {
     // Given a subquery and its parameters to select immersion offers (with columns siret, rome_code, rome_label, appellations and distance_m),
     // this method returns a list of SearchImmersionResultDto
+
+    //TODO make query through kysely
     const pgResult = await executeKyselyRawSqlQuery(
       this.transaction,
       `WITH 
@@ -512,10 +479,58 @@ export class PgEstablishmentAggregateRepository
           WHERE role = 'establishment-admin'
         ), 
         match_immersion_offer AS (
-          ${selectedOffersSubQuery}
+          SELECT 
+            io.siret,
+            io.rome_code,
+            prd.libelle_rome as rome_label,
+            (JSON_AGG (JSON_BUILD_OBJECT(
+              'appellationCode', ogr_appellation::text,
+              'appellationLabel', libelle_appellation_long
+            ) ORDER BY ogr_appellation)) AS appellations,
+            null AS distance_m,
+            1 AS row_number,
+            loc_inf.*,
+            loc_inf.id AS location_id,
+            loc_pos.position,
+            e.score,
+            e.naf_code,
+            e.is_max_discussions_for_period_reached	,
+            date_to_iso(e.next_availability_date) as next_availability_date,
+            e.name,
+            e.website,
+            e.additional_information,
+            e.customized_name,
+            e.fit_for_disabled_workers,
+            e.number_employees,
+            e.contact_mode
+          FROM immersion_offers AS io
+          LEFT JOIN establishments e ON io.siret = e.siret
+          LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
+          LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+          LEFT JOIN establishments_location_infos AS loc_inf ON loc_inf.establishment_siret = io.siret
+          LEFT JOIN establishments_location_positions AS loc_pos ON loc_inf.id = loc_pos.id
+          WHERE io.siret = $1 AND io.appellation_code = $2 AND loc_inf.id = $3
+          GROUP BY (io.siret, io.rome_code, prd.libelle_rome, e.naf_code, e.is_max_discussions_for_period_reached	, e.next_availability_date, e.name, e.website,
+            e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees, e.score, e.contact_mode, 
+            loc_pos.id, loc_inf.id )
         ),
         establishment_locations_agg AS (
-          ${withEstablishmentLocationsSubQuery}
+          SELECT
+            establishment_siret,
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'id', id,
+                'position', JSON_BUILD_OBJECT('lon', lon, 'lat', lat),
+                'address', JSON_BUILD_OBJECT(
+                    'streetNumberAndAddress', street_number_and_address,
+                    'postcode', post_code,
+                    'city', city,
+                    'departmentCode', department_code
+                )
+              )
+            ) AS locations
+          FROM establishments_location_infos
+          GROUP BY establishment_siret
         )
       SELECT 
         row_number,
@@ -523,7 +538,7 @@ export class PgEstablishmentAggregateRepository
           'rome', io.rome_code,
           'siret', io.siret,
           'establishmentScore', io.score,
-          ${shouldSetDistance ? `'distance_m', io.distance_m,` : ""}
+          'distance_m', io.distance_m,
           'isSearchable', NOT io.is_max_discussions_for_period_reached	,
           'nextAvailabilityDate', io.next_availability_date,
           'name', io.name,
@@ -551,7 +566,7 @@ export class PgEstablishmentAggregateRepository
       LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = io.siret
       LEFT JOIN establishments__users AS ec ON ec.user_id = uec.user_id
       ORDER BY row_number ASC, io.location_id ASC;`,
-      selectedOffersSubQueryParams,
+      [siret, appellationCode, locationId],
     );
 
     return pgResult.rows.map(
@@ -762,6 +777,55 @@ export class PgEstablishmentAggregateRepository
           ]),
         })),
       )
+      .execute();
+  }
+
+  public async updateAllEstablishmentScores(): Promise<void> {
+    const minimumScore = 10;
+    const conventionCountCoefficient = 20;
+
+    await this.transaction
+      .with("convention_counts", (qb) =>
+        qb
+          .selectFrom("conventions")
+          .where("date_submission", ">=", sql<Date>`NOW() - INTERVAL '1 year'`)
+          .where("status", "=", "ACCEPTED_BY_VALIDATOR")
+          .groupBy("siret")
+          .select([
+            "siret",
+            ({ fn }) => fn.count("siret").as("convention_count"),
+          ]),
+      )
+      .with("discussion_counts", (qb) =>
+        qb
+          .selectFrom("discussions as d")
+          .innerJoin("exchanges", "d.id", "exchanges.discussion_id")
+          .where("d.created_at", ">=", sql<Date>`NOW() - INTERVAL '1 year'`)
+          .select([
+            "siret",
+            sql`COUNT(DISTINCT d.id)`.as("total_discussions"),
+            sql`COUNT(DISTINCT CASE WHEN exchanges.sender = 'establishment'::exchange_role THEN d.id END)`.as(
+              "answered_discussions",
+            ),
+          ])
+          .groupBy("siret"),
+      )
+      .updateTable("establishments as e")
+      .set({
+        score: sql`ROUND(
+                (${minimumScore} + COALESCE((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0))
+                * (COALESCE((
+                  SELECT
+                    CASE
+                      WHEN total_discussions > 0
+                      THEN (answered_discussions::float / total_discussions)
+                      ELSE 1
+                    END
+                  FROM discussion_counts
+                  WHERE siret = e.siret
+                ), 1)
+              ))`,
+      })
       .execute();
   }
 }
@@ -1053,3 +1117,119 @@ const makeOrderByClauses = (
 
   throw errors.establishment.invalidGeoParams();
 };
+
+const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
+  db
+    .selectFrom("establishments as e")
+    .select(({ ref, eb }) =>
+      jsonStripNulls(
+        jsonBuildObject({
+          establishment: jsonBuildObject({
+            acquisitionCampaign: ref("e.acquisition_campaign"),
+            acquisitionKeyword: ref("e.acquisition_keyword"),
+            score: ref("e.score"),
+            siret: ref("e.siret"),
+            name: ref("e.name"),
+            customizedName: ref("e.customized_name"),
+            contactMethod: ref("e.contact_mode"),
+            website: ref("e.website"),
+            additionalInformation: ref("e.additional_information"),
+            locations: jsonArrayFrom(
+              eb
+                .selectFrom("establishments_location_infos as loc")
+                .whereRef("loc.establishment_siret", "=", "e.siret")
+                .select(({ ref }) =>
+                  jsonBuildObject({
+                    id: ref("loc.id"),
+                    position: jsonBuildObject({
+                      lon: ref("loc.lon"),
+                      lat: ref("loc.lat"),
+                    }),
+                    address: jsonBuildObject({
+                      streetNumberAndAddress: ref(
+                        "loc.street_number_and_address",
+                      ),
+                      postcode: ref("loc.post_code"),
+                      city: ref("loc.city"),
+                      departmentCode: ref("department_code"),
+                    }),
+                  }).as("location"),
+                ),
+            ),
+            sourceProvider: ref("e.source_provider"),
+            numberEmployeesRange: ref("e.number_employees"),
+            updatedAt: sql<string>`TO_CHAR( ${ref(
+              "e.update_date",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+            createdAt: sql<string>`TO_CHAR( ${ref(
+              "e.created_at",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+            lastInseeCheckDate: sql<string>`TO_CHAR( ${ref(
+              "e.last_insee_check_date",
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+            isOpen: ref("e.is_open"),
+            isMaxDiscussionsForPeriodReached: ref(
+              "e.is_max_discussions_for_period_reached",
+            ),
+            isCommited: ref("e.is_commited"),
+            fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
+            maxContactsPerMonth: ref("e.max_contacts_per_month"),
+            nextAvailabilityDate: sql<string>`date_to_iso(${ref(
+              "e.next_availability_date",
+            )})`,
+            searchableBy: jsonBuildObject({
+              jobSeekers: ref("e.searchable_by_job_seekers"),
+              students: ref("e.searchable_by_students"),
+            }),
+            nafDto: jsonBuildObject({
+              code: ref("e.naf_code"),
+              nomenclature: ref("e.naf_nomenclature"),
+            }),
+          }),
+          immersionOffers: jsonArrayFrom(
+            eb
+              .selectFrom("immersion_offers as io")
+              .leftJoin(
+                "public_appellations_data as pad",
+                "pad.ogr_appellation",
+                "io.appellation_code",
+              )
+              .leftJoin(
+                "public_romes_data as prd",
+                "prd.code_rome",
+                "io.rome_code",
+              )
+              .whereRef("io.siret", "=", "e.siret")
+              .select(({ ref }) =>
+                jsonBuildObject({
+                  romeCode: ref("io.rome_code"),
+                  romeLabel: ref("prd.libelle_rome"),
+                  appellationCode: sql<string>`${ref(
+                    "io.appellation_code",
+                  )}::text`,
+                  appellationLabel: ref("pad.libelle_appellation_long"),
+                  createdAt: sql<string>`TO_CHAR( ${ref(
+                    "io.created_at",
+                  )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+                }).as("offer"),
+              )
+              .orderBy("io.appellation_code asc"),
+          ),
+          userRights: jsonArrayFrom(
+            eb
+              .selectFrom("establishments__users as eu")
+              .whereRef("eu.siret", "=", "e.siret")
+              .select(({ ref }) =>
+                jsonBuildObject({
+                  userId: ref("eu.user_id"),
+                  role: ref("eu.role"),
+                  job: ref("eu.job"),
+                  phone: ref("eu.phone"),
+                }).as("userRight"),
+              ),
+          ),
+        }),
+      ).as("aggregate"),
+    )
+    .groupBy("e.siret")
+    .orderBy("e.siret asc");

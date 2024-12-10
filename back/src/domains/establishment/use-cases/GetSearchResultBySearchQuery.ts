@@ -21,19 +21,19 @@ export class GetSearchResultBySearchQuery extends TransactionalUseCase<
   ): Promise<SearchResultDto> {
     const { siret, appellationCode, locationId } = siretAndAppellationDto;
 
-    const searchImmersionResultDto =
-      await uow.establishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+    const searchResult =
+      await uow.establishmentAggregateRepository.getSearchResultBySearchQuery(
         siret,
         appellationCode,
         locationId,
       );
-    if (!searchImmersionResultDto)
+    if (!searchResult)
       throw errors.establishment.offerMissing({
         appellationCode,
         siret,
         mode: "not found",
       });
 
-    return searchImmersionResultDto;
+    return searchResult;
   }
 }

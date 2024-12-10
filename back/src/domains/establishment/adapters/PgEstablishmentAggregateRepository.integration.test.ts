@@ -1,7 +1,10 @@
-import { addMilliseconds, subDays } from "date-fns";
+import { addMilliseconds, subDays, subMonths } from "date-fns";
 import { Pool } from "pg";
 import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
   DiscussionBuilder,
+  Exchange,
   GeoPositionDto,
   Location,
   LocationBuilder,
@@ -17,12 +20,16 @@ import {
 import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
+import { toAgencyWithRights } from "../../../utils/agency";
+import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
+import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import {
   rueBitcheDto,
   rueGuillaumeTellDto,
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregate,
   EstablishmentUserRight,
@@ -54,6 +61,8 @@ describe("PgEstablishmentAggregateRepository", () => {
   let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
   let pgDiscussionRepository: PgDiscussionRepository;
   let pgUserRepository: PgUserRepository;
+  let pgAgencyRepository: PgAgencyRepository;
+  let pgConventionRepository: PgConventionRepository;
 
   beforeAll(() => {
     pool = getTestPgPool();
@@ -68,12 +77,17 @@ describe("PgEstablishmentAggregateRepository", () => {
     await kyselyDb.deleteFrom("establishments_location_positions").execute();
     await kyselyDb.deleteFrom("establishments").execute();
     await kyselyDb.deleteFrom("users").execute();
+    await kyselyDb.deleteFrom("conventions").execute();
+    await kyselyDb.deleteFrom("agency_groups__agencies").execute();
+    await kyselyDb.deleteFrom("agencies").execute();
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       kyselyDb,
     );
     pgDiscussionRepository = new PgDiscussionRepository(kyselyDb);
     pgUserRepository = new PgUserRepository(kyselyDb);
+    pgAgencyRepository = new PgAgencyRepository(kyselyDb);
+    pgConventionRepository = new PgConventionRepository(kyselyDb);
 
     await pgUserRepository.save(osefUser, "proConnect");
   });
@@ -1235,7 +1249,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
     });
 
-    describe("getSearchImmersionResultDtoBySearchQuery", () => {
+    describe("getSearchResultBySearchQuery", () => {
       beforeEach(async () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentWithOfferA1101_AtPosition,
@@ -1246,7 +1260,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const missingSiret = "11111111111111";
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             missingSiret,
             establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
             establishmentWithOfferA1101_AtPosition.establishment.locations[0]
@@ -1260,7 +1274,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const missingLocationId = "55555555-5555-4444-5555-555555555666";
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             establishmentWithOfferA1101_AtPosition.establishment.siret,
             establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
             missingLocationId,
@@ -1273,7 +1287,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const missingAppellationCode = artisteCirqueOffer.appellationCode;
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             establishmentWithOfferA1101_AtPosition.establishment.siret,
             missingAppellationCode,
             establishmentWithOfferA1101_AtPosition.establishment.locations[0]
@@ -1285,7 +1299,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       it("Returns reconstructed SearchImmersionResultDto for given siret, appellationCode and location id", async () => {
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             establishmentWithOfferA1101_AtPosition.establishment.siret,
             establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
             establishmentWithOfferA1101_AtPosition.establishment.locations[0]
@@ -2080,6 +2094,114 @@ describe("PgEstablishmentAggregateRepository", () => {
           [establishmentIsNotSearchableAndMaxContactPerMonth1],
         );
       });
+    });
+  });
+
+  describe("updateAllEstablishmentScoresQuery", () => {
+    it("updates all the establishments scores, depending on the number of conventions and discussion answered in the last year", async () => {
+      const user = new UserBuilder()
+        .withId(new UuidV4Generator().new())
+        .withEmail("test@user.com")
+        .build();
+      const establishment = new EstablishmentAggregateBuilder()
+        .withScore(0)
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: user.id,
+          },
+        ])
+        .build();
+      const { siret } = establishment.establishment;
+
+      const agency = new AgencyDtoBuilder().build();
+      await pgUserRepository.save(user, "proConnect");
+      await pgAgencyRepository.insert(toAgencyWithRights(agency));
+
+      const convention = new ConventionDtoBuilder()
+        .withSiret(siret)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withAgencyId(agency.id)
+        .withDateSubmission(new Date().toISOString())
+        .build();
+
+      await pgConventionRepository.save(convention);
+
+      const initialExchange: Exchange = {
+        subject: "Hello",
+        message: "Initial message",
+        sender: "potentialBeneficiary",
+        recipient: "establishment",
+        sentAt: new Date().toISOString(),
+        attachments: [],
+      };
+
+      const discussionWithoutResponse = new DiscussionBuilder()
+        .withSiret(siret)
+        .withCreatedAt(new Date())
+        .withExchanges([initialExchange])
+        .build();
+
+      const discussionWithResponse = new DiscussionBuilder()
+        .withSiret(siret)
+        .withCreatedAt(new Date())
+        .withId("11111111-1111-4444-1111-111111111333")
+        .withExchanges([
+          initialExchange,
+          {
+            subject: "Yo",
+            message: "my response",
+            sender: "establishment",
+            recipient: "potentialBeneficiary",
+            sentAt: new Date().toISOString(),
+            attachments: [],
+          },
+        ])
+        .build();
+
+      const discussionWithResponseButTooOld = new DiscussionBuilder()
+        .withSiret(siret)
+        .withCreatedAt(subMonths(new Date(), 13))
+        .withId("22222222-1111-4444-1111-111111112222")
+        .withExchanges([
+          initialExchange,
+          {
+            subject: "Yo",
+            message: "my response",
+            sender: "establishment",
+            recipient: "potentialBeneficiary",
+            sentAt: new Date().toISOString(),
+            attachments: [],
+          },
+        ])
+        .build();
+
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishment,
+      );
+
+      await Promise.all(
+        [
+          discussionWithoutResponse,
+          discussionWithResponse,
+          discussionWithResponseButTooOld,
+        ].map((discussion) => pgDiscussionRepository.insert(discussion)),
+      );
+
+      await pgEstablishmentAggregateRepository.updateAllEstablishmentScores();
+
+      const establishmentAfter =
+        await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+          siret,
+        );
+
+      const minimumScore = 10;
+      const discussionScore = 1 / 2;
+      const conventionScore = 20 * 1;
+      const expectedScore = (minimumScore + conventionScore) * discussionScore;
+      expectToEqual(establishmentAfter?.establishment.score, expectedScore);
     });
   });
 });
