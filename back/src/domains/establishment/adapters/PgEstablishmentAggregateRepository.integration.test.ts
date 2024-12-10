@@ -1464,16 +1464,15 @@ describe("PgEstablishmentAggregateRepository", () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret1)
           .withOffers([
-            //Normal que la query fonctionne lorsqu'on a une incohérance Code ROME <> Code appellation / OGR ?
             new OfferEntityBuilder()
-              .withRomeLabel("Bûcheronnage et élagage")
-              .withRomeCode("A1201")
+              .withRomeLabel("Stylisme")
+              .withRomeCode("B1805")
               .withAppellationLabel("Styliste")
               .withAppellationCode("19540")
               .build(),
             new OfferEntityBuilder()
-              .withRomeLabel("Conduite d'engins agricoles et forestiers")
-              .withRomeCode("A1101")
+              .withRomeLabel("Stylisme")
+              .withRomeCode("B1805")
               .withAppellationCode("19541")
               .withAppellationLabel("Styliste chaussure")
               .build(),
@@ -1688,7 +1687,10 @@ describe("PgEstablishmentAggregateRepository", () => {
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("11111111111111")
           .withOffers([
-            new OfferEntityBuilder().withRomeCode(matchingRomeCode).build(),
+            new OfferEntityBuilder()
+              .withAppellationCode("11987")
+              .withRomeCode(matchingRomeCode)
+              .build(),
           ])
           .withLocationId(uuid())
           .withUserRights([osefUserRight])
