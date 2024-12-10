@@ -60,48 +60,43 @@ describe("getAgencyByIdForDashboard", () => {
   const notAgencyAdminUser = new InclusionConnectedUserBuilder()
     .withId("notAgencyAdminUser")
     .withEmail("not-agencyAdminUser@email.com")
-    .withAgencyRights([])
     .build();
 
   let uow: InMemoryUnitOfWork;
-  let getAgencyByIdForDashboard: GetAgencyById;
+  let getAgencyById: GetAgencyById;
 
   beforeEach(() => {
     uow = createInMemoryUow();
+    uow.userRepository.users = [
+      counsellor1,
+      validator,
+      counsellor2,
+      agencyAdminUser,
+    ];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(peAgency, {
+        [counsellor1.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+      toAgencyWithRights(agencyWithRefersTo, {
+        [counsellor2.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [agencyAdminUser.id]: {
+          isNotifiedByEmail: true,
+          roles: ["agency-admin"],
+        },
+      }),
+    ];
 
-    getAgencyByIdForDashboard = makeGetAgencyById({
+    getAgencyById = makeGetAgencyById({
       uowPerformer: new InMemoryUowPerformer(uow),
     });
   });
 
   describe("right paths", () => {
     it("get the agency by id", async () => {
-      uow.userRepository.users = [
-        counsellor1,
-        validator,
-        counsellor2,
-        agencyAdminUser,
-      ];
-      uow.agencyRepository.agencies = [
-        toAgencyWithRights(peAgency, {
-          [counsellor1.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        }),
-        toAgencyWithRights(agencyWithRefersTo, {
-          [counsellor2.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-          [agencyAdminUser.id]: {
-            isNotifiedByEmail: true,
-            roles: ["agency-admin"],
-          },
-        }),
-      ];
-
       expectToEqual(
-        await getAgencyByIdForDashboard.execute(
-          agencyWithRefersTo.id,
-          agencyAdminUser,
-        ),
+        await getAgencyById.execute(agencyWithRefersTo.id, agencyAdminUser),
         {
           ...agencyWithRefersTo,
           counsellorEmails: [counsellor2.email],
@@ -113,21 +108,15 @@ describe("getAgencyByIdForDashboard", () => {
 
   describe("wrong paths", () => {
     it("Throw when no agency were found", async () => {
+      uow.agencyRepository.agencies = [];
+
       await expectPromiseToFailWithError(
-        getAgencyByIdForDashboard.execute(
-          agencyWithRefersTo.id,
-          notAgencyAdminUser,
-        ),
+        getAgencyById.execute(agencyWithRefersTo.id, notAgencyAdminUser),
         errors.agency.notFound({ agencyId: agencyWithRefersTo.id }),
       );
     });
+
     it("Throw when user is not admin on agency", async () => {
-      uow.userRepository.users = [
-        counsellor1,
-        validator,
-        counsellor2,
-        notAgencyAdminUser,
-      ];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(peAgency, {
           [counsellor1.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
@@ -142,11 +131,9 @@ describe("getAgencyByIdForDashboard", () => {
           },
         }),
       ];
+
       await expectPromiseToFailWithError(
-        getAgencyByIdForDashboard.execute(
-          agencyWithRefersTo.id,
-          notAgencyAdminUser,
-        ),
+        getAgencyById.execute(agencyWithRefersTo.id, notAgencyAdminUser),
         errors.user.forbidden({
           userId: notAgencyAdminUser.id,
         }),

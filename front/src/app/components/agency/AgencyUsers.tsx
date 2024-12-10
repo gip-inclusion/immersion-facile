@@ -160,6 +160,7 @@ export const AgencyUsers = ({
   const onUserUpdateSubmitted = (userParamsForAgency: UserParamsForAgency) => {
     isLocationAdmin
       ? dispatch(
+          //TODO split icUsersAdminSlice to not have a big slice for all admin actions
           icUsersAdminSlice.actions.updateUserOnAgencyRequested({
             ...userParamsForAgency,
             feedbackTopic: "agency-user",

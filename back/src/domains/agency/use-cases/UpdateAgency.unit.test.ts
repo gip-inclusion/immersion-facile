@@ -143,7 +143,7 @@ describe("Update agency", () => {
     });
   });
 
-  it("Updates agency without changes on user rights and create corresponding event", async () => {
+  it("Backoffice admin can update agency without changes on user rights and create corresponding event", async () => {
     uow.agencyRepository.agencies = [
       toAgencyWithRights(initialAgencyInRepo, {}),
     ];
@@ -180,7 +180,7 @@ describe("Update agency", () => {
     ]);
   });
 
-  it("Updates agency without changes on user rights and create corresponding event when user that trigger the update is agency admin on agency", async () => {
+  it("Agency admin can update agency without changes on user rights and create corresponding event", async () => {
     uow.userRepository.users = [agencyAdmin];
     uow.agencyRepository.agencies = [
       toAgencyWithRights(initialAgencyInRepo, {

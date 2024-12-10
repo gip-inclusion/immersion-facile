@@ -23,72 +23,76 @@ export const AgencyUsersTable = ({
   onModifyClicked,
   onDeleteClicked,
   routeName,
-}: AgencyUsersTableProps) => (
-  <Table
-    fixed
-    id={
-      routeName === "adminAgencies" || routeName === "adminAgencyDetail"
-        ? domElementIds.admin.agencyTab.agencyUsersTable
-        : domElementIds.agencyDashboard.agencyDetails.agencyUsersTable
-    }
-    headers={[
-      "Utilisateurs",
-      "Préférence de communication",
-      "Rôles",
-      "Actions",
-    ]}
-    data={agencyUsers.map((agencyUser, index) => [
-      <NameAndEmailInTable
-        firstName={agencyUser.firstName}
-        lastName={agencyUser.lastName}
-        email={agencyUser.email}
-      />,
-      agencyUser.agencyRights[agency.id].isNotifiedByEmail
-        ? "Reçoit les notifications"
-        : "Ne reçoit pas les notifications",
-      agencyUser.agencyRights[agency.id].roles.map((role) => {
-        return (
-          <Badge
-            small
-            className={fr.cx(agencyRoleToDisplay[role].className, "fr-mr-1w")}
-          >
-            {agencyRoleToDisplay[role].label}
-          </Badge>
-        );
-      }),
-      <ButtonsGroup
-        inlineLayoutWhen={"always"}
-        buttons={[
-          {
-            children: "Modifier",
-            priority: "secondary",
-            disabled:
-              agency.refersToAgencyId !== null &&
-              agencyUser.agencyRights[agency.id].roles.includes("validator"),
-            id: `${
-              routeName === "adminAgencies" || routeName === "adminAgencyDetail"
-                ? domElementIds.admin.agencyTab.editAgencyUserRoleButton
-                : domElementIds.agencyDashboard.agencyDetails
-                    .editAgencyUserRoleButton
-            }-${agency.id}-${index}`,
-            onClick: () => onModifyClicked(agencyUser),
-          },
-          {
-            children: "Supprimer",
-            priority: "secondary",
-            disabled:
-              agency.refersToAgencyId !== null &&
-              agencyUser.agencyRights[agency.id].roles.includes("validator"),
-            id: `${
-              routeName === "adminAgencies" || routeName === "adminAgencyDetail"
-                ? domElementIds.admin.agencyTab.editAgencyRemoveUserButton
-                : domElementIds.agencyDashboard.agencyDetails
-                    .editAgencyRemoveUserButton
-            }-${agency.id}-${index}`,
-            onClick: () => onDeleteClicked(agencyUser),
-          },
-        ]}
-      />,
-    ])}
-  />
-);
+}: AgencyUsersTableProps) => {
+  const id =
+    routeName === "adminAgencies" || routeName === "adminAgencyDetail"
+      ? domElementIds.admin.agencyTab.agencyUsersTable
+      : domElementIds.agencyDashboard.agencyDetails.agencyUsersTable;
+  return (
+    <Table
+      fixed
+      id={id}
+      headers={[
+        "Utilisateurs",
+        "Préférence de communication",
+        "Rôles",
+        "Actions",
+      ]}
+      data={agencyUsers.map((agencyUser, index) => [
+        <NameAndEmailInTable
+          firstName={agencyUser.firstName}
+          lastName={agencyUser.lastName}
+          email={agencyUser.email}
+        />,
+        agencyUser.agencyRights[agency.id].isNotifiedByEmail
+          ? "Reçoit les notifications"
+          : "Ne reçoit pas les notifications",
+        agencyUser.agencyRights[agency.id].roles.map((role) => {
+          return (
+            <Badge
+              small
+              className={fr.cx(agencyRoleToDisplay[role].className, "fr-mr-1w")}
+            >
+              {agencyRoleToDisplay[role].label}
+            </Badge>
+          );
+        }),
+        <ButtonsGroup
+          inlineLayoutWhen={"always"}
+          buttons={[
+            {
+              children: "Modifier",
+              priority: "secondary",
+              disabled:
+                agency.refersToAgencyId !== null &&
+                agencyUser.agencyRights[agency.id].roles.includes("validator"),
+              id: `${
+                routeName === "adminAgencies" ||
+                routeName === "adminAgencyDetail"
+                  ? domElementIds.admin.agencyTab.editAgencyUserRoleButton
+                  : domElementIds.agencyDashboard.agencyDetails
+                      .editAgencyUserRoleButton
+              }-${agency.id}-${index}`,
+              onClick: () => onModifyClicked(agencyUser),
+            },
+            {
+              children: "Supprimer",
+              priority: "secondary",
+              disabled:
+                agency.refersToAgencyId !== null &&
+                agencyUser.agencyRights[agency.id].roles.includes("validator"),
+              id: `${
+                routeName === "adminAgencies" ||
+                routeName === "adminAgencyDetail"
+                  ? domElementIds.admin.agencyTab.editAgencyRemoveUserButton
+                  : domElementIds.agencyDashboard.agencyDetails
+                      .editAgencyRemoveUserButton
+              }-${agency.id}-${index}`,
+              onClick: () => onDeleteClicked(agencyUser),
+            },
+          ]}
+        />,
+      ])}
+    />
+  );
+};
