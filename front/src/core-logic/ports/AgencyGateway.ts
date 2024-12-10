@@ -45,7 +45,6 @@ export interface AgencyGateway {
     params: UserParamsForAgency,
     token: InclusionConnectJwt,
   ): Observable<void>;
-
   removeUserFromAgency$(
     params: WithAgencyIdAndUserId,
     token: InclusionConnectJwt,

@@ -349,7 +349,6 @@ describe("InclusionConnected", () => {
           email: user.email,
           roles: [...agencyRight.roles, "counsellor"],
           isNotifiedByEmail: agencyRight.isNotifiedByEmail,
-
           feedbackTopic: "user",
         }),
       );

@@ -26,7 +26,6 @@ export const updateAgencySlice = createSlice({
     ) => {
       state.isLoading = false;
     },
-
     updateAgencyFailed: (
       state,
       _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,

@@ -7,7 +7,6 @@ import {
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
 
-import { AgencyId, AgencyRight } from "shared";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 
 export type CreateUserOnAgencyAction = ActionOfSlice<
@@ -38,7 +37,7 @@ const createUserOnAgencyEpic: CreateUserOnAgencyEpic = (
                     ...agenciesAcc,
                     [agencyRight.agency.id]: agencyRight,
                   }),
-                  {} as Record<AgencyId, AgencyRight>,
+                  {},
                 ),
               },
               agencyId: action.payload.agencyId,

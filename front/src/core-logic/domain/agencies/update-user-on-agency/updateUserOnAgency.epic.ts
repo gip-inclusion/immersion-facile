@@ -24,10 +24,9 @@ const updateUserAgencyRightEpic: UpdateUserOnAgencyEpic = (
         .updateUserAgencyRight$(action.payload, getAdminToken(state$.value))
         .pipe(
           map(() =>
-            updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded({
-              ...action.payload,
-              feedbackTopic: action.payload.feedbackTopic,
-            }),
+            updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded(
+              action.payload,
+            ),
           ),
           catchEpicError((error) =>
             updateUserOnAgencySlice.actions.updateUserAgencyRightFailed({
