@@ -60,16 +60,15 @@ describe("getAgencyByIdForDashboard", () => {
   const notAgencyAdminUser = new InclusionConnectedUserBuilder()
     .withId("notAgencyAdminUser")
     .withEmail("not-agencyAdminUser@email.com")
-    .withAgencyRights([])
     .build();
 
   let uow: InMemoryUnitOfWork;
-  let getAgencyByIdForDashboard: GetAgencyById;
+  let getAgencyById: GetAgencyById;
 
   beforeEach(() => {
     uow = createInMemoryUow();
 
-    getAgencyByIdForDashboard = makeGetAgencyById({
+    getAgencyById = makeGetAgencyById({
       uowPerformer: new InMemoryUowPerformer(uow),
     });
   });
@@ -98,10 +97,7 @@ describe("getAgencyByIdForDashboard", () => {
       ];
 
       expectToEqual(
-        await getAgencyByIdForDashboard.execute(
-          agencyWithRefersTo.id,
-          agencyAdminUser,
-        ),
+        await getAgencyById.execute(agencyWithRefersTo.id, agencyAdminUser),
         {
           ...agencyWithRefersTo,
           counsellorEmails: [counsellor2.email],
@@ -114,10 +110,7 @@ describe("getAgencyByIdForDashboard", () => {
   describe("wrong paths", () => {
     it("Throw when no agency were found", async () => {
       await expectPromiseToFailWithError(
-        getAgencyByIdForDashboard.execute(
-          agencyWithRefersTo.id,
-          notAgencyAdminUser,
-        ),
+        getAgencyById.execute(agencyWithRefersTo.id, notAgencyAdminUser),
         errors.agency.notFound({ agencyId: agencyWithRefersTo.id }),
       );
     });
@@ -143,10 +136,7 @@ describe("getAgencyByIdForDashboard", () => {
         }),
       ];
       await expectPromiseToFailWithError(
-        getAgencyByIdForDashboard.execute(
-          agencyWithRefersTo.id,
-          notAgencyAdminUser,
-        ),
+        getAgencyById.execute(agencyWithRefersTo.id, notAgencyAdminUser),
         errors.user.forbidden({
           userId: notAgencyAdminUser.id,
         }),
