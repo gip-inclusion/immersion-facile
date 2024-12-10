@@ -7,18 +7,21 @@ import {
   AgencyRoutes,
   CreateAgencyDto,
   InclusionConnectJwt,
+  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
+  WithAgencyIdAndUserId,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
+  throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyRoutes>) {}
@@ -35,15 +38,70 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
+  public createUserForAgency$(
+    params: UserParamsForAgency,
+    token: string,
+  ): Observable<InclusionConnectedUser> {
+    return from(
+      this.httpClient
+        .createUserForAgency({
+          body: params,
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
   public getAgencyAdminById$(
     agencyId: AgencyId,
     adminToken: InclusionConnectJwt,
   ): Observable<AgencyDto> {
     return from(
       this.httpClient
-        .getAgencyAdminById({
+        .getAgencyById({
           urlParams: { agencyId },
           headers: { authorization: adminToken },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  getAgencyById$(
+    agencyId: AgencyId,
+    token: InclusionConnectJwt,
+  ): Observable<AgencyDto> {
+    return from(
+      this.httpClient
+        .getAgencyById({
+          urlParams: { agencyId },
+          headers: { authorization: token },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+  getAgencyUsers$(
+    agencyId: AgencyId,
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser[]> {
+    return from(
+      this.httpClient
+        .getAgencyUsersByAgencyId({
+          urlParams: { agencyId },
+          headers: { authorization: token },
         })
         .then((response) =>
           match(response)
@@ -147,10 +205,29 @@ export class HttpAgencyGateway implements AgencyGateway {
         })
         .then((response) =>
           match(response)
+            .with({ status: 201 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public removeUserFromAgency$(
+    params: WithAgencyIdAndUserId,
+    token: string,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .removeUserFromAgency({
+          headers: { authorization: token },
+          urlParams: params,
+        })
+        .then((response) =>
+          match(response)
             .with({ status: 200 }, () => undefined)
-            .with({ status: 400 }, logBodyAndThrow)
-            .with({ status: 401 }, logBodyAndThrow)
-            .with({ status: 404 }, logBodyAndThrow)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

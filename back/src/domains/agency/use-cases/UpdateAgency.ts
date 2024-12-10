@@ -8,7 +8,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 export class UpdateAgency extends TransactionalUseCase<
   AgencyDto,
@@ -32,7 +32,7 @@ export class UpdateAgency extends TransactionalUseCase<
     uow: UnitOfWork,
     currentUser: InclusionConnectedUser,
   ): Promise<void> {
-    throwIfNotAdmin(currentUser);
+    throwIfNotAgencyAdminOrBackofficeAdmin(agency.id, currentUser);
     const {
       validatorEmails: _,
       counsellorEmails: __,

@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
+import { AgencyDetailForAgencyDashboard } from "src/app/components/forms/agency/AgencyDetailForAgencyDashboard";
 import { MyProfile } from "src/app/pages/MyProfile";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
@@ -125,16 +126,16 @@ const getPageByRouteName: {
       <AgencyDashboardPage route={route} />
     </AgencyDashboardPrivateRoute>
   ),
-  // agencyDashboardAgencies: (route) => (
-  //   <AgencyDashboardPrivateRoute route={route}>
-  //     <AgencyDashboardPage route={route} />
-  //   </AgencyDashboardPrivateRoute>
-  // ),
-  // agencyDashboardAgencyDetails: (route) => (
-  //   <AgencyDashboardPrivateRoute route={route}>
-  //     <AgencyDashboardPage route={route} />
-  //   </AgencyDashboardPrivateRoute>
-  // ),
+  agencyDashboardAgencies: (route) => (
+    <AgencyDashboardPrivateRoute route={route}>
+      <AgencyDashboardPage route={route} />
+    </AgencyDashboardPrivateRoute>
+  ),
+  agencyDashboardAgencyDetails: (route) => (
+    <AgencyDashboardPrivateRoute route={route}>
+      <AgencyDetailForAgencyDashboard route={route} />
+    </AgencyDashboardPrivateRoute>
+  ),
 
   beneficiaryDashboard: () => <BeneficiaryDashboardPage />,
   initiateConvention: () => <InitiateConventionPage />,

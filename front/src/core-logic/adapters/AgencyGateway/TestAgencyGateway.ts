@@ -7,16 +7,19 @@ import {
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   InclusionConnectJwt,
+  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
+  UserParamsForAgency,
   WithAgencyId,
+  WithAgencyIdAndUserId,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
-  addAgency$(_agency: CreateAgencyDto): Observable<void> {
-    return this.addAgencyResponse$;
-  }
+  public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
+
+  public addAgencyResponse$ = new Subject<undefined>();
 
   public agencyOptions$ = new Subject<AgencyOption[]>();
 
@@ -24,21 +27,41 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public customAgencyId$ = new Subject<AgencyId | undefined>();
 
-  public fetchedAgency$ = new Subject<AgencyDto | undefined>();
+  public fetchedAgency$ = new Subject<AgencyDto>();
+
+  public fetchedAgencyUsers$ = new Subject<InclusionConnectedUser[]>();
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
   public updateUserAgencyRightResponse$ = new Subject<undefined>();
 
-  public addAgencyResponse$ = new Subject<undefined>();
+  public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
   #agencies: Record<string, AgencyDto> = {};
 
-  public getAgencyAdminById$(
+  addAgency$(_agency: CreateAgencyDto): Observable<void> {
+    return this.addAgencyResponse$;
+  }
+
+  public createUserForAgency$(
+    _params: UserParamsForAgency,
+    _token: string,
+  ): Observable<InclusionConnectedUser> {
+    return this.createUserForAgencyResponse$;
+  }
+
+  public getAgencyById$(
     _agencyId: AgencyId,
-    _adminToken: InclusionConnectJwt,
-  ): Observable<AgencyDto | undefined> {
+    _token: InclusionConnectJwt,
+  ): Observable<AgencyDto> {
     return this.fetchedAgency$;
+  }
+
+  public getAgencyUsers$(
+    _agencyId: AgencyId,
+    _token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser[]> {
+    return this.fetchedAgencyUsers$;
   }
 
   public getAgencyPublicInfoById$(
@@ -68,6 +91,13 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public updateUserAgencyRight$(): Observable<void> {
     return this.updateUserAgencyRightResponse$;
+  }
+
+  public removeUserFromAgency$(
+    _params: WithAgencyIdAndUserId,
+    _token: string,
+  ): Observable<void> {
+    return this.removeUserFromAgencyResponse$;
   }
 
   public validateOrRejectAgency$(

@@ -6,11 +6,13 @@ import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
+import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
 import { AgencyAdminAutocomplete } from "./AgencyAdminAutocomplete";
 
 export const EditAgency = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
+  const agencyUsersById = useAppSelector(icUsersAdminSelectors.agencyUsers);
 
   return (
     <>
@@ -23,6 +25,7 @@ export const EditAgency = () => {
           placeholder={"Ex : Agence de Berry"}
         />
       </div>
+      {/* //Todo remove this from agency tab to redirect on agency detail admin page when select an agency in autocomplete */}
       {agency && (
         <>
           <AgencyTag
@@ -30,10 +33,16 @@ export const EditAgency = () => {
             className={fr.cx("fr-my-4w")}
           />
           <AgencyStatusBadge status={agency.status} />
-          <EditAgencyForm agency={agency} />
+          <EditAgencyForm agency={agency} routeName="adminAgencies" />
         </>
       )}
-      {agency && <AgencyUsers agency={agency} />}
+      {agency && (
+        <AgencyUsers
+          agency={agency}
+          agencyUsersById={agencyUsersById}
+          routeName="adminAgencies"
+        />
+      )}
     </>
   );
 };

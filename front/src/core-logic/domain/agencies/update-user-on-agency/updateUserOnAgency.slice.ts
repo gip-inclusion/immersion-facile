@@ -1,25 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { InclusionConnectJwt, UserParamsForAgency } from "shared";
+import { UserParamsForAgency } from "shared";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 type UpdateUserOnAgencyState = {
   isLoading: boolean;
 };
 
-const initialState: UpdateUserOnAgencyState = {
+export const updateUserOnAgencyInitialState: UpdateUserOnAgencyState = {
   isLoading: false,
 };
 
 export const updateUserOnAgencySlice = createSlice({
   name: "updateUserOnAgency",
-  initialState,
+  initialState: updateUserOnAgencyInitialState,
   reducers: {
     updateUserAgencyRightRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{
-        user: UserParamsForAgency;
-        jwt: InclusionConnectJwt;
-      }>,
+      _action: PayloadActionWithFeedbackTopic<UserParamsForAgency>,
     ) => {
       state.isLoading = true;
     },

@@ -6,18 +6,28 @@ import {
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   InclusionConnectJwt,
+  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
+  WithAgencyIdAndUserId,
 } from "shared";
 
 export interface AgencyGateway {
   addAgency$(agency: CreateAgencyDto): Observable<void>;
-  getAgencyAdminById$(
+  createUserForAgency$(
+    params: UserParamsForAgency,
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser>;
+  getAgencyById$(
     agencyId: AgencyId,
-    adminToken: InclusionConnectJwt,
-  ): Observable<AgencyDto | undefined>;
+    token: InclusionConnectJwt,
+  ): Observable<AgencyDto>;
+  getAgencyUsers$(
+    agencyId: AgencyId,
+    token: InclusionConnectJwt,
+  ): Observable<InclusionConnectedUser[]>;
   getAgencyPublicInfoById$(
     agencyId: WithAgencyId,
   ): Observable<AgencyPublicDisplayDto>;
@@ -33,6 +43,10 @@ export interface AgencyGateway {
   ): Observable<void>;
   updateUserAgencyRight$(
     params: UserParamsForAgency,
+    token: InclusionConnectJwt,
+  ): Observable<void>;
+  removeUserFromAgency$(
+    params: WithAgencyIdAndUserId,
     token: InclusionConnectJwt,
   ): Observable<void>;
   validateOrRejectAgency$(

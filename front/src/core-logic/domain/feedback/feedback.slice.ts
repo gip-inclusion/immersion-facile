@@ -4,9 +4,14 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { keys } from "shared";
+import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
+import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -27,10 +32,12 @@ const topics = [
   "auth-global",
   "establishments-batch",
   "user",
+  "agency-user-for-dashboard",
   "search-result",
   "establishment-modification-link",
   "form-establishment",
   "siret-input",
+  "agency-for-dashboard",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -213,6 +220,67 @@ export const feedbackMapping: Record<
       action: inclusionConnectedSlice.actions.registerAgenciesFailed,
       title: "Erreur lors de la demande de rattachement à une agence",
       message: "Une erreur est survenue lors du rattachement de l'utilisateur",
+    },
+  },
+  "agency-user-for-dashboard": {
+    "fetch.error": {
+      action: fetchAgencySlice.actions.fetchAgencyUsersFailed,
+      title:
+        "Problème rencontré lors de la récupération de la liste des utilisateurs",
+      message:
+        "Une erreur est survenue lors de la récupération de la liste des utilisateurs de cette agence",
+    },
+    "update.success": {
+      action: updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
+      title: "L'utilisateur a été mis à jour",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "update.error": {
+      action: updateUserOnAgencySlice.actions.updateUserAgencyRightFailed,
+      title: "Problème lors de la mise à jour de l'utilisateur",
+      message:
+        "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+    },
+    "create.success": {
+      action: createUserOnAgencySlice.actions.createUserOnAgencySucceeded,
+      title: "L'utilisateur a été créé",
+      message: "L'utilisateur a été créé et associé à cette agence.",
+    },
+    "create.error": {
+      action: createUserOnAgencySlice.actions.createUserOnAgencyFailed,
+      title: "Problème lors de la création de l'utilisateur",
+      message: "Une erreur est survenue lors de la création de l'utilisateur",
+    },
+    "delete.success": {
+      action: removeUserFromAgencySlice.actions.removeUserFromAgencySucceeded,
+      title: "L'utilisateur n'est plus rattaché à cette agence",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "delete.error": {
+      action: removeUserFromAgencySlice.actions.removeUserFromAgencyFailed,
+      title:
+        "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
+      message:
+        "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur.",
+    },
+  },
+  "agency-for-dashboard": {
+    "fetch.error": {
+      action: fetchAgencySlice.actions.fetchAgencyFailed,
+      title:
+        "Problème rencontré lors de la récupération des données de l'agence",
+      message:
+        "Une erreur est survenue lors de la récupération des données de cette agence",
+    },
+    "update.success": {
+      action: updateAgencySlice.actions.updateAgencySucceeded,
+      title: "L'agence a été mis à jour",
+      message: "Les données de l'agence ont été mises à jour.",
+    },
+    "update.error": {
+      action: updateAgencySlice.actions.updateAgencyFailed,
+      title: "Problème lors de la mise à jour de l'agence",
+      message: "Une erreur est survenue lors de la mise à jour de l'agence",
     },
   },
   "establishments-batch": {

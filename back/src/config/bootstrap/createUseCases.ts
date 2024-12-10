@@ -1,6 +1,5 @@
 import { keys } from "ramda";
 import {
-  AgencyId,
   ApiConsumerId,
   FindSimilarConventionsParams,
   FindSimilarConventionsResponseDto,
@@ -9,6 +8,7 @@ import {
   SiretDto,
 } from "shared";
 import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
+import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
 import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
 import { RegisterAgencyToInclusionConnectUser } from "../../domains/agency/use-cases/RegisterAgencyToInclusionConnectUser";
@@ -127,7 +127,6 @@ import { RejectIcUserForAgency } from "../../domains/inclusion-connected-users/u
 import { makeRemoveUserFromAgency } from "../../domains/inclusion-connected-users/use-cases/RemoveUserFromAgency";
 import { UpdateUserForAgency } from "../../domains/inclusion-connected-users/use-cases/UpdateUserForAgency";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
-import { agencyWithRightToAgencyDto } from "../../utils/agency";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import {
@@ -577,7 +576,7 @@ export const createUseCases = (
         uuidGenerator,
       ),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
-      updateAgencyAdmin: new UpdateAgency(uowPerformer, createNewEvent),
+      updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
       saveApiConsumer: new SaveApiConsumer(
         uowPerformer,
@@ -595,11 +594,6 @@ export const createUseCases = (
         uowPerformer.perform((uow) => uow.apiConsumerRepository.getById(id)),
       getAllApiConsumers: () =>
         uowPerformer.perform((uow) => uow.apiConsumerRepository.getAll()),
-      getAgencyById: (id: AgencyId) =>
-        uowPerformer.perform(async (uow) => {
-          const [agency] = await uow.agencyRepository.getByIds([id]);
-          return agencyWithRightToAgencyDto(uow, agency);
-        }),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
         uowPerformer.perform((uow) =>
           uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
@@ -629,6 +623,10 @@ export const createUseCases = (
           similarConventionIds:
             await uow.conventionQueries.findSimilarConventions(params),
         })),
+    }),
+
+    getAgencyById: makeGetAgencyById({
+      uowPerformer,
     }),
     inclusionConnectLogout: makeGetInclusionConnectLogoutUrl({
       uowPerformer,

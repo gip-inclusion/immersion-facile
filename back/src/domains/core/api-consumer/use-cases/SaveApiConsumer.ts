@@ -9,7 +9,7 @@ import {
   WriteApiConsumerParams,
   writeApiConsumerSchema,
 } from "shared";
-import { throwIfNotAdmin } from "../../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAdmin } from "../../../inclusion-connected-users/helpers/authorization.helper";
 import { TransactionalUseCase } from "../../UseCase";
 import { CreateNewEvent } from "../../events/ports/EventBus";
 import { GenerateApiConsumerJwt } from "../../jwt";

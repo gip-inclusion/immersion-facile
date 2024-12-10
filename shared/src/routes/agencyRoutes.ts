@@ -1,4 +1,5 @@
 import { defineRoute, defineRoutes } from "shared-routes";
+import { z } from "zod";
 import { userParamsForAgencySchema } from "../admin/admin.schema";
 import {
   agencyIdResponseSchema,
@@ -13,38 +14,64 @@ import {
 import { agencyPublicDisplaySchema } from "../agency/publicAgency.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
+import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 
-const agencyWithIdForAdminUrl = "/admin/agencies/:agencyId" as const;
-
 export type AgencyRoutes = typeof agencyRoutes;
+
 export const agencyRoutes = defineRoutes({
-  getAgencyAdminById: defineRoute({
+  addAgency: defineRoute({
+    method: "post",
+    url: "/agencies",
+    requestBodySchema: createAgencySchema,
+    responses: {
+      200: expressEmptyResponseBody,
+      404: httpErrorSchema,
+      409: httpErrorSchema,
+    },
+  }),
+  createUserForAgency: defineRoute({
+    method: "post",
+    url: "/agency/users",
+    requestBodySchema: userParamsForAgencySchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: inclusionConnectedUserSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
+
+  getAgencyById: defineRoute({
     method: "get",
-    url: agencyWithIdForAdminUrl,
+    url: "/agencies/:agencyId",
     ...withAuthorizationHeaders,
     responses: { 200: agencySchema },
   }),
-  updateAgencyStatus: defineRoute({
-    method: "patch",
-    url: agencyWithIdForAdminUrl,
-    requestBodySchema: updateAgencyStatusParamsWithoutIdSchema,
-    ...withAuthorizationHeaders,
-    responses: {
-      200: expressEmptyResponseBody,
-      409: httpErrorSchema,
-    },
+  getAgencyOptionsByFilter: defineRoute({
+    method: "get",
+    url: "/agencies",
+    queryParamsSchema: listAgencyOptionsRequestSchema,
+    responses: { 200: agencyOptionsSchema },
   }),
-  updateAgency: defineRoute({
-    method: "put",
-    url: agencyWithIdForAdminUrl,
-    requestBodySchema: agencySchema,
+  getAgencyPublicInfoById: defineRoute({
+    method: "get",
+    url: "/agency-public-info-by-id",
+    queryParamsSchema: withAgencyIdSchema,
+    responses: { 200: agencyPublicDisplaySchema },
+  }),
+  getAgencyUsersByAgencyId: defineRoute({
+    method: "get",
+    url: "/agencies/:agencyId/users",
+
     ...withAuthorizationHeaders,
-    responses: {
-      200: expressEmptyResponseBody,
-      401: httpErrorSchema,
-      409: httpErrorSchema,
-    },
+    responses: { 200: z.array(inclusionConnectedUserSchema) },
+  }),
+  getImmersionFacileAgencyId: defineRoute({
+    method: "get",
+    url: "/immersion-facile-agency-id",
+    responses: { 200: agencyIdResponseSchema },
   }),
   listAgenciesOptionsWithStatus: defineRoute({
     method: "get",
@@ -56,37 +83,45 @@ export const agencyRoutes = defineRoutes({
       401: httpErrorSchema,
     },
   }),
-  getAgencyOptionsByFilter: defineRoute({
-    method: "get",
-    url: "/agencies",
-    queryParamsSchema: listAgencyOptionsRequestSchema,
-    responses: { 200: agencyOptionsSchema },
-  }),
-  addAgency: defineRoute({
-    method: "post",
-    url: "/agencies",
-    requestBodySchema: createAgencySchema,
+  updateAgency: defineRoute({
+    method: "put",
+    url: "/agencies/:agencyId",
+    requestBodySchema: agencySchema,
+    ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
-      404: httpErrorSchema,
+      401: httpErrorSchema,
       409: httpErrorSchema,
     },
   }),
-  getImmersionFacileAgencyId: defineRoute({
-    method: "get",
-    url: "/immersion-facile-agency-id",
-    responses: { 200: agencyIdResponseSchema },
+
+  updateAgencyStatus: defineRoute({
+    method: "patch",
+    url: "/admin/agencies/:agencyId",
+    requestBodySchema: updateAgencyStatusParamsWithoutIdSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      409: httpErrorSchema,
+    },
   }),
-  getAgencyPublicInfoById: defineRoute({
-    method: "get",
-    url: "/agency-public-info-by-id",
-    queryParamsSchema: withAgencyIdSchema,
-    responses: { 200: agencyPublicDisplaySchema },
-  }),
+
   updateUserRoleForAgency: defineRoute({
     method: "patch",
     url: "/agencies/:agencyId/users",
     requestBodySchema: userParamsForAgencySchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      201: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
+
+  removeUserFromAgency: defineRoute({
+    method: "delete",
+    url: "/dashboard/agencies/:agencyId/users/:userId",
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

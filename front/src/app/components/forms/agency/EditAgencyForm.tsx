@@ -19,6 +19,7 @@ import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
 } from "src/app/components/forms/agency/AgencyFormCommonFields";
+import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
   displayReadableError,
@@ -30,9 +31,11 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 
 type EditAgencyFormProperties = {
   agency: AgencyDto;
+  routeName: AgencyOverviewRouteName;
 };
 
 const kindOptions = Object.entries(agencyKindToLabel).map(([value, label]) => ({
@@ -47,6 +50,7 @@ const statusListOfOptions = allAgencyStatuses.map((agencyStatus) => ({
 
 export const EditAgencyForm = ({
   agency,
+  routeName,
 }: EditAgencyFormProperties): JSX.Element => {
   const dispatch = useDispatch();
   const agencyState = useAppSelector(agencyAdminSelectors.agencyState);
@@ -60,15 +64,37 @@ export const EditAgencyForm = ({
 
   const getFieldError = makeFieldError(formState);
 
+  const adminAgencyIds = domElementIds.admin.agencyTab;
+
+  const agencyDashboardAgencyIds = domElementIds.agencyDashboard.agencyDetails;
+
+  const isRouteAdmin =
+    routeName === "adminAgencies" || routeName === "adminAgencyDetail";
+
   const refersToOtherAgency = !!agency.refersToAgencyId;
   return (
     <FormProvider {...methods}>
       <form
         onSubmit={handleSubmit((values) => {
-          dispatch(agencyAdminSlice.actions.updateAgencyRequested(values));
+          isRouteAdmin
+            ? dispatch(agencyAdminSlice.actions.updateAgencyRequested(values))
+            : dispatch(
+                updateAgencySlice.actions.updateAgencyRequested({
+                  ...values,
+                  feedbackTopic: "agency-for-dashboard",
+                }),
+              );
         })}
-        id={domElementIds.admin.agencyTab.editAgencyForm}
-        data-matomo-name={domElementIds.admin.agencyTab.editAgencyForm}
+        id={
+          isRouteAdmin
+            ? adminAgencyIds.editAgencyForm
+            : agencyDashboardAgencyIds.editAgencyForm
+        }
+        data-matomo-name={
+          isRouteAdmin
+            ? adminAgencyIds.editAgencyForm
+            : agencyDashboardAgencyIds.editAgencyForm
+        }
       >
         <div className={fr.cx("fr-mb-4w")}>
           <AgencyFormCommonFields
@@ -77,34 +103,38 @@ export const EditAgencyForm = ({
             mode="edit"
           />
 
-          <Select
-            label={"⚠️Type de structure ⚠️"}
-            options={kindOptions}
-            nativeSelectProps={{
-              ...register("kind"),
-              id: domElementIds.admin.agencyTab.editAgencyFormKindSelector,
-            }}
-          />
+          {isRouteAdmin && (
+            <>
+              <Select
+                label={"!Type de structure!"}
+                options={kindOptions}
+                nativeSelectProps={{
+                  ...register("kind"),
+                  id: adminAgencyIds.editAgencyFormKindSelector,
+                }}
+              />
 
-          <Select
-            label="⚠️Statut de l'agence ⚠️"
-            options={statusListOfOptions}
-            placeholder="Sélectionner un statut"
-            nativeSelectProps={{
-              ...register("status"),
-              id: domElementIds.admin.agencyTab.editAgencyFormStatusSelector,
-            }}
-          />
+              <Select
+                label="!Statut de l'agence !"
+                options={statusListOfOptions}
+                placeholder="Sélectionner un statut"
+                nativeSelectProps={{
+                  ...register("status"),
+                  id: adminAgencyIds.editAgencyFormStatusSelector,
+                }}
+              />
 
-          <Input
-            label="⚠️Code Safir de l'agence ⚠️"
-            nativeInputProps={{
-              ...register("codeSafir"),
-              placeholder: "Code Safir ",
-              id: domElementIds.admin.agencyTab.editAgencyFormSafirCodeInput,
-            }}
-            {...getFieldError("codeSafir")}
-          />
+              <Input
+                label="!Code Safir de l'agence !"
+                nativeInputProps={{
+                  ...register("codeSafir"),
+                  placeholder: "Code Safir ",
+                  id: adminAgencyIds.editAgencyFormSafirCodeInput,
+                }}
+                {...getFieldError("codeSafir")}
+              />
+            </>
+          )}
 
           <AgencyLogoUpload />
         </div>
@@ -124,7 +154,9 @@ export const EditAgencyForm = ({
             type="submit"
             disabled={agencyState.isUpdating}
             nativeButtonProps={{
-              id: domElementIds.admin.agencyTab.editAgencyFormEditSubmitButton,
+              id: isRouteAdmin
+                ? adminAgencyIds.editAgencyFormEditSubmitButton
+                : agencyDashboardAgencyIds.editAgencyFormEditSubmitButton,
             }}
           >
             Mettre à jour

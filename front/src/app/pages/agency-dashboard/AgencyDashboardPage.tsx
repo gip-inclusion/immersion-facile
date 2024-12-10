@@ -1,17 +1,25 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import Table from "@codegouvfr/react-dsfr/Table";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { subMinutes } from "date-fns";
 import { all } from "ramda";
 import React from "react";
 import { Loader } from "react-design-system";
-import { AgencyRight, InclusionConnectedUser, domElementIds } from "shared";
+import {
+  AgencyRight,
+  InclusionConnectedUser,
+  addressDtoToString,
+  agencyKindToLabelIncludingIF,
+  domElementIds,
+} from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SelectConventionFromIdForm } from "src/app/components/SelectConventionFromIdForm";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-
+import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
+import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   AgencyDashboardRouteName,
   AgencyTabRoute,
@@ -37,105 +45,160 @@ export const AgencyDashboardPage = ({
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
-
   const rawAgencyDashboardTabs = ({
     dashboards: {
       agencies: { agencyDashboardUrl, erroredConventionsDashboardUrl },
     },
     agencyRights,
-  }: InclusionConnectedUser): DashboardTab[] => [
-    ...(agencyDashboardUrl
-      ? [
-          {
-            tabId: "agencyDashboardMain" satisfies AgencyDashboardRouteName,
-            label: "Tableau de bord",
-            content: (
-              <>
-                <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionInclusionConnected" />
-                <MetabaseView
-                  title="Tableau de bord agence"
-                  subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
-                  url={agencyDashboardUrl}
-                />
-              </>
-            ),
-          },
-        ]
-      : []),
-    ...(erroredConventionsDashboardUrl
-      ? [
-          {
-            tabId:
-              "agencyDashboardSynchronisedConventions" satisfies AgencyDashboardRouteName,
-            label: "Conventions synchronisées",
-            content: (
-              <>
-                {isPeUser(agencyRights) && (
-                  <Button
-                    priority="secondary"
-                    linkProps={{
-                      href: "https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.francetravail.fr/documents/Immersion_facilitee/GUIDE_SAISIE_(de_gestion)_DES_CONVENTIONS_(en_erreur).pptx",
-                      target: "_blank",
-                      rel: "noreferrer",
-                    }}
-                  >
-                    Guide de gestion des conventions en erreur
-                  </Button>
-                )}
-                {inclusionConnectedJwt ? (
-                  <MarkPartnersErroredConventionAsHandledFormSection
-                    jwt={inclusionConnectedJwt}
-                    isPeUser={isPeUser(agencyRights)}
-                  />
-                ) : (
-                  <Alert
-                    severity="error"
-                    title="Non autorisé"
-                    description="Cette page est reservée aux utilisateurs connectés avec Inclusion Connect, et dont l'agence est responsable de cette convention."
-                  />
-                )}
-                <MetabaseView
-                  title="Tableau de bord agence"
-                  url={erroredConventionsDashboardUrl}
-                />
-                {isPeUser(agencyRights) && (
-                  <>
-                    <h2 className={fr.cx("fr-h5", "fr-mt-2w")}>
-                      Comment prévenir les erreurs :
-                    </h2>
+  }: InclusionConnectedUser): DashboardTab[] => {
+    const agenciesUserIsAdminOn = agencyRights
+      .filter((agencyRight) => agencyRight.roles.includes("agency-admin"))
+      .map((agencyRightWithAdminRole) => agencyRightWithAdminRole.agency);
 
-                    <h3 className={fr.cx("fr-h6")}>
-                      Identifiant National DE trouvé mais écart sur la date de
-                      naissance
-                    </h3>
-                    <p>
-                      Action → Modifier la date de naissance dans la demande
-                      pour correspondre à l'information présente dans le dossier
-                      du Demandeur d'emploi
-                    </p>
+    return [
+      ...(agencyDashboardUrl
+        ? [
+            {
+              tabId: "agencyDashboardMain" satisfies AgencyDashboardRouteName,
+              label: "Tableau de bord",
+              content: (
+                <>
+                  <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionInclusionConnected" />
+                  <MetabaseView
+                    title="Tableau de bord agence"
+                    subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
+                    url={agencyDashboardUrl}
+                  />
+                </>
+              ),
+            },
+          ]
+        : []),
+      ...(erroredConventionsDashboardUrl
+        ? [
+            {
+              tabId:
+                "agencyDashboardSynchronisedConventions" satisfies AgencyDashboardRouteName,
+              label: "Conventions synchronisées",
+              content: (
+                <>
+                  {isPeUser(agencyRights) && (
+                    <Button
+                      priority="secondary"
+                      linkProps={{
+                        href: "https://view.officeapps.live.com/op/embed.aspx?src=https://mediatheque.francetravail.fr/documents/Immersion_facilitee/GUIDE_SAISIE_(de_gestion)_DES_CONVENTIONS_(en_erreur).pptx",
+                        target: "_blank",
+                        rel: "noreferrer",
+                      }}
+                    >
+                      Guide de gestion des conventions en erreur
+                    </Button>
+                  )}
+                  {inclusionConnectedJwt ? (
+                    <MarkPartnersErroredConventionAsHandledFormSection
+                      jwt={inclusionConnectedJwt}
+                      isPeUser={isPeUser(agencyRights)}
+                    />
+                  ) : (
+                    <Alert
+                      severity="error"
+                      title="Non autorisé"
+                      description="Cette page est reservée aux utilisateurs connectés avec Inclusion Connect, et dont l'organisme est responsable de cette convention."
+                    />
+                  )}
+                  <MetabaseView
+                    title="Tableau de bord agence"
+                    url={erroredConventionsDashboardUrl}
+                  />
+                  {isPeUser(agencyRights) && (
+                    <>
+                      <h2 className={fr.cx("fr-h5", "fr-mt-2w")}>
+                        Comment prévenir les erreurs :
+                      </h2>
 
-                    <h3 className={fr.cx("fr-h6")}>
-                      Identifiant National DE non trouvé
-                    </h3>
-                    <p>
-                      Action → Soit le mail utilisé chez Immersion Facilitée est
-                      différent de celui du dossier du Demandeur d'emploi. Dans
-                      ce cas, modifier l'email dans le dossier du Demandeur
-                      d'emploi avant validation et avec son accord.
-                    </p>
-                    <p>
-                      Action → Soit le candidat n'est pas inscrit. Dans ce cas,
-                      procéder à l'inscription ou réinscription avant la
-                      validation .
-                    </p>
-                  </>
-                )}
-              </>
-            ),
-          },
-        ]
-      : []),
-  ];
+                      <h3 className={fr.cx("fr-h6")}>
+                        Identifiant National DE trouvé mais écart sur la date de
+                        naissance
+                      </h3>
+                      <p>
+                        Action → Modifier la date de naissance dans la demande
+                        pour correspondre à l'information présente dans le
+                        dossier du Demandeur d'emploi
+                      </p>
+
+                      <h3 className={fr.cx("fr-h6")}>
+                        Identifiant National DE non trouvé
+                      </h3>
+                      <p>
+                        Action → Soit le mail utilisé chez Immersion Facilitée
+                        est différent de celui du dossier du Demandeur d'emploi.
+                        Dans ce cas, modifier l'email dans le dossier du
+                        Demandeur d'emploi avant validation et avec son accord.
+                      </p>
+                      <p>
+                        Action → Soit le candidat n'est pas inscrit. Dans ce
+                        cas, procéder à l'inscription ou réinscription avant la
+                        validation .
+                      </p>
+                    </>
+                  )}
+                </>
+              ),
+            },
+          ]
+        : []),
+      ...(agenciesUserIsAdminOn
+        ? [
+            {
+              tabId:
+                "agencyDashboardAgencies" satisfies AgencyDashboardRouteName,
+              label: "Mes Organismes",
+              content: (
+                <>
+                  <p className={fr.cx("fr-text--bold")}>
+                    Organismes sur lesquels vous êtes administrateur (
+                    {agenciesUserIsAdminOn.length} organismes)
+                  </p>
+
+                  <Table
+                    headers={[
+                      "Nom de l'organisme",
+                      "Type d'organisme",
+                      "Actions",
+                    ]}
+                    data={agenciesUserIsAdminOn.map((agency) => {
+                      return [
+                        <>
+                          <AgencyTag
+                            refersToAgencyName={agency.refersToAgencyName}
+                          />
+                          <AgencyStatusBadge status={agency.status} />
+                          <br />
+                          <span>{agency.name}</span>
+                          <br />
+                          <span className={fr.cx("fr-hint-text")}>
+                            {addressDtoToString(agency.address)}
+                          </span>
+                        </>,
+                        agencyKindToLabelIncludingIF[agency.kind],
+
+                        <a
+                          {...routes.agencyDashboardAgencyDetails({
+                            agencyId: agency.id,
+                          })}
+                        >
+                          Voir l'organisme
+                        </a>,
+                      ];
+                    })}
+                  />
+                </>
+              ),
+            },
+          ]
+        : []),
+    ];
+  };
 
   const currentTab = route.name;
 
@@ -159,8 +222,8 @@ export const AgencyDashboardPage = ({
                   return (
                     <Alert
                       severity="warning"
-                      title="Rattachement à vos agences en cours"
-                      description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des agences rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
+                      title="Rattachement à vos organismes en cours"
+                      description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
                     />
                   );
                 return <RegisterAgenciesForm />;

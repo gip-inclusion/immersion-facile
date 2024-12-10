@@ -15,6 +15,14 @@ import { listUsersEpics } from "src/core-logic/domain/admin/listUsers/listUsers.
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { notificationsEpics } from "src/core-logic/domain/admin/notifications/notifications.epics";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
+import { createUserOnAgencyEpics } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.epics";
+import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
+import { fetchAgencyEpics } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.epics";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import { removeUserFromAgencyEpics } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.epics";
+import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
+import { updateAgencyEpics } from "src/core-logic/domain/agencies/update-agency/updateAgency.epics";
+import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencyEpics } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.epic";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerEpics } from "src/core-logic/domain/apiConsumer/apiConsumer.epics";
@@ -76,6 +84,10 @@ const allEpics: AppEpic<any>[] = [
   ...listUsersEpics,
   ...fetchUserEpics,
   ...updateUserOnAgencyEpics,
+  ...fetchAgencyEpics,
+  ...updateAgencyEpics,
+  ...createUserOnAgencyEpics,
+  ...removeUserFromAgencyEpics,
 ];
 
 const appReducer = combineReducers({
@@ -90,6 +102,10 @@ const appReducer = combineReducers({
   }),
   agency: combineReducers({
     [updateUserOnAgencySlice.name]: updateUserOnAgencySlice.reducer,
+    [fetchAgencySlice.name]: fetchAgencySlice.reducer,
+    [updateAgencySlice.name]: updateAgencySlice.reducer,
+    [createUserOnAgencySlice.name]: createUserOnAgencySlice.reducer,
+    [removeUserFromAgencySlice.name]: removeUserFromAgencySlice.reducer,
   }),
   [agencyAdminSlice.name]: agencyAdminSlice.reducer,
   [agenciesSlice.name]: agenciesSlice.reducer,

@@ -9,7 +9,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/throwIfIcUserNotBackofficeAdmin";
+import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyStatusParams,
