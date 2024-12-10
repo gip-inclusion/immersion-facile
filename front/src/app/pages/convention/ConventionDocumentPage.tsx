@@ -13,6 +13,7 @@ import {
   ConventionId,
   ConventionReadDto,
   addressDtoToString,
+  convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   isConventionRenewed,
   isStringDate,
@@ -221,7 +222,11 @@ export const ConventionDocumentPage = ({
               né(e) le{" "}
               <strong>
                 {isStringDate(beneficiary.birthdate)
-                  ? toDisplayedDate({ date: new Date(beneficiary.birthdate) })
+                  ? toDisplayedDate({
+                      date: convertLocaleDateToUtcTimezoneDate(
+                        new Date(beneficiary.birthdate),
+                      ),
+                    })
                   : "Date invalide"}
               </strong>{" "}
               en qualité de <strong>bénéficiaire</strong> {""}
@@ -434,8 +439,18 @@ export const ConventionDocumentPage = ({
           <p className={fr.cx("fr-text--bold")}>
             {internshipKind === "immersion" ? "L'immersion" : "Le mini-stage"}{" "}
             se déroulera du{" "}
-            {toDisplayedDate({ date: new Date(convention.dateStart) })} au{" "}
-            {toDisplayedDate({ date: new Date(convention.dateEnd) })}.
+            {toDisplayedDate({
+              date: convertLocaleDateToUtcTimezoneDate(
+                new Date(convention.dateStart),
+              ),
+            })}{" "}
+            au{" "}
+            {toDisplayedDate({
+              date: convertLocaleDateToUtcTimezoneDate(
+                new Date(convention.dateEnd),
+              ),
+            })}
+            .
           </p>
           <div>
             <strong>

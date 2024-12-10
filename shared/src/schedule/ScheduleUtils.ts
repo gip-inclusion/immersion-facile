@@ -16,7 +16,7 @@ import {
 } from "../convention/convention.dto";
 import { isConventionOld } from "../convention/convention.schema";
 import { arrayFromNumber } from "../utils";
-import { DateString } from "../utils/date";
+import { DateString, convertLocaleDateToUtcTimezoneDate } from "../utils/date";
 import {
   DailyScheduleDto,
   DateIntervalDto,
@@ -361,13 +361,16 @@ export const makeImmersionTimetable = (
               mondayOfFirstWeek,
               (dayIndex + weekIndex * weekdays.length) * 24,
             );
-            const dailySchedule = complexSchedule.find(
-              (dailySchedule) =>
-                parseISO(dailySchedule.date).getDate() === date.getDate() &&
-                parseISO(dailySchedule.date).getMonth() === date.getMonth() &&
-                parseISO(dailySchedule.date).getFullYear() ===
-                  date.getFullYear(),
-            );
+            const dailySchedule = complexSchedule.find((dailyScheduleItem) => {
+              const schedule = convertLocaleDateToUtcTimezoneDate(
+                parseISO(dailyScheduleItem.date),
+              );
+              return (
+                schedule.getDate() === date.getDate() &&
+                schedule.getMonth() === date.getMonth() &&
+                schedule.getFullYear() === date.getFullYear()
+              );
+            });
             return {
               timePeriods: dailySchedule?.timePeriods ?? null,
               date: date.toISOString(),
