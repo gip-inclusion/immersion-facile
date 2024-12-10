@@ -114,6 +114,7 @@ describe("getAgencyByIdForDashboard", () => {
         errors.agency.notFound({ agencyId: agencyWithRefersTo.id }),
       );
     });
+
     it("Throw when user is not admin on agency", async () => {
       uow.userRepository.users = [
         counsellor1,
