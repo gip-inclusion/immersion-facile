@@ -57,9 +57,18 @@ const getConventionEpic: ConventionEpic = (
     filter(
       (action) =>
         conventionSlice.actions.fetchConventionRequested.match(action) ||
-        conventionSlice.actions.signConventionSucceeded.match(action),
+        conventionSlice.actions.signConventionSucceeded.match(action) ||
+        conventionSlice.actions.statusChangeSucceeded.match(action),
     ),
-    switchMap(({ payload }) => conventionGateway.retrieveFromToken$(payload)),
+    switchMap((action) => {
+      const params = conventionSlice.actions.statusChangeSucceeded.match(action)
+        ? {
+            conventionId: action.payload.updateStatusParams.conventionId,
+            jwt: action.payload.jwt,
+          }
+        : action.payload;
+      return conventionGateway.retrieveFromToken$(params);
+    }),
     map(conventionSlice.actions.fetchConventionSucceeded),
     catchEpicError((error: Error) =>
       conventionSlice.actions.fetchConventionFailed(error.message),
@@ -118,19 +127,22 @@ const conventionStatusChangeEpic: ConventionEpic = (
       conventionGateway
         .updateConventionStatus$(payload.updateStatusParams, payload.jwt)
         .pipe(
-          map(() =>
-            conventionSlice.actions.statusChangeSucceeded(payload.feedbackKind),
-          ),
+          map(() => conventionSlice.actions.statusChangeSucceeded(payload)),
+          catchEpicError((error: Error) => {
+            if (
+              error.message.includes(
+                "Convention should be reviewed by counsellor",
+              )
+            )
+              return conventionSlice.actions.statusChangeSucceeded({
+                ...payload,
+                feedbackKind: "missingCounsellorValidationError",
+              });
+
+            return conventionSlice.actions.statusChangeFailed(error.message);
+          }),
         ),
     ),
-    catchEpicError((error: Error) => {
-      if (error.message.includes("Convention should be reviewed by counsellor"))
-        return conventionSlice.actions.statusChangeSucceeded(
-          "missingCounsellorValidationError",
-        );
-
-      return conventionSlice.actions.statusChangeFailed(error.message);
-    }),
   );
 
 const getConventionStatusDashboardUrl: ConventionEpic = (

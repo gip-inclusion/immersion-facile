@@ -795,13 +795,34 @@ describe("Convention slice", () => {
 
   describe("Convention status change", () => {
     it("sends modification request with provided justification", () => {
+      const agencyFields = {
+        agencyCounsellorEmails: [],
+        agencyDepartment: "75",
+        agencyKind: "mission-locale" as const,
+        agencyName: "Agence Mission Locale",
+        agencyRefersTo: undefined,
+        agencySiret: "11110000111155",
+        agencyValidatorEmails: [],
+      };
+      const convention: ConventionReadDto = {
+        ...agencyFields,
+        ...new ConventionDtoBuilder().withStatus("IN_REVIEW").build(),
+      };
+
+      ({ store, dependencies } = createTestStore({
+        convention: {
+          ...initialConventionState,
+          convention,
+        },
+      }));
+
       const jwt = "some-correct-jwt";
       store.dispatch(
         conventionSlice.actions.statusChangeRequested({
           updateStatusParams: {
             status: "DRAFT",
             statusJustification: "There is a mistake in my last name",
-            conventionId: "some-id",
+            conventionId: convention.id,
             modifierRole: "beneficiary",
           },
           feedbackKind: "modificationsAskedFromSignatory",
@@ -812,8 +833,24 @@ describe("Convention slice", () => {
         isLoading: true,
       });
       feedGatewayWithModificationSuccess();
+
       expectConventionState({
         isLoading: false,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        convention,
+      });
+
+      const updatedConvention: ConventionReadDto = {
+        ...convention,
+        status: "DRAFT",
+        statusJustification: "There is a mistake in my last name",
+      };
+
+      feedGatewayWithConvention(updatedConvention);
+
+      expectConventionState({
+        isLoading: false,
+        convention: updatedConvention,
         feedback: { kind: "modificationsAskedFromSignatory" },
       });
     });
