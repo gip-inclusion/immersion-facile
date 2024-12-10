@@ -1,8 +1,8 @@
-import { RedisClientType } from "redis";
+import type { RedisClientType } from "redis";
 import { DefaultCacheConfig, MakeWithCache } from "../port/WithCache";
 
 type RedisWithCacheConfig = DefaultCacheConfig & {
-  redisClient: RedisClientType;
+  redisClient: RedisClientType<any, any, any>;
 };
 
 export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
@@ -10,6 +10,7 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
   ({ overrideCacheDurationInHours, getCacheKey, cb }) => {
     type Callback = typeof cb;
     return (async (...params: Parameters<Callback>) => {
+      if (!redisClient.isOpen) return cb(...params);
       const cacheKey = getCacheKey(...params);
 
       const cachedValue = await redisClient.get(cacheKey);

@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { trim } from "ramda";
+import {trim} from "ramda";
 import {
   AbsoluteUrl,
   ProcessEnv,
@@ -11,9 +11,13 @@ import {
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
 } from "shared";
-import { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
-import { DomainTopic } from "../../domains/core/events/events";
-import { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
+import {
+  EmailableApiKey
+} from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
+import {DomainTopic} from "../../domains/core/events/events";
+import {
+  S3Params
+} from "../../domains/core/file-storage/adapters/S3DocumentGateway";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;
@@ -139,6 +143,10 @@ export class AppConfig {
     });
   }
 
+  public get redisUrl() {
+    return this.#throwIfNotDefinedOrDefault("REDIS_URL");
+  }
+
   public get cellarS3Params(): S3Params | undefined {
     if (this.documentGateway === "S3") {
       return {
@@ -163,7 +171,7 @@ export class AppConfig {
     readDotEnv = true,
     configParams = process.env,
   ): AppConfig {
-    if (readDotEnv) dotenv.config({ path: `${__dirname}/../../../.env` });
+    if (readDotEnv) dotenv.config({path: `${__dirname}/../../../.env`});
     return new AppConfig(configParams);
   }
 
@@ -600,9 +608,9 @@ const parseStringList = (str: string | undefined, separator = ","): string[] =>
 
 // Email allow list from env variable
 export const makeEmailAllowListPredicate = ({
-  skipEmailAllowList,
-  emailAllowList,
-}: {
+                                              skipEmailAllowList,
+                                              emailAllowList,
+                                            }: {
   skipEmailAllowList: boolean;
   emailAllowList: string[];
 }): ((recipient: string) => boolean) =>

@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: immersion
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pg_password}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U immersion -d immersion-db"]
+      test: [ "CMD-SHELL", "pg_isready -U immersion -d immersion-db" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -22,3 +22,20 @@ services:
     image: adminer
     ports:
       - "8090:8080"
+
+  redis:
+    image: redis:7.2.5 # this is the version of the scalingo addon
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_password}
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./docker-data/redis:/data
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540"
+    volumes:
+      - ./docker-data/redis-insight:/db
+    restart: unless-stopped

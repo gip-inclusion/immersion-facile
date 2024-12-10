@@ -83,7 +83,7 @@ export class HttpAddressGateway implements AddressGateway {
 
     return this.#withCache({
       overrideCacheDurationInHours: 24,
-      getCacheKey: (query) => query,
+      getCacheKey: (query) => `geosearch_${query}`,
       cb: (cachedQuery: string) =>
         this.#limiter
           .schedule(() => {
