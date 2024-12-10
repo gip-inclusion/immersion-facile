@@ -103,12 +103,12 @@ export const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
               .leftJoin(
                 "public_romes_data as prd",
                 "prd.code_rome",
-                "io.rome_code",
+                "pad.code_rome",
               )
               .whereRef("io.siret", "=", "e.siret")
               .select(({ ref }) =>
                 jsonBuildObject({
-                  romeCode: ref("io.rome_code"),
+                  romeCode: ref("pad.code_rome"),
                   romeLabel: ref("prd.libelle_rome"),
                   appellationCode: sql<string>`${ref(
                     "io.appellation_code",
