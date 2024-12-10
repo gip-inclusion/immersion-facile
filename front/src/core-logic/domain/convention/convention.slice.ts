@@ -194,10 +194,10 @@ export const conventionSlice = createSlice({
     },
     statusChangeSucceeded: (
       state,
-      action: PayloadAction<ConventionFeedbackKind>,
+      action: PayloadAction<StatusChangePayload>,
     ) => {
       state.isLoading = false;
-      state.feedback = { kind: action.payload };
+      state.feedback = { kind: action.payload.feedbackKind };
     },
     statusChangeFailed: setFeedbackAsErrored,
 
