@@ -62,7 +62,7 @@ export const createConventionFeedbackMessageByKind = (
   markedAsEligible: {
     title: "Convention marquée comme éligible !",
     message:
-      "Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la Convention.",
+      "Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la convention.",
   },
   markedAsValidated: {
     title: "Convention validée !",
