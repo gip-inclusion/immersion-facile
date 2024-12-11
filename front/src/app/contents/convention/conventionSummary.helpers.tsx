@@ -10,6 +10,7 @@ import {
 import {
   ConventionReadDto,
   addressDtoToString,
+  convertLocaleDateToUtcTimezoneDate,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
   removeEmptyValue,
@@ -385,7 +386,9 @@ const makeBeneficiarySubSections = (
           key: "beneficiaryBirthdate",
           label: "Date de naissance",
           value: toDisplayedDate({
-            date: new Date(convention.signatories.beneficiary.birthdate),
+            date: convertLocaleDateToUtcTimezoneDate(
+              new Date(convention.signatories.beneficiary.birthdate),
+            ),
           }),
         },
         {
@@ -588,12 +591,20 @@ const makeImmersionSubSections = (
         {
           key: "dateStart",
           label: "Date de début",
-          value: toDisplayedDate({ date: new Date(convention.dateStart) }),
+          value: toDisplayedDate({
+            date: convertLocaleDateToUtcTimezoneDate(
+              new Date(convention.dateStart),
+            ),
+          }),
         },
         {
           key: "dateEnd",
           label: "Date de fin",
-          value: toDisplayedDate({ date: new Date(convention.dateEnd) }),
+          value: toDisplayedDate({
+            date: convertLocaleDateToUtcTimezoneDate(
+              new Date(convention.dateEnd),
+            ),
+          }),
         },
       ],
     },
@@ -677,8 +688,8 @@ export const makeConventionSections = (
 
 const printWeekSchedule = (convention: ConventionReadDto, cx: Cx) => {
   const weeklySchedule = makeWeeklySchedule(convention.schedule, {
-    start: new Date(convention.dateStart),
-    end: new Date(convention.dateEnd),
+    start: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateStart)),
+    end: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateEnd)),
   });
   return (
     <div className={fr.cx("fr-grid-row")}>

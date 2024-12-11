@@ -71,11 +71,13 @@ export const ScheduleSection = () => {
     const inputName = event.target.name;
     if (inputValue !== "" && isStringDate(inputValue)) {
       const newDates: DateIntervalDto = {
-        start: new Date(values.dateStart),
-        end: new Date(values.dateEnd),
+        start: convertLocaleDateToUtcTimezoneDate(new Date(values.dateStart)),
+        end: convertLocaleDateToUtcTimezoneDate(new Date(values.dateEnd)),
       };
 
-      const inputValueAsDate = new Date(inputValue);
+      const inputValueAsDate = convertLocaleDateToUtcTimezoneDate(
+        new Date(inputValue),
+      );
 
       if (inputName === "dateStart") {
         newDates.start = inputValueAsDate;

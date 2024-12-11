@@ -1,4 +1,3 @@
-// Matches valid dates of the format 'yyyy-mm-dd'.
 import { addHours, format, isValid } from "date-fns";
 import { z } from "zod";
 import { Flavor } from "../typeFlavors";
@@ -31,5 +30,17 @@ export const toDisplayedDate = ({
 
 export const isStringDate = (string: string) => isValid(new Date(string));
 
-export const convertLocaleDateToUtcTimezoneDate = (date: Date): Date =>
-  addHours(date, date.getTimezoneOffset() / 60);
+export const convertLocaleDateToUtcTimezoneDate = (date: Date): Date => {
+  const datePlusTwoHours = addHours(date, 2); // get rid of daylight saving time
+  return new Date(
+    Date.UTC(
+      datePlusTwoHours.getFullYear(),
+      datePlusTwoHours.getMonth(),
+      datePlusTwoHours.getDate(),
+      0,
+      0,
+      0,
+      0,
+    ),
+  );
+};
