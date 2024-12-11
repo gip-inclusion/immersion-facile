@@ -109,6 +109,21 @@ export const ConventionFormWrapper = ({
       })
         .with(
           {
+            conventionCantBeEdited: true,
+            formSuccessfullySubmitted: false,
+            shouldRedirectToError: false,
+          },
+          () => (
+            <Alert
+              severity="error"
+              title="Cette convention ne peut plus être modifiée"
+              description="Cette convention ne peut plus être modifiée car elle a déjà été signée, validée ou refusée."
+              className={fr.cx("fr-mb-4w")}
+            />
+          ),
+        )
+        .with(
+          {
             formSuccessfullySubmitted: false,
             shouldRedirectToError: false,
           },
@@ -144,13 +159,7 @@ export const ConventionFormWrapper = ({
             )}
           </>
         ))
-        .with({ conventionCantBeEdited: true }, () => (
-          <Alert
-            severity="error"
-            title="Cette convention ne peut plus être modifiée"
-            description="Cette convention ne peut plus être modifiée car elle a déjà été signée, validée ou refusée."
-          />
-        ))
+
         .exhaustive()}
     </div>
   );

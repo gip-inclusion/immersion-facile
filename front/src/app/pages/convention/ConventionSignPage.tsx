@@ -143,7 +143,7 @@ const ConventionSignPageContent = ({
               }
             >
               {convention && (
-                <>
+                <div className={fr.cx("fr-mb-4w")}>
                   {convention.status === "REJECTED" && (
                     <Alert
                       severity="error"
@@ -197,7 +197,7 @@ const ConventionSignPageContent = ({
                         submitFeedback={submitFeedback}
                       />
                     )}
-                </>
+                </div>
               )}
             </MainWrapper>
           ),
