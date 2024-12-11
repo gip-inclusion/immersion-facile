@@ -58,7 +58,7 @@ describe("Add FormEstablishment", () => {
   it("saves an establishment in the repository", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withFitForDisabledWorkers(true)
-      .withMaxContactsPerWeek(9)
+      .withMaxContactsPerMonth(9)
       .withNextAvailabilityDate(new Date())
       .build();
 

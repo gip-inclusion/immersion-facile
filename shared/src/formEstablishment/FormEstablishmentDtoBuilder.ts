@@ -225,7 +225,7 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withMaxContactsPerWeek(maxContactsPerMonth: number) {
+  public withMaxContactsPerMonth(maxContactsPerMonth: number) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       maxContactsPerMonth: maxContactsPerMonth,

@@ -71,7 +71,7 @@ export class PgGroupRepository implements GroupRepository {
       .where("e.is_max_discussions_for_period_reached", "=", false)
       .groupBy([
         "e.siret",
-        "io.rome_code",
+        "r.code_rome",
         "r.libelle_rome",
         "naf.class_label",
         "e.contact_mode",
@@ -80,7 +80,7 @@ export class PgGroupRepository implements GroupRepository {
       .select(({ ref }) =>
         jsonStripNulls(
           jsonBuildObject({
-            rome: ref("io.rome_code"),
+            rome: ref("r.code_rome"),
             siret: ref("e.siret"),
             establishmentScore: ref("e.score"),
             distance_m: sql`0`,

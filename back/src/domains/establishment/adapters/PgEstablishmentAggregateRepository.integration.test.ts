@@ -36,7 +36,16 @@ import {
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import {
+  analysteEnGeomatiqueImmersionOffer,
+  artisteCirqueOffer,
+  cartographeImmersionOffer,
+  cuvisteOffer,
+  groomChevauxOffer,
   makeExpectedSearchResult,
+  offer_A1101_11987,
+  offer_A1101_12862,
+  offer_A1101_17751,
+  offer_A1101_20404,
   sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
 } from "./PgEstablishmentAggregateRepository.test.helpers";
 
@@ -1464,16 +1473,15 @@ describe("PgEstablishmentAggregateRepository", () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret1)
           .withOffers([
-            //Normal que la query fonctionne lorsqu'on a une incohérance Code ROME <> Code appellation / OGR ?
             new OfferEntityBuilder()
-              .withRomeLabel("Bûcheronnage et élagage")
-              .withRomeCode("A1201")
+              .withRomeLabel("Stylisme")
+              .withRomeCode("B1805")
               .withAppellationLabel("Styliste")
               .withAppellationCode("19540")
               .build(),
             new OfferEntityBuilder()
-              .withRomeLabel("Conduite d'engins agricoles et forestiers")
-              .withRomeCode("A1101")
+              .withRomeLabel("Stylisme")
+              .withRomeCode("B1805")
               .withAppellationCode("19541")
               .withAppellationLabel("Styliste chaussure")
               .build(),
@@ -1508,6 +1516,39 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
 
       it.each([
+        {
+          originalEstablishment: new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("78000403200029")
+            .withEstablishmentCreatedAt(new Date("2021-01-15"))
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "aaaaaaaaaaaaa",
+                phone: "+33600000000",
+                userId: user.id,
+              },
+            ])
+            .withOffers([analysteEnGeomatiqueImmersionOffer, cuvisteOffer])
+            .build(),
+          updatedEstablishment: new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret("78000403200029")
+            .withEstablishmentCreatedAt(new Date("2021-01-15"))
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "aaaaaaaaaaaaa",
+                phone: "+33600000000",
+                userId: user.id,
+              },
+            ])
+            .withOffers([
+              analysteEnGeomatiqueImmersionOffer,
+              artisteCirqueOffer,
+              cuvisteOffer,
+            ])
+            .build(),
+          title: "add immersion offer on establishment",
+        },
         {
           originalEstablishment: new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("78000403200029")
@@ -1588,6 +1629,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withIsCommited(true)
                 .withLastInseeCheck(new Date())
                 .withNextAvailabilityDate(new Date())
+                .withMaxContactsPerMonth(2)
                 .withUpdatedAt(new Date())
                 .withWebsite("www.truc.com")
                 .withAcquisition(aquisition)
@@ -1606,6 +1648,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   .withContactMethod("IN_PERSON")
                   .withLastInseeCheck(new Date())
                   .withNextAvailabilityDate(new Date())
+                  .withMaxContactsPerMonth(5)
                   .withUpdatedAt(new Date())
                   .withWebsite("www.truc.com")
                   .withAcquisition(aquisition)
@@ -1688,7 +1731,10 @@ describe("PgEstablishmentAggregateRepository", () => {
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret("11111111111111")
           .withOffers([
-            new OfferEntityBuilder().withRomeCode(matchingRomeCode).build(),
+            new OfferEntityBuilder()
+              .withAppellationCode("11987")
+              .withRomeCode(matchingRomeCode)
+              .build(),
           ])
           .withLocationId(uuid())
           .withUserRights([osefUserRight])
@@ -2093,68 +2139,6 @@ const toReadableSearchResult = ({
   rome,
   distance_m,
 });
-
-const cartographeImmersionOffer = new OfferEntityBuilder()
-  .withAppellationCode("11704")
-  .withAppellationLabel("Cartographe")
-  .withRomeCode("M1808")
-  .withRomeLabel("Information géographique")
-  .build();
-
-const analysteEnGeomatiqueImmersionOffer = new OfferEntityBuilder()
-  .withAppellationCode("10946")
-  .withAppellationLabel("Analyste en géomatique")
-  .withRomeCode("M1808")
-  .withRomeLabel("Information géographique")
-  .build();
-
-const cuvisteOffer = new OfferEntityBuilder()
-  .withRomeCode("A1413")
-  .withRomeLabel("Fermentation de boissons alcoolisées")
-  .withAppellationCode("140927")
-  .withAppellationLabel("Cuviste")
-  .build();
-
-const groomChevauxOffer = new OfferEntityBuilder()
-  .withRomeCode("A1501")
-  .withRomeLabel("Aide aux soins animaux")
-  .withAppellationCode("140928")
-  .withAppellationLabel("Groom chevaux")
-  .build();
-
-const artisteCirqueOffer = new OfferEntityBuilder()
-  .withRomeCode("L1204")
-  .withRomeLabel("Arts du cirque et arts visuels")
-  .withAppellationCode("11155")
-  .withAppellationLabel("Artiste de cirque")
-  .build();
-
-const offer_A1101 = new OfferEntityBuilder()
-  .withRomeCode("A1101")
-  .withRomeLabel("Conduite d'engins agricoles et forestiers")
-  .withAppellationCode("0")
-  .withAppellationLabel("")
-  .build();
-
-const offer_A1101_11987 = new OfferEntityBuilder(offer_A1101)
-  .withAppellationCode("11987")
-  .withAppellationLabel("Chauffeur / Chauffeuse de machines agricoles")
-  .build();
-
-const offer_A1101_12862 = new OfferEntityBuilder(offer_A1101)
-  .withAppellationCode("12862")
-  .withAppellationLabel("")
-  .build();
-
-const offer_A1101_17751 = new OfferEntityBuilder(offer_A1101)
-  .withAppellationCode("17751")
-  .withAppellationLabel("Pilote de machines d'abattage")
-  .build();
-
-const offer_A1101_20404 = new OfferEntityBuilder(offer_A1101)
-  .withAppellationCode("20404")
-  .withAppellationLabel("Tractoriste agricole")
-  .build();
 
 const centerOfSaintesGeoPosition: GeoPositionDto = {
   lat: 45.7461575,

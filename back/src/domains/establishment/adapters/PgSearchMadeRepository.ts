@@ -39,7 +39,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         "lon",
         "needstobesearched",
         "number_of_results",
-        "rome",
         "searchable_by",
         "sorted_by",
         "voluntary_to_immersion",
@@ -51,7 +50,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
               [
                 {
                   id: searchMade.id,
-                  rome: searchMade.romeCode,
                   needstobesearched: searchMade.needsToBeSearched,
                   voluntary_to_immersion: searchMade.voluntaryToImmersion,
                   api_consumer_name: searchMade.apiConsumerName,
@@ -131,7 +129,6 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
                 sql`NULL`,
               )
               .as("number_of_results"),
-            "values.rome",
             eb.fn
               .coalesce(
                 sql`${eb.ref("values.searchable_by")}::searchable_by`,
