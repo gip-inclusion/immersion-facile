@@ -104,6 +104,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     const establishmentAggregate = makeEstablishmentAggregate({
       uuidGenerator: this.#uuidGenerator,
       timeGateway: this.#timeGateway,
+      formEstablishment,
       nafAndNumberOfEmployee: {
         nafDto: initialEstablishmentAggregate.establishment.nafDto,
         numberEmployeesRange:
@@ -118,7 +119,6 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
           ),
         ),
       ),
-      formEstablishment,
       score: initialEstablishmentAggregate.establishment.score,
       userRights: updatedUserRights,
     });

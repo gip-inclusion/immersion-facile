@@ -100,7 +100,6 @@ export class PgEstablishmentAggregateRepository
       .insertInto("immersion_offers")
       .values(
         offersWithSiret.map((offerWithSiret) => ({
-          rome_code: offerWithSiret.romeCode,
           appellation_code: parseInt(offerWithSiret.appellationCode),
           siret: offerWithSiret.siret,
           created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
@@ -142,12 +141,12 @@ export class PgEstablishmentAggregateRepository
   ): Promise<AppellationAndRomeDto[]> {
     const results = await this.transaction
       .selectFrom("immersion_offers as io")
-      .fullJoin("public_romes_data as prd", "prd.code_rome", "io.rome_code")
       .leftJoin(
         "public_appellations_data as pad",
         "pad.ogr_appellation",
         "io.appellation_code",
       )
+      .fullJoin("public_romes_data as prd", "prd.code_rome", "pad.code_rome")
       .select([
         "prd.code_rome",
         "prd.libelle_rome",
@@ -237,7 +236,12 @@ export class PgEstablishmentAggregateRepository
     const results = await this.transaction
       .selectFrom("immersion_offers")
       .select("siret")
-      .where("rome_code", "=", rome)
+      .leftJoin(
+        "public_appellations_data",
+        "public_appellations_data.ogr_appellation",
+        "immersion_offers.appellation_code",
+      )
+      .where("public_appellations_data.code_rome", "=", rome)
       .execute();
 
     return results.map((row) => row.siret);
@@ -348,7 +352,7 @@ export class PgEstablishmentAggregateRepository
       await this.#selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         `SELECT 
           io.siret,
-          io.rome_code,
+          pad.code_rome as rome_code,
           prd.libelle_rome as rome_label,
           (JSON_AGG (JSON_BUILD_OBJECT(
             'appellationCode', ogr_appellation::text,
@@ -373,11 +377,11 @@ export class PgEstablishmentAggregateRepository
         FROM immersion_offers AS io
         LEFT JOIN establishments e ON io.siret = e.siret
         LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = io.appellation_code 
-        LEFT JOIN public_romes_data AS prd ON prd.code_rome = io.rome_code 
+        LEFT JOIN public_romes_data AS prd ON prd.code_rome = pad.code_rome 
         LEFT JOIN establishments_location_infos AS loc_inf ON loc_inf.establishment_siret = io.siret
         LEFT JOIN establishments_location_positions AS loc_pos ON loc_inf.id = loc_pos.id
         WHERE io.siret = $1 AND io.appellation_code = $2 AND loc_inf.id = $3
-        GROUP BY (io.siret, io.rome_code, prd.libelle_rome, e.naf_code, e.is_max_discussions_for_period_reached	, e.next_availability_date, e.name, e.website,
+        GROUP BY (io.siret, pad.code_rome, prd.libelle_rome, e.naf_code, e.is_max_discussions_for_period_reached	, e.next_availability_date, e.name, e.website,
           e.additional_information, e.customized_name, e.fit_for_disabled_workers, e.number_employees, e.score, e.contact_mode, 
           loc_pos.id, loc_inf.id )`,
         [siret, appellationCode, locationId],
@@ -691,7 +695,6 @@ export class PgEstablishmentAggregateRepository
         .insertInto("immersion_offers")
         .values(
           offersToAdd.map((offerToAdd) => ({
-            rome_code: offerToAdd.romeCode,
             appellation_code: parseInt(offerToAdd.appellationCode),
             created_at: sql`${offerToAdd.createdAt.toISOString()}`,
             siret,
@@ -712,9 +715,18 @@ export class PgEstablishmentAggregateRepository
     if (offersToRemoveByRomeCode.length > 0)
       await this.transaction
         .deleteFrom("immersion_offers")
+        .leftJoin(
+          "public_appellations_data",
+          "immersion_offers.appellation_code",
+          "public_appellations_data.ogr_appellation",
+        )
         .where("siret", "=", siret)
         .where("appellation_code", "is", null)
-        .where("rome_code", "in", offersToRemoveByRomeCode)
+        .where(
+          "public_appellations_data.code_rome",
+          "in",
+          offersToRemoveByRomeCode,
+        )
         .execute();
 
     const offersToRemoveByAppellationCode = offersToRemove
@@ -921,15 +933,24 @@ const searchImmersionResultsQuery = (
               pipeWithValue(
                 eb
                   .selectFrom("immersion_offers")
+                  .leftJoin(
+                    "public_appellations_data",
+                    "immersion_offers.appellation_code",
+                    "public_appellations_data.ogr_appellation",
+                  )
                   .select([
                     "siret",
-                    "rome_code",
+                    "public_appellations_data.code_rome as rome_code",
                     "created_at",
                     "appellation_code",
                   ]),
                 (eb) =>
                   filters?.romeCodes
-                    ? eb.where("rome_code", "in", filters.romeCodes)
+                    ? eb.where(
+                        "public_appellations_data.code_rome",
+                        "in",
+                        filters.romeCodes,
+                      )
                     : eb,
               ).as("offer"),
             (join) => join.onRef("offer.siret", "=", "e.siret"),

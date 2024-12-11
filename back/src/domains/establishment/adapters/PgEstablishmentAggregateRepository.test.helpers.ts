@@ -1,6 +1,7 @@
 import { Location, SearchResultDto } from "shared";
 import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { OfferEntity } from "../entities/OfferEntity";
+import { OfferEntityBuilder } from "../helpers/EstablishmentBuilders";
 
 export const makeExpectedSearchResult = ({
   establishment: establishmentAggregate,
@@ -65,3 +66,65 @@ export const sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults = (
   if (a.siret < b.siret) return -1;
   return 0;
 };
+
+export const cartographeImmersionOffer = new OfferEntityBuilder()
+  .withAppellationCode("11704")
+  .withAppellationLabel("Cartographe")
+  .withRomeCode("M1808")
+  .withRomeLabel("Information géographique")
+  .build();
+
+export const analysteEnGeomatiqueImmersionOffer = new OfferEntityBuilder()
+  .withAppellationCode("10946")
+  .withAppellationLabel("Analyste en géomatique")
+  .withRomeCode("M1808")
+  .withRomeLabel("Information géographique")
+  .build();
+
+export const cuvisteOffer = new OfferEntityBuilder()
+  .withRomeCode("A1413")
+  .withRomeLabel("Fermentation de boissons alcoolisées")
+  .withAppellationCode("140927")
+  .withAppellationLabel("Cuviste")
+  .build();
+
+export const groomChevauxOffer = new OfferEntityBuilder()
+  .withRomeCode("A1501")
+  .withRomeLabel("Aide aux soins animaux")
+  .withAppellationCode("140928")
+  .withAppellationLabel("Groom chevaux")
+  .build();
+
+export const artisteCirqueOffer = new OfferEntityBuilder()
+  .withRomeCode("L1204")
+  .withRomeLabel("Arts du cirque et arts visuels")
+  .withAppellationCode("11155")
+  .withAppellationLabel("Artiste de cirque")
+  .build();
+
+export const offer_A1101 = new OfferEntityBuilder()
+  .withRomeCode("A1101")
+  .withRomeLabel("Conduite d'engins agricoles et forestiers")
+  .withAppellationCode("0")
+  .withAppellationLabel("")
+  .build();
+
+export const offer_A1101_11987 = new OfferEntityBuilder(offer_A1101)
+  .withAppellationCode("11987")
+  .withAppellationLabel("Chauffeur / Chauffeuse de machines agricoles")
+  .build();
+
+export const offer_A1101_12862 = new OfferEntityBuilder(offer_A1101)
+  .withAppellationCode("12862")
+  .withAppellationLabel("")
+  .build();
+
+export const offer_A1101_17751 = new OfferEntityBuilder(offer_A1101)
+  .withAppellationCode("17751")
+  .withAppellationLabel("Pilote de machines d'abattage")
+  .build();
+
+export const offer_A1101_20404 = new OfferEntityBuilder(offer_A1101)
+  .withAppellationCode("20404")
+  .withAppellationLabel("Tractoriste agricole")
+  .build();

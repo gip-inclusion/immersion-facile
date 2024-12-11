@@ -77,7 +77,11 @@ describe("Update Establishment aggregate from form data", () => {
       .build();
     const previousAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
-        new EstablishmentEntityBuilder().withSiret(siret).withScore(25).build(),
+        new EstablishmentEntityBuilder()
+          .withSiret(siret)
+          .withMaxContactsPerMonth(6)
+          .withScore(25)
+          .build(),
       )
       .withOffers([
         new OfferEntityBuilder().build(),
@@ -149,6 +153,7 @@ describe("Update Establishment aggregate from form data", () => {
       .withBusinessContactEmail(updatedAdmin.email)
       .withBusinessContactCopyEmails([updatedContact.email])
       .withNextAvailabilityDate(nextAvailabilityDate)
+      .withMaxContactsPerMonth(10)
       .withSearchableBy({
         jobSeekers: true,
         students: false,
@@ -182,6 +187,9 @@ describe("Update Establishment aggregate from form data", () => {
                 .withIsCommited(updatedFormEstablishment.isEngagedEnterprise)
                 .withIsOpen(true)
                 .withName(updatedFormEstablishment.businessName)
+                .withMaxContactsPerMonth(
+                  updatedFormEstablishment.maxContactsPerMonth,
+                )
                 .withLocations([
                   {
                     address: rueGuillaumeTellDto,
@@ -264,6 +272,9 @@ describe("Update Establishment aggregate from form data", () => {
                 .withIsCommited(updatedFormEstablishment.isEngagedEnterprise)
                 .withIsOpen(true)
                 .withName(updatedFormEstablishment.businessName)
+                .withMaxContactsPerMonth(
+                  updatedFormEstablishment.maxContactsPerMonth,
+                )
                 .withLocations([
                   {
                     address: rueGuillaumeTellDto,
