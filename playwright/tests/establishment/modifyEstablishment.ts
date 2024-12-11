@@ -23,7 +23,7 @@ import { goToManageEtablishmentBySiretInAdmin } from "./establishmentNavigation.
 
 export const updateEstablishmentThroughMagicLink =
   (
-    updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
+    updatedFormEstablishment: Partial<FormEstablishmentDto>,
     testEstablishments: TestEstablishments,
   ): PlaywrightTestCallback =>
   async ({ page }, { retry }) => {
@@ -32,7 +32,7 @@ export const updateEstablishmentThroughMagicLink =
     await editEstablishmentWithStepForm(
       page,
       retry,
-      updatedEstablishmentInfos,
+      updatedFormEstablishment,
       testEstablishments,
     );
   };
@@ -101,8 +101,10 @@ const editEstablishmentWithStepForm = async (
     throw new Error(
       "Missing next availability date for updatedEstablishmentInfos",
     );
-  const maxContactsPerMonth = updatedEstablishmentInfos.maxContactsPerMonth;
-  if (!maxContactsPerMonth)
+
+  const updatedMaxContactsPerMonth =
+    updatedEstablishmentInfos.maxContactsPerMonth;
+  if (!updatedMaxContactsPerMonth)
     throw new Error(
       "Missing max contacts per month for updatedEstablishmentInfos",
     );
@@ -133,7 +135,12 @@ const editEstablishmentWithStepForm = async (
     throw new Error("Missing website for updatedEstablishmentInfos");
 
   await start(page);
-  await step1Availability(page, nextAvailabilityDate, maxContactsPerMonth);
+
+  await step1Availability(
+    page,
+    nextAvailabilityDate,
+    updatedMaxContactsPerMonth,
+  );
   await step2SearchableBy(page);
   await step3BusinessContact(page, businessContact);
   await step4AImmersionOffer(
@@ -279,7 +286,7 @@ const step2SearchableBy = async (page: Page) => {
 const step1Availability = async (
   page: Page,
   nextAvailabilityDate: DateTimeIsoString,
-  maxContactsPerMonth: number,
+  updatedMaxContactsPerMonth: number,
 ) => {
   await page
     .locator(`#${domElementIds.establishment.edit.availabilityButton}`)
@@ -290,9 +297,21 @@ const step1Availability = async (
     .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
     .fill(nextAvailabilityDate.split("T")[0]);
 
-  await page.fill(
+  const maxContactPerMonthLocator = await page.locator(
     `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
-    maxContactsPerMonth.toString(),
+  );
+
+  const maxContactPerMonthLocatorCurrentValue =
+    await maxContactPerMonthLocator.inputValue();
+  await expect(maxContactPerMonthLocatorCurrentValue).not.toBe("");
+  await expect(maxContactPerMonthLocatorCurrentValue).not.toBe(
+    updatedMaxContactsPerMonth.toString(),
+  );
+  await maxContactPerMonthLocator.fill(updatedMaxContactsPerMonth.toString());
+  const maxContactPerMonthLocatorUpdatedValue =
+    await maxContactPerMonthLocator.inputValue();
+  await expect(maxContactPerMonthLocatorUpdatedValue).toBe(
+    updatedMaxContactsPerMonth.toString(),
   );
 
   await goToNextStep(page, 1, "edit");
