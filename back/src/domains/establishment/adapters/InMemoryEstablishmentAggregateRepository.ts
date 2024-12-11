@@ -81,7 +81,7 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async getSearchImmersionResultDtoBySearchQuery(
+  public async getSearchResultBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
   ): Promise<SearchResultDto | undefined> {
@@ -237,6 +237,15 @@ export class InMemoryEstablishmentAggregateRepository
             }
           : aggregate;
       },
+    );
+  }
+
+  public async updateAllEstablishmentScores(): Promise<void> {
+    this.establishmentAggregates = this.establishmentAggregates.map(
+      (aggregate) => ({
+        ...aggregate,
+        establishment: { ...aggregate.establishment, score: 100000 },
+      }),
     );
   }
 }
