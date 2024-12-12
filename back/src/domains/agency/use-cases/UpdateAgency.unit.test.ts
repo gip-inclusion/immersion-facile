@@ -1,7 +1,9 @@
 import {
   AgencyDtoBuilder,
   BadRequestError,
+  InclusionConnectedUser,
   InclusionConnectedUserBuilder,
+  UserWithAdminRights,
   errors,
   expectArraysToMatch,
   expectPromiseToFail,
@@ -143,83 +145,59 @@ describe("Update agency", () => {
     });
   });
 
-  it("Backoffice admin can update agency without changes on user rights and create corresponding event", async () => {
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(initialAgencyInRepo, {}),
-    ];
+  it.each([
+    {
+      triggeredByRole: "backoffice-admin",
+      triggeredByUser: icAdmin,
+      initialUsers: [admin, notAdmin],
+    },
+    {
+      triggeredByRole: "agency-admin",
+      triggeredByUser: icAgencyAdmin,
+      initialUsers: [agencyAdmin],
+    },
+  ] satisfies {
+    triggeredByRole: string;
+    triggeredByUser: InclusionConnectedUser;
+    initialUsers: UserWithAdminRights[];
+  }[])(
+    "$triggeredByRole can update agency without changes on user rights and create corresponding event",
+    async ({ initialUsers, triggeredByUser }) => {
+      uow.userRepository.users = initialUsers;
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(initialAgencyInRepo, {}),
+      ];
 
-    const updatedAgency = new AgencyDtoBuilder(initialAgencyInRepo)
-      .withName("L'agence modifié")
-      .build();
+      const updatedAgency = new AgencyDtoBuilder(initialAgencyInRepo)
+        .withName("L'agence modifié")
+        .build();
 
-    await updateAgency.execute(
-      { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
-      icAdmin,
-    );
+      await updateAgency.execute(
+        { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
+        triggeredByUser,
+      );
 
-    expectToEqual(uow.agencyRepository.agencies, [
-      toAgencyWithRights(
-        new AgencyDtoBuilder(initialAgencyInRepo)
-          .withName("L'agence modifié")
-          .build(),
-        {},
-      ),
-    ]);
-    expectToEqual(uow.userRepository.users, [admin, notAdmin]);
-    expectArraysToMatch(uow.outboxRepository.events, [
-      {
-        topic: "AgencyUpdated",
-        payload: {
-          agencyId: updatedAgency.id,
-          triggeredBy: {
-            kind: "inclusion-connected",
-            userId: admin.id,
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(
+          new AgencyDtoBuilder(initialAgencyInRepo)
+            .withName("L'agence modifié")
+            .build(),
+          {},
+        ),
+      ]);
+      expectToEqual(uow.userRepository.users, initialUsers);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "AgencyUpdated",
+          payload: {
+            agencyId: updatedAgency.id,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: triggeredByUser.id,
+            },
           },
         },
-      },
-    ]);
-  });
-
-  it("Agency admin can update agency without changes on user rights and create corresponding event", async () => {
-    uow.userRepository.users = [agencyAdmin];
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(initialAgencyInRepo, {
-        [icAgencyAdmin.id]: {
-          roles: ["agency-admin"],
-          isNotifiedByEmail: true,
-        },
-      }),
-    ];
-
-    const updatedAgency = new AgencyDtoBuilder(initialAgencyInRepo)
-      .withName("L'agence modifié")
-      .build();
-
-    await updateAgency.execute(
-      { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
-      icAgencyAdmin,
-    );
-
-    expectToEqual(uow.agencyRepository.agencies, [
-      toAgencyWithRights(updatedAgency, {
-        [icAgencyAdmin.id]: {
-          roles: ["agency-admin"],
-          isNotifiedByEmail: true,
-        },
-      }),
-    ]);
-    expectToEqual(uow.userRepository.users, [agencyAdmin]);
-    expectArraysToMatch(uow.outboxRepository.events, [
-      {
-        topic: "AgencyUpdated",
-        payload: {
-          agencyId: updatedAgency.id,
-          triggeredBy: {
-            kind: "inclusion-connected",
-            userId: icAgencyAdmin.id,
-          },
-        },
-      },
-    ]);
-  });
+      ]);
+    },
+  );
 });

@@ -45,7 +45,7 @@ describe("getAgencyByIdForDashboard", () => {
     .withEmail("validator@email.com")
     .buildUser();
 
-  const agencyAdminUser = new InclusionConnectedUserBuilder()
+  const agencyAdminBuilder = new InclusionConnectedUserBuilder()
     .withId("agencyAdminUser")
     .withEmail("agencyAdminUser@email.com")
     .withAgencyRights([
@@ -54,8 +54,9 @@ describe("getAgencyByIdForDashboard", () => {
         isNotifiedByEmail: true,
         roles: ["agency-admin"],
       },
-    ])
-    .build();
+    ]);
+  const icAgencyAdminUser = agencyAdminBuilder.build();
+  const agencyAdminUser = agencyAdminBuilder.buildUser();
 
   const notAgencyAdminUser = new InclusionConnectedUserBuilder()
     .withId("notAgencyAdminUser")
@@ -96,7 +97,7 @@ describe("getAgencyByIdForDashboard", () => {
   describe("right paths", () => {
     it("get the agency by id", async () => {
       expectToEqual(
-        await getAgencyById.execute(agencyWithRefersTo.id, agencyAdminUser),
+        await getAgencyById.execute(agencyWithRefersTo.id, icAgencyAdminUser),
         {
           ...agencyWithRefersTo,
           counsellorEmails: [counsellor2.email],
