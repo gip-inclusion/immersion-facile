@@ -56,8 +56,8 @@ type FormattedScheduleByWeek = {
 const formatSchedule = (convention: ConventionReadDto) => {
   const scheduleByWeek: FormattedScheduleByWeek = [];
   prettyPrintSchedule(convention.schedule, {
-    start: new Date(convention.dateStart),
-    end: new Date(convention.dateEnd),
+    start: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateStart)),
+    end: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateEnd)),
   })
     .split("\n")
     .forEach((line: string) => {
@@ -562,7 +562,9 @@ export const ConventionDocumentPage = ({
                 </strong>{" "}
                 (signé le{" "}
                 {toDisplayedDate({
-                  date: new Date(throwOnMissingSignDate(beneficiary.signedAt)),
+                  date: convertLocaleDateToUtcTimezoneDate(
+                    new Date(throwOnMissingSignDate(beneficiary.signedAt)),
+                  ),
                   withHours: true,
                   showGMT: true,
                 })}
@@ -577,9 +579,11 @@ export const ConventionDocumentPage = ({
                   </strong>{" "}
                   (signé le{" "}
                   {toDisplayedDate({
-                    date: new Date(
-                      throwOnMissingSignDate(
-                        beneficiaryRepresentative.signedAt,
+                    date: convertLocaleDateToUtcTimezoneDate(
+                      new Date(
+                        throwOnMissingSignDate(
+                          beneficiaryRepresentative.signedAt,
+                        ),
                       ),
                     ),
                     withHours: true,
@@ -598,9 +602,11 @@ export const ConventionDocumentPage = ({
                   </strong>{" "}
                   (signé le{" "}
                   {toDisplayedDate({
-                    date: new Date(
-                      throwOnMissingSignDate(
-                        beneficiaryCurrentEmployer.signedAt,
+                    date: convertLocaleDateToUtcTimezoneDate(
+                      new Date(
+                        throwOnMissingSignDate(
+                          beneficiaryCurrentEmployer.signedAt,
+                        ),
                       ),
                     ),
                   })}
@@ -615,9 +621,11 @@ export const ConventionDocumentPage = ({
                 </strong>{" "}
                 (signé le{" "}
                 {toDisplayedDate({
-                  date: new Date(
-                    throwOnMissingSignDate(
-                      establishmentRepresentative.signedAt,
+                  date: convertLocaleDateToUtcTimezoneDate(
+                    new Date(
+                      throwOnMissingSignDate(
+                        establishmentRepresentative.signedAt,
+                      ),
                     ),
                   ),
                 })}
@@ -631,8 +639,10 @@ export const ConventionDocumentPage = ({
                     : "du mini-stage"}
                   , <strong>{convention.agencyName}</strong> (validé le{" "}
                   {toDisplayedDate({
-                    date: new Date(
-                      throwOnMissingSignDate(convention.dateValidation),
+                    date: convertLocaleDateToUtcTimezoneDate(
+                      new Date(
+                        throwOnMissingSignDate(convention.dateValidation),
+                      ),
                     ),
                   })}
                   )
@@ -648,8 +658,10 @@ export const ConventionDocumentPage = ({
                     , <strong>{convention.agencyRefersTo.name}</strong> (validé
                     le{" "}
                     {toDisplayedDate({
-                      date: new Date(
-                        throwOnMissingSignDate(convention.dateValidation),
+                      date: convertLocaleDateToUtcTimezoneDate(
+                        new Date(
+                          throwOnMissingSignDate(convention.dateValidation),
+                        ),
                       ),
                     })}
                     ).
@@ -658,8 +670,10 @@ export const ConventionDocumentPage = ({
                     √ La structure d'accompagnement du candidat,{" "}
                     <strong>{convention.agencyName}</strong> (validé le{" "}
                     {toDisplayedDate({
-                      date: new Date(
-                        throwOnMissingSignDate(convention.dateApproval),
+                      date: convertLocaleDateToUtcTimezoneDate(
+                        new Date(
+                          throwOnMissingSignDate(convention.dateApproval),
+                        ),
                       ),
                     })}
                     ).
