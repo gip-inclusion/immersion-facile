@@ -38,10 +38,13 @@ const searchResult = new LaBonneBoiteCompanyDtoBuilder()
     departmentCode: "29",
   })
   .build()
-  .toSearchResult({
-    romeCode: boulangerRomeData.rome,
-    romeLabel: boulangerRomeData.romeLabel,
-  });
+  .toSearchResult(
+    {
+      romeCode: boulangerRomeData.rome,
+      romeLabel: boulangerRomeData.romeLabel,
+    },
+    benodetLonLat,
+  );
 
 describe("HttpLaBonneBoiteGateway", () => {
   let laBonneBoiteGateway: HttpLaBonneBoiteGateway;

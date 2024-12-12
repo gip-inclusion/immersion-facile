@@ -15,12 +15,22 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
   public async searchCompanies({
     rome,
     romeLabel,
+    lon,
+    lat,
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
     this.nbOfCalls = this.nbOfCalls + 1;
     if (this._error) throw this._error;
     return this._results
       .filter((result) => result.isCompanyRelevant())
-      .map((result) => result.toSearchResult({ romeCode: rome, romeLabel }));
+      .map((result) =>
+        result.toSearchResult(
+          { romeCode: rome, romeLabel },
+          {
+            lat,
+            lon,
+          },
+        ),
+      );
   }
 
   public async fetchCompanyBySiret(

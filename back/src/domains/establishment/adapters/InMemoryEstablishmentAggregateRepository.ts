@@ -281,10 +281,8 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation
         establishmentAgg.establishment?.additionalInformation,
       distance_m: position
         ? distanceBetweenCoordinatesInMeters(
-            establishmentAgg.establishment.locations[0].position.lat,
-            establishmentAgg.establishment.locations[0].position.lon,
-            position.lat,
-            position.lon,
+            establishmentAgg.establishment.locations[0].position,
+            position,
           )
         : undefined,
       position: establishmentAgg.establishment.locations[0].position,

@@ -141,10 +141,14 @@ export class SearchImmersion extends TransactionalUseCase<
     const { romeCode, romeLabel } = romeAndAppellationData;
     if (hasSearchGeoParams(geoParams))
       try {
-        return await this.laBonneBoiteAPI.searchCompanies({
+        const lbbResults = await this.laBonneBoiteAPI.searchCompanies({
           rome: romeCode,
           romeLabel,
           ...geoParams,
+        });
+        return lbbResults.filter((result) => {
+          if (!result.distance_m) return true;
+          return result.distance_m <= params.distanceKm * 1000;
         });
       } catch (error) {
         logger.error({

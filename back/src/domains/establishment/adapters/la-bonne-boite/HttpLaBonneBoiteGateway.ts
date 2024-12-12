@@ -21,6 +21,7 @@ const lbbMaxQueryPerSeconds = 1;
 const lbbV2App = "api_labonneboitev2";
 
 const logger = createLogger(__filename);
+
 export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   #limiter = new Bottleneck({
     reservoir: lbbMaxQueryPerSeconds,
@@ -70,7 +71,10 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
               )
               .filter((result) => result.isCompanyRelevant())
               .map((result) =>
-                result.toSearchResult({ romeCode: rome, romeLabel }),
+                result.toSearchResult(
+                  { romeCode: rome, romeLabel },
+                  { lat, lon },
+                ),
               )
           : [];
       })
@@ -89,6 +93,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
         throw error;
       });
   }
+
   public async fetchCompanyBySiret(
     siret: SiretDto,
     romeDto: RomeDto,
@@ -132,4 +137,5 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
       });
   }
 }
+
 const createAuthorization = (accessToken: string) => `Bearer ${accessToken}`;

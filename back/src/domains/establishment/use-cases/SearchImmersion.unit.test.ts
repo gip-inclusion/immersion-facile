@@ -330,10 +330,14 @@ describe("SearchImmersionUseCase", () => {
         boulangerOffer.romeCode,
         606885,
       ),
-      lbbToSearchResult(lbbCompanyVO, {
-        romeCode: secretariatOffer.romeCode,
-        romeLabel: secretariatOffer.romeLabel,
-      }),
+      lbbToSearchResult(
+        lbbCompanyVO,
+        {
+          romeCode: secretariatOffer.romeCode,
+          romeLabel: secretariatOffer.romeLabel,
+        },
+        { distance_m: 23649 },
+      ),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -370,10 +374,14 @@ describe("SearchImmersionUseCase", () => {
         secretariatOffer.romeCode,
         606885,
       ),
-      lbbToSearchResult(lbbCompanyVO, {
-        romeCode: secretariatOffer.romeCode,
-        romeLabel: secretariatOffer.romeLabel,
-      }),
+      lbbToSearchResult(
+        lbbCompanyVO,
+        {
+          romeCode: secretariatOffer.romeCode,
+          romeLabel: secretariatOffer.romeLabel,
+        },
+        { distance_m: 23649 },
+      ),
     ]);
     expectToEqual(uow.searchMadeRepository.searchesMade, [
       {
@@ -450,7 +458,7 @@ describe("SearchImmersionUseCase", () => {
       establishment,
     ];
 
-    const range = 10;
+    const range = 50;
     const companiesInRangeFromLbb = [
       new LaBonneBoiteCompanyDtoBuilder()
         .withSiret("22220000000022")
@@ -479,10 +487,14 @@ describe("SearchImmersionUseCase", () => {
     expectToEqual(
       response,
       companiesInRangeFromLbb.map((result) =>
-        lbbToSearchResult(result, {
-          romeCode: secretariatOffer.romeCode,
-          romeLabel: secretariatOffer.romeLabel,
-        }),
+        lbbToSearchResult(
+          result,
+          {
+            romeCode: secretariatOffer.romeCode,
+            romeLabel: secretariatOffer.romeLabel,
+          },
+          { distance_m: 23649 },
+        ),
       ),
     );
 
@@ -1223,6 +1235,7 @@ const authenticatedApiConsumerPayload: ApiConsumer = {
 const lbbToSearchResult = (
   lbb: LaBonneBoiteCompanyDto,
   romeDto: RomeDto,
+  { distance_m }: { distance_m: number | undefined },
 ): SearchResultDto => ({
   additionalInformation: "",
   establishmentScore: 0,
@@ -1234,7 +1247,7 @@ const lbbToSearchResult = (
   },
   appellations: [],
   customizedName: "",
-  distance_m: undefined,
+  distance_m,
   fitForDisabledWorkers: false,
   naf: lbb.props.naf,
   nafLabel: lbb.props.naf_label,

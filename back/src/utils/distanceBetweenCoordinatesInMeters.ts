@@ -1,11 +1,14 @@
 // Takes two coordinates (in degrees) and returns distance in meters.
+
+import { GeoPositionDto } from "shared";
+
 // Taken from https://www.movable-type.co.uk/scripts/latlong.html (MIT license)
 export const distanceBetweenCoordinatesInMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
+  pointA: GeoPositionDto,
+  pointB: GeoPositionDto,
 ) => {
+  const { lat: lat1, lon: lon1 } = pointA;
+  const { lat: lat2, lon: lon2 } = pointB;
   const R = 6371e3; // metres
   const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
   const φ2 = (lat2 * Math.PI) / 180;
