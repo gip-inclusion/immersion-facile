@@ -13,6 +13,7 @@ import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesP
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
+import { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import {
   TestDependencies,
   createTestStore,
@@ -131,69 +132,39 @@ describe("UpdateUserOnAgency slice", () => {
     );
   });
 
-  it("not update the user rights if error, and store the feedback in user feedbacks", () => {
-    store.dispatch(
-      updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        ...userParams,
-        feedbackTopic: "user",
-      }),
-    );
+  it.each(["user", "agency-user-for-dashboard"] as const)(
+    "not update the user rights if error, and store the feedback in feedback topic %s",
+    (feedbackTopic: FeedbackTopic) => {
+      store.dispatch(
+        updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
+          ...userParams,
+          feedbackTopic,
+        }),
+      );
 
-    expectToEqual(
-      updateUserOnAgencySelectors.isLoading(store.getState()),
-      true,
-    );
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        true,
+      );
 
-    dependencies.agencyGateway.updateUserAgencyRightResponse$.error(
-      "Une erreur est survenue lors de la mise à jour de l'utilisateur",
-    );
-
-    expectToEqual(
-      updateUserOnAgencySelectors.isLoading(store.getState()),
-      false,
-    );
-    expectToEqual(feedbacksSelectors.feedbacks(store.getState()).user, {
-      level: "error",
-      message:
+      dependencies.agencyGateway.updateUserAgencyRightResponse$.error(
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
-      on: "update",
-      title: "Problème lors de la mise à jour de l'utilisateur",
-    });
-  });
+      );
 
-  it("not update the user rights if error and store the feedback in agency-user-for-dashboard feedbacks", () => {
-    store.dispatch(
-      updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
-        ...userParams,
-        feedbackTopic: "agency-user-for-dashboard",
-      }),
-    );
-
-    expectToEqual(
-      updateUserOnAgencySelectors.isLoading(store.getState()),
-      true,
-    );
-
-    dependencies.agencyGateway.updateUserAgencyRightResponse$.error(
-      "Une erreur est survenue lors de la mise à jour de l'utilisateur",
-    );
-
-    expectToEqual(
-      updateUserOnAgencySelectors.isLoading(store.getState()),
-      false,
-    );
-
-    expectToEqual(
-      feedbacksSelectors.feedbacks(store.getState())[
-        "agency-user-for-dashboard"
-      ],
-      {
-        level: "error",
-        message:
-          "Une erreur est survenue lors de la mise à jour de l'utilisateur",
-        on: "update",
-        title: "Problème lors de la mise à jour de l'utilisateur",
-      },
-    );
-  });
+      expectToEqual(
+        updateUserOnAgencySelectors.isLoading(store.getState()),
+        false,
+      );
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[feedbackTopic],
+        {
+          level: "error",
+          message:
+            "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+          on: "update",
+          title: "Problème lors de la mise à jour de l'utilisateur",
+        },
+      );
+    },
+  );
 });

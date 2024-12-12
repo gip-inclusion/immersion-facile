@@ -47,18 +47,6 @@ const backOfficeUserBuilder = new InclusionConnectedUserBuilder()
 const backOfficeUser = backOfficeUserBuilder.buildUser();
 const icbackOffice = backOfficeUserBuilder.build();
 
-const agencyAdminUserBuilder = new InclusionConnectedUserBuilder()
-  .withId("agency-admin")
-  .withFirstName("Jack")
-  .withLastName("The agency Admin")
-  .withEmail("jack.admin@mail.com")
-  .withCreatedAt(new Date())
-  .withExternalId("jack-admin-external-id")
-  .withIsAdmin(true);
-
-const agencyAdminUser = agencyAdminUserBuilder.buildUser();
-const icAgencyAdmin = agencyAdminUserBuilder.build();
-
 const notBackOfficeUserBuilder = new InclusionConnectedUserBuilder(icbackOffice)
   .withExternalId("not-backoffice-admin")
   .withIsAdmin(false);
@@ -90,6 +78,24 @@ const {
   counsellorEmails: ______,
   ...agencyWithRefersToWithoutEmails
 } = agencyWithRefersTo;
+
+const agencyAdminUserBuilder = new InclusionConnectedUserBuilder()
+  .withId("agency-admin")
+  .withFirstName("Jack")
+  .withLastName("The agency Admin")
+  .withEmail("jack.admin@mail.com")
+  .withCreatedAt(new Date())
+  .withExternalId("jack-admin-external-id")
+  .withAgencyRights([
+    {
+      agency: agencyWithRefersTo,
+      roles: ["agency-admin"],
+      isNotifiedByEmail: true,
+    },
+  ]);
+
+const agencyAdminUser = agencyAdminUserBuilder.buildUser();
+const icAgencyAdmin = agencyAdminUserBuilder.build();
 
 const agency1WithRights = toAgencyWithRights(agency1, {
   [johnUser.id]: {

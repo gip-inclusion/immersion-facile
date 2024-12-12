@@ -28,6 +28,13 @@ import {
 } from "./CreateUserForAgency";
 
 describe("CreateUserForAgency", () => {
+  const counsellor = new InclusionConnectedUserBuilder()
+    .withId("counsellor")
+    .withEmail("counsellor@mail.com")
+    .buildUser();
+
+  const agencyWithCounsellor = new AgencyDtoBuilder().build();
+
   const icBackofficeAdminUserBuilder = new InclusionConnectedUserBuilder()
     .withId("backoffice-admin-id")
     .withIsAdmin(true);
@@ -45,12 +52,17 @@ describe("CreateUserForAgency", () => {
     .withIsAdmin(false);
   const icNotAgencyAdminUser = icNotAgencyAdminUserBuilder.build();
 
-  const counsellor = new InclusionConnectedUserBuilder()
-    .withId("counsellor")
-    .withEmail("counsellor@mail.com")
-    .buildUser();
-
-  const agencyWithCounsellor = new AgencyDtoBuilder().build();
+  const icAgencyAdminUserBuilder = new InclusionConnectedUserBuilder()
+    .withId("agency-admin-id")
+    .withIsAdmin(false)
+    .withAgencyRights([
+      {
+        agency: agencyWithCounsellor,
+        roles: ["agency-admin"],
+        isNotifiedByEmail: true,
+      },
+    ]);
+  const icAgencyAdminUser = icAgencyAdminUserBuilder.build();
 
   let uow: InMemoryUnitOfWork;
   let createUserForAgency: CreateUserForAgency;
@@ -170,111 +182,147 @@ describe("CreateUserForAgency", () => {
     });
   });
 
-  it("create new user with its agency rights if no other users exist by email", async () => {
-    const newUserId = uuidGenerator.new();
-    uow.userRepository.users = [counsellor];
+  it.each([
+    {
+      triggeredByRole: "backoffice-admin",
+      triggeredByUser: icBackofficeAdminUser,
+    },
+    {
+      triggeredByRole: "agency-admin",
+      triggeredByUser: icAgencyAdminUser,
+    },
+  ])(
+    "$triggeredByRole can create new user with its agency rights if no other users exist by email",
+    async ({ triggeredByUser }) => {
+      const newUserId = uuidGenerator.new();
+      uow.userRepository.users = [counsellor];
 
-    const icUserForAgency: UserParamsForAgency = {
-      userId: newUserId,
-      agencyId: agencyWithCounsellor.id,
-      roles: ["counsellor"],
-      isNotifiedByEmail: false,
-      email: "new-user@email.fr",
-    };
+      const icUserForAgency: UserParamsForAgency = {
+        userId: newUserId,
+        agencyId: agencyWithCounsellor.id,
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+        email: "new-user@email.fr",
+      };
 
-    await createUserForAgency.execute(icUserForAgency, icBackofficeAdminUser);
+      await createUserForAgency.execute(icUserForAgency, triggeredByUser);
 
-    expectToEqual(uow.userRepository.users, [
-      counsellor,
-      {
-        id: icUserForAgency.userId,
-        email: icUserForAgency.email,
-        createdAt: timeGateway.now().toISOString(),
-        firstName: emptyName,
-        lastName: emptyName,
+      expectToEqual(uow.userRepository.users, [
+        counsellor,
+        {
+          id: icUserForAgency.userId,
+          email: icUserForAgency.email,
+          createdAt: timeGateway.now().toISOString(),
+          firstName: emptyName,
+          lastName: emptyName,
+          externalId: null,
+        },
+      ]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agencyWithCounsellor, {
+          [newUserId]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [counsellor.id]: {
+            isNotifiedByEmail: false,
+            roles: ["counsellor"],
+          },
+        }),
+      ]);
+
+      expectToEqual(uow.outboxRepository.events, [
+        createNewEvent({
+          topic: "IcUserAgencyRightChanged",
+          payload: {
+            agencyId: icUserForAgency.agencyId,
+            userId: icUserForAgency.userId,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: triggeredByUser.id,
+            },
+          },
+        }),
+      ]);
+    },
+  );
+
+  it.each([
+    {
+      triggeredByRole: "backoffice-admin",
+      triggeredByUser: icBackofficeAdminUser,
+    },
+    {
+      triggeredByRole: "agency-admin",
+      triggeredByUser: icAgencyAdminUser,
+    },
+  ])(
+    "$triggeredByRole can add agency rights to an existing user",
+    async ({ triggeredByUser }) => {
+      const validator: User = {
+        id: "validator",
+        email: "user@email.fr",
+        firstName: "John",
+        lastName: "Doe",
         externalId: null,
-      },
-    ]);
-    expectToEqual(uow.agencyRepository.agencies, [
-      toAgencyWithRights(agencyWithCounsellor, {
-        [newUserId]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-      }),
-    ]);
+        createdAt: timeGateway.now().toISOString(),
+      };
+      uow.userRepository.users = [validator, counsellor];
 
-    expectToEqual(uow.outboxRepository.events, [
-      createNewEvent({
-        topic: "IcUserAgencyRightChanged",
-        payload: {
-          agencyId: icUserForAgency.agencyId,
-          userId: icUserForAgency.userId,
-          triggeredBy: {
-            kind: "inclusion-connected",
-            userId: icBackofficeAdminUser.id,
+      const anotherAgency = new AgencyDtoBuilder()
+        .withId("another-agency-id")
+        .build();
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agencyWithCounsellor, {
+          [icAgencyAdminUser.id]: {
+            isNotifiedByEmail: false,
+            roles: ["agency-admin"],
           },
-        },
-      }),
-    ]);
-  });
+        }),
+        toAgencyWithRights(anotherAgency, {
+          [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      ];
 
-  it("add agency rights to an existing user with same email", async () => {
-    const validator: User = {
-      id: "validator",
-      email: "user@email.fr",
-      firstName: "John",
-      lastName: "Doe",
-      externalId: null,
-      createdAt: timeGateway.now().toISOString(),
-    };
-    uow.userRepository.users = [validator, counsellor];
+      const icUserForAgency: UserParamsForAgency = {
+        userId: validator.id,
+        agencyId: agencyWithCounsellor.id,
+        roles: ["counsellor"],
+        isNotifiedByEmail: false,
+        email: validator.email,
+      };
 
-    const anotherAgency = new AgencyDtoBuilder()
-      .withId("another-agency-id")
-      .build();
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(agencyWithCounsellor, {
-        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-      }),
-      toAgencyWithRights(anotherAgency, {}),
-    ];
+      await createUserForAgency.execute(icUserForAgency, triggeredByUser);
 
-    const icUserForAgency: UserParamsForAgency = {
-      userId: validator.id,
-      agencyId: anotherAgency.id,
-      roles: ["counsellor"],
-      isNotifiedByEmail: false,
-      email: validator.email,
-    };
-
-    await createUserForAgency.execute(icUserForAgency, icBackofficeAdminUser);
-
-    expectToEqual(uow.agencyRepository.agencies, [
-      toAgencyWithRights(agencyWithCounsellor, {
-        [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
-        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-      }),
-      toAgencyWithRights(anotherAgency, {
-        [validator.id]: {
-          isNotifiedByEmail: icUserForAgency.isNotifiedByEmail,
-          roles: icUserForAgency.roles,
-        },
-      }),
-    ]);
-    expectToEqual(uow.outboxRepository.events, [
-      createNewEvent({
-        topic: "IcUserAgencyRightChanged",
-        payload: {
-          agencyId: anotherAgency.id,
-          userId: validator.id,
-          triggeredBy: {
-            kind: "inclusion-connected",
-            userId: icBackofficeAdminUser.id,
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agencyWithCounsellor, {
+          [icAgencyAdminUser.id]: {
+            isNotifiedByEmail: false,
+            roles: ["agency-admin"],
           },
-        },
-      }),
-    ]);
-  });
+          [validator.id]: {
+            isNotifiedByEmail: icUserForAgency.isNotifiedByEmail,
+            roles: icUserForAgency.roles,
+          },
+        }),
+        toAgencyWithRights(anotherAgency, {
+          [counsellor.id]: { isNotifiedByEmail: false, roles: ["counsellor"] },
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      ]);
+      expectToEqual(uow.outboxRepository.events, [
+        createNewEvent({
+          topic: "IcUserAgencyRightChanged",
+          payload: {
+            agencyId: agencyWithCounsellor.id,
+            userId: validator.id,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: triggeredByUser.id,
+            },
+          },
+        }),
+      ]);
+    },
+  );
 
   it("throw if user already exist in agency", async () => {
     const validator: User = {

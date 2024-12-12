@@ -34,7 +34,6 @@ describe("RemoveUserFromAgency", () => {
     .withIsAdmin(true);
 
   const icAdmin = adminBuilder.build();
-  const adminUser = adminBuilder.buildUser();
 
   const notAdminBuilder = new InclusionConnectedUserBuilder()
     .withId("not-admin-id")
@@ -42,10 +41,17 @@ describe("RemoveUserFromAgency", () => {
   const icNotAdmin = notAdminBuilder.build();
   const notAdminUser = notAdminBuilder.buildUser();
 
-  const icNotAgencyAdminUserBuilder = new InclusionConnectedUserBuilder()
-    .withId("not-agency-admin-id")
-    .withIsAdmin(false);
-  const icNotAgencyAdminUser = icNotAgencyAdminUserBuilder.build();
+  const icAgencyAdminUserBuilder = new InclusionConnectedUserBuilder()
+    .withId("agency-admin-id")
+    .withIsAdmin(false)
+    .withAgencyRights([
+      {
+        agency: agency,
+        roles: ["agency-admin"],
+        isNotifiedByEmail: true,
+      },
+    ]);
+  const icAgencyAdminUser = icAgencyAdminUserBuilder.build();
 
   let uow: InMemoryUnitOfWork;
   let createNewEvent: CreateNewEvent;
@@ -65,7 +71,7 @@ describe("RemoveUserFromAgency", () => {
   });
 
   describe("Wrong paths", () => {
-    it("throws forbidden when token payload is not backoffice token", async () => {
+    it("throws forbidden when token payload is not backoffice token nor agencyAdmin", async () => {
       await expectPromiseToFailWithError(
         removeUserFromAgency.execute(
           {
@@ -75,19 +81,6 @@ describe("RemoveUserFromAgency", () => {
           icNotAdmin,
         ),
         errors.user.forbidden({ userId: icNotAdmin.id }),
-      );
-    });
-
-    it("throws forbidden when token payload is not backoffice token", async () => {
-      await expectPromiseToFailWithError(
-        removeUserFromAgency.execute(
-          {
-            agencyId: "agency-id",
-            userId: "user-id",
-          },
-          icNotAgencyAdminUser,
-        ),
-        errors.user.forbidden({ userId: icNotAgencyAdminUser.id }),
       );
     });
 
@@ -249,8 +242,18 @@ describe("RemoveUserFromAgency", () => {
     });
   });
 
-  describe("user to delete has right on agency", () => {
-    it("remove user from agency", async () => {
+  it.each([
+    {
+      triggeredByRole: "backoffice-admin",
+      triggeredByUser: icAdmin,
+    },
+    {
+      triggeredByRole: "agency-admin",
+      triggeredByUser: icAgencyAdminUser,
+    },
+  ])(
+    "$triggeredByRole can remove user from agency",
+    async ({ triggeredByUser }) => {
       const agency2 = new AgencyDtoBuilder().withId("agency-2-id").build();
       const otherUserWithRightOnAgencies: User = {
         ...icNotAdmin,
@@ -285,7 +288,7 @@ describe("RemoveUserFromAgency", () => {
         agencyId: agency.id,
         userId: notAdminUser.id,
       };
-      await removeUserFromAgency.execute(inputParams, icAdmin);
+      await removeUserFromAgency.execute(inputParams, triggeredByUser);
 
       expectToEqual(uow.agencyRepository.agencies, [
         toAgencyWithRights(agency, {
@@ -312,11 +315,11 @@ describe("RemoveUserFromAgency", () => {
             ...inputParams,
             triggeredBy: {
               kind: "inclusion-connected",
-              userId: adminUser.id,
+              userId: triggeredByUser.id,
             },
           },
         },
       ]);
-    });
-  });
+    },
+  );
 });
