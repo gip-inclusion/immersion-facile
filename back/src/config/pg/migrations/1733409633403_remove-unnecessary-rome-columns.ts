@@ -36,16 +36,6 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
 
 const searchesMade = (pgm: MigrationBuilder, mode: "up" | "down") => {
   if (mode === "up") {
-    pgm.sql(`
-      INSERT INTO searches_made__appellation_code (search_made_id, appellation_code)
-      SELECT DISTINCT ON (sm.id) sm.id, pad.ogr_appellation
-      FROM searches_made as sm
-      LEFT JOIN searches_made__appellation_code as sma ON sma.search_made_id = sm.id
-      LEFT JOIN public_appellations_data        as pad ON sm.rome = pad.code_rome
-      WHERE sma.search_made_id IS NULL
-      AND sm.rome IS NOT NULL
-      ORDER BY sm.id, pad.ogr_appellation;
-    `);
     pgm.dropColumn("searches_made", "rome");
   }
   if (mode === "down") {
