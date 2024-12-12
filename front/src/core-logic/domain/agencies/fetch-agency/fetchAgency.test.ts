@@ -91,11 +91,17 @@ describe("fetchAgency", () => {
         }),
       );
 
+      expectFetchAgencyStateToMatch({
+        ...fetchAgencyInitialState,
+        isLoading: true,
+      });
+
       feedWithFetchedAgency(agencyDto);
 
       expectFetchAgencyStateToMatch({
         isLoading: false,
         agency: agencyDto,
+        agencyUsers: {},
       });
     });
 
@@ -109,16 +115,18 @@ describe("fetchAgency", () => {
         }),
       );
 
+      expectFetchAgencyStateToMatch({
+        ...fetchAgencyInitialState,
+        isLoading: true,
+      });
+
       dependencies.agencyGateway.fetchedAgency$.error(
         new Error(
           "Une erreur est survenue lors de la récupération des données de cette agence",
         ),
       );
 
-      expectFetchAgencyStateToMatch({
-        isLoading: false,
-        agency: null,
-      });
+      expectFetchAgencyStateToMatch(fetchAgencyInitialState);
 
       expectToEqual(
         feedbacksSelectors.feedbacks(store.getState())["agency-for-dashboard"],
@@ -145,11 +153,17 @@ describe("fetchAgency", () => {
         }),
       );
 
+      expectFetchAgencyStateToMatch({
+        ...fetchAgencyInitialState,
+        isLoading: true,
+      });
+
       feedWithFetchedAgencyUsers(fakeAgencyUsers);
 
       expectFetchAgencyStateToMatch({
         isLoading: false,
         agencyUsers: fakeAgencyUsers,
+        agency: null,
       });
     });
 
@@ -163,6 +177,11 @@ describe("fetchAgency", () => {
         }),
       );
 
+      expectFetchAgencyStateToMatch({
+        ...fetchAgencyInitialState,
+        isLoading: true,
+      });
+
       dependencies.agencyGateway.fetchedAgencyUsers$.error(
         new Error(
           "Une erreur est survenue lors de la récupération de la liste des utilisateurs de cette agence",
@@ -172,6 +191,7 @@ describe("fetchAgency", () => {
       expectFetchAgencyStateToMatch({
         isLoading: false,
         agencyUsers: {},
+        agency: null,
       });
 
       expectToEqual(
@@ -233,7 +253,11 @@ describe("fetchAgency", () => {
 
         dependencies.agencyGateway.updateAgencyResponse$.next(undefined);
 
-        expectFetchAgencyStateToMatch({ agency: updatedAgency });
+        expectFetchAgencyStateToMatch({
+          agency: updatedAgency,
+          agencyUsers: {},
+          isLoading: false,
+        });
       });
 
       it("if it is not agency in state, do nothing", () => {
@@ -396,6 +420,8 @@ describe("fetchAgency", () => {
 
         expectFetchAgencyStateToMatch({
           agencyUsers: fakeAgencyUsers,
+          agency: null,
+          isLoading: false,
         });
 
         store.dispatch(
@@ -411,6 +437,8 @@ describe("fetchAgency", () => {
         );
 
         expectFetchAgencyStateToMatch({
+          agency: null,
+          isLoading: false,
           agencyUsers: { [user1.id]: fakeAgencyUsers[user1.id] },
         });
       });
@@ -469,6 +497,8 @@ describe("fetchAgency", () => {
 
         expectFetchAgencyStateToMatch({
           agencyUsers: fakeAgencyUsers,
+          agency: null,
+          isLoading: false,
         });
 
         store.dispatch(
@@ -488,6 +518,8 @@ describe("fetchAgency", () => {
 
         expectFetchAgencyStateToMatch({
           agencyUsers: { ...fakeAgencyUsers, [originalUser.id]: updatedUser },
+          agency: null,
+          isLoading: false,
         });
       });
 
@@ -503,6 +535,8 @@ describe("fetchAgency", () => {
 
         expectFetchAgencyStateToMatch({
           agencyUsers: fakeAgencyUsers,
+          agency: null,
+          isLoading: false,
         });
 
         store.dispatch(
@@ -522,16 +556,19 @@ describe("fetchAgency", () => {
 
         expectFetchAgencyStateToMatch({
           agencyUsers: { ...fakeAgencyUsers },
+          agency: null,
+          isLoading: false,
         });
       });
     });
   });
 
   const expectFetchAgencyStateToMatch = (params: Partial<FetchAgencyState>) => {
-    expectToEqual(fetchAgencySelectors.fetchAgencyState(store.getState()), {
-      ...fetchAgencyInitialState,
-      ...params,
-    });
+    expectToEqual(fetchAgencySelectors.agency(store.getState()), params.agency);
+    expectToEqual(
+      fetchAgencySelectors.agencyUsers(store.getState()),
+      params.agencyUsers,
+    );
   };
 
   const feedWithFetchedAgency = (agencyDto: AgencyDto) => {

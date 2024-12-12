@@ -17,6 +17,7 @@ export const AgencyDetailForAgencyDashboard = ({
 }: AgencyDetailForAgencyDashboardProps) => {
   const agency = useAppSelector(fetchAgencySelectors.agency);
   const agencyUsersById = useAppSelector(fetchAgencySelectors.agencyUsers);
+  const isFetchingAgency = useAppSelector(fetchAgencySelectors.isLoading);
 
   const dispatch = useDispatch();
 
@@ -38,7 +39,7 @@ export const AgencyDetailForAgencyDashboard = ({
     };
   }, [dispatch, route.params.agencyId]);
 
-  if (!agency) return <Loader />;
+  if (!agency || isFetchingAgency) return <Loader />;
 
   return (
     <AgencyOverview
