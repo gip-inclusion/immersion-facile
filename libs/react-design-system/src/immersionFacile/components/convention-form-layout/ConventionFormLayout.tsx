@@ -16,7 +16,10 @@ export const ConventionFormLayout = ({
   return (
     <>
       <div
-        className={cx(fr.cx("fr-col-12", "fr-col-lg-8"), Styles.formWrapper)}
+        className={cx(
+          fr.cx("fr-col-12", "fr-col-lg-8", "fr-pb-6w"),
+          Styles.formWrapper,
+        )}
       >
         {form}
       </div>
