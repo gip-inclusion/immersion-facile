@@ -95,12 +95,16 @@ export const AgencyAdminAutocomplete = ({
     return `${agencyOption.name}${status ? ` [${status}]` : ""}`;
   };
 
+  const sortedAgencyOptions: AgencyId[] = [...agencyOptions]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(prop("id"));
+
   return (
     <>
       <Autocomplete
         disablePortal
         filterOptions={(x) => x}
-        options={agencyOptions.map(prop("id"))}
+        options={sortedAgencyOptions}
         id={domElementIds.admin.agencyTab.editAgencyAutocompleteInput}
         value={agency ? agency.id : ""}
         noOptionsText={
