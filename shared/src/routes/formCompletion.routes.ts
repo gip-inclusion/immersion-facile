@@ -2,11 +2,11 @@ import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { appellationSearchResponseSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import { searchTextSchema } from "../search/searchText.schema";
 import {
   getSiretInfoSchema,
   isSiretExistResponseSchema,
 } from "../siret/siret.schema";
-import { zStringMinLength1 } from "../zodUtils";
 
 export type FormCompletionRoutes = typeof formCompletionRoutes;
 export const formCompletionRoutes = defineRoutes({
@@ -43,7 +43,7 @@ export const formCompletionRoutes = defineRoutes({
     method: "get",
     url: "/appellation",
     queryParamsSchema: z.object({
-      searchText: zStringMinLength1,
+      searchText: searchTextSchema,
       naturalLanguage: z.literal("true").optional(),
     }),
     responses: {
