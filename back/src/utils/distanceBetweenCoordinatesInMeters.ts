@@ -7,13 +7,13 @@ export const distanceBetweenCoordinatesInMeters = (
   pointA: GeoPositionDto,
   pointB: GeoPositionDto,
 ) => {
-  const { lat: lat1, lon: lon1 } = pointA;
-  const { lat: lat2, lon: lon2 } = pointB;
+  const { lat: latA, lon: lonA } = pointA;
+  const { lat: latB, lon: lonB } = pointB;
   const R = 6371e3; // metres
-  const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
-  const φ2 = (lat2 * Math.PI) / 180;
-  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+  const φ1 = (latA * Math.PI) / 180; // φ, λ in radians
+  const φ2 = (latB * Math.PI) / 180;
+  const Δφ = ((latB - latA) * Math.PI) / 180;
+  const Δλ = ((lonB - lonA) * Math.PI) / 180;
 
   const a =
     Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
