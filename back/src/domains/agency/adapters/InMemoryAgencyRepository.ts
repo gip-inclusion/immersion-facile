@@ -213,18 +213,8 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 const sortByNearestFrom =
   (position: GeoPositionDto) =>
   (a: AgencyOption & WithGeoPosition, b: AgencyOption & WithGeoPosition) =>
-    distanceBetweenCoordinatesInMeters(
-      a.position.lat,
-      a.position.lon,
-      position.lat,
-      position.lon,
-    ) -
-    distanceBetweenCoordinatesInMeters(
-      b.position.lat,
-      b.position.lon,
-      position.lat,
-      position.lon,
-    );
+    distanceBetweenCoordinatesInMeters(a.position, position) -
+    distanceBetweenCoordinatesInMeters(b.position, position);
 
 const agencyIsOfKind = (
   agency: AgencyWithUsersRights,
@@ -281,10 +271,8 @@ const agencyIsOfPosition = (
   if (!positionFilter) return true;
   return (
     distanceBetweenCoordinatesInMeters(
-      agency.position.lat,
-      agency.position.lon,
-      positionFilter.position.lat,
-      positionFilter.position.lon,
+      agency.position,
+      positionFilter.position,
     ) <
     positionFilter.distance_km * 1000
   );

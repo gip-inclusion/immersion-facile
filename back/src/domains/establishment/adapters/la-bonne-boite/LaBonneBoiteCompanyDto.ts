@@ -1,4 +1,5 @@
-import { RomeDto, SearchResultDto, SiretDto } from "shared";
+import { GeoPositionDto, RomeDto, SearchResultDto, SiretDto } from "shared";
+import { distanceBetweenCoordinatesInMeters } from "../../../../utils/distanceBetweenCoordinatesInMeters";
 
 export type LaBonneBoiteApiResultV2Props = {
   rome: string | undefined;
@@ -73,7 +74,10 @@ export class LaBonneBoiteCompanyDto {
     return this.props.siret;
   }
 
-  public toSearchResult(romeDto: RomeDto): SearchResultDto {
+  public toSearchResult(
+    romeDto: RomeDto,
+    searchedCoordinate?: GeoPositionDto,
+  ): SearchResultDto {
     return {
       siret: this.props.siret,
       establishmentScore: 0,
@@ -87,7 +91,12 @@ export class LaBonneBoiteCompanyDto {
       additionalInformation: "",
       appellations: [],
       customizedName: "",
-      distance_m: undefined,
+      distance_m: searchedCoordinate
+        ? distanceBetweenCoordinatesInMeters(
+            searchedCoordinate,
+            this.props.location,
+          )
+        : undefined,
       fitForDisabledWorkers: false,
       naf: this.props.naf,
       nafLabel: this.props.naf_label,
