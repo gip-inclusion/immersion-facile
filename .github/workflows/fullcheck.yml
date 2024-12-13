@@ -48,23 +48,17 @@ jobs:
         run: pnpm install
 
       - name: ${{matrix.command}}
-        env:
-          COMMAND: ${{matrix.command}}
-        run: |
-          STORAGE_FULL_PATH=$(pwd)/back/storage
-          mkdir -p $STORAGE_FULL_PATH/tmp/
-          STORAGE_ROOT=$STORAGE_FULL_PATH $COMMAND
+        run: ${{matrix.command}}
 
   back-integration-tests:
     name: "Back integration tests"
     runs-on: ubuntu-latest
     env:
       TEST_DATABASE_URL: postgresql://immersion:password@localhost:5432/immersion-db
-      TEST_REDIS_URL: redis://:redis_password@localhost:6379
+      TEST_REDIS_URL: redis://@localhost:6379
     services:
       redis:
         image: redis:7.2.5
-        command: redis-server --requirepass redis_password
         ports:
           - 6379:6379
       postgres:
@@ -98,9 +92,7 @@ jobs:
         run: |
           echo $TEST_DATABASE_URL
           echo $TEST_REDIS_URL
-          STORAGE_FULL_PATH=$(pwd)/back/storage
-          mkdir -p $STORAGE_FULL_PATH/tmp/
-          DATABASE_URL=$TEST_DATABASE_URL REDIS_URL=$TEST_REDIS_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration
+          DATABASE_URL=$TEST_DATABASE_URL REDIS_URL=$TEST_REDIS_URL pnpm back test:integration
 
   playwright-tests:
     name: "Playwright tests"
