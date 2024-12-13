@@ -75,9 +75,10 @@ export class HttpAddressGateway implements AddressGateway {
   public async lookupLocationName(
     query: string,
   ): Promise<LookupSearchResult[]> {
+    const sanitizedQuery = query.trim().toLowerCase();
     const queryMinLength = 3;
 
-    if (query.length < queryMinLength)
+    if (sanitizedQuery.length < queryMinLength)
       throw errors.address.queryToShort({
         minLength: queryMinLength,
       });
@@ -112,7 +113,7 @@ export class HttpAddressGateway implements AddressGateway {
               toLookupSearchResults(response.body),
             );
           }),
-    })(query);
+    })(sanitizedQuery);
   }
 
   public async lookupStreetAddress(
