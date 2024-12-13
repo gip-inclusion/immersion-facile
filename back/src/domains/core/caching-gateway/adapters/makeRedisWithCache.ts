@@ -1,4 +1,5 @@
-import type { RedisClientType } from "redis";
+import { type RedisClientType, createClient } from "redis";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
 import { DefaultCacheConfig, MakeWithCache } from "../port/WithCache";
@@ -62,3 +63,8 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
       return result;
     }) as Callback;
   };
+
+export const getTestRedisClient = () => {
+  const appConfig = AppConfig.createFromEnv();
+  return createClient({ url: appConfig.redisUrl }).connect();
+};
