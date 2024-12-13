@@ -139,6 +139,7 @@ export const createUseCases = (
   config: AppConfig,
   gateways: Gateways,
   generateConventionJwt: GenerateConventionJwt,
+  generateConventionLongDurationJwt: GenerateConventionJwt,
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
   generateAuthenticatedUserToken: GenerateInclusionConnectJwt,
   generateApiConsumerJwt: GenerateApiConsumerJwt,
@@ -172,6 +173,11 @@ export const createUseCases = (
   const generateConventionMagicLinkUrl = makeGenerateConventionMagicLinkUrl(
     config,
     generateConventionJwt,
+  );
+
+  const generateConventionStatusLinkUrl = makeGenerateConventionMagicLinkUrl(
+    config,
+    generateConventionLongDurationJwt,
   );
 
   const addConvention = new AddConvention(
@@ -461,7 +467,7 @@ export const createUseCases = (
         new NotifyLastSigneeThatConventionHasBeenSigned(
           uowPerformer,
           saveNotificationAndRelatedEvent,
-          generateConventionMagicLinkUrl,
+          generateConventionStatusLinkUrl,
           gateways.timeGateway,
         ),
       notifyAllActorsOfFinalConventionValidation:
