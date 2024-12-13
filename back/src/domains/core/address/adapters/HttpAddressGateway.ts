@@ -10,6 +10,7 @@ import {
   OpenCageGeoSearchKey,
   Postcode,
   StreetNumberAndAddress,
+  addressRoutes,
   errors,
   filterNotFalsy,
   getDepartmentCodeFromDepartmentNameOrCity,
@@ -84,6 +85,10 @@ export class HttpAddressGateway implements AddressGateway {
     return this.#withCache({
       overrideCacheDurationInHours: 24,
       getCacheKey: (query) => `geosearch_${query}`,
+      logParams: {
+        partner: "openCageData",
+        route: addressRoutes.lookupLocation,
+      },
       cb: (cachedQuery: string) =>
         this.#limiter
           .schedule(() => {
