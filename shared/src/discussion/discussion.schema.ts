@@ -76,7 +76,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> = z
     siret: siretSchema,
     businessName: zStringMinLength1,
     appellation: appellationDtoSchema,
-    immersionObjective: immersionObjectiveSchema,
+    immersionObjective: immersionObjectiveSchema.or(z.null()),
     address: addressSchema,
     potentialBeneficiary: z.object({
       firstName: zStringMinLength1,
