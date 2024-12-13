@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from "axios";
 import { Pool } from "pg";
-import { createClient as createRedisClient } from "redis";
 import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
@@ -23,9 +22,6 @@ import { InMemoryPeConnectGateway } from "../../domains/core/authentication/pe-c
 import { makePeConnectExternalRoutes } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
 import { PeConnectGateway } from "../../domains/core/authentication/pe-connect/port/PeConnectGateway";
 import { InMemoryCachingGateway } from "../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
-import { withNoCache } from "../../domains/core/caching-gateway/adapters/makeNotCachedWithCache";
-import { makeRedisWithCache } from "../../domains/core/caching-gateway/adapters/makeRedisWithCache";
-import { WithCache } from "../../domains/core/caching-gateway/port/WithCache";
 import { MetabaseDashboardGateway } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../domains/core/dashboard/adapters/StubDashboardGateway";
 import { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
@@ -77,6 +73,7 @@ import {
   AppConfig,
   makeEmailAllowListPredicate,
 } from "./appConfig";
+import { getWithCache } from "./cache";
 import { logPartnerResponses } from "./logPartnerResponses";
 import { partnerNames } from "./partnerNames";
 
@@ -191,17 +188,7 @@ export const createGateways = async (
         )
       : new InMemoryPoleEmploiGateway();
 
-  const withCache: WithCache = await (async () => {
-    const defaultCacheDurationInHours = 24;
-    if (config.cache === "NONE") return withNoCache;
-    if (config.cache === "REDIS") {
-      return makeRedisWithCache({
-        defaultCacheDurationInHours,
-        redisClient: await getConnectedRedisClient(config),
-      });
-    }
-    return config.cache satisfies never;
-  })();
+  const withCache = await getWithCache(config);
 
   const peConnectGateway: PeConnectGateway =
     config.peConnectGateway === "HTTPS"
@@ -475,42 +462,3 @@ const createDashboardGateway = (config: AppConfig): DashboardGateway =>
         config.metabase.metabaseApiKey,
       )
     : new StubDashboardGateway();
-
-const getConnectedRedisClient = async (config: AppConfig) => {
-  const redisClient = await createRedisClient({
-    url: config.redisUrl,
-  }).connect();
-
-  // Handle disconnections
-  redisClient.on("disconnect", () => {
-    logger.warn({
-      message: "Redis disconnected - attempting to reconnect...",
-    });
-  });
-
-  // Handle reconnection attempts
-  redisClient.on("reconnecting", () => {
-    logger.info({ message: "Redis attempting to reconnect..." });
-  });
-
-  // Handle successful reconnection
-  redisClient.on("connect", () => {
-    logger.info({ message: "Redis connected successfully" });
-  });
-
-  // Handle when ready for commands
-  redisClient.on("ready", () => {
-    logger.info({ message: "Redis client ready for commands" });
-  });
-
-  redisClient.on("error", (err) =>
-    logger.error({
-      message: `Redis Client Error : ${err.message}`,
-      error: err,
-    }),
-  );
-
-  logger.info({ message: "Redis client connected successfully" });
-
-  return redisClient;
-};
