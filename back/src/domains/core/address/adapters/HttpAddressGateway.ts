@@ -254,5 +254,3 @@ const makeStreetNumberAndAddress = (
 const franceAndAttachedTerritoryCountryCodes =
   "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
 const language = "fr";
-
-// https://api.opencagedata.com/geocode/v1/json?q=47.99603%2C-4.10248&key=a80af7a94fb34eb3ab0262483b63ff79
