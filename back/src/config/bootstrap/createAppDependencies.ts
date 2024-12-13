@@ -46,6 +46,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   const oneHourInSeconds = 3600;
   const oneDayInSecond = oneHourInSeconds * 24;
   const thirtyDaysInSecond = oneDayInSecond * 30;
+  const sixMonthsInSecond = oneDayInSecond * 6 * 30;
 
   const generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt =
     makeGenerateJwtES256<"establishment">(config.jwtPrivateKey, oneDayInSecond);
@@ -65,6 +66,9 @@ export const createAppDependencies = async (config: AppConfig) => {
       thirtyDaysInSecond,
     );
 
+  const generateConventionLongDurationJwt: GenerateConventionJwt =
+    makeGenerateJwtES256<"convention">(config.jwtPrivateKey, sixMonthsInSecond);
+
   const redirectErrorUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${frontRoutes.error}`;
   const errorHandlers = {
     handleManagedRedirectResponseError:
@@ -77,6 +81,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     config,
     gateways,
     generateConventionJwt,
+    generateConventionLongDurationJwt,
     generateEditEstablishmentJwt,
     generateInclusionConnectJwt,
     generateApiConsumerJwt,

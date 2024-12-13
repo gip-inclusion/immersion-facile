@@ -28,11 +28,11 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
+    generateConventionStatusLinkUrl: GenerateConventionMagicLinkUrl,
     timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
-    this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#generateConventionMagicLinkUrl = generateConventionStatusLinkUrl;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#timeGateway = timeGateway;
   }
