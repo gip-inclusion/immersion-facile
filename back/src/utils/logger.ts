@@ -59,11 +59,12 @@ type RouteMethodAndUrl = {
   url: string;
 };
 
-type PartnerApiCall = {
+export type PartnerApiCall = {
   partnerName: string;
   route: RouteMethodAndUrl;
   durationInMs: number;
   response:
+    | { kind: "cache-hit" }
     | {
         kind: "success";
         status: number;
@@ -90,6 +91,7 @@ type ApiConsumerCall = {
 
 type LoggerParams = Partial<{
   partnerApiCall: PartnerApiCall;
+  cacheKey: string;
   apiConsumerCall: ApiConsumerCall;
   adapters: {
     repositories: "IN_MEMORY" | "PG";
@@ -174,6 +176,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
     (method: LogMethod): LoggerFunction =>
     ({
       partnerApiCall,
+      cacheKey,
       adapters,
       agencyId,
       conventionId,
@@ -240,6 +243,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         partnerApiCall,
         siret,
         romeLabel,
+        cacheKey,
       };
 
       const opacifiedWithoutNullOrUndefined = pickBy(

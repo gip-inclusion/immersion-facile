@@ -1,3 +1,6 @@
+import { UnknownSharedRoute } from "shared-routes";
+import { PartnerKey } from "../../../../config/bootstrap/partnerNames";
+
 export type DefaultCacheConfig = {
   defaultCacheDurationInHours: number;
 };
@@ -8,6 +11,7 @@ export type MakeWithCache<
   overrideCacheDurationInHours?: number;
   getCacheKey: (...params: Parameters<Cb>) => string;
   cb: Cb;
+  logParams?: { route: UnknownSharedRoute; partner: PartnerKey };
 }) => Cb;
 
 export type WithCache = ReturnType<MakeWithCache>;
