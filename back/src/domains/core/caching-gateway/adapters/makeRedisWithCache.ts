@@ -38,8 +38,11 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
             });
           }
           return response;
-        } catch (error) {
-          console.error("Error parsing cached value:", error);
+        } catch (error: any) {
+          logger.error({
+            message: `Error parsing cached value: ${error?.message}`,
+            error,
+          });
           // If parsing fails, continue to fetch fresh data
         }
       }
@@ -55,8 +58,11 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
           durationInSecond,
           JSON.stringify(result),
         );
-      } catch (error) {
-        console.error("Error setting cache:", error);
+      } catch (error: any) {
+        logger.error({
+          message: `Error setting cache : ${error?.message}`,
+          error,
+        });
         // Continue even if caching fails
       }
 
