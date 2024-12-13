@@ -1,5 +1,5 @@
 import { LocationId } from "../address/address.dto";
-import { AgencyId } from "../agency/agency.dto";
+import { AgencyId, AgencyStatus } from "../agency/agency.dto";
 import {
   ApiConsumerRightName,
   ApiConsumerSubscriptionId,
@@ -298,6 +298,15 @@ export const errors = {
     invalidSiret: ({ siret }: { siret: SiretDto }) =>
       new NotFoundError(
         `Le SIRET que vous avez saisi (${siret}) n'est pas valide et votre organisme n'a pas été enregistré. Merci de corriger le SIRET et de soumettre à nouveau le formulaire.`,
+      ),
+
+    invalidStatus: ({
+      id,
+      actual,
+      expected,
+    }: { id: AgencyId; actual: AgencyStatus; expected: AgencyStatus }) =>
+      new BadRequestError(
+        `L'agence '${id}' n'a pas le bon status. Le status actuel est '${actual}' alors que le status attendu est '${expected}'.`,
       ),
     emailNotFound: ({ agencyId }: { agencyId: AgencyId }) =>
       new NotFoundError(
