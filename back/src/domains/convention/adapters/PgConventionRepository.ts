@@ -552,7 +552,7 @@ export class PgConventionRepository implements ConventionRepository {
         date_start: convention.dateStart,
         date_end: convention.dateEnd,
         date_validation: convention.dateValidation,
-        date_approval: convention.dateApproval,
+        date_approval: convention.dateApproval ?? null,
         siret: convention.siret,
         business_name: convention.businessName,
         schedule: sql`${JSON.stringify(convention.schedule)}`,
