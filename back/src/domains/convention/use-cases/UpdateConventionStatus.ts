@@ -4,6 +4,7 @@ import {
   ConventionReadDto,
   ConventionRelatedJwtPayload,
   ConventionStatus,
+  DateString,
   Email,
   InclusionConnectedUser,
   Role,
@@ -142,15 +143,21 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       params.status === "ACCEPTED_BY_VALIDATOR" &&
       (params.lastname || params.firstname);
 
+    const getDateApproval = (): DateString | undefined => {
+      if (reviewedConventionStatuses.includes(params.status))
+        return conventionUpdatedAt;
+      if (validatedConventionStatuses.includes(params.status))
+        return conventionRead.dateApproval;
+      return undefined;
+    };
+
     const updatedConvention: ConventionDto = {
       ...conventionRead,
       status: params.status,
       dateValidation: validatedConventionStatuses.includes(params.status)
         ? conventionUpdatedAt
         : undefined,
-      dateApproval: reviewedConventionStatuses.includes(params.status)
-        ? conventionUpdatedAt
-        : undefined,
+      dateApproval: getDateApproval(),
       statusJustification,
       ...(hasCounsellor
         ? {

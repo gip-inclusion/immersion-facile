@@ -785,7 +785,7 @@ describe("PgConventionRepository", () => {
       );
     });
 
-    it("update convention with dateApproval and drops it when undefined", async () => {
+    it("Update convention with dateApproval and drops it when undefined", async () => {
       const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
       const convention = conventionStylisteBuilder
         .withId(conventionId)
@@ -805,6 +805,19 @@ describe("PgConventionRepository", () => {
 
       expect(await conventionRepository.getById(conventionId)).toEqual(
         updatedConvention,
+      );
+
+      const conventionBackToDraft: ConventionDto = {
+        ...updatedConvention,
+        status: "DRAFT",
+        dateApproval: undefined,
+      };
+
+      await conventionRepository.update(conventionBackToDraft);
+
+      expectToEqual(
+        await conventionRepository.getById(conventionId),
+        conventionBackToDraft,
       );
     });
   });
