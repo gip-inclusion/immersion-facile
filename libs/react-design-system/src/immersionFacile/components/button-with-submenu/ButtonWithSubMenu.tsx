@@ -39,6 +39,9 @@ export const ButtonWithSubMenu = ({
       window.removeEventListener("resize", () => {});
     };
   }, []);
+
+  const isMobile = id?.includes("-mobile");
+
   return (
     <div className={cx(Styles.root)}>
       <Button
@@ -70,7 +73,13 @@ export const ButtonWithSubMenu = ({
         <ul className={cx(fr.cx("fr-menu__list"), Styles.list)}>
           {navItems.map((item) => (
             <li key={item.linkProps.id}>
-              <a className={fr.cx("fr-nav__link")} {...item.linkProps}>
+              <a
+                className={fr.cx("fr-nav__link")}
+                {...item.linkProps}
+                id={
+                  isMobile ? `${item.linkProps.id}-mobile` : item.linkProps.id
+                }
+              >
                 {item.text}
               </a>
             </li>

@@ -103,7 +103,6 @@ export const LayoutHeader = () => {
             ]
           : []),
       ]}
-      id={quickAccessIds.myAccount}
       buttonLabel={
         currentUser
           ? currentUser.firstName && currentUser.lastName
