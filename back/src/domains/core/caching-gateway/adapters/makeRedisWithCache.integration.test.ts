@@ -1,3 +1,4 @@
+import { RedisClientType } from "redis";
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { getTestRedisClient, makeRedisWithCache } from "./makeRedisWithCache";
 
@@ -12,9 +13,17 @@ describe("createRedisWithCache implementation", () => {
   };
 
   let cachedCallToPartner: typeof someCallToAPartner;
+  let redisClient: RedisClientType<any, any, any>;
+
+  beforeAll(async () => {
+    redisClient = await getTestRedisClient();
+  });
+
+  afterAll(async () => {
+    await redisClient.disconnect();
+  });
 
   beforeEach(async () => {
-    const redisClient = await getTestRedisClient();
     await redisClient.flushAll();
     const withCache = makeRedisWithCache({
       defaultCacheDurationInHours: 1,
