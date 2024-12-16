@@ -452,7 +452,7 @@ export const defaultEmailValueByEmailKind: {
     dateStart: "DATE_START",
     dateEnd: "DATE_END",
     establishmentFeedback: "ESTABLISHMENT_FEEDBACK",
-    assessmentStatus: "FINISHED",
+    assessmentStatus: "COMPLETED",
     immersionObjective: "Confirmer un projet professionnel",
     internshipKind: "immersion",
   },

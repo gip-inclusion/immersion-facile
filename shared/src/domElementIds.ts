@@ -14,9 +14,9 @@ type FrontRouteParametrizedValue = (
 
 type FrontRoutePossibleValues =
   | Record<
-      string,
-      string | FrontRouteParametrizedValue | Record<string, string>
-    >
+    string,
+    string | FrontRouteParametrizedValue | Record<string, string>
+  >
   | string
   | FrontRouteParametrizedValue;
 
@@ -505,6 +505,7 @@ export const domElementIds = {
   },
 
   assessment: {
+    form: "im-assessment-form",
     formSubmitButton: "im-assessment-form__submit-button",
     formDownloadButton: "im-assessment-form__download-button",
   },

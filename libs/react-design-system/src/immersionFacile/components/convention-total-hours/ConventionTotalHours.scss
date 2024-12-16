@@ -1,0 +1,8 @@
+.im-convention-total-hours {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--background-alt-blue-france);
+  &__illustration-wrapper {
+    max-width: 3rem;
+  }
+}

@@ -7,6 +7,8 @@ export type DateString = Flavor<string, "DateString">;
 
 export type DateTimeIsoString = Flavor<string, "DateTimeIsoString">;
 
+const hourDisplayedSeparator = "h";
+
 export const dateTimeIsoStringSchema: z.Schema<DateTimeIsoString> = z
   .string()
   .datetime();
@@ -25,8 +27,7 @@ export const toDisplayedDate = ({
 }:
   | { date: Date; withHours?: false; showGMT?: false }
   | { date: Date; withHours?: true; showGMT?: boolean }): string =>
-  `${format(date, withHours ? "dd/MM/yyyy 'à' HH'h'mm" : "dd/MM/yyyy")}${
-    showGMT ? " (heure de Paris GMT+1)" : ""
+  `${format(date, withHours ? "dd/MM/yyyy 'à' HH'h'mm" : "dd/MM/yyyy")}${showGMT ? " (heure de Paris GMT+1)" : ""
   }`;
 
 export const isStringDate = (string: string) => isValid(new Date(string));
@@ -35,3 +36,21 @@ export const convertLocaleDateToUtcTimezoneDate = (date: Date): Date => {
   if (date.getTimezoneOffset() < 0) return date; // if browser's timezone is ahead of UTC, return the date as is
   return addHours(date, date.getTimezoneOffset() / 60);
 };
+
+export const hoursDisplayedToHoursValue = (hoursDisplayed: string): number => {
+  if (!hoursDisplayed.includes(hourDisplayedSeparator)) {
+    const valueAsNumber = parseInt(hoursDisplayed);
+    if (Number.isNaN(valueAsNumber)) return 0;
+    return valueAsNumber;
+  }
+  const [hours, minutes] = hoursDisplayed.split(hourDisplayedSeparator);
+  return Number(hours) + Math.round((Number(minutes) / 60 + Number.EPSILON) * 100) / 100;
+}
+
+export const hoursValueToHoursDisplayed = (hoursValue: number): string => {
+  const hours = Math.floor(hoursValue);
+  const minutes = Math.round((hoursValue - hours) * 60);
+  const hoursDisplayed = `${hours < 10 ? `0${hours}` : hours}`;
+  if (minutes === 0) return `${hoursDisplayed}${hourDisplayedSeparator}`;
+  return `${hoursDisplayed}${hourDisplayedSeparator}${minutes < 10 ? `0${minutes}` : minutes}`;
+}

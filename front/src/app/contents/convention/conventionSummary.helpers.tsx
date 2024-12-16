@@ -1,14 +1,14 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
-import { CopyButton } from "react-design-system";
+import { ConventionWeeklySchedule, CopyButton } from "react-design-system";
 import {
   ConventionSummaryField,
   ConventionSummarySection,
   ConventionSummarySubSection,
-  conventionSummaryStyles,
 } from "react-design-system/src/immersionFacile/components/convention-summary";
 import {
   ConventionReadDto,
+  DateString,
+  ScheduleDto,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
   makeSiretDescriptionLink,
@@ -16,7 +16,6 @@ import {
   removeEmptyValue,
   toDisplayedDate,
 } from "shared";
-import { Cx } from "tss-react";
 
 const makeSignatoriesSubsections = (
   convention: ConventionReadDto,
@@ -533,7 +532,6 @@ const makeEstablishmentSubSections = (
 
 const makeImmersionSubSections = (
   convention: ConventionReadDto,
-  cx: Cx,
 ): ConventionSummarySubSection[] => {
   return [
     {
@@ -613,7 +611,12 @@ const makeImmersionSubSections = (
       fields: [
         {
           key: "schedule",
-          value: printWeekSchedule(convention, cx),
+          value: printWeekSchedule({
+            schedule: convention.schedule,
+            dateStart: convention.dateStart,
+            dateEnd: convention.dateEnd,
+            useWrapper: false,
+          }),
         },
       ],
       isFullWidthDisplay: true,
@@ -660,7 +663,6 @@ const makeAdditionalInformationSubSections = (
 
 export const makeConventionSections = (
   convention: ConventionReadDto,
-  cx: Cx,
 ): ConventionSummarySection[] => {
   return [
     {
@@ -677,7 +679,7 @@ export const makeConventionSections = (
     },
     {
       title: "Informations sur l'immersion",
-      subSections: makeImmersionSubSections(convention, cx),
+      subSections: makeImmersionSubSections(convention),
     },
     {
       title: "Informations complémentaires",
@@ -686,64 +688,36 @@ export const makeConventionSections = (
   ];
 };
 
-const printWeekSchedule = (convention: ConventionReadDto, cx: Cx) => {
-  const weeklySchedule = makeWeeklySchedule(convention.schedule, {
-    start: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateStart)),
-    end: convertLocaleDateToUtcTimezoneDate(new Date(convention.dateEnd)),
+export const printWeekSchedule = ({
+  schedule,
+  dateStart,
+  dateEnd,
+  useWrapper,
+}: {
+  schedule: ScheduleDto;
+  dateStart: DateString;
+  dateEnd: DateString;
+  useWrapper: boolean;
+}) => {
+  const weeklyScheduleDto = makeWeeklySchedule(schedule, {
+    start: convertLocaleDateToUtcTimezoneDate(new Date(dateStart)),
+    end: convertLocaleDateToUtcTimezoneDate(new Date(dateEnd)),
   });
   return (
-    <div className={fr.cx("fr-grid-row")}>
-      {weeklySchedule.map((week, index) => (
-        <div
-          className={fr.cx(
-            "fr-col-12",
-            "fr-col-md-6",
-            "fr-col-lg-4",
-            "fr-col-xl-3",
-            "fr-my-3v",
-          )}
-          key={week.period.start.toISOString()}
-        >
-          <div
-            className={cx(
-              fr.cx("fr-col-6", "fr-m-0", "fr-text--sm"),
-              conventionSummaryStyles.subsectionScheduleWeek,
-            )}
-          >
-            Semaine {index + 1}
-          </div>
-          {week.period?.start && week.period?.end && (
-            <div className={fr.cx("fr-text--xs", "fr-m-0")}>
-              Du {toDisplayedDate({ date: week.period.start })} au{" "}
-              {toDisplayedDate({ date: week.period.end })}
-            </div>
-          )}
-          <div aria-hidden="true" className={fr.cx("fr-text--xs", "fr-m-0")}>
-            --
-          </div>
-          <p className={fr.cx("fr-text--xs", "fr-mb-3v")}>
-            {week.weeklyHours} heures de travail hebdomadaires
-          </p>
-          <ul
-            style={{
-              paddingInlineStart: "0",
-            }}
-          >
-            {week.schedule.map((daySchedule) => (
-              <li
-                key={daySchedule}
-                className={cx(
-                  fr.cx("fr-text--sm"),
-                  conventionSummaryStyles.subsectionScheduleDay,
-                )}
-              >
-                {daySchedule}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
+    <ConventionWeeklySchedule
+      weeklySchedule={weeklyScheduleDto.map((week) => ({
+        ...week,
+        period: {
+          start: toDisplayedDate({
+            date: week.period.start,
+          }),
+          end: toDisplayedDate({
+            date: week.period.end,
+          }),
+        },
+      }))}
+      useWrapper={useWrapper}
+    />
   );
 };
 
