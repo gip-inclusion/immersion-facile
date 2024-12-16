@@ -10,7 +10,6 @@ import {
   OpenCageGeoSearchKey,
   Postcode,
   StreetNumberAndAddress,
-  addressRoutes,
   errors,
   filterNotFalsy,
   getDepartmentCodeFromDepartmentNameOrCity,
@@ -26,7 +25,10 @@ import {
   OpenCageDataProperties,
   OpenCageDataSearchResultCollection,
 } from "./HttpAddressGateway.dto";
-import { AddressesRoutes } from "./HttpAddressGateway.routes";
+import {
+  AddressesRoutes,
+  addressesExternalRoutes,
+} from "./HttpAddressGateway.routes";
 
 const openCageDateMaxRequestsPerSeconds = 15;
 
@@ -88,7 +90,7 @@ export class HttpAddressGateway implements AddressGateway {
       getCacheKey: (query) => `geosearch_${query}`,
       logParams: {
         partner: "openCageData",
-        route: addressRoutes.lookupLocation,
+        route: addressesExternalRoutes.geosearch,
       },
       cb: (cachedQuery: string) =>
         this.#limiter
