@@ -391,223 +391,6 @@ describe("PgConventionRepository", () => {
     expectToEqual(results2, [{ email }]);
   });
 
-  it("Updates the establisment representative", async () => {
-    const commonFields = {
-      firstName: "Rep",
-      lastName: "Rep",
-      email: "rep@rep.com",
-      phone: "+33584548754",
-    };
-
-    const tutor: EstablishmentTutor = {
-      ...commonFields,
-      role: "establishment-tutor",
-      job: "Super tutor",
-    };
-
-    const establishmentRepresentative: EstablishmentRepresentative = {
-      ...commonFields,
-      role: "establishment-representative",
-    };
-
-    const signedDate = new Date().toISOString();
-
-    const convention = new ConventionDtoBuilder()
-      .withEstablishmentTutor(tutor)
-      .withEstablishmentRepresentative(establishmentRepresentative)
-      .notSigned()
-      .build();
-
-    await conventionRepository.save(convention);
-
-    const updatedConvention: ConventionDto = new ConventionDtoBuilder(
-      convention,
-    )
-      .withEstablishmentRepresentative({
-        ...establishmentRepresentative,
-        signedAt: signedDate,
-      })
-      .build();
-
-    await conventionRepository.update(updatedConvention);
-    const updatedConventionStored = await conventionRepository.getById(
-      updatedConvention.id,
-    );
-    expectToEqual(
-      updatedConventionStored?.signatories.establishmentRepresentative,
-      updatedConvention.signatories.establishmentRepresentative,
-    );
-    await expectTutorAndRepToHaveSameId(updatedConvention.id);
-
-    const toDraftConvention: ConventionDto = new ConventionDtoBuilder(
-      convention,
-    )
-      .withEstablishmentRepresentative(establishmentRepresentative)
-      .build();
-
-    await conventionRepository.update(toDraftConvention);
-    const toDraftConventionStored = await conventionRepository.getById(
-      toDraftConvention.id,
-    );
-    expectToEqual(
-      toDraftConventionStored?.signatories.establishmentRepresentative,
-      toDraftConvention.signatories.establishmentRepresentative,
-    );
-  });
-
-  it("Update convention with different tutor and establishment rep", async () => {
-    const tutor: EstablishmentTutor = {
-      firstName: "Joe",
-      lastName: "Doe",
-      job: "Tutor",
-      email: "tutor123w@mail.com",
-      phone: "0111223344",
-      role: "establishment-tutor",
-    };
-
-    const conventionId = "40400404-0000-0000-0000-6bb9bd38bbbb";
-
-    const conventionWithSameTutorAndRep = new ConventionDtoBuilder()
-      .withId(conventionId)
-      .withEstablishmentTutor(tutor)
-      .withEstablishmentRepresentative({
-        ...tutor,
-        role: "establishment-representative",
-      })
-      .build();
-
-    const conventionWithDiffTutorAndRep = new ConventionDtoBuilder(
-      conventionWithSameTutorAndRep,
-    )
-      .withEstablishmentRepresentative({
-        role: "establishment-representative",
-        firstName: "Rep",
-        lastName: "Rep",
-        email: "Rep@rep.com",
-        phone: "rep",
-      })
-      .build();
-
-    //SAVE CONVENTION WITH SAME TUTOR & REP
-    await conventionRepository.save(conventionWithSameTutorAndRep);
-    await expectTutorAndRepToHaveSameId(conventionId);
-
-    //UPDATE CONVENTION WITH DIFFERENT TUTOR & REP"
-    await conventionRepository.update(conventionWithDiffTutorAndRep);
-    await expectTutorAndRepToHaveDifferentIds(conventionId);
-
-    //UPDATE CONVENTION WITH SAME TUTOR & REP
-    await conventionRepository.update(conventionWithSameTutorAndRep);
-    await expectTutorAndRepToHaveSameId(conventionId);
-  });
-
-  it("Update convention with beneficiary current employer", async () => {
-    const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
-      firstName: "Current",
-      lastName: "Employer",
-      email: "current.employer@mail.com",
-      phone: "+33111223344",
-      role: "beneficiary-current-employer",
-      businessName: "Entreprise .Inc",
-      businessSiret: "01234567891234",
-      job: "Boss",
-      businessAddress: "Rue des Bouchers 67065 Strasbourg",
-    };
-
-    const conventionId = "40400404-0000-0000-0000-6bb9bd38aaaa";
-
-    const conventionWithoutBeneficiaryCurrentEmployer =
-      new ConventionDtoBuilder().withId(conventionId).build();
-
-    const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
-      conventionWithoutBeneficiaryCurrentEmployer,
-    )
-      .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-      .build();
-
-    //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
-    await conventionRepository.save(
-      conventionWithoutBeneficiaryCurrentEmployer,
-    );
-
-    await expectConventionHaveBeneficiaryCurrentEmployer(
-      conventionRepository,
-      conventionId,
-      undefined,
-    );
-
-    //SAVE CONVENTION WITH BENEFICIARY CURRENT EMPLOYER
-    await conventionRepository.update(conventionWithBeneficiaryCurrentEmployer);
-
-    await expectConventionHaveBeneficiaryCurrentEmployer(
-      conventionRepository,
-      conventionId,
-      beneficiaryCurrentEmployer,
-    );
-
-    //SAVE CONVENTION WITH BENEFICIARY CURRENT EMPLOYER UPDATED
-    const newBeneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
-      businessName: "NEW EMPLOYER .INC",
-      businessSiret: "00112233445566",
-      email: "boss@employer.com",
-      firstName: "NEW",
-      lastName: "BOSS",
-      job: "Boss",
-      phone: "+33112233445",
-      role: "beneficiary-current-employer",
-      businessAddress: "Rue des Bouchers 67065 Strasbourg",
-    };
-
-    await conventionRepository.update(
-      new ConventionDtoBuilder(conventionWithBeneficiaryCurrentEmployer)
-        .withBeneficiaryCurrentEmployer(newBeneficiaryCurrentEmployer)
-        .build(),
-    );
-
-    await expectConventionHaveBeneficiaryCurrentEmployer(
-      conventionRepository,
-      conventionId,
-      newBeneficiaryCurrentEmployer,
-    );
-
-    //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
-    await conventionRepository.update(
-      conventionWithoutBeneficiaryCurrentEmployer,
-    );
-
-    await expectConventionHaveBeneficiaryCurrentEmployer(
-      conventionRepository,
-      conventionId,
-      undefined,
-    );
-  });
-
-  it("Update convention with validator", async () => {
-    const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = conventionStylisteBuilder
-      .withId(conventionId)
-      .withStatus("ACCEPTED_BY_COUNSELLOR")
-      .build();
-    await conventionRepository.save(convention);
-
-    const updatedConvention = conventionStylisteBuilder
-      .withId(conventionId)
-      .withStatus("ACCEPTED_BY_COUNSELLOR")
-      .withValidator({ firstname: "John", lastname: "Doe" })
-      .withCounsellor({ firstname: "Billy", lastname: "Idol" })
-      .withBeneficiaryEmail("some.updated@email.com")
-      .withStatusJustification("some justification")
-      .withDateStart(new Date("2024-10-20").toISOString())
-      .withDateEnd(new Date("2024-10-24").toISOString())
-      .build();
-
-    await conventionRepository.update(updatedConvention);
-
-    expect(await conventionRepository.getById(conventionId)).toEqual(
-      updatedConvention,
-    );
-  });
-
   it("clear convention signatories signedAt", async () => {
     const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
     const conventionBuilder = conventionStylisteBuilder
@@ -639,29 +422,6 @@ describe("PgConventionRepository", () => {
     expect(
       conventionInDB?.signatories.establishmentRepresentative.signedAt,
     ).toBeUndefined();
-  });
-
-  it("update convention with dateApproval", async () => {
-    const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = conventionStylisteBuilder
-      .withId(conventionId)
-      .withStatus("IN_REVIEW")
-      .build();
-    await conventionRepository.save(convention);
-
-    const updatedConvention = conventionStylisteBuilder
-      .withId(conventionId)
-      .withStatus("ACCEPTED_BY_COUNSELLOR")
-      .withDateStart(new Date("2024-10-20").toISOString())
-      .withDateEnd(new Date("2024-10-24").toISOString())
-      .withDateApproval(new Date("2024-10-15").toISOString())
-      .build();
-
-    await conventionRepository.update(updatedConvention);
-
-    expect(await conventionRepository.getById(conventionId)).toEqual(
-      updatedConvention,
-    );
   });
 
   it("Retrieves federated identity if exists", async () => {
@@ -738,65 +498,315 @@ describe("PgConventionRepository", () => {
     );
   });
 
-  it("Updates an already saved immersion with a beneficiary representative", async () => {
-    const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = conventionStylisteBuilder
-      .withId(idA)
-      .withBeneficiaryRepresentative(beneficiaryRepresentative)
-      .build();
-    await conventionRepository.save(convention);
+  describe("Update convention", () => {
+    it("Update convention with different tutor and establishment rep", async () => {
+      const tutor: EstablishmentTutor = {
+        firstName: "Joe",
+        lastName: "Doe",
+        job: "Tutor",
+        email: "tutor123w@mail.com",
+        phone: "0111223344",
+        role: "establishment-tutor",
+      };
 
-    const updatedConvention = conventionStylisteBuilder
-      .withId(idA)
-      .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withBeneficiaryEmail("some.updated@email.com")
-      .withBeneficiaryRepresentative({
-        ...beneficiaryRepresentative,
-        email: "some@new-representative.com",
-      })
-      .signedByBeneficiary(new Date().toISOString())
-      .signedByEstablishmentRepresentative(new Date().toISOString())
-      .signedByBeneficiaryRepresentative(new Date().toISOString())
-      .withDateStart(new Date("2024-10-20").toISOString())
-      .withDateEnd(new Date("2024-10-24").toISOString())
-      .build();
+      const conventionId = "40400404-0000-0000-0000-6bb9bd38bbbb";
 
-    await conventionRepository.update(updatedConvention);
+      const conventionWithSameTutorAndRep = new ConventionDtoBuilder()
+        .withId(conventionId)
+        .withEstablishmentTutor(tutor)
+        .withEstablishmentRepresentative({
+          ...tutor,
+          role: "establishment-representative",
+        })
+        .build();
 
-    expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
-  });
+      const conventionWithDiffTutorAndRep = new ConventionDtoBuilder(
+        conventionWithSameTutorAndRep,
+      )
+        .withEstablishmentRepresentative({
+          role: "establishment-representative",
+          firstName: "Rep",
+          lastName: "Rep",
+          email: "Rep@rep.com",
+          phone: "rep",
+        })
+        .build();
 
-  it("Updates an already saved immersion if the beneficiary representative is removed", async () => {
-    const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = conventionStylisteBuilder
-      .withId(idA)
-      .withBeneficiaryRepresentative(beneficiaryRepresentative)
-      .build();
-    await conventionRepository.save(convention);
+      //SAVE CONVENTION WITH SAME TUTOR & REP
+      await conventionRepository.save(conventionWithSameTutorAndRep);
+      await expectTutorAndRepToHaveSameId(conventionId);
 
-    const updatedConvention = conventionStylisteBuilder
-      .withId(idA)
-      .withBeneficiaryRepresentative(undefined)
-      .build();
+      //UPDATE CONVENTION WITH DIFFERENT TUTOR & REP"
+      await conventionRepository.update(conventionWithDiffTutorAndRep);
+      await expectTutorAndRepToHaveDifferentIds(conventionId);
 
-    await conventionRepository.update(updatedConvention);
+      //UPDATE CONVENTION WITH SAME TUTOR & REP
+      await conventionRepository.update(conventionWithSameTutorAndRep);
+      await expectTutorAndRepToHaveSameId(conventionId);
+    });
 
-    expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
-  });
+    it("Update convention with beneficiary current employer", async () => {
+      const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
+        firstName: "Current",
+        lastName: "Employer",
+        email: "current.employer@mail.com",
+        phone: "+33111223344",
+        role: "beneficiary-current-employer",
+        businessName: "Entreprise .Inc",
+        businessSiret: "01234567891234",
+        job: "Boss",
+        businessAddress: "Rue des Bouchers 67065 Strasbourg",
+      };
 
-  it("Updates an already saved immersion without beneficiary representative with a beneficiary representative", async () => {
-    const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
-    const convention = conventionStylisteBuilder.withId(idA).build();
-    await conventionRepository.save(convention);
+      const conventionId = "40400404-0000-0000-0000-6bb9bd38aaaa";
 
-    const updatedConvention = conventionStylisteBuilder
-      .withId(idA)
-      .withBeneficiaryRepresentative(beneficiaryRepresentative)
-      .build();
+      const conventionWithoutBeneficiaryCurrentEmployer =
+        new ConventionDtoBuilder().withId(conventionId).build();
 
-    await conventionRepository.update(updatedConvention);
+      const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
+        conventionWithoutBeneficiaryCurrentEmployer,
+      )
+        .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
+        .build();
 
-    expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
+      //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
+      await conventionRepository.save(
+        conventionWithoutBeneficiaryCurrentEmployer,
+      );
+
+      await expectConventionHaveBeneficiaryCurrentEmployer(
+        conventionRepository,
+        conventionId,
+        undefined,
+      );
+
+      //SAVE CONVENTION WITH BENEFICIARY CURRENT EMPLOYER
+      await conventionRepository.update(
+        conventionWithBeneficiaryCurrentEmployer,
+      );
+
+      await expectConventionHaveBeneficiaryCurrentEmployer(
+        conventionRepository,
+        conventionId,
+        beneficiaryCurrentEmployer,
+      );
+
+      //SAVE CONVENTION WITH BENEFICIARY CURRENT EMPLOYER UPDATED
+      const newBeneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
+        businessName: "NEW EMPLOYER .INC",
+        businessSiret: "00112233445566",
+        email: "boss@employer.com",
+        firstName: "NEW",
+        lastName: "BOSS",
+        job: "Boss",
+        phone: "+33112233445",
+        role: "beneficiary-current-employer",
+        businessAddress: "Rue des Bouchers 67065 Strasbourg",
+      };
+
+      await conventionRepository.update(
+        new ConventionDtoBuilder(conventionWithBeneficiaryCurrentEmployer)
+          .withBeneficiaryCurrentEmployer(newBeneficiaryCurrentEmployer)
+          .build(),
+      );
+
+      await expectConventionHaveBeneficiaryCurrentEmployer(
+        conventionRepository,
+        conventionId,
+        newBeneficiaryCurrentEmployer,
+      );
+
+      //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
+      await conventionRepository.update(
+        conventionWithoutBeneficiaryCurrentEmployer,
+      );
+
+      await expectConventionHaveBeneficiaryCurrentEmployer(
+        conventionRepository,
+        conventionId,
+        undefined,
+      );
+    });
+
+    it("Update convention with validator", async () => {
+      const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const convention = conventionStylisteBuilder
+        .withId(conventionId)
+        .withStatus("ACCEPTED_BY_COUNSELLOR")
+        .build();
+      await conventionRepository.save(convention);
+
+      const updatedConvention = conventionStylisteBuilder
+        .withId(conventionId)
+        .withStatus("ACCEPTED_BY_COUNSELLOR")
+        .withValidator({ firstname: "John", lastname: "Doe" })
+        .withCounsellor({ firstname: "Billy", lastname: "Idol" })
+        .withBeneficiaryEmail("some.updated@email.com")
+        .withStatusJustification("some justification")
+        .withDateStart(new Date("2024-10-20").toISOString())
+        .withDateEnd(new Date("2024-10-24").toISOString())
+        .build();
+
+      await conventionRepository.update(updatedConvention);
+
+      expect(await conventionRepository.getById(conventionId)).toEqual(
+        updatedConvention,
+      );
+    });
+
+    it("Updates the establisment representative", async () => {
+      const commonFields = {
+        firstName: "Rep",
+        lastName: "Rep",
+        email: "rep@rep.com",
+        phone: "+33584548754",
+      };
+
+      const tutor: EstablishmentTutor = {
+        ...commonFields,
+        role: "establishment-tutor",
+        job: "Super tutor",
+      };
+
+      const establishmentRepresentative: EstablishmentRepresentative = {
+        ...commonFields,
+        role: "establishment-representative",
+      };
+
+      const signedDate = new Date().toISOString();
+
+      const convention = new ConventionDtoBuilder()
+        .withEstablishmentTutor(tutor)
+        .withEstablishmentRepresentative(establishmentRepresentative)
+        .notSigned()
+        .build();
+
+      await conventionRepository.save(convention);
+
+      const updatedConvention: ConventionDto = new ConventionDtoBuilder(
+        convention,
+      )
+        .withEstablishmentRepresentative({
+          ...establishmentRepresentative,
+          signedAt: signedDate,
+        })
+        .build();
+
+      await conventionRepository.update(updatedConvention);
+      const updatedConventionStored = await conventionRepository.getById(
+        updatedConvention.id,
+      );
+      expectToEqual(
+        updatedConventionStored?.signatories.establishmentRepresentative,
+        updatedConvention.signatories.establishmentRepresentative,
+      );
+      await expectTutorAndRepToHaveSameId(updatedConvention.id);
+
+      const toDraftConvention: ConventionDto = new ConventionDtoBuilder(
+        convention,
+      )
+        .withEstablishmentRepresentative(establishmentRepresentative)
+        .build();
+
+      await conventionRepository.update(toDraftConvention);
+      const toDraftConventionStored = await conventionRepository.getById(
+        toDraftConvention.id,
+      );
+      expectToEqual(
+        toDraftConventionStored?.signatories.establishmentRepresentative,
+        toDraftConvention.signatories.establishmentRepresentative,
+      );
+    });
+
+    it("Updates an already saved immersion with a beneficiary representative", async () => {
+      const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const convention = conventionStylisteBuilder
+        .withId(idA)
+        .withBeneficiaryRepresentative(beneficiaryRepresentative)
+        .build();
+      await conventionRepository.save(convention);
+
+      const updatedConvention = conventionStylisteBuilder
+        .withId(idA)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withBeneficiaryEmail("some.updated@email.com")
+        .withBeneficiaryRepresentative({
+          ...beneficiaryRepresentative,
+          email: "some@new-representative.com",
+        })
+        .signedByBeneficiary(new Date().toISOString())
+        .signedByEstablishmentRepresentative(new Date().toISOString())
+        .signedByBeneficiaryRepresentative(new Date().toISOString())
+        .withDateStart(new Date("2024-10-20").toISOString())
+        .withDateEnd(new Date("2024-10-24").toISOString())
+        .build();
+
+      await conventionRepository.update(updatedConvention);
+
+      expect(await conventionRepository.getById(idA)).toEqual(
+        updatedConvention,
+      );
+    });
+
+    it("Updates an already saved immersion if the beneficiary representative is removed", async () => {
+      const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const convention = conventionStylisteBuilder
+        .withId(idA)
+        .withBeneficiaryRepresentative(beneficiaryRepresentative)
+        .build();
+      await conventionRepository.save(convention);
+
+      const updatedConvention = conventionStylisteBuilder
+        .withId(idA)
+        .withBeneficiaryRepresentative(undefined)
+        .build();
+
+      await conventionRepository.update(updatedConvention);
+
+      expect(await conventionRepository.getById(idA)).toEqual(
+        updatedConvention,
+      );
+    });
+
+    it("Updates an already saved immersion without beneficiary representative with a beneficiary representative", async () => {
+      const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const convention = conventionStylisteBuilder.withId(idA).build();
+      await conventionRepository.save(convention);
+
+      const updatedConvention = conventionStylisteBuilder
+        .withId(idA)
+        .withBeneficiaryRepresentative(beneficiaryRepresentative)
+        .build();
+
+      await conventionRepository.update(updatedConvention);
+
+      expect(await conventionRepository.getById(idA)).toEqual(
+        updatedConvention,
+      );
+    });
+
+    it("update convention with dateApproval and drops it when undefined", async () => {
+      const conventionId: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const convention = conventionStylisteBuilder
+        .withId(conventionId)
+        .withStatus("IN_REVIEW")
+        .build();
+      await conventionRepository.save(convention);
+
+      const updatedConvention = conventionStylisteBuilder
+        .withId(conventionId)
+        .withStatus("ACCEPTED_BY_COUNSELLOR")
+        .withDateStart(new Date("2024-10-20").toISOString())
+        .withDateEnd(new Date("2024-10-24").toISOString())
+        .withDateApproval(new Date("2024-10-15").toISOString())
+        .build();
+
+      await conventionRepository.update(updatedConvention);
+
+      expect(await conventionRepository.getById(conventionId)).toEqual(
+        updatedConvention,
+      );
+    });
   });
 
   describe("deprecateConventionsWithoutDefinitiveStatusEndedSince", () => {
