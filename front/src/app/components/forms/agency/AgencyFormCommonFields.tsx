@@ -26,6 +26,7 @@ type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
   refersToOtherAgency: boolean;
   mode: "edit" | "create";
+  disableAgencyName: boolean;
 };
 
 type ValidationSteps = "validatorsOnly" | "counsellorsAndValidators";
@@ -34,6 +35,7 @@ export const AgencyFormCommonFields = ({
   addressInitialValue,
   refersToOtherAgency,
   mode,
+  disableAgencyName,
 }: AgencyFormCommonFieldsProps) => {
   const { getValues, setValue, register, formState, watch } =
     useFormContext<CreateAgencyDto>();
@@ -100,6 +102,7 @@ export const AgencyFormCommonFields = ({
           ...formContents.name,
         }}
         {...getFieldError("name")}
+        disabled={disableAgencyName}
       />
       <AddressAutocomplete
         {...formContents.address}
