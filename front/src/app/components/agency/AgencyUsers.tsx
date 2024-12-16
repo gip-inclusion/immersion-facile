@@ -341,6 +341,8 @@ export const AgencyUsers = ({
                 },
               },
               {
+                id: domElementIds.admin.agencyTab
+                  .editAgencyRemoveUserConfirmationButton,
                 priority: "primary",
                 children: "Supprimer le rattachement",
                 onClick: () => onUserRemoveSubmitted(),
