@@ -24,24 +24,20 @@ const makeConnectedRedisClient = async (config: AppConfig) => {
     url: config.redisUrl,
   }).connect();
 
-  // Handle disconnections
   redisClient.on("disconnect", () => {
     logger.warn({
       message: "Redis disconnected - attempting to reconnect...",
     });
   });
 
-  // Handle reconnection attempts
   redisClient.on("reconnecting", () => {
     logger.info({ message: "Redis attempting to reconnect..." });
   });
 
-  // Handle successful reconnection
   redisClient.on("connect", () => {
     logger.info({ message: "Redis connected successfully" });
   });
 
-  // Handle when ready for commands
   redisClient.on("ready", () => {
     logger.info({ message: "Redis client ready for commands" });
   });
