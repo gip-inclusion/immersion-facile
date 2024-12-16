@@ -1,6 +1,6 @@
 import { createClient as createRedisClient } from "redis";
-import { withNoCache } from "../../domains/core/caching-gateway/adapters/makeNotCachedWithCache";
 import { makeRedisWithCache } from "../../domains/core/caching-gateway/adapters/makeRedisWithCache";
+import { withNoCache } from "../../domains/core/caching-gateway/adapters/withNoCache";
 import { WithCache } from "../../domains/core/caching-gateway/port/WithCache";
 import { createLogger } from "../../utils/logger";
 import { type AppConfig } from "./appConfig";

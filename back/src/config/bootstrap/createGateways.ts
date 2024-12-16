@@ -238,6 +238,7 @@ export const createGateways = async (
             routes: emailableValidationRoutes,
           }),
           config.emailableApiKey,
+          withCache,
         ),
     })[config.emailValidationGateway]();
 
