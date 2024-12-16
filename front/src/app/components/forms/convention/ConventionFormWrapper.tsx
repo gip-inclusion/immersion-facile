@@ -27,7 +27,6 @@ import { routes, useRoute } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { match } from "ts-pattern";
-import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
 
 const {
@@ -166,7 +165,6 @@ export const ConventionFormWrapper = ({
 };
 
 const ConventionSummarySection = () => {
-  const { cx } = useStyles();
   const dispatch = useDispatch();
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const convention = useAppSelector(conventionSelectors.convention);
@@ -219,7 +217,7 @@ const ConventionSummarySection = () => {
             submittedAt={toDisplayedDate({
               date: new Date(convention.dateSubmission),
             })}
-            summary={makeConventionSections(convention, cx)}
+            summary={makeConventionSections(convention)}
           />
           <ConventionFeedbackNotification
             submitFeedback={submitFeedback}

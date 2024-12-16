@@ -24,8 +24,10 @@ describe("Immersion Assessment slice", () => {
       assessmentSlice.actions.creationRequested({
         assessment: {
           conventionId: "23465",
-          status: "ABANDONED",
+          status: "DID_NOT_SHOW",
+          endedWithAJob: false,
           establishmentFeedback: "my feedback",
+          establishmentAdvices: "my advices",
         },
         jwt: "",
       }),
@@ -43,8 +45,10 @@ describe("Immersion Assessment slice", () => {
       assessmentSlice.actions.creationRequested({
         assessment: {
           conventionId: "23465",
-          status: "ABANDONED",
+          status: "DID_NOT_SHOW",
+          endedWithAJob: false,
           establishmentFeedback: "my feedback",
+          establishmentAdvices: "my advices",
         },
         jwt: "",
       }),

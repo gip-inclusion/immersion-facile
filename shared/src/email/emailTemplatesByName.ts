@@ -70,9 +70,8 @@ L'équipe d'Immersion Facilitée`,
       }) => ({
         subject: `[Demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}] Ce candidat attend toujours votre réponse.`,
         greetings: `Répondez vite à ${beneficiaryFirstName}`,
-        content: `${beneficiaryFirstName} vous a contacté il y a ${
-          mode === "3days" ? "3" : "7"
-        } jours pour une demande d\`immersion pour le métier de ${appellationLabel}.
+        content: `${beneficiaryFirstName} vous a contacté il y a ${mode === "3days" ? "3" : "7"
+          } jours pour une demande d\`immersion pour le métier de ${appellationLabel}.
 <b>Votre réponse est importante</b> : ${beneficiaryFirstName} a choisi votre entreprise et une immersion est souvent clé dans le parcours des candidates ou les candidats.
 Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         buttons: [
@@ -101,14 +100,12 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         conventionFormUrl,
         internshipKind,
       }) => ({
-        subject: `${
-          internshipKind ? "Immersion Facilitée" : "Mini Stage"
-        } - Pour action : une demande de convention préremplie vous est transmise pour que vous la complétiez`,
+        subject: `${internshipKind ? "Immersion Facilitée" : "Mini Stage"
+          } - Pour action : une demande de convention préremplie vous est transmise pour que vous la complétiez`,
         greetings: "Bonjour,",
         content: `
-        <strong>Une demande de convention ${
-          internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-        } doit être complétée :</strong>
+        <strong>Une demande de convention ${internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+          } doit être complétée :</strong>
         ${additionalDetails}
       `,
         buttons: [{ label: "Compléter la demande", url: conventionFormUrl }],
@@ -135,40 +132,33 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       }) => ({
         subject:
           internshipKind === "immersion"
-            ? `Pour action : ${
-                renewed ? "Immersion en entreprise prolongée," : ""
-              } signez votre demande de convention`
-            : `Pour action : ${
-                renewed ? "Mini-stage en entreprise prolongé," : ""
-              } signez votre demande de mini stage`,
+            ? `Pour action : ${renewed ? "Immersion en entreprise prolongée," : ""
+            } signez votre demande de convention`
+            : `Pour action : ${renewed ? "Mini-stage en entreprise prolongé," : ""
+            } signez votre demande de mini stage`,
         greetings: greetingsWithConventionId(conventionId, signatoryName),
-        content: `Une demande de convention ${
-          internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-        } vient d'être enregistrée. Vous devez maintenant la confirmer.
-          ${
-            renewed
-              ? `\nCette convention a été renouvelée par le conseiller depuis la convention numéro : ${renewed.from}.
+        content: `Une demande de convention ${internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+          } vient d'être enregistrée. Vous devez maintenant la confirmer.
+          ${renewed
+            ? `\nCette convention a été renouvelée par le conseiller depuis la convention numéro : ${renewed.from}.
           La raison est la suivante : ${renewed.justification}.\n`
-              : ""
+            : ""
           }
           Pour rappel, cette demande concerne : 
-             - Le bénéficiaire ${beneficiaryName}${
-               beneficiaryRepresentativeName
-                 ? `\n- Le représentant légal du bénéficiaire ${beneficiaryRepresentativeName}`
-                 : ""
-             }${
-               beneficiaryCurrentEmployerName
-                 ? `\n- L'employeur actuel du bénéficiaire ${beneficiaryCurrentEmployerName}`
-                 : ""
-             }
+             - Le bénéficiaire ${beneficiaryName}${beneficiaryRepresentativeName
+            ? `\n- Le représentant légal du bénéficiaire ${beneficiaryRepresentativeName}`
+            : ""
+          }${beneficiaryCurrentEmployerName
+            ? `\n- L'employeur actuel du bénéficiaire ${beneficiaryCurrentEmployerName}`
+            : ""
+          }
              - L'entreprise ${businessName} représentée par ${establishmentRepresentativeName}
              - Le tuteur dans l'entreprise ${establishmentTutorName}
           
-            <strong>Votre signature est obligatoire</strong> pour permettre à votre ${
-              internshipKind === "immersion"
-                ? "conseiller"
-                : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
-            } de valider la convention. Merci !
+            <strong>Votre signature est obligatoire</strong> pour permettre à votre ${internshipKind === "immersion"
+            ? "conseiller"
+            : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
+          } de valider la convention. Merci !
           
           <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
           - Si les informations sont correctes, cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant.
@@ -178,23 +168,21 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           createConventionStatusButton(conventionStatusLink),
         ],
         highlight: {
-          content: `Attention, ne démarrez pas votre ${
-            internshipKind === "immersion" ? "immersion" : "mini stage"
-          } tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.`,
+          content: `Attention, ne démarrez pas votre ${internshipKind === "immersion" ? "immersion" : "mini stage"
+            } tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.`,
         },
-        subContent: `La décision de votre ${
-          internshipKind === "immersion"
+        subContent: `La décision de votre ${internshipKind === "immersion"
             ? "conseiller"
             : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
-        } vous sera transmise par mail.
+          } vous sera transmise par mail.
   
           ${defaultSignature(internshipKind)}
         `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
-              ]
+              "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
+            ]
             : undefined,
         agencyLogoUrl,
       }),
@@ -290,11 +278,10 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             : `Mini Stage - une demande de convention de mini stage est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`,
         greetings: greetingsWithConventionId(conventionId),
         content: `
-      <strong>Une nouvelle demande ${
-        internshipKind === "immersion"
-          ? "d'immersion professionnelle"
-          : "de mini stage"
-      } a été enregistrée.</strong>
+      <strong>Une nouvelle demande ${internshipKind === "immersion"
+            ? "d'immersion professionnelle"
+            : "de mini stage"
+          } a été enregistrée.</strong>
 
       
 
@@ -305,9 +292,8 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         <li>Vous ne pouvez pas la valider tant que le bénéficiaire et l'entreprise n'ont pas confirmé chacun leur accord pour cette demande.</li>
         <li>Vous avez connaissance du mail et du téléphone de chacun. Vous pouvez les relancer en cas de besoin.</li>
       </ul> 
-      <strong>Dates ${
-        internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
-      } :</strong> 
+      <strong>Dates ${internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+          } :</strong> 
       - du ${dateStart}
       - au ${dateEnd}      
 
@@ -327,8 +313,8 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
-              ]
+              "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+            ]
             : undefined,
         agencyLogoUrl,
       }),
@@ -349,26 +335,23 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             : `Mini Stage - Confirmation de signature du mini stage - ${conventionId}`,
         greetings: greetingsWithConventionId(conventionId),
         content: `
-      Nous confirmons que vous avez signé ${
-        internshipKind === "immersion"
-          ? "la convention d'immersion professionnelle"
-          : "la convention de mini stage "
-      } le ${
-        isStringDate(signedAt)
-          ? toDisplayedDate({
+      Nous confirmons que vous avez signé ${internshipKind === "immersion"
+            ? "la convention d'immersion professionnelle"
+            : "la convention de mini stage "
+          } le ${isStringDate(signedAt)
+            ? toDisplayedDate({
               date: new Date(signedAt),
               withHours: true,
               showGMT: true,
             })
-          : "DATE INVALIDE"
-      }.
+            : "DATE INVALIDE"
+          }.
       `,
         highlight: {
           content: `
         Attention. Votre convention est en cours d'examen.
-        Avant de débuter ${
-          internshipKind === "immersion" ? "l'immersion" : "le mini stage"
-        }, veuillez vous assurer que la convention a bien été validée par un conseiller de la structure d'accompagnement du bénéficiaire (${agencyName}).
+        Avant de débuter ${internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+            }, veuillez vous assurer que la convention a bien été validée par un conseiller de la structure d'accompagnement du bénéficiaire (${agencyName}).
         Vous recevrez une notification lorsque ce sera fait.
         `,
         },
@@ -455,16 +438,14 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             : `Mini Stage - Demande de mini stage à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
         greetings: greetingsWithConventionId(conventionId),
         content: `
-      <strong>Une nouvelle demande ${
-        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-      } vous est envoyée${validatorName ? ` par ${validatorName} ` : " "}pour que vous l'examiniez.</strong>
+      <strong>Une nouvelle demande ${internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+          } vous est envoyée${validatorName ? ` par ${validatorName} ` : " "}pour que vous l'examiniez.</strong>
       
-      ${
-        peAdvisor && !peAdvisor.recipientIsPeAdvisor
-          ? `Vous recevez cet email en copie de ${peAdvisor.firstName} ${peAdvisor.lastName} (${peAdvisor.email}).
+      ${peAdvisor && !peAdvisor.recipientIsPeAdvisor
+            ? `Vous recevez cet email en copie de ${peAdvisor.firstName} ${peAdvisor.lastName} (${peAdvisor.email}).
       C'est à ce conseiller d'examiner cette demande d'immersion en priorité. En cas d'absence de sa part, un autre conseiller peut l'examiner afin de ne pas retarder le candidat.`
-          : ""
-      }
+            : ""
+          }
       
       Elle concerne le bénéficiaire ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} 
 
@@ -482,8 +463,8 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
-              ]
+              "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+            ]
             : undefined,
         agencyLogoUrl,
       }),
@@ -510,9 +491,8 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             : "Pour action : à vous de confirmer votre demande de mini stage",
         greetings: greetingsWithConventionId(conventionId),
         content: `
-      La demande de convention pour ${
-        internshipKind === "immersion" ? "l'immersion" : "le mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier de ${immersionProfession} dans l'entreprise ${businessName} encadré par ${establishmentRepresentativeName} vient d'être signée par ${existingSignatureName}.
+      La demande de convention pour ${internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+          } de ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier de ${immersionProfession} dans l'entreprise ${businessName} encadré par ${establishmentRepresentativeName} vient d'être signée par ${existingSignatureName}.
 
       <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
       - Si les informations sont correctes, cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant.
@@ -525,9 +505,8 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         subContent: `
       Ensuite, il vous suffira d'attendre le mail de validation de l'organisme d'accompagnement.
 
-      <strong>Attention, ne démarrez pas ${
-        internshipKind === "immersion" ? "l'immersion" : "le mini stage"
-      } sans ce mail de validation. Sinon, le risque “accident du travail” ne sera pas couvert.</strong>
+      <strong>Attention, ne démarrez pas ${internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+          } sans ce mail de validation. Sinon, le risque “accident du travail” ne sera pas couvert.</strong>
       
       ${defaultSignature(internshipKind)}
       `,
@@ -709,13 +688,11 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         content: `
       Bonne nouvelle ! 
 
-      La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né le ${
-        isStringDate(beneficiaryBirthdate)
-          ? toDisplayedDate({ date: new Date(beneficiaryBirthdate) })
-          : "Date invalide"
-      }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée${
-        validatorName ? ` par ${validatorName} ` : " "
-      }et la convention est bien enregistrée. 
+      La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né le ${isStringDate(beneficiaryBirthdate)
+            ? toDisplayedDate({ date: new Date(beneficiaryBirthdate) })
+            : "Date invalide"
+          }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée${validatorName ? ` par ${validatorName} ` : " "
+          }et la convention est bien enregistrée. 
       
       ${internshipKind === "immersion" ? "L'immersion" : "Le mini stage"} peut donc démarrer aux dates convenues.       
       `,
@@ -731,36 +708,32 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             label: "Télécharger la fiche bilan",
             url:
               agencyAssessmentDocumentLink ||
-              `${
-                internshipKind === "immersion"
-                  ? "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf"
-                  : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
+              `${internshipKind === "immersion"
+                ? "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf"
+                : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
               }`,
           },
         ],
         highlight: {
           kind: "info",
-          content: `${
-            internshipKind === "immersion"
+          content: `${internshipKind === "immersion"
               ? "À la fin de l'immersion, nous vous remercions de compléter la fiche bilan de l'immersion, et de l'envoyer au conseiller qui a signé la convention (France Travail, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion."
               : "À la fin du mini stage, nous vous remercions de compléter la fiche bilan du mini stage, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage."
-          }`,
+            }`,
         },
         subContent: `
       ${defaultSignature(internshipKind)}
 
 
-      En cas de difficulté, prévenez au plus vite votre ${
-        internshipKind === "immersion"
-          ? "conseiller"
-          : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
-      } pour qu'il vous conseille au mieux. 
+      En cas de difficulté, prévenez au plus vite votre ${internshipKind === "immersion"
+            ? "conseiller"
+            : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
+          } pour qu'il vous conseille au mieux. 
       
-      ${
-        emergencyContactInfos
-          ? `Si la situation l'impose, le contact d'urgence de ${beneficiaryFirstName} ${beneficiaryLastName} : ${emergencyContactInfos}`
-          : ""
-      }`,
+      ${emergencyContactInfos
+            ? `Si la situation l'impose, le contact d'urgence de ${beneficiaryFirstName} ${beneficiaryLastName} : ${emergencyContactInfos}`
+            : ""
+          }`,
         agencyLogoUrl,
       }),
     },
@@ -785,9 +758,8 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             ? "Pour action : veuillez modifier cette demande d'immersion professionnelle"
             : "Pour action : mini Stage - veuillez modifier cette demande de mini stage",
         greetings: greetingsWithConventionId(conventionId),
-        content: `Une demande de modification vous a été adressé par ${requesterName} concernant la demande ${
-          internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-        } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}.
+        content: `Une demande de modification vous a été adressé par ${requesterName} concernant la demande ${internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+          } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}.
          
          <strong>Les raisons sont&nbsp;:</strong>
         ${justification}`,
@@ -832,9 +804,8 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         <strong>Identifiant de la convention : ${conventionId}</strong>
         
         Bonjour ${signatoryFirstName} ${signatoryLastName},`,
-        content: `La demande de convention pour ${
-          internshipKind === "immersion" ? "l'immersion" : "le mini stage"
-        }
+        content: `La demande de convention pour ${internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+          }
         de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de ${businessName} vient d'être modifiée.
         
         <strong>Les raisons sont&nbsp;:</strong>
@@ -876,20 +847,18 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             : `Mini Stage - Refus de la demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName}`,
         greetings: greetingsWithConventionId(conventionId),
         content: `
-      Nous vous informons que la demande ${
-        internshipKind === "immersion"
-          ? "d'immersion professionnelle"
-          : "de mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agencyName}.
+      Nous vous informons que la demande ${internshipKind === "immersion"
+            ? "d'immersion professionnelle"
+            : "de mini stage"
+          } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agencyName}.
       
       <strong>Les raisons sont&nbsp;:</strong>
       ${rejectionReason}       
       
-      Vous pouvez vous rapprocher de votre conseiller${
-        internshipKind === "immersion"
-          ? ""
-          : " de la chambre de commerce et d'instrustrie - CCI"
-      } pour en échanger.      
+      Vous pouvez vous rapprocher de votre conseiller${internshipKind === "immersion"
+            ? ""
+            : " de la chambre de commerce et d'instrustrie - CCI"
+          } pour en échanger.      
       
       Bien cordialement,       
       ${signature} 
@@ -920,29 +889,25 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             : `Mini Stage - Annulation de la demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName}`,
         greetings: greetingsWithConventionId(conventionId),
         content: `
-      Nous vous informons que la demande ${
-        internshipKind === "immersion"
-          ? "d'immersion professionnelle"
-          : "de mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${
-        isStringDate(dateStart)
-          ? toDisplayedDate({ date: new Date(dateStart), withHours: true })
-          : "DATE INVALIDE"
-      } au ${
-        isStringDate(dateEnd)
-          ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
-          : "DATE INVALIDE"
-      } a été annulée par ${agencyName}.
+      Nous vous informons que la demande ${internshipKind === "immersion"
+            ? "d'immersion professionnelle"
+            : "de mini stage"
+          } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${isStringDate(dateStart)
+            ? toDisplayedDate({ date: new Date(dateStart), withHours: true })
+            : "DATE INVALIDE"
+          } au ${isStringDate(dateEnd)
+            ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
+            : "DATE INVALIDE"
+          } a été annulée par ${agencyName}.
       
       La demande a été annulée pour la raison suivante :
       
       ${justification}
       
-      Vous pouvez vous rapprocher de votre conseiller${
-        internshipKind === "immersion"
-          ? ""
-          : " de la chambre de commerce et d'instrustrie - CCI"
-      } pour en échanger ou établir une nouvelle demande si nécessaire.      
+      Vous pouvez vous rapprocher de votre conseiller${internshipKind === "immersion"
+            ? ""
+            : " de la chambre de commerce et d'instrustrie - CCI"
+          } pour en échanger ou établir une nouvelle demande si nécessaire.      
       
       Bien cordialement,       
       ${signature} 
@@ -970,26 +935,22 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             : `Mini Stage - Demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName} obsolète`,
         greetings: greetingsWithConventionId(conventionId),
         content: `
-      Nous vous informons que la demande ${
-        internshipKind === "immersion"
-          ? "d'immersion professionnelle"
-          : "de mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} pour réaliser ${
-        internshipKind === "immersion"
-          ? "une immersion professionnelle"
-          : "un mini stage"
-      } du ${
-        isStringDate(dateStart)
-          ? toDisplayedDate({
+      Nous vous informons que la demande ${internshipKind === "immersion"
+            ? "d'immersion professionnelle"
+            : "de mini stage"
+          } de ${beneficiaryFirstName} ${beneficiaryLastName} pour réaliser ${internshipKind === "immersion"
+            ? "une immersion professionnelle"
+            : "un mini stage"
+          } du ${isStringDate(dateStart)
+            ? toDisplayedDate({
               date: new Date(dateStart),
               withHours: true,
             })
-          : "DATE INVALIDE"
-      } au ${
-        isStringDate(dateEnd)
-          ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
-          : "DATE INVALIDE"
-      } dans l'entreprise ${businessName} est supprimée.
+            : "DATE INVALIDE"
+          } au ${isStringDate(dateEnd)
+            ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
+            : "DATE INVALIDE"
+          } dans l'entreprise ${businessName} est supprimée.
       
       Les raisons en sont: ${deprecationReason}.         
       
@@ -1016,9 +977,8 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           ? greetingsWithConventionId(conventionId)
           : "Bonjour ,",
         content: `
-      Vous venez de demander le renouvellement d'un lien pour accéder à une demande ${
-        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-      }. Veuillez le trouver ci-dessous :
+      Vous venez de demander le renouvellement d'un lien pour accéder à une demande ${internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+          }. Veuillez le trouver ci-dessous :
       `,
         buttons: [
           {
@@ -1046,19 +1006,17 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         internshipKind,
         agencyAssessmentDocumentLink,
       }) => ({
-        subject: `Remplissez le bilan de fin ${
-          internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
-        } avec votre tuteur`,
+        subject: `Remplissez le bilan de fin ${internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
+          } avec votre tuteur`,
         greetings: greetingsWithConventionId(
           conventionId,
           `${beneficiaryFirstName} ${beneficiaryLastName}`,
         ),
         content: `
-        Votre ${
-          internshipKind === "immersion"
+        Votre ${internshipKind === "immersion"
             ? "immersion professionnelle"
             : "mini-stage"
-        } au sein de l'entreprise ${businessName} est bientôt finie.
+          } au sein de l'entreprise ${businessName} est bientôt finie.
         
         Prenez quelques instants pour remplir le bilan avec votre tuteur. Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier. Renvoyez-le ensuite à votre conseiller par email.
         `,
@@ -1067,10 +1025,9 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             label: "Télécharger la fiche bilan",
             url:
               agencyAssessmentDocumentLink ||
-              `${
-                internshipKind === "immersion"
-                  ? "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf"
-                  : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
+              `${internshipKind === "immersion"
+                ? "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf"
+                : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
               }`,
           },
         ],
@@ -1098,24 +1055,21 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           establishmentTutorName,
         ),
         content: `
-      ${
-        internshipKind === "immersion"
-          ? "L'immersion professionnelle"
-          : "Le mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de votre entreprise est en passe de s'achever. 
+      ${internshipKind === "immersion"
+            ? "L'immersion professionnelle"
+            : "Le mini stage"
+          } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de votre entreprise est en passe de s'achever. 
 
       Nous vous remercions de votre accueil. 
 
-      Pouvez-vous indiquer si ${
-        internshipKind ? "cette immersion" : "ce mini stage"
-      } s'est bien déroulée jusqu'à sa date de fin prévue ?`,
+      Pouvez-vous indiquer si ${internshipKind ? "cette immersion" : "ce mini stage"
+          } s'est bien déroulée jusqu'à sa date de fin prévue ?`,
         buttons: [
           {
-            label: `Evaluer ${
-              internshipKind === "immersion"
+            label: `Evaluer ${internshipKind === "immersion"
                 ? "cette immersion"
                 : "ce mini stage"
-            }`,
+              }`,
             url: assessmentCreationLink,
           },
         ],
@@ -1145,32 +1099,27 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         assessmentStatus,
         internshipKind,
       }) => ({
-        subject: `Pour information : évaluation ${
-          internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
-        } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
+        subject: `Pour information : évaluation ${internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+          } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
         greetings: greetingsWithConventionId(conventionId),
-        content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son ${
-          internshipKind === "immersion" ? "immersion" : "mini-stage"
-        } au sein de l'entreprise ${businessName}.
+        content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son ${internshipKind === "immersion" ? "immersion" : "mini-stage"
+          } au sein de l'entreprise ${businessName}.
         <ul>
-          <li>Objectif ${
-            internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+          <li>Objectif ${internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
           } : ${immersionObjective}</li>
-          <li>Le bénéficiaire était bien présent aux dates prévues sur la convention, du ${
-            isStringDate(dateStart)
-              ? toDisplayedDate({
-                  date: new Date(dateStart),
-                  withHours: true,
-                })
-              : "DATE INVALIDE"
-          } au ${
-            isStringDate(dateEnd)
-              ? toDisplayedDate({
-                  date: new Date(dateEnd),
-                  withHours: true,
-                })
-              : "DATE INVALIDE"
-          } : ${assessmentStatus === "FINISHED" ? "oui" : "non"}</li>
+          <li>Le bénéficiaire était bien présent aux dates prévues sur la convention, du ${isStringDate(dateStart)
+            ? toDisplayedDate({
+              date: new Date(dateStart),
+              withHours: true,
+            })
+            : "DATE INVALIDE"
+          } au ${isStringDate(dateEnd)
+            ? toDisplayedDate({
+              date: new Date(dateEnd),
+              withHours: true,
+            })
+            : "DATE INVALIDE"
+          } : ${assessmentStatus === "COMPLETED" ? "oui" : "non"}</li>
           <li>Retour de l'entreprise : ${establishmentFeedback}</li>
         </ul>
         La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email.`,
@@ -1234,50 +1183,46 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       }) => ({
         subject: "Immersion Facilitée - Votre structure a été activée",
         greetings: "Bonjour,",
-        content: `<strong>Votre ${
-          refersToOtherAgency
+        content: `<strong>Votre ${refersToOtherAgency
             ? `structure d'accompagnement`
             : "organisme prescripteur"
-        } ${agencyName} est activée sur Immersion facilitée !</strong> 
+          } ${agencyName} est activée sur Immersion facilitée !</strong> 
 
         Vous pouvez dès à présent valider les conventions dématérialisées sur Immersion Facilitée.
 
         <strong>Voici les différents utilisateurs rattachés à la structure et leur rôles :</strong>
 
-        Chaque utilisateur peut se créer un espace personnel afin de voir${
-          refersToOtherAgency
+        Chaque utilisateur peut se créer un espace personnel afin de voir${refersToOtherAgency
             ? " ou pré-valider"
             : ", pré-valider ou valider et piloter"
-        } ses conventions, en fonction de ses droits.
-        ${
-          refersToOtherAgency &&
+          } ses conventions, en fonction de ses droits.
+        ${refersToOtherAgency &&
           `Les conventions devront ensuite être validées par l’un des validateurs de votre organisme prescripteur lié : ${agencyReferdToName}.`
-        }
+          }
         ${users
-          .map(
-            ({
-              firstName,
-              lastName,
-              email,
-              agencyName,
-              isNotifiedByEmail,
-              roles,
-            }) =>
-              generateUserInfo(
+            .map(
+              ({
                 firstName,
                 lastName,
                 email,
-                roles,
-                isNotifiedByEmail,
                 agencyName,
-              ),
-          )
-          .join("")}
+                isNotifiedByEmail,
+                roles,
+              }) =>
+                generateUserInfo(
+                  firstName,
+                  lastName,
+                  email,
+                  roles,
+                  isNotifiedByEmail,
+                  agencyName,
+                ),
+            )
+            .join("")}
  
 
-        Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs${
-          refersToOtherAgency ? ` et aux structures d'accompagnement` : ""
-        }</strong> pour être accompagné par notre équipe.
+        Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs${refersToOtherAgency ? ` et aux structures d'accompagnement` : ""
+          }</strong> pour être accompagné par notre équipe.
 
         Au programme :
           • Comment établir une convention d'immersion
@@ -1397,9 +1342,8 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         content: `
       <strong>Félicitations !</strong>
 
-      Vous venez d'enregistrer votre établissement ${businessName} (${
-        businessAddresses[0]
-      }) pour accueillir des immersions professionnelles.      
+      Vous venez d'enregistrer votre établissement ${businessName} (${businessAddresses[0]
+          }) pour accueillir des immersions professionnelles.      
 
       ${contactFirstName} ${contactLastName} recevra bien les demandes d'immersion.
       
@@ -1529,29 +1473,25 @@ Immersion souhaitée :
 
     • Métier : ${appellationLabel}.
     • Dates d’immersion envisagées : ${potentialBeneficiaryDatePreferences}.
-    • ${
-      immersionObjective
-        ? `But de l'immersion : ${labelsForImmersionObjective[immersionObjective]}.`
-        : ""
-    }
+    • ${immersionObjective
+            ? `But de l'immersion : ${labelsForImmersionObjective[immersionObjective]}.`
+            : ""
+          }
 
 Profil du candidat :
 
-    • Expérience professionnelle : ${
-      potentialBeneficiaryHasWorkingExperience
-        ? "j’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat"
-        : "je n’ai jamais travaillé"
-    }.
-    ${
-      potentialBeneficiaryExperienceAdditionalInformation
-        ? `• Informations supplémentaires sur l'expérience du candidat : ${potentialBeneficiaryExperienceAdditionalInformation}.`
-        : ""
-    }
-    ${
-      potentialBeneficiaryResumeLink
-        ? `• CV du candidat : ${potentialBeneficiaryResumeLink}.`
-        : ""
-    }`,
+    • Expérience professionnelle : ${potentialBeneficiaryHasWorkingExperience
+            ? "j’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat"
+            : "je n’ai jamais travaillé"
+          }.
+    ${potentialBeneficiaryExperienceAdditionalInformation
+            ? `• Informations supplémentaires sur l'expérience du candidat : ${potentialBeneficiaryExperienceAdditionalInformation}.`
+            : ""
+          }
+    ${potentialBeneficiaryResumeLink
+            ? `• CV du candidat : ${potentialBeneficiaryResumeLink}.`
+            : ""
+          }`,
         buttons: [
           {
             label: "Répondre au candidat via mon espace",
@@ -1594,11 +1534,10 @@ Profil du candidat :
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
         content: `
-        Un candidat souhaite faire une immersion ${
-          immersionObjective
+        Un candidat souhaite faire une immersion ${immersionObjective
             ? `pour "${immersionObjective?.toLowerCase()}"`
             : ""
-        } sur le métier de <strong>${appellationLabel}</strong> dans votre entreprise ${businessName} (${businessAddress}).
+          } sur le métier de <strong>${appellationLabel}</strong> dans votre entreprise ${businessName} (${businessAddress}).
 
         Voici son message:
 
@@ -1607,11 +1546,10 @@ Profil du candidat :
       ${potentialBeneficiaryFirstName} 
       ${potentialBeneficiaryLastName}
 
-      ${
-        potentialBeneficiaryResumeLink
-          ? `Plus d'info sur ce candidat: <a href="${potentialBeneficiaryResumeLink}">${potentialBeneficiaryResumeLink}</a>`
-          : ""
-      }
+      ${potentialBeneficiaryResumeLink
+            ? `Plus d'info sur ce candidat: <a href="${potentialBeneficiaryResumeLink}">${potentialBeneficiaryResumeLink}</a>`
+            : ""
+          }
       
       `,
         buttons: [
@@ -1713,32 +1651,27 @@ Profil du candidat :
       }) => ({
         subject: "Test contenant toutes les blocs email",
         greetings: greetingsWithConventionId(conventionId, beneficiaryName),
-        content: `Merci d'avoir confirmé votre demande ${
-          internshipKind ? "d'immersion" : "de mini stage"
-        }. Elle va être transmise à votre ${
-          internshipKind === "immersion"
+        content: `Merci d'avoir confirmé votre demande ${internshipKind ? "d'immersion" : "de mini stage"
+          }. Elle va être transmise à votre ${internshipKind === "immersion"
             ? "conseiller"
             : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
-        } référent.
+          } référent.
       
-      Il vous informera par mail de la validation ou non ${
-        internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
-      }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
+      Il vous informera par mail de la validation ou non ${internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+          }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
         legals: defaultConventionFinalLegals(internshipKind),
         buttons: [
           { label: "Label de bouton", url: "http://www.example.com" },
           createConventionStatusButton(conventionStatusLink),
         ],
-        subContent: `Il vous informera par mail de la validation ou non ${
-          internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
-        }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.
+        subContent: `Il vous informera par mail de la validation ou non ${internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+          }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.
       
       ${defaultSignature(internshipKind)}
       `,
         highlight: {
-          content: `Attention, ne démarrez pas ${
-            internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
-          } tant que vous n'avez pas reçu cette validation !`,
+          content: `Attention, ne démarrez pas ${internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+            } tant que vous n'avez pas reçu cette validation !`,
         },
         agencyLogoUrl,
       }),
@@ -1816,11 +1749,10 @@ const generateUserInfo = (
   return `
     <ul style="list-style-type: none; border: 1px solid #ddd; padding: 16px;"><li><strong>${nameDisplay}</strong></li>
       ${rolesDescriptionList}
-      <li>${
-        isNotified
-          ? "Reçoit les emails de toutes les conventions de "
-          : "Ne reçoit aucun email pour "
-      } ${agencyName}</li>
+      <li>${isNotified
+      ? "Reçoit les emails de toutes les conventions de "
+      : "Ne reçoit aucun email pour "
+    } ${agencyName}</li>
       <li><a href="https://immersion-facile.beta.gouv.fr/tableau-de-bord-agence" target="_blank">Espace personnel</a></li></ul>
   `;
 };
