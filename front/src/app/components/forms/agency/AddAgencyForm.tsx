@@ -331,6 +331,7 @@ const AgencyForm = ({
                 <AgencyFormCommonFields
                   refersToOtherAgency={refersToOtherAgency}
                   mode="create"
+                  disableAgencyName={false}
                 />
                 <AgencyLogoUpload />
 
