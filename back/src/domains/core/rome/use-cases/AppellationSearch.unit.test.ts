@@ -181,5 +181,25 @@ describe("AppellationSearch", () => {
         [],
       );
     });
+
+    it("have a fallback when diagoriente appellations search returns empty array", async () => {
+      expectToEqual(
+        await useCase.execute({
+          searchText: "lapins",
+          fetchAppellationsFromNaturalLanguage: true,
+        }),
+        [
+          {
+            appellation: {
+              appellationCode: "14704",
+              appellationLabel: "Éleveur / Éleveuse de lapins angoras",
+              romeCode: "A1409",
+              romeLabel: "Élevage",
+            },
+            matchRanges: [{ startIndexInclusive: 22, endIndexExclusive: 28 }],
+          },
+        ],
+      );
+    });
   });
 });
