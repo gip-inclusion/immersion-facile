@@ -36,7 +36,7 @@ describe("createRedisWithCache implementation", () => {
     });
   });
 
-  it("calls the function the first time than gets results from cache", async () => {
+  it("calls the function the first time then gets results from cache", async () => {
     const query = "my query";
     const expectedResult = { value: `value is : ${query}` };
 
