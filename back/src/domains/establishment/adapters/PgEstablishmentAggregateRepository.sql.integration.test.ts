@@ -18,11 +18,19 @@ import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGenerato
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
-import { updateAllEstablishmentScoresQuery } from "./PgEstablishmentAggregateRepository.sql";
+import {
+  deactivateUnresponsiveEstablishmentsQuery,
+  updateAllEstablishmentScoresQuery,
+} from "./PgEstablishmentAggregateRepository.sql";
 
 describe("SQL queries, independent from PgEstablishmentAggregateRepository", () => {
   let pool: Pool;
   let db: KyselyDb;
+  let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
+  let pgDiscussionRepository: PgDiscussionRepository;
+  let pgConventionRepository: PgConventionRepository;
+  let pgAgencyRepository: PgAgencyRepository;
+  let pgUserRepository: PgUserRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -36,6 +44,14 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();
     await db.deleteFrom("users").execute();
+
+    pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
+      db,
+    );
+    pgDiscussionRepository = new PgDiscussionRepository(db);
+    pgConventionRepository = new PgConventionRepository(db);
+    pgAgencyRepository = new PgAgencyRepository(db);
+    pgUserRepository = new PgUserRepository(db);
   });
 
   afterAll(async () => {
@@ -44,13 +60,6 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
 
   describe("updateAllEstablishmentScoresQuery", () => {
     it("updates all the establishments scores, depending on the number of conventions and discussion answered in the last year", async () => {
-      const pgEstablishmentAggregateRepository =
-        new PgEstablishmentAggregateRepository(db);
-
-      const pgDiscussionRepository = new PgDiscussionRepository(db);
-      const pgConventionRepository = new PgConventionRepository(db);
-      const pgAgencyRepository = new PgAgencyRepository(db);
-
       const user = new UserBuilder()
         .withId(new UuidV4Generator().new())
         .build();
@@ -153,6 +162,145 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       const conventionScore = 20 * 1;
       const expectedScore = (minimumScore + conventionScore) * discussionScore;
       expectToEqual(establishmentAfter?.establishment.score, expectedScore);
+    });
+  });
+
+  describe("deactivateUnresponsiveEstablishmentsQuery", () => {
+    const testUser = new UserBuilder()
+      .withId("11111111-1111-4444-1111-111111111111")
+      .build();
+
+    beforeEach(async () => {
+      await pgUserRepository.save(testUser, "proConnect");
+    });
+
+    it("deactivates establishments with 50+ unanswered discussions and no recent conventions", async () => {
+      // Create establishment that should be deactivated
+      const establishment = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("12345678901234")
+        .withMaxContactsPerMonth(10)
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            userId: testUser.id,
+            job: "",
+            phone: "",
+          },
+        ])
+        .build();
+
+      // Create 50 unanswered discussions
+      const discussions = Array.from({ length: 50 }, (_, i) =>
+        new DiscussionBuilder()
+          .withSiret(establishment.establishment.siret)
+          .withCreatedAt(new Date())
+          .withId(
+            `00000000-0000-4000-b000-00000000${i.toString().padStart(4, "0")}`,
+          )
+          .withExchanges([
+            {
+              subject: "Hello",
+              message: "Initial message",
+              sender: "potentialBeneficiary",
+              recipient: "establishment",
+              sentAt: new Date().toISOString(),
+              attachments: [],
+            },
+          ])
+          .build(),
+      );
+
+      // Insert test data
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishment,
+      );
+      await Promise.all(
+        discussions.map((d) => pgDiscussionRepository.insert(d)),
+      );
+
+      // Run the deactivation query
+      await deactivateUnresponsiveEstablishmentsQuery(db);
+
+      // Verify the establishment was deactivated using direct DB query
+      const result = await db
+        .selectFrom("establishments")
+        .select(["max_contacts_per_month", "status", "status_updated_at"])
+        .where("siret", "=", establishment.establishment.siret)
+        .executeTakeFirst();
+
+      expectToEqual(result?.max_contacts_per_month, 0);
+      expectToEqual(result?.status, "DEACTIVATED_FOR_LACK_OF_RESPONSES");
+      expect(result?.status_updated_at).toBeDefined();
+    });
+
+    it("does not deactivate establishments with recent conventions", async () => {
+      // Create establishment
+      const establishment = new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret("12345678901234")
+        .withMaxContactsPerMonth(10)
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            userId: testUser.id,
+            job: "",
+            phone: "",
+          },
+        ])
+        .build();
+
+      // Create agency and convention
+      const agency = new AgencyDtoBuilder().build();
+      await pgAgencyRepository.insert(toAgencyWithRights(agency));
+
+      const convention = new ConventionDtoBuilder()
+        .withSiret(establishment.establishment.siret)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withAgencyId(agency.id)
+        .withDateStart(new Date().toISOString())
+        .build();
+
+      // Create 50 unanswered discussions
+      const discussions = Array.from({ length: 50 }, (_, i) =>
+        new DiscussionBuilder()
+          .withSiret(establishment.establishment.siret)
+          .withCreatedAt(new Date())
+          .withId(
+            `00000000-0000-4000-b000-00000000${i.toString().padStart(4, "0")}`,
+          )
+          .withExchanges([
+            {
+              subject: "Hello",
+              message: "Initial message",
+              sender: "potentialBeneficiary",
+              recipient: "establishment",
+              sentAt: new Date().toISOString(),
+              attachments: [],
+            },
+          ])
+          .build(),
+      );
+
+      // Insert test data
+      await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+        establishment,
+      );
+      await pgConventionRepository.save(convention);
+      await Promise.all(
+        discussions.map((d) => pgDiscussionRepository.insert(d)),
+      );
+
+      // Run the deactivation query
+      await deactivateUnresponsiveEstablishmentsQuery(db);
+
+      // Verify the establishment was not deactivated using direct DB query
+      const result = await db
+        .selectFrom("establishments")
+        .select(["max_contacts_per_month", "status", "status_updated_at"])
+        .where("siret", "=", establishment.establishment.siret)
+        .executeTakeFirst();
+
+      expectToEqual(result?.max_contacts_per_month, 10);
+      expectToEqual(result?.status, null);
     });
   });
 });
