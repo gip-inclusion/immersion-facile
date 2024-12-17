@@ -238,4 +238,5 @@ export const deactivateUnresponsiveEstablishmentsQuery = (db: KyselyDb) =>
         ),
       ),
     )
+    .returningAll()
     .execute();
