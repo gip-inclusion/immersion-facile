@@ -377,6 +377,8 @@ interface OngoingOauths {
   updated_at: Generated<Timestamp>;
 }
 
+type EstablishmentStatus = "DEACTIVATED_FOR_LACK_OF_RESPONSES";
+
 interface Establishments extends WithAcquisition {
   additional_information: Generated<string | null>;
   is_max_discussions_for_period_reached: Generated<boolean>;
@@ -401,6 +403,8 @@ interface Establishments extends WithAcquisition {
   update_date: Timestamp;
   website: Generated<string | null>;
   score: Generated<number>;
+  status: EstablishmentStatus | null;
+  status_updated_at: Timestamp | null;
 }
 
 interface PublicAppellationsData {
