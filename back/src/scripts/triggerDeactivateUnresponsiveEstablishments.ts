@@ -8,14 +8,21 @@ import { handleCRONScript } from "./handleCRONScript";
 const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
-type Report = { status: "success" } | { status: "error"; message: string };
+type Report =
+  | { status: "success"; updatedCount: number }
+  | { status: "error"; message: string };
 
 const deactivateUnresponsiveEstablishments = async (): Promise<Report> => {
   const pool = new Pool({ connectionString: config.pgImmersionDbUrl });
   const db = makeKyselyDb(pool);
 
   return deactivateUnresponsiveEstablishmentsQuery(db)
-    .then((): Report => ({ status: "success" }))
+    .then(
+      (updatedEstablishments): Report => ({
+        status: "success",
+        updatedCount: updatedEstablishments.length,
+      }),
+    )
     .catch(
       (e): Report => ({
         status: "error",
@@ -31,7 +38,7 @@ handleCRONScript(
   deactivateUnresponsiveEstablishments,
   (report) =>
     report.status === "success"
-      ? "Unresponsive establishments deactivated successfully"
+      ? `${report.updatedCount} unresponsive establishments deactivated successfully`
       : `Error deactivating unresponsive establishments: ${report.message}`,
   logger,
 );

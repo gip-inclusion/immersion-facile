@@ -219,7 +219,11 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       );
 
       // Run the deactivation query
-      await deactivateUnresponsiveEstablishmentsQuery(db);
+      const updatedEstablishments =
+        await deactivateUnresponsiveEstablishmentsQuery(db);
+
+      // Verify the count of updated establishments
+      expectToEqual(updatedEstablishments.length, 1);
 
       // Verify the establishment was deactivated using direct DB query
       const result = await db
@@ -290,7 +294,11 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       );
 
       // Run the deactivation query
-      await deactivateUnresponsiveEstablishmentsQuery(db);
+      const updatedEstablishments =
+        await deactivateUnresponsiveEstablishmentsQuery(db);
+
+      // Verify no establishments were updated
+      expectToEqual(updatedEstablishments.length, 0);
 
       // Verify the establishment was not deactivated using direct DB query
       const result = await db
