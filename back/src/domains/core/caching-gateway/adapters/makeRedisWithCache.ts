@@ -14,10 +14,10 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
   ({ defaultCacheDurationInHours, redisClient }) =>
   ({ overrideCacheDurationInHours, getCacheKey, cb, logParams }) => {
     type Callback = typeof cb;
-    return (async (...params: Parameters<Callback>) => {
+    return (async (param: Parameters<Callback>[0]) => {
       const start = Date.now();
-      if (!redisClient.isOpen) return cb(...params);
-      const cacheKey = getCacheKey(...params);
+      if (!redisClient.isOpen) return cb(param);
+      const cacheKey = getCacheKey(param);
 
       const cachedValue = await redisClient.get(cacheKey);
       if (cachedValue) {
@@ -50,7 +50,7 @@ export const makeRedisWithCache: MakeWithCache<RedisWithCacheConfig> =
       const durationInSecond =
         (overrideCacheDurationInHours ?? defaultCacheDurationInHours) * 3600;
 
-      const result = await cb(...params);
+      const result = await cb(param);
 
       try {
         await redisClient.setEx(
