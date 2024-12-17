@@ -1,3 +1,4 @@
+import { omit } from "ramda";
 import {
   Email,
   InclusionConnectedUser,
@@ -73,14 +74,19 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     rejectIfEditionOfValidatorsOfAgencyWithRefersTo(agency, params.roles);
     rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
 
+    const updatedRoles = isBackOfficeOrAgencyAdmin
+      ? params.roles
+      : agencyRightToUpdate.roles;
     const updatedRights: AgencyUsersRights = {
-      ...agency.usersRights,
-      [userToUpdate.id]: {
-        roles: isBackOfficeOrAgencyAdmin
-          ? params.roles
-          : agencyRightToUpdate.roles,
-        isNotifiedByEmail: params.isNotifiedByEmail,
-      },
+      ...omit([userToUpdate.id], agency.usersRights),
+      ...(updatedRoles.length > 0
+        ? {
+            [userToUpdate.id]: {
+              roles: updatedRoles,
+              isNotifiedByEmail: params.isNotifiedByEmail,
+            },
+          }
+        : {}),
     };
 
     validateAgencyRights(agency.id, updatedRights);

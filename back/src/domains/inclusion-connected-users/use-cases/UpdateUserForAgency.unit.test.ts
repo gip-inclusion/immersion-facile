@@ -775,7 +775,7 @@ describe("UpdateUserForAgency", () => {
       });
 
       describe("is removed", () => {
-        it("can remove counsellor if no other", async () => {
+        it("can remove counsellor role", async () => {
           const agency = new AgencyDtoBuilder().build();
           uow.agencyRepository.agencies = [
             toAgencyWithRights(agency, {
@@ -799,6 +799,34 @@ describe("UpdateUserForAgency", () => {
           expectToEqual(uow.agencyRepository.agencies, [
             toAgencyWithRights(agency, {
               [user.id]: { roles: ["agency-viewer"], isNotifiedByEmail: false },
+              [validator.id]: { roles: ["validator"], isNotifiedByEmail: true },
+            }),
+          ]);
+        });
+
+        it("can remove user from agency if he has no role", async () => {
+          const agency = new AgencyDtoBuilder().build();
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [user.id]: { roles: ["counsellor"], isNotifiedByEmail: true },
+              [validator.id]: { roles: ["validator"], isNotifiedByEmail: true },
+            }),
+          ];
+          uow.userRepository.users = [user, validator];
+
+          await updateIcUserRoleForAgency.execute(
+            {
+              agencyId: agency.id,
+              roles: [],
+              userId: user.id,
+              isNotifiedByEmail: false,
+              email: user.email,
+            },
+            icAdmin,
+          );
+
+          expectToEqual(uow.agencyRepository.agencies, [
+            toAgencyWithRights(agency, {
               [validator.id]: { roles: ["validator"], isNotifiedByEmail: true },
             }),
           ]);
