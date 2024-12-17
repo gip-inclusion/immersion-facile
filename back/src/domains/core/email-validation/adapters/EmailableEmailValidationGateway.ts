@@ -1,5 +1,5 @@
 import Bottleneck from "bottleneck";
-import { ValidateEmailFeedback } from "shared";
+import { Email, ValidateEmailFeedback } from "shared";
 import { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
 import { WithCache } from "../../caching-gateway/port/WithCache";
@@ -34,13 +34,13 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   ): Promise<ValidateEmailFeedback> {
     const sanitizedEmail = emailInParams.toLowerCase().trim();
 
-    return this.withCache({
+    return this.withCache<Email>({
       logParams: {
         partner: "emailable",
         route: emailableValidationRoutes.validateEmail,
       },
       overrideCacheDurationInHours: thirtyDaysInHours,
-      getCacheKey: ({ email }) => `emailable_${email}`,
+      getCacheKey: (email) => `emailable_${email}`,
       cb: (email) =>
         this.#limiter.schedule(() =>
           this.httpClient

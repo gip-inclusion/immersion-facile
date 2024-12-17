@@ -7,9 +7,12 @@ export type DefaultCacheConfig = {
 
 export type MakeWithCache<
   Config extends DefaultCacheConfig = DefaultCacheConfig,
-> = (config: Config) => <Cb extends (...params: any[]) => Promise<any>>(args: {
+> = (config: Config) => <
+  T,
+  Cb extends (param: T) => Promise<any> = (param: T) => Promise<any>,
+>(args: {
   overrideCacheDurationInHours?: number;
-  getCacheKey: (...params: Parameters<Cb>) => string;
+  getCacheKey: (param: Parameters<Cb>[0]) => string;
   cb: Cb;
   logParams?: { route: UnknownSharedRoute; partner: PartnerKey };
 }) => Cb;
