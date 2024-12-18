@@ -1,6 +1,6 @@
-import { Breadcrumbs } from "@mui/material";
 import React from "react";
 import { PageHeader } from "react-design-system";
+import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   FrontAgencyDashboardRoute,
   InclusionConnectedPrivateRoute,
