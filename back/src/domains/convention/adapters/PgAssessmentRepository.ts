@@ -19,8 +19,22 @@ export class PgAssessmentRepository implements AssessmentRepository {
 
     const dto = assessmentSchema.parse({
       conventionId: result.convention_id,
-      establishmentFeedback: result.establishment_feedback,
       status: result.status,
+      ...(result.status === "PARTIALLY_COMPLETED"
+        ? {
+            lastDayOfPresence: result.last_day_of_presence,
+            numberOfMissedHours: result.number_of_missed_hours,
+          }
+        : {}),
+      endedWithAJob: result.ended_wit_a_job,
+      ...(result.ended_wit_a_job
+        ? {
+            typeOfContract: result.type_of_contract,
+            contractStartDate: result.contract_start_date,
+          }
+        : {}),
+      establishmentFeedback: result.establishment_feedback,
+      establishmentAdvices: result.establishment_advices,
     });
 
     return {
@@ -29,22 +43,36 @@ export class PgAssessmentRepository implements AssessmentRepository {
     };
   }
 
-  public async save({
-    status,
-    conventionId,
-    establishmentFeedback,
-  }: AssessmentEntity): Promise<void> {
+  public async save(assessmentEntity: AssessmentEntity): Promise<void> {
     await this.transaction
       .insertInto("immersion_assessments")
       .values({
-        convention_id: conventionId,
-        status,
-        establishment_feedback: establishmentFeedback,
+        convention_id: assessmentEntity.conventionId,
+        status: assessmentEntity.status,
+        last_day_of_presence:
+          assessmentEntity.status === "PARTIALLY_COMPLETED"
+            ? assessmentEntity.lastDayOfPresence
+            : null,
+        number_of_missed_hours:
+          assessmentEntity.status === "PARTIALLY_COMPLETED"
+            ? assessmentEntity.numberOfMissedHours
+            : null,
+        ended_wit_a_job: assessmentEntity.endedWithAJob,
+        type_of_contract: assessmentEntity.endedWithAJob
+          ? assessmentEntity.typeOfContract
+          : null,
+        contract_start_date: assessmentEntity.endedWithAJob
+          ? assessmentEntity.contractStartDate
+          : null,
+        establishment_feedback: assessmentEntity.establishmentFeedback,
+        establishment_advices: assessmentEntity.establishmentAdvices,
       })
       .execute()
       .catch((error) => {
         if (error?.message.includes(noConventionMatchingErrorMessage))
-          throw new Error(`No convention found for id ${conventionId}`);
+          throw new Error(
+            `No convention found for id ${assessmentEntity.conventionId}`,
+          );
 
         throw error;
       });

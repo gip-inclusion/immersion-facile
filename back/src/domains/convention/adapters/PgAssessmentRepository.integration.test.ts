@@ -80,9 +80,15 @@ describe("PgAssessmentRepository", () => {
 
       expectArraysToMatch(await allAssessmentsQueryBuilder.execute(), [
         {
-          status: assessment.status,
-          establishment_feedback: assessment.establishmentFeedback,
           convention_id: assessment.conventionId,
+          status: assessment.status,
+          last_day_of_presence: null,
+          number_of_missed_hours: null,
+          ended_wit_a_job: false,
+          type_of_contract: null,
+          contract_start_date: null,
+          establishment_feedback: assessment.establishmentFeedback,
+          establishment_advices: assessment.establishmentAdvices,
         },
       ]);
     });
