@@ -68,7 +68,7 @@ export const ConventionValidation = ({
         submittedAt={toDisplayedDate({
           date: new Date(convention.dateSubmission),
         })}
-        summary={makeConventionSections(convention, cx)}
+        summary={makeConventionSections(convention)}
         conventionId={convention.id}
       />
     </>

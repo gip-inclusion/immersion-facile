@@ -11,43 +11,43 @@ import {
   typeOfContracts,
 } from "./assessment.dto";
 
+const withAssessmentStatusSchema: z.Schema<WithAssessmentStatus> =
+  z.discriminatedUnion("status", [
+    z.object({
+      status: z.literal("COMPLETED"),
+    }),
+    z.object({
+      status: z.literal("DID_NOT_SHOW"),
+    }),
+    z.object({
+      status: z.literal("PARTIALLY_COMPLETED"),
+      lastDayOfPresence: makeDateStringSchema(),
+      numberOfMissedHours: z.number(),
+    }),
+  ]);
 
-const withAssessmentStatusSchema: z.Schema<WithAssessmentStatus> = z.discriminatedUnion("status", [
+const withEstablishmentCommentsSchema: z.Schema<WithEstablishmentComments> =
   z.object({
-    status: z.literal("COMPLETED"),
-  }),
-  z.object({
-    status: z.literal("DID_NOT_SHOW"),
-  }),
-  z.object({
-    status: z.literal("PARTIALLY_COMPLETED"),
-    lastDayOfPresence: makeDateStringSchema(),
-    numberOfMissedHours: z.number(),
+    establishmentFeedback: zStringMinLength1,
+    establishmentAdvices: zStringMinLength1,
+  });
+
+const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> =
+  z.discriminatedUnion("endedWithAJob", [
+    z.object({
+      endedWithAJob: z.literal(true),
+      typeOfContract: zEnumValidation(typeOfContracts, localization.required),
+      contractStartDate: makeDateStringSchema(),
+    }),
+    z.object({
+      endedWithAJob: z.literal(false),
+    }),
+  ]);
+
+export const assessmentSchema: z.Schema<AssessmentDto> = z
+  .object({
+    conventionId: z.string(),
   })
-])
-
-const withEstablishmentCommentsSchema: z.Schema<WithEstablishmentComments> = z.object({
-  establishmentFeedback: zStringMinLength1,
-  establishmentAdvices: zStringMinLength1,
-})
-
-const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> = z.discriminatedUnion("endedWithAJob", [
-  z.object({
-    endedWithAJob: z.literal(true),
-    typeOfContract: zEnumValidation(
-      typeOfContracts,
-      localization.required
-    ),
-    contractStartDate: makeDateStringSchema(),
-  }),
-  z.object({
-    endedWithAJob: z.literal(false),
-  })
-])
-
-export const assessmentSchema: z.Schema<AssessmentDto> = z.object({
-  conventionId: z.string(),
-})
   .and(withAssessmentStatusSchema)
   .and(withEstablishmentCommentsSchema)
   .and(withEndedWithAJobSchema);

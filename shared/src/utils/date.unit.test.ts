@@ -1,5 +1,10 @@
 import { parseISO } from "date-fns";
-import { hoursDisplayedToHoursValue, hoursValueToHoursDisplayed, toDateString, toDisplayedDate } from "./date";
+import {
+  hoursDisplayedToHoursValue,
+  hoursValueToHoursDisplayed,
+  toDateString,
+  toDisplayedDate,
+} from "./date";
 
 describe("Date utils tests - toDateString", () => {
   it("should format a valid date", () => {
@@ -39,7 +44,6 @@ describe("Date utils tests - toDisplayedDate", () => {
   });
 });
 
-
 describe("Date utils tests - hoursDisplayedToHoursValue", () => {
   it.each([
     { input: "10h15", expected: 10.25 },
@@ -50,7 +54,7 @@ describe("Date utils tests - hoursDisplayedToHoursValue", () => {
     { input: "", expected: 0 },
     { input: "h", expected: 0 },
     { input: "10", expected: 10 },
-    { input: "0", expected: 0 }
+    { input: "0", expected: 0 },
   ])("convert $input to $expected", ({ input, expected }) => {
     expect(hoursDisplayedToHoursValue(input)).toBe(expected);
   });
@@ -67,4 +71,3 @@ describe("Date utils tests - hoursValueToHoursDisplayed", () => {
     expect(hoursValueToHoursDisplayed(input)).toBe(expected);
   });
 });
-

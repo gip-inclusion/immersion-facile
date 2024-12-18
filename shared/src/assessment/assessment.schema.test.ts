@@ -62,10 +62,8 @@ describe("Assessment schema", () => {
       establishmentAdvices: "my minimum establishment advices",
       establishmentFeedback: "my minimum establishment feedback",
     };
-    expectToEqual(assessmentSchema.parse(assessment), {});
     expect(() => assessmentSchema.parse(assessment)).toThrowError();
   });
-
 });
 const expectDateRangeToFailWithError = (
   dateRange: DateRange,
