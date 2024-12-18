@@ -225,10 +225,8 @@ describe("Broadcasts events to France Travail", () => {
     );
   });
 
-  // TODO: uncomment when France Travail is ready to accept those
-  it.skip("broadcast to pole-emploi when convention is from an agency RefersTo", async () => {
+  it("broadcast to pole-emploi when convention is from an agency RefersTo", async () => {
     // Prepare
-
     const agencyWithRefersTo = toAgencyWithRights(
       new AgencyDtoBuilder(peAgencyWithoutCounsellorsAndValidators)
         .withId("635354435345435")
@@ -363,8 +361,7 @@ describe("Broadcasts events to France Travail", () => {
           });
         });
 
-        // TODO: uncomment when France Travail is ready to accept those
-        it.skip(`broadcast to france travail when convention is from an agency RefersTo (and the refered agency is ${agencyKind})`, async () => {
+        it(`do not broadcast to france travail when convention is from an agency RefersTo (and the refered agency is ${agencyKind})`, async () => {
           uow.featureFlagRepository.featureFlags = featureFlag;
 
           const agencyWithRefersTo = toAgencyWithRights(
@@ -397,12 +394,7 @@ describe("Broadcasts events to France Travail", () => {
           });
 
           // Assert
-          expect(poleEmploiGateWay.notifications).toHaveLength(1);
-          expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
-            id: externalId,
-            originalId: conventionLinkedToAgencyReferingToOther.id,
-            statut: "DEMANDE_VALIDÉE",
-          });
+          expect(poleEmploiGateWay.notifications).toHaveLength(0);
         });
       },
     );
