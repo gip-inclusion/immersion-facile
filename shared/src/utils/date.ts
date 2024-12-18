@@ -27,7 +27,8 @@ export const toDisplayedDate = ({
 }:
   | { date: Date; withHours?: false; showGMT?: false }
   | { date: Date; withHours?: true; showGMT?: boolean }): string =>
-  `${format(date, withHours ? "dd/MM/yyyy 'à' HH'h'mm" : "dd/MM/yyyy")}${showGMT ? " (heure de Paris GMT+1)" : ""
+  `${format(date, withHours ? "dd/MM/yyyy 'à' HH'h'mm" : "dd/MM/yyyy")}${
+    showGMT ? " (heure de Paris GMT+1)" : ""
   }`;
 
 export const isStringDate = (string: string) => isValid(new Date(string));
@@ -42,13 +43,18 @@ export const hoursDisplayedToHoursValue = (hoursDisplayed: string): number => {
     return valueAsNumber;
   }
   const [hours, minutes] = hoursDisplayed.split(hourDisplayedSeparator);
-  return Number(hours) + Math.round((Number(minutes) / 60 + Number.EPSILON) * 100) / 100;
-}
+  return (
+    Number(hours) +
+    Math.round((Number(minutes) / 60 + Number.EPSILON) * 100) / 100
+  );
+};
 
 export const hoursValueToHoursDisplayed = (hoursValue: number): string => {
   const hours = Math.floor(hoursValue);
   const minutes = Math.round((hoursValue - hours) * 60);
   const hoursDisplayed = `${hours < 10 ? `0${hours}` : hours}`;
   if (minutes === 0) return `${hoursDisplayed}${hourDisplayedSeparator}`;
-  return `${hoursDisplayed}${hourDisplayedSeparator}${minutes < 10 ? `0${minutes}` : minutes}`;
-}
+  return `${hoursDisplayed}${hourDisplayedSeparator}${
+    minutes < 10 ? `0${minutes}` : minutes
+  }`;
+};

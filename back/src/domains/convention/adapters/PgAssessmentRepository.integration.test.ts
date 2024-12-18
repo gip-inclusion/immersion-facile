@@ -21,8 +21,10 @@ const convention = new ConventionDtoBuilder().withId(conventionId).build();
 const assessment: AssessmentEntity = {
   _entityName: "Assessment",
   conventionId,
-  status: "FINISHED",
+  status: "COMPLETED",
+  endedWithAJob: false,
   establishmentFeedback: "Ca s'est bien passé",
+  establishmentAdvices: "mon conseil",
 };
 
 describe("PgAssessmentRepository", () => {

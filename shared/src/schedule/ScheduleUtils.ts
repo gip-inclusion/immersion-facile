@@ -107,7 +107,8 @@ export const makeWeeklySchedule = (
         },
         schedule: weekSchedule.map(
           (daySchedule) =>
-            `${frenchDayMapping(daySchedule.date).frenchDayName
+            `${
+              frenchDayMapping(daySchedule.date).frenchDayName
             } : ${prettyPrintDaySchedule(daySchedule.timePeriods)}`,
         ),
       };
@@ -230,8 +231,9 @@ export const validateSchedule = ({
 
   for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
     if (totalHours > IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS)
-      return `${conventionIdPrefix}Veuillez saisir moins de ${IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS}h pour la semaine ${totalHoursIndex + 1
-        }.`;
+      return `${conventionIdPrefix}Veuillez saisir moins de ${IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS}h pour la semaine ${
+        totalHoursIndex + 1
+      }.`;
   }
 
   const totalHoursFromComplexSchedule =
@@ -248,10 +250,11 @@ export const validateSchedule = ({
     for (const [periodIndex, period] of dailySchedule.timePeriods.entries()) {
       // Check if all periods are positive.
       if (!isTimePeriodPositive(period))
-        return `${conventionIdPrefix}La plage horaire ${periodIndex + 1
-          } ${periodToHumanReadableString(period)} du ${toFrenchReadableDate(
-            dailySchedule.date,
-          )} est incorrecte. L'heure de début doit précéder l'heure de fin.`;
+        return `${conventionIdPrefix}La plage horaire ${
+          periodIndex + 1
+        } ${periodToHumanReadableString(period)} du ${toFrenchReadableDate(
+          dailySchedule.date,
+        )} est incorrecte. L'heure de début doit précéder l'heure de fin.`;
 
       // Check for overlap with other periods
       for (const [
@@ -262,11 +265,13 @@ export const validateSchedule = ({
           periodIndex !== otherPeriodIndex &&
           isPeriodsOverlap(period, otherPeriod)
         )
-          return `${conventionIdPrefix}Les plages horaires ${periodIndex + 1
-            } ${periodToHumanReadableString(period)} et ${otherPeriodIndex + 1
-            } ${periodToHumanReadableString(
-              otherPeriod,
-            )} du ${toFrenchReadableDate(dailySchedule.date)} se chevauchent.`;
+          return `${conventionIdPrefix}Les plages horaires ${
+            periodIndex + 1
+          } ${periodToHumanReadableString(period)} et ${
+            otherPeriodIndex + 1
+          } ${periodToHumanReadableString(
+            otherPeriod,
+          )} du ${toFrenchReadableDate(dailySchedule.date)} se chevauchent.`;
       }
     }
   }
@@ -317,7 +322,7 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
         parseISO(dailySchedule.date).getDate() === currentDate.getDate() &&
         parseISO(dailySchedule.date).getMonth() === currentDate.getMonth() &&
         parseISO(dailySchedule.date).getFullYear() ===
-        currentDate.getFullYear(),
+          currentDate.getFullYear(),
     );
     if (date) totalOfMinutes += minutesInDay(date.timePeriods);
   }
@@ -346,32 +351,32 @@ export const makeImmersionTimetable = (
     end: endDay,
   })
     ? arrayFromNumber(differenceInCalendarWeeksBetweenDates).map(
-      (_, weekIndex) =>
-        arrayFromNumber(weekdays.length).map((dayIndex) => {
-          const mondayOfFirstWeek = subDays(
-            startDay,
-            frenchDayMapping(startDay.toISOString()).frenchDay,
-          );
-          const date = addHours(
-            mondayOfFirstWeek,
-            (dayIndex + weekIndex * weekdays.length) * 24,
-          );
-          const dailySchedule = complexSchedule.find((dailyScheduleItem) => {
-            const schedule = convertLocaleDateToUtcTimezoneDate(
-              parseISO(dailyScheduleItem.date),
+        (_, weekIndex) =>
+          arrayFromNumber(weekdays.length).map((dayIndex) => {
+            const mondayOfFirstWeek = subDays(
+              startDay,
+              frenchDayMapping(startDay.toISOString()).frenchDay,
             );
-            return (
-              schedule.getDate() === date.getDate() &&
-              schedule.getMonth() === date.getMonth() &&
-              schedule.getFullYear() === date.getFullYear()
+            const date = addHours(
+              mondayOfFirstWeek,
+              (dayIndex + weekIndex * weekdays.length) * 24,
             );
-          });
-          return {
-            timePeriods: dailySchedule?.timePeriods ?? null,
-            date: date.toISOString(),
-          } satisfies DailyImmersionTimetableDto;
-        }),
-    )
+            const dailySchedule = complexSchedule.find((dailyScheduleItem) => {
+              const schedule = convertLocaleDateToUtcTimezoneDate(
+                parseISO(dailyScheduleItem.date),
+              );
+              return (
+                schedule.getDate() === date.getDate() &&
+                schedule.getMonth() === date.getMonth() &&
+                schedule.getFullYear() === date.getFullYear()
+              );
+            });
+            return {
+              timePeriods: dailySchedule?.timePeriods ?? null,
+              date: date.toISOString(),
+            } satisfies DailyImmersionTimetableDto;
+          }),
+      )
     : [];
 };
 
@@ -505,19 +510,19 @@ const makeWeeklyPrettyPrint = (
   displayFreeDays: boolean,
   interval: DateIntervalDto,
 ): string | readonly string[] => [
-    `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
-    ...week
-      .filter(({ timePeriods, date }) => {
-        const shouldRemoveDay = !timePeriods && !displayFreeDays;
-        return isWithinInterval(new Date(date), interval) && !shouldRemoveDay;
-      })
-      .map(
-        ({ date, timePeriods }) =>
-          `${frenchDayMapping(date).frenchDayName} : ${prettyPrintDaySchedule(
-            timePeriods,
-          )}`,
-      ),
-  ];
+  `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
+  ...week
+    .filter(({ timePeriods, date }) => {
+      const shouldRemoveDay = !timePeriods && !displayFreeDays;
+      return isWithinInterval(new Date(date), interval) && !shouldRemoveDay;
+    })
+    .map(
+      ({ date, timePeriods }) =>
+        `${frenchDayMapping(date).frenchDayName} : ${prettyPrintDaySchedule(
+          timePeriods,
+        )}`,
+    ),
+];
 
 const removeEmptyDays = (
   weekIndex: number,
