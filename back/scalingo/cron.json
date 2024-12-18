@@ -53,6 +53,10 @@
       "size": "M"
     },
     {
+      "command": "15 23 * * * pnpm back run trigger-deactivate-unresponsive-establishments",
+      "size": "M"
+    },
+    {
       "command": "41 22 1 * * pnpm back run trigger-update-rome-data",
       "size": "M"
     },
