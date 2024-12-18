@@ -29,7 +29,6 @@ import {
   ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
-import { useStyles } from "tss-react/dsfr";
 import { SignatureActions } from "./SignatureActions";
 
 type ConventionSignFormProperties = {
@@ -43,7 +42,6 @@ export const ConventionSignForm = ({
   submitFeedback,
   convention,
 }: ConventionSignFormProperties): JSX.Element => {
-  const { cx } = useStyles();
   const dispatch = useDispatch();
   const { signatory: currentSignatory } = useAppSelector(
     conventionSelectors.signatoryData,
@@ -112,7 +110,7 @@ export const ConventionSignForm = ({
           submittedAt={toDisplayedDate({
             date: new Date(convention.dateSubmission),
           })}
-          summary={makeConventionSections(convention, cx)}
+          summary={makeConventionSections(convention)}
           conventionId={convention.id}
         />
       </>
@@ -135,7 +133,7 @@ export const ConventionSignForm = ({
             submittedAt={toDisplayedDate({
               date: new Date(convention.dateSubmission),
             })}
-            summary={makeConventionSections(convention, cx)}
+            summary={makeConventionSections(convention)}
             conventionId={convention.id}
           />
         )}

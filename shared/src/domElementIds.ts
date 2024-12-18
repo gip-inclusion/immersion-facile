@@ -14,9 +14,9 @@ type FrontRouteParametrizedValue = (
 
 type FrontRoutePossibleValues =
   | Record<
-    string,
-    string | FrontRouteParametrizedValue | Record<string, string>
-  >
+      string,
+      string | FrontRouteParametrizedValue | Record<string, string>
+    >
   | string
   | FrontRouteParametrizedValue;
 

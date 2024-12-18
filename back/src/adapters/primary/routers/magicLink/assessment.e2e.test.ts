@@ -59,8 +59,10 @@ describe("Assessment routes", () => {
 
       const assessment: AssessmentDto = {
         conventionId,
-        status: "ABANDONED",
+        status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
+        endedWithAJob: false,
+        establishmentAdvices: "mon conseil",
       };
 
       const response = await httpClient.createAssessment({
@@ -86,8 +88,10 @@ describe("Assessment routes", () => {
     it("fails with 401 if jwt is not valid", async () => {
       const assessment: AssessmentDto = {
         conventionId,
-        status: "ABANDONED",
+        status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
+        endedWithAJob: false,
+        establishmentAdvices: "mon conseil",
       };
 
       const response = await httpClient.createAssessment({
@@ -104,8 +108,10 @@ describe("Assessment routes", () => {
     it("fails with 400 if some data is not valid", async () => {
       const assessment: AssessmentDto = {
         conventionId,
-        status: "ABANDONED",
+        status: "COMPLETED",
         establishmentFeedback: "",
+        endedWithAJob: false,
+        establishmentAdvices: "mon conseil",
       };
 
       const response = await httpClient.createAssessment({
@@ -127,8 +133,10 @@ describe("Assessment routes", () => {
     it("fails with 403 if convention id does not matches the one in token", async () => {
       const assessment: AssessmentDto = {
         conventionId: "another-convention-id",
-        status: "ABANDONED",
+        status: "COMPLETED",
         establishmentFeedback: "mon feedback",
+        endedWithAJob: false,
+        establishmentAdvices: "mon conseil",
       };
 
       const response = await httpClient.createAssessment({

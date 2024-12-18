@@ -33,9 +33,11 @@ const convention = new ConventionDtoBuilder()
   .build();
 
 const assessment: AssessmentDto = {
+  endedWithAJob: false,
   conventionId: convention.id,
-  status: "FINISHED",
+  status: "COMPLETED",
   establishmentFeedback: "osef",
+  establishmentAdvices: "osef",
 };
 
 describe("NotifyAgencyThatAssessmentIsCreated", () => {
