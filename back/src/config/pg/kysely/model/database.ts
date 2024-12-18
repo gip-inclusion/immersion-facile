@@ -633,6 +633,12 @@ interface EstablishmentsDeleted {
 interface ImmersionAssessments {
   convention_id: string;
   status: string;
+  last_day_of_presence: Timestamp | null;
+  number_of_missed_hours: number | null;
+  ended_wit_a_job: boolean;
+  type_of_contract: string | null;
+  contract_start_date: Timestamp | null;
+  establishment_advices: string;
   establishment_feedback: string;
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;
