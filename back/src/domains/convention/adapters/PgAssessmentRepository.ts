@@ -26,8 +26,8 @@ export class PgAssessmentRepository implements AssessmentRepository {
             numberOfMissedHours: result.number_of_missed_hours,
           }
         : {}),
-      endedWithAJob: result.ended_wit_a_job,
-      ...(result.ended_wit_a_job
+      endedWithAJob: result.ended_with_a_job,
+      ...(result.ended_with_a_job
         ? {
             typeOfContract: result.type_of_contract,
             contractStartDate: result.contract_start_date,
@@ -57,7 +57,7 @@ export class PgAssessmentRepository implements AssessmentRepository {
           assessmentEntity.status === "PARTIALLY_COMPLETED"
             ? assessmentEntity.numberOfMissedHours
             : null,
-        ended_wit_a_job: assessmentEntity.endedWithAJob,
+        ended_with_a_job: assessmentEntity.endedWithAJob,
         type_of_contract: assessmentEntity.endedWithAJob
           ? assessmentEntity.typeOfContract
           : null,
