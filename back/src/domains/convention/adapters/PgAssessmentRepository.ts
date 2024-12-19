@@ -22,7 +22,7 @@ export class PgAssessmentRepository implements AssessmentRepository {
       status: result.status,
       ...(result.status === "PARTIALLY_COMPLETED"
         ? {
-            lastDayOfPresence: result.last_day_of_presence,
+            lastDayOfPresence: result.last_day_of_presence?.toISOString(),
             numberOfMissedHours: result.number_of_missed_hours,
           }
         : {}),
@@ -30,7 +30,7 @@ export class PgAssessmentRepository implements AssessmentRepository {
       ...(result.ended_with_a_job
         ? {
             typeOfContract: result.type_of_contract,
-            contractStartDate: result.contract_start_date,
+            contractStartDate: result.contract_start_date?.toISOString(),
           }
         : {}),
       establishmentFeedback: result.establishment_feedback,
