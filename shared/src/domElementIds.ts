@@ -576,6 +576,8 @@ export const domElementIds = {
       editAgencyRemoveUserModal: "im-form-edit-agency__remove-user-modal",
       editAgencyUserRoleButton: "im-form-edit-agency__users-table-edit-button",
       editAgencyRemoveUserButton: "im-form-edit-agency__remove-user-button",
+      editAgencyRemoveUserConfirmationButton:
+        "im-form-edit-agency__remove-user-confirmation-button",
       editAgencyUserRoleSubmitButton:
         "im-form-edit-agency__users-submit-button",
       editAgencyManageUserCheckbox: "im-form-edit-agency__manage-user-checkbox",
@@ -628,6 +630,12 @@ export const domElementIds = {
     },
   },
   profile: {
+    firstName: "im-profile__first-name",
+    lastName: "im-profile__last-name",
+    email: "im-profile__email",
+    editRoleButton: "im-profile__edit-role-button",
+    adminAgencyLink: "im-profile__admin-agency-link",
+    updateOwnInfosLink: "im-profile__update-own-infos-link",
     editAgencyUserEmail: "im-profile-edit-agency-user__email",
     editAgencyManageUserCheckbox:
       "im-profile-form-edit-agency__manage-user-checkbox",

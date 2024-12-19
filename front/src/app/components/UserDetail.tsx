@@ -49,11 +49,17 @@ export const UserDetail = ({
 
       <ul className={fr.cx("fr-text--sm", "fr-mb-2w")}>
         <li>Id de l'utilisateur: {userWithRights.id}</li>
-        <li>Email : {userWithRights.email}</li>
+        <li id={domElementIds.profile.email}>Email : {userWithRights.email}</li>
         {userWithRights.firstName && (
-          <li>Prénom : {userWithRights.firstName}</li>
+          <li id={domElementIds.profile.firstName}>
+            Prénom : {userWithRights.firstName}
+          </li>
         )}
-        {userWithRights.lastName && <li>Nom : {userWithRights.lastName}</li>}
+        {userWithRights.lastName && (
+          <li id={domElementIds.profile.lastName}>
+            Nom : {userWithRights.lastName}
+          </li>
+        )}
       </ul>
 
       {editInformationsLink && (
@@ -64,6 +70,7 @@ export const UserDetail = ({
             href: editInformationsLink,
             target: "_blank",
           }}
+          id={domElementIds.profile.updateOwnInfosLink}
         >
           Modifier mes informations
         </Button>
@@ -107,6 +114,7 @@ const AgenciesTable = ({
     const editRolesButton = (
       <Button
         size="small"
+        id={`${domElementIds.profile.editRoleButton}-${agencyRight.agency.id}`}
         onClick={() => {
           onUpdateClicked(agencyRight);
         }}
@@ -117,6 +125,7 @@ const AgenciesTable = ({
     const viewAgencyButton = (
       <Button
         priority="tertiary no outline"
+        id={`${domElementIds.profile.adminAgencyLink}-${agencyRight.agency.id}`}
         size="small"
         linkProps={
           routes.adminAgencyDetail({
@@ -155,7 +164,7 @@ const AgenciesTable = ({
           "Actions",
         ]}
         data={agencyRights.map((agencyRight) => [
-          <>
+          <div key={agencyRight.agency.id}>
             {agencyRight.agency.name}
             <span className={fr.cx("fr-hint-text")}>
               {addressDtoToString(agencyRight.agency.address)}
@@ -176,7 +185,7 @@ const AgenciesTable = ({
                 Voir l'agence
               </a>
             )}
-          </>,
+          </div>,
           <ul className={fr.cx("fr-raw-list")}>
             <li>
               <AgencyTag
