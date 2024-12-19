@@ -84,7 +84,7 @@ describe("PgAssessmentRepository", () => {
           status: assessment.status,
           last_day_of_presence: null,
           number_of_missed_hours: null,
-          ended_wit_a_job: false,
+          ended_with_a_job: false,
           type_of_contract: null,
           contract_start_date: null,
           establishment_feedback: assessment.establishmentFeedback,
