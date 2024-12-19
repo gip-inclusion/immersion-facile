@@ -1,31 +1,38 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { AssessmentDto } from "shared";
+import {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithFeedbackTopicError,
+} from "src/core-logic/domain/feedback/feedback.slice";
 import { AssessmentAndJwt } from "src/core-logic/ports/AssessmentGateway";
 
-export type AssessmentUIStatus = "Idle" | "Loading" | "Success";
-
 export interface AssessmentState {
-  status: AssessmentUIStatus;
-  error: string | null;
+  isLoading: boolean;
+  currentAssessment: AssessmentDto | null;
 }
 
 const initialState: AssessmentState = {
-  status: "Idle",
-  error: null,
+  isLoading: false,
+  currentAssessment: null,
 };
 
 export const assessmentSlice = createSlice({
   name: "assessment",
   initialState,
   reducers: {
-    creationRequested: (state, _action: PayloadAction<AssessmentAndJwt>) => {
-      state.status = "Loading";
+    creationRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        assessmentAndJwt: AssessmentAndJwt;
+      }>,
+    ) => {
+      state.isLoading = true;
     },
-    creationSucceeded: (state) => {
-      state.status = "Success";
+    creationSucceeded: (state, _action: PayloadActionWithFeedbackTopic) => {
+      state.isLoading = false;
     },
-    creationFailed: (state, action: PayloadAction<string>) => {
-      state.status = "Idle";
-      state.error = action.payload;
+    creationFailed: (state, _action: PayloadActionWithFeedbackTopicError) => {
+      state.isLoading = false;
     },
   },
 });

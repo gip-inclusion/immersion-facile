@@ -1,0 +1,21 @@
+@import "../../../config/responsive";
+
+.im-convention-job-and-objective {
+  background-color: var(--background-alt-blue-france);
+  &__list {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    flex-direction: column;
+    @include for-screen-min($bp-lg) {
+      flex-direction: row;
+    }
+  }
+  &__item {
+    display: flex;
+    gap: 1rem;
+  }
+  &__illustration {
+    max-width: 4rem;
+  }
+}

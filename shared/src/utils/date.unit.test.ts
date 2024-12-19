@@ -55,6 +55,7 @@ describe("Date utils tests - hoursDisplayedToHoursValue", () => {
     { input: "h", expected: 0 },
     { input: "10", expected: 10 },
     { input: "0", expected: 0 },
+    { input: "10h3", expected: 10.5 },
   ])("convert $input to $expected", ({ input, expected }) => {
     expect(hoursDisplayedToHoursValue(input)).toBe(expected);
   });

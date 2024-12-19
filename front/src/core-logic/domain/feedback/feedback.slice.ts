@@ -12,6 +12,7 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 
+import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -38,6 +39,7 @@ const topics = [
   "form-establishment",
   "siret-input",
   "agency-for-dashboard",
+  "assessment",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -364,6 +366,18 @@ export const feedbackMapping: Record<
     },
   },
   "siret-input": {},
+  assessment: {
+    "create.success": {
+      action: assessmentSlice.actions.creationSucceeded,
+      title: "Bilan envoyé",
+      message: "Le bilan a bien été envoyé",
+    },
+    "create.error": {
+      action: assessmentSlice.actions.creationFailed,
+      title: "Problème lors de l'envoi du bilan",
+      message: "Une erreur est survenue lors de l'envoi du bilan",
+    },
+  },
 };
 
 export const feedbackSlice = createSlice({

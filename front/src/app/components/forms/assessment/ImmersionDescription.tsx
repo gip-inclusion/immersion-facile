@@ -16,7 +16,7 @@ export const ImmersionDescription = ({
         ? "L'immersion"
         : "Le mini-stage"}{" "}
       de <strong>{beneficiaryName}</strong> chez{" "}
-      <strong>{convention.businessName}</strong> ,qui a eu lieu du{" "}
+      <strong>{convention.businessName}</strong>, qui a eu lieu du{" "}
       <strong>{dateStart}</strong> au <strong>{dateEnd}</strong>, touche à sa
       fin. Afin de procéder au bilan, nous vous invitons à compléter ce
       formulaire (moins de 3 minutes). Vos réponses seront partagées avec Jean

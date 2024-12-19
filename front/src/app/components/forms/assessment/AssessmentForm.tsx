@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
@@ -7,7 +8,11 @@ import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
 import React, { useState } from "react";
-import { ConventionTotalHours } from "react-design-system";
+import {
+  ConventionJobAndObjective,
+  ConventionTotalHours,
+  Loader,
+} from "react-design-system";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import {
   AssessmentDto,
@@ -18,16 +23,20 @@ import {
   InternshipKind,
   assessmentSchema,
   assessmentStatuses,
+  convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   hoursDisplayedToHoursValue,
   hoursValueToHoursDisplayed,
+  toDisplayedDate,
   typeOfContracts,
 } from "shared";
+import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ImmersionDescription } from "src/app/components/forms/assessment/ImmersionDescription";
 import { printWeekSchedule } from "src/app/contents/convention/conventionSummary.helpers";
 import { useAssessment } from "src/app/hooks/assessment.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
+import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { match } from "ts-pattern";
 
@@ -63,8 +72,7 @@ export const AssessmentForm = ({
   jwt,
 }: AssessmentFormProperties): JSX.Element => {
   const [currentStep, setCurrentStep] = useState<Step>(1);
-  const { createAssessment } = useAssessment(jwt);
-  const [formIsSubmitted, setFormIsSubmitted] = useState(false);
+  const { createAssessment, isLoading } = useAssessment(jwt);
   const initialValues: AssessmentDto = {
     conventionId: convention.id,
     status: "COMPLETED",
@@ -81,7 +89,6 @@ export const AssessmentForm = ({
 
   const onSubmit = (values: AssessmentDto) => {
     createAssessment(values);
-    setFormIsSubmitted(true);
   };
   const onStepChange: OnStepChange = async (step, fieldsToValidate) => {
     if (step && currentStep && step < currentStep) {
@@ -98,46 +105,61 @@ export const AssessmentForm = ({
     }
   };
   useScrollToTop(currentStep);
-  return match(formIsSubmitted)
-    .with(true, () => <div>Form submitted</div>)
-    .otherwise(() => (
-      <>
-        <ImmersionDescription convention={convention} />
-        <FormProvider {...methods}>
-          <div className={fr.cx("fr-grid-row")}>
-            <div className={fr.cx("fr-col-lg-7")}>
-              <Stepper
-                currentStep={currentStep}
-                stepCount={keys(steps).length}
-                title={steps[currentStep].title}
-                nextTitle={steps[currentStep].nextTitle}
-              />
-            </div>
-          </div>
-
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            id={domElementIds.assessment.form}
-            data-matomo-name={domElementIds.assessment.form}
-          >
-            {match(currentStep)
-              .with(1, () => (
-                <AssessmentStatusSection
-                  convention={convention}
-                  onStepChange={onStepChange}
+  return (
+    <>
+      {isLoading && <Loader />}
+      <WithFeedbackReplacer
+        topic="assessment"
+        renderFeedback={() => (
+          <AssessmentSuccessMessage
+            firstName={convention.signatories.beneficiary.firstName}
+            lastName={convention.signatories.beneficiary.lastName}
+          />
+        )}
+      >
+        <>
+          <ImmersionDescription convention={convention} />
+          <FormProvider {...methods}>
+            <div className={fr.cx("fr-grid-row")}>
+              <div className={fr.cx("fr-col-lg-7", "fr-col-12")}>
+                <Stepper
+                  currentStep={currentStep}
+                  stepCount={keys(steps).length}
+                  title={steps[currentStep].title}
+                  nextTitle={steps[currentStep].nextTitle}
                 />
-              ))
-              .with(2, () => (
-                <AssessmentContractSection onStepChange={onStepChange} />
-              ))
-              .with(3, () => (
-                <AssessmentCommentsSection onStepChange={onStepChange} />
-              ))
-              .exhaustive()}
-          </form>
-        </FormProvider>
-      </>
-    ));
+              </div>
+            </div>
+
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              id={domElementIds.assessment.form}
+              data-matomo-name={domElementIds.assessment.form}
+            >
+              {match(currentStep)
+                .with(1, () => (
+                  <AssessmentStatusSection
+                    convention={convention}
+                    onStepChange={onStepChange}
+                  />
+                ))
+                .with(2, () => (
+                  <AssessmentContractSection onStepChange={onStepChange} />
+                ))
+                .with(3, () => (
+                  <AssessmentCommentsSection
+                    onStepChange={onStepChange}
+                    jobTitle={convention.immersionAppellation.appellationLabel}
+                    objective={convention.immersionObjective}
+                  />
+                ))
+                .exhaustive()}
+            </form>
+          </FormProvider>
+        </>
+      </WithFeedbackReplacer>
+    </>
+  );
 };
 
 const wordingByIntershipKind: Record<
@@ -179,9 +201,9 @@ const AssessmentStatusSection = ({
   const formValues = watch();
   const [numberOfMissedHoursDisplayed, setNumberOfMissedHoursDisplayed] =
     useState("");
-
-  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let input = e.target.value;
+  const assessmentStatus = watch("status");
+  const handleHoursChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let input = event.target.value;
     input = input.replace(/[^0-9h]/g, "");
     if (/^\d{2}$/.test(input)) {
       input = `${input}h`;
@@ -191,7 +213,11 @@ const AssessmentStatusSection = ({
     }
     setNumberOfMissedHoursDisplayed(input);
   };
-  const totalHours = computeTotalHours(convention, formValues);
+  const totalHours = computeTotalHours(
+    convention,
+    hoursDisplayedToHoursValue(numberOfMissedHoursDisplayed),
+    assessmentStatus,
+  );
   return (
     <>
       <div className={fr.cx("fr-grid-row")}>
@@ -220,15 +246,22 @@ const AssessmentStatusSection = ({
             <>
               <Input
                 label="Dernier jour de presence"
-                hintText="Date indiquée dans la convention : TODO"
+                hintText={`Date indiquée dans la convention : ${toDisplayedDate(
+                  {
+                    date: convertLocaleDateToUtcTimezoneDate(
+                      new Date(convention.dateEnd),
+                    ),
+                  },
+                )}`}
                 nativeInputProps={{
                   type: "date",
                   ...register("lastDayOfPresence"),
+                  defaultValue: convention.dateEnd,
                 }}
                 {...getFieldError("lastDayOfPresence")}
               />
               <Input
-                label="L'immersion représente actuellement TODO heures, pouvez vous indiquer le nombre d'heure manquées ?"
+                label={`L'immersion représente actuellement ${convention.schedule.totalHours} heures, pouvez vous indiquer le nombre d'heure manquées ?`}
                 hintText={`Nombre total d'heures indiquées dans la convention : ${hoursValueToHoursDisplayed(
                   convention.schedule.totalHours,
                 )}`}
@@ -246,7 +279,6 @@ const AssessmentStatusSection = ({
               />
             </>
           )}
-
           <ConventionTotalHours
             totalHours={totalHours}
             illustration={<img src={commonIllustrations.warning} alt="" />}
@@ -288,30 +320,17 @@ const AssessmentStatusSection = ({
 
 const computeTotalHours = (
   convention: ConventionDto,
-  formValues: AssessmentDto,
+  missedHours: number,
+  assessmentStatus: AssessmentStatus,
 ) =>
-  match(formValues)
-    .with(
-      {
-        status: "COMPLETED",
-      },
-      () => hoursValueToHoursDisplayed(convention.schedule.totalHours),
+  match(assessmentStatus)
+    .with("COMPLETED", () =>
+      hoursValueToHoursDisplayed(convention.schedule.totalHours),
     )
-    .with(
-      {
-        status: "PARTIALLY_COMPLETED",
-      },
-      ({ numberOfMissedHours }) =>
-        hoursValueToHoursDisplayed(
-          convention.schedule.totalHours - numberOfMissedHours,
-        ),
+    .with("PARTIALLY_COMPLETED", () =>
+      hoursValueToHoursDisplayed(convention.schedule.totalHours - missedHours),
     )
-    .with(
-      {
-        status: "DID_NOT_SHOW",
-      },
-      () => hoursValueToHoursDisplayed(0),
-    )
+    .with("DID_NOT_SHOW", () => hoursValueToHoursDisplayed(0))
     .exhaustive();
 
 const AssessmentContractSection = ({
@@ -404,45 +423,102 @@ const AssessmentContractSection = ({
 
 const AssessmentCommentsSection = ({
   onStepChange,
+  jobTitle,
+  objective,
 }: {
   onStepChange: OnStepChange;
+  jobTitle: string;
+  objective: string;
 }) => {
   const { register, formState } = useFormContext<AssessmentDto>();
   const getFieldError = makeFieldError(formState);
   return (
-    <>
-      <Input
-        textArea
-        label="Avez-vous une appréciation générale à donner sur l'immersion ?"
-        nativeTextAreaProps={{
-          ...register("establishmentAdvices"),
-        }}
-        {...getFieldError("establishmentAdvices")}
-      />
-      <Input
-        textArea
-        label="Sur la base de l'objectif de l'immersion et du métier observé, quels conseils donneriez-vous au candidat pour la suite de son parcours professionnel ?"
-        nativeTextAreaProps={{
-          ...register("establishmentFeedback"),
-        }}
-        {...getFieldError("establishmentFeedback")}
-      />
-      <ButtonsGroup
-        inlineLayoutWhen="always"
-        buttons={[
-          {
-            children: "Revenir à l'étape précédente",
-            type: "button",
-            onClick: () => onStepChange(2, []),
-            priority: "secondary",
-          },
-          {
-            children: "Envoyer le bilan",
-            type: "submit",
-            priority: "primary",
-          },
-        ]}
-      />
-    </>
+    <div className={fr.cx("fr-grid-row")}>
+      <div className={fr.cx("fr-col-lg-8")}>
+        <ConventionJobAndObjective
+          jobIllustration={<img src={commonIllustrations.job} alt="" />}
+          objectiveIllustration={
+            <img src={commonIllustrations.objective} alt="" />
+          }
+          jobTitle={jobTitle}
+          objective={objective}
+        />
+        <Input
+          textArea
+          label="Avez-vous une appréciation générale à donner sur l'immersion ?"
+          nativeTextAreaProps={{
+            ...register("establishmentAdvices"),
+          }}
+          {...getFieldError("establishmentAdvices")}
+        />
+        <Input
+          textArea
+          label="Sur la base de l'objectif de l'immersion et du métier observé, quels conseils donneriez-vous au candidat pour la suite de son parcours professionnel ?"
+          nativeTextAreaProps={{
+            ...register("establishmentFeedback"),
+          }}
+          {...getFieldError("establishmentFeedback")}
+        />
+        <ButtonsGroup
+          inlineLayoutWhen="always"
+          buttons={[
+            {
+              children: "Revenir à l'étape précédente",
+              type: "button",
+              onClick: () => onStepChange(2, []),
+              priority: "secondary",
+            },
+            {
+              children: "Envoyer le bilan",
+              type: "submit",
+              priority: "primary",
+            },
+          ]}
+        />
+      </div>
+    </div>
   );
 };
+
+const AssessmentSuccessMessage = ({
+  firstName,
+  lastName,
+}: {
+  firstName: string;
+  lastName: string;
+}) => (
+  <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
+    <div className={fr.cx("fr-col-lg-8")}>
+      <h2>Merci d'avoir rempli le bilan !</h2>
+      <p>
+        Nous vous remercions d`avoir utilisé Immersion Facilitée pour
+        accompagner {firstName} {lastName} dans son immersion. Votre implication
+        contribue à améliorer notre site et à enrichir le dossier du candidat.
+      </p>
+      <h3>Que faire ensuite ?</h3>
+      <p>
+        Maintenez à jour votre fiche entreprise afin de continuer à recevoir des
+        immersions.
+      </p>
+      <p>À bientôt sur Immersion Facilitée !</p>
+      <Button
+        priority="primary"
+        onClick={() => {
+          routes.establishmentDashboard().push();
+        }}
+      >
+        Accéder à ma fiche entreprise
+      </Button>
+    </div>
+    <div
+      className={fr.cx(
+        "fr-col-lg-3",
+        "fr-col-offset-lg-1",
+        "fr-hidden",
+        "fr-unhidden-lg",
+      )}
+    >
+      <img src={commonIllustrations.success} alt="" />
+    </div>
+  </div>
+);
