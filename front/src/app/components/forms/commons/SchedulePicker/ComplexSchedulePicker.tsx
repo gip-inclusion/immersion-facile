@@ -10,6 +10,7 @@ import {
   TimePeriodsDto,
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
+  convertLocaleDateToUtcTimezoneDate,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 import { DayPicker } from "./DayPicker";
@@ -40,8 +41,10 @@ export const ComplexSchedulePicker = ({
           complexSchedule={values.schedule.complexSchedule}
           selectedDate={selectedDate}
           interval={{
-            start: new Date(values.dateStart),
-            end: new Date(values.dateEnd),
+            start: convertLocaleDateToUtcTimezoneDate(
+              new Date(values.dateStart),
+            ),
+            end: convertLocaleDateToUtcTimezoneDate(new Date(values.dateEnd)),
           }}
           onChange={(lastSelectedDate) => {
             const updatedSchedule = clone(values.schedule);
@@ -69,7 +72,12 @@ export const ComplexSchedulePicker = ({
                 values.schedule.complexSchedule.find(
                   (dailySchedule) =>
                     selectedDate &&
-                    isSameDay(selectedDate, new Date(dailySchedule.date)),
+                    isSameDay(
+                      selectedDate,
+                      convertLocaleDateToUtcTimezoneDate(
+                        new Date(dailySchedule.date),
+                      ),
+                    ),
                 )?.timePeriods ?? []
               }
               onValueChange={(newTimePeriods) => {
@@ -105,7 +113,11 @@ const makeUpdatedScheduleWithTimePeriodForSelectedDate = (
   newTimePeriods: TimePeriodsDto,
 ): ScheduleDto => {
   const newComplexSchedule = schedule.complexSchedule.map((dailySchedule) =>
-    selectedDate && isSameDay(selectedDate, new Date(dailySchedule.date))
+    selectedDate &&
+    isSameDay(
+      selectedDate,
+      convertLocaleDateToUtcTimezoneDate(new Date(dailySchedule.date)),
+    )
       ? {
           ...dailySchedule,
           timePeriods: newTimePeriods,
