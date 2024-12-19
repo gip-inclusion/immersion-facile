@@ -14,6 +14,7 @@ import {
   calculateWeeklyHoursFromSchedule,
   regularTimePeriods,
   selectedDaysFromComplexSchedule,
+  convertLocaleDateToUtcTimezoneDate,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 import { HourPicker } from "./HourPicker";
@@ -40,6 +41,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const selectedHours = regularTimePeriods(
     values.schedule.complexSchedule[0]?.timePeriods,
   );
+  console.log({ complexeSchedule: values.schedule.complexSchedule });
 
   return (
     <>
@@ -122,8 +124,10 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
           <WeeksHoursIndicator
             schedule={values.schedule}
             interval={{
-              start: new Date(values.dateStart),
-              end: new Date(values.dateEnd),
+              start: convertLocaleDateToUtcTimezoneDate(
+                new Date(values.dateStart),
+              ),
+              end: convertLocaleDateToUtcTimezoneDate(new Date(values.dateEnd)),
             }}
           />
         </div>

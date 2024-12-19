@@ -11,6 +11,7 @@ import {
   frenchDayMapping,
   maximumCalendarDayByInternshipKind,
   removeAtIndex,
+  convertLocaleDateToUtcTimezoneDate,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 import { DayCircle } from "./DayCircle";
@@ -34,6 +35,7 @@ export const WeekdayPicker = ({
 }: WeekdayPickerProps) => {
   const { cx } = useStyles();
   const onDayClick = (day: WeekdayNumber) => {
+    console.log({ selectedDays, day });
     const newDaysSelected = selectedDays.includes(day)
       ? removeAtIndex(selectedDays, selectedDays.indexOf(day))
       : [...selectedDays, day];
@@ -49,8 +51,12 @@ export const WeekdayPicker = ({
     const uniqueWeekDaysOnInterval = uniq(
       arrayFromNumber(startEndDiff + 1).map(
         (dayIndex) =>
-          frenchDayMapping(addDays(new Date(start), dayIndex).toISOString())
-            .frenchDay,
+          frenchDayMapping(
+            addDays(
+              convertLocaleDateToUtcTimezoneDate(new Date(start)),
+              dayIndex,
+            ).toISOString(),
+          ).frenchDay,
       ),
     );
     return !uniqueWeekDaysOnInterval.includes(day);
