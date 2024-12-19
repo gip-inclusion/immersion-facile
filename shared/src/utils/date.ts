@@ -43,7 +43,10 @@ export const hoursDisplayedToHoursValue = (hoursDisplayed: string): number => {
     if (Number.isNaN(valueAsNumber)) return 0;
     return valueAsNumber;
   }
-  const [hours, minutes] = hoursDisplayed.split(hourDisplayedSeparator);
+  let [hours, minutes] = hoursDisplayed.split(hourDisplayedSeparator);
+  if (minutes.length === 1) {
+    minutes = `${minutes}0`;
+  }
   return (
     Number(hours) +
     Math.round((Number(minutes) / 60 + Number.EPSILON) * 100) / 100

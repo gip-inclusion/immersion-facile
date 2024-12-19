@@ -15,10 +15,20 @@ const createAssessmentEpic: AppEpic<AssessmentAction> = (
 ) =>
   action$.pipe(
     filter(assessmentSlice.actions.creationRequested.match),
-    switchMap((action) => assessmentGateway.createAssessment$(action.payload)),
-    map((_result) => assessmentSlice.actions.creationSucceeded()),
-    catchEpicError((error) =>
-      assessmentSlice.actions.creationFailed(error.message),
+    switchMap((action) =>
+      assessmentGateway.createAssessment$(action.payload.assessmentAndJwt).pipe(
+        map((_result) =>
+          assessmentSlice.actions.creationSucceeded({
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          assessmentSlice.actions.creationFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
     ),
   );
 
