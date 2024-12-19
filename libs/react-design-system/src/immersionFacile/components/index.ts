@@ -5,6 +5,7 @@ export * from "./convention-form-sidebar";
 export * from "./convention-summary";
 export * from "./convention-weekly-schedule";
 export * from "./convention-renewed-informations";
+export * from "./convention-job-and-objective";
 export * from "./convention-total-hours";
 export * from "./copy-button";
 export * from "./crisp-chat";

@@ -77,6 +77,10 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
       },
     },
   },
+  assessment: {
+    label: "Bilan d'immersion",
+    route: routes.assessment({ jwt: "" }),
+  },
 };
 
 export const getBreadcrumbs = makeBreadcrumbsSegments<typeof breadcrumbs>(

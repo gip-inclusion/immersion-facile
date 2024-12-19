@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
@@ -6,6 +7,7 @@ import {
   Role,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
+import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AssessmentForm } from "src/app/components/forms/assessment/AssessmentForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConvention } from "src/app/hooks/convention.hooks";
@@ -67,6 +69,8 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
               layout="default"
               pageHeader={
                 <PageHeader
+                  breadcrumbs={<Breadcrumbs />}
+                  className={fr.cx("fr-mb-0")}
                   title={
                     convention.internshipKind === "immersion"
                       ? `Bilan de l'immersion de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`

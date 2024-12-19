@@ -16,7 +16,10 @@ export const ConventionTotalHours = ({
       <div className={cx(fr.cx("fr-mr-1w"), Styles.illustrationWrapper)}>
         {illustration}
       </div>
-      <span>Le candidat a fait au total {totalHours} d'immersion.</span>
+      <span>
+        Le candidat a fait un total de <strong>{totalHours} d'immersion</strong>
+        .
+      </span>
     </div>
   );
 };
