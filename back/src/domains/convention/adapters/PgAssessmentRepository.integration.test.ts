@@ -2,7 +2,6 @@ import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -18,11 +17,24 @@ const conventionId = "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa";
 
 const convention = new ConventionDtoBuilder().withId(conventionId).build();
 
-const assessment: AssessmentEntity = {
+const minimalAssessment: AssessmentEntity = {
   _entityName: "Assessment",
   conventionId,
   status: "COMPLETED",
   endedWithAJob: false,
+  establishmentFeedback: "Ca s'est bien passé",
+  establishmentAdvices: "mon conseil",
+};
+
+const fullAssessment: AssessmentEntity = {
+  _entityName: "Assessment",
+  conventionId,
+  status: "PARTIALLY_COMPLETED",
+  lastDayOfPresence: new Date("2024-01-01").toISOString(),
+  numberOfMissedHours: 10,
+  endedWithAJob: true,
+  typeOfContract: "CDI",
+  contractStartDate: new Date("2024-01-10").toISOString(),
   establishmentFeedback: "Ca s'est bien passé",
   establishmentAdvices: "mon conseil",
 };
@@ -60,7 +72,7 @@ describe("PgAssessmentRepository", () => {
     it("fails to save when it does not match an existing Convention", async () => {
       await expectPromiseToFailWithError(
         assessmentRepository.save({
-          ...assessment,
+          ...minimalAssessment,
           conventionId: "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
         }),
         new Error(
@@ -69,28 +81,46 @@ describe("PgAssessmentRepository", () => {
       );
     });
 
-    it("when all is good", async () => {
-      const allAssessmentsQueryBuilder = db
-        .selectFrom("immersion_assessments")
-        .selectAll();
+    it("saves a minimal assessment", async () => {
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          minimalAssessment.conventionId,
+        ),
+        undefined,
+      );
 
-      expectToEqual(await allAssessmentsQueryBuilder.execute(), []);
+      await assessmentRepository.save(minimalAssessment);
 
-      await assessmentRepository.save(assessment);
+      expect(
+        await db.selectFrom("immersion_assessments").selectAll().execute(),
+      ).toHaveLength(1);
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          minimalAssessment.conventionId,
+        ),
+        minimalAssessment,
+      );
+    });
 
-      expectArraysToMatch(await allAssessmentsQueryBuilder.execute(), [
-        {
-          convention_id: assessment.conventionId,
-          status: assessment.status,
-          last_day_of_presence: null,
-          number_of_missed_hours: null,
-          ended_with_a_job: false,
-          type_of_contract: null,
-          contract_start_date: null,
-          establishment_feedback: assessment.establishmentFeedback,
-          establishment_advices: assessment.establishmentAdvices,
-        },
-      ]);
+    it("saves a full assessment", async () => {
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          fullAssessment.conventionId,
+        ),
+        undefined,
+      );
+
+      await assessmentRepository.save(fullAssessment);
+
+      expect(
+        await db.selectFrom("immersion_assessments").selectAll().execute(),
+      ).toHaveLength(1);
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          fullAssessment.conventionId,
+        ),
+        fullAssessment,
+      );
     });
   });
 
@@ -105,11 +135,13 @@ describe("PgAssessmentRepository", () => {
     });
 
     it("returns assessment found", async () => {
-      await assessmentRepository.save(assessment);
+      await assessmentRepository.save(minimalAssessment);
 
       expectToEqual(
-        await assessmentRepository.getByConventionId(assessment.conventionId),
-        assessment,
+        await assessmentRepository.getByConventionId(
+          minimalAssessment.conventionId,
+        ),
+        minimalAssessment,
       );
     });
   });
