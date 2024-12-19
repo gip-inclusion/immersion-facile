@@ -12,6 +12,7 @@ import {
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
   calculateWeeklyHoursFromSchedule,
+  convertLocaleDateToUtcTimezoneDate,
   regularTimePeriods,
   selectedDaysFromComplexSchedule,
 } from "shared";
@@ -122,8 +123,10 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
           <WeeksHoursIndicator
             schedule={values.schedule}
             interval={{
-              start: new Date(values.dateStart),
-              end: new Date(values.dateEnd),
+              start: convertLocaleDateToUtcTimezoneDate(
+                new Date(values.dateStart),
+              ),
+              end: convertLocaleDateToUtcTimezoneDate(new Date(values.dateEnd)),
             }}
           />
         </div>
