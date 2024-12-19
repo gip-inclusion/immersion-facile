@@ -208,8 +208,8 @@ export const ScheduleSection = () => {
 
       <SchedulePicker
         interval={{
-          start: new Date(values.dateStart),
-          end: new Date(values.dateEnd),
+          start: convertLocaleDateToUtcTimezoneDate(new Date(values.dateStart)),
+          end: convertLocaleDateToUtcTimezoneDate(new Date(values.dateEnd)),
         }}
         excludedDays={excludedDays}
       />

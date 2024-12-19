@@ -8,6 +8,7 @@ import {
   SelectedDaysOfTheWeekDto,
   WeekdayNumber,
   arrayFromNumber,
+  convertLocaleDateToUtcTimezoneDate,
   frenchDayMapping,
   maximumCalendarDayByInternshipKind,
   removeAtIndex,
@@ -49,8 +50,12 @@ export const WeekdayPicker = ({
     const uniqueWeekDaysOnInterval = uniq(
       arrayFromNumber(startEndDiff + 1).map(
         (dayIndex) =>
-          frenchDayMapping(addDays(new Date(start), dayIndex).toISOString())
-            .frenchDay,
+          frenchDayMapping(
+            addDays(
+              convertLocaleDateToUtcTimezoneDate(new Date(start)),
+              dayIndex,
+            ).toISOString(),
+          ).frenchDay,
       ),
     );
     return !uniqueWeekDaysOnInterval.includes(day);
