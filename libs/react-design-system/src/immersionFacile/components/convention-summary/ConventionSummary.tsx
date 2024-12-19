@@ -236,8 +236,7 @@ const SubSection = ({
 
 const Schedule = ({ fields }: { fields: ConventionSummaryField[] }) => {
   const schedule = fields[0];
-
-  if (!schedule) return <></>;
+  if (!schedule) return null;
   return <>{schedule.value}</>;
 };
 

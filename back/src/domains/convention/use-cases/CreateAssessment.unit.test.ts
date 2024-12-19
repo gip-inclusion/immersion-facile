@@ -30,8 +30,10 @@ const conventionId = "conventionId";
 
 const assessment: AssessmentDto = {
   conventionId,
-  status: "FINISHED",
+  status: "COMPLETED",
+  endedWithAJob: false,
   establishmentFeedback: "Ca c'est bien passé",
+  establishmentAdvices: "mon conseil",
 };
 
 const ConventionDtoBuilderWithId = new ConventionDtoBuilder().withId(
