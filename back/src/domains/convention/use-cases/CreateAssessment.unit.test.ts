@@ -102,7 +102,7 @@ describe("CreateAssessment", () => {
         role: "beneficiary",
       } as ConventionJwtPayload),
       new ForbiddenError(
-        "Only an establishment tutor can create an assessment",
+        "Only an establishment tutor can create or get an assessment",
       ),
     );
   });
