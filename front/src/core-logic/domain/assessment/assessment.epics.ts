@@ -1,4 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
+import { errors } from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
@@ -32,4 +33,30 @@ const createAssessmentEpic: AppEpic<AssessmentAction> = (
     ),
   );
 
-export const assessmentEpics = [createAssessmentEpic];
+const getAssessmentEpic: AppEpic<AssessmentAction> = (
+  action$,
+  _,
+  { assessmentGateway },
+) =>
+  action$.pipe(
+    filter(assessmentSlice.actions.getAssessmentRequested.match),
+    switchMap((action) =>
+      assessmentGateway.getAssessment$(action.payload).pipe(
+        map((result) => assessmentSlice.actions.getAssessmentSucceeded(result)),
+        catchEpicError((error) => {
+          if (
+            error.message ===
+            errors.assessment.notFound(action.payload.conventionId).message
+          ) {
+            return assessmentSlice.actions.setIsLoading(false);
+          }
+          return assessmentSlice.actions.getAssessmentFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          });
+        }),
+      ),
+    ),
+  );
+
+export const assessmentEpics = [createAssessmentEpic, getAssessmentEpic];

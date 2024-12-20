@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -7,13 +8,14 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ConventionJobAndObjective,
   ConventionTotalHours,
   Loader,
 } from "react-design-system";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   AssessmentDto,
   AssessmentStatus,
@@ -38,6 +40,7 @@ import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { match } from "ts-pattern";
 
 type AssessmentFormProperties = {
@@ -71,8 +74,9 @@ export const AssessmentForm = ({
   convention,
   jwt,
 }: AssessmentFormProperties): JSX.Element => {
+  const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState<Step>(1);
-  const { createAssessment, isLoading } = useAssessment(jwt);
+  const { createAssessment, isLoading, currentAssessment } = useAssessment(jwt);
   const initialValues: AssessmentDto = {
     conventionId: convention.id,
     status: "COMPLETED",
@@ -105,59 +109,81 @@ export const AssessmentForm = ({
     }
   };
   useScrollToTop(currentStep);
+
+  useEffect(() => {
+    dispatch(
+      assessmentSlice.actions.getAssessmentRequested({
+        conventionId: convention.id,
+        jwt,
+        feedbackTopic: "assessment",
+      }),
+    );
+  }, [dispatch, convention.id, jwt]);
+
   return (
     <>
       {isLoading && <Loader />}
-      <WithFeedbackReplacer
-        topic="assessment"
-        renderFeedback={() => (
-          <AssessmentSuccessMessage
-            firstName={convention.signatories.beneficiary.firstName}
-            lastName={convention.signatories.beneficiary.lastName}
-          />
-        )}
-      >
-        <>
-          <ImmersionDescription convention={convention} />
-          <FormProvider {...methods}>
-            <div className={fr.cx("fr-grid-row")}>
-              <div className={fr.cx("fr-col-lg-7", "fr-col-12")}>
-                <Stepper
-                  currentStep={currentStep}
-                  stepCount={keys(steps).length}
-                  title={steps[currentStep].title}
-                  nextTitle={steps[currentStep].nextTitle}
-                />
+      {currentAssessment && (
+        <Alert
+          severity="error"
+          title="Erreur"
+          description="Le bilan a déjà été rempli"
+        />
+      )}
+      {!currentAssessment && (
+        <WithFeedbackReplacer
+          topic="assessment"
+          renderFeedback={() => (
+            <AssessmentSuccessMessage
+              firstName={convention.signatories.beneficiary.firstName}
+              lastName={convention.signatories.beneficiary.lastName}
+            />
+          )}
+        >
+          <>
+            <ImmersionDescription convention={convention} />
+            <FormProvider {...methods}>
+              <div className={fr.cx("fr-grid-row")}>
+                <div className={fr.cx("fr-col-lg-7", "fr-col-12")}>
+                  <Stepper
+                    currentStep={currentStep}
+                    stepCount={keys(steps).length}
+                    title={steps[currentStep].title}
+                    nextTitle={steps[currentStep].nextTitle}
+                  />
+                </div>
               </div>
-            </div>
 
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              id={domElementIds.assessment.form}
-              data-matomo-name={domElementIds.assessment.form}
-            >
-              {match(currentStep)
-                .with(1, () => (
-                  <AssessmentStatusSection
-                    convention={convention}
-                    onStepChange={onStepChange}
-                  />
-                ))
-                .with(2, () => (
-                  <AssessmentContractSection onStepChange={onStepChange} />
-                ))
-                .with(3, () => (
-                  <AssessmentCommentsSection
-                    onStepChange={onStepChange}
-                    jobTitle={convention.immersionAppellation.appellationLabel}
-                    objective={convention.immersionObjective}
-                  />
-                ))
-                .exhaustive()}
-            </form>
-          </FormProvider>
-        </>
-      </WithFeedbackReplacer>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                id={domElementIds.assessment.form}
+                data-matomo-name={domElementIds.assessment.form}
+              >
+                {match(currentStep)
+                  .with(1, () => (
+                    <AssessmentStatusSection
+                      convention={convention}
+                      onStepChange={onStepChange}
+                    />
+                  ))
+                  .with(2, () => (
+                    <AssessmentContractSection onStepChange={onStepChange} />
+                  ))
+                  .with(3, () => (
+                    <AssessmentCommentsSection
+                      onStepChange={onStepChange}
+                      jobTitle={
+                        convention.immersionAppellation.appellationLabel
+                      }
+                      objective={convention.immersionObjective}
+                    />
+                  ))
+                  .exhaustive()}
+              </form>
+            </FormProvider>
+          </>
+        </WithFeedbackReplacer>
+      )}
     </>
   );
 };
