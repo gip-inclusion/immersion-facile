@@ -1,4 +1,5 @@
 import { Observable, delay, of, throwError } from "rxjs";
+import { AssessmentDto, ConventionId } from "shared";
 import {
   AssessmentAndJwt,
   AssessmentGateway,
@@ -14,5 +15,17 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
     return assessment.conventionId === failedId
       ? throwError(failedIdError)
       : of(undefined).pipe(delay(this.latency));
+  }
+
+  public getAssessment$({
+    conventionId,
+  }: { conventionId: ConventionId; jwt: string }): Observable<AssessmentDto> {
+    return of({
+      conventionId,
+      status: "COMPLETED",
+      endedWithAJob: false,
+      establishmentAdvices: "my advices",
+      establishmentFeedback: "my feedback",
+    });
   }
 }

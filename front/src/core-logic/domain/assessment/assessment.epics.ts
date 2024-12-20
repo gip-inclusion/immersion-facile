@@ -32,4 +32,24 @@ const createAssessmentEpic: AppEpic<AssessmentAction> = (
     ),
   );
 
-export const assessmentEpics = [createAssessmentEpic];
+const getAssessmentEpic: AppEpic<AssessmentAction> = (
+  action$,
+  _,
+  { assessmentGateway },
+) =>
+  action$.pipe(
+    filter(assessmentSlice.actions.getAssessmentRequested.match),
+    switchMap((action) =>
+      assessmentGateway.getAssessment$(action.payload).pipe(
+        map((result) => assessmentSlice.actions.getAssessmentSucceeded(result)),
+        catchEpicError((error) =>
+          assessmentSlice.actions.getAssessmentFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
+export const assessmentEpics = [createAssessmentEpic, getAssessmentEpic];
