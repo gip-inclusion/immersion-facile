@@ -377,6 +377,11 @@ export const feedbackMapping: Record<
       title: "Problème lors de l'envoi du bilan",
       message: "Une erreur est survenue lors de l'envoi du bilan",
     },
+    "fetch.error": {
+      action: assessmentSlice.actions.getAssessmentFailed,
+      title: "Problème lors de la récupération du bilan",
+      message: "Un problème est survenu lors de la récupération du bilan",
+    },
   },
 };
 

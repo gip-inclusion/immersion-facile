@@ -1,5 +1,10 @@
 import { Observable, from } from "rxjs";
-import { ConventionMagicLinkRoutes } from "shared";
+import {
+  AssessmentDto,
+  ConventionId,
+  ConventionMagicLinkRoutes,
+  NotFoundError,
+} from "shared";
 import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
@@ -34,6 +39,31 @@ export class HttpAssessmentGateway implements AssessmentGateway {
             .with({ status: P.union(401, 403) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
+    );
+  }
+
+  public getAssessment$({
+    conventionId,
+    jwt,
+  }: { conventionId: ConventionId; jwt: string }): Observable<AssessmentDto> {
+    return from(
+      this.httpClient
+        .getAssessment({
+          headers: { authorization: jwt },
+          urlParams: { conventionId },
+        })
+        .then((response) => {
+          return match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with(
+              { status: 404, body: { message: P.not(P.nullish) } },
+              ({ body }) => {
+                throw new NotFoundError(body.message);
+              },
+            )
+            .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow);
+        }),
     );
   }
 }

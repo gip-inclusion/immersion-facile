@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { AssessmentDto } from "shared";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { AssessmentDto, ConventionId } from "shared";
 import {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -33,6 +33,28 @@ export const assessmentSlice = createSlice({
     },
     creationFailed: (state, _action: PayloadActionWithFeedbackTopicError) => {
       state.isLoading = false;
+    },
+    getAssessmentRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        conventionId: ConventionId;
+        jwt: string;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    getAssessmentSucceeded: (state, action: PayloadAction<AssessmentDto>) => {
+      state.isLoading = false;
+      state.currentAssessment = action.payload;
+    },
+    getAssessmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    setIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
     },
   },
 });
