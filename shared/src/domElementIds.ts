@@ -505,6 +505,7 @@ export const domElementIds = {
   },
 
   assessment: {
+    form: "im-assessment-form",
     formSubmitButton: "im-assessment-form__submit-button",
     formDownloadButton: "im-assessment-form__download-button",
   },

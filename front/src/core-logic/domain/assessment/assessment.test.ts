@@ -1,14 +1,12 @@
-import { expectToEqual } from "shared";
+import { AssessmentDto, NotFoundError, expectToEqual } from "shared";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import {
-  assessmentErrorSelector,
-  assessmentStatusSelector,
-} from "./assessment.selectors";
-import { AssessmentUIStatus, assessmentSlice } from "./assessment.slice";
+import { assessmentSelectors } from "./assessment.selectors";
+import { assessmentSlice } from "./assessment.slice";
 
 describe("Immersion Assessment slice", () => {
   let store: ReduxStore;
@@ -18,59 +16,136 @@ describe("Immersion Assessment slice", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("immersion assessment creation requested - success", () => {
-    expectStatusToBe("Idle");
-    store.dispatch(
-      assessmentSlice.actions.creationRequested({
+  describe("immersion assessment creation requested", () => {
+    const feedGatewayWithCreationError = (error: Error) => {
+      dependencies.assessmentGateway.creationResponse$.error(error);
+    };
+
+    const feedGatewayWithCreationSuccess = () => {
+      dependencies.assessmentGateway.creationResponse$.next(undefined);
+    };
+
+    it("success", () => {
+      expectStateToMatchInitialState(store);
+      store.dispatch(
+        assessmentSlice.actions.creationRequested({
+          assessmentAndJwt: {
+            assessment: {
+              conventionId: "23465",
+              status: "DID_NOT_SHOW",
+              endedWithAJob: false,
+              establishmentFeedback: "my feedback",
+              establishmentAdvices: "my advices",
+            },
+            jwt: "",
+          },
+          feedbackTopic: "assessment",
+        }),
+      );
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
+      feedGatewayWithCreationSuccess();
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         assessment: {
-          conventionId: "23465",
-          status: "ABANDONED",
-          establishmentFeedback: "my feedback",
+          title: "Bilan envoyé",
+          level: "success",
+          on: "create",
+          message: "Le bilan a bien été envoyé",
         },
-        jwt: "",
-      }),
-    );
-    expectStatusToBe("Loading");
-    feedGatewayWithCreationSuccess();
-    expectStatusToBe("Success");
-    expectErrorToBe(null);
+      });
+    });
+
+    it("error on backend", () => {
+      const backendError: Error = new Error("Backend Error");
+      expectStateToMatchInitialState(store);
+      store.dispatch(
+        assessmentSlice.actions.creationRequested({
+          assessmentAndJwt: {
+            assessment: {
+              conventionId: "23465",
+              status: "DID_NOT_SHOW",
+              endedWithAJob: false,
+              establishmentFeedback: "my feedback",
+              establishmentAdvices: "my advices",
+            },
+            jwt: "",
+          },
+          feedbackTopic: "assessment",
+        }),
+      );
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
+      feedGatewayWithCreationError(backendError);
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+        assessment: {
+          title: "Problème lors de l'envoi du bilan",
+          level: "error",
+          on: "create",
+          message: "Backend Error",
+        },
+      });
+    });
   });
 
-  it("immersion assessment creation requested - error on backend", () => {
-    const backendError: Error = new Error("Backend Error");
-    expectStatusToBe("Idle");
-    store.dispatch(
-      assessmentSlice.actions.creationRequested({
+  describe("immersion assessment get requested", () => {
+    const conventionId = "11111111-1111-4111-1111-111111111111";
+    const assessment: AssessmentDto = {
+      conventionId,
+      status: "COMPLETED",
+      endedWithAJob: false,
+      establishmentAdvices: "my advices",
+      establishmentFeedback: "my feedback",
+    };
+    const feedGatewayWithGetError = (error: Error) => {
+      dependencies.assessmentGateway.getResponse$.error(error);
+    };
+
+    const feedGatewayWithGetSuccess = () => {
+      dependencies.assessmentGateway.getResponse$.next(assessment);
+    };
+
+    it("success", () => {
+      expectStateToMatchInitialState(store);
+
+      store.dispatch(
+        assessmentSlice.actions.getAssessmentRequested({
+          conventionId,
+          jwt: "my-jwt",
+          feedbackTopic: "assessment",
+        }),
+      );
+
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
+      feedGatewayWithGetSuccess();
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
+    });
+
+    it("error", () => {
+      expectStateToMatchInitialState(store);
+      store.dispatch(
+        assessmentSlice.actions.getAssessmentRequested({
+          conventionId,
+          jwt: "my-jwt",
+          feedbackTopic: "assessment",
+        }),
+      );
+
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
+      feedGatewayWithGetError(new NotFoundError("Assessement not found"));
+      expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
+      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         assessment: {
-          conventionId: "23465",
-          status: "ABANDONED",
-          establishmentFeedback: "my feedback",
+          title: "Problème lors de la récupération du bilan",
+          level: "error",
+          on: "fetch",
+          message: "Assessement not found",
         },
-        jwt: "",
-      }),
-    );
-    expectStatusToBe("Loading");
-    feedGatewayWithCreationError(backendError);
-    expectStatusToBe("Idle");
-    expectErrorToBe(backendError.message);
+      });
+    });
   });
-
-  const expectStatusToBe = (assessmentStatus: AssessmentUIStatus) => {
-    expectToEqual(assessmentStatusSelector(store.getState()), assessmentStatus);
-  };
-
-  const expectErrorToBe = (expectedErrorMessage: string | null) => {
-    expectToEqual(
-      assessmentErrorSelector(store.getState()),
-      expectedErrorMessage,
-    );
-  };
-
-  const feedGatewayWithCreationError = (error: Error) => {
-    dependencies.assessmentGateway.creationResponse$.error(error);
-  };
-
-  const feedGatewayWithCreationSuccess = () => {
-    dependencies.assessmentGateway.creationResponse$.next(undefined);
-  };
 });
+
+const expectStateToMatchInitialState = (store: ReduxStore) => {
+  expectToEqual(assessmentSelectors.isLoading(store.getState()), false);
+  expectToEqual(assessmentSelectors.currentAssessment(store.getState()), null);
+};

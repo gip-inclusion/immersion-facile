@@ -24,6 +24,19 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       ),
   );
 
+  sharedRouter.getAssessment(
+    deps.conventionMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getAssessment.execute(
+          {
+            conventionId: req.params.conventionId,
+          },
+          req.payloads?.convention,
+        ),
+      ),
+  );
+
   sharedRouter.getConvention(
     deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>

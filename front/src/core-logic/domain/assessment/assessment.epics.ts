@@ -15,11 +15,41 @@ const createAssessmentEpic: AppEpic<AssessmentAction> = (
 ) =>
   action$.pipe(
     filter(assessmentSlice.actions.creationRequested.match),
-    switchMap((action) => assessmentGateway.createAssessment$(action.payload)),
-    map((_result) => assessmentSlice.actions.creationSucceeded()),
-    catchEpicError((error) =>
-      assessmentSlice.actions.creationFailed(error.message),
+    switchMap((action) =>
+      assessmentGateway.createAssessment$(action.payload.assessmentAndJwt).pipe(
+        map((_result) =>
+          assessmentSlice.actions.creationSucceeded({
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          assessmentSlice.actions.creationFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
     ),
   );
 
-export const assessmentEpics = [createAssessmentEpic];
+const getAssessmentEpic: AppEpic<AssessmentAction> = (
+  action$,
+  _,
+  { assessmentGateway },
+) =>
+  action$.pipe(
+    filter(assessmentSlice.actions.getAssessmentRequested.match),
+    switchMap((action) =>
+      assessmentGateway.getAssessment$(action.payload).pipe(
+        map((result) => assessmentSlice.actions.getAssessmentSucceeded(result)),
+        catchEpicError((error) =>
+          assessmentSlice.actions.getAssessmentFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
+export const assessmentEpics = [createAssessmentEpic, getAssessmentEpic];

@@ -23,9 +23,11 @@ const domainEvt: DomainEvent = {
   topic: "AssessmentCreated",
   payload: {
     assessment: {
-      status: "FINISHED",
+      status: "COMPLETED",
       conventionId: "a convention id",
-      establishmentFeedback: "Super top",
+      endedWithAJob: false,
+      establishmentFeedback: "osef",
+      establishmentAdvices: "osef",
     },
     triggeredBy: {
       kind: "inclusion-connected",

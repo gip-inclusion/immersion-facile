@@ -1170,7 +1170,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
                   withHours: true,
                 })
               : "DATE INVALIDE"
-          } : ${assessmentStatus === "FINISHED" ? "oui" : "non"}</li>
+          } : ${assessmentStatus === "COMPLETED" ? "oui" : "non"}</li>
           <li>Retour de l'entreprise : ${establishmentFeedback}</li>
         </ul>
         La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email.`,

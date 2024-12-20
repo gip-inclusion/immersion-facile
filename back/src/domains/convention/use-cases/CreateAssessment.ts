@@ -1,5 +1,6 @@
 import { AssessmentDto, ConventionJwtPayload, assessmentSchema } from "shared";
 import { ConflictError, ForbiddenError, NotFoundError } from "shared";
+import { throwForbiddenIfNotAllow } from "../../../utils/assessment";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -26,7 +27,7 @@ export const makeCreateAssessment = createTransactionalUseCase<
   }) => {
     if (!conventionJwtPayload)
       throw new ForbiddenError("No magic link provided");
-    throwForbiddenIfNotAllow(dto, conventionJwtPayload);
+    throwForbiddenIfNotAllow(dto.conventionId, conventionJwtPayload);
 
     const assessmentEntity = await validateConventionAndCreateAssessmentEntity(
       uow,
@@ -72,18 +73,4 @@ const validateConventionAndCreateAssessmentEntity = async (
     );
 
   return createAssessmentEntity(dto, convention);
-};
-
-const throwForbiddenIfNotAllow = (
-  dto: AssessmentDto,
-  conventionJwtPayload: ConventionJwtPayload,
-) => {
-  if (conventionJwtPayload.role !== "establishment-tutor")
-    throw new ForbiddenError(
-      "Only an establishment tutor can create an assessment",
-    );
-  if (dto.conventionId !== conventionJwtPayload.applicationId)
-    throw new ForbiddenError(
-      "Convention provided in DTO is not the same as application linked to it",
-    );
 };

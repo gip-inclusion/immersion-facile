@@ -1,5 +1,10 @@
 import { Observable, from } from "rxjs";
-import { ConventionMagicLinkRoutes } from "shared";
+import {
+  AssessmentDto,
+  ConventionId,
+  ConventionMagicLinkRoutes,
+  messageAndIssuesToString,
+} from "shared";
 import { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
@@ -32,6 +37,31 @@ export class HttpAssessmentGateway implements AssessmentGateway {
             .with({ status: 201 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 403) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getAssessment$({
+    conventionId,
+    jwt,
+  }: { conventionId: ConventionId; jwt: string }): Observable<AssessmentDto> {
+    return from(
+      this.httpClient
+        .getAssessment({
+          headers: { authorization: jwt },
+          urlParams: { conventionId },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 404 }, () => {
+              const errorMessage = messageAndIssuesToString({
+                message: "Le bilan a déjà été rempli",
+              });
+              throw new Error(errorMessage);
+            })
+            .with({ status: P.union(400, 401, 403) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

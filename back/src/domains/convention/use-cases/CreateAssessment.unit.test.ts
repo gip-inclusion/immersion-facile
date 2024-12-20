@@ -30,8 +30,10 @@ const conventionId = "conventionId";
 
 const assessment: AssessmentDto = {
   conventionId,
-  status: "FINISHED",
+  status: "COMPLETED",
+  endedWithAJob: false,
   establishmentFeedback: "Ca c'est bien passé",
+  establishmentAdvices: "mon conseil",
 };
 
 const ConventionDtoBuilderWithId = new ConventionDtoBuilder().withId(
@@ -100,7 +102,7 @@ describe("CreateAssessment", () => {
         role: "beneficiary",
       } as ConventionJwtPayload),
       new ForbiddenError(
-        "Only an establishment tutor can create an assessment",
+        "Only an establishment tutor can create or get an assessment",
       ),
     );
   });
