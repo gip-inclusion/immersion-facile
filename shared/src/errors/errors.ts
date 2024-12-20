@@ -43,6 +43,12 @@ import {
 } from "./httpErrors";
 
 export const errors = {
+  assessment: {
+    notFound: (conventionId: ConventionId) =>
+      new NotFoundError(
+        `Il n'y a pas de bilan pour la convention ${conventionId}`,
+      ),
+  },
   inclusionConnect: {
     missingOAuth: ({
       state,

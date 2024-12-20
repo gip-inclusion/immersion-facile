@@ -20,6 +20,7 @@ import { AddValidatedConventionNps } from "../../domains/convention/use-cases/Ad
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
+import { makeGetAssessment } from "../../domains/convention/use-cases/GetAssessment";
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
@@ -641,6 +642,9 @@ export const createUseCases = (
     createAssessment: makeCreateAssessment({
       uowPerformer,
       deps: { createNewEvent },
+    }),
+    getAssessment: makeGetAssessment({
+      uowPerformer,
     }),
     listActiveSubscriptions: makeListActiveSubscriptions({
       uowPerformer,
