@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
+import React, { useEffect } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import {
   ConventionJwtPayload,
@@ -14,6 +14,8 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
+import { useDispatch } from "react-redux";
+import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 
 type AssessmentRoute = Route<typeof routes.assessment>;
 
@@ -22,6 +24,7 @@ interface AssessmentPageProps {
 }
 
 export const AssessmentPage = ({ route }: AssessmentPageProps) => {
+  const dispatch = useDispatch();
   const { role, applicationId: conventionId } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
       route.params.jwt,
@@ -45,6 +48,10 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
         jwt={route.params.jwt}
       />
     );
+
+  useEffect(() => {
+    dispatch(assessmentSlice.actions.getAssessmentRequested);
+  }, [dispatch]);
 
   return (
     <HeaderFooterLayout>
