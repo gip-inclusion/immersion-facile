@@ -1,7 +1,9 @@
 import { Pool } from "pg";
 import {
   AgencyDtoBuilder,
+  AssessmentDtoBuilder,
   ConventionDtoBuilder,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -18,25 +20,13 @@ const conventionId = "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa";
 const convention = new ConventionDtoBuilder().withId(conventionId).build();
 
 const minimalAssessment: AssessmentEntity = {
+  ...new AssessmentDtoBuilder().withMinimalInformations().build(),
   _entityName: "Assessment",
-  conventionId,
-  status: "COMPLETED",
-  endedWithAJob: false,
-  establishmentFeedback: "Ca s'est bien passé",
-  establishmentAdvices: "mon conseil",
 };
 
 const fullAssessment: AssessmentEntity = {
+  ...new AssessmentDtoBuilder().withFullInformations().build(),
   _entityName: "Assessment",
-  conventionId,
-  status: "PARTIALLY_COMPLETED",
-  lastDayOfPresence: new Date("2024-01-01").toISOString(),
-  numberOfMissedHours: 10,
-  endedWithAJob: true,
-  typeOfContract: "CDI",
-  contractStartDate: new Date("2024-01-10").toISOString(),
-  establishmentFeedback: "Ca s'est bien passé",
-  establishmentAdvices: "mon conseil",
 };
 
 describe("PgAssessmentRepository", () => {
@@ -70,14 +60,13 @@ describe("PgAssessmentRepository", () => {
 
   describe("save", () => {
     it("fails to save when it does not match an existing Convention", async () => {
+      const conventionId = "40400c99-9c0b-bbbb-bb6d-6bb9bd300404";
       await expectPromiseToFailWithError(
         assessmentRepository.save({
           ...minimalAssessment,
-          conventionId: "40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
+          conventionId,
         }),
-        new Error(
-          "No convention found for id 40400c99-9c0b-bbbb-bb6d-6bb9bd300404",
-        ),
+        errors.convention.notFound({ conventionId }),
       );
     });
 
@@ -142,6 +131,16 @@ describe("PgAssessmentRepository", () => {
           minimalAssessment.conventionId,
         ),
         minimalAssessment,
+      );
+    });
+    it("returns assessment found with all fields", async () => {
+      await assessmentRepository.save(fullAssessment);
+
+      expectToEqual(
+        await assessmentRepository.getByConventionId(
+          fullAssessment.conventionId,
+        ),
+        fullAssessment,
       );
     });
   });

@@ -1,4 +1,4 @@
-import { ConventionId, assessmentSchema } from "shared";
+import { ConventionId, assessmentSchema, errors } from "shared";
 import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { AssessmentRepository } from "../ports/AssessmentRepository";
@@ -20,21 +20,21 @@ export class PgAssessmentRepository implements AssessmentRepository {
     const dto = assessmentSchema.parse({
       conventionId: result.convention_id,
       status: result.status,
-      ...(result.status === "PARTIALLY_COMPLETED"
-        ? {
-            lastDayOfPresence: result.last_day_of_presence?.toISOString(),
-            numberOfMissedHours: result.number_of_missed_hours,
-          }
-        : {}),
-      endedWithAJob: result.ended_with_a_job,
-      ...(result.ended_with_a_job
-        ? {
-            typeOfContract: result.type_of_contract,
-            contractStartDate: result.contract_start_date?.toISOString(),
-          }
-        : {}),
       establishmentFeedback: result.establishment_feedback,
       establishmentAdvices: result.establishment_advices,
+      endedWithAJob: result.ended_with_a_job,
+      ...(result.contract_start_date
+        ? { contractStartDate: result.contract_start_date.toISOString() }
+        : {}),
+      ...(result.type_of_contract
+        ? { typeOfContract: result.type_of_contract }
+        : {}),
+      ...(result.last_day_of_presence
+        ? { lastDayOfPresence: result.last_day_of_presence.toISOString() }
+        : {}),
+      ...(result.number_of_missed_hours
+        ? { numberOfMissedHours: result.number_of_missed_hours }
+        : {}),
     });
 
     return {
@@ -70,9 +70,9 @@ export class PgAssessmentRepository implements AssessmentRepository {
       .execute()
       .catch((error) => {
         if (error?.message.includes(noConventionMatchingErrorMessage))
-          throw new Error(
-            `No convention found for id ${assessmentEntity.conventionId}`,
-          );
+          throw errors.convention.notFound({
+            conventionId: assessmentEntity.conventionId,
+          });
 
         throw error;
       });

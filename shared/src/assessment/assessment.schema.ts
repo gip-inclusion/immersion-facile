@@ -14,10 +14,7 @@ import {
 const withAssessmentStatusSchema: z.Schema<WithAssessmentStatus> =
   z.discriminatedUnion("status", [
     z.object({
-      status: z.literal("COMPLETED"),
-    }),
-    z.object({
-      status: z.literal("DID_NOT_SHOW"),
+      status: z.enum(["COMPLETED", "DID_NOT_SHOW"]),
     }),
     z.object({
       status: z.literal("PARTIALLY_COMPLETED"),

@@ -3,7 +3,7 @@ import {
   AssessmentDto,
   ConventionId,
   ConventionMagicLinkRoutes,
-  NotFoundError,
+  errors,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import {
@@ -48,19 +48,16 @@ export class HttpAssessmentGateway implements AssessmentGateway {
   }: { conventionId: ConventionId; jwt: string }): Observable<AssessmentDto> {
     return from(
       this.httpClient
-        .getAssessment({
+        .getAssessmentByConventionId({
           headers: { authorization: jwt },
           urlParams: { conventionId },
         })
         .then((response) => {
           return match(response)
             .with({ status: 200 }, ({ body }) => body)
-            .with(
-              { status: 404, body: { message: P.not(P.nullish) } },
-              ({ body }) => {
-                throw new NotFoundError(body.message);
-              },
-            )
+            .with({ status: 404, body: { message: P.not(P.nullish) } }, () => {
+              throw errors.assessment.notFound(conventionId);
+            })
             .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow);
         }),

@@ -3,6 +3,8 @@ import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab, openEmailInAdmin } from "../../utils/admin";
 
+test.describe.configure({ mode: "serial" });
+
 test.describe("Assessment workflow", () => {
   test.use({ storageState: testConfig.adminAuthFile });
 
@@ -51,6 +53,7 @@ test.describe("Assessment workflow", () => {
       await page.locator(`#${domElementIds.assessment.successMessage}`),
     ).toBeVisible();
   });
+
   test("Can't fill the form if assessment has already been submitted", async ({
     page,
   }) => {

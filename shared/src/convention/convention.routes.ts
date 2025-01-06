@@ -34,7 +34,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     },
   }),
 
-  getAssessment: defineRoute({
+  getAssessmentByConventionId: defineRoute({
     url: "/auth/convention/:conventionId/assessment",
     method: "get",
     ...withAuthorizationHeaders,

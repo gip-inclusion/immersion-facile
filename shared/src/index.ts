@@ -17,6 +17,7 @@ export * from "./apiConsumer/ApiConsumer";
 export * from "./apiConsumer/apiConsumer.schema";
 export * from "./assessment/assessment.dto";
 export * from "./assessment/assessment.schema";
+export * from "./assessment/AssessmentDtoBuilder";
 export * from "./Builder";
 export * from "./contactEstablishmentRequest/contactEstablishmentRequest.dto";
 export * from "./role/role.schema";

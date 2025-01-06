@@ -3,9 +3,6 @@ import { ExtractFromExisting } from "../utils";
 import { DateString } from "../utils/date";
 
 export type AssessmentStatus = (typeof assessmentStatuses)[number];
-export type LegacyAssessmentStatus = (typeof legacyAssessmentStatuses)[number];
-
-export const legacyAssessmentStatuses = ["ABANDONED", "FINISHED"] as const;
 export const assessmentStatuses = [
   "COMPLETED",
   "PARTIALLY_COMPLETED",
@@ -22,7 +19,6 @@ export const typeOfContracts = [
 ] as const;
 export type TypeOfContract = (typeof typeOfContracts)[number];
 
-// step 1
 export type WithAssessmentStatus =
   | {
       status: ExtractFromExisting<
@@ -36,7 +32,6 @@ export type WithAssessmentStatus =
       numberOfMissedHours: number;
     };
 
-// step 2
 export type WithEndedWithAJob =
   | { endedWithAJob: false }
   | {
@@ -45,7 +40,6 @@ export type WithEndedWithAJob =
       contractStartDate: DateString;
     };
 
-// step 3
 export type WithEstablishmentComments = {
   establishmentFeedback: string;
   establishmentAdvices: string;

@@ -48,7 +48,7 @@ const getAssessmentEpic: AppEpic<AssessmentAction> = (
             error.message ===
             errors.assessment.notFound(action.payload.conventionId).message
           ) {
-            return assessmentSlice.actions.setIsLoading(false);
+            return assessmentSlice.actions.noAssessmentForConventionFound();
           }
           return assessmentSlice.actions.getAssessmentFailed({
             errorMessage: error.message,

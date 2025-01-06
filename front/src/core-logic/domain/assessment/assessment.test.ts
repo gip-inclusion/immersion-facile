@@ -1,4 +1,4 @@
-import { AssessmentDto, NotFoundError, expectToEqual } from "shared";
+import { AssessmentDto, errors, expectToEqual } from "shared";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   TestDependencies,
@@ -131,11 +131,7 @@ describe("Immersion Assessment slice", () => {
       );
 
       expect(assessmentSelectors.isLoading(store.getState())).toBe(true);
-      feedGatewayWithGetError(
-        new NotFoundError(
-          `Il n'y a pas de bilan pour la convention ${conventionId}`,
-        ),
-      );
+      feedGatewayWithGetError(errors.assessment.notFound(conventionId));
       expect(assessmentSelectors.isLoading(store.getState())).toBe(false);
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {});
     });
