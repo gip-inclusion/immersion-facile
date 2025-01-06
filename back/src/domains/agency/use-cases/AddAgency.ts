@@ -21,6 +21,11 @@ import {
   AgencyWithUsersRights,
 } from "../ports/AgencyRepository";
 
+type WithUserIdAndIsNotified = {
+  userId: UserId;
+  isNotifiedByEmail: boolean;
+};
+
 export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
   protected inputSchema = createAgencySchema;
 
@@ -47,25 +52,34 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
     { validatorEmails, counsellorEmails, ...rest }: CreateAgencyDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const validatorUserIdsForAgency = rest.refersToAgencyId
-      ? await this.#getReferedAgencyValidatorUserIds(uow, rest.refersToAgencyId)
-      : await Promise.all(
-          validatorEmails.map((email) =>
-            createOrGetUserIdByEmail(
-              uow,
-              this.#timeGateway,
-              this.#uuidGenerator,
-              { email },
-            ),
-          ),
-        );
+    const validatorUserIdsForAgency: WithUserIdAndIsNotified[] =
+      rest.refersToAgencyId
+        ? await this.#getReferredAgencyValidatorUserIds(
+            uow,
+            rest.refersToAgencyId,
+          )
+        : await Promise.all(
+            validatorEmails.map(async (email) => {
+              const userId = await createOrGetUserIdByEmail(
+                uow,
+                this.#timeGateway,
+                this.#uuidGenerator,
+                { email },
+              );
+              return { userId, isNotifiedByEmail: true };
+            }),
+          );
 
     const counsellorUserIdsForAgency = await Promise.all(
-      counsellorEmails.map((email) =>
-        createOrGetUserIdByEmail(uow, this.#timeGateway, this.#uuidGenerator, {
-          email,
-        }),
-      ),
+      counsellorEmails.map(async (email) => {
+        const userId = await createOrGetUserIdByEmail(
+          uow,
+          this.#timeGateway,
+          this.#uuidGenerator,
+          { email },
+        );
+        return { userId, isNotifiedByEmail: true };
+      }),
     );
 
     const agency: AgencyWithUsersRights = {
@@ -101,16 +115,16 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
   }
 
   #makeUserRights(
-    validatorUserIdsForAgency: UserId[],
-    counsellorUserIdsForAgency: UserId[],
+    validatorUsersForAgency: WithUserIdAndIsNotified[],
+    counsellorUsersForAgency: WithUserIdAndIsNotified[],
   ): AgencyUsersRights {
-    const validatorsAndCounsellors = validatorUserIdsForAgency.filter((id) =>
-      counsellorUserIdsForAgency.includes(id),
+    const validatorsAndCounsellors = validatorUsersForAgency.filter((id) =>
+      counsellorUsersForAgency.includes(id),
     );
-    const validators = validatorUserIdsForAgency.filter(
+    const validators = validatorUsersForAgency.filter(
       (id) => !validatorsAndCounsellors.includes(id),
     );
-    const counsellors = counsellorUserIdsForAgency.filter(
+    const counsellors = counsellorUsersForAgency.filter(
       (id) => !validatorsAndCounsellors.includes(id),
     );
     return {
@@ -123,28 +137,31 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
     };
   }
 
-  async #getReferedAgencyValidatorUserIds(
+  async #getReferredAgencyValidatorUserIds(
     uow: UnitOfWork,
     refersToAgencyId: AgencyId,
-  ): Promise<UserId[]> {
-    const referedAgency = await uow.agencyRepository.getById(refersToAgencyId);
-    if (!referedAgency)
+  ): Promise<WithUserIdAndIsNotified[]> {
+    const referredAgency = await uow.agencyRepository.getById(refersToAgencyId);
+    if (!referredAgency)
       throw errors.agency.notFound({ agencyId: refersToAgencyId });
-    return toPairs(referedAgency.usersRights)
+    return toPairs(referredAgency.usersRights)
       .filter(([_, right]) => right?.roles.includes("validator"))
-      .map(([id]) => id);
+      .map(([userId, right]) => ({
+        userId,
+        isNotifiedByEmail: right?.isNotifiedByEmail ?? true,
+      }));
   }
 }
 const buildAgencyUsersRights = (
-  userIdsBothValidatorAndCounsellor: UserId[],
+  userIdsBothValidatorAndCounsellor: WithUserIdAndIsNotified[],
   roles: AgencyRole[],
 ): AgencyUsersRights =>
   userIdsBothValidatorAndCounsellor.reduce<AgencyUsersRights>(
-    (acc, id) => ({
+    (acc, { userId, isNotifiedByEmail }) => ({
       ...acc,
-      [id]: {
+      [userId]: {
         roles,
-        isNotifiedByEmail: true,
+        isNotifiedByEmail,
       },
     }),
     {},
