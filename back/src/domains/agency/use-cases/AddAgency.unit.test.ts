@@ -39,6 +39,7 @@ describe("AddAgency use case", () => {
     .withId("validator")
     .withEmail("validator@mail.com")
     .buildUser();
+
   const createParisMissionLocaleParams: CreateAgencyDto = {
     id: "some-id",
     coveredDepartments: ["75"],
@@ -258,7 +259,11 @@ describe("AddAgency use case", () => {
       ]);
     });
 
-    it("agengy with refers to should have validator emails from referral agency", async () => {
+    it("agency with refers to should have validator emails from referral agency, respecting the notification option", async () => {
+      const validator2 = new InclusionConnectedUserBuilder()
+        .withId("validator-2")
+        .withEmail("validator2@mail.com")
+        .buildUser();
       const existingMiloAgency: AgencyDto = {
         ...createParisMissionLocaleParams,
         counsellorEmails: [],
@@ -268,11 +273,12 @@ describe("AddAgency use case", () => {
         codeSafir: null,
         rejectionJustification: null,
       };
-      uow.userRepository.users = [counsellor, validator];
+      uow.userRepository.users = [counsellor, validator, validator2];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(existingMiloAgency, {
           [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
         }),
       ];
 
@@ -290,6 +296,7 @@ describe("AddAgency use case", () => {
       expectToEqual(uow.userRepository.users, [
         counsellor,
         validator,
+        validator2,
         newCounsellor,
       ]);
       expectToEqual(uow.agencyRepository.agencies, [
@@ -301,6 +308,7 @@ describe("AddAgency use case", () => {
               roles: ["counsellor"],
             },
             [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+            [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
           },
         ),
         toAgencyWithRights(
@@ -314,6 +322,7 @@ describe("AddAgency use case", () => {
           },
           {
             [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+            [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
             [newCounsellor.id]: {
               isNotifiedByEmail: true,
               roles: ["counsellor"],
@@ -351,7 +360,7 @@ describe("AddAgency use case", () => {
       await expectPromiseToFail(addAgency.execute(agencyWithBadPosition));
     });
 
-    it("fails when refered agency is missing", async () => {
+    it("fails when referred agency is missing", async () => {
       uow.agencyRepository.agencies = [];
 
       await expectPromiseToFailWithError(
