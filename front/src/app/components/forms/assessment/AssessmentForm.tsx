@@ -127,7 +127,7 @@ export const AssessmentForm = ({
         <Alert
           severity="error"
           title="Erreur"
-          description="Le bilan a déjà été rempli"
+          description="Le bilan a déjà été rempli et ne peut être modifié."
         />
       )}
       {!currentAssessment && (
@@ -249,6 +249,7 @@ const AssessmentStatusSection = ({
       <div className={fr.cx("fr-grid-row")}>
         <div className={fr.cx("fr-col-lg-7")}>
           <RadioButtons
+            id={domElementIds.assessment.statusInput}
             options={assessmentStatuses.map((value) => ({
               label: getLabels(convention.internshipKind)[value],
               nativeInputProps: {
@@ -282,6 +283,7 @@ const AssessmentStatusSection = ({
                 nativeInputProps={{
                   type: "date",
                   ...register("lastDayOfPresence"),
+                  id: domElementIds.assessment.lastDayOfPresenceInput,
                   defaultValue: convention.dateEnd,
                 }}
                 {...getFieldError("lastDayOfPresence")}
@@ -298,6 +300,8 @@ const AssessmentStatusSection = ({
                       return hoursDisplayedToHoursValue(value);
                     },
                   }),
+                  id: domElementIds.assessment.numberOfMissedHoursInput,
+
                   value: numberOfMissedHoursDisplayed,
                   onChange: handleHoursChange,
                 }}
@@ -321,10 +325,13 @@ const AssessmentStatusSection = ({
         inlineLayoutWhen="always"
         buttons={[
           {
-            children: "Revenir à l'étape précéden",
+            children: "Revenir à l'étape précédente",
             disabled: true,
             type: "button",
             priority: "secondary",
+            id: domElementIds.assessment.previousButtonForStep({
+              currentStep: 1,
+            }),
           },
           {
             children: "Passer à l'étape suivante",
@@ -337,6 +344,9 @@ const AssessmentStatusSection = ({
               ]),
             type: "button",
             priority: "primary",
+            id: domElementIds.assessment.nextButtonFromStepAndMode({
+              currentStep: 1,
+            }),
           },
         ]}
       />
@@ -372,6 +382,7 @@ const AssessmentContractSection = ({
     <>
       <RadioButtons
         legend="L'immersion a-t-elle débouché sur une embauche ?"
+        id={domElementIds.assessment.endedWithAJobInput}
         options={[
           {
             label: "Oui",
@@ -399,6 +410,7 @@ const AssessmentContractSection = ({
         <>
           <Select
             label="Type de contrat associé à l’embauche :"
+            id={domElementIds.assessment.typeOfContractInput}
             options={typeOfContracts.map((contractType) => ({
               label: contractType,
               value: contractType,
@@ -413,6 +425,7 @@ const AssessmentContractSection = ({
             label="Date de début du contrat :"
             nativeInputProps={{
               ...register("contractStartDate"),
+              id: domElementIds.assessment.contractStartDateInput,
               type: "date",
             }}
             {...getFieldError("contractStartDate")}
@@ -428,6 +441,9 @@ const AssessmentContractSection = ({
             type: "button",
             onClick: () => onStepChange(1, []),
             priority: "secondary",
+            id: domElementIds.assessment.previousButtonForStep({
+              currentStep: 2,
+            }),
           },
           {
             children: "Passer à l'étape suivante",
@@ -440,6 +456,9 @@ const AssessmentContractSection = ({
               ),
             type: "button",
             priority: "primary",
+            id: domElementIds.assessment.nextButtonFromStepAndMode({
+              currentStep: 2,
+            }),
           },
         ]}
       />
@@ -474,6 +493,7 @@ const AssessmentCommentsSection = ({
           label="Avez-vous une appréciation générale à donner sur l'immersion ?"
           nativeTextAreaProps={{
             ...register("establishmentAdvices"),
+            id: domElementIds.assessment.establishmentAdvicesInput,
           }}
           {...getFieldError("establishmentAdvices")}
         />
@@ -482,6 +502,7 @@ const AssessmentCommentsSection = ({
           label="Sur la base de l'objectif de l'immersion et du métier observé, quels conseils donneriez-vous au candidat pour la suite de son parcours professionnel ?"
           nativeTextAreaProps={{
             ...register("establishmentFeedback"),
+            id: domElementIds.assessment.establishmentFeedbackInput,
           }}
           {...getFieldError("establishmentFeedback")}
         />
@@ -493,11 +514,15 @@ const AssessmentCommentsSection = ({
               type: "button",
               onClick: () => onStepChange(2, []),
               priority: "secondary",
+              id: domElementIds.assessment.previousButtonForStep({
+                currentStep: 3,
+              }),
             },
             {
               children: "Envoyer le bilan",
               type: "submit",
               priority: "primary",
+              id: domElementIds.assessment.formSubmitButton,
             },
           ]}
         />
@@ -514,7 +539,10 @@ const AssessmentSuccessMessage = ({
   lastName: string;
 }) => (
   <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
-    <div className={fr.cx("fr-col-lg-8")}>
+    <div
+      className={fr.cx("fr-col-lg-8")}
+      id={domElementIds.assessment.successMessage}
+    >
       <h2>Merci d'avoir rempli le bilan !</h2>
       <p>
         Nous vous remercions d`avoir utilisé Immersion Facilitée pour

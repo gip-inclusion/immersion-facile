@@ -5,6 +5,8 @@ import {
   InclusionConnectedUserBuilder,
   UserBuilder,
   conventionSchema,
+  frontRoutes,
+  immersionFacileNoReplyEmailSender,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
@@ -12,7 +14,9 @@ import {
 } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createAppDependencies } from "../config/bootstrap/createAppDependencies";
+import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
@@ -66,6 +70,7 @@ const seed = async () => {
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("Reset Db start");
+  await db.deleteFrom("immersion_assessments").execute();
   await db.deleteFrom("api_consumers_subscriptions").execute();
   await db.deleteFrom("api_consumers").execute();
   await db.deleteFrom("users_ongoing_oauths").execute();
@@ -342,7 +347,11 @@ const establishmentSeed = async (uow: UnitOfWork) => {
 const conventionSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("seeding conventions...");
-
+  const config = AppConfig.createFromEnv();
+  const generateConventionJwt = makeGenerateJwtES256<"convention">(
+    config.jwtPrivateKey,
+    3600 * 24 * 30,
+  );
   const peConvention = new ConventionDtoBuilder()
     .withId(new UuidV4Generator().new())
     .withInternshipKind("immersion")
@@ -367,10 +376,87 @@ const conventionSeed = async (uow: UnitOfWork) => {
 
   conventionSchema.parse(cciConvention);
 
+  const conventionWithAssessmentReadyToFill = new ConventionDtoBuilder()
+    .withId(new UuidV4Generator().new())
+    .withInternshipKind("immersion")
+    .withDateStart(new Date("2025-01-01").toISOString())
+    .withDateEnd(new Date("2025-01-05").toISOString())
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .withAgencyId(getRandomAgencyId({ kind: "pole-emploi" }))
+    .withSchedule(reasonableSchedule)
+    .build();
+
+  conventionSchema.parse(conventionWithAssessmentReadyToFill);
+
   await Promise.all([
     uow.conventionRepository.save(peConvention),
     uow.conventionRepository.save(cciConvention),
+    uow.conventionRepository.save(conventionWithAssessmentReadyToFill),
   ]);
+
+  await uow.notificationRepository.save({
+    id: new UuidV4Generator().new(),
+    createdAt: new Date().toISOString(),
+    kind: "email",
+    templatedContent: {
+      kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+      recipients: [
+        conventionWithAssessmentReadyToFill.establishmentTutor.email,
+      ],
+      sender: immersionFacileNoReplyEmailSender,
+      params: {
+        agencyLogoUrl: undefined,
+        beneficiaryFirstName:
+          conventionWithAssessmentReadyToFill.signatories.beneficiary.firstName,
+        beneficiaryLastName:
+          conventionWithAssessmentReadyToFill.signatories.beneficiary.lastName,
+        conventionId: conventionWithAssessmentReadyToFill.id,
+        establishmentTutorName: `${conventionWithAssessmentReadyToFill.establishmentTutor.firstName} ${conventionWithAssessmentReadyToFill.establishmentTutor.lastName}`,
+        assessmentCreationLink: makeGenerateConventionMagicLinkUrl(
+          config,
+          generateConventionJwt,
+        )({
+          email: conventionWithAssessmentReadyToFill.establishmentTutor.email,
+          id: conventionWithAssessmentReadyToFill.id,
+          now: new Date(),
+          role: "establishment-tutor",
+          targetRoute: frontRoutes.assessment,
+        }),
+        internshipKind: conventionWithAssessmentReadyToFill.internshipKind,
+      },
+    },
+    followedIds: {
+      conventionId: conventionWithAssessmentReadyToFill.id,
+      agencyId: conventionWithAssessmentReadyToFill.agencyId,
+      establishmentSiret: conventionWithAssessmentReadyToFill.siret,
+    },
+  });
+  await uow.outboxRepository.save({
+    id: new UuidV4Generator().new(),
+    occurredAt: new Date().toISOString(),
+    status: "published",
+    publications: [],
+    wasQuarantined: false,
+    topic: "EmailWithLinkToCreateAssessmentSent",
+    payload: {
+      id: conventionWithAssessmentReadyToFill.id,
+    },
+  });
+
+  // const peConventionAssessment: AssessmentEntity = {
+  //   _entityName: "Assessment",
+  //   contractStartDate: new Date("2023-03-27").toISOString(),
+  //   conventionId: peConvention.id,
+  //   status: "PARTIALLY_COMPLETED",
+  //   lastDayOfPresence: null,
+  //   numberOfMissedHours: 0,
+  //   endedWithAJob: true,
+  //   typeOfContract: "CDI",
+  //   establishmentAdvices: "RAS",
+  //   establishmentFeedback: "Très bien",
+  // };
+
+  // await uow.assessmentRepository.save(peConventionAssessment);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");

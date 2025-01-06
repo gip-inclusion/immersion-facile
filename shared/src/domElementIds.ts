@@ -508,6 +508,22 @@ export const domElementIds = {
     form: "im-assessment-form",
     formSubmitButton: "im-assessment-form__submit-button",
     formDownloadButton: "im-assessment-form__download-button",
+    statusInput: "im-assessment-form__status-input",
+    lastDayOfPresenceInput: "im-assessment-form__last-day-of-presence-input",
+    numberOfMissedHoursInput:
+      "im-assessment-form__number-of-missed-hours-input",
+    endedWithAJobInput: "im-assessment-form__ended-with-a-job-input",
+    typeOfContractInput: "im-assessment-form__type-of-contract-input",
+    contractStartDateInput: "im-assessment-form__contract-start-date-input",
+    establishmentAdvicesInput:
+      "im-assessment-form__establishment-advices-input",
+    establishmentFeedbackInput:
+      "im-assessment-form__establishment-feedback-input",
+    previousButtonForStep: ({ currentStep }) =>
+      `im-assessment-form__previous-button--step-${currentStep}`,
+    nextButtonFromStepAndMode: ({ currentStep }) =>
+      `im-assessment-form__next-button--step-${currentStep}`,
+    successMessage: "im-assessment-form__success-message",
   },
 
   magicLinkRenewal: {

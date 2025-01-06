@@ -57,14 +57,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
         />
       ) : (
         <>
-          {convention && !canCreateAssessment && (
-            <Alert
-              severity="error"
-              title="Votre convention n'est pas prête à recevoir un bilan"
-              description="Seule une convention entièrement validée peut recevoir un bilan"
-            />
-          )}
-          {convention && canCreateAssessment && (
+          {convention && (
             <MainWrapper
               layout="default"
               pageHeader={
@@ -79,7 +72,19 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
                 />
               }
             >
-              <AssessmentForm convention={convention} jwt={route.params.jwt} />
+              {convention && !canCreateAssessment && (
+                <Alert
+                  severity="error"
+                  title="Votre convention n'est pas prête à recevoir un bilan"
+                  description="Seule une convention entièrement validée peut recevoir un bilan"
+                />
+              )}
+              {convention && canCreateAssessment && (
+                <AssessmentForm
+                  convention={convention}
+                  jwt={route.params.jwt}
+                />
+              )}
             </MainWrapper>
           )}
         </>
